@@ -8893,18 +8893,125 @@ html.no-art-logo .logo-img  { display: none; }
 .mc-char .co-av { width: 100%; height: 100%; }
 .mc-char .co-av svg { width: 100%; height: 100%; display: block; }
 
-/* 색 순서는 레퍼런스 위→아래 그대로: 핑크 → 보라 → 노랑 → 주황 (§F 실측). */
-.mbtn-play {
+/* ==========================================================================
+   ★ 14차 — 메인 메뉴 4버튼 CSS 캔디 재창조 (화면 1)
+   --------------------------------------------------------------------------
+   폐기한 것: `--lib-btn-*` 9-slice 조각 4장. 조각이 세로로 잘못 잘려 몸체가
+   깨진 크롭으로 보였고, 좌측 칩은 `--lib-chip` 의 갈색 알약이라 원화의
+   "면 위에 직접 얹힌 자립 소품" 과 정반대였다. 조각을 고치는 대신 원화를
+   **CSS 로 다시 그린다** — 레시피는 저장소에 이미 검증된 캔디 CSS
+   (`.tile[data-sp="gold"]::before`, 1585~) 의 문법을 그대로 따른다.
+
+   원화 버튼 해부 5요소(menubtn-ref-01~04.png 실측, 행별 중앙값):
+     ① 상단 유리 광택 — 위쪽에서 떨어지는 radial 하이라이트
+     ② 본색 면       — LIGHT / BASE 두 칸
+     ③ 하단 3D 밴드  — 높이 0.14 × H  (inset box-shadow)
+     ④ 유채색 진한 외곽선 — 본색을 어둡게 한 색. **검정 아님**
+     ⑤ 면과 한 몸인 아이콘 — 칩 컨테이너 없음
+
+   골격(H = 버튼 높이 --bh):
+     border-radius = 0.18 × H          (원화 실측. §4 의 0.45H 는 폐기)
+     면 그라데이션 47% **하드에지**    (매끄러운 그라데는 §7-6 위반)
+
+   ⚠ 선택자에 id 를 섞는 이유: 위 8751~ 의 `#screen-menu #btn-play …` 블록이
+     `border-radius:0 / background:none / box-shadow:none` 을 id 특이도로 걸어
+     둔다. 클래스만으로는 못 이긴다. 그 블록을 지우지 않고 `#id.class`
+     (0,2,1,0) 로 같은 무게 + 1 을 얹어 덮는다.
+   🚨 `border-image` 를 걷어내면서 `border-width` 값은 **`padding` 으로 이관**
+     했다(15/21/18/21 등 원래 값 그대로). box-sizing 이 border-box 라 바깥
+     치수는 그대로지만, 이관하지 않으면 내용 상자가 버튼 전체로 벌어진다.
+   ========================================================================== */
+
+/* 색 순서는 레퍼런스 위→아래 그대로: 핑크 → 보라 → 노랑 → 주황 (§F 실측).
+   --cl 광택면 / --cb 본색 / --cd 하단밴드 / --co 외곽선 / --cp 립(0 3px 0) */
+#screen-menu #btn-play.mbtn {
+  --bh: calc(var(--mh) * 1.25);
+  --cl: #F78FAB; --cb: #EB6E99; --cd: #C85C8A; --co: #AE3E6A; --cp: #8E2F58;
   height: calc(var(--mh) * 1.25);
   font-size: 20px;
-  border-width: 15px 21px 18px 21px;
-  border-image: var(--lib-btn-pink) 29 41 35 41 fill stretch;
+  padding: 15px 21px 18px 21px;   /* ← 폐기한 border-width 15/21/18/21 이관분 */
 }
-.mbtn-cont { border-width: 16px 20px 19px 20px; border-image: var(--lib-btn-purple) 31 39 37 39 fill stretch; }
-.mbtn-char { border-width: 16px 20px 20px 20px; border-image: var(--lib-btn-yellow) 32 39 39 39 fill stretch; }
-.mbtn-set  { border-width: 16px 20px 20px 20px; border-image: var(--lib-btn-orange) 32 39 39 39 fill stretch; }
-.mbtn-play .mbtn-chip { width: calc(var(--mh) * .68); height: calc(var(--mh) * .68); }
-.mbtn-play .mbtn-lab { left: calc(var(--mh) * .82 + 12px); }
+#screen-menu #btn-cont.mbtn {
+  --bh: var(--mh);
+  --cl: #BB93F5; --cb: #A671EC; --cd: #8B58CE; --co: #6B3AAB; --cp: #572B8E;
+  padding: 16px 20px 19px 20px;   /* ← 이관분 16/20/19/20 */
+}
+#screen-menu #char-open.mbtn {
+  --bh: var(--mh);
+  --cl: #FAD65E; --cb: #F9BC40; --cd: #DE9433; --co: #B87218; --cp: #98590F;
+  padding: 16px 20px 20px 20px;   /* ← 이관분 16/20/20/20 */
+}
+#screen-menu #btn-settings.mbtn {
+  --bh: var(--mh);
+  --cl: #EC9A66; --cb: #DD8355; --cd: #B96540; --co: #8F4A2A; --cp: #743A20;
+  padding: 16px 20px 20px 20px;   /* ← 이관분 16/20/20/20 */
+}
+
+#screen-menu #btn-play.mbtn,
+#screen-menu #btn-cont.mbtn,
+#screen-menu #char-open.mbtn,
+#screen-menu #btn-settings.mbtn {
+  border: 0;
+  border-image: none;
+  border-radius: calc(var(--bh) * .18);
+  /* ① 유리 광택은 면 위에 얹는 별도 레이어다. 면 자체(②)는 47% 하드에지 —
+     LIGHT 가 47% 에서 BASE 로 **끊긴다**. 두 스톱을 같은 위치에 겹쳐 적는다. */
+  background:
+    radial-gradient(118% 76% at 50% -20%,
+      rgba(255, 255, 255, .58) 0%,
+      rgba(255, 255, 255, .17) 44%,
+      rgba(255, 255, 255, 0) 62%),
+    linear-gradient(180deg,
+      var(--cl) 0%, var(--cl) 47%,
+      var(--cb) 47%, var(--cb) 100%);
+  /* ③ 밴드는 마지막에 적어 가장 아래에 깔고, ④ 외곽선을 그 앞에 적어 밴드
+     **위에** 오게 한다(그림자 목록은 먼저 적은 것이 위에 칠해진다). */
+  box-shadow:
+    0 3px 0 var(--cp),
+    0 8px 18px rgba(83, 28, 40, .26),
+    inset 0 0 0 2.5px var(--co),
+    inset 0 calc(var(--bh) * -.14) 0 var(--cd);
+}
+#screen-menu #btn-play.mbtn:active,
+#screen-menu #btn-cont.mbtn:active,
+#screen-menu #char-open.mbtn:active,
+#screen-menu #btn-settings.mbtn:active {
+  box-shadow:
+    0 1px 0 var(--cp),
+    0 3px 8px rgba(83, 28, 40, .22),
+    inset 0 0 0 2.5px var(--co),
+    inset 0 calc(var(--bh) * -.14) 0 var(--cd);
+}
+
+/* ⑤ 칩 폐기 — `--lib-chip` 갈색 알약 컨테이너를 끊고 글리프만 면 위에 세운다.
+   조각 파일은 지우지 않고 참조만 끊는다. 글리프가 칩 상자를 통째로 채우므로
+   `overflow:hidden` 도 필요 없다(그게 원래 굶주림의 원인이었다). */
+#screen-menu .mbtn .mbtn-chip {
+  left: calc(var(--mh) * .26);
+  width: calc(var(--mh) * .52);
+  height: calc(var(--mh) * .52);
+  border: 0;
+  border-image: none;
+  border-image-width: 0;
+  background: none;
+  overflow: visible;
+}
+#screen-menu .mbtn .mbtn-chip::before {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 2px 0 rgba(72, 30, 44, .34));
+}
+#screen-menu .mbtn .mbtn-lab {
+  left: calc(var(--mh) * .88);
+  right: calc(var(--mh) * .20);
+  text-shadow: 0 2px 0 var(--co);
+}
+#screen-menu #btn-play.mbtn .mbtn-chip {
+  left: calc(var(--mh) * .30);
+  width: calc(var(--mh) * .68);
+  height: calc(var(--mh) * .68);
+}
+#screen-menu #btn-play.mbtn .mbtn-lab { left: calc(var(--mh) * 1.12); }
 
 /* 하단 상태 한 줄은 "아주 작게" 남는다 (§6.8). */
 #screen-menu .menu-best { font-size: 11.5px; opacity: .78; }
