@@ -11175,6 +11175,196 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
 #modal-node .ncta-cost { opacity: 1; text-shadow: 0 1px 0 rgba(23, 69, 127, .85); }
 /* ===== MARKER-14-MODAL-NODE-CANDY-END ===== */
 
+/* ===== 14차 6호 — 맵 화면 크롬 CSS 캔디 재편성 (화면 6) ==MAPCANDY:BEGIN== =====
+   전부 #screen-map / #modal-node 로 스코프한다. .hchip·.nchip 은 다른 화면과
+   공유하는 클래스라 전역으로 고치면 스코프 밖 화면이 같이 흔들린다 — 원본 규칙은
+   한 줄도 건드리지 않고 여기서 특정성으로만 덮는다(화면 2·5 와 같은 시공 패턴).
+
+   기하는 원화 실측 정본: 반경 0.18*H · 하단 3D 밴드 0.14*H. H 는 추정이 아니라
+   06-map-BEFORE.rects.json 실측이다 — #map-bot 110px, 테두리 7+7 을 뺀 96px 이
+   비율의 기준이라 .mfbtn(68%)=65.27 · #map-plate(74%)=71.04 다.
+   해부 5요소: ①상단 유리 광택 ②본색 면 ③하단 3D 밴드 ④유채색 진한 외곽선
+   ⑤면과 한 몸인 아이콘(칩 배경 폐기).
+
+   🚨 sp-star-gold(--lib-star-gold) 대책 — 킷 전수 감사 최악 결함(KEYING-AUDIT
+   §97: 경계점의 42% 에 평균 0.4px 근백색 잔재, 한계 28%). 그 감사의 판정 기준은
+   **어두운 배경(#12101C) 합성**이고, 같은 문서 5행이 "밝은 배경에서는 흰 헤일로가
+   구조적으로 보이지 않는다"고 못박는다. 현행 맵은 정확히 그 최악 조건이었다 —
+   ui-chip.9 는 진갈색 알약이라 금별이 어두운 면 위에 얹혀 흰 테가 그대로 떴다
+   (06-map-BEFORE.png 상단 띠). 이 블록은 별을 태우는 소비처의 면을
+   **크림색 캔디**로 바꿔 합성 단계에서 헤일로를 지운다.
+   ⚠ 조각 자체의 근백색 잔재는 남아 있다. 진짜 디프린지는 재키잉·재베이크라
+   CSS 밖의 일이다 — 여기서 닫은 것은 "보이는 결함"이지 "구워진 결함"이 아니다.
+
+   🚨 .mp-arrow 는 손대지 않는다 — E절에서 제거가 예약돼 있고 대체 조작(챕터 선택
+   시트)이 아직 없다. 지금 건드리면 챕터 이동이 마비된다. 아래 어디에도 .mp-arrow
+   셀렉터는 없다. 명판의 border-width→padding 이관은 내용 상자 크기를 그대로
+   보존하므로 화살표의 flex 배치도 그대로다.
+   🚨 좌우 드래그 탐험(game.js:9763~9854)은 #map-view/#map-layer/#map-path 의
+   일이다. 이 블록은 그 셋을 건드리지 않는다 — 크롬만 다시 칠한다. */
+
+/* --- 크림 캔디 팔레트 (칩 공통) ---------------------------------------------
+   LIGHT #FFF3DC · BASE #FFE0B0 · LIP #C88F55 · OUTLINE #8A5A33 · BAND #F6CE97
+   외곽선은 검정이 아니라 본색을 어둡게 한 유채색 갈색이다(ART §7-3). */
+
+/* ① 상단 띠 칩 — H=34 → 반경 6.1 · 밴드 4.8 -------------------------------- */
+/* border-image 를 걷어내면서 border-width(8px 19px)가 먹던 레이아웃 상자를
+   padding 으로 그대로 이관한다: 기존 border 19 + padding 4 = 23px/변 이므로
+   새 padding 도 23px/변 이다. 폭이 1px 도 움직이지 않는다. */
+#screen-map .hchip {
+  border-image: none;
+  border-style: none;
+  border-width: 0;
+  padding: 8px 23px;
+  border-radius: 6.1px;
+  color: #5C4033;
+  background:
+    radial-gradient(ellipse 26% 32% at 15% 24%, rgba(255, 255, 255, .55), rgba(255, 255, 255, 0) 70%),
+    linear-gradient(180deg, #FFF3DC 0%, #FFF3DC 47%, #FFE0B0 47%, #FFE0B0 100%);
+  box-shadow:
+    0 3px 0 #C88F55,
+    0 8px 18px rgba(83, 28, 40, .26),
+    inset 0 0 0 2.5px #8A5A33,
+    inset 0 2.5px 0 rgba(255, 255, 255, .45),
+    inset 0 -4.8px 0 #F6CE97;
+}
+/* 누르는 칩은 최소 히트 44px 이라 H 가 다르다 → 반경 7.9 · 밴드 6.2 */
+#screen-map .hchip-btn {
+  border-radius: 7.9px;
+  box-shadow:
+    0 3px 0 #C88F55,
+    0 8px 18px rgba(83, 28, 40, .26),
+    inset 0 0 0 2.5px #8A5A33,
+    inset 0 2.5px 0 rgba(255, 255, 255, .45),
+    inset 0 -6.2px 0 #F6CE97;
+}
+#screen-map .hchip-btn:active {
+  transform: translateY(3px);
+  box-shadow:
+    0 0 0 0 #C88F55,
+    0 3px 8px rgba(83, 28, 40, .22),
+    inset 0 0 0 2.5px #8A5A33,
+    inset 0 -6.2px 0 #F6CE97;
+}
+/* ⑤ 면과 한 몸인 아이콘 — 글리프에 칩 배경을 따로 깔지 않고, 면과 같은 광원의
+   1px 굽만 붙여 면에 눌러 앉힌다. 별의 근백색 잔재도 이 따뜻한 굽에 물든다. */
+#screen-map .hc-ico { filter: drop-shadow(0 1px 0 rgba(138, 90, 51, .45)); }
+#screen-map .hchip b { color: #5C4033; }
+#screen-map .hchip i { color: #7A5744; opacity: 1; }
+
+/* ② 하단 띠 좌측 두 칩 — 굶주림 결함 동시 수리 -------------------------------
+   이 둘만은 border-width 를 padding 으로 **그대로 옮기면 안 된다.** 폭이 내용이
+   아니라 원본 비율표로 고정돼 있어서다(#map-b1 = 390px 에서 54.7px). 현행은
+   border 12 + padding 4 = 16px/변 이라 내용 상자가 22.7px 뿐인데, 한 자리 숫자에도
+   18(글리프)+5(gap)+7(주아체 1자) = 29.98px 이 필요해 별·점수 글리프가 flex 로
+   0 까지 눌려 사라져 있었다(style.css:8691 주석의 실측, 06-map-BEFORE.png 하단
+   띠에서 별이 실 한 오라기로 남은 것이 그것이다).
+   9-slice 를 걷어내는 지금이 그 캡을 놓을 수 있는 유일한 순간이다 — 칠이 CSS 가
+   되면 끝동을 위해 상자를 떼어 줄 이유가 없다. padding 을 4px/변 으로 내리면
+   내용 상자가 46.7px 이 되어 29.98px 요구를 넘긴다. 폭·위치는 비율표 그대로다. */
+#screen-map #map-b1,
+#screen-map #map-b2 {
+  border-image: none;
+  border-style: none;
+  border-width: 0;
+  padding: 6px 4px;
+  gap: 4px;
+  border-radius: 6.1px;
+  overflow: visible;
+}
+#screen-map #map-b1 .hc-ico,
+#screen-map #map-b2 .hc-ico { flex: 0 0 auto; }
+
+/* ③ 챕터 명판 — H=71.04 → 반경 12.8 · 밴드 9.9 ------------------------------
+   카라멜 캔디. 명판 글자(.mp-txt)는 흰/크림이라 면이 밝아지면 읽히지 않는다.
+   그래서 여기만 깊은 카라멜로 간다 — 유채색이고, 흰 글자 대비도 지킨다.
+   border-width 20px 14px → padding 20px 14px 로 이관: 내용 상자가 그대로라
+   .mp-arrow 의 flex 자리도 그대로다(화살표 자체는 건드리지 않는다). */
+#screen-map #map-plate {
+  border-image: none;
+  border-style: none;
+  border-width: 0;
+  padding: 20px 14px;
+  border-radius: 12.8px;
+  background:
+    radial-gradient(ellipse 26% 32% at 15% 24%, rgba(255, 255, 255, .30), rgba(255, 255, 255, 0) 70%),
+    linear-gradient(180deg, #B87B45 0%, #B87B45 47%, #96582C 47%, #96582C 100%);
+  box-shadow:
+    0 3px 0 #67380F,
+    0 8px 18px rgba(83, 28, 40, .26),
+    inset 0 0 0 2.5px #4E2809,
+    inset 0 2.5px 0 rgba(255, 255, 255, .28),
+    inset 0 -9.9px 0 #7F4820;
+}
+#screen-map .mp-txt > b { text-shadow: 0 1.5px 0 rgba(60, 30, 8, .55); }
+#screen-map .mp-txt > i { text-shadow: 0 1.5px 0 rgba(60, 30, 8, .55); }
+
+/* ④ 하단 캐릭터/기록 버튼 — H=65.27 → 반경 11.7 · 밴드 9.1 -------------------
+   border-width 16/15/18/15 → padding 으로 이관하되 .mfbtn 의 padding 0 1px 을
+   합산한다(좌우 15+1=16). 13차-a2 ③ 이 좁은 글자칸을 겨우 확보해 둔 자리라
+   여기서 한 px 도 더 뺏으면 "캐릭터"가 다시 접힌다.
+   두 조각의 정체성(캐릭터=시안 / 기록=레드)은 그대로 계승한다. */
+#screen-map .mfbtn {
+  border-image: none;
+  border-style: none;
+  border-width: 0;
+  padding: 16px 16px 18px;
+  border-radius: 11.7px;
+  text-shadow: 0 2px 0 rgba(20, 45, 60, .5);
+}
+#screen-map .mfbtn-l {
+  background:
+    radial-gradient(ellipse 26% 32% at 15% 24%, rgba(255, 255, 255, .60), rgba(255, 255, 255, 0) 70%),
+    linear-gradient(180deg, #7EE2F6 0%, #7EE2F6 47%, #2FB6D6 47%, #2FB6D6 100%);
+  box-shadow:
+    0 3px 0 #17849F,
+    0 8px 18px rgba(83, 28, 40, .26),
+    inset 0 0 0 2.5px #0D6479,
+    inset 0 2.5px 0 rgba(255, 255, 255, .45),
+    inset 0 -9.1px 0 #22A2C1;
+}
+#screen-map .mfbtn-r {
+  background:
+    radial-gradient(ellipse 26% 32% at 15% 24%, rgba(255, 255, 255, .60), rgba(255, 255, 255, 0) 70%),
+    linear-gradient(180deg, #FF9DA2 0%, #FF9DA2 47%, #EE5D67 47%, #EE5D67 100%);
+  box-shadow:
+    0 3px 0 #B3323C,
+    0 8px 18px rgba(83, 28, 40, .26),
+    inset 0 0 0 2.5px #932430,
+    inset 0 2.5px 0 rgba(255, 255, 255, .45),
+    inset 0 -9.1px 0 #D84A54;
+  text-shadow: 0 2px 0 rgba(90, 20, 28, .5);
+}
+/* 눌림은 원본과 같은 계산식을 유지한다 — #map-bot > * 가 translateY(-50%) 를
+   이미 걸어 두었으므로 -50% 를 잃으면 버튼이 띠 밖으로 튄다. */
+#screen-map .mfbtn:active {
+  transform: translateY(calc(-50% + 3px));
+  box-shadow:
+    0 0 0 0 rgba(0, 0, 0, 0),
+    0 3px 8px rgba(83, 28, 40, .22),
+    inset 0 0 0 2.5px #0D6479,
+    inset 0 -9.1px 0 #22A2C1;
+}
+#screen-map .mfbtn-r:active {
+  box-shadow:
+    0 0 0 0 rgba(0, 0, 0, 0),
+    0 3px 8px rgba(83, 28, 40, .22),
+    inset 0 0 0 2.5px #932430,
+    inset 0 -9.1px 0 #D84A54;
+}
+
+/* ⑤ 스테이지 노드 카드 위젯 — **이 블록에서 다루지 않는다.** ------------------
+   노드 카드는 #screen-map 이 아니라 #modal-node(맵 위에 뜨는 모달)이고, 그 자리는
+   14차 5호 블록(바로 위, MARKER-14-MODAL-NODE-CANDY)이 이미 가져갔다.
+   5호는 .nchip 에 background: none · box-shadow: none 을 주어 **칩을 아예 폐기**하고
+   글리프를 34px 로 키워 판 위에 직접 얹었다 — 해부 5요소 ⑤(면과 한 몸인 아이콘,
+   칩 배경 폐기)의 가장 순수한 형태다. 여기서 크림 면을 다시 깔면 5호가 일부러
+   없앤 칩이 되살아나고, 시트에서 더 아래라는 이유만으로 5호를 덮어쓴다 —
+   "공유 규칙을 직접 고치면 스코프 밖 화면이 흔들린다"의 정확한 반대 방향 사고다.
+   sp-star-gold 소비처인 .nchip-mis 도 5호의 크림 판 위로 올라가 헤일로 조건
+   (어두운 배경 합성)에서 이미 벗어나 있다. 손대지 않는 것이 옳다. */
+/* ==MAPCANDY:END== 14차 6호 끝 */
+
 </style>
 </head>
 <body>
