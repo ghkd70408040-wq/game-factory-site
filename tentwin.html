@@ -664,15 +664,27 @@ button {
 .btn[hidden] { display: none !important; }
 .btn:active { transform: scale(.96); }
 
+/* 14차 §4 — 반경 교정. --r-md(16px) 는 카드·입력칸용 값이고 52px 높이의 캔디
+   버튼에는 너무 각지다(0.18xH = 23px 가 이 계열의 정본). 전역 --r-md 는 손대지
+   않고 두 버튼에만 22px 를 박는다 — 변수를 바꾸면 카드까지 딸려 둥글어진다. */
 .btn-primary {
   color: var(--ink);
+  border-radius: 9px;
   background: linear-gradient(180deg, #FFF0A0 0%, var(--c8) 100%);
   box-shadow: 0 3px 0 #B7A93B, 0 8px 20px rgba(240, 228, 102, .28);
 }
+/* 14차 §6 — .btn-secondary 는 매끄러운 그라데이션(§7-6 정면 위반)이었고 딥
+   아웃라인이 아예 없었다. 47% 하드에지 + inset 아웃라인 + 바닥 밴드로 재작성.
+   3레이어: 배경/테두리 = CSS 캔디, 내용물(글자) = 그대로. 크롭 판때기 없음. */
 .btn-secondary {
   color: var(--ink);
-  background: linear-gradient(180deg, #FF9ED2 0%, var(--c4) 100%);
-  box-shadow: 0 3px 0 #B24C8B, 0 8px 20px rgba(244, 113, 189, .26);
+  border-radius: 9px;
+  background: linear-gradient(180deg, #FF8FB8 0%, #FF8FB8 47%, #F26D9E 47%, #F26D9E 100%);
+  box-shadow:
+    0 3px 0 #AE4470,
+    0 8px 18px rgba(83, 28, 40, .26),
+    inset 0 0 0 2.5px #6E463A,
+    inset 0 -7px 0 #C9527D;
 }
 /* v6: the orange #btn-rush skin and its clip-path bolt glyph are DELETED. Both
    existed to keep two full-width secondary buttons apart; side by side under one
@@ -7582,16 +7594,30 @@ html.no-art-logo .logo-img  { display: none; }
   min-height: 36px;
   padding: 0 14px;
   border: 0;
-  border-radius: 12px;
+  /* 14차 §4 — 12px 는 36px 높이의 18%(=6.5px)에 못 미쳐 각져 보였다 */
+  border-radius: 6.5px;
   color: #FFFFFF;
   font: 800 13px/1 var(--font-latin);
   cursor: pointer;
-  background: linear-gradient(180deg, #6FA8F5 0%, #6FA8F5 46%, #4C86E8 46%, #4C86E8 100%);
-  box-shadow: inset 0 2px 0 rgba(255, 255, 255, .34), 0 0 0 2.5px var(--j-outline), 0 3px 0 #2F62BC;
+  /* 14차 §2·§3 — 47% 하드에지 + 딥 아웃라인 #333366(파랑 계열 전용 아웃라인)
+     + 바닥 밴드 0.14xH(36px) = 2.5px. 링(0 0 0)이 아니라 inset 아웃라인이라
+     레이아웃을 밀지 않는다. */
+  background: linear-gradient(180deg, #92A9DF 0%, #92A9DF 47%, #7D88C7 47%, #7D88C7 100%);
+  box-shadow:
+    0 3px 0 #4E5A94,
+    0 8px 18px rgba(83, 28, 40, .26),
+    inset 0 0 0 2.5px #333366,
+    inset 0 -5px 0 #5F6BA8;
 }
+/* 꺼짐 상태는 따뜻한 베이지라 아웃라인도 따뜻한 --j-outline 을 쓴다 — 차가운
+   #333366 은 파란 켜짐 상태 전용이다(토글할 때 테두리 색이 튀지 않는다). */
 .set-tg[aria-pressed="false"] {
-  background: linear-gradient(180deg, #D9C6AE 0%, #D9C6AE 46%, #BFA98D 46%, #BFA98D 100%);
-  box-shadow: inset 0 2px 0 rgba(255, 255, 255, .34), 0 0 0 2.5px var(--j-outline), 0 3px 0 #8E7355;
+  background: linear-gradient(180deg, #E4D3BC 0%, #E4D3BC 47%, #C9B396 47%, #C9B396 100%);
+  box-shadow:
+    0 3px 0 #8E7355,
+    0 8px 18px rgba(83, 28, 40, .26),
+    inset 0 0 0 2.5px var(--j-outline),
+    inset 0 -5px 0 #A8906F;
 }
 .set-tg:active { transform: translateY(2px); }
 
@@ -7664,25 +7690,43 @@ html.no-art-logo .logo-img  { display: none; }
   height: 100%;
   max-height: 52px;
   margin: 0;
-  padding: 0 6px;
+  /* 14차-C — 원래 `padding: 0 6px` + `border-width: 0 40px 0 46px`.
+     border-width 가 레이아웃 상자를 먹고 있었으므로 **같은 양을 padding 으로
+     이관**한다. 폭은 `width:75%` 로 고정이라 바깥 상자는 불변이고, 캡이 그림이
+     아니게 됐으니 비등방(46/40)을 유지할 이유가 사라져 대칭 22px 로 맞춘다. */
+  padding: 0 22px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 0 solid transparent;
-  /* ⚠️ 14차 — 여기만 **일부러 비등방을 남긴다**. 실측:
-     --ui-ribbon 348x144, 슬라이스 0/160/0/184. 세로 52px(=156기기px/144=1.083x)
-     대비 좌캡 46px(=138/184=0.750x)·우캡 40px(=120/160=0.750x) → **1.44:1**.
-     등방값(좌 66.4·우 57.8)으로 고쳐 실촬해 봤더니 **화면이 더 나빠졌다**:
-     이 조각의 왼쪽 캡에는 레퍼런스 배경(네이비 슬래브)이 84px, 오른쪽 캡
-     앞머리에는 크림 세로 막대가 16px **구워져 있어서**(FEEDBACK #31 · ART
-     §0.5.2 "오른쪽 끝 세로 흰 막대 찌꺼기") 캡을 넓히면 그 찌꺼기가 같이 커진다.
-     캡 폭을 그대로 두고 리본만 넓히면 찌꺼기의 절대 크기는 그대로이고 비중만
-     11.9% → 7.5% 로 준다. 조각이 교체되면 위 등방값으로 즉시 바꿀 것. */
-  border-width: 0 40px 0 46px;
-  border-image: var(--ui-ribbon) 0 160 0 184 fill stretch;
-  border-radius: 0;
-  background: none;
-  box-shadow: none;
+  /* ★ 14차-C 3레이어 재편성 — ①프레임 배경 + ②테두리를 CSS 캔디로 재창조.
+     border-image 를 걷어낸 이유(원리적):
+       --ui-ribbon 348x144 의 중앙 밴드는 폭 4px(348−184−160) 뿐인데 이것을
+       리본 폭(390px 기기에서 ~290px)까지 늘리면 **~72배 스트레치**다. 게다가
+       이 조각은 좌캡에 레퍼런스 배경(네이비 슬래브) 84px, 우캡 앞머리에 크림
+       세로 막대 16px 이 **구워져 있다**(FEEDBACK #31 · ART §0.5.2 "오른쪽 끝
+       세로 흰 막대 찌꺼기") — 실렌더에서 리본 오른쪽에 붙어 나오던 그 이물이다.
+       CSS 는 어떤 크기든 네이티브로 그리므로 스트레치 얼룩도 찌꺼기도 없다.
+     골격 = ART §4 캔디 2톤 (H = max-height 52px):
+       radius **0.18H** = 9.36 → 9.4px · 광택 밴드 47% **하드 에지**(그라데이션 아님)
+       · 하단 3D 밴드 **0.14H** = 7.28 → 7.3px · 딥 아웃라인 2.5px.
+     ⚠️ 14차-C 수치 정정: radius 0.45H(23px)·밴드 0.07H(3.6px) 는 **원화 실측
+       이전의 §4 추정치**라 폐기했다. 최상위 기준은 "원화와 나란히 구분 안 되는가"
+       이고 충돌 시 원화가 이긴다 — 레퍼런스 리본은 캡슐이 아니라 **모서리만 살짝
+       둥근 명판**이고 하단 어두운 띠는 오히려 **두껍다**. 47% 하드에지·딥
+       아웃라인·플럼 드롭섀도는 정정 없이 그대로 유지.
+     색 = ART §2 팔레트 주석의 **BG-01-01 실측 정본**(표 기재가 아니라 실측):
+       #E0816F(살구 산호) → #C5536A(라즈베리) · 아웃라인 #531C28(리본 파생값,
+       §7-1 이 금지하는 순검정 아님). */
+  border: 0;
+  border-radius: 9.4px;
+  background: linear-gradient(180deg,
+    #E0816F 0%, #E0816F 47%,
+    #C5536A 47%, #C5536A 100%);
+  box-shadow:
+    0 3px 0 #A83F55,
+    0 8px 18px rgba(83, 28, 40, .26),
+    inset 0 0 0 2.5px #531C28,
+    inset 0 -7.3px 0 #A83F55;
   color: #FFFFFF;
   font-family: var(--font-display);
   font-size: 19px;
@@ -7912,14 +7956,40 @@ html.no-art-logo .logo-img  { display: none; }
   flex-direction: column;
   gap: 5px;              /* 14차 — 원래 6px (카드 세로 예산 회수) */
   margin-top: 6px;
-  padding: 0;
-  /* 14차 퍼짐 수리 — 원래 border-left/right-width: 20px.
-     --ui-panel 은 148x148, 슬라이스 68. 좌우 20px(=60기기px/68=0.882x) 와
-     상하 14px(=42/68=0.618x) 가 어긋나 **모서리 라운드가 1.43:1 로 눌려**
-     있었다(세로로 찌그러진 살몬 프레임). 사방 14px 로 맞추면 0.618x 등방.
-     세로를 20px 로 올리는 쪽은 카드 세로 예산이 없어 못 쓴다. */
-  border: 14px solid transparent;
-  border-image: var(--ui-panel) 68 fill stretch;
+  /* 🚨 14차-C — `border: 14px` 를 걷어내면서 **같은 14px 를 padding 으로 이관**한다.
+     border-width 는 칠과 동시에 레이아웃 상자를 차지하고 있었으므로, 그냥 0 으로
+     두면 카드 안쪽 콘텐츠 폭이 28px 넓어지며 창이 무너진다. 상자 크기 불변. */
+  padding: 14px;
+  /* ★ 14차-C 3레이어 재편성 — ①프레임 배경 + ②테두리를 CSS 캔디로 재창조.
+     (구 주석 보존: 원래 border-left/right-width 20px 이 상하 14px 과 어긋나
+      모서리 라운드가 1.43:1 로 눌려 있었고, 사방 14px 로 등방을 맞췄었다.
+      그 비등방 문제는 아래 CSS 라운드가 원리적으로 소멸시킨다.)
+     border-image 를 걷어낸 이유: --ui-panel 은 148x148 · 슬라이스 68 이라
+     **중앙 밴드가 12x12px**(148−68−68) 뿐인데, 이걸 카드 실측 ~362x300px 로
+     늘리면 가로 **30배 · 세로 25배** 스트레치다. 조각이 아무리 좋아도 그 배율
+     에서는 얼룩이 수백 px 띠가 된다. CSS 는 어떤 크기든 네이티브로 그린다.
+     ② 테두리 = 3중 링(ART §4 패널 해부도 그대로, 안쪽으로 쌓는다):
+       0~2.5px  딥 아웃라인 #6E463A (§7-1 검정 금지)
+       2.5~9px  외부 살몬 프레임
+       9~11px   프레임 어두운 에지 (§2-5 본색 30~40% 어둡게)
+       11~12px  내부 밝은 크림 헤어라인 (§4 "내부 1px 밝은 크림 보더")
+     ① 프레임 배경 = 크림 47% 하드 에지. 단계 폭은 작게 잡았다 — BG-01-01
+     실측이 패널 안쪽을 **Δ−0.6 = 사실상 평탄**으로 내놨기 때문이다(ART §2
+     팔레트 주석). 하드 에지 문법은 지키되 레퍼런스의 평탄함을 깨지 않는 폭.
+     하단 밝은 림은 결함이 아니라 의도된 림라이트(같은 주석)라 inset 으로 남긴다. */
+  border: 0;
+  border-radius: 24px;
+  background: linear-gradient(180deg,
+    #F8E6D5 0%, #F8E6D5 47%,
+    #F3DCC7 47%, #F3DCC7 100%);
+  box-shadow:
+    inset 0 0 0 2.5px #6E463A,
+    inset 0 0 0 9px #EFA0A2,
+    inset 0 0 0 11px #C9736B,
+    inset 0 0 0 12px rgba(255, 248, 238, .92),
+    inset 0 -7px 0 -3px rgba(250, 212, 187, .78),
+    0 3px 0 #C98F7A,
+    0 8px 18px rgba(83, 28, 40, .26);
   overflow: hidden;
   color: var(--j-ink);
 }
@@ -9718,25 +9788,40 @@ html[lang="en"] .mfbtn { font-size: 8px; letter-spacing: -.15px; }
   font-family: var(--font-display);
   min-height: 52px;
 }
+/* 14차 — 민트 닫기. border-image 9-slice 제거: 중앙 밴드 32x32px 를 폭 방향으로
+   15~17배 연신하면서 원본의 얼룩이 가로띠로 번졌다(키잉 만점 에셋도 같은 경로로
+   깨진다). CSS 캔디는 이 문제가 원리적으로 없다.
+   §5 준수 — border-width(16/20/19/20) 를 .btn 의 padding(15/18) 에 더해
+   padding(31/38/34/38) 으로 이관했다. 바깥 상자 크기가 1px도 변하지 않는다.
+   H≈85px → radius 0.18xH≈38px, 바닥 밴드 0.14xH≈6px. */
 #modal-rank .btn-primary,
 #modal-skin .btn-primary {
-  border-style: solid;
-  border-width: 16px 20px 19px 20px;
-  border-image: var(--lib-btn-mint) 32 39 38 39 fill stretch;
-  border-radius: 0;
-  background: none;
-  box-shadow: none;
+  border: 0;
+  padding: 31px 38px 34px 38px;
+  border-radius: 15px;
+  background: linear-gradient(180deg, #7ED9C0 0%, #7ED9C0 47%, #54BFA2 47%, #54BFA2 100%);
+  box-shadow:
+    0 3px 0 #35866F,
+    0 8px 18px rgba(83, 28, 40, .26),
+    inset 0 0 0 2.5px #6E463A,
+    inset 0 -12px 0 #3E9C82;
   font-family: var(--font-display);
   min-height: 52px;
 }
+/* 14차 — 오렌지 닫기. 민트와 같은 이유로 9-slice 를 걷어냈다.
+   §5 준수 — border-width(16/20/20/20) + .btn padding(15/18) = padding(31/38/35/38).
+   H≈86px → radius 0.18xH≈38px, 바닥 밴드 0.14xH≈6px. */
 #modal-settings .btn-primary,
 #modal-howto .btn-primary {
-  border-style: solid;
-  border-width: 16px 20px 20px 20px;
-  border-image: var(--lib-btn-orange) 32 39 39 39 fill stretch;
-  border-radius: 0;
-  background: none;
-  box-shadow: none;
+  border: 0;
+  padding: 31px 38px 35px 38px;
+  border-radius: 15px;
+  background: linear-gradient(180deg, #FFA05C 0%, #FFA05C 47%, #EE7F3A 47%, #EE7F3A 100%);
+  box-shadow:
+    0 3px 0 #A85420,
+    0 8px 18px rgba(83, 28, 40, .26),
+    inset 0 0 0 2.5px #6E463A,
+    inset 0 -12px 0 #C96426;
   font-family: var(--font-display);
   min-height: 52px;
 }
@@ -10548,7 +10633,9 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
   filter:
     drop-shadow(0 0 1.6px var(--j-outline))
     drop-shadow(0 2px 0 rgba(90, 48, 74, .62));
-  animation: splash-breathe 1.9s ease-in-out infinite;
+  /* 1.7s = 사용자 지정 1.6~1.8s 의 한가운데. 느린 쪽(1.9s)은 왕복이 길어져
+     "정지해 있다"에 가깝게 읽힌다 — 진폭을 키운 만큼 주기도 당긴다. */
+  animation: splash-breathe 1.7s ease-in-out infinite;
 }
 @supports ((-webkit-background-clip: text) or (background-clip: text)) {
   .splash-tap-t {
@@ -10561,15 +10648,53 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
   }
 }
 /* 부드러운 점멸 — 급격한 on/off 깜빡임은 금지다(눈이 아프고 싸구려로 보인다).
-   불투명도를 .5~1 사이에서 ease-in-out 으로 왕복시키고 아주 작은 스케일을
-   같이 태워 "숨 쉬는" 느낌만 준다. 사라지는 구간이 없으므로 글자는 항상 읽힌다. */
-   🚨 골이 .5 가 아니라 .68 인 이유: 판 위의 글자라 해도 절반까지 떨어뜨리면
-   골 프레임에서 눈에 띄게 흐려진다. 실캡처로 골을 잡아 확인하고 좁혔다 —
-   "숨 쉰다"에 필요한 것은 깊이가 아니라 **부드러운 왕복**이다. */
+   불투명도를 ease-in-out 으로 왕복시키고 글로우와 아주 작은 스케일을 같이 태워
+   "숨 쉬는" 느낌을 준다. 사라지는 구간이 없으므로 글자는 항상 읽힌다.
+
+   🚨🚨 이 주석 블록에는 예전에 **주석 닫기 표식이 두 번** 들어 있었다. 앞쪽
+   표식에서 주석이 이미 닫히고 남은 산문이 이어지다 두 번째 표식으로 끝나는
+   모양이라, CSS 파서가 그 찌꺼기를 선택자 프렐류드로 읽고 **바로 뒤의
+   @keyframes 블록 전체를 통째로 삼켰다**.
+   ⚠ 그래서 이 주석 안에서는 닫기 표식을 절대 인용하지 않는다 — 백틱으로
+   감싸도 소용없다. CSS 파서는 백틱을 모르고, 표식을 보는 순간 닫는다.
+   (14차에서 이 사고를 설명하려고 표식을 인용했다가 같은 사고를 다시 냈다.)
+   그래서 `animation: splash-breathe` 는 이름만 있고 정의가 없는
+   상태였고 — 문구는 골 .68 로 맥동한 적이 **한 번도 없다**. 실기기에서
+   "정적으로 느껴진다"가 아니라 **실제로 정적이었다**. 주석을 닫아 되살린다.
+
+   🚨 진폭 — 골을 .5 까지 내린다(사용자 14차 #38 ①). 이전 주석은 골을 .68 로
+   좁혔다고 적어 놨지만 위 파서 사고 때문에 그 값은 한 번도 화면에 나온 적이
+   없다. 따라서 .68 은 실측 근거가 아니다. .5 로 열고 실캡처로 골 프레임의
+   가독을 직접 판정한다 — 안 읽히면 ART §7-8 「가독성은 왕」에 따라 진폭을
+   줄인다. 판(스크림)이 대비를 책임지므로 글자만 오르내려도 바닥은 안 꺼진다.
+
+   ② 빛 호흡 — 밝아질 때 핑크 헤일로가 같이 부푼다. ART §1 밤 자체발광의
+   "가우시안 헤일로" 문법을 그대로 쓰되, 이 요소는 background-clip:text +
+   text-fill-color:transparent 라 text-shadow 를 쓰면 그림자가 투명한 글자
+   속으로 비쳐 글자 안이 분홍 덩어리로 뭉친다. 그래서 이 파일이 이미 쓰는
+   젤리 발광 문법 — drop-shadow 2겹(좁은 코어 + 넓은 헤일로, style.css:1747
+   .candok-glow 와 같은 짜임) — 으로 얹는다. 색은 --j-pink(#FF8FB8).
+   ⚠ filter 는 목록 구조가 키프레임마다 **같아야** 보간된다. 그래서 기존
+   외곽선/드롭섀도 2겹을 두 키프레임에 모두 그대로 다시 적는다(값 동일). */
 @keyframes splash-breathe {
-  0%   { opacity: 1;   transform: scale(1); }
-  50%  { opacity: .68; transform: scale(.985); }
-  100% { opacity: 1;   transform: scale(1); }
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1.03);
+    filter:
+      drop-shadow(0 0 1.6px var(--j-outline))
+      drop-shadow(0 2px 0 rgba(90, 48, 74, .62))
+      drop-shadow(0 0 6px rgba(255, 143, 184, .80))
+      drop-shadow(0 0 15px rgba(255, 143, 184, .55));
+  }
+  50% {
+    opacity: .5;
+    transform: scale(1);
+    filter:
+      drop-shadow(0 0 1.6px var(--j-outline))
+      drop-shadow(0 2px 0 rgba(90, 48, 74, .62))
+      drop-shadow(0 0 2px rgba(255, 143, 184, .18))
+      drop-shadow(0 0 5px rgba(255, 143, 184, .06));
+  }
 }
 /* game.js 의 splashBind 가 접근성을 위해 이 판에 포커스를 준다. 포커스 링은
    여기선 뜻이 없다 — 화면 **전체**가 버튼이라 뷰포트를 두르는 테두리가 될 뿐이고,
@@ -10604,6 +10729,150 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
     opacity: 1;
   }
   #splash.is-out { transition-duration: 0s; }
+}
+
+/* ===== 14차 1호 — #modal-mode CSS 캔디 전환 ===== */
+/* 전부 #modal-mode 로 스코프한다. 공유 클래스(.r10-panel/.r10-ribbon/.nchip)를
+   전역으로 건드리면 다른 모달과 맵 노드카드가 같이 깨진다.
+   border-image 를 걷어낼 때 border-width 가 먹고 있던 레이아웃 상자를 padding 으로
+   그대로 이관해 팝업 크기를 보존한다(--pw 는 이 요소에 정의돼 있어 유효).
+   기하: 반경 0.18*H · 하단 밴드 0.14*H — 원화 실측값이다(0.45 알약은 원화보다
+   확연히 둥글어 실루엣부터 티가 난다). 외곽선은 검정도 공통 갈색도 아닌
+   **본색을 어둡게 한 유채색**이고, 상단에 유리 광택 면을 하드에지 위에 얹는다. */
+
+/* --- 팝업 판 (크림) — 높이가 가변이라 비율 기하 대상이 아니다: 반경 30px 고정 --- */
+#modal-mode .sheet.r10-panel {
+  border-image: none;
+  border-style: none;
+  border-width: 0;
+  padding: 17px calc(var(--pw) * .07 + 17px) calc(var(--pw) * .06 + 17px);
+  border-radius: 30px;
+  background:
+    radial-gradient(ellipse 26% 32% at 15% 24%, rgba(255, 255, 255, .35), rgba(255, 255, 255, 0) 70%),
+    linear-gradient(180deg, #FFF6E4 0%, #FFF6E4 38%, #FFE9C9 38%, #FFE9C9 100%);
+  box-shadow:
+    0 3px 0 #D9A96F,
+    0 8px 18px rgba(83, 28, 40, .26),
+    inset 0 0 0 2.5px #6E463A,
+    inset 0 2.5px 0 rgba(255, 255, 255, .45),
+    inset 0 -10px 0 #F2D2A4;
+}
+
+/* --- 리본 헤더 (핑크) · H≈70 → 반경 13 · 밴드 10 --- */
+/* 좌우 53px 은 에셋 매듭캡 몫이라 CSS 에선 불필요하다. 세로만 보존한다:
+   28+22+28=78 → 24+22+24=70. margin-top -46 은 유지 — 판 위로 29px 걸치는
+   겹침량이 그대로라 실루엣이 유지된다. 알약이 아니라 **둥근 사각**이다. */
+#modal-mode .r10-ribbon {
+  border-image: none;
+  border-style: none;
+  border-width: 0;
+  padding: 24px 34px;
+  margin: -46px auto 2px;
+  border-radius: 13px;
+  background:
+    radial-gradient(ellipse 26% 32% at 15% 24%, rgba(255, 255, 255, .60), rgba(255, 255, 255, 0) 70%),
+    linear-gradient(180deg, #FF9DB4 0%, #FF9DB4 47%, #EE6C8E 47%, #EE6C8E 100%);
+  box-shadow:
+    0 3px 0 #B8425F,
+    0 8px 18px rgba(83, 28, 40, .26),
+    inset 0 0 0 2.5px #8E2C46,
+    inset 0 2.5px 0 rgba(255, 255, 255, .45),
+    inset 0 -10px 0 #D2557A;
+}
+
+/* --- 칩 폐기 — 아이콘만 자립 소품으로 남긴다 --- */
+/* 근거: FEEDBACK-0813.md E절 #1. 레퍼런스 메뉴 버튼 6개 중 어느 것도 아이콘 뒤에
+   칩 배경이 없다(원화 퍼플 버튼의 나침반도 버튼 면에 직접 얹혀 자체 금색 외곽선을
+   갖는다). ⚠ 이 규칙은 #modal-mode 스코프라 맵 노드카드(.nrow)의 칩은 그대로
+   남는다 — 의도된 것이다. */
+#modal-mode .nchip {
+  border-image: none;
+  border-style: none;
+  border-width: 0;
+  border-image-width: 0;
+  background: none;
+  box-shadow: none;
+  overflow: visible;
+  width: 36px;
+  height: 36px;
+}
+/* 🚨 여기서 background 단축을 쓰지 마라 — .nchip-adv::before 등이 background-image
+   로만 글리프를 얹으므로 background 를 덮으면 아이콘이 전부 사라진다. */
+#modal-mode .nchip::before {
+  width: 34px;
+  height: 34px;
+  filter:
+    drop-shadow(0 2px 0 rgba(110, 70, 58, .45))
+    drop-shadow(0 3px 4px rgba(83, 28, 40, .30));
+}
+
+/* --- 4버튼 공통 골격 (H=56 → 반경 10 · 밴드 8) --- */
+#modal-mode .mode-list .mode-row {
+  border-image: none;
+  border: 0;
+  border-radius: 10px;
+  padding: 6px 12px;
+}
+#modal-mode .mode-list .mode-row:active { transform: translateY(2px); }
+
+/* --- 버튼별 색 (원화 실측) — 레퍼런스 메뉴 6버튼이 전부 다른 색인 게 젤리팡 룩이다 --- */
+#modal-mode #mode-adv {
+  background:
+    radial-gradient(ellipse 26% 32% at 15% 24%, rgba(255, 255, 255, .60), rgba(255, 255, 255, 0) 70%),
+    linear-gradient(180deg, #FF9DB4 0%, #FF9DB4 47%, #EE6C8E 47%, #EE6C8E 100%);
+  box-shadow:
+    0 3px 0 #B8425F,
+    0 8px 18px rgba(83, 28, 40, .26),
+    inset 0 0 0 2.5px #8E2C46,
+    inset 0 2.5px 0 rgba(255, 255, 255, .45),
+    inset 0 -8px 0 #D2557A;
+}
+#modal-mode #mode-arcade {
+  background:
+    radial-gradient(ellipse 26% 32% at 15% 24%, rgba(255, 255, 255, .60), rgba(255, 255, 255, 0) 70%),
+    linear-gradient(180deg, #BE92F8 0%, #BE92F8 47%, #A26FEA 47%, #A26FEA 100%);
+  box-shadow:
+    0 3px 0 #6B3FA6,
+    0 8px 18px rgba(83, 28, 40, .26),
+    inset 0 0 0 2.5px #4F2D6A,
+    inset 0 2.5px 0 rgba(255, 255, 255, .45),
+    inset 0 -8px 0 #8B57D2;
+}
+#modal-mode #mode-daily {
+  background:
+    radial-gradient(ellipse 26% 32% at 15% 24%, rgba(255, 255, 255, .60), rgba(255, 255, 255, 0) 70%),
+    linear-gradient(180deg, #86DFC0 0%, #86DFC0 47%, #57C4A2 47%, #57C4A2 100%);
+  box-shadow:
+    0 3px 0 #2C8468,
+    0 8px 18px rgba(83, 28, 40, .26),
+    inset 0 0 0 2.5px #1F6B52,
+    inset 0 2.5px 0 rgba(255, 255, 255, .45),
+    inset 0 -8px 0 #41AA88;
+}
+#modal-mode #mode-rush {
+  background:
+    radial-gradient(ellipse 26% 32% at 15% 24%, rgba(255, 255, 255, .60), rgba(255, 255, 255, 0) 70%),
+    linear-gradient(180deg, #FFD65F 0%, #FFD65F 47%, #F4B23A 47%, #F4B23A 100%);
+  box-shadow:
+    0 3px 0 #B57717,
+    0 8px 18px rgba(83, 28, 40, .26),
+    inset 0 0 0 2.5px #8A5510,
+    inset 0 2.5px 0 rgba(255, 255, 255, .45),
+    inset 0 -8px 0 #D89826;
+}
+
+/* --- 채도 올라간 면 위 글자 가독성 --- */
+#modal-mode .mode-t > b {
+  color: #FFFFFF;
+  text-shadow: 0 2px 0 rgba(110, 70, 58, .55);
+}
+#modal-mode .mode-t > i {
+  color: rgba(255, 255, 255, .94);
+  text-shadow: 0 1px 0 rgba(110, 70, 58, .45);
+}
+#modal-mode .mode-b {
+  color: #FFFFFF;
+  text-shadow: 0 2px 0 rgba(110, 70, 58, .55);
 }
 
 </style>
