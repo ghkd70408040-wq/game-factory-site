@@ -19088,6 +19088,10 @@ window.TT_SFX = {
                     * 될 뿐, 타임스톱과 재개는 사운드와 무관하게 돈다. */
                    'hurry', 'cry'];
 
+  /* 14차 수리 3 — 한 번의 탭 안에서 ui() 가 여러 번 불려도 소리는 한 번만.
+     쓰이는 자리는 bindJuice 의 셔임 하나뿐이다(그 주석에 근거를 적어 뒀다). */
+  var UI_SFX_MERGE_MS = 60;
+
   function bindJuice() {
     var src = (typeof window !== 'undefined' && window.Juice) ? window.Juice : {};
     var s = src.sfx || {};
@@ -19097,6 +19101,29 @@ window.TT_SFX = {
     JUICE_SFX.forEach(function (n) {
       J.sfx[n] = (typeof s[n] === 'function') ? s[n].bind(s) : noop;
     });
+    /* ---- 14차 수리 3 — 탭 SFX 중복 병합 -----------------------------------
+       wire() 의 전역 버튼 핸들러가 모든 <button> 탭에 J.sfx.ui() 를 준다. 그런데
+       개별 핸들러 서른 곳 남짓은 예전처럼 자기 자리에서도 ui() 를 부른다. 둘을
+       그대로 두면 한 번 누를 때 같은 음이 두 번 겹쳐 "틱틱" 하고 갈라진다.
+
+       🚨 고르는 방법이 중요하다. 개별 호출을 지우면 서른 곳을 건드려야 하고,
+       전역 핸들러를 "버튼에 리스너가 없을 때만"으로 좁히면 알 방법이 없다.
+       그래서 **부르는 쪽을 하나도 고치지 않고** 나가는 쪽에서 합친다:
+       같은 탭 안(60ms)의 두 번째 ui() 는 조용히 버린다.
+
+       · 60ms 인 근거: 사람이 두 번 누를 수 있는 최소 간격보다 훨씬 짧고
+         (연타 상한이 대략 100~120ms), pointerdown → click 사이(같은 한 번의 탭)
+         보다는 길다. 즉 "한 번의 탭"만 정확히 접는다.
+       · 🚨 juice.js 는 한 줄도 건드리지 않는다 — 셔임 한 겹만 덧댄다.
+       · ui() 만 감싼다. match/combo 같은 게임 소리는 원래대로 매번 난다. */
+    var rawUi = J.sfx.ui;
+    var lastUiAt = 0;
+    J.sfx.ui = function () {
+      var nowMs = (typeof Date !== 'undefined' && Date.now) ? Date.now() : 0;
+      if (nowMs && (nowMs - lastUiAt) < UI_SFX_MERGE_MS) return;
+      lastUiAt = nowMs;
+      return rawUi.apply(null, arguments);
+    };
     // Juice.bgm is an OBJECT, not a function, so it needs its own no-op shim.
     // Each method is bound and probed independently: a juice.js that ships only
     // part of the trio still contributes the part it has.
@@ -29246,6 +29273,41 @@ window.TT_SFX = {
         else if (S.running) pause();
       }
     });
+    /* ---- 14차 수리 3 — 터치음 통일 ----------------------------------------
+       "스플래시 터치음과 동일한 음을 모든 버튼 탭에도."
+
+       동일한 음의 정체는 J.sfx.ui() 다 — 스플래시의 splashDown() 이 부르는 바로
+       그 함수이고, 이미 서른 곳 남짓의 버튼이 각자 부르던 그 함수다.
+       🚨 새 음원을 만들지 않는다. 배선만 한 곳에 모은다.
+
+       왜 위임 하나로 끝나는가:
+         · 대상은 t.closest('button') 이다. 마크업의 버튼 76개가 한 줄로 덮인다.
+           개별 배선이 빠져 있던 버튼(설정 토글·닫기 X 같은 것들)이 이 줄 하나로
+           같이 소리를 얻는다 — 그게 "통일"의 실제 내용이다.
+         · 🚨 타일은 <div class="tile"> 라 button 이 아니다. 그래서 이 핸들러는
+           매치음(J.sfx.match)과 절대 겹치지 않는다. 보드는 조용히 지나간다.
+         · disabled 버튼은 거른다. 눌리지도 않는 것이 소리만 내면 거짓말이 된다.
+
+       왜 pointerdown 인가: 이번 수리의 원칙 그대로 **소리는 「누를 때」**다.
+       click 에 걸면 버튼도 스플래시와 똑같이 "떼야 소리가 나는" 물건이 된다.
+
+       왜 버블 단계이고 passive:true 인가: 캡처로 걸면 버튼 자신의 핸들러보다
+       먼저 도는데 이 리스너는 그럴 이유가 없고, passive 는 preventDefault 를
+       브라우저가 금지시켜 **이 줄이 어떤 버튼도 죽일 수 없음**을 구조로 보장한다.
+       (13차 unlock 핸들러가 같은 근거로 passive 다.)
+
+       중복은? 개별 핸들러의 J.sfx.ui() 와 이 줄이 한 탭에 겹치지만, bindJuice 의
+       60ms 병합이 하나로 접는다. 부르는 자리를 하나도 지우지 않은 이유가 그것이다. */
+    if (typeof document !== 'undefined') {
+      document.addEventListener('pointerdown', function (ev) {
+        var t = ev && ev.target;
+        if (!t || typeof t.closest !== 'function') return;
+        var b = t.closest('button');
+        if (!b || b.disabled) return;
+        J.sfx.ui();
+      }, { passive: true });
+    }
+
     // Single audio unlock on the very first pointer interaction.
     /* 14차 #35 — 첫 접촉으로 칠 입력들. 순서는 의미가 없다(먼저 오는 것이 이긴다). */
     var UNLOCK_EVENTS = ['pointerdown', 'touchstart', 'keydown'];
@@ -29369,9 +29431,116 @@ window.TT_SFX = {
     } catch (e) { /* 소리 때문에 화면 전환이 죽는 일은 없다 */ }
   }
 
+  /* ---- 14차 수리 1 — 클릭 없는 첫 시도 --------------------------------------
+     "페이지 로드 직후 클릭 없이 play() 를 시도한다. 막히면 조용히 기다린다."
+
+     🚨 이것이 자동재생 정책을 우회하는 코드가 아니라는 점부터. 정책이 막는 것은
+     소리를 내는 것이고, 막혔을 때 일어나는 일은 예외가 아니라 **컨텍스트가
+     suspended 로 남는 것**이다(actx.resume() 의 거절은 juice.js:4560 이 이미
+     .catch 로 삼킨다). 그래서 실패해도 콘솔이 시끄러워지지 않는다 — 우리가
+     따로 로그를 찍지 않는 한. 그래서 찍지 않는다.
+
+     막혔을 때 이 호출이 **헛일이 아닌** 이유가 이 수리의 핵심이다:
+       · scene('menu') → trkStart(T) 가 T.wanted 를 켜고 디코드를 걸어 둔다.
+       · source.start() 는 suspended 컨텍스트에서도 예약된다. 컨텍스트 시계가
+         멈춰 있으므로 곡은 **한 프레임도 흘러가지 않고** 첫머리에 서 있는다.
+       · 그래서 첫 pointerdown 의 resumeAudio() 가 시계를 푸는 그 순간, 곡은
+         디코드도 로드도 기다리지 않고 **이미 서 있던 자리에서** 바로 난다.
+     즉 "차단 시 폴백 = 첫 pointerdown 에 즉시 재생"이 저절로 성립한다. 13차의
+     0.5~0.7초 디코드 지연(juice.js:2653 표)이 첫 탭 뒤가 아니라 그 **앞**으로
+     통째로 옮겨간다.
+
+     그리고 정책이 안 막는 경우(재방문·미디어 인게이지먼트가 쌓인 브라우저·웹뷰)
+     에는 말 그대로 탭 없이 로비 곡이 흐른다. 그것이 이 수리가 노린 첫 그림이다.
+
+     🚨 새 오디오 서브시스템을 만들지 않는다. 부르는 것은 unlock 핸들러와 **똑같은**
+     두 줄(J.resumeAudio / J.bgm.scene)뿐이고, 선디코드도 기존 bgmWarm 경로가
+     그대로 한다. audioUnlocked 는 **켜지 않는다** — 저 깃발은 "진짜 제스처가
+     있었다"는 뜻이고, 여기엔 제스처가 없다. 깃발을 거짓으로 켜면 splashAudioHook
+     의 그물이 조용히 무력해진다.
+
+     왜 init 안이 아니라 'load' 뒤인가: bgmWarm 이 지키는 규율 ①과 같다. 첫 화면
+     페인트(실측 456ms)와 디코드를 경쟁시키지 않는다. 첫 탭은 아무리 빨라도
+     스플래시를 읽는 시간만큼 뒤에 온다. */
+  var splashAutoTried = false;
+
+  function splashAudioBoot() {
+    if (splashAutoTried) return;
+    splashAutoTried = true;
+    try {
+      J.resumeAudio();
+      if (J.bgm.scene !== noop) J.bgm.scene('menu');
+      else J.bgm.start();
+    } catch (e) { /* 조용히 대기 — 첫 제스처가 이어받는다 */ }
+  }
+
+  function splashAudioBootSchedule() {
+    if (typeof document === 'undefined') return;
+    try {
+      if (document.readyState === 'complete') splashAudioBoot();
+      else window.addEventListener('load', splashAudioBoot, { once: true });
+    } catch (e) { /* 조용히 무시 */ }
+  }
+
+  /* ---- 14차 수리 2 — 클릭 실드 ----------------------------------------------
+     🚨 이번 건의 진짜 버그가 여기다. 실기기 보고: "손 떼기도 전에 화면이 넘어가면서
+     아래 메뉴창이 클릭돼 버린다."
+
+     원인은 두 겹이었다.
+       ① 전환이 touchstart/pointerdown 에 걸려 있었다 → 손을 대는 순간 이미 넘어간다.
+       ② style.css:10837 `#splash.is-out { pointer-events: none; }` → 페이드 도는
+          0.28초 동안 스플래시는 **입력을 통과시킨다**. 그 사이 브라우저가 뒤늦게
+          쏘는 합성 click(터치는 pointerdown/up 뒤에 mousedown/mouseup/click 을
+          한 벌 더 만든다)이 그대로 아래 메뉴 버튼에 꽂힌다.
+     ①만 고치면 ②가 남는다. 손을 떼는 순간 전환이 시작되고, 합성 click 은 그
+     **뒤에** 오기 때문이다. 그래서 둘 다 고친다.
+
+     실드의 규율:
+       · document **캡처** 단계다. 아래 메뉴 버튼(버블 단계의 click 리스너)보다
+         반드시 먼저 봐야 막을 수 있다.
+       · preventDefault + stopPropagation + stopImmediatePropagation 셋 다 부른다.
+         전파만 끊고 기본동작을 두면 <label>/<a> 같은 것이 여전히 반응한다.
+       · 400ms 만 산다. 터치의 합성 click 지연은 길어야 300ms 대이고(구형 사파리의
+         300ms 탭 딜레이가 상한), 여기에 여유 한 뼘을 더한 값이다. 더 길게 잡으면
+         "스플래시를 걷고 곧바로 메뉴를 누르는" 정상 조작까지 먹는다.
+       · 시간과 리스너 제거를 **둘 다** 건다. 타이머만 믿으면 탭이 백그라운드로
+         내려가 타이머가 밀렸을 때 실드가 오래 남고, 시각 비교만 믿으면 아무도
+         클릭하지 않을 때 리스너가 영원히 남는다. */
+  var SPLASH_SHIELD_MS = 400;
+  var splashShieldUntil = 0;
+
+  function splashClickShield(ev) {
+    if (Date.now() > splashShieldUntil) {
+      splashDisarmShield();
+      return;                      // 이미 지났다 = 이 클릭은 사용자의 진짜 조작이다
+    }
+    try {
+      if (ev.cancelable) ev.preventDefault();
+      ev.stopPropagation();
+      if (ev.stopImmediatePropagation) ev.stopImmediatePropagation();
+    } catch (e) { /* 막는 데 실패해도 게임은 계속 돈다 */ }
+  }
+
+  function splashDisarmShield() {
+    try { document.removeEventListener('click', splashClickShield, true); } catch (e) {}
+  }
+
+  function splashArmShield() {
+    if (typeof document === 'undefined') return;
+    splashShieldUntil = Date.now() + SPLASH_SHIELD_MS;
+    try {
+      document.addEventListener('click', splashClickShield, true);
+      setTimeout(splashDisarmShield, SPLASH_SHIELD_MS + 40);
+    } catch (e) { /* 조용히 무시 */ }
+  }
+
   function splashDismiss() {
     if (splashDone) return;
     splashDone = true;
+    /* 🚨 실드가 먼저다. 아래 el.hidden / is-out 이 도는 사이에 합성 click 이
+       끼어들 수 있으므로, 스플래시가 입력을 통과시키기 시작하는 그 순간에는
+       실드가 이미 서 있어야 한다. */
+    splashArmShield();
     var el = document.getElementById('splash');
     if (!el) { splashAudioHook(); return; }
     el.classList.add('is-out');
@@ -29381,22 +29550,81 @@ window.TT_SFX = {
     splashAudioHook();
   }
 
-  /* 버튼이 없다 — 어디를 눌러도 걷힌다. 🚨 preventDefault/stopPropagation 을
-     절대 부르지 않는다: 이 제스처는 document 캡처 단계의 unlock 리스너가
-     먼저 봐야 하고, 그래야 오디오가 열린다. */
+  /* ---- 14차 수리 2 — 「누를 때」와 「뗄 때」를 가른다 -------------------------
+     버튼이 없다 — 어디를 눌러도 걷힌다. 바뀐 것은 **언제** 걷히느냐다.
+
+       · 소리 = pointerdown / touchstart  (손가락이 닿는 순간)
+       · 전환 = pointerup / touchend      (손가락을 뗄 때)
+
+     🚨 두 이벤트를 합치면 반드시 둘 중 하나가 틀어진다. 13차는 둘 다 down 에
+     묶어 두었고, 그래서 실기기에서 "손 떼기도 전에 화면이 넘어가면서 아래 메뉴창이
+     클릭돼 버린다"가 났다. 반대로 둘 다 up 으로 옮기면 이번엔 소리가 손을 떼야
+     나서 "누르는데 왜 조용하지"가 된다. 그래서 가른다.
+
+     down 쪽 규율(13차에서 그대로 가져온다):
+       🚨 passive:true 로 등록하고 preventDefault/stopPropagation 을 부르지 않는다.
+       이 제스처는 document 캡처 단계의 unlock 리스너(UNLOCK_EVENTS)가 먼저 봐야
+       하고, 그래야 오디오 컨텍스트가 열린다. passive 등록 자체가 그 보장이다.
+
+     up 쪽 규율:
+       preventDefault 를 **부른다**. touchend 의 기본동작이 곧 합성 마우스 한 벌
+       (mousedown/mouseup/click)을 만드는 일이라, 여기서 끊는 것이 아래 메뉴
+       오클릭을 막는 첫 번째 방벽이다. 두 번째 방벽이 splashArmShield 다. 하나만
+       두지 않는 이유: preventDefault 는 브라우저마다 합성 이벤트 억제 범위가
+       미묘하게 다르고, 실드는 시간에 기대는 근사값이다. 서로의 빈틈을 덮는다. */
+  function splashDown() {
+    if (splashDone) return;
+    /* 소리는 「누를 때」. 두 줄 다 여러 번 불려도 안전하다 —
+       splashAudioHook 은 trkStart 의 `if (T.running) return;` 이 받아내고,
+       J.sfx.ui 는 bindJuice 의 60ms 병합이 받아낸다.
+       (touch 기기는 pointerdown 과 touchstart 가 **둘 다** 온다.) */
+    splashAudioHook();
+    J.sfx.ui();
+  }
+
+  function splashUp(ev) {
+    /* 🚨 preventDefault 가 splashDone 검사보다 **먼저**다. 터치에서는 pointerup 이
+       먼저 오고 touchend 가 뒤따르는데, 합성 마우스 이벤트를 실제로 막아 주는
+       것은 뒤에 오는 touchend 쪽이다. 여기서 먼저 return 해 버리면 정작 필요한
+       그 한 번을 놓친다. */
+    try { if (ev && ev.cancelable) ev.preventDefault(); } catch (e) {}
+    splashDismiss();
+  }
+
   function splashBind() {
     var el = document.getElementById('splash');
     if (!el) return;
-    var go = function () { splashDismiss(); };
-    el.addEventListener('pointerdown', go, { passive: true });
-    el.addEventListener('touchstart', go, { passive: true });
-    el.addEventListener('click', go);
+    el.addEventListener('pointerdown', splashDown, { passive: true });
+    el.addEventListener('touchstart', splashDown, { passive: true });
+    /* 🚨 passive 를 주지 않는다(기본 false). up 에서는 preventDefault 가 일이다. */
+    el.addEventListener('pointerup', splashUp);
+    el.addEventListener('touchend', splashUp);
+    /* 제스처가 도중에 뺏기면(전화·시스템 스와이프) up 이 영영 안 온다. 그때
+       스플래시가 화면에 갇히지 않도록 취소도 해제로 친다 — 아래 보드의
+       touchend 유실 처리(game.js 위쪽)와 같은 판단이다. */
+    el.addEventListener('pointercancel', splashUp);
+    el.addEventListener('touchcancel', splashUp);
+    /* 폴백 — 포인터·터치 이벤트가 아예 없는 환경(아주 오래된 브라우저, 일부
+       자동화 드라이버)에서는 click 만 온다. splashDone 가드가 있어 정상 경로에서
+       이 줄이 두 번째로 걷는 일은 없다(그때는 이미 실드가 먹는다). */
+    el.addEventListener('click', splashUp);
     /* 🚨 키보드는 **document** 에 걸어야 한다. #splash 에만 걸면 영영 안 걷힌다:
        키 이벤트는 focus 를 따라가는데 부팅 직후 focus 는 <body> 에 있고, #splash 는
        body 의 조상이 아니라 자손이라 버블링이 그리로 올라가지 않는다. tabindex="0"
        는 "포커스될 수 있다"는 뜻일 뿐 "포커스돼 있다"가 아니다.
-       document 리스너라 위임이 필요 없고, splashDone 가드가 중복을 막는다. */
-    document.addEventListener('keydown', go);
+       document 리스너라 위임이 필요 없고, splashDone 가드가 중복을 막는다.
+
+       🚨 14차: down/up 을 가르면서도 **이 줄은 document 에 그대로 남긴다.** 과거에
+       이걸 #splash 로 옮겼다가 위 이유로 통째로 죽은 적이 있다. 그 수리분을 깨지
+       않는다. 키보드에는 "누름/뗌"의 오클릭 문제가 없으므로(합성 click 은 오지만
+       그건 아래 실드가 받는다) keydown 하나로 소리와 전환을 함께 낸다 —
+       #splash 는 role="button" 이라 Enter/Space 에서 브라우저가 click 을 만들어
+       내고, 그 click 이 곧 아래 메뉴로 샐 수 있는 그 클릭이다. */
+    document.addEventListener('keydown', function () {
+      if (splashDone) return;
+      splashDown();
+      splashDismiss();
+    });
     /* 포커스를 스플래시로 옮겨 두면 스크린리더가 이 판을 먼저 읽고, 탭 순서도
        메뉴 버튼이 아니라 여기서 시작한다. 실패해도(비표시 등) 무시 — 위의
        document 리스너가 키보드 경로를 이미 책임진다. */
@@ -29447,6 +29675,10 @@ window.TT_SFX = {
     /* 스플래시 무장 — 여기부터 showScreen 이 스플래시를 걷는다(위 splashBooted 주석). */
     splashBind();
     splashBooted = true;
+    /* 14차 수리 1 — 클릭 없는 첫 재생 시도를 예약한다. 실제 시도는 'load' 뒤로
+       내려간다(splashAudioBoot 주석의 근거). 막히면 조용히 대기하고, 첫
+       pointerdown 이 그 자리에서 이어받는다. */
+    splashAudioBootSchedule();
   }
 
   if (typeof document !== 'undefined') {
