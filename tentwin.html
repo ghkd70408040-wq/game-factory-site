@@ -9155,11 +9155,77 @@ html.no-art-logo .logo-img  { display: none; }
    라벨 좌변은 상자 우변에서 0.07 --bh 를 띄운다 = (--chip + 0.17) x --bh. */
 #screen-menu #btn-play.mbtn     { --chip: .671; }
 #screen-menu #btn-cont.mbtn     { --chip: .885; }
-#screen-menu #char-open.mbtn    { --chip: .920; }
+#screen-menu #char-open.mbtn    { --chip: .703; }   /* 수리 7: 하트(.729) → 표준 face(.995) */
 #screen-menu #btn-settings.mbtn { --chip: .741; }
 
+/* ★ 14차 수리 6 — 배치·글자 (사용자 반려: "글자 위치 똑바로 해라 · 겹쳐서
+   글자도 제대로 인식 안 된다")
+   ---------------------------------------------------------------------------
+   직전 판의 실패는 아이콘을 키운 것이 아니라 **배치가 절대좌표로 남은 것**이다.
+   칩과 라벨이 각자 `position:absolute` 로 서 있어서 (a) 둘 사이 간격이 계산
+   결과로만 존재했고(실측 3.4~4.3px — 붙어 보인다), (b) 라벨이 칩 우변부터
+   버튼 우변까지를 통째로 차지한 뒤 **좌측 정렬**이라 오른쪽 절반이 빈 채로
+   글자가 아이콘에 붙어 버렸다.
+
+   레퍼런스 재실측(`menubtn-ref-*.png`, 회전 보정 후 버튼 폭 BW 기준):
+     ① 아이콘 좌측 여백 ÷ BW   오렌지 10/183 = .055 · 퍼플 10/183 = .055
+                               옐로 10/184 = .054 · 민트 11/184 = .060  → **.055**
+     ② 아이콘 ↔ 글자 간격 ÷ BW 오렌지 18/183 = .098 · 핑크 10/230 = .043
+                               퍼플 6/183 = .033                        → **.036** 채택
+                               (= --bh .17 배. 아래 gap 이 그 값이다)
+     ③ 묶음 수평 위치 — 좌우 여백을 각각 재면 오렌지 L 10 / R 14, 퍼플 L 10 /
+        R 14, 옐로 L 10 / R 14 로 **거의 대칭**이다. 좌측 정렬이 아니라
+        **중앙 정렬**이 정답이다 → `justify-content: center`.
+     ④ 글자 높이 ÷ 버튼 높이   오렌지("설정" 2자) 34/61 = .557 · 핑크("게임을
+        시작" 5자) 34/76 = .447 · 퍼플(5자) 21/62 = .34 → 글자 수가 적을수록
+        크다. 4자 라벨 기준 잉크 .40H 를 노리고 한글 잉크/폰트크기 ≈ .72 로
+        역산해 **font-size = .56 --bh**. (직전 17px 은 .35 --bh 였다)
+     ⑤ 글자 스타일 — 채운 색 #FFF3EA(오렌지)·#FFF1F0(핑크)·#FFF3FF(퍼플) =
+        **면 색으로 살짝 물든 따뜻한 흰색**. 외곽선 #673420·#74343F·#5A3771 은
+        **이미 이 파일이 들고 있는 `--co`(외곽선 링)와 같은 계열**이라 새 변수를
+        만들지 않고 --co 를 그대로 쓴다. 두께는 원화 3px/BH 61 = .049H ≈ .06em.
+
+   🚨 겹침 0 의 근거는 계산이 아니라 **레이아웃 규칙**이다: 칩과 라벨을 같은
+      flex 줄의 형제로 세우고 `gap` 을 고정하면 두 상자는 정의상 겹칠 수 없다.
+      라벨은 `white-space: nowrap` 으로 줄바꿈을 막고, 좌우 패딩을 --bh .10 으로
+      줄여 가장 좁은 폭(360px)에서도 묶음이 내용 상자 안에 들어간다. */
+#screen-menu .mbtn {
+  display: flex;
+  /* 🚨 `flex-direction` 을 **반드시** 명시한다. 8차의 `#btn-play`(730행)가
+     `flex-direction: column` 을 id 특이도로 들고 있어서, 방향을 안 적으면 CTA
+     한 장만 칩과 라벨이 세로로 쌓여 정확히 겹쳐 보인다(실측으로 잡았다:
+     칩 중심 113.10 · 라벨 중심 113.09 로 동심원이었다). */
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--bh) * .17);
+  text-align: center;
+  color: #FFF3EC;
+}
+/* 좌우 패딩은 폐기한 9-slice 캡의 이관분(20~21px)이었다. 칠은 이제 CSS 그라데
+   이션이고 캡이 없으므로, 묶음이 쓸 폭을 되찾기 위해 --bh 기준으로 줄인다.
+   세로 패딩(15/18 · 16/19 · 16/20)은 **그대로 둔다** — 그 비대칭이 하단 3D
+   밴드만큼 내용을 위로 올려 주는 값이라 글자가 면 한가운데에 앉는다. */
+#screen-menu #btn-play.mbtn,
+#screen-menu #btn-cont.mbtn,
+#screen-menu #char-open.mbtn,
+#screen-menu #btn-settings.mbtn {
+  padding-left: calc(var(--bh) * .10);
+  padding-right: calc(var(--bh) * .10);
+}
 #screen-menu .mbtn .mbtn-chip {
-  left: calc(var(--bh) * .10);
+  /* 🚨 `static` 이 아니라 `relative` 다. 글리프(`.mbtn-chip::before`)가
+     `position:absolute; left:50%; top:50%` 라서, 칩이 static 이 되면 기준이
+     **버튼**으로 올라가 글리프가 버튼 한가운데 = 글자 위에 겹쳐 찍힌다.
+     (실제로 한 번 그렇게 났다 — 상자는 안 겹치는데 그림만 겹치는 상태라
+     getBoundingClientRect 로는 안 잡히고 화면에서만 보였다.)
+     relative 는 흐름 배치는 static 과 같고 기준점만 칩에 남긴다. */
+  position: relative;
+  left: auto;
+  top: auto;
+  transform: none;
+  flex: 0 0 auto;
   width: calc(var(--bh) * var(--chip));
   height: calc(var(--bh) * var(--chip));
   border: 0;
@@ -9174,9 +9240,36 @@ html.no-art-logo .logo-img  { display: none; }
   filter: drop-shadow(0 2px 0 rgba(72, 30, 44, .34));
 }
 #screen-menu .mbtn .mbtn-lab {
-  left: calc(var(--bh) * (var(--chip) + .17));
-  right: calc(var(--mh) * .20);
-  text-shadow: 0 2px 0 var(--co);
+  position: static;
+  left: auto;
+  right: auto;
+  top: auto;
+  transform: none;
+  flex: 0 1 auto;
+  min-width: 0;
+  /* 🚨 overflow 는 visible 이어야 한다 — hidden 이면 아래 외곽선 링이 잘린다.
+     넘침은 자르는 것이 아니라 **안 나게** 막는다(폭 예산은 위 패딩 주석). */
+  overflow: visible;
+  text-overflow: clip;
+  white-space: nowrap;
+  /* .58 은 안전 상한이다. 원화 비율만 보면 더 키울 수 있지만(4자 라벨 .72 --bh
+     까지 들어간다), --font-display 의 첫 후보가 못 실리고 시스템 한글로 떨어지면
+     글자 폭이 0.794em → 1.0em 으로 벌어진다. 그 최악에서도 360px 폭에서 묶음이
+     내용 상자 안에 남는 값이 .58 이다(계산: 4자 × 1.0em × .58 × 60.13 + 칩
+     40.34 + gap 10.22 = 190.1 ≤ 196.8). 실측 검증은 아래 §증거. */
+  font-size: calc(var(--bh) * .58);
+  font-weight: 800;
+  letter-spacing: -.015em;
+  /* 굵은 라운드체 + 밝은 면 + 부드러운 외곽선 + 미세 그림자 (실측 ⑤).
+     8방 오프셋으로 링을 만들고 blur 한 겹으로 모서리를 풀어 준다. */
+  text-shadow:
+    .060em 0 0 var(--co), -.060em 0 0 var(--co),
+    0 .060em 0 var(--co), 0 -.060em 0 var(--co),
+    .043em .043em 0 var(--co), -.043em .043em 0 var(--co),
+    .043em -.043em 0 var(--co), -.043em -.043em 0 var(--co),
+    0 0 .05em var(--co),
+    0 .075em 0 var(--cp),
+    0 .11em .10em rgba(48, 18, 26, .32);
 }
 
 /* 🚨 ★ 14차 수리 4 — 「흰 캐릭터 얼굴」 아이콘 **사용 중지**.
@@ -9192,12 +9285,27 @@ html.no-art-logo .logo-img  { display: none; }
    면과 갈라지고, 하트(분홍 몸통 + 진한 밤색 외곽선)가 그 대비 구조와 같다.
    왕관으로 되돌리려면 아래 background-image 한 줄만 바꾸면 된다:
      background-image: var(--lib-glyph-crown);
-   크기는 위 수리 3 의 0.70 비율을 그대로 받는다(칩을 100% 채운다). */
-#screen-menu .mbtn .mbtn-chip.mc-char .co-av { display: none; }
-#screen-menu .mbtn .mbtn-chip.mc-char::before {
-  content: '';
-  background-image: var(--lib-glyph-heart);
+   크기는 위 수리 3 의 0.70 비율을 그대로 받는다(칩을 100% 채운다).
+
+   ★ 14차 수리 7 — 임시 하트를 **왕자 정식 일러스트로 교체**한다.
+   ---------------------------------------------------------------------------
+   위의 하트는 "반려된 흰 얼굴을 끊되 대체가 없다"는 상황의 임시방편이었다.
+   그런데 대체는 이미 저장소에 있다: 13차-a 파이프라인이 구운 **투명 표준 세트**
+   (`assets/characters/<id>/face.png` → `--ch-<id>-face`)다. QA 를 통과했고
+   `#mascot`·`.mn-hero` 가 이미 같은 세트를 쓰고 있으므로 화면 사이 인물이
+   갈라지지 않는다. 그래서 하트를 끄고 `.co-av` 를 **되살려** 그 위에 표준
+   face 를 깐다 — 칩이 **선택된 캐릭터**를 따라가는 것이 덤이다(하트는 누구를
+   고르든 하트였다).
+   🚨 상자 보정: face.png 의 잉크는 캔버스의 1019/1024 = **0.995** 를 채운다
+      (하트는 0.729 였다). 목표 0.70 ÷ 0.995 = **.703** — 그래서 위 --chip 표의
+      옐로 칸이 .920 에서 .703 으로 내려간다. 상자는 줄지만 **화면에 찍히는
+      아이콘 높이는 그대로 0.70 --bh** 다. */
+#screen-menu .mbtn .mbtn-chip.mc-char .co-av {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
+#screen-menu .mbtn .mbtn-chip.mc-char::before { content: none; }
 
 /* 하단 상태 한 줄은 "아주 작게" 남는다 (§6.8). */
 #screen-menu .menu-best { font-size: 11.5px; opacity: .78; }
@@ -10551,6 +10659,71 @@ html[data-fruit="1"] .tile.blocker:not([data-sp]):not(.dead) {
   pointer-events: none;
 }
 .mn-hero[data-art="std"] svg { display: none; }
+
+/* ---- 26-3b. 🚨 14차 수리 8 — 「흰 얼굴 SVG」 잔존 소비처 **전량** 교체 --------
+   -----------------------------------------------------------------------------
+   직전 라운드는 메인 메뉴의 `.mc-char .co-av` **한 곳만** 끊고 끝냈다. 같은
+   소재(`.cav` 인라인 SVG)를 복제해 쓰는 자리가 다섯 곳 더 있었고, 사용자가
+   실기기에서 그중 둘(스테이지 정보 팝업의 주인공 슬롯 · 동료 줄)을 잡아냈다.
+   `game.js` 에서 `.cav` 를 복제하는 자리를 전수로 훑어 정리하면 이렇다:
+
+     자리                     소스        상태(수리 전)          이 블록의 처리
+     ─────────────────────────────────────────────────────────────────────────
+     #mascot (인게임 HUD 원)  face        **이미 std** (26-1)    손대지 않음
+     .mn-hero (맵 현재 노드)  full        **이미 std** (26-3)    손대지 않음
+     #cp-rack .cp-th / .ci-chip          data-art 로 이미 분기   손대지 않음
+     #co-hero (메뉴 캐릭터칩) face        SVG (CSS 로 감춤만)    → std 로 교체
+     #node-hero-av (팝업 주인공) face     **SVG 노출 — 반려분**  → std 로 교체
+     .nmate (팝업 동료 3칸)   face        SVG 노출               → std 로 교체
+     #skill-av (필살기 게이지) face       SVG 노출               → std 로 교체
+     .cutin-av (필살기 컷인)  full        SVG 노출               → std 로 교체
+
+   규약은 26-1 부터 쓰던 것 그대로다 — JS 가 `setStdArt()` 로 `data-art="std"`
+   와 그림 변수를 심고, 여기서 `::after` 가 그림을 깔고 `.cav` 를 끈다.
+   🚨 크기 사고 재발 방지: 전부 **`contain`** 이다. `cover`·고정 px 은 쓰지
+      않는다 — 직전에 224px 얼굴을 52px 칸에 밀어 넣어 액자를 덮은 사고가
+      바로 그 두 값에서 났다. `contain` 은 정의상 슬롯을 넘지 않는다.
+      `border-radius: inherit` 로 원형 슬롯에서는 원이 그림을 자른다. */
+.co-av[data-art="std"],
+.node-hero-av[data-art="std"],
+.nmate[data-art="std"],
+.skill-av[data-art="std"],
+.cutin-av[data-art="std"] { position: relative; }
+
+.co-av[data-art="std"]::after,
+.node-hero-av[data-art="std"]::after,
+.nmate[data-art="std"]::after,
+.skill-av[data-art="std"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  background: var(--slot-std, none) center / contain no-repeat;
+  opacity: 1;
+  pointer-events: none;
+}
+/* 컷인만 전신이라 발밑 정렬이다(맵 노드와 같은 이유 — 서 있는 것이 읽혀야 한다). */
+.cutin-av[data-art="std"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: var(--slot-std, none) center bottom / contain no-repeat;
+  pointer-events: none;
+}
+/* 그림이 붙은 자리에서는 SVG 를 **완전히** 끈다(opacity 0 이 아니라 display
+   none — 반투명으로 남으면 두 인물이 겹쳐 보인다). 파일·노드는 지우지 않는다. */
+.co-av[data-art="std"] .cav,
+.co-av[data-art="std"] svg,
+.node-hero-av[data-art="std"] .cav,
+.node-hero-av[data-art="std"] svg,
+.nmate[data-art="std"] .cav,
+.nmate[data-art="std"] svg,
+.skill-av[data-art="std"] .cav,
+.skill-av[data-art="std"] svg,
+.cutin-av[data-art="std"] .cav,
+.cutin-av[data-art="std"] svg { display: none; }
 
 /* ---- 26-4. HUD 칩 · 하단 액션 바 = 도서관 조각 (§5.9-1) ---------------------
    상단 바(#topbar)는 12차에 이미 --lib-hud-bar 를 입었는데, 그 **안에 뜨는 칩**
@@ -22875,11 +23048,15 @@ window.TT_SFX = {
       h.innerHTML = '';
       node = cavClone(id);
       if (node) h.appendChild(node);
+      /* 14차 수리 8 — 표준 투명 세트가 있으면 그것이 이긴다. SVG 는 폴백으로만
+         남는다(§26-3b). 반려된 흰 얼굴이 화면에 남는 자리를 0 으로 만든다. */
+      setStdArt(h, id, 'face', '--slot-std');
     }
     if (m) {
       m.className = 'co-av co-av-m' + (mid ? ' ' + CHARS[mid].cls : '');
       m.innerHTML = '';
       if (mid) { node = cavClone(mid); if (node) m.appendChild(node); }
+      setArt(m, '--slot-std', mid ? stdArt(mid, 'face') : '', '');
     }
     setText('co-name', mid ? (t('char.' + id + '.name') + ' + ' + t('char.' + mid + '.name'))
                            : t('char.' + id + '.name'));
@@ -23869,6 +24046,7 @@ window.TT_SFX = {
           ? document.querySelector('#char-pick .char-card[data-char="' + id + '"] .cav')
           : null;
         if (src && src.cloneNode) av.appendChild(src.cloneNode(true));
+        setStdArt(av, id, 'face', '--slot-std');   /* 14차 수리 8 (§26-3b) */
       }
     }
     /* 남은 시간이 있으면 시간이, 없으면 충전률이 숫자칸을 쓴다. 두 숫자가
@@ -23929,6 +24107,7 @@ window.TT_SFX = {
           ? document.querySelector('#char-pick .char-card[data-char="' + castId + '"] .cav')
           : null;
         if (src && src.cloneNode) art.appendChild(src.cloneNode(true));
+        setStdArt(art, castId, 'full', '--slot-std');   /* 14차 수리 8 (§26-3b) */
       }
       el.style.setProperty('--cut-key', (CHARS[castId] || CHARS.ten).key);
       setText('cutin-name', t(nameKey));
@@ -28695,6 +28874,8 @@ window.TT_SFX = {
         ? document.querySelector('#char-pick .char-card[data-char="' + p.hero + '"] .cav')
         : null;
       if (src && src.cloneNode) av.appendChild(src.cloneNode(true));
+      /* 🚨 14차 수리 8 — 사용자가 실기기에서 잡아낸 바로 그 자리다(§26-3b). */
+      setStdArt(av, p.hero, 'face', '--slot-std');
     }
     setText('node-star1', t('adv.star1'));
     setText('node-star2', t('adv.star2', { n: Math.round(p.par * ADV_STAR2) }));
@@ -28743,6 +28924,7 @@ window.TT_SFX = {
       if (id) {
         var av = cavClone(id);
         if (av) b.appendChild(av);
+        setStdArt(b, id, 'face', '--slot-std');   /* 14차 수리 8 (§26-3b) */
       } else {
         var x = document.createElement('span');
         x.className = 'nmate-x';
