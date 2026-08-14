@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>틴트윈 관제탑</title>
+<style>
+:root{
+  --bg:#FBF6EF; --card:#FFFFFF; --ink:#3D2B26; --sub:#8A7468; --line:#EADFD6;
+  --done:#2E9E5B; --css:#2B7DC7; --temp:#C98A1B; --queued:#7B6AC7; --empty:#C24545;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;line-height:1.5;padding-bottom:60px}
+main{max-width:44rem;margin:0 auto;padding:14px}
+h1{font-size:1.3rem;margin:6px 0 2px}
+.updated{color:var(--sub);font-size:.8rem;margin-bottom:12px}
+section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:14px}
+h2{font-size:.95rem;margin:0 0 10px}
+.small{color:var(--sub);font-size:.78rem}
+
+/* 5단계 진행바 */
+.phases{display:flex;gap:5px;flex-wrap:wrap}
+.phase{flex:1 1 0;min-width:100px;text-align:center;font-size:.72rem;padding:7px 4px;border-radius:9px;background:#F3EAE0;color:var(--sub);border:1px solid var(--line)}
+.phase.cur{background:#3D2B26;color:#FFF3E8;font-weight:700;border-color:#3D2B26}
+.phase.past{background:#E7F5EC;color:var(--done)}
+
+/* 요약 칩 */
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.chip{font-size:.75rem;padding:4px 10px;border-radius:99px;border:1px solid var(--line);background:#FDFAF6}
+.chip b{font-variant-numeric:tabular-nums}
+
+/* 화면 선택 탭 */
+.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+.tab{flex:none;border:1px solid var(--line);background:#FDFAF6;border-radius:11px;padding:7px 11px;font-size:.8rem;cursor:pointer;color:var(--ink)}
+.tab.on{background:#3D2B26;color:#FFF3E8;border-color:#3D2B26}
+.tab .pct{display:block;font-size:.68rem;color:var(--sub)}
+.tab.on .pct{color:#D8C4B4}
+
+/* 조립 무대 */
+.stage-wrap{display:flex;justify-content:center;margin:10px 0}
+.stage{width:270px;height:480px;border-radius:22px;border:6px solid #2B1F1B;overflow:hidden;position:relative;background:#CDE6F5;flex:none}
+.stage-note{text-align:center;color:var(--sub);font-size:.74rem;margin-top:6px}
+
+/* 상태 표기 */
+.dot{display:inline-block;width:.6em;height:.6em;border-radius:50%;margin-right:6px;vertical-align:baseline}
+.s-done{background:var(--done)} .s-css{background:var(--css)} .s-temp{background:var(--temp)} .s-queued{background:var(--queued)} .s-empty{background:var(--empty)}
+ul.slots{list-style:none;margin:0;padding:0}
+ul.slots li{display:flex;gap:8px;align-items:baseline;padding:7px 0;border-top:1px solid var(--line);font-size:.86rem}
+ul.slots li:first-child{border-top:0}
+.meth{color:var(--sub);font-size:.74rem;margin-left:auto;text-align:right;flex:none}
+.note{color:var(--temp);font-size:.72rem}
+li.empty-slot .nm{color:var(--empty);font-weight:700}
+.legend{display:flex;gap:10px;flex-wrap:wrap;font-size:.72rem;color:var(--sub);margin-top:8px}
+
+/* 도식 무대(스키매틱) */
+.schem{position:absolute;inset:0;display:flex;flex-direction:column;gap:5px;padding:10px;background:linear-gradient(180deg,#BFE0F2,#DFF0E2)}
+.blk{border-radius:9px;padding:5px 8px;font-size:.66rem;color:#FFF;display:flex;align-items:center;min-height:26px}
+.blk.b-done{background:rgba(46,158,91,.85)} .blk.b-css{background:rgba(43,125,199,.85)}
+.blk.b-temp{background:rgba(201,138,27,.9)} .blk.b-queued{background:rgba(123,106,199,.9)}
+.blk.b-empty{background:repeating-linear-gradient(45deg,#B9AA9E,#B9AA9E 6px,#A79789 6px,#A79789 12px);color:#4b3f37;border:2px dashed #8A7468}
+
+/* ── 라이브 무대: 스플래시 ── */
+.st-splash{background:linear-gradient(180deg,#5B4B8A 0%,#8B6BB0 45%,#C08BC0 70%,#4C6E8E 100%)}
+.st-splash .logo{position:absolute;top:17%;left:0;right:0;text-align:center;font-weight:900;font-size:34px;color:#E9B9E4;-webkit-text-stroke:2px #6C3B57;text-shadow:0 3px 0 #6C3B57}
+.st-splash .logo small{display:block;font-size:13px;color:#F5D9A8;-webkit-text-stroke:0;text-shadow:0 2px 0 #7A4A34}
+.scrim{position:absolute;left:10%;right:10%;top:57%;background:rgba(46,26,40,.8);border-radius:99px;padding:9px 0;text-align:center}
+.breathe{color:#FFDFEB;font-weight:800;font-size:15px;animation:br 1.7s ease-in-out infinite}
+@keyframes br{0%,100%{opacity:1;transform:scale(1.03);text-shadow:0 0 6px rgba(255,143,184,.8),0 0 15px rgba(255,143,184,.55)}50%{opacity:.62;transform:scale(1.01)}}
+
+/* ── 라이브 무대: 메인 메뉴 (게임 본판 e7a7a66 캔디 CSS 이식) ── */
+.st-menu{background:linear-gradient(180deg,#8FCBEF 0%,#BFE3F4 40%,#9CD48F 78%,#4C86B8 100%)}
+.st-menu .logo{position:absolute;top:6%;left:0;right:0;text-align:center;font-weight:900;font-size:26px;color:#E9A9DE;-webkit-text-stroke:1.5px #6C3B57;text-shadow:0 2px 0 #6C3B57}
+.mstack{position:absolute;top:23%;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:13px}
+.mb{position:relative;width:66%;height:34px;border:0;border-radius:8.3px;color:#FFF;font-weight:800;font-size:13px;font-family:inherit;cursor:pointer;
+  background:linear-gradient(180deg,var(--crt) 4%,var(--crt) 12%,var(--cl) 20%,var(--clb) 48%,var(--cb) 57%,var(--cbb) 68%,var(--crb) 78%,var(--crb) 87%,var(--cd) 89%,var(--cdd) 100%);
+  box-shadow:0 3px 0 var(--cp),0 6px 12px rgba(83,28,40,.26),inset 0 0 0 2px var(--co);
+  text-shadow:0 1.5px 0 rgba(110,70,58,.55)}
+.mb:active{transform:translateY(2px);box-shadow:0 1px 0 var(--cp),0 3px 8px rgba(83,28,40,.22),inset 0 0 0 2px var(--co)}
+.mb.p{--crt:#FEA4BE;--cl:#F8AAC5;--clb:#F797B2;--cb:#F98FAA;--cbb:#E97D98;--crb:#FFB3CA;--cd:#AD4972;--cdd:#812B4A;--co:#672124;--cp:#651D2A;height:42px;font-size:15px}
+.mb.v{--crt:#CEADFF;--cl:#BC94F4;--clb:#B084E0;--cb:#A573EE;--cbb:#A571ED;--crb:#C694FF;--cd:#8E58D0;--cdd:#855AC4;--co:#5C3E96;--cp:#413575}
+.mb.y{--crt:#FAD879;--cl:#FBD86A;--clb:#F5C152;--cb:#F4BC50;--cbb:#EBB551;--crb:#FFD764;--cd:#DD913A;--cdd:#D59032;--co:#75642A;--cp:#75642A}
+.mb.o{--crt:#E9A784;--cl:#E08E5F;--clb:#E08454;--cb:#E08554;--cbb:#E18653;--crb:#F5AA83;--cd:#9D5839;--cdd:#8E5843;--co:#6F422F;--cp:#693D28}
+.mb i{font-style:normal;margin-right:7px;font-size:15px;vertical-align:-1px}
+
+/* ── 라이브 무대: 플레이 팝업 / 설정 ── */
+.st-pop{background:linear-gradient(180deg,#6B5B94 0%,#7E6BA5 100%)}
+.pop{position:absolute;left:6%;right:6%;top:12%;bottom:12%;background:#FBEFDD;border-radius:16px;box-shadow:inset 0 0 0 3px #E9CBA8,0 8px 20px rgba(30,15,40,.35);padding:44px 10px 10px}
+.pop-head{position:absolute;top:-14px;left:14%;right:14%;padding:9px 0;text-align:center;color:#FFF;font-weight:800;font-size:13px;border-radius:11px;
+  background:linear-gradient(180deg,#FBA9C4 8%,#F58BAB 45%,#EE7396 70%,#C24868 92%);box-shadow:0 3px 0 #8F2643,inset 0 0 0 2px #A82E4D}
+.mode{position:relative;width:100%;height:36px;border:0;border-radius:9px;margin-bottom:9px;color:#FFF;font-weight:800;font-size:12px;text-align:left;padding-left:38px;font-family:inherit;cursor:pointer;
+  background:linear-gradient(180deg,var(--a) 10%,var(--b) 55%,var(--c) 90%);box-shadow:0 2.5px 0 var(--d),inset 0 0 0 2px var(--d);text-shadow:0 1px 0 rgba(80,40,40,.4)}
+.mode:active{transform:translateY(2px)}
+.mode i{position:absolute;left:9px;top:50%;transform:translateY(-50%);font-style:normal;font-size:16px}
+.m1{--a:#F8A0BC;--b:#EE7396;--c:#D95C80;--d:#A82E4D}
+.m2{--a:#C7A2F5;--b:#A97BE8;--c:#9463D6;--d:#5C3E96}
+.m3{--a:#7FDCB2;--b:#4EC493;--c:#3BAF7F;--d:#1F6B52}
+.m4{--a:#FBD86A;--b:#F4BC50;--c:#E8A93F;--d:#8A5510}
+.tgl{display:flex;align-items:center;justify-content:space-between;background:#FFFDF6;border:2px solid #E8A98D;border-radius:11px;padding:7px 10px;margin-bottom:8px;font-size:12px;font-weight:700}
+.tgl button{border:0;border-radius:9px;padding:5px 13px;color:#FFF;font-weight:800;font-size:11px;font-family:inherit;cursor:pointer;
+  background:linear-gradient(180deg,#9BB8F0 8%,#6E92E4 55%,#5878C9 90%);box-shadow:0 2px 0 #34477E,inset 0 0 0 2px #45579B}
+.tgl button.off{filter:grayscale(.7) brightness(.9)}
+
+/* 대기열·커밋·링크 */
+ol.queue{margin:0;padding-left:20px;font-size:.85rem}
+ol.queue li{padding:3px 0}
+.commits{font-family:Consolas,monospace;font-size:.76rem;line-height:1.9;overflow-x:auto;white-space:nowrap}
+.commits b{color:#B0682A}
+.links{display:flex;gap:8px;flex-wrap:wrap}
+.links a{font-size:.8rem;border:1px solid var(--line);border-radius:99px;padding:6px 12px;color:var(--ink);text-decoration:none;background:#FDFAF6}
+.extra-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:520px){.extra-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main>
+<h1>🗼 틴트윈 관제탑</h1>
+<div class="updated" id="updated"></div>
+
+<section>
+  <div class="phases" id="phases"></div>
+  <div class="chips" id="chips"></div>
+</section>
+
+<section>
+  <h2>화면별 조립 무대 · 분해도</h2>
+  <div class="tabs" id="tabs"></div>
+  <div class="stage-wrap"><div class="stage" id="stage"></div></div>
+  <div class="stage-note" id="stagenote"></div>
+  <ul class="slots" id="slots"></ul>
+  <div class="legend">
+    <span><span class="dot s-done"></span>확보·배선</span>
+    <span><span class="dot s-css"></span>CSS 구현</span>
+    <span><span class="dot s-temp"></span>임시(교체예정)</span>
+    <span><span class="dot s-queued"></span>발주·예약</span>
+    <span><span class="dot s-empty"></span>빈 슬롯</span>
+  </div>
+</section>
+
+<section>
+  <h2>발주 대기열</h2>
+  <ol class="queue" id="queue"></ol>
+</section>
+
+<section>
+  <h2>사운드 · 게임플레이 기획</h2>
+  <div class="extra-grid" id="extra"></div>
+</section>
+
+<section>
+  <h2>최근 커밋</h2>
+  <div class="small" style="margin-bottom:6px">표에 적은 것이 아니라 <b>커밋된 것</b>이 끝난 것이다.</div>
+  <div class="commits" id="commits"></div>
+</section>
+
+<section>
+  <h2>바로가기</h2>
+  <div class="links" id="links"></div>
+</section>
+</main>
+
+<script>
+const S = { done:'s-done', css:'s-css', temp:'s-temp', queued:'s-queued', empty:'s-empty' };
+const FILLED = s => s==='done' || s==='css';
+
+fetch('board-data.json?v=' + Date.now()).then(r=>r.json()).then(D=>{
+  document.getElementById('updated').textContent = '갱신 ' + D.updated + ' · 푸시마다 이 판이 갱신됩니다';
+
+  // 5단계 바
+  const ph = document.getElementById('phases');
+  D.phases.forEach((p,i)=>{
+    const d=document.createElement('div');
+    d.className='phase ' + (i+1<D.phase?'past':(i+1===D.phase?'cur':''));
+    d.textContent=p; ph.appendChild(d);
+  });
+
+  // 전체 칩
+  let all=0, done=0, tempN=0, queued=0, empty=0;
+  D.screens.forEach(sc=>sc.slots.forEach(sl=>{ all++;
+    if(FILLED(sl.s))done++; else if(sl.s==='temp')tempN++; else if(sl.s==='queued')queued++; else empty++; }));
+  document.getElementById('chips').innerHTML =
+    `<span class="chip">전체 <b>${all}</b></span><span class="chip">✅ 채움 <b>${done}</b></span>`+
+    `<span class="chip">🟡 임시 <b>${tempN}</b></span><span class="chip">📋 발주·예약 <b>${queued}</b></span>`+
+    `<span class="chip">⬜ 빈 슬롯 <b>${empty}</b></span>`;
+
+  // 탭
+  const tabs=document.getElementById('tabs');
+  D.screens.forEach((sc,i)=>{
+    const f=sc.slots.filter(x=>FILLED(x.s)).length;
+    const b=document.createElement('button');
+    b.className='tab'; b.innerHTML=`${sc.name}<span class="pct">${Math.round(f/sc.slots.length*100)}%</span>`;
+    b.onclick=()=>show(i); tabs.appendChild(b);
+  });
+
+  function show(i){
+    [...tabs.children].forEach((t,j)=>t.classList.toggle('on',j===i));
+    const sc=D.screens[i];
+    const st=document.getElementById('stage');
+    const note=document.getElementById('stagenote');
+    st.className='stage'; st.innerHTML='';
+    if(sc.id==='splash'){
+      st.classList.add('st-splash');
+      st.innerHTML=`<div class="logo">Ten Twin<small>젤리 팡 월드</small></div>
+        <div class="scrim"><span class="breathe">화면을 터치하세요</span></div>`;
+      note.textContent='실동 무대 — 문구가 실제로 숨쉰다 · 배경·로고는 근사(실물은 게임 본판) · 기준 e88a767';
+    } else if(sc.id==='menu'){
+      st.classList.add('st-menu');
+      st.innerHTML=`<div class="logo">Ten Twin</div>
+        <div class="mstack">
+          <button class="mb p"><i>⭐</i>시작하기</button>
+          <button class="mb v"><i>🚩</i>이어하기</button>
+          <button class="mb y"><i>🧸</i>캐릭터</button>
+          <button class="mb o"><i>⚙️</i>설정</button>
+        </div>`;
+      note.textContent='실동 무대 — 눌러봐, 진짜 눌린다 · 색은 게임 본판 정본 그대로 · 아이콘은 임시 · 기준 e7a7a66';
+    } else if(sc.id==='play'){
+      st.classList.add('st-pop');
+      st.innerHTML=`<div class="pop"><div class="pop-head">플레이</div>
+        <button class="mode m1"><i>🚩</i>모험</button>
+        <button class="mode m2"><i>♾️</i>아케이드</button>
+        <button class="mode m3"><i>📅</i>데일리</button>
+        <button class="mode m4"><i>⏰</i>타임 러시</button></div>`;
+      note.textContent='실동 무대 — 버튼 동작 · 글리프 4종은 임시(발주 중) · 기준 b73c4eb';
+    } else if(sc.id==='settings'){
+      st.classList.add('st-pop');
+      st.innerHTML=`<div class="pop"><div class="pop-head">설정</div>
+        <div class="tgl">소리 <button onclick="this.classList.toggle('off');this.textContent=this.classList.contains('off')?'꺼짐':'켜짐'">켜짐</button></div>
+        <div class="tgl">진동 <button onclick="this.classList.toggle('off');this.textContent=this.classList.contains('off')?'꺼짐':'켜짐'">켜짐</button></div>
+        <div class="tgl">테마 <button>밝게</button></div>
+        <button class="mode m1" style="padding-left:0;text-align:center">기록</button>
+        <button class="mode m4" style="padding-left:0;text-align:center">닫기</button></div>`;
+      note.textContent='실동 무대 — 토글 눌러봐 · 헤더 리본은 근사(실물 신작은 게임 본판) · 기준 6f930be';
+    } else {
+      const sch=document.createElement('div'); sch.className='schem';
+      sc.slots.forEach(sl=>{
+        const b=document.createElement('div');
+        b.className='blk b-'+sl.s;
+        b.textContent=(sl.s==='empty'?'⬜ ':'')+sl.n;
+        sch.appendChild(b);
+      });
+      st.appendChild(sch);
+      note.textContent='도식 무대 — 조각별 상태를 층으로 표시 (실동 무대는 다음 라운드에 확장)';
+    }
+    // 슬롯 목록
+    const ul=document.getElementById('slots'); ul.innerHTML='';
+    sc.slots.forEach(sl=>{
+      const li=document.createElement('li');
+      if(sl.s==='empty')li.className='empty-slot';
+      li.innerHTML=`<span class="dot ${S[sl.s]}"></span><span class="nm">${sl.n}</span>`+
+        (sl.note?` <span class="note">${sl.note}</span>`:'')+
+        `<span class="meth">${sl.m}</span>`;
+      ul.appendChild(li);
+    });
+  }
+  show(1); // 기본: 메인 메뉴
+
+  // 대기열
+  document.getElementById('queue').innerHTML = D.queue.map(q=>`<li>${q}</li>`).join('');
+
+  // 엑스트라
+  document.getElementById('extra').innerHTML = D.extra.map(g=>
+    `<div><b style="font-size:.85rem">${g.name}</b><ul class="slots">`+
+    g.items.map(it=>`<li><span class="dot ${S[it.s]}"></span><span class="nm">${it.n}</span></li>`).join('')+
+    `</ul></div>`).join('');
+
+  // 커밋
+  document.getElementById('commits').innerHTML = D.commits.map(c=>`<b>${c[0]}</b>  ${c[1]}`).join('<br>');
+
+  // 링크
+  document.getElementById('links').innerHTML = D.links.map(l=>`<a href="${l[1]}">${l[0]}</a>`).join('');
+});
+</script>
+</body>
+</html>
