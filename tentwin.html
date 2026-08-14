@@ -17669,11 +17669,52 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
     if (!soundOn) return;                 // 음소거면 컨텍스트 생성 자체를 회피
     try {
       if (!actx) createAudio();
-      if (actx && actx.state === 'suspended') {
+      /* 14차 #38 — 'suspended' 만 보던 자리다. iOS 사파리는 자체 상태
+         'interrupted' 를 쓰고(다른 앱 오디오·무음 스위치·통화 뒤), 그 상태에서는
+         이 가드가 resume() 을 통째로 건너뛰어 컨텍스트가 영영 안 열렸다.
+         running 이 아니면 무조건 깨우는 것이 맞다 — resume() 은 멱등이다. */
+      if (actx && actx.state !== 'running') {
         var pr = actx.resume();
         if (pr && typeof pr.catch === 'function') pr.catch(function () {});
       }
     } catch (e) { /* 조용히 무시 */ }
+  }
+
+  /* ---- 14차 #38 — 제스처 태스크 안에서의 「동기 언락」 ------------------------
+     🚨 실기기 버그의 진짜 원인이 여기다. 사용자 보고: "스플래시를 터치해도 조용하고
+     메뉴 버튼을 눌러야 노래가 난다."
+
+     resume() 만으로는 부족하다. iOS 사파리와 안드로이드 WebView 는 컨텍스트를
+     **그 제스처 태스크 안에서 실제로 start() 된 소스 노드를 하나 볼 때** 연다.
+     그런데 14차 #35/#37 의 선디코드·프리부트(splashAudioBoot) 가 BGM 의 start()
+     를 제스처보다 **앞으로** 옮겨 놓았다 — 그래서 첫 터치 태스크 안에는 start()
+     가 하나도 없었고, 컨텍스트는 안 열렸다. 그 다음 제스처(메뉴 버튼)의
+     J.sfx.ui() 가 비로소 태스크 안에서 소스를 켜면서 컨텍스트가 열리고, 이미
+     첫머리에 서 있던 로비 곡이 그때 터져 나온다 — 보고된 증상 그대로다.
+
+     그래서 이 함수는 **1샘플 무음 버퍼**를 그 자리에서 start() 한다. 소리가 나지
+     않으므로 어떤 화면에서 불려도 안전하고, 멱등이며, await 를 하나도 거치지
+     않는다(🚨 이 함수 안에 프로미스 대기를 넣지 마라 — 넣는 순간 제스처 토큰을
+     잃고 이 버그가 그대로 돌아온다).
+
+     BGM 자체는 여기서 건드리지 않는다. 컨텍스트가 열리면 시계가 흐르기 시작하고,
+     디코드가 끝나는 대로 trkLoad 의 `if (T.wanted) trkStart(T)` 가 추가 제스처
+     없이 잇는다. */
+  function unlockAudio() {
+    if (!soundOn) return;
+    try {
+      if (!actx) createAudio();
+      if (!actx) return;
+      if (actx.state !== 'running') {
+        var pr = actx.resume();
+        if (pr && typeof pr.catch === 'function') pr.catch(function () {});
+      }
+      var b = actx.createBufferSource();
+      b.buffer = actx.createBuffer(1, 1, actx.sampleRate || 44100);
+      b.connect(actx.destination);        // master 를 거치지 않는다 — 음소거 게인과 무관하게 언락만 한다
+      if (b.start) b.start(0);
+      else if (b.noteOn) b.noteOn(0);     // 아주 오래된 webkit 표기
+    } catch (e) { /* 언락 실패로 입력이 죽는 일은 없다 */ }
   }
 
   var listenersBound = false;
@@ -17734,6 +17775,8 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
     setSound: setSound,
     setVibrate: setVibrate,
     resumeAudio: resumeAudio,
+    /* 14차 #38 — 제스처 태스크 안에서 부를 것. 이름/시그니처 고정. */
+    unlockAudio: unlockAudio,
     sfx: SFX,
     burst: burst,
     beam: beam,
@@ -19196,7 +19239,11 @@ window.TT_SFX = {
   var J = { sfx: {}, bgm: { start: noop, stop: noop, setFever: noop, setIntensity: noop,
                             setPanic: noop, scene: noop, mainStart: noop, mainStop: noop,
                             setNight: noop } };
-  var JUICE_FNS = ['init', 'setSound', 'setVibrate', 'resumeAudio', 'burst', 'beam',
+  var JUICE_FNS = ['init', 'setSound', 'setVibrate', 'resumeAudio',
+                   /* 14차 #38: 제스처 동기 언락. 구버전 juice.js 면 no-op 이 되고,
+                    * 부르는 자리마다 J.resumeAudio() 를 뒤에 함께 두어 13차 동작으로
+                    * 정확히 되돌아간다(소리가 사라지지 않는다). */
+                   'unlockAudio', 'burst', 'beam',
                    'sweep', 'confetti', 'floatText', 'screenPulse', 'vignette',
                    'vibrate', 'clear',
                    // v2 additions (contract §7) — absent methods stay no-ops
@@ -29450,7 +29497,12 @@ window.TT_SFX = {
     var unlock = function () {
       if (audioUnlocked) return;
       audioUnlocked = true;
-      J.resumeAudio();
+      /* 🚨 14차 #38 — 이 두 줄이 **핸들러의 맨 앞**이어야 한다. 제스처 언락은
+         "같은 실행 태스크 안에서 동기로 start() 된 소스"를 브라우저가 볼 때만
+         성립한다. 앞에 await/프로미스 대기를 두면 그 순간 토큰을 잃고, 소리는
+         다음 제스처(메뉴 버튼)에서야 난다 — 그것이 이번에 고친 버그다. */
+      J.unlockAudio();      // 무음 1샘플 start() = 그 자리에서 컨텍스트를 연다
+      J.resumeAudio();      // 구버전 juice.js 폴백(unlockAudio 가 no-op 인 경우)
       // The loop BGM (review #4) can only start after a user gesture has unlocked
       // audio. juice.js owns everything after this call — mute, tab-hide and tab-return
       // are all handled there via bgmWanted — so this is the only start() the game
@@ -29710,6 +29762,15 @@ window.TT_SFX = {
        미묘하게 다르고, 실드는 시간에 기대는 근사값이다. 서로의 빈틈을 덮는다. */
   function splashDown() {
     if (splashDone) return;
+    /* 🚨 14차 #38 — 언락이 이 함수의 맨 앞이다. document 캡처의 unlock 핸들러가
+       보통 먼저 돌지만, 그 핸들러는 audioUnlocked 가 이미 켜져 있으면 즉시
+       되돌아 나오고(그리고 첫 발화 뒤 스스로 리스너를 뗀다) — 그러면 **이 터치
+       태스크 안에서 start() 되는 소스가 하나도 없어** 컨텍스트가 안 열린다.
+       그래서 스플래시 터치는 상태와 무관하게 자기 손으로 한 번 더 언락한다.
+       멱등이고(무음 1샘플), await 가 하나도 없다. */
+    try { J.unlockAudio(); J.resumeAudio(); } catch (e) {}
+    /* 훅의 audioUnlocked 가드를 여기서 연다 — 방금 진짜 제스처가 있었다. */
+    audioUnlocked = true;
     /* 소리는 「누를 때」. 두 줄 다 여러 번 불려도 안전하다 —
        splashAudioHook 은 trkStart 의 `if (T.running) return;` 이 받아내고,
        J.sfx.ui 는 bindJuice 의 60ms 병합이 받아낸다.
