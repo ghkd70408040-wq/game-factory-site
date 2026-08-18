@@ -6096,6 +6096,272 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   72%      { transform: translateX(-4px); box-shadow: inset 0 0 0 2000px rgba(255, 45, 45, .09); }
 }
 
+/* ---- 18.4b 전투 HUD (#duel-hud) — 전투 개편 단계 4 ---------------------------
+   시안 gm-ingame-battle.png 의 배치를 **코드 스킨**으로 세운 절이다:
+   좌 악당(뼈 장식 · 검붉은 채움 · 현재/최대) · 중앙 젤리 유리 캡슐 타이머 ·
+   우 내 진영(날개 장식 · 하늘색 채움). 아트는 아직 한 장도 없다.
+
+   ★ 에셋 교체 규약 — 이 절의 유일한 계약 ★
+   임시 스킨의 전부가 아래 #duel-hud 의 --duel-* 한 블록에 모여 있다. 그림이
+   도착하면 **그 변수들만** url(...)/9-slice 로 갈아 끼운다: 프레임 넷
+   (--duel-foe-frame · --duel-me-frame · --duel-cap-frame · --duel-castle-img)과
+   장식 둘(--duel-orn-l · --duel-orn-r)은 지금 none 이라 배경 사슬의 **앞칸**이
+   비어 있고, 값이 들어오는 순간 그 칸이 뒤의 그라데이션 폴백을 그대로 덮는다.
+   마크업·JS·선택자는 그날 한 글자도 안 바뀐다(--char-img 규약과 같다).
+
+   높이 예산: 진영 캡슐 = 4+34+5 = 43px, 중앙 = 15(성)+1+28(캡슐) = 44px.
+   #boss-bar(약 41px)와 같은 급이고, 전투에서는 #tb-stats 두 줄(44px)이 대신
+   비므로 보드가 잃는 높이는 실질 0 이다. */
+#duel-hud {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 0 calc(var(--safe-r) + 8px) 4px calc(var(--safe-l) + 8px);
+
+  /* --- 임시 코드 스킨. 에셋 도착 시 갈아 끼우는 칸은 여기가 전부다 --- */
+  --duel-foe-frame: none;
+  --duel-me-frame: none;
+  --duel-cap-frame: none;
+  --duel-castle-img: none;
+  --duel-orn-l: none;
+  --duel-orn-r: none;
+  --duel-foe-panel: linear-gradient(180deg, rgba(78, 32, 60, .86) 0%, rgba(36, 11, 28, .90) 100%);
+  --duel-me-panel:  linear-gradient(180deg, rgba(232, 247, 255, .92) 0%, rgba(180, 220, 246, .94) 100%);
+  --duel-foe-track: rgba(18, 4, 11, .74);
+  --duel-me-track:  rgba(34, 74, 108, .28);
+  --duel-foe-fill:  linear-gradient(180deg, #D22B44 0%, #90112A 55%, #56091A 100%);
+  --duel-me-fill:   linear-gradient(180deg, #CFF4FF 0%, #86D8F7 52%, #4FB6E8 100%);
+  --duel-foe-atk:   linear-gradient(90deg, #FF5A3D, #FFB03D);
+  --duel-me-atk:    linear-gradient(90deg, #FFD24D, #FF8A3D);
+  --duel-cap-bg: linear-gradient(180deg, rgba(255, 255, 255, .40) 0%, rgba(255, 255, 255, .12) 48%, rgba(146, 196, 234, .26) 100%);
+  --duel-orn-fb-foe: radial-gradient(closest-side, rgba(244, 232, 220, .46) 92%, transparent 100%);
+  --duel-orn-fb-me:  radial-gradient(closest-side, rgba(255, 255, 255, .72) 92%, transparent 100%);
+  --duel-tm-color: #F0537D;
+}
+#duel-hud[hidden] { display: none; }
+
+.dh-side {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px 5px;
+  border-radius: 13px;
+  background-size: 100% 100%, auto;
+  background-repeat: no-repeat, repeat;
+}
+.dh-foe {
+  background-image: var(--duel-foe-frame), var(--duel-foe-panel);
+  box-shadow: inset 0 0 0 1px rgba(255, 170, 170, .22), 0 2px 6px rgba(0, 0, 0, .30);
+}
+.dh-me {
+  background-image: var(--duel-me-frame), var(--duel-me-panel);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .60), 0 2px 6px rgba(0, 0, 0, .20);
+}
+/* 장식(악당=뼈, 내 쪽=날개)의 **자리**. 지금은 캡슐 양끝의 부드러운 도형이고,
+   --duel-orn-l/r 에 url 이 들어오면 앞칸이 그 도형을 덮어 그림이 된다. */
+.dh-side::before,
+.dh-side::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  margin-top: -9px;
+  width: 11px;
+  height: 18px;
+  pointer-events: none;
+  background-size: contain, contain;
+  background-repeat: no-repeat, no-repeat;
+  background-position: center, center;
+}
+.dh-side::before { left: 0; }
+.dh-side::after  { right: 0; }
+.dh-foe::before { background-image: var(--duel-orn-l), var(--duel-orn-fb-foe); }
+.dh-foe::after  { background-image: var(--duel-orn-r), var(--duel-orn-fb-foe); }
+.dh-me::before  { background-image: var(--duel-orn-l), var(--duel-orn-fb-me); }
+.dh-me::after   { background-image: var(--duel-orn-r), var(--duel-orn-fb-me); }
+
+#duel-hud .dh-av { flex: 0 0 auto; width: 36px; height: 34px; }
+/* 내 초상은 선택 캐릭터의 표준 face 다 — applyCharSkin 의 --slot-face 와 같은
+   setStdArt 규약이고, 표준 얼굴이 없는 캐릭터에서는 변수가 비어 빈 칸이 된다. */
+.dh-av-me {
+  background-image: var(--duel-me-face, none);
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.dh-info { flex: 1 1 auto; min-width: 0; position: relative; z-index: 1; }
+.dh-top { display: flex; align-items: baseline; justify-content: space-between; gap: 5px; }
+.dh-name {
+  flex: 0 1 auto;
+  min-width: 0;
+  font: 800 11px/1.2 var(--font);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dh-lv { flex: 0 0 auto; font: 800 9px/1 var(--font-latin); }
+.dh-foe .dh-name { color: #FFE4E9; }
+.dh-foe .dh-lv   { color: #FFB4A6; }
+.dh-me  .dh-name { color: #204464; }
+.dh-me  .dh-lv   { color: #2C6E96; }
+
+.dh-bar {
+  position: relative;
+  height: 13px;
+  margin-top: 2px;
+  border-radius: 7px;
+  overflow: hidden;
+}
+.dh-foe .dh-bar { background: var(--duel-foe-track); box-shadow: inset 0 0 0 1px rgba(255, 150, 150, .24); }
+.dh-me  .dh-bar { background: var(--duel-me-track);  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .55); }
+/* width 가 아니라 scaleX — #boss-hp-fill 과 같은 이유다(체력은 매치마다 줄어드는
+   값이라 레이아웃을 건드리면 그 프레임에 보드 전체가 다시 배치된다). */
+.dh-fill {
+  position: absolute;
+  inset: 0;
+  transform-origin: 0 50%;
+  transform: scaleX(var(--hp, 1));
+  transition: transform 300ms var(--ease);
+}
+.dh-foe .dh-fill { background-image: var(--duel-foe-fill); }
+.dh-me  .dh-fill { background-image: var(--duel-me-fill); }
+.dh-num {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: 800 9px/1 var(--font-latin);
+  white-space: nowrap;
+}
+.dh-foe .dh-num { color: #FFF1F1; text-shadow: 0 1px 2px rgba(0, 0, 0, .85); }
+.dh-me  .dh-num { color: #16374E; text-shadow: 0 1px 1px rgba(255, 255, 255, .70); }
+
+/* 공격 게이지. 시안에는 없지만 전투 정보로는 필수다 — 만땅이 곧 자동 발동이라
+   "언제 나가나"가 화면에 없으면 공격도 피격도 사고처럼 읽힌다. 주 HP 바 아래
+   2px 로만 눕혀서 시안의 구도(두 체력바 + 가운데 시계)를 흔들지 않는다. */
+.dh-sub { height: 2px; margin-top: 2px; border-radius: 1px; overflow: hidden; background: rgba(0, 0, 0, .34); }
+.dh-me .dh-sub { background: rgba(34, 74, 108, .26); }
+.dh-subfill {
+  display: block;
+  height: 100%;
+  transform-origin: 0 50%;
+  transform: scaleX(var(--atk, 0));
+  transition: transform 200ms linear;
+}
+.dh-foe .dh-subfill { background-image: var(--duel-foe-atk); }
+.dh-me  .dh-subfill { background-image: var(--duel-me-atk); }
+
+/* 가한 누적 데미지 — 전투의 '점수'다. #tb-stats 가 전투에서 비는 자리를 이
+   한 줄이 대신한다(별·best 는 여전히 S.score 로 계산된다 — 두 계좌는 다르다). */
+.dh-dmg {
+  display: block;
+  margin-top: 2px;
+  font: 800 9px/1.2 var(--font-latin);
+  color: #2C6E96;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dh-mid { flex: 0 0 auto; width: 92px; display: flex; flex-direction: column; align-items: center; }
+.dh-castle {
+  display: block;
+  width: 22px;
+  height: 15px;
+  font-size: 13px;
+  line-height: 15px;
+  text-align: center;
+  background-image: var(--duel-castle-img);
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+/* 젤리 유리 캡슐. 시안 중앙의 그 캡슐이고, 아트가 오면 --duel-cap-frame 이 덮는다. */
+#duel-timer {
+  width: 100%;
+  margin-top: 1px;
+  padding: 3px 4px 4px;
+  border-radius: 14px;
+  text-align: center;
+  font: 900 21px/1 var(--font-latin);
+  letter-spacing: .5px;
+  color: var(--duel-tm-color);
+  background-image: var(--duel-cap-frame), var(--duel-cap-bg);
+  background-size: 100% 100%, auto;
+  background-repeat: no-repeat, repeat;
+  box-shadow:
+    inset 0 0 0 1.5px rgba(255, 255, 255, .62),
+    inset 0 3px 7px rgba(255, 255, 255, .34),
+    0 2px 7px rgba(0, 0, 0, .22);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, .55), 0 2px 3px rgba(0, 0, 0, .22);
+}
+/* 마지막 10초의 박동은 #rush-timer 와 **같은 keyframes** 를 쓴다 — 시계가 자리를
+   옮겼다고 긴장의 문법까지 새로 만들지 않는다. */
+#app.danger #duel-timer { color: #FF3D2E; animation: rushbeat 1s infinite; }
+
+/* 전투에서 자리를 비우는 둘. **숨김이지 삭제가 아니다**: .battle 은 battleOn()
+   계보만 켜므로 TW_BATTLE=false 면 영영 안 켜지고, 세 모드는 이 줄을 지나지
+   않는다. 시간은 #duel-timer 가, 점수는 .dh-dmg 가 대신 말한다 — 같은 사실이
+   화면에 두 번 서면 어느 쪽이 나를 죽이는지가 흐려진다(syncRushHud 의 규율). */
+#app.battle #tb-stats { display: none; }
+#app.battle #rush-timer { display: none; }
+
+/* 피격. 맞은 쪽 진영만 밝게 튀고 흔들린다 — #app.duel-hurt 의 붉은 톤과 같은
+   계열이되 판 전체를 덮지 않는다(맞은 뒤에도 판은 계속 읽혀야 한다). */
+#duel-hud.fhit .dh-foe .dh-fill,
+#duel-hud.mhit .dh-me .dh-fill { animation: dhflash 300ms var(--ease); }
+#duel-hud.fhit .dh-foe,
+#duel-hud.mhit .dh-me { animation: dhknock 300ms var(--ease); }
+#duel-hud.fhit.big .dh-foe { animation: dhknock 460ms var(--spring) 2; }
+@keyframes dhflash {
+  0%, 100% { filter: none; }
+  25%      { filter: brightness(2.6) saturate(.35); }
+}
+@keyframes dhknock {
+  0%, 100% { transform: translateX(0); }
+  30%      { transform: translateX(-5px); }
+  65%      { transform: translateX(4px); }
+}
+/* 예고 — #boss-bar.tell 과 같은 문법(테두리가 경고색으로 뛴다). 화면을 덮지
+   않는 것이 규칙이다: 예고 1.8초 동안 플레이어는 계속 매치할 수 있어야 한다. */
+#duel-hud.tell .dh-foe { animation: dhtell .6s ease-in-out infinite; }
+@keyframes dhtell {
+  0%, 100% { box-shadow: inset 0 0 0 1px rgba(255, 170, 170, .22), 0 2px 6px rgba(0, 0, 0, .30); }
+  50%      { box-shadow: inset 0 0 0 2px rgba(255, 90, 61, .95), 0 2px 10px rgba(255, 90, 61, .50); }
+}
+/* 격파 — 보스바와 같은 keyframes(bossdown). 바는 비워진다. */
+#duel-hud.down .dh-foe { animation: bossdown .6s var(--ease) forwards; }
+#duel-hud.down .dh-foe .dh-fill { transform: scaleX(0); }
+
+@media (prefers-reduced-motion: reduce) {
+  #duel-hud.tell .dh-foe,
+  #duel-hud.fhit .dh-foe,
+  #duel-hud.mhit .dh-me,
+  #duel-hud.fhit .dh-foe .dh-fill,
+  #duel-hud.mhit .dh-me .dh-fill,
+  #app.danger #duel-timer { animation: none; }
+  .dh-fill, .dh-subfill { transition: none; }
+}
+
+/* 폭 예산(390px): 좌우 진영이 각각 (390 − 16 여백 − 12 gap − 92 중앙)/2 = 135px.
+   초상 36 + gap 5 + 정보 최소 86 이 그 안에 들어간다. 더 좁아지면 **이름부터**
+   접는다 — 초상과 색이 이미 말하고 있는 사실이라 가장 먼저 생략해도 되고,
+   숫자(현재/최대)와 레벨은 남는다. */
+@media (max-width: 379px) {
+  #duel-hud { gap: 4px; }
+  .dh-mid { width: 82px; }
+  #duel-timer { font-size: 18px; }
+  #duel-hud .dh-name { display: none; }
+  #duel-hud .dh-av { width: 30px; height: 28px; }
+}
+
 /* ---- 18.5 보스 스프라이트 (단일 SVG + .bs-* 토글) ---------------------------
    캐릭터와 **같은 규약**이다: 마크업은 한 벌이고 색 토글만 클래스가 갈아
    끼운다. 셋 다 "귀엽지만 못된" 인상 — 둥근 젤리 몸에 큰 눈과 볼록한 광택
@@ -12160,6 +12426,47 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
       <div class="stat" id="stat-timer" hidden><span class="stat-k" data-i18n="hud.time">Time</span><span id="timer-val" class="stat-v">0:00</span></div>
       </div>
     </header>
+    <!-- ============================================================
+         전투 개편 §4 — 전투 HUD (#duel-hud).
+
+         한 줄에 셋: [좌 악당 진영] [중앙 타이머] [우 내 진영]. 좌상 일시정지는
+         기존 #btn-pause 가 그대로 맡는다(시안과 같은 자리). 전투(adv + S.duel)
+         에서만 존재하고 그 밖에서는 [hidden] 이라 높이가 정확히 0 이다 —
+         #boss-bar 와 같은 규약으로 세로 패딩을 자기 것으로 갖지 않는다.
+
+         **스킨은 아직 코드다.** 시안(gm-ingame-battle.png)의 뼈 장식·날개
+         장식·젤리 유리 캡슐은 지금 CSS 그라데이션이 대신 서 있고, 그 값은
+         전부 style §18.4b 의 --duel-* 한 블록에 모여 있다. 에셋이 도착하면
+         **그 변수들만** url(...) 로 갈아 끼운다 — 마크업도 JS 도 그날 한 글자
+         안 바뀐다(--char-img · --bs-face 와 같은 교체 규약).
+
+         악당 초상은 .boss-av + .bs-* 를 그대로 빌린다(복제가 아니라 재사용) —
+         맵 노드·보스바와 같은 표 한 곳을 고치면 이 자리도 함께 바뀐다.
+         소유자: game.js 의 duelHudMount()(판당 1회) + syncDuel()(매 틱).
+         ============================================================ -->
+    <div id="duel-hud" hidden>
+      <div class="dh-side dh-foe">
+        <span id="duel-foe-av" class="dh-av boss-av bs-grape" aria-hidden="true"></span>
+        <div class="dh-info">
+          <div class="dh-top"><b id="duel-foe-name" class="dh-name"></b><span id="duel-foe-lv" class="dh-lv">Lv.1</span></div>
+          <div class="dh-bar"><i id="duel-foe-fill" class="dh-fill"></i><span id="duel-foe-n" class="dh-num">0 / 0</span></div>
+          <div class="dh-sub"><i id="duel-foe-atk" class="dh-subfill"></i></div>
+        </div>
+      </div>
+      <div class="dh-mid">
+        <span class="dh-castle" aria-hidden="true">&#127984;</span>
+        <div id="duel-timer" role="timer">0:00</div>
+      </div>
+      <div class="dh-side dh-me">
+        <div class="dh-info">
+          <div class="dh-top"><b id="duel-me-name" class="dh-name"></b><span id="duel-me-lv" class="dh-lv">Lv.1</span></div>
+          <div class="dh-bar"><i id="duel-me-fill" class="dh-fill"></i><span id="duel-me-n" class="dh-num">0 / 0</span></div>
+          <div class="dh-sub"><i id="duel-me-atk" class="dh-subfill"></i></div>
+          <span id="duel-dmg" class="dh-dmg"></span>
+        </div>
+        <span id="duel-me-av" class="dh-av dh-av-me" aria-hidden="true"></span>
+      </div>
+    </div>
     <!-- v2 HUD strip. Collapses to 0px when both children are [hidden] (no vertical
          padding of its own), so classic Endless / Daily keep the v1 board height. -->
     <div id="hud-row">
@@ -24788,10 +25095,18 @@ window.TT_SFX = {
   function syncRushHud() {
     var timed = S.mode === 'rush' || S.mode === 'adv';
     var el = $('rush-timer');
+    var txt = S.mode === 'rush' ? fmtTime(Math.ceil(rushLeftMs() / 1000))
+            : S.mode === 'adv' ? fmtTime(Math.ceil(advLeftMs() / 1000)) : '';
     if (el) {
       el.hidden = !timed;
-      if (S.mode === 'rush') el.textContent = fmtTime(Math.ceil(rushLeftMs() / 1000));
-      else if (S.mode === 'adv') el.textContent = fmtTime(Math.ceil(advLeftMs() / 1000));
+      if (txt) el.textContent = txt;
+    }
+    /* 전투 개편 단계 4 — 같은 값이 #duel-hud 중앙에도 선다(#rush-timer 는 그때
+       CSS 로 숨는다). 시계를 하나로 두는 규율은 그대로다: 자리만 옮겼을 뿐
+       숫자를 만드는 곳은 여전히 이 함수 한 곳이다. */
+    if (txt && battleOn()) {
+      var dt = $('duel-timer');
+      if (dt && dt.textContent !== txt) dt.textContent = txt;
     }
     if (!timed) setDanger(false);
     syncAdvGoal();
@@ -25195,6 +25510,11 @@ window.TT_SFX = {
        "3모드 무영향" 규약의 구멍이다. */
     S.duel = null;
     setAppClass('duel-hurt', false);
+    /* 단계 4: 화면도 같이 내린다. .battle 이 남으면 #tb-stats 가 숨은 채 다음
+       모드가 시작되고, #duel-hud 가 남으면 endless 의 보드가 그만큼 낮아진다 —
+       "3모드 무영향"은 값뿐 아니라 화면에도 적용된다(위 skillReset 과 같은 규약). */
+    setAppClass('battle', false);
+    duelHudUnmount();
   }
 
   function startEndless(fresh) {
@@ -28225,6 +28545,10 @@ window.TT_SFX = {
   function bossDefeatFx() {
     var el = $('boss-bar');
     if (el && el.classList) el.classList.add('down');
+    /* 단계 4: 전투에서는 같은 격파 연출이 #duel-hud 의 악당 진영에서 일어난다
+       (keyframes 는 bossdown 하나를 나눠 쓴다 — 격파는 한 사실이다). */
+    var hud = $('duel-hud');
+    if (hud && hud.classList) { hud.classList.remove('tell'); hud.classList.add('down'); }
     setAppClass('boss-tell', false);
     J.screenPulse();
     J.vignette(0.55);
@@ -28320,33 +28644,115 @@ window.TT_SFX = {
     S.bossTellAt = 0;
     S.bossArm = false;
     setAppClass('boss', true);
-    /* 임시 HUD (단계 4의 #duel-hud 가 오기 전까지): 기존 보스 체력바를 악당 HP
-       표시기로 그대로 굴린다. 내 HP·게이지는 window.Game.state.duel 로 본다. */
-    var el = $('boss-bar');
-    if (el) {
-      el.hidden = false;
-      if (el.classList) el.classList.remove('hit', 'big', 'down', 'tell');
-      var av = $('boss-av');
-      if (av && d.def) av.className = 'boss-av bs-' + d.def.id;
-      setText('boss-name', d.def ? bossName(d.def) : '');
+    /* 단계 4: 화면은 #duel-hud 가 통째로 맡는다. .battle 이 켜지는 **유일한
+       자리**이기도 하다 — 단계 1의 #app.battle #board-scroll{overflow:hidden}
+       과 단계 4의 #tb-stats·#rush-timer 숨김이 이 한 줄에 달려 있다. */
+    setAppClass('battle', true);
+    /* legacy 보스바는 전투에서 켜지 **않는다**. 지우지 않는 이유는 TW_BATTLE=false
+       원복과 비전투 보스탄(bossStart 경로)이 그대로 살아 있어야 하기 때문이다. */
+    var bb = $('boss-bar');
+    if (bb) {
+      bb.hidden = true;
+      if (bb.classList) bb.classList.remove('hit', 'big', 'down', 'tell');
     }
+    duelHudMount(d);
     syncDuel();
   }
 
-  /** 임시 HUD 의 단독 소유자 (단계 4에서 #duel-hud 로 이사한다). */
+  /* -------------------------------------------------------------------------
+   * #duel-hud (전투 개편 단계 4)
+   *
+   * 두 소유자로 나뉜다: **판당 1회**의 duelHudMount(이름·레벨·초상 — 판이 도는
+   * 동안 바뀌지 않는 것들)와 **매 틱**의 syncDuel(숫자·게이지). 나누는 이유는
+   * duelTick 이 200ms 마다 도는데, 매 틱 setStdArt·className 까지 다시 쓰면
+   * 판당 600회의 스타일 재계산이 공짜로 생기기 때문이다.
+   * ----------------------------------------------------------------------- */
+
+  /** 판당 1회. 지난 판의 값 캐시(d.hud)를 비우는 것이 여기 있는 이유다. */
+  function duelHudMount(d) {
+    var hud = $('duel-hud');
+    if (!hud || !d) return;
+    hud.hidden = false;
+    if (hud.classList) hud.classList.remove('fhit', 'mhit', 'big', 'tell', 'down');
+    d.hud = null;                      // 캐시 초기화 — 첫 틱이 여섯 칸을 다 쓴다
+    /* 악당 초상: 맵 노드·보스바와 **같은 .bs-* 표**를 읽는다(복제가 아니라 재사용). */
+    var av = $('duel-foe-av');
+    if (av) av.className = 'dh-av boss-av bs-' + (d.def ? d.def.id : 'grape');
+    setText('duel-foe-name', d.def ? bossName(d.def) : '');
+    /* Lv 은 탄 번호다. 양쪽에 같은 값이 서는 것이 시안이고, 실제로도 이 판의
+       난이도(HP·공격력·게이지 캡)를 정하는 단 하나의 수가 탄 번호다. */
+    var lv = 'Lv.' + Math.max(1, S.stage | 0);
+    setText('duel-foe-lv', lv);
+    setText('duel-me-lv', lv);
+    var cid = charId();
+    setText('duel-me-name', t('char.' + cid + '.name'));
+    var me = $('duel-me-av');
+    if (me) setStdArt(me, cid, 'face', '--duel-me-face');
+  }
+
+  /** 전투 화면을 내린다. 값(S.duel)은 호출자의 소유다 — 여기는 화면만 만진다. */
+  function duelHudUnmount() {
+    var hud = $('duel-hud');
+    if (!hud) return;
+    hud.hidden = true;
+    if (hud.classList) hud.classList.remove('fhit', 'mhit', 'big', 'tell', 'down');
+  }
+
+  /* 값이 **바뀐 칸만** 쓴다. duelTick 이 200ms 마다 syncDuel 을 부르므로 2분짜리
+     판이면 600틱이고, 무조건 쓰면 그것이 여섯 칸짜리 DOM 쓰기 3600회가 된다 —
+     그 대부분은 같은 값을 같은 자리에 다시 넣는 일이다. */
+  function dhVar(c, k, id, prop, v) {
+    var n = Math.round(v * 1000) / 1000;
+    if (c[k] === n) return;
+    c[k] = n;
+    var el = $(id);
+    if (el && el.style) el.style.setProperty(prop, String(n));
+  }
+  function dhText(c, k, id, s) {
+    if (c[k] === s) return;
+    c[k] = s;
+    setText(id, s);
+  }
+
+  /** #duel-hud 의 단독 소유자. duelTick·duelHit*·duelFoeGauge 가 부른다. */
   function syncDuel() {
     var d = S.duel;
     if (!d) return;
-    var el = $('boss-bar');
-    if (!el || el.hidden) return;
-    var f = d.foe.hpMax > 0 ? Math.max(0, d.foe.hp) / d.foe.hpMax : 0;
-    el.style.setProperty('--hp', String(f));
-    setText('boss-hp-n', Math.max(0, Math.ceil(f * 100)) + '%');
-    setText('boss-cond', t('duel.hud', {
-      hp: Math.max(0, Math.ceil(d.me.hp)),
-      a: Math.min(100, Math.round(d.me.atk / d.me.atkMax * 100)),
-      s: Math.min(100, Math.round(d.me.sp / d.me.spMax * 100))
-    }));
+    var hud = $('duel-hud');
+    if (!hud || hud.hidden) return;
+    var c = d.hud || (d.hud = {});
+    var f = d.foe, m = d.me;
+    dhVar(c, 'fr', 'duel-foe-fill', '--hp', f.hpMax > 0 ? Math.max(0, f.hp) / f.hpMax : 0);
+    dhVar(c, 'mr', 'duel-me-fill', '--hp', m.hpMax > 0 ? Math.max(0, m.hp) / m.hpMax : 0);
+    dhVar(c, 'fa', 'duel-foe-atk', '--atk', f.atkMax > 0 ? Math.min(1, f.atk / f.atkMax) : 0);
+    dhVar(c, 'ma', 'duel-me-atk', '--atk', m.atkMax > 0 ? Math.min(1, m.atk / m.atkMax) : 0);
+    dhText(c, 'fn', 'duel-foe-n', Math.max(0, Math.ceil(f.hp)) + ' / ' + f.hpMax);
+    dhText(c, 'mn', 'duel-me-n', Math.max(0, Math.ceil(m.hp)) + ' / ' + m.hpMax);
+    dhText(c, 'dm', 'duel-dmg', 'DMG ' + (d.dmg | 0));
+  }
+
+  /** 악당 진영의 화면 좌표. 연출(빔의 과녁·데미지 숫자)이 여기로 모인다 —
+   *  HUD 가 이사했으므로 과녁도 함께 이사한다. 못 재면 종전의 화면 상단이다. */
+  function duelFoeAt() {
+    var w = typeof window !== 'undefined' ? window.innerWidth : 360;
+    var h = typeof window !== 'undefined' ? window.innerHeight : 640;
+    var pt = { x: w / 2, y: h * 0.16 };
+    var el = $('duel-foe-av');
+    if (el && el.getBoundingClientRect) {
+      var r = el.getBoundingClientRect();
+      if (r.width > 0) { pt.x = r.left + r.width / 2; pt.y = r.top + r.height / 2; }
+    }
+    return pt;
+  }
+
+  /** 피격 플래시. 맞은 쪽 진영만 튄다(§18.4b). 다시 걸어야 재생되므로 먼저 지운다. */
+  function duelHudFlash(cls, big) {
+    var hud = $('duel-hud');
+    if (!hud || hud.hidden || !hud.classList) return;
+    hud.classList.remove('fhit', 'mhit', 'big');
+    void hud.offsetWidth;
+    hud.classList.add(cls);
+    if (big) hud.classList.add('big');
   }
 
   /**
@@ -28362,15 +28768,17 @@ window.TT_SFX = {
     var real = Math.min(n, d.foe.hp);
     d.foe.hp -= real;
     d.dmg += real;
-    var el = $('boss-bar');
-    if (el && el.classList) {
-      el.classList.remove(big ? 'big' : 'hit');
-      void el.offsetWidth;
-      el.classList.add(big ? 'big' : 'hit');
-    }
+    duelHudFlash('fhit', big);
     if (big && typeof window !== 'undefined') {
-      J.shockwave(window.innerWidth / 2, window.innerHeight * 0.16, '#ff5a3d');
-      J.floatText(window.innerWidth / 2, window.innerHeight * 0.24, '-' + n, '#ff8a3d', 36);
+      /* 데미지 숫자 팝은 단계 2 그대로다 — 바뀐 것은 **과녁**뿐이고, 과녁은
+         이제 #duel-hud 의 악당 초상이다(숫자가 자기 바 위에서 떠야 읽힌다). */
+      var at = duelFoeAt();
+      J.shockwave(at.x, at.y, '#ff5a3d');
+      /* 숫자는 과녁 바로 위가 아니라 **화면 안**에 떠야 한다: 악당 진영이 왼쪽
+         끝이라 다섯 자리 데미지를 초상 중앙에 걸면 앞자리가 화면 밖으로 잘린다
+         (390px 에서 실제로 잘렸다). 36px 6글자의 반폭이 96px 이라 그만큼 민다. */
+      var px = Math.min(Math.max(at.x, 96), Math.max(96, window.innerWidth - 96));
+      J.floatText(px, at.y + 26, '-' + n, '#ff8a3d', 36);
       J.vibrate(50);
       heroSay('boss', 5);
     }
@@ -28391,13 +28799,8 @@ window.TT_SFX = {
     me.atk -= me.atkMax;
     if (me.atk < 0) me.atk = 0;
     if (typeof window !== 'undefined') {
-      var el = $('boss-bar');
-      var tx = window.innerWidth / 2, ty = window.innerHeight * 0.16;
-      if (el && el.getBoundingClientRect) {
-        var r = el.getBoundingClientRect();
-        if (r.width > 0) { tx = r.left + r.width / 2; ty = r.top + r.height / 2; }
-      }
-      J.beam(window.innerWidth / 2, window.innerHeight * 0.74, tx, ty, '#ffb03d');
+      var at = duelFoeAt();
+      J.beam(window.innerWidth / 2, window.innerHeight * 0.74, at.x, at.y, '#ffb03d');
     }
     J.sfx.bomb();
     duelHitFoe(me.atkMax, true);
@@ -28411,6 +28814,7 @@ window.TT_SFX = {
     var n = Math.max(0, Math.round(dmg));
     if (n <= 0) return;
     d.me.hp = Math.max(0, d.me.hp - n);
+    duelHudFlash('mhit', false);
     setAppClass('duel-hurt', true);
     later(function () { setAppClass('duel-hurt', false); }, 420);
     J.screenPulse();
@@ -28449,6 +28853,8 @@ window.TT_SFX = {
     setAppClass('boss-tell', true);
     var el = $('boss-bar');
     if (el && el.classList) el.classList.add('tell');
+    var hud = $('duel-hud');
+    if (hud && hud.classList) hud.classList.add('tell');
     toast(t('duel.tell'));
     J.sfx.fail();
     J.vibrate(20);
@@ -28460,6 +28866,8 @@ window.TT_SFX = {
     setAppClass('boss-tell', false);
     var el = $('boss-bar');
     if (el && el.classList) el.classList.remove('tell');
+    var hud = $('duel-hud');
+    if (hud && hud.classList) hud.classList.remove('tell');
     if (!d || d.down) return;
     d.foe.atk = 0;
     duelHitMe(d.foe.hit);
@@ -29174,6 +29582,10 @@ window.TT_SFX = {
        같은 판정을 두 번 내지 않게. duel 자체는 남겨 둔다(결과 시트·디버그가 읽는다). */
     if (S.duel) { S.duel.down = true; S.duel.meArm = false; }
     setAppClass('duel-hurt', false);
+    /* 전투 화면 상태를 내린다(단계 4). HUD 자체는 **아직 안 지운다** — 격파
+       연출(.down)이 이 직후에 재생되고, 결과 시트가 그 위를 덮는다. 실제 철거는
+       모드를 떠나는 leaveAdvSkin 한 곳의 몫이다. */
+    setAppClass('battle', false);
     setAppClass('boss-tell', false);
     S.bossTellAt = 0;
     var p = S.advPlan || advPlan(S.stage);
@@ -31231,9 +31643,11 @@ window.TT_SFX = {
        위한 핸들. 게임 코드는 이 중 무엇도 window.Game 을 거쳐 부르지 않는다. */
     battleRefill: battleRefill, battleRefillEx: battleRefillEx,
     battleFitBoard: battleFitBoard, battleRows: battleRows, battleOn: battleOn,
-    /* 전투 코어(단계 2) — 본 HUD 는 단계 4에서 온다. 그때까지 내 HP·양쪽 게이지는
-       `Game.state.duel` 로 읽고, 승패 경로는 아래 손잡이로 곧장 몰아 볼 수 있다.
-       게임 코드는 이 중 무엇도 window.Game 을 거쳐 부르지 않는다. */
+    /* 전투 코어(단계 2) — 값은 `Game.state.duel`, 화면은 #duel-hud(단계 4)다.
+       승패 경로는 아래 손잡이로 곧장 몰아 볼 수 있고, syncDuel 은 하네스가 값을
+       강제로 바꾼 뒤 화면을 한 번 맞추기 위한 것이다(전투 루프는 자기 힘으로
+       부른다). 게임 코드는 이 중 무엇도 window.Game 을 거쳐 부르지 않는다. */
+    syncDuel: syncDuel,
     duelTick: duelTick, duelHitFoe: duelHitFoe, duelHitMe: duelHitMe,
     duelFoeGauge: duelFoeGauge, duelMeAttack: duelMeAttack,
     duelOnMatch: duelOnMatch, duelInit: duelInit, duelTimeoutWin: duelTimeoutWin,
