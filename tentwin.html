@@ -2213,8 +2213,11 @@ button {
 #btn-shuffle .act-ico { font-size: 18px; }
 
 /* When shuffle is the ONLY remaining move, it stops being a convenience and
-   becomes the instruction. game.js may add .urge; motion is transform-only. */
-#btn-shuffle.urge {
+   becomes the instruction. game.js may add .urge; motion is transform-only.
+   전투 개편 단계 3 — 선택자가 `.act.urge` 로 일반화됐다: 전투에서는 같은 신호를
+   필살기(만땅)와 각성(게이지 만땅)이 쓴다. "이 버튼이 지금 수(手)다"라는 뜻은
+   버튼이 바뀌어도 그대로여서, 신호를 하나 더 만들 이유가 없다. */
+.act.urge {
   background: rgba(204, 86, 255, .16);
   box-shadow: inset 0 0 0 1px rgba(204, 86, 255, .5);
   animation: act-urge 1.6s var(--ease) infinite;
@@ -3065,7 +3068,7 @@ li.roll-in { animation: rollin 380ms var(--spring) backwards; }
   }
   :where(:root:not([data-theme="dark"])) #stat-moves.low .stat-k { color: #A03A26; }
   :where(:root:not([data-theme="dark"])) #stat-moves.low .stat-v { color: #C7301A; }
-  :where(:root:not([data-theme="dark"])) #btn-shuffle.urge {
+  :where(:root:not([data-theme="dark"])) .act.urge {
     background: rgba(146, 38, 200, .12);
     box-shadow: inset 0 0 0 1px rgba(146, 38, 200, .45);
   }
@@ -3235,7 +3238,7 @@ li.roll-in { animation: rollin 380ms var(--spring) backwards; }
 }
 :where(:root[data-theme="light"]) #stat-moves.low .stat-k { color: #A03A26; }
 :where(:root[data-theme="light"]) #stat-moves.low .stat-v { color: #C7301A; }
-:where(:root[data-theme="light"]) #btn-shuffle.urge {
+:where(:root[data-theme="light"]) .act.urge {
   background: rgba(146, 38, 200, .12);
   box-shadow: inset 0 0 0 1px rgba(146, 38, 200, .45);
 }
@@ -3368,7 +3371,7 @@ li.roll-in { animation: rollin 380ms var(--spring) backwards; }
      bob keyframes were deleted with the floating pill. */
   .stat-v.tick,
   #stat-moves.low .stat-v,
-  #btn-shuffle.urge,
+  .act.urge,
   #clear-stage-hero,
   /* v6.1: the menu's 54s background breath. Its resting state is opacity 1 (the
      keyframe's own midpoint), so the tile motif does not disappear — it stops. */
@@ -4539,6 +4542,17 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
 @keyframes mate-bob {
   0%, 100% { transform: translateY(0)    scale(1); }
   50%      { transform: translateY(-2px) scale(1.02); }
+}
+/* 전투 개편 단계 3 — 펫 스킬을 쓴 순간 동료가 한 번 뛴다. 한 번뿐이라 상시
+   호흡(mate-bob)을 덮어쓰고 끝나며, 새 에셋 없이 transform 만 쓴다.
+   prefers-reduced-motion 블록이 이미 #mate 의 animation 을 끄므로 별도 예외가
+   필요 없다 — 뛰지 않을 뿐, 토스트가 같은 말을 이미 하고 있다. */
+#mate.petgo { animation: mate-petgo 600ms var(--ease); }
+@keyframes mate-petgo {
+  0%   { transform: translateY(0)     scale(1); }
+  26%  { transform: translateY(-11px) scale(1.18); }
+  58%  { transform: translateY(0)     scale(.94); }
+  100% { transform: translateY(0)     scale(1); }
 }
 /* 동료 배지 — 뭉치의 누적(x1.35)과 삐약의 장전(x1.5!)이 여기 뜬다.
    스프라이트 머리 위라, 숫자가 누구의 것인지 화살표 없이도 읽힌다. */
@@ -18679,6 +18693,10 @@ window.TT_SFX = {
   var DUEL_SKILL_MS = BOSS_ATK_MS;   // 방해 스킬 케이던스 — 반격 주기(15초) 재사용
   var DUEL_SKILL_BLK = 2;
   var DUEL_PET_MAX = 2;              // 펫 스킬 판당 횟수 (단계 3에서 소비)
+  /* 단계 3 — 동료의 **액티브** 두 종. 둘 다 화력이 아니라 유틸이라는 것이 요점이다:
+     피해는 게이지 한 문으로만 들어온다는 단계 2의 계약을 펫이 뚫으면 안 된다. */
+  var DUEL_PET_POP = 4;              // 삐약 "쪼아먹기" — 한 번에 지우는 산 칸 수
+  var DUEL_PET_FREEZE_MS = 6000;     // 뭉치 "덩어리 방패" — 적 게이지 동결 시간
 
   /* =========================================================================
    * SECTION 1 — PURE RULE / GENERATOR FUNCTIONS
@@ -20787,6 +20805,23 @@ window.TT_SFX = {
       'duel.hit': 'Hit! -{n} HP',
       'duel.skill': 'Blockers dropped x{n}!',
       'duel.hud': 'HP {hp} / ATK {a}% / SP {s}%',
+      /* 전투 개편 단계 3 — 하단 네 버튼의 전투 이름과 응답. */
+      'act.attack': 'Attack',
+      'act.special': 'Special',
+      'act.pet': 'Pet',
+      'act.awaken': 'Awaken',
+      'aria.attack': 'Attack gauge status',
+      'aria.special': 'Fire your special attack',
+      'aria.pet': 'Use your partner skill',
+      'aria.awaken': 'TenTwin Awakening',
+      'duel.atkstat': 'Attack gauge {n}% — it fires on its own when it fills.',
+      'duel.spstat': 'Special {n}% — fill it up first.',
+      'duel.spgo': 'SPECIAL! -{n}',
+      'duel.petnone': 'No partner yet — pick one to get a pet skill.',
+      'duel.petout': 'No pet skill left this round.',
+      'duel.petempty': 'Nothing left to peck.',
+      'duel.petpeck': 'Peck! {n} tiles cleared',
+      'duel.petshield': 'Chunky Shield! Villain gauge frozen for {n}s',
       'adv.heartkept': 'Cleared, so no heart was spent.',
       'adv.heartplus': 'Boss bonus: +1 heart!',
       'adv.heartlost': '-1 heart. {n} left.',
@@ -20807,10 +20842,12 @@ window.TT_SFX = {
       'skill.ready': 'GO!',
       'skill.notyet': 'The gauge is still charging.',
       'skill.sub': 'ULTIMATE',
-      'skill.ten.name': 'TWIN PRINCE, COME!',
-      'skill.twin.name': 'TENTEN PRINCE, COME!',
+      /* 단계 3 개명: "소환" → "각성". 키는 그대로다 — castSkill 의 분기가 이 키로
+         갈리므로 문구만 바뀌고 코드 경로는 한 글자도 안 움직인다. */
+      'skill.ten.name': 'TENTWIN AWAKENING — TWIN PRINCE!',
+      'skill.twin.name': 'TENTWIN AWAKENING — TENTEN PRINCE!',
       'skill.jelly.name': 'JELLY TIME!',
-      'skill.on.summon': 'The brothers fight as one — every match is a TenTwin chain!',
+      'skill.on.summon': 'TenTwin Awakening! Every match is a TenTwin chain now!',
       'skill.on.jelly': 'Jelly Time! Jackpot odds are up to 40%',
       'skill.gauge': 'Ultimate',
 
@@ -21366,6 +21403,23 @@ window.TT_SFX = {
       'duel.hit': '피격! HP -{n}',
       'duel.skill': '방해 블로커 {n}개!',
       'duel.hud': 'HP {hp} / 공격 {a}% / 필살 {s}%',
+      /* 전투 개편 단계 3 — 하단 네 버튼의 전투 이름과 응답. */
+      'act.attack': '공격',
+      'act.special': '필살기',
+      'act.pet': '펫소환',
+      'act.awaken': '각성',
+      'aria.attack': '공격 게이지 상태',
+      'aria.special': '필살기 발동',
+      'aria.pet': '펫 스킬 사용',
+      'aria.awaken': '텐트윈 각성',
+      'duel.atkstat': '공격 게이지 {n}% — 다 차면 저절로 나가요.',
+      'duel.spstat': '필살기 {n}% — 아직 덜 찼어요.',
+      'duel.spgo': '필살기! -{n}',
+      'duel.petnone': '동료가 없어요. 먼저 동료를 골라 주세요.',
+      'duel.petout': '이번 판 펫 스킬을 다 썼어요.',
+      'duel.petempty': '쪼아먹을 타일이 없어요.',
+      'duel.petpeck': '쪼아먹기! {n}칸 정리',
+      'duel.petshield': '덩어리 방패! {n}초 동안 악당 게이지가 얼었어요',
       'adv.heartkept': '클리어라 하트는 그대로예요.',
       'adv.heartplus': '보스 보상, 하트 +1!',
       'adv.heartlost': '하트 -1. {n}개 남았어요.',
@@ -21386,10 +21440,11 @@ window.TT_SFX = {
       'skill.ready': '발동!',
       'skill.notyet': '게이지가 아직 안 찼어요.',
       'skill.sub': '필살기',
-      'skill.ten.name': '트윈 왕자 소환!',
-      'skill.twin.name': '텐텐 왕자 소환!',
+      /* 단계 3 개명: "소환" → "각성". 키는 그대로 (castSkill 무수정). */
+      'skill.ten.name': '텐트윈 각성 — 트윈 왕자!',
+      'skill.twin.name': '텐트윈 각성 — 텐텐 왕자!',
       'skill.jelly.name': '젤리 타임!',
-      'skill.on.summon': '형제 합동! 이제 모든 매치가 텐트윈 콤보예요',
+      'skill.on.summon': '텐트윈 각성! 이제 모든 매치가 텐트윈 콤보예요',
       'skill.on.jelly': '젤리 타임! 잭팟 확률이 40%로',
       'skill.gauge': '필살기',
 
@@ -22218,6 +22273,21 @@ window.TT_SFX = {
        * `S.running` keeps it off during the stage-clear sweep, where the board is
        * legitimately empty and pairsLeft is 0 for a reason that is not stuck. */
       bsh.classList.toggle('urge', S.running && S.shuffles > 0 && S.pairsLeft === 0);
+    }
+    /* 전투(단계 3): 네 버튼이 [공격·필살기·펫소환·각성]이 된다. 위 블록을 고치지
+       않고 **덮어쓰는** 것이 요점이다 — endless/daily/rush 는 이 줄을 지나지 않고,
+       TW_BATTLE=false 면 battleOn() 이 영영 false 라 원복이 성립한다.
+       라벨 복구가 else 가 아니라 플래그인 이유: applyI18n 이 되돌려 놓은 마크업
+       문구를 매 페인트마다 다시 쓰는 것은 세 모드가 늘 치르는 비용이 된다. */
+    if (battleOn()) { syncBattleActs(ba, bh, bu, bsh); actBattleLabels = true; }
+    else if (actBattleLabels) {
+      resetActLabel(ba); resetActLabel(bh); resetActLabel(bu); resetActLabel(bsh);
+      /* `.urge` 도 함께 내린다. 위 블록은 셔플에만 그 클래스를 토글하므로, 전투가
+         필살기 버튼에 붙여 둔 보라 링이 endless 로 그대로 따라 나갔다(실측). */
+      if (ba) ba.classList.remove('urge');
+      if (bh) bh.classList.remove('urge');
+      if (bu) bu.classList.remove('urge');
+      actBattleLabels = false;
     }
     var st = $('stat-timer');
     if (st) st.hidden = S.mode !== 'daily';
@@ -24110,6 +24180,9 @@ window.TT_SFX = {
   function syncSkill() {
     var el = $('skill-btn');
     if (!el) return;
+    /* 전투(단계 3): 각성이 하단 4버튼으로 이사했다. 같은 기능이 두 자리에 있으면
+       플레이어는 둘이 다른 것이라고 읽는다 — 떠 있는 원은 여기서 접는다. */
+    if (battleOn()) { el.hidden = true; return; }
     var live = S.mode === 'adv' && S.running;
     el.hidden = !live;
     if (!live) return;
@@ -27057,6 +27130,9 @@ window.TT_SFX = {
     if (S.duel) {
       if (S.duel.idleAt > 0) S.duel.idleAt += held;
       if (S.duel.foeSkillAt > 0) S.duel.foeSkillAt += held;
+      /* 단계 3 — 방패도 벽시계다. 여기 없으면 컷인 0.8초가 6초 방패에서 그대로
+         깎이고, 플레이어가 산 것이 연출에게 먹힌다. */
+      if (S.duel.freezeUntil > 0) S.duel.freezeUntil += held;
     }
     // The run's age is a wall-clock field like every other one: without this
     // shift, a long pause would age the run and silently trigger the match decay.
@@ -28222,6 +28298,10 @@ window.TT_SFX = {
       refillSeq: 0,
       foeSkillAt: 0,
       idleAt: 0,
+      /* 뭉치의 방패가 걸린 벽시계. 0 이면 방패가 없다 — 상태를 boolean 이 아니라
+         마감으로 두면 해제를 예약할 필요가 없고, 일시정지도 shiftDeadlines 한
+         줄로 따라온다(idleAt·foeSkillAt 과 같은 계약). */
+      freezeUntil: 0,
       meArm: false,
       down: false
     };
@@ -28351,6 +28431,9 @@ window.TT_SFX = {
   function duelFoeGauge(n) {
     var d = S.duel;
     if (!d || d.down || !S.running) return;
+    /* 뭉치의 방패(단계 3). 실수 소스 셋이 전부 이 문 하나를 지나므로 동결은
+       여기 한 줄로 끝난다 — 소스마다 가드를 심으면 언젠가 하나가 샌다. */
+    if (d.freezeUntil > 0 && now() < d.freezeUntil) return;
     if (S.bossTellAt > 0) return;      // 이미 예고 중 — 예고 위에 예고를 쌓지 않는다
     d.foe.atk += Math.max(0, n | 0);
     if (d.foe.atk >= d.foe.atkMax) {
@@ -28489,6 +28572,231 @@ window.TT_SFX = {
     var mine = d.me.hpMax > 0 ? d.me.hp / d.me.hpMax : 0;
     var theirs = d.foe.hpMax > 0 ? d.foe.hp / d.foe.hpMax : 0;
     return mine >= theirs;
+  }
+
+  /* =========================================================================
+   * SECTION 14D — 하단 네 버튼의 전투 얼굴 (전투 개편 단계 3)
+   *
+   * 전투에서 [추가·힌트·되돌리기·섞기]는 [공격·필살기·펫소환·각성]이 된다.
+   * **기존 네 핸들러는 한 글자도 고치지 않는다** — 배선만 디스패처로 감싸고,
+   * 전투가 아니면 그 디스패처가 옛 핸들러를 그대로 부른다. endless/daily/rush
+   * 가 이 절을 지나는 경로는 존재하지 않는다(battleOn() 이 유일한 스위치이고,
+   * TW_BATTLE=false 면 그 스위치가 영영 안 켜진다).
+   *
+   *   공격   **표시기다.** 발동은 duelMeAttack() 이 자동으로 한다(단계 2) —
+   *          누르면 게이지 상태 토스트만 낸다. 무반응 버튼은 고장으로 읽힌다.
+   *   필살기 이 판에서 **유일하게 수동인 화력**. 만땅에서만 나가고 위력은
+   *          DUEL_SP_MULT × atkMax = 자동 공격 두 번분이다. 컷인은 쓰지 않는다:
+   *          전면 효과는 각성·격파의 몫이고, 필살기까지 화면을 멈추면 전투
+   *          내내 판이 서 있게 된다(fxBusy 규율).
+   *   펫소환 동료의 액티브, 판당 DUEL_PET_MAX 회. 삐약은 판을 정리하고 뭉치는
+   *          적 게이지를 얼린다 — 둘 다 데미지를 내지 않는다(§14C 의 "피해는
+   *          한 문으로만" 계약).
+   *   각성   기존 fireSkill() 그대로. 게이지·컷인·지속효과는 하나도 안 바뀌었고
+   *          바뀐 것은 이름과 **누르는 자리**뿐이다(#skill-btn 은 전투에서 숨는다).
+   * ========================================================================= */
+
+  function duelAtkPct() {
+    var d = S.duel;
+    if (!d || d.me.atkMax <= 0) return 0;
+    return Math.min(100, Math.floor(d.me.atk / d.me.atkMax * 100));
+  }
+  function duelSpPct() {
+    var d = S.duel;
+    if (!d || d.me.spMax <= 0) return 0;
+    return Math.min(100, Math.floor(d.me.sp / d.me.spMax * 100));
+  }
+  function duelGaugePct() {
+    return Math.floor(clamp(store.gauge, 0, SKILL_MAX) / SKILL_MAX * 100);
+  }
+
+  /** 공격 버튼 = 표시기. 누른 값은 게이지 상태 하나뿐이다(발동은 자동). */
+  function duelAtkInfo() {
+    if (!S.duel) return;
+    toast(t('duel.atkstat', { n: duelAtkPct() }));
+    J.sfx.ui();
+  }
+
+  /**
+   * 필살기. 자동 공격이 리듬을 가져간 뒤로 "언제 쓸까"는 이 버튼 하나가 전부
+   * 짊어진다 — 그래서 미만땅에서도 **반드시 응답한다**(잔량 토스트). 게이지를
+   * 먼저 0 으로 만들고 때리는 순서인 것은 duelHitFoe 가 격파 판정을 하지 않기
+   * 때문이다: 판정은 duelTick 한 곳이고, 그 사이에 sp 가 남아 있으면 안 된다.
+   */
+  function doSpecial() {
+    var d = S.duel;
+    if (!d || d.down || !S.running || S.paused) return;
+    if (d.me.sp < d.me.spMax) {
+      toast(t('duel.spstat', { n: duelSpPct() }));
+      J.sfx.fail();
+      return;
+    }
+    d.me.sp = 0;
+    var dmg = DUEL_SP_MULT * d.me.atkMax;
+    if (typeof window !== 'undefined') {
+      /* 화면 플래시 + 빔 + 큰 숫자. 전부 기존 juice 유틸이라 새 에셋이 없다 —
+         "큰 기술"의 체감은 크기와 색이 만들고, 그 둘은 코드로 충분하다. */
+      J.screenPulse();
+      J.vignette(0.5);
+      J.beam(window.innerWidth / 2, window.innerHeight * 0.78,
+             window.innerWidth / 2, window.innerHeight * 0.16, '#ff5ae0');
+      J.shockwave(window.innerWidth / 2, window.innerHeight * 0.2, '#ff5ae0');
+    }
+    J.sfx.bomb();
+    J.vibrate(80);
+    var real = duelHitFoe(dmg, true);
+    if (typeof window !== 'undefined') {
+      J.floatText(window.innerWidth / 2, window.innerHeight * 0.36,
+                  '-' + real, '#ff9ae8', 52);
+    }
+    toast(t('duel.spgo', { n: real }));
+    syncHud();
+    syncDuel();
+  }
+
+  /**
+   * 펫 스킬. 동료가 없으면 **버튼이 사라지는 대신 말을 한다** — 없는 이유가
+   * 화면 밖(동료 선택)에 있는 기능은 눌러 보기 전에는 알 길이 없다.
+   */
+  function doPetSkill() {
+    var d = S.duel;
+    if (!d || d.down || !S.running || S.paused) return;
+    if (S.busy) return;                  // 리필·연출 한가운데서 판을 또 흔들지 않는다
+    var mid = mateId();
+    if (!mid) { toast(t('duel.petnone')); J.sfx.fail(); return; }
+    if ((d.petLeft | 0) <= 0) { toast(t('duel.petout')); J.sfx.fail(); return; }
+    var ok = (mid === 'mungchi') ? petShield() : petPeck();
+    if (!ok) return;
+    d.petLeft = (d.petLeft | 0) - 1;
+    duelPetFx();
+    badgePop('undo-badge');
+    syncHud();
+    syncDuel();
+  }
+
+  /**
+   * 삐약 "쪼아먹기" — 산 타일 넷을 즉시 지운다. 지운 몫은 **공격 게이지에만**
+   * 들어간다: S.score 는 매치가 만든 것만 세야 별·최고점의 계약이 유지된다.
+   * 블로커는 고르지 않는다(이웃 매치로만 풀리는 것이 그 타일의 규칙이고, 펫이
+   * 그것을 우회하면 블로커라는 핸디캡 자체가 사라진다). 얼음은 폭탄과 같은
+   * 문법으로 뚫는다 — 껍질째 지운다.
+   */
+  function petPeck() {
+    var d = S.duel, i;
+    var live = [];
+    for (i = 0; i < S.cells.length; i++) {
+      var c = S.cells[i];
+      if (c && !c.dead && c.sp !== 'block') live.push(i);
+    }
+    if (!live.length) { toast(t('duel.petempty')); J.sfx.fail(); return false; }
+    shuffleSeeded(live, battleRng());     // 시드 파생 — 같은 판·같은 순서면 같은 표적
+    var kill = live.slice(0, Math.min(DUEL_PET_POP, live.length));
+    clearSelection();
+    clearHints();
+    S.busy = true;
+    var vals = [];
+    for (i = 0; i < kill.length; i++) {
+      var k = kill[i], cc = S.cells[k];
+      vals.push(cc.v);
+      cc.dead = true; cc.sp = ''; cc.ice = 0; cc.blk = 0;
+      if (tileEls[k]) tileEls[k].classList.add('pop');
+    }
+    /* 게이지 몫은 폭탄이 부순 칸과 같은 단위(BOMB_KILL_SCORE × stage)다 — 새 계수를
+       만들면 "펫 한 번이 몇 대 분인가"가 표에서 사라진다. */
+    var pts = BOMB_KILL_SCORE * S.stage * kill.length;
+    d.me.atk += pts;
+    if (d.me.atk >= d.me.atkMax) d.meArm = true;
+    /* 판이 나 때문에 바뀐 것이므로 무매치 시계도 여기서 리셋한다(리스크 9). */
+    d.idleAt = now() + DUEL_IDLE_MS;
+    J.sfx.bomb();
+    J.vibrate(30);
+    toast(t('duel.petpeck', { n: kill.length }));
+    (function (list, vlist) {
+      later(function () {
+        for (var n = 0; n < list.length; n++) {
+          var el = tileEls[list[n]], ctr = tileCenter(list[n]);
+          J.burst(ctr.x, ctr.y, '#ffd76a', 13, fruitOf(vlist[n]));
+          if (el) { el.classList.remove('pop'); el.classList.add('dead'); }
+        }
+        runBattleRefill();       // S.busy 는 리필이 끝내 준다 (resolveMatch 와 같은 사슬)
+      }, POP_MS);
+    })(kill.slice(), vals);
+    return true;
+  }
+
+  /** 뭉치 "덩어리 방패" — 적 게이지가 DUEL_PET_FREEZE_MS 동안 한 톨도 안 오른다. */
+  function petShield() {
+    var d = S.duel;
+    d.freezeUntil = now() + DUEL_PET_FREEZE_MS;
+    J.screenPulse();
+    J.vignette(0.2);
+    J.sfx.mission();
+    J.vibrate(30);
+    if (typeof window !== 'undefined') {
+      J.shockwave(window.innerWidth / 2, window.innerHeight * 0.62, '#7ae0ff');
+    }
+    toast(t('duel.petshield', { n: Math.round(DUEL_PET_FREEZE_MS / 1000) }));
+    return true;
+  }
+
+  /** 동료 스프라이트가 한 번 뛴다 — "지금 저 애가 했다"를 화살표 없이 말한다. */
+  function duelPetFx() {
+    var el = $('mate');
+    if (!el || !el.classList) return;
+    el.classList.remove('petgo');
+    void el.offsetWidth;
+    el.classList.add('petgo');
+    later(function () { el.classList.remove('petgo'); }, 620);
+  }
+
+  /** 텐트윈 각성. 기존 필살기 **그대로**다 — fireSkill 이 게이지·컷인·지속을 전부
+   *  갖고 있고, 여기서 하는 일은 부르는 것뿐이다(효과를 두 벌로 나누지 않는다). */
+  function doAwaken() { fireSkill(); }
+
+  /** 라벨 한 벌. 전투 문구로 갈아 끼운다. */
+  function setActLabel(btn, key, ariaKey) {
+    if (!btn) return;
+    var lab = btn.querySelector ? btn.querySelector('.act-t') : null;
+    if (lab) lab.textContent = t(key);
+    btn.setAttribute('aria-label', t(ariaKey));
+  }
+  /** 마크업이 원래 갖고 있던 문구로 되돌린다 (applyI18n 과 같은 출처를 읽는다). */
+  function resetActLabel(btn) {
+    if (!btn) return;
+    var lab = btn.querySelector ? btn.querySelector('.act-t') : null;
+    if (lab) { var k = lab.getAttribute('data-i18n'); if (k) lab.textContent = t(k); }
+    var ak = btn.getAttribute('data-i18n-aria');
+    if (ak) btn.setAttribute('aria-label', t(ak));
+  }
+  /* 전투 라벨을 지금 쓰고 있는가. 비전투에서 **한 번만** 되돌리기 위한 기억이다 —
+     매 syncHud 마다 되돌리면 endless/daily/rush 가 이 절의 비용을 늘 치른다. */
+  var actBattleLabels = false;
+
+  /**
+   * 네 버튼의 배지·활성·라벨을 duel 상태로 덮어쓴다. syncHud 의 기존 블록이
+   * 먼저 다 돌고 **그 위에** 얹히므로, 비전투 경로는 한 글자도 달라지지 않는다.
+   */
+  function syncBattleActs(ba, bh, bu, bsh) {
+    var d = S.duel;
+    if (!d) return;
+    var spFull = d.me.sp >= d.me.spMax;
+    var gFull = gaugeFull() && !S.skillKind;
+    var petOk = (d.petLeft | 0) > 0 && !!mateId();
+    setText('add-badge', duelAtkPct() + '%');
+    setText('hint-badge', duelSpPct() + '%');
+    setText('undo-badge', d.petLeft | 0);
+    setText('shuffle-badge', duelGaugePct() + '%');
+    /* 공격 버튼은 절대 흐려지지 않는다 — 표시기라서 항상 읽혀야 한다.
+       필살기는 미만땅이면 흐리지만 **클릭은 살아 있다**: .act.off 는 시각뿐이고
+       (opacity), 핸들러가 스스로 잔량을 말한다. */
+    if (ba) { ba.classList.remove('off'); ba.classList.remove('urge'); }
+    if (bh) { bh.classList.toggle('off', !spFull); bh.classList.toggle('urge', spFull); }
+    if (bu) { bu.classList.toggle('off', !petOk); bu.classList.remove('urge'); }
+    if (bsh) { bsh.classList.toggle('off', !gFull); bsh.classList.toggle('urge', gFull); }
+    setActLabel(ba, 'act.attack', 'aria.attack');
+    setActLabel(bh, 'act.special', 'aria.special');
+    setActLabel(bu, 'act.pet', 'aria.pet');
+    setActLabel(bsh, 'act.awaken', 'aria.awaken');
   }
 
   /** 탄 하나의 완전한 계획서. 지도 카드와 실제 판이 공유하는 단 하나의 출처. */
@@ -30362,10 +30670,13 @@ window.TT_SFX = {
       on(board, 'dblclick', function (e) { if (e && e.preventDefault) e.preventDefault(); });
       on(board, 'contextmenu', function (e) { if (e && e.preventDefault) e.preventDefault(); });
     }
-    on($('btn-add'), 'click', doAdd);
-    on($('btn-hint'), 'click', doHint);
-    on($('btn-undo'), 'click', doUndo);
-    on($('btn-shuffle'), 'click', function () { doShuffle(false); });
+    /* 전투 개편 단계 3 — 네 버튼의 배선은 **디스패처**다. 기존 네 핸들러는 한
+       글자도 안 바뀌었고, 전투가 아니면 클릭이 종전과 완전히 같은 함수로 간다
+       (endless/daily/rush 회귀 0). 전투 얼굴은 SECTION 14D 에 있다. */
+    on($('btn-add'), 'click', function () { if (battleOn()) duelAtkInfo(); else doAdd(); });
+    on($('btn-hint'), 'click', function () { if (battleOn()) doSpecial(); else doHint(); });
+    on($('btn-undo'), 'click', function () { if (battleOn()) doPetSkill(); else doUndo(); });
+    on($('btn-shuffle'), 'click', function () { if (battleOn()) doAwaken(); else doShuffle(false); });
     on($('btn-pause'), 'click', pause);
 
     // --- pause modal ---
@@ -30928,6 +31239,12 @@ window.TT_SFX = {
     duelOnMatch: duelOnMatch, duelInit: duelInit, duelTimeoutWin: duelTimeoutWin,
     duelAtkMax: duelAtkMax, duelFoeHpMax: duelFoeHpMax, duelFoeHit: duelFoeHit,
     foeDriver: foeDriver,
+    /* 전투 버튼(단계 3) — 배선은 디스패처라 DOM 없이 눌러 볼 수가 없다. 시뮬이
+       필살기·펫·각성을 곧장 부를 수 있도록 손잡이만 낸다(게임 코드는 이 중
+       무엇도 window.Game 을 거쳐 부르지 않는다). */
+    duelAtkInfo: duelAtkInfo, doSpecial: doSpecial, doPetSkill: doPetSkill,
+    doAwaken: doAwaken, petPeck: petPeck, petShield: petShield,
+    duelAtkPct: duelAtkPct, duelSpPct: duelSpPct, syncBattleActs: syncBattleActs,
     genBoardExt: genBoardExt, extRows: extRows, extBoardSize: extBoardSize,
     extFillP: extFillP,
     // v4 EXT: shuffle + blocked-path explanation, exported so both can be
