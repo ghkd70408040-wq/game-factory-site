@@ -6313,6 +6313,57 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
 #app.battle #tb-stats { display: none; }
 #app.battle #rush-timer { display: none; }
 
+/* ---- 실기기 반려 ①④ (0819) — 배경 원화 · 상단 이중 HUD 정리 -----------------
+   ① "인게임 배경이 검정이다."
+      원인은 전투가 아니라 **게임 화면 전체**에 있었다: #screen-game 은 배경을
+      한 겹도 갖지 않는 컨테이너이고(§6 주석 "no pseudo-element background of
+      its own"), 그래서 화면에 실제로 보이던 것은 #app 의 어두운 그라데이션
+      (linear-gradient(180deg, var(--panel), #191426)) 이었다. 전투가 그 경로를
+      건너뛴 것도, .battle 이 무언가를 덮은 것도, board-scroll 의 overflow 도
+      아니다 — 깔 배경이 처음부터 없었다.
+      시안(gm-ingame-battle.png)의 첫 사실은 "판이 **밝은 원화 위에** 떠 있다"
+      이므로, 이미 임베드돼 있는 챕터 원화(--art-map-bg — #map-layer 가 쓰는
+      바로 그 그림)를 전투 화면의 배경으로 깐다. 새 이미지는 0 장이고 번들은
+      한 바이트도 안 늘어난다.
+      **요소 배경**으로 까는 것이 중요하다: ::before 한 겹을 세우면 z-index 를
+      갖게 되고, 그 순간 #board-scroll(2) · #hero-slot(3) · #fx(60) 와 순서를
+      다투게 된다. 요소 배경은 언제나 모든 자식 아래이므로 쌓임 순서에 관해
+      아무 약속도 새로 하지 않는다.
+      위·아래의 얕은 스크림(.30/.06/.06/.34)은 §17 .map-scrim 과 같은 문법이다 —
+      가운데(판이 앉는 띠)는 열어 두고 HUD 가 앉는 양 끝만 눌러, 그림이 밝든
+      어둡든 상단 HUD 와 하단 버튼의 대비를 다시 재지 않아도 되게 한다.
+   ④ "주황 topbar 와 #duel-hud 가 겹쳐 정신없다."
+      #tb-stats 는 이미 숨었으므로 남은 중복은 둘이었다: (a) #hero-slot 의
+      주인공 초상 — #duel-hud 의 .dh-av-me 가 **같은 얼굴**을 이미 들고 있다,
+      (b) --lib-hud-bar 띠 그 자체 — 시안의 좌상단은 띠 없이 뜬 알약 버튼
+      하나다. 둘 다 전투에서만 벗긴다(세 모드는 이 줄을 지나지 않는다).
+      슬롯을 접으면 #topbar 의 오른쪽 예산 100px 도 의미를 잃으므로 12px 로
+      되돌린다 — 벗긴 띠 두께(7px×2)와 함께 약 20px 이 보드로 넘어간다.
+   ------------------------------------------------------------------------- */
+#app.battle #screen-game {
+  background-image:
+    linear-gradient(180deg,
+      rgba(12, 8, 24, .30) 0%,
+      rgba(12, 8, 24, .06) 18%,
+      rgba(12, 8, 24, .06) 78%,
+      rgba(12, 8, 24, .34) 100%),
+    var(--art-map-bg);
+  background-size: cover, cover;
+  background-position: center center, center center;
+  background-repeat: no-repeat, no-repeat;
+}
+#app.battle #hero-slot { display: none; }
+#app.battle #screen-game #topbar {
+  border-width: 0;
+  border-image: none;
+  background: none;
+  padding: calc(var(--safe-t) + 6px) calc(var(--safe-r) + 12px) 2px calc(var(--safe-l) + 12px);
+}
+/* 펫 소환의 "지금 저 애가 했다"는 #mate 스프라이트의 점프였는데, 위에서 슬롯을
+   통째로 접었으므로 **버튼 자신이 뛴다**. 새 keyframes 를 만들지 않고
+   mate-petgo 를 그대로 재사용한다 — 같은 사건에 같은 동작이라야 학습이 옮겨간다. */
+#app.battle #btn-undo.petgo { animation: mate-petgo 600ms var(--ease); }
+
 /* 피격. 맞은 쪽 진영만 밝게 튀고 흔들린다 — #app.duel-hurt 의 붉은 톤과 같은
    계열이되 판 전체를 덮지 않는다(맞은 뒤에도 판은 계속 읽혀야 한다). */
 #duel-hud.fhit .dh-foe .dh-fill,
@@ -24921,7 +24972,16 @@ window.TT_SFX = {
 
   function syncMission() {
     var badge = $('mission-badge');
-    var live = !!S.mission && featuresOn() && missionMode();
+    /* 실기기 반려 ② (0819) — 전투에서는 미션 배지가 서지 않는다.
+       "줄 1개 없애기"(rows)가 전투에 떠 있었는데, 전투의 보충은 행 소거가 아니라
+       **컬럼 중력 + 상단 스폰**이라 행이 비는 순간이 원리적으로 존재하지 않는다
+       (SECTION 10B). 즉 달성 불가능한 목표가 상시로 떠 있었다는 뜻이고, 그것은
+       "이걸 못 하면 지는 건가"를 매 판 묻게 만든다 — syncAdvGoal 이 목표 칩을
+       전투에서 접은 것과 **정확히 같은 이유**다. 전투의 목표는 하나뿐이다:
+       악당의 체력(advGoalMet). 진행 쪽은 missionBump/checkColumnMission/
+       tickMission 이 각각 같은 게이트를 든다 — 화면만 끄고 값이 계속 돌면
+       판이 끝난 뒤의 정산에서 유령 보너스가 살아난다. */
+    var live = !!S.mission && featuresOn() && missionMode() && !battleOn();
     if (badge) badge.hidden = !live;
     if (!live) return;
     setText('mission-text', missionText(S.mission));
@@ -24953,6 +25013,7 @@ window.TT_SFX = {
   /** Advance the active mission when `kind` matches. Never penalises a miss. */
   function missionBump(kind, n) {
     var m = S.mission;
+    if (battleOn()) return;              // 반려 ② — 전투에는 미션이 없다(syncMission 주석)
     if (!m || m.done || !missionMode() || !featuresOn()) return;
     // 시간 초과된 미션은 더 이상 진행되지 않는다 (실패해도 스테이지는 계속된다).
     if (S.missionUntil < 0) return;
@@ -24998,6 +25059,7 @@ window.TT_SFX = {
    */
   function checkColumnMission() {
     var m = S.mission;
+    if (battleOn()) return;              // 반려 ② — missionBump 과 같은 게이트
     if (!m || m.done || m.id !== 'col') return;
     if (!missionMode() || !featuresOn() || S.missionUntil < 0) return;
     if (!columnCleared((m.goal | 0) - 1)) return;
@@ -26227,9 +26289,49 @@ window.TT_SFX = {
   var TW_BATTLE = true;
   /* 그리드 상수화 준비 — 값은 이번 단계 고정. 뒤에 가로·세로를 바꿀 때의 단일 지점. */
   var BATTLE_COLS = COLS;
-  var BATTLE_ROWS_MIN = 3, BATTLE_ROWS_MAX = 5;
+  /* 실기기 반려 ③ (0819) — "보드 아래 거대한 빈 공간".
+     단계 1의 3~5행은 **판의 칸 수**(extBoardSize)에서 왔다. 그 수는 모험의
+     난이도 표가 정한 것이지 화면 높이와는 아무 관계가 없어서, 390×844 에서
+     5×9=45 판은 212px 짜리 판이 되고 layout() 이 그것을 세로 중앙에 놓아도
+     위아래로 175px 씩 빈다 — 실기기에서 그 빈칸이 "덜 그려진 화면"으로 읽혔다
+     (REVIEW-01 TOP-5 #1 이 v3 에서 고쳤던 결함과 **같은 결함**이다).
+     그래서 행 수의 출처를 칸 수에서 **쓸 수 있는 세로 높이**로 옮긴다: 타일
+     크기는 어차피 폭이 정하므로(9열 고정), 그 타일로 보드 영역을 몇 줄 채울 수
+     있는지가 답이다. 시안(gm-ingame-battle.png)이 12행인 것과 같은 산술이다.
+     짝 밀도·데드락은 행 증가에 **유리**하다(같은 열에 후보가 늘어난다 —
+     단계 1 시뮬의 근거). par 스케일은 무관하다: duelFoeHpMax/duelAtkMax 는
+     advPar(n) → extBoardSize(n) 를 읽고, 그것은 **계획서의 칸 수**라 여기서
+     늘린 실제 행 수를 보지 않는다. 즉 판이 커져도 악당 체력은 그대로다. */
+  var BATTLE_ROWS_MIN = 8, BATTLE_ROWS_MAX = 12;
+  /* #hud-row 가 나중에 자랄 수 있는 최대 높이(칩 한 줄). 실측 30px + 여유 4px. */
+  var BATTLE_HUD_RESERVE = 34;
+  /**
+   * 전투 판의 행 수. n(계획서의 칸 수)은 이제 **폴백**으로만 쓰인다 — 화면을
+   * 아직 잴 수 없는 순간(hidden 화면·jsdom)에도 답이 나와야 하기 때문이다.
+   */
   function battleRows(n) {
-    return clamp(Math.round(n / BATTLE_COLS), BATTLE_ROWS_MIN, BATTLE_ROWS_MAX) | 0;
+    var rows = 0;
+    try {
+      var area = boardArea();
+      var bmax = boardMaxPx();
+      var w = (bmax > 0 && area.w > bmax) ? bmax : area.w;
+      /* 타일 크기는 layout() 과 **같은 식**으로 뽑는다. 두 곳이 다른 식을 쓰면
+         여기서 센 줄 수와 실제로 그려지는 줄 수가 어긋나 다시 빈칸이 생긴다. */
+      var tw = clamp(Math.floor((w - GAP * (BATTLE_COLS - 1)) / BATTLE_COLS),
+                     TILE_MIN, TILE_MAX);
+      /* #hud-row 는 **판이 시작된 뒤에 자란다**: "다음: 텐!" 칩(#tw-chip)은 첫
+         매치 전에는 [hidden] 이라 지금 재면 0px 이고, 첫 매치와 함께 한 줄이
+         생긴다. 전투는 #board-scroll 이 overflow:hidden 이므로(단계 1) 그 한 줄
+         만큼 판이 넘치면 **맨 아랫줄이 조용히 잘린다** — 잘린 줄은 짝이 보이지
+         않는데 데드락 판정에는 들어가 있어서, 화면과 규칙이 어긋나는 가장 나쁜
+         종류의 결함이 된다. 그래서 아직 안 자란 몫을 미리 뺀 높이로 센다. */
+      var hr = $('hud-row');
+      var hrH = hr ? hr.getBoundingClientRect().height : 0;
+      var reserve = hrH >= BATTLE_HUD_RESERVE ? 0 : (BATTLE_HUD_RESERVE - hrH);
+      rows = Math.floor((area.h - reserve + GAP) / (tw + GAP));
+    } catch (e) { rows = 0; }
+    if (!isFinite(rows) || rows <= 0) rows = Math.round((n | 0) / BATTLE_COLS);
+    return clamp(rows, BATTLE_ROWS_MIN, BATTLE_ROWS_MAX) | 0;
   }
   /** 전투인가. 단계 2에서 예고한 대로 S.duel 기반으로 정식화됐다 — 전투 분기의
    *  유일한 스위치이고, TW_BATTLE=false 면 S.duel 이 아예 세워지지 않는다. */
@@ -26301,9 +26403,21 @@ window.TT_SFX = {
     var out = cells.slice(0, want);
     if (out.length < want) {
       var rng = mulberry32(((seed >>> 0) ^ BATTLE_SALT) >>> 0);
+      var from = out.length;
       while (out.length < want) {
         var v = 1 + ((rng() * 9) | 0); if (v > 9) v = 9;
         out.push({ v: v, dead: false });
+      }
+      /* 반려 ③ 로 채우는 몫이 커졌다(45 → 최대 108). 채운 값이 판 전체의 짝
+         밀도를 떨어뜨리는 일이 없도록 battleRefillEx 와 **같은 문법**으로
+         채운 칸의 값만 다시 뽑는다 — 같은 rng 스트림을 계속 소비하므로
+         "같은 시드면 같은 판"은 그대로다. */
+      for (var t = 0; t < DUEL_REROLL_MAX; t++) {
+        if (countPairsEx(out) >= DUEL_MIN_PAIRS) break;
+        for (var i = from; i < out.length; i++) {
+          var nv = 1 + ((rng() * 9) | 0); if (nv > 9) nv = 9;
+          out[i].v = nv;
+        }
       }
     }
     return out;
@@ -29149,7 +29263,10 @@ window.TT_SFX = {
 
   /** 동료 스프라이트가 한 번 뛴다 — "지금 저 애가 했다"를 화살표 없이 말한다. */
   function duelPetFx() {
-    var el = $('mate');
+    /* 반려 ④ — 전투에서는 #hero-slot(그 안의 #mate)이 접혀 있다. display:none
+       인 요소에 애니메이션을 걸면 아무 일도 일어나지 않으므로, 누른 버튼
+       자신이 대신 뛴다(style 쪽에서 같은 keyframes 를 그 자리에 걸어 뒀다). */
+    var el = battleOn() ? $('btn-undo') : $('mate');
     if (!el || !el.classList) return;
     el.classList.remove('petgo');
     void el.offsetWidth;
@@ -29472,6 +29589,9 @@ window.TT_SFX = {
        "끝나기 직전에 시작해서 절대 못 깨는" 상태로 걸리지 않는다. */
     /* 창의 길이는 판이 정한다. 보스3 의 미션은 **사슬**이라 하나가 45초를 다
        쓰면 제한시간 안에 두 번째가 들어갈 자리가 없다 — 그 탄만 15초다. */
+    /* 반려 ② — 전투는 시계를 걸지 않는다. 0 이면 tickMission 이 지나가고
+       syncMission 이 배지를 접은 상태 그대로 남는다(만료 표식 -1 도 안 생긴다). */
+    if (battleOn()) { S.missionUntil = 0; syncMission(); return; }
     var span = (S.advPlan && S.advPlan.bossDef && S.advPlan.bossDef.seq)
       ? BOSS_MISSION_MS : ADV_MISSION_MS;
     var room = Math.max(5000, advLeftMs() - 2000);
@@ -29482,6 +29602,9 @@ window.TT_SFX = {
   /** 미션 시계 한 틱. 만료는 페널티가 아니라 "보너스가 닫혔다"일 뿐이다. */
   function tickMission() {
     if (S.paused || S.bangOn) return;            // 허리 업이 우선 (위 순서 계약 3)
+    /* 반려 ② — 전투에는 미션이 없으므로 만료도 없다. 게이트가 없으면 화면에
+       아무것도 없는 채로 "미션 실패" 토스트만 뜨는 상태가 만들어진다. */
+    if (battleOn()) return;
     if (!(S.missionUntil > 0)) return;
     if (!S.mission || S.mission.done) return;
     if (now() >= S.missionUntil) {
