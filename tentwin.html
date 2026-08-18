@@ -6071,6 +6071,17 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   100% { transform: scale(.2)  rotate(28deg);  opacity: 0; }
 }
 
+/* 전투 피격 (단계 2 임시 — 단계 4의 duel-hud 가 오면 그쪽으로 이사한다).
+   판만 붉게 번쩍이며 흔들린다: 화면 전체를 덮지 않는 것은 예고 규율과 같은
+   이유다 — 맞은 뒤에도 플레이어는 계속 판을 읽고 있어야 한다. */
+#app.duel-hurt #board { animation: duelhurt 380ms var(--ease); }
+@keyframes duelhurt {
+  0%, 100% { transform: translateX(0); box-shadow: none; }
+  15%      { transform: translateX(-9px); box-shadow: inset 0 0 0 2000px rgba(255, 45, 45, .22); }
+  42%      { transform: translateX(8px); }
+  72%      { transform: translateX(-4px); box-shadow: inset 0 0 0 2000px rgba(255, 45, 45, .09); }
+}
+
 /* ---- 18.5 보스 스프라이트 (단일 SVG + .bs-* 토글) ---------------------------
    캐릭터와 **같은 규약**이다: 마크업은 한 벌이고 색 토글만 클래스가 갈아
    끼운다. 셋 다 "귀엽지만 못된" 인상 — 둥근 젤리 몸에 큰 눈과 볼록한 광택
@@ -6277,6 +6288,7 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   #boss-bar.hit .boss-av,
   #boss-bar.big,
   #boss-bar.big .boss-av { animation: none; }
+  #app.duel-hurt #board { animation: none; }
   #boss-hp-fill { transition: none; }
   #cutin.go .cut-dim { animation-duration: 1ms; opacity: 1; }
   #cutin.go .cut-band { animation: none; opacity: .4; transform: rotate(-14deg) translateX(0); }
@@ -18636,6 +18648,38 @@ window.TT_SFX = {
   var BOSS_MISSION_MS = 15000;       // 보스3 미션 사슬의 미션당 제한시간
   var BOSS_SPRINT_MS = 10000;        // 보스3 첫 미션의 창 = 스펙의 "10초 5매치"
 
+  /* --- 전투 개편 단계 2: 대칭 전투(듀얼)의 수치 ------------------------------
+   * 양쪽이 **같은 문법**을 쓴다: 게이지가 차면 자동 발동. 다른 것은 예고의 유무
+   * 하나뿐이다(피할 수 없는 피해에는 반드시 예고가 선행한다는 기존 규율).
+   *
+   *   me.hpMax   = DUEL_ME_HP 고정 100          게이지의 의미론을 %로 고정
+   *   me.atkMax  = advPar(n) × DUEL_ATK_K       자동 발동 1회의 위력 = 발동 주기
+   *   me.spMax   = me.atkMax × DUEL_SP_MULT     필살기(수동 — 단계 3에서 발동)
+   *   foe.hpMax  = advPar(n) × DUEL_FOE_HP_K    보스탄은 × DUEL_BOSS_HP_K
+   *   foe.atkMax = 100 고정                     적립량(12/5/8)이 곧 "몇 번 실수하면 맞나"
+   *   foe.hit    = 100 × (0.18 + n×0.004), 상한 35
+   *
+   * 공격 게이지의 적립량은 **점수식의 산출값 그대로**다(resolveMatch 의 단일
+   * 반올림 지점을 지난 값). 그래서 두 계좌(S.score / duel.me.atk)가 같은 단위이고,
+   * 밸런스 서술이 "par 의 몇 %"라는 한 자로 끝난다.
+   */
+  var DUEL_ATK_K = 0.35;
+  var DUEL_SP_MULT = 2;              // spMax = atkMax × 2, 필살기 위력도 같은 배수
+  var DUEL_FOE_HP_K = 0.65;
+  var DUEL_BOSS_HP_K = 1.5;          // 보스탄(10/20/30…)의 체력 배수
+  var DUEL_ME_HP = 100;
+  var DUEL_FOE_ATK_MAX = 100;
+  var DUEL_MISS_GAIN = 12;           // ① 매치 불가 탭   (~8회면 만땅)
+  var DUEL_BREAK_GAIN = 5;           // ② 콤보 끊김      (소량)
+  var DUEL_IDLE_MS = 6000;           // ③ 무매치 방치의 적립 주기 (반복)
+  var DUEL_IDLE_GAIN = 8;
+  var DUEL_HIT_BASE = 0.18;
+  var DUEL_HIT_STEP = 0.004;
+  var DUEL_HIT_CAP = 35;
+  var DUEL_SKILL_MS = BOSS_ATK_MS;   // 방해 스킬 케이던스 — 반격 주기(15초) 재사용
+  var DUEL_SKILL_BLK = 2;
+  var DUEL_PET_MAX = 2;              // 펫 스킬 판당 횟수 (단계 3에서 소비)
+
   /* =========================================================================
    * SECTION 1 — PURE RULE / GENERATOR FUNCTIONS
    * No DOM. No Juice. No module state. Safe to unit-test in isolation.
@@ -20737,6 +20781,12 @@ window.TT_SFX = {
       'adv.note.next': 'Score {n} for the second star.',
       'adv.reason.timeout': 'Out of time.',
       'adv.reason.stuck': 'No moves left.',
+      'adv.reason.ko': 'You were knocked out.',
+      /* 전투 개편 단계 2 — 임시 문구. 본 HUD 는 단계 4에서 온다. */
+      'duel.tell': 'The villain is winding up!',
+      'duel.hit': 'Hit! -{n} HP',
+      'duel.skill': 'Blockers dropped x{n}!',
+      'duel.hud': 'HP {hp} / ATK {a}% / SP {s}%',
       'adv.heartkept': 'Cleared, so no heart was spent.',
       'adv.heartplus': 'Boss bonus: +1 heart!',
       'adv.heartlost': '-1 heart. {n} left.',
@@ -21310,6 +21360,12 @@ window.TT_SFX = {
       'adv.note.next': '{n}점이면 별 두 개예요.',
       'adv.reason.timeout': '시간이 다 됐어요.',
       'adv.reason.stuck': '더 이상 맞출 짝이 없어요.',
+      'adv.reason.ko': '쓰러지고 말았어요...',
+      /* 전투 개편 단계 2 — 임시 문구. 본 HUD 는 단계 4에서 온다. */
+      'duel.tell': '악당이 공격을 준비해요!',
+      'duel.hit': '피격! HP -{n}',
+      'duel.skill': '방해 블로커 {n}개!',
+      'duel.hud': 'HP {hp} / 공격 {a}% / 필살 {s}%',
       'adv.heartkept': '클리어라 하트는 그대로예요.',
       'adv.heartplus': '보스 보상, 하트 +1!',
       'adv.heartlost': '하트 -1. {n}개 남았어요.',
@@ -21699,6 +21755,22 @@ window.TT_SFX = {
     bossSeqIdx: 0,
     bossDown: false,
     bossArm: false,          // 공략 조건이 채워졌다 — 다음 안전한 순간에 필살기가 터진다
+    /* --- 전투 개편 단계 2: 대칭 전투의 런타임 (adv 전용, 다른 모드는 항상 null) --
+     * duel = {
+     *   me:  { hp, hpMax, atk, atkMax, sp, spMax }  atk=공격 게이지(만땅=자동 발동)
+     *                                               sp =필살기 게이지(수동 — 단계 3)
+     *   foe: { hp, hpMax, atk, atkMax, hit }        atk=내 실수로만 오른다
+     *   def        악당 정의 (BOSS_DEFS 순환 재사용 — 아바타·이름)
+     *   dmg        가한 누적 데미지 (전투의 '점수')
+     *   petLeft    펫 스킬 잔여 (단계 3)
+     *   refillSeq  낙하 스폰 난수 스트림 순번 (단계 1의 S.refillSeq 를 이어받는다)
+     *   foeSkillAt 방해 스킬의 다음 케이던스 (벽시계 — shiftDeadlines 목록에 있다)
+     *   idleAt     무매치 적립의 다음 마감   (벽시계 — 같은 목록에 있다)
+     *   meArm      내 게이지 만땅 확정 — 판이 조용해지면 duelTick 이 발동한다
+     *   down       승패 판정을 이미 냈는가 (두 번 들어오지 않게)
+     * 예고 마감은 새로 만들지 않고 S.bossTellAt 을 그대로 쓴다 — 그 필드는 이미
+     * shiftDeadlines 의 목록에 있어서 일시정지·컷인 중에 흐르지 않는다. }  */
+    duel: null,
     /* sprint 미션의 창 길이. 평시는 MISSION_SPRINT_MS 지만 보스3 의 첫 미션만
      * 스펙이 "10초 5매치"라고 못박아 두어 판마다 갈릴 수 있어야 한다. */
     sprintWin: MISSION_SPRINT_MS
@@ -22446,10 +22518,15 @@ window.TT_SFX = {
     }
     var left = S.comboUntil - now();
     if (left <= 0) {
+      var prevC = S.combo;
       S.combo = 1;
       if (fill) fill.style.width = '0%';
       if (label) { label.textContent = ''; label.style.color = ''; }
       syncBgmIntensity();   // the chain died: drop the combo lift back out of the mix
+      /* 전투(단계 2) 실수 소스 ② — 콤보 끊김. 사슬이 **실제로 있었을 때만** 센다
+         (prev > 1). 여기가 먼저 1로 내려놓으면 bumpCombo 쪽의 prev 도 1이 되므로
+         두 경로가 같은 끊김을 두 번 계상하는 일은 없다. */
+      if (battleOn() && prevC > 1) foeDriver.onBreak();
       return;
     }
     if (fill) fill.style.width = (clamp(left / COMBO_MS, 0, 1) * 100).toFixed(1) + '%';
@@ -22461,7 +22538,12 @@ window.TT_SFX = {
     var prev = S.combo;
     if (S.combo > 1 && t < S.comboUntil) S.combo = Math.min(COMBO_MAX, S.combo + 1);
     else if (S.combo === 1 && t < S.comboUntil) S.combo = 2;
-    else S.combo = 1;
+    else {
+      S.combo = 1;
+      /* 전투(단계 2) 실수 소스 ② 의 나머지 절반 — comboLoop 가 만료를 보기 전에
+         다음 매치가 먼저 도착한 경우다. 가드·이유는 그쪽 주석과 같다. */
+      if (battleOn() && prev > 1) foeDriver.onBreak();
+    }
     S.comboUntil = t + COMBO_MS;
     if (S.combo > S.maxCombo) S.maxCombo = S.combo;
     if (S.combo > S.stageMaxCombo) S.stageMaxCombo = S.combo;
@@ -24924,6 +25006,11 @@ window.TT_SFX = {
      * 게임의 기본 계약 — "아까 그 판을 다시 푼다"가 성립해야 한다). */
     var advp = (S.mode === 'adv') ? advPlan(stage) : null;
     S.advPlan = advp;
+    /* 전투 상태는 판보다 **먼저** 선다 — battleOn() 이 S.duel 을 보고, 그 스위치를
+       바로 아래의 직사각형 보정이 이미 읽기 때문이다. duelInit 은 DOM 을 건드리지
+       않아서 여기 설 수 있다(화면 몫은 판이 다 그려진 뒤의 duelStart 가 맡는다).
+       모험이 아니면 항상 null — 전투 분기가 다른 모드로 새지 않는 근거다. */
+    if (advp && TW_BATTLE) duelInit(advp); else S.duel = null;
     var gen = advp
       ? genBoardBanded(stage, advp.seed, advp.density)
       : genBoardBanded(S.mode === 'daily' ? 3 : stage, seed);
@@ -24947,7 +25034,7 @@ window.TT_SFX = {
                      mulberry32(((gen.seed >>> 0) ^ ADV_HAND_SALT) >>> 0));
     }
     S.addSeq = 0;
-    S.refillSeq = 0;             // 낙하 스폰 난수 스트림 순번 (단계 2에서 S.duel 로 이사)
+    S.refillSeq = 0;             // 낙하 스폰 순번의 비전투 폴백 (전투는 duel.refillSeq)
     S.feverCdUntil = 0;          // a new board always allows fever immediately
     S.stageStartedAt = Date.now();
     S.stageMaxCombo = 1;
@@ -25008,7 +25095,11 @@ window.TT_SFX = {
     /* 보스는 판이 다 그려진 뒤에 등장한다 — 체력바가 먼저 뜨고 보드가 나중에
        채워지면 "누구와 싸우는지"보다 "화면이 덜 그려졌다"가 먼저 읽힌다.
        보스탄이 아니면 bossReset 이 지난 판의 잔상만 걷어내고 끝난다. */
-    if (advp && advp.boss) bossStart(advp); else bossReset();
+    /* 전투(단계 2)에서는 옛 보스 런타임을 먼저 비우고 그 자리에 듀얼을 세운다.
+       bossStart 를 부르지 않는 것이 핵심이다 — 공략조건/확정필살기/반격 스케줄이
+       게이지와 겹쳐 두 개의 전투가 한 판에서 돌아가면 안 된다. */
+    if (battleOn()) { bossReset(); duelStart(advp); }
+    else if (advp && advp.boss) bossStart(advp); else bossReset();
     syncHud();
     syncSkill();
     syncBgmIntensity();      // the stage base moved; the combo lift is back to zero
@@ -25026,6 +25117,11 @@ window.TT_SFX = {
        않는다. "무영향" 규약은 값뿐 아니라 화면에도 적용된다. */
     skillReset();
     bossReset();
+    /* 단계 2: 전투 상태도 값·화면 둘 다 여기서 내린다. S.duel 이 남아 있으면
+       battleOn() 이 모드 전환의 한 프레임 동안 참일 수 있고, 그 한 프레임이 곧
+       "3모드 무영향" 규약의 구멍이다. */
+    S.duel = null;
+    setAppClass('duel-hurt', false);
   }
 
   function startEndless(fresh) {
@@ -25414,6 +25510,10 @@ window.TT_SFX = {
          * 되고, 그러면 정작 읽어야 할 위 두 문장까지 같이 무시된다. */
         shakeNum(a); shakeNum(b);
       }
+      /* 전투(단계 2) 실수 소스 ① — 매치 불가 탭. 사유(why)별 차등은 v1 에 없다:
+         "무엇을 틀렸나"는 위 세 갈래가 이미 가르치고 있고, 벌의 크기까지 갈리면
+         플레이어가 배워야 할 것이 둘로 늘어난다. */
+      if (battleOn()) foeDriver.onMiss(why);
       J.sfx.fail();
       J.vibrate(12);
       clearSelection();
@@ -25563,6 +25663,10 @@ window.TT_SFX = {
     /* v4 §3: 텐트윈 배수도 여기서 합류한다. passiveApply 와 마찬가지로 상태를
        함께 전진시키므로 매치당 정확히 한 번만 부른다. 얼음만 깬 경우가 제외인
        것도 같은 이유다 — 매치가 아닌 것이 교대 사슬을 이을 수는 없다. */
+    /* 전투의 필살기 게이지는 **교대 사슬이 전진한 매치**에서만 오른다. 그 판정에
+       필요한 것은 twinApply 를 부르기 **전**의 사슬 길이다 — 그 호출이 상태를
+       함께 전진시키므로, 뒤에서 읽으면 전진 여부가 이미 지워져 있다. */
+    var twPrev = S.pv ? (S.pv.twAlt | 0) : 0;
     var tw = iceOnly ? { mult: 1, kind: '', chain: 0, fired: 0 } : twinApply(va, vb);
     /* v4 4차-a: 미션 성공 배수(S.missionMult)가 곱항 하나로 더 합류한다.
        상태를 전진시키지 않는 순수한 값이라 매치당 몇 번 읽어도 안전하다. */
@@ -25574,6 +25678,10 @@ window.TT_SFX = {
     var bombGain = blown.length ? BOMB_KILL_SCORE * S.stage * blown.length * fx : 0;
     S.score += gain + bombGain;
     if (S.feverOn) S.feverScore += gain + bombGain;
+    /* 전투(단계 2): 공격 게이지는 점수와 **같은 값**을 같은 순간에 받는다. 점수식
+       (위 블록)은 한 글자도 바뀌지 않았고 S.score 도 그대로 적립되므로 별·최고점
+       계산은 종전과 완전히 같다 — 두 계좌가 나란히 갈 뿐이다. */
+    if (battleOn()) duelOnMatch(gain + bombGain, iceOnly, tw, twPrev);
 
     if (!iceOnly) {
       S.matches++;
@@ -25596,7 +25704,10 @@ window.TT_SFX = {
       gaugeBump(S.combo);
       /* v4 5차 §4: 보스에게 가는 칩 데미지 + 공략 조건. 필살기 발동은 여기서
          하지 않고 bossTick 이 판이 조용해진 뒤에 한다(재진입 금지). */
-      if (S.mode === 'adv' && S.advPlan && S.advPlan.boss) {
+      /* 전투(단계 2)에서는 이 사슬이 통째로 잠긴다 — 칩 데미지·공략 조건·확정
+         필살기는 게이지 전투가 전부 대신한다. 지우지 않고 else 로 남기는 것은
+         TW_BATTLE=false 원복이 성립해야 하기 때문이다. */
+      if (!battleOn() && S.mode === 'adv' && S.advPlan && S.advPlan.boss) {
         bossOnMatch(gain + bombGain, va, vb, tw);
       }
     }
@@ -25727,18 +25838,23 @@ window.TT_SFX = {
   function battleRows(n) {
     return clamp(Math.round(n / BATTLE_COLS), BATTLE_ROWS_MIN, BATTLE_ROWS_MAX) | 0;
   }
-  /** 전투인가. 단계 2에서 S.duel 기반으로 정식화된다(그때도 이 함수 하나만 바뀐다). */
-  function battleOn() { return TW_BATTLE && S.mode === 'adv'; }
+  /** 전투인가. 단계 2에서 예고한 대로 S.duel 기반으로 정식화됐다 — 전투 분기의
+   *  유일한 스위치이고, TW_BATTLE=false 면 S.duel 이 아예 세워지지 않는다. */
+  function battleOn() { return TW_BATTLE && S.mode === 'adv' && !!S.duel; }
 
   var DUEL_MIN_PAIRS = 3;      // 리필 직후 최소 짝 수. 미달이면 스폰 값만 다시 뽑는다.
   var DUEL_REROLL_MAX = 8;
   var BATTLE_SALT = 0x5EED1A11;
 
-  /** 스폰 난수. (gridSeed, refillSeq) 파생이라 재도전하면 같은 판 · 같은 스폰이다. */
+  /** 스폰 난수. (gridSeed, refillSeq) 파생이라 재도전하면 같은 판 · 같은 스폰이다.
+   *  단계 2에서 순번의 집이 S.duel 로 옮겨졌다 — 값은 같은 0에서 같은 폭으로 오르
+   *  므로 스트림 자체는 한 글자도 달라지지 않는다(단계 1의 판 재현성 그대로). */
   function battleRng() {
-    S.refillSeq = (S.refillSeq | 0) + 1;
+    var d = S.duel;
+    var seq = ((d ? d.refillSeq : S.refillSeq) | 0) + 1;
+    if (d) d.refillSeq = seq; else S.refillSeq = seq;
     return mulberry32((((S.gridSeed >>> 0) ^ BATTLE_SALT) ^
-                       Math.imul(S.refillSeq, 0x9E3779B1)) >>> 0);
+                       Math.imul(seq, 0x9E3779B1)) >>> 0);
   }
 
   /**
@@ -25959,6 +26075,11 @@ window.TT_SFX = {
 
   /** Post-move arbitration: stage clear -> game over -> keep playing. */
   function afterMove() {
+    /* 리스크 #9 — 무매치 타이머의 억울함. 낙하 리필이 끝나거나 판이 무료로
+       섞인 직후에도 idleAt 이 그대로 흐르면 "판이 나 없이 나빠졌다"가 된다.
+       afterMove 는 판의 모든 변형이 착지하는 유일한 정착점이라, 리셋 한 줄이
+       세 경로(매치·리필·섞기)를 한꺼번에 덮는다. */
+    if (battleOn()) S.duel.idleAt = now() + DUEL_IDLE_MS;
     checkColumnMission();   // board-state mission, judged on every settled move
     /* THE settle point. Every board mutation that goes through play — match, bomb
      * chain, row collapse, Add — funnels into afterMove() once the animation has
@@ -26269,6 +26390,10 @@ window.TT_SFX = {
     /* 모험은 "판을 비웠다"가 곧 승리다 — 어떤 목표든 판을 다 지운 것보다 강한
      * 달성은 없으므로, 목표 판정을 거치지 않고 곧장 클리어로 보낸다. */
     if (S.mode === 'adv') {
+      /* 단계 2: 전투에서는 승패가 우선이다. 낙하 리필이 판을 늘 꽉 채우므로 이
+         경로 자체가 사실상 닿지 않지만, 닿는다면 그것은 "악당이 먹을 젤리를
+         남김없이 가져갔다"이므로 격파로 접수하고 판정은 duelTick 한 곳에 맡긴다. */
+      if (battleOn()) { S.duel.foe.hp = 0; duelTick(); return; }
       /* 보스탄에서 판이 먼저 비는 것은 실전에서는 거의 불가능하지만(135칸을
          제한시간 안에 다 지워야 한다), 일어난다면 그건 보스가 먹을 젤리를
          플레이어가 남김없이 가져갔다는 뜻이다 — 격파로 읽는 것이 맞고, 무엇보다
@@ -26463,7 +26588,12 @@ window.TT_SFX = {
     /* 모험에는 "게임 오버"가 없다. 손이 막힌 것뿐이고, 그 순간 목표가 이미
      * 채워져 있으면 그것은 클리어다 (점수/제거 목표는 판을 다 비울 필요가 없다).
      * 랭킹 제출도 하지 않는다 — 모험은 기록 보드의 종목이 아니다. */
-    if (S.mode === 'adv') { advFinish(advGoalMet(), 'stuck'); return; }
+    /* 단계 2: 전투에서 손이 막히는 것은 무료 자동 섞기(afterMove)가 이미 막고
+       있지만, 그래도 여기 닿았다면 시간 종료와 같은 자로 잰다 — 남은 HP 비율. */
+    if (S.mode === 'adv') {
+      advFinish(battleOn() ? duelTimeoutWin() : advGoalMet(), 'stuck');
+      return;
+    }
     S.running = false;
     S.busy = true;
     stopComboLoop();
@@ -26920,6 +27050,14 @@ window.TT_SFX = {
     if (S.skillUntil > 0) S.skillUntil += held;
     if (S.bossAtkAt > 0) S.bossAtkAt += held;
     if (S.bossTellAt > 0) S.bossTellAt += held;
+    /* 전투(단계 2)의 벽시계 둘. 여기 없으면 일시정지·컷인·"빡!" 중에 무매치
+       타이머가 흘러 **판을 보고 있지도 않은 사이에 적 게이지가 오른다** — 이유
+       없이 나빠지는 판이 정확히 그것이고, 위 두 줄과 완전히 같은 계약이다.
+       (예고 마감은 새 필드를 만들지 않고 S.bossTellAt 을 그대로 쓴다.) */
+    if (S.duel) {
+      if (S.duel.idleAt > 0) S.duel.idleAt += held;
+      if (S.duel.foeSkillAt > 0) S.duel.foeSkillAt += held;
+    }
     // The run's age is a wall-clock field like every other one: without this
     // shift, a long pause would age the run and silently trigger the match decay.
     if (S.rushStartedAt > 0) S.rushStartedAt += held;
@@ -27782,6 +27920,9 @@ window.TT_SFX = {
 
   /** HP 바 + 공략 진행. 200ms 시계와 매치마다 불린다(둘 다 싸다 — 텍스트 두 줄). */
   function syncBoss() {
+    /* 단계 2: 전투에서는 같은 체력바를 syncDuel 이 소유한다. 두 함수가 한 바를
+       번갈아 그리면 프레임마다 값이 튄다 — 소유자는 언제나 하나여야 한다. */
+    if (battleOn()) { syncDuel(); return; }
     var el = $('boss-bar');
     if (!el || el.hidden) return;
     var p = S.advPlan, d = p && p.bossDef;
@@ -27877,6 +28018,10 @@ window.TT_SFX = {
 
   /** completeMission 이 부른다. 보스3 이 아니면 아무 일도 하지 않는다. */
   function bossOnMissionDone() {
+    /* 단계 2: 전투에서는 보스3 의 미션 사슬도 함께 잠긴다. 이 훅은 완주한 미션을
+       보스 공략으로 세고 **다음 미션을 판에 갈아 끼우는데**, 전투에서는 그 사슬이
+       승리 조건이 아니면서 노드가 약속한 미션만 덮어쓴다. */
+    if (battleOn()) return;
     var p = S.advPlan, d = p && p.bossDef;
     if (!p || !p.boss || !d || d.cond !== 'mission2' || S.bossDown) return;
     S.bossProg++;
@@ -27894,6 +28039,7 @@ window.TT_SFX = {
 
   /** tickMission 의 만료 경로가 부른다. 사슬은 "연속"이 조건이라 끊기면 처음부터. */
   function bossOnMissionFail() {
+    if (battleOn()) return;      // bossOnMissionDone 과 같은 이유 — 사슬 통째로 잠금
     var p = S.advPlan, d = p && p.bossDef;
     if (!p || !p.boss || !d || d.cond !== 'mission2' || S.bossDown) return;
     S.bossProg = 0;
@@ -28013,6 +28159,336 @@ window.TT_SFX = {
       J.floatText(window.innerWidth / 2, window.innerHeight * 0.3,
                   t('boss.down'), '#ffd76a', 40);
     }
+  }
+
+  /* =========================================================================
+   * SECTION 14C — 전투 코어: HP · 게이지 · 자동 발동 · 승패 (전투 개편 단계 2)
+   *
+   * 한 문장: **잘 맞추면 내 게이지가, 실수하면 적 게이지가 오르고, 찬 쪽이
+   * 자동으로 때린다.** 양쪽이 같은 문법을 쓰는 것이 이 절의 전부다.
+   *
+   *   내 게이지  resolveMatch 의 점수식 산출값(gain+bombGain)이 그대로 적립된다.
+   *              만땅이면 meArm 만 세우고 발동은 duelTick 이 **판이 조용할 때**
+   *              한다 — bossArm 이 지키던 재진입 금지 계약을 그대로 잇는다.
+   *   적 게이지  실수 3종으로만 오른다: ① 매치 불가 탭 ② 콤보 끊김
+   *              ③ 무매치 방치(DUEL_IDLE_MS 마다 반복). 만땅이면 1.8초 예고 뒤
+   *              내 HP 를 깎는다. 예고가 있는 것이 내 쪽과의 유일한 차이다.
+   *   방해 스킬  데미지가 아닌 유틸(블로커 투하). 피해는 게이지 한 문으로만
+   *              들어온다 — 두 문을 만들면 "왜 맞았는지"를 읽을 수 없게 된다.
+   *   승패       duelTick 한 곳에서만 낸다. 애니메이션 사슬 한가운데서 판을
+   *              끝내면 뒤따르던 later() 들이 끝난 판 위에서 돈다.
+   *
+   * 분기의 유일한 스위치는 battleOn() 이고 전체 밸브는 TW_BATTLE 이다. 이 절의
+   * 어느 함수도 endless/daily/rush 에서 불리지 않는다.
+   * ========================================================================= */
+
+  /** 이 탄의 악당. 보스탄이 아니면 BOSS_DEFS 를 순환 재사용한다 — 전투는 모든
+   *  탄에 붙는데 악당 정의는 셋뿐이라, 아바타·이름을 돌려 쓰는 것이 v1 이다. */
+  function duelFoeDef(n) {
+    var d = bossDefOf(n);
+    if (d) return d;
+    var k = ((n | 0) - 1) % BOSS_DEFS.length;
+    return BOSS_DEFS[((k % BOSS_DEFS.length) + BOSS_DEFS.length) % BOSS_DEFS.length];
+  }
+
+  function duelFoeHpMax(n) {
+    var hp = advPar(n) * DUEL_FOE_HP_K * (advIsBoss(n) ? DUEL_BOSS_HP_K : 1);
+    return Math.max(1, Math.round(hp));
+  }
+  /** 자동 발동 1회의 위력 = 그대로 발동 **주기**이기도 하다 (캡이 리듬을 만든다). */
+  function duelAtkMax(n) { return Math.max(1, Math.round(advPar(n) * DUEL_ATK_K)); }
+  function duelFoeHit(n) {
+    return Math.min(DUEL_HIT_CAP,
+                    Math.round(DUEL_ME_HP * (DUEL_HIT_BASE + (n | 0) * DUEL_HIT_STEP)));
+  }
+
+  /**
+   * 상태만 세운다 — DOM 을 한 글자도 건드리지 않는다. 그래서 startStage 의 판
+   * 생성보다 **앞**에 설 수 있고, 그것이 필요한 이유는 battleOn() 이 S.duel 을
+   * 보기 때문이다: 직사각형 보정(단계 1)이 그 스위치를 이미 읽는다.
+   */
+  function duelInit(p) {
+    var n = p ? p.n : 1;
+    var atkMax = duelAtkMax(n);
+    var foeHp = duelFoeHpMax(n);
+    S.duel = {
+      me: { hp: DUEL_ME_HP, hpMax: DUEL_ME_HP, atk: 0, atkMax: atkMax,
+            sp: 0, spMax: atkMax * DUEL_SP_MULT },
+      foe: { hp: foeHp, hpMax: foeHp, atk: 0, atkMax: DUEL_FOE_ATK_MAX,
+             hit: duelFoeHit(n) },
+      def: duelFoeDef(n),
+      dmg: 0,
+      petLeft: DUEL_PET_MAX,
+      refillSeq: 0,
+      foeSkillAt: 0,
+      idleAt: 0,
+      meArm: false,
+      down: false
+    };
+    return S.duel;
+  }
+
+  /** 판이 다 그려진 뒤의 화면 몫 + 벽시계 출발. duelInit 이 이미 상태를 잡았다. */
+  function duelStart(p) {
+    var d = S.duel;
+    if (!d) return;
+    d.foeSkillAt = now() + DUEL_SKILL_MS;   // 첫 방해는 판이 궤도에 오른 뒤에
+    d.idleAt = now() + DUEL_IDLE_MS;
+    /* 옛 반격 스케줄과 확정필살기는 전투에서 잠근다 — 게이지가 그 둘을 모두
+       대신한다. 지우지 않는 이유는 TW_BATTLE=false 원복이 성립해야 하기 때문이다. */
+    S.bossAtkAt = 0;
+    S.bossTellAt = 0;
+    S.bossArm = false;
+    setAppClass('boss', true);
+    /* 임시 HUD (단계 4의 #duel-hud 가 오기 전까지): 기존 보스 체력바를 악당 HP
+       표시기로 그대로 굴린다. 내 HP·게이지는 window.Game.state.duel 로 본다. */
+    var el = $('boss-bar');
+    if (el) {
+      el.hidden = false;
+      if (el.classList) el.classList.remove('hit', 'big', 'down', 'tell');
+      var av = $('boss-av');
+      if (av && d.def) av.className = 'boss-av bs-' + d.def.id;
+      setText('boss-name', d.def ? bossName(d.def) : '');
+    }
+    syncDuel();
+  }
+
+  /** 임시 HUD 의 단독 소유자 (단계 4에서 #duel-hud 로 이사한다). */
+  function syncDuel() {
+    var d = S.duel;
+    if (!d) return;
+    var el = $('boss-bar');
+    if (!el || el.hidden) return;
+    var f = d.foe.hpMax > 0 ? Math.max(0, d.foe.hp) / d.foe.hpMax : 0;
+    el.style.setProperty('--hp', String(f));
+    setText('boss-hp-n', Math.max(0, Math.ceil(f * 100)) + '%');
+    setText('boss-cond', t('duel.hud', {
+      hp: Math.max(0, Math.ceil(d.me.hp)),
+      a: Math.min(100, Math.round(d.me.atk / d.me.atkMax * 100)),
+      s: Math.min(100, Math.round(d.me.sp / d.me.spMax * 100))
+    }));
+  }
+
+  /**
+   * 악당의 체력을 깎는다. 격파 판정은 **여기서 하지 않는다** — bossDamage 주석의
+   * 재진입 금지 계약을 그대로 잇는다. 판정은 duelTick 한 곳의 몫이다.
+   * @return 실제로 깎인 양 (duel.dmg 가 세는 것과 같은 값)
+   */
+  function duelHitFoe(dmg, big) {
+    var d = S.duel;
+    if (!d || d.down) return 0;
+    var n = Math.max(0, Math.round(dmg));
+    if (n <= 0) return 0;
+    var real = Math.min(n, d.foe.hp);
+    d.foe.hp -= real;
+    d.dmg += real;
+    var el = $('boss-bar');
+    if (el && el.classList) {
+      el.classList.remove(big ? 'big' : 'hit');
+      void el.offsetWidth;
+      el.classList.add(big ? 'big' : 'hit');
+    }
+    if (big && typeof window !== 'undefined') {
+      J.shockwave(window.innerWidth / 2, window.innerHeight * 0.16, '#ff5a3d');
+      J.floatText(window.innerWidth / 2, window.innerHeight * 0.24, '-' + n, '#ff8a3d', 36);
+      J.vibrate(50);
+      heroSay('boss', 5);
+    }
+    syncDuel();
+    return real;
+  }
+
+  /**
+   * 내 자동 공격. duelTick 이 meArm && !S.busy && !fxBusy() 인 순간에만 부른다 —
+   * 리필 착지 → 공격 빔 → 데미지 숫자의 순서를 그 가드 하나가 보장한다.
+   * 초과분은 버리지 않고 이월한다: 자동 발동에서 캡 낭비는 실력이 아니라
+   * 타이밍 운이 되기 때문이다(이월분이 또 만땅이면 다음 조용한 틱에 재발동).
+   */
+  function duelMeAttack() {
+    var d = S.duel;
+    if (!d || d.down) return;
+    var me = d.me;
+    me.atk -= me.atkMax;
+    if (me.atk < 0) me.atk = 0;
+    if (typeof window !== 'undefined') {
+      var el = $('boss-bar');
+      var tx = window.innerWidth / 2, ty = window.innerHeight * 0.16;
+      if (el && el.getBoundingClientRect) {
+        var r = el.getBoundingClientRect();
+        if (r.width > 0) { tx = r.left + r.width / 2; ty = r.top + r.height / 2; }
+      }
+      J.beam(window.innerWidth / 2, window.innerHeight * 0.74, tx, ty, '#ffb03d');
+    }
+    J.sfx.bomb();
+    duelHitFoe(me.atkMax, true);
+    d.meArm = me.atk >= me.atkMax;
+  }
+
+  /** 내 HP 가 깎인다. KO 판정은 하지 않는다 — duelHitFoe 와 같은 이유다. */
+  function duelHitMe(dmg) {
+    var d = S.duel;
+    if (!d || d.down) return;
+    var n = Math.max(0, Math.round(dmg));
+    if (n <= 0) return;
+    d.me.hp = Math.max(0, d.me.hp - n);
+    setAppClass('duel-hurt', true);
+    later(function () { setAppClass('duel-hurt', false); }, 420);
+    J.screenPulse();
+    J.vignette(0.45);
+    J.vibrate(70);
+    if (typeof window !== 'undefined') {
+      J.shockwave(window.innerWidth / 2, window.innerHeight * 0.6, '#ff3d3d');
+      J.floatText(window.innerWidth / 2, window.innerHeight * 0.64, '-' + n, '#ff6a6a', 36);
+    }
+    J.sfx.fail();
+    syncDuel();
+  }
+
+  /**
+   * 실수 하나가 적 게이지에 얹히는 **유일한 문**. 소스가 셋이어도 문은 하나라,
+   * "몇 번 실수하면 맞나"가 상수 셋(12/5/8)과 atkMax 하나로 전부 읽힌다.
+   */
+  function duelFoeGauge(n) {
+    var d = S.duel;
+    if (!d || d.down || !S.running) return;
+    if (S.bossTellAt > 0) return;      // 이미 예고 중 — 예고 위에 예고를 쌓지 않는다
+    d.foe.atk += Math.max(0, n | 0);
+    if (d.foe.atk >= d.foe.atkMax) {
+      d.foe.atk = d.foe.atkMax;
+      duelTell();
+    }
+    syncDuel();
+  }
+
+  /** 1.8초 예고. bossTell 과 같은 기계·같은 벽시계 필드(S.bossTellAt)를 쓴다. */
+  function duelTell() {
+    S.bossTellAt = now() + BOSS_TELL_MS;
+    setAppClass('boss-tell', true);
+    var el = $('boss-bar');
+    if (el && el.classList) el.classList.add('tell');
+    toast(t('duel.tell'));
+    J.sfx.fail();
+    J.vibrate(20);
+  }
+
+  function duelFoeAttack() {
+    var d = S.duel;
+    S.bossTellAt = 0;
+    setAppClass('boss-tell', false);
+    var el = $('boss-bar');
+    if (el && el.classList) el.classList.remove('tell');
+    if (!d || d.down) return;
+    d.foe.atk = 0;
+    duelHitMe(d.foe.hit);
+    toast(t('duel.hit', { n: d.foe.hit }));
+  }
+
+  /** 방해 스킬 — **비데미지 유틸**이다. 블로커 투하는 기존 함수 그대로 부른다. */
+  function duelFoeSkill() {
+    S.bossAtkN = (S.bossAtkN | 0) + 1;   // 위치 난수의 순번 (재도전 재현성)
+    var n = bossDropBlockers(DUEL_SKILL_BLK);
+    if (n > 0) {
+      toast(t('duel.skill', { n: n }));
+      J.sfx.bomb();
+      J.screenPulse();
+      J.vibrate(30);
+    }
+  }
+
+  /* 상대 구동자. 훅은 **셋뿐**이다 — 나중에 원격 플레이어의 입력이 같은 셋으로
+     foe 를 구동한다. 이 이상의 추상화는 금지(과설계 금지 지시).
+     방해 스킬 테이블(확장 자리) — 지금은 블로커 투하 1종이고, 뒤에 붙일 후보는
+     'freeze'(한 컬럼 얼리기) / 'mask'(숫자 가리기) / 'quake'(판 흔들기)다.
+     셋 다 **비데미지**여야 한다: 피해가 두 문으로 들어오면 "왜 맞았나"를
+     플레이어가 읽을 수 없게 되고, 그 순간 예고 규율도 함께 무너진다. */
+  var bossDriver = {
+    onMiss: function (why) { duelFoeGauge(DUEL_MISS_GAIN); },
+    onBreak: function () { duelFoeGauge(DUEL_BREAK_GAIN); },
+    onTick: function () { duelFoeSkill(); }
+  };
+  var foeDriver = bossDriver;
+
+  /**
+   * 매치 하나가 전투에 하는 일. resolveMatch 가 점수를 적립한 **바로 그 자리**
+   * 에서 한 번 부른다 — 두 계좌(S.score / me.atk)가 같은 값을 같은 순간에 받아야
+   * "게이지 적립량 = 점수"라는 밸런스 서술이 코드에서도 한 줄로 성립한다.
+   * @param pts     gain + bombGain (점수식의 단일 반올림을 지난 값)
+   * @param iceOnly 얼음만 깼는가 — 매치가 아닌 것은 사슬도 타이머도 건드리지 않는다
+   * @param twPrev  twinApply **전**의 교대 사슬 길이 (전진 판정의 유일한 근거)
+   */
+  function duelOnMatch(pts, iceOnly, tw, twPrev) {
+    var d = S.duel;
+    if (!d || d.down) return;
+    d.me.atk += Math.max(0, pts);
+    if (!iceOnly) {
+      /* ③ 무매치 타이머의 리셋. 매치가 확정된 이 자리가 그 유일한 정착점이다. */
+      d.idleAt = now() + DUEL_IDLE_MS;
+      /* 필살기 게이지는 **교대 사슬이 전진한 매치**에서만 2배 속도로 오른다
+         (텐↔트윈을 번갈아 맞추는 플레이의 단독 보상). 발동은 단계 3의 버튼이
+         맡고, 이 단계는 적립·저장까지만 한다. */
+      if (tw && (tw.chain | 0) > (twPrev | 0)) {
+        d.me.sp = Math.min(d.me.spMax, d.me.sp + DUEL_SP_MULT * Math.max(0, pts));
+      }
+    }
+    /* 만땅은 여기서 **표시만** 한다. 발동은 duelTick 이 판이 조용해진 뒤에 —
+       매치 애니메이션 한가운데서 때리면 연출이 서로를 잘라 먹는다. */
+    if (d.me.atk >= d.me.atkMax) d.meArm = true;
+    syncDuel();
+  }
+
+  /**
+   * 전투의 심장. 순서가 곧 계약이다 (bossTick 의 계보를 그대로 잇는다):
+   *   ① 격파        — 다른 무엇보다 먼저. 이미 진 악당이 반격하면 안 된다
+   *   ② 내 KO
+   *   ③ 내 자동 공격 — 판이 조용할 때만 (!S.busy && !fxBusy())
+   *   ④ 예고 만료   — 예고가 걸려 있는 동안은 다른 스케줄이 끼어들지 않는다
+   *   ⑤ 무매치 적립 — DUEL_IDLE_MS 마다 반복
+   *   ⑥ 방해 스킬   — 조용할 때만 (③ 과 같은 가드)
+   * 200ms 루프(startAdvLoop)가 S.paused 가드 아래에서 부르므로 일시정지는
+   * 이중으로 안전하다 — 벽시계 두 개(idleAt/foeSkillAt)는 shiftDeadlines 가 민다.
+   */
+  function duelTick() {
+    var d = S.duel;
+    if (!d || !S.running || S.mode !== 'adv') return;
+    if (!d.down && d.foe.hp <= 0) {
+      d.down = true;
+      d.meArm = false;
+      bossDefeatFx();
+      advFinish(true, 'boss');
+      return;
+    }
+    if (!d.down && d.me.hp <= 0) {
+      d.down = true;
+      d.meArm = false;
+      advFinish(false, 'ko');
+      return;
+    }
+    if (d.down) return;
+    if (d.meArm && !S.busy && !fxBusy()) { duelMeAttack(); return; }
+    if (S.bossTellAt > 0) {
+      if (now() >= S.bossTellAt) duelFoeAttack();
+      return;
+    }
+    if (d.idleAt > 0 && now() >= d.idleAt) {
+      d.idleAt = now() + DUEL_IDLE_MS;
+      duelFoeGauge(DUEL_IDLE_GAIN);
+    }
+    if (d.foeSkillAt > 0 && now() >= d.foeSkillAt) {
+      /* 대형 연출·리필 중에는 미룬다 — 그 뒤에서 블로커가 떨어지면 아무도 못
+         보고, 그 순간이 곧 "이유 없이 판이 나빠졌다"가 된다(bossTick 과 같은 규율). */
+      if (S.busy || fxBusy()) { d.foeSkillAt = now() + 700; return; }
+      d.foeSkillAt = now() + DUEL_SKILL_MS;
+      foeDriver.onTick();
+    }
+  }
+
+  /** 시간 종료의 판정. 남은 HP **비율**을 견주고, 동률은 플레이어의 승리다. */
+  function duelTimeoutWin() {
+    var d = S.duel;
+    if (!d) return false;
+    var mine = d.me.hpMax > 0 ? d.me.hp / d.me.hpMax : 0;
+    var theirs = d.foe.hpMax > 0 ? d.foe.hp / d.foe.hpMax : 0;
+    return mine >= theirs;
   }
 
   /** 탄 하나의 완전한 계획서. 지도 카드와 실제 판이 공유하는 단 하나의 출처. */
@@ -28180,6 +28656,9 @@ window.TT_SFX = {
   function advGoalMet() {
     var p = S.advPlan;
     if (!p) return false;
+    /* 단계 2: 전투에서 승리 조건은 하나뿐이다 — 악당의 체력. 옛 목표(점수/제거/
+       숫자)는 보너스로 존속하되 승패에서는 빠진다(설계 §1 승인 항목). */
+    if (battleOn()) return S.duel.foe.hp <= 0;
     if (p.goal.type === 'boss') return S.bossDown || S.bossHp <= 0;
     if (p.goal.type === 'score') return S.score >= p.goal.need;
     if (p.goal.type === 'digit') return S.advDigit >= p.goal.need;
@@ -28192,7 +28671,9 @@ window.TT_SFX = {
     if (!el) return;
     /* 보스탄에서는 이 칩을 숨긴다 — 체력바가 이미 목표를 상시로 말하고 있고,
        같은 사실을 두 자리에서 말하면 폭 예산만 먹는다(#hud-row 규약). */
-    var live = S.mode === 'adv' && !!S.advPlan && !S.advPlan.boss;
+    /* 단계 2: 전투에서도 숨긴다 — 승리 조건이 아닌 것을 목표 칩이 계속 말하면
+       "저걸 채우면 이기는 줄" 알게 된다(보스탄에서 숨기는 것과 같은 이유). */
+    var live = S.mode === 'adv' && !!S.advPlan && !S.advPlan.boss && !battleOn();
     el.hidden = !live;
     if (!live) return;
     var p = S.advPlan, txt;
@@ -28323,9 +28804,16 @@ window.TT_SFX = {
       maybeHurry(left);                          // 20초 — 스토리 긴장
       tickMission();                             // 그 다음이 미션 시계
       skillTick();                               // v4 5차 §2: 필살기 지속 만료
-      bossTick();                                // v4 5차 §4: 격파·확정발동·반격
+      /* 단계 2: 전투에서는 듀얼이 옛 보스 시계를 대신한다. 둘을 함께 돌리면
+         한 판에서 두 전투가 서로의 승패를 덮어쓴다. */
+      if (battleOn()) duelTick();
+      else bossTick();                           // v4 5차 §4: 격파·확정발동·반격
       if (!S.running) return;                    // 위에서 격파로 판이 끝났을 수 있다
-      if (left <= 0) { stopAdv(); advFinish(advGoalMet(), 'timeout'); }
+      /* 시간 종료 — 전투는 남은 HP **비율**을 견주고 동률은 플레이어의 승리다. */
+      if (left <= 0) {
+        stopAdv();
+        advFinish(battleOn() ? duelTimeoutWin() : advGoalMet(), 'timeout');
+      }
     }, 200);
   }
 
@@ -28374,6 +28862,12 @@ window.TT_SFX = {
        다음 판의 첫 매치가 남의 필살기로 터진다. 게이지는 그대로 둔다(유지가 스펙). */
     endSkill();
     S.bossArm = false;
+    /* 전투도 여기서 문을 닫는다 — 시트가 떠 있는 동안 200ms 틱이 한 번 더 들어와
+       같은 판정을 두 번 내지 않게. duel 자체는 남겨 둔다(결과 시트·디버그가 읽는다). */
+    if (S.duel) { S.duel.down = true; S.duel.meArm = false; }
+    setAppClass('duel-hurt', false);
+    setAppClass('boss-tell', false);
+    S.bossTellAt = 0;
     var p = S.advPlan || advPlan(S.stage);
     var key = String(p.n);
     var stars = 0;
@@ -28482,7 +28976,8 @@ window.TT_SFX = {
     setText('adv-score', S.score);
     setText('adv-note', win
       ? (stars >= 3 ? t('adv.note3') : t('adv.note.next', { n: Math.round(p.par * ADV_STAR2) }))
-      : t('adv.reason.' + (why === 'timeout' ? 'timeout' : 'stuck')));
+      : t('adv.reason.' + (why === 'timeout' ? 'timeout'
+                                             : (why === 'ko' ? 'ko' : 'stuck'))));
     setText('adv-hearts', win
       ? (p.boss ? t('adv.heartplus') : t('adv.heartkept'))
       : t('adv.heartlost', { n: Math.max(0, store.hearts) }));
@@ -30425,6 +30920,14 @@ window.TT_SFX = {
        위한 핸들. 게임 코드는 이 중 무엇도 window.Game 을 거쳐 부르지 않는다. */
     battleRefill: battleRefill, battleRefillEx: battleRefillEx,
     battleFitBoard: battleFitBoard, battleRows: battleRows, battleOn: battleOn,
+    /* 전투 코어(단계 2) — 본 HUD 는 단계 4에서 온다. 그때까지 내 HP·양쪽 게이지는
+       `Game.state.duel` 로 읽고, 승패 경로는 아래 손잡이로 곧장 몰아 볼 수 있다.
+       게임 코드는 이 중 무엇도 window.Game 을 거쳐 부르지 않는다. */
+    duelTick: duelTick, duelHitFoe: duelHitFoe, duelHitMe: duelHitMe,
+    duelFoeGauge: duelFoeGauge, duelMeAttack: duelMeAttack,
+    duelOnMatch: duelOnMatch, duelInit: duelInit, duelTimeoutWin: duelTimeoutWin,
+    duelAtkMax: duelAtkMax, duelFoeHpMax: duelFoeHpMax, duelFoeHit: duelFoeHit,
+    foeDriver: foeDriver,
     genBoardExt: genBoardExt, extRows: extRows, extBoardSize: extBoardSize,
     extFillP: extFillP,
     // v4 EXT: shuffle + blocked-path explanation, exported so both can be
