@@ -86,20 +86,15 @@ summary .cnt{margin-left:auto;font-weight:400;font-size:.72rem;color:var(--sub);
 .s-queued{background:var(--queued)}.s-empty{background:var(--empty)}
 .slab{font-size:.62rem;color:var(--sub)}
 
-/* ── 4. 조립 완성본 슬롯 ── */
-details.asm{border-top:1px solid var(--line);background:#F8F1E8}
-details.asm>summary{cursor:pointer;padding:12px 14px;font-weight:800;font-size:.9rem;
-  list-style:none;display:flex;align-items:center;gap:8px}
-details.asm>summary::-webkit-details-marker{display:none}
-details.asm>summary::before{content:'▸';color:var(--sub);font-weight:400;transition:.15s}
-details.asm[open]>summary::before{transform:rotate(90deg)}
-.asmbody{padding:0 14px 16px}
-.asmnote{margin:0 0 10px;font-size:.74rem;color:var(--sub)}
-.swrow{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
-.sw{padding:0;border:2px solid var(--line);border-radius:8px;background:var(--dark);
-  cursor:pointer;overflow:hidden;line-height:0}
-.sw img{width:52px;height:34px;object-fit:cover;display:block}
-.sw.on{border-color:var(--ink)}
+/* ── 4. 그룹 안 조립 화면 미리보기 (한 번에 하나만 산다) ── */
+.gbody{display:flex;align-items:flex-start;gap:10px;padding:10px 12px 15px}
+.gbody>.grid{flex:1 1 auto;min-width:0;padding:0}
+.pv{flex:0 0 214px;width:214px}
+.pvbtn{width:100%;font-family:inherit;font-size:.74rem;padding:11px 6px;border-radius:11px;
+  border:1px dashed var(--sub);background:#FCF7F1;color:var(--sub);cursor:pointer}
+.pvbtn:hover{border-color:var(--ink);color:var(--ink)}
+.bgcard.pick{cursor:pointer}
+.bgcard.sel{border-color:var(--ok);box-shadow:0 0 0 2px var(--ok)}
 .phonewrap{position:relative;overflow:hidden}
 .phone{width:390px;height:844px;transform-origin:top left;border:8px solid var(--ink);
   border-radius:30px;overflow:hidden;background:#000}
@@ -113,6 +108,8 @@ details.asm[open]>summary::before{transform:rotate(90deg)}
   .sidehead{flex:0 0 auto;margin:0;align-self:center;writing-mode:horizontal-tb}
   .bgcard{flex:0 0 132px;width:132px;margin-bottom:0}
   .bgcard img,.bgcard .bgph{height:64px}
+  .gbody{display:block}
+  .pv{flex:none;width:auto;max-width:390px;margin-top:10px}
 }
 </style>
 </head>
@@ -157,12 +154,14 @@ function mkCard(it){
   return el;
 }
 
-function mkBgCard(it){
+function mkBgCard(it,si){
   const nm=it[0],st=it[2],ref=it[3],dyn=it[6];
   const el=document.createElement('div');
   el.className='bgcard st-'+st;
-  el.dataset.cls='bg'; el.dataset.dyn=dyn;
+  el.dataset.cls='bg'; el.dataset.dyn=dyn; el.dataset.si=String(si);
   const f=(ref&&ref.indexOf('img:')===0)?M[ref.slice(4)]:null;
+  if(f){ el.classList.add('pick'); el.dataset.bg=ref.slice(4);
+         el.addEventListener('click',function(){ pickBg(el); }); }
   el.innerHTML='<div class="band">배경</div>'
     +(f?'<img loading="lazy" src="catalog/'+f.file+'" alt="">'
        :'<div class="bgph">'+(st==='empty'?'없음':st==='queued'?'발주·예약':'코드·CSS')+'</div>')
@@ -171,45 +170,64 @@ function mkBgCard(it){
   return el;
 }
 
-function mkAssembly(si,bgItems){
-  const d=document.createElement('details'); d.className='asm';
-  d.innerHTML='<summary>📱 배경 포함 조립 완성본</summary>';
-  const box=document.createElement('div'); box.className='asmbody';
-  d.appendChild(box);
-  let built=false;
-  d.addEventListener('toggle',function(){
-    if(!d.open||built) return;
-    built=true;                                  /* 처음 열릴 때만 iframe 생성 */
-    const sw=bgItems.filter(it=>it[3]&&it[3].indexOf('img:')===0&&M[it[3].slice(4)]);
-    let html='';
-    if(si>0) html+='<p class="asmnote">게임 안에서 해당 화면으로 이동해 확인하세요.</p>';
-    if(sw.length){
-      html+='<div class="swrow">'+sw.map(function(it){
-        const k=it[3].slice(4);
-        return '<button class="sw" data-bg="'+esc(k)+'" title="'+esc(it[0])+'">'
-             + '<img src="catalog/'+M[k].file+'" alt=""></button>';
-      }).join('')+'</div>';
-    }
-    html+='<div class="phonewrap"><div class="phone">'
-        + '<iframe title="조립 완성본" src="tentwin.html"></iframe></div></div>';
-    box.innerHTML=html;
-    const wrap=box.querySelector('.phonewrap'),ph=box.querySelector('.phone'),
-          fr=box.querySelector('iframe');
-    function fit(){
-      const s=Math.min(1,wrap.clientWidth/390);
-      ph.style.transform='scale('+s+')';
-      wrap.style.height=(844*s)+'px';
-    }
-    fit(); window.addEventListener('resize',fit);
-    box.querySelectorAll('.sw').forEach(function(b){
-      b.addEventListener('click',function(){
-        box.querySelectorAll('.sw').forEach(x=>x.classList.remove('on'));
-        b.classList.add('on');
-        fr.src='tentwin.html?bg='+b.dataset.bg;   /* 배경 교체 미리보기 */
-      });
-    });
-  });
-  return d;
+/* ── 조립 화면 미리보기 ───────────────────────────────────────────────
+   ACT 는 지금 살아 있는 미리보기 하나(폰 성능 보호 — 동시 1개만).
+   SECBG[si] 는 그 섹션에서 고른 배경 키(없으면 게임 기본 배경). */
+let ACT=null; const SECBG={};
+
+function srcFor(scr,bg){
+  const q=[];
+  if(scr&&scr!=='splash') q.push('screen='+encodeURIComponent(scr));
+  if(bg) q.push('bg='+encodeURIComponent(bg));
+  return 'tentwin.html'+(q.length?'?'+q.join('&'):'');
+}
+
+function mkPreview(scr,si){
+  const pv=document.createElement('div'); pv.className='pv';
+  pv.dataset.scr=scr; pv.dataset.si=String(si);
+  resetPv(pv);
+  return pv;
+}
+
+function resetPv(pv){
+  pv.innerHTML='<button class="pvbtn" type="button">▶ 조립 화면 보기</button>';
+  pv.querySelector('.pvbtn').addEventListener('click',function(){ openPv(pv); });
+  if(ACT&&ACT.pv===pv) ACT=null;
+}
+
+function openPv(pv){
+  if(ACT&&ACT.pv!==pv) resetPv(ACT.pv);          /* 다른 미리보기는 내린다 */
+  const scr=pv.dataset.scr, si=pv.dataset.si;
+  pv.innerHTML='<div class="phonewrap"><div class="phone"><iframe title="조립 화면" src="'
+    +esc(srcFor(scr,SECBG[si]))+'"></iframe></div></div>';
+  ACT={pv:pv,scr:scr,si:si};
+  fitPv();
+}
+
+function fitPv(){
+  if(!ACT) return;
+  const wrap=ACT.pv.querySelector('.phonewrap'), ph=ACT.pv.querySelector('.phone');
+  if(!wrap||!ph) return;
+  const s=Math.min(1,wrap.clientWidth/390);
+  ph.style.transform='scale('+s+')';
+  wrap.style.height=(844*s)+'px';
+}
+window.addEventListener('resize',fitPv);
+
+/* 사이드 배경 카드 = 배경 선택 버튼. 같은 카드를 다시 누르면 기본 배경으로. */
+function pickBg(card){
+  const si=card.dataset.si, k=card.dataset.bg;
+  const next=(SECBG[si]===k)?null:k;
+  SECBG[si]=next;
+  card.parentNode.querySelectorAll('.bgcard').forEach(x=>x.classList.remove('sel'));
+  if(next) card.classList.add('sel');
+  if(ACT&&ACT.si===si){
+    const fr=ACT.pv.querySelector('iframe');
+    if(fr) fr.src=srcFor(ACT.scr,next);
+  }else{
+    const first=document.querySelector('.pv[data-si="'+si+'"]');
+    if(first) openPv(first);                     /* 없으면 이 섹션 첫 화면을 연다 */
+  }
 }
 
 function applyFilter(f){
@@ -270,7 +288,7 @@ Promise.all([
     if(bgItems.length){
       const side=document.createElement('aside'); side.className='side';
       side.innerHTML='<div class="sidehead">배경</div>';
-      bgItems.forEach(it=>side.appendChild(mkBgCard(it)));
+      bgItems.forEach(it=>side.appendChild(mkBgCard(it,si)));
       body.appendChild(side);
     }
 
@@ -282,12 +300,17 @@ Promise.all([
       const filled=items.filter(it=>it[2]==='ok'||it[2]==='css').length;
       det.innerHTML='<summary>'+esc(g.name)
         +'<span class="cnt">'+filled+'/'+items.length+'</span></summary>';
+      const gb=document.createElement('div'); gb.className='gbody';
       const grid=document.createElement('div'); grid.className='grid';
       items.forEach(it=>grid.appendChild(mkCard(it)));
-      det.appendChild(grid);
+      gb.appendChild(grid);
+      if(g.scr) gb.appendChild(mkPreview(g.scr,si));   /* 화면에 대응하는 그룹만 */
+      det.appendChild(gb);
+      det.addEventListener('toggle',function(){
+        if(!det.open&&ACT&&det.contains(ACT.pv)) resetPv(ACT.pv);
+      });
       mb.appendChild(det);
     });
-    if(si<4) mb.appendChild(mkAssembly(si,bgItems));   /* 화면 섹션 Ⅰ~Ⅳ */
 
     body.appendChild(mb); s.appendChild(body); cats.appendChild(s);
   });

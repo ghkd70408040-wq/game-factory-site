@@ -30448,5 +30448,70 @@ var f=m&&m[k]&&m[k].file;if(!f)return;var s=document.createElement('style');
 s.textContent='#screen-menu::before,#screen-menu.is-night::before{background-image:url("catalog/'+f+'")!important;background-size:cover!important;background-position:center center!important;background-repeat:no-repeat!important;}';
 document.head.appendChild(s);}).catch(function(){});})();
 </script>
+<script id="screen-preview-hook">
+/* 관제탑 화면 점프 훅 — ?screen=<키>, 파라미터 없으면 무동작.
+   게임 로직은 한 줄도 건드리지 않는다: 실제 버튼의 click() 과 이미 노출돼 있는
+   window.Game 손잡이만 써서 사용자 흐름을 그대로 재연한다. ?bg= 와 병용 가능. */
+(function(){
+var KEY=new URLSearchParams(location.search).get('screen');
+if(!KEY) return;                                   /* 파라미터 없음 = 부수효과 0 */
+function $(i){return document.getElementById(i);}
+function open_(i){var e=$(i);return !!(e&&!e.hidden);}
+function act(i){var e=$(i);return !!(e&&e.classList&&e.classList.contains('active'));}
+function tap(i){var e=$(i);if(!e||e.hidden)return false;try{e.click();}catch(err){}return true;}
+function G(){return window.Game;}
+function call(n,a){var g=G();if(g&&typeof g[n]==='function'){try{g[n](a);}catch(err){}}}
+/* 조건이 참이 될 때까지 같은 동작을 되풀이한다 — 클릭 한 번이 스플래시 실드나
+   초기화 타이밍에 먹혀도 다음 틱이 다시 시도하므로 순서가 어긋나지 않는다. */
+function till(ok,go){return function(){if(ok())return true;go();return false;};}
+var t0=0;
+var PRE=[
+  /* init 이 끝나야 버튼 배선(wire)과 스플래시 바인딩이 서 있다. */
+  function(){var g=G();return !!(g&&g.state)&&document.readyState!=='loading';},
+  /* 스플래시 터치 스크림 통과 — #splash 는 click 폴백 리스너를 갖고 있다. */
+  function(){var s=$('splash');if(!s||s.hidden)return true;try{s.click();}catch(e){}return false;},
+  /* 스플래시가 400ms 짜리 클릭 실드를 세운다. 그게 걷힌 뒤에 눌러야 한다. */
+  function(){if(!t0)t0=Date.now();return Date.now()-t0>440;},
+  /* 첫 실행이면 튜토리얼이 떠 있다. 미리보기에서는 닫고 시작한다. */
+  function(){if(!open_('modal-tutorial'))return true;call('finishTutorial',false);return false;}
+];
+var SET =till(function(){return open_('modal-settings');},function(){tap('btn-settings');});
+var CHAR=till(function(){return open_('charpanel');},function(){tap('char-open');});
+var MAP =till(function(){return act('screen-map');},function(){call('openMap');});
+var NODE=till(function(){return open_('modal-node');},function(){
+  if(!tap('map-cur')){var g=G();if(g&&g.store)call('openNodeCard',(g.store.advMax|0)||1);}});
+var PLAY=till(function(){return act('screen-game');},function(){tap('node-go');});
+var SEQ={
+  menu:[],
+  play:[till(function(){return open_('modal-mode');},function(){tap('btn-play');})],
+  character:[CHAR],
+  skin:[CHAR,till(function(){return open_('modal-skin');},function(){tap('cp-skin');})],
+  settings:[SET],
+  records:[SET,till(function(){return open_('modal-rank');},function(){tap('st-rank');})],
+  howto:[SET,till(function(){return open_('modal-howto');},function(){tap('st-howto');})],
+  /* 갤러리 줄은 본 컷툰이 있어야 나타나므로, 뷰어를 직접 재생한다. 두 번째 인자를
+     빈 문자열로 주면 "봤다" 표시가 저장되지 않는다(cutFinish 의 `if (cutId)`). */
+  story:[till(function(){return act('screen-story');},function(){
+    var g=G();if(g&&g.playCuts&&g.CUTS_OPEN){try{g.playCuts(g.CUTS_OPEN,'',null);}catch(e){}}})],
+  map:[MAP],
+  stageinfo:[MAP,NODE],
+  game:[MAP,NODE,PLAY],
+  pause:[MAP,NODE,PLAY,till(function(){return open_('modal-pause');},function(){tap('btn-pause');})],
+  clear:[MAP,NODE,PLAY,till(function(){return open_('modal-adv');},function(){call('onStageClear');})],
+  over: [MAP,NODE,PLAY,till(function(){return open_('modal-adv');},function(){call('onGameOver');})]
+};
+var steps=SEQ[KEY];
+if(!steps) return;                                 /* 모르는 키 = 무동작 */
+steps=PRE.concat(steps);
+var i=0,end=Date.now()+8000;                       /* 최대 8초까지만 재시도 */
+(function tick(){
+  if(i>=steps.length||Date.now()>end) return;
+  var done=false;
+  try{done=!!steps[i]();}catch(e){}
+  if(done)i++;
+  setTimeout(tick,80);
+})();
+})();
+</script>
 </body>
 </html>
