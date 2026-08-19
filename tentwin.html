@@ -12178,6 +12178,11 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
 /* ===== 14차 7호 끝 ===== */
 
 </style>
+<!-- 최우선 2장만 preload — 젤리판(세 인터페이스 공용)과 플레이 팝업 레터링이다.
+     나머지 31장은 부트 뒤 유휴 프리로더(#catalog-preload)가 데운다. 여기에 더
+     얹으면 초기 로드 대역폭을 게임 코드와 다투게 되므로 늘리지 않는다. -->
+<link rel="preload" as="image" href="catalog/jelly-box.webp">
+<link rel="preload" as="image" href="catalog/duel-title-play.webp">
 </head>
 <body>
 <!-- ============================================================
@@ -21195,7 +21200,7 @@ window.TT_SFX = {
       'adv.leave': 'Map (-1 heart)',
       'adv.abandon': 'Left the stage. -1 heart.',
       'adv.heartin': 'Next in {t}',
-      'adv.heartfull': 'Full',
+      'adv.heartfull': 'MAX',   /* 2026-08-19 한/영 공통 표기로 통일 */
       'adv.heartwait': 'Out of hearts. Next one in {t}.',
       'adv.ad': 'Watch an ad for a heart',
       'adv.adsoon': 'Coming when the game goes live on the portal.',
@@ -21793,7 +21798,7 @@ window.TT_SFX = {
       'adv.leave': '지도로 (하트 -1)',
       'adv.abandon': '스테이지를 나왔어요. 하트 -1.',
       'adv.heartin': '다음 {t}',
-      'adv.heartfull': '가득',
+      'adv.heartfull': 'MAX',   /* 2026-08-19 사용자 반려 — "가득"이 촌스럽다. 한/영 공통 MAX */
       'adv.heartwait': '하트가 없어요. 다음 하트까지 {t}.',
       'adv.ad': '광고 보고 하트 받기',
       'adv.adsoon': '포털 출시 후 제공돼요.',
@@ -32582,6 +32587,12 @@ window.TT_SFX = {
      border-radius:6px;
      filter:drop-shadow(0 2px 5px rgba(46,20,58,.30));
      봉인 끝 */
+  /* 2026-08-19 하늘빛 틴트 — 사용자 지시("실제 플레이 화면에도 그 톤으로").
+     색은 맵 하단 띠와 **같은 한 값**이다(시안 상단 슬래브 림 실측 유도값).
+     α 만 .52 → .40 으로 낮춘다: 전투 배경은 하늘·물이라 초록이 샐 걱정이 없고,
+     덜 덮을수록 시안처럼 뒤 하늘이 유리 너머로 살아난다.
+     합성 rgb(208,218,228) — 하늘 배경 rgb(169,205,211) 위, 파랑이 최상위다. */
+  --jbox-tint: rgba(215, 236, 253, .40);
   margin:0 calc(var(--safe-r) + 4px) 4px calc(var(--safe-l) + 4px);
   padding:4px 5px 5px;
   gap:5px;
@@ -32599,6 +32610,9 @@ window.TT_SFX = {
      border-image:url("catalog/jelly-box.webp") 120 fill stretch !important;
      border-image-width:34px !important;
      봉인 끝 */
+  /* 2026-08-19 하늘빛 틴트 — 상단 슬래브와 완전히 같은 값이다(한 판·한 색).
+     합성 rgb(188,202,217) — 물가 배경 rgb(100,150,170) 위, 역시 파랑이 최상위. */
+  --jbox-tint: rgba(215, 236, 253, .40);
   padding:8px calc(var(--safe-r) + 10px) calc(var(--safe-b) + 9px) calc(var(--safe-l) + 10px) !important;
 }
 
@@ -32980,10 +32994,14 @@ window.TT_SFX = {
    (바깥에서 안으로 flood fill + 경계 디프린지, 캔버스 크기·본체 픽셀 무접촉).
    캔버스가 그대로라 좌표도 구판 값 그대로 성립한다 — 아래 네 줄이 그 값이다.
    sep3 조각은 catalog/_superseded/*-sep.webp 로 보관한다(삭제하지 않는다).
-   (CSS 쪽에는 파랑 그림자가 없다 — #map-top > * 가 box-shadow:none 이다.) */
-#screen-map #map-back   { left: 3.76cqw;  top: 3.83cqw; width: 14.99cqw; height: 15.46cqw; background-image: url("catalog/stage-btn_back.webp"); }
+   (CSS 쪽에는 파랑 그림자가 없다 — #map-top > * 가 box-shadow:none 이다.)
+   ⚠ 2026-08-19 캐시 버스트 `?v=3` — stage-btn_back / stage-pill_coin (하단 테두리
+     정리)과 아래 #map-rec 의 stage-btn_records (워터마크 재제거)는 **같은 파일명**
+     으로 갱신됐다. 사용자 폰이 구캐시를 물고 있어 쿼리로 강제 재로드시킨다.
+     조각을 또 갈면 v 를 올린다. 다른 조각에는 붙이지 않는다. */
+#screen-map #map-back   { left: 3.76cqw;  top: 3.83cqw; width: 14.99cqw; height: 15.46cqw; background-image: url("catalog/stage-btn_back.webp?v=3"); }
 #screen-map #map-hearts { left: 21.91cqw; top: 5.51cqw; width: 33.32cqw; height: 12.60cqw; background-image: url("catalog/stage-pill_life.webp"); }
-#screen-map #map-stars  { left: 56.31cqw; top: 5.87cqw; width: 21.75cqw; height: 11.71cqw; background-image: url("catalog/stage-pill_coin.webp"); }
+#screen-map #map-stars  { left: 56.31cqw; top: 5.87cqw; width: 21.75cqw; height: 11.71cqw; background-image: url("catalog/stage-pill_coin.webp?v=3"); }
 #screen-map #map-gear   { left: 81.40cqw; top: 3.85cqw; width: 14.92cqw; height: 15.43cqw; background-image: url("catalog/stage-btn_settings.webp"); }
 #screen-map #map-top .hc-ico { display: none; }   /* 봉인 — 하트·코인·톱니·화살표는 조각에 그려져 있다 */
 /* 하트 수·회복 타이머는 조각의 글자 상자 자리에 코드가 얹는다. */
@@ -33003,15 +33021,28 @@ window.TT_SFX = {
 /* ---- 하단: 공통 젤리박스 띠 ----------------------------------------------
    시안 조각 panel_bottom 은 **쓰지 않는다** — 한 판(.jbox)을 세 인터페이스가
    공유하는 것이 직전 커밋의 원칙이라, 틴트 축만 시안 실측값으로 맞춘다.
-   ⚠ 2026-08-19 판 보정 v2 에 따른 틴트 **재재산출** — 판 가운데 슬라이스의 알파가
-   .243 → **.553** 으로 올라, 이제 틴트가 아니라 판 자신이 합성색을 지배한다.
-   직전 값 rgba(229,229,220,.90) 을 그대로 두면 띠가 시안보다 밝고 누렇게 뜬다.
-   합성 순서대로(배경 → background-color 틴트 → border-image fill 가운데 슬라이스)
-   역산했다: 판 실측 RGB(225.3,218.6,228.4)·α.553, 틴트 α.90, 뒤 배경 휘도 125
-   ⇒ 틴트 rgba(206,210,184,.90) 일 때 합성 RGB(213,211,206) = 시안 띠 실측과 Δ≤1.
-   다른 자리의 --jbox-tint 는 transparent 그대로다 — 여기 한 곳만 색을 탄다. */
+   ⚠ 2026-08-19 **하늘빛 재조정** — 직전 값 rgba(206,210,184,.90) 은 사용자 반려다
+   ("하단 젤리 인터페이스 너무 회색 — 투명도 올리고 하늘색으로"). 회색-올리브로
+   읽힌 이유는 두 가지였다: ① 틴트 자신이 파랑이 가장 낮은 누런 색이었고
+   ② α.90 이라 판이 사실상 불투명해 뒤가 안 비쳤다.
+   시안 gm-ingame-battle.png(1536×2750) 실측으로 다시 잡았다 — 상단 슬래브의
+   좌·우 림을 행마다 훑어 얻은 유리 고유색 median rgb(205,211,253)(좌하 림
+   n=96 sd(8,6.5,1.3) / 좌상 n=110 / 우 n=93), 그리고 슬래브 오른쪽 가장자리에서
+   유리 안팎을 짝지어 뽑은 투과율 α≈.34 (배경 rgb(72,114,124) → 유리 너머
+   rgb(122,149,161); 채널별 .38/.36/.29).
+   그 유리를 우리 스택(배경 → 틴트 → 판 α.539·RGB(225.1,217.7,228.4))으로 옮기면
+   판이 이미 밝은 자홍-흰색이라 **절대 밝기는 시안과 못 맞춘다**(구조적 하한
+   RGB≈(121,117,123)+). 그래서 맞춘 축은 색기울기(채널별 편차)다 — 시안 유리를
+   같은 배경 위에 올렸을 때의 편차와 우리 합성의 편차 차이를 최소화해
+   rgb(215,236,253) 을 얻었다(cast Δ≈10, 후보군 전체가 ±0.7 안이라 사실상 평평).
+   α 는 .90 → **.52**. 맵 배경이 초록이라 이보다 더 열면(≤.45) 초록이 새 나와
+   다시 탁해진다 — 실측 스윕(.38/.45/.52/.58/.64/.70)에서 .52 가 뒤 언덕이 비치되
+   띠는 맑은 하늘-흰빛으로 읽히는 첫 지점이었다.
+   합성 결과 rgb(209,214,210) — 직전 rgb(214,213,205)(파랑이 최저)에서 파랑이
+   빨강 위로 올라오며 누런 기운이 사라진다.
+   전투 위·아래 두 자리도 같은 색을 α.40 으로 나눠 쓴다(§ #duel-hud/#actionbar). */
 #screen-map #map-bot {
-  --jbox-tint: rgba(206, 210, 184, .90);
+  --jbox-tint: rgba(215, 236, 253, .52);
   height: calc(25.61cqw + var(--safe-b));
   padding: 0 0 var(--safe-b);
 }
@@ -33043,7 +33074,7 @@ window.TT_SFX = {
 #screen-map #map-b1    { left: 2.14%;  width: 30.39%; height: 12.47cqw; background-image: url("catalog/stage-pill_star.webp"); }
 #screen-map #map-plate { left: 34.22%; width: 31.66%; height: 18.97cqw; background-image: url("catalog/stage-pill_chapter.webp"); }
 #screen-map #map-char  { left: 66.84%; width: 15.43%; height: 18.62cqw; background-image: url("catalog/stage-btn_chars.webp"); }
-#screen-map #map-rec   { left: 82.91%; width: 15.15%; height: 18.78cqw; background-image: url("catalog/stage-btn_records.webp"); }
+#screen-map #map-rec   { left: 82.91%; width: 15.15%; height: 18.78cqw; background-image: url("catalog/stage-btn_records.webp?v=3"); }
 #screen-map #map-b1-v {
   position: absolute; left: 57.7%; top: 41.7%;
   transform: translate(-50%, -50%);
@@ -33101,12 +33132,20 @@ window.TT_SFX = {
 #screen-map #map-ch-prev { left: -1cqw; right: auto; }
 #screen-map #map-ch-next { right: -1cqw; left: auto; }
 #screen-map #map-plate .mp-arrow[disabled] { opacity: .22; cursor: default; }
-/* 캐릭터·기록의 글자도 조각에서 지우고 코드가 다시 얹는다 — 언어 토글 생존. */
+/* 캐릭터·기록의 글자도 조각에서 지우고 코드가 다시 얹는다 — 언어 토글 생존.
+   ⚠ 2026-08-19 정렬 수정(실기기 반려: "한글 라벨이 버튼 밖으로 삐져나온다").
+   원인은 글자상자가 단추보다 넓었던 것이다 — width 106% 는 단추 폭 15.43cqw 를
+   16.36cqw 로 넘겨 좌우로 0.47cqw 씩 흘러나갔고, 글자 자체도 4.0cqw 라
+   "캐릭터" 세 자가 12cqw 를 먹어 여백이 사실상 없었다.
+   조각의 배경은 100% 100% 라 요소 경계 = 그림 경계다. 그래서 상자를 그림 안쪽
+   (92%)으로 들이고 글자를 3.5cqw 로 줄인다 — "캐릭터" 10.5cqw < 상자 14.2cqw.
+   세로는 시안 gm-stage-full 의 라벨 자리(단추 아래 1/4)에 맞춰 77% → 80%:
+   글자 띠가 단추 높이의 71~89% 구간에 앉아 아래 테두리를 안 넘는다. */
 #screen-map #map-char > span, #screen-map #map-rec > span {
-  position: absolute; left: 50%; top: 77%;
-  width: 106%;
+  position: absolute; left: 50%; top: 80%;
+  width: 92%;
   transform: translate(-50%, -50%);
-  font-size: 4.0cqw;
+  font-size: 3.5cqw;
   font-weight: 700;
   letter-spacing: -.03em;
   text-align: center;
@@ -33202,6 +33241,15 @@ window.TT_SFX = {
    되살리면 된다. */
 #screen-map #map-path .map-node .mn-plate { display: none; }
 
+/* ---- 챕터 관문 표지 봉인 (2026-08-19 사용자 반려) -------------------------
+   10번 노드 너머에 뜨던 **주황 반쪽 젤리**다. 노드가 5색 젤리 단추로 갈릴 때
+   .st-gate 만 제외됐던 탓에(위 :not(.st-gate)) 혼자 구판 원반(--disc)으로 남았고,
+   번호도 별도 없어 "만들다 만 것"처럼 읽혔다. 마크업(makeMapNode 뒤 <span>)과
+   좌표표(MAP_GATES)는 그대로 두고 표시만 끈다 — 추후 보스/스페셜 아이콘을
+   정본으로 발주하면 이 한 줄만 지우면 제자리에 그대로 선다.
+   노드 10 자신의 왕관(.mn-crown)·자물쇠(.st-lock)는 건드리지 않는다. */
+#screen-map #map-path .map-node.st-gate { display: none; }
+
 /* 자물쇠(.st-lock::before)는 손대지 않는다 — 도서관 조각 sp-glyph-lock 은 지금도
    또렷하고, 받침 링 오른쪽 아래(left 80% · top 74%)라 신품 단추 위에서도 제자리다. */
 </style>
@@ -33277,6 +33325,43 @@ var i=0,end=Date.now()+8000;                       /* 최대 8초까지만 재�
   if(done)i++;
   setTimeout(tick,80);
 })();
+})();
+</script>
+<script id="catalog-preload">
+/* 부트 후 유휴 프리로더 (2026-08-19) — 시안 스프라이트는 전부 catalog/*.webp
+   외부 참조인데 프리로드가 없어, 화면이 바뀌며 그 규칙이 **처음 적용되는 순간**
+   네트워크 요청이 시작됐다. 그래서 팝업이 뜬 뒤 버튼이 한 박자 늦게 채워지고
+   맵의 젤리 숫자 단추도 뒤늦게 렌더링됐다(사용자 반려).
+   첫 페인트가 끝난 뒤 유휴 시간에만 33장을 순서대로 데운다 — 기존 코드는 한 줄도
+   건드리지 않고, 이미 캐시에 있으면 요청 자체가 안 나가므로 무해하다.
+   순서 = 화면이 열리는 순서: ①메인·팝업(공용 젤리판·시트 부속) ②맵 ③전투.
+   동시 4장으로 묶어 초기 대역폭 경쟁을 막는다. */
+(function(){
+var L=("jelly-box,duel-title-play,sian2-ribbon,sian2-btn-pink,sian2-btn-purple,"
+      +"sian2-btn-orange,sian2-btn-mint,"
+      +"stage-btn_back,stage-btn_settings,stage-btn_chars,stage-btn_records,"
+      +"stage-pill_life,stage-pill_coin,stage-pill_star,stage-pill_chapter,"
+      +"stage-jelly-1,stage-jelly-2,stage-jelly-3,stage-jelly-4,stage-jelly-5,"
+      +"stage-star-on,stage-star-off,"
+      +"duel-medal-attack,duel-medal-special,duel-medal-pet,duel-medal-awaken,"
+      +"duel-btn-pause,duel-hpbar-bone,duel-hpbar-wing,"
+      +"duel-castle-hd,duel-cloud-big,duel-cloud-baby,duel-demon-full").split(",");
+/* 이 세 장은 CSS 쪽도 ?v=3 로 캐시를 끊었다(조각 갱신) — 프리로더가 쿼리 없는
+   주소를 데우면 서로 다른 캐시 항목이 되어 헛 요청이 되므로 여기서도 맞춘다. */
+var V="stage-btn_back,stage-pill_coin,stage-btn_records";
+var i=0;
+function next(){
+  if(i>=L.length) return;                          /* 다 데웠다 */
+  var n=L[i++],im=new Image();
+  im.onload=im.onerror=next;                       /* 실패해도 다음 장으로 */
+  im.src="catalog/"+n+".webp"+(V.indexOf(n)<0?"":"?v=3");
+}
+function warm(){ for(var k=0;k<4;k++) next(); }    /* 동시 4장 유지 */
+function start(){
+  (window.requestIdleCallback||function(f){setTimeout(f,600);})(warm,{timeout:1500});
+}
+if(document.readyState==="complete") start();
+else window.addEventListener("load",start);
 })();
 </script>
 </body>
