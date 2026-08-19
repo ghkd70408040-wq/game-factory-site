@@ -20368,6 +20368,58 @@ window.TT_SFX = {
 
   // Tracked timers so nothing leaks between stages / screens.
   var timers = [];
+
+  /* =========================================================================
+   * W2 - 잠금 2단계화 (팝 허용 / 재배치 차단)
+   *
+   * v1 의 잠금은 S.busy 단일 플래그였다. resolveMatch 가 켜고, 팝(260ms) ->
+   * 중력/리필/행소거(최대 ~1.5s) 가 전부 끝난 뒤에야 꺼졌다. 그래서 애니가
+   * 도는 내내 다음 탭이 통째로 씹혔고, 그것이 "반응이 굼뜨다"의 실체였다.
+   *
+   * 실제로 위험한 구간은 그중 뒤쪽뿐이다:
+   *   1) 팝 단계  - 매치 직후 POP_MS. 셀 값(dead/sp/ice)은 이미 **동기 확정**
+   *                되어 있고 인덱스도 tileEls 도 한 칸도 안 움직인다. 즉 판정에
+   *                쓰이는 모든 자료가 정합하다 -> 새 매칭을 **허용**해도 안전하다.
+   *   2) 재배치 단계 - 중력 낙하/상단 리필/행 소거. S.cells 가 통째로 갈리고
+   *                tileEls 가 재배열된다 -> 계속 **차단**한다.
+   *
+   * 구현은 플래그를 늘리지 않고 카운터 둘로 한다. S.busy 는 의미도 사용처도
+   * 그대로 두고(doAdd/doHint/doUndo/doShuffle/duelTick/bossTick 게이트 전부
+   * 무수정), **탭 게이트 한 곳만** popLive 를 함께 본다.
+   *
+   *   popLive - POP_MS 창 안에 있는 매치 수. >0 이면 지금이 팝 단계다.
+   *             겹친 팝의 **합류점(coalescing)** 판정도 이 수가 한다: 0 으로
+   *             떨어뜨린 마지막 팝만 중력/리필/행소거를 1회 연다.
+   *   popGen  - 팝 세대. popLive 가 타이머 유실로 헐거워져도 옛 세대가
+   *             합류점을 열지 못하게 막는 이중 안전장치.
+   *
+   * 두 값은 판의 상태가 아니라 **연출 타이머의 상태**라서 S 가 아니라 여기에
+   * 산다 - 그래서 clearTimers() 가 타이머를 전부 버릴 때 같이 0 으로 돌아간다.
+   * (그 짝을 안 맞추면 유실된 popSettle 이 popLive 를 영영 1 로 남겨, 판이
+   *  바뀐 뒤에도 팝 단계로 오인해 재배치 중 입력이 새어 들어온다.)
+   * ========================================================================= */
+  var popLive = 0;
+  var popGen = 0;
+  /* popBurstAt - 이번 **연타 묶음**의 첫 팝이 난 시각. popLive 가 0 에서 1 로
+   * 오르는 순간에만 찍힌다.
+   *
+   * 왜 필요한가. 합류점은 "마지막 팝"을 기다리는데, 새 매치가 계속 들어오면
+   * 마지막 팝도 계속 미뤄진다. 즉 **손이 안 쉬면 판이 영영 재배치되지 않는다**.
+   * 사람 손으로는 260ms 안에 두 칸을 또 찾아 누르기가 어려워 잘 안 드러나지만,
+   * 자동 연타(소크 테스트)에서는 즉시 드러났다: 매치 30수 · 리필 3회, 죽은 칸이
+   * 판에 그대로 쌓여 짝이 말라붙었다. 전투에서는 더 나쁘다 — 리필이 안 오면
+   * 판이 빈다.
+   *
+   * 그래서 "팝 중 매칭 허용"에 **시간 예산**을 물린다. 묶음의 첫 팝으로부터
+   * POP_BURST_MS 안에 시작된 매치까지만 받고, 그 뒤의 탭은 재배치가 끝날 때까지
+   * 평소처럼 막는다. 최악의 정착 지연은 POP_BURST_MS + POP_MS 로 못박힌다.
+   * 예산을 팝 두 번치(2 x POP_MS)로 잡은 것은, 그 안에서 사람이 낼 수 있는
+   * 연타가 보통 2~4수이고 그 이상은 이미 "판이 따라오지 못하는" 속도이기
+   * 때문이다. 개수가 아니라 시간으로 재는 이유도 같다 — 개수 상한은 팝이
+   * 하나씩 빠질 때마다 자리가 나서 연기를 못 막는다. */
+  var popBurstAt = 0;
+  var POP_BURST_MS = POP_MS * 2;
+
   function later(fn, ms) {
     var id = setTimeout(function () {
       var k = timers.indexOf(id);
@@ -20380,6 +20432,11 @@ window.TT_SFX = {
   function clearTimers() {
     for (var i = 0; i < timers.length; i++) clearTimeout(timers[i]);
     timers.length = 0;
+    /* W2 - 팝 카운터는 타이머와 한 몸이다. 여기서 버려지는 later() 중에
+       popSettle 이 섞여 있으므로 같이 0 으로 되돌린다. */
+    popLive = 0;
+    popGen = 0;
+    popBurstAt = 0;
   }
 
   function now() {
@@ -26126,7 +26183,21 @@ window.TT_SFX = {
   }
 
   function onBoardPointerDown(e) {
-    if (!e || S.busy || S.paused || !S.running) return;
+    /* W2 - 잠금 2단계화. 옛 게이트는 아래 한 줄이었다 (되돌릴 근거로 보존):
+     *
+     *     if (!e || S.busy || S.paused || !S.running) return;
+     *
+     * 바뀐 것은 S.busy 를 보는 방식뿐이다. 일시정지/판 종료는 그대로 전면
+     * 차단이고, S.busy 는 **재배치 단계일 때만** 차단한다. popLive > 0 이면
+     * 지금은 팝 단계이고, 그 구간의 S.cells/tileEls 는 매치 판정에 필요한
+     * 모든 면에서 정합하므로(dead 는 이미 찍혔고 인덱스는 안 움직인다)
+     * 다음 매칭을 그 자리에서 시작해도 된다.
+     *
+     * 이 완화는 **탭에만** 준다. doAdd/doHint/doUndo/doShuffle/duelPetSkill/
+     * duelTick/bossTick 은 여전히 S.busy 만 보고 통째로 막힌다 - 그것들은 팝이
+     * 물고 있는 dying/blown 목록 밑에서 판을 갈아엎기 때문이다. */
+    if (!e || S.paused || !S.running) return;
+    if (S.busy && !(popLive > 0 && (now() - popBurstAt) < POP_BURST_MS)) return;
     /* `tg`, not `t`: the i18n translator is also called `t`, and a local of that
      * name would shadow it for this whole function — which is exactly what broke
      * the moment the blocked-path branch below started needing a string.
@@ -26324,9 +26395,24 @@ window.TT_SFX = {
    * snapshot -> ice -> gold -> bomb -> score -> row collapse.
    */
   function resolveMatch(a, b) {
+    /* W2 계약 - **매치당 정확히 1회**인 것들은 전부 이 동기 구간에 있다:
+     *   takeSnapshot() / tickFever() / passiveApply() / twinApply() (교대 사슬
+     *   S.pv.twAlt) / bumpCombo() / missionBump / gaugeBump.
+     * resolveMatch 는 처음부터 끝까지 동기이고 중간에 await 도 later 도 끼지
+     * 않으므로, 팝 창 안에서 두 번째 매치가 들어와도 그것은 resolveMatch 의
+     * **두 번째 완전한 호출**이지 첫 호출의 재진입이 아니다. 따라서 "매치당
+     * 1회"는 매치 수만큼 정확히 지켜진다 - 팝 허용으로 깨지는 계약이 없다.
+     * (깨질 수 있었던 것은 뒤쪽 비동기 꼬리뿐이고, 그것은 popSettle 합류점이
+     *  정착 사이클당 1회로 묶는다.) */
     takeSnapshot();
     tickFever();      // authoritative expiry before anything is scored
     S.busy = true;
+    /* 팝 단계 진입. S.busy 는 여전히 켠다 - 완화는 탭 게이트 한 곳뿐이고,
+       나머지 잠금 사용처의 의미는 한 글자도 안 바뀐다. */
+    if (popLive === 0) popBurstAt = now();   // 이 매치가 연타 묶음의 첫 팝이다
+    popLive++;
+    popGen++;
+    var myGen = popGen;
 
     var ca = tileCenter(a), cb = tileCenter(b);
     var cola = tileColor(a), colb = tileColor(b);
@@ -26497,28 +26583,48 @@ window.TT_SFX = {
        여러 숫자를 한꺼번에 날리는 경우까지 이 배열 하나로 정확해진다. */
     var dyingV = dying.map(function (ix) { return S.cells[ix] ? S.cells[ix].v : 0; });
     var blownV = blown.map(function (ix) { return S.cells[ix] ? S.cells[ix].v : 0; });
-    (function (dyingList, blownList, chippedList, dyingVals, blownVals) {
+    /* W2 필수수리 1 - **인덱스가 아니라 엘리먼트와 좌표를 지금 캡처**한다.
+     * v1 은 dying/blown/chipped 를 인덱스 배열로 넘겨 260ms 뒤에 tileEls[i] 를
+     * 읽었다. 팝 중 다음 매칭이 허용되는 지금은 그 사이에 판이 한 번 더 움직일
+     * 여지가 생기고(그리고 합류점이 아무리 잘 묶어도, 인덱스 캡처는 리팩터
+     * 한 번이면 조용히 깨지는 종류의 전제다), 그러면 이 콜백은 **엉뚱한 타일**
+     * 에 .dead 를 붙이고 원래 타일에는 .pop 을 영영 남긴다.
+     * 엘리먼트 참조는 tileEls 가 어떻게 재배열되든 그 타일 자신을 가리키고,
+     * 좌표도 매치가 난 그 순간의 자리라 파편이 터질 곳으로 정확하다.
+     *
+     * 옛 서명(되돌릴 근거로 보존):
+     *   (function (dyingList, blownList, chippedList, dyingVals, blownVals) {
+     *     ... var de = tileEls[dyingList[n]]; var dc = tileCenter(dyingList[n]); ...
+     *   })(dying.slice(), blown.slice(), chipped.slice(), dyingV, blownV); */
+    var dyingE = dying.map(function (ix) { return tileEls[ix] || null; });
+    var blownE = blown.map(function (ix) { return tileEls[ix] || null; });
+    var chippedE = chipped.map(function (ix) { return tileEls[ix] || null; });
+    var dyingC = dying.map(function (ix) { return tileCenter(ix); });
+    var blownC = blown.map(function (ix) { return tileCenter(ix); });
+    (function (blownList, dyingEls, blownEls, chippedEls, dyingVals, blownVals, dyingCs, blownCs) {
       later(function () {
         var n;
-        for (n = 0; n < dyingList.length; n++) {
-          var de = tileEls[dyingList[n]];
-          var dc = tileCenter(dyingList[n]);
+        for (n = 0; n < dyingEls.length; n++) {
+          var de = dyingEls[n], dc = dyingCs[n];
           J.burst(dc.x, dc.y, n === 0 ? cola : colb, 14, fruitOf(dyingVals[n]));
           if (de) { de.classList.remove('pop'); de.classList.add('dead'); }
         }
-        for (n = 0; n < blownList.length; n++) {
-          var be = tileEls[blownList[n]];
-          var bcc = tileCenter(blownList[n]);
+        for (n = 0; n < blownEls.length; n++) {
+          var be = blownEls[n], bcc = blownCs[n];
           J.burst(bcc.x, bcc.y, '#ff8a3d', 10, fruitOf(blownVals[n]));
           if (be) { be.classList.remove('bombgo'); be.classList.add('dead'); }
-          paintTile(blownList[n]);
+          /* paintTile 만은 모델(S.cells[i])을 읽으므로 인덱스가 필요하다.
+             그래서 **동일성 확인**을 한 겹 두른다: 그 인덱스에 아직 같은
+             엘리먼트가 앉아 있을 때만 칠한다. 재배열이 끼어들었다면 그 자리는
+             이미 다른 타일이고, 칠하면 멀쩡한 타일의 뱃지를 지우게 된다. */
+          if (be && tileEls[blownList[n]] === be) paintTile(blownList[n]);
         }
-        for (n = 0; n < chippedList.length; n++) {
-          var ce = tileEls[chippedList[n]];
+        for (n = 0; n < chippedEls.length; n++) {
+          var ce = chippedEls[n];
           if (ce) ce.classList.remove('pop');
         }
       }, POP_MS);
-    })(dying.slice(), blown.slice(), chipped.slice(), dyingV, blownV);
+    })(blown.slice(), dyingE, blownE, chippedE, dyingV, blownV, dyingC, blownC);
     /* "+점수"가 커진다 — 사용자 요구("점수가 늘어나는 게 명확히 보여야")의 핵심.
        크기만으로 콤보를 말하므로 화면 전체를 건드리지 않고도 고조가 읽힌다.
        22 → 최대 42px. floatText 가 겹치는 글자를 알아서 비켜 준다. */
@@ -26553,19 +26659,66 @@ window.TT_SFX = {
 
     /* 전투는 행 소거가 없다 — 판이 늘 꽉 찬 직사각형이라 "행이 통째로 죽는" 일이
        성립하지 않는다. 대신 컬럼 중력이 즉시 판을 메운다 (단계 1). */
-    if (battleOn()) { later(runBattleRefill, POP_MS); return; }
+    /* W2 - 세 갈래 꼬리가 합류점 popSettle() 하나로 모인다.
+     * 폐기한 옛 꼬리를 **지우지 않고 남긴다** (되돌릴 근거):
+     *
+     *   if (battleOn()) { later(runBattleRefill, POP_MS); return; }
+     *   // --- row collapse is judged immediately after the match ---
+     *   var rows = findFullDeadRows(S.cells);
+     *   if (rows.length) {
+     *     later(function () { runRowCollapse(rows); }, POP_MS);
+     *   } else {
+     *     later(function () { S.busy = false; saveProgress(); afterMove(); }, POP_MS);
+     *   }
+     *
+     * 왜 폐기하는가. 둘이 문제였다.
+     *   (a) findFullDeadRows 를 **지금** 계산해 260ms 뒤의 runRowCollapse 에
+     *       넘겼다. 그 사이 판이 안 변한다는 전제였는데, 팝 중 매칭이 허용되면
+     *       두 번째 매치가 같은 행에 죽은 칸을 더 만든다 - 즉 그때 무너뜨려야
+     *       할 행이 지금 센 목록과 다르다. (필수수리 2)
+     *   (b) 팝이 겹치면 중력/리필/행소거가 **매치마다 한 번씩** 예약됐다.
+     *       두 번 돌면 두 번째는 이미 갈린 S.cells 위에서 돌아 판이 깨진다.
+     *       (필수수리 3)
+     * popSettle 은 그 둘을 한꺼번에 없앤다: 마지막 팝만 통과시키고(합류),
+     * 통과한 뒤에 행 목록을 새로 센다(재계산). */
+    later(function () { popSettle(myGen); }, POP_MS);
+  }
 
-    // --- row collapse is judged immediately after the match ---
+  /**
+   * W2 합류점 - 팝 단계의 끝, 재배치 단계의 시작.
+   *
+   * 겹쳐 있던 팝 중 **마지막 하나만** 여기를 통과해 중력/리필/행소거를 정확히
+   * 1회 연다. 그 1회 보장이 아래 계약들을 통째로 떠받친다:
+   *   - battleRng() 의 refillSeq 직렬성 (필수수리 5) - runBattleRefill 이
+   *     정착 사이클당 한 번만 도므로 시드 스트림은 v1 과 한 톨도 안 달라진다.
+   *     팝을 몇 개 겹쳐 터뜨렸든 소비되는 seq 는 리필 1회분뿐이다.
+   *   - afterMove() 1회 (필수수리 6) - 데드락 판정/클리어 판정/미션 재계수가
+   *     중간 상태(죽은 칸이 아직 판에 남아 있는 상태)에서 돌지 않는다.
+   *   - saveProgress() 1회 - 중간 상태가 저장되지 않는다.
+   */
+  function popSettle(gen) {
+    if (popLive > 0) popLive--;
+    /* 마지막 팝만 연다. popLive 는 겹침 수를, gen 은 세대를 본다 - 후자는
+       타이머가 유실돼 popLive 가 헐거워졌을 때 옛 세대가 합류점을 열어 버리는
+       것을 막는 이중 안전장치다. */
+    if (popLive > 0 || gen !== popGen) return;
+    /* 판이 이미 끝났으면(시간 종료/전투 패배 등) 여기서 아무것도 열지 않는다.
+       그 경로들은 S.busy = true 로 판을 일부러 잠가 둔 상태이고, 여기서 풀면
+       결과 시트 뒤의 판이 다시 눌린다. */
+    if (!S.running) return;
+    /* S.sel 무효화 - 이 줄 아래부터 인덱스가 움직인다. 탭으로 들어온 선택은
+       onBoardPointerDown 이 이미 지우지만, 팝 창 안에서 한 칸만 고르고 만
+       선택은 여기까지 살아 있을 수 있다. */
+    clearSelection();
+    clearHints();
+    /* 전투는 행 소거가 없다 - 컬럼 중력이 즉시 판을 메운다. */
+    if (battleOn()) { runBattleRefill(); return; }
+    /* 필수수리 2 - 행 목록을 **실행 직전에** 다시 센다. */
     var rows = findFullDeadRows(S.cells);
-    if (rows.length) {
-      later(function () { runRowCollapse(rows); }, POP_MS);
-    } else {
-      later(function () {
-        S.busy = false;
-        saveProgress();
-        afterMove();
-      }, POP_MS);
-    }
+    if (rows.length) { runRowCollapse(rows); return; }
+    S.busy = false;
+    saveProgress();
+    afterMove();
   }
 
   /* =========================================================================
@@ -26577,6 +26730,13 @@ window.TT_SFX = {
 
   /** 전체 롤백 밸브. false 면 아래 전투 분기가 하나도 열리지 않는다. */
   var TW_BATTLE = true;
+  /* W2 보너스 - 전투의 낙하 지속은 CSS 가 이미 300ms 로 조여 놨는데
+     (#app.battle .tile.fall { transition-duration: 300ms }), JS 는 공용
+     FALL_MS(420) + 40 = 460ms 를 기다리고 있었다. 낙하가 끝난 뒤 160ms 동안
+     판이 아무 이유 없이 잠겨 있었다는 뜻이다 - 팝을 열어 준 이번 개조에서
+     가장 크게 남는 체감 지연이라 여기서 같이 없앤다. 값은 CSS 와 같은 자를
+     쓴다: 300 + 40. */
+  var BATTLE_FALL_MS = 300;
   /* 그리드 상수화 준비 — 값은 이번 단계 고정. 뒤에 가로·세로를 바꿀 때의 단일 지점. */
   var BATTLE_COLS = COLS;
   /* 실기기 반려 ③ (0819) — "보드 아래 거대한 빈 공간".
@@ -26797,7 +26957,7 @@ window.TT_SFX = {
       S.busy = false;
       saveProgress();
       afterMove();
-    }, FALL_MS + 40);
+    }, BATTLE_FALL_MS + 40);   // 옛 값: FALL_MS + 40 (=460ms). CSS 300ms 와 어긋나 있었다
   }
 
   function runRowCollapse(rows) {
