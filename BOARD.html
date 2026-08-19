@@ -100,6 +100,37 @@ summary .cnt{margin-left:auto;font-weight:400;font-size:.72rem;color:var(--sub);
   border-radius:30px;overflow:hidden;background:#000}
 .phone iframe{width:100%;height:100%;border:0;display:block;background:#FFF}
 
+/* ── 5. 밤샘 작업 일지 ── */
+#worklog{margin-bottom:22px}
+.logday{background:var(--card);border:1px solid var(--line);border-radius:16px;
+  margin-bottom:18px;overflow:hidden}
+.logday>h2{font-size:1.06rem;margin:0;padding:13px 16px;background:#F1E3D3;
+  border-bottom:2px solid #E0CDB6;display:flex;align-items:center;gap:9px}
+.logday>h2 .moon{font-size:1.1rem}
+.logday>h2 .cnt{margin-left:auto;font-weight:400;font-size:.72rem;color:var(--sub);
+  font-variant-numeric:tabular-nums}
+.logitem{display:flex;gap:12px;padding:12px 16px;border-top:1px solid var(--line);
+  border-left:4px solid #E9D7BE;background:#FCF7F1}
+.logitem:first-of-type{border-top:0}
+.logitem .when{flex:0 0 62px;font-size:.74rem;font-weight:800;color:var(--sub);
+  font-variant-numeric:tabular-nums;padding-top:1px}
+.logitem .core{flex:1 1 auto;min-width:0}
+.logitem .hd{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px}
+.wv{font-size:.6rem;font-weight:800;padding:2px 7px;border-radius:6px;color:#FFF;
+  background:var(--queued)}
+.logitem .ttl{font-weight:800;font-size:.93rem}
+.stt{font-size:.6rem;font-weight:700;padding:2px 8px;border-radius:99px;color:#FFF}
+.stt.done{background:var(--ok)}.stt.doing{background:var(--css)}.stt.hold{background:var(--temp)}
+.logitem ul{margin:0;padding-left:17px;font-size:.78rem;line-height:1.55;color:#4E3A33}
+.logitem .sha{display:inline-block;margin-top:5px;font-size:.66rem;color:var(--sub);
+  font-family:ui-monospace,Consolas,monospace;background:#F1E7DC;border:1px solid var(--line);
+  border-radius:5px;padding:1px 6px}
+.logempty{padding:16px;color:var(--sub);font-size:.8rem}
+@media (max-width:720px){
+  .logitem{display:block}
+  .logitem .when{margin-bottom:3px}
+}
+
 /* ── 좁은 화면: 사이드 → 가로 스크롤 줄 ── */
 @media (max-width:720px){
   .secbody{display:block}
@@ -117,6 +148,7 @@ summary .cnt{margin-left:auto;font-weight:400;font-size:.72rem;color:var(--sub);
 <main>
 <h1>🗼 틴트윈 관제탑</h1>
 <div class="filters" id="filters"></div>
+<div id="worklog" hidden></div>
 <div id="cats"></div>
 </main>
 
@@ -125,7 +157,8 @@ const SD={ok:'s-ok',css:'s-css',temp:'s-temp',queued:'s-queued',empty:'s-empty'}
 const SL={ok:'확보',css:'CSS',temp:'임시',queued:'발주·예약',empty:'빈칸'};
 const TB={bg:'배경',code:'코드',motion:'모션',plan:'기획'};
 const TABS=[['all','전체'],['bg','배경'],['char','캐릭터'],['fruit','과일'],
-            ['fx','효과'],['ui','인터페이스'],['time','시간'],['dyn','⚡동적']];
+            ['fx','효과'],['ui','인터페이스'],['time','시간'],['dyn','⚡동적'],
+            ['log','🌙 밤샘 일지']];
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 let M={};
 
@@ -230,6 +263,57 @@ function pickBg(card){
   }
 }
 
+/* ── 밤샘 작업 일지 ─────────────────────────────────────────────────
+   board-data.json 의 worklog 배열만 읽는다. 항목 1개를 append 하면 바로 뜬다.
+   { t:"2026-08-20 02:10", wave:"W0", title:"...", summary:["..."],
+     status:"완료|진행|보류", commit:"0704500" }                            */
+const STC={'완료':'done','진행':'doing','보류':'hold'};
+
+function dayLabel(t){
+  const d=String(t).slice(0,10), h=parseInt(String(t).slice(11,13),10);
+  const band=(isNaN(h)||h>=18||h<6)?'밤':'낮';
+  return d+' '+band;
+}
+
+function mkLogItem(e){
+  const el=document.createElement('article'); el.className='logitem';
+  const sum=Array.isArray(e.summary)?e.summary:(e.summary?[e.summary]:[]);
+  el.innerHTML='<div class="when">'+esc(String(e.t||'').slice(11)||'—')+'</div>'
+    +'<div class="core"><div class="hd">'
+    +(e.wave?'<span class="wv">'+esc(e.wave)+'</span>':'')
+    +'<span class="ttl">'+esc(e.title||'')+'</span>'
+    +'<span class="stt '+(STC[e.status]||'doing')+'">'+esc(e.status||'진행')+'</span>'
+    +'</div>'
+    +(sum.length?'<ul>'+sum.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>':'')
+    +(e.commit?'<span class="sha">'+esc(e.commit)+'</span>':'')
+    +'</div>';
+  return el;
+}
+
+function renderWorklog(list){
+  const box=document.getElementById('worklog');
+  box.innerHTML='';
+  const L=(list||[]).slice().sort((a,b)=>String(b.t).localeCompare(String(a.t)));
+  if(!L.length){ box.innerHTML='<div class="logday"><div class="logempty">아직 기록이 없습니다.</div></div>'; return; }
+  let cur=null, day=null;
+  L.forEach(function(e){
+    const lb=dayLabel(e.t);
+    if(lb!==day){
+      day=lb;
+      cur=document.createElement('section'); cur.className='logday';
+      cur.innerHTML='<h2><span class="moon">🌙</span>'+esc(lb)+'<span class="cnt"></span></h2>';
+      box.appendChild(cur);
+    }
+    cur.appendChild(mkLogItem(e));
+    cur.querySelector('.cnt').textContent=cur.querySelectorAll('.logitem').length+'건';
+  });
+}
+
+function showLog(on){
+  document.getElementById('worklog').hidden=!on;
+  document.getElementById('cats').style.display=on?'none':'';
+}
+
 function applyFilter(f){
   document.querySelectorAll('.acard,.bgcard').forEach(function(c){
     const on = f==='all' ? true
@@ -268,10 +352,14 @@ Promise.all([
     b.className='fb'+(i===0?' on':''); b.textContent=t[1]; b.dataset.f=t[0];
     b.addEventListener('click',function(){
       fbox.querySelectorAll('.fb').forEach(x=>x.classList.remove('on'));
-      b.classList.add('on'); applyFilter(t[0]);
+      b.classList.add('on');
+      if(t[0]==='log'){ showLog(true); return; }
+      showLog(false); applyFilter(t[0]);
     });
     fbox.appendChild(b);
   });
+
+  renderWorklog(D.worklog);
 
   const cats=document.getElementById('cats');
   D.sections.forEach(function(sec,si){
