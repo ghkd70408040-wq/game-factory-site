@@ -32408,6 +32408,20 @@ window.TT_SFX = {
   border-image-width:34px !important;
   padding:8px calc(var(--safe-r) + 10px) calc(var(--safe-b) + 9px) calc(var(--safe-l) + 10px) !important;
 }
+
+/* ---- 4. "플레이" 제목 = 시안 레터링 실물 (사용자 지시: 글자 따로 뽑아 이식) ----
+   코드 그라데이션+스트로크로는 시안의 통통한 젤리 레터링이 안 나와 반려됨.
+   gm-play-popup.png 제목 영역(540,615~1010,805 실측)을 rembg+다중 연결영역으로
+   추출한 catalog/duel-title-play.webp(396×153)를 글자 대신 깐다.
+   글자는 시각적으로 숨기되 접근성(스크린리더)을 위해 투명 텍스트로 유지.
+   ⚠ 한국어 레터링 베이크 — 영어 로케일 대응 필요 시 en에선 이 룰을 :lang로 끄는 게 후속. */
+#modal-mode .r10-ribbon h2, #modal-mode #mode-h{
+  background:url("catalog/duel-title-play.webp") center/contain no-repeat !important;
+  background-clip:border-box !important;-webkit-background-clip:border-box !important;
+  color:transparent !important;-webkit-text-fill-color:transparent !important;
+  -webkit-text-stroke:0 !important;text-shadow:none !important;
+  width:min(52%, 200px) !important;height:52px !important;margin:2px auto 6px !important;
+}
 </style>
 <script id="bg-preview-hook">
 /* 관제탑 배경 미리보기 훅 — ?bg=<카탈로그키>, 파라미터 없으면 무동작 */
