@@ -31976,7 +31976,7 @@ window.TT_SFX = {
 #screen-menu .mbtn .mbtn-chip{display:none !important;}
 #screen-menu .mbtn .mbtn-lab{left:27% !important;right:8% !important;text-align:left;font-size:min(22px,5.2vw) !important;}
 #screen-menu .mbtn:active{transform:translateY(2px);filter:brightness(.95);}
-#screen-menu .tagline{position:relative;display:inline-block;margin:8px auto 0;padding:13px 42px 15px;max-width:88%;border:0;box-shadow:none;background:url("catalog/sian2-ribbon.webp") center/100% 100% no-repeat;color:#7E4056;font-weight:800;text-shadow:0 1px 0 rgba(255,255,255,.6);}
+#screen-menu .tagline{position:relative;display:inline-block;margin:8px auto 0;padding:13px 42px 15px;max-width:88%;border:0;box-shadow:none;background:url("catalog/sian2-ribbon.webp") center/100% 100% no-repeat;color:#4F4953;font-weight:700;text-shadow:0 0 2px rgba(255,255,255,.35);}
 </style>
 
 <style id="sian-play-sprites">
@@ -32054,6 +32054,271 @@ window.TT_SFX = {
   color:transparent !important;font-size:0 !important;line-height:0 !important;
   text-indent:-9999px;overflow:hidden;}
 #modal-mode .r10-x:active{transform:scale(.92);}
+</style>
+
+<style id="sian-battle-hud">
+/* ============================================================
+   시안 4호 — 인게임 전투 HUD (gm-ingame-battle.png)
+   14차 수확 8장을 실물로 배선한다. 전부 catalog 참조다(번들 임베드 0바이트):
+     duel-medal-attack / -special / -pet / -awaken   하단 4버튼 메달(라벨 베이크)
+     duel-btn-pause                                  좌상단 일시정지(보라 잔상 제거)
+     duel-icon-castle                                중앙 성
+     duel-portrait-demon / -portrait-cloud           좌·우 아바타
+
+   범위는 **#app.battle 안쪽뿐**이다. .battle 은 duelStart() 한 곳에서만 켜지고
+   그 계보의 밸브가 TW_BATTLE 이므로, endless/daily/rush 는 이 절의 어느 줄도
+   지나지 않는다(TW_BATTLE=false 원복이 그대로 성립한다).
+
+   유리는 이미지가 아니다: HP 바 틀과 타이머판은 시안에서 **반투명**이라
+   추출하면 뒤 배경이 딸려 온다. 그래서 gm-ingame-battle-hd.png 3점 샘플로
+   코드 재현한다 — sian3 유리판(panel-black 3점)과 같은 판정이다.
+     타이머판(410,90~1120,310)  몸 #C4C0DA · 테두리빛 #DDDBFF · 광택 #FAF7FE
+                                 (바깥 윤곽 #59568D, 숫자 젤리 #FFF4C0→#FB7E93)
+     Demon HP(60,320~560,510)   판 #986898 · 림 #C89AC8 · 윤곽 #550947
+                                 트랙 #480868 · 채움 #A01830→#4A0013 · 라벨 #FED7EA
+     Cloud HP(970,320~1470,500) 판 #E0F0F8→#A0C0D8 · 윤곽 #557695
+                                 트랙 #577695(30%) · 채움 #E6F7FF→#74BBD7 · 라벨 #FFF
+
+   ※ 다음 발주 메모: 시안 좌우의 **뼈 장식(악당)·날개 장식(내 진영)** 은 이번
+     수확에 없다(--duel-orn-l/-r 은 계속 none 폴백). 투명 PNG 두 장이 오면
+     이 파일은 한 줄도 안 바뀌고 그 변수 두 칸만 채우면 된다.
+   ============================================================ */
+
+/* ---- 1. 하단 4버튼 = 메달 실물 ------------------------------------------
+   메달에 라벨(공격/필살기/펫소환 스킬/텐트윈 각성 스킬)이 이미 구워져 있으므로
+   코드 쪽 .act-t 명판과 .act-ico 글리프는 전투에서 내린다(sian2/3 과 같은
+   "시안 동일성 우선" 처분). 주황 띠(--lib-hud-bar)도 벗긴다 — 시안의 바닥은
+   투명이고, 메달이 배경 위에 그대로 떠 있는 것이 그 화면의 첫인상이다. */
+#app.battle #actionbar{
+  border-image:none !important;border-style:none !important;border-width:0 !important;
+  background:none !important;background-image:none !important;
+  gap:4px !important;
+  padding:2px calc(var(--safe-r) + 8px) calc(var(--safe-b) + 9px) calc(var(--safe-l) + 8px) !important;
+}
+/* 그림은 버튼이 아니라 **::before 한 겹**이 든다. 이유는 .off 다: 버튼 자신에
+   opacity 를 걸면 배지 칩까지 함께 흐려져(자식은 부모의 opacity·filter 를 그대로
+   받는다) "몇 %인가"가 가장 필요한 순간에 가장 안 읽힌다. 겹을 나누면 메달만
+   흐려지고 칩은 늘 100% 로 선다. */
+#app.battle #actionbar .act{
+  position:relative;
+  border-image:none !important;border:0 !important;border-radius:0 !important;
+  background:none !important;background-image:none !important;box-shadow:none !important;
+  padding:0 !important;margin:0 !important;
+  min-height:0 !important;height:94px !important;
+}
+#app.battle #actionbar .act::before{
+  content:"";position:absolute;inset:0;
+  background-repeat:no-repeat;
+  background-position:center bottom;
+  background-size:contain;
+  transition:opacity 160ms var(--ease),filter 160ms var(--ease);
+  pointer-events:none;
+}
+#app.battle #btn-add.act::before    {background-image:url("catalog/duel-medal-attack.webp");}
+#app.battle #btn-hint.act::before   {background-image:url("catalog/duel-medal-special.webp");}
+#app.battle #btn-undo.act::before   {background-image:url("catalog/duel-medal-pet.webp");}
+#app.battle #btn-shuffle.act::before{background-image:url("catalog/duel-medal-awaken.webp");}
+#app.battle #actionbar .act .act-t,
+#app.battle #actionbar .act .act-ico{display:none !important;}
+#app.battle #actionbar .act:active{transform:scale(.94);background:none !important;}
+/* 흐림은 "지금 못 쓴다"의 신호지 소멸이 아니다 — .34 는 메달 위에서 그림이
+   통째로 사라져 버려서, 채도와 밝기만 눌러 형태는 남긴다. */
+#app.battle #actionbar .act.off{opacity:1 !important;}
+#app.battle #actionbar .act.off::before{opacity:.80;filter:saturate(.42) brightness(.86);}
+/* 만땅 펄스는 같은 keyframes(act-urge)를 그대로 쓴다. 배경 링이 사라진 자리는
+   메달 자신이 빛나는 것으로 대신한다 — 신호를 하나 더 만들지 않는다. */
+#app.battle #actionbar .act.urge{
+  background:none !important;box-shadow:none !important;
+}
+#app.battle #actionbar .act.urge::before{
+  filter:drop-shadow(0 0 6px rgba(255,214,120,.95)) drop-shadow(0 0 14px rgba(255,120,220,.55));
+}
+/* 게이지 배지 = 메달 우상단의 작은 칩. 메달 면색이 넷 다 다르므로(적·청·보라·주황)
+   칩은 어두운 잉크 알약 + 흰 글자 한 벌로 고정한다 — 어느 메달 위에서도 대비가
+   같다(§액션바 명판 주석의 "캡 색이 무엇이든 대비가 고정된다"와 같은 규율). */
+#app.battle #actionbar .act .act-badge{
+  top:2px !important;right:4px !important;left:auto !important;
+  min-width:21px !important;height:21px !important;
+  padding:0 5px !important;
+  display:flex !important;align-items:center;justify-content:center;
+  border-radius:999px !important;
+  font-size:10px !important;font-weight:800 !important;line-height:1 !important;
+  color:#FFFFFF !important;
+  background:linear-gradient(180deg,rgba(74,32,66,.94),rgba(34,10,32,.96)) !important;
+  box-shadow:0 0 0 1.5px rgba(255,255,255,.88),0 2px 5px rgba(0,0,0,.55) !important;
+  text-shadow:0 1px 1px rgba(0,0,0,.6);
+}
+#app.battle #actionbar .act.off .act-badge{
+  background:linear-gradient(180deg,rgba(74,32,66,.94),rgba(34,10,32,.96)) !important;
+  color:#FFFFFF !important;
+}
+@media (max-height:739px){
+  #app.battle #actionbar .act{height:80px !important;}
+}
+@media (max-height:659px){
+  #app.battle #actionbar .act{height:70px !important;}
+}
+
+/* ---- 2. 일시정지 · 성 · 아바타 (실물) ------------------------------------ */
+#app.battle #btn-pause{
+  background:url("catalog/duel-btn-pause.webp") center/contain no-repeat !important;
+  box-shadow:none !important;border-radius:0 !important;
+  width:40px !important;height:40px !important;
+}
+#app.battle #btn-pause .ic{display:none !important;}
+#app.battle #btn-pause:active{transform:scale(.92);}
+
+#app.battle #duel-hud{
+  /* 교체 규약이 약속한 그 칸 — 성만 url 로 채운다(프레임 넷 중 나머지 셋은
+     시안에서 반투명이라 아래 유리 절이 코드로 세운다). */
+  --duel-castle-img:url("catalog/duel-icon-castle.webp");
+  /* HP 바 3점 샘플의 자리. 임시 파스텔을 시안 색으로 갈아 끼운다. */
+  --duel-foe-panel:linear-gradient(180deg,rgba(163,113,166,.94) 0%,rgba(122,66,124,.95) 52%,rgba(85,9,71,.96) 100%);
+  --duel-me-panel:linear-gradient(180deg,rgba(232,244,252,.94) 0%,rgba(198,222,240,.94) 54%,rgba(160,192,216,.95) 100%);
+  --duel-foe-track:rgba(46,6,32,.86);
+  --duel-me-track:rgba(87,118,149,.30);
+  --duel-foe-fill:linear-gradient(180deg,#C0304F 0%,#A01830 46%,#6B0B22 78%,#4A0013 100%);
+  --duel-me-fill:linear-gradient(180deg,#E6F7FF 0%,#C8E8F0 38%,#A5DCE6 70%,#74BBD7 100%);
+  --duel-tm-color:#EE6A88;
+}
+#app.battle .dh-castle{
+  width:24px !important;height:21px !important;
+  margin-bottom:-5px;
+  position:relative;z-index:1;
+  filter:drop-shadow(0 1px 2px rgba(60,20,60,.45));
+}
+/* 아바타 둘. 왼쪽은 데몬 머리, 오른쪽은 왕관 구름 — 시안 동일성 우선이라
+   내 초상은 setStdArt 의 --duel-me-face 대신 이 그림이 선다(그 변수는 값을
+   계속 받고 있으므로, 되돌릴 때 이 한 줄만 지우면 원래 얼굴이 다시 뜬다). */
+#app.battle #duel-foe-av{
+  background-image:url("catalog/duel-portrait-demon.webp") !important;
+  width:40px !important;height:38px !important;
+  filter:drop-shadow(0 2px 3px rgba(30,4,24,.55));
+}
+#app.battle #duel-me-av{
+  background-image:url("catalog/duel-portrait-cloud.webp") !important;
+  background-size:contain;background-position:center;background-repeat:no-repeat;
+  width:42px !important;height:38px !important;
+  filter:drop-shadow(0 2px 3px rgba(40,70,100,.35));
+}
+
+/* ---- 3. 타이머 유리 캡슐 + 젤리 숫자 --------------------------------------
+   유리는 ::before 한 겹이 맡고(z-index:-1), 요소 자신의 배경은 **글자 젤리**가
+   쓴다 — 한 요소의 배경을 둘로 쪼개는 유일한 방법이고, .dh-mid 에 스태킹
+   컨텍스트(z-index:0)를 세워 그 -1 이 화면 배경까지 내려가지 않게 묶는다.
+   글자 그라데이션은 팝업 제목에서 검증된 롱핸드 패턴 그대로다(@supports 폴백). */
+#app.battle .dh-mid{position:relative;z-index:0;}
+#app.battle #duel-timer{
+  position:relative;
+  background:none !important;background-image:none !important;
+  box-shadow:none !important;
+  padding:4px 6px 5px !important;
+  border-radius:16px !important;
+  font-size:22px !important;
+  color:var(--duel-tm-color) !important;
+  text-shadow:0 1px 0 rgba(255,255,255,.62),0 2px 4px rgba(70,40,90,.35);
+}
+#app.battle #duel-timer::before{
+  content:"";position:absolute;inset:0;z-index:-1;
+  border-radius:16px;
+  background:
+    radial-gradient(ellipse 38% 26% at 22% 16%,rgba(250,247,254,.92),rgba(250,247,254,0) 70%),
+    radial-gradient(ellipse 12% 9% at 74% 12%,rgba(250,247,254,.72),rgba(250,247,254,0) 72%),
+    radial-gradient(ellipse 40% 24% at 82% 92%,rgba(221,219,255,.42),rgba(221,219,255,0) 74%),
+    linear-gradient(180deg,rgba(238,237,255,.80) 0%,rgba(214,211,238,.62) 38%,
+      rgba(196,192,218,.56) 72%,rgba(168,164,204,.62) 100%);
+  -webkit-backdrop-filter:blur(7px) saturate(1.5) brightness(1.12);
+  backdrop-filter:blur(7px) saturate(1.5) brightness(1.12);
+  box-shadow:
+    inset 0 0 0 1.5px rgba(255,255,255,.86),
+    inset 0 3px 6px rgba(255,255,255,.54),
+    inset 0 -6px 12px rgba(89,86,141,.30),
+    0 2px 7px rgba(41,26,66,.34);
+}
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+  #app.battle #duel-timer{
+    background-image:linear-gradient(180deg,#FFF4C0 0%,#FFE585 22%,#FDC377 50%,
+      #FD9A78 74%,#FB7E93 100%) !important;
+    background-color:transparent !important;
+    -webkit-background-clip:text !important;background-clip:text !important;
+    color:transparent !important;-webkit-text-fill-color:transparent !important;
+    text-shadow:none;
+    /* filter 를 걸지 않는 것이 이 절의 함정이다: filter 는 스태킹 컨텍스트를
+       만들고, 그 순간 z-index:-1 인 유리 겹이 **요소 배경(=글자 젤리) 위로**
+       올라와 숫자를 덮는다(실측 — 숫자가 뿌옇게 죽었다). 그래서 윤곽은
+       drop-shadow 가 아니라 획(text-stroke)이 만든다. */
+    -webkit-text-stroke:1px rgba(177,100,84,.80);
+    paint-order:stroke fill;
+  }
+}
+/* 마지막 10초. 여기서는 **젤리 클립을 아예 내린다**: rushbeat 가 transform 을
+   애니메이션하는 순간 #duel-timer 가 스태킹 컨텍스트가 되고, 그러면 z-index:-1
+   유리 겹이 요소 배경(=글자 젤리) 위로 올라와 숫자가 뿌옇게 죽는다(실측).
+   글자를 **내용**으로 되돌리면 어떤 쌓임 순서에서도 유리 위에 선다 —
+   그리고 마지막 10초에 필요한 것은 그라데이션이 아니라 붉은 한 톤이다. */
+#app.danger.battle #duel-timer{
+  background-image:none !important;
+  color:#FF4432 !important;-webkit-text-fill-color:#FF4432 !important;
+  -webkit-text-stroke:1px rgba(122,20,10,.55);
+  text-shadow:0 1px 0 rgba(255,255,255,.55),0 2px 4px rgba(122,20,10,.35);
+}
+
+/* ---- 4. HP 바 유리화 ------------------------------------------------------
+   좌(적) = 어두운 자주 틀 + 검붉은 채움 + 분홍 라벨, 우(내) = 밝은 하늘 유리 +
+   흰 라벨. 위 --duel-* 가 면을 칠했고, 여기서는 그 위의 **림·광택**만 얹는다. */
+#app.battle .dh-side{
+  background-size:100% 100%,auto !important;
+  -webkit-backdrop-filter:blur(4px) saturate(1.2);
+  backdrop-filter:blur(4px) saturate(1.2);
+}
+/* !important 를 쓰지 않는다 — 예고(dhtell)·격파는 **애니메이션으로** 테두리를
+   바꾸는데, !important 선언은 애니메이션보다 세다(CSS 우선순위 규칙). 여기서
+   림을 못 박으면 "1.8초 뒤에 맞는다"는 신호가 통째로 사라진다. 선택자
+   특이도(#app.battle .dh-foe)만으로 이미 기본 규칙을 이긴다. */
+#app.battle .dh-foe{
+  box-shadow:
+    inset 0 0 0 1.5px rgba(200,154,200,.78),
+    inset 0 2px 5px rgba(255,214,246,.32),
+    inset 0 -6px 10px rgba(85,9,71,.55),
+    0 2px 6px rgba(24,4,20,.44);
+}
+#app.battle .dh-me{
+  box-shadow:
+    inset 0 0 0 1.5px rgba(255,255,255,.88),
+    inset 0 2px 5px rgba(255,255,255,.60),
+    inset 0 -6px 10px rgba(87,118,149,.30),
+    0 2px 6px rgba(40,70,100,.28);
+}
+#app.battle .dh-foe .dh-bar{
+  box-shadow:
+    inset 0 0 0 1px rgba(85,9,71,.95),
+    inset 0 2px 4px rgba(0,0,0,.55);
+}
+#app.battle .dh-me .dh-bar{
+  box-shadow:
+    inset 0 0 0 1px rgba(87,118,149,.70),
+    inset 0 2px 4px rgba(87,118,149,.28);
+}
+/* 채움 위의 유리 광택 한 겹 — 두 진영 모두 같은 문법이라 색만 다르다. */
+#app.battle .dh-fill::after{
+  content:"";position:absolute;inset:0 0 52% 0;
+  border-radius:7px 7px 0 0;
+  background:linear-gradient(180deg,rgba(255,255,255,.42),rgba(255,255,255,0));
+  pointer-events:none;
+}
+#app.battle .dh-foe .dh-name{color:#FED7EA !important;text-shadow:0 1px 2px rgba(66,11,53,.92);}
+#app.battle .dh-foe .dh-lv  {color:#FFC2DE !important;text-shadow:0 1px 2px rgba(66,11,53,.92);}
+#app.battle .dh-foe .dh-num {color:#FFF1F6 !important;text-shadow:0 1px 2px rgba(40,0,16,.95);}
+/* 흰 라벨은 밝은 하늘 유리 위에 선다 — 흰 대 흰이라 **획 외곽선**이 대비를
+   만든다(시안의 Cloud HP 가 쓰는 바로 그 수법). 사방 1px 짙은 강청 그림자. */
+#app.battle .dh-me .dh-name{color:#FFFFFF !important;
+  text-shadow:0 1px 0 rgba(43,71,99,.95),0 -1px 0 rgba(43,71,99,.80),
+    1px 0 0 rgba(43,71,99,.80),-1px 0 0 rgba(43,71,99,.80),0 2px 4px rgba(43,71,99,.55);}
+#app.battle .dh-me .dh-lv  {color:#F2FBFF !important;
+  text-shadow:0 1px 0 rgba(43,71,99,.95),0 -1px 0 rgba(43,71,99,.80),
+    1px 0 0 rgba(43,71,99,.80),-1px 0 0 rgba(43,71,99,.80);}
+#app.battle .dh-me .dh-num {color:#16374E !important;text-shadow:0 1px 1px rgba(255,255,255,.80);}
+#app.battle .dh-me .dh-dmg {color:#255C82 !important;text-shadow:0 1px 1px rgba(255,255,255,.72);}
 </style>
 <script id="bg-preview-hook">
 /* 관제탑 배경 미리보기 훅 — ?bg=<카탈로그키>, 파라미터 없으면 무동작 */
