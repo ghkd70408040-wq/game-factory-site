@@ -33094,6 +33094,75 @@ window.TT_SFX = {
 #screen-map #map-plate .mp-arrow:active { transform: translateY(calc(-50% + 2px)); }
 </style>
 
+<style id="stage-jelly-nodes">
+/* ============================================================
+   14차-c — 스테이지 **노드(포인트)의 표피만** 젤리 단추로 교체
+   시안 assets/art/incoming/mockup/gm-stage-jelly-nodes.jpg
+   조각 catalog/stage-jelly-1~5.webp · stage-star-on/off.webp
+   (시안에 구워져 있던 숫자 1~5 는 인페인트로 지웠다 — 탄 번호는 동적이라
+    지금까지처럼 .mn-num 이 코드로 얹는다.)
+
+   ⚠ 범위 — 노드 상자 **안에 무엇이 그려지는가**만 바꾼다. 상자 자체
+     (--l/--t/--w/--h = MAP_ANCHORS)·드래그·배경(#map-layer)·상하단 띠·
+     .mn-crown / .mn-hero / .mn-flag 는 한 줄도 건드리지 않는다.
+     모든 선택자가 #screen-map 스코프다.
+   ⚠ 롤백 밸브 — 이 <style> 블록 하나만 지우면 구판 원반(--disc)이 그대로 돌아온다.
+   ============================================================ */
+
+/* ---- 단추 그림 -----------------------------------------------------------
+   구판 원반은 상자를 100% 100% 로 늘려 채웠다. 젤리 단추는 시안의 비율
+   (옆으로 퍼진 돔 + 받침 링 · 300:264)이 곧 형태라 늘리면 안 된다 —
+   **높이만 상자에 맞추고 폭은 비율이 정한다**(background-size: auto 100%).
+   세로 범위가 구판 원반과 똑같으므로 왕관·주인공·깃발·히트영역의 자리 계산이
+   하나도 흔들리지 않는다.
+   관문 표지(.st-gate)는 길 위의 표지판이지 단추가 아니라 제외한다 — 그쪽은
+   지금까지처럼 --disc 를 쓴다. */
+#screen-map #map-path .map-node:not(.st-gate) {
+  background-image: var(--jelly);
+  background-position: center center;
+  background-size: auto 100%;
+  background-repeat: no-repeat;
+}
+/* 색은 **노드 순번 기준 5색 순환**이다 (1분홍 · 2노랑 · 3초록 · 4파랑 · 5마젠타 ·
+   6분홍 …). 관문 표지는 <span> 이라 <button> 을 세는 :nth-of-type 셈에 끼지
+   않는다 — 챕터가 넘어가도 각 쪽의 첫 칸이 늘 분홍에서 시작한다. */
+#screen-map #map-path .map-node:nth-of-type(5n+1) { --jelly: url("catalog/stage-jelly-1.webp"); }
+#screen-map #map-path .map-node:nth-of-type(5n+2) { --jelly: url("catalog/stage-jelly-2.webp"); }
+#screen-map #map-path .map-node:nth-of-type(5n+3) { --jelly: url("catalog/stage-jelly-3.webp"); }
+#screen-map #map-path .map-node:nth-of-type(5n+4) { --jelly: url("catalog/stage-jelly-4.webp"); }
+#screen-map #map-path .map-node:nth-of-type(5n)   { --jelly: url("catalog/stage-jelly-5.webp"); }
+
+/* ---- 번호 ----------------------------------------------------------------
+   시안에서 구운 숫자는 단추 높이의 31%, 중심이 위에서 40% 지점이다. 그 두 값을
+   그대로 옮긴다. 크기가 상자마다 달라야 하므로(앵커표의 노드 높이는 4.5%~7.53%)
+   앵커의 --h 를 그대로 쓴다 — #map-layer 의 높이가 곧 화면 높이라 1% = 1vh 다.
+   외곽선도 같은 비율로 따라간다(글자 크기의 약 9%). */
+#screen-map #map-path .mn-num {
+  top: 40%;
+  font-size: calc(var(--h, 5) * .44 * 1vh);
+  -webkit-text-stroke-width: calc(var(--h, 5) * .0396 * 1vh);
+}
+/* ---- 별 세 칸 ------------------------------------------------------------
+   신품 금별 / 베이지 미획득별로 갈아 끼우고, 줄의 자리도 시안 실측으로 옮긴다:
+   줄 중심은 단추 위끝에서 단추 높이의 17% 위, 줄 너비는 단추 폭의 80%
+   (= 상자 폭의 약 65%), 별 하나는 줄의 31%. 별이 세 칸인 규칙과 클리어한 탄에만
+   걸치는 규칙은 그대로다 — 바뀐 것은 그림과 자리뿐이다. */
+#screen-map #map-path .mn-stars {
+  top: -17%;
+  bottom: auto;
+  width: 65%;
+}
+#screen-map #map-path .mn-stars i {
+  width: 31%;
+  aspect-ratio: 96 / 98;
+  background-image: url("catalog/stage-star-on.webp");
+}
+#screen-map #map-path .mn-stars i.off { background-image: url("catalog/stage-star-off.webp"); }
+
+/* 자물쇠(.st-lock::before)는 손대지 않는다 — 도서관 조각 sp-glyph-lock 은 지금도
+   또렷하고, 받침 링 오른쪽 아래(left 80% · top 74%)라 신품 단추 위에서도 제자리다. */
+</style>
+
 <script id="bg-preview-hook">
 /* 관제탑 배경 미리보기 훅 — ?bg=<카탈로그키>, 파라미터 없으면 무동작 */
 (function(){var k=new URLSearchParams(location.search).get('bg');if(!k)return;
