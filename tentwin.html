@@ -29956,9 +29956,15 @@ window.TT_SFX = {
      [중심x, 중심y, 폭, 높이] 순서·의미는 옛 표와 같다(5번째 칸 --art-nNN 은
      이제 CSS 가 상태별로 고르므로 쓰지 않는다).
      한 판이 6칸이라 10탄 1챕터는 2쪽으로 나뉜다 — 쪽 번호가 mapPage 다.
-     ⚠ 롤백 밸브: SIAN_MAP=0 이면 아래 옛 표로 그대로 되돌아간다(스타일은
-       <style id="sian-stage-map"> 를 지우면 함께 돌아온다). */
-  var SIAN_MAP = 1;
+
+     ⚠ 14차-b 선별 롤백 — **이 밸브는 지금 닫혀 있다(SIAN_MAP = 0)**.
+       사용자 반려: 맵이 드래그로 움직이지 않고 스테이지가 챕터 첫 탄이 아닌
+       중간(쪽 2의 머리)에서 시작한다. 원인이 바로 아래 쪽 넘김이라, 좌표표·쪽
+       넘김·진입 쪽 계산을 통째로 구판 경로로 돌린다. 표와 함수는 지우지 않고
+       남겨 둔다 — 다시 켜려면 1 로만 바꾸면 된다.
+       표피(스타일) 쪽 짝은 <style id="sian-stage-map"> 의 "맵 본체" 주석이다.
+       상·하단 인터페이스는 이 스위치와 무관하게 신판 그대로 남는다. */
+  var SIAN_MAP = 0;
   var SIAN_PER = 6;
   var mapPage = 0;
   var SIAN_SLOTS = [
@@ -32869,7 +32875,8 @@ window.TT_SFX = {
 </style>
 <style id="sian-stage-map">
 /* ============================================================
-   14차 시안 — 스테이지 선택(모험 맵) **전면 교체**
+   14차 시안 — 스테이지 선택(모험 맵) **상·하단 인터페이스만** 교체
+   (14차-b 선별 롤백 뒤. 맵 본체—배경·노드·드래그—는 구판 그대로다.)
    시안 gm-stage-full.jpg · 조각 catalog/stage-*.webp
    좌표 정본 assets_stage/stage-pieces.json (원판 784×1373)
 
@@ -32878,116 +32885,29 @@ window.TT_SFX = {
    쓸 수 있고, --app-max 가 620/760px 로 넓어지는 데스크톱에서도 비율이 안 깨진다
    (vw 로 썼다면 깨진다).
 
-   ⚠ 롤백 밸브: 이 <style> 블록 하나만 지우면 표피가 통째로 옛 모습으로 돌아간다.
-     짝이 되는 스위치는 게임 스크립트의 SIAN_MAP = 0 이다(노드 좌표·쪽 넘김).
+   ⚠ 롤백 밸브: 이 <style> 블록 하나만 지우면 상·하단까지 옛 모습으로 돌아간다.
+     맵 본체는 이미 구판이다(SIAN_MAP = 0 + 아래 "맵 본체" 주석 참조).
    ⚠ 모든 선택자가 #screen-map 스코프다 — 전투·엔들리스·메뉴·모달은 한 줄도
      건드리지 않는다. 옛 규칙은 지우지 않고 여기서 덮거나 display:none 으로 봉인한다.
    ============================================================ */
 #screen-map { container-type: inline-size; }
 
-/* ---- 배경: 캔디 숲 맵 풀블리드 ------------------------------------------
-   폭에 맞춰 깔고 **아래를 맞춘다**. 노드 프레임도 같은 규칙이라 젤리 단추가 늘
-   그림의 길 위에 앉는다. 화면이 더 길면 위가 남는데, 그림 맨 위 4% 가 이미 평평한
-   하늘(#C3F9F9)이라 같은 색으로 이어 붙이면 이음매가 보이지 않는다. */
-#screen-map #map-view {
-  background-color: #C3F9F9;
-  background-image: url("catalog/stage-bg.webp");
-  background-size: 100% auto;
-  background-position: center bottom;
-  background-repeat: no-repeat;
-  cursor: default;
-}
-/* 옛 지도는 화면보다 넓은 그림을 좌우로 끌고 다녔다. 시안은 한 판에 다 들어오므로
-   레이어를 화면에 붙여 드래그를 **성립하지 않게** 만든다(mapFit 의 vw−lw = 0). */
-#screen-map #map-layer {
-  top: 0; left: 0; right: 0;
-  width: auto; height: 100%;
-  aspect-ratio: auto;
-  transform: none;
-  background-image: none;
-}
-#screen-map #map-tint { display: none; }   /* 봉인 — 챕터 틴트는 시안에 없다 */
-/* 노드 프레임 = 그림과 똑같은 상자(폭 100% · 종횡비 784/1373 · 하단 정렬). */
-#screen-map #map-path { top: auto; bottom: 0; left: 0; right: 0; height: 175.13cqw; }
+/* ---- 맵 본체는 **구판으로 되돌렸다** (14차-b 선별 롤백) ------------------
+   사용자 반려: "위 인터페이스랑 아래 인터페이스만 건들었어야지 — 그 둘만 빼고
+   전부 이전 상태로 돌려라." 그래서 이 자리에 있던 시안 규칙을 전부 걷어냈다:
+     · #map-view 의 stage-bg.webp 풀블리드 배경 (구판 --art-map-bg 로 복귀)
+     · #map-layer 를 화면에 붙여 드래그를 죽이던 규칙 (구판 2600/1272 레이어가
+       화면보다 넓어져 mapFit 의 vw-lw < 0 이 다시 성립한다 = 가로 드래그 부활)
+     · #map-path 175.13cqw 프레임, .map-node 의 stage-node_* 표피,
+       .mn-num / .mn-stars(star_*) / st-lock::before(icon_lock) / .mn-flag(char_flag)
+     · #map-tint / .st-gate / .mn-crown / .mn-hero 의 display:none 봉인
+   짝이 되는 스위치는 게임 스크립트의 SIAN_MAP = 0 이다 — 노드 좌표표가 구판
+   MAP_ANCHORS_CH(챕터당 10칸)로, 명판 화살표가 구판 챕터 넘김으로 돌아간다.
+   걷어낸 규칙 전문은 커밋 6730977 에 그대로 남아 있다.
 
-/* ---- 젤리 단추 노드 ------------------------------------------------------
-   그림은 **상태**가 고르고, 홀·짝 두 벌을 번갈아 써서 시안의 색 리듬(라임→초록,
-   분홍→보라)을 그대로 살린다. 6번째 칸은 프레임에 잘린 조각이라 바꿔 끼울 수 없다. */
-#screen-map .map-node {
-  background-color: transparent;
-  background-image: url("catalog/stage-node_lime.webp");
-  background-size: 100% 100%;
-  background-position: center;
-  background-repeat: no-repeat;
-  filter: none;
-}
-#screen-map .map-node.st-clear:nth-of-type(2n) { background-image: url("catalog/stage-node_green.webp"); }
-#screen-map .map-node.st-cur                   { background-image: url("catalog/stage-node_teal.webp"); }
-#screen-map .map-node.st-lock                  { background-image: url("catalog/stage-node_pink.webp"); }
-#screen-map .map-node.st-lock:nth-of-type(2n)  { background-image: url("catalog/stage-node_purple.webp"); }
-#screen-map #map-path .map-node:nth-of-type(6) { background-image: url("catalog/stage-node_red.webp"); }
-#screen-map .map-node.st-gate { display: none; }   /* 봉인 — 시안 지도에 관문 표지 자리가 없다 */
-#screen-map .mn-crown { display: none; }           /* 봉인 — 왕관은 시안의 조각 목록에 없다 */
-
-/* 번호는 조각에서 지워 두고(구운 글자 제거) 코드가 글자 상자 자리에 다시 얹는다.
-   여섯 조각의 num 상자 중심이 모두 가로 51±2% · 세로 46±3% 라 한 값으로 덮는다. */
-#screen-map .mn-num {
-  left: 0; right: 0; top: 46%;
-  padding-left: 3%;
-  transform: translateY(-50%);
-  font-size: 6.0cqw;
-  font-weight: 700;
-  color: #FFFFFF;
-  text-shadow: 0 .35cqw 0 rgba(122, 74, 96, .8), 0 0 .6cqw rgba(122, 74, 96, .55);
-}
-/* 별 트리오 — 시안에서는 크기가 **절대값**(노드 폭에 비례하지 않는다). 그래서
-   폭을 cqw 로 못 박고 노드 중심 위에 건다. */
-#screen-map .mn-stars {
-  left: 50%; top: auto; bottom: 100%;
-  margin-bottom: .70cqw;
-  width: 12.07cqw;
-  transform: translateX(-50%);
-  justify-content: space-between;
-}
-#screen-map .mn-stars i {
-  width: 3.95cqw; height: 3.83cqw;
-  aspect-ratio: auto;
-  background-image: url("catalog/stage-star_gold.webp");
-  background-size: 100% 100%;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-#screen-map .mn-stars i.off { background-image: url("catalog/stage-star_gray.webp"); }
-/* 자물쇠 — 시안의 lock 상자 중심(분홍 78/71 · 보라 78.6/71.6)의 평균이다. */
-#screen-map .map-node.st-lock::before {
-  content: '';
-  display: block;
-  left: 78%; top: 71%;
-  width: 40%; height: auto;
-  aspect-ratio: 51.5 / 59.5;
-  transform: translate(-50%, -50%);
-  background-color: transparent;
-  background-image: url("catalog/stage-icon_lock.webp");
-  background-size: 100% 100%;
-  background-position: center;
-  background-repeat: no-repeat;
-  filter: drop-shadow(0 .2cqw .3cqw rgba(110, 70, 58, .4));
-}
-/* 잘린 6번째 칸에는 자물쇠를 걸지 않는다 — 시안과 같다(프레임 밖으로 나간다). */
-#screen-map #map-path .map-node:nth-of-type(6).st-lock::before { display: none; }
-/* 현재 위치 — char_flag 조각이 곰과 깃발을 함께 들고 있어 아바타 복제본은 쉰다. */
-#screen-map .mn-hero { display: none; }
-#screen-map .mn-flag {
-  left: 76.7%; bottom: 61.8%;
-  width: 110.6%;
-  aspect-ratio: 131.8 / 101.5;
-  transform: translateX(-50%);
-  background-color: transparent;
-  background-image: url("catalog/stage-char_flag.webp");
-  background-size: 100% 100%;
-  background-position: center bottom;
-  background-repeat: no-repeat;
-}
+   남긴 것은 아래 두 절뿐이다 — 상단(#map-top: 뒤로/하트/코인/설정 조각)과
+   하단(#map-bot: 공통 젤리박스 띠 + 별/챕터 명판/캐릭터/기록). 위의
+   #screen-map { container-type } 은 그 두 절이 쓰는 cqw 단위의 기준이라 남긴다. */
 
 /* ---- 상단: 판 없이 뜬 네 조각 --------------------------------------------
    .hudbar 의 9-슬라이스 띠와 .hchip 젤리를 벗기고 조각을 시안 좌표로 띄운다.
