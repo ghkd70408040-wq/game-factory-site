@@ -33053,15 +33053,24 @@ window.TT_SFX = {
 /* 챕터 명판 — 두 줄은 시안의 line1/line2 상자 중심에 그대로 앉는다. 화살표는
    시안에 없지만 챕터·쪽을 넘길 손잡이가 사라지면 안 되므로 명판 양 끝에 얹는다. */
 /* 신품 명판은 **무지판**이라(sep2) 글자 상자가 따로 없다 — 판의 참 가운데에 둔다. */
+/* 상자는 명판 안폭의 92% 다(구 88%). 영문 "Chapter 1: Sweet Map" 의 실측 진폭이
+   9.16em × 2.90cqw = 26.6cqw 라 88%(27.9cqw)로는 여유가 5% 밖에 안 남는다 —
+   92%(29.1cqw)면 10% 여유가 생기고, 글자는 가운데 정렬이라 자리는 그대로다. */
 #screen-map #map-plate .mp-txt {
   position: absolute; left: 50%; top: 50%;
-  width: 88%;
+  width: 92%;
   transform: translate(-50%, -50%);
   display: block;
   text-align: center;
 }
+/* ⚠ max-width 를 반드시 푼다. 구 HUD 절의 `.mp-txt > i { max-width: 96px }` 과
+   `@media (max-width:400px) { .mp-txt > i { max-width: 74px } }` 는 명판이 120px
+   짜리 9-슬라이스 띠였던 시절의 못이다. 지금 명판은 cqw 로 큰데 그 못만 px 로
+   남아, 실기기(폭 400px 미만)에서 챕터 이름이 "챕터 1: 달콤한 지..." 로 잘렸다.
+   상자 폭은 위 .mp-txt(92%)가 정하게 두고 여기서 px 상한을 없앤다. */
 #screen-map #map-ch-k, #screen-map #map-ch-n {
   display: block;
+  max-width: none;
   font-style: normal;
   font-weight: 700;
   color: #FFFFFF;
