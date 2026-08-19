@@ -2,6 +2,23 @@
  "updated": "2026-08-20",
  "worklog": [
   {
+   "t": "2026-08-20 04:20",
+   "wave": "W2",
+   "title": "팝 중 연속 매칭 — 잠금 2단계화(팝 허용/재배치 차단)",
+   "summary": [
+    "S.busy 단일 플래그가 팝(260ms)~재배치(최대 ~1.5s)를 통째로 막던 것을 둘로 가름 — 팝 단계는 새 매칭 허용, 재배치 단계(중력·리필·행소거)는 종전대로 차단",
+    "완화는 탭 게이트 onBoardPointerDown 한 곳뿐 — doAdd/doHint/doUndo/doShuffle/duelPetSkill/duelTick/bossTick 은 여전히 S.busy 만 보고 전면 차단(잠금 의미 무변경)",
+    "합류점 popSettle() 신설 — 겹친 팝 중 마지막 하나만 중력/리필/행소거를 1회 연다(afterMove·saveProgress·battleRng refillSeq 도 사이클당 1회로 묶임)",
+    "팝 콜백이 인덱스 대신 엘리먼트·좌표를 캡처(paintTile 만 인덱스 필요 → 동일성 확인 한 겹) · findFullDeadRows 는 runRowCollapse 직전 재계산",
+    "연타 묶음 시간 예산 POP_BURST_MS=2×POP_MS — 소크가 드러낸 굶주림(손이 안 쉬면 재배치가 영영 안 옴: 매치 30수·리필 3회) 차단, 최악 정착 지연 = POP_BURST_MS+POP_MS",
+    "전투 낙하 대기 460ms→340ms (CSS #app.battle .tile.fall 300ms 와 어긋나 있던 160ms 사공백 제거) · 콤보 상한 COMBO_MULT_CAP_ADV=40 하드 클램프 확인, 수치 불변",
+    "검증(playwright·헤드리스 msedge·전체 2회 연속 10/10 PASS): 탭 폭풍 41/41 매치 무결성 이상 0 · 100수 소크 엔들리스/전투 각 1판 콘솔 에러 0 · 시드 고정 판 재현 및 같은 수순 최종 그리드 동일 · afterMove 정착 사이클당 정확히 1회(13사이클/38매치) · 행 소거 중 연타 붕괴 5회 관측 무결성 이상 0 · 첫 탭 소리 1회/언두 1회 복원 · 튜토리얼 3단 완주",
+    "blob 6,408,207B (상한 16,777,216B · 여유 10.4MB) — W2 증가분 +11,787B"
+   ],
+   "status": "완료",
+   "commit": "1e3aebb"
+  },
+  {
    "t": "2026-08-20 03:48",
    "wave": "W1.5",
    "title": "BGM 외부화(번들 7.4MB 방출)",
