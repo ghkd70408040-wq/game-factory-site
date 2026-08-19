@@ -164,8 +164,12 @@
   --r-lg: 24px;
 
   /* Layout budget. --app-max is the phone-first column; the desktop media queries
-     below widen both so a 9-column board can actually grow instead of leaving 63%
-     of the viewport empty (review 1). game.js still clamps the tile size itself. */
+     below widen both so the board can actually grow instead of leaving 63%
+     of the viewport empty (review 1). game.js still clamps the tile size itself.
+     W1: the board is 7 columns wide now, so these same three budgets buy a
+     100px tile at the widest breakpoint instead of a 77px one — the numbers
+     here are a WIDTH policy and are deliberately unchanged; only game.js's
+     TILE_MAX had to move to keep 720 reachable. */
   --app-max: 480px;
   --board-max: 460px;
 
@@ -1260,10 +1264,16 @@ button {
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
   /* Horizontal padding stays at the safe-area inset only. game.js subtracts this
-     padding from the board width, and with its GAP of 3px a 390px viewport needs
-     every pixel to keep tiles at the 40px minimum touch size:
-     floor((390 - 8*3) / 9) = 40px. game.js then sets #board's own width, and
-     `margin: 0 auto` centres it, so the board still reads as inset. */
+     padding from the board width, and with its GAP of 3px a 390px viewport gives
+     the tile every pixel it can:
+     floor((390 - 6*3) / 7) = 53px. game.js then sets #board's own width, and
+     `margin: 0 auto` centres it, so the board still reads as inset.
+     W1 (7-column board): the divisor was 9 and the arithmetic read
+     floor((390 - 8*3) / 9) = 40px — the "minimum touch size" the old comment
+     defended. Dropping to 7 columns is exactly what buys the 13px back, and the
+     safe-area-only padding is what makes 53 rather than 49 reachable: measured
+     headless (msedge, 390x844) #board-scroll's content box is 390px wide, so
+     nothing but GAP is subtracted here. */
   padding: 2px var(--safe-r) 10px var(--safe-l);
 }
 
@@ -3300,7 +3310,8 @@ li.roll-in { animation: rollin 380ms var(--spring) backwards; }
    the board grows with it. game.js clamps the tile size, so a wide screen buys
    bigger, easier-to-hit tiles rather than a stretched grid.
    NOTE for game.js: its own BOARD_MAX constant is the real ceiling — it must track
-   --board-max (720) or the CSS width here is never reached. */
+   --board-max (720) or the CSS width here is never reached. W1 re-checked this
+   for 7 columns: floor((720 - 3*6) / 7) = 100, which is exactly TILE_MAX. */
 @media (min-width: 700px) {
   :root { --app-max: 620px; --board-max: 600px; }
   .menu-inner { max-width: 380px; }
@@ -18627,25 +18638,56 @@ window.TT_SFX = {
    * SECTION 0 — CONSTANTS
    * ========================================================================= */
 
-  var COLS = 9;
+  /* W1 — 9 -> 7. 사용자 반려의 1순위가 "과일이 너무 작다"였고, 390px 폭에서
+   * 타일 크기는 오로지 floor((390 - GAP*(COLS-1)) / COLS) 이 정한다:
+   *   9열 -> floor((390 - 24) / 9) = 40px   (실측, 헤드리스 msedge 390x844)
+   *   7열 -> floor((390 - 18) / 7) = 53px   (+32%)
+   * 열을 줄이는 것 말고 이 수를 올릴 방법은 없다 — --board-max 를 키워도 뷰포트가
+   * 390 이면 area.w 가 390 에서 잘리고, TILE_MAX 를 올려도 폭 항이 항상 이긴다
+   * (layout() 의 `if (next > byW) next = byW`). COLS 참조는 파일 전체에서 59곳이고
+   * 전부 이 상수에서 파생되므로 값 하나로 따라온다. 따라오지 '않는' 곳 —
+   * MISSION_GOALS.special / .col 의 상수, EB_ROWS0/EB_ROWS_MAX, TILE_MAX,
+   * EB_P_A — 은 각자의 자리에서 다시 잰 값으로 바뀌었다. */
+  var COLS = 7;
   var GAP = 3;
-  /* Tile size bounds. TILE_MAX used to be 72, which capped the board at
-   * 9×72 + 8×3 = 672px — narrower than the 720px `--board-max` the stylesheet
-   * offers at the 1000px breakpoint, so the widest desktop board was simply
-   * unreachable. 77 is floor((720 - 3×8) / 9): exactly the tile that fills it.
+  /* Tile size bounds. TILE_MAX is the tile that exactly fills the widest
+   * `--board-max`: it was 77 = floor((720 - 3×8) / 9) for a 9-column board, and
+   * W1 re-derives it for 7 columns as floor((720 - 3×6) / 7) = 100. Leaving it
+   * at 77 would have capped the desktop board at 7×77 + 6×3 = 557px inside a
+   * 720px box — the exact defect the 72 -> 77 change fixed, reintroduced by the
+   * column change.
    * The REAL ceiling is min(TILE_MAX, boardMaxPx()-derived). `--board-max` is
    * responsive (460 / 600 / 720), so the CSS owns that part and layout() only
-   * reads it; TILE_MAX is a legibility bound, not a width policy. */
+   * reads it; TILE_MAX is a legibility bound, not a width policy.
+   *
+   * ⚠ 절단 검산 (W1 의 최고 위험). #app.battle #board-scroll{overflow:hidden} 과
+   * BATTLE_ROWS_MIN=8 이 만나면 "안 보이는데 데드락 판정에는 들어가는 아랫줄"이
+   * 생길 수 있다. 그 조건은 TILE_MAX 가 아니라 TILE_MIN 이 만든다: layout() 은
+   * next = min(byW, byH) 로 두 축을 모두 보므로 byH 가 이미 행 수에 맞춰 타일을
+   * 줄이고, 넘칠 수 있는 유일한 경로는 clamp(next, TILE_MIN, TILE_MAX) 가 byH 를
+   * TILE_MIN 위로 **끌어올리는** 때뿐이다. 즉 절단이 시작되는 높이는
+   *     area.h < 8×TILE_MIN + 7×GAP = 8×34 + 21 = 293px
+   * 이고 TILE_MAX 와는 무관하다. 실측 전투 보드 실높이는 390×844 에서 514.7px,
+   * 360×740 에서 420.4px, 412×915 에서 578.5px — 셋 다 293 을 크게 넘는다
+   * (여유가 가장 적은 360×740 에서도 1.43배). 그래서 TILE_MAX 를 100 으로 올려도
+   * 아랫줄은 잘리지 않는다: 폭이 좁은 기기에서는 byW 가, 높이가 모자란 기기에서는
+   * byH 가 먼저 100 아래로 내려가므로 100 은 데스크톱에서만 도달한다.
+   * 검증: 390×844 / 360×740 / 412×915 × (엔들리스·전투 3탄·12탄·25탄)에서 모든
+   * .tile 의 boundingBox 가 #board-scroll 콘텐트 박스에 완전히 포함됨 — 절단 0건. */
   var TILE_MIN = 34;            // never smaller than this unless width forces it
-  var TILE_MAX = 77;            // beyond this the board reads as a toddler toy
+  var TILE_MAX = 100;           // = floor((720 - GAP×(COLS-1)) / COLS), 7열 기준
   /* No longer a width cap. Its only remaining job is boardArea()'s hidden-screen
    * estimate: while #screen-game is still hidden every measurement reads 0, and
    * this is the number the estimate falls back to. The live cap is boardMaxPx(). */
-  var BOARD_MAX = COLS * TILE_MAX + (COLS - 1) * GAP;   // 717
+  var BOARD_MAX = COLS * TILE_MAX + (COLS - 1) * GAP;   // 7×100 + 6×3 = 718
   /* Used only when getComputedStyle cannot produce a usable `--board-max`
    * (jsdom, very old engines). It matches the widest breakpoint so the fallback
    * can never under-cap a desktop board — an over-cap is corrected by the
-   * `area.w` measurement itself, an under-cap would be permanent. */
+   * `area.w` measurement itself, an under-cap would be permanent.
+   * W1 재산정: 이 값의 정의는 "가장 넓은 브레이크포인트의 --board-max" 이지
+   * 열 수의 함수가 아니다. 그 브레이크포인트(@media min-width:1000px)는 720 그대로
+   * 이므로 재산정 결과도 720 이다 — BOARD_MAX(718) 와 헷갈리지 말 것. 718 은
+   * 7×100+6×3 이라 720 안에 들어가고, 남는 2px 은 `margin:0 auto` 가 먹는다. */
   var BOARD_MAX_FALLBACK = 720;
   var COMBO_MS = 5000;
   /* v3: 8 → 99. 사용자 증언 "콤보 8쯤부터 소리가 일정해져서 감동이 없다"의 1차 원인은
@@ -18865,7 +18907,17 @@ window.TT_SFX = {
     same:    function (n) { return Math.max(6, Math.round(n * 0.26)); },
     rows:    function (n) { return Math.max(3, Math.round(n / COLS * 0.7)); },
     noadd:   function (n) { return Math.max(8, Math.round(n * 0.30)); },
-    special: function (n) { return n >= 36 ? 3 : 2; },
+    /* W1 재산정. 옛 식 `n >= 36 ? 3 : 2` 는 9열 108칸 기준이었다: 판 위의 특수는
+     * round(n × SP_DENSITY) = 8개라 목표 3개가 그중 37%였다. 7열 70~84칸에서는
+     * 특수가 5~6개뿐이라 3개는 60% — "웬만하면 달성"이 "특수만 노려야 달성"으로
+     * 뒤집힌다(이 표의 계수는 전부 봇 처리량의 0.7배로 잡혀 있고, 이것만 절대수라
+     * 칸 수를 안 따라온다). 그래서 절대수를 버리고 판 위 특수 수의 0.4배로 되돌린다.
+     * 옛 크기에서의 답은 그대로다: 108칸 → 8×0.4 = 3, 36·45칸 → 3×0.4 → 하한 2.
+     * 새 크기: 70칸 → 5×0.4 = 2, 84칸 → 6×0.4 = 2. 상한 3은 후반 대형판(모험
+     * 확장 등)에서 목표가 계속 자라지 않게 잡아 둔다. */
+    special: function (n) {
+      return clamp(Math.round(Math.round(n * SP_DENSITY) * 0.4), 2, 3);
+    },
     fever:   function ()  { return 1; },
     bomb:    function ()  { return 2; },
     /* v3 — missions that change how you play, not just how much you play.
@@ -18876,7 +18928,12 @@ window.TT_SFX = {
     sprint:  function (n) { return Math.max(5, Math.round(n * 0.14)); },
     col:     function (n, r) {
       var wide = Math.min(COLS, n) - 1;            // last existing column index
-      if (wide > 6) wide = 6;                      // cols 7-8 can be short on a 25-cell board
+      /* W1: 옛 상한 6 은 "9열 25칸 판에서 마지막 행까지 꽉 차는 마지막 열"이었다
+       * (25 = 2행 + 7칸이라 7·8열은 한 칸씩 짧다). 7열에서 같은 뜻의 상한은 5다 —
+       * 실제로 쓰이는 판은 전부 COLS 의 배수(엔들리스 70~84, 전투 7×행)라 모든
+       * 열이 꽉 차지만, 부분 행이 남는 판이 다시 생겨도 미션이 "짧은 오른쪽 끝
+       * 열"을 지목하지 않도록 방어선은 남긴다. */
+      if (wide > 5) wide = 5;                      // 7열: 맨 오른쪽 열은 지목하지 않는다
       if (wide < 0) wide = 0;
       var pick = r ? ((r() * (wide + 1)) | 0) : 0;
       return clamp(pick, 0, wide) + 1;             // 1-based for display
@@ -18940,7 +18997,12 @@ window.TT_SFX = {
   var ADV_PAR_K = 79;
   /* par 의 매치 항 상한: 사람이 매치 하나에 쓰는 시간(초). 칸수×0.5(판을 다
    * 비우는 매치 수)만으로 par 를 잡으면 후반 탄에서 전제가 깨진다 — 25탄은
-   * 135칸(67매치 전제)인데 제한시간이 70초라 실제로는 35매치가 한계다. */
+   * (9열 시절) 135칸(67매치 전제)인데 제한시간이 70초라 실제로는 35매치가 한계다.
+   * W1(7열): 25탄이 84칸(42매치 전제)이 되면서 min() 의 두 항이 42 vs 35 로
+   * 가까워졌다. 즉 이 상한은 여전히 작동하고, 칸수 항이 이기는 초반 탄에서는
+   * par 가 판 크기를 그대로 따라 내려간다(advPar 는 extBoardSize 파생이라 자동).
+   * duelFoeHpMax · duelAtkMax 도 같은 par 에서 나오므로 악당 체력·공격력이 함께
+   * 내려가 상대 난이도는 유지된다 — 실측 전/후 비교는 W1 검증 보고 참조. */
   var ADV_PAR_SEC = 2.0;
   var ADV_STAR2 = 1.2;               // ★★ = 기준점수의 120%
   var ADV_STAR3 = 1.5;               // ★★★ = 150% (또는 노셔플 — advStars 주석 참조)
@@ -19480,8 +19542,11 @@ window.TT_SFX = {
     }
     if (!live.length) return cells;
     shuffleSeeded(live, rng);
-    /* 판의 ADV_HAND_RATIO 를 넘지 않는다. 표의 개수(최대 8)는 108~135칸에서
-     * 이 천장에 걸리지 않지만, 천장이 없으면 31탄 이후 공식이 언젠가는 넘긴다. */
+    /* 판의 ADV_HAND_RATIO 를 넘지 않는다. W1 전(9열 108~135칸)에는 표의 개수
+     * (최대 8)가 이 천장에 걸리지 않았지만, 7열 70~84칸에서는 천장이 실제로 문다
+     * — ADV_HAND_RATIO 를 그대로 두면 작아진 판에 옛 개수를 그대로 얹게 되므로
+     * 이 clamp 가 방해물 비율을 판 크기에 자동으로 맞춰 준다(= 체감 방해 밀도
+     * 유지). 천장이 없으면 31탄 이후 공식이 언젠가는 넘긴다. */
     var cap = Math.floor(cells.length * ADV_HAND_RATIO);
     if (want > cap) want = cap;
     if (want > live.length) want = live.length;
@@ -19603,13 +19668,11 @@ window.TT_SFX = {
    * PURE genBoard stays in place, untouched, and the rule harness keeps testing
    * it; the game path simply stops calling it.
    *
-   * Measured, not estimated (headless Chrome at device metrics 390x844@2, all
-   * three modes). #board-scroll's box is 652px in endless (the mission badge
-   * costs 28px), 645px in rush (the rush timer costs 36px) and 680px in daily
-   * (the HUD strip collapses to 0). The tile is width-bound at 40px —
-   * floor((390 - 8*3) / 9) — so board height is 43*rows - 3, and the leftover
-   * whitespace is the scroller's box minus that:
+   * ⚠ W1 재측정 (2026-08-20). 아래 표는 **9열 · 타일 40px** 전제로 잰 것이라
+   * 7열 전환과 함께 전부 무효가 됐다. 같은 방법(헤드리스 msedge, 390x844@2)으로
+   * 다시 재고, 옛 표는 판단 근거를 지우지 않기 위해 그대로 남긴다.
    *
+   * --- 옛 표 (9열 · 타일 40px · #board-scroll 박스 652px 시절) — 무효 ---------
    *     rows  cells  board h   endless   rush   daily   <= 200px?
    *       9      81    384       268      261     296     no
    *      10      90    427       225      218     253     no
@@ -19621,21 +19684,43 @@ window.TT_SFX = {
    *      16     144    637*       15       24      27     YES, but the tile drops
    *                                                       to 36-38px and the
    *                                                       board starts scrolling
-   *   (* 15 rows costs 1px of tile in endless/rush, 16 rows costs 3-4px and
-   *      overflows the scroller — both are worse than the whitespace they save.)
    *
-   * Hence 12 rows on stage 1: the smallest board that meets the goal on the
-   * FIRST screen in the worst mode. It grows one row every three stages to a
-   * 15-row cap — the largest board that still needs no scrolling and no tile
-   * below 39px at 390x844. Past the cap the difficulty comes from the density
-   * curve below and from the Add budget (addsForStage), not from more cells.
+   * --- 새 표 (W1 실측: 7열 · 폭 항 타일 53px = floor((390-6*3)/7)) -------------
+   * #board-scroll 의 콘텐트 박스는 390x844 엔들리스에서 **605px** 이다(옛 주석의
+   * 652 는 그 뒤 상단 크롬이 자라면서 이미 낡은 값이었다 — 이번에 다시 쟀다).
+   * 보드 높이는 56*rows - 3 이고, 남는 여백은 605 에서 그것을 뺀 값이다:
+   *
+   *     rows  cells  board h   여백   실제 타일(390)   비고
+   *        8     56     445     160        53
+   *        9     63     501     104        53
+   *       10     70     557      48        53         <- 스테이지 1
+   *       11     77     613      -8        52         높이 항이 이기기 시작
+   *       12     84     669     -64        47         <- 상한
+   *       13     91     725    -120        44
+   *
+   * 여백 목표(<=200px)는 8행부터 이미 충족된다 — 7열 타일이 9열보다 13px 크기
+   * 때문에 같은 행 수로 훨씬 많은 세로를 먹는다. 그래서 이번 결정의 기준은
+   * 여백이 아니라 **사용자 반려 1순위인 타일 크기**다:
+   *   EB_ROWS0 = 10  (70칸) — 폭 항 53px 을 한 픽셀도 잃지 않는 가장 큰 판이고
+   *                           여백 48px 이라 "덜 그려진 화면"과도 무관하다.
+   *   EB_ROWS_MAX = 12 (84칸) — 3스테이지마다 한 줄, 스테이지 7에서 도달한다.
+   *                           12행은 타일이 53 -> 47 로 6px 내려가지만, 그래도
+   *                           현행 9열의 40px 보다 18% 크고 절단은 없다(byH 가
+   *                           타일을 먼저 줄이므로 보드가 박스를 넘지 않는다 —
+   *                           TILE_MAX 주석의 절단 검산 참조).
+   *   ※ 타일을 스테이지 내내 52px 이상으로 고정하고 싶다면 상한을 11 로 내리면
+   *      된다(여백 -8px 은 byH 가 52 로 흡수한다). 성장 축이 한 칸으로 줄어드는
+   *      대가가 있어 이번에는 12 를 골랐다.
+   * 좁은 기기 실측(같은 방법): 360x740 엔들리스 박스 501px → 10행 47px / 12행
+   * 39px, 412x915 박스 671px → 10행 56px / 12행 52px. 어느 조합에서도 스크롤도
+   * 절단도 생기지 않는다.
    *
    * SIZE IS A FUNCTION OF STAGE ALONE. Never the viewport, never a measured DOM
    * value: Daily is a fixed seed at a pinned stage, and the whole world has to
    * keep generating one identical board.
    * ---------------------------------------------------------------------- */
-  var EB_ROWS0 = 12;         // rows on stage 1 -> 108 cells
-  var EB_ROWS_MAX = 15;      // cap -> 135 cells, the last no-scroll size at 390px
+  var EB_ROWS0 = 10;         // rows on stage 1 -> 70 cells (7열)
+  var EB_ROWS_MAX = 12;      // cap -> 84 cells, reached at stage 7
   var EB_STAGE_STEP = 3;     // stages per extra row
   var EB_RETRIES = 40;       // genBoardExt's own re-seed budget (PURE's number)
 
@@ -19655,21 +19740,21 @@ window.TT_SFX = {
    * than stage 5. The fix is a target band plus a deterministic seed walk.
    *
    * The target is PAIRS PER LIVING CELL, not an absolute count: the board grows
-   * from 108 to 135 cells, so an absolute target that "falls with stage" would
+   * from 70 to 84 cells, so an absolute target that "falls with stage" would
    * be describing two different boards. Density is what a player feels, and it
    * is what falls here — 0.90 pairs/cell on stage 1 down to a 0.60 floor from
    * stage 11.
    *
-   * Reachability is why these numbers are these numbers. A 9-wide board of
-   * 108-135 random 1..9 tiles already carries ~0.75 pairs/cell with no help at
-   * all (measured mean over 400 seeds: 0.742 at 108 cells, 0.751 at 135; sd
-   * ~0.08). Planting adjacent pairs with probability p lifts that almost
+   * Reachability is why these numbers are these numbers. A 7-wide board of
+   * 70-84 random 1..9 tiles already carries ~0.73 pairs/cell with no help at
+   * all (W1 재측정, 600 seeds/size: 0.722 at 70 cells, 0.724 at 77, 0.732 at 84;
+   * sd ~0.09). Planting adjacent pairs with probability p lifts that almost
    * linearly:
-   *       density ~= EB_P_A + EB_P_B * p     (fit over 400 seeds x 108..135)
+   *       density ~= EB_P_A + EB_P_B * p     (fit over 600 seeds x 70..84)
    * so extFillP INVERTS that fit and aims the raw distribution at the stage's
-   * own target; the search then only has to correct the noise. Above 0.75 the
+   * own target; the search then only has to correct the noise. Above 0.73 the
    * planting does the work; below it the search picks from the low tail, and
-   * 0.60 at 135 cells (81 pairs) sits almost exactly at the minimum of 40 draws
+   * 0.60 at 84 cells (50 pairs) sits almost exactly at the minimum of 40 draws
    * — which is why the floor is 0.60 and not lower. Measured medians track the
    * target to within a pair or two at every stage 1..20.
    *
@@ -19685,8 +19770,39 @@ window.TT_SFX = {
   var GB_DSTEP = 0.03;       // ...falling this much per stage
   var GB_DMIN = 0.60;        // ...down to this floor (reached at stage 11)
   var GB_WALK = 0x9E3779B1;  // golden-ratio step for the seed walk
-  var EB_P_A = 0.75;         // measured density of a board with no planting at all
-  var EB_P_B = 0.53;         // measured density gained per unit of planting p
+  /* ---- W1 재피팅 (7열) ---------------------------------------------------
+   * 옛 값 0.75 / 0.53 은 9열 108~135칸 회귀다. 게임의 짝 판정(canMatch ·
+   * isReadingConnected · isLineConnected · connectCandidates · countPairs)을
+   * node 로 그대로 이식해 무작위 판 600개/크기를 돌려 다시 쟀다.
+   *
+   *   p      9열(108~135)   7열(70~84)      ← 평균 pairs/cell, 무작위 판
+   *   0.00      0.7479         0.7260
+   *   0.05      0.7872         0.7592
+   *   0.10      0.8189         0.7984
+   *   0.15      0.8499         0.8248
+   *   0.20      0.8784         0.8550
+   *   0.25      0.9027         0.8792
+   *   0.30      0.9256         0.9019
+   *   최소자승  A=0.7561       A=0.7324      rmse 0.0052 / 0.0052
+   *             B=0.5883       B=0.5886      max|잔차| 0.0082 / 0.0072
+   *
+   * 두 가지가 드러났다. ① 열이 줄면 절편 A 가 0.024 내려간다 — 같은 칸에서
+   * 뻗는 8방향 광선 중 가로/대각이 짧아져 후보가 줄기 때문이다. ② 기울기 B 는
+   * 열 수와 **무관하다**(0.5883 vs 0.5886) — 심는 짝은 읽는 순서로 붙어 있어
+   * 격자 폭을 타지 않는다. 그래서 옛 0.53 은 열 때문이 아니라 그냥 낡은 값이고,
+   * 이번에 둘 다 실측값으로 맞춘다.
+   * 피팅 구간을 p<=0.30 으로 잡은 이유: 목표 밀도의 최대치가 GB_D0=0.90 이고
+   * extFillP 의 역산이 그보다 큰 p 를 요구하지 않는다. 전 구간(0~0.55)으로
+   * 피팅하면 포화 꼬리 때문에 B 가 0.499 로 눌리고 조준이 계통적으로 빗나간다.
+   *
+   * 검산(조준 정확도): 스테이지 1 목표 0.90 → p=(0.90-0.73)/0.59=0.288 →
+   * 실측 밀도 0.8965, 오차 -0.0035. 옛 계수를 그대로 뒀다면 p=0.283 → 0.894
+   * (조준이 목표 아래라 탐색이 상위 꼬리에서만 골라야 했다).
+   * 종단 검산(genBoardBanded 전체 파이프라인, 스테이지 1..20 × 60판):
+   * 중앙값이 목표에서 벗어난 최대치 0.0167 pairs/cell(= 84칸에서 1.4짝),
+   * 데드락 판 0건. ------------------------------------------------------- */
+  var EB_P_A = 0.73;         // measured density of a board with no planting at all
+  var EB_P_B = 0.59;         // measured density gained per unit of planting p
   var EB_P_MAX = 0.55;       // PURE's own stage-1 p, kept as the ceiling
 
   /** Target pairs-per-cell for a stage. Smooth, monotonically decreasing. */
@@ -22330,8 +22446,8 @@ window.TT_SFX = {
    * 에서 사람들이 실제로 부딪힌 사유는 압도적으로 **비정렬**이었다. 가장 자주
    * 겪는 거절을 한 번도 안 가르치는 튜토리얼이었던 셈이다.
    *
-   * 새 판이 2D 인 방법: PURE 의 idxToRC 는 COLS(=9) 고정이므로, 격자를 만들려면
-   * **셀 배열이 논리적으로 9열**이어야 한다. 그래서 각 행은 9칸이고, 왼쪽
+   * 새 판이 2D 인 방법: PURE 의 idxToRC 는 COLS 고정이므로, 격자를 만들려면
+   * **셀 배열이 논리적으로 COLS 열**이어야 한다. 그래서 각 행은 COLS 칸이고, 왼쪽
    * TUT_VIS_COLS 칸만 값을 갖는다. 나머지는 {v:0, dead:true} 패딩이라 DOM 자체가
    * 만들어지지 않는다(tutBuildBoard 참조). 그 덕에 ③단계의 줄바꿈 연결이 흉내가
    * 아니라 **진짜로** 성립한다 — 죽은 칸을 건너뛰는 isReadingConnected 때문에
@@ -22341,8 +22457,18 @@ window.TT_SFX = {
    * isReadingConnected · connectCandidates)에 그대로 통과시켜 검산했고, 각 주석의
    * 좌표·사유가 그 출력이다. 세 판 모두 **합법 짝이 정확히 하나**이고 blocked
    * 후보는 0 이다 — 플레이어가 대본 밖으로 샐 길이 없다는 뜻이다.
+   *
+   * ⚠ W1(COLS 9 -> 7) 재검증. 이 세 판은 **열 수가 바뀌어도 불변**이고, 그 이유는
+   * 우연이 아니라 구조다: 살아 있는 칸은 전부 왼쪽 TUT_VIS_COLS(=4) 열 안에 있어
+   * 행·열 좌표가 COLS 와 무관하게 같고, 따라서 isLineConnected 가 보는 dr·dc 가
+   * 한 글자도 달라지지 않는다. 늘거나 주는 것은 오른쪽 죽은 패딩의 **개수**뿐인데
+   * (9열이면 행마다 5칸, 7열이면 3칸) isReadingConnected 는 죽은 칸을 건너뛰므로
+   * 읽는 순서 이웃 관계도 그대로다. 유일한 요구는 COLS >= TUT_VIS_COLS 이고
+   * 7 >= 4 이니 성립한다.
+   * 실측 재검증(헤드리스 msedge, 7열): 세 단계 모두 합법 짝 정확히 1개 —
+   * ① (0,1)~(1,1) · ② (0,1)~(1,0) · ③ (0,3)~(1,0), 아래 주석의 좌표와 일치.
    * ---------------------------------------------------------------------- */
-  var TUT_VIS_COLS = 4;   // 화면에 그리는 열 수. 나머지 COLS-4 열은 죽은 패딩이다.
+  var TUT_VIS_COLS = 4;   // 화면에 그리는 열 수. 나머지 COLS-4 열(7열이면 3칸)은 죽은 패딩이다.
   var TUT_BOARDS = [
     /* ① 직선 쌍 성공. 유일한 합법 짝은 (0,1)=7 ~ (1,1)=7 — 세로 일직선이고,
      *    isLineConnected 만으로 이어진다(읽는 순서로는 사이에 (0,2)=4 가 살아
@@ -26437,7 +26563,8 @@ window.TT_SFX = {
          그동안 맞았던 것은 두 어긋남이 상쇄됐기 때문이다: 안 빠진 구 HUD 63px
          과, .battle 이 되돌려 주는 #tb-stats 두 줄 + 주황 띠(합 약 63px).
          재조립으로 HUD 가 63px → 폭/3.072 로 자랐으니 **자란 몫만** 더 뺀다
-         (390px 폭: 127−63 = 64px ≒ 1.5줄). 넘겨 빼면 줄이 하나 주는 데 그치지만
+         (390px 폭: 127−63 = 64px — 9열 43px 타일로는 1.5줄, W1 의 7열 56px
+         타일로는 1.1줄이다). 넘겨 빼면 줄이 하나 주는 데 그치지만
          덜 빼면 #app.battle #board-scroll{overflow:hidden} 이 맨 아랫줄을 조용히
          잘라 낸다 — 잘린 줄은 안 보이는데 데드락 판정에는 들어가는, 이 파일이
          가장 경계하는 종류의 결함이다. 그래서 보수적으로 뺀다.
@@ -27822,7 +27949,7 @@ window.TT_SFX = {
    * Rebuild the mini board's DOM from tutCells. Sizes itself like #board does.
    *
    * 14차 #34 — 1행 가정을 버리고 행/열 2D 로 일반화했다. tutCells 는 논리적으로
-   * COLS(=9)열이지만 그리는 것은 **왼쪽 TUT_VIS_COLS 열뿐**이고, 그마저도 처음부터
+   * COLS 열이지만(W1 부터 7) 그리는 것은 **왼쪽 TUT_VIS_COLS 열뿐**이고, 그마저도 처음부터
    * 죽어 있는 칸(창 밖 패딩 · 행이 4칸을 못 채워 남은 자리)은 아예 만들지 않는다.
    *
    * 그래서 tutEls 를 tutCells 와 **같은 길이의 희소 배열**로 둔다 — 없는 자리에는
@@ -27991,7 +28118,7 @@ window.TT_SFX = {
     tutFailShown = false;
     tutBusy = false;
     tutCells.length = 0;
-    /* 표기는 "보이는 4열"이지만 셀 배열은 **9열 격자**여야 한다 — PURE 의 idxToRC
+    /* 표기는 "보이는 4열"이지만 셀 배열은 **COLS 열 격자**여야 한다 — PURE 의 idxToRC
      * 가 COLS 로 나누기 때문이고, 그것 말고는 이 판이 2D 로 성립할 방법이 없다.
      * 창 밖(c >= TUT_VIS_COLS)과 행이 4칸을 못 채워 남은 자리는 {v:0, dead:true}
      * 로 메운다. 죽은 칸은 PURE 가 "없는 칸"과 똑같이 취급하므로(isAlive → false),
