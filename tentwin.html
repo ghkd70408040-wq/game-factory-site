@@ -32326,6 +32326,89 @@ window.TT_SFX = {
 #app.battle .dh-me .dh-num {color:#16374E !important;text-shadow:0 1px 1px rgba(255,255,255,.80);}
 #app.battle .dh-me .dh-dmg {color:#255C82 !important;text-shadow:0 1px 1px rgba(255,255,255,.72);}
 </style>
+
+<style id="sian-jelly-panel-v4">
+/* ============================================================
+   시안 5호 — 젤리판 **실물** (catalog/duel-jelly-panel.webp)
+   14차 이중 배경 매팅(dual-matte)이 건져 올린 460×524 반투명 분홍 젤리판이다.
+   시안 3호·4호가 "유리는 이미지가 아니다"라며 CSS 로 재현하던 그 판을, 이제
+   진짜 그림이 대신한다. 세 자리가 **한 장**을 공유한다:
+     ① 플레이 팝업   #modal-mode .sheet.r10-panel   (v3 그라데이션 틴트 → 실물)
+     ② 전투 상단 슬래브 #app.battle #duel-hud       (좌 HP~우 HP 를 한 판이 감싼다)
+     ③ 하단 메달 받침  #app.battle #actionbar       (메달 4장이 앉는 가로 트레이)
+
+   판 자체의 생김새(수확 실측):
+     본체 #C7A7B8 · 좌상 광택 방울 2개(x 0~110, y 0~50) · 우하 말림 하이라이트
+     (x 407~451, y 481~515) · 사방 밝은 림 약 5px · 모서리 반경 약 20px.
+     알파는 **전역 ×0.75** 로 낮춰 구웠다 — 원본(평균 α245)은 시안 팝업보다
+     확연히 진해 뒤가 안 비쳤다. 0.75/0.82/0.90/1.00 네 장을 같은 배경 위에서
+     나란히 찍어 로고 비침 정도를 대조했고, 시안에 가장 가까운 0.75 를 채택했다
+     (림·광택은 그 알파에서도 그대로 읽힌다).
+     가장자리 고스트(정렬 오차) — 상·좌의 밝은 자홍 띠와 하·우의 검은 띠,
+     그리고 바닥의 **이중 림**(어긋난 복제) — 은 크롭으로 잘라 냈고 α<12 는 소거했다.
+
+   9-슬라이스 규약: 슬라이스는 셋 다 **120** 이다. 광택 방울도 말림도 이 안에
+   들어오므로, 늘어나는 것은 늘 민무늬 몸통뿐이라 어떤 비율에서도 안 뭉개진다.
+   크기는 `border-image-width`(biw)로만 맞춘다 — border-width 로 주면 상자를
+   빼앗아 팝업 내용이 굶고(§9 칩 주석과 같은 함정), biw 는 칠만 키운다.
+   네 변의 k = biw/120 이 같아야 모서리가 안 늘어난다:
+     팝업   biw 85px → k .708  (= 시트 폭 326 / 판 폭 460, 판을 통째로 축소한 배율)
+     슬래브 biw 26px → k .217  (63px 짜리 띠 안에 26+26 이 들어간다)
+     트레이 biw 34px → k .283
+   ⚠ `border-image` 단축이 biw 를 1 로 되돌리므로 biw 선언은 반드시 단축 뒤에.
+   되돌리기: 이 <style> 블록 하나를 통째로 지우면 시안 3호·4호가 그대로 선다.
+   ============================================================ */
+
+/* ---- 1. 플레이 팝업 v4 ----------------------------------------------------
+   v3 의 그라데이션 틴트 3겹 + 광택 radial 2개 + inset 림은 전부 그림이 대신하므로
+   background 를 비우고 box-shadow 는 **바깥 그림자 한 줄만** 남긴다. 뒤 비침
+   blur(5px) 는 유지한다 — 진짜 판이라도 뒤가 날것이면 유리로 안 읽힌다.
+   border-radius 는 34 → 14px: backdrop-filter 는 **테두리 반경으로 잘리므로**,
+   그림의 실제 모서리(20px × k .708 ≒ 14px)보다 크면 흐림이 판 밖으로 삐져나온다. */
+#modal-mode .sheet.r10-panel{
+  background:none !important;background-image:none !important;
+  border-style:solid !important;border-width:1.5px !important;border-color:transparent !important;
+  border-image:url("catalog/duel-jelly-panel.webp") 120 fill stretch !important;
+  border-image-width:85px !important;
+  border-radius:14px !important;
+  box-shadow:0 14px 34px rgba(83,28,40,.26) !important;
+  -webkit-backdrop-filter:blur(5px) saturate(1.18);
+  backdrop-filter:blur(5px) saturate(1.18);
+}
+
+/* ---- 2. 전투 상단 슬래브 --------------------------------------------------
+   시안의 상단은 캡슐 세 개가 따로 뜬 것이 아니라, 좌 HP~타이머~우 HP 를
+   **한 장의 넓은 젤리판**이 받치고 그 위에 캡슐이 앉은 구도다. #duel-hud 는
+   지금까지 배경 없는 flex 껍데기였으므로, 판은 여기에 깐다.
+   판이 캡슐을 **받치려면** 안쪽 여백이 필요한데, 그 여백을 그냥 padding 으로만
+   주면 캡슐이 좁아져 보스 이름이 말줄임에 걸린다("포도 먹깨비" → "포도 먹…").
+   그래서 잃은 만큼 바깥 margin(8→4px)에서 되찾는다 — 캡슐이 쓰는 폭은
+   382 − 10(padding) − 10(gap 5×2) = 362 로 배선 전과 **정확히 같다**.
+   덤으로 판이 화면 가장자리에 더 붙어 시안의 통짜 띠에 가까워진다.
+   biw 26 은 4px 늘어난 높이(54→63)의 절반 아래라 위아래 림이 서로 안 먹는다. */
+#app.battle #duel-hud{
+  border-style:solid;border-width:0;
+  border-image:url("catalog/duel-jelly-panel.webp") 120 fill stretch;
+  border-image-width:26px;
+  border-radius:6px;
+  margin:0 calc(var(--safe-r) + 4px) 4px calc(var(--safe-l) + 4px);
+  padding:4px 5px 5px;
+  gap:5px;
+  filter:drop-shadow(0 2px 5px rgba(46,20,58,.30));
+}
+
+/* ---- 3. 하단 메달 받침 ----------------------------------------------------
+   시안 4호 §1 이 "시안의 바닥은 투명"이라며 주황 띠를 벗겨 둔 자리다. 그때
+   비워 둔 이유가 오늘 채워진다 — 시안의 바닥은 투명이 아니라 **같은 젤리판**
+   이었다. 배경만 이 판으로 갈아 끼우고 메달·배지·흐림 규칙은 한 줄도 안 건드린다.
+   padding-top 2 → 8px: 트레이 윗림과 메달 사이에 숨 쉴 틈을 준다(높이 +6px). */
+#app.battle #actionbar{
+  border-style:solid !important;border-width:0 !important;
+  border-image:url("catalog/duel-jelly-panel.webp") 120 fill stretch !important;
+  border-image-width:34px !important;
+  padding:8px calc(var(--safe-r) + 10px) calc(var(--safe-b) + 9px) calc(var(--safe-l) + 10px) !important;
+}
+</style>
 <script id="bg-preview-hook">
 /* 관제탑 배경 미리보기 훅 — ?bg=<카탈로그키>, 파라미터 없으면 무동작 */
 (function(){var k=new URLSearchParams(location.search).get('bg');if(!k)return;
