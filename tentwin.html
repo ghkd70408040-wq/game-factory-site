@@ -30150,12 +30150,8 @@ window.TT_SFX = {
          복제한 SVG 는 그림이 있으면 CSS 가 감추고, 없으면 그대로 폴백이 된다. */
       setStdArt(hero, cid, 'full', '--map-full');
       b.appendChild(hero);
-      /* 14차 시안의 "Ten Twin" 나무 명패 — 현재 노드 아래에만 달린다.
-         그림 한 장뿐이라 글자가 없고, 자리는 CSS(.mn-plate)가 정한다. */
-      var plate = document.createElement('span');
-      plate.className = 'mn-plate';
-      plate.setAttribute('aria-hidden', 'true');
-      b.appendChild(plate);
+      /* (2026-08-19 봉인 — "Ten Twin" 나무 명패는 승인 범위 밖의 추가물이라
+         만들지 않는다. CSS 쪽 .mn-plate 절도 display:none 으로 봉인돼 있다.) */
     }
     return b;
   }
@@ -32977,17 +32973,18 @@ window.TT_SFX = {
   line-height: 1;
   pointer-events: auto;
 }
-/* ⚠ 2026-08-19 사용자 분리판 교체 — 조각이 구판보다 3~4% 작고 3~4% 아래에서
-   시작한다. 판이 바뀐 게 아니라 **구판 조각이 부풀어 있었다**: 시안 흰 배경의
-   부드러운 드롭섀도까지 반투명 픽셀로 끌어안은 채 상자를 재는 바람에, 조각마다
-   사방으로 헤일로가 한 겹 둘려 있었다. 그 헤일로가 알록달록한 맵 위에 얹히면
-   네모난 연푸른 틀로 떠오른다 — 실기기에서 보이던 "이상한 파랑 그림자 틀"이
-   바로 이것이고, 여기 좌표와 조각을 함께 갈아 끼우는 것이 그 본질 수리다.
+/* ⚠ 2026-08-19 **원복 + 헤일로 수리**. 직전 커밋은 상단 넷을 분리판(sep3) 신품
+   으로 통째 갈아 끼웠지만, 사용자가 시킨 것은 "구버전에서 테두리만 손보고 이상한
+   그림자만 없애라"였다. 그래서 조각은 구판(v1)으로 되돌리고, 그 구판 webp 자체
+   에서 **흰 배경에 구워진 드롭섀도(연푸른 헤일로)만** 알파 0 으로 키잉했다
+   (바깥에서 안으로 flood fill + 경계 디프린지, 캔버스 크기·본체 픽셀 무접촉).
+   캔버스가 그대로라 좌표도 구판 값 그대로 성립한다 — 아래 네 줄이 그 값이다.
+   sep3 조각은 catalog/_superseded/*-sep.webp 로 보관한다(삭제하지 않는다).
    (CSS 쪽에는 파랑 그림자가 없다 — #map-top > * 가 box-shadow:none 이다.) */
-#screen-map #map-back   { left: 3.92cqw;  top: 4.08cqw; width: 14.57cqw; height: 15.31cqw; background-image: url("catalog/stage-btn_back.webp"); }
-#screen-map #map-hearts { left: 22.16cqw; top: 5.55cqw; width: 32.84cqw; height: 12.31cqw; background-image: url("catalog/stage-pill_life.webp"); }
-#screen-map #map-stars  { left: 56.51cqw; top: 5.90cqw; width: 21.36cqw; height: 11.48cqw; background-image: url("catalog/stage-pill_coin.webp"); }
-#screen-map #map-gear   { left: 81.54cqw; top: 4.08cqw; width: 14.57cqw; height: 15.31cqw; background-image: url("catalog/stage-btn_settings.webp"); }
+#screen-map #map-back   { left: 3.76cqw;  top: 3.83cqw; width: 14.99cqw; height: 15.46cqw; background-image: url("catalog/stage-btn_back.webp"); }
+#screen-map #map-hearts { left: 21.91cqw; top: 5.51cqw; width: 33.32cqw; height: 12.60cqw; background-image: url("catalog/stage-pill_life.webp"); }
+#screen-map #map-stars  { left: 56.31cqw; top: 5.87cqw; width: 21.75cqw; height: 11.71cqw; background-image: url("catalog/stage-pill_coin.webp"); }
+#screen-map #map-gear   { left: 81.40cqw; top: 3.85cqw; width: 14.92cqw; height: 15.43cqw; background-image: url("catalog/stage-btn_settings.webp"); }
 #screen-map #map-top .hc-ico { display: none; }   /* 봉인 — 하트·코인·톱니·화살표는 조각에 그려져 있다 */
 /* 하트 수·회복 타이머는 조각의 글자 상자 자리에 코드가 얹는다. */
 #screen-map #map-top b, #screen-map #map-top i {
@@ -32998,10 +32995,10 @@ window.TT_SFX = {
   white-space: nowrap;
   opacity: 1;
 }
-/* 자리는 신품 조각에 구워진 글자 덩어리를 다시 실측해 옮겼다(조각 안 %). */
-#screen-map #map-hearts-v { left: 40.5%; top: 43.9%; font-size: 5.40cqw; text-shadow: 0 .3cqw 0 rgba(176, 82, 112, .7); }
-#screen-map #map-heart-t  { left: 70.9%; top: 44.2%; font-size: 4.40cqw; text-shadow: 0 .3cqw 0 rgba(150, 66, 92, .8); }
-#screen-map #map-stars-v  { left: 63.6%; top: 44.7%; font-size: 5.00cqw; text-shadow: 0 .3cqw 0 rgba(196, 140, 40, .85); }
+/* 자리도 구판 지오메트리로 복귀한다(2026-08-19 원복). */
+#screen-map #map-hearts-v { left: 40.7%; top: 43.3%; font-size: 5.40cqw; text-shadow: 0 .3cqw 0 rgba(176, 82, 112, .7); }
+#screen-map #map-heart-t  { left: 70.0%; top: 42.8%; font-size: 4.40cqw; text-shadow: 0 .3cqw 0 rgba(150, 66, 92, .8); }
+#screen-map #map-stars-v  { left: 65.7%; top: 43.6%; font-size: 5.00cqw; text-shadow: 0 .3cqw 0 rgba(196, 140, 40, .85); }
 
 /* ---- 하단: 공통 젤리박스 띠 ----------------------------------------------
    시안 조각 panel_bottom 은 **쓰지 않는다** — 한 판(.jbox)을 세 인터페이스가
@@ -33138,24 +33135,20 @@ window.TT_SFX = {
    관문 표지(.st-gate)는 길 위의 표지판이지 단추가 아니라 제외한다 — 그쪽은
    지금까지처럼 --disc 를 쓴다.
 
-   ⚠ 2026-08-19 사용자 분리판(gm-stage-sep1-nodes.jpg)으로 교체. 자물쇠가 걸린
-     분홍·보라는 자물쇠만 떼고 가려져 있던 받침 링을 좌우 대칭으로 복원했다
-     (자물쇠 자체는 지금까지처럼 .st-lock::before 도서관 조각이 얹는다).
-     신품은 구판보다 옆으로 퍼져서(비율 1.136 → 1.27~1.38) 상자 폭에 거의 꽉 찬다.
-     그래서 auto 100% 를 **contain** 으로 바꿨다 — auto 100% 는 상자보다 넓어진
-     그림의 좌우를 잘라 돔의 둥근 옆구리를 평평하게 만든다. contain 이면 어떤
-     상자 비율에서도 실루엣이 통째로 살고, 세로 손해는 최대 2.5% 뿐이라 왕관·
-     주인공·깃발·히트영역의 자리 계산이 그대로 성립한다. */
+   ⚠ 2026-08-19 **원복**. 직후 커밋이 여기를 분리판(sep1)으로 갈아 끼우고
+     background-size 를 contain 으로 바꿨으나, 사용자 확정판은 그 이전
+     (c569ff2)의 5색 젤리 단추다. 조각·비율·크기 규칙을 전부 그때로 되돌린다
+     — 승인 범위는 하단 조각뿐이었다. sep1 조각은 catalog/_superseded/
+     stage-jelly-*-sep.webp 에 보관한다(삭제하지 않는다). */
 #screen-map #map-path .map-node:not(.st-gate) {
   background-image: var(--jelly);
   background-position: center center;
-  background-size: contain;
+  background-size: auto 100%;
   background-repeat: no-repeat;
 }
-/* 색은 **노드 순번 기준 5색 순환**이다. 분리판 교체로 색 구성이 바뀌었다:
-   1라임 · 2초록 · 3청록 · 4분홍 · 5보라 · 6라임 …
-   관문 표지는 <span> 이라 <button> 을 세는 :nth-of-type 셈에 끼지 않는다 —
-   챕터가 넘어가도 각 쪽의 첫 칸이 늘 라임에서 시작한다. */
+/* 색은 **노드 순번 기준 5색 순환**이다 (1분홍 · 2노랑 · 3초록 · 4파랑 · 5마젠타 ·
+   6분홍 …). 관문 표지는 <span> 이라 <button> 을 세는 :nth-of-type 셈에 끼지
+   않는다 — 챕터가 넘어가도 각 쪽의 첫 칸이 늘 분홍에서 시작한다. */
 #screen-map #map-path .map-node:nth-of-type(5n+1) { --jelly: url("catalog/stage-jelly-1.webp"); }
 #screen-map #map-path .map-node:nth-of-type(5n+2) { --jelly: url("catalog/stage-jelly-2.webp"); }
 #screen-map #map-path .map-node:nth-of-type(5n+3) { --jelly: url("catalog/stage-jelly-3.webp"); }
@@ -33167,13 +33160,10 @@ window.TT_SFX = {
    그대로 옮긴다. 크기가 상자마다 달라야 하므로(앵커표의 노드 높이는 4.5%~7.53%)
    앵커의 --h 를 그대로 쓴다 — #map-layer 의 높이가 곧 화면 높이라 1% = 1vh 다.
    외곽선도 같은 비율로 따라간다(글자 크기의 약 9%).
-
-   ⚠ 2026-08-19: 사용자 확정에 따라 **번호 렌더는 현행 그대로 둔다** — 글꼴·색·
-     외곽선·크기는 한 글자도 손대지 않았다. 신품 단추에서 구운 숫자가 앉아 있던
-     자리를 다섯 색 모두 실측한 결과 중심이 위에서 43.5·44.1·44.7·45.9·44.7%
-     (평균 44.6%)라, 돔 한가운데에 앉도록 **top 한 줄만** 40% → 44.5% 로 옮긴다. */
+   (2026-08-19 원복 — sep1 판에 맞춰 44.5% 로 내렸던 top 을 확정판 값 40% 로
+    되돌린다.) */
 #screen-map #map-path .mn-num {
-  top: 44.5%;
+  top: 40%;
   font-size: calc(var(--h, 5) * .44 * 1vh);
   -webkit-text-stroke-width: calc(var(--h, 5) * .0396 * 1vh);
 }
@@ -33182,13 +33172,12 @@ window.TT_SFX = {
    줄 중심은 단추 위끝에서 단추 높이의 17% 위, 줄 너비는 단추 폭의 80%
    (= 상자 폭의 약 65%), 별 하나는 줄의 31%. 별이 세 칸인 규칙과 클리어한 탄에만
    걸치는 규칙은 그대로다 — 바뀐 것은 그림과 자리뿐이다. */
-/* 자리는 분리판에서 다시 실측했다(단추 2·3·5 세 벌 평균): 줄 너비 = 단추 폭의
-   75.4%, 줄 중심 = 단추 위끝에서 단추 높이의 21.5% 위, 별 하나 = 줄의 31%.
-   신품이 상자 폭의 약 97%로 그려지므로 줄 너비는 상자 기준 73% 다. */
+/* (2026-08-19 원복 — sep1 판 실측으로 옮겼던 -21.5% / 73% 를 확정판 값으로
+   되돌린다.) */
 #screen-map #map-path .mn-stars {
-  top: -21.5%;
+  top: -17%;
   bottom: auto;
-  width: 73%;
+  width: 65%;
 }
 #screen-map #map-path .mn-stars i {
   width: 31%;
@@ -33197,27 +33186,12 @@ window.TT_SFX = {
 }
 #screen-map #map-path .mn-stars i.off { background-image: url("catalog/stage-star-off.webp"); }
 
-/* ---- "Ten Twin" 명패 ------------------------------------------------------
-   분리판의 4번 노드에는 단추 아래에 나무 명패가 달려 있다. 그 조각을 떼어
-   **현재 노드에만** 붙인다(주인공이 서 있는 칸이 어디인지 한눈에 읽힌다).
-   시안 실측: 명패 폭 = 돔 폭의 88.5%, 명패 윗변이 돔 아랫변보다 돔 높이의 5%
-   만큼 위(살짝 물린다), 조각 비율 601:192.
-   신품 단추가 상자 폭의 약 97%로 그려지므로 상자 기준 폭은 86% 다.
-   ⚠ 노드 상자(--l/--t/--w/--h)와 드래그·배경은 여전히 무접촉이다 — 명패는
-     상자 **바깥 아래로** 흘러나오는 자식일 뿐이라 좌표표를 건드리지 않는다. */
-#screen-map #map-path .map-node .mn-plate {
-  position: absolute;
-  left: 50%;
-  top: 95%;
-  width: 86%;
-  aspect-ratio: 601 / 192;
-  transform: translateX(-50%);
-  background-image: url("catalog/stage-plate_tentwin.webp");
-  background-position: center center;
-  background-size: 100% 100%;
-  background-repeat: no-repeat;
-  pointer-events: none;
-}
+/* ---- "Ten Twin" 명패 — 봉인(2026-08-19) ------------------------------------
+   분리판에서 떼어 현재 노드 아래에 달았던 나무 명패는 **승인받지 않은 추가물**
+   이었다. 마크업 생성(mn-plate)과 함께 걷어낸다. 조각 자체는 지우지 않고
+   catalog/stage-plate_tentwin.webp 로 남겨 둔다 — 나중에 요청이 오면 이 절만
+   되살리면 된다. */
+#screen-map #map-path .map-node .mn-plate { display: none; }
 
 /* 자물쇠(.st-lock::before)는 손대지 않는다 — 도서관 조각 sp-glyph-lock 은 지금도
    또렷하고, 받침 링 오른쪽 아래(left 80% · top 74%)라 신품 단추 위에서도 제자리다. */
