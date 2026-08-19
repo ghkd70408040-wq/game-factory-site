@@ -18404,6 +18404,8 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
       if (actx && actx.state !== 'running') {
         var pr = actx.resume();
         if (pr && typeof pr.catch === 'function') pr.catch(function () {});
+        return pr;   /* 2026-08-20 결함B — 첫 터치가 running 전이에 매달릴 수 있게.
+                        기존 호출부는 전부 반환값을 쓰지 않는다(전수 확인). */
       }
     } catch (e) { /* 조용히 무시 */ }
   }
@@ -20102,7 +20104,13 @@ window.TT_SFX = {
   }
 
   if (typeof document !== 'undefined' && document.addEventListener) {
-    var UI_TAP_DOWN = ['pointerdown', 'touchstart', 'mousedown', 'keydown'];
+    /* 2026-08-20 결함A 근본수리 — 'mousedown' 제거. 안드로이드 크롬은 탭의 합성
+       mousedown 을 touchend 뒤(pointerdown 기준 80~150ms)에 쏜다. 40ms 병합창
+       밖이라 새 표를 끊었고, 뒤이은 합성 click 의 개별 ui() 가 새 표를 보고 2번째
+       소리를 냈다(데스크톱 마우스는 pointerdown 과 동시라 무검증 통과). pointerdown 이
+       마우스·터치·펜을 모두 덮어 mousedown 표는 불필요.
+       원본: var UI_TAP_DOWN = ['pointerdown', 'touchstart', 'mousedown', 'keydown']; */
+    var UI_TAP_DOWN = ['pointerdown', 'touchstart', 'keydown'];
     for (var utd = 0; utd < UI_TAP_DOWN.length; utd++) {
       document.addEventListener(UI_TAP_DOWN[utd], uiTapMark, { capture: true, passive: true });
     }
@@ -30448,7 +30456,10 @@ window.TT_SFX = {
     var w = $('map-heart-t');
     if (!w) return;
     var ms = heartNextMs();
-    w.textContent = ms > 0 ? t('adv.heartin', { t: fmtHeartWait(ms) }) : t('adv.heartfull');
+    /* 2026-08-20 결함C — 슬롯이 "다음 mm:ss"/"Next in mm:ss" 를 못 담아 개수(40.7%)와
+       겹치고 배지 밖으로 넘쳤다. 슬롯 폭에 맞게 시계만 얹는다.
+       원본: w.textContent = ms > 0 ? t('adv.heartin', { t: fmtHeartWait(ms) }) : t('adv.heartfull'); */
+    w.textContent = ms > 0 ? fmtHeartWait(ms) : t('adv.heartfull');
   }
 
   function startMapTicker() {
@@ -31681,28 +31692,54 @@ window.TT_SFX = {
        · 🚨 수리 1(탭 가드)과 충돌하지 않는다. 그 가드는 표 번호만 올리고 이벤트를
          전혀 건드리지 않으므로 스플래시의 첫 발화는 언제나 통과한다. */
   var splashBgmKicked = false;
+  // 2026-08-20 결함B 근본수리 — 아래는 교체 전 원본 전문(보존). 본문 안에 블록
+  // 주석이 들어 있어 블록 주석으로 감싸면 중첩이 깨지므로 줄주석으로 보존한다.
+  //   function splashBgmNow() {
+  //     if (!store.sound) return;              // 음악 OFF 존중
+  //     if (splashBgmKicked) { splashAudioHook(); return; }
+  //     splashBgmKicked = true;
+  //     try {
+  //       if (J.bgm.mainStop !== noop) J.bgm.mainStop(0);   // 헛돌던 running 을 내린다
+  //       if (J.bgm.scene !== noop) J.bgm.scene('menu');    // 제스처 태스크 안의 진짜 start()
+  //       else J.bgm.start();
+  //     } catch (e) { /* 소리 때문에 스플래시가 안 걷히는 일은 없다 */ }
+  //     try {
+  //       setTimeout(function () {
+  //         if (!store.sound) return;
+  //         /* 0.6초 사이에 이미 판이 열렸다면 로비 곡을 되돌려 씌우지 않는다 —
+  //            그 화면의 scene('game') 이 이미 옳은 판단을 했다. */
+  //         var gsc = $('screen-game');
+  //         if (gsc && gsc.classList && gsc.classList.contains('active')) return;
+  //         try {
+  //           if (J.bgm.scene !== noop) J.bgm.scene('menu');
+  //           else J.bgm.start();
+  //         } catch (e2) { /* 조용히 무시 — 다음 상호작용이 이어받는다 */ }
+  //       }, 600);
+  //     } catch (e3) { /* setTimeout 이 없는 환경은 폴백 없이 그대로 간다 */ }
+  //   }
+  // (원본 끝)
   function splashBgmNow() {
-    if (!store.sound) return;              // 음악 OFF 존중
+    if (!store.sound) return;
     if (splashBgmKicked) { splashAudioHook(); return; }
     splashBgmKicked = true;
-    try {
-      if (J.bgm.mainStop !== noop) J.bgm.mainStop(0);   // 헛돌던 running 을 내린다
-      if (J.bgm.scene !== noop) J.bgm.scene('menu');    // 제스처 태스크 안의 진짜 start()
-      else J.bgm.start();
-    } catch (e) { /* 소리 때문에 스플래시가 안 걷히는 일은 없다 */ }
-    try {
-      setTimeout(function () {
-        if (!store.sound) return;
-        /* 0.6초 사이에 이미 판이 열렸다면 로비 곡을 되돌려 씌우지 않는다 —
-           그 화면의 scene('game') 이 이미 옳은 판단을 했다. */
-        var gsc = $('screen-game');
-        if (gsc && gsc.classList && gsc.classList.contains('active')) return;
-        try {
-          if (J.bgm.scene !== noop) J.bgm.scene('menu');
-          else J.bgm.start();
-        } catch (e2) { /* 조용히 무시 — 다음 상호작용이 이어받는다 */ }
-      }, 600);
-    } catch (e3) { /* setTimeout 이 없는 환경은 폴백 없이 그대로 간다 */ }
+    /* 2026-08-20 결함B 근본수리 — 컨텍스트가 실제로 running 이 된 순간 딱 한 번:
+       mainStop(0) 으로 suspended 에서 park 된 헛 running 을 내리고(안 내리면
+       scene→mainStart→trkStart 의 `if(T.running)return` 에 죽는다) 새 소스를 건다.
+       600ms 시간창 폴백(원본, 위 주석)은 mainStop 이 없어 같은 가드에 죽어 있었다. */
+    var kick = function () {
+      if (!store.sound) return;
+      var gsc = $('screen-game');
+      if (gsc && gsc.classList && gsc.classList.contains('active')) return;
+      try {
+        if (J.bgm.mainStop !== noop) J.bgm.mainStop(0);
+        if (J.bgm.scene !== noop) J.bgm.scene('menu');
+        else J.bgm.start();
+      } catch (e) {}
+    };
+    var pr;
+    try { pr = J.resumeAudio(); } catch (e1) {}
+    if (pr && typeof pr.then === 'function') pr.then(kick, kick);
+    else { try { setTimeout(kick, 300); } catch (e2) {} }
   }
 
   /* ---- 14차 수리 1 — 클릭 없는 첫 시도 --------------------------------------
@@ -32734,7 +32771,14 @@ window.TT_SFX = {
      α 만 .52 → .40 으로 낮춘다: 전투 배경은 하늘·물이라 초록이 샐 걱정이 없고,
      덜 덮을수록 시안처럼 뒤 하늘이 유리 너머로 살아난다.
      합성 rgb(208,218,228) — 하늘 배경 rgb(169,205,211) 위, 파랑이 최상위다. */
-  --jbox-tint: rgba(215, 236, 253, .40);
+  /* 2026-08-20 하늘빛 틴트 B — 사용자 판정 확정(A/B 중 B). 색을 rgb(215,236,253)
+     에서 rgb(170,218,255) 로 옮긴다: 파랑을 더 세우고 빨강을 낮춰, 직전 값이
+     남기던 흰-회 기운을 걷고 '하늘색'으로 읽히게 한다. α 도 함께 내려 뒤가
+     더 비친다. 밝기 +6% 는 색이 아니라 backdrop-filter 의 brightness(1.06) 로
+     얹는다 — 틴트 α 를 더 올리면 다시 판이 덮여 뒤가 죽기 때문이다.
+     원본: --jbox-tint: rgba(215, 236, 253, .40); */
+  --jbox-tint: rgba(170, 218, 255, .30);
+  --jbox-blur: var(--jbox-frost) brightness(1.06);
   margin:0 calc(var(--safe-r) + 4px) 4px calc(var(--safe-l) + 4px);
   padding:4px 5px 5px;
   gap:5px;
@@ -32754,7 +32798,14 @@ window.TT_SFX = {
      봉인 끝 */
   /* 2026-08-19 하늘빛 틴트 — 상단 슬래브와 완전히 같은 값이다(한 판·한 색).
      합성 rgb(188,202,217) — 물가 배경 rgb(100,150,170) 위, 역시 파랑이 최상위. */
-  --jbox-tint: rgba(215, 236, 253, .40);
+  /* 2026-08-20 하늘빛 틴트 B — 사용자 판정 확정(A/B 중 B). 색을 rgb(215,236,253)
+     에서 rgb(170,218,255) 로 옮긴다: 파랑을 더 세우고 빨강을 낮춰, 직전 값이
+     남기던 흰-회 기운을 걷고 '하늘색'으로 읽히게 한다. α 도 함께 내려 뒤가
+     더 비친다. 밝기 +6% 는 색이 아니라 backdrop-filter 의 brightness(1.06) 로
+     얹는다 — 틴트 α 를 더 올리면 다시 판이 덮여 뒤가 죽기 때문이다.
+     원본: --jbox-tint: rgba(215, 236, 253, .40); */
+  --jbox-tint: rgba(170, 218, 255, .30);
+  --jbox-blur: var(--jbox-frost) brightness(1.06);
   padding:8px calc(var(--safe-r) + 10px) calc(var(--safe-b) + 9px) calc(var(--safe-l) + 10px) !important;
 }
 
@@ -33144,10 +33195,14 @@ window.TT_SFX = {
      v=3 → v=4 (2026-08-19 저녁): 세 조각이 **v=3 배포 뒤에 다시** 갱신됐다
      (stage-btn_records 통째 교체 · 나머지 둘 하단 그림자 절단). v=3 을 이미 받은
      기기가 구판을 물고 있어 한 번 더 올린다. 값은 CSS 3곳과 프리로더의 VQ,
-     총 4곳이 언제나 같아야 한다. */
-#screen-map #map-back   { left: 3.76cqw;  top: 3.83cqw; width: 14.99cqw; height: 15.46cqw; background-image: url("catalog/stage-btn_back.webp?v=4"); }
+     총 4곳이 언제나 같아야 한다.
+     v=4 → v=5 (2026-08-20): stage-btn_records 를 워터마크·글린트 없는 신품
+     (stage-btn_records-noglint.webp)으로 통째 교체했다. 구판은
+     catalog/_superseded/stage-btn_records-wm3.webp 로 보관한다(삭제하지 않는다).
+     이번에도 네 곳을 모두 v=5 로 올렸다. */
+#screen-map #map-back   { left: 3.76cqw;  top: 3.83cqw; width: 14.99cqw; height: 15.46cqw; background-image: url("catalog/stage-btn_back.webp?v=5"); }
 #screen-map #map-hearts { left: 21.91cqw; top: 5.51cqw; width: 33.32cqw; height: 12.60cqw; background-image: url("catalog/stage-pill_life.webp"); }
-#screen-map #map-stars  { left: 56.31cqw; top: 5.87cqw; width: 21.75cqw; height: 11.71cqw; background-image: url("catalog/stage-pill_coin.webp?v=4"); }
+#screen-map #map-stars  { left: 56.31cqw; top: 5.87cqw; width: 21.75cqw; height: 11.71cqw; background-image: url("catalog/stage-pill_coin.webp?v=5"); }
 #screen-map #map-gear   { left: 81.40cqw; top: 3.85cqw; width: 14.92cqw; height: 15.43cqw; background-image: url("catalog/stage-btn_settings.webp"); }
 #screen-map #map-top .hc-ico { display: none; }   /* 봉인 — 하트·코인·톱니·화살표는 조각에 그려져 있다 */
 /* 하트 수·회복 타이머는 조각의 글자 상자 자리에 코드가 얹는다. */
@@ -33188,7 +33243,14 @@ window.TT_SFX = {
    빨강 위로 올라오며 누런 기운이 사라진다.
    전투 위·아래 두 자리도 같은 색을 α.40 으로 나눠 쓴다(§ #duel-hud/#actionbar). */
 #screen-map #map-bot {
-  --jbox-tint: rgba(215, 236, 253, .52);
+  /* 2026-08-20 하늘빛 틴트 B — 사용자 판정 확정(A/B 중 B). 색을 rgb(215,236,253)
+     에서 rgb(170,218,255) 로 옮긴다: 파랑을 더 세우고 빨강을 낮춰, 직전 값이
+     남기던 흰-회 기운을 걷고 '하늘색'으로 읽히게 한다. α 도 함께 내려 뒤가
+     더 비친다. 밝기 +6% 는 색이 아니라 backdrop-filter 의 brightness(1.06) 로
+     얹는다 — 틴트 α 를 더 올리면 다시 판이 덮여 뒤가 죽기 때문이다.
+     원본: --jbox-tint: rgba(215, 236, 253, .52); */
+  --jbox-tint: rgba(170, 218, 255, .39);
+  --jbox-blur: var(--jbox-frost) brightness(1.06);
   height: calc(25.61cqw + var(--safe-b));
   padding: 0 0 var(--safe-b);
 }
@@ -33220,7 +33282,7 @@ window.TT_SFX = {
 #screen-map #map-b1    { left: 2.14%;  width: 30.39%; height: 12.47cqw; background-image: url("catalog/stage-pill_star.webp"); }
 #screen-map #map-plate { left: 34.22%; width: 31.66%; height: 18.97cqw; background-image: url("catalog/stage-pill_chapter.webp"); }
 #screen-map #map-char  { left: 66.84%; width: 15.43%; height: 18.62cqw; background-image: url("catalog/stage-btn_chars.webp"); }
-#screen-map #map-rec   { left: 82.91%; width: 15.15%; height: 18.78cqw; background-image: url("catalog/stage-btn_records.webp?v=4"); }
+#screen-map #map-rec   { left: 82.91%; width: 15.15%; height: 18.78cqw; background-image: url("catalog/stage-btn_records.webp?v=5"); }
 #screen-map #map-b1-v {
   position: absolute; left: 57.7%; top: 41.7%;
   transform: translate(-50%, -50%);
@@ -33497,7 +33559,7 @@ var L=("jelly-box,duel-title-play,sian2-ribbon,sian2-btn-pink,sian2-btn-purple,"
    🚨 값은 아래 VQ 한 곳에서만 고치고, CSS 3곳(#map-back/#map-stars/#map-rec)과
    반드시 같은 숫자로 맞춘다. 어긋나면 프리로드가 통째로 헛 요청이 된다. */
 var V="stage-btn_back,stage-pill_coin,stage-btn_records";
-var VQ="?v=4";                                     /* CSS 3곳과 반드시 같은 값 */
+var VQ="?v=5";                                     /* CSS 3곳과 반드시 같은 값 */
 var i=0;
 function next(){
   if(i>=L.length) return;                          /* 다 데웠다 */
