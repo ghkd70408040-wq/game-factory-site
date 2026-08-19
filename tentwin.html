@@ -12410,7 +12410,9 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
     </div>
     <!-- 하단 띠 — 원본 하단 바의 가로 비율 그대로(ROUND10-SPEC §A 표). 좌표는
          CSS 가 %로 들고 있고, 여기서는 순서와 조각 종류만 정한다. -->
-    <footer id="map-bot" class="hudbar">
+    <!-- 14차 시안 — 하단 띠는 공통 젤리박스(.jbox--strip)다. 시안 조각
+         panel_bottom 은 쓰지 않는다(한 판을 세 인터페이스가 공유하는 원칙). -->
+    <footer id="map-bot" class="hudbar jbox jbox--strip">
       <span class="hchip" id="map-b1"><span class="hc-ico hc-star" aria-hidden="true"></span><b id="map-b1-v">0</b></span>
       <span class="hchip" id="map-b2"><span class="hc-ico hc-score" aria-hidden="true"></span><b id="map-b2-v">0</b></span>
       <div id="map-plate">
@@ -29949,6 +29951,27 @@ window.TT_SFX = {
    * 가린다. 크기(w·h)는 원근에 맞춘 8단 사다리이고 전부 10차가 쓰던 범위
    * (2.80~5.20%) 안에 있다. 원반 그림 --art-nNN 은 **재사용**이다(신규 에셋 0).
    * ------------------------------------------------------------------------ */
+  /* ── 14차 시안(캔디 숲 맵) 노드 좌표 — assets_stage/stage-pieces.json 실측 ──
+     좌표계는 #map-path 프레임(폭 100% · 종횡비 784/1373 · 하단 정렬)의 % 이고,
+     [중심x, 중심y, 폭, 높이] 순서·의미는 옛 표와 같다(5번째 칸 --art-nNN 은
+     이제 CSS 가 상태별로 고르므로 쓰지 않는다).
+     한 판이 6칸이라 10탄 1챕터는 2쪽으로 나뉜다 — 쪽 번호가 mapPage 다.
+     ⚠ 롤백 밸브: SIAN_MAP=0 이면 아래 옛 표로 그대로 되돌아간다(스타일은
+       <style id="sian-stage-map"> 를 지우면 함께 돌아온다). */
+  var SIAN_MAP = 1;
+  var SIAN_PER = 6;
+  var mapPage = 0;
+  var SIAN_SLOTS = [
+    [ 8.865, 69.516, 15.179, 6.591],   // 1 왼쪽 아래 라임 젤리
+    [29.298, 80.022, 19.515, 7.793],   // 2 초록 젤리 (가장 앞·가장 크다)
+    [49.821, 67.225, 15.204, 6.336],   // 3 가운데 민트 — 시안의 "현재 위치"
+    [69.828, 78.543, 17.156, 8.070],   // 4 오른쪽 분홍
+    [88.597, 70.983, 15.332, 7.225],   // 5 오른쪽 보라
+    [96.052, 62.221,  7.972, 5.841]    // 6 오른쪽 끝 — 프레임에 잘린 조각
+  ];
+  /** 한 챕터가 몇 쪽인가 (10탄 ÷ 6칸 = 2쪽). */
+  function sianPages() { return Math.ceil(ADV_CHAPTER / SIAN_PER); }
+
   var MAP_ANCHORS_CH = [
     /* 챕터 1 — 구미 포레스트 남쪽 초원에서 캔디스톤 길을 타고 언덕 마루까지.
        x 7.62~43.36 = 레이어 폭의 35.7% (폰 화면 1.58 개분). */
@@ -30024,6 +30047,7 @@ window.TT_SFX = {
 
   /** 지금 챕터의 앵커표. 표가 세 장이 됐어도 읽는 쪽 코드는 한 줄도 안 바뀐다. */
   function mapAnchors(c) {
+    if (SIAN_MAP) return SIAN_SLOTS;   // 시안 판은 챕터와 무관하게 같은 6칸을 재사용한다
     return MAP_ANCHORS_CH[Math.min(Math.max(1, c || mapChap), MAP_ANCHORS_CH.length) - 1];
   }
   /** 이 챕터에서 가장 아래에 있는 노드의 아래끝(레이어 %). 레이어의 세로 오프셋을
@@ -30066,7 +30090,8 @@ window.TT_SFX = {
     b.style.setProperty('--t', String(a[1]));
     b.style.setProperty('--w', String(a[2]));
     b.style.setProperty('--h', String(a[3]));
-    b.style.setProperty('--disc', 'var(' + a[4] + ')');
+    if (a[4]) b.style.setProperty('--disc', 'var(' + a[4] + ')');   // 시안 표에는 없다 — 그림은 CSS 가 상태로 고른다
+    b.style.setProperty('--slot', String(slot));
     if (st === 'lock') b.setAttribute('aria-disabled', 'true');
     b.setAttribute('aria-label', t('adv.nodearia', { n: n, s: advStarsOf(n) }));
 
@@ -30132,8 +30157,18 @@ window.TT_SFX = {
     root.innerHTML = '';
     var first = chapFirst(mapChap);
     var anch = mapAnchors();
-    for (var i = 0; i < anch.length; i++) {
-      root.appendChild(makeMapNode(first + i, i));
+    if (SIAN_MAP) {
+      /* 시안 판은 한 쪽에 6칸이다. 챕터의 마지막 쪽은 남는 칸을 비워 둔다 —
+         칸을 늘리면 좌표가 그림의 길에서 벗어난다. */
+      if (mapPage < 0) mapPage = 0;
+      if (mapPage > sianPages() - 1) mapPage = sianPages() - 1;
+      var s0 = first + mapPage * SIAN_PER;
+      var s1 = Math.min(first + ADV_CHAPTER - 1, s0 + SIAN_PER - 1);
+      for (var k = 0; s0 + k <= s1; k++) root.appendChild(makeMapNode(s0 + k, k));
+    } else {
+      for (var i = 0; i < anch.length; i++) {
+        root.appendChild(makeMapNode(first + i, i));
+      }
     }
     /* 관문 마커. 버튼이 아니라 표지라서 <span> 이고, 탭도 포커스도 받지
        않는다(§A "탭 불가"). 챕터마다 가리키는 곳이 다르다. */
@@ -30168,8 +30203,9 @@ window.TT_SFX = {
     setText('map-ch-k', 'CHAPTER ' + mapChap);
     setText('map-ch-n', t('map.plate' + mapChap));
     var pv = $('map-ch-prev'), nx = $('map-ch-next');
-    if (pv) pv.disabled = mapChap <= 1;
-    if (nx) nx.disabled = mapChap >= Math.min(ADV_CHAPTERS, chapMax());
+    var lastCh = Math.min(ADV_CHAPTERS, chapMax());
+    if (pv) pv.disabled = SIAN_MAP ? (mapChap <= 1 && mapPage <= 0) : mapChap <= 1;
+    if (nx) nx.disabled = SIAN_MAP ? (mapChap >= lastCh && mapPage >= sianPages() - 1) : mapChap >= lastCh;
 
     setText('map-stars-v', advStarTotal());
     setText('map-b1-v', advStarTotal());
@@ -30180,6 +30216,19 @@ window.TT_SFX = {
 
   /** 챕터를 한 칸 옮긴다. 열린 챕터 밖으로는 나가지 않는다. */
   function mapGoChapter(d) {
+    if (SIAN_MAP) {
+      /* 화살표는 이제 **쪽**을 넘긴다. 쪽 끝에서 한 번 더 누르면 챕터가 바뀐다 —
+         명판·화살표 마크업과 핸들러는 그대로다. */
+      var p = mapPage + d, c = mapChap;
+      if (p < 0) { c -= 1; p = sianPages() - 1; }
+      if (p > sianPages() - 1) { c += 1; p = 0; }
+      if (c < 1 || c > Math.min(ADV_CHAPTERS, chapMax())) { J.sfx.fail(); return; }
+      mapChap = c; mapPage = p;
+      J.sfx.ui();
+      buildMap();
+      mapCenterCurrent();
+      return;
+    }
     var next = mapChap + d;
     if (next < 1 || next > Math.min(ADV_CHAPTERS, chapMax())) { J.sfx.fail(); return; }
     mapChap = next;
@@ -30333,6 +30382,11 @@ window.TT_SFX = {
     /* 진행이 닿은 챕터를 연다. 이전 챕터를 다시 보고 싶으면 명판의 화살표로
        돌아간다 — 클리어한 탄의 재도전이 10차에서 사라지지 않게 하는 유일한 손잡이다. */
     mapChap = chapMax();
+    /* 시안 판은 한 챕터가 2쪽이라, 지금 도전 중인 탄이 있는 쪽을 펴고 들어간다. */
+    if (SIAN_MAP) {
+      mapPage = Math.min(sianPages() - 1,
+        Math.floor(((Math.max(1, store.advMax | 0) - 1) % ADV_CHAPTER) / SIAN_PER));
+    }
     buildMap();
     closeAllModals();
     showScreen('screen-map');
@@ -32813,6 +32867,277 @@ window.TT_SFX = {
   z-index:3;
 }
 </style>
+<style id="sian-stage-map">
+/* ============================================================
+   14차 시안 — 스테이지 선택(모험 맵) **전면 교체**
+   시안 gm-stage-full.jpg · 조각 catalog/stage-*.webp
+   좌표 정본 assets_stage/stage-pieces.json (원판 784×1373)
+
+   좌표계를 하나로 통일한다: #screen-map 이 인라인 컨테이너라 **1cqw = 화면 폭 1%**
+   이고, 원판의 세로 1% = **1.75128cqw** 다(1373/784). 시안의 pct 를 그대로 옮겨
+   쓸 수 있고, --app-max 가 620/760px 로 넓어지는 데스크톱에서도 비율이 안 깨진다
+   (vw 로 썼다면 깨진다).
+
+   ⚠ 롤백 밸브: 이 <style> 블록 하나만 지우면 표피가 통째로 옛 모습으로 돌아간다.
+     짝이 되는 스위치는 게임 스크립트의 SIAN_MAP = 0 이다(노드 좌표·쪽 넘김).
+   ⚠ 모든 선택자가 #screen-map 스코프다 — 전투·엔들리스·메뉴·모달은 한 줄도
+     건드리지 않는다. 옛 규칙은 지우지 않고 여기서 덮거나 display:none 으로 봉인한다.
+   ============================================================ */
+#screen-map { container-type: inline-size; }
+
+/* ---- 배경: 캔디 숲 맵 풀블리드 ------------------------------------------
+   폭에 맞춰 깔고 **아래를 맞춘다**. 노드 프레임도 같은 규칙이라 젤리 단추가 늘
+   그림의 길 위에 앉는다. 화면이 더 길면 위가 남는데, 그림 맨 위 4% 가 이미 평평한
+   하늘(#C3F9F9)이라 같은 색으로 이어 붙이면 이음매가 보이지 않는다. */
+#screen-map #map-view {
+  background-color: #C3F9F9;
+  background-image: url("catalog/stage-bg.webp");
+  background-size: 100% auto;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  cursor: default;
+}
+/* 옛 지도는 화면보다 넓은 그림을 좌우로 끌고 다녔다. 시안은 한 판에 다 들어오므로
+   레이어를 화면에 붙여 드래그를 **성립하지 않게** 만든다(mapFit 의 vw−lw = 0). */
+#screen-map #map-layer {
+  top: 0; left: 0; right: 0;
+  width: auto; height: 100%;
+  aspect-ratio: auto;
+  transform: none;
+  background-image: none;
+}
+#screen-map #map-tint { display: none; }   /* 봉인 — 챕터 틴트는 시안에 없다 */
+/* 노드 프레임 = 그림과 똑같은 상자(폭 100% · 종횡비 784/1373 · 하단 정렬). */
+#screen-map #map-path { top: auto; bottom: 0; left: 0; right: 0; height: 175.13cqw; }
+
+/* ---- 젤리 단추 노드 ------------------------------------------------------
+   그림은 **상태**가 고르고, 홀·짝 두 벌을 번갈아 써서 시안의 색 리듬(라임→초록,
+   분홍→보라)을 그대로 살린다. 6번째 칸은 프레임에 잘린 조각이라 바꿔 끼울 수 없다. */
+#screen-map .map-node {
+  background-color: transparent;
+  background-image: url("catalog/stage-node_lime.webp");
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: none;
+}
+#screen-map .map-node.st-clear:nth-of-type(2n) { background-image: url("catalog/stage-node_green.webp"); }
+#screen-map .map-node.st-cur                   { background-image: url("catalog/stage-node_teal.webp"); }
+#screen-map .map-node.st-lock                  { background-image: url("catalog/stage-node_pink.webp"); }
+#screen-map .map-node.st-lock:nth-of-type(2n)  { background-image: url("catalog/stage-node_purple.webp"); }
+#screen-map #map-path .map-node:nth-of-type(6) { background-image: url("catalog/stage-node_red.webp"); }
+#screen-map .map-node.st-gate { display: none; }   /* 봉인 — 시안 지도에 관문 표지 자리가 없다 */
+#screen-map .mn-crown { display: none; }           /* 봉인 — 왕관은 시안의 조각 목록에 없다 */
+
+/* 번호는 조각에서 지워 두고(구운 글자 제거) 코드가 글자 상자 자리에 다시 얹는다.
+   여섯 조각의 num 상자 중심이 모두 가로 51±2% · 세로 46±3% 라 한 값으로 덮는다. */
+#screen-map .mn-num {
+  left: 0; right: 0; top: 46%;
+  padding-left: 3%;
+  transform: translateY(-50%);
+  font-size: 6.0cqw;
+  font-weight: 700;
+  color: #FFFFFF;
+  text-shadow: 0 .35cqw 0 rgba(122, 74, 96, .8), 0 0 .6cqw rgba(122, 74, 96, .55);
+}
+/* 별 트리오 — 시안에서는 크기가 **절대값**(노드 폭에 비례하지 않는다). 그래서
+   폭을 cqw 로 못 박고 노드 중심 위에 건다. */
+#screen-map .mn-stars {
+  left: 50%; top: auto; bottom: 100%;
+  margin-bottom: .70cqw;
+  width: 12.07cqw;
+  transform: translateX(-50%);
+  justify-content: space-between;
+}
+#screen-map .mn-stars i {
+  width: 3.95cqw; height: 3.83cqw;
+  aspect-ratio: auto;
+  background-image: url("catalog/stage-star_gold.webp");
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+#screen-map .mn-stars i.off { background-image: url("catalog/stage-star_gray.webp"); }
+/* 자물쇠 — 시안의 lock 상자 중심(분홍 78/71 · 보라 78.6/71.6)의 평균이다. */
+#screen-map .map-node.st-lock::before {
+  content: '';
+  display: block;
+  left: 78%; top: 71%;
+  width: 40%; height: auto;
+  aspect-ratio: 51.5 / 59.5;
+  transform: translate(-50%, -50%);
+  background-color: transparent;
+  background-image: url("catalog/stage-icon_lock.webp");
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: drop-shadow(0 .2cqw .3cqw rgba(110, 70, 58, .4));
+}
+/* 잘린 6번째 칸에는 자물쇠를 걸지 않는다 — 시안과 같다(프레임 밖으로 나간다). */
+#screen-map #map-path .map-node:nth-of-type(6).st-lock::before { display: none; }
+/* 현재 위치 — char_flag 조각이 곰과 깃발을 함께 들고 있어 아바타 복제본은 쉰다. */
+#screen-map .mn-hero { display: none; }
+#screen-map .mn-flag {
+  left: 76.7%; bottom: 61.8%;
+  width: 110.6%;
+  aspect-ratio: 131.8 / 101.5;
+  transform: translateX(-50%);
+  background-color: transparent;
+  background-image: url("catalog/stage-char_flag.webp");
+  background-size: 100% 100%;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+}
+
+/* ---- 상단: 판 없이 뜬 네 조각 --------------------------------------------
+   .hudbar 의 9-슬라이스 띠와 .hchip 젤리를 벗기고 조각을 시안 좌표로 띄운다.
+   세로 기준은 **안전영역**이라 그림이 위에서 잘려도 버튼은 늘 제자리다. */
+#screen-map #map-top {
+  top: var(--safe-t);
+  height: 20cqw;
+  display: block;
+  padding: 0;
+  gap: 0;
+  border: 0;
+  border-image: none;
+  background-color: transparent;
+  background-image: none;
+  pointer-events: none;
+}
+#screen-map #map-top > * {
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+  background-color: transparent;
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  box-shadow: none;
+  color: #FFFFFF;
+  font-family: var(--font-display);
+  line-height: 1;
+  pointer-events: auto;
+}
+#screen-map #map-back   { left: 3.76cqw;  top: 3.83cqw; width: 14.99cqw; height: 15.46cqw; background-image: url("catalog/stage-btn_back.webp"); }
+#screen-map #map-hearts { left: 21.91cqw; top: 5.51cqw; width: 33.32cqw; height: 12.60cqw; background-image: url("catalog/stage-pill_life.webp"); }
+#screen-map #map-stars  { left: 56.31cqw; top: 5.87cqw; width: 21.75cqw; height: 11.71cqw; background-image: url("catalog/stage-pill_coin.webp"); }
+#screen-map #map-gear   { left: 81.40cqw; top: 3.85cqw; width: 14.92cqw; height: 15.43cqw; background-image: url("catalog/stage-btn_settings.webp"); }
+#screen-map #map-top .hc-ico { display: none; }   /* 봉인 — 하트·코인·톱니·화살표는 조각에 그려져 있다 */
+/* 하트 수·회복 타이머는 조각의 글자 상자 자리에 코드가 얹는다. */
+#screen-map #map-top b, #screen-map #map-top i {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  font-style: normal;
+  font-weight: 700;
+  white-space: nowrap;
+  opacity: 1;
+}
+#screen-map #map-hearts-v { left: 40.7%; top: 43.3%; font-size: 5.40cqw; text-shadow: 0 .3cqw 0 rgba(176, 82, 112, .7); }
+#screen-map #map-heart-t  { left: 70.0%; top: 42.8%; font-size: 4.40cqw; text-shadow: 0 .3cqw 0 rgba(150, 66, 92, .8); }
+#screen-map #map-stars-v  { left: 65.7%; top: 43.6%; font-size: 5.00cqw; text-shadow: 0 .3cqw 0 rgba(196, 140, 40, .85); }
+
+/* ---- 하단: 공통 젤리박스 띠 ----------------------------------------------
+   시안 조각 panel_bottom 은 **쓰지 않는다** — 한 판(.jbox)을 세 인터페이스가
+   공유하는 것이 직전 커밋의 원칙이라, 틴트 축만 시안 실측값으로 맞춘다. */
+#screen-map #map-bot {
+  --jbox-tint: rgba(214, 218, 227, .90);
+  height: calc(25.61cqw + var(--safe-b));
+  padding: 0 0 var(--safe-b);
+}
+#screen-map #map-bot > * {
+  top: 14.0cqw;
+  right: auto;
+  transform: translateY(-50%);
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+  background-color: transparent;
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  box-shadow: none;
+  color: #FFFFFF;
+  font-family: var(--font-display);
+  line-height: 1;
+}
+#screen-map #map-b2 { display: none; }   /* 봉인 — 시안 하단 띠에 점수 자리가 없다 */
+#screen-map #map-b1    { left: 1.91%;  width: 30.80%; height: 12.40cqw; background-image: url("catalog/stage-pill_star.webp"); }
+#screen-map #map-plate { left: 33.90%; width: 32.27%; height: 17.86cqw; background-image: url("catalog/stage-pill_chapter.webp"); }
+#screen-map #map-char  { left: 66.96%; width: 15.82%; height: 16.74cqw; background-image: url("catalog/stage-btn_chars.webp"); }
+#screen-map #map-rec   { left: 82.40%; width: 15.46%; height: 16.77cqw; background-image: url("catalog/stage-btn_records.webp"); }
+#screen-map #map-b1-v {
+  position: absolute; left: 58.4%; top: 43.2%;
+  transform: translate(-50%, -50%);
+  font-size: 5.60cqw; font-weight: 700;
+  text-shadow: 0 .3cqw 0 rgba(196, 140, 40, .85);
+}
+/* 챕터 명판 — 두 줄은 시안의 line1/line2 상자 중심에 그대로 앉는다. 화살표는
+   시안에 없지만 챕터·쪽을 넘길 손잡이가 사라지면 안 되므로 명판 양 끝에 얹는다. */
+#screen-map #map-plate .mp-txt {
+  position: absolute; left: 49.3%; top: 50%;
+  width: 88%;
+  transform: translate(-50%, -50%);
+  display: block;
+  text-align: center;
+}
+#screen-map #map-ch-k, #screen-map #map-ch-n {
+  display: block;
+  font-style: normal;
+  font-weight: 700;
+  color: #FFFFFF;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 .3cqw 0 rgba(96, 40, 72, .7);
+}
+#screen-map #map-ch-k { font-size: 4.40cqw; letter-spacing: -.01em; }
+#screen-map #map-ch-n { margin-top: .55cqw; font-size: 2.90cqw; letter-spacing: -.02em; }
+#screen-map #map-plate .mp-arrow {
+  position: absolute; top: 50%;
+  width: 4.6cqw; height: 76%;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background-color: transparent;
+  background-image: none;
+  box-shadow: none;
+  transform: translateY(-50%);
+  color: #FFFFFF;
+  font-size: 5cqw;
+  line-height: 1;
+  text-shadow: 0 .3cqw 0 rgba(96, 40, 72, .7);
+  cursor: pointer;
+  z-index: 2;
+}
+#screen-map #map-ch-prev { left: -1cqw; right: auto; }
+#screen-map #map-ch-next { right: -1cqw; left: auto; }
+#screen-map #map-plate .mp-arrow[disabled] { opacity: .22; cursor: default; }
+/* 캐릭터·기록의 글자도 조각에서 지우고 코드가 다시 얹는다 — 언어 토글 생존. */
+#screen-map #map-char > span, #screen-map #map-rec > span {
+  position: absolute; left: 50%; top: 77%;
+  width: 106%;
+  transform: translate(-50%, -50%);
+  font-size: 4.0cqw;
+  font-weight: 700;
+  letter-spacing: -.03em;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 .28cqw 0 rgba(92, 58, 78, .7);
+}
+/* 눌림 — 옛 .mfbtn:active 는 translateY(-50%) 를 전제로 한 식이라 다시 세운다. */
+#screen-map #map-char:active, #screen-map #map-rec:active, #screen-map #map-b1:active,
+#screen-map #map-plate .mp-arrow:active { transform: translateY(calc(-50% + 2px)); }
+</style>
+
 <script id="bg-preview-hook">
 /* 관제탑 배경 미리보기 훅 — ?bg=<카탈로그키>, 파라미터 없으면 무동작 */
 (function(){var k=new URLSearchParams(location.search).get('bg');if(!k)return;
