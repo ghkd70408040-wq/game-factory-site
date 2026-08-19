@@ -5955,6 +5955,101 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   word-break: keep-all;
 }
 
+/* ============================================================================
+   W3 (2026-08-20) — 스킬 연출 강화. 아래 넷은 전부 **CSS 만**이고, 새 이미지도
+   새 오디오도 한 개 들어오지 않았다(효과음은 WebAudio 합성 변주다).
+     ① 적 컷인 옷        #cutin.cut-foe — 같은 기계, 붉은 옷
+     ② 히트스톱          #app.hitstop — 60~90ms 동안 움직이는 것을 세운다
+     ③ 흔들림 3단계      #app.shk1/2/3 — #board 만 흔든다
+     ④ 예고 글로우       #duel-foe-av.foewarn (전투 스킨 절에 함께 있다)
+   ========================================================================== */
+
+/* ① 적 컷인. 구조는 한 줄도 안 바뀌었다 — 같은 #cutin, 같은 네 겹, 같은 0.8초.
+   갈리는 것은 색과 **방향**뿐이다: 밴드가 거울로 뒤집혀(+14deg) 아군과 반대편
+   에서 들어온다. 각도 하나가 "저건 내 기술이 아니다"를 글자 없이 말한다. */
+#cutin.cut-foe .cut-dim {
+  background-image: radial-gradient(circle at 50% 50%, rgba(54, 4, 16, .60) 0%, rgba(26, 2, 8, .93) 100%);
+}
+#cutin.cut-foe .cut-band { transform: rotate(14deg) translateX(-120%); }
+#cutin.cut-foe.go .cut-band { animation: cutbandfoe .8s cubic-bezier(.2, .8, .3, 1) forwards; }
+@keyframes cutbandfoe {
+  0%   { transform: rotate(14deg) translateX(-120%); opacity: 0; }
+  22%  { transform: rotate(14deg) translateX(0);     opacity: .5; }
+  80%  { transform: rotate(14deg) translateX(0);     opacity: .5; }
+  100% { transform: rotate(14deg) translateX(40%);   opacity: 0; }
+}
+/* 악당은 오른쪽에서 선다 — 아군 컷인이 늘 왼쪽이라, 자리만으로도 둘이 갈린다.
+   #duel-hud 의 좌우 배치(악당 왼쪽)와 반대인 것은 일부러다: 컷인은 HUD 의
+   확대판이 아니라 별개의 무대이고, 여기서 중요한 것은 "아군 컷인과 다르다"뿐이다. */
+#cutin.cut-foe .cut-stage { left: auto; right: 6%; }
+#cutin.cut-foe.go .cut-stage { animation: cutslidefoe .8s cubic-bezier(.2, .9, .28, 1) forwards; }
+@keyframes cutslidefoe {
+  0%   { transform: translate(140%, -50%) scale(.82); opacity: 0; }
+  26%  { transform: translate(0, -50%)    scale(1.06); opacity: 1; }
+  36%  { transform: translate(0, -50%)    scale(1);    opacity: 1; }
+  80%  { transform: translate(0, -50%)    scale(1);    opacity: 1; }
+  100% { transform: translate(26%, -50%)  scale(.94);  opacity: 0; }
+}
+#cutin.cut-foe .cut-txt { right: auto; left: 5%; align-items: flex-start; text-align: left; }
+#cutin.cut-foe.go .cut-txt { animation: cuttxtfoe .8s cubic-bezier(.2, .9, .28, 1) forwards; }
+@keyframes cuttxtfoe {
+  0%   { transform: translate(-140%, -50%); opacity: 0; }
+  34%  { transform: translate(0, -50%);     opacity: 1; }
+  80%  { transform: translate(0, -50%);     opacity: 1; }
+  100% { transform: translate(-30%, -50%);  opacity: 0; }
+}
+#cutin.cut-foe .cut-name { color: #FFE3DC; }
+#cutin.cut-foe .cutin-img { filter: drop-shadow(0 10px 26px rgba(122, 0, 24, .70)); }
+
+/* ①-b 컷인 캐릭터가 한 번도 안 서던 문제의 수리 (W3 실측).
+   §26-3b 의 공용 규칙 `.cutin-av[data-art="std"] { position: relative; }` 이
+   .cutin-av 자신의 `position:absolute; inset:0` 을 특이도(0,2,0 > 0,1,0)로
+   이겼다. 그 결과 컷인 아바타는 **내용이 없는 inline span 그대로 0×0** 이 되고,
+   ::after 의 inset:0 도 0×0 위에 깔려 그림이 단 한 번도 그려지지 않았다.
+   실측: getBoundingClientRect() = 0×0 · ::after 의 background-image 는 정상적으로
+   --ch-ten-full 을 물고 있었다(= 아트 배선은 멀쩡했고 상자만 없었다).
+   공용 규칙은 다른 슬롯(.co-av·.node-hero-av·.nmate·.skill-av)이 함께 쓰므로
+   건드리지 않고, **컷인 자리만** 제 상자로 되돌린다. 각성 컷인도 같은 경로라
+   이 한 줄로 함께 살아난다. */
+#cutin .cutin-av[data-art="std"] { position: absolute; inset: 0; display: block; }
+
+/* ② 히트스톱. 움직이는 것 전부를 세운다. transition 은 건드리지 않는다 —
+   60~90ms 짜리 정지가 색 전이까지 끊으면 그건 "멈춤"이 아니라 "끊김"이다. */
+#app.hitstop *,
+#app.hitstop *::before,
+#app.hitstop *::after { animation-play-state: paused !important; }
+
+/* ③ 흔들림 3단계. 대상이 #board 하나인 이유는 shakeScreen() 주석에 있다
+   (요약: #app 에 transform 을 걸면 position:fixed 컷인이 함께 흔들린다). */
+#app.shk1 #board { animation: shk1 210ms var(--ease); }
+#app.shk2 #board { animation: shk2 280ms var(--ease); }
+#app.shk3 #board { animation: shk3 380ms var(--ease); }
+@keyframes shk1 {
+  0%, 100% { transform: translate(0, 0); }
+  30%      { transform: translate(-3px, 1px); }
+  62%      { transform: translate(2px, -1px); }
+}
+@keyframes shk2 {
+  0%, 100% { transform: translate(0, 0); }
+  18%      { transform: translate(-7px, 3px); }
+  44%      { transform: translate(6px, -3px); }
+  72%      { transform: translate(-3px, 1px); }
+}
+@keyframes shk3 {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  12%      { transform: translate(-12px, 5px) rotate(-.6deg); }
+  34%      { transform: translate(11px, -5px) rotate(.5deg); }
+  58%      { transform: translate(-7px, 3px) rotate(-.3deg); }
+  80%      { transform: translate(4px, -2px) rotate(.15deg); }
+}
+
+/* 모션 축소 요청 — 흔들림과 히트스톱은 통째로 끈다. 컷인은 기존 절이 이미
+   1ms 로 눌러 두었으므로 여기서 다시 손대지 않는다. */
+@media (prefers-reduced-motion: reduce) {
+  #app.shk1 #board, #app.shk2 #board, #app.shk3 #board { animation: none; }
+  #app.hitstop *, #app.hitstop *::before, #app.hitstop *::after { animation-play-state: running !important; }
+}
+
 /* ---- 18.4 보스 체력바 -------------------------------------------------------
    자기 줄을 쓰되 보스탄에서만 존재한다([hidden] 이면 높이 0). 세 사실이
    한 줄에 있다: 누구인가(아바타+이름) · 얼마나 남았나(HP) · 무엇을 해야 하나
@@ -13878,7 +13973,10 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
      겹침 금지(voiceBusyUntil)는 그대로 둔다: 그쪽이 "말이 잡음이 되는 것"을
      막는 진짜 장치이고, 래치는 그 위에 얹힌 여유분일 뿐이다. 300ms 는 가장 짧은
      보이스(젤리 2음절 ≈ 0.20s)보다 길어 래치가 겹침 금지보다 먼저 풀리는 일이 없다. */
-  var SFX_DEBOUNCE_MAP = { match: 70, combo: 70, cheer: 340, voice: 300, tierUp: 300, jackpot: 240 };
+  /* W3 — 스킬 3종은 컷인 한 번에 한 발이므로 팡파르(tierUp)와 같은 300ms 를 준다.
+     그보다 짧으면 연발 시 같은 소리가 자기 꼬리를 밟고, 길면 두 번째 스킬이 묵음이 된다. */
+  var SFX_DEBOUNCE_MAP = { match: 70, combo: 70, cheer: 340, voice: 300, tierUp: 300, jackpot: 240,
+                           spBlast: 300, petBell: 300, foeStab: 300 };
 
   /* ---- v3 믹스 레벨 (애니팡 문법: BGM 은 깔개, 매치 "팡"이 주인공) -----------
    * 절대 진폭 기준(마스터 0.55 를 곱하기 전). 청감 dB 는 match 를 0dB 로 둔 상대값.
@@ -15747,6 +15845,60 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
       tone('triangle',  90, 30, t0, 0.34, 0.14, 0.005);   // 바디
       noise(t0, 0.40, 0.15, 'lowpass', 900, 90, 0.8, 0.002);
       noise(t0, 0.08, 0.055, 'highpass', 4800, 1600, 0.7, 0.001);  // 짧은 크랙
+    },
+
+    /* ---- W3: 스킬 컷인 3종 (2026-08-20) ---------------------------------
+       파일 클립은 한 장도 쓰지 않는다 — 셋 다 기존 tone/noise/jellyDrop 의
+       파라미터 변주다. 서로 안 섞이게 **방향**으로 갈라 놓았다:
+         필살기  아래에서 위로 (스윕) 뒤에 킥이 떨어진다
+         펫      가운데서 반짝 (벨 아르페지오) — 위협이 0인 소리
+         적      위에서 아래로 (스태브) — 짧고 낮고 불길하다
+       한 판에서 셋이 연달아 나와도 "무엇이 울렸는지"가 파형이 아니라
+       움직이는 방향으로 읽힌다. --------------------------------------------- */
+
+    /** 필살기 — 상승 스윕(0.30s) + 킥. "차오르다 터진다"의 두 박자. */
+    spBlast: function () {
+      if (!gate('spBlast')) return;
+      var t0 = at();
+      /* ① 스윕 220→1760Hz. 이 신스에서 위로 가는 소리는 팡파르(tierUp)와
+         여기 둘뿐이다 — 상행은 드물어야 "올라간다"로 들린다. */
+      tone('sawtooth', 220, 1760, t0, 0.32, 0.070, 0.020);
+      tone('sine',     110,  880, t0, 0.32, 0.052, 0.024);
+      noise(t0, 0.30, 0.050, 'bandpass', 700, 6200, 0.9, 0.030);
+      /* ② 킥 — 스윕이 꼭대기에 닿는 순간에 떨어진다. bomb() 보다 살짝 높고
+         짧아서, 착탄의 bomb() 과 겹쳐도 두 발로 세어진다. */
+      tone('sine',     150, 44, t0 + 0.28, 0.36, 0.270, 0.003);
+      tone('triangle',  96, 34, t0 + 0.28, 0.26, 0.115, 0.004);
+      noise(t0 + 0.28, 0.09, 0.058, 'highpass', 5200, 1800, 0.7, 0.001);
+      // ③ 꼬리 — D4 링잉이 킥 뒤에 남아 "큰 것"의 크기를 만든다.
+      tone('sine', 293.66, 293.66, t0 + 0.30, 0.40, 0.042, 0.010);
+    },
+
+    /** 펫 — 벨 아르페지오 E6·G#6·B6·E7 (48ms 간격) + 젤리 방울 한 알. */
+    petBell: function () {
+      if (!gate('petBell')) return;
+      var t0 = at();
+      var arp = [1318.51, 1661.22, 1975.53, 2637.02];
+      for (var i = 0; i < 4; i++) {
+        var f = arp[i], st = t0 + i * 0.048;
+        tone('sine', f,        f,        st, 0.32, 0.078, 0.006);
+        tone('sine', f * 2.76, f * 2.76, st, 0.14, 0.013, 0.006);   // 비정수 배음 = 종
+      }
+      /* 젤리 방울 한 알을 섞는다. 이 세계의 서명이라, 이것 하나로 "벨"이
+         남의 게임에서 빌려 온 소리가 아니게 된다(gold 와 갈리는 지점이기도 하다). */
+      jellyDrop(t0 + 0.02, 659.26, 0.068, 0.16, 0.58);
+      noise(t0 + 0.03, 0.22, 0.019, 'highpass', 4800, 9000, 0.6, 0.030);
+    },
+
+    /** 적 — 낮은 스태브(0.22s). 아프지 않고 **불길하다**(비데미지 계약의 소리판). */
+    foeStab: function () {
+      if (!gate('foeStab')) return;
+      var t0 = at();
+      tone('sawtooth', 138, 58, t0, 0.22, 0.110, 0.004);
+      tone('square',    69, 29, t0, 0.26, 0.066, 0.006);
+      tone('sine',      46, 30, t0, 0.34, 0.135, 0.008);
+      noise(t0,        0.18, 0.052, 'lowpass',  1400, 220, 0.9, 0.002);
+      noise(t0 + 0.02, 0.06, 0.028, 'highpass', 3600, 1400, 0.7, 0.001);
     },
 
     /** 골드 — 밝은 벨 아르페지오 C6·E6·G6·C7 (55ms 간격) + 시머 노이즈. */
@@ -19197,6 +19349,15 @@ window.TT_SFX = {
      피해는 게이지 한 문으로만 들어온다는 단계 2의 계약을 펫이 뚫으면 안 된다. */
   var DUEL_PET_POP = 4;              // 삐약 "쪼아먹기" — 한 번에 지우는 산 칸 수
   var DUEL_PET_FREEZE_MS = 6000;     // 뭉치 "덩어리 방패" — 적 게이지 동결 시간
+  /* ---- W3 (2026-08-20) 스킬 연출 강화 상수 -------------------------------
+     아래 넷은 **연출 전용**이다. 밸런스 표에 들어가는 값은 하나도 없다:
+     타격감을 만드는 것은 밀리초 셋(히트스톱)이고, 나머지 둘은 아직 등록되지
+     않은 동료 둘의 예약 상수라 지금 이 판에서 읽히는 경로가 없다. */
+  var HITSTOP_LIGHT_MS = 60;         // 작은 사건 — 적 스킬 착탄·방패
+  var HITSTOP_MS = 78;               // 보통 — 펫 발동
+  var HITSTOP_HEAVY_MS = 90;         // 필살기 착탄. 90ms 를 넘기면 "멈췄다"가 아니라 "끊겼다"
+  var DUEL_MONGLE_FREEZE_MS = 4000;  // (다음 파도 예약) 몽글 "시간 웅덩이" — 뭉치의 짧은 변주
+  var DUEL_CHURUP_ROWS = 1;          // (다음 파도 예약) 츄릅 "한 입 재굴림" — 다시 굴릴 행 수
 
   /* =========================================================================
    * SECTION 1 — PURE RULE / GENERATOR FUNCTIONS
@@ -20218,7 +20379,13 @@ window.TT_SFX = {
                    'jackpot',
                    /* v4 §6.5: 허리 업 임팩트와 울먹임. 없으면 조용한 허리 업이
                     * 될 뿐, 타임스톱과 재개는 사운드와 무관하게 돈다. */
-                   'hurry', 'cry'];
+                   'hurry', 'cry',
+                   /* W3 — 스킬 컷인 3종(필살기 스윕·펫 벨·적 스태브). 이 표에
+                    * 이름이 없으면 J.sfx.<이름> 자체가 만들어지지 않아 호출이
+                    * TypeError 로 터진다 — 이 목록이 곧 셔임의 정의역이다.
+                    * 구버전 juice.js 면 셋 다 no-op 이 되어 컷인이 조용해질 뿐,
+                    * 정지·효과·타이머 회계는 사운드와 무관하게 그대로 돈다. */
+                   'spBlast', 'petBell', 'foeStab'];
 
   /* 14차 수리 3 — 한 번의 탭 안에서 ui() 가 여러 번 불려도 소리는 한 번만.
      쓰이는 자리는 bindJuice 의 셔임 하나뿐이다(그 주석에 근거를 적어 뒀다). */
@@ -21516,7 +21683,25 @@ window.TT_SFX = {
       'duel.petout': 'No pet skill left this round.',
       'duel.petempty': 'Nothing left to peck.',
       'duel.petpeck': 'Peck! {n} tiles cleared',
-      'duel.petshield': 'Chunky Shield! Villain gauge frozen for {n}s',
+      /* W3 — 기술이 "숫자 멈춤"으로 승격되면서 문구도 두 사실을 다 말한다:
+         시계도 멈추고 악당 게이지도 멈춘다. 하나만 말하면 나머지 하나는
+         플레이어가 영영 모르는 효과가 된다. */
+      'duel.petshield': 'Chunky Shield! Clock AND villain gauge frozen for {n}s',
+      /* --- W3: 컷인이 붙은 기술들의 이름 한 벌 --- */
+      'skill.sub.sp': 'SPECIAL',
+      'skill.sub.pet': 'PARTNER',
+      'skill.sub.foe': 'VILLAIN',
+      'skill.sp.name': 'FULL-POWER STRIKE!',
+      'skill.ppyak.name': 'PPYAK — PECK STORM!',
+      'skill.mungchi.name': 'MUNGCHI — TIME FREEZE!',
+      'skill.foe.name': 'BLOCKER RAIN!',
+      'duel.tellwarn': 'INCOMING!',
+      'duel.timestop': 'TIME STOP',
+      /* 아직 등록되지 않은 동료 둘 (MATE_IDS 밖) — 문구만 먼저 선다 */
+      'skill.mongle.name': 'MONGLE — TIME PUDDLE!',
+      'skill.churup.name': 'CHURUP — ONE BIG BITE!',
+      'duel.petmongle': 'Time Puddle! The clock stops for {n}s',
+      'duel.petchurup': 'One Big Bite! {n} row re-rolled',
       'adv.heartkept': 'Cleared, so no heart was spent.',
       'adv.heartplus': 'Boss bonus: +1 heart!',
       'adv.heartlost': '-1 heart. {n} left.',
@@ -22114,7 +22299,25 @@ window.TT_SFX = {
       'duel.petout': '이번 판 펫 스킬을 다 썼어요.',
       'duel.petempty': '쪼아먹을 타일이 없어요.',
       'duel.petpeck': '쪼아먹기! {n}칸 정리',
-      'duel.petshield': '덩어리 방패! {n}초 동안 악당 게이지가 얼었어요',
+      /* W3 — 기술이 "숫자 멈춤"으로 승격되면서 문구도 두 사실을 다 말한다:
+         시계도 멈추고 악당 게이지도 멈춘다. 하나만 말하면 나머지 하나는
+         플레이어가 영영 모르는 효과가 된다. */
+      'duel.petshield': '덩어리 방패! {n}초 동안 시간도 악당 게이지도 멈춰요',
+      /* --- W3: 컷인이 붙은 기술들의 이름 한 벌 --- */
+      'skill.sub.sp': '필살기',
+      'skill.sub.pet': '동료 기술',
+      'skill.sub.foe': '악당 기술',
+      'skill.sp.name': '혼신의 일격!',
+      'skill.ppyak.name': '삐약 — 쪼아먹기 폭풍!',
+      'skill.mungchi.name': '뭉치 — 시간 정지!',
+      'skill.foe.name': '블로커 비!',
+      'duel.tellwarn': '온다!',
+      'duel.timestop': '시간 정지',
+      /* 아직 등록되지 않은 동료 둘 (MATE_IDS 밖) — 문구만 먼저 선다 */
+      'skill.mongle.name': '몽글 — 시간 웅덩이!',
+      'skill.churup.name': '츄릅 — 한 입 재굴림!',
+      'duel.petmongle': '시간 웅덩이! {n}초 동안 시계가 멈춰요',
+      'duel.petchurup': '한 입 재굴림! {n}줄을 다시 굴렸어요',
       'adv.heartkept': '클리어라 하트는 그대로예요.',
       'adv.heartplus': '보스 보상, 하트 +1!',
       'adv.heartlost': '하트 -1. {n}개 남았어요.',
@@ -24831,6 +25034,54 @@ window.TT_SFX = {
     return !!(S.paused || S.bangOn || S.cutOn || S.hurryOn);
   }
 
+  /* ---- W3: 타격감 두 벌 (히트스톱 · 흔들림 계층) ---------------------------
+   * 둘 다 **화면만** 만진다. S.paused 를 건드리지 않으므로 벽시계 회계
+   * (shiftDeadlines)와 아무 관계가 없고, 그래서 어디서 불러도 시간을 먹지
+   * 않는다. fxBusy() 에도 들어가지 않는다 — 60~90ms 짜리 장식이 필살기·허리
+   * 업의 발동 가드가 되면 "가끔 버튼이 안 먹는다"가 되고, 그건 고장이다.
+   *
+   * 브라우저에 진짜 프레임 정지는 없다. 필요한 것도 그것이 아니라 "맞는 순간
+   * 세상이 걸린다"는 체감뿐이라, 움직이는 것(CSS 애니메이션) 전부를 잠깐
+   * 세우는 것으로 충분하다.
+   * ------------------------------------------------------------------------ */
+  var hitStopUntil = 0;
+  function hitStop(ms) {
+    var n = ms | 0;
+    if (n <= 0) return;
+    var until = now() + n;
+    /* 더 짧은 정지가 더 긴 정지를 끊지 않는다. 연출이 겹칠 때 마지막 호출이
+       이기면, 큰 기술의 90ms 가 작은 기술의 60ms 에 잘려 나간다. */
+    if (until <= hitStopUntil) return;
+    hitStopUntil = until;
+    setAppClass('hitstop', true);
+    later(function () {
+      if (now() + 8 < hitStopUntil) return;   // 나중 호출이 더 멀리 밀어 놨다
+      hitStopUntil = 0;
+      setAppClass('hitstop', false);
+    }, n);
+  }
+
+  /**
+   * 흔들림 3단계. 세기를 계층으로 나눈 이유는 크기를 말하기 위해서다 —
+   * 모든 사건이 같은 폭으로 흔들리면 흔들림은 정보가 아니라 배경이 된다.
+   *   1  예고·방패 같은 "알림"      (±3px)
+   *   2  스킬 발동·블로커 착탄       (±7px)
+   *   3  필살기 착탄                 (±12px + 미세 회전)
+   * 흔드는 대상은 **#board 하나**다. #app 에 transform 을 걸면 그 순간
+   * position:fixed 인 컷인·토스트가 #app 을 컨테이닝 블록으로 삼아 함께
+   * 흔들리고, 전면 오버레이가 흔들리면 그건 연출이 아니라 버그로 읽힌다.
+   * (같은 이유로 기존 #app.duel-hurt 도 #board 만 흔든다.)
+   */
+  function shakeScreen(level) {
+    var k = clamp(level | 0, 1, 3);
+    var el = $('app');
+    if (!el || !el.classList) return;
+    el.classList.remove('shk1', 'shk2', 'shk3');
+    void el.offsetWidth;                       // 다시 걸어야 재생된다 (duelHudFlash 와 같은 문법)
+    el.classList.add('shk' + k);
+    later(function () { if (el.classList) el.classList.remove('shk' + k); }, 120 + k * 90);
+  }
+
   /** 이번 매치가 게이지에 넣는 양(%p). 콤보 가중은 SKILL_COMBO_CAP 에서 포화. */
   function gaugeGain(combo) {
     var c = combo | 0;
@@ -24940,17 +25191,41 @@ window.TT_SFX = {
     setAppClass('cutin', false);
     var el = $('cutin');
     if (el) { el.classList.remove('go'); el.hidden = true; }
+    /* W3 — 아트 슬롯도 함께 비운다. 적 컷인이 --cutin-img 를 채우고 가는데
+       여기서 안 지우면, 다음 각성 컷인의 캐릭터 위에 악당 그림이 그대로
+       덮인다(변수는 #cutin 에 남고 .cutin-img 가 그것을 읽는다). */
+    if (el && el.style && el.style.removeProperty) el.style.removeProperty('--cutin-img');
   }
 
   /**
    * @param castId  화면에 크게 나오는 캐릭터 (소환이면 *불려 온 쪽*)
    * @param nameKey 기술명 i18n 키
    * @param then    컷인이 끝난 뒤 실행할 함수 (실제 효과)
+   * @param opt     W3 신설 — 컷인 한 벌의 **외형만** 바꾸는 선택 인자.
+   *   컷인 축이 넷(각성·필살기·펫·적)으로 늘었는데, 축마다 함수를 복제하면
+   *   언젠가 한 축만 정지 회계를 빠뜨린다. 그래서 기계는 여전히 이 하나이고
+   *   갈리는 것은 옷뿐이다. opt 를 안 주면 종전 동작과 한 글자도 다르지 않다
+   *   (각성 경로 castSkill 이 그 증거다 — 인자를 안 넘긴다).
+   *     subKey  부제 i18n 키          (기본 'skill.sub')
+   *     key     밴드·부제 색           (기본 CHARS[castId].key)
+   *     cls     #cutin 추가 클래스     (적 컷인의 'cut-foe')
+   *     img     아트 슬롯 CSS url()    (--cutin-img — 표에 없는 배역을 세우는 자리)
+   *     noAv    캐릭터 SVG/표준아트를 걸지 않는다 (img 로 대신할 때)
+   *     voice   보이스 캐릭터 id       (기본 castId, '' 면 침묵)
+   *     vig     비네트 세기            (기본 0.5)
+   *     sfx     임팩트 효과음 함수     (기본 J.sfx.tierUp(3))
    */
-  function runCutin(castId, nameKey, then) {
+  function runCutin(castId, nameKey, then, opt) {
+    var o = opt || {};
     /* 이미 대형 연출이 돌고 있으면 효과만 즉시 건다. 컷인을 큐에 쌓지 않는 것이
        규칙이다 — 쌓으면 정지 시간이 누적돼 "필살기를 썼더니 화면이 멈춰 있었다"가
-       된다. 잃는 것은 연출 하나뿐이고, 게임 상태는 하나도 어긋나지 않는다. */
+       된다. 잃는 것은 연출 하나뿐이고, 게임 상태는 하나도 어긋나지 않는다.
+
+       W3 감사 — 이 폴백에서 **타이머는 한 톨도 손해 보지 않는다**. 이 경로는
+       정지를 시작하지도 끝내지도 않으므로 shiftDeadlines 가 개입할 여지가
+       없고, 지금 화면을 잡고 있는 연출(빡!·허리 업·다른 컷인)은 자기가 끝날 때
+       자기 held 를 자기가 민다. 즉 정지 구간의 소유자는 언제나 하나뿐이고,
+       이 return 은 그 소유권을 넘겨받지 않는다. */
     if (fxBusy()) { if (then) then(); return; }
     S.cutOn = true;
     S.cutAt = now();
@@ -24962,32 +25237,43 @@ window.TT_SFX = {
     setAppClass('cutin', true);
     var el = $('cutin');
     if (el) {
-      el.className = 'cut-' + castId;
+      el.className = 'cut-' + castId + (o.cls ? (' ' + o.cls) : '');
       var art = $('cutin-av');
       if (art) {
         art.className = 'cutin-av ' + ((CHARS[castId] && CHARS[castId].cls) || 'ch-ten');
         art.innerHTML = '';
-        var src = document.querySelector
-          ? document.querySelector('#char-pick .char-card[data-char="' + castId + '"] .cav')
-          : null;
-        if (src && src.cloneNode) art.appendChild(src.cloneNode(true));
-        setStdArt(art, castId, 'full', '--slot-std');   /* 14차 수리 8 (§26-3b) */
+        if (o.noAv) {
+          /* 표에 없는 배역(악당)은 SVG 폴백도 표준아트도 없다. 빈 자리를
+             남겨 두면 data-art 가 앞 컷인의 것으로 남아 엉뚱한 그림이 선다. */
+          if (art.removeAttribute) art.removeAttribute('data-art');
+          if (art.style && art.style.removeProperty) art.style.removeProperty('--slot-std');
+        } else {
+          var src = document.querySelector
+            ? document.querySelector('#char-pick .char-card[data-char="' + castId + '"] .cav')
+            : null;
+          if (src && src.cloneNode) art.appendChild(src.cloneNode(true));
+          setStdArt(art, castId, 'full', '--slot-std');   /* 14차 수리 8 (§26-3b) */
+        }
       }
-      el.style.setProperty('--cut-key', (CHARS[castId] || CHARS.ten).key);
+      el.style.setProperty('--cut-key', o.key || (CHARS[castId] || CHARS.ten).key);
+      if (o.img) el.style.setProperty('--cutin-img', o.img);
+      else if (el.style.removeProperty) el.style.removeProperty('--cutin-img');
       setText('cutin-name', t(nameKey));
-      setText('cutin-sub', t('skill.sub'));
+      setText('cutin-sub', t(o.subKey || 'skill.sub'));
       el.hidden = false;
       el.classList.remove('go');
       void el.offsetWidth;
       el.classList.add('go');
     }
     /* 소리 셋이 한 자리에 겹치지 않게 순서를 준다: 임팩트 → (200ms) 기술명 외침.
-       보이스는 불려 온 캐릭터의 것이다 — 형이 부르고 동생이 대답하는 구조. */
-    J.sfx.tierUp(3);
+       보이스는 불려 온 캐릭터의 것이다 — 형이 부르고 동생이 대답하는 구조.
+       W3: 임팩트만 축마다 갈린다(스윕/벨/스태브). 순서와 간격은 그대로다. */
+    if (o.sfx) o.sfx(); else J.sfx.tierUp(3);
     J.screenPulse();
-    J.vignette(0.5);
+    J.vignette(o.vig === undefined ? 0.5 : o.vig);
     J.vibrate(50);
-    later(function () { J.sfx.voice(castId, 6); }, 200);
+    var vid = (o.voice === undefined) ? castId : o.voice;
+    if (vid) later(function () { J.sfx.voice(vid, 6); }, 200);
     later(function () { endCutin(false); }, SKILL_CUTIN_MS);
   }
 
@@ -28038,6 +28324,11 @@ window.TT_SFX = {
       /* 단계 3 — 방패도 벽시계다. 여기 없으면 컷인 0.8초가 6초 방패에서 그대로
          깎이고, 플레이어가 산 것이 연출에게 먹힌다. */
       if (S.duel.freezeUntil > 0) S.duel.freezeUntil += held;
+      /* W3 — 시간 정지의 **커서**도 같은 목록에 든다(마감이 아니라 커서라는
+         차이는 duelChillTick 주석에 있다). 여기 없으면 정지·컷인 구간을 위
+         advEndAt 줄이 한 번 밀고 커서가 또 한 번 밀어, 뭉치가 "시간을 멈추는"
+         기술이 아니라 "시간을 버는" 기술이 된다. freezeUntil 바로 옆이 그 자리다. */
+      if (S.duel.chillAt > 0) S.duel.chillAt += held;
     }
     // The run's age is a wall-clock field like every other one: without this
     // shift, a long pause would age the run and silently trigger the match decay.
@@ -29211,6 +29502,9 @@ window.TT_SFX = {
          마감으로 두면 해제를 예약할 필요가 없고, 일시정지도 shiftDeadlines 한
          줄로 따라온다(idleAt·foeSkillAt 과 같은 계약). */
       freezeUntil: 0,
+      /* W3 — 시간 정지 커서. "마지막으로 잔여시간을 밀어 준 시각"이고 0 이면
+         정지가 안 돌고 있다. 마감(freezeUntil)과 짝이지 대체가 아니다. */
+      chillAt: 0,
       meArm: false,
       down: false
     };
@@ -29440,8 +29734,29 @@ window.TT_SFX = {
     if (el && el.classList) el.classList.add('tell');
     var hud = $('duel-hud');
     if (hud && hud.classList) hud.classList.add('tell');
+    /* ---- W3: 예고를 **판을 보면서도** 읽게 한다 --------------------------
+       종전의 예고는 토스트 한 줄 + HUD 테두리였다. 그런데 예고가 필요한 순간은
+       정확히 플레이어가 판에 코를 박고 있는 순간이라, 화면 위쪽 문구는 구조적
+       으로 안 읽힌다. 그래서 신호를 둘 더 준다 — 적 진영이 붉게 맥동하고(글로우),
+       그 위로 경고 플로트가 뜬다. 둘 다 **표시일 뿐**이라 예고 규율(피해는 한
+       문으로만·예고 위에 예고 없음)을 건드리지 않는다. */
+    var fav = $('duel-foe-av');
+    if (fav && fav.classList) {
+      fav.classList.remove('foewarn');
+      void fav.offsetWidth;
+      fav.classList.add('foewarn');
+      later(function () { if (fav.classList) fav.classList.remove('foewarn'); }, BOSS_TELL_MS);
+    }
+    if (typeof window !== 'undefined') {
+      /* 숫자 팝과 같은 클램프를 쓴다 — 적 진영이 화면 왼쪽 끝이라 문구를
+         초상 중앙에 걸면 앞글자가 잘린다(duelHitFoe 주석의 그 실측). */
+      var at = duelFoeAt();
+      var px = Math.min(Math.max(at.x, 96), Math.max(96, window.innerWidth - 96));
+      J.floatText(px, Math.max(40, at.y - 18), t('duel.tellwarn'), '#ff5a3d', 26);
+    }
     toast(t('duel.tell'));
     J.sfx.fail();
+    shakeScreen(1);           // 가장 약한 단계 — 예고는 알림이지 타격이 아니다
     J.vibrate(20);
   }
 
@@ -29459,16 +29774,41 @@ window.TT_SFX = {
     toast(t('duel.hit', { n: d.foe.hit }));
   }
 
-  /** 방해 스킬 — **비데미지 유틸**이다. 블로커 투하는 기존 함수 그대로 부른다. */
+  /**
+   * 방해 스킬 — **비데미지 유틸**이다. 블로커 투하는 기존 함수 그대로 부른다.
+   *
+   * W3 — 여기에 적의 컷인 축이 붙었다. 아군만 컷인을 가지면 화면은 "내가 큰
+   * 것을 했다"만 말하고 상대가 무엇을 했는지는 토스트 한 줄로 지나간다 —
+   * 대전 게임에서 그건 상대가 없는 것과 같다. 기계는 아군과 **같은 runCutin**
+   * 이고(정지 회계를 두 번 쓰지 않는다) 갈리는 것은 옷뿐이다:
+   *   붉은 키색 + .cut-foe 틴트(밴드 각도까지 거울) + 악당 전신 아트.
+   * CHARS 에 'demon' 을 넣지 않은 것은 의도적이다 — 그 표는 **플레이어가 고를
+   * 수 있는 캐릭터**의 표이고, 악당은 거기 속하지 않는다. 표에 없는 배역을
+   * 세우는 자리가 정확히 opt.img(아트 슬롯)다.
+   * 비데미지 계약은 그대로다: 컷인 뒤에 떨어지는 것은 여전히 블로커뿐이다.
+   */
   function duelFoeSkill() {
     S.bossAtkN = (S.bossAtkN | 0) + 1;   // 위치 난수의 순번 (재도전 재현성)
-    var n = bossDropBlockers(DUEL_SKILL_BLK);
-    if (n > 0) {
-      toast(t('duel.skill', { n: n }));
-      J.sfx.bomb();
-      J.screenPulse();
-      J.vibrate(30);
-    }
+    runCutin('demon', 'skill.foe.name', function () {
+      var n = bossDropBlockers(DUEL_SKILL_BLK);
+      if (n > 0) {
+        toast(t('duel.skill', { n: n }));
+        J.sfx.bomb();
+        J.screenPulse();
+        hitStop(HITSTOP_LIGHT_MS);
+        shakeScreen(2);
+        J.vibrate(30);
+      }
+    }, {
+      subKey: 'skill.sub.foe',
+      key: '#FF3D2E',
+      cls: 'cut-foe',
+      noAv: true,
+      voice: '',                                        // 악당에게는 보이스 세트가 없다
+      vig: 0.62,
+      img: 'url("catalog/duel-demon-full.webp")',       // 이미 화면이 쓰는 그 한 장
+      sfx: function () { J.sfx.foeStab(); }
+    });
   }
 
   /* 상대 구동자. 훅은 **셋뿐**이다 — 나중에 원격 플레이어의 입력이 같은 셋으로
@@ -29558,6 +29898,76 @@ window.TT_SFX = {
     }
   }
 
+  /* =========================================================================
+   * W3 — 뭉치의 "숫자 멈춤" (전투 타이머 정지)
+   *
+   * ▣ 왜 `S.advEndAt += DUEL_PET_FREEZE_MS` (선지급)가 아닌가
+   *   ① 숫자가 **뛴다**. 화면이 말하는 것은 "시간이 멈췄다"가 아니라 "보너스
+   *      6초를 받았다"가 되고, 그 둘은 서로 다른 기술이다. 사용자가 요구한
+   *      것은 앞의 것이다.
+   *   ② 얼음이 도중에 끝나는 경로(격파·KO·시간종료·판 이탈)에서 이미 준 6초를
+   *      회수할 방법이 없다. 선지급은 언제나 정산이 남고, 정산은 언제나 샌다.
+   *
+   * ▣ 왜 새 벽시계를 만들지 않는가
+   *   마감은 d.freezeUntil 하나로 이미 충분하다(적 게이지 동결이 그것을 쓰고
+   *   있고 shiftDeadlines 목록에도 이미 들어 있다). 여기서 새로 드는 필드는
+   *   마감이 아니라 **커서**다: d.chillAt = "마지막으로 잔여시간을 밀어 준
+   *   시각". 커서는 자기가 아직 안 지난 구간만 밀므로, 같은 밀리초를 두 번
+   *   미는 일이 원리적으로 불가능하다.
+   *
+   * ▣ shiftDeadlines 와의 이중 계상 회피 (이 절의 핵심)
+   *   정지 구간(일시정지·컷인·빡!·허리 업)에서는 shiftDeadlines 가 advEndAt 을
+   *   held 만큼 민다. 같은 자리에서 **chillAt 도 held 만큼 민다**. 그래서 그
+   *   구간은 커서가 "이미 지난 것"이 되고, 정지가 풀린 뒤 첫 틱은 정지 이후의
+   *   실경과만 센다. 두 경로가 같은 구간을 다투는 조합이 존재하지 않는다.
+   *   반대 방향의 사고(커서를 안 밀었을 때)도 적어 둔다: 커서가 정지 전 시각에
+   *   묶여 있으면 정지 구간을 커서가 한 번 더 밀어, 6초 방패가 6초+정지시간의
+   *   **시간 획득**이 된다.
+   *
+   * ▣ 정산 시점
+   *   200ms 모험 루프가 advLeftMs() 를 읽기 **직전**에 부른다. 순서가 뒤집히면
+   *   그 틱 한 번(200ms)만큼 숫자가 먼저 줄었다가 되돌아와, 멈춘 시계가 떤다.
+   * ========================================================================= */
+
+  /** 얼음 오버레이와 타이머 색은 "지금 얼어 있는가" 한 사실의 두 얼굴이다. */
+  function duelChillSync() {
+    var d = S.duel;
+    var on = !!(d && d.freezeUntil > 0 && now() < d.freezeUntil);
+    setAppClass('chill', on);
+    var dt = $('duel-timer');
+    if (dt && dt.classList) dt.classList.toggle('chill', on);
+    var rt = $('rush-timer');
+    if (rt && rt.classList) rt.classList.toggle('chill', on);
+    return on;
+  }
+
+  /** @return 이번 틱에 밀어 준 밀리초 (0 이면 정지가 안 돌고 있다) */
+  function duelChillTick() {
+    var d = S.duel;
+    if (!d) return 0;
+    if (!(d.freezeUntil > 0)) {
+      if (d.chillAt > 0) { d.chillAt = 0; duelChillSync(); }
+      return 0;
+    }
+    var t = now(), held;
+    if (t >= d.freezeUntil) {
+      /* 마지막 조각(커서 → 마감)까지만 밀고 커서를 닫는다. 틱이 마감을 지나쳐
+         들어와도 초과분은 밀지 않는다 — 그 초과분은 이미 흐른 시간이다. */
+      held = d.chillAt > 0 ? Math.max(0, d.freezeUntil - d.chillAt) : 0;
+      d.chillAt = 0;
+      d.freezeUntil = 0;
+      if (held > 0 && S.advEndAt > 0) S.advEndAt += held;
+      duelChillSync();
+      return held;
+    }
+    if (!(d.chillAt > 0)) { d.chillAt = t; duelChillSync(); return 0; }
+    held = Math.max(0, t - d.chillAt);
+    d.chillAt = t;
+    if (held > 0 && S.advEndAt > 0) S.advEndAt += held;
+    duelChillSync();
+    return held;
+  }
+
   /** 시간 종료의 판정. 남은 HP **비율**을 견주고, 동률은 플레이어의 승리다. */
   function duelTimeoutWin() {
     var d = S.duel;
@@ -29582,6 +29992,17 @@ window.TT_SFX = {
    *          DUEL_SP_MULT × atkMax = 자동 공격 두 번분이다. 컷인은 쓰지 않는다:
    *          전면 효과는 각성·격파의 몫이고, 필살기까지 화면을 멈추면 전투
    *          내내 판이 서 있게 된다(fxBusy 규율).
+   *          ── W3 (2026-08-20) 추기: 바로 위 두 줄의 설계 의도는 **사용자 지시로
+   *          뒤집혔다**. 원문을 지우지 않고 남기는 이유는, 되돌릴 근거가 필요할
+   *          때 "무엇을 왜 포기했는지"가 남아 있어야 하기 때문이다. 뒤집은 근거는
+   *          둘이다. ① 전투는 이제 판이 아니라 **대결**을 보여 줘야 하고, 큰 기술이
+   *          큰 화면을 못 받으면 필살기와 자동 공격이 같은 크기로 읽힌다.
+   *          ② "판이 서 있게 된다"는 걱정의 실체는 정지 그 자체가 아니라 정지가
+   *          제한시간을 먹는 것이었는데, 그 값은 shiftDeadlines 가 이미 0 으로
+   *          만들어 두었다(컷인 held 를 통째로 되돌려 준다). 남은 비용은 0.8초의
+   *          손맛뿐이고, 그건 비용이 아니라 이 라운드가 사려던 것이다.
+   *          발동 빈도도 함께 근거가 된다: 필살기는 sp 만땅에서만 나가므로 한 판에
+   *          많아야 두세 번이고, 그 정도면 "드물게"라는 가독성 규율 안이다.
    *   펫소환 동료의 액티브, 판당 DUEL_PET_MAX 회. 삐약은 판을 정리하고 뭉치는
    *          적 게이지를 얼린다 — 둘 다 데미지를 내지 않는다(§14C 의 "피해는
    *          한 문으로만" 계약).
@@ -29626,25 +30047,70 @@ window.TT_SFX = {
     }
     d.me.sp = 0;
     var dmg = DUEL_SP_MULT * d.me.atkMax;
-    if (typeof window !== 'undefined') {
-      /* 화면 플래시 + 빔 + 큰 숫자. 전부 기존 juice 유틸이라 새 에셋이 없다 —
-         "큰 기술"의 체감은 크기와 색이 만들고, 그 둘은 코드로 충분하다. */
-      J.screenPulse();
-      J.vignette(0.5);
-      J.beam(window.innerWidth / 2, window.innerHeight * 0.78,
-             window.innerWidth / 2, window.innerHeight * 0.16, '#ff5ae0');
-      J.shockwave(window.innerWidth / 2, window.innerHeight * 0.2, '#ff5ae0');
-    }
-    J.sfx.bomb();
-    J.vibrate(80);
-    var real = duelHitFoe(dmg, true);
-    if (typeof window !== 'undefined') {
-      J.floatText(window.innerWidth / 2, window.innerHeight * 0.36,
-                  '-' + real, '#ff9ae8', 52);
-    }
-    toast(t('duel.spgo', { n: real }));
+    /* 게이지가 비었다는 사실은 컷인보다 **먼저** 화면에 선다: 0.8초 동안 만땅
+       게이지를 보고 있으면 "안 먹혔다"로 읽히고, 그 사이 다시 누르게 된다. */
     syncHud();
     syncDuel();
+    /* W3 — 컷인 → 효과. 순서가 이런 이유는 castSkill 주석과 정확히 같다:
+       연출 뒤에서 체력바가 미리 줄어 있으면 컷인이 결과의 재방송이 되고,
+       "저 연출이 이걸 했다"가 안 읽힌다. 발동 캐릭터는 주인공 본인(charId)이다
+       — 각성이 *불려 온 형제*를 세우는 것과 갈리는 지점이고, 그래야 두 컷인이
+       같은 판에서 서로 다른 사건으로 읽힌다. */
+    runCutin(charId(), 'skill.sp.name', function () { duelSpBlast(dmg); },
+             { subKey: 'skill.sub.sp', sfx: function () { J.sfx.spBlast(); } });
+  }
+
+  /**
+   * 필살기의 착탄. 컷인이 끝난 **뒤**에 이 순서로 터진다:
+   *   0ms    빔 발사 (내 진영 → 악당 진영) + 화면 플래시
+   *   140ms  과녁 쇼크웨이브 2겹 + 히트스톱 90ms + 최대 흔들림
+   *   250ms  실제 데미지 + 큰 숫자 + 토스트
+   * 셋을 같은 프레임에 쏟지 않는 것이 이 함수의 전부다. 한꺼번에 터뜨리면
+   * "번쩍" 하나로 뭉쳐 크기가 안 읽히고, 무엇보다 **때린 순간**이 없어진다.
+   * 딜레이 체인의 간격(140/110ms)은 빔이 화면을 가로지르는 시간과 히트스톱이
+   * 풀리는 시간에 각각 맞췄다.
+   *
+   * 원 주석 보존 — "화면 플래시 + 빔 + 큰 숫자. 전부 기존 juice 유틸이라 새
+   * 에셋이 없다 — '큰 기술'의 체감은 크기와 색이 만들고, 그 둘은 코드로
+   * 충분하다." W3 도 이 계약을 지킨다: 새 에셋 0장, 새 오디오 파일 0개.
+   */
+  function duelSpBlast(dmg) {
+    var d = S.duel;
+    if (!d || d.down) return;
+    var w = (typeof window !== 'undefined') ? window.innerWidth : 360;
+    var h = (typeof window !== 'undefined') ? window.innerHeight : 640;
+    var at = duelFoeAt();
+    if (typeof window !== 'undefined') {
+      J.screenPulse();
+      J.vignette(0.55);
+      J.beam(w / 2, h * 0.78, at.x, at.y, '#ff5ae0');
+    }
+    shakeScreen(2);
+    J.vibrate(40);
+    later(function () {
+      if (typeof window !== 'undefined') {
+        /* 두 겹인 이유: 분홍은 기술의 색이고 금빛은 **맞았다**의 색이다.
+           한 겹이면 "쐈다"까지만 보이고 "맞았다"가 안 보인다. */
+        J.shockwave(at.x, at.y, '#ff5ae0');
+        J.shockwave(at.x, at.y, '#ffd76a');
+      }
+      hitStop(HITSTOP_HEAVY_MS);
+      shakeScreen(3);
+      J.sfx.bomb();
+      J.vibrate(90);
+    }, 140);
+    later(function () {
+      /* 데미지는 히트스톱이 풀리는 자리에서 들어간다. 격파 판정을 여기서
+         하지 않는 것은 종전과 같다 — 판정은 duelTick 한 곳의 몫이고,
+         duelHitFoe 는 이미 down 인 악당에게 0 을 돌려준다(재진입 안전). */
+      var real = duelHitFoe(dmg, true);
+      if (typeof window !== 'undefined') {
+        J.floatText(w / 2, h * 0.36, '-' + real, '#ff9ae8', 52);
+      }
+      toast(t('duel.spgo', { n: real }));
+      syncHud();
+      syncDuel();
+    }, 250);
   }
 
   /**
@@ -29658,13 +30124,37 @@ window.TT_SFX = {
     var mid = mateId();
     if (!mid) { toast(t('duel.petnone')); J.sfx.fail(); return; }
     if ((d.petLeft | 0) <= 0) { toast(t('duel.petout')); J.sfx.fail(); return; }
-    var ok = (mid === 'mungchi') ? petShield() : petPeck();
-    if (!ok) return;
+    /* ---- W3: 동료에게도 컷인을 준다 --------------------------------------
+       "지금 저 애가 했다"를 종전에는 버튼 점프(duelPetFx) 하나로만 말했다.
+       그런데 동료 기술은 판을 통째로 바꾸는 사건이라(4칸 소거·시간 정지),
+       원인이 12px 짜리 점프로만 남으면 결과가 원인 없이 일어난 것처럼 보인다.
+
+       소비(petLeft)와 버튼 반응은 **컷인 전에** 확정한다: 800ms 동안 잔여
+       뱃지가 그대로면 "안 먹혔다"로 읽히기 때문이다. 대신 효과가 실패하면
+       (petPeck 의 빈 판) 그 자리에서 되돌린다 — 실패는 횟수를 먹지 않는다.
+       이 되돌림이 성립하는 이유는 컷인 중 입력이 멈춰 그 사이에 petLeft 를
+       건드릴 다른 경로가 없기 때문이다(S.paused 가 네 버튼 전부를 막는다).
+
+       판을 바꾸는 사슬(petPeck 의 잠금 → 소거 → 리필)은 전부 컷인 완료
+       콜백 안이다. 컷인 앞에 두면 정지된 화면 뒤에서 타일이 사라지고,
+       0.8초 뒤 플레이어는 이미 끝난 결과만 보게 된다. */
     d.petLeft = (d.petLeft | 0) - 1;
     duelPetFx();
     badgePop('undo-badge');
     syncHud();
     syncDuel();
+    runCutin(mid, 'skill.' + mid + '.name', function () {
+      var ok = (mid === 'mungchi') ? petShield() : petPeck();
+      if (!ok) {
+        d.petLeft = (d.petLeft | 0) + 1;
+        syncHud();
+        syncDuel();
+        return;
+      }
+      hitStop(HITSTOP_MS);
+      syncHud();
+      syncDuel();
+    }, { subKey: 'skill.sub.pet', sfx: function () { J.sfx.petBell(); } });
   }
 
   /**
@@ -29717,18 +30207,134 @@ window.TT_SFX = {
     return true;
   }
 
-  /** 뭉치 "덩어리 방패" — 적 게이지가 DUEL_PET_FREEZE_MS 동안 한 톨도 안 오른다. */
+  /**
+   * 뭉치 "덩어리 방패" — 적 게이지가 DUEL_PET_FREEZE_MS 동안 한 톨도 안 오른다.
+   *
+   * W3 — 이 기술이 **"숫자 멈춤"으로 승격**됐다. 같은 6초 안에서 세 가지가
+   * 동시에 참이 된다:
+   *   ① 적 게이지 동결   (종전 그대로 — duelFoeGauge 의 freezeUntil 가드 한 줄)
+   *   ② 전투 타이머 정지 (신규 — duelChillTick 이 잔여시간을 고정한다)
+   *   ③ 판 전체가 얼음빛 (신규 — CSS 만. #app.chill 오버레이 + 타이머 얼음색)
+   * 셋이 **같은 마감 하나**(d.freezeUntil)를 읽는 것이 이 절의 규율이다.
+   * 마감이 셋이면 언젠가 하나가 다른 둘보다 늦게 풀려, 화면은 얼어 있는데
+   * 시계는 흐르는(또는 그 반대의) 상태가 생긴다.
+   * 데미지는 여전히 0 이다 — §14C 의 "피해는 한 문으로만" 계약 그대로.
+   */
   function petShield() {
     var d = S.duel;
     d.freezeUntil = now() + DUEL_PET_FREEZE_MS;
+    /* 커서를 **지금**으로 찍어 둔다. 200ms 틱이 알아서 열게 두면 최대 한 틱
+       (200ms)이 정지 밖으로 새어 나가, 6초 정지가 5.8초가 된다. */
+    if (!(d.chillAt > 0)) d.chillAt = now();
+    duelChillSync();
     J.screenPulse();
-    J.vignette(0.2);
+    J.vignette(0.24);
+    /* 소리 두 겹: 얼음(파열)이 먼저 서고 미션 벨이 받는다. 게이트 이름이
+       달라 서로를 디바운스하지 않는다. */
+    J.sfx.ice();
     J.sfx.mission();
+    hitStop(HITSTOP_LIGHT_MS);
+    shakeScreen(1);
     J.vibrate(30);
     if (typeof window !== 'undefined') {
       J.shockwave(window.innerWidth / 2, window.innerHeight * 0.62, '#7ae0ff');
+      J.floatText(window.innerWidth / 2, window.innerHeight * 0.50,
+                  t('duel.timestop'), '#9fe8ff', 34);
     }
     toast(t('duel.petshield', { n: Math.round(DUEL_PET_FREEZE_MS / 1000) }));
+    return true;
+  }
+
+  /* =========================================================================
+   * W3 준비 — 신규 동료 2종의 기술 함수 (아직 **등록 전**)
+   *
+   * MATE_IDS 에 넣지 않았으므로 mateId() 가 이 둘을 돌려줄 방법이 없고,
+   * 따라서 doPetSkill 이 이들을 부를 경로도 아직 존재하지 않는다. 지금 이
+   * 파일에서 두 함수는 window.Game 손잡이로만 닿을 수 있는 **무해한 코드**다.
+   * 다음 파도의 배선은 세 줄이다: CHARS·CHAR_STD 에 id 추가 → MATE_IDS 에
+   * 추가 → doPetSkill 의 분기(지금의 mungchi/그 외 2분기)를 표로 바꾸기.
+   *
+   * 계약은 기존 둘과 같다: **비데미지**, 리턴은 성공 여부(false 면 횟수 미소비).
+   * ========================================================================= */
+
+  /**
+   * 몽글 "시간 웅덩이" — 뭉치의 짧은 변주(4초). 값이 아니라 **길이**만 다르다.
+   * 같은 d.freezeUntil 을 쓰므로 적 게이지 동결도 함께 따라온다 — 그게 옳다:
+   * 두 기술이 같은 사실("얼었다")을 말하는데 얼음의 뜻이 서로 다르면, 화면의
+   * 파란 틴트가 무엇을 보증하는지 플레이어가 배울 수 없다.
+   * 이미 더 긴 얼음이 걸려 있으면 **덮어쓰지 않는다** (짧은 것이 긴 것을 자르지 않는다).
+   */
+  function petFreeze4s_mongle() {
+    var d = S.duel;
+    if (!d || d.down) return false;
+    var until = now() + DUEL_MONGLE_FREEZE_MS;
+    if (until > d.freezeUntil) d.freezeUntil = until;
+    if (!(d.chillAt > 0)) d.chillAt = now();
+    duelChillSync();
+    J.sfx.ice();
+    J.screenPulse();
+    J.vignette(0.20);
+    hitStop(HITSTOP_LIGHT_MS);
+    shakeScreen(1);
+    J.vibrate(24);
+    if (typeof window !== 'undefined') {
+      J.shockwave(window.innerWidth / 2, window.innerHeight * 0.60, '#9fe8ff');
+      J.floatText(window.innerWidth / 2, window.innerHeight * 0.50,
+                  t('duel.timestop'), '#9fe8ff', 32);
+    }
+    toast(t('duel.petmongle', { n: Math.round(DUEL_MONGLE_FREEZE_MS / 1000) }));
+    return true;
+  }
+
+  /**
+   * 츄릅 "한 입 재굴림" — 행 DUEL_CHURUP_ROWS 개를 다시 굴린다.
+   *
+   * 지우지 않으므로 점수도 게이지도 한 톨 안 움직인다: 이 기술이 파는 것은
+   * **배치**뿐이다(삐약이 파는 것은 칸, 뭉치가 파는 것은 시간).
+   *
+   * 값을 새로 뽑지 않고 **그 행 안에서 섞는** 이유가 이 함수의 유일한 설계
+   * 판단이다. 새로 뽑으면 판 전체의 숫자 풀이 바뀌고, 그 순간 "짝이 통째로
+   * 사라지는" 사고가 확률로 존재하게 된다. 행 안 순열은 풀을 보존하므로 그
+   * 사고가 원리적으로 안 난다 — 기존 섞기(shuffleCellsEx)가 판 전체에 대해
+   * 쓰는 것과 같은 근거다. 블로커·죽은 칸은 자리에서 빠진다(블로커는 이웃
+   * 매치로만 풀리는 것이 그 타일의 규칙이고, 펫이 그것을 우회하면 핸디캡
+   * 자체가 사라진다 — petPeck 주석과 같은 계약).
+   */
+  function petRowShuffle_churup() {
+    var d = S.duel, i, r;
+    if (!d || d.down || S.busy) return false;
+    var rows = Math.ceil(S.cells.length / COLS);
+    if (rows <= 0) return false;
+    var pick = [];
+    for (r = 0; r < rows; r++) {
+      var n = 0;
+      for (i = 0; i < COLS; i++) {
+        var c = S.cells[r * COLS + i];
+        if (c && !c.dead && c.sp !== 'block') n++;
+      }
+      if (n >= 2) pick.push(r);          // 한 칸짜리 행은 섞어 봐야 그대로다
+    }
+    if (!pick.length) { toast(t('duel.petempty')); J.sfx.fail(); return false; }
+    shuffleSeeded(pick, battleRng());    // 시드 파생 — 같은 판·같은 순서면 같은 행
+    var take = Math.min(DUEL_CHURUP_ROWS, pick.length);
+    for (var k = 0; k < take; k++) {
+      var row = pick[k], idx = [], vals = [];
+      for (i = 0; i < COLS; i++) {
+        var kk = row * COLS + i, cc = S.cells[kk];
+        if (cc && !cc.dead && cc.sp !== 'block') { idx.push(kk); vals.push(cc.v); }
+      }
+      shuffleSeeded(vals, battleRng());
+      for (i = 0; i < idx.length; i++) S.cells[idx[i]].v = vals[i];
+    }
+    clearSelection();
+    clearHints();
+    renderAll();
+    /* 판이 나 때문에 바뀌었으므로 무매치 시계도 여기서 리셋한다(petPeck 리스크 9). */
+    d.idleAt = now() + DUEL_IDLE_MS;
+    J.sfx.petBell();
+    shakeScreen(1);
+    J.vibrate(24);
+    toast(t('duel.petchurup', { n: take }));
     return true;
   }
 
@@ -30103,6 +30709,10 @@ window.TT_SFX = {
     advInt = setInterval(function () {
       if (S.mode !== 'adv' || !S.running) return;
       if (S.paused) return;
+      /* W3 — 뭉치의 시간 정지는 **잔여시간을 읽기 전에** 정산한다. 순서가
+         뒤집히면 이 틱 한 번(200ms)만큼 숫자가 먼저 줄었다가 되돌아와, 멈춘
+         시계가 떤다. 이중 계상을 어떻게 피하는지는 duelChillTick 주석에 있다. */
+      if (battleOn()) duelChillTick();
       var left = advLeftMs();
       syncHud();                                 // syncRushHud/syncAdvGoal 포함
       var danger = left <= RUSH_DANGER_MS && left > 0;
@@ -32405,6 +33015,14 @@ window.TT_SFX = {
        무엇도 window.Game 을 거쳐 부르지 않는다). */
     duelAtkInfo: duelAtkInfo, doSpecial: doSpecial, doPetSkill: doPetSkill,
     doAwaken: doAwaken, petPeck: petPeck, petShield: petShield,
+    /* W3 — 연출 축 넷과 시간 정지를 DOM 없이 몰아 볼 손잡이. 위와 같은 규약이다:
+       게임 코드는 이 중 무엇도 window.Game 을 거쳐 부르지 않는다.
+       뒤의 둘은 **아직 등록되지 않은 동료**의 기술이라, 지금은 이 손잡이가
+       그 함수에 닿는 유일한 길이다(MATE_IDS 밖이므로 화면에서는 못 나온다). */
+    duelFoeSkill: duelFoeSkill, duelTell: duelTell, duelSpBlast: duelSpBlast,
+    duelChillTick: duelChillTick, duelChillSync: duelChillSync,
+    runCutin: runCutin, hitStop: hitStop, shakeScreen: shakeScreen,
+    petFreeze4s_mongle: petFreeze4s_mongle, petRowShuffle_churup: petRowShuffle_churup,
     duelAtkPct: duelAtkPct, duelSpPct: duelSpPct, syncBattleActs: syncBattleActs,
     genBoardExt: genBoardExt, extRows: extRows, extBoardSize: extBoardSize,
     extFillP: extFillP,
@@ -33463,6 +34081,84 @@ window.TT_SFX = {
   color:#FFFFFF !important;
   text-shadow:0 1px 2px rgba(46,20,58,.85),0 0 3px rgba(46,20,58,.55) !important;
   z-index:3;
+}
+
+/* ============================================================================
+   W3 (2026-08-20) — 뭉치의 "숫자 멈춤" 표시 · 적 예고 글로우
+
+   이 절이 전투 스킨 블록의 **끝**에 있는 이유는 우선순위 하나 때문이다:
+   위쪽 #app.danger.battle #duel-timer 가 마지막 10초를 붉게 못 박는데, 얼음은
+   그 위에 서야 한다(시간이 멈춘 마지막 10초에 숫자가 빨간색이면 "얼었다"가
+   거짓말이 된다). 특이도가 같으므로 **뒤에 오는 쪽**이 이긴다.
+   ========================================================================== */
+
+/* 얼음 틴트. 판을 **가리지 않고 물들인다** — 시간이 멈춰 있는 동안에도
+   플레이어는 계속 판을 읽고 탭해야 하므로 pointer-events 는 none 이고,
+   불투명도도 숫자가 그대로 읽히는 선에서 멈춘다. JS 가 하는 일은
+   #app 에 .chill 한 글자를 켜고 끄는 것뿐이다(duelChillSync). */
+#app.chill #board::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 18px;
+  /* 두 겹이다. ① 서리 — 네 귀퉁이에서 안쪽으로 스미는 흰 얼음(radial).
+     ② 물빛 — 위아래가 짙고 가운데가 옅은 파랑(linear). 가운데를 비워 두는 것이
+     가독성 예산이다: 숫자가 앉는 띠에서 알파를 가장 낮게 잡아, 판이 얼어도
+     읽기는 안 얼게 한다. 실측 1차의 .30/.11/.27 은 화면에서 "얼었다"로 안
+     읽혔다(캡처 대조) — 값을 올린 근거가 그 실측이다. */
+  background-image:
+    radial-gradient(120% 78% at 50% 50%, rgba(255, 255, 255, 0) 42%, rgba(214, 246, 255, .52) 100%),
+    linear-gradient(180deg,
+      rgba(96, 206, 255, .44) 0%,
+      rgba(122, 224, 255, .26) 46%,
+      rgba(150, 232, 255, .42) 100%);
+  box-shadow:
+    inset 0 0 0 3px rgba(190, 244, 255, .80),
+    inset 0 0 46px rgba(90, 196, 255, .60),
+    0 0 22px rgba(122, 224, 255, .45);
+  pointer-events: none;
+  z-index: 6;
+  animation: chillpulse 1.6s ease-in-out infinite;
+}
+@keyframes chillpulse { 0%, 100% { opacity: .88; } 50% { opacity: 1; } }
+
+/* 타이머 숫자. 젤리 클립(background-clip:text)을 내리고 통짜 얼음색으로
+   되돌린다 — danger 절이 붉은 톤에서 같은 이유로 같은 일을 한다(그 절의
+   주석: 클립이 남으면 유리 겹이 숫자를 덮는다). */
+#app.chill.battle #duel-timer,
+#app.chill #duel-timer.chill {
+  background-image: none !important;
+  color: #9FE8FF !important;
+  -webkit-text-fill-color: #9FE8FF !important;
+  -webkit-text-stroke: 1px rgba(10, 62, 92, .60);
+  text-shadow: 0 0 12px rgba(122, 224, 255, .90), 0 1px 0 rgba(255, 255, 255, .45);
+  animation: none !important;          /* rushbeat 를 세운다 — 멈춘 시계는 뛰지 않는다 */
+}
+#rush-timer.chill {
+  color: #9FE8FF;
+  text-shadow: 0 0 12px rgba(122, 224, 255, .90);
+  animation: none;
+}
+
+/* 적 반격 예고(1.8초)의 글로우. 토스트를 못 본 사람도 **판을 보면서** 읽는다.
+   filter 를 애니메이션하므로 위쪽 #app.battle #duel-foe-av 의 drop-shadow
+   선언을 자연히 이긴다(애니메이션 > 일반 선언). 끝나면 클래스가 걷히고
+   원래 그림자로 돌아간다. */
+#app.battle #duel-foe-av.foewarn { animation: foewarn 360ms ease-in-out 5; }
+@keyframes foewarn {
+  0%, 100% {
+    filter: drop-shadow(0 2px 4px rgba(30, 4, 24, .42));
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 14px rgba(255, 61, 46, .95)) drop-shadow(0 2px 4px rgba(30, 4, 24, .42));
+    transform: translate(0, -3px) scale(1.05);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #app.chill #board::after { animation: none; }
+  #app.battle #duel-foe-av.foewarn { animation: none; filter: drop-shadow(0 0 10px rgba(255, 61, 46, .9)); }
 }
 </style>
 <style id="sian-stage-map">
