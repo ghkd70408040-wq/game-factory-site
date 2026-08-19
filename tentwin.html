@@ -12500,7 +12500,7 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
          쌓임 순서(§18.4d 가 z-index 로 못 박는다): 슬래브(요소 배경) < 타이머 유리
          < 데몬·큰구름 < 성·아기구름 < 날개바 < 뼈바. 데몬과 큰구름의 **평평한 절단
          면**(원본에서 가려져 있던 하단)은 HP 바 두 장이 덮어 감춘다. -->
-    <div id="duel-hud" hidden>
+    <div id="duel-hud" class="jbox jbox--slab" hidden>
       <span id="duel-foe-av" class="dh-av boss-av bs-grape" aria-hidden="true"></span>
       <span id="duel-me-av" class="dh-av dh-av-me" aria-hidden="true"></span>
       <i id="duel-baby" class="dh-baby" aria-hidden="true"></i>
@@ -13621,7 +13621,7 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
        숨고 #node-wait(회복 대기 안내)와 #node-ad(광고 자리)가 대신 나온다.
        game.js openNodeCard() 가 내용의 단독 소유자.
        ============================================================ -->
-  <div id="modal-node" class="modal r10m" hidden role="dialog" aria-modal="true" aria-labelledby="node-title"><div class="sheet r10-panel">
+  <div id="modal-node" class="modal r10m" hidden role="dialog" aria-modal="true" aria-labelledby="node-title"><div class="sheet r10-panel jbox jbox--modal">
     <!-- 10차 §B — "LEVEL 64" 문법. 리본이 패널 위에 걸쳐 앉고, 닫기는 리본 오른쪽
          바깥이 아니라 패널 우상단에 44pt 로 붙는다(엄지가 닿는 자리). -->
     <div class="r10-ribbon"><h2 id="node-title">Stage 1</h2></div>
@@ -13702,7 +13702,7 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
        오늘 완료 여부는 메뉴가 아니라 **여기** 있다: 그 사실이 쓸모 있는 순간은
        "오늘 데일리를 할까"를 고르는 이 화면 하나뿐이다.
        ============================================================ -->
-  <div id="modal-mode" class="modal r10m" hidden role="dialog" aria-modal="true" aria-labelledby="mode-h"><div class="sheet r10-panel">
+  <div id="modal-mode" class="modal r10m" hidden role="dialog" aria-modal="true" aria-labelledby="mode-h"><div class="sheet r10-panel jbox jbox--modal">
     <div class="r10-ribbon"><h2 id="mode-h" data-i18n="mode.title">Play</h2></div>
     <button id="mode-close" class="r10-x" type="button" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
     <div class="mode-list">
@@ -32019,11 +32019,14 @@ window.TT_SFX = {
   backdrop-filter:blur(2.5px) saturate(1.06) !important;
 }
 #modal-mode .sheet.r10-panel{
+  max-width:min(326px,100%) !important;
+  padding:16px 14px 26px !important;
+  /* ⚠ 아래 시안 3호 유리판(CSS 재현)은 **봉인**이다. .jbox 는 클래스(0,1,0)라
+     !important 를 붙여도 이 id 규칙(1,2,0)을 못 이긴다 — 그래서 v4 처럼 덮는
+     대신 여기서 내린다. 롤백: 이 주석 한 쌍을 벗기고 마크업의 jbox 를 지운다.
   border-image:none !important;border-style:solid !important;
   border-width:1.5px !important;border-color:rgba(255,247,253,.72) !important;
   border-radius:34px !important;
-  max-width:min(326px,100%) !important;
-  padding:16px 14px 26px !important;
   background:
     radial-gradient(ellipse 44% 20% at 24% 8%,rgba(255,255,255,.42),rgba(255,255,255,0) 64%),
     radial-gradient(ellipse 12% 6% at 77% 6%,rgba(255,255,255,.34),rgba(255,255,255,0) 70%),
@@ -32038,6 +32041,7 @@ window.TT_SFX = {
     inset -2px 0 0 rgba(255,255,255,.15),
     inset 0 -6px 14px rgba(211,115,169,.18),
     0 14px 34px rgba(83,28,40,.26) !important;
+   봉인 끝 */
 }
 #modal-mode .r10-ribbon{border-image:none !important;border:0 !important;
   background:none !important;background-image:none !important;
@@ -32120,8 +32124,11 @@ window.TT_SFX = {
    "시안 동일성 우선" 처분). 주황 띠(--lib-hud-bar)도 벗긴다 — 시안의 바닥은
    투명이고, 메달이 배경 위에 그대로 떠 있는 것이 그 화면의 첫인상이다. */
 #app.battle #actionbar{
-  border-image:none !important;border-style:none !important;border-width:0 !important;
-  background:none !important;background-image:none !important;
+  /* 봉인(.jbox 통합) — 주황 띠 벗기기는 이제 #jelly-box-core 별칭이 겸한다
+     (border/background 를 한 곳에서만 쓴다: 3단 덮어쓰기 → 1단).
+     border-image:none !important;border-style:none !important;border-width:0 !important;
+     background:none !important;background-image:none !important;
+     봉인 끝 */
   gap:4px !important;
   padding:2px calc(var(--safe-r) + 8px) calc(var(--safe-b) + 9px) calc(var(--safe-l) + 8px) !important;
 }
@@ -32350,9 +32357,73 @@ window.TT_SFX = {
 #app.battle .dh-me .dh-dmg {color:#255C82 !important;text-shadow:0 1px 1px rgba(255,255,255,.72);}
 </style>
 
+<style id="jelly-box-core">
+/* ============================================================
+   공통 젤리박스 컴포넌트 `.jbox` — 세 인터페이스가 **한 판**을 공유한다.
+   사용자 지시(14차): "투명 젤리 박스가 먼저 깔리고 그 위에 에셋이 레이어로
+   쌓인다 — 공통 에셋으로 젤리박스를 먼저 만들고 색감 정도만 나눠 동일하게 써라."
+   판 원본: catalog/jelly-box.webp (460×524 · 9-슬라이스 120 fill · 모서리 ~20px).
+
+   분기는 **등급 3종뿐**이다. 화면별로 판을 다시 선언하지 말 것 — 그 복붙이
+   !important 3종·반경 제각각·그림자 문법 3종을 낳은 원인이었다.
+     .jbox--modal  팝업/노드카드  biw 85px (k .708)
+     .jbox--slab   전투 상단 슬래브 biw 26px (k .217)
+     .jbox--strip  하단 메달 받침  biw 34px (k .283)
+   k = biw/120 이 네 변에서 같아야 모서리가 안 늘어난다.
+   반경은 backdrop-filter 의 클립 경계다(기존 규약) — 그림 모서리 20px×k 를
+   넘기면 흐림이 판 밖으로 삐져나온다.
+   ⚠ background 단축 금지(clip 리셋 사고 전력) — 롱핸드 두 줄만.
+   ⚠ border-image 단축 금지(biw 를 1 로 되돌린다) — 롱핸드 넷만.
+   ⚠ #actionbar 는 전 화면 공용이라 마크업에 클래스를 못 박으면 비전투 화면의
+     주황 띠까지 젤리로 바뀐다. 그래서 그 한 자리만 `#app.battle #actionbar`
+     별칭으로 편입한다 — 값은 여전히 등급 한 곳에만 산다.
+   ============================================================ */
+:root{
+  /* 프로스티드 유리 세기. 슬래브·받침 두 겹의 backdrop-filter 는 저사양 폰에서
+     비싸다 — 무거우면 이 한 줄만 none 으로 바꿔 전투 화면 흐림을 통째로 끈다
+     (팝업은 승인값 blur(5px) 를 따로 들고 있어 영향받지 않는다). */
+  --jbox-frost:blur(3px);
+}
+.jbox,
+#app.battle #actionbar{
+  border-style:solid !important;
+  border-color:transparent !important;
+  border-width:var(--jbox-bw,0) !important;
+  border-image-source:url("catalog/jelly-box.webp") !important;
+  border-image-slice:120 fill !important;
+  border-image-repeat:stretch !important;
+  border-image-width:var(--jbox-biw,1) !important;
+  border-radius:var(--jbox-radius,0) !important;
+  background-color:var(--jbox-tint,transparent) !important;
+  background-image:none !important;
+  box-shadow:var(--jbox-shadow,none) !important;
+  filter:var(--jbox-filter,none) !important;
+  -webkit-backdrop-filter:var(--jbox-blur,none) !important;
+  backdrop-filter:var(--jbox-blur,none) !important;
+}
+/* ---- 등급 3종 = 유일한 분기축 (틴트는 --jbox-tint 로 색감만 나눈다) ---- */
+.jbox--modal{           /* 팝업 승인값 — 픽셀 동등 보존, 변경 금지 */
+  --jbox-biw:85px; --jbox-radius:14px; --jbox-bw:1.5px;
+  --jbox-shadow:0 14px 34px rgba(83,28,40,.26);
+  --jbox-blur:blur(5px) saturate(1.18);
+}
+.jbox--slab{            /* 전투 상단 슬래브 — 그림자는 그림 알파를 따라야 해서 filter */
+  --jbox-biw:26px; --jbox-radius:6px;
+  --jbox-filter:drop-shadow(0 2px 5px rgba(46,20,58,.30));
+  --jbox-blur:var(--jbox-frost);
+}
+.jbox--strip,
+#app.battle #actionbar{ /* 하단 메달 받침 */
+  --jbox-biw:34px; --jbox-radius:8px;
+  --jbox-blur:var(--jbox-frost);
+}
+</style>
+
 <style id="sian-jelly-panel-v4">
 /* ============================================================
-   시안 5호 — 젤리판 **실물** (catalog/duel-jelly-panel.webp)
+   시안 5호 — 젤리판 **실물** (catalog/jelly-box.webp · 구 duel-jelly-panel)
+   ⚠ 2026-08-19: 이 블록의 판 선언 세 벌은 위 #jelly-box-core 로 이관돼
+     **주석 봉인** 상태다. 롤백하려면 봉인을 벗기고 마크업의 jbox 클래스를 지운다.
    14차 이중 배경 매팅(dual-matte)이 건져 올린 460×524 반투명 분홍 젤리판이다.
    시안 3호·4호가 "유리는 이미지가 아니다"라며 CSS 로 재현하던 그 판을, 이제
    진짜 그림이 대신한다. 세 자리가 **한 장**을 공유한다:
@@ -32388,16 +32459,18 @@ window.TT_SFX = {
    blur(5px) 는 유지한다 — 진짜 판이라도 뒤가 날것이면 유리로 안 읽힌다.
    border-radius 는 34 → 14px: backdrop-filter 는 **테두리 반경으로 잘리므로**,
    그림의 실제 모서리(20px × k .708 ≒ 14px)보다 크면 흐림이 판 밖으로 삐져나온다. */
+/* 봉인(.jbox 이관) — 아래 값 전부가 `.jbox--modal` 등급으로 그대로 옮겨 갔다.
 #modal-mode .sheet.r10-panel{
   background:none !important;background-image:none !important;
   border-style:solid !important;border-width:1.5px !important;border-color:transparent !important;
-  border-image:url("catalog/duel-jelly-panel.webp") 120 fill stretch !important;
+  border-image:url("catalog/jelly-box.webp") 120 fill stretch !important;
   border-image-width:85px !important;
   border-radius:14px !important;
   box-shadow:0 14px 34px rgba(83,28,40,.26) !important;
   -webkit-backdrop-filter:blur(5px) saturate(1.18);
   backdrop-filter:blur(5px) saturate(1.18);
 }
+   봉인 끝 */
 
 /* ---- 2. 전투 상단 슬래브 --------------------------------------------------
    시안의 상단은 캡슐 세 개가 따로 뜬 것이 아니라, 좌 HP~타이머~우 HP 를
@@ -32410,14 +32483,17 @@ window.TT_SFX = {
    덤으로 판이 화면 가장자리에 더 붙어 시안의 통짜 띠에 가까워진다.
    biw 26 은 4px 늘어난 높이(54→63)의 절반 아래라 위아래 림이 서로 안 먹는다. */
 #app.battle #duel-hud{
-  border-style:solid;border-width:0;
-  border-image:url("catalog/duel-jelly-panel.webp") 120 fill stretch;
-  border-image-width:26px;
-  border-radius:6px;
+  /* 판 그리기는 마크업의 `jbox jbox--slab` 이 맡는다. 여기 남는 것은 상자뿐.
+     봉인(.jbox 이관):
+     border-style:solid;border-width:0;
+     border-image:url("catalog/jelly-box.webp") 120 fill stretch;
+     border-image-width:26px;
+     border-radius:6px;
+     filter:drop-shadow(0 2px 5px rgba(46,20,58,.30));
+     봉인 끝 */
   margin:0 calc(var(--safe-r) + 4px) 4px calc(var(--safe-l) + 4px);
   padding:4px 5px 5px;
   gap:5px;
-  filter:drop-shadow(0 2px 5px rgba(46,20,58,.30));
 }
 
 /* ---- 3. 하단 메달 받침 ----------------------------------------------------
@@ -32426,9 +32502,12 @@ window.TT_SFX = {
    이었다. 배경만 이 판으로 갈아 끼우고 메달·배지·흐림 규칙은 한 줄도 안 건드린다.
    padding-top 2 → 8px: 트레이 윗림과 메달 사이에 숨 쉴 틈을 준다(높이 +6px). */
 #app.battle #actionbar{
-  border-style:solid !important;border-width:0 !important;
-  border-image:url("catalog/duel-jelly-panel.webp") 120 fill stretch !important;
-  border-image-width:34px !important;
+  /* 판 그리기는 #jelly-box-core 의 `#app.battle #actionbar` 별칭(= --strip 등급).
+     봉인(.jbox 이관):
+     border-style:solid !important;border-width:0 !important;
+     border-image:url("catalog/jelly-box.webp") 120 fill stretch !important;
+     border-image-width:34px !important;
+     봉인 끝 */
   padding:8px calc(var(--safe-r) + 10px) calc(var(--safe-b) + 9px) calc(var(--safe-l) + 10px) !important;
 }
 
