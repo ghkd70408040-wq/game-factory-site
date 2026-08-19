@@ -32419,19 +32419,48 @@ window.TT_SFX = {
 
 <style id="jelly-box-core">
 /* ============================================================
-   공통 젤리박스 컴포넌트 `.jbox` — 세 인터페이스가 **한 판**을 공유한다.
+   공통 젤리박스 컴포넌트 `.jbox` — 다섯 자리가 **한 판**을 공유한다.
    사용자 지시(14차): "투명 젤리 박스가 먼저 깔리고 그 위에 에셋이 레이어로
    쌓인다 — 공통 에셋으로 젤리박스를 먼저 만들고 색감 정도만 나눠 동일하게 써라."
-   판 원본: catalog/jelly-box.webp (460×524 · 9-슬라이스 120 fill · 모서리 ~20px).
+   판 원본: catalog/jelly-box.webp (1294×1480 = 2x · 9-슬라이스 190 fill).
+
+   ⚠ 2026-08-19 **정본 교체 v2** — 사용자 합격본("된 거 같아 적용해봐")으로 갈아
+   끼웠다. 구판(460×524 · 전역 알파 ×0.75 베이크 분홍)은 지우지 않고
+   catalog/_superseded/jelly-box-v1.webp 로 물러났다. 아래 <style id=
+   "sian-jelly-panel-v4"> 의 판 서술(460×524·슬라이스 120·모서리 20px)은 **구판
+   기준의 봉인된 기록**이니 그대로 두고, 살아 있는 값은 이 블록만 믿을 것.
+   신품 실측(2x 원본 기준): 하드 외곽선 α>0.9 2~7px · 림 램프 α1.0→0.35 ≈65px ·
+   평탄 도달 ≈140px · 내부 알파 0.243 균질(행방향 σ=0) · 내부색 RGB(191,177,199) ·
+   모서리는 스퀘어클(원 근사 R≈160@2x).
 
    분기는 **등급 3종뿐**이다. 화면별로 판을 다시 선언하지 말 것 — 그 복붙이
    !important 3종·반경 제각각·그림자 문법 3종을 낳은 원인이었다.
-     .jbox--modal  팝업/노드카드  biw 85px (k .708)
-     .jbox--slab   전투 상단 슬래브 biw 26px (k .217)
-     .jbox--strip  하단 메달 받침  biw 34px (k .283)
-   k = biw/120 이 네 변에서 같아야 모서리가 안 늘어난다.
-   반경은 backdrop-filter 의 클립 경계다(기존 규약) — 그림 모서리 20px×k 를
-   넘기면 흐림이 판 밖으로 삐져나온다.
+     .jbox--modal  팝업/노드카드   biw 48px (k .253)
+     .jbox--slab   전투 상단 슬래브 biw 15px (k .079)
+     .jbox--strip  하단 메달 받침·맵 띠 biw 19px (k .100)
+   k = biw/190 이 네 변에서 같아야 모서리가 안 늘어난다.
+
+   ── 슬라이스 190 의 근거 ──
+   램프 65 + 평탄 도달 145 를 삼키면서 스퀘어클 모서리를 모서리 타일 안에 온전히
+   담아야 한다. 170~200 을 PIL 9-슬라이스 시뮬로 훑어 190 채택 — 이 지점에서
+   직선 변과의 어긋남이 8px@2x(=화면 1px 미만)까지 줄고, 늘어나는 것은 여전히
+   민무늬 몸통뿐이라 어떤 비율에서도 안 뭉개진다.
+
+   ── 등급 biw 의 근거 = **사용자 목표 이미지 비율** ──
+   목표(assets/art/incoming/mockup/gm-jellybox-target.jpg): 판 폭 647px 에
+   림 램프 33px = 판폭의 5.1%. 신품을 1:1(647 = 1294/2)로 놓으면 램프가 정확히
+   32.5px 라 목표와 같은 비율이 된다 ⇒ 등급 배율은 **판을 통째로 축소한 비율**.
+     모달   k = 시트 폭 326 / 판 폭 1294 = .2519 → biw 190×.2519 ≒ 48px
+            (화면 림 = 65×.2519 = 16.4px = 시트 폭의 5.0% ✔ 목표 5.1%)
+     슬래브·띠는 구판의 상대 관계를 그대로 옮긴다(구판 k .2167/.2833 ÷ .7083
+     = 모달의 .306 / .400 배):
+       슬래브 48×.306 ≒ 15px (화면 림 5.1px — 63px 띠에 15+15 이 들어간다)
+       띠     48×.400 ≒ 19px (화면 림 6.5px)
+   반경은 backdrop-filter 의 클립 경계다(기존 규약) — 그림 모서리 R160@2x × k 와
+   어긋나면 흐림이 판 밖으로 삐져나온다. 구판 R20 이 R160 으로 커졌으므로 14→40:
+     모달 160×48/190 = 40px · 슬래브 13px · 띠 16px
+     (14/28/40/52 를 좌상 모서리 시뮬로 대조 — 14·28 은 흐림이 판 밖으로 샜고,
+      52 는 판 안쪽에 안 흐린 띠가 남았다. 40 이 판 윤곽과 정확히 겹친다.)
    ⚠ background 단축 금지(clip 리셋 사고 전력) — 롱핸드 두 줄만.
    ⚠ border-image 단축 금지(biw 를 1 로 되돌린다) — 롱핸드 넷만.
    ⚠ #actionbar 는 전 화면 공용이라 마크업에 클래스를 못 박으면 비전투 화면의
@@ -32450,7 +32479,7 @@ window.TT_SFX = {
   border-color:transparent !important;
   border-width:var(--jbox-bw,0) !important;
   border-image-source:url("catalog/jelly-box.webp") !important;
-  border-image-slice:120 fill !important;
+  border-image-slice:190 fill !important;
   border-image-repeat:stretch !important;
   border-image-width:var(--jbox-biw,1) !important;
   border-radius:var(--jbox-radius,0) !important;
@@ -32462,19 +32491,19 @@ window.TT_SFX = {
   backdrop-filter:var(--jbox-blur,none) !important;
 }
 /* ---- 등급 3종 = 유일한 분기축 (틴트는 --jbox-tint 로 색감만 나눈다) ---- */
-.jbox--modal{           /* 팝업 승인값 — 픽셀 동등 보존, 변경 금지 */
-  --jbox-biw:85px; --jbox-radius:14px; --jbox-bw:1.5px;
+.jbox--modal{           /* 팝업/노드카드 — 흐림·그림자는 승인값 그대로, 판만 v2 */
+  --jbox-biw:48px; --jbox-radius:40px; --jbox-bw:1.5px;
   --jbox-shadow:0 14px 34px rgba(83,28,40,.26);
   --jbox-blur:blur(5px) saturate(1.18);
 }
 .jbox--slab{            /* 전투 상단 슬래브 — 그림자는 그림 알파를 따라야 해서 filter */
-  --jbox-biw:26px; --jbox-radius:6px;
+  --jbox-biw:15px; --jbox-radius:13px;
   --jbox-filter:drop-shadow(0 2px 5px rgba(46,20,58,.30));
   --jbox-blur:var(--jbox-frost);
 }
 .jbox--strip,
-#app.battle #actionbar{ /* 하단 메달 받침 */
-  --jbox-biw:34px; --jbox-radius:8px;
+#app.battle #actionbar{ /* 하단 메달 받침 · 맵 하단 띠 */
+  --jbox-biw:19px; --jbox-radius:16px;
   --jbox-blur:var(--jbox-frost);
 }
 </style>
@@ -32962,9 +32991,16 @@ window.TT_SFX = {
 
 /* ---- 하단: 공통 젤리박스 띠 ----------------------------------------------
    시안 조각 panel_bottom 은 **쓰지 않는다** — 한 판(.jbox)을 세 인터페이스가
-   공유하는 것이 직전 커밋의 원칙이라, 틴트 축만 시안 실측값으로 맞춘다. */
+   공유하는 것이 직전 커밋의 원칙이라, 틴트 축만 시안 실측값으로 맞춘다.
+   ⚠ 2026-08-19 판 정본 교체(v2)에 따른 틴트 재산출 — 구판은 내부 알파 .72 짜리
+   분홍이라 틴트가 거의 안 비쳤지만, 신품은 내부 알파 **.243** 이라 이 틴트가
+   합성색을 지배한다. 구값 rgba(214,218,227,.90) 을 그대로 두면 합성이
+   RGB(202,201,211) 로 시안보다 어둡고 푸르게 뜬다(시안 띠 실측 213,211,206).
+   ⇒ rgba(229,229,220,.90) 로만 보정 → 합성 RGB(212,209,207), 시안과 Δ≤2.4.
+   불투명도는 오히려 내려갔다(구 .972 → 신 .925)이므로 알파는 .90 유지.
+   다른 자리의 --jbox-tint 는 transparent 그대로다 — 여기 한 곳만 색을 탄다. */
 #screen-map #map-bot {
-  --jbox-tint: rgba(214, 218, 227, .90);
+  --jbox-tint: rgba(229, 229, 220, .90);
   height: calc(25.61cqw + var(--safe-b));
   padding: 0 0 var(--safe-b);
 }
