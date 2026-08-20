@@ -2492,9 +2492,20 @@ button {
      ⚠ 단축(`background:`)이 아니라 롱핸드로 쓴다 — 이 파일의 규율이다(단축은
      background-image/clip 까지 함께 리셋한다). 옛 줄도 단축이었으나 여기서 바로잡는다.
      옛 값: background rgba(8,6,14,.62) · blur(10px) saturate(1.1). */
-  background-color: rgba(26, 14, 38, .28);
-  -webkit-backdrop-filter: blur(2.5px) saturate(1.06);
-  backdrop-filter: blur(2.5px) saturate(1.06);
+  /* W7.5 — 틴트 2차와 **한 몸인 수리**다. 사용자의 "뒤가 더 비쳐야"를 실제로
+     막고 있던 것이 판이 아니라 이 줄이었다: .28 짜리 스크림은 장면의 모든 화소를
+     약 208 이하로 눌러, 판이 무엇을 하든 그 아래는 이미 계조를 잃은 상태였다.
+     정본 시안 실측은 판 **바깥** p99.9 = (254,244,246) · 최대 (255,250,251) —
+     시안에는 스크림이 사실상 없다. 여기서 0 으로 두지 않는 것은 모달이 배경과
+     분리돼 보여야 한다는 UI 요건 때문이고, .12 는 그 최소치다.
+     흐림도 2.5 → 1px: 시안은 판 뒤를 안 흐리지만(σ 상한 0.4 CSS px), 화면 전체
+     층에서 0 으로 두면 모달 밖 타일이 눌러도 되는 것처럼 읽힌다.
+     색도 함께 옮긴다 — 남보라 rgba(26,14,38) 은 판의 새 색상각(300°)과 어긋나
+     경계에서 색이 꺾였다. rgba(88,64,112) 은 같은 보라 계열의 밝은 쪽이다.
+     옛 값: background-color rgba(26,14,38,.28) · blur(2.5px) saturate(1.06). */
+  background-color: rgba(88, 64, 112, .12);
+  -webkit-backdrop-filter: blur(1px) saturate(1.04);
+  backdrop-filter: blur(1px) saturate(1.04);
   animation: fadein 200ms var(--ease);
 }
 .modal[hidden] { display: none; }
@@ -3056,7 +3067,11 @@ li.roll-in { animation: rollin 380ms var(--spring) backwards; }
      `background` 단축을 `background-color` 롱핸드로 바꾼 것은 이 파일의 규율이다
      (단축은 background-image/clip 까지 리셋한다 — 젤리판 사고 전력).
      옛 값: background: rgba(60, 48, 34, .3); */
-  :where(:root:not([data-theme="dark"])) .modal { background-color: rgba(72, 56, 86, .26); }
+  /* W7.5 - 틴트 2차와 함께 내린다. 라이트 테마의 이 사본은 순서상 위 .modal
+     기본값을 **이깁니다**(:where 라 특정도는 같고 뒤에 있다) - 헤드리스 기본이
+     라이트라 실측에서 바로 잡혔다. 두 진입점 동기화 규약대로 아래 [data-theme]
+     사본과 한 값이어야 한다. 옛 값: rgba(72, 56, 86, .26). */
+  :where(:root:not([data-theme="dark"])) .modal { background-color: rgba(88, 64, 112, .12); }
   :where(:root:not([data-theme="dark"])) .howto-art { background: rgba(34, 27, 46, .04); }
   :where(:root:not([data-theme="dark"])) #tut-stage { background: rgba(34, 27, 46, .04); }
   :where(:root:not([data-theme="dark"])) #combo-bar { background: rgba(34, 27, 46, .1); }
@@ -3252,7 +3267,8 @@ li.roll-in { animation: rollin 380ms var(--spring) backwards; }
 :where(:root[data-theme="light"]) .act { background: rgba(34, 27, 46, .05); }
 /* W2.5 ⑤ — 위 13A 사본과 **한 값**이어야 한다(두 진입점 동기화 규약).
    근거는 그쪽 주석. 옛 값: background: rgba(60, 48, 34, .3); */
-:where(:root[data-theme="light"]) .modal { background-color: rgba(72, 56, 86, .26); }
+/* W7.5 - 위 13A 사본과 한 값. 옛 값: rgba(72, 56, 86, .26). */
+:where(:root[data-theme="light"]) .modal { background-color: rgba(88, 64, 112, .12); }
 :where(:root[data-theme="light"]) .howto-art { background: rgba(34, 27, 46, .04); }
 :where(:root[data-theme="light"]) #tut-stage { background: rgba(34, 27, 46, .04); }
 :where(:root[data-theme="light"]) #combo-bar { background: rgba(34, 27, 46, .1); }
@@ -5967,11 +5983,17 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   background: radial-gradient(circle at 50% 50%, rgba(8, 5, 16, .62) 0%, rgba(8, 5, 16, .88) 100%);
   opacity: 0;
 }
-#cutin.go .cut-dim { animation: cutdim .8s ease-out forwards; }
+/* W7.5 — 컷인 2초화(아래 여섯 줄과 키프레임 일곱 벌이 한 묶음이다).
+   길이를 2s 로 늘리되 **등장은 절대시간을 지킨다**: 백분율을 그대로 두고
+   늘리면 인물 등장이 208ms 에서 520ms 로, 글자가 272ms 에서 680ms 로 늘어
+   "묵직"이 아니라 "굼뜸"이 된다. 그래서 정지점을 새 길이 기준으로 다시
+   찍었다 — 늘어난 시간은 전부 **유지 구간**이 가져간다.
+   옛 줄: animation: cutdim .8s ease-out forwards;  (정지점 0/14/82/100) */
+#cutin.go .cut-dim { animation: cutdim 2s ease-out forwards; }
 @keyframes cutdim {
   0%   { opacity: 0; }
-  14%  { opacity: 1; }
-  82%  { opacity: 1; }
+  6%   { opacity: 1; }   /* 120ms — 어둠은 옛 길이 그대로 빨리 찬다 */
+  85%  { opacity: 1; }   /* 1700ms */
   100% { opacity: 0; }
 }
 
@@ -5992,11 +6014,12 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
     transparent 100%);
   opacity: 0;
 }
-#cutin.go .cut-band { animation: cutband .8s cubic-bezier(.2, .8, .3, 1) forwards; }
+/* W7.5 컷인 2초화 — 옛 줄: animation: cutband .8s … */
+#cutin.go .cut-band { animation: cutband 2s cubic-bezier(.2, .8, .3, 1) forwards; }
 @keyframes cutband {
   0%   { transform: rotate(-14deg) translateX(-120%); opacity: 0; }
-  22%  { transform: rotate(-14deg) translateX(0);     opacity: .5; }
-  80%  { transform: rotate(-14deg) translateX(0);     opacity: .5; }
+  15%  { transform: rotate(-14deg) translateX(0);     opacity: .5; }   /* 300ms */
+  85%  { transform: rotate(-14deg) translateX(0);     opacity: .5; }   /* 1700ms */
   100% { transform: rotate(-14deg) translateX(40%);   opacity: 0; }
 }
 
@@ -6010,12 +6033,13 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   max-height: 260px;
   transform: translate(-140%, -50%);
 }
-#cutin.go .cut-stage { animation: cutslide .8s cubic-bezier(.2, .9, .28, 1) forwards; }
+/* W7.5 컷인 2초화 — 옛 줄: animation: cutslide .8s … */
+#cutin.go .cut-stage { animation: cutslide 2s cubic-bezier(.2, .9, .28, 1) forwards; }
 @keyframes cutslide {
   0%   { transform: translate(-140%, -50%) scale(.82); opacity: 0; }
-  26%  { transform: translate(0, -50%)     scale(1.06); opacity: 1; }
-  36%  { transform: translate(0, -50%)     scale(1);    opacity: 1; }
-  80%  { transform: translate(0, -50%)     scale(1);    opacity: 1; }
+  10%  { transform: translate(0, -50%)     scale(1.06); opacity: 1; }   /* 200ms 오버슛 */
+  15%  { transform: translate(0, -50%)     scale(1);    opacity: 1; }   /* 300ms 안착 */
+  85%  { transform: translate(0, -50%)     scale(1);    opacity: 1; }   /* 1700ms */
   100% { transform: translate(-26%, -50%)  scale(.94);  opacity: 0; }
 }
 .cutin-av { position: absolute; inset: 0; }
@@ -6050,11 +6074,12 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   transform: translate(140%, -50%);
   text-align: right;
 }
-#cutin.go .cut-txt { animation: cuttxt .8s cubic-bezier(.2, .9, .28, 1) forwards; }
+/* W7.5 컷인 2초화 — 옛 줄: animation: cuttxt .8s … */
+#cutin.go .cut-txt { animation: cuttxt 2s cubic-bezier(.2, .9, .28, 1) forwards; }
 @keyframes cuttxt {
   0%   { transform: translate(140%, -50%); opacity: 0; }
-  34%  { transform: translate(0, -50%);    opacity: 1; }
-  80%  { transform: translate(0, -50%);    opacity: 1; }
+  14%  { transform: translate(0, -50%);    opacity: 1; }   /* 280ms */
+  85%  { transform: translate(0, -50%);    opacity: 1; }   /* 1700ms */
   100% { transform: translate(30%, -50%);  opacity: 0; }
 }
 .cut-sub {
@@ -6092,31 +6117,34 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   background-image: radial-gradient(circle at 50% 50%, rgba(54, 4, 16, .60) 0%, rgba(26, 2, 8, .93) 100%);
 }
 #cutin.cut-foe .cut-band { transform: rotate(14deg) translateX(-120%); }
-#cutin.cut-foe.go .cut-band { animation: cutbandfoe .8s cubic-bezier(.2, .8, .3, 1) forwards; }
+/* W7.5 컷인 2초화 — 옛 줄: animation: cutbandfoe .8s … */
+#cutin.cut-foe.go .cut-band { animation: cutbandfoe 2s cubic-bezier(.2, .8, .3, 1) forwards; }
 @keyframes cutbandfoe {
   0%   { transform: rotate(14deg) translateX(-120%); opacity: 0; }
-  22%  { transform: rotate(14deg) translateX(0);     opacity: .5; }
-  80%  { transform: rotate(14deg) translateX(0);     opacity: .5; }
+  15%  { transform: rotate(14deg) translateX(0);     opacity: .5; }   /* 300ms */
+  85%  { transform: rotate(14deg) translateX(0);     opacity: .5; }   /* 1700ms */
   100% { transform: rotate(14deg) translateX(40%);   opacity: 0; }
 }
 /* 악당은 오른쪽에서 선다 — 아군 컷인이 늘 왼쪽이라, 자리만으로도 둘이 갈린다.
    #duel-hud 의 좌우 배치(악당 왼쪽)와 반대인 것은 일부러다: 컷인은 HUD 의
    확대판이 아니라 별개의 무대이고, 여기서 중요한 것은 "아군 컷인과 다르다"뿐이다. */
 #cutin.cut-foe .cut-stage { left: auto; right: 6%; }
-#cutin.cut-foe.go .cut-stage { animation: cutslidefoe .8s cubic-bezier(.2, .9, .28, 1) forwards; }
+/* W7.5 컷인 2초화 — 옛 줄: animation: cutslidefoe .8s … */
+#cutin.cut-foe.go .cut-stage { animation: cutslidefoe 2s cubic-bezier(.2, .9, .28, 1) forwards; }
 @keyframes cutslidefoe {
   0%   { transform: translate(140%, -50%) scale(.82); opacity: 0; }
-  26%  { transform: translate(0, -50%)    scale(1.06); opacity: 1; }
-  36%  { transform: translate(0, -50%)    scale(1);    opacity: 1; }
-  80%  { transform: translate(0, -50%)    scale(1);    opacity: 1; }
+  10%  { transform: translate(0, -50%)    scale(1.06); opacity: 1; }   /* 200ms 오버슛 */
+  15%  { transform: translate(0, -50%)    scale(1);    opacity: 1; }   /* 300ms 안착 */
+  85%  { transform: translate(0, -50%)    scale(1);    opacity: 1; }   /* 1700ms */
   100% { transform: translate(26%, -50%)  scale(.94);  opacity: 0; }
 }
 #cutin.cut-foe .cut-txt { right: auto; left: 5%; align-items: flex-start; text-align: left; }
-#cutin.cut-foe.go .cut-txt { animation: cuttxtfoe .8s cubic-bezier(.2, .9, .28, 1) forwards; }
+/* W7.5 컷인 2초화 — 옛 줄: animation: cuttxtfoe .8s … */
+#cutin.cut-foe.go .cut-txt { animation: cuttxtfoe 2s cubic-bezier(.2, .9, .28, 1) forwards; }
 @keyframes cuttxtfoe {
   0%   { transform: translate(-140%, -50%); opacity: 0; }
-  34%  { transform: translate(0, -50%);     opacity: 1; }
-  80%  { transform: translate(0, -50%);     opacity: 1; }
+  14%  { transform: translate(0, -50%);     opacity: 1; }   /* 280ms */
+  85%  { transform: translate(0, -50%);     opacity: 1; }   /* 1700ms */
   100% { transform: translate(-30%, -50%);  opacity: 0; }
 }
 #cutin.cut-foe .cut-name { color: #FFE3DC; }
@@ -6859,6 +6887,12 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   #boss-bar.big .boss-av { animation: none; }
   #app.duel-hurt #board { animation: none; }
   #boss-hp-fill { transition: none; }
+  /* W7.5 — 동작 최소화에서는 아래 세 줄이 애니메이션을 아예 끄고 최종 상태로
+     고정하므로, 컷인은 **움직이지 않는 그림 한 장**이 된다. 그 정지 화면의
+     길이는 CSS 가 아니라 JS 상수(SKILL_CUTIN_MS)가 정하는데, 2초가 되면
+     "연출"이 아니라 그냥 2초간 판이 멈춘 것으로 읽힌다 — 동작을 줄여 달라고
+     한 사용자에게 가장 나쁜 결과다. runCutin 이 이 매체질의를 읽어 옛 길이를
+     쓰게 했다(cutinHoldMs 참조). 이 블록은 그 사실의 CSS 쪽 절반이다. */
   #cutin.go .cut-dim { animation-duration: 1ms; opacity: 1; }
   #cutin.go .cut-band { animation: none; opacity: .4; transform: rotate(-14deg) translateX(0); }
   #cutin.go .cut-stage { animation: none; transform: translate(0, -50%); opacity: 1; }
@@ -11002,6 +11036,39 @@ html[lang="en"] .mfbtn { font-size: 8px; letter-spacing: -.15px; }
   z-index: -1;
 }
 
+/* ---- W7.5 — 허리 업 인물을 **선택한 히어로**로 -----------------------------
+   runHurry 가 setStdArt(cast, charId(), 'face', '--hu-face') 로 표준 아트를 넣는다.
+   그림이 들어온 판에서만 data-art="std" 가 찍히므로, 옛 인라인 SVG 는 정확히
+   그때만 숨는다 — 표준 아트가 없는 캐릭터에서는 표식이 안 찍혀 SVG 가 그대로
+   폴백한다(지우지 않은 이유이자 롤백 밸브). .mn-hero 의 선례와 같은 배선이다.
+   크기는 .hu-av(84×80)에 맞춘다: 이 자리는 옆에서 빼꼼 내미는 작은 슬롯이라
+   `contain` 으로 담고 `center bottom` 이 아니라 `center` 로 둔다(전신이 아니라
+   얼굴이므로 발밑 앵커 규약이 적용되지 않는다). */
+#hurry-cast::after {
+  content: "";
+  position: absolute;
+  left: calc(var(--safe-l) + 2px);
+  top: 0;
+  width: 84px;
+  height: 80px;
+  background-image: var(--hu-face, none);
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, .40));
+  pointer-events: none;
+}
+/* ⚠ display:none 이 아니라 visibility:hidden 이다. #hurry-cast 는 flex 행이고
+   그 행의 폭·높이를 만드는 것이 바로 이 .hu-av(84×80)다 — display:none 으로
+   빼면 상자가 사라져 위 ::after(절대배치)가 잡을 자리가 없어지고, 옆의
+   #hurry-line 말풍선이 왼쪽으로 끌려온다. 자리는 남기고 잉크만 지운다. */
+#hurry-cast[data-art="std"] .hu-av { visibility: hidden; }
+/* 공주로 플레이 중이면 감옥을 깔지 않는다. 인물이 이제 **내가 고른 캐릭터**라,
+   젤리(공주)를 골랐을 때 감옥을 그대로 두면 "내가 갇혀 있다"가 되어 위
+   .hu-prince 분기가 세운 서사(공주가 플레이어면 갇힌 것은 공주가 아니다)와
+   정면으로 어긋난다. 그 분기가 이미 들고 있는 클래스를 그대로 쓴다. */
+#hurry.hu-prince #hurry-cast::before { background-image: none; box-shadow: none; }
+
 /* ==FRUIT:BEGIN== generated by tools/fruit-tiles.js — do not edit by hand */
 /* v4 11차 — 숫자별 열매 실루엣 타일 (DESIGN-V4 §5.8 / ART §2·§3).
    롤백: game.js 의 FRUIT_TILES 를 false 로 두면 html[data-fruit] 가 안 붙고
@@ -11925,6 +11992,120 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
   color: #FFFFFF;
   text-shadow: 0 2px 0 rgba(110, 70, 58, .55);
 }
+
+/* ===== W7.5 — #modal-classic (클래식 허브) ==============================
+   문법은 바로 위 14차 1호(#modal-mode)와 같고, **다른 점이 하나**다: 여기서는
+   글자를 감추지 않는다.
+
+   #modal-mode 의 네 줄은 <style id="sian-play-sprites"> 가 행마다 base64 웹피를
+   깔고 .nchip/.mode-t/.mode-b 를 display:none !important 로 덮은 **그림 버튼**이다.
+   그 규칙이 전부 `#modal-mode` 로 스코프돼 있다는 사실이 이 블록의 설계 근거다 —
+   새 시트를 `#modal-classic` 으로 두는 것만으로 그림 규칙이 한 줄도 닿지 않고,
+   공용 기본 CSS(.mode-row / .mode-t > b / .mode-t > i / .mode-b)가 그대로 살아
+   **코드로 쓴 텍스트 라벨**이 보인다. 발주 0 장으로 다섯째·여섯째·일곱째 줄을
+   얻는 유일한 길이고, 동시에 앞으로 클래식 종목이 늘어도 아트가 필요 없다.
+   ========================================================================= */
+#modal-classic .sheet.r10-panel {
+  border-image: none;
+  border-style: none;
+  border-width: 0;
+  padding: 17px calc(var(--pw) * .07 + 17px) calc(var(--pw) * .06 + 17px);
+  border-radius: 30px;
+}
+/* 리드 문장 — 이 모드가 무엇을 뺀 모드인지 한 줄로 말한다. 줄이 없으면 세 행의
+   라벨만으로는 "일반 아케이드와 뭐가 다른가"가 안 읽힌다(사용자 시안 취지). */
+#classic-lead {
+  margin: 2px 0 10px;
+  font-size: 12.5px;
+  line-height: 1.45;
+  text-align: center;
+  color: #8A6B52;
+}
+#modal-classic .mode-list .mode-row {
+  border-image: none;
+  border: 0;
+  border-radius: 12px;
+  padding: 9px 12px;
+  min-height: 60px;
+  box-shadow: 0 3px 0 rgba(110, 70, 58, .28), inset 0 2px 0 rgba(255, 255, 255, .40);
+}
+#modal-classic .mode-list .mode-row:active { transform: translateY(2px); }
+/* 세 줄의 색은 일반 시트의 같은 종목과 **같은 계열**로 맞춘다 — 아케이드=보라,
+   러시=노랑, 데일리=민트. 클래식이 별세계가 아니라 같은 종목의 다른 규칙이라는
+   것이 색으로 먼저 읽혀야 한다. 채도만 한 단계 낮춰 "장식을 뺀 판"을 만든다. */
+#modal-classic #classic-arcade {
+  background-color: transparent;
+  background-image: linear-gradient(180deg, #C6A2F5 0%, #A97FE4 100%);
+}
+#modal-classic #classic-rush {
+  background-color: transparent;
+  background-image: linear-gradient(180deg, #FFD97A 0%, #EFB752 100%);
+}
+#modal-classic #classic-daily {
+  background-color: transparent;
+  background-image: linear-gradient(180deg, #93E2C7 0%, #5FC0A4 100%);
+}
+/* 단축(background:)이 아니라 롱핸드다 — 이 파일의 규율이고, .nchip 은 특히
+   그렇다: 글리프를 background-image 로만 얹는 ::before 를 가진 계열이라
+   단축 한 줄이 아이콘을 통째로 지운 전력이 있다. */
+#modal-classic .nchip {
+  background-color: transparent;
+  background-image: none;
+  box-shadow: none;
+  border-image: none;
+  border: 0;
+  width: 34px;
+  height: 34px;
+  overflow: visible;
+}
+/* 🚨 background 단축 금지 — .nchip::before 가 background-image 로만 글리프를
+   얹으므로 덮으면 아이콘이 사라진다(#modal-node 의 같은 주석과 같은 함정). */
+#modal-classic .nchip::before {
+  width: 32px;
+  height: 32px;
+  filter: drop-shadow(0 2px 0 rgba(110, 70, 58, .45));
+}
+#modal-classic .mode-t > b {
+  color: #FFFFFF;
+  text-shadow: 0 2px 0 rgba(110, 70, 58, .55);
+}
+#modal-classic .mode-t > i {
+  color: rgba(255, 255, 255, .94);
+  text-shadow: 0 1px 0 rgba(110, 70, 58, .45);
+}
+#modal-classic .mode-b {
+  color: #FFFFFF;
+  text-shadow: 0 2px 0 rgba(110, 70, 58, .55);
+}
+
+/* ---- W7.5 — 기록창 탭이 여섯이 됐다 -------------------------------------
+   규칙은 여기가 아니라 **`.w6m .rank-tab` 옆**에 있다(파일 끝 시안 젤리 블록).
+   이 자리에 `.rank-tab { … }` 로 써 봤지만 화면이 안 바뀌었다: 기록창은
+   `<div id="modal-rank" class="modal w6m">` 이고, 같은 파일 뒤쪽의
+   `.w6m .rank-tab{ flex:1 1 0; … }` 가 특정도(0,2,0)로도 순서로도 이겨서
+   `.rank-tab`(0,1,0) 선언이 한 번도 값을 하지 않는다. !important 로 억지로
+   덮는 대신 **이기는 쪽을 고쳤다** — 규칙이 사는 곳을 하나로 두기 위해서다.
+   실제 값과 그 근거는 `.w6m .rank-tab` 선언부의 주석에 있다. */
+
+/* ---- W7.5 — 클래식 인게임: 안 쓰는 것은 자리도 비운다 --------------------
+   #app.classic 은 syncClassicSkin() 이 붙이고 뗀다. 여기서 닫는 것들은 전부
+   **예산·게이트로도 이미 죽어 있는** 것들이다(아이템 예산 0 · passiveApply/
+   twinApply 미호출 · gaugeBump 차단). CSS 는 그 사실을 화면에 반영할 뿐이라,
+   이 블록을 통째로 지워도 규칙은 하나도 안 바뀌고 빈 버튼만 다시 보인다 —
+   숨김이 유일한 방어선이 아니라는 뜻이고, 그것이 이 배선의 안전 근거다. */
+#app.classic #actionbar { display: none; }
+/* 동료 미니 · 패시브 칩 · 텐트윈 칩: 클래식에는 패시브가 없으므로 칩은 영영
+   빈 채로 남는다(twinApply 를 안 부르니 pv.twLast 가 안 생긴다). 그래도 명시적으로
+   닫는 이유는, 앞 판에서 켜져 있던 칩이 클래식 진입 시점에 **아직 안 지워진**
+   프레임이 한 장 존재하기 때문이다 — 그 한 장이 "클래식인데 패시브가 보였다"가 된다. */
+#app.classic #mate,
+#app.classic #pv-chip,
+#app.classic #tw-chip,
+#app.classic #mate-chip { display: none; }
+/* #hud-row 는 자식이 전부 hidden 이면 0 높이로 접히지만 min-height:34px 이
+   그것을 막아 준다(D1 예약 높이 · BATTLE_HUD_RESERVE 와 같은 수). 클래식에서는
+   미션 배지가 바로 그 줄에 살아 있으므로 예약이 실제로 쓰이고, 판이 뜨거나
+   접히는 일이 없다 — 그래서 이 줄에는 클래식 전용 규칙이 필요 없다. */
 
 /* ===== 14차 5호 — #modal-node (스테이지 정보 팝업) CSS 캔디 전환 ===== */
 /* MARKER-14-MODAL-NODE-CANDY */
@@ -14128,6 +14309,40 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
     </div>
   </div></div>
 
+  <!-- ===== W7.5 클래식 허브 =================================================
+       메인 메뉴의 "이어하기" 자리를 물려받은 두 번째 시트다. 구조는 #modal-mode
+       와 같은 문법(.jbox--modal 판 + .r10-ribbon + .mode-list/.mode-row)이지만,
+       **아트 의존은 일부러 끊었다**: #modal-mode 의 네 줄은 <style
+       id="sian-play-sprites"> 가 행마다 base64 웹피를 깔고 .mode-t/.nchip/.mode-b
+       를 display:none 으로 덮어 쓴 그림 버튼이라, 다섯째 줄을 그 규약으로 만들려면
+       발주가 필요하다. 이 파도는 발주 0 이므로 반대로 갔다 — 저 덮어쓰기가 전부
+       `#modal-mode` 로 스코프돼 있다는 사실을 이용해, 새 시트를 `#modal-classic`
+       으로 두면 그림 규칙이 한 줄도 닿지 않고 공용 기본 CSS(.mode-row/.mode-t)가
+       그대로 살아 **코드 텍스트 라벨**이 보인다. 색은 아래 전용 블록이 준다.
+       세 줄은 모험이 없다 — 클래식은 순수 실력 종목만 모으는 자리다. -->
+  <div id="modal-classic" class="modal r10m" hidden role="dialog" aria-modal="true" aria-labelledby="classic-h"><div class="sheet r10-panel jbox jbox--modal">
+    <div class="r10-ribbon"><h2 id="classic-h" data-i18n="classic.title">Classic</h2></div>
+    <button id="classic-close" class="r10-x" type="button" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
+    <p id="classic-lead" data-i18n="classic.lead">No skills, no items, no passives. Just you and the board.</p>
+    <div class="mode-list">
+      <button id="classic-arcade" class="mode-row" type="button">
+        <span class="nchip nchip-arc" aria-hidden="true"></span>
+        <span class="mode-t"><b data-i18n="classic.arcade">Arcade</b><i data-i18n="classic.arcade.d">Endless, pure. Missions still count.</i></span>
+        <span id="classic-arcade-b" class="mode-b"></span>
+      </button>
+      <button id="classic-rush" class="mode-row" type="button">
+        <span class="nchip nchip-rush" aria-hidden="true"></span>
+        <span class="mode-t"><b data-i18n="classic.rush">Time Rush</b><i data-i18n="classic.rush.d">Sixty seconds. Skill only.</i></span>
+        <span id="classic-rush-b" class="mode-b"></span>
+      </button>
+      <button id="classic-daily" class="mode-row" type="button">
+        <span class="nchip nchip-day" aria-hidden="true"></span>
+        <span class="mode-t"><b data-i18n="classic.daily">Daily</b><i data-i18n="classic.daily.d">Today's board, on even ground.</i></span>
+        <span id="classic-daily-b" class="mode-b"></span>
+      </button>
+    </div>
+  </div></div>
+
   <!-- v4 4차-a — 모험 스테이지 결과. 성공/실패가 같은 시트를 쓰고 .lost 클래스가
        색과 별 줄의 유무를 가른다: 두 시트를 따로 두면 버튼 위치가 미묘하게
        어긋나 "다시 도전"을 누르려다 "지도로"를 누르는 사고가 난다. -->
@@ -14188,6 +14403,14 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
       <button id="rank-tab-endless" class="rank-tab" role="tab" aria-selected="true" data-i18n="rank.tab.endless">Endless</button>
       <button id="rank-tab-rush" class="rank-tab" role="tab" aria-selected="false" data-i18n="rank.tab.rush">Time Rush</button>
       <button id="rank-tab-daily" class="rank-tab" role="tab" aria-selected="false" data-i18n="rank.tab.daily">Daily</button>
+      <!-- W7.5 클래식 — 일반 셋과 **같은 문법의 다른 보드**다. 탭이 여섯이 되면서
+           #rank-tabs 가 두 줄로 접히도록 CSS 에 flex-wrap 을 세웠고(.rank-tab 의
+           flex-basis 가 그 접힘을 강제한다), 앞 세 개 / 뒤 세 개가 한 줄씩 서서
+           "일반 | 클래식" 의 구분이 배치만으로 읽힌다. 배선은 wire() 의
+           RANK_MODES 루프가 이미 하고 있어 한 줄도 더 붙지 않는다. -->
+      <button id="rank-tab-classic" class="rank-tab" role="tab" aria-selected="false" data-i18n="rank.tab.classic">Classic</button>
+      <button id="rank-tab-classic-rush" class="rank-tab" role="tab" aria-selected="false" data-i18n="rank.tab.classicrush">Classic Rush</button>
+      <button id="rank-tab-classic-daily" class="rank-tab" role="tab" aria-selected="false" data-i18n="rank.tab.classicdaily">Classic Daily</button>
     </div>
     <p id="rank-hint"></p>
     <div id="rank-list"></div>
@@ -19591,8 +19814,27 @@ window.TT_SFX = {
      shiftDeadlines 가 멈춘 만큼을 전부 밀어 주므로, 늘어난 200ms 는 제한시간에서
      한 톨도 새지 않는다(§25 정지 규율). 스킵은 그대로 SKILL_CUTIN_MIN_MS 뒤부터.
      옛 값: 800. */
-  var SKILL_CUTIN_MS = 1000;         // 전면 컷인 (타임스톱 포함, 탭으로 스킵)
+  /* W7.5 (2026-08-20) — 사용자 확정 "스킬 컷인 정지를 2초로". 1000 → 2000.
+     적용 대상은 이 상수를 쓰는 컷인 **전부**다(필살기 doSpecial · 펫 소환
+     doPetSkill · 적/보스 스킬 duelFoeSkill · 각성 castSkill) — 네 자리 모두
+     runCutin 에 자기 길이를 넘기지 않고 이 값을 읽으므로 여기 한 줄이 넷을
+     함께 옮긴다.
+     ⚠ 이 값만 올리면 안 된다는 것이 실측으로 드러났다: 컷인의 등장·유지·퇴장은
+     JS 가 아니라 **CSS 키프레임**이 들고 있고 그 길이가 전부 .8s 로 못박혀
+     있었다. 그래서 1차(800→1000) 때 이미 200ms 짜리 **빈 화면 꼬리**가 생겨
+     있었다 — 모든 요소가 opacity:0 으로 끝나 forwards 로 굳는데 오버레이는 아직
+     안 걷히고 판도 멈춰 있다. 2000 이면 그 꼬리가 1200ms 가 된다. 아래 CSS
+     일곱 줄을 2s 로 함께 옮기고 백분율을 재배분한 이유가 이것이다
+     (등장 ~0.3s / 유지 ~1.4s / 퇴장 0.3s).
+     타이머 손실은 0 이고 그것은 이 상수와 **무관하다** — endCutin 이 미는 held 는
+     상수가 아니라 실측 경과(now() − S.pausedAt)라, 1000 이든 2000 이든 탭 스킵이든
+     정지한 만큼만 밀린다. shiftDeadlines 는 한 글자도 안 고쳤다.
+     옛 값: 800 → 1000 → 2000. */
+  var SKILL_CUTIN_MS = 2000;         // 전면 컷인 (타임스톱 포함, 탭으로 스킵)
   var SKILL_CUTIN_MIN_MS = 260;      // 이보다 일찍은 스킵되지 않는다 (오폭 방지)
+  /* W7.5 — 동작 최소화를 켠 사용자의 컷인 길이. 위 cutinHoldMs 주석 참조.
+     옛 SKILL_CUTIN_MS 값(1000)을 그대로 물려받는다 — 이미 통과한 길이다. */
+  var SKILL_CUTIN_REDUCED_MS = 1000;
   /* 지속시간 — 스펙 고정값. 왕자 6초 / 공주 8초. */
   /* E3 W7 — 신규 둘은 **길이만** 다른 변주다(효과 자체는 위 둘 중 하나 그대로).
      푸딩 방패 7초: 소환(6초)보다 한 박자 길다 — "버틴다"가 이 캐릭터의 성격이다.
@@ -21016,6 +21258,15 @@ window.TT_SFX = {
     best: 0, bestStage: 1, sound: true, vibrate: true,
     streak: 0, lastDailyDate: '', dailyBest: null, save: null,
     lang: '',  // '' = follow navigator; 'en' / 'ko' = explicit user choice
+    /* --- W7.5 클래식 (순수 실력 모드) -------------------------------------
+     * 일반 모드의 어느 칸과도 겹치지 않는 자기 칸들이다. bestKey()/bestStageKey()
+     * /saveSlot() 만이 이 이름들을 부르므로, 분리는 호출부 규율이 아니라 이
+     * 이름들이 다른 곳에 안 쓰인다는 사실로 보장된다. */
+    bestClassic: 0,          // 클래식 아케이드 최고 점수
+    bestClassicStage: 1,     // 클래식 아케이드 최고 단계
+    bestClassicRush: 0,      // 클래식 타임러시 최고 점수
+    classicDailyBest: null,  // 클래식 데일리 오늘 결과 (일반 dailyBest 와 별개)
+    saveClassic: null,       // 클래식 전용 진행 저장 슬롯
     // --- v2 (contract §9). Older saves simply lack these; defaults apply. ---
     bestRush: 0,        // Time Rush high score, kept apart from `best`
     totalMatches: 0,    // lifetime matches, drives the milestone toasts
@@ -21163,6 +21414,18 @@ window.TT_SFX = {
         if (typeof o.lang === 'string') store.lang = o.lang;
         if (o.dailyBest) store.dailyBest = o.dailyBest;
         if (o.save && Array.isArray(o.save.cells)) store.save = o.save;
+        /* W7.5 — 클래식 칸들. 검증 문법은 위 줄들과 한 글자도 다르지 않다.
+         * saveClassic 도 cells 배열 유무만 본다: mode 는 restoreSave 의 화이트
+         * 리스트가 걸러 주므로 여기서 두 번 볼 이유가 없다. */
+        if (o.saveClassic && Array.isArray(o.saveClassic.cells)) store.saveClassic = o.saveClassic;
+        if (typeof o.bestClassic === 'number' && isFinite(o.bestClassic)) store.bestClassic = o.bestClassic;
+        if (typeof o.bestClassicStage === 'number' && isFinite(o.bestClassicStage)) {
+          store.bestClassicStage = o.bestClassicStage;
+        }
+        if (typeof o.bestClassicRush === 'number' && isFinite(o.bestClassicRush)) {
+          store.bestClassicRush = o.bestClassicRush;
+        }
+        if (o.classicDailyBest) store.classicDailyBest = o.classicDailyBest;
         // v2 fields — a pre-v2 save just leaves the defaults in place.
         if (typeof o.bestRush === 'number' && isFinite(o.bestRush)) store.bestRush = o.bestRush;
         if (typeof o.totalMatches === 'number' && isFinite(o.totalMatches)) {
@@ -21346,8 +21609,11 @@ window.TT_SFX = {
     /* 모험도 같다 — 스테이지는 제한시간 한 판이고, 재개 지점은 판 중간이 아니라
      * **지도의 노드**다. 중간 저장을 하면 "시계를 세워 둔 채 나갔다 오는" 경로가
      * 생겨 제한시간이 제한시간이 아니게 된다. */
-    if (S.mode === 'rush' || S.mode === 'adv') { persist(); return; }
-    store.save = {
+    if (isRush() || S.mode === 'adv') { persist(); return; }
+    /* W7.5 — 클래식은 자기 슬롯(store.saveClassic)에 쓴다. 저장되는 **모양은
+     * 한 칸도 다르지 않다**: 같은 restoreSave 가 두 슬롯을 다 읽으므로 모양이
+     * 갈리면 복원 코드가 둘로 갈라진다. */
+    store[saveSlot()] = {
       mode: S.mode, stage: S.stage, seed: S.seed,
       cells: cloneCells(S.cells),
       score: S.score, adds: S.adds, hints: S.hints, startedAt: S.startedAt,
@@ -21366,7 +21632,9 @@ window.TT_SFX = {
   }
 
   function dropProgress() {
-    store.save = null;
+    /* W7.5 — 끝난 판이 살던 슬롯만 비운다. store.save = null 로 두면 클래식
+     * 게임오버가 일반 진행 저장을 함께 지웠다(반대도 마찬가지). */
+    store[saveSlot()] = null;
     persist();
   }
 
@@ -21398,8 +21666,22 @@ window.TT_SFX = {
    *   ever increases, so the mirror is never SMALLER than what the run deserved.
    * ========================================================================= */
 
-  var RANK_MODES = ['endless', 'rush', 'daily'];
+  /* W7.5 - 클래식 세 종목이 보드로 합류한다. 기록 완전 분리는 여기서 시작한다:
+   * 클래식은 일반 보드에 항목을 올릴 수 없고(제출 키가 다르다), 일반은 클래식
+   * 보드를 읽지 않는다. 순서가 곧 탭 순서다 - 일반 셋 다음에 클래식 셋. */
+  var RANK_MODES = ['endless', 'rush', 'daily', 'classic', 'classic-rush', 'classic-daily'];
   var RANK_CAP = 5;
+
+  /* W7.5 - 모드 이름과 항목의 **모양**을 갈라 놓는다. 클래식 세 종목은 일반 세
+   * 종목과 정확히 같은 것을 겨루므로(점수+단계 / 점수+매치수 / 시간) 모양을
+   * 새로 만들 이유가 없다. 이 표 하나를 두면 정규화·비교자·행 그리기 세 곳이
+   * 전부 고칠 것 없이 새 모드를 받는다 - 각 자리에서 여섯 갈래를 손으로 세는
+   * 대신 여전히 세 갈래만 본다. */
+  var RANK_SHAPE = {
+    endless: 'endless', rush: 'rush', daily: 'daily',
+    classic: 'endless', 'classic-rush': 'rush', 'classic-daily': 'daily'
+  };
+  function rankShape(mode) { return RANK_SHAPE[mode] || 'endless'; }
 
   /* The exact key set each mode's entries are allowed to carry. Anything else
    * found on a stored entry is deleted by the sanitizer, so a save written by a
@@ -21428,15 +21710,16 @@ window.TT_SFX = {
     if (!e || typeof e !== 'object') return null;
     // The primary metric is the one the mode is ranked by; an entry without a
     // usable one cannot be placed at all and is dropped rather than guessed at.
-    var prim = (mode === 'daily') ? rankInt(e.timeSec) : rankInt(e.score);
+    var sh = rankShape(mode);   // W7.5 - 이름이 아니라 모양으로 가른다
+    var prim = (sh === 'daily') ? rankInt(e.timeSec) : rankInt(e.score);
     if (prim === null) return null;
-    if (mode === 'daily') {
+    if (sh === 'daily') {
       e.timeSec = prim;
       e.n = rankInt(e.n) || 0;
       e.matches = rankInt(e.matches) || 0;
       e.maxCombo = rankInt(e.maxCombo) || 0;
       e.grade = (typeof e.grade === 'string') ? e.grade : '';
-    } else if (mode === 'rush') {
+    } else if (sh === 'rush') {
       e.score = prim;
       e.matches = rankInt(e.matches) || 0;
     } else {
@@ -21445,7 +21728,7 @@ window.TT_SFX = {
       e.stage = rankInt(e.stage) || 1;
     }
     e.date = (typeof e.date === 'string') ? e.date : '';
-    var keep = RANK_FIELDS[mode], k;
+    var keep = RANK_FIELDS[sh], k;
     for (k in e) {
       if (Object.prototype.hasOwnProperty.call(e, k) && keep.indexOf(k) < 0) delete e[k];
     }
@@ -21471,7 +21754,7 @@ window.TT_SFX = {
     return cmpRankDate(a.date, b.date);
   }
   function rankCmpFor(mode) {
-    return (mode === 'daily') ? cmpRankTime : cmpRankScore;
+    return (rankShape(mode) === 'daily') ? cmpRankTime : cmpRankScore;
   }
 
   /**
@@ -21512,7 +21795,9 @@ window.TT_SFX = {
    */
   function ensureRankArrays() {
     if (!store.ranks || typeof store.ranks !== 'object') {
-      store.ranks = { endless: [], rush: [], daily: [] };
+      /* W7.5 - 세 이름을 손으로 적던 자리를 비운다. 바로 아래 루프가 RANK_MODES
+         전부를 채우므로, 여기에 목록을 또 두면 모드가 늘 때 둘이 갈라진다. */
+      store.ranks = {};
     }
     for (var i = 0; i < RANK_MODES.length; i++) {
       if (!Array.isArray(store.ranks[RANK_MODES[i]])) store.ranks[RANK_MODES[i]] = [];
@@ -21581,6 +21866,11 @@ window.TT_SFX = {
     // --- 4. derive the mirrors (see the section header for why not bestStage) ---
     store.best = R.endless[0] ? R.endless[0].score : 0;
     store.bestRush = R.rush[0] ? R.rush[0].score : 0;
+    /* W7.5 - 클래식도 같은 규약을 받는다: 최고점은 **보드 1위의 거울**이지
+       독립적으로 자라는 수가 아니다. bestClassicStage 는 거울이 아니다 -
+       일반 bestStage 와 같은 이유로(단조 최대값) 여기서 유도하지 않는다. */
+    store.bestClassic = R.classic[0] ? R.classic[0].score : 0;
+    store.bestClassicRush = R['classic-rush'][0] ? R['classic-rush'][0].score : 0;
   }
 
   /**
@@ -21643,10 +21933,15 @@ window.TT_SFX = {
     en: {
       'menu.tagline': 'Match pairs that are equal or sum to 10.',
       'menu.play': 'Play',
-      'menu.continue': 'Continue',
+      /* W7.5 — 메뉴 둘째 버튼의 라벨. 키 이름은 'menu.continue' 그대로 둔다:
+         #btn-cont 의 마크업 · 버튼 아트 · aria 배선이 전부 이 이름을 물고 있고,
+         키를 갈면 그 넷을 다 따라 고쳐야 하는데 그 작업이 사는 값이 없다.
+         옛 값: 'Continue'. */
+      'menu.continue': 'Classic',
       'menu.daily': 'Daily',
       'menu.howto': 'How to play',
       'menu.best': 'Best {score} · Stage {stage}',
+      'menu.bestclassic': 'Classic {score}',
       'splash.tap': 'Tap anywhere to start',
 
       'aria.play': 'Play endless mode',
@@ -21987,6 +22282,15 @@ window.TT_SFX = {
       'rank.hint.endless': 'Your 5 best Endless runs, by final score.',
       'rank.hint.rush': 'Your 5 best Time Rush runs, by final score.',
       'rank.hint.daily': 'Your 5 fastest Daily clears. Every Daily is the same size, so time is the fair measure.',
+      /* W7.5 — 클래식 보드 셋. 행 문구(rank.row.* / rank.meta.*)는 새로 만들지
+         않는다: buildRankRow 가 rankShape() 로 갈라 일반 셋의 문구를 그대로
+         쓰기 때문이고, 겨루는 것이 같으니 읽히는 문장도 같아야 한다. */
+      'rank.tab.classic': 'Classic',
+      'rank.tab.classicrush': 'Classic Rush',
+      'rank.tab.classicdaily': 'Classic Daily',
+      'rank.hint.classic': 'Your 5 best Classic runs — no skills, no items.',
+      'rank.hint.classic-rush': 'Your 5 best Classic Time Rush runs — skill only.',
+      'rank.hint.classic-daily': "Your 5 fastest Classic Daily clears — everyone on even ground.",
       'rank.empty': 'Empty — go take it',
       'rank.dateunknown': 'earlier',
       'rank.close': 'Close',
@@ -22017,7 +22321,16 @@ window.TT_SFX = {
       'mode.arcade.d': 'Endless. Chase your best.',
       'mode.daily.d': 'One board a day — the same for everyone.',
       'mode.rush.d': 'Sixty seconds. Every match buys time.',
-      'aria.cont': 'Continue where you left off',
+      /* --- W7.5 클래식 허브 ------------------------------------------- */
+      'classic.title': 'Classic',
+      'classic.lead': 'No skills, no items, no passives. Just you and the board.',
+      'classic.arcade': 'Arcade',
+      'classic.arcade.d': 'Endless, pure. Missions still count.',
+      'classic.rush': 'Time Rush',
+      'classic.rush.d': 'Sixty seconds. Skill only.',
+      'classic.daily': 'Daily',
+      'classic.daily.d': "Today's board, on even ground.",
+      'aria.cont': 'Classic — pure skill modes',
       'aria.chprev': 'Previous chapter',
       'aria.chnext': 'Next chapter',
       'aria.gallery': 'Story gallery',
@@ -22338,10 +22651,12 @@ window.TT_SFX = {
     ko: {
       'menu.tagline': '같은 숫자, 또는 합이 10인 짝을 지우세요.',
       'menu.play': '시작하기',
-      'menu.continue': '이어하기',
+      // W7.5 — 옛 값: '이어하기'. 키 이름을 남긴 이유는 en 쪽 주석 참조.
+      'menu.continue': '클래식',
       'menu.daily': '데일리',
       'menu.howto': '게임 방법',
       'menu.best': '최고 {score}점 · {stage}단계',
+      'menu.bestclassic': '클래식 {score}점',
       'splash.tap': '화면을 터치하세요',
 
       'aria.play': '엔들리스 모드 시작',
@@ -22668,6 +22983,13 @@ window.TT_SFX = {
       'rank.hint.endless': '엔들리스 최고 점수 TOP 5',
       'rank.hint.rush': '타임 러시 최고 점수 TOP 5',
       'rank.hint.daily': '데일리 최단 시간 TOP 5. 데일리는 매일 판 크기가 같아서 시간으로 겨뤄요.',
+      // W7.5 — 클래식 보드 셋. 행 문구를 새로 만들지 않는 이유는 en 쪽 주석 참조.
+      'rank.tab.classic': '클래식',
+      'rank.tab.classicrush': '클래식 러시',
+      'rank.tab.classicdaily': '클래식 데일리',
+      'rank.hint.classic': '클래식 최고 점수 TOP 5 — 스킬도 아이템도 없이.',
+      'rank.hint.classic-rush': '클래식 타임 러시 최고 점수 TOP 5 — 실력만으로.',
+      'rank.hint.classic-daily': '클래식 데일리 최단 시간 TOP 5 — 모두가 같은 조건.',
       'rank.empty': '아직 비었어요',
       'rank.dateunknown': '예전 기록',
       'rank.close': '닫기',
@@ -22698,7 +23020,16 @@ window.TT_SFX = {
       'mode.arcade.d': '끝없이. 최고 기록에 도전해요.',
       'mode.daily.d': '하루 한 판 — 모두가 같은 판.',
       'mode.rush.d': '60초. 맞출 때마다 시간이 늘어요.',
-      'aria.cont': '하던 것 이어하기',
+      /* --- W7.5 클래식 허브 ------------------------------------------- */
+      'classic.title': '클래식',
+      'classic.lead': '스킬도 아이템도 패시브도 없어요. 오직 실력으로.',
+      'classic.arcade': '아케이드',
+      'classic.arcade.d': '끝없이, 순수하게. 미션은 그대로 있어요.',
+      'classic.rush': '타임 러시',
+      'classic.rush.d': '60초. 실력만으로.',
+      'classic.daily': '데일리',
+      'classic.daily.d': '오늘의 판을, 같은 조건으로.',
+      'aria.cont': '클래식 — 순수 실력 모드',
       'aria.chprev': '이전 챕터',
       'aria.chnext': '다음 챕터',
       'aria.gallery': '스토리 갤러리',
@@ -23336,10 +23667,59 @@ window.TT_SFX = {
     [[1, 3, 5, 6], [6, 2]]
   ];
 
+  /* ---- W7.5 클래식 모드 서술어 ---------------------------------------------
+   * 클래식은 스킬·아이템·패시브·특수타일·페버가 전부 꺼진 **순수 실력** 모드다.
+   * 세 종목(아케이드/타임러시/데일리)이 각자 독립된 S.mode 문자열을 갖는다 —
+   * 플래그가 아니라 값이다. 그래서 store.save*.mode / RANK_MODES / RANK_FIELDS /
+   * 랭킹 탭 id 가 전부 **같은 한 문자열**을 키로 쓰고, (모드, 플래그) 두 값을
+   * 짝지어 들고 다니는 자리가 한 곳도 생기지 않는다.
+   *
+   * 아래 두 기계 서술어는 기존 `S.mode === 'rush'` / `=== 'daily'` 비교를
+   * **넓히기만** 한다. 기존 네 값('endless'/'rush'/'daily'/'adv')에 대해서는
+   * 추가된 논리합 항이 전부 false 라 값이 한 치도 달라지지 않는다 — 즉 이
+   * 치환은 기존 모드에 관해 정의상 무변형이고, 그것이 회귀 위험을 0 으로 두는
+   * 근거다. */
+  function isClassic() {
+    return S.mode === 'classic' || S.mode === 'classic-rush' || S.mode === 'classic-daily';
+  }
+  /** 러시 기계(90초 시계 · 러시 HUD · 무한 Add · 중간저장 금지)를 쓰는 모드. */
+  function isRush() { return S.mode === 'rush' || S.mode === 'classic-rush'; }
+  /** 데일리 기계(결정론 시드 · 타이머 · 결과창)를 쓰는 모드. */
+  function isDaily() { return S.mode === 'daily' || S.mode === 'classic-daily'; }
+
+  /* ---- W7.5 기록 칸 선택 ---------------------------------------------------
+   * "기록 완전 분리"는 여기 한 곳에서 성립한다. 최고점·최고단계·랭킹 보드를
+   * 쓰는 자리가 store.best 를 **이름으로 직접** 부르지 않고 이 세 함수가 고른
+   * 칸을 쓰게 하면, 클래식이 일반 기록에 닿을 수 있는 경로가 문법적으로
+   * 사라진다 — 분리를 규율이 아니라 배관으로 세우는 것이 요점이다. */
+  function bestKey() {
+    if (S.mode === 'classic-rush') return 'bestClassicRush';
+    if (S.mode === 'classic') return 'bestClassic';
+    return isRush() ? 'bestRush' : 'best';
+  }
+  function bestStageKey() { return isClassic() ? 'bestClassicStage' : 'bestStage'; }
+  /** 이 모드의 랭킹 보드 키. RANK_MODES 의 원소이거나 '' (제출 안 함 = 모험). */
+  function rankKeyOf() {
+    if (S.mode === 'adv') return '';
+    if (isClassic()) return S.mode;          // 'classic' / 'classic-rush' / 'classic-daily'
+    if (S.mode === 'rush') return 'rush';
+    if (S.mode === 'daily') return 'daily';
+    return 'endless';
+  }
+  /* 진행 중 저장은 슬롯이 둘이다. 하나를 모드로 나눠 쓰면 "일반 아케이드를
+   * 한 판 켜는 것만으로 클래식 저장이 사라지는" 경로가 남는다 — 오염 없음을
+   * 주장하려면 칸 자체가 달라야 한다. 클래식 안에서는 아케이드·데일리가 한 칸을
+   * 나눠 쓰는데, 그것은 일반 쪽 endless·daily 가 이미 그렇게 살고 있는 것과
+   * 정확히 같은 규약이라 새 규칙이 아니다. */
+  function saveSlot() { return isClassic() ? 'saveClassic' : 'save'; }
+
   /** Specials / fever / missions exist everywhere except Daily (contract §0.7). */
-  function featuresOn() { return S.mode !== 'daily'; }
+  /* W7.5 — 클래식도 같은 이유로 전부 끈다. 단 **미션만은 예외**이고, 그 예외는
+   * featuresOn 을 흔들어서가 아니라 missionsOn() 이라는 별도 서술어로 세운다
+   * (아래 SECTION 미션 참조) — featuresOn 은 계속 "특수·페버·배수"만 뜻한다. */
+  function featuresOn() { return !isDaily() && !isClassic(); }
   /** Time Rush hands out unlimited Adds, so "out of adds" can never end it. */
-  function addsExhausted() { return S.mode !== 'rush' && S.adds <= 0; }
+  function addsExhausted() { return !isRush() && S.adds <= 0; }
 
   /* =========================================================================
    * SECTION 5 — LAYOUT & RENDERING (transform-only)
@@ -23624,7 +24004,14 @@ window.TT_SFX = {
       * would leave the board floating over the menu. */
      'modal-rank',
      // v4 4차-a — 모험의 두 시트도 여기 목록에 있어야 지도/메뉴로 나갈 때 남지 않는다.
-     'modal-node', 'modal-adv']
+     'modal-node', 'modal-adv',
+     /* W7.5 — 클래식 허브. #modal-mode 가 이 목록에 없는 것과 대칭이 아닌 데는
+      * 이유가 있다: 모드 시트는 각 행이 진입 함수를 부르기 **전에** 자기를 닫고
+      * 들어가지만, 클래식 세 진입 함수는 startEndless 계열의 복제라 자기 안에서
+      * closeAllModals() 를 부른다. 그 한 번으로 허브까지 걷히려면 목록에 있어야
+      * 한다(허브의 행 핸들러도 닫지만, 그것 하나에만 기대면 다른 경로로 진입할
+      * 때 허브가 판 위에 남는다). */
+     'modal-classic']
       .forEach(closeModal);
   }
 
@@ -23651,6 +24038,20 @@ window.TT_SFX = {
   /** Today's daily is finished (and it is still today). */
   function dailyDoneToday() {
     return !!(store.dailyBest && store.dailyBest.date === todayKey());
+  }
+  /**
+   * W7.5 — 지금 판이 읽어야 할 데일리 결과 칸. 결과 시트 · 공유문 · 언어 전환
+   * 재렌더가 전부 이것을 지난다. S.mode 를 보는 것으로 충분한 이유는 그 셋이
+   * **판이 끝난 직후**에만 불리기 때문이고, 판을 열기 전(허브에서 “오늘 이미
+   * 했음”을 눌러 결과만 다시 볼 때)처럼 S.mode 를 믿을 수 없는 자리에서는
+   * 호출부가 칸을 명시적으로 넘긴다 — showDailyResult 의 둘째 인자가 그것이다.
+   */
+  function dailyBestNow() {
+    return (S.mode === 'classic-daily') ? store.classicDailyBest : store.dailyBest;
+  }
+  /** W7.5 — 클래식 데일리의 같은 질문. 판(시드)은 같아도 완주 여부는 별개다. */
+  function classicDailyDoneToday() {
+    return !!(store.classicDailyBest && store.classicDailyBest.date === todayKey());
   }
 
   /**
@@ -23681,7 +24082,22 @@ window.TT_SFX = {
     later(function () { if (v && v.classList) v.classList.remove('tick'); }, 320);
   }
 
+  /**
+   * W7.5 — #app 에 `classic` 클래스를 붙이거나 뗀다. 클래식에서 안 보여야 하는
+   * 것들(#actionbar · #mate · 패시브/텐트윈 칩)은 전부 CSS 한 곳에서 닫는다.
+   *
+   * syncHud() 에서 부르는 이유: 게임 화면에 들어오는 경로가 넷(fresh 진입 ·
+   * restoreSave · 재시작 · 러시 다음 판)인데 그 넷이 전부 syncHud 를 지나므로,
+   * 진입점마다 붙이고 떼는 것보다 새 진입점이 생겨도 안 빠진다. 값이 안 바뀌면
+   * classList.toggle 은 아무것도 하지 않으므로 러시의 초당 5회 호출에도 무해하다.
+   */
+  function syncClassicSkin() {
+    var app = $('app');
+    if (app && app.classList) app.classList.toggle('classic', isClassic());
+  }
+
   function syncHud() {
+    syncClassicSkin();
     /* The Stage stat is a THREE-mode slot (review: 데일리 HUD "D" 한 글자):
      *   endless  Stage / 7
      *   daily    Daily / #412      — the puzzle number, which is what a player
@@ -23691,12 +24107,12 @@ window.TT_SFX = {
      * applyI18n() resets the label from data-i18n="hud.stage" on every language
      * switch, and setLang() calls syncHud() straight afterwards, so this
      * override survives the toggle — the same pattern syncToggleLabels() uses. */
-    setText('stage-val', S.mode === 'daily' ? ('#' + dailyNumber()) : S.stage);
+    setText('stage-val', isDaily() ? ('#' + dailyNumber()) : S.stage);
     var ss = $('stat-stage');
     if (ss) {
-      ss.hidden = (S.mode === 'rush');
+      ss.hidden = isRush();
       var sk = ss.querySelector ? ss.querySelector('.stat-k') : null;
-      if (sk) sk.textContent = (S.mode === 'daily') ? t('hud.daily') : t('hud.stage');
+      if (sk) sk.textContent = isDaily() ? t('hud.daily') : t('hud.stage');
     }
     setText('score-val', S.score);
     /* "Best" must mean the best of the mode being played. Daily used to show the
@@ -23705,9 +24121,14 @@ window.TT_SFX = {
      * either — today's board is a different puzzle — so it reads 0 until today's
      * run has been finished once. */
     var bestShown;
-    if (S.mode === 'rush') bestShown = store.bestRush;
-    else if (S.mode === 'daily') bestShown = dailyDoneToday() ? store.dailyBest.score : 0;
-    else bestShown = store.best;
+    /* W7.5 — 데일리 두 계열만 손으로 갈라 읽고, 나머지는 bestKey() 가 고른 칸을
+     * 그대로 읽는다. 그래서 클래식 판 위의 "Best" 는 클래식 최고점이지, 일반
+     * 최고점이 아니다 — 이 판에서 깰 수 없는 수를 옆에 세워 두지 않는다는 아래
+     * 주석의 규약이 클래식에도 그대로 적용된 것이다. */
+    if (S.mode === 'daily') bestShown = dailyDoneToday() ? store.dailyBest.score : 0;
+    else if (S.mode === 'classic-daily') {
+      bestShown = classicDailyDoneToday() ? store.classicDailyBest.score : 0;
+    } else bestShown = store[bestKey()];
     setText('best-val', bestShown);
     setText('hint-badge', S.hints);
     setText('undo-badge', S.undoLeft);
@@ -23718,7 +24139,7 @@ window.TT_SFX = {
      * the arithmetic and is called from the board-mutation sites instead. */
     paintMoves(false);
 
-    var rush = S.mode === 'rush';
+    var rush = isRush();
     var cd = rush ? Math.max(0, Math.ceil((S.addCdUntil - now()) / 1000)) : 0;
     setText('add-badge', rush ? (cd > 0 ? cd : t('act.addfree')) : S.adds);
 
@@ -23752,7 +24173,7 @@ window.TT_SFX = {
       actBattleLabels = false;
     }
     var st = $('stat-timer');
-    if (st) st.hidden = S.mode !== 'daily';
+    if (st) st.hidden = !isDaily();
     syncMission();
     syncRushHud();
   }
@@ -23776,6 +24197,9 @@ window.TT_SFX = {
        모드 시트가 열려 있으면 그 안의 상태 배지만 다시 그린다. */
     var msh = $('modal-mode');
     if (msh && !msh.hidden) syncModeSheet();
+    // W7.5 — 클래식 허브의 배지도 같은 규약으로 다시 그린다.
+    var csh = $('modal-classic');
+    if (csh && !csh.hidden) syncClassicSheet();
     var mb = $('menu-best');
     if (mb) {
       // One line, two records: endless best + Time Rush best (contract §6).
@@ -23784,6 +24208,12 @@ window.TT_SFX = {
         parts.push(t('menu.best', { score: store.best, stage: store.bestStage }));
       }
       if (store.bestRush > 0) parts.push(t('menu.bestrush', { score: store.bestRush }));
+      /* W7.5 — 클래식 최고점. 0 이면 줄에 아무것도 더하지 않는다(한 판도 안 한
+         사람에게 '클래식 0점'을 보여 줄 이유가 없다), 그래서 기존 사용자의 이
+         줄은 클래식을 켜기 전까지 한 글자도 안 바뀐다. */
+      if (store.bestClassic > 0) {
+        parts.push(t('menu.bestclassic', { score: store.bestClassic }));
+      }
       /* Third part: a reason to come back TODAY (review: "메뉴에 스트릭·데일리
        * 완료 여부 미표시 — 재방문 이유 불가시"). Always present, unlike the two
        * record parts, because "the daily is waiting" is exactly the state a
@@ -23814,7 +24244,7 @@ window.TT_SFX = {
      * moved on and the line would describe a board nobody is about to play. */
     var cm = $('modal-clear');
     if (cm && !cm.hidden) paintNextPreview();
-    var d = store.dailyBest;
+    var d = dailyBestNow();   // W7.5 — 열려 있는 시트가 말하고 있는 그 판
     if (d) {
       setText('daily-title', t('daily.title', { n: d.n }));
       setText('daily-stats', dailyStatsLine(d));
@@ -24550,7 +24980,7 @@ window.TT_SFX = {
    * 재현성이 생겨 리롤 어뷰징의 표면이 된다. 그쪽은 Math.random 이 맞다.
    */
   function jackpotRoll() {
-    if (S.mode !== 'daily') return Math.random();
+    if (!isDaily()) return Math.random();
     var s = (((S.seed >>> 0) ^ JELLY_SALT) +
              Math.imul((S.matches | 0) + 1, JELLY_GOLDEN)) >>> 0;
     return mulberry32(s)();
@@ -25676,7 +26106,7 @@ window.TT_SFX = {
    * 콤보 리프트는 제거했다 — 콤보가 오를 때 커져야 하는 건 BGM 이 아니라 팡이다.
    */
   function syncBgmIntensity() {
-    var base = (S.mode === 'rush') ? 1 : (S.stage >= 10 ? 1 : 0);
+    var base = isRush() ? 1 : (S.stage >= 10 ? 1 : 0);
     var lift = S.feverOn ? 2 : 0;
     /* v4 §6.5: 허리 업 이후로는 +1 이 계속 얹혀 있다. 20초 지점부터 판이 끝날
        때까지 편성이 한 겹 두꺼워지는 것 — 되돌아오지 않는 것이 요점이다. */
@@ -25813,6 +26243,13 @@ window.TT_SFX = {
    * 이미 부르므로, 여기서 또 쓰면 같은 프레임에 localStorage 를 두 번 만진다.
    */
   function gaugeBump(combo) {
+    /* W7.5 — 이 줄은 이미 클래식을 막는다(S.mode 가 'adv' 가 아니므로). 그래도
+     * isClassic() 을 **명시적으로** 세워 두는 이유는 방어가 아니라 기록이다:
+     * 언젠가 이 게이트가 "모험 + 무엇"으로 넓어질 때, 클래식이 그 무엇에 딸려
+     * 들어가면 안 된다는 사실이 조건식 자체에 남아 있어야 한다. 각성 게이지는
+     * store 에 살아 판을 넘어 유지되는 값이라, 새면 순수 실력 모드가 일반 모드의
+     * 진행도를 적립해 주는 통로가 된다. */
+    if (isClassic()) return;
     if (S.mode !== 'adv') return;
     var was = gaugeFull();
     store.gauge = clamp(store.gauge + gaugeGain(combo), 0, SKILL_MAX);
@@ -25878,6 +26315,8 @@ window.TT_SFX = {
    * -------------------------------------------------------------------------- */
 
   function cutinReset() {
+    // W7.5 — 하드 티어다운도 예약을 걷는다(endCutin 과 같은 이유).
+    if (cutTimer) { clearTimeout(cutTimer); cutTimer = 0; }
     S.cutOn = false;
     S.cutAt = 0;
     S.cutFn = null;
@@ -25908,6 +26347,23 @@ window.TT_SFX = {
    *     vig     비네트 세기            (기본 0.5)
    *     sfx     임팩트 효과음 함수     (기본 J.sfx.tierUp(3))
    */
+  /* W7.5 — 컷인 종료 예약의 id. 스킵이 이것을 취소하지 않으면 유령 타이머가
+     다음 컷인을 끊는다(runCutin 의 예약 지점 주석 참조). */
+  var cutTimer = 0;
+
+  /**
+   * 컷인이 화면을 잡고 있는 길이. 보통은 SKILL_CUTIN_MS(2초)지만, 동작 최소화를
+   * 켠 사용자에게는 컷인이 **정지 화면 한 장**이다(CSS 가 애니메이션을 끄고 최종
+   * 상태로 고정한다). 그 경로에서 2초는 연출이 아니라 그냥 멈춤이라 옛 길이를
+   * 유지한다 — 이 분기가 없으면 "동작을 줄여 달라"는 설정이 오히려 체감 정지를
+   * 두 배로 늘리는 결과가 된다.
+   */
+  function cutinHoldMs() {
+    var mq = (typeof window !== 'undefined' && window.matchMedia)
+      ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+    return (mq && mq.matches) ? SKILL_CUTIN_REDUCED_MS : SKILL_CUTIN_MS;
+  }
+
   function runCutin(castId, nameKey, then, opt) {
     var o = opt || {};
     /* 이미 대형 연출이 돌고 있으면 효과만 즉시 건다. 컷인을 큐에 쌓지 않는 것이
@@ -25967,13 +26423,28 @@ window.TT_SFX = {
     J.vibrate(50);
     var vid = (o.voice === undefined) ? castId : o.voice;
     if (vid) later(function () { J.sfx.voice(vid, 6); }, 200);
-    later(function () { endCutin(false); }, SKILL_CUTIN_MS);
+    /* W7.5 — 타이머 id 를 붙든다. 여태 이 later 의 id 를 아무도 안 들고 있었고,
+     * endCutin 도 취소하지 않았다. 탭 스킵으로 컷인을 끊으면 그 타이머는 살아남아
+     * 원래 시각에 endCutin(false) 를 부르는데, 지금까지는 `if (!S.cutOn) return;`
+     * 가 조용히 삼켜 무해했다 — **다음 컷인이 그 사이에 시작되지 않았다면**.
+     * 스킵 직후에는 S.cutOn·S.paused 가 풀려 fxBusy() 가 false 이므로 새 컷인이
+     * 곧바로 열릴 수 있고, 그때 유령 타이머가 **새 컷인을 조기 종료**시킨다
+     * (효과 콜백이 일찍 돌고 held 가 너무 작게 밀린다). 취약 구간은 여태 최대
+     * 740ms 였고 2000ms 로 늘리면 **1740ms** 가 되어, 15초마다 도는 적 스킬
+     * 컷인과 충분히 겹친다. 그래서 길이를 올리는 이 파도에서 함께 닫는다.
+     * later() 가 돌려주는 것은 setTimeout 의 raw id 이고 발화 시 스스로
+     * timers 에서 빠지므로, clearTimeout 뒤에 죽은 id 가 남아도 무해하다
+     * (clearTimers 가 다시 지울 뿐이다). */
+    cutTimer = later(function () { endCutin(false); }, cutinHoldMs());
   }
 
   /** @param skip 탭으로 끊었는가 (최소 대기 전에는 무시된다) */
   function endCutin(skip) {
     if (!S.cutOn) return;
     if (skip && (now() - S.cutAt) < SKILL_CUTIN_MIN_MS) return;
+    // W7.5 — 두 가드를 통과해 **실제로 끝내기로 한** 뒤에 끈다. 가드 위에서
+    // 끄면 너무 이른 스킵 탭이 정상 종료 타이머까지 지워 컷인이 안 걷힌다.
+    if (cutTimer) { clearTimeout(cutTimer); cutTimer = 0; }
     var fn = S.cutFn;
     S.cutOn = false;
     S.cutFn = null;
@@ -26297,7 +26768,25 @@ window.TT_SFX = {
   }
 
   /** 미션이 살아 있는 모드인가. 엔들리스(무작위 미션)와 모험(노드에 적힌 미션). */
-  function missionMode() { return S.mode === 'endless' || S.mode === 'adv'; }
+  /* W7.5 — 클래식 아케이드가 셋째로 들어온다. 사용자 확정 사항이다: 클래식은
+   * 스킬·아이템을 뺀 모드이지 목표를 뺀 모드가 아니고, "콤보 5까지 올리기"류
+   * 미션은 오히려 순수 실력의 과녁이 된다. 러시·데일리 계열이 빠진 것은 일반
+   * 쪽 규약을 그대로 따른 것이다 — 러시는 시계가, 데일리는 완주가 이미 목표다. */
+  function missionMode() {
+    return S.mode === 'endless' || S.mode === 'adv' || S.mode === 'classic';
+  }
+
+  /**
+   * W7.5 — 미션의 켜짐 조건. 여태 세 곳이 `missionMode() && featuresOn()` 을 손으로
+   * 짝지어 들고 있었는데, 클래식은 **featuresOn() 은 false 인데 미션은 켜야 하는**
+   * 첫 모드라 그 짝이 더는 성립하지 않는다.
+   *
+   * 갈림길에서 featuresOn() 을 넓히지 않은 것이 이 함수의 요점이다: featuresOn()
+   * 은 "특수타일·페버·배수"를 뜻하고 그 셋은 클래식에서 확실히 꺼져야 한다.
+   * 그래서 뜻을 흐리는 대신 미션 전용 서술어를 새로 세우고, 세 호출부가 이것
+   * 하나만 보게 했다 — 앞으로 미션 조건이 바뀌어도 고칠 자리가 한 곳이다.
+   */
+  function missionsOn() { return missionMode() && (featuresOn() || isClassic()); }
 
   function syncMission() {
     var badge = $('mission-badge');
@@ -26310,7 +26799,7 @@ window.TT_SFX = {
        악당의 체력(advGoalMet). 진행 쪽은 missionBump/checkColumnMission/
        tickMission 이 각각 같은 게이트를 든다 — 화면만 끄고 값이 계속 돌면
        판이 끝난 뒤의 정산에서 유령 보너스가 살아난다. */
-    var live = !!S.mission && featuresOn() && missionMode() && !battleOn();
+    var live = !!S.mission && missionsOn() && !battleOn();
     if (badge) badge.hidden = !live;
     if (!live) return;
     setText('mission-text', missionText(S.mission));
@@ -26343,7 +26832,7 @@ window.TT_SFX = {
   function missionBump(kind, n) {
     var m = S.mission;
     if (battleOn()) return;              // 반려 ② — 전투에는 미션이 없다(syncMission 주석)
-    if (!m || m.done || !missionMode() || !featuresOn()) return;
+    if (!m || m.done || !missionsOn()) return;
     // 시간 초과된 미션은 더 이상 진행되지 않는다 (실패해도 스테이지는 계속된다).
     if (S.missionUntil < 0) return;
     if (m.id !== kind) return;
@@ -26390,7 +26879,7 @@ window.TT_SFX = {
     var m = S.mission;
     if (battleOn()) return;              // 반려 ② — missionBump 과 같은 게이트
     if (!m || m.done || m.id !== 'col') return;
-    if (!missionMode() || !featuresOn() || S.missionUntil < 0) return;
+    if (!missionsOn() || S.missionUntil < 0) return;
     if (!columnCleared((m.goal | 0) - 1)) return;
     m.prog = 1;
     completeMission();
@@ -26435,7 +26924,7 @@ window.TT_SFX = {
   /* ---- Time Rush (DESIGN 9-FUN D) --------------------------------------- */
 
   function rushLeftMs() {
-    return S.mode === 'rush' ? Math.max(0, S.rushEndAt - now()) : 0;
+    return isRush() ? Math.max(0, S.rushEndAt - now()) : 0;
   }
 
   /**
@@ -26452,7 +26941,7 @@ window.TT_SFX = {
   }
 
   function addRushTime(ms) {
-    if (S.mode !== 'rush') return;
+    if (!isRush()) return;
     /* The cap is on what PLAY can buy, not on the mode: the run opens at 90s and
      * decays freely, but once time is being earned it can never be pushed past
      * RUSH_LEFT_CAP_MS remaining. Above the cap a match adds nothing at all —
@@ -26517,9 +27006,9 @@ window.TT_SFX = {
   }
 
   function syncRushHud() {
-    var timed = S.mode === 'rush' || S.mode === 'adv';
+    var timed = isRush() || S.mode === 'adv';
     var el = $('rush-timer');
-    var txt = S.mode === 'rush' ? fmtTime(Math.ceil(rushLeftMs() / 1000))
+    var txt = isRush() ? fmtTime(Math.ceil(rushLeftMs() / 1000))
             : S.mode === 'adv' ? fmtTime(Math.ceil(advLeftMs() / 1000)) : '';
     if (el) {
       el.hidden = !timed;
@@ -26546,7 +27035,7 @@ window.TT_SFX = {
   function startRushLoop() {
     stopRush();
     rushInt = setInterval(function () {
-      if (S.mode !== 'rush' || !S.running) return;
+      if (!isRush() || !S.running) return;
       if (S.paused) return;
       var left = rushLeftMs();
       syncRushHud();
@@ -26607,7 +27096,7 @@ window.TT_SFX = {
      * (§6.5 는 "제한시간 모드"라고만 했다). `S.paused` 가 이미 참이면 "빡!"
      * 배너의 타임스톱 중이라는 뜻이라 자동으로 순서가 잡힌다: 배너가 화면을
      * 잡고 있는 동안에는 허리 업이 절대 끼어들지 않는다. */
-    if (S.mode !== 'rush' && S.mode !== 'adv') return;
+    if (!isRush() && S.mode !== 'adv') return;
     /* v4 5차: 컷인도 같은 목록에 들어온다. S.paused 만으로도 이미 막히지만
        (컷인이 정지를 세우므로), 가드를 fxBusy() 하나로 모아 두면 "왜 여기서
        허리 업이 안 뜨는가"를 두 군데서 따로 읽을 일이 없다. */
@@ -26636,8 +27125,30 @@ window.TT_SFX = {
     if (el) {
       /* ③ 캐릭터 분기(스펙 §6.5): 공주로 플레이 중이면 공주가 갇혀 있을 수 없다.
          그때는 왕자 형제가 대신 나와 응원한다 — 납치 서사와 충돌하지 않는다. */
-      var asJelly = charId() === 'jelly';
+      var cid = charId();
+      var asJelly = cid === 'jelly';
       el.classList.toggle('hu-prince', asJelly);
+      /* W7.5 — 사용자 반려 "허리 업 연출의 캐릭터 아이콘이 구판(이상한 버전)".
+       * 실측: 이 자리의 인물은 에셋이 아니라 **마크업에 손으로 그린 인라인 SVG**
+       * (.hu-av, 13237~ 의 <g class="hu-princess">)였다. 14차 수리 8 이 "흰 얼굴
+       * SVG" 소비처를 전량 교체할 때 #hurry-cast 만 빠졌던 것으로, 텐텐도 트윈도
+       * 젤리도 아닌 일반 마스코트라 **어떤 캐릭터를 골라도 같은 그림**이 나왔다.
+       *
+       * 문법은 W4 의 #duel-me-av(--me-full) · W2.5 의 #duel-baby(--pet-face) 와
+       * 같다: JS 가 표준 아트를 변수로 주입하고 CSS 는 var(…, 폴백) 만 쥔다.
+       * setStdArt 를 쓰는 것은 그것이 data-art="std" 까지 함께 찍어 주기 때문이고,
+       * 그 표식이 있어야 CSS 가 옛 SVG 를 정확히 그때만 감출 수 있다(.mn-hero 의
+       * 선례와 같은 배선). 표준 아트가 없는 캐릭터면 변수를 **지우고** 표식도 안
+       * 찍히므로 옛 SVG 가 한 픽셀도 다르지 않게 되돌아온다 — 폴백이자 롤백 밸브다.
+       *
+       * 'full' 이 아니라 'face' 인 이유: 이 슬롯은 84×80px(거의 정사각)이고
+       * hu-peek 가 왼쪽에서 빼꼼 내미는 연출이라 왼쪽 끝이 일부러 잘린다. 전신을
+       * 넣으면 얼굴이 25~30px 로 줄고 몸통이 잘려 나간다(#duel-baby 방울에서
+       * face 를 고른 것과 같은 판단).
+       *
+       * 판마다 한 번만 돈다 — 허리 업은 판당 1회(S.hurryDone)다. */
+      var cast = $('hurry-cast');
+      if (cast) setStdArt(cast, cid, 'face', '--hu-face');
       var big = $('hurry-big'), line = $('hurry-line');
       if (big) big.textContent = t('hurry.big');
       if (line) line.textContent = t(asJelly ? 'hurry.prince' : 'hurry.princess');
@@ -26828,7 +27339,7 @@ window.TT_SFX = {
     if (advp && TW_BATTLE) duelInit(advp); else S.duel = null;
     var gen = advp
       ? genBoardBanded(stage, advp.seed, advp.density)
-      : genBoardBanded(S.mode === 'daily' ? 3 : stage, seed);
+      : genBoardBanded(isDaily() ? 3 : stage, seed);
     S.cells = gen.cells;
     /* 전투 판은 완전 직사각형이어야 한다 — 컬럼 중력의 전제다. 특수·핸디캡보다
        **먼저** 맞춰서 그 개수가 실제 판 크기를 따르게 한다. 전투에는 Add 가 없으
@@ -26856,9 +27367,14 @@ window.TT_SFX = {
     /* 모험의 미션은 무작위가 아니라 **노드에 미리 적힌 것**이라, 지도에서 보여
      * 준 그 미션이 그대로 실려야 한다. advPlan 이 이미 뽑아 둔 것을 복제해서
      * 쓴다 (계획서는 순수 함수의 산출물이므로 절대 직접 변형하지 않는다). */
+    /* W7.5 — 'endless' 를 missionMode() 로 넓힌다. 여기가 **클래식에 미션이 실제로
+     * 생기는 유일한 자리**다: 게이트(missionsOn)를 아무리 열어 놔도 S.mission 이
+     * null 이면 배지는 영영 안 뜬다. 모험은 위 갈래가 이미 가로채므로 이 자리에서
+     * missionMode() 가 참인 값은 endless 와 classic 둘뿐이고, pickMission 은 이미
+     * S.mode 를 인자로 받고 있어 종목별로 다른 표를 쓸 여지도 그대로 남는다. */
     S.mission = advp
       ? { id: advp.mission.id, goal: advp.mission.goal, prog: 0, done: false }
-      : ((S.mode === 'endless')
+      : (missionMode()
           ? pickMission(gen.seed, S.cells.length, stage, S.mode, store.lastMissionId) : null);
     // Remembered in the store (and mirrored into the save) so the "never twice
     // in a row" rule survives a reload, not just a stage transition.
@@ -26878,13 +27394,36 @@ window.TT_SFX = {
        않는다 — "판 넘어가도 유지"가 스펙이고, 그게 이 시스템의 존재 이유다. */
     skillReset();
     S.overInfo = null;
-    S.adds = S.mode === 'daily' ? 3 : addsForStage(stage);
+    S.adds = isDaily() ? 3 : addsForStage(stage);
     S.addCdUntil = 0;
     S.hints = 3;
     S.undoLeft = 1;
     // 셔플 금지(핸디캡 축 4)는 예산을 0으로 두는 것으로 끝난다 — 버튼의 비활성화·
     // 자동 구제 경로가 이미 전부 `S.shuffles > 0` 하나만 본다.
     S.shuffles = (advp && advp.hand.noShuffle) ? 0 : SHUFFLES_PER_STAGE;
+    /* ---- W7.5 클래식 예산 --------------------------------------------------
+     * 아이템은 예산 0 으로 끝난다(#actionbar 자체도 CSS 로 숨지만, 예산이 0 이면
+     * 버튼이 어떤 경로로 눌려도 아무 일이 없다 — 숨김이 유일한 방어선이 아니다).
+     *
+     * **Add 가 0 이어야 하는 것은 취향이 아니라 안전 요건이다.** afterMove 의
+     * 막힘 판정은 `addsExhausted()` 를 지나야 열리는데, 그 함수는 S.adds > 0 이면
+     * false 다. 즉 Add 예산을 남겨 두면 판이 막혀도 게임오버 판정이 아예 열리지
+     * 않고, 누를 버튼은 숨겨져 있어 **소프트락**이 된다.
+     *
+     * 반대로 셔플은 **일부러 남긴다**(예산은 일반 아케이드와 같은 SHUFFLES_PER_STAGE).
+     * 근거: 클래식에서 셔플은 플레이어가 쓸 수 있는 자원이 아니다 — 버튼이 없고,
+     * doShuffle(false) 는 유효쌍이 남아 있으면 거절하므로, 이 예산은 오직
+     * afterMove 의 **자동 구제**(유효쌍 0 일 때만)로만 소비된다. 그리고 셔플은
+     * 같은 숫자 다발을 다시 늘어놓을 뿐 이득을 주지 않는다. 예산을 0 으로 두면
+     * "판이 우연히 일찍 막혔다"가 그대로 최고기록의 상한이 되어, 순수 실력 모드의
+     * 대표 기록이 실력이 아니라 주사위에 좌우된다 — 이 모드가 부정하는 바로 그것이다.
+     * 예산이 유한하므로 판은 여전히 끝난다(막힘 + 구제 소진 = 게임오버), 그리고
+     * 다시 늘어놔도 열리지 않으면 doShuffle 이 그 자리에서 onGameOver 를 부른다. */
+    if (isClassic()) {
+      S.adds = 0;
+      S.hints = 0;
+      S.undoLeft = 0;
+    }
     S.shuffleCount = 0;      // new board, new stream: the ordinal restarts with it
     S.snapshot = null;
     /* 14차 #32-4 — 판 수를 여기서 센다. 첫 판에서만 비정렬 거부에 규칙 전문을
@@ -27000,6 +27539,82 @@ window.TT_SFX = {
     startRushLoop();
   }
 
+  /* =========================================================================
+   * W7.5 — 클래식 (순수 실력 모드)
+   *
+   * 스킬·아이템·패시브·특수타일·페버·점수배수가 전부 꺼진 세 종목이다. 아래 세
+   * 진입 함수는 바로 위 세 함수의 **복제**이고, 다른 것은 딱 둘뿐이다: S.mode
+   * 문자열과 저장 슬롯. 판을 만드는 코드(startStage)도 복원 코드(restoreSave)도
+   * 통째로 공유하므로, 판 생성 규약이 일반 모드와 갈라질 수 있는 자리가 없다.
+   * 꺼짐은 여기가 아니라 featuresOn()/isClassic() 게이트가 맡는다 — 진입 함수가
+   * 무엇을 끄는지 알아야 한다면 종목이 늘 때마다 끄는 목록을 베껴야 한다.
+   * ========================================================================= */
+
+  /** 클래식 아케이드 — startEndless 의 복제. 저장이 있으면 그 판을 그대로 잇는다. */
+  function startClassic(fresh) {
+    leaveAdvSkin();
+    S.mode = 'classic';
+    var sv = store.saveClassic;
+    if (!fresh && sv && sv.mode === 'classic') {
+      restoreSave(sv);
+    } else {
+      S.score = 0;
+      S.matches = 0;
+      S.maxCombo = 1;
+      S.startedAt = Date.now();
+      startStage(1, (Math.random() * 0x7fffffff) | 0);
+    }
+    closeAllModals();
+    showScreen('screen-game');
+    layout();
+  }
+
+  /** 클래식 타임러시 — startRush 의 복제. 러시는 언제나 새 판이다(중간저장 없음). */
+  function startClassicRush() {
+    leaveAdvSkin();
+    S.mode = 'classic-rush';
+    S.score = 0;
+    S.matches = 0;
+    S.maxCombo = 1;
+    S.startedAt = Date.now();
+    S.rushEndAt = now() + RUSH_MS;
+    S.rushStartedAt = now();   // the run's age — only a rush entry may set this
+    S.rushBeatAt = 0;
+    S.addCdUntil = 0;
+    hurryReset();              // v4 §6.5 — 허리 업은 러시 세션당 1회다
+    startStage(1, (Math.random() * 0x7fffffff) | 0);
+    closeAllModals();
+    showScreen('screen-game');
+    layout();
+    syncRushHud();
+    startRushLoop();
+  }
+
+  /**
+   * 클래식 데일리 — startDaily 의 복제. **시드는 일반 데일리와 같은 dailySeed()**
+   * 를 그대로 쓴다: 데일리의 결정론 규약("모두가 같은 판")은 이 모드가 훼손해도
+   * 되는 것이 아니고, 기록만 갈라 두면 스킬이 없는 만큼 판이 오히려 더 공정해진다
+   * — 같은 판을 같은 조건으로 겨루는 쪽이 데일리의 원래 주장에 더 가깝다.
+   */
+  function startClassicDaily(fresh) {
+    leaveAdvSkin();
+    S.mode = 'classic-daily';
+    var sv = store.saveClassic;
+    if (!fresh && sv && sv.mode === 'classic-daily') {
+      restoreSave(sv);
+    } else {
+      S.score = 0;
+      S.matches = 0;
+      S.maxCombo = 1;
+      S.startedAt = Date.now();
+      startStage(1, dailySeed());
+    }
+    closeAllModals();
+    showScreen('screen-game');
+    layout();
+    startTimer();
+  }
+
   /** Board emptied in Time Rush: roll straight into the next one, no modal. */
   function rushNextBoard() {
     S.stage += 1;
@@ -27028,7 +27643,14 @@ window.TT_SFX = {
     layoutRowsReset();  // D1: startStage() 를 안 거치는 유일한 진입로라 여기도 필요하다
     hurryReset();
     applyCharSkin();
-    S.mode = sv.mode === 'daily' ? 'daily' : 'endless';
+    /* W7.5 좁은목 — 저장된 mode 를 그대로 믿지 않고 **화이트리스트**로 받는다.
+     * 목록에 없는 값(옛 빌드·손댄 저장·클래식 러시처럼 애초에 저장되지 않아야
+     * 할 값)은 전부 endless 로 떨어진다. 'classic-rush' 가 목록에 없는 것은
+     * 실수가 아니다 — 러시 계열은 saveProgress 가 중간저장을 거절하므로 이
+     * 자리에 도달할 수 있는 저장이 존재하지 않고, 혹시 존재한다면 그것이야말로
+     * 받아 주면 안 되는 값이다. */
+    S.mode = (sv.mode === 'daily' || sv.mode === 'classic' || sv.mode === 'classic-daily')
+      ? sv.mode : 'endless';
     S.stage = sv.stage || 1;
     S.seed = sv.seed || 1;
     S.gridSeed = sv.gridSeed || S.seed;
@@ -27044,7 +27666,11 @@ window.TT_SFX = {
     if (typeof sv.lastMission === 'string' && sv.lastMission) {
       store.lastMissionId = sv.lastMission;
     }
-    S.mission = (S.mode === 'endless')
+    /* W7.5 — 'endless' 를 missionMode() 로 바꾼다. 이 자리에 도달하는 mode 는
+     * 위 화이트리스트가 네 값으로 좁혀 두었고(endless·daily·classic·classic-daily),
+     * 그 넷에 대해 missionMode() 는 endless 와 classic 에만 true 라 뜻이 정확히
+     * "미션을 쓰는 모드"가 된다. 모험은 restoreSave 를 지나지 않는다. */
+    S.mission = missionMode()
       ? (sv.mission && sv.mission.id
           ? { id: sv.mission.id, goal: sv.mission.goal || 5,
               prog: sv.mission.prog || 0, done: !!sv.mission.done }
@@ -27078,7 +27704,7 @@ window.TT_SFX = {
     renderAll();
     recountMoves();          // the restored board is a board mutation like any other
     syncHud();
-    if (S.mode === 'daily') startTimer();
+    if (isDaily()) startTimer();
   }
 
   function startTimer() {
@@ -27530,7 +28156,17 @@ window.TT_SFX = {
      * 얼음만 깬 경우(iceOnly)는 매치가 아니다: 콤보도 매치 수도 오르지 않으므로
      * 패시브도 붙지 않는다 — 여기서 예외를 두지 않으면 얼음 파밍이 생긴다. */
     var fx = S.feverOn ? FEVER_MULT : 1;
-    var pass = iceOnly ? { mult: 1, fx: '', mfx: '' } : passiveApply(va, vb, S.combo);
+    /* ---- W7.5 클래식: 캐릭터 배수를 1 로 고정 -------------------------------
+     * 이미 있던 `iceOnly` 문법을 그대로 넓힌다. 배수만 나중에 1 을 곱해 지우는
+     * 방식이 아니라 **함수를 아예 부르지 않는** 것이 요점이다: passiveApply 와
+     * twinApply 는 값을 돌려줄 뿐 아니라 상태(교대 사슬 pv.twAlt · 패시브 누적)를
+     * 함께 전진시키므로, 부르고 나서 배수만 버리면 사슬은 조용히 자라고 그 결과가
+     * pv/tw 칩과 전투 게이지로 새어 나간다. 클래식에서 두 칩이 영영 비어 있는 것도
+     * 이 한 줄의 결과이지, 따로 숨긴 것이 아니다.
+     * 페버(fx)는 여기서 손대지 않는다 — 점화 자체가 featuresOn() 뒤에 있어
+     * 클래식에서는 S.feverOn 이 참이 되는 경로가 없고, fx 는 늘 1 이다. */
+    var noBonus = iceOnly || isClassic();
+    var pass = noBonus ? { mult: 1, fx: '', mfx: '' } : passiveApply(va, vb, S.combo);
     /* v4 §3: 텐트윈 배수도 여기서 합류한다. passiveApply 와 마찬가지로 상태를
        함께 전진시키므로 매치당 정확히 한 번만 부른다. 얼음만 깬 경우가 제외인
        것도 같은 이유다 — 매치가 아닌 것이 교대 사슬을 이을 수는 없다. */
@@ -27538,14 +28174,18 @@ window.TT_SFX = {
        필요한 것은 twinApply 를 부르기 **전**의 사슬 길이다 — 그 호출이 상태를
        함께 전진시키므로, 뒤에서 읽으면 전진 여부가 이미 지워져 있다. */
     var twPrev = S.pv ? (S.pv.twAlt | 0) : 0;
-    var tw = iceOnly ? { mult: 1, kind: '', chain: 0, fired: 0 } : twinApply(va, vb);
+    var tw = noBonus ? { mult: 1, kind: '', chain: 0, fired: 0 } : twinApply(va, vb);
     /* v4 4차-a: 미션 성공 배수(S.missionMult)가 곱항 하나로 더 합류한다.
        상태를 전진시키지 않는 순수한 값이라 매치당 몇 번 읽어도 안전하다. */
     var mm = S.missionMult > 1 ? S.missionMult : 1;
     var gain = iceOnly
       ? ICE_BREAK_SCORE * S.stage * fx
       : Math.round(10 * S.stage * comboScoreMult(S.combo, S.mode !== 'adv') *
-                   (gold ? GOLD_MULT : 1) * fx * pass.mult * tw.mult * mm);
+                   /* W7.5 — 황금 타일은 특수타일이라 클래식에서는 애초에 안
+                      깔리지만, 배수 게이트는 스폰과 별개로 여기서도 닫아 둔다:
+                      점수식이 "클래식에서 1 이 아닌 곱항"을 하나도 갖지 않는다는
+                      성질을 이 줄만 읽고 확인할 수 있어야 한다. */
+                   ((gold && !isClassic()) ? GOLD_MULT : 1) * fx * pass.mult * tw.mult * mm);
     var bombGain = blown.length ? BOMB_KILL_SCORE * S.stage * blown.length * fx : 0;
     S.score += gain + bombGain;
     if (S.feverOn) S.feverScore += gain + bombGain;
@@ -27563,7 +28203,7 @@ window.TT_SFX = {
       else if (va + vb === 10) missionBump('sum10', 1);
       if (specialsUsed) missionBump('special', specialsUsed);
       if (blown.length) missionBump('bomb', blown.length);
-      if (S.mode === 'rush') addRushTime(rushMatchMs());   // decays past 60s
+      if (isRush()) addRushTime(rushMatchMs());   // decays past 60s
       // Fever ignites at combo x4 and only ever ends on its own timer.
       if (featuresOn()) {
         if (S.feverOn) extendFever();
@@ -28116,7 +28756,7 @@ window.TT_SFX = {
     S.score += bonus;
     if (S.feverOn) S.feverScore += bonus;
     missionBump('rows', rows.length);
-    if (S.mode === 'rush') addRushTime(RUSH_ROW_MS * rows.length);
+    if (isRush()) addRushTime(RUSH_ROW_MS * rows.length);
     syncHud();
 
     // Phase 1 — whole-row flash (DESIGN 3: "행 전체 플래시 → 좌→우 스윕 소멸").
@@ -28271,7 +28911,7 @@ window.TT_SFX = {
     /* 전투에서 Add 는 없다. buildAddCells 는 판 뒤에 칸을 덧붙여 직사각형을
        깨뜨리므로(컬럼 중력의 전제), 버튼이 교체되는 단계 3 전까지 여기서 막는다. */
     if (battleOn()) { toast(t('toast.noadds')); J.sfx.fail(); return; }
-    if (S.mode === 'rush') {
+    if (isRush()) {
       // Unlimited, but rate-limited: Add becomes a timing decision.
       var cdLeft = S.addCdUntil - now();
       if (cdLeft > 0) {
@@ -28292,7 +28932,7 @@ window.TT_SFX = {
       applyBombs(S.cells, oldLen, S.mode,
                  mulberry32(((S.seed >>> 0) + S.addSeq * 0x9E3779B1) >>> 0));
     }
-    if (S.mode === 'rush') S.addCdUntil = now() + RUSH_ADD_CD;
+    if (isRush()) S.addCdUntil = now() + RUSH_ADD_CD;
     else S.adds--;
     // "No Add" mission restarts rather than failing (contract §3).
     if (S.mission && S.mission.id === 'noadd' && !S.mission.done) {
@@ -28553,8 +29193,10 @@ window.TT_SFX = {
       return;
     }
     // Time Rush never stops for a modal — the clock is the only pacing device.
-    if (S.mode === 'rush') {
-      if (S.score > store.bestRush) { store.bestRush = S.score; persist(); }
+    if (isRush()) {
+      /* W7.5 - bestKey() 가 고른 칸에 쓴다. 클래식 러시는 bestClassicRush,
+         일반 러시는 bestRush. 이름을 직접 부르지 않는 것이 분리의 보증이다. */
+      if (S.score > store[bestKey()]) { store[bestKey()] = S.score; persist(); }
       rushNextBoard();
       return;
     }
@@ -28571,8 +29213,9 @@ window.TT_SFX = {
      * stage+1 with the same score. Filing it now would put four half-runs from
      * one session on a five-slot board. The sheet gets an entry BUTTON into the
      * ranking screen instead (#btn-clear-rank) — a look, not a claim. */
-    if (S.score > store.best) store.best = S.score;
-    if (S.stage > store.bestStage) store.bestStage = S.stage;
+    /* W7.5 - 같은 이유로 칸을 함수가 고른다(클래식이면 bestClassic*). */
+    if (S.score > store[bestKey()]) store[bestKey()] = S.score;
+    if (S.stage > store[bestStageKey()]) store[bestStageKey()] = S.stage;
 
     var clearSec = Math.max(0, Math.floor((Date.now() - S.stageStartedAt) / 1000));
     // extBoardSize(stage), not S.cells.length: by the time a stage clears the
@@ -28587,7 +29230,7 @@ window.TT_SFX = {
     later(function () { J.confetti(window.innerWidth * 0.25, window.innerHeight * 0.5); }, 160);
     later(function () { J.confetti(window.innerWidth * 0.75, window.innerHeight * 0.5); }, 300);
 
-    if (S.mode === 'daily') { finishDaily(); return; }
+    if (isDaily()) { finishDaily(); return; }
 
     dropProgress();
     persist();
@@ -28753,13 +29396,14 @@ window.TT_SFX = {
     J.vibrate(60);
     mascotSad();
 
-    var rush = S.mode === 'rush';
-    if (rush) {
-      if (S.score > store.bestRush) store.bestRush = S.score;
-    } else {
-      if (S.score > store.best) store.best = S.score;
-      if (S.stage > store.bestStage) store.bestStage = S.stage;
-    }
+    /* W7.5 — `rush` 는 여기서 **연출용 불리언**으로 남는다(무한 Add 라 +2 Add 를
+     * 숨긴다 · 결과창이 단계 대신 매치 수를 읽는다). 기록이 어디로 가는지는 더는
+     * 이 불리언이 정하지 않는다: bestKey()/bestStageKey()/rankKeyOf() 셋이 정한다.
+     * 그래서 클래식 세 종목이 store.best / ranks.endless 로 새어 들어갈 문법적
+     * 경로가 없다 — 이 함수 안에 'endless' 나 'best' 라는 이름이 남아 있지 않다. */
+    var rush = isRush();
+    if (S.score > store[bestKey()]) store[bestKey()] = S.score;
+    if (!rush && S.stage > store[bestStageKey()]) store[bestStageKey()] = S.stage;
     dropProgress();
     persist();
 
@@ -28768,11 +29412,16 @@ window.TT_SFX = {
      * S.overInfo is built, so the frozen `best` below is already the reconciled
      * mirror and the sheet can never show a number the board disagrees with. */
     clearRankFresh();
+    /* W7.5 — 보드 키도 rankKeyOf() 가 고른다. 항목의 **모양**은 여전히 러시냐
+     * 아니냐로 갈린다(러시는 단계가 뜻이 없어 matches 를 싣는다) — RANK_FIELDS 가
+     * classic-rush 를 rush 와 같은 모양으로, classic 을 endless 와 같은 모양으로
+     * 선언해 두었기 때문에 이 두 갈래로 충분하다. */
+    var rkey = rankKeyOf();
     var newRank = rush
-      ? submitRank('rush', { score: S.score, matches: S.matches })
-      : submitRank('endless', { score: S.score, stage: S.stage });
+      ? submitRank(rkey, { score: S.score, matches: S.matches })
+      : submitRank(rkey, { score: S.score, stage: S.stage });
     if (newRank > 0) {
-      rankFresh.mode = rush ? 'rush' : 'endless';
+      rankFresh.mode = rkey;
       rankFresh.pos = newRank;
     }
 
@@ -28781,7 +29430,7 @@ window.TT_SFX = {
     S.overInfo = {
       rush: rush,
       score: S.score,
-      best: rush ? store.bestRush : store.best,
+      best: store[bestKey()],   // W7.5 — 이 판이 겨룬 바로 그 기록
       stage: S.stage,
       rank: newRank
     };
@@ -28815,7 +29464,7 @@ window.TT_SFX = {
     badgePop('add-badge');
     syncHud();
     saveProgress();
-    if (S.mode === 'daily') startTimer();
+    if (isDaily()) startTimer();
   }
 
   /* =========================================================================
@@ -28852,8 +29501,14 @@ window.TT_SFX = {
   function finishDaily() {
     stopTimer();
     var sec = Math.floor((Date.now() - S.startedAt) / 1000);
-    bumpStreak();
-    store.dailyBest = {
+    /* W7.5 - 클래식 데일리는 같은 판(같은 시드)을 겨루지만 **다른 칸**에
+     * 적힌다. 연속 일수(streak)는 일반 데일리만 올린다: 하나의 습관 지표를
+     * 두 모드가 함께 올리면 하루에 두 번 출석한 것이 되어 수가 거짓말을 한다.
+     * 결과 시트가 읽는 칸도 같은 이름으로 갈린다(dailyBestOf). */
+    var classicRun = (S.mode === 'classic-daily');
+    var bestSlot = classicRun ? 'classicDailyBest' : 'dailyBest';
+    if (!classicRun) bumpStreak();
+    store[bestSlot] = {
       date: todayKey(), n: dailyNumber(), timeSec: sec,
       matches: S.matches, maxCombo: S.maxCombo, score: S.score,
       // Grade and milestones are seed-independent, so awarding them in Daily
@@ -28870,12 +29525,12 @@ window.TT_SFX = {
      * same-date dedupe inside submitRank() is what makes a replay of today's
      * puzzle either improve the single entry for today or change nothing. */
     clearRankFresh();
-    var dRank = submitRank('daily', {
+    var dRank = submitRank(rankKeyOf(), {
       timeSec: sec, n: dailyNumber(), matches: S.matches,
-      maxCombo: S.maxCombo, grade: store.dailyBest.grade, date: todayKey()
+      maxCombo: S.maxCombo, grade: store[bestSlot].grade, date: todayKey()
     });
-    if (dRank > 0) { rankFresh.mode = 'daily'; rankFresh.pos = dRank; }
-    showDailyResult(dRank);
+    if (dRank > 0) { rankFresh.mode = rankKeyOf(); rankFresh.pos = dRank; }
+    showDailyResult(dRank, classicRun);
   }
 
   /**
@@ -28883,8 +29538,15 @@ window.TT_SFX = {
    *   from a module variable because this sheet is ALSO opened from the menu for
    *   a daily finished hours ago, where celebrating again would be a lie.
    */
-  function showDailyResult(rank) {
-    var d = store.dailyBest;
+  /**
+   * @param classicRun 클래식 데일리의 결과인가. 생략하면 S.mode 로 판단한다 —
+   *   판이 막 끝난 경로(finishDaily)에서는 그것이 맞지만, 허브에서 “오늘 이미
+   *   했음”을 눌러 결과만 다시 여는 경로는 아직 그 모드로 **들어가기 전**이라
+   *   S.mode 가 딴 값이다. 그 한 자리만 명시적으로 넘긴다.
+   */
+  function showDailyResult(rank, classicRun) {
+    var d = (classicRun === undefined) ? dailyBestNow()
+      : (classicRun ? store.classicDailyBest : store.dailyBest);
     if (!d) { goMenu(); return; }
     dailyRank = rank | 0;
     setText('daily-title', t('daily.title', { n: d.n }));
@@ -28899,7 +29561,7 @@ window.TT_SFX = {
   }
 
   function shareText() {
-    var d = store.dailyBest;
+    var d = dailyBestNow();   // W7.5 — 방금 끝낸 판의 칸
     if (!d) return '';
     // Language-independent by design (contract §8).
     return 'TenTwin #' + d.n + ' ✅ ' + fmtTime(d.timeSec) + ' 🔥' + d.maxCombo + 'x' +
@@ -29029,12 +29691,12 @@ window.TT_SFX = {
     if (!e) {
       main.textContent = t('rank.empty');
       meta.textContent = '';
-    } else if (rankMode === 'daily') {
+    } else if (rankShape(rankMode) === 'daily') {
       main.textContent = t('rank.row.daily', { time: fmtTime(e.timeSec) });
       meta.textContent = t('rank.meta.daily', {
         n: e.n, combo: e.maxCombo, date: rankDateText(e.date)
       });
-    } else if (rankMode === 'rush') {
+    } else if (rankShape(rankMode) === 'rush') {
       main.textContent = t('rank.row.rush', { score: e.score });
       meta.textContent = t('rank.meta.rush', { matches: e.matches, date: rankDateText(e.date) });
     } else {
@@ -29184,7 +29846,7 @@ window.TT_SFX = {
       stopFeverLoop();
       rafFever = requestAnimationFrame(feverLoop);
     }
-    if (S.mode === 'rush') S.rushEndAt += held;
+    if (isRush()) S.rushEndAt += held;
     /* 모험의 스테이지 시계와 미션 시계도 벽시계다. 둘 다 여기 없으면 "빡!"
      * 배너와 허리 업 타임스톱이 곧바로 제한시간을 먹어 치운다 — 연출이
      * 불이익이 되는 순간 두 연출 모두 존재 이유를 잃는다. */
@@ -29281,9 +29943,9 @@ window.TT_SFX = {
     S.combo = 1;
     S.comboUntil = 0;
     var keepEnd = S.rushEndAt;
-    startStage(S.stage, S.mode === 'daily' ? dailySeed() : S.seed);
-    if (S.mode === 'daily') { S.startedAt = Date.now(); startTimer(); }
-    if (S.mode === 'rush') { S.rushEndAt = keepEnd; startRushLoop(); }
+    startStage(S.stage, isDaily() ? dailySeed() : S.seed);
+    if (isDaily()) { S.startedAt = Date.now(); startTimer(); }
+    if (isRush()) { S.rushEndAt = keepEnd; startRushLoop(); }
     J.sfx.ui();
   }
 
@@ -32589,11 +33251,37 @@ window.TT_SFX = {
    * 현재 지점이다. 두 갈래를 한 버튼에 둔 이유는 §6.8 이 버튼을 넷으로 못박았기
    * 때문이 아니라, 플레이어에게 이 둘이 같은 문장이기 때문이다 — "아까 하던 거".
    */
+  /* W7.5 — 폐지. 메뉴의 이 자리는 이제 클래식 허브가 쓴다(#btn-cont 는 id 와
+   * 버튼 아트를 그대로 물려받고 라벨만 i18n 으로 갈렸다). 함수는 지우지 않고
+   * 남긴다: 되돌리려면 wire() 의 한 줄을 openClassicHub 에서 resumeLast 로
+   * 되돌리면 되고, 그때 이 본문이 있어야 한다. 참고로 이 함수에는 결함이 하나
+   * 있었다 — 저장된 판이 데일리여도 startEndless(false) 를 불러, store.save.mode
+   * 가 'endless' 가 아니면 그 저장을 조용히 버리고 새 판을 시작했다. */
   function resumeLast() {
     J.sfx.ui();
     if (store.save) { startEndless(false); return; }
     openAdventure();
   }
+
+  /* ---- W7.5 §클래식 허브 ---------------------------------------------------
+   * 모드 시트와 같은 규약이다: 허브는 **상태를 만들지 않는다**. 각 줄은 진입
+   * 함수를 그대로 부르고, 배지는 이미 store 에 있는 사실을 읽어 쓸 뿐이다.
+   * ------------------------------------------------------------------------- */
+  function syncClassicSheet() {
+    /* 아케이드 배지는 최고점, 러시 배지도 최고점, 데일리 배지는 오늘 완료 표식.
+       전부 클래식 전용 칸에서 읽는다 — 여기서 일반 store.best 를 읽으면 화면이
+       "기록 분리"를 스스로 부정한다. */
+    setText('classic-arcade-b', store.bestClassic > 0 ? String(store.bestClassic) : '');
+    setText('classic-rush-b', store.bestClassicRush > 0 ? String(store.bestClassicRush) : '');
+    setText('classic-daily-b', classicDailyDoneToday() ? '✅' : '');
+  }
+
+  function openClassicHub() {
+    syncClassicSheet();
+    openModal('modal-classic');
+    J.sfx.ui();
+  }
+  function closeClassicHub() { closeModal('modal-classic'); }
 
   /* ---- §E 스토리 컷툰 -----------------------------------------------------
    * 컷 그림은 아직 없다(--cut-*-img 미정의). 그래서 표의 `img` 칸은 지금 전부
@@ -33059,7 +33747,27 @@ window.TT_SFX = {
     /* v4 10차 §C — 메뉴는 네 버튼이고, 모드는 시트 안이다. 각 모드의 동작은
        9차와 **한 글자도 다르지 않다**: 부르는 자리만 한 겹 안으로 들어갔다. */
     on($('btn-play'), 'click', openModeSheet);
-    on($('btn-cont'), 'click', resumeLast);
+    /* W7.5 — 메뉴 둘째 버튼은 "이어하기"에서 **클래식**이 됐다. 버튼 id 와 아트
+       (mbtn-cont / mc-cont, 글자가 안 구워진 보라 버튼)는 그대로 물려받고 라벨만
+       i18n 으로 갈린다 — 아트 발주 0. 이어하기가 하던 일은 이제 각 모드가 자기
+       진입점에서 자동 복원으로 처리하므로 버튼 하나가 통째로 비었다. */
+    on($('btn-cont'), 'click', openClassicHub);
+    on($('classic-close'), 'click', function () { closeClassicHub(); J.sfx.ui(); });
+    on($('classic-arcade'), 'click', function () {
+      closeClassicHub(); J.sfx.ui(); startClassic(false);
+    });
+    on($('classic-rush'), 'click', function () {
+      closeClassicHub(); J.sfx.ui(); startClassicRush();
+    });
+    on($('classic-daily'), 'click', function () {
+      closeClassicHub();
+      J.sfx.ui();
+      /* 일반 데일리와 같은 규약: 오늘 이미 끝냈으면 결과를 다시 보여 주고 판을
+         새로 열지 않는다. 다만 읽는 칸이 classicDailyBest 라 두 데일리는 서로의
+         완료 여부를 모른다 — 하루에 둘 다 한 판씩 할 수 있어야 하기 때문이다. */
+      if (classicDailyDoneToday()) showDailyResult(0, true);
+      else startClassicDaily(false);
+    });
     on($('mode-close'), 'click', function () { closeModeSheet(); J.sfx.ui(); });
     on($('mode-adv'), 'click', function () { closeModeSheet(); J.sfx.ui(); openAdventure(); });
     on($('mode-arcade'), 'click', function () { closeModeSheet(); J.sfx.ui(); startEndless(false); });
@@ -33067,7 +33775,7 @@ window.TT_SFX = {
       closeModeSheet();
       J.sfx.ui();
       // 0: re-opening a result finished hours ago must not re-celebrate it.
-      if (store.dailyBest && store.dailyBest.date === todayKey()) showDailyResult(0);
+      if (store.dailyBest && store.dailyBest.date === todayKey()) showDailyResult(0, false);
       else startDaily(false);
     });
     on($('mode-rush'), 'click', function () {
@@ -33461,6 +34169,8 @@ window.TT_SFX = {
         if ($('modal-rank') && !$('modal-rank').hidden) { closeRank(); return; }
         // 10차 §C: 모드 시트는 메뉴 위에 떠 있는 한 겹이라 가장 먼저 닫힌다.
         if ($('modal-mode') && !$('modal-mode').hidden) { closeModeSheet(); return; }
+      // W7.5 — 클래식 허브도 메뉴 위의 한 겹이라 모드 시트와 같은 우선순위다.
+      if ($('modal-classic') && !$('modal-classic').hidden) { closeClassicHub(); return; }
         /* 모험의 두 시트. 미션 카드는 지도 위에 떠 있으므로 먼저 닫히고, 결과
          * 시트는 닫는 것이 아니라 **지도로 돌아가는 것**이다 — 그냥 닫으면
          * 판이 끝난 화면에 갇힌다. */
@@ -34073,6 +34783,12 @@ window.TT_SFX = {
     openTutorial: openTutorial, tutLoadStep: tutLoadStep, finishTutorial: finishTutorial,
     state: S, layout: layout, render: renderAll, boardArea: boardArea,
     startEndless: startEndless, startDaily: startDaily, startRush: startRush,
+    /* W7.5 — 클래식 세 종목. 위 셋과 같은 자격의 디버그 핸들이다(검증 하네스가
+       메뉴를 거치지 않고 모드를 여는 데 쓴다). openClassicHub 까지 함께 내보내는
+       것은 허브 자체도 판정 대상이기 때문이다. */
+    startClassic: startClassic, startClassicRush: startClassicRush,
+    startClassicDaily: startClassicDaily, openClassicHub: openClassicHub,
+    isClassic: isClassic, bestKey: bestKey, rankKeyOf: rankKeyOf,
     menu: goMenu,
     /* v5 E-1 ranking board — DEBUG HANDLES ONLY, in the same spirit as
      * `state` / `layout` / `render` above: nothing in the game reaches the
@@ -34695,8 +35411,58 @@ window.TT_SFX = {
      견본(노드 카드·플레이 시트)을 제외했었지만, 이번 사용자 지시가 "모달로
      쓰이는 건 전부 동일 색상"이라 견본도 편입한다. 등급에 두면 창이 늘어도
      고칠 자리가 여기 한 곳이다. */
-  --modal-tint:rgba(255,228,244,.22);
-  --modal-glass:blur(2px) saturate(1.04) brightness(1.18);
+  /* ===== W7.5 — 모달 젤리판 틴트 **2차** 재조색 =============================
+     1차(바로 위 W2.5 주석의 값)가 사용자 반려됐다. 낱말 셋: ①더 투명하게(뒤가
+     더 비쳐야) ②연핑크와 연보라의 **중간** 파스텔이어야 하는데 지금은 아니다
+     ③"제대로 시안처럼". 정본 시안(gm-modal-pink-target.jpg)을 다시 실측했다.
+
+     ▸ 실측 방법 — 판 경계 안팎으로 **같은 배경 조각**을 짝지어 147쌍을 떴다
+       (바깥 띠 rim+3~17px / 안쪽 띠 rim+14~28px). 합성 모형
+         inside = clamp(outside × b) × (1−a) + tint × a
+       에서 관측으로 식별 가능한 것은 대비이득 k = b(1−a) 와 베일 offset = a·tint
+       둘뿐이다. 강건회귀 + 내용자기상관(ρ=0.837) 보정 결과:
+         **k = 0.62 (0.53~0.70)** · **offset = (101, 96, 102) ±6**
+       내용이 실제로 일치하는 짝(나무줄기·아래 수풀·연못)에서 잔차 ±1~8.
+
+     ▸ 가장 결정적인 한 쌍 — 판 바깥의 **무채색 회색 (132,132,131)** 이 판 안에서
+       **(182,164,189)** 이 된다. R·B 가 +51/+56 오르는 동안 G 는 +32 만 오른다.
+       베일은 흰색도 분홍도 아닌 **마젠타-보라**다. 사용자 낱말이 옳았다.
+
+     ▸ 색상각 — offset(101,96,102) = **HSL 290°**, b=1.0 최적합 틴트
+       (255,243,255) = **298.5°**. 실측 틴트 색상각 **295° ± 8°**.
+       1차 값 rgb(255,228,244) 은 **324°(분홍)** 로 약 30° 분홍 쪽으로 치우쳐 있었다.
+       분홍 330~350° / 라벤더 270~290° 의 **중간이 정확히 300°** 이고 실측이
+       그 값을 가리킨다. 그래서 rgb(255,242,255) — R 과 B 를 같게 두고 G 만 13 내린
+       HSL(300, 100%, 97.5%). 이것이 "연핑크와 연보라의 중간 파스텔"이다.
+
+     ▸ ⚠ 사용자의 "더 투명하게"와 실측이 **겉보기에 어긋난다**: 시안의 판은 1차보다
+       오히려 **더 불투명**하다(1차 k=0.92 offset=(56,50,54) / 시안 k=0.62
+       offset=(101,96,102)). 그런데도 시안이 더 비쳐 보이는 이유를 실측이 말한다 —
+       1차에서 뒤 화면을 죽인 것은 틴트 α 가 아니라 **다른 셋**이었다:
+         ⑴ brightness(1.18) 이 216 이상인 backdrop 채널을 전부 흰색으로 **클리핑**해
+            밝은 하늘·구름을 납작한 우윳빛 덩어리로 만들었다.
+         ⑵ 화면 전체 스크림 rgba(26,14,38,.28) 이 판에 닿기도 **전에** 장면의
+            중간톤 대비를 이미 눌러 놓았다(시안 실측: 판 바깥 p99.9 = (254,244,246),
+            최대 (255,250,251) — 시안에는 스크림이 아예 **없다**).
+         ⑶ blur(2px) 가 뒤를 서리유리로 만들었다.
+       그래서 α 를 더 내리는 대신 저 셋을 걷는다. α 는 .22 → **.40** 으로 오르지만
+       장면이 선명함과 전체 계조를 되찾으므로 **더 비쳐 보인다** — 사용자가 말한
+       것은 α 가 아니라 "뒤가 읽히는가"였다.
+       (덧: offset 101 을 만들려면 어떤 색역 내 틴트로도 α ≥ 101/255 = 0.40 이
+        필요하다. .12~.16 대역으로는 시안에 **도달할 수 없다** — 산술로 닫힌다.)
+
+     ▸ 흐림 — 시안은 판 뒤를 **안 흐린다**. 판 안팎 캐노피 타일의 방사평균 파워
+       스펙트럼 비 P_in/P_out 가 주파수와 함께 0.37 → 0.49 → 0.60 → 0.86 → 0.94
+       → 2.43 으로 **오른다**. 가우시안 흐림이면 exp(−4π²σ²f²) 로 떨어져야 하므로
+       적합값은 σ = 0.00px (f² 계수가 양수로 나온다). 상한 σ < 0.7 시안px = **0.4 CSS px**.
+       그래서 blur(0px). 시안의 매력은 나무가 판 너머로 **선명하게 읽히는** 것이다.
+
+     옛 값(되돌릴 근거):
+       --modal-tint:rgba(255,228,244,.22);
+       --modal-glass:blur(2px) saturate(1.04) brightness(1.18);
+     ========================================================================= */
+  --modal-tint:rgba(255,242,255,.40);
+  --modal-glass:blur(0px) saturate(1.04) brightness(1.03);
 }
 .jbox,
 #app.battle #actionbar{
@@ -35034,7 +35800,20 @@ window.TT_SFX = {
     inset 0 -5px 0 #43A184;
   text-shadow:0 1.5px 0 rgba(110,70,58,.55);
 }
-.w6m .rank-tab{ flex:1 1 0; min-width:0; overflow:hidden; text-overflow:ellipsis; }
+/* W7.5 — 기록창 탭이 셋에서 **여섯**이 됐다(일반 3 + 클래식 3).
+   옛 한 줄:  .w6m .rank-tab{ flex:1 1 0; min-width:0; overflow:hidden; text-overflow:ellipsis; }
+   그대로 두면 여섯 개가 한 줄에 욱여넣어져 칸당 42px(실측)이 되고 "클래식
+   데일리"가 통째로 잘린다. 폭을 줄이는 대신 **줄을 접는다**.
+   ⚠ flex-wrap:wrap 만으로는 안 접힌다 — flex-shrink 가 1 이면 기준폭을 무시하고
+   쪼그라들어 한 줄에 다 들어가기 때문이다. 접힘을 강제하는 것은 wrap 이 아니라
+   `flex-shrink: 0` 이고(줄이지 못하면 넘칠 수밖에 없다), 그때 비로소 wrap 이 일한다.
+   기준폭 28% × 6 = 168% → 한 줄에 셋씩. grow 1 이라 셋이 남은 폭을 나눠 갖는다.
+   탭이 셋이던 때와의 호환: 3 × 28% = 84% + 간격이라 여전히 한 줄이고 grow 가
+   폭을 채우므로 **옛 화면은 한 픽셀도 안 바뀐다**.
+   min-width:0 은 뺐다 — shrink 가 0 이면 값을 할 일이 없고, 남겨 두면 "여기서
+   줄어들 수 있다"는 거짓 신호가 된다. 말줄임은 남긴다(긴 번역 대비). */
+.w6m .rank-tab{ flex:1 0 28%; overflow:hidden; text-overflow:ellipsis; }
+.w6m #rank-tabs{ flex-wrap:wrap; row-gap:8px; }
 /* 꺼짐 · 비선택 — 같은 캔디에서 채도만 뺀다 */
 .w6m .set-tg[aria-pressed="false"],
 .w6m .rank-tab[aria-selected="false"]{
