@@ -36,7 +36,7 @@ SEED_PENDING = (
     ["ch-%s-%s" % (c, p)
      for c in ("pudding", "sodawitch", "mongle", "churup")
      for p in ("face", "full", "portrait", "thumb")]
-    + ["cut-free-1", "cut-free-2"]
+    + ["cut-free-1", "cut-free-2", "cut-n3-v2"]
     + ["duel-demon-full-straw", "duel-demon-full-soda", "duel-demon-full-grape"]
 )
 SEED_NOTE = {
@@ -46,6 +46,7 @@ SEED_NOTE = {
     "thumb": "썸네일 — 목록 아이콘",
     "cut-free-1": "컷신 — 해방 연출 1",
     "cut-free-2": "컷신 — 해방 연출 2",
+    "cut-n3-v2": "컷신 — 형제 2인컷(컷10 결의) 세로 재발주판",
     "duel-demon-full-straw": "보스 전신 — 딸기 속성 변형",
     "duel-demon-full-soda": "보스 전신 — 소다 속성 변형",
     "duel-demon-full-grape": "보스 전신 — 포도 속성 변형",
