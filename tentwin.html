@@ -21822,6 +21822,24 @@ window.TT_SFX = {
    * ========================================================================= */
   var fallGen = 0;
 
+  /* =========================================================================
+   * WD-1 §12 — 스탯 발동 카운터 세 개.
+   *
+   * popLive/popBurstAt/fallGen 과 같은 자리에 사는 이유가 있다: 셋 다 판의
+   * 상태(S)가 아니라 **연출·입력 리듬의 상태**라서, 타이머가 통째로 버려질 때
+   * 같이 0 으로 돌아가야 말이 된다. S 에 넣으면 스냅샷(되돌리기)이 이 값을
+   * 같이 되감아, 이미 지나간 손놀림이 되살아난다.
+   *
+   *   awkStreak  이번 판에서 성공한 각성 시전 수 (§12 폭발력)
+   *   stdyRun    무딜레이 연속 매칭 수 (§12 꾸준함)
+   *   statAgil   이번 매치가 팝/낙하 진행 중이었나 (§12 순발력)
+   *   statFxLast 직전 매치에서 띄운 발동 플로트의 종류 (엣지 트리거용)
+   * ========================================================================= */
+  var awkStreak = 0;
+  var stdyRun = 0;
+  var statAgil = false;
+  var statFxLast = '';
+
   function later(fn, ms) {
     var id = setTimeout(function () {
       var k = timers.indexOf(id);
@@ -21842,6 +21860,13 @@ window.TT_SFX = {
     /* W2.5 - 낙하 세대도 타이머와 한 몸이다. 여기서 버려지는 later() 중에
        `.fall` 청소가 섞여 있으므로 같이 0 으로 돌린다. */
     fallGen = 0;
+    /* WD-1 §12 — 스탯 발동 카운터도 같은 한 몸이다. stdyRun/statAgil 은 popLive
+       가 만들어 주는 값이라 popLive 만 0 이 되고 이것들이 남으면, 판이 바뀐 뒤
+       첫 매치가 "이미 3연속 중"으로 잡혀 꾸준함이 공짜로 붙는다. */
+    awkStreak = 0;
+    stdyRun = 0;
+    statAgil = false;
+    statFxLast = '';
   }
 
   function now() {
@@ -21975,6 +22000,13 @@ window.TT_SFX = {
     skins: [],
     equipped: {},
     jstar: 0,
+    /* --- WD-1 §12/§13: 스탯 강화 레벨 ------------------------------------
+     * { charId: { power, steady, agility, luck } }. 없는 키 = 강화 0 이고,
+     * 기본표(STAT_BASE)는 코드가 들고 있으므로 여기에는 **올린 만큼만** 적는다.
+     * 기본값까지 세이브에 굽지 않는 이유는 §13.2 표가 앞으로도 조정될 수
+     * 있기 때문이다 — 구운 값이 남아 있으면 표를 고쳐도 기존 플레이어만
+     * 옛 표를 계속 쓰게 된다. */
+    statLv: {},
     /* --- v4 10차 §E: 컷툰 시청 기록 ---------------------------------------
      * { open: 1, ten: 1, … } — 본 묶음의 id 를 켜 둔다. 두 가지 일을 한다:
      *   ① 오프닝은 **최초 1회만** 자동으로 열린다(두 번째 모험 진입에서 또 12컷을
@@ -22164,6 +22196,30 @@ window.TT_SFX = {
           for (var ck in o.seenCuts) {
             if (!Object.prototype.hasOwnProperty.call(o.seenCuts, ck)) continue;
             if (typeof ck === 'string' && ck.length <= 16 && o.seenCuts[ck]) store.seenCuts[ck] = 1;
+          }
+        }
+        /* WD-1 §12 — 스탯 강화 레벨. 통과 조건이 좁은 것은 이 값이 곧바로
+           점수식의 곱항이 되기 때문이다: 아는 캐릭터(HERO_IDS) · 아는 네 칸
+           (STAT_KEYS) · 0..STAT_LV_MAX 의 정수만 살린다. 어긋난 항목은 그
+           항목만 버린다 — 맵 전체를 버리면 손상된 칸 하나 때문에 강화 진행이
+           통째로 날아간다(9차 sanitizeCountMap 과 같은 규율). */
+        if (o.statLv && typeof o.statLv === 'object') {
+          for (var hi = 0; hi < HERO_IDS.length; hi++) {
+            var hid = HERO_IDS[hi];
+            var src = o.statLv[hid];
+            if (!src || typeof src !== 'object') continue;
+            var dst = null;
+            for (var ski = 0; ski < STAT_KEYS.length; ski++) {
+              var sk = STAT_KEYS[ski];
+              var sv = src[sk];
+              if (typeof sv !== 'number' || !isFinite(sv)) continue;
+              sv = sv | 0;
+              if (sv < 0) sv = 0;
+              if (sv > STAT_LV_MAX) sv = STAT_LV_MAX;
+              if (!dst) dst = {};
+              dst[sk] = sv;
+            }
+            if (dst) store.statLv[hid] = dst;
           }
         }
         if (o.jellyOn === true) store.jellyOn = true;
@@ -23081,6 +23137,14 @@ window.TT_SFX = {
          짧아야 한다: 터진 그 자리에서 한 줄로 읽히고 사라지는 글자다. */
       'mk.pet': '+1 PET!',
       'mk.star': 'SPECIAL MAX!',
+      /* WD-1 §12 — 스탯 발동 플로트. mk.* 와 같은 자리에 사는 같은 종류의 글자라
+         길이도 거기에 맞춘다. 치환 토큰이 %d 가 아니라 {n} 인 것은 이 파일의
+         t() 가 {name} 꼴만 알기 때문이다 — 문구 하나를 위해 두 번째 서식기를
+         들이는 것보다 이미 있는 규약을 쓰는 편이 낫다. */
+      'stat.power': 'POWER +{n}%',
+      'stat.steady': 'STEADY +{n}%',
+      'stat.agility': 'AGILITY +{n}%',
+      'stat.luck': 'LUCKY x2!',
       /* W3 — 기술이 "숫자 멈춤"으로 승격되면서 문구도 두 사실을 다 말한다:
          시계도 멈추고 악당 게이지도 멈춘다. 하나만 말하면 나머지 하나는
          플레이어가 영영 모르는 효과가 된다. */
@@ -23826,6 +23890,11 @@ window.TT_SFX = {
       /* W2.5 ④ — 마크 과일의 플로트 문구(사용자 확정 문구 그대로). */
       'mk.pet': '+1 펫!',
       'mk.star': '각성 MAX!',
+      /* WD-1 §12 — 스탯 발동 플로트(§13.1 의 네 이름 그대로). */
+      'stat.power': '폭발력 +{n}%',
+      'stat.steady': '꾸준함 +{n}%',
+      'stat.agility': '순발력 +{n}%',
+      'stat.luck': '행운 2배!',
       /* W3 — 기술이 "숫자 멈춤"으로 승격되면서 문구도 두 사실을 다 말한다:
          시계도 멈추고 악당 게이지도 멈춘다. 하나만 말하면 나머지 하나는
          플레이어가 영영 모르는 효과가 된다. */
@@ -25691,7 +25760,13 @@ window.TT_SFX = {
    * 0.20 으로 올려 적으면 agility 최댓값이 .111(트윈) → .20 으로 뛰어
    * **기존 세 캐릭터의 막대가 함께 짧아진다** — E3 가 W7 주석에 적어 둔 바로 그
    * 함정이다. 막대는 캐릭터를 고를 때의 상대 비교표지 계산서가 아니므로,
-   * 계열이 같은 한 쌍을 공유하는 쪽이 옳다. */
+   * 계열이 같은 한 쌍을 공유하는 쪽이 옳다.
+   *
+   * ※ WD-1 §13.5 추가 — 위 문단이 말하는 정규화는 heroStatPct 에서 걷어냈다.
+   *   막대는 이제 STAT_CAP 고정 눈금에서 STAT_BASE 를 읽으므로, 여기 계수를 어떻게
+   *   잡든 남의 막대가 따라 움직이는 일은 더 이상 없다. 결론(계열이 같은 쌍을
+   *   공유한다)은 그대로 둔다 — 사라진 것은 근거였던 함정 하나뿐이고, 소다의
+   *   기댓값을 젤리와 같게 맞춘다는 밸런스 판단 자체는 §13.5 와 무관하다. */
   var PUDDING_SOFT_MULT = 1 + (TEN_SUM10_MULT - 1) / 4;   // = 1.15
   var SODA_P_MULT = 2;                                     // 잭팟 확률 ×2 (= 20%)
   var SODA_MULT = 1 + (JELLY_MULT - 1) / 2;                // = 2
@@ -25882,6 +25957,11 @@ window.TT_SFX = {
     syncCharSummary();
     applySkins();
     syncGems();
+    /* WD-1 §13.5 — 막대는 강화에 따라 움직이므로 부팅 1회로는 모자란다. 패널이
+       열릴 때마다 다시 칠한다: 멱등하고 값이 같으면 아무 일도 안 일어나므로
+       (applyHeroStats 주석 참조) 여는 비용은 사실상 0 이고, 대신 "강화하고
+       나왔더니 막대가 그대로"인 순간이 존재하지 않게 된다. */
+    applyHeroStats();
   }
 
   /** 젤리별 잔액을 표시하는 두 자리. */
@@ -27325,6 +27405,12 @@ window.TT_SFX = {
     setAppClass('skill', true);
     setAppClass('skill-jelly', kind === 'jellytime');
     if (kind === 'summon') {
+      /* WD-1 §12 폭발력 — 각성 연쇄는 **여기서만** 오른다. 수동 발동
+         (fireSkill → castSkill)과 보스전 확정 시전이 결국 둘 다 applySkill 로
+         모이므로, 이 한 줄이 "실제로 성립한 시전"을 빠짐없이 그리고 두 번 세지
+         않고 센다. 게이지가 모자라 튕긴 시도는 여기까지 못 오므로 자동으로
+         제외된다 — 그 판정을 따로 복제하지 않는 것이 요점이다. */
+      awkStreak++;
       /* 형제는 이미 리듬을 맞춘 채로 도착한다 — 사슬이 SKILL_TW_HEAD 에서
          출발한다. twSeen 도 같이 올려 5연쇄 배너가 "내가 한 것도 아닌데" 터지는
          것을 막는다(10연쇄 배너는 그대로 살아 있어서 목표가 남는다). */
@@ -28156,6 +28242,13 @@ window.TT_SFX = {
     S.gainPet = 0;
     S.gainStar = 0;
     S.gainGem = 0;
+    /* WD-1 §12 — 스탯 발동 카운터도 판 단위다. 특히 awkStreak 은 각성 시전
+       기록이라 판이 바뀌어도 저절로 안 줄어든다: 여기서 안 지우면 지난 판에서
+       쌓은 연쇄가 다음 판 첫 매치에 폭발력 정점으로 그대로 얹힌다. */
+    awkStreak = 0;
+    stdyRun = 0;
+    statAgil = false;
+    statFxLast = '';
     rwReset();
     applyCharSkin();    // 마스코트 슬롯을 선택 캐릭터로 (메뉴에서 바꿨을 수 있다)
     S.stage = stage;
@@ -28893,7 +28986,22 @@ window.TT_SFX = {
     S.busy = true;
     /* 팝 단계 진입. S.busy 는 여전히 켠다 - 완화는 탭 게이트 한 곳뿐이고,
        나머지 잠금 사용처의 의미는 한 글자도 안 바뀐다. */
-    if (popLive === 0) popBurstAt = now();   // 이 매치가 연타 묶음의 첫 팝이다
+    /* WD-1 §12 꾸준함·순발력 — 두 조건의 판정을 여기 한 곳에 둔다. 탭 게이트
+       (위 W2 주석의 그 게이트)가 S.busy 중의 탭을 `popLive > 0` 일 때만 통과
+       시키므로, **이 시점에 popLive 가 0 이 아니라는 사실 자체가** "앞 매치의
+       팝/낙하가 아직 진행 중인데 다음 짝을 찾아 눌렀다" 의 증거다. 시각을 따로
+       재거나 입력 이벤트에 갈고리를 다는 것보다 이쪽이 정확하다 — 게이트와
+       같은 값을 읽으므로 둘이 어긋날 수 없다.
+         popLive === 0 → 묶음의 첫 수. 연속은 1 에서 다시 시작하고 순발력은 없다.
+         popLive  > 0  → 묶음 안의 이어친 수. 연속이 자라고 순발력이 선다. */
+    if (popLive === 0) {
+      popBurstAt = now();   // 이 매치가 연타 묶음의 첫 팝이다
+      stdyRun = 1;
+      statAgil = false;
+    } else {
+      stdyRun++;
+      statAgil = true;
+    }
     popLive++;
     popGen++;
     var myGen = popGen;
@@ -29017,6 +29125,16 @@ window.TT_SFX = {
     /* v4 4차-a: 미션 성공 배수(S.missionMult)가 곱항 하나로 더 합류한다.
        상태를 전진시키지 않는 순수한 값이라 매치당 몇 번 읽어도 안전하다. */
     var mm = S.missionMult > 1 ? S.missionMult : 1;
+    /* WD-1 §12.2 — 스탯 곱항. 기존 곱항은 하나도 안 건드리고 **맨 끝에 하나만**
+       더 붙는다. statMult 는 noBonus 를 그대로 받으므로 얼음·클래식에서는 1 이고
+       (데일리는 그 함수 안에서 한 겹 더 막는다), 강화가 0 이고 아무 조건도 안
+       걸린 평범한 매치에서도 1 이다. 즉 st.mult === 1 인 모든 경로에서 이 줄은
+       종전과 **같은 부동소수 곱을 같은 순서로** 수행하고 반올림 위치도 그대로다
+       — PURE/133 이 재는 값이 한 톨도 안 움직인다는 근거가 이것이다.
+       statMult 는 상태를 전진시키지 않는 순수 읽기지만(카운터는 매치 입구와
+       applySkill 이 이미 움직였다), 행운이 난수를 뽑으므로 매치당 한 번만 부른다
+       — 여러 번 부르면 점수와 플로트가 서로 다른 시행을 말하게 된다. */
+    var st = statMult(noBonus);
     var gain = iceOnly
       ? ICE_BREAK_SCORE * S.stage * fx
       : Math.round(10 * S.stage * comboScoreMult(S.combo, S.mode !== 'adv') *
@@ -29024,7 +29142,7 @@ window.TT_SFX = {
                       깔리지만, 배수 게이트는 스폰과 별개로 여기서도 닫아 둔다:
                       점수식이 "클래식에서 1 이 아닌 곱항"을 하나도 갖지 않는다는
                       성질을 이 줄만 읽고 확인할 수 있어야 한다. */
-                   ((gold && !isClassic()) ? GOLD_MULT : 1) * fx * pass.mult * tw.mult * mm);
+                   ((gold && !isClassic()) ? GOLD_MULT : 1) * fx * pass.mult * tw.mult * mm * st.mult);
     var bombGain = blown.length ? BOMB_KILL_SCORE * S.stage * blown.length * fx : 0;
     S.score += gain + bombGain;
     if (S.feverOn) S.feverScore += gain + bombGain;
@@ -29034,6 +29152,20 @@ window.TT_SFX = {
     if (battleOn()) duelOnMatch(gain + bombGain, iceOnly, tw, twPrev);
 
     if (!iceOnly) {
+      /* WD-1 §12 — 발동 알림. **엣지에서만** 띄운다: 꾸준함처럼 한 번 서면
+         묶음이 끝날 때까지 매 매치 서 있는 조건은, 매치마다 알리면 그것은
+         정보가 아니라 소음이고 보드 위 글자가 짝 찾기를 가린다. 종류가 바뀌는
+         순간에만 한 줄 — "지금 무엇이 붙기 시작했다"가 알릴 값어치가 있는
+         전부다. 얼음만 깬 매치가 이 블록 밖인 것도 같은 이유다: 점수가 안 난
+         곳에서 배수 자랑을 하면 그것이 거짓말이 된다.
+         높이 -30 은 마크 플로트(-44)·콤보 칭찬(-58)과 겹치지 않게 잡은 값이다. */
+      if (st.kind && st.kind !== statFxLast) {
+        var stC = tileCenter(dying.length ? dying[0] : a);
+        floatOnBoard(stC.x, stC.y - 30,
+                     t('stat.' + st.kind, { n: Math.round((st.mult - 1) * 100) }),
+                     STAT_FX_COLOR[st.kind] || '#FFD34D');
+      }
+      statFxLast = st.kind;
       S.matches++;
       store.totalMatches = (store.totalMatches | 0) + 1;
       missionBump('noadd', 1);
@@ -35083,6 +35215,129 @@ window.TT_SFX = {
    * 것도 사실 그대로다 — 같은 값을 다르게 그리면 그것이 장식이다.
    * --------------------------------------------------------------------- */
   var STAT_KEYS = ['power', 'steady', 'agility', 'luck'];
+
+  /* =========================================================================
+   * WD-1 §12·§13 — 스탯 엔진 (폭발력 / 꾸준함 / 순발력 / 행운)
+   *
+   * 여기까지의 스탯은 **그림뿐**이었다: heroStatRaw 가 계수에서 막대 길이를
+   * 뽑아내고 그것으로 끝이었고, 네 칸이 실제 점수에 닿는 경로가 없었다.
+   * §12 는 그 네 칸에 각각 **발동 조건 하나**를 물려 점수식의 곱항으로 만든다.
+   *
+   *   폭발력  각성(소환 필살기)이 걸려 있는 동안의 매치 — 연쇄가 쌓일수록 정점
+   *   꾸준함  무딜레이 연속 매칭 3수 이상
+   *   순발력  낙하/팝이 진행 중인 와중에 낸 매치
+   *   행운    매 매치 독립 시행. 걸리면 그 매치 점수가 2배
+   *
+   * §13.2 의 기본표(STAT_BASE)는 **정본**이라 여기서 임의로 못 고친다. 강화
+   * (store.statLv)는 1레벨당 +1%p 로 얹히고, 최종값은 §12.3 의 스탯별 상한
+   * (STAT_CAP)에서 잘린다 — 상한이 값 쪽에 있어야 "강화를 아무리 부어도
+   * 확정 곱항이 폭주하지 않는다"가 세이브 내용과 무관하게 성립한다.
+   * ========================================================================= */
+  var STAT_BASE = {
+    ten:       { power: 6, steady: 1, agility: 2, luck: 1 },
+    twin:      { power: 2, steady: 1, agility: 6, luck: 1 },
+    jelly:     { power: 2, steady: 1, agility: 1, luck: 6 },
+    pudding:   { power: 1, steady: 6, agility: 1, luck: 2 },
+    sodawitch: { power: 1, steady: 2, agility: 1, luck: 6 }
+  };
+  var STAT_CAP = { power: 12, steady: 8, agility: 10, luck: 10 };
+  var STAT_LV_STEP = 1;      // 강화 1레벨 = +1%
+  /* 실질 상한은 STAT_CAP 이다. STAT_LV_MAX 는 **세이브 소독용 안전 상한**으로,
+     남의 손을 탄 statLv 가 10^9 같은 값을 들고 와도 곱셈 한 번에 Infinity 가
+     나지 않게 입구에서 자른다(9차 sanitizeCountMap 과 같은 규율). */
+  var STAT_LV_MAX = 12;
+  var EXPL_STREAK_CAP = 3;   // 각성 연쇄 정점 (§14 째깍이 조건과 같은 수)
+  var STDY_RUN_NEED = 3;     // 무딜레이 연속 3+ (§12.1)
+  var LUCK_MULT = 2;         // 확률 점수 2배 (§12.1)
+  var STAT_SUM_CAP = 0.15;   // 확정 3스탯 동시 기여 상한 (§12.3)
+
+  /** store.statLv[id] 를 네 칸 정수로 읽는다. 없는 필드·없는 항목 = 전부 0. */
+  function statLvOf(id) {
+    var m = (store && store.statLv && typeof store.statLv === 'object')
+      ? store.statLv[id] : null;
+    var out = {}, i, k;
+    for (i = 0; i < STAT_KEYS.length; i++) {
+      k = STAT_KEYS[i];
+      out[k] = (m && typeof m === 'object') ? (m[k] | 0) : 0;
+    }
+    return out;
+  }
+
+  /** 기본값 + 강화, 스탯별 상한에서 잘린 **실효 스탯**. 모르는 id 는 텐텐표. */
+  function statEff(id) {
+    var base = STAT_BASE[id] || STAT_BASE.ten;
+    var lv = statLvOf(id);
+    var out = {}, i, k;
+    for (i = 0; i < STAT_KEYS.length; i++) {
+      k = STAT_KEYS[i];
+      out[k] = clamp(base[k] + clamp(lv[k], 0, STAT_LV_MAX) * STAT_LV_STEP,
+                     0, STAT_CAP[k]);
+    }
+    return out;
+  }
+
+  /* §12.2 — 행운은 **잭팟과 병렬인 신규 시행**이다. jackpotRoll() 을 나눠 쓰지
+     않는 이유가 여기 있다: 같은 난수를 둘이 읽으면 "잭팟이 터진 매치는 반드시
+     행운도 터진다" 같은 상관이 생겨, 젤리 계열 캐릭터에서 두 효과가 한 몸으로
+     보이고 확률 설계(§12.3 의 기대 +10%)가 통째로 틀어진다. */
+  function luckRoll() { return Math.random(); }
+
+  /* -------------------------------------------------------------------------
+   * §12.2 합성 곱항. 점수식이 곱하는 값 하나와, 플로트에 쓸 "무엇이 걸렸나"를
+   * 함께 돌려준다.
+   *
+   * ⚠ 상한이 **두 겹**인 것이 이 함수의 요점이다.
+   *   ① 확정 3스탯(폭발력·꾸준함·순발력)은 서로 곱해진 뒤 1+STAT_SUM_CAP 에서
+   *      잘린다. §12.3 이 상한을 건 대상은 "전스탯 **동시** 기여"이고, 셋이
+   *      동시에 걸리는 순간은 실제로 존재하기 때문이다(각성 중 무딜레이 연속
+   *      매칭). 그 봉우리를 안 막으면 한 매치가 +30% 를 넘어 버린다.
+   *   ② 행운의 ×2 는 그 clamp **밖**에 있다. §12.2 는 행운을 "확률 2배"라고
+   *      글자 그대로 못박았고, §12.3 은 그것을 봉우리가 아니라 **기대값**으로
+   *      예산 잡았다(p ≤ 10% → 기대 +10%). clamp 안에 넣으면 2배가 1.15배로
+   *      깎여 문구도 거짓이 되고 예산도 안 맞는다 — 확률 스탯의 값어치는
+   *      "가끔 크게"에 있지 평균 높이에 있지 않다.
+   *
+   * 게이트가 두 개인 것도 의도다. noBonus 는 점수 블록이 이미 계산해 둔 값
+   * (얼음만 깬 매치 · 클래식)을 그대로 받고, isDaily() 만 여기서 더한다:
+   * 데일리는 isClassic() 이 안 잡는 별개 모드인데 §11.2·§12.5 가 "전 세계가
+   * 같은 판으로 겨루는 곳에는 캐릭터 배수를 들이지 않는다"를 요구한다.
+   * ---------------------------------------------------------------------- */
+  function statMult(noBonus) {
+    if (noBonus || isDaily()) return { mult: 1, kind: '' };
+    var e = statEff(charId());
+    var det = 1, kind = '';
+    /* 폭발력 — 연쇄가 EXPL_STREAK_CAP 에 닿으면 정확히 1 + e.power/100 이 된다
+       (만렙 텐텐 = +12%, §12.3 의 폭발력 상한 그대로). 그 아래는 비례 배분이라
+       "각성을 처음 켠 한 수"와 "3연쇄째"가 같은 값을 주지 않는다. */
+    if (e.power > 0 && skillOn('summon') && awkStreak > 0) {
+      det *= 1 + (e.power / 100) * (Math.min(awkStreak, EXPL_STREAK_CAP) / EXPL_STREAK_CAP);
+      kind = 'power';
+    }
+    if (e.steady > 0 && stdyRun >= STDY_RUN_NEED) {
+      det *= 1 + e.steady / 100;
+      kind = 'steady';
+    }
+    if (e.agility > 0 && statAgil) {
+      det *= 1 + e.agility / 100;
+      kind = 'agility';
+    }
+    if (det > 1 + STAT_SUM_CAP) det = 1 + STAT_SUM_CAP;
+    /* 행운이 걸리면 그것이 화면에 알릴 값어치가 있는 유일한 사건이므로 kind 를
+       빼앗는다. 나머지는 마지막에 걸린 것이 남는다. */
+    if (e.luck > 0 && luckRoll() < e.luck / 100) {
+      return { mult: det * LUCK_MULT, kind: 'luck' };
+    }
+    return { mult: det, kind: kind };
+  }
+
+  /** 발동 플로트의 색. 네 칸이 화면에서 서로 안 헷갈리는 최소 조건이다. */
+  var STAT_FX_COLOR = {
+    power:   '#FF7A59',
+    steady:  '#5FD08A',
+    agility: '#59B7FF',
+    luck:    '#FFD34D'
+  };
+
   var pairPCache = null;
 
   /** 판의 자릿수 분포에서 두 짝 유형의 확률을 잰다. 부팅 후 한 번만 돈다. */
@@ -35117,7 +35372,11 @@ window.TT_SFX = {
        소환(왕자 계열), 소다 마녀는 젤리 타임(잭팟 계열)이다. 값을 기존 것과
        같은 쌍으로 잡은 것은 의도다 — heroStatPct 가 최댓값으로 정규화하므로,
        새 값이 기존 최댓값을 넘으면 **기존 세 캐릭터의 막대가 함께 짧아진다**.
-       같은 쌍이면 max 가 한 톨도 안 움직여 셋의 화면이 그대로 남는다. */
+       같은 쌍이면 max 가 한 톨도 안 움직여 셋의 화면이 그대로 남는다.
+       ※ WD-1 §13.5 — 그 정규화는 heroStatPct 에서 사라졌고(막대는 이제
+       STAT_CAP 고정 눈금 × STAT_BASE 에서 나온다), 따라서 이 함수는 더 이상
+       화면 길이를 정하지 않는다. 그래도 통째로 남겨 둔 것은 §13.5 가 이 파생을
+       **표시 근거**로 보존하라고 했기 때문이다 — 손잡이로도 이미 나가 있다. */
     if (id === 'ten' || id === 'pudding') { p = pp.sum10; M = TEN_SUM10_MULT; }
     else if (id === 'twin')  { p = pp.same;  M = TWIN_SAME_MULT; }
     else                     { p = JELLY_P;  M = JELLY_MULT; }
@@ -35133,43 +35392,75 @@ window.TT_SFX = {
     };
   }
 
-  /** 세 주인공을 나란히 재고 최댓값을 100% 로 잡는다. 바닥 42% 는 §7-2(단색 플랫
-      금지)와 같은 이유다 — 0 에 붙은 막대는 트랙이 비어 있는 것으로 읽힌다. */
+  /**
+   * WD-1 §13.5 — 막대는 이제 **스탯별 상한(STAT_CAP)을 100% 로 고정한 눈금**에서
+   * 읽는다. 옛 방식(HERO_IDS 다섯의 최댓값을 100% 로 정규화)을 걷어낸 것이 §13.5
+   * 의 요점이다: 그 눈금은 상대적이라 **자기 값이 그대로여도 남이 세지면 내 막대가
+   * 짧아진다**. W7 이 신규 둘의 계수를 굳이 기존 쌍에 맞춰 넣어야 했던 것도(위
+   * heroStatRaw 주석이 "함정"이라 부른 그것) 같은 뿌리다 — 캐릭터 한 장을 더하는
+   * 일이 기존 넷의 화면을 흔들었다. 상한 고정 눈금에서는 그 결합이 통째로 사라지고,
+   * 100% 는 언제나 "이 스탯이 갈 수 있는 끝"이라는 한 가지 뜻만 갖는다.
+   *
+   * 값을 둘로 나눠 돌려주는 것도 같은 절이다.
+   *   base  §13.2 의 타고난 값        eff  강화(store.statLv)까지 얹은 지금 값
+   * 화면은 둘을 겹쳐 그려 "얼마나 키웠나"를 한눈에 보여 준다. 강화는 값을 깎지
+   * 않으므로 언제나 base ≤ eff 이고, 그래서 기본선 마커는 늘 필 안에 떨어진다.
+   *
+   * heroStatRaw 는 한 글자도 안 건드린다 — §13.5 가 그 파생을 **표시 근거**로
+   * 남기라고 했고, 손잡이(window.Game)로 이미 밖에 나가 있는 값이기도 하다.
+   */
   function heroStatPct() {
-    var raw = {}, max = {}, k, i;
-    for (i = 0; i < HERO_IDS.length; i++) raw[HERO_IDS[i]] = heroStatRaw(HERO_IDS[i]);
-    for (i = 0; i < STAT_KEYS.length; i++) {
-      k = STAT_KEYS[i];
-      max[k] = 0;
-      for (var j = 0; j < HERO_IDS.length; j++) {
-        if (raw[HERO_IDS[j]][k] > max[k]) max[k] = raw[HERO_IDS[j]][k];
-      }
-    }
-    var out = {};
+    var out = {}, i, m, k;
     for (i = 0; i < HERO_IDS.length; i++) {
       var id = HERO_IDS[i];
+      var base = STAT_BASE[id] || STAT_BASE.ten;
+      var eff = statEff(id);
       out[id] = [];
-      for (var m = 0; m < STAT_KEYS.length; m++) {
+      for (m = 0; m < STAT_KEYS.length; m++) {
         k = STAT_KEYS[m];
-        var v = max[k] > 0 ? Math.round(100 * raw[id][k] / max[k]) : 42;
-        out[id].push(clamp(v, 42, 100));
+        var cap = STAT_CAP[k] || 1;
+        out[id].push({
+          base: clamp(Math.round(100 * clamp(base[k], 0, cap) / cap), 0, 100),
+          eff:  clamp(Math.round(100 * eff[k] / cap), 0, 100)
+        });
       }
     }
     return out;
   }
 
-  /** 마크업의 --v 를 계산값으로 덮어쓴다. 부팅에 한 번이면 충분하다(계수는 상수다). */
-  var statsPainted = false;
+  /**
+   * 마크업의 --v(실효) 와 --v0(기본) 을 계산값으로 덮어쓴다.
+   *
+   * 부팅 1회 빗장(옛 statsPainted)을 걷어냈다: 강화가 생긴 뒤로 이 값은 더 이상
+   * 상수가 아니라서, 한 번 칠하고 잠그면 강화 직후 패널이 **옛 길이**를 보여 준다.
+   * 대신 함수를 싸고 멱등하게 만든다 — 다섯 × 네 칸의 CSS 변수 두 개를 같은 값으로
+   * 다시 쓰는 것이 전부이고 기본선 마커는 없을 때만 한 번 심으므로, 패널이 열릴
+   * 때마다(syncCharPick) 불러도 레이아웃이 새로 안 일어난다.
+   */
   function applyHeroStats() {
-    if (statsPainted || typeof document === 'undefined' || !document.querySelectorAll) return;
-    statsPainted = true;
+    if (typeof document === 'undefined' || !document.querySelectorAll) return;
     var pct = heroStatPct();
     for (var i = 0; i < HERO_IDS.length; i++) {
       var id = HERO_IDS[i];
+      var row = pct[id];
+      if (!row) continue;
       var bars = document.querySelectorAll('#cp-info .ci[data-char="' + id + '"] .cs-bar');
       if (!bars) continue;
       for (var b = 0; b < bars.length && b < 4; b++) {
-        if (bars[b].style) bars[b].style.setProperty('--v', pct[id][b] + '%');
+        var el = bars[b];
+        if (!el || !el.style) continue;
+        el.style.setProperty('--v', row[b].eff + '%');
+        el.style.setProperty('--v0', row[b].base + '%');
+        /* 기본선 마커는 **실제 자식 노드**다. .cs-bar 의 두 의사요소는 이미 둘 다
+           일하고 있고(::before = 필, ::after = 14차가 캡에 맞춰 둔 광택 노브),
+           하나를 빼앗으면 그 그림이 사라진다. 자식은 ::before 뒤·::after 앞에
+           칠해져 "필 위, 노브 아래"라는 정확히 맞는 층에 들어간다. */
+        if (el.querySelector && !el.querySelector('.cs-b0')) {
+          var mk0 = document.createElement('i');
+          mk0.className = 'cs-b0';
+          mk0.setAttribute('aria-hidden', 'true');
+          el.appendChild(mk0);
+        }
       }
     }
   }
@@ -36351,6 +36642,20 @@ window.TT_SFX = {
     mapAnchors: mapAnchors, mapLowBottom: mapLowBottom,
     mapFit: mapFit, mapCenterCurrent: mapCenterCurrent, mapGoChapter: mapGoChapter,
     pairTypeP: pairTypeP, heroStatRaw: heroStatRaw, heroStatPct: heroStatPct,
+    /* WD-1 §12 — 스탯 엔진 손잡이. 위 debug handles 와 같은 규약이다: 게임
+       코드는 이 중 무엇도 window.Game 을 거쳐 부르지 않는다. 관문 하네스가
+       "점수식의 새 곱항이 정말 계수에서 나왔는가"를 사람 눈이 아니라 숫자로
+       확인해야 하므로(§H), 표·상한·계산 함수를 그대로 읽게 연다.
+       statCounters 는 읽기와 심기를 겸한다 — 발동 조건 셋은 손놀림의 타이밍에서
+       나오는 값이라, 하네스가 그것을 실제 연타로 재현하려 들면 검증이 브라우저
+       속도에 매달린다. 심어 놓고 한 매치를 돌리는 쪽이 결정론적이다. */
+    STAT_BASE: STAT_BASE, STAT_CAP: STAT_CAP, STAT_LV_MAX: STAT_LV_MAX,
+    STAT_SUM_CAP: STAT_SUM_CAP, statEff: statEff, statMult: statMult,
+    statLvOf: statLvOf, applyHeroStats: applyHeroStats,
+    statCounters: function (v) {
+      if (v) { awkStreak = v.awk | 0; stdyRun = v.stdy | 0; statAgil = !!v.agil; }
+      return { awk: awkStreak, stdy: stdyRun, agil: statAgil };
+    },
     playCuts: playCuts, CUTS_OPEN: CUTS_OPEN, CUTS_SORTIE: CUTS_SORTIE,
     /* E3 — 하네스 손잡이. 위 debug handles 와 같은 규약이다: 게임 코드는 이 중
        무엇도 window.Game 을 거쳐 부르지 않는다. 해방 컷툰은 "10탄 보스를 처음
@@ -38851,6 +39156,42 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
    여기가 정하기 때문이다. */
 .ch-pudding   .cs-bar::before{ background-image:linear-gradient(90deg,var(--j-stat-2) 0%,#F0CC72 46%,var(--j-stat-3) 100%); }
 .ch-sodawitch .cs-bar::before{ background-image:linear-gradient(90deg,var(--j-stat-b) 0%,#9FE4F6 46%,var(--j-stat-3) 100%); }
+
+/* ---- WD-1 §13.5 기본선 마커 ------------------------------------------------
+   막대가 이제 두 값을 갖는다: --v0(타고난 값) 과 --v(강화까지 얹은 지금 값).
+   강화는 값을 깎지 않으므로 언제나 --v0 <= --v 이고, 그래서 마커는 늘 필 안에
+   떨어진다 — "여기까지가 타고난 것, 그 오른쪽이 내가 키운 것"이 한 눈에 읽힌다.
+
+   왜 자식 <i> 인가. .cs-bar 의 의사요소는 둘 다 이미 일하고 있다(::before = 필,
+   ::after = 14차가 캡 형태에 맞춰 둔 광택 노브). 셋째 그림을 얹을 자리가 없어서
+   applyHeroStats 가 노드를 하나 심고, 여기서는 칠하기만 한다. 자식은 ::before
+   뒤·::after 앞에 칠해지므로 층도 정확히 맞는다.
+
+   색은 흰 실선 + 갈색 얇은 테두리 한 겹이다. 캐릭터마다 필 그라디언트가 다른데
+   (파랑/주황/분홍/노랑/하늘) 흰 실선 하나만으로는 밝은 노랑 위에서 사라지고,
+   갈색 하나만으로는 어두운 파랑 위에서 사라진다. 두 겹이면 어느 쪽에서도 남는다.
+   폭 2px · 반투명으로 잡은 것은 이것이 눈금이지 두 번째 필이 아니기 때문이다. */
+.cs-bar > .cs-b0{
+  position:absolute;
+  left:calc(var(--v0, 0%) - 1px);
+  top:3.5px;
+  bottom:3.5px;
+  width:2px;
+  border-radius:1px;
+  background-color:rgba(255,255,255,.78);
+  box-shadow:0 0 0 1px rgba(110,70,58,.34);
+  pointer-events:none;
+}
+/* 카드 안의 막대는 border-image 캡 때문에 필이 -2px/+4px 로 밀려 있다(위 8991
+   블록). 마커도 같은 만큼 밀어야 필의 끝과 같은 좌표계에서 읽힌다. */
+.cp-card .cs-bar > .cs-b0{ left:calc(var(--v0, 0%) + 1px); top:4.5px; bottom:4.5px; }
+/* 타고난 값이 0 이면 마커는 트랙 왼쪽 끝에 겹쳐 눈금이 아니라 때처럼 보인다.
+   그 경우 숨기는 편이 옳다 — 0 은 필 자체가 이미 말하고 있다. 두 벌을 적는 것은
+   style.setProperty 의 직렬화가 브라우저마다 `--v0:0%` 와 `--v0: 0%` 로 갈리기
+   때문이다(현행 STAT_BASE 에는 0 인 칸이 없어 지금은 어느 쪽도 안 걸리지만,
+   표가 조정되면 조용히 어긋날 자리라 양쪽을 다 적어 둔다). */
+.cs-bar[style*="--v0:0%"] > .cs-b0,
+.cs-bar[style*="--v0: 0%"] > .cs-b0{ opacity:0; }
 
 /* ---- W7 펫 탭 그리드의 신규 두 칸 ----------------------------------------
    기존 ppyak/mungchi 두 칸이 쓰는 --mate-img-on 스위치를 **그대로 빌린다**
