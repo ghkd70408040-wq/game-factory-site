@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>틴트윈 관제탑</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>%F0%9F%97%BC</text></svg>">
 <style>
 :root{
   --bg:#FBF6EF; --card:#FFFFFF; --ink:#3D2B26; --sub:#8A7468; --line:#EADFD6;
@@ -142,6 +143,76 @@ summary .cnt{margin-left:auto;font-weight:400;font-size:.72rem;color:var(--sub);
   .gbody{display:block}
   .pv{flex:none;width:auto;max-width:390px;margin-top:10px}
 }
+
+/* ── 6. 🧪 에셋 검수 (확대 검수 → 승인) ── */
+#assetview{margin-bottom:22px}
+.avbar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.avsearch{font-family:inherit;font-size:.8rem;padding:6px 13px;border-radius:99px;
+  border:1px solid var(--line);background:#FFF;color:var(--ink);flex:1 1 190px;max-width:300px}
+.avsearch:focus{outline:0;border-color:var(--sub)}
+.avcnt{margin-left:auto;font-size:.72rem;color:var(--sub);font-variant-numeric:tabular-nums}
+details.avgrp{background:var(--card);border:1px solid var(--line);border-radius:16px;
+  margin-bottom:14px;overflow:hidden}
+details.avgrp>summary{cursor:pointer;padding:13px 16px;font-weight:800;font-size:1rem;
+  list-style:none;display:flex;align-items:center;gap:9px;background:#F1E3D3;
+  border-bottom:2px solid #E0CDB6}
+details.avgrp>summary::-webkit-details-marker{display:none}
+details.avgrp>summary::before{content:'▸';color:var(--sub);font-weight:400;transition:.15s}
+details.avgrp[open]>summary::before{transform:rotate(90deg)}
+.avgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:9px;
+  padding:11px 13px 15px}
+.avcard{position:relative;border:1px solid var(--line);border-radius:11px;background:#FDFAF6;
+  overflow:hidden;display:flex;flex-direction:column;cursor:zoom-in;text-align:left;
+  font-family:inherit;color:inherit;padding:0}
+.avcard:hover{border-color:var(--sub);box-shadow:0 2px 8px rgba(61,43,38,.13)}
+.avthumb{height:88px;display:flex;align-items:center;justify-content:center;
+  background:conic-gradient(#EFE7DC 25%,#F8F2EA 0 50%,#EFE7DC 0 75%,#F8F2EA 0) 0 0/16px 16px}
+.avthumb img{max-width:92%;max-height:80px;object-fit:contain}
+.avmeta{padding:6px 7px 7px;font-size:.7rem;line-height:1.3}
+.avmeta .nm{display:block;font-weight:700;word-break:break-all}
+.avmeta .sz{display:block;color:var(--sub);font-size:.62rem;font-variant-numeric:tabular-nums}
+.avb{position:absolute;left:4px;top:4px;font-size:.58rem;padding:1px 7px;border-radius:6px;
+  color:#FFF;font-weight:700;z-index:2}
+.avb.wait{background:var(--temp)}.avb.ok{background:var(--ok)}.avb.no{background:var(--empty)}
+.avold{position:absolute;right:4px;top:4px;font-size:.56rem;padding:1px 5px;border-radius:6px;
+  background:#FBD86A;color:#4A3208;font-weight:700;z-index:2}
+.avnone{padding:18px;color:var(--sub);font-size:.8rem;background:var(--card);
+  border:1px solid var(--line);border-radius:16px}
+
+/* 라이트박스 — 원본 그대로 확대·비교 */
+#lbox{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;
+  background:rgba(28,22,20,.9)}
+#lbox[hidden]{display:none}
+.lbtool{flex:0 0 auto;display:flex;gap:6px;flex-wrap:wrap;align-items:center;
+  padding:9px 12px;background:var(--bg);border-bottom:1px solid var(--line)}
+.lbtitle{font-weight:800;font-size:.92rem;word-break:break-all}
+.lbinfo{font-size:.7rem;color:var(--sub);font-variant-numeric:tabular-nums}
+.lbsep{flex:1 1 8px}
+.lbsel{font-family:inherit;font-size:.75rem;padding:5px 10px;border-radius:99px;
+  border:1px solid var(--line);background:#FFF;color:var(--ink);max-width:200px}
+.lbstage{flex:1 1 auto;display:flex;gap:8px;padding:8px;overflow:hidden}
+.lbpane{flex:1 1 0;min-width:0;position:relative;overflow:hidden;border-radius:12px;
+  touch-action:none;cursor:grab}
+.lbpane.drag{cursor:grabbing}
+.lbpane img{position:absolute;left:0;top:0;transform-origin:0 0;max-width:none;
+  user-select:none;-webkit-user-drag:none}
+.lbpane.px img{image-rendering:pixelated}
+.lbpane .plab{position:absolute;left:8px;top:8px;z-index:2;background:rgba(43,35,32,.8);
+  color:#FFF;font-size:.66rem;padding:3px 9px;border-radius:99px;pointer-events:none}
+.bg-check{background:conic-gradient(#DCD3C7 25%,#F2ECE3 0 50%,#DCD3C7 0 75%,#F2ECE3 0) 0 0/22px 22px}
+.bg-light{background:#FBF6EF}
+.bg-dark{background:#2B2320}
+.bg-game{background:#84966B}
+
+@media (max-width:720px){
+  .avgrid{grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:7px;padding:9px 10px 13px}
+  .avthumb{height:74px}.avthumb img{max-height:68px}
+  .avsearch{max-width:none}
+  .lbtool{padding:7px 9px;gap:4px}
+  .lbtool .fb{font-size:.72rem;padding:4px 10px}
+  .lbtitle{font-size:.82rem;width:100%}
+  .lbstage{flex-direction:column;padding:6px;gap:6px}
+}
 </style>
 </head>
 <body>
@@ -149,8 +220,30 @@ summary .cnt{margin-left:auto;font-weight:400;font-size:.72rem;color:var(--sub);
 <h1>🗼 틴트윈 관제탑</h1>
 <div class="filters" id="filters"></div>
 <div id="worklog" hidden></div>
+<div id="assetview" hidden></div>
 <div id="cats"></div>
 </main>
+
+<div id="lbox" hidden>
+  <div class="lbtool">
+    <span class="lbtitle" id="lbTitle"></span>
+    <span class="lbinfo" id="lbInfo"></span>
+    <span class="lbsep"></span>
+    <button class="fb" type="button" id="lbOut">－</button>
+    <button class="fb" type="button" id="lbZoom">100%</button>
+    <button class="fb" type="button" id="lbIn">＋</button>
+    <button class="fb" type="button" id="lbFit">맞춤</button>
+    <button class="fb" type="button" id="lbPx">픽셀 확대</button>
+    <button class="fb on" type="button" data-bg="check">체커</button>
+    <button class="fb" type="button" data-bg="light">밝음</button>
+    <button class="fb" type="button" data-bg="dark">어두움</button>
+    <button class="fb" type="button" data-bg="game">게임배경</button>
+    <select class="lbsel" id="lbOld" hidden></select>
+    <button class="fb" type="button" id="lbGame" hidden>▶ 게임 화면에서 보기</button>
+    <button class="fb" type="button" id="lbClose">✕ 닫기</button>
+  </div>
+  <div class="lbstage" id="lbStage"></div>
+</div>
 
 <script>
 const SD={ok:'s-ok',css:'s-css',temp:'s-temp',queued:'s-queued',empty:'s-empty'};
@@ -158,7 +251,7 @@ const SL={ok:'확보',css:'CSS',temp:'임시',queued:'발주·예약',empty:'빈
 const TB={bg:'배경',code:'코드',motion:'모션',plan:'기획'};
 const TABS=[['all','전체'],['bg','배경'],['char','캐릭터'],['fruit','과일'],
             ['fx','효과'],['ui','인터페이스'],['time','시간'],['dyn','⚡동적'],
-            ['log','🌙 밤샘 일지']];
+            ['asset','🧪 에셋 검수'],['log','🌙 밤샘 일지']];
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 let M={};
 
@@ -184,6 +277,8 @@ function mkCard(it){
     +'<div class="meta"><span class="nm">'+esc(nm)+'</span>'
     +'<span><span class="sdot '+SD[st]+'"></span><span class="slab">'+SL[st]+'</span></span>'
     +(note?'<span class="nt">'+esc(note)+'</span>':'')+'</div>';
+  if(ref&&ref.indexOf('img:')===0&&M[ref.slice(4)]){ el.style.cursor='zoom-in';
+    el.addEventListener('click',function(){ openLB(ref.slice(4)); }); }   /* 부품 카드 → 라이트박스 */
   return el;
 }
 
@@ -309,9 +404,255 @@ function renderWorklog(list){
   });
 }
 
-function showLog(on){
-  document.getElementById('worklog').hidden=!on;
-  document.getElementById('cats').style.display=on?'none':'';
+/* 패널 3개(부품표 cats / 밤샘 일지 worklog / 에셋 검수 assetview) 중 하나만 보인다. */
+function showPane(name){
+  document.getElementById('worklog').hidden   = name!=='log';
+  document.getElementById('assetview').hidden = name!=='asset';
+  document.getElementById('cats').style.display = name==='cats' ? '' : 'none';
+}
+
+/* ── 🧪 에셋 검수 ─────────────────────────────────────────────────────
+   manifest 전 항목을 접두사로 묶어 깔고, 카드를 누르면 원본 그대로 확대한다.
+   승인 상태는 staging.json 이 정본 — 없거나 키가 빠졌으면 "적용"으로 본다.      */
+const AVG=[['art','배경·일러스트'],['ch','캐릭터'],['cut','컷신'],['duel','대전'],
+           ['jelly','젤리'],['lib','공용 부품'],['sian','시안 1차'],['sian2','시안 2차'],
+           ['sian3','시안 3차'],['stage','스테이지 맵'],['tmr','타임러시 숫자']];
+const AVL={}; AVG.forEach(g=>AVL[g[0]]=g[1]);
+const STCLS={'대기':'wait','적용':'ok','반려':'no'};
+let AVS={}, AVBUILT=false, OLDV={};
+
+function stOf(k){ const s=AVS[k]; return (s&&s.state)||'적용'; }
+function noteOf(k){ const s=AVS[k]; return (s&&s.note)||''; }
+function keysOf(){ return Object.keys(M).filter(k=>k.charAt(0)!=='_'); }
+
+function buildOldIndex(){
+  OLDV={};
+  const sup=M._superseded||{};
+  Object.keys(sup).forEach(function(f){
+    const v=sup[f]; if(!v.stem) return;
+    (OLDV[v.stem]=OLDV[v.stem]||[]).push({file:f,kb:v.kb,px:v.px,mtime:v.mtime,ver:v.ver||'구판'});
+  });
+  Object.keys(OLDV).forEach(k=>OLDV[k].sort((a,b)=>a.file.localeCompare(b.file)));
+}
+
+function mkAvCard(k){
+  const f=M[k], st=stOf(k), old=OLDV[k];
+  const el=document.createElement('button');
+  el.type='button'; el.className='avcard'; el.dataset.k=k; el.dataset.st=st;
+  el.innerHTML='<span class="avb '+STCLS[st]+'">'+esc(st)+'</span>'
+    +(old?'<span class="avold">전판 '+old.length+'</span>':'')
+    +'<span class="avthumb"><img loading="lazy" src="catalog/'+esc(f.file)+'" alt=""></span>'
+    +'<span class="avmeta"><span class="nm">'+esc(k)+'</span>'
+    +'<span class="sz">'+f.kb+'KB · '+esc(f.px||'—')+'</span></span>';
+  el.addEventListener('click',function(){ openLB(k); });
+  return el;
+}
+
+function buildAssetView(){
+  if(AVBUILT) return;
+  AVBUILT=true;
+  buildOldIndex();
+  const box=document.getElementById('assetview');
+  box.innerHTML='';
+
+  const bar=document.createElement('div'); bar.className='avbar';
+  bar.innerHTML='<input class="avsearch" id="avq" type="search" placeholder="이름으로 찾기 (예: ch-pudding)">'
+    +['전체','대기','적용','반려'].map((s,i)=>'<button class="fb'+(i?'':' on')
+      +'" type="button" data-st="'+esc(s)+'">'+esc(s)+'</button>').join('')
+    +'<span class="avcnt" id="avcnt"></span>';
+  box.appendChild(bar);
+
+  const groups={};
+  keysOf().forEach(function(k){
+    const g=k.indexOf('-')>0?k.slice(0,k.indexOf('-')):k;
+    (groups[AVL[g]?g:'etc']=groups[AVL[g]?g:'etc']||[]).push(k);
+  });
+  const order=AVG.map(g=>g[0]).filter(g=>groups[g]).concat(groups.etc?['etc']:[]);
+  order.forEach(function(g){
+    const det=document.createElement('details'); det.className='avgrp'; det.open=true;
+    det.dataset.g=g;
+    det.innerHTML='<summary>'+esc(AVL[g]||'기타')
+      +'<span class="cnt">'+groups[g].length+'</span></summary>';
+    const grid=document.createElement('div'); grid.className='avgrid';
+    groups[g].forEach(k=>grid.appendChild(mkAvCard(k)));
+    det.appendChild(grid); box.appendChild(det);
+  });
+
+  const none=document.createElement('div'); none.className='avnone'; none.id='avnone';
+  none.hidden=true; none.textContent='조건에 맞는 에셋이 없습니다.';
+  box.appendChild(none);
+
+  bar.querySelector('#avq').addEventListener('input',avFilter);
+  bar.querySelectorAll('.fb').forEach(function(b){
+    b.addEventListener('click',function(){
+      bar.querySelectorAll('.fb').forEach(x=>x.classList.remove('on'));
+      b.classList.add('on'); avFilter();
+    });
+  });
+  avFilter();
+}
+
+function avFilter(){
+  const box=document.getElementById('assetview');
+  const q=(box.querySelector('#avq').value||'').trim().toLowerCase();
+  const on=box.querySelector('.avbar .fb.on');
+  const st=on?on.dataset.st:'전체';
+  let live=0;
+  box.querySelectorAll('details.avgrp').forEach(function(det){
+    let n=0;
+    det.querySelectorAll('.avcard').forEach(function(c){
+      const hit=(!q||c.dataset.k.toLowerCase().indexOf(q)>=0)
+             && (st==='전체'||c.dataset.st===st);
+      c.style.display=hit?'':'none'; if(hit) n++;
+    });
+    det.style.display=n?'':'none';
+    det.querySelector('.cnt').textContent=n;
+    live+=n;
+  });
+  box.querySelector('#avcnt').textContent=live+' / '+keysOf().length+'개';
+  box.querySelector('#avnone').hidden=!!live;
+}
+
+/* ── 라이트박스: 원본 URL 그대로, 변환 없이 확대·비교 ─────────────────── */
+const LB={key:null,z:1,pan:{x:0,y:0},px:false,panes:[]};
+const LBOX=()=>document.getElementById('lbox');
+
+function lbRender(){
+  LB.panes.forEach(function(p){
+    const bw=p.el.clientWidth, bh=p.el.clientHeight;
+    const tx=(bw-p.nw*LB.z)/2+LB.pan.x, ty=(bh-p.nh*LB.z)/2+LB.pan.y;
+    p.img.style.transform='translate('+tx+'px,'+ty+'px) scale('+LB.z+')';
+    p.img.style.width=p.nw+'px'; p.img.style.height=p.nh+'px';
+  });
+  document.getElementById('lbZoom').textContent=Math.round(LB.z*100)+'%';
+}
+
+function lbFit(){
+  LB.pan.x=0; LB.pan.y=0;
+  const p=LB.panes[0]; if(!p||!p.nw){ LB.z=1; lbRender(); return; }
+  const bw=p.el.clientWidth-24, bh=p.el.clientHeight-24;
+  LB.z=Math.max(.25,Math.min(8,Math.min(bw/p.nw,bh/p.nh,1)));
+  lbRender();
+}
+
+function lbZoomAt(pane,cx,cy,f){
+  const z2=Math.max(.25,Math.min(8,LB.z*f));
+  if(pane&&pane.nw){
+    const bw=pane.el.clientWidth, bh=pane.el.clientHeight;
+    const tx=(bw-pane.nw*LB.z)/2+LB.pan.x, ty=(bh-pane.nh*LB.z)/2+LB.pan.y;
+    const ux=(cx-tx)/LB.z, uy=(cy-ty)/LB.z;
+    LB.pan.x=cx-ux*z2-(bw-pane.nw*z2)/2;
+    LB.pan.y=cy-uy*z2-(bh-pane.nh*z2)/2;
+  }
+  LB.z=z2; lbRender();
+}
+
+function mkPane(src,label){
+  const el=document.createElement('div');
+  el.className='lbpane bg-'+(LB.bg||'check')+(LB.px?' px':'');
+  el.innerHTML='<span class="plab">'+esc(label)+'</span>';
+  const img=document.createElement('img'); img.alt=label; img.src=src;
+  el.appendChild(img);
+  const p={el:el,img:img,nw:0,nh:0};
+  function done(){ p.nw=img.naturalWidth||1; p.nh=img.naturalHeight||1;
+                   if(LB.panes[0]===p) lbFit(); else lbRender(); }
+  if(img.complete&&img.naturalWidth) done(); else img.addEventListener('load',done);
+
+  let drag=null;
+  el.addEventListener('pointerdown',function(e){
+    drag={x:e.clientX,y:e.clientY}; el.classList.add('drag');
+    el.setPointerCapture(e.pointerId);
+  });
+  el.addEventListener('pointermove',function(e){
+    if(!drag) return;
+    LB.pan.x+=e.clientX-drag.x; LB.pan.y+=e.clientY-drag.y;
+    drag={x:e.clientX,y:e.clientY}; lbRender();
+  });
+  ['pointerup','pointercancel'].forEach(t=>el.addEventListener(t,function(){
+    drag=null; el.classList.remove('drag'); }));
+  el.addEventListener('wheel',function(e){
+    e.preventDefault();
+    const r=el.getBoundingClientRect();
+    lbZoomAt(p,e.clientX-r.left,e.clientY-r.top,e.deltaY<0?1.15:1/1.15);
+  },{passive:false});
+  return p;
+}
+
+function lbStage(oldFile){
+  const stage=document.getElementById('lbStage');
+  stage.innerHTML=''; LB.panes=[];
+  const f=M[LB.key];
+  const cur=mkPane('catalog/'+f.file,'현행 '+LB.key);
+  LB.panes.push(cur); stage.appendChild(cur.el);
+  if(oldFile){
+    const meta=(OLDV[LB.key]||[]).filter(o=>o.file===oldFile)[0]||{};
+    const old=mkPane('catalog/_superseded/'+oldFile,
+      '전판 '+(meta.ver||'')+' · '+(meta.kb||'?')+'KB · '+(meta.px||'?'));
+    LB.panes.push(old); stage.appendChild(old.el);
+  }
+  lbFit();
+}
+
+function lbBg(name){
+  LB.bg=name;
+  document.querySelectorAll('#lbox .lbtool .fb[data-bg]').forEach(function(b){
+    b.classList.toggle('on',b.dataset.bg===name); });
+  document.querySelectorAll('#lbox .lbpane').forEach(function(el){
+    el.className='lbpane bg-'+name+(LB.px?' px':''); });
+}
+
+function openLB(key){
+  if(!M[key]) return;
+  if(ACT) resetPv(ACT.pv);                 /* 미리보기 iframe 은 동시 1개 규칙 */
+  LB.key=key;
+  const f=M[key], st=stOf(key), note=noteOf(key);
+  document.getElementById('lbTitle').textContent=key;
+  document.getElementById('lbInfo').textContent=
+    f.file+' · '+f.kb+'KB · '+(f.px||'—')+' · '+st+(note?' · '+note:'');
+  const sel=document.getElementById('lbOld'), old=OLDV[key]||[];
+  sel.hidden=!old.length;
+  sel.innerHTML='<option value="">전판 보기 ('+old.length+')</option>'
+    +old.map(o=>'<option value="'+esc(o.file)+'">'+esc(o.ver)+' · '+o.kb+'KB · '
+      +esc(o.mtime||'')+'</option>').join('');
+  const gb=document.getElementById('lbGame');
+  gb.hidden=key.indexOf('art-')!==0;       /* 배경류만 게임 실렌더로 점프 */
+  LBOX().hidden=false;
+  lbBg(LB.bg||'check');
+  lbStage('');
+}
+
+function closeLB(){ LBOX().hidden=true; document.getElementById('lbStage').innerHTML='';
+                    LB.panes=[]; }
+
+function lbInit(){
+  buildOldIndex();
+  document.getElementById('lbClose').addEventListener('click',closeLB);
+  document.getElementById('lbFit').addEventListener('click',lbFit);
+  document.getElementById('lbZoom').addEventListener('click',function(){
+    LB.z=1; LB.pan.x=0; LB.pan.y=0; lbRender(); });
+  document.getElementById('lbIn').addEventListener('click',function(){
+    const p=LB.panes[0]; if(p) lbZoomAt(p,p.el.clientWidth/2,p.el.clientHeight/2,1.25); });
+  document.getElementById('lbOut').addEventListener('click',function(){
+    const p=LB.panes[0]; if(p) lbZoomAt(p,p.el.clientWidth/2,p.el.clientHeight/2,.8); });
+  document.getElementById('lbPx').addEventListener('click',function(){
+    LB.px=!LB.px; this.classList.toggle('on',LB.px); lbBg(LB.bg||'check'); });
+  document.querySelectorAll('#lbox .lbtool .fb[data-bg]').forEach(function(b){
+    b.addEventListener('click',function(){ lbBg(b.dataset.bg); }); });
+  document.getElementById('lbOld').addEventListener('change',function(){
+    lbStage(this.value); });
+  document.getElementById('lbGame').addEventListener('click',function(){
+    const k=LB.key; closeLB();
+    const fbox=document.getElementById('filters');
+    fbox.querySelectorAll('.fb').forEach(x=>x.classList.remove('on'));
+    fbox.querySelector('.fb').classList.add('on');
+    showPane('cats'); applyFilter('all');
+    const pv=document.querySelector('.pv'); if(!pv) return;
+    SECBG[pv.dataset.si]=k; openPv(pv);
+    pv.scrollIntoView({block:'center',behavior:'smooth'});
+  });
+  window.addEventListener('keydown',function(e){
+    if(e.key==='Escape'&&!LBOX().hidden) closeLB(); });
+  window.addEventListener('resize',function(){ if(!LBOX().hidden) lbRender(); });
 }
 
 function applyFilter(f){
@@ -342,9 +683,12 @@ function applyFilter(f){
 
 Promise.all([
   fetch('board-data.json?v='+Date.now()).then(r=>r.json()),
-  fetch('catalog/manifest.json?v='+Date.now()).then(r=>r.json())
+  fetch('catalog/manifest.json?v='+Date.now()).then(r=>r.json()),
+  /* 승인 상태표 — 없으면 전부 "적용"으로 본다 */
+  fetch('staging.json?v='+Date.now()).then(r=>r.ok?r.json():{}).catch(()=>({}))
 ]).then(function(res){
-  const D=res[0]; M=res[1];
+  const D=res[0]; M=res[1]; AVS=res[2]||{};
+  lbInit();
 
   const fbox=document.getElementById('filters');
   TABS.forEach(function(t,i){
@@ -353,8 +697,9 @@ Promise.all([
     b.addEventListener('click',function(){
       fbox.querySelectorAll('.fb').forEach(x=>x.classList.remove('on'));
       b.classList.add('on');
-      if(t[0]==='log'){ showLog(true); return; }
-      showLog(false); applyFilter(t[0]);
+      if(t[0]==='log'){ showPane('log'); return; }
+      if(t[0]==='asset'){ showPane('asset'); buildAssetView(); return; }
+      showPane('cats'); applyFilter(t[0]);
     });
     fbox.appendChild(b);
   });
