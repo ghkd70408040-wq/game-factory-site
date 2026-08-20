@@ -36000,8 +36000,26 @@ window.TT_SFX = {
        --modal-tint:rgba(255,228,244,.22);
        --modal-glass:blur(2px) saturate(1.04) brightness(1.18);
      ========================================================================= */
-  --modal-tint:rgba(255,242,255,.40);
-  --modal-glass:blur(0px) saturate(1.04) brightness(1.03);
+  /* ▣▣ W6.5b — 투명도 3차. **수치 논리를 버리고 감각을 따른다** ▣▣
+     2차(α .40)는 시안 역산이 낸 값이고 산술은 지금도 옳다 — offset 101 을 만들려면
+     α ≥ .40 이 필요하다는 그 계산 말이다. 그런데 사용자가 3차로 같은 말을 했다:
+     "더 더 투명하게, 은은하게 비치는 핑크. 여전히 뿌옇다."
+
+     그러면 틀린 것은 값이 아니라 **목표**다. 2차의 목표는 "시안의 판 색을 재현"
+     이었는데, 사용자가 원한 것은 시안의 **색**이 아니라 "뒤가 비치는 정도"였다.
+     같은 α 라도 시안은 밝고 대비 큰 일러스트 위에 있고 이 게임은 어두운 숲 배경
+     위에 있어, 같은 베일이 여기서는 두 배로 뿌옇다. 역산이 옳아도 옮겨 붙일 수
+     없는 값이었다.
+     그래서 α 를 .40 → **.17** 로 내린다(요청 대역 .15~.20 의 가운데). 색상각
+     300° 는 그대로다 — 사용자가 "핑크"라고 부른 그 색이 맞다고 두 번 확인됐다.
+     brightness(1.03) 도 뺀다: 이득이 1 을 넘는 순간 밝은 화소가 클리핑돼
+     "우윳빛 덩어리"가 되는데, 그것이 1차에서 이미 지목당한 결함이었다(1.18).
+     1.03 은 그 결함의 작은 판일 뿐 방향이 같다. 흐림은 이미 0px 이다.
+     글자 가독은 판을 희생해 지키지 않는다 — 텍스트 헤일로(흰 그림자)가 이미
+     모든 제목·본문에 붙어 있고, 그것이 이 파도에서 판을 밀 수 있는 이유다.
+     옛 값: rgba(255,242,255,.40) · blur(0px) saturate(1.04) brightness(1.03) */
+  --modal-tint:rgba(255,242,255,.17);
+  --modal-glass:blur(0px) saturate(1.06);
 }
 .jbox,
 #app.battle #actionbar{
@@ -37015,10 +37033,15 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
      지금까지 쿼리가 안 붙어 있었으므로 **버스트 대상에 새로 들어온다** — 그래서
      이번 판올림은 값만 올리는 것이 아니라 목록 자체가 셋에서 넷으로 늘었다
      (CSS 4곳 + 프리로더 V·VQ). 목록과 값이 어긋나면 프리로더가 쿼리 없는 주소를
-     데우고 화면은 쿼리 붙은 주소를 받아 **같은 그림을 두 번** 내려받는다. */
-#screen-map #map-back   { left: 3.76cqw;  top: 3.83cqw; width: 14.99cqw; height: 15.46cqw; background-image: url("catalog/stage-btn_back.webp?v=6"); }
+     데우고 화면은 쿼리 붙은 주소를 받아 **같은 그림을 두 번** 내려받는다.
+     v=6 → v=7 (2026-08-20 W6.5b): stage-btn_records 의 테두리 표백 수리본이
+     같은 파일 이름으로 교체된다(그림만 바뀌고 코드는 한 줄도 안 바뀐다).
+     파일명이 그대로이므로 **버스트 없이는 구판이 그대로 뜬다** — 그래서 이
+     커밋이 네 곳 + VQ 를 함께 올린다. 수리 커밋이 이 커밋보다 늦어도 v=7 은
+     그대로 유효하다(주소가 달라졌을 뿐 그림은 언제 와도 그 주소로 온다). */
+#screen-map #map-back   { left: 3.76cqw;  top: 3.83cqw; width: 14.99cqw; height: 15.46cqw; background-image: url("catalog/stage-btn_back.webp?v=7"); }
 #screen-map #map-hearts { left: 21.91cqw; top: 5.51cqw; width: 33.32cqw; height: 12.60cqw; background-image: url("catalog/stage-pill_life.webp"); }
-#screen-map #map-stars  { left: 56.31cqw; top: 5.87cqw; width: 21.75cqw; height: 11.71cqw; background-image: url("catalog/stage-pill_coin.webp?v=6"); }
+#screen-map #map-stars  { left: 56.31cqw; top: 5.87cqw; width: 21.75cqw; height: 11.71cqw; background-image: url("catalog/stage-pill_coin.webp?v=7"); }
 #screen-map #map-gear   { left: 81.40cqw; top: 3.85cqw; width: 14.92cqw; height: 15.43cqw; background-image: url("catalog/stage-btn_settings.webp"); }
 #screen-map #map-top .hc-ico { display: none; }   /* 봉인 — 하트·코인·톱니·화살표는 조각에 그려져 있다 */
 /* 하트 수·회복 타이머는 조각의 글자 상자 자리에 코드가 얹는다. */
@@ -37119,10 +37142,10 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
    얹힌다(언어 토글 생존). 나머지 셋은 sep3 정리판에서 나왔다.
    세로가 구판보다 큰 것은 헤일로가 빠지면서 조각의 참 비율이 드러난 결과다
    — 띠(높이 25.61cqw) 안에 그대로 들어간다(가장 큰 명판이 4.5~24.0cqw). */
-#screen-map #map-b1    { left: 2.14%;  width: 30.39%; height: 12.47cqw; background-image: url("catalog/stage-pill_star.webp?v=6"); }
+#screen-map #map-b1    { left: 2.14%;  width: 30.39%; height: 12.47cqw; background-image: url("catalog/stage-pill_star.webp?v=7"); }
 #screen-map #map-plate { left: 34.22%; width: 31.66%; height: 18.97cqw; background-image: url("catalog/stage-pill_chapter.webp"); }
 #screen-map #map-char  { left: 66.84%; width: 15.43%; height: 18.62cqw; background-image: url("catalog/stage-btn_chars.webp"); }
-#screen-map #map-rec   { left: 82.91%; width: 15.15%; height: 18.78cqw; background-image: url("catalog/stage-btn_records.webp?v=6"); }
+#screen-map #map-rec   { left: 82.91%; width: 15.15%; height: 18.78cqw; background-image: url("catalog/stage-btn_records.webp?v=7"); }
 #screen-map #map-b1-v {
   position: absolute; left: 57.7%; top: 41.7%;
   transform: translate(-50%, -50%);
@@ -37699,7 +37722,11 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
      가 통째로 어두워져 유리가 **잿빛 판때기**로 보였다(중앙 실측 rgb(43,48,61)
      @a=80 → 언프리멀티 rgb(137,153,194)). 원본은 지우지 않고 남긴다. */
   --w65-capsule:url("catalog/glass-hud-capsule-st.webp");
+  /* 🚨 W6.5b 원복 — 무지개 X 전량 철회(사용자: "이전 게 완벽했는데 왜 바꿨냐").
+     변수는 **지우지 않고 봉인**한다: 소비처 넷(③ 블록)이 함께 봉인돼 있으므로
+     이 한 줄을 되살리는 것이 롤백의 전부다. staging 은 "반려".
   --w65-x:url("catalog/ui-x-jelly.webp");
+     봉인 끝 */
 }
 
 /* ---- 신규 넷의 키색 한 벌 (W7 블록과 같은 여섯 자리 셀렉터 목록) ------------
@@ -38044,16 +38071,32 @@ html[lang="en"] .splash-logo{
 #modal-classic .r10-ribbon,
 #charpanel #cp-h{
   align-self:center;
-  /* 🚨 높이를 **못 박는다**(66px). 캡슐은 9슬라이스라 세로 배율 = border-width ÷
-     slice 인데, 높이를 내용에 맡기면 창마다 그 배율이 달라진다 — 실측에서
-     #modal-mode 만 95px 이 나왔고(41px 짜리 제목 글자), 그 한 창에서만 캡이
-     세로로 늘어나 **둥근 끝이 각진 모서리**로 보였다(사용자 반려의 그 결함).
-     66px 에서 세로 배율은 22÷130 = 0.169, 가로는 36÷200 = 0.180 이라 캡이
-     원판 비율의 6% 안에서 재현된다.
+  /* 🚨🚨 W6.5b — **세로 슬라이스 폐지**. 사용자 3차 반려("캡슐이 쭈글쭈글
+     구겨졌다")의 원인이 여기 있었다.
+
+     W6.5a 는 양축 9슬라이스였다: `130 200 130 200 / 22px 36px`. 그러면 세로가
+     **두 배율로 쪼개진다** — 캡의 위아래 130px 은 22÷130=0.169 로, 가운데
+     38px 은 (66−44)÷38=0.58 로. 한 그림 안에서 세로 배율이 3.4배 어긋나니
+     알약의 곡선이 중간에서 꺾이고 림이 구겨졌다. 66px 이라는 작은 상자에서
+     그 꺾임은 "대충 그린 번짐"으로 읽힌다.
+
+     고치는 법은 슬라이스 숫자를 다시 고르는 것이 아니라 **세로를 안 쪼개는**
+     것이다: 세로 슬라이스 0 · 세로 border-width 0 → 좌우 테두리 칸이 원본의
+     세로 전체(298px)를 통째로 받아 상자 높이에 **균일 축소**된다.
+       세로 배율 = H ÷ 298
+       가로 배율 = --w65-cap ÷ 200
+     둘을 같게 두면(H=80 → 200×80÷298 = 53.7 ≒ 54px) 캡은 **원본 비율 그대로**
+     이고 구겨질 자리가 산술적으로 없다. 가운데 칸만 가로로 늘어나는데, 알약의
+     허리는 가로로 균일한 구간이라 늘려도 아무것도 안 바뀐다(3슬라이스 원리).
+
+     높이 66 → **80px**: 66px 에서는 림 선(원본 8px)이 2.1px 로 뭉개져 회색
+     실선이 됐다. 80px 이면 2.6px 이고, 사용자 시안 헤더 비율(gm-settings-
+     target.png)에도 이쪽이 가깝다. 12창 전부 같은 값이다.
      flex 중앙정렬은 글자를 그 고정 높이 안에 세우기 위한 것이다(글자 높이가
      상자를 정하던 관계를 뒤집는다). */
+  --w65-cap:54px;                /* = 200 × 80 ÷ 298. 높이를 바꾸면 같이 바꾼다 */
   box-sizing:border-box;
-  height:66px;
+  height:80px;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -38064,11 +38107,11 @@ html[lang="en"] .splash-logo{
   width:fit-content;
   min-width:56%;
   max-width:100%;
-  margin:-26px auto 6px;
+  margin:-32px auto 6px;
   padding:0 10px;
   border-style:solid;
-  border-width:22px 36px 22px 36px;
-  border-image:var(--w65-capsule) 130 200 130 200 fill stretch;
+  border-width:0 var(--w65-cap);
+  border-image:var(--w65-capsule) 0 200 fill stretch;
   border-radius:0;
   background-color:transparent;
   background-image:none;
@@ -38144,18 +38187,18 @@ html[lang="ko"] #modal-mode .r10-ribbon > h2{ color:transparent; text-shadow:non
    (color 만 투명하게 하면 background-clip:text 판이 그대로 남는다). */
 #modal-mode .r10-ribbon{
   border-style:solid !important;
-  border-width:22px 36px 22px 36px !important;
-  border-image:var(--w65-capsule) 130 200 130 200 fill stretch !important;
+  border-width:0 var(--w65-cap,54px) !important;   /* W6.5b — 세로 슬라이스 폐지 */
+  border-image:var(--w65-capsule) 0 200 fill stretch !important;
   border-radius:0 !important;
   width:fit-content !important;
   min-width:56% !important;
   padding:0 10px !important;
-  margin:-26px auto 6px !important;
+  margin:-32px auto 6px !important;
   /* 위 공통 규칙의 66px 을 여기서도 못 박는다 — :11883 의 padding:24px 34px 와
      :35552 의 padding:0 !important 가 이 자리에서 싸우고 있어, !important 없이는
-     높이가 다시 내용에 끌려간다(실측 95px). */
+     높이가 다시 내용에 끌려간다(실측 95px). W6.5b 에서 66 → 80px. */
   box-sizing:border-box !important;
-  height:66px !important;
+  height:80px !important;
   display:flex !important;
   align-items:center !important;
   justify-content:center !important;
@@ -38193,12 +38236,16 @@ html[lang="ko"] #modal-mode .r10-ribbon > h2{
 #modal-mode .r10-x{
   width:44px !important;
   height:44px !important;
+  /* 🚨 W6.5b 원복 — 그림만 봉인하고 **크기는 남긴다**. 44pt 터치 타깃은 X 디자인이
+     아니라 접근성 하한(ROUND10-SPEC §B)이라 무지개 X 반려와 무관한 사실이다.
+     아래 두 줄이 빠지면 :35590 의 시안 3호 X(구운 webp)가 그대로 되살아난다.
   background-image:var(--w65-x) !important;
   background-repeat:no-repeat !important;
   background-position:center center !important;
   background-size:contain !important;
   color:transparent !important;
   -webkit-text-fill-color:transparent !important;
+     봉인 끝 */
 }
 /* 🚨 배선하지 **않은** 자리 셋 — 의도된 공백이다.
      · #modal-adv  제목이 "N탄 클리어!/실패" 라 스테이지 번호가 글자에 들어간다.
@@ -38210,13 +38257,17 @@ html[lang="ko"] #modal-mode .r10-ribbon > h2{
    넷 다 캡슐 프레임은 받고 글자만 남는다. 레터링이 도착하거나 화면이 생기면
    위 표에 한 줄씩 더하는 것이 배선의 전부다. */
 
-/* ---- ③ X 버튼 전량 교체 — 무지개 젤리 (ui-x-jelly.webp) -------------------
-   글자 `&times;` 는 **지우지 않는다**: 마크업에 그대로 남고 여기서 투명해질 뿐이라,
-   그림이 못 오면 문자 X 가 되살아나는 것이 아니라(투명이라 안 보인다) —
-   되돌리려면 이 규칙 하나를 지우면 된다. 14차 「글자만, 44pt」 규약을 여는 자리라
-   주석으로 그 사실을 남긴다: 이 파도부터 X 는 조각이다.
-   [data-w6x] 스코프를 쓰지 않는다 — 코디 지시가 "모달 X 전부"다. 노드 카드의
-   X 도 같은 그림이 되고, 그것이 옳다(같은 낱말은 같은 그림). */
+/* ---- ③ X 버튼 전량 교체 — 무지개 젤리 (ui-x-jelly.webp) ★전량 봉인★ ---------
+   🚨 W6.5b 원복(사용자 반려: "이전 게 완벽했는데 왜 바꿨냐"). W6.5a 가 이 블록
+   하나로 모달 X 전부를 무지개 젤리로 갈았고, 그 교체가 통째로 반려됐다.
+
+   되돌리는 법이 이 설계의 값이다 — **아래 주석 한 쌍만 벗기면** 다시 무지개다.
+   지운 규칙은 0개이고, 봉인이 걷히는 순간 이전 X 셋이 자기 자리로 돌아온다:
+     · `.r10-x`        → :9313 의 원래 규칙(크림 원판 + 글자 ×)
+     · `#modal-mode`   → :35590 의 시안 3호 X(구운 webp)
+     · `#charpanel`    → :7807/:8357 의 `.icon-btn` 닫기
+   preloader 의 ui-x-jelly 도 같은 파도에서 걷었고, catalog 의 그림은 남는다.
+
 .r10-x{
   color:transparent;
   text-shadow:none;
@@ -38227,8 +38278,8 @@ html[lang="ko"] #modal-mode .r10-ribbon > h2{
   background-size:contain;
 }
 .r10-x[data-w6x]{ color:transparent; text-shadow:none; }
-/* 캐릭터 패널의 닫기는 `.r10-x` 가 아니라 `.icon-btn` 이라 위 규칙 밖에 있었다 —
-   실렌더에서 이 한 자리만 크림 원판 × 로 남아 "모달 X 전부"를 못 채웠다. */
+   캐릭터 패널의 닫기는 `.r10-x` 가 아니라 `.icon-btn` 이라 위 규칙 밖에 있었다 —
+   실렌더에서 이 한 자리만 크림 원판 × 로 남아 "모달 X 전부"를 못 채웠다.
 #charpanel #cp-close{
   border:0;
   color:transparent;
@@ -38240,6 +38291,7 @@ html[lang="ko"] #modal-mode .r10-ribbon > h2{
   background-size:contain;
   box-shadow:none;
 }
+   ③ 봉인 끝 */
 </style>
 
 <script id="bg-preview-hook">
@@ -38347,8 +38399,11 @@ var L=("jelly-box,duel-title-play,sian2-ribbon,sian2-btn-pink,sian2-btn-purple,"
    ① 헤더 캡슐·X 는 모달이 처음 열릴 때 필요하고, 모달은 첫 프레임이 아니다.
    ② 레터링 아홉 장은 각각 자기 모달 하나에서만 쓰인다.
    ③ 동료 얼굴 넷은 펫 탭에서만 뜬다(전투 슬롯은 setStdArt 가 직접 건다).
-   못 데워도 무해하다 — 그때 브라우저가 직접 받는다. */
-      +"glass-hud-capsule-st,ui-x-jelly,art-logo-en,"
+   못 데워도 무해하다 — 그때 브라우저가 직접 받는다.
+   🚨 W6.5b: `ui-x-jelly` 를 목록에서 뺐다(무지개 X 전량 원복 — 소비처 0).
+      대신 유리 HUD 세트 셋을 더한다. 이 셋은 **전투 첫 프레임**에 필요하지만
+      전투는 메뉴→맵→노드를 거쳐야 오므로 목록 끝으로도 늦지 않다. */
+      +"glass-hud-capsule-st,glass-hud-slab-st,glass-hud-plate-st,glass-hud-bar-st,art-logo-en,"
       +"ttl-settings,ttl-pause,ttl-rank,ttl-play,ttl-clear,"
       +"ttl-over,ttl-daily,ttl-skin,ttl-chars,"
       +"ch-mukmul-face,ch-tiktok-face,ch-kkultteok-face,ch-bangul-face,"
@@ -38359,7 +38414,7 @@ var L=("jelly-box,duel-title-play,sian2-ribbon,sian2-btn-pink,sian2-btn-purple,"
    #map-b1)과 반드시 같은 숫자로 맞춘다. 어긋나면 프리로드가 통째로 헛 요청이 된다.
    W6: stage-pill_star 가 수리 교체되면서 목록이 셋 → 넷이 됐다. */
 var V="stage-btn_back,stage-pill_coin,stage-btn_records,stage-pill_star";
-var VQ="?v=6";                                     /* CSS 4곳과 반드시 같은 값 */
+var VQ="?v=7";                                     /* CSS 4곳과 반드시 같은 값 */
 var i=0,bgmQueued=0;
 function next(){
   if(i>=L.length){ if(!bgmQueued){ bgmQueued=1; warmBgm(); } return; }  /* 그림 끝 → BGM */
