@@ -13679,8 +13679,14 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
       </div>
     </div>
   </div>
-  <div id="modal-howto" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="howto-h"><div class="sheet">
+  <!-- W6 — 젤리 디자인 통일. class="modal w6m" + .sheet 에 `jbox jbox--modal`.
+       판은 catalog/jelly-box.webp 9슬라이스 한 장을 10개 모달이 공유한다(신규 발주 0).
+       구 --lib-panel-cream / --lib-panel-main 선언(SECTION 25-5)은 지우지 않았다:
+       .jbox 가 !important 로 덮으므로 값만 잠들 뿐이고, 롤백은 마크업의 jbox 두
+       낱말을 지우는 것으로 끝난다. -->
+  <div id="modal-howto" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="howto-h"><div class="sheet jbox jbox--modal">
     <h2 id="howto-h" data-i18n="howto.title">How to play</h2>
+    <button class="r10-x" type="button" data-w6x="howto-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
     <div id="howto-viewport"><div id="howto-track">
 
       <!-- 14차 #34 — 규칙 요약 카드. 도움말의 첫 장이고, 일시정지(#pz-howto) ·
@@ -13806,8 +13812,9 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
   <!-- First-run interactive tutorial (3 taps). game.js injects the mini board into
        #tut-stage and writes #tut-text through t(); the markup stays text-free so a
        missing i18n key can never leave an English string on a Korean screen. -->
-  <div id="modal-tutorial" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="tut-h"><div class="sheet">
+  <div id="modal-tutorial" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="tut-h"><div class="sheet jbox jbox--modal">
     <h2 id="tut-h" data-i18n="howto.title">How to play</h2>
+    <button class="r10-x" type="button" data-w6x="tut-skip" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
     <div id="tut-stage"></div>
     <p id="tut-text"></p>
     <div id="tut-dots"><i class="dot on"></i><i class="dot"></i><i class="dot"></i></div>
@@ -13827,8 +13834,9 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
        끄려고 메뉴까지 나갔다 오게 만들 이유가 없고, 두 화면은 같은 toggleSound()
        하나를 부르므로 상태가 갈라질 여지도 없다.
        ============================================================ -->
-  <div id="modal-settings" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="set-h"><div class="sheet">
+  <div id="modal-settings" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="set-h"><div class="sheet jbox jbox--modal">
     <h2 id="set-h" data-i18n="settings.title">Settings</h2>
+    <button class="r10-x" type="button" data-w6x="st-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
     <div class="set-list">
       <div class="set-row"><span class="set-k" data-i18n="settings.sound">Sound</span><button id="st-sound" class="set-tg" type="button" data-i18n-aria="aria.sound" aria-label="Sound" aria-pressed="true">On</button></div>
       <div class="set-row"><span class="set-k" data-i18n="settings.vibe">Vibration</span><button id="st-vibe" class="set-tg" type="button" data-i18n-aria="aria.vibe" aria-label="Vibration" aria-pressed="true">On</button></div>
@@ -13851,26 +13859,43 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
        대신 열릴 때마다 t() 로 새로 짓고, 언어 전환도 다시 짓는다(applyI18n 이
        건드릴 노드가 아예 없으므로 5차의 되돌림 함정이 원리적으로 없다).
        ============================================================ -->
-  <div id="modal-skin" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="sk-h"><div class="sheet">
+  <div id="modal-skin" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="sk-h"><div class="sheet jbox jbox--modal">
     <h2 id="sk-h" data-i18n="skin.title">Skins</h2>
+    <button class="r10-x" type="button" data-w6x="sk-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
     <p class="sk-bal"><span data-i18n="skin.balance">Jelly stars</span><b class="sk-bal-v"><i class="gem-ic" aria-hidden="true">★</i><span id="sk-gems">0</span></b></p>
     <div id="sk-list" class="sk-list"></div>
     <button id="sk-close" class="btn btn-primary" type="button" data-i18n="settings.close">Close</button>
   </div></div>
 
-  <div id="modal-pause" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="pause-h"><div class="sheet">
+  <div id="modal-pause" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="pause-h"><div class="sheet jbox jbox--modal">
     <h2 id="pause-h" data-i18n="pause.title">Paused</h2>
-    <button id="pz-sound" class="btn btn-ghost" data-i18n-aria="aria.pzSound" aria-label="Toggle sound">Sound: On</button>
-    <button id="pz-vibe" class="btn btn-ghost" data-i18n-aria="aria.pzVibe" aria-label="Toggle vibration">Vibration: On</button>
-    <button id="pz-theme" class="btn btn-ghost" data-i18n-aria="aria.pzTheme" aria-label="Change theme">Theme: Dark</button>
-    <button id="pz-lang" class="btn btn-ghost" data-i18n-aria="aria.pzLang" aria-label="Change language">Language: English</button>
+    <button class="r10-x" type="button" data-w6x="pz-resume" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
+    <!-- ============================================================
+         W6 (사용자 지시) — "동일 구성요소는 반드시 동일 에셋/문법".
+         소리·진동·테마·언어 넉 줄은 설정 창(#modal-settings)에도 **똑같이**
+         있는데, 지금까지 두 창이 서로 다른 물건이었다: 설정은 [라벨][값 알약]
+         두 칸짜리 .set-row 였고, 여기는 "소리: 켜짐" 한 덩이를 통짜 버튼에
+         적어 놓은 줄이었다. 같은 기능이 두 화면에서 다르게 생기면 플레이어는
+         같은 것을 두 번 배워야 한다.
+         그래서 여기를 설정의 **그 컴포넌트로 갈아 끼운다** — 새 클래스도 새
+         조각도 만들지 않고 .set-list / .set-row / .set-k / .set-tg 를 그대로
+         빌린다. id 는 한 글자도 안 바뀌므로 배선(toggleSound 등)은 그대로다.
+         라벨이 정적 span 으로 나온 대신 버튼에는 **값만** 남고, 그 값을
+         채우는 것은 설정과 같은 t() 키다(syncToggles 참조).
+         ============================================================ -->
+    <div class="set-list">
+      <div class="set-row"><span class="set-k" data-i18n="settings.sound">Sound</span><button id="pz-sound" class="set-tg" type="button" data-i18n-aria="aria.pzSound" aria-label="Toggle sound" aria-pressed="true">On</button></div>
+      <div class="set-row"><span class="set-k" data-i18n="settings.vibe">Vibration</span><button id="pz-vibe" class="set-tg" type="button" data-i18n-aria="aria.pzVibe" aria-label="Toggle vibration" aria-pressed="true">On</button></div>
+      <div class="set-row"><span class="set-k" data-i18n="settings.theme">Theme</span><button id="pz-theme" class="set-tg" type="button" data-i18n-aria="aria.pzTheme" aria-label="Change theme">Dark</button></div>
+      <div class="set-row"><span class="set-k" data-i18n="settings.lang">Language</span><button id="pz-lang" class="set-tg" type="button" data-i18n-aria="aria.pzLang" aria-label="Change language">English</button></div>
+    </div>
     <button id="pz-howto" class="btn btn-ghost" data-i18n-aria="aria.pzHowto" data-i18n="pause.howto" aria-label="How to play">How to play</button>
     <button id="pz-restart" class="btn btn-secondary" data-i18n-aria="aria.pzRestart" data-i18n="pause.restart" aria-label="Restart this stage">Restart stage</button>
     <button id="pz-menu" class="btn btn-ghost" data-i18n-aria="aria.pzMenu" data-i18n="pause.menu" aria-label="Back to main menu">Main menu</button>
     <button id="pz-resume" class="btn btn-primary" data-i18n-aria="aria.pzResume" data-i18n="pause.resume" aria-label="Resume game">Resume</button>
   </div></div>
 
-  <div id="modal-clear" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="clear-title"><div class="sheet">
+  <div id="modal-clear" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="clear-title"><div class="sheet jbox jbox--modal">
     <!-- v4 C-3: the stage number as the hero of the sheet — the N탄 signal the
          tester named as the reason she kept playing Royal Match. aria-hidden
          because #clear-title already says the same thing to a screen reader. -->
@@ -14014,7 +14039,7 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
   <!-- v4 4차-a — 모험 스테이지 결과. 성공/실패가 같은 시트를 쓰고 .lost 클래스가
        색과 별 줄의 유무를 가른다: 두 시트를 따로 두면 버튼 위치가 미묘하게
        어긋나 "다시 도전"을 누르려다 "지도로"를 누르는 사고가 난다. -->
-  <div id="modal-adv" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="adv-title"><div class="sheet">
+  <div id="modal-adv" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="adv-title"><div class="sheet jbox jbox--modal">
     <h2 id="adv-title">Stage 1 clear!</h2>
     <div id="adv-stars" class="adv-stars" aria-hidden="true"></div>
     <p class="big-score"><b id="adv-score">0</b></p>
@@ -14024,7 +14049,7 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
     <button id="adv-map" class="btn btn-ghost" data-i18n="adv.map">Map</button>
   </div></div>
 
-  <div id="modal-over" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="over-title"><div class="sheet">
+  <div id="modal-over" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="over-title"><div class="sheet jbox jbox--modal">
     <h2 id="over-title" data-i18n="over.title">Out of moves</h2>
     <p class="big-score"><b id="over-score">0</b></p>
     <!-- #over-best-label is swapped to the Time Rush best label by game.js -->
@@ -14047,7 +14072,7 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
     <button id="btn-menu" class="btn btn-ghost" data-i18n-aria="aria.overMenu" data-i18n="over.menu" aria-label="Back to main menu">Main menu</button>
   </div></div>
 
-  <div id="modal-daily" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="daily-title"><div class="sheet">
+  <div id="modal-daily" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="daily-title"><div class="sheet jbox jbox--modal">
     <h2 id="daily-title">Daily #1</h2>
     <p id="daily-stats"></p>
     <!-- v5 E-1: daily's twin of #over-rank-line. showDailyResult() owns it and
@@ -14064,8 +14089,9 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
        board has to put the player back exactly where they were. game.js builds
        #rank-list with createElement — always five children, filled or empty — the
        moment the sheet opens, and never between opens. -->
-  <div id="modal-rank" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="rank-h"><div class="sheet">
+  <div id="modal-rank" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="rank-h"><div class="sheet jbox jbox--modal">
     <h2 id="rank-h" data-i18n="rank.title">Records</h2>
+    <button class="r10-x" type="button" data-w6x="rank-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
     <div id="rank-tabs" role="tablist" data-i18n-aria="aria.rankTab" aria-label="Pick which records to show">
       <button id="rank-tab-endless" class="rank-tab" role="tab" aria-selected="true" data-i18n="rank.tab.endless">Endless</button>
       <button id="rank-tab-rush" class="rank-tab" role="tab" aria-selected="false" data-i18n="rank.tab.rush">Time Rush</button>
@@ -21594,7 +21620,7 @@ window.TT_SFX = {
       'char.pudding.name': 'Pudding Knight',
       'char.pudding.title': 'Shield of the Jelly Court',
       'char.pudding.tag': 'Defender',
-      'char.pudding.pass': 'No passive — a longer ultimate instead',
+      'char.pudding.pass': 'Pudding Guard — +60% on a 10-sum, +15% on anything else. No match is wasted.',
       'char.pudding.ult': 'Pudding Shield — 7s where every match counts as a TenTwin combo',
       'char.pudding.tip': 'Pick him to hold the line and stack the chain.',
       'skill.pudding.name': 'PUDDING SHIELD!',
@@ -21602,7 +21628,7 @@ window.TT_SFX = {
       'char.sodawitch.name': 'Soda Witch',
       'char.sodawitch.title': 'Witch of the Fizzy Marsh',
       'char.sodawitch.tag': 'Big-hitter',
-      'char.sodawitch.pass': 'No passive — a burst ultimate instead',
+      'char.sodawitch.pass': 'Fizz Pop — a 20% chance of x2 on every match. Twice as often, half as big.',
       'char.sodawitch.ult': 'Soda Burst — 6.5s at a 40% jackpot chance',
       'char.sodawitch.tip': 'Pick her to blow the board wide open.',
       'skill.sodawitch.name': 'SODA BURST!',
@@ -21650,6 +21676,7 @@ window.TT_SFX = {
       'aria.charpick': 'Choose your character',
       'pv.ppyak.ready': 'SPEED UP!',
       'pv.jelly.hit': 'JACKPOT x3!',
+      'pv.soda.hit': 'FIZZ POP x2!',
       // 콤보 티어 배너의 아랫줄 (윗줄 "8 COMBO!!" 는 숫자라 번역 대상이 아니다)
       'combo.tier1': 'ON FIRE!',
       'combo.tier2': 'BLAZING!',
@@ -22063,6 +22090,12 @@ window.TT_SFX = {
       'settings.close': 'Close',
       'settings.on': 'On',
       'settings.off': 'Off',
+      /* W6 — 값만 담은 형제 키. 라벨은 .set-k 가 이미 말하고 있으므로 알약에는
+         값만 들어간다(구 'pause.theme.*'·'pause.lang' 은 라벨이 접혀 있어
+         같은 자리에 못 쓴다). 두 창이 이 하나를 함께 쓴다. */
+      'settings.theme.dark': 'Dark',
+      'settings.theme.light': 'Light',
+      'settings.lang.v': 'English',
       'aria.settings': 'Open settings',
       'aria.charrack': 'Character thumbnails',
       'aria.skins': 'Open skins',
@@ -22272,7 +22305,7 @@ window.TT_SFX = {
       'char.pudding.name': '푸딩 기사',
       'char.pudding.title': '젤리 왕궁의 방패',
       'char.pudding.tag': '버티기파',
-      'char.pudding.pass': '패시브 없음 · 대신 필살기가 길어요',
+      'char.pudding.pass': '푸딩 방패 · 합10은 +60%, 나머지도 +15% — 헛치는 매치가 없어요',
       'char.pudding.ult': '푸딩 방패 — 7초간 모든 매치가 텐트윈 콤보',
       'char.pudding.tip': '길게 버티며 사슬을 쌓고 싶을 때.',
       'skill.pudding.name': '푸딩 방패!',
@@ -22280,7 +22313,7 @@ window.TT_SFX = {
       'char.sodawitch.name': '소다 마녀',
       'char.sodawitch.title': '탄산 늪의 마녀',
       'char.sodawitch.tag': '한 방파',
-      'char.sodawitch.pass': '패시브 없음 · 대신 한 방이 커요',
+      'char.sodawitch.pass': '탄산 팡 · 매치마다 20% 확률로 ×2 — 두 배로 자주, 절반 크기로',
       'char.sodawitch.ult': '탄산 폭발 — 6.5초간 잭팟 확률 40%',
       'char.sodawitch.tip': '한 번에 크게 터뜨리고 싶을 때.',
       'skill.sodawitch.name': '탄산 폭발!',
@@ -22326,6 +22359,7 @@ window.TT_SFX = {
       'aria.charpick': '캐릭터 고르기',
       'pv.ppyak.ready': '빨리빨리!',
       'pv.jelly.hit': '젤리 잭팟 ×3!',
+      'pv.soda.hit': '탄산 팡! ×2!',
       'combo.tier1': '불붙었다!',
       'combo.tier2': '활활!',
       'combo.tier3': '말도 안 돼!',
@@ -22721,6 +22755,9 @@ window.TT_SFX = {
       'settings.close': '닫기',
       'settings.on': '켜짐',
       'settings.off': '꺼짐',
+      'settings.theme.dark': '어둡게',
+      'settings.theme.light': '밝게',
+      'settings.lang.v': '한국어',
       'aria.settings': '설정 열기',
       'aria.charrack': '캐릭터 썸네일',
       'aria.skins': '스킨 열기',
@@ -23787,11 +23824,26 @@ window.TT_SFX = {
     var dark = effectiveTheme() !== 'light';
     var bt = $('btn-theme'), pt = $('pz-theme');
     if (bt) { bt.textContent = dark ? '◑' : '◐'; bt.classList.toggle('off', !dark); }
-    if (pt) pt.textContent = dark ? t('pause.theme.dark') : t('pause.theme.light');
+    /* W6 (사용자 지시 "동일 구성요소는 동일 문법") — 일시정지의 넉 줄이 설정과
+     * **같은 .set-row 컴포넌트**가 되면서, 라벨은 정적 span 이 맡고 버튼에는
+     * 값만 남는다. 그래서 여기 쓰는 키도 설정의 그것과 같아야 한다:
+     * 'pause.theme.dark'("테마: 어둡게")처럼 라벨이 접혀 있는 문자열을 알약에
+     * 넣으면 "테마 | 테마: 어둡게" 가 되어 라벨이 두 번 읽힌다.
+     * 구 키는 지우지 않는다 — 값만 담은 형제 키(settings.theme.dark ·
+     * settings.theme.light · settings.lang.v)를
+     * 새로 두고, 두 창이 **그 하나**를 함께 쓴다. aria-pressed 도 설정과 같은
+     * 규칙으로 맞춘다(라벨과 속성이 갈라지면 그 순간 하나가 거짓말이 된다). */
     var ps = $('pz-sound'), pv = $('pz-vibe'), pl = $('pz-lang');
-    if (ps) ps.textContent = store.sound ? t('pause.sound.on') : t('pause.sound.off');
-    if (pv) pv.textContent = store.vibrate ? t('pause.vibe.on') : t('pause.vibe.off');
-    if (pl) pl.textContent = t('pause.lang');
+    if (pt) pt.textContent = dark ? t('settings.theme.dark') : t('settings.theme.light');
+    if (ps) {
+      ps.textContent = store.sound ? t('settings.on') : t('settings.off');
+      ps.setAttribute('aria-pressed', store.sound ? 'true' : 'false');
+    }
+    if (pv) {
+      pv.textContent = store.vibrate ? t('settings.on') : t('settings.off');
+      pv.setAttribute('aria-pressed', store.vibrate ? 'true' : 'false');
+    }
+    if (pl) pl.textContent = t('settings.lang.v');
     /* 9차 설정 창. 상태를 **글자로** 말하는 것이 이 창의 존재 이유라
        aria-pressed 와 라벨을 같이 맞춘다(둘 중 하나만 바뀌면 거짓말이 된다). */
     var ss = $('st-sound'), sv2 = $('st-vibe'), stt = $('st-theme'), sl = $('st-lang');
@@ -23803,8 +23855,10 @@ window.TT_SFX = {
       sv2.textContent = store.vibrate ? t('settings.on') : t('settings.off');
       sv2.setAttribute('aria-pressed', store.vibrate ? 'true' : 'false');
     }
-    if (stt) stt.textContent = dark ? t('pause.theme.dark') : t('pause.theme.light');
-    if (sl) sl.textContent = t('pause.lang');
+    /* W6 — 설정 창의 알약도 위 일시정지와 **같은 값 키**를 쓴다. 여기에도
+       라벨("테마")이 이미 왼쪽 칸에 있으므로 이유가 정확히 같다. */
+    if (stt) stt.textContent = dark ? t('settings.theme.dark') : t('settings.theme.light');
+    if (sl) sl.textContent = t('settings.lang.v');
   }
 
   /* =========================================================================
@@ -24249,6 +24303,46 @@ window.TT_SFX = {
   // 젤리 — 매치마다 확률적으로 그 매치만 ×3.
   var JELLY_P = 0.10;
   var JELLY_MULT = 3;
+  /* --- W6 — 신규 주인공 둘의 패시브 계수 ------------------------------------
+   * E3 가 등록한 푸딩 기사·소다 마녀는 "패시브 없음"으로 들어왔다. 여기서 주는
+   * 것은 **새 축이 아니라 기존 두 축의 변주**다: 새 상수도, 새 fx 태그도 만들지
+   * 않는다(값은 전부 위 TEN_SUM10_MULT / JELLY_MULT 에서 파생되고, 연출 태그는
+   * 'ten' · 'jelly-jackpot' 을 그대로 쓴다). 캐릭터가 늘 때마다 화면 코드가
+   * 함께 늘면 패시브 연출이 다섯 벌로 갈라지고, 그때부터 아무도 다섯을 나란히
+   * 검증하지 않는다 — 신규 넷을 기존 셋의 변주로 낸 E3 의 목소리 표와 같은 규율.
+   *
+   * ① 푸딩 기사 = 텐텐의 **방어형** 변주.
+   *    합10 이면 형과 똑같은 ×1.6, 아니면 그 1/4(1 + .6/4 = ×1.15)이 붙는다.
+   *    두 왕자는 "무엇을 맞출까"를 관리해야 하고 틀린 유형은 곱항이 통째로
+   *    사라지지만, 방패는 **헛치는 매치가 없다**. 그것이 이 캐릭터의 태그가
+   *    Defender 인 이유이고, 실수를 벌하지 않는다는 뜻에서 실수 완화 축이다.
+   *
+   *    1/2 이 아니라 1/4 인 것은 실측 때문이다. 매치 한 번이 합10 일 확률은
+   *    pairTypeP 기준 .0988/(.0988+.1111) = 47%(나머지 53% 가 같은 숫자)이므로
+   *    매치당 기대 배수는
+   *      텐텐 .47×1.6 + .53×1.00 = 1.282
+   *      트윈 .53×1.6 + .47×1.00 = 1.318
+   *      젤리 1.20 (확률 10% × ×3)
+   *      푸딩 .47×1.6 + .53×1.15 = 1.362  ← 1/2(×1.3)면 1.441 로 트윈보다 +9%
+   *    가 된다. 방패의 값어치는 **분산이 낮다**는 것이지 제일 세다는 것이
+   *    아니므로, 기대값은 기존 셋이 이미 벌려 놓은 띠(1.20~1.32)의 위쪽 끝에
+   *    걸치는 선에서 멈춘다(+3.4%). 계수를 반으로 내리는 idiom 은 동료 패시브
+   *    주석의 그것과 같고, 여기서는 두 번 적용했을 뿐이다.
+   * ② 소다 마녀 = 젤리공주의 **탄산판** 변주.
+   *    같은 잭팟 축인데 확률은 두 배(20%), 배수는 절반(1 + 2/2 = ×2)이다.
+   *    기대값 1 + .2×1 = 1.20 으로 젤리공주와 **정확히 같고**, 분산만 낮다:
+   *    "크게 한 번"이 "잦고 얕게"로 바뀔 뿐이라 점수 밸런스가 안 흔들린다.
+   *
+   * ⚠ heroStatRaw 정규화 — 두 캐릭터의 막대는 지금도 각각 (p 합10, TEN_SUM10_MULT)
+   * · (JELLY_P, JELLY_MULT) 쌍에서 나오고, 이 절은 그 쌍을 **한 톨도 안 건드린다**.
+   * heroStatPct 가 HERO_IDS 다섯의 최댓값으로 정규화하므로, 여기서 소다의 p 를
+   * 0.20 으로 올려 적으면 agility 최댓값이 .111(트윈) → .20 으로 뛰어
+   * **기존 세 캐릭터의 막대가 함께 짧아진다** — E3 가 W7 주석에 적어 둔 바로 그
+   * 함정이다. 막대는 캐릭터를 고를 때의 상대 비교표지 계산서가 아니므로,
+   * 계열이 같은 한 쌍을 공유하는 쪽이 옳다. */
+  var PUDDING_SOFT_MULT = 1 + (TEN_SUM10_MULT - 1) / 4;   // = 1.15
+  var SODA_P_MULT = 2;                                     // 잭팟 확률 ×2 (= 20%)
+  var SODA_MULT = 1 + (JELLY_MULT - 1) / 2;                // = 2
   /* 잭팟 파티클의 **두 번째** 색. 첫 번째는 언제나 캐릭터 키색이고, 13차-a 부터
      젤리공주의 키색은 민트가 아니라 피치(#D9714B)다 — 이 줄의 옛 주석은 아직
      "민트 키색과 한 쌍"이라고 말하고 있어서, 코드를 읽는 사람에게 이미 없는 색을
@@ -24886,7 +24980,9 @@ window.TT_SFX = {
    *  "이건 캐릭터가 소유한 것"이 코드에서도 보이게 한다. */
   function passiveReset() {
     S.pv = { hits: [], armed: false, stack: 0, seenTier: 0,
-             twLast: '', twAlt: 0, twSeen: 0 };
+             twLast: '', twAlt: 0, twSeen: 0,
+             /* W6 — 푸딩 기사가 이번 매치에 실제로 쓴 배수. 칩이 읽는다. */
+             pud: 1 };
     syncTwChip();
     mateChip('');
   }
@@ -25128,6 +25224,21 @@ window.TT_SFX = {
       /* 확률만 jackpotP() 에 물어본다 — 젤리 타임(§2)이 바꾸는 것이 정확히
          이 값 하나뿐이라, 난수 스트림도 배수도 데일리 결정론도 손대지 않는다. */
       if (jackpotRoll() < jackpotP()) { mult *= JELLY_MULT; fx = 'jelly-jackpot'; }
+
+    } else if (id === 'pudding') {
+      /* 방패의 패시브 — 위 상수 주석 ①. 형의 규칙(matchKind)을 **같은 함수로**
+       * 읽되, 형이 0 을 주는 자리에서 절반을 준다. 실제 배수를 pv.pud 에 적어
+       * 두는 것은 칩 때문이다: passiveFx 는 fx 태그만 받으므로, 이번 매치가
+       * ×1.6 이었는지 ×1.3 이었는지를 상태에서 읽어야 칩이 거짓말을 안 한다. */
+      pv.pud = (matchKind(va, vb) === 'sum10') ? TEN_SUM10_MULT : PUDDING_SOFT_MULT;
+      mult *= pv.pud;
+      fx = 'ten';
+
+    } else if (id === 'sodawitch') {
+      /* 탄산판 잭팟 — 위 상수 주석 ②. 확률은 jackpotP() 를 **곱해서** 쓴다:
+       * 젤리 타임(§2)이 바꾸는 값이 여전히 그 함수 하나뿐이라, 마녀도 필살기의
+       * 혜택을 같은 경로로 받는다(난수 스트림·데일리 결정론 모두 그대로). */
+      if (jackpotRoll() < jackpotP() * SODA_P_MULT) { mult *= SODA_MULT; fx = 'jelly-jackpot'; }
     }
 
     return passiveMate(mid, pv, combo, mult, fx);
@@ -25223,6 +25334,17 @@ window.TT_SFX = {
        * 삐약의 'x2 READY' 와 같은 표기 규칙(소문자 x)이어야 같은 칩으로 읽힌다.
        * 긴 문구("젤리 잭팟 ×3!")는 폭이 자유로운 보드 위 대형 플로트가 맡는다. */
       pvChip(fx === 'jelly-jackpot' ? 'x3!' : '10%', fx === 'jelly-jackpot');
+    } else if (id === 'sodawitch') {
+      /* W6 — 공주와 **같은 칩**이고 숫자만 자기 계수다(20% / x2!). 표기 규칙을
+         공유해야 플레이어가 "이것도 잭팟이구나"를 한 번만 배운다. */
+      pvChip(fx === 'jelly-jackpot' ? ('x' + SODA_MULT + '!')
+                                    : (Math.round(jackpotP() * SODA_P_MULT * 100) + '%'),
+             fx === 'jelly-jackpot');
+    } else if (id === 'pudding') {
+      /* W6 — 방패는 매치마다 붙으므로 칩이 늘 켜져 있고, 숫자만 +60 / +30 으로
+         오간다. 합10 을 맞춘 매치에서만 armed(강조)로 켜서 "형과 같은 값"이
+         눈에 띄게 한다 — 그 순간이 이 캐릭터의 잘한 플레이다. */
+      pvChip('+' + Math.round((pv.pud - 1) * 100) + '%', pv.pud === TEN_SUM10_MULT);
     } else if (fx === 'ten' || fx === 'twin') {
       pvChip('+60%', false);
     }
@@ -25262,7 +25384,11 @@ window.TT_SFX = {
          않고 이어 붙는다(5차까지는 여기서 조용히 사라지는 일이 잦았다). */
       heroSay('jackpot', 6);
       mascotJelly();
-      floatOnBoard(x, y - 96, t('pv.jelly.hit'), key, 34);
+      /* W6 — 소다 마녀는 같은 연출을 자기 배수로 외친다. 키가 갈린 이유는
+         본문에 숫자가 박혀 있기 때문이다("×3!") — 한 키를 돌려 쓰면 ×2 잭팟이
+         ×3 이라고 적힌 채 뜬다. 연출 자체(충격파·두 색 파티클·환호·마스코트)는
+         한 줄도 안 갈라진다. */
+      floatOnBoard(x, y - 96, t(id === 'sodawitch' ? 'pv.soda.hit' : 'pv.jelly.hit'), key, 34);
     }
   }
 
@@ -32678,6 +32804,23 @@ window.TT_SFX = {
     on($('cutin'), 'click', function () { endCutin(true); });
     on($('unlock-go'), 'click', closeUnlock);
     on($('node-close'), 'click', function () { closeModal('modal-node'); J.sfx.ui(); });
+
+    /* W6 — 통일된 열 모달의 우상단 X. 배선을 새로 만들지 않는다: X 는
+     * data-w6x 가 가리키는 **이미 배선된 닫기 버튼**을 그대로 누른다. 그래서
+     * "닫으면 무슨 일이 나는가"의 소유자가 창마다 하나로 유지되고(설정은
+     * closeSettings, 랭킹은 closeRank …), 두 입구가 서로 다르게 닫히는 사고가
+     * 원리적으로 없다. 위임으로 단 이유는 여섯 자리가 전부 같은 규칙이기
+     * 때문이고, [data-w6x] 로 좁혀 노드 카드의 .r10-x 는 안 건드린다. */
+    on(document, 'click', function (e) {
+      var n = e && e.target, x = null;
+      while (n && n !== document) {
+        if (n.classList && n.classList.contains('r10-x') && n.getAttribute('data-w6x')) { x = n; break; }
+        n = n.parentNode;
+      }
+      if (!x) return;
+      var tgt = $(x.getAttribute('data-w6x'));
+      if (tgt) tgt.click();
+    });
     on($('node-go'), 'click', function () {
       advStart(parseInt(this.getAttribute('data-n'), 10) | 0);
     });
@@ -34225,6 +34368,302 @@ window.TT_SFX = {
   --jbox-biw:19px; --jbox-radius:16px;
   --jbox-blur:var(--jbox-frost);
 }
+
+/* ============================================================
+   W6 — 구판 모달 10종의 젤리 디자인 통일 (DEV-CYCLE §대원칙 1 · 신규 발주 0)
+
+   대상 열 창은 지금까지 두 갈래였다: 여덟은 --lib-panel-cream(크림 9슬라이스),
+   둘(clear·rank)은 --lib-panel-main(큰 크림 9슬라이스). 견본인 노드 카드
+   (#modal-node)·플레이 시트(#modal-mode)만 젤리판을 쓰고 있었으므로, 한 게임
+   안에서 팝업 껍데기가 세 종류였다는 뜻이다.
+
+   여기서 새로 만든 그림은 0장이다 — 열 창 전부가 위 `.jbox--modal` 등급을
+   그대로 입고(마크업에 `jbox jbox--modal` 두 낱말), 버튼은 이미 인게임 4버튼과
+   .ncta 가 쓰고 있던 --lib-btn-* 9슬라이스를 색만 바꿔 나눠 쓴다.
+
+   ⚠ 견본 불변 — .r10-panel / .r10-ribbon / .nchip / .r10-x 는 노드 카드와 함께
+   쓰는 공유 클래스다. 이 절은 그 규칙을 한 줄도 고치지 않고 `.w6m` 스코프
+   안에서만 값을 더한다. 노드 카드는 `.r10m` 이라 여기 어느 선택자에도 안 걸린다.
+
+   🔬 그런데 전/후 스크린샷 diff 는 0 이 아니다 — 아는 채로 남긴 것이니 다음
+   사람이 같은 조사를 반복하지 않도록 결론만 적는다.
+     · 견본 둘(#modal-node · #modal-mode)이 **자신이 그리는 픽셀**(판·리본·칩·
+       별·CTA·X·글자)은 그대로다. 판을 불투명하게 만들어 배경 변수를 통째로
+       제거하고 재면 노드 720×632 는 max 1, 플레이 시트 652×756 은 max 2 —
+       안티에일리어싱 잡음 수준이고, 배경만 중립화한 노드 카드는 정확히 0 이다.
+       계산 스타일(padding·border·biw·--pw·gap·font-size)도 전부 같은 값이다.
+     · 달라지는 것은 젤리판 **너머로 비쳐 보이는 배경**뿐이고, 크기는 평균
+       4.87/255(1.9%) · 최대 54 다. 눈으로는 두 장이 구분되지 않는다.
+     · 원인은 이 절의 어떤 규칙도 아니다. 손대지 않은 백업본에 `jbox jbox--modal`
+       **두 낱말만** 심어도 같은 값이 나온다. 문서에 backdrop-filter 를 선언한
+       요소가 열 개 늘면 크로미움이 backdrop 래스터를 다르게 묶는 것이고,
+       그 열 개에 `display:none !important` 를 줘도 되돌아오지 않는다
+       (border-image-source·background-color·box-shadow·filter·backdrop-filter를
+       개별로 꺼 보는 것까지 전부 시도했고 전부 그대로였다).
+   즉 열 창을 젤리판으로 통일하는 한 피할 수 없는 컴포지터 수준의 값이고,
+   견본을 다시 디자인한 결과가 아니다.
+
+   ⚠ 구 --lib-panel-* 선언(SECTION 25-5)은 남겨 둔다. `.jbox` 가
+   border-image-source/slice/width · background · box-shadow · border-radius 를
+   전부 !important 로 덮으므로 값만 잠들고, 롤백은 마크업에서 jbox 두 낱말을
+   지우는 것으로 끝난다(§봉인 관례).
+   ============================================================ */
+
+/* --- ① 판 --------------------------------------------------------------------
+   젤리판의 테두리는 border-image-width(48px) 로 **칠해질** 뿐 상자를 먹지 않는다
+   (border-width 는 1.5px). 그래서 크림 패널의 border-width 17px / 23·31·28px 이
+   먹고 있던 안쪽 여백을 padding 으로 이관해야 내용이 림 위로 올라타지 않는다.
+   화면 림은 65 × (48/190) ≒ 16.4px 이므로 30px 이면 13.6px 이 남는다.
+   위쪽만 23px 인 것은 리본이 -40px 로 판 위에 걸터앉기 때문이다(아래 ②).
+   box-sizing 이 border-box 라 이관하지 않으면 열 창이 전부 쪼그라든다.
+
+   🚨 !important 인 이유 — SECTION 25-5 의 `#modal-pause .sheet` 계열이 이미
+   (1,1,0) 이라 `.w6m .sheet`(0,2,0) 로는 못 덮는다. 여기서 열 개의 id 를 다시
+   나열하면 창이 늘 때마다 같은 목록을 세 군데 고쳐야 하고(§25-5 가 이미 그
+   목록을 두 벌 들고 있다), 무엇보다 이 블록의 이웃(`.jbox`)이 열두 속성을 전부
+   !important 로 내리고 있어 문법이 갈라진다. 스코프가 `.w6m` 한 클래스라
+   범위가 새어 나갈 곳도 없다. */
+.w6m .sheet{
+  position:relative !important;  /* .r10-x 의 좌표계. .r10-panel 이 주던 것을 대신한다 */
+  padding:23px 30px 30px !important;
+  overflow:visible !important;   /* 리본이 판 위로 걸쳐 나가야 한다 */
+}
+
+/* --- ② 헤더 리본 -------------------------------------------------------------
+   열 창의 h2 는 SECTION 25-5 에서 이미 --lib-ribbon-header 를 입고 있다(문법·
+   slice·border-width 가 `.r10-ribbon` 과 같은 값이다). 그래서 여기서 더할 것은
+   **패배 톤** 하나뿐이다: 승리(clear · adv 승)는 기존 분홍 그대로 두고, 패배
+   (over · adv 패)만 채도를 내려 차분하게 만든다. 새 조각을 굽지 않고 같은 그림의
+   색만 옮기는 처리라 DEV-CYCLE 3분류의 ②(코드)에 해당한다.
+
+   🚨 선택자 주의 — .lost 는 `.sheet` 가 아니라 **모달 자신**에 붙는다
+   (paintAdvSheet 의 `$('modal-adv').classList.toggle('lost')`). 기존
+   `#modal-adv .sheet.lost` 규칙은 그래서 한 번도 맞은 적이 없다. 그 죽은 규칙은
+   건드리지 않고, 여기서 맞는 선택자로 새로 쓴다. */
+#modal-over .sheet > h2,
+#modal-adv.lost .sheet > h2{
+  filter:saturate(.42) brightness(.88) hue-rotate(-10deg);
+  text-shadow:0 2px 0 rgba(72,54,60,.85);
+}
+
+/* --- ③ 버튼 ------------------------------------------------------------------
+   조각은 전부 기존 자산이고 slice 값도 이미 쓰이던 표 그대로다(신규 발주 0):
+     cta-blue 25 33 28 33 (.ncta) · pink 29 41 35 41 (#btn-shuffle)
+     yellow/orange 32 39 39 39 (#btn-hint · .mbtn-set) · purple 31 39 37 39 (#btn-undo)
+   border-width 는 slice ×0.5(.ncta·#actionbar 규약).
+
+   🚨 --lib-btn-red · --lib-btn-mint 는 **쓰지 않는다**. 처음엔 빨강을
+   "나가기"에, 민트를 "부행동"에 배정했다가 실렌더에서 둘 다 깨졌다. 원판을
+   5배로 확대해 보니 조각 자체의 문제였다:
+     · red(110×94) — 잘못 잘렸다. 좌상단에 갈색 토막이 붙어 있고 윗 테두리가
+       통째로 날아갔으며 우/하도 도형 중간에서 끊겼다. slice 를 여덟 조합으로
+       훑어도 왼쪽 결손이 그대로 남는다(고칠 수 있는 값이 없다). 이 파일 어디에도
+       소비처가 0 이었던 이유가 이것이다.
+     · mint(110×102) — 좌하단 연두 얼룩과 우상단 검은 점. 14차가 `#modal-rank
+       .btn-primary` 에서 "중앙 밴드를 15~17배 연신하면 원본 얼룩이 가로띠로
+       번진다"며 9슬라이스를 걷어낸 그 조각이 바로 이것이다.
+   깨끗한 다섯(cta-blue · pink · yellow · orange · purple)만 쓰고, 원래 민트가
+   맡던 3순위 자리는 조각이 아니라 **유리 줄**(아래 ⑥)이 받는다. 결과적으로
+   버튼의 층이 셋으로 정리된다: 주행동=파랑 · 진행/이탈=색 조각 · 3순위=유리 줄.
+
+   색 배정은 "무엇을 누르는가"를 색으로 갈라 놓는다(결과창의 버튼 두 개가 같은
+   색이면 눌러야 할 쪽이 안 읽힌다). 같은 낱말은 창이 달라도 같은 색이다 —
+   "메인 메뉴"는 일시정지에서도 게임오버에서도 데일리에서도 보라 하나다:
+     파랑  계속하기 · 닫기(도움말·설정·스킨·기록 넷 전부)
+     핑크  다음 단계 · 모험 다음/재도전 · 광고 보고 +2
+     노랑  단계 다시하기 · 결과 복사
+     주황  재도전(게임오버)
+     보라  메인 메뉴(일시정지 · 게임오버 · 데일리)
+     유리  지도로 · 내 기록 · 게임 방법 · 제작진 · 공유하기
+   선택자를 `.w6m .sheet #id`(1,2,0) 로 잡은 것은 SECTION 25-5 의
+   `#modal-clear .btn-primary` 계열이 이미 (1,1,0) 이라 id 하나(1,0,0)로는
+   **못 덮기 때문**이다 — 실측으로 확인한 값이다(덮기 전 #btn-next·#btn-share·
+   #adv-again 셋이 파란 조각 그대로 남았다). #btn-add 4형제가 쓰던 것과
+   같은 조각 문법이라 새 문법은 아니고, 스코프만 한 겹 두껍다. */
+.w6m .sheet .btn{
+  border-radius:0;
+  /* ⚠ background 단축 금지(clip 리셋 사고 전력) — 이 절은 전부 롱핸드다 */
+  background-color:transparent;
+  background-image:none;
+  box-shadow:none;
+  font-family:var(--font-display);
+  text-shadow:0 2px 0 rgba(110,70,58,.55);
+}
+.w6m .sheet .btn:active{ transform:translateY(2px); }
+/* 조각 버튼 공통 — 어느 자리든 상자는 같다. 14차가 캔디로 바꾸면서 padding 에
+   접어 넣었던 값(31/38/35/38 등)을 여기서 도로 풀어야 조각이 제 크기로 앉는다:
+   안 풀면 주황 캔디 배경이 파란 조각 뒤로 삐져나와 테두리처럼 보인다(실측). */
+.w6m .sheet #pz-resume, .w6m .sheet #howto-close, .w6m .sheet #st-close,
+.w6m .sheet #sk-close,  .w6m .sheet #rank-close,
+.w6m .sheet #btn-next,  .w6m .sheet #adv-again,   .w6m .sheet #btn-continue,
+.w6m .sheet #pz-restart,.w6m .sheet #btn-share,
+.w6m .sheet #btn-retry,
+.w6m .sheet #pz-menu,   .w6m .sheet #btn-menu,    .w6m .sheet #btn-daily-menu{
+  padding:0 12px;
+  min-height:56px;
+  border-radius:0;
+  background-color:transparent;
+  background-image:none;
+  box-shadow:none;
+  color:#FFFFFF;
+  font-family:var(--font-display);
+  text-shadow:0 2px 0 rgba(110,70,58,.55);
+}
+/* 파랑 — 계속하기 · 닫기 넷 (주행동) */
+.w6m .sheet #pz-resume,
+.w6m .sheet #howto-close,
+.w6m .sheet #st-close,
+.w6m .sheet #sk-close,
+.w6m .sheet #rank-close{ border-style:solid; border-width:13px 17px 14px 17px; border-image:var(--lib-btn-cta-blue) 25 33 28 33 fill stretch; }
+/* 핑크 — 다음/진행 */
+.w6m .sheet #btn-next,
+.w6m .sheet #adv-again,
+.w6m .sheet #btn-continue{ border-style:solid; border-width:15px 21px 18px 21px; border-image:var(--lib-btn-pink) 29 41 35 41 fill stretch; }
+/* 노랑 — 다시/복사 */
+.w6m .sheet #pz-restart,
+.w6m .sheet #btn-share{ border-style:solid; border-width:16px 20px 20px 20px; border-image:var(--lib-btn-yellow) 32 39 39 39 fill stretch; }
+/* 주황 — 재도전 */
+.w6m .sheet #btn-retry{ border-style:solid; border-width:16px 20px 20px 20px; border-image:var(--lib-btn-orange) 32 39 39 39 fill stretch; }
+/* 보라 — 메인 메뉴. 세 창의 같은 낱말이 같은 색이다. */
+.w6m .sheet #pz-menu,
+.w6m .sheet #btn-menu,
+.w6m .sheet #btn-daily-menu{ border-style:solid; border-width:16px 20px 19px 20px; border-image:var(--lib-btn-purple) 31 39 37 39 fill stretch; }
+
+/* --- ④ 우상단 X --------------------------------------------------------------
+   조각이 아니라 글자다(ROUND10-SPEC §B "글자만, 44pt"). `.r10-x` 를 그대로
+   빌려 쓰되, 젤리판은 크림 패널보다 어두워 잉크색이 묻는다 — 흰 글자에 자두
+   그림자로 바꾼다. `[data-w6x]` 로 스코프를 좁혀 노드 카드의 X 는 안 건드린다. */
+.r10-x[data-w6x]{
+  top:2px;
+  right:2px;
+  color:#FFFFFF;
+  text-shadow:0 2px 0 rgba(83,28,40,.55);
+}
+
+/* ============================================================
+   W6-b — 판 안쪽까지 통일 (사용자 2차 지시, 시안 3장 첨부)
+
+   1차에서 껍데기(판·리본·버튼)를 젤리로 옮겼더니 사용자가 **판 안쪽**을 짚었다:
+     · 분위기·질감은 투명 젤리 · 프로스티드 유리여야 한다 — 베이지 민판 전폐.
+     · 같은 구성요소는 반드시 같은 에셋·같은 문법이어야 한다. 설정과 일시정지에
+       둘 다 있는 소리/진동/테마/언어 넉 줄이 서로 다른 물건이었고, 기록의 탭
+       알약·리스트 줄·닫기도 제각각이었다.
+     · 리본은 좋은 조각이니 그대로 쓴다. 신규 발주는 여전히 0.
+
+   그래서 이 절이 만드는 것은 **두 개의 조각뿐**이고, 열 창이 그 둘만 돌려 쓴다:
+     ① 유리 줄 (.set-row · .rank-row · 남은 .btn-ghost · #rank-hint)
+     ② 젤리 알약 (.set-tg · .rank-tab) — 켜짐/선택은 민트, 꺼짐/비선택은 라일락
+   둘 다 새 그림이 아니라 이 파일이 이미 쓰던 **캔디 문법**(하드에지 47% +
+   딥 아웃라인 + 바닥 밴드 0.14×H, 반경 0.18×H)의 색 변형이다 — 14차가
+   `#modal-rank .btn-primary` 를 그 문법으로 만들면서 "작은 띠에 9슬라이스를
+   늘리면 원본 얼룩이 가로띠로 번진다"는 이유까지 적어 두었고, 여기 알약은
+   36px 높이라 그 함정에 정확히 해당한다. 조각을 굽지 않는 이유가 이것이다.
+   ============================================================ */
+
+/* --- ⑤ 판 색감 — 프로스티드 크림 -------------------------------------------
+   젤리판 자체는 틴트가 없어서(=투명) 뒤 배경색을 그대로 물고 온다. 메뉴 배경
+   위에서는 판이 중간 회보라(실측 RGB 165,153,158)가 되는데, 이 밝기에서는
+   **어느 쪽 글자도 4.5:1 을 못 넘는다**: 잉크(#5C4033)로는 도움말 본문이
+   3.87:1, 스킨 잔액줄이 2.27:1 까지 떨어졌다(전 6.23 / 3.32 에서 하락).
+   해법은 글자색이 아니라 판이다 — 크림 틴트를 얹어 판을 밝은 쪽으로 밀면
+   ART §7-1 의 "크림 위 잉크" 규약이 그대로 성립한다. 실측 스윕:
+     틴트 없음 3.87 / 2.27 · .28 → 4.68 / 2.71 · .42 → 5.20 / 2.96
+     .56 → 5.69 / 3.21 · .70 → 6.18 / 3.47
+   .50 을 고른 것은 뒤가 **비쳐야** 하기 때문이다(사용자 지시 1: 투명 젤리).
+   .70 은 수치가 제일 좋지만 그 지점에서 판이 유리가 아니라 종이가 된다.
+
+   ⚠ 이 값은 `.jbox--modal` **등급이 아니라 `.w6m` 소비처**에 건다. 등급에 걸면
+   견본(노드 카드·플레이 시트)까지 함께 밝아져 "견본 불변" 계약이 깨진다.
+   `--jbox-tint` 는 젤리박스 주석이 명시한 소비처별 손잡이이고(슬래브·띠도
+   각자 자기 값을 들고 있다), 판 자체는 여전히 한 장이다. */
+.w6m .sheet{ --jbox-tint:rgba(255,241,216,.50); }
+
+/* --- ⑥ 유리 줄 (조각 ①) ----------------------------------------------------
+   베이지 민판(--j-rim + 연어색 테두리)과 어두운 반투명 줄(rgba 255/.05) 두
+   문법이 창마다 갈라져 있던 자리를 하나로 모은다. 크림 틴트 판 위이므로
+   줄은 **더 밝은 유리**여야 판에서 떠 보인다(어두운 줄은 구멍처럼 읽힌다). */
+.w6m .set-row,
+.w6m .rank-row,
+.w6m .sheet .btn-ghost,
+.w6m .sheet .btn-secondary{
+  border-radius:16px;
+  background-color:rgba(255,255,255,.38);
+  background-image:none;
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.62), 0 1px 0 rgba(110,70,58,.10);
+  color:var(--j-ink);
+}
+/* .btn-secondary(기록·스토리 갤러리)까지 여기 들어오는 이유 — 설정 창에서
+   그 둘만 분홍 캔디로 남으면 "게임 방법 / 제작진"과 같은 3순위인데 혼자 소리를
+   지른다. 3순위는 전부 유리 줄이라는 ③의 층 구분을 그대로 따른다. */
+.w6m .sheet .btn-ghost,
+.w6m .sheet .btn-secondary{
+  border:0;
+  padding:13px 16px;
+  min-height:0;
+  font-family:var(--font-display);
+  text-shadow:none;
+}
+.w6m .sheet .btn-ghost:active,
+.w6m .sheet .btn-secondary:active{ transform:translateY(2px); background-color:rgba(255,255,255,.52); }
+/* 빈 기록 줄은 "있는데 아직 안 찬 칸"이라 지우지 않고 묽게만 한다(원 규칙의 뜻 그대로) */
+.w6m .rank-row.rank-empty{ background-color:rgba(255,255,255,.20); }
+.w6m .rank-row .rank-main{ color:var(--j-ink); }
+.w6m .rank-row .rank-pos,
+.w6m .rank-row .rank-meta,
+.w6m #rank-hint{ color:#7A5C4A; }
+.w6m .set-k{ color:var(--j-ink); }
+
+/* --- ⑦ 젤리 알약 (조각 ②) --------------------------------------------------
+   설정의 파랑 사각 토글(반려)과 기록의 탭 알약이 **같은 물건**이 된다.
+   기하는 캔디 문법 그대로 두고(하드에지 47% · 바닥 밴드 5px · 딥 아웃라인
+   2.5px) 모서리만 완전 알약(999px)으로 연다 — "사각"이 반려 사유였고, 젤리
+   계열 버튼은 이 파일 어디서도 각지지 않는다.
+   색은 민트 하나뿐이다: 켜짐·선택 = 민트(닫기 버튼이 쓰던 그 값), 꺼짐·비선택
+   = 같은 캔디의 채도만 뺀 라일락. 상태가 색 하나로만 갈리므로 "켜짐/꺼짐"을
+   글자와 색이 동시에 말한다. */
+.w6m .set-tg,
+.w6m .rank-tab{
+  flex:0 0 auto;
+  min-width:92px;
+  min-height:36px;
+  padding:0 16px;
+  border:0;
+  border-radius:999px;
+  color:#FFFFFF;
+  font-family:var(--font-display);
+  font-size:13.5px;
+  line-height:36px;
+  white-space:nowrap;
+  cursor:pointer;
+  background-color:transparent;
+  background-image:linear-gradient(180deg, #7ED9C0 0%, #7ED9C0 47%, #54BFA2 47%, #54BFA2 100%);
+  box-shadow:
+    0 3px 0 #35866F,
+    0 6px 14px rgba(83,28,40,.22),
+    inset 0 0 0 2.5px #6E463A,
+    inset 0 -5px 0 #43A184;
+  text-shadow:0 1.5px 0 rgba(110,70,58,.55);
+}
+.w6m .rank-tab{ flex:1 1 0; min-width:0; overflow:hidden; text-overflow:ellipsis; }
+/* 꺼짐 · 비선택 — 같은 캔디에서 채도만 뺀다 */
+.w6m .set-tg[aria-pressed="false"],
+.w6m .rank-tab[aria-selected="false"]{
+  background-color:transparent;
+  background-image:linear-gradient(180deg, #CDC2D4 0%, #CDC2D4 47%, #B3A6BC 47%, #B3A6BC 100%);
+  box-shadow:
+    0 3px 0 #8B7E95,
+    0 6px 14px rgba(83,28,40,.18),
+    inset 0 0 0 2.5px var(--j-outline),
+    inset 0 -5px 0 #A296AC;
+}
+.w6m .set-tg:active,
+.w6m .rank-tab:active{ transform:translateY(2px); }
+
+/* --- ⑧ 기록 탭 줄 간격 ------------------------------------------------------
+   알약이 커졌으니 탭 줄도 유리 줄들과 같은 리듬(8px)으로 띄운다. */
+.w6m #rank-tabs{ gap:8px; margin:2px 0 6px; }
+.w6m #rank-list{ gap:8px; }
+.w6m .set-list{ gap:8px; }
 </style>
 
 <style id="sian-jelly-panel-v4">
@@ -34829,10 +35268,15 @@ window.TT_SFX = {
      v=4 → v=5 (2026-08-20): stage-btn_records 를 워터마크·글린트 없는 신품
      (stage-btn_records-noglint.webp)으로 통째 교체했다. 구판은
      catalog/_superseded/stage-btn_records-wm3.webp 로 보관한다(삭제하지 않는다).
-     이번에도 네 곳을 모두 v=5 로 올렸다. */
-#screen-map #map-back   { left: 3.76cqw;  top: 3.83cqw; width: 14.99cqw; height: 15.46cqw; background-image: url("catalog/stage-btn_back.webp?v=5"); }
+     이번에도 네 곳을 모두 v=5 로 올렸다.
+     v=5 → v=6 (2026-08-20 W6): stage-pill_star 를 수리본으로 교체했다. 이 조각은
+     지금까지 쿼리가 안 붙어 있었으므로 **버스트 대상에 새로 들어온다** — 그래서
+     이번 판올림은 값만 올리는 것이 아니라 목록 자체가 셋에서 넷으로 늘었다
+     (CSS 4곳 + 프리로더 V·VQ). 목록과 값이 어긋나면 프리로더가 쿼리 없는 주소를
+     데우고 화면은 쿼리 붙은 주소를 받아 **같은 그림을 두 번** 내려받는다. */
+#screen-map #map-back   { left: 3.76cqw;  top: 3.83cqw; width: 14.99cqw; height: 15.46cqw; background-image: url("catalog/stage-btn_back.webp?v=6"); }
 #screen-map #map-hearts { left: 21.91cqw; top: 5.51cqw; width: 33.32cqw; height: 12.60cqw; background-image: url("catalog/stage-pill_life.webp"); }
-#screen-map #map-stars  { left: 56.31cqw; top: 5.87cqw; width: 21.75cqw; height: 11.71cqw; background-image: url("catalog/stage-pill_coin.webp?v=5"); }
+#screen-map #map-stars  { left: 56.31cqw; top: 5.87cqw; width: 21.75cqw; height: 11.71cqw; background-image: url("catalog/stage-pill_coin.webp?v=6"); }
 #screen-map #map-gear   { left: 81.40cqw; top: 3.85cqw; width: 14.92cqw; height: 15.43cqw; background-image: url("catalog/stage-btn_settings.webp"); }
 #screen-map #map-top .hc-ico { display: none; }   /* 봉인 — 하트·코인·톱니·화살표는 조각에 그려져 있다 */
 /* 하트 수·회복 타이머는 조각의 글자 상자 자리에 코드가 얹는다. */
@@ -34909,10 +35353,10 @@ window.TT_SFX = {
    얹힌다(언어 토글 생존). 나머지 셋은 sep3 정리판에서 나왔다.
    세로가 구판보다 큰 것은 헤일로가 빠지면서 조각의 참 비율이 드러난 결과다
    — 띠(높이 25.61cqw) 안에 그대로 들어간다(가장 큰 명판이 4.5~24.0cqw). */
-#screen-map #map-b1    { left: 2.14%;  width: 30.39%; height: 12.47cqw; background-image: url("catalog/stage-pill_star.webp"); }
+#screen-map #map-b1    { left: 2.14%;  width: 30.39%; height: 12.47cqw; background-image: url("catalog/stage-pill_star.webp?v=6"); }
 #screen-map #map-plate { left: 34.22%; width: 31.66%; height: 18.97cqw; background-image: url("catalog/stage-pill_chapter.webp"); }
 #screen-map #map-char  { left: 66.84%; width: 15.43%; height: 18.62cqw; background-image: url("catalog/stage-btn_chars.webp"); }
-#screen-map #map-rec   { left: 82.91%; width: 15.15%; height: 18.78cqw; background-image: url("catalog/stage-btn_records.webp?v=5"); }
+#screen-map #map-rec   { left: 82.91%; width: 15.15%; height: 18.78cqw; background-image: url("catalog/stage-btn_records.webp?v=6"); }
 #screen-map #map-b1-v {
   position: absolute; left: 57.7%; top: 41.7%;
   transform: translate(-50%, -50%);
@@ -34978,9 +35422,14 @@ window.TT_SFX = {
    조각의 배경은 100% 100% 라 요소 경계 = 그림 경계다. 그래서 상자를 그림 안쪽
    (92%)으로 들이고 글자를 3.5cqw 로 줄인다 — "캐릭터" 10.5cqw < 상자 14.2cqw.
    세로는 시안 gm-stage-full 의 라벨 자리(단추 아래 1/4)에 맞춰 77% → 80%:
-   글자 띠가 단추 높이의 71~89% 구간에 앉아 아래 테두리를 안 넘는다. */
+   글자 띠가 단추 높이의 71~89% 구간에 앉아 아래 테두리를 안 넘는다.
+   W6 반려 수리 — 80% 는 실기에서 글자가 단추 **바닥에 붙어** 보였다. 조각의
+   아래 테두리(둥근 젤리 굽)가 그림 높이의 마지막 12% 를 먹고 있어, 글자 띠의
+   아래쪽 89% 가 그 굽 위에 얹히면서 여백이 사라진 것이다. 73% 로 올리면 띠가
+   64~82% 구간이 되어 굽과 7% 를 띄우고, 위로는 아이콘(중심 ~40%)과의 간격이
+   같아져 아이콘·글자가 단추 안에서 대칭으로 앉는다. */
 #screen-map #map-char > span, #screen-map #map-rec > span {
-  position: absolute; left: 50%; top: 80%;
+  position: absolute; left: 50%; top: 73%;
   width: 92%;
   transform: translate(-50%, -50%);
   font-size: 3.5cqw;
@@ -35552,10 +36001,11 @@ var L=("jelly-box,duel-title-play,sian2-ribbon,sian2-btn-pink,sian2-btn-purple,"
       +"cut-free-1,cut-free-2").split(",");
 /* 이 세 장은 CSS 쪽도 ?v=4 로 캐시를 끊었다(조각 갱신) — 프리로더가 쿼리 없는
    주소를 데우면 서로 다른 캐시 항목이 되어 헛 요청이 되므로 여기서도 맞춘다.
-   🚨 값은 아래 VQ 한 곳에서만 고치고, CSS 3곳(#map-back/#map-stars/#map-rec)과
-   반드시 같은 숫자로 맞춘다. 어긋나면 프리로드가 통째로 헛 요청이 된다. */
-var V="stage-btn_back,stage-pill_coin,stage-btn_records";
-var VQ="?v=5";                                     /* CSS 3곳과 반드시 같은 값 */
+   🚨 값은 아래 VQ 한 곳에서만 고치고, CSS 4곳(#map-back/#map-stars/#map-rec/
+   #map-b1)과 반드시 같은 숫자로 맞춘다. 어긋나면 프리로드가 통째로 헛 요청이 된다.
+   W6: stage-pill_star 가 수리 교체되면서 목록이 셋 → 넷이 됐다. */
+var V="stage-btn_back,stage-pill_coin,stage-btn_records,stage-pill_star";
+var VQ="?v=6";                                     /* CSS 4곳과 반드시 같은 값 */
 var i=0,bgmQueued=0;
 function next(){
   if(i>=L.length){ if(!bgmQueued){ bgmQueued=1; warmBgm(); } return; }  /* 그림 끝 → BGM */
