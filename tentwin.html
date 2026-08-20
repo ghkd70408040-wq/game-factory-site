@@ -13344,6 +13344,17 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
         -->
       </div>
       <div class="cp-card">
+        <!-- W4 (2026-08-20) — 캐릭터 / 펫 카테고리 탭.
+             자리를 **카드 안**으로 잡은 이유는 세로 예산이다: 무대(.cp-stage) 위에
+             한 줄을 더 얹으면 카드 예산 산식(:8769 주석)이 통째로 어긋나는데,
+             카드 안에서는 "정보 카드 자리 <-> 펫 그리드 자리"의 **맞교환**이라
+             두 탭의 세로 총합이 같다(탭 띠 몫은 캐릭터 탭에서 숨는 동료 줄
+             34px 로 상쇄된다). 새 상태를 만들지 않는다: 저장은 여전히
+             store.charId / store.mateId 이고, 탭은 세션 로컬 변수 하나다. -->
+        <div id="cp-tabs" class="cp-tabs" role="tablist" aria-label="Category">
+          <button class="cp-tab" type="button" role="tab" data-cptab="char" aria-selected="true" data-i18n="cp.tab.char">Characters</button>
+          <button class="cp-tab" type="button" role="tab" data-cptab="pet" aria-selected="false" data-i18n="cp.tab.pet">Pets</button>
+        </div>
         <div id="cp-info" class="cp-info">
           <div class="ci ci-ten" data-char="ten">
             <div class="ci-id">
@@ -21362,6 +21373,9 @@ window.TT_SFX = {
       /* ---- v4 §2: 주인공 / 동료 2단 선택 ---- */
       'pick.hero': 'Hero',
       'pick.mate': 'Buddy',
+      /* W4 — 캐릭터 선택창의 카테고리 탭 두 장 */
+      'cp.tab.char': 'Characters',
+      'cp.tab.pet': 'Pets',
       'aria.matepick': 'Choose your buddy',
       'mate.none.name': 'Solo',
       'mate.none.pass': 'No buddy',
@@ -21988,6 +22002,9 @@ window.TT_SFX = {
       /* ---- v4 §2: 주인공 / 동료 2단 선택 ---- */
       'pick.hero': '주인공',
       'pick.mate': '동료',
+      /* W4 — 캐릭터 선택창의 카테고리 탭 두 장 */
+      'cp.tab.char': '캐릭터',
+      'cp.tab.pet': '펫',
       'aria.matepick': '동료를 고르세요',
       'mate.none.name': '없음',
       'mate.none.pass': '혼자서',
@@ -24408,10 +24425,31 @@ window.TT_SFX = {
     J.sfx.win();
   }
 
+  /* W4 — 탭은 **세션 로컬**이다. store 에 안 넣는 이유는, 그것이 "무엇을 골랐나"가
+     아니라 "지금 무엇을 보고 있나"이기 때문이다(cpIdx 와 같은 급의 값). 저장하면
+     다음 접속에서 캐릭터 선택창이 펫 화면으로 열리는 일이 생긴다. */
+  var cpTabCur = 'char';
+
+  /** 카테고리 탭 전환. 화면 상태의 근거는 #charpanel 의 data-cptab 하나뿐이고,
+   *  보이고 숨는 일은 전부 CSS 가 한다(JS 가 display 를 만지지 않는다). */
+  function cpTab(k) {
+    var root = $('charpanel');
+    cpTabCur = (k === 'pet') ? 'pet' : 'char';
+    if (!root || !root.setAttribute) return;
+    root.setAttribute('data-cptab', cpTabCur);
+    var tabs = root.querySelectorAll ? root.querySelectorAll('.cp-tab') : null;
+    if (!tabs) return;
+    for (var i = 0; i < tabs.length; i++) {
+      tabs[i].setAttribute('aria-selected',
+        tabs[i].getAttribute('data-cptab') === cpTabCur ? 'true' : 'false');
+    }
+  }
+
   function openCharPanel() {
     var el = $('charpanel');
     if (!el) return;
     el.hidden = false;
+    cpTab(cpTabCur);          /* W4 — 세션 안에서 마지막으로 보던 탭으로 연다 */
     syncCharPick();
     var cur = HERO_IDS.indexOf(charId());
     cpShow(cur < 0 ? 0 : cur);
@@ -25787,6 +25825,39 @@ window.TT_SFX = {
 
   /* 카운트다운 표시는 러시와 모험이 **같은 한 칸**을 쓴다. 화면에 시계가 두 개
    * 생기면 어느 쪽이 나를 죽이는지가 흐려지고, 두 모드가 동시에 돌 일은 없다. */
+  /**
+   * W4 (2026-08-20) — 타이머 숫자를 **글리프 스프라이트**로 그린다.
+   *
+   * 왜: CSS 그라데이션 글자(background-clip:text + -webkit-text-stroke)가
+   * 사용자 실기기(안드로이드 크롬)에서 **속 빈 외곽선만** 렌더링됐다(스크린샷 2회).
+   * 데스크톱 크롬은 멀쩡했으므로 논리 오류가 아니라 그 조합의 렌더러 편차이고,
+   * 코드로 이길 수 있는 종류가 아니다. 그림으로 바꾸면 렌더러가 개입할 여지가 없다.
+   *
+   * 200ms x 600틱 규율은 그대로다. 두 겹으로 막는다:
+   *   ① 값이 통째로 같으면 **아무것도 안 한다**(data-tg 캐시 — 함수 첫 줄).
+   *   ② 값이 달라도 자리수가 같으면 상자를 다시 짓지 않고, **바뀐 자리의**
+   *      className 한 개만 쓴다(1:27 -> 1:26 이면 DOM 쓰기가 정확히 1회다).
+   * 자리수가 바뀔 때만 상자를 다시 짓는다(10:00 -> 9:59 같은 경우).
+   *
+   * 접근성: role="timer" 의 내용이 그림이 되므로 aria-label 로 같은 값을 남긴다.
+   */
+  function duelTimerGlyphs(dt, txt) {
+    if (!dt || dt.getAttribute('data-tg') === txt) return;
+    var prev = dt.getAttribute('data-tg') || '', i;
+    if (prev.length !== txt.length) {
+      while (dt.firstChild) dt.removeChild(dt.firstChild);   /* 마크업 초기값 "0:00" 포함 */
+      for (i = 0; i < txt.length; i++) dt.appendChild(document.createElement('i'));
+      prev = '';
+    }
+    for (i = 0; i < txt.length; i++) {
+      if (prev.charAt(i) === txt.charAt(i)) continue;        /* 안 바뀐 자리는 무접촉 */
+      var c = txt.charAt(i);
+      dt.childNodes[i].className = 'tg tg-' + (c === ':' ? 'colon' : c);
+    }
+    dt.setAttribute('data-tg', txt);
+    dt.setAttribute('aria-label', txt);
+  }
+
   function syncRushHud() {
     var timed = S.mode === 'rush' || S.mode === 'adv';
     var el = $('rush-timer');
@@ -25801,7 +25872,9 @@ window.TT_SFX = {
        숫자를 만드는 곳은 여전히 이 함수 한 곳이다. */
     if (txt && battleOn()) {
       var dt = $('duel-timer');
-      if (dt && dt.textContent !== txt) dt.textContent = txt;
+      /* W4 — 구판 한 줄(되돌릴 근거): if (dt && dt.textContent !== txt) dt.textContent = txt;
+         값 비교 가드는 duelTimerGlyphs 안으로 옮겼다(data-tg). */
+      duelTimerGlyphs(dt, txt);
     }
     if (!timed) setDanger(false);
     syncAdvGoal();
@@ -29566,7 +29639,20 @@ window.TT_SFX = {
     var cid = charId();
     setText('duel-me-name', t('char.' + cid + '.name'));
     var me = $('duel-me-av');
-    if (me) setStdArt(me, cid, 'face', '--duel-me-face');
+    if (me) {
+      setStdArt(me, cid, 'face', '--duel-me-face');
+      /* W4 (2026-08-20) — 전투 아바타는 **선택 주인공의 전신(full)** 이다.
+         위 --duel-me-face 줄은 지우지 않는다: 14차 재조립 전의 작은 초상 배선이고,
+         되돌릴 때 그대로 다시 값을 하며, 지금도 계산 비용이 사실상 0 이다.
+         값이 비면 변수를 **지운다** — 남겨 두면 앞 캐릭터 그림이 그대로 남고,
+         지우면 CSS 폴백(시안 구름)이 정확히 되돌아온다(setArt 의 규약과 같다).
+         판당 1회만 돈다: 판이 도는 동안 주인공은 바뀌지 않는다. */
+      var meFull = stdArt(cid, 'full');
+      if (me.style) {
+        if (meFull) me.style.setProperty('--me-full', meFull);
+        else me.style.removeProperty('--me-full');
+      }
+    }
   }
 
   /** 전투 화면을 내린다. 값(S.duel)은 호출자의 소유다 — 여기는 화면만 만진다. */
@@ -32184,6 +32270,18 @@ window.TT_SFX = {
     on($('char-open'), 'click', openCharPanel);
     on($('cp-close'), 'click', closeCharPanel);
     on($('cp-go'), 'click', cpConfirm);
+    /* W4 — 카테고리 탭. 위임 한 줄이라 탭이 늘어도 배선이 안 는다. */
+    on($('cp-tabs'), 'click', function (ev) {
+      var el = ev.target;
+      while (el && el !== this && !(el.classList && el.classList.contains('cp-tab'))) {
+        el = el.parentNode;
+      }
+      if (!el || el === this) return;
+      var k = el.getAttribute('data-cptab');
+      if (k === cpTabCur) return;
+      cpTab(k);
+      J.sfx.ui();
+    });
     /* 14차 #판정 — 좌우 화살표(.cp-arrow) 제거에 따라 배선도 뗀다. 되돌릴 근거로
      * 두 줄을 보존한다. 전환 진입점은 cpShow(i) 하나이고 남은 사용자 경로는 셋:
      * ① #cp-rack 썸네일 탭(아래) ② .cp-view 스와이프(아래) ③ ArrowLeft/Right(아래).
@@ -33892,7 +33990,23 @@ window.TT_SFX = {
 #app.battle #duel-me-av{
   left:73.30%;top:20.95%;
   width:17.09% !important;height:49.81% !important;
-  background-image:url("catalog/duel-cloud-big.webp") !important;
+  /* W4 (2026-08-20) — 사용자 반려 "내가 선택한 캐릭터가 아니라 이상한 구름이 나옴".
+     원인은 정확히 아래 한 줄이었다: !important 로 못 박힌 시안 구름이라
+     duelHudMount 가 --duel-me-face 에 무엇을 넣든 화면에서는 늘 구름이 이겼다.
+     이제 이 자리는 **개방돼 있다** — duelHudMount 가 선택 주인공의 전신(full)
+     아트를 --me-full 로 주입하고, 주입이 없을 때만(= 표준 에셋이 없는 캐릭터)
+     시안 구름이 그대로 선다. 구름 파일은 지우지 않는다: 폴백이자 롤백 밸브다.
+     ⚠ 실측으로 확인한 사실 하나 — catalog/duel-cloud-big.webp 는 왕관 쓴 **구름**
+     이고 주인공 셋(텐텐 = 흰 비숑 왕자 / 트윈 = 주황 곰 / 젤리 = 토끼 공주) 중
+     누구도 아니다. 즉 이 자리에 구름이 서는 한 어떤 캐릭터를 골라도 사용자 반려가
+     그대로 재현된다. 그래서 셋 다 자기 그림을 받는다.
+     구판 한 줄(되돌릴 근거):
+       background-image:url("catalog/duel-cloud-big.webp") !important; */
+  background-image:var(--me-full,url("catalog/duel-cloud-big.webp")) !important;
+  /* 캐릭터별 좌우반전·미세 보정이 필요해지면 이 변수만 주입한다.
+     미주입이면 none 이라 지금 화면과 픽셀이 같고, transform:none 은 쌓임
+     컨텍스트를 만들지 않으므로 위 §18.4d 의 z-index 계약도 안 흔든다. */
+  transform:var(--me-flip,none);
   filter:drop-shadow(0 2px 4px rgba(40,70,100,.30));
   z-index:2;
 }
@@ -34511,6 +34625,249 @@ window.TT_SFX = {
 /* 자물쇠(.st-lock::before)는 손대지 않는다 — 도서관 조각 sp-glyph-lock 은 지금도
    또렷하고, 받침 링 오른쪽 아래(left 80% · top 74%)라 신품 단추 위에서도 제자리다. */
 </style>
+<style id="w4-select-hud">
+/* ============================================================================
+   W4 (2026-08-20) — 전투 HUD 시안 정합 + 캐릭터/펫 선택 UI
+
+   세 가지가 이 한 블록에 모여 있다. 전부 **뒤에서 덮는다** — 앞의 규칙은 한 줄도
+   지우지 않았고, 이 <style> 블록 하나만 지우면 W3 직후 화면으로 정확히 돌아간다
+   (짝이 되는 JS 되돌림 지점은 duelTimerGlyphs / cpTab 두 함수의 보존 주석이다).
+     ① 타이머 숫자 = 글리프 스프라이트 (catalog/tmr-*.webp 11장)
+     ② #charpanel 캐릭터/펫 카테고리 탭
+     ③ #modal-node 동료 줄 봉인
+   ========================================================================== */
+
+/* ---- ① 타이머 젤리 숫자 -> 글리프 스프라이트 -------------------------------
+   왜 바꿨나: CSS 그라데이션 글자(background-clip:text + -webkit-text-stroke)가
+   **사용자 실기기(안드로이드 크롬)에서 속 빈 외곽선만** 렌더링됐다(스크린샷 2회
+   확증). 데스크톱 크롬은 멀쩡했다 — 즉 논리 오류가 아니라 그 조합의 렌더러
+   편차이고, 코드로 이길 수 있는 종류가 아니다.
+
+   구조: #duel-timer 의 **자식 <i> 한 자리당 한 장**이다. syncRushHud 의
+   duelTimerGlyphs() 가 자리수가 바뀔 때만 상자를 다시 짓고, 값이 바뀐 자리만
+   className 을 갈아 쓴다(200ms x 600틱 규율 유지).
+
+   ★ 이 파일이 두 번 적어 둔 **겹침 함정이 여기서 원리적으로 사라진다**.
+   옛 절의 함정은 "filter 를 걸면 스태킹 컨텍스트가 생겨 z-index:-1 유리겹이
+   글자(= 요소 배경) 위로 올라온다" 였다. 이제 숫자는 요소 배경이 아니라
+   **자식 요소**다 — 자식(z-index:auto)은 음수 z-index 자식보다 항상 위에
+   그려지므로 어떤 쌓임 순서에서도 안 덮인다. danger 의 rushbeat(transform)가
+   #duel-timer 를 스태킹 컨텍스트로 만들어도 마찬가지다. 그래서 아래 danger·
+   chill 색을 filter 로 자유롭게 쌓을 수 있다.
+
+   ⚠ 옛 젤리 글자 절 셋(sian-battle-hud §3 · sian-hud-rebuild §2 · W3 얼음 절)은
+   **지우지 않고 그대로 둔다**. 그릴 글자 노드가 사라졌으므로 색·획·클립 선언은
+   전부 무해하게 비활성이다. 되돌리려면 이 절만 지우고 duelTimerGlyphs 를 그
+   함수의 보존 주석에 적힌 textContent 한 줄로 되돌리면 된다. */
+#app.battle #duel-timer{
+  /* 남아 있을 수 있는 글자 노드(마크업 초기값 "0:00")를 0 으로 눕힌다 —
+     글리프가 서기 전 한 프레임이라도 두 겹으로 보이면 안 된다. */
+  font-size:0 !important;
+  letter-spacing:normal !important;
+  gap:0;
+}
+#app.battle #duel-timer > i{
+  flex:0 1 auto;
+  /* 시안 실측(gm-ingame-battle.png · 1536 원판): 숫자 잉크 높이 156px, 캡슐 높이
+     253px. 스프라이트 잉크가 캔버스 209 중 199 이므로 캔버스 기준 높이는
+     156/199*209/253 = 64%. 폭은 aspect-ratio 가 낸다(= 캡슐 폭의 21.9%). */
+  height:64%;
+  width:auto;
+  aspect-ratio:172/209;
+  /* 공통 캔버스는 172 폭 고정인데 시안의 자간은 그보다 좁다. %마진은 컨테이닝
+     블록의 **가로**를 기준으로 하므로 이 값이 곧 캡슐 폭 기준 음수 트래킹이다. */
+  margin-left:-1%;
+  margin-right:-1%;
+  background-repeat:no-repeat;
+  background-position:center;
+  background-size:contain;
+  filter:drop-shadow(0 1px 2px rgba(70,40,90,.34));
+}
+/* 콜론은 캔버스의 43% 만 잉크다. 상자를 좁히는 대신 좌우를 더 당긴다 —
+   상자를 좁히면 aspect-ratio 가 높이까지 깎아 숫자와 크기가 어긋난다. */
+#app.battle #duel-timer > i.tg-colon{ margin-left:-3%; margin-right:-3%; }
+#app.battle #duel-timer > i.tg-0{background-image:url("catalog/tmr-0.webp");}
+#app.battle #duel-timer > i.tg-1{background-image:url("catalog/tmr-1.webp");}
+#app.battle #duel-timer > i.tg-2{background-image:url("catalog/tmr-2.webp");}
+#app.battle #duel-timer > i.tg-3{background-image:url("catalog/tmr-3.webp");}
+#app.battle #duel-timer > i.tg-4{background-image:url("catalog/tmr-4.webp");}
+#app.battle #duel-timer > i.tg-5{background-image:url("catalog/tmr-5.webp");}
+#app.battle #duel-timer > i.tg-6{background-image:url("catalog/tmr-6.webp");}
+#app.battle #duel-timer > i.tg-7{background-image:url("catalog/tmr-7.webp");}
+#app.battle #duel-timer > i.tg-8{background-image:url("catalog/tmr-8.webp");}
+#app.battle #duel-timer > i.tg-9{background-image:url("catalog/tmr-9.webp");}
+#app.battle #duel-timer > i.tg-colon{background-image:url("catalog/tmr-colon.webp");}
+
+/* 마지막 10초 = 붉은 톤. 스프라이트라 색을 **필터로** 바꾼다: sepia() 가 두 톤
+   (위 노랑 / 아래 분홍)을 한 색상으로 접고, hue-rotate 가 그 한 색을 원하는
+   각도로 옮긴다 — 젤리의 명암·광택은 남고 색만 갈린다. */
+#app.danger.battle #duel-timer > i{
+  /* 실측으로 고른 값이다(후보 15종 캡처 대조). 순서가 중요하다:
+     ① grayscale(1) 이 두 톤(위 노랑 / 아래 분홍)을 먼저 **한 톤으로 접는다** —
+        이걸 건너뛰면 sepia 행렬이 두 색을 조금 다르게 옮기고, 뒤의 saturate 가
+        그 차이를 증폭해 노랑 위 / 자홍 아래의 엉뚱한 그라데이션이 남는다.
+     ② brightness(.90)·saturate(3.5) 로 **채널 클리핑을 피한다**. saturate 를
+        6 이상으로 올리면 밝은 윗부분이 R 부터 포화해 색상이 도로 노랑으로
+        틀어진다(후보 캡처에서 그대로 재현됐다).
+     크림색 외곽선은 일부러 남는다 — 시안의 획이 원래 크림이고, 붉은 몸 위에서
+     가독성을 만드는 것이 그 획이다. */
+  filter:grayscale(1) sepia(1) hue-rotate(-50deg) saturate(3.5) brightness(.90) contrast(1.2)
+         drop-shadow(0 1px 2px rgba(122,20,10,.45));
+}
+/* 얼음(W3 뭉치 시간정지). danger 절보다 **뒤에** 있어야 마지막 10초에도
+   "얼었다"가 이긴다 — 특이도가 같으므로 순서가 곧 서열이다(W3 절의 규율 그대로). */
+#app.chill.battle #duel-timer > i,
+#app.chill #duel-timer.chill > i{
+  filter:grayscale(.5) sepia(1) saturate(3.4) hue-rotate(158deg) brightness(1.08)
+         drop-shadow(0 0 6px rgba(122,224,255,.85));
+}
+
+/* ---- ② #charpanel 캐릭터/펫 카테고리 탭 -----------------------------------
+   상태의 근거는 #charpanel 의 data-cptab 하나다. JS 는 그 한 글자만 쓰고,
+   보이고 숨는 일은 전부 여기서 한다. 저장은 없다 — 선택 자체는 여전히
+   store.charId / store.mateId 이고 탭은 "지금 무엇을 보고 있나"일 뿐이다. */
+#charpanel .cp-tabs{
+  flex:0 0 auto;
+  display:flex;
+  gap:6px;
+}
+#charpanel .cp-tab{
+  flex:1 1 0;
+  min-width:0;
+  min-height:26px;
+  padding:4px 6px 5px;
+  border:0;
+  border-radius:12px 12px 5px 5px;
+  background-color:rgba(255,255,255,.34);
+  box-shadow:inset 0 0 0 2px rgba(110,70,58,.26);
+  color:var(--j-ink-2);
+  font-family:var(--font-display);
+  font-size:12px;
+  line-height:1;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+#charpanel .cp-tab[aria-selected="true"]{
+  background-color:var(--j-cream);
+  box-shadow:inset 0 0 0 2.5px var(--j-outline),0 2px 0 rgba(110,70,58,.22);
+  color:var(--j-ink);
+}
+/* 펫 탭만 살짝 다른 색을 입는다 — 팔레트에 이미 있는 민트 3형제를 그대로 쓰고
+   새 색을 만들지 않는다(ART §3 의 여섯 벌 밖으로 나가지 않는다). */
+#charpanel .cp-tab[data-cptab="pet"][aria-selected="true"]{
+  background-color:rgba(126,217,192,.58);
+  box-shadow:inset 0 0 0 2.5px var(--j-mint-e),0 2px 0 rgba(46,138,114,.30);
+  color:#2E5A50;
+}
+/* 발자국 뱃지. 새 조각을 굽지 않고 radial-gradient 넷(패드 1 + 발가락 3)으로
+   그린다 — 12px 짜리 표식에 네트워크 요청을 만들 이유가 없다. */
+#charpanel .cp-tab[data-cptab="pet"]::before{
+  content:"";
+  display:inline-block;
+  width:12px;
+  height:12px;
+  margin-right:5px;
+  vertical-align:-2px;
+  background-repeat:no-repeat;
+  background-image:
+    radial-gradient(ellipse 40% 30% at 50% 80%,var(--j-mint-e) 0 99%,rgba(0,0,0,0) 100%),
+    radial-gradient(circle at 16% 34%,var(--j-mint-e) 0 20%,rgba(0,0,0,0) 21%),
+    radial-gradient(circle at 50% 20%,var(--j-mint-e) 0 20%,rgba(0,0,0,0) 21%),
+    radial-gradient(circle at 84% 34%,var(--j-mint-e) 0 20%,rgba(0,0,0,0) 21%);
+}
+
+/* 캐릭터 탭(= 기본, 속성이 아직 없을 때 포함): 펫 줄이 숨고 정보 카드가 선다.
+   !important 를 쓰는 이유는 앞의 두 미디어 쿼리(:8708 세로 짧은 기기 none /
+   :8774 가로 flex)가 이 자리를 이미 못 박고 있기 때문이다 — 탭이 그보다 세야
+   한다. 그 두 줄은 지우지 않는다: 탭 구조를 되돌리면 다시 값을 한다. */
+#charpanel:not([data-cptab="pet"]) .pick-row.pick-mate{ display:none !important; }
+
+/* 펫 탭: 정보 카드가 물러나고 그 세로 예산을 펫 그리드가 통째로 받는다.
+   두 탭의 세로 총합이 같으므로 카드 예산 산식(:8769)이 그대로 유효하다. */
+#charpanel[data-cptab="pet"] #cp-info{ display:none !important; }
+#charpanel[data-cptab="pet"] .pick-row.pick-mate{
+  display:flex !important;
+  flex:1 1 auto;
+  flex-direction:column;
+  align-items:stretch;
+  justify-content:center;
+  gap:8px;
+  min-height:0;
+  padding:8px 8px 10px;
+  border-radius:14px;
+  /* 파스텔 민트 틴트 — "여기는 펫 칸"을 색 하나로 말한다. */
+  background-color:rgba(126,217,192,.22);
+  box-shadow:inset 0 0 0 2px rgba(84,191,162,.45);
+}
+/* 탭이 이미 "펫"이라고 말하므로 줄 라벨("동료")은 펫 탭에서 중복이다 — 숨기고
+   그 몫의 세로를 카드에 준다. 봉인이지 삭제가 아니다: 탭 구조를 되돌리면
+   34px 짜리 구 동료 줄에서 이 라벨이 그대로 다시 값을 한다. */
+#charpanel[data-cptab="pet"] .pick-lab{ display:none; }
+#charpanel[data-cptab="pet"] #mate-pick{
+  display:flex;
+  flex:1 1 auto;
+  min-height:0;
+  gap:8px;
+  align-items:stretch;
+  justify-content:center;
+}
+#charpanel[data-cptab="pet"] #mate-pick .char-card{
+  position:relative;
+  flex:1 1 0;
+  width:auto;
+  height:auto;
+  min-width:0;
+  max-width:112px;
+  padding:6px 4px 7px;
+  gap:2px;
+  overflow:hidden;
+}
+#charpanel[data-cptab="pet"] #mate-pick .char-card .cav{
+  width:100%;
+  height:auto;
+  max-height:100%;
+  min-height:0;
+}
+#charpanel[data-cptab="pet"] #mate-pick .cc-name{
+  display:block;
+  font-size:10px;
+}
+/* 펫 얼굴은 이 화면에서도 **표준 컷아웃**이다. 11차의 --mate-img-on 스위치를
+   그대로 빌린다(복제가 아니라 재사용) — 컷아웃이 없으면 0 이라 SVG 폴백이 남고,
+   있으면 1 이라 SVG 가 사라진다. 규칙은 펫 탭 안으로만 스코프되므로 34px 짜리
+   구 동료 줄·다른 화면은 한 픽셀도 안 바뀐다. */
+#charpanel[data-cptab="pet"] #mate-pick .char-card.ch-ppyak .cav,
+#charpanel[data-cptab="pet"] #mate-pick .char-card.ch-mungchi .cav{
+  opacity:calc(1 - var(--mate-img-on,0));
+}
+#charpanel[data-cptab="pet"] #mate-pick .char-card.ch-ppyak::after,
+#charpanel[data-cptab="pet"] #mate-pick .char-card.ch-mungchi::after{
+  content:"";
+  position:absolute;
+  left:6%;right:6%;top:5%;bottom:22%;
+  background-repeat:no-repeat;
+  background-position:center bottom;
+  background-size:contain;
+  opacity:var(--mate-img-on,0);
+  pointer-events:none;
+}
+#charpanel[data-cptab="pet"] #mate-pick .char-card.ch-ppyak::after{
+  background-image:var(--mate-ppyak-img,none);
+}
+#charpanel[data-cptab="pet"] #mate-pick .char-card.ch-mungchi::after{
+  background-image:var(--mate-mungchi-img,none);
+}
+
+/* ---- ③ #modal-node 동료 줄 봉인 -------------------------------------------
+   사용자 확정: 스테이지 정보 카드에서 동료 3슬롯 줄을 **없앤다**. 동료는 이제
+   캐릭터 선택창의 펫 탭 한 곳에서만 고른다 — 같은 선택이 두 자리에 있으면
+   어느 쪽이 진짜인지가 흐려지고, 그건 이 파일이 시계(#rush-timer/#duel-timer)
+   에서 이미 한 번 정리한 규율이다.
+   ⚠ 봉인이지 삭제가 아니다: 마크업(.nrow-mate)과 buildNodeMates()/클릭 위임은
+   그대로 살아 있고 무해하다(0px 이므로 레이아웃 비용도 0). 되살리려면 이 한
+   규칙만 지우면 된다. */
+#modal-node .nrow-mate{ display:none !important; }
+</style>
 
 <script id="bg-preview-hook">
 /* 관제탑 배경 미리보기 훅 — ?bg=<카탈로그키>, 파라미터 없으면 무동작 */
@@ -34603,7 +34960,11 @@ var L=("jelly-box,duel-title-play,sian2-ribbon,sian2-btn-pink,sian2-btn-purple,"
       +"stage-star-on,stage-star-off,"
       +"duel-medal-attack,duel-medal-special,duel-medal-pet,duel-medal-awaken,"
       +"duel-btn-pause,duel-hpbar-bone,duel-hpbar-wing,"
-      +"duel-castle-hd,duel-cloud-big,duel-cloud-baby,duel-demon-full").split(",");
+      +"duel-castle-hd,duel-cloud-big,duel-cloud-baby,duel-demon-full,"
+/* W4 — 타이머 젤리 숫자 글리프 11장(172x209 공통 캔버스). 전투에 들어서는 순간
+   네 자리가 동시에 뜨므로 전투 조각들과 같은 묶음 끝에 둔다. 못 데워도 무해하다
+   (그때 브라우저가 직접 받는다) — 다만 첫 판의 첫 프레임이 한 박자 빈다. */
+      +"tmr-0,tmr-1,tmr-2,tmr-3,tmr-4,tmr-5,tmr-6,tmr-7,tmr-8,tmr-9,tmr-colon").split(",");
 /* 이 세 장은 CSS 쪽도 ?v=4 로 캐시를 끊었다(조각 갱신) — 프리로더가 쿼리 없는
    주소를 데우면 서로 다른 캐시 항목이 되어 헛 요청이 되므로 여기서도 맞춘다.
    🚨 값은 아래 VQ 한 곳에서만 고치고, CSS 3곳(#map-back/#map-stars/#map-rec)과
