@@ -27089,6 +27089,32 @@ window.TT_SFX = {
     return { id: id, goal: goalFn ? goalFn(n, r) : 5, prog: 0, done: false };
   }
 
+  /**
+   * ★ W6.5b P0 — **special 미션의 물리적 불가 방지** (STAGE-OPS §7.1)
+   *
+   * `special` 만 이 표에서 **절대수**다. 나머지 일곱은 칸 수에 비례하는데, 이것만
+   * "특수타일 몇 개"라 판 위에 실제로 몇 개가 스탬프됐는지에 매인다 — 그리고 그
+   * 개수는 `applySpecials` 가 확률로 찍는 값이라 판마다 흔들린다. 7열 70~84칸에서
+   * 기대값은 5~6개지만 **아래로 흔들린 판에서는 요구가 있는 것보다 많아진다**.
+   * 그때 그 미션은 어려운 것이 아니라 **불가능**하고, 플레이어는 자기 실력이
+   * 아니라 판을 원망하게 된다.
+   *
+   * digit 목표가 정확히 같은 병을 앓았고 같은 처방을 받았다(v4 8차: "그 숫자가
+   * 이 판에 실제로 몇 개 있는지"를 세서 그 비율을 요구 · 상한은 개수 자체).
+   * 여기서도 마지막 빗장만 건다 — **있는 것보다 많이 지우라고 하지 않는다**.
+   *
+   * ⚠ 개수가 0 인 판에서 목표를 0 으로 두지 않는 이유: 보충(refill)이 다시
+   *   특수를 찍으므로 그 판이 영영 0 인 것은 아니다. 0 은 "이미 달성"이 되어
+   *   미션이 뜨자마자 완료되는 다른 종류의 고장이라, 하한을 1 로 둔다.
+   * ⚠ 계수는 하나도 안 만든다. 표의 값을 **자르기만** 한다(clamp).
+   */
+  function capSpecialMission(m) {
+    if (!m || m.id !== 'special') return m;
+    var have = countSpecials(S.cells);
+    m.goal = Math.max(1, Math.min(m.goal, have > 0 ? have : 1));
+    return m;
+  }
+
   function missionText(m) {
     return m ? t('mission.' + m.id, { goal: m.goal }) : '';
   }
@@ -27712,6 +27738,7 @@ window.TT_SFX = {
           ? pickMission(gen.seed, S.cells.length, stage, S.mode, store.lastMissionId) : null);
     // Remembered in the store (and mirrored into the save) so the "never twice
     // in a row" rule survives a reload, not just a stage transition.
+    capSpecialMission(S.mission);          /* W6.5b P0 — 있는 것보다 많이 요구 금지 */
     if (S.mission && !advp) store.lastMissionId = S.mission.id;
     // 미션 시계는 "빡!" 배너가 끝난 뒤에 시작한다 (advBeginStage). 여기서는 0.
     S.missionUntil = 0;
@@ -28010,6 +28037,7 @@ window.TT_SFX = {
               prog: sv.mission.prog || 0, done: !!sv.mission.done }
           : pickMission(S.seed, S.cells.length, S.stage, S.mode, store.lastMissionId))
       : null;
+    capSpecialMission(S.mission);          /* W6.5b P0 — 복원된 판에서도 같은 빗장 */
     if (S.mission) store.lastMissionId = S.mission.id;
     S.sprintTimes = [];
     S.overInfo = null;
@@ -31191,6 +31219,7 @@ window.TT_SFX = {
     if (!d || !d.seq) return;
     var step = d.seq[clamp(S.bossSeqIdx, 0, d.seq.length - 1)];
     S.mission = { id: step.id, goal: step.goal, prog: 0, done: false };
+    capSpecialMission(S.mission);          /* W6.5b P0 — 보스 미션 사슬도 같은 빗장 */
     S.sprintWin = step.id === 'sprint' ? BOSS_SPRINT_MS : MISSION_SPRINT_MS;
     S.sprintTimes = [];
     /* 미션 시계는 스테이지 남은 시간을 넘지 않는다 — 넘으면 "시작하자마자
