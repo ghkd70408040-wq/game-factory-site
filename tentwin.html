@@ -6567,6 +6567,19 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
    화면에 두 번 서면 어느 쪽이 나를 죽이는지가 흐려진다(syncRushHud 의 규율). */
 #app.battle #tb-stats { display: none; }
 #app.battle #rush-timer { display: none; }
+/* 🚨 W6.5b ⑥ — 전투에서 `#hud-row` 의 34px 예약은 **영원히 빈 자리**다.
+   실측(390×844 전투 진입): 자식 다섯이 전부 높이 0 이다 —
+     mission-badge  syncMission 이 `!battleOn()` 으로 접는다(전투의 목표는 악당
+                    체력 하나뿐이라는 그 절의 규약)
+     adv-goal       같은 이유로 접힌다
+     pv-chip · tw-chip  전투에는 패시브 칩이 안 선다
+     rush-timer     바로 위 줄이 display:none 이다
+   D1 이 34px 를 **예약**한 이유는 "칩이 나타나면 판이 흔들린다"였는데, 전투에는
+   나타날 칩이 없으므로 그 이유가 성립하지 않는다. 그래서 전투에서만 예약을 푼다
+   (다른 세 모드는 이 줄을 지나지 않아 한 픽셀도 안 바뀐다).
+   회수한 34px 은 그대로 열매 크기가 된다: byH = (area.h − GAP×(rows−1)) ÷ rows.
+   실측 결과 이 파도의 상단 교정(34+8px)과 합쳐 타일 48 → 56px (**+16.7%**). */
+#app.battle #hud-row { min-height: 0; }
 
 /* ---- 실기기 반려 ①④ (0819) — 배경 원화 · 상단 이중 HUD 정리 -----------------
    ① "인게임 배경이 검정이다."
@@ -12940,6 +12953,30 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
       <div class="stat" id="stat-timer" hidden><span class="stat-k" data-i18n="hud.time">Time</span><span id="timer-val" class="stat-v">0:00</span></div>
       </div>
     </header>
+    <!-- ============================================================
+         W6.5b — 클래식 인게임 상단 (#classic-hud)
+
+         정본 시안: mockup/gm-classic-target.jpg (사용자가 클래식을 요청하며
+         붙인 스크린샷). 구성이 셋이다 — 유리 본판 + 가운데 캡슐 + 좌우 게이지.
+
+         **왜 새 마크업인가**(스킨으로 못 끝낸 이유, 실측 셋):
+           ① 러시·데일리의 시계는 `#stat-timer` 가 아니라 `#rush-timer` 라는
+              **다른 노드**다. `#tb-stats` 를 옷만 갈아입히면 중앙이 빈다.
+           ② 시안의 좌우는 글자 스탯이 아니라 **게이지**다(아이콘 + 값).
+           ③ 본판은 시안에서 독립 띠인데 `#topbar` 는 일시정지·캐릭터 슬롯까지
+              담은 다른 상자다 — 슬래브 하단 림이 띠 한가운데를 가로지른다.
+         그래서 전투가 `#duel-hud` 를 따로 갖는 것과 **같은 구조**로 간다.
+
+         소유자: syncClassicHud() 하나뿐이고, syncHud() 가 매 갱신에 부른다
+         (게임 화면에 들어오는 경로 넷이 전부 syncHud 를 지난다 —
+          syncClassicSkin 이 `.classic` 클래스를 그 자리에서 붙이는 것과 같은 근거).
+         클래식이 아니면 [hidden] 이라 **높이가 정확히 0** 이다(#duel-hud 규약).
+         ============================================================ -->
+    <div id="classic-hud" hidden aria-hidden="true">
+      <div id="ch-cap"><span id="ch-cap-v">0</span></div>
+      <div id="ch-l" class="ch-g"><i class="ch-i ch-i-goal" aria-hidden="true"></i><b id="ch-l-v">0</b></div>
+      <div id="ch-r" class="ch-g"><i class="ch-i ch-i-score" aria-hidden="true"></i><b id="ch-r-v">0</b></div>
+    </div>
     <!-- ============================================================
          전투 개편 §4 — 전투 HUD (#duel-hud).
 
@@ -24337,8 +24374,36 @@ window.TT_SFX = {
     if (app && app.classList) app.classList.toggle('classic', isClassic());
   }
 
+  /**
+   * W6.5b — 클래식 인게임 상단(#classic-hud)의 **유일한 소유자**.
+   * 값은 하나도 새로 만들지 않는다. 이미 있는 넷을 다른 옷에 담을 뿐이다:
+   *   가운데  러시·데일리 = 남은 시간 / 아케이드 = 점수(코디 확정: "아케이드는
+   *           점수 중앙"). 아케이드에는 시계가 없어서 캡슐이 빌 자리다.
+   *   왼쪽    미션이 있으면 진행(시안의 ◎ 0/1), 없으면 남은 짝.
+   *   오른쪽  가운데가 시간이면 점수, 가운데가 점수면 최고점.
+   * 클래식이 아니면 [hidden] 이라 높이가 정확히 0 이다 — #duel-hud 와 같은 규약.
+   */
+  function syncClassicHud() {
+    var box = $('classic-hud');
+    if (!box) return;
+    var live = isClassic() && S.running;
+    box.hidden = !live;
+    if (!live) return;
+    var timed = isRush() || isDaily();
+    var sec = isRush() ? Math.ceil(rushLeftMs() / 1000)
+                       : Math.floor((Date.now() - S.startedAt) / 1000);
+    setText('ch-cap-v', timed ? fmtTime(Math.max(0, sec)) : String(S.score));
+    var m = S.mission;
+    var mLive = !!m && missionsOn();
+    setText('ch-l-v', mLive
+      ? (m.prog + '/' + (m.id === 'col' ? 1 : m.goal))
+      : String(S.pairsLeft));
+    setText('ch-r-v', timed ? String(S.score) : String(store[bestKey()] || 0));
+  }
+
   function syncHud() {
     syncClassicSkin();
+    syncClassicHud();
     /* The Stage stat is a THREE-mode slot (review: 데일리 HUD "D" 한 글자):
      *   endless  Stage / 7
      *   daily    Daily / #412      — the puzzle number, which is what a player
@@ -35726,10 +35791,29 @@ window.TT_SFX = {
   transition:opacity 160ms var(--ease),filter 160ms var(--ease);
   pointer-events:none;
 }
+/* 🚨 W6.5b — 메달 **v3 + 언어별 명패**로 교체(사용자가 직접 만들어 온 최종판).
+   구판 넉 장은 지우지 않고 봉인한다 — 되돌리기가 이 주석 한 쌍이다.
 #app.battle #btn-add.act::before    {background-image:url("catalog/duel-medal-attack.webp");}
 #app.battle #btn-hint.act::before   {background-image:url("catalog/duel-medal-special.webp");}
 #app.battle #btn-undo.act::before   {background-image:url("catalog/duel-medal-pet.webp");}
 #app.battle #btn-shuffle.act::before{background-image:url("catalog/duel-medal-awaken.webp");}
+   구판 봉인 끝 */
+/* 신판: 메달 본체(718×907, 아래 명패가 **빈 판**)와 명패 8종(645×249 · ko/en)이
+   따로 왔고, tools/medal-label-merge.py 가 **한 캔버스로 합쳐** 놓았다.
+   화면에서 두 겹으로 겹치지 않는 이유가 정렬이다 — `background-size:contain` 은
+   두 그림을 각자의 비율로 앉히므로 버튼 크기가 바뀔 때마다 명패가 판에서
+   미끄러진다. 합쳐 두면 그 문제가 산술로 사라지고 소비처는 lang 한 줄만 갖는다.
+   기본은 ko 이고 `html[lang="en"]` 이 en 으로 갈아 끼운다(영문 로고와 같은 문법).
+   ⚠ 라벨 정렬은 실측이다: 명패 그림의 판 폭을 메달 판 폭에 맞추고 바닥을 맞춘다
+     (배율 0.998~1.010 — 두 벌이 같은 원판에서 나왔다는 증거이기도 하다). */
+#app.battle #btn-add.act::before    {background-image:url("catalog/medal-attack-ko.webp");}
+#app.battle #btn-hint.act::before   {background-image:url("catalog/medal-special-ko.webp");}
+#app.battle #btn-undo.act::before   {background-image:url("catalog/medal-pet-ko.webp");}
+#app.battle #btn-shuffle.act::before{background-image:url("catalog/medal-awaken-ko.webp");}
+html[lang="en"] #app.battle #btn-add.act::before    {background-image:url("catalog/medal-attack-en.webp");}
+html[lang="en"] #app.battle #btn-hint.act::before   {background-image:url("catalog/medal-special-en.webp");}
+html[lang="en"] #app.battle #btn-undo.act::before   {background-image:url("catalog/medal-pet-en.webp");}
+html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catalog/medal-awaken-en.webp");}
 #app.battle #actionbar .act .act-t,
 #app.battle #actionbar .act .act-ico{display:none !important;}
 #app.battle #actionbar .act:active{transform:scale(.94);background:none !important;}
@@ -35748,9 +35832,16 @@ window.TT_SFX = {
 /* 게이지 배지 = 메달 우상단의 작은 칩. 메달 면색이 넷 다 다르므로(적·청·보라·주황)
    칩은 어두운 잉크 알약 + 흰 글자 한 벌로 고정한다 — 어느 메달 위에서도 대비가
    같다(§액션바 명판 주석의 "캡 색이 무엇이든 대비가 고정된다"와 같은 규율). */
+/* W6.5b — 메달 v3 로 갈면서 칩을 **메달 위로** 들여놓는다. 실측: 메달은
+   `contain` 이라 폭이 94 × 718/907 = 74.4px 이고 90px 버튼 안에서 좌우 7.8px 씩
+   남는다. 그래서 right:4 는 메달 **밖**(유리판 위)이었다 — 9px 이 돔의 오른쪽
+   어깨다. 크기도 21 → 19px: 새 메달은 돔이 좁아 21px 칩이 뚜껑을 덮었다.
+   ⚠ 남기는 것은 **기능 정보뿐**이다(게이지 % · 펫 잔여 횟수). 레벨·등급 표기는
+     구판 메달 그림에 구워져 있던 것이고(Attack V.5 / Special 3 / Lv.1),
+     신판 그림에서 사라졌으므로 코드 쪽에도 그것을 되살리는 오버레이가 없다. */
 #app.battle #actionbar .act .act-badge{
-  top:2px !important;right:4px !important;left:auto !important;
-  min-width:21px !important;height:21px !important;
+  top:5px !important;right:9px !important;left:auto !important;
+  min-width:19px !important;height:19px !important;
   padding:0 5px !important;
   display:flex !important;align-items:center;justify-content:center;
   border-radius:999px !important;
@@ -35776,6 +35867,13 @@ window.TT_SFX = {
   background:url("catalog/duel-btn-pause.webp") center/contain no-repeat !important;
   box-shadow:none !important;border-radius:0 !important;
   width:40px !important;height:40px !important;
+  /* 🚨 W6.5b ⑥ — HUD 를 34px 끌어올리자 슬래브가 이 버튼 **위**로 올라왔다
+     (#duel-hud 는 DOM 에서 #topbar 다음이라 나중에 칠해진다). 시안에서는 반대로
+     일시정지가 유리판 위에 떠 있다 — 그 순서를 여기서 되돌린다.
+     상단바 자체에 z-index 를 주는 것이 아니라 **버튼 하나**만 올린다: 상단바를
+     올리면 그 배경(전투에서는 없지만 다른 모드에서는 있다)까지 함께 올라간다. */
+  position:relative;
+  z-index:6;
 }
 #app.battle #btn-pause .ic{display:none !important;}
 #app.battle #btn-pause:active{transform:scale(.92);}
@@ -38608,6 +38706,21 @@ html[lang="ko"] #modal-mode .r10-ribbon > h2{
      왜곡 0 이 산술로 닫힌다.
    ---------------------------------------------------------------------------- */
 #app.battle #duel-hud{
+  /* 🚨 W6.5b — 사용자 반려 "상단 유리 HUD 가 잘려 있다". 실측이 그 말대로였다:
+     HUD 상자가 y=48 에서 시작하는데(전투에서도 #topbar 가 48px 를 먹는다) 슬래브는
+     **위쪽 림이 없는 부재**라, 그 48px 아래에서 시작하면 위가 잘린 판으로 읽힌다.
+     시안(gm-ingame-battle.png)에서 슬래브는 화면 맨 위에 붙고 일시정지 버튼이
+     그 위에 뜬다 — 즉 원래 배치가 "붙어서 잘린 것처럼 보이는" 것이 아니라
+     **붙어 있는** 것이다.
+     그래서 압축이 아니라 **위치 교정**이다: 비율·크기는 한 값도 안 바꾸고 상자만
+     34px 끌어올린다. 아래로는 명패 바가 상자 밖으로 6.7%(약 8px) 내려오므로
+     그만큼을 margin-bottom 에서 되찾는다 — 두 값이 합쳐 **약 40px** 를
+     보드에 돌려주고, 그 40px 이 곧 열매 크기다(byH = (area.h − gap×(rows−1)) ÷ rows).
+     ⚠ 성 꼭대기(.dh-castle top 1.22%)는 상자 안이라 잘리지 않는다 — 끌어올린
+       뒤에도 화면 위쪽에 그만큼 여유가 남는지가 검증의 관문이다. */
+  margin-top:-34px !important;
+  margin-bottom:-8px !important;
+  /* ⑥ 열매 확대의 나머지 몫 — 아래 `#app.battle #hud-row` 주석이 본문이다. */
   border-image-source:none !important;
   border-image-width:0 !important;
   border-width:0 !important;
@@ -38837,6 +38950,136 @@ html[lang="ko"] #modal-mode .r10-ribbon > h2{
 
    클래식 상단 초안 봉인 끝 */
 
+/* ---------------------------------------------------------------------------
+   신판 — 클래식 전용 상단 `#classic-hud`
+   전투 HUD 와 **같은 유리 킷 · 같은 규율**이다: 슬래브는 요소 배경, 캡슐은
+   ::after, 9슬라이스 0장(부재를 자기 비율 그대로 놓는다), 좌표는 %.
+   높이 예산: 컨테이너 = 슬래브의 자연 비율(1694/300) 그대로라 폭의 17.71% 다
+   (390px 화면에서 약 68px). 캡슐은 그 위로 20% 솟아 시안의 "튀어나온 시계"를
+   만든다 — `overflow:visible` 이라 잘리지 않고, margin-top 이 그만큼을 미리
+   비워 두므로 보드가 잃는 높이는 캡슐 돌출분이 아니라 슬래브 높이뿐이다.
+   --------------------------------------------------------------------------- */
+#classic-hud{ display:none; }
+#classic-hud[hidden]{ display:none !important; }
+#app.classic #classic-hud{
+  display:block;
+  position:relative;
+  flex:0 0 auto;
+  /* 위쪽 여백이 캡슐 돌출분을 미리 비운다 — 그래야 캡슐이 상단바를 안 침범한다. */
+  margin:30px calc(var(--safe-r) + 8px) 2px calc(var(--safe-l) + 8px);
+  aspect-ratio:1695/298;
+  height:auto;
+  overflow:visible;
+  container-type:inline-size;
+  /* 🚨 부재는 slab 이 아니라 **plate** 다. 첫 배선은 slab 을 썼는데 실렌더에서
+     띠가 거의 안 보였다: slab 은 본문 알파가 8 근처인 "거의 투명한 유리"라
+     66px 높이(원본 300px 의 22%)로 줄면 림이 1px 이 되어 사라진다.
+     plate 는 본문 알파 0.20 짜리 서리유리라 작아져도 판으로 읽히고, 무엇보다
+     **상단 중앙에 홈**이 있어 캡슐이 앉을 자리를 그림이 이미 갖고 있다.
+     원판(glass-hud-report.json)에서 캡슐 아래끝(419)은 plate(292~590) 안쪽
+     42.6% 지점이다 — 아래 -57.4% 가 바로 그 값이고, 시안의 "튀어나온 시계"가
+     임의 배치가 아니라 원판의 겹침이라는 뜻이다. */
+  background-image:url("catalog/glass-hud-plate-st.webp");
+  background-repeat:no-repeat;
+  background-position:center top;
+  background-size:100% 100%;
+  filter:drop-shadow(0 2px 5px rgba(46,20,58,.30));
+}
+/* 가운데 캡슐 — 폭 43.816% 는 전투 HUD 와 **같은 값**이다(같은 원판의 같은 부재).
+   plate 높이 = 원판 298 = 캡슐 높이와 같으므로 height:100% 가 곧 원본 비율이다. */
+#app.classic #classic-hud::after,
+#app.classic #ch-cap{
+  position:absolute;
+  left:28.328%;
+  width:43.816%;
+  top:-57.4%;
+  height:100%;
+}
+#app.classic #classic-hud::after{
+  content:"";
+  background-image:url("catalog/glass-hud-capsule-st.webp");
+  background-repeat:no-repeat;
+  background-position:center;
+  background-size:100% 100%;
+  pointer-events:none;
+  z-index:0;
+}
+#app.classic #ch-cap{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:1;
+  pointer-events:none;
+}
+#app.classic #ch-cap-v{
+  font-family:var(--font-display);
+  font-size:26px;                 /* @container 미지원 폴백 */
+  font-size:9.2cqw;
+  line-height:1;
+  letter-spacing:.02em;
+  color:var(--j-ink);
+  text-shadow:0 1px 0 rgba(255,255,255,.92), 0 2px 5px rgba(120,110,150,.38);
+}
+/* 좌우 게이지 알약 — 같은 캡슐 그림의 작은 판이다(새 색·새 조각 0).
+   여기서만 9슬라이스를 쓴다: 알약을 **가로로만** 늘려야 하므로 세로 슬라이스는
+   0 이고 cap 폭은 늘 `200 × 높이 ÷ 298` 이다. plate 의 명패는 좌우 끝이 높고
+   가운데가 낮으므로, 알약은 그 **높은 끝** 안에 앉힌다(top 22% · 높이 46%). */
+#app.classic #classic-hud .ch-g{
+  position:absolute;
+  top:22%;
+  height:46%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  padding:0 2.2cqw;
+  box-sizing:border-box;
+  border-style:solid;
+  border-color:transparent;
+  border-width:0;
+  border-image-source:url("catalog/glass-hud-capsule-st.webp");
+  border-image-slice:0 200 fill;
+  border-image-repeat:stretch;
+  border-image-width:0 5.43cqw;   /* = 200 ÷ 298 × 8.09cqw(=46% 높이) */
+  z-index:1;
+}
+#app.classic #ch-l{ left:3.2%;  width:23%; }
+#app.classic #ch-r{ right:3.2%; width:27%; }
+#app.classic #classic-hud .ch-g b{
+  font-family:var(--font-display);
+  font-size:12px;
+  font-size:4.0cqw;
+  line-height:1;
+  color:var(--j-ink);
+  text-shadow:0 1px 0 rgba(255,255,255,.88);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+/* 아이콘 둘 — 시안의 ◎(목표)·◆(점수)다. 조각을 굽지 않는다: 이 파일이 이미
+   쓰는 CSS 도형 문법이고, 색은 젤리 키색에서 온다. */
+#app.classic #classic-hud .ch-i{
+  flex:0 0 auto;
+  width:4.4cqw;
+  height:4.4cqw;
+  display:block;
+}
+#app.classic .ch-i-goal{
+  border-radius:50%;
+  box-shadow:inset 0 0 0 .9cqw #E86A9E, 0 1px 0 rgba(255,255,255,.75);
+}
+#app.classic .ch-i-score{
+  transform:rotate(45deg);
+  border-radius:12%;
+  background-image:linear-gradient(180deg,#8FD8F5 0%,#4FA3D8 100%);
+  box-shadow:0 1px 0 rgba(255,255,255,.75);
+}
+/* 러시의 큰 시계(#rush-timer)는 클래식에서 내린다 — 같은 숫자가 캡슐 안에 이미
+   있고, 둘이 나란히 뜨면 "무엇이 진짜 시계인가"가 매 판 헷갈린다.
+   전투가 같은 자리에서 같은 처분을 하고 있다(:6569 `#app.battle #rush-timer`). */
+#app.classic #rush-timer{ display:none !important; }
+#app.classic #tb-stats{ display:none !important; }
+
 /* ===========================================================================
    W6.5b — **텐트윈 각성 연쇄 루프** (사용자 전략 확정)
 
@@ -39041,7 +39284,10 @@ var L=("jelly-box,duel-title-play,sian2-ribbon,sian2-btn-pink,sian2-btn-purple,"
       +"stage-pill_life,stage-pill_coin,stage-pill_star,stage-pill_chapter,"
       +"stage-jelly-1,stage-jelly-2,stage-jelly-3,stage-jelly-4,stage-jelly-5,"
       +"stage-star-on,stage-star-off,"
-      +"duel-medal-attack,duel-medal-special,duel-medal-pet,duel-medal-awaken,"
+      /* W6.5b — 메달 v3(언어별 명패 합성본)으로 교체. 구판 넉 장은 파일로 남지만
+   화면 참조가 0 이라 데울 이유가 없다. 현재 언어 넉 장만 데운다(en 은 그때 받는다).
+      +"duel-medal-attack,duel-medal-special,duel-medal-pet,duel-medal-awaken," */
+      +"medal-attack-ko,medal-special-ko,medal-pet-ko,medal-awaken-ko,"
       +"duel-btn-pause,duel-hpbar-bone,duel-hpbar-wing,"
       +"duel-castle-hd,duel-cloud-big,duel-cloud-baby,duel-demon-full,"
 /* W4 — 타이머 젤리 숫자 글리프 11장(172x209 공통 캔버스). 전투에 들어서는 순간
