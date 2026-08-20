@@ -40398,7 +40398,27 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
      것이라 같은 그림의 같은 픽셀이고, 격자만 없다.
      ⚠ 캔버스가 744×298 → 716×273 으로 바뀌었다. 9슬라이스 캡(--w65-cap)이
      `200 × 높이 ÷ 원본높이` 로 정의돼 있으므로 아래 한 줄도 함께 움직인다. */
-  --w65-capsule:url("catalog/glass-capsule-v3.webp");
+  /* W-E(2026-08-21) — **v3 은 잘린 판이었다.** 사용자 실기기 반려 2건이 같은
+     원인 하나에서 나왔다: v3 은 통짜를 `px[494,136,716,273]` 이라는 **직사각
+     좌표**로 오렸는데, 그 상자가 알약보다 좁다. 에셋 실측(알파):
+       · 세로 중앙 행의 좌·우 끝 알파 = 242 / 238  → 캡이 **화면 밖으로 잘려**
+         있었다(온전한 알약이라면 양끝은 0 이어야 한다). CSS 로는 못 고친다.
+       · 하변 행 평균 알파 57, 끝값 84~93 → 하변이 **슬래브 접합면**을 지나며
+         잘려 점선 이음매가 남았다. W-C2 는 이걸 "400% 에서만 보인다"고 판정했고
+         **그 판정이 틀렸다**(1배율 실기기에서 사용자가 지적).
+     v4 는 같은 통짜에서 **알약의 제 윤곽**으로 오려 냈다 — 행별 알파 추적(8px
+     연속 투명을 '진짜 바깥'의 조건으로 삼아 이음매 자국과 구분)으로 위쪽 절반의
+     외곽선을 얻고, 슬래브에 파묻힌 아래 절반은 그 윤곽을 접어 썼다. 슬래브 어깨와
+     융합된 허리 띠(|dy|<45)만 안쪽으로 3px 물려 잘랐다(덜 나가면 림이 평평해질
+     뿐이지만 더 나가면 슬래브 살점이 귀처럼 붙는다 — 실제로 붙어 봤다).
+     결과 733×286, 네 변 끝 알파 전부 **0**(전 캡 온전 · 하변 자유 경계).
+     구판 두 줄 봉인(롤백은 맞바꾸기):
+       --w65-capsule:url("catalog/glass-capsule-v3.webp");   ← 캡 잘린 판
+       --w65-capsule:url("catalog/glass-hud-capsule-st.webp"); ← 체커 잔재 판
+     ⚠ 캔버스가 716×273 → 733×286. 캡 상수(--w65-cap)는 `캡슬라이스 × 높이 ÷
+     원본높이` 이고 v4 의 캡 슬라이스는 **190**(=상변이 평평해지는 지점 174px +
+     여유)이다. 아래 한 줄과 `border-image ... 0 190 fill` 두 자리가 한 몸이다. */
+  --w65-capsule:url("catalog/glass-capsule-v4.webp");
   /* 🚨 W6.5b 원복 — 무지개 X 전량 철회(사용자: "이전 게 완벽했는데 왜 바꿨냐").
      변수는 **지우지 않고 봉인**한다: 소비처 넷(③ 블록)이 함께 봉인돼 있으므로
      이 한 줄을 되살리는 것이 롤백의 전부다. staging 은 "반려".
@@ -40780,8 +40800,9 @@ html[lang="en"] .splash-logo{
   /* W-C2 — 캡슐이 v3(716×273)으로 갈리면서 분모가 298 → 273 이 됐다. 이 한 줄이
      위 문단의 "둘을 같게 두면" 을 지키는 유일한 자리다: 세로 배율 H÷273 과
      가로 배율 cap÷200 이 어긋나는 순간 알약이 다시 구겨진다.
-     구판(-st) 값 봉인 — 롤백은 이 값으로 되돌린다:  --w65-cap:54px;  (= 200 × 80 ÷ 298) */
-  --w65-cap:59px;                /* = 200 × 80 ÷ 273. 높이를 바꾸면 같이 바꾼다 */
+     구판(-st) 값 봉인 — 롤백은 이 값으로 되돌린다:  --w65-cap:54px;  (= 200 × 80 ÷ 298)
+     W-E: v4(733×286·캡 슬라이스 190)로 갈리며 59 → 53px. 봉인:  --w65-cap:59px; */
+  --w65-cap:53px;                /* = 190 × 80 ÷ 286. 높이를 바꾸면 같이 바꾼다 */
   box-sizing:border-box;
   height:80px;
   display:flex;
@@ -40798,7 +40819,7 @@ html[lang="en"] .splash-logo{
   padding:0 10px;
   border-style:solid;
   border-width:0 var(--w65-cap);
-  border-image:var(--w65-capsule) 0 200 fill stretch;
+  border-image:var(--w65-capsule) 0 190 fill stretch;   /* W-E: v4 캡 슬라이스 190(구판 200 봉인) */
   border-radius:0;
   background-color:transparent;
   background-image:none;
@@ -40874,8 +40895,8 @@ html[lang="ko"] #modal-mode .r10-ribbon > h2{ color:transparent; text-shadow:non
    (color 만 투명하게 하면 background-clip:text 판이 그대로 남는다). */
 #modal-mode .r10-ribbon{
   border-style:solid !important;
-  border-width:0 var(--w65-cap,59px) !important;   /* W6.5b — 세로 슬라이스 폐지. W-C2: 폴백도 v3(÷273) 값으로 */
-  border-image:var(--w65-capsule) 0 200 fill stretch !important;
+  border-width:0 var(--w65-cap,53px) !important;   /* W6.5b — 세로 슬라이스 폐지. W-E: 폴백도 v4(190÷286) 값으로 */
+  border-image:var(--w65-capsule) 0 190 fill stretch !important;
   border-radius:0 !important;
   width:fit-content !important;
   min-width:56% !important;
@@ -41542,8 +41563,9 @@ html[lang="ko"] #modal-mode .r10-ribbon > h2{
 }
 #app.classic #classic-hud::after{
   content:"";
-  /* W-C2 — 구판 봉인: background-image:url("catalog/glass-hud-capsule-st.webp"); */
-  background-image:url("catalog/glass-capsule-v3.webp");
+  /* W-C2 — 구판 봉인: background-image:url("catalog/glass-hud-capsule-st.webp");
+     W-E — 캡 잘린 v3 봉인: background-image:url("catalog/glass-capsule-v3.webp"); */
+  background-image:url("catalog/glass-capsule-v4.webp");
   background-repeat:no-repeat;
   background-position:center;
   background-size:100% 100%;
@@ -41583,13 +41605,15 @@ html[lang="ko"] #modal-mode .r10-ribbon > h2{
   border-style:solid;
   border-color:transparent;
   border-width:0;
-  /* W-C2 — 구판 봉인: border-image-source:url("catalog/glass-hud-capsule-st.webp"); */
-  border-image-source:url("catalog/glass-capsule-v3.webp");
-  border-image-slice:0 200 fill;
+  /* W-C2 — 구판 봉인: border-image-source:url("catalog/glass-hud-capsule-st.webp");
+     W-E — 캡 잘린 v3 봉인: border-image-source:url("catalog/glass-capsule-v3.webp"); */
+  border-image-source:url("catalog/glass-capsule-v4.webp");
+  border-image-slice:0 190 fill;   /* W-E: v4 캡 슬라이스(구판 200 봉인) */
   border-image-repeat:stretch;
   /* W-C2 — 분모가 캡슐 원본 높이다. v3(273)으로 갈리며 5.43 → 5.93cqw.
-     구판 값 봉인: border-image-width:0 5.43cqw;  (= 200 ÷ 298 × 8.09cqw) */
-  border-image-width:0 5.93cqw;   /* = 200 ÷ 273 × 8.09cqw(=46% 높이) */
+     구판 값 봉인: border-image-width:0 5.43cqw;  (= 200 ÷ 298 × 8.09cqw)
+     W-E — v4(190÷286)로 갈리며 5.93 → 5.37cqw. 봉인: border-image-width:0 5.93cqw; */
+  border-image-width:0 5.37cqw;   /* = 190 ÷ 286 × 8.09cqw(=46% 높이) */
   z-index:1;
 }
 #app.classic #ch-l{ left:3.2%;  width:23%; }
@@ -42243,7 +42267,9 @@ var L=("jelly-box,duel-title-play,sian2-ribbon,sian2-btn-pink,sian2-btn-purple,"
          구판 조각(롤백 근거, 파일은 보존)
            "glass-hud-capsule-st,glass-hud-plate-st,"
          glass-hud-bar-st(하단 액션바)는 재절단 대상이 아니라 그대로 둔다. */
-      +"glass-hud-v2,glass-capsule-v3,glass-band-v2,glass-hud-bar-st,"
+      /* W-E — 캡 잘린 v3 → 제 윤곽으로 다시 오린 v4. 구판 조각 봉인:
+           "glass-hud-v2,glass-capsule-v3,glass-band-v2,..." */
+      +"glass-hud-v2,glass-capsule-v4,glass-band-v2,glass-hud-bar-st,"
       +"sian3-close,art-logo-en,"
       +"ttl-settings,ttl-pause,ttl-rank,ttl-play,ttl-clear,"
       +"ttl-over,ttl-daily,ttl-skin,ttl-chars,"
