@@ -489,6 +489,11 @@
   "note": "유리 HUD 통짜 한 장(1698×590) — 3부재를 원판 src_box 좌표로 합성 + 면 얼룩 평탄화. 전투 상단 #duel-hud 배경이었다. ⚠ W-B(2026-08-21) glass-hud-v2 로 교체되어 **화면 참조 0** — 우측 소실 결함(배경 추정 알파의 우측 저알파 뭉갬) 때문이다. 파일·주석은 남긴다(_superseded 이동 안 함): tentwin.html 의 background-image 한 줄을 되돌리면 곧 롤백이다",
   "t": "2026-08-21"
  },
+ "ch-ten-inline": {
+  "state": "적용",
+  "note": "⚠ 배선 사실 기록(파일 아님) — tentwin.html 은 ch-ten 의 portrait/full 을 base64 인라인으로 물고 있다(:9184-9185). 병렬 팀의 볼-지팡이 잔재 수리(0a6c69c)는 catalog/*.webp 만 고쳤으므로 화면에는 반영이 안 됐고, W-B 가 인라인 사본을 재임베드해 반영했다. 방법: 카탈로그 구판(_superseded/ch-ten-*-v1.webp)과 신판의 알파 차로 절단 커버리지 cov=1-a_new/a_old 를 얻어, 무손실 마스터 PNG 를 생성기와 같은 폭(760/900)으로 줄인 판에 alpha*=(1-cov) 로 적용한 뒤 art-embed.js 의 캐릭터 규격(quality 78 / alphaQuality 100 / effort 6)으로 재인코딩 — 카탈로그 q92 를 다시 굽는 이중 lossy 를 피했다. 절단 3985px(portrait) / 4425px(full), HTML +4.8KB. 🚨 회귀 위험: 마스터 PNG(tentwin/assets/characters/tenten/*.png)는 아직 잔재를 품고 있다. art-embed.js 를 다시 돌리면 이 수리가 통째로 풀린다 — 마스터 수리가 후속 과제다. 증적: evidence-14/36-ten-cheek-inline.png",
+  "t": "2026-08-21"
+ },
  "glass-hud-v2": {
   "state": "적용",
   "note": "W-B(2026-08-21) 배선 완료 — 전투 상단 #duel-hud 배경(background-size:100% auto, aspect 1696/608). 자식 슬롯(타이머·성·아바타 셋)은 gm-hud-layers.json 기준상자 [16,0,1674,558] 로 재검해 보정했고, HP 바 두 장은 차이 1%p 미만이라 무보정. 실렌더 시트: evidence-14/34-glass-v2-live.png. || 전투 HUD 1층 — 순수 유리 통짜 구조(상단 슬래브+중앙 캡슐+하단 명패 밴드가 한 몸). 내용물 0: 글자·게이지·아바타·성이 하나도 구워져 있지 않다. 1696x608 스트레이트 알파 무손실 webp. 공법: 사용자가 제공한 흰 배경판(Bw=249)과 동일 렌더의 체커 배경판(D=85.9/L=122.8)을 짝지은 2배경 매팅 — 정렬 오차 0(동일 렌더라 shift=(0,0)), 흰판 재합성 잔차 0.10, 체커판 셀평균 잔차 0.62(p95 2.40). 체커 오분류가 남기는 주기 50px 비늘무늬는 8방향 접선 평활 + 빈영역 열기로 제거(림 선명도 보존). 직선 림 이탈 max 2.54px / p95 2.49px (원판 자체 max 1.78px). 좌하단 'AI로 생성한 콘텐츠' 워터마크 완전 제거, 우하단 AI 반짝 ✦ 인페인팅 제거. 기존 glass-hud-full(v1, 배경 추정 방식)은 우측 절반이 소실돼 있어 대체 후보. 배치는 mockup/gm-hud-layers.json(1층 유리 → 2층 HP틀 → 3층 내용물) 참조. 판정 시트: evidence-14/33-glass-v2-judge.png",
