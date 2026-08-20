@@ -6568,7 +6568,7 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
 #app.battle #tb-stats { display: none; }
 #app.battle #rush-timer { display: none; }
 /* 🚨 W6.5b ⑥ — 전투에서 `#hud-row` 의 34px 예약은 **영원히 빈 자리**다.
-   실측(390×844 전투 진입): 자식 다섯이 전부 높이 0 이다 —
+   실측(390×844 전투 **진입 직후**): 자식 다섯이 전부 높이 0 이다 —
      mission-badge  syncMission 이 `!battleOn()` 으로 접는다(전투의 목표는 악당
                     체력 하나뿐이라는 그 절의 규약)
      adv-goal       같은 이유로 접힌다
@@ -6578,8 +6578,30 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
    나타날 칩이 없으므로 그 이유가 성립하지 않는다. 그래서 전투에서만 예약을 푼다
    (다른 세 모드는 이 줄을 지나지 않아 한 픽셀도 안 바뀐다).
    회수한 34px 은 그대로 열매 크기가 된다: byH = (area.h − GAP×(rows−1)) ÷ rows.
-   실측 결과 이 파도의 상단 교정(34+8px)과 합쳐 타일 48 → 56px (**+16.7%**). */
-#app.battle #hud-row { min-height: 0; }
+   실측 결과 이 파도의 상단 교정(34+8px)과 합쳐 타일 48 → 56px (**+16.7%**).
+
+   ⛔ D1 재발 (2026-08-21) — 위 실측의 다섯 줄 중 **한 줄이 거짓**이었다.
+   "pv-chip · tw-chip 전투에는 안 선다"는 **진입 직후**에만 참이다. syncTwChip()
+   은 `S.pv.twLast` 하나만 보고 켜지며 battleOn() 을 **묻지 않는다**(그 함수의
+   본문 전체가 근거다 — 전투 분기가 한 줄도 없다). 그래서 전투에서도 첫 텐/트윈
+   매치와 함께 #tw-chip("● ○ 다음: 텐!")이 서고, 그 순간 이 줄이 0 → 30px 로
+   자란다. 사용자 실기기 증거 두 장이 정확히 그 두 프레임이다(칩 있음/없음).
+   그 30px 은 곧바로 #board-scroll 에서 빠지고 layout() 의
+   byH = (area.h − GAP×(rows−1)) ÷ rows 가 작아져 --ts 가 줄어든다 —
+   관문 실측(수리 전): 전투 414×896 에서 56px → 54px, 360×740 에서는 줄 높이만
+   0→30 이고 byW(48)가 min 을 쥐고 있어 눈에 안 띄었다. 즉 이 결함은 뷰포트가
+   byH 쪽을 min 으로 만들 때만 화면에 나오는, 기기마다 갈리는 종류다.
+
+   그래서 W6.5b ⑥ 의 회수를 **되돌린다**. 판 도중에 자랄 수 있는 줄은 판이
+   열리는 순간부터 그 높이를 차지해야 한다 — 34px 은 다른 세 모드와 같은 수이자
+   game.js BATTLE_HUD_RESERVE 와 같은 수이고, 그래야 battleRows() 의
+   `reserve = hrH >= 34 ? 0 : 34 − hrH` 가 스스로 0 이 되어 이중 보정이 나지
+   않는다(행 수는 수리 전후로 **같다**: 전에는 area.h 가 34 크고 reserve 가 34,
+   지금은 area.h 가 34 작고 reserve 가 0 이라 분자가 같다 — 관문 실측이 확인).
+   대가는 타일 2px 이고, 얻는 것은 "한 판 안에서 타일 크기 불변"이다.
+   ⚠ 이 줄을 다시 0 으로 만들려면 먼저 syncTwChip() 을 battleOn() 으로 닫아
+   칩이 **정말로** 안 서게 만들고, gates/d1-tile-stable.mjs 를 통과시켜라. */
+#app.battle #hud-row { min-height: 34px; }
 
 /* ---- 실기기 반려 ①④ (0819) — 배경 원화 · 상단 이중 HUD 정리 -----------------
    ① "인게임 배경이 검정이다."
@@ -6621,11 +6643,36 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   background-repeat: no-repeat, no-repeat;
 }
 #app.battle #hero-slot { display: none; }
+/* 🚨 W10 ① (2026-08-21) 사용자 반려 — "유리 판을 화면 최상단에 붙여라".
+   전까지 유리판 위에 14px 의 빈 띠가 있었고, 그 14px 의 출처는 **상단바의 키**
+   였다. 산술이 정확히 이랬다:
+     #topbar 높이 = padding-top 6 + 가장 큰 자식(#btn-pause 40) + padding-bottom 2
+                  = 48px
+     #duel-hud 는 margin-top:-34px 로 그중 34 를 끌어올린다 → 48 − 34 = **14px**
+   전투의 상단바는 **일시정지 버튼 하나**만 든다(#tb-stats·#rush-timer·#hero-slot
+   이 전부 이 절과 위 줄에서 접힌다). 즉 그 48px 은 버튼 한 개를 세우려고 판을
+   14px 아래로 미는 값이었다. 그래서 버튼을 흐름에서 빼고(아래 #btn-pause 절이
+   position:absolute 로 시안 자리에 박는다) 상단바를 **높이 0** 으로 접는다.
+   남기는 것은 safe-area 뿐이다 — "최상단"이 노치 밑을 뜻하지는 않는다.
+   ⚠ overflow 를 visible 로 두는 것이 필수다: 접힌 상단바 밖으로 버튼이 나간다. */
 #app.battle #screen-game #topbar {
   border-width: 0;
   border-image: none;
   background: none;
-  padding: calc(var(--safe-t) + 6px) calc(var(--safe-r) + 12px) 2px calc(var(--safe-l) + 12px);
+  padding: var(--safe-t) 0 0 0;
+  position: relative;
+  overflow: visible;
+  /* 🚨 cqw 이지 % 가 아니다. 아래 #btn-pause 는 이 길이를 `width` 와 `top` 두
+     곳에서 쓰는데, 커스텀 속성은 **토큰 치환**이라 `100%` 를 넣으면 width 에서는
+     폭의 100%, top 에서는 **높이**의 100% 로 각각 풀린다. 이 상단바는 높이가 0
+     이므로 top 이 −0.3px 이 되어 버튼 머리가 화면 밖으로 잘렸다(실측).
+     cqw 는 어느 속성에서 쓰든 컨테이너의 **인라인 크기**라 그 함정이 없다.
+     그래서 container-type 이 장식이 아니라 필수다. */
+  container-type: inline-size;
+  /* 유리판의 실폭. 아래 #btn-pause 의 좌표가 전부 이 길이의 비율이다 —
+     시안(gm-hud-placement2.json)이 재는 기준상자가 곧 유리판이기 때문이다.
+     8px 은 #duel-hud 의 좌우 마진 4+4(:36741)와 **같은 수**다(함께 고칠 것). */
+  --dh-w: calc(100cqw - var(--safe-l) - var(--safe-r) - 8px);
 }
 /* 펫 소환의 "지금 저 애가 했다"는 #mate 스프라이트의 점프였는데, 위에서 슬롯을
    통째로 접었으므로 **버튼 자신이 뛴다**. 새 keyframes 를 만들지 않고
@@ -14639,8 +14686,10 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
      보이스(젤리 2음절 ≈ 0.20s)보다 길어 래치가 겹침 금지보다 먼저 풀리는 일이 없다. */
   /* W3 — 스킬 3종은 컷인 한 번에 한 발이므로 팡파르(tierUp)와 같은 300ms 를 준다.
      그보다 짧으면 연발 시 같은 소리가 자기 꼬리를 밟고, 길면 두 번째 스킬이 묵음이 된다. */
+  /* W10 ④ — awakenMax 는 **한 판에 여러 번** 난다(연쇄 루프의 2·3회차). 소리가
+     0.95s 짜리라 래치를 그보다 짧게 두면 자기 꼬리를 밟는다. 900ms 로 잡는다. */
   var SFX_DEBOUNCE_MAP = { match: 70, combo: 70, cheer: 340, voice: 300, tierUp: 300, jackpot: 240,
-                           spBlast: 300, petBell: 300, foeStab: 300 };
+                           spBlast: 300, petBell: 300, foeStab: 300, awakenMax: 900 };
 
   /* ---- v3 믹스 레벨 (애니팡 문법: BGM 은 깔개, 매치 "팡"이 주인공) -----------
    * 절대 진폭 기준(마스터 0.55 를 곱하기 전). 청감 dB 는 match 를 0dB 로 둔 상대값.
@@ -16583,6 +16632,51 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
       noise(t0 + 0.28, 0.09, 0.058, 'highpass', 5200, 1800, 0.7, 0.001);
       // ③ 꼬리 — D4 링잉이 킥 뒤에 남아 "큰 것"의 크기를 만든다.
       tone('sine', 293.66, 293.66, t0 + 0.30, 0.40, 0.042, 0.010);
+    },
+
+    /** 🚨 W10 ④ (2026-08-21) — **각성 만땅**. 사용자 요구: "게이지 꽉 차는 순간
+     *  존재감 있는 상승 사운드, 차올랐다!가 귀로 들리게".
+     *
+     *  왜 mission() 으로 부족한가: 그 소리는 G5·B5·D6 세 음을 85ms 로 던지는
+     *  **알림**이다(0.55s). 짧고 평평해서 "됐다"는 들리지만 "차올랐다"는 안 들린다.
+     *  그리고 이 게임에서 미션 달성은 각성 만땅보다 작은 사건인데 같은 소리를
+     *  쓰면 큰 사건이 작은 사건의 급으로 내려앉는다.
+     *
+     *  그래서 spBlast 의 **상행 문법**을 빌려 오되 톤을 바꾼다. spBlast 는
+     *  sawtooth 스윕 + 킥이라 "터진다"에 가깝다(§ 그쪽 주석의 두 박자). 각성은
+     *  터지는 사건이 아니라 **차오르는** 사건이므로:
+     *    ① 상행 스윕을 sawtooth 가 아니라 triangle 로 — 배음이 부드러워 밝고
+     *       성스러운 쪽으로 간다. 330→2093Hz(E4→C7), 0.52s 로 spBlast(0.32s)보다
+     *       **길게** 끈다. 길이가 곧 "차오름"이다.
+     *    ② 그 위에 **완전5도 병행**(1.5배)을 한 겹 더 얹는다 — 오르간·성가의
+     *       그 소리다. 이 신스에서 5도 병행을 쓰는 소리는 여기 하나뿐이라
+     *       다른 무엇과도 안 헷갈린다.
+     *    ③ 꼭대기에서 킥이 아니라 **메이저 트라이어드**가 열린다(C6·E6·G6 을
+     *       40ms 간격으로). 착탄이 아니라 개화다.
+     *    ④ 위쪽에 반짝임 한 알(C7)과 아주 옅은 하이패스 노이즈 — 화면의 스파클
+     *       ::after 와 귀에서 같은 자리를 맡는다.
+     *  ⚠ 킥(저역 임팩트)을 **일부러 안 넣었다**: 저역이 들어가는 순간 필살기와
+     *    같은 급으로 들리고, 그러면 넷 중 무엇이 찼는지 귀가 못 고른다 — 화면에서
+     *    무지개가 하는 구별을 소리에서도 지켜야 한다(:39284 절의 같은 규율). */
+    awakenMax: function () {
+      if (!gate('awakenMax')) return;
+      var t0 = at();
+      // ① 상행 스윕 E4 → C7. 이 신스에서 가장 긴 상행이다.
+      tone('triangle', 329.63, 2093.00, t0, 0.52, 0.086, 0.026);
+      // ② 완전5도 병행 — 같은 곡선을 1.5배 위에서 그린다.
+      tone('sine', 494.44, 3139.50, t0, 0.52, 0.048, 0.030);
+      // ③ 꼭대기의 개화 — C6·E6·G6 메이저 트라이어드(40ms 간격).
+      var tri = [1046.50, 1318.51, 1567.98];
+      for (var i = 0; i < 3; i++) {
+        var st = t0 + 0.46 + i * 0.040;
+        tone('triangle', tri[i], tri[i], st, 0.46, 0.105, 0.006);
+        tone('sine', tri[i] * 2, tri[i] * 2, st, 0.28, 0.030, 0.006);
+      }
+      // ④ 반짝임 한 알 + 숨결. 노이즈는 아주 옅게 — 있는지 모를 정도가 맞다.
+      tone('sine', 2093.00, 2093.00, t0 + 0.50, 0.30, 0.036, 0.004);
+      noise(t0 + 0.44, 0.26, 0.026, 'highpass', 4200, 9000, 0.7, 0.040);
+      // 꼬리 — C4 받침이 0.42s 남아 "큰 것"의 크기를 만든다(spBlast ③ 와 같은 문법).
+      tone('sine', 261.63, 261.63, t0 + 0.48, 0.42, 0.038, 0.012);
     },
 
     /** 펫 — 벨 아르페지오 E6·G#6·B6·E7 (48ms 간격) + 젤리 방울 한 알. */
@@ -19963,6 +20057,37 @@ window.TT_SFX = {
   var SKILL_BASE = 1.5;
   var SKILL_COMBO = 0.18;
   var SKILL_COMBO_CAP = 20;
+  /* 🚨 W10 ④ (2026-08-21) 사용자 확정 — "잘하면 각성이 거의 이어지게".
+     위 넷은 **한 값도 안 바꾼다**(133 계수의 약속). 대신 전투에서만 곱해지는
+     신규 계수를 세운다 — gaugeBump() 가 유일한 소비처이고 battleOn() 으로
+     좁혀져 있다(그 자리 주석에 근거).
+     2 인 이유는 **실측**이다. 시작값은 지시대로 1.5(+50%)였고, 봇(gates/
+     awaken-uptime.mjs · 사람 속도 800ms/수 · 스테이지 3·7·12)으로 스윕했다:
+       K=1(기준선) → 각성 가동률 28.5%
+       K=1.5       → 37.1%
+       K=2.0       → 43.9%
+       K=2.4       → 47.2%   ← 여기서 이미 포화한다
+     2.4 에서 판마다 "최종 게이지 100"이 찍힌다 — 다 찼는데 **못 쓰고 서 있다**는
+     뜻이다. 그 지점부터 병목은 충전 속도가 아니라 셋이다: ① 지속 중에는 다시
+     못 쏜다(canFireSkill 의 `!S.skillKind`) ② 한 발이 8초다(SKILL_MS.jelly)
+     ③ 전투 한 판이 25~35초다. 즉 곱항을 더 올려도 게이지가 노는 시간만 늘고
+     가동률은 안 오른다. 그래서 포화 직전인 2.0 에서 멈춘다.
+     ⚠ 목표 대역(50~65%)은 이 손잡이로는 못 닿는다 — 닿으려면 SKILL_MS(133 계수)
+       를 올리거나 지속 중 중첩을 허용해야 하고, 둘 다 이 파도의 권한 밖이다.
+       28.5% → 43.9% 는 **가동률 기준 +54%**로, 지시받은 +40~60% 대역 안이다.
+     새 사다리(위 표를 2배 한 값):
+       콤보 1  → 3.36%p → 30 매치
+       콤보 8  → 5.88%p → 17 매치
+       콤보 20 → 10.20%p → 10 매치  (절정: 각성 8초 안에 다음 발이 장전된다)
+     마지막 줄이 사용자가 말한 "거의 이어진다"의 정의다 — .primed 신호가 그것을
+     화면에 이미 말하고 있다(:39346 절).
+     ⚠ 상한은 여전히 SKILL_COMBO_CAP=20 이 잡는다. 곱항은 사다리를 **평행이동**
+       할 뿐 상한을 밀지 않는다 — "잘 풀린 판이 더 잘 풀린다"의 폭주를 막는
+       위 문단의 근거가 그대로 살아 있어야 한다.
+     ⚠ tools/balance-sim-v2.js 는 gaugeGain 공식을 복사해 두었는데(그쪽 :429),
+       이 계수는 거기 없다. 그래서 그 시뮬은 계속 **기준선**(K=1)을 잰다 —
+       의도한 것이다. 전투 가동률은 별도 봇(gates/awaken-uptime.mjs)이 잰다. */
+  var AWAKEN_GAIN_K = 2;
   /* W2.5 ③ (2026-08-20) — 사용자 확정 "스탑모션이 너무 짧아 조금 더 여유를".
      800 → 1000. 컷인은 startCutin/endCutin 이 판 시계를 **통째로 세우고**
      shiftDeadlines 가 멈춘 만큼을 전부 밀어 주므로, 늘어난 200ms 는 제한시간에서
@@ -21200,7 +21325,12 @@ window.TT_SFX = {
                     * TypeError 로 터진다 — 이 목록이 곧 셔임의 정의역이다.
                     * 구버전 juice.js 면 셋 다 no-op 이 되어 컷인이 조용해질 뿐,
                     * 정지·효과·타이머 회계는 사운드와 무관하게 그대로 돈다. */
-                   'spBlast', 'petBell', 'foeStab'];
+                   'spBlast', 'petBell', 'foeStab',
+                   /* W10 ④ — 각성 만땅 전용음. 위 셋과 같은 계약이다: 이 표에
+                    * 이름이 없으면 J.sfx.awakenMax 자체가 안 만들어져 호출이
+                    * TypeError 로 터진다. 구버전 juice.js 면 no-op 이 되어
+                    * 만땅이 조용해질 뿐, 게이지 회계는 그대로 돈다. */
+                   'awakenMax'];
 
   /* 14차 수리 3 — 한 번의 탭 안에서 ui() 가 여러 번 불려도 소리는 한 번만.
      쓰이는 자리는 bindJuice 의 셔임 하나뿐이다(그 주석에 근거를 적어 뒀다). */
@@ -26587,12 +26717,30 @@ window.TT_SFX = {
     if (isClassic()) return;
     if (S.mode !== 'adv') return;
     var was = gaugeFull();
-    store.gauge = clamp(store.gauge + gaugeGain(combo), 0, SKILL_MAX);
+    /* 🚨 W10 ④ (2026-08-21) 사용자 확정 — "각성이 잘하면 거의 이어지게".
+       곱항이 gaugeGain() **안**이 아니라 여기 붙는 이유가 둘이다:
+         ① 133 계수(SKILL_BASE·SKILL_COMBO·SKILL_COMBO_CAP·SKILL_MAX)를 한 값도
+            안 건드린다는 약속. verify.js 의 밸런스 스냅샷은 기존 대문자 상수의
+            **값 변경**을 FAIL 로 보고 신규 상수는 통과시킨다. gaugeGain 은
+            그래서 순수 공식 그대로 남고, tools/balance-sim-v2.js 가 복사해 둔
+            같은 공식(:429)도 계속 맞는다 — 시뮬은 **기준선**을 계속 잰다.
+         ② battleOn() 으로 좁혀 두면 이 손잡이가 정확히 전투에만 닿는다.
+            지금은 모든 모험이 전투라 실효가 같지만, TW_BATTLE=false 원복이
+            성립해야 한다는 이 파일의 규약을 여기서도 지킨다.
+       클래식·엔들리스·데일리는 위 두 줄에서 이미 돌아간다 — 각성 자체가 없다. */
+    store.gauge = clamp(store.gauge + gaugeGain(combo) * (battleOn() ? AWAKEN_GAIN_K : 1),
+                        0, SKILL_MAX);
     if (!was && gaugeFull()) {
       /* 만땅이 된 그 순간만 알린다. 국소 연출로만 — 게이지가 찼다는 것은
-         "쓸 수 있게 됐다"이지 마일스톤이 아니다(전면 효과는 컷인·격파만). */
-      J.sfx.mission();
-      J.vibrate(24);
+         "쓸 수 있게 됐다"이지 마일스톤이 아니다(전면 효과는 컷인·격파만).
+         🚨 W10 ④ — 소리가 mission() 에서 **전용음**으로 갈렸다. 사용자 반려의
+         핵심이 "차올랐다가 귀로 안 들린다"였고, 원인은 미션 달성과 각성 만땅이
+         같은 소리를 쓰고 있었다는 것이다(작은 사건이 큰 사건의 급을 결정해
+         버린다). 새 소리의 설계 근거는 J.sfx.awakenMax 주석에 있다.
+         전투 밖(현재 도달 불가 경로)에서는 종전 소리를 그대로 둔다 — 그 자리의
+         "각성"은 하단 메달이 아니라 떠 있는 스킬 링이고, 급이 다르다. */
+      if (battleOn() && J.sfx.awakenMax) J.sfx.awakenMax(); else J.sfx.mission();
+      J.vibrate(battleOn() ? 40 : 24);
     }
     syncSkill();
   }
@@ -35845,7 +35993,18 @@ window.TT_SFX = {
   border-image:none !important;border:0 !important;border-radius:0 !important;
   background:none !important;background-image:none !important;box-shadow:none !important;
   padding:0 !important;margin:0 !important;
-  min-height:0 !important;height:94px !important;
+  /* 🚨 W10 ③ (2026-08-21) 사용자 반려 — "스킬 메달이 눈에 안 보인다".
+     메달 그림은 `background-size:contain`(:35901)이라 **높이가 곧 크기**이고,
+     그림 비가 718/907 이라 그려지는 폭 = 높이 × 0.7916 이다. 94px 이면 폭 74.4px.
+     위로 얼마나 갈 수 있나는 **가로 예산**이 정한다(390 폭 기준):
+       바 안쪽 = 390 − 좌우 padding 10+10(:36769) = 370
+       메달 넷 + 사이 간격 4×3(:35858) = 370 − 12 = 358 → 한 칸 89.5px
+       → 높이 상한 = 89.5 ÷ 0.7916 = **113px**
+     상한까지 가지 않고 106px 로 잡는다. 이유는 세로 예산이다: 바가 12px 두꺼워지면
+     그만큼 보드가 줄고, 이번 파도는 "보드 공간 확보"를 함께 받았다. W10 ① 이
+     상단에서 14px 을 돌려받았으므로 12px 지출은 그 안에서 소화된다(순증 +2px).
+     화면 결과: 그림 74.4×94 → 83.9×106 (**+12.8%**). */
+  min-height:0 !important;height:106px !important;
 }
 #app.battle #actionbar .act::before{
   content:"";position:absolute;inset:0;
@@ -35882,9 +36041,19 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
 #app.battle #actionbar .act .act-ico{display:none !important;}
 #app.battle #actionbar .act:active{transform:scale(.94);background:none !important;}
 /* 흐림은 "지금 못 쓴다"의 신호지 소멸이 아니다 — .34 는 메달 위에서 그림이
-   통째로 사라져 버려서, 채도와 밝기만 눌러 형태는 남긴다. */
+   통째로 사라져 버려서, 채도와 밝기만 눌러 형태는 남긴다.
+   🚨 W10 ③ — 그 "눌러"가 너무 셌다. 사용자 반려: "필살기 메달이 회색으로
+   뭉개진다". saturate(.42)×brightness(.86)×opacity(.80) 은 세 값이 **곱해져서**
+   실효 채도가 원본의 1/3 수준이 되고, 메달 넷의 면색(적·청·보라·주황)이 서로
+   구별되지 않는 회색 덩어리로 수렴한다 — 0% 상태에서도 "무슨 기술인가"는
+   읽혀야 한다(그것이 이 겹을 나눈 이유이기도 하다).
+   그래서 셋 다 완화하고 contrast 를 한 항 더해 **형태의 윤곽**을 되살린다:
+     채도 .42 → .62 (면색이 서로 구별되는 하한 — 넷을 나란히 놓고 고른 값)
+     밝기 .86 → .94 · 불투명도 .80 → .92 (유리 트레이 위에서 뭉개지지 않게)
+     contrast 1.06 (판·명패·글자의 경계가 살아난다)
+   그래도 활성 메달과는 확실히 구별된다: 활성은 채도 1.0 에 그림자 한 겹이 있다. */
 #app.battle #actionbar .act.off{opacity:1 !important;}
-#app.battle #actionbar .act.off::before{opacity:.80;filter:saturate(.42) brightness(.86);}
+#app.battle #actionbar .act.off::before{opacity:.92;filter:saturate(.62) brightness(.94) contrast(1.06);}
 /* 만땅 펄스는 같은 keyframes(act-urge)를 그대로 쓴다. 배경 링이 사라진 자리는
    메달 자신이 빛나는 것으로 대신한다 — 신호를 하나 더 만들지 않는다. */
 #app.battle #actionbar .act.urge{
@@ -35927,16 +36096,36 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
 }
 
 /* ---- 2. 일시정지 · 성 · 아바타 (실물) ------------------------------------ */
+/* 🚨 W10 ② (2026-08-21) 사용자 반려 — "일시정지가 찌그러진 주황 사각으로 보인다".
+   실측은 **찌그러짐이 아니라 자리와 크기**를 지목했다:
+     · 그림  catalog/duel-btn-pause.webp (152×151) · background-size:contain
+       → skew 0.7%. 늘어난 곳은 한 군데도 없다(비율 스캔 관문의 수치).
+     · 자리  시안(gm-hud-placement2.json pause_button)은 유리판 기준 cy 26.35%
+       — **유리 위에 떠 있는** 버튼이다. 그런데 실측은 cy 9.65% 였다: 버튼이
+       상단바의 흐름에 서 있어서 유리판보다 **위**에 있었고, 그래서 유리 밖
+       빈 하늘에 40px 짜리 코랄 덩어리 하나가 떠 있는 그림이 됐다.
+     · 크기  실측 폭 10.47% vs 시안 9.63%.
+   그래서 흐름에서 빼고 시안 좌표에 박는다. 기준은 유리판 폭(--dh-w, :6646 절):
+     w  = 9.63%   · h 는 원본 비율(152/151)이 정한다 — 늘림 금지
+     cx = 8.60%   → left = (8.60 − 9.63/2)% = 3.785%
+     cy = 26.35%  → top  = (26.35 − 28.66/2)% 의 **높이** 비율이고, 유리판 높이는
+                    폭/3.072(aspect-ratio:1536/500)이므로 폭 기준으로 환산하면
+                    12.02% ÷ 3.072 = 3.913% 다. 좌표계를 폭 하나로 통일해야
+                    유리판이 커지고 작아져도 버튼이 같은 자리에 남는다.
+   ⚠ 시안 rect 의 비(145/143)와 그림의 비(152/151)는 0.7% 차이라 폭을 시안에
+     맞추고 높이는 그림에 맡긴다 — 둘 다 시안에 맞추면 그때 진짜로 찌그러진다.
+   z-index 6 은 W6.5b 의 근거를 그대로 잇는다: #duel-hud 가 DOM 에서 #topbar
+   **다음**이라 나중에 칠해지므로, 버튼 하나만 유리 위로 올린다(상단바를 올리면
+   그 배경까지 함께 올라간다). */
 #app.battle #btn-pause{
   background:url("catalog/duel-btn-pause.webp") center/contain no-repeat !important;
   box-shadow:none !important;border-radius:0 !important;
-  width:40px !important;height:40px !important;
-  /* 🚨 W6.5b ⑥ — HUD 를 34px 끌어올리자 슬래브가 이 버튼 **위**로 올라왔다
-     (#duel-hud 는 DOM 에서 #topbar 다음이라 나중에 칠해진다). 시안에서는 반대로
-     일시정지가 유리판 위에 떠 있다 — 그 순서를 여기서 되돌린다.
-     상단바 자체에 z-index 를 주는 것이 아니라 **버튼 하나**만 올린다: 상단바를
-     올리면 그 배경(전투에서는 없지만 다른 모드에서는 있다)까지 함께 올라간다. */
-  position:relative;
+  position:absolute;
+  left:calc(var(--safe-l) + 4px + 0.03785 * var(--dh-w));
+  top:calc(0.03913 * var(--dh-w));
+  width:calc(0.0963 * var(--dh-w)) !important;
+  height:auto !important;
+  aspect-ratio:152/151;
   z-index:6;
 }
 #app.battle #btn-pause .ic{display:none !important;}
@@ -36847,11 +37036,39 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
   background-size:contain;
   pointer-events:none;
 }
+/* 🚨 W10 ② (2026-08-21) 사용자 반려 — "적·아군·펫 아바타가 너무 작다".
+   실측이 낸 답은 뜻밖이었다: **상자는 이미 시안 그대로다**(아래 세 절의 % 가
+   gm-hud-placement2.json 의 avatar_* 와 소수점까지 같다). 작아 보인 것은 상자가
+   아니라 **그림**이었고, 범인은 `background-size:contain`(:36907) 이다.
+   contain 은 상자 안에 그림을 넣되 **비율을 지켜** 넣으므로, 상자 비와 그림 비가
+   다르면 짧은 축이 남는다. 실측(390×844, 상자 382×124.3):
+     #duel-foe-av  상자 53.3×73(비 0.730) · 그림 387×418(비 0.926)
+                   → 폭이 먼저 차서 그림은 53.3×57.6 — 상자 높이의 **79%** 만 씀
+     #duel-me-av   상자 68×51.6(비 1.318) · 그림 900×1200(비 0.750)
+                   → 높이가 먼저 차서 그림은 38.7×51.6 — 상자 폭의 **57%** 만 씀
+   즉 시안 rect 는 "구름에 얹힌 무리"를 잰 가로 상자인데 우리 그림은 세로 인물
+   한 장이라, 같은 rect 를 줘도 화면에서는 절반만 찬다. 시안 rect 를 그대로 두면
+   영원히 작다.
+   수리 원칙 — **면적을 시안에 맞추고, 비율은 그림에 맡긴다**:
+     ① 상자를 그림이 확실히 높이로 차게 넓힌다(폭이 남는 상자는 contain 아래서
+        아무 해가 없다 — 늘어나지 않고 가운데 설 뿐이다. 이것이 aspect-ratio 를
+        박지 않는 이유이기도 하다: --bs-full/--me-full 은 종·캐릭터마다 비가
+        다르고, 박는 순간 어느 하나는 반드시 여백을 뒤집어쓴다).
+     ② 앉힘점은 시안 그대로 유지한다 — 데몬은 **아랫변**(발이 뼈바 뒤로 물리는
+        자리 = top+height = 81.16%), 아군·펫도 같은 셈으로 아랫변을 고정한다.
+   ⚠ background-position 을 center bottom 으로 내리는 것이 짝이다. 폭이 남는
+     상자에서 center(=center center)면 그림이 공중에 뜬다. */
 #app.battle #duel-foe-av{
   /* W6.5b-5 — 시안 실측(avatar_demon). 시안에서 데몬은 **발이 HP 바 뒤로 물린다** —
-     z-index:2 가 뼈바(5)보다 아래라 그 물림이 이미 성립한다. */
-  left:15.34%;top:22.44%;
-  width:13.94% !important;height:58.72% !important;
+     z-index:2 가 뼈바(5)보다 아래라 그 물림이 이미 성립한다.
+     W10 ② — 높이(58.72%)와 중심(cx 22.31%)은 시안 그대로 두고 **폭만** 넓혔다:
+     그림 비 0.926 이 높이로 차려면 최소 58.72×0.926/3.072 = 17.70% 가 필요해서
+     여유를 붙여 18.50% 로 잡았다(3.072 는 유리판 aspect-ratio — 높이% 를 폭% 로
+     옮기는 환산 상수다). left = 22.31 − 18.50/2 = 13.06%.
+     화면 결과: 그림 53.3×57.6 → 67.6×73 (**높이 +26.7%**). */
+  left:13.06%;top:22.44%;
+  width:18.50% !important;height:58.72% !important;
+  background-position:center bottom;
   /* E3 W8 — 한 장으로 못박혀 있던 자리가 .bs-* 표에 **열렸다**. 폴백을 그대로
      남긴 것이 계약이다: 클래스가 아직 안 붙은 첫 프레임이나 표에 없는 종(種)이
      오면 종전의 그 한 장이 선다 — 빈 사각형이 생길 자리가 없다. */
@@ -36863,8 +37080,24 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
   /* W6.5b-5 — 시안 실측(avatar_cloud). 시안에서 구름은 명패 **위에 얹힌다**(데몬과
      앉힘 방식이 다르다) — 날개바가 z 4 이고 이쪽이 2 라 지금은 뒤로 물린다.
      그 차이는 조각의 알파가 결정하므로 좌표만 옮기고 z 는 안 건드린다. */
-  left:73.90%;top:28.06%;
-  width:17.80% !important;height:41.48% !important;
+  /* W10 ② — 여기는 데몬과 계산이 다르다. 시안 rect(268×207, 비 1.294)는 가로
+     상자인데 그림(900×1200, 비 0.750)은 세로 인물이라 **높이가 먼저 차서** 상자를
+     넓혀도 그림은 안 커진다(위 절의 실측 ②). 그래서 이쪽만은 높이를 올린다.
+     기준은 시안의 **면적**이다: 68×51.6 = 3509px² 를 비 0.750 으로 채우면
+     51.3×68.4 → 높이 68.4/124.3 = **55.00%**(41.48% → +32.6%).
+     폭 20.00% 는 여유칸이다(비 0.93 인 뭉치까지 높이로 차게 한다 —
+     55.00×0.93/3.072 = 16.65% < 20.00%). left = 82.80(시안 cx) − 10 = 72.80%.
+     아랫변은 시안 그대로 69.54%(=28.06+41.48) 에 못 박는다 → top = 69.54 − 55.00.
+     시안이 "구름은 명패 **위에 얹힌다**"고 한 그 얹힘점이 이 아랫변이다.
+     ⚠ 가로 중심만 시안(82.80%)에서 **2.5%p 왼쪽**으로 옮겼다(80.30%). 셋을 한꺼번에
+       키우자 왕자의 왕관 오른쪽이 펫 방울(z-index 3, 위에 선다)에 먹히는 실측이
+       나왔기 때문이다. 시안에서도 둘은 겹치지만(구름 73.90~91.70 vs 방울
+       86.52~98.21) 그쪽 "구름"은 왕관이 없다 — 우리 그림에서는 겹침이 곧
+       머리 절단이다. 옮긴 뒤 겹침은 약 3px 로 줄고 왕관은 온전히 선다.
+       left = 80.30 − 20.00/2 = 70.30%. */
+  left:70.30%;top:14.54%;
+  width:20.00% !important;height:55.00% !important;
+  background-position:center bottom;
   /* W4 (2026-08-20) — 사용자 반려 "내가 선택한 캐릭터가 아니라 이상한 구름이 나옴".
      원인은 정확히 아래 한 줄이었다: !important 로 못 박힌 시안 구름이라
      duelHudMount 가 --duel-me-face 에 무엇을 넣든 화면에서는 늘 구름이 이겼다.
@@ -36886,9 +37119,20 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
   z-index:2;
 }
 #app.battle #duel-baby{
-  /* W6.5b-5 — 시안 실측(avatar_cloud_baby) */
-  left:86.52%;top:5.01%;
-  width:11.69%;height:37.07%;
+  /* W6.5b-5 — 시안 실측(avatar_cloud_baby)
+     W10 ② — 펫 방울은 셋 중 그림이 상자를 가장 잘 채우고 있었다(비 0.956 대
+     0.968 — 실측 44.6×46.1 of 44.6×46.1). 그래도 사용자가 "작다"에 함께 꼽았고,
+     화면에서 이 조각은 46px 짜리다. 그래서 상자 자체를 키운다: 높이 37.07 →
+     40.00%(**+7.9%**), 폭은 그 비에 맞춰 12.70%(40.00×0.956/3.072 = 12.45% 에
+     여유). 중심은 시안 cx 92.36% 유지 → left = 92.36 − 6.35 = 86.01%.
+     ⚠ 44% 까지 갔다가 40% 로 되돌렸다: 44% 에서는 방울이 왕자의 왕관을 덮었다
+       (위 #duel-me-av 절의 그 실측). 왕자를 왼쪽으로 옮기는 것과 이 4%p 를
+       합쳐야 겹침이 3px 로 떨어진다 — 한쪽만으로는 부족했다.
+     ⚠ 윗변(5.01%)을 고정하고 **아래로** 키운다. 위로 키우면 유리판이 화면
+     최상단에 붙은 지금(W10 ①) 방울 머리가 화면 밖으로 잘린다. */
+  left:86.01%;top:5.01%;
+  width:12.70%;height:40.00%;
+  background-position:center bottom;
   /* W2.5 ② (2026-08-20) — 사용자 반려 "우상단 방울이 내가 고른 펫이 아니다".
      #duel-me-av 와 같은 개방 문법이다: duelHudMount 가 선택 동료의 face 를
      --pet-face 로 주입하고, 주입이 없을 때만(= 펫 미선택) 시안 구름이 선다.
@@ -38771,8 +39015,13 @@ html[lang="ko"] #modal-mode .r10-ribbon > h2{
      상자 비를 원판으로 되돌리면 오히려 시안보다 8px 두꺼워진다.
    ---------------------------------------------------------------------------- */
 #app.battle #duel-hud{
-  /* 위치 교정(W6.5b-4) 유지 — 근거는 그 파도의 주석. */
-  margin-top:-34px !important;
+  /* 🚨 W10 ① — 위치 교정(W6.5b-4)의 `margin-top:-34px` 는 **끌어올리기**였다:
+     상단바가 48px 을 먹으니 그중 34 를 되돌려 받는 식이었고, 남은 14px 이
+     사용자가 반려한 그 빈 띠다. 이제 :6646 절이 상단바를 높이 0 으로 접었으므로
+     끌어올릴 것이 없다 — 0 이면 판이 safe-area 바로 밑, 곧 화면 최상단에 선다.
+     ⚠ 음수로 되돌리지 말 것: 상단바가 0 인 지금 음수 마진은 판을 화면 **밖으로**
+     밀어 윗변을 잘라 낸다("잘림 없이"가 반려의 절반이었다). */
+  margin-top:0 !important;
   margin-bottom:-8px !important;
   border-image-source:none !important;
   border-image-width:0 !important;
@@ -38782,7 +39031,16 @@ html[lang="ko"] #modal-mode .r10-ribbon > h2{
   background-image:url("catalog/glass-hud-full.webp") !important;
   background-repeat:no-repeat !important;
   background-position:center top !important;
-  background-size:100% 100% !important;
+  /* 🚨 W10 ③ — 비율 스캔이 잡은 **유일한 원본 비율 위반**이 이 줄이었다.
+     glass-hud-full.webp 는 1698×590(비 2.878)인데 상자는 aspect-ratio:1536/500
+     (비 3.072)이라, `100% 100%` 는 그림을 세로로 6.3% 눌러 그렸다.
+     `contain` 은 좌우에 24px 의 빈 틈을 내고 `cover` 는 유리의 둥근 윗변을
+     잘라 내므로, 폭만 맞추고 높이는 원본이 정하게 둔다(`100% auto`).
+     그 결과 그림이 상자보다 8.4px(390 폭 기준) 아래로 흘러넘치는데, 그 자리는
+     #hud-row 가 D1 예약으로 비워 둔 34px 이라 아무것도 가리지 않는다
+     (overflow 는 :36855 에서 이미 visible 이다). 자식들의 % 좌표계는 상자
+     기준이라 한 픽셀도 안 움직인다 — 늘어난 그림만 제자리를 찾는다. */
+  background-size:100% auto !important;
 }
 /* 조각 3장 배선 — 통짜 판으로 대체되어 봉인(삭제 0). 되돌리기는 이 주석 한 쌍.
 #app.battle #duel-hud::before{
@@ -39152,23 +39410,38 @@ html[lang="ko"] #modal-mode .r10-ribbon > h2{
        크게 벌어지는 것이 의도이고(사용자: "각성 유지 시간이 점수를 극심하게
        가른다"), 그 벌어짐은 **배수가 아니라 플레이어의 손**이 만든다.
    =========================================================================== */
+/* 🚨 W10 ④ (2026-08-21) 사용자 재강조 — "시각 효과 더 크게. 정신없이 숫자 맞추다가도
+   **시야 구석에서** 느껴질 것." 주변시(peripheral vision)는 색상 해상도가 낮고
+   대신 **밝기 변화와 움직임**에 민감하다. 그래서 세 축을 각각 그쪽으로 민다:
+     ① 글로우  퍼짐 반경을 키우고(7/18 → 12/30px) 채도 대신 **밝기**를 함께
+        흔든다(brightness 1.0↔1.16). 색만 도는 빛은 곁눈에 안 잡히고, 밝아졌다
+        어두워지는 빛은 잡힌다.
+     ② 바운스  튐 폭 −4px/1.085 → −7px/1.13. 움직임이 주변시의 첫 번째 단서다.
+     ③ 스파클  22% → 34% 크기, 번쩍임을 주기당 한 번에서 **두 번**으로(8%·52%).
+   주기(1.15s)는 안 바꾼다 — 그 값은 필살기 `.urge` 와 리듬을 나누는 값이고,
+   빨라지면 "급하다"가 되지 "찼다"가 되지 않는다.
+   ⚠ 여전히 `#btn-shuffle` 스코프다: 넷 중 각성만 이 급으로 빛나야 눈이 고른다. */
 @keyframes w65-awk-glow{
-  0%,100%{ filter:drop-shadow(0 0 7px rgba(255,214,120,.95)) drop-shadow(0 0 18px rgba(255,120,220,.62)); }
-  25%    { filter:drop-shadow(0 0 11px rgba(120,255,214,.95)) drop-shadow(0 0 24px rgba(120,180,255,.66)); }
-  50%    { filter:drop-shadow(0 0 9px rgba(255,120,220,.95))  drop-shadow(0 0 22px rgba(255,214,120,.66)); }
-  75%    { filter:drop-shadow(0 0 13px rgba(190,140,255,.95)) drop-shadow(0 0 26px rgba(120,255,214,.62)); }
+  0%,100%{ filter:drop-shadow(0 0 12px rgba(255,214,120,1)) drop-shadow(0 0 30px rgba(255,120,220,.72)) brightness(1); }
+  25%    { filter:drop-shadow(0 0 18px rgba(120,255,214,1)) drop-shadow(0 0 38px rgba(120,180,255,.76)) brightness(1.16); }
+  50%    { filter:drop-shadow(0 0 15px rgba(255,120,220,1)) drop-shadow(0 0 34px rgba(255,214,120,.76)) brightness(1.04); }
+  75%    { filter:drop-shadow(0 0 21px rgba(190,140,255,1)) drop-shadow(0 0 42px rgba(120,255,214,.72)) brightness(1.16); }
 }
 @keyframes w65-awk-bounce{
   0%,70%,100%{ transform:translateY(0) scale(1); }
-  78%        { transform:translateY(-4px) scale(1.085); }
-  86%        { transform:translateY(0) scale(.972); }
-  93%        { transform:translateY(-2px) scale(1.028); }
+  78%        { transform:translateY(-7px) scale(1.13); }
+  86%        { transform:translateY(0) scale(.960); }
+  93%        { transform:translateY(-3px) scale(1.042); }
 }
 @keyframes w65-awk-spark{
   0%  { opacity:0; transform:scale(.35) rotate(0deg); }
-  8%  { opacity:1; transform:scale(1.18) rotate(28deg); }
+  8%  { opacity:1; transform:scale(1.30) rotate(28deg); }
   24% { opacity:0; transform:scale(.55) rotate(64deg); }
-  100%{ opacity:0; transform:scale(.35) rotate(64deg); }
+  /* 두 번째 번쩍임 — 주기의 뒷절반. 한 번만 반짝이면 곁눈이 놓치는 주기가 생긴다. */
+  46% { opacity:0; transform:scale(.40) rotate(96deg); }
+  52% { opacity:1; transform:scale(1.14) rotate(122deg); }
+  66% { opacity:0; transform:scale(.55) rotate(150deg); }
+  100%{ opacity:0; transform:scale(.35) rotate(150deg); }
 }
 #app.battle #btn-shuffle.act.urge{
   animation:w65-awk-bounce 1.15s var(--ease) infinite;
@@ -39181,10 +39454,13 @@ html[lang="ko"] #modal-mode .r10-ribbon > h2{
 #app.battle #btn-shuffle.act.urge::after{
   content:"";
   position:absolute;
+  /* W10 ④ — 22% → 34%. 메달이 106px 로 커졌으므로(:35890) 같은 %가 더 큰
+     조각이 되지만, 사용자 요구는 그 이상이었다. 우상단 배지 칩과 겹치지 않는
+     상한이 34% 다(칩은 top:5px/right:9px 의 19px 알약 — :35970 절). */
   right:16%;
   top:12%;
-  width:22%;
-  height:22%;
+  width:34%;
+  height:34%;
   pointer-events:none;
   background-image:
     linear-gradient(90deg, rgba(255,255,255,0) 44%, rgba(255,255,255,.95) 50%, rgba(255,255,255,0) 56%),
@@ -39402,6 +39678,20 @@ html[lang="ko"] #modal-mode .r10-ribbon > h2{
     grid-row: 1;
     /* 오른쪽 62px 은 #hero-slot 자리였다. 슬롯이 좌 날개로 갔으므로 회수. */
     padding-right: calc(var(--safe-r) + 16px);
+  }
+  /* 🚨 W10 ② — 세로에서 일시정지는 유리판 폭의 9.63% 로 시안 자리에 박히지만
+     (:6646·:35970), 가로에서는 그 셈이 성립하지 않는다: 상단바는 1/4 열을 통째로
+     쓰는데 유리판은 max-width:860px 로 **가운데 고정**이라 둘의 폭이 다르고,
+     1200px 화면에서 9.63% 는 115px 짜리 버튼이 된다. 가로에서는 W9 까지의
+     흐름 배치를 그대로 쓴다 — 세로 수리 전과 픽셀이 같다. */
+  #app.battle #screen-game.active #topbar {
+    padding: calc(var(--safe-t) + 6px) calc(var(--safe-r) + 16px) 2px calc(var(--safe-l) + 12px);
+  }
+  #app.battle #screen-game.active #btn-pause {
+    position: relative;
+    left: auto; top: auto;
+    width: 40px !important; height: 40px !important;
+    aspect-ratio: auto;
   }
   #screen-game.active #tb-stats {
     max-width: 660px;
