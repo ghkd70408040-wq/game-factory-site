@@ -2478,9 +2478,23 @@ button {
   align-items: center;
   justify-content: center;
   padding: calc(var(--safe-t) + 18px) calc(var(--safe-r) + 18px) calc(var(--safe-b) + 18px) calc(var(--safe-l) + 18px);
-  background: rgba(8, 6, 14, .62);
-  -webkit-backdrop-filter: blur(10px) saturate(1.1);
-  backdrop-filter: blur(10px) saturate(1.1);
+  /* W2.5 ⑤ (2026-08-20) — 사용자 반려 "배경 블러가 너무 강해서 감성이 떨어진다".
+     이 줄 둘이 **모달 뒤 화면 전체**에 걸리는 층이다(판 자신의 흐림은 .jbox--modal
+     이 따로 들고 있다). 옛 값은 62% 짜리 검정 스크림 + blur(10px) 이라 뒤 화면이
+     형체 없는 회색 덩어리가 됐고, 그 위에 얹힌 크림 틴트 판까지 더해져 사용자가
+     말한 "무채색·혼탁"이 완성됐다.
+     새 값은 **플레이 팝업(#modal-mode)이 이미 쓰고 있던 값**이다 — 사용자가
+     기준으로 지목한 그 창이다. 즉 새로 지어낸 수가 아니라, 통과한 한 자리의 값을
+     열 창 전체로 넓히는 것이다(§#modal-mode.modal 은 이제 같은 값을 두 번 쓴다).
+     정본 시안(gm-modal-pink-target.jpg) 실측도 같은 방향을 가리킨다: 판 안쪽의
+     고주파 에너지(σ=6.8)가 판 바깥(σ=2.4)보다 **높다** — 시안의 배경은 판 뒤에서
+     흐려지지 않는다.
+     ⚠ 단축(`background:`)이 아니라 롱핸드로 쓴다 — 이 파일의 규율이다(단축은
+     background-image/clip 까지 함께 리셋한다). 옛 줄도 단축이었으나 여기서 바로잡는다.
+     옛 값: background rgba(8,6,14,.62) · blur(10px) saturate(1.1). */
+  background-color: rgba(26, 14, 38, .28);
+  -webkit-backdrop-filter: blur(2.5px) saturate(1.06);
+  backdrop-filter: blur(2.5px) saturate(1.06);
   animation: fadein 200ms var(--ease);
 }
 .modal[hidden] { display: none; }
@@ -3034,7 +3048,15 @@ li.roll-in { animation: rollin 380ms var(--spring) backwards; }
   :where(:root:not([data-theme="dark"])) #mascot .ms-shadow { fill: rgba(34, 27, 46, .18); }
   :where(:root:not([data-theme="dark"])) .stat { background: rgba(34, 27, 46, .04); }
   :where(:root:not([data-theme="dark"])) .act { background: rgba(34, 27, 46, .05); }
-  :where(:root:not([data-theme="dark"])) .modal { background: rgba(60, 48, 34, .3); }
+  /* W2.5 ⑤ — 라이트 테마의 스크림도 같이 식힌다. 옛 값 rgba(60,48,34,.3) 은
+     **갈색**이라(파랑 최저) 뒤 화면을 누렇게 눌렀고, 그 누런 기운이 크림 틴트와
+     겹쳐 사용자가 말한 "혼탁"의 나머지 절반이었다. α 는 거의 그대로(.30→.26)
+     두고 색만 다크 테마와 같은 보랏빛 계열로 옮긴다 — 두 테마에서 팝업 뒤의
+     **색 기울기가 같아야** 판의 분홍이 테마마다 다르게 읽히지 않는다.
+     `background` 단축을 `background-color` 롱핸드로 바꾼 것은 이 파일의 규율이다
+     (단축은 background-image/clip 까지 리셋한다 — 젤리판 사고 전력).
+     옛 값: background: rgba(60, 48, 34, .3); */
+  :where(:root:not([data-theme="dark"])) .modal { background-color: rgba(72, 56, 86, .26); }
   :where(:root:not([data-theme="dark"])) .howto-art { background: rgba(34, 27, 46, .04); }
   :where(:root:not([data-theme="dark"])) #tut-stage { background: rgba(34, 27, 46, .04); }
   :where(:root:not([data-theme="dark"])) #combo-bar { background: rgba(34, 27, 46, .1); }
@@ -3228,7 +3250,9 @@ li.roll-in { animation: rollin 380ms var(--spring) backwards; }
 :where(:root[data-theme="light"]) .icon-btn { background: rgba(34, 27, 46, .05); }
 :where(:root[data-theme="light"]) .stat { background: rgba(34, 27, 46, .04); }
 :where(:root[data-theme="light"]) .act { background: rgba(34, 27, 46, .05); }
-:where(:root[data-theme="light"]) .modal { background: rgba(60, 48, 34, .3); }
+/* W2.5 ⑤ — 위 13A 사본과 **한 값**이어야 한다(두 진입점 동기화 규약).
+   근거는 그쪽 주석. 옛 값: background: rgba(60, 48, 34, .3); */
+:where(:root[data-theme="light"]) .modal { background-color: rgba(72, 56, 86, .26); }
 :where(:root[data-theme="light"]) .howto-art { background: rgba(34, 27, 46, .04); }
 :where(:root[data-theme="light"]) #tut-stage { background: rgba(34, 27, 46, .04); }
 :where(:root[data-theme="light"]) #combo-bar { background: rgba(34, 27, 46, .1); }
@@ -5635,6 +5659,74 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   background: repeating-linear-gradient(135deg,
     rgba(70, 58, 46, .55) 0 5px, rgba(30, 24, 20, .55) 5px 10px);
   box-shadow: inset 0 0 0 2px rgba(20, 16, 12, .7);
+}
+
+/* ---- 17.9b W2.5 ④ 특수 마크 과일 (발주 0 — 코드 배지) ---------------------
+   §7A 의 특수 타일들은 타일 **전체**를 다른 재질로 바꾼다(무지개·폭탄 케이싱·
+   서리). 마크 과일은 정반대다: 과일은 과일 그대로 두고 **우상단에 작은 마크
+   하나**만 얹는다 — 사용자 주문이 "특수 마크 과일"이고, 값(숫자)과 색(과일)이
+   그대로 읽혀야 짝을 찾는 눈이 안 흔들린다. 그래서 칸도 sp 가 아니라 mk 다
+   (JS 쪽 paintTile 주석 참조): `html[data-fruit="1"] .tile:not([data-sp])` 가
+   거는 과일 스킨이 여기서는 벗겨지지 않는다.
+
+   그림은 전부 CSS 다 — 이모지 글리프 두 개(🐾/⭐)와 알약 하나. 발주도, 파일도,
+   base64 도 없다. 원반을 한 겹 까는 이유는 대비다: 과일 색이 9종이라 마크만
+   얹으면 노란 과일 위의 금색 별이 사라진다.
+
+   §7A 가 아니라 여기(.dead / .pop 선언 뒤)에 사는 이유: 죽은 칸·터지는 칸에서
+   배지를 걷는 규칙이 뒤에 와야 순서로 이긴다. 배지는 (0,2,1) 로 §7A 의
+   `[data-sp]` 얼굴들과 같은 급이지만, 둘이 한 타일에 겹칠 일은 없다(스폰이
+   sp 붙은 칸을 건너뛴다). */
+.tile[data-mk]:not(.dead)::after {
+  content: var(--mk-glyph, '');
+  position: absolute;
+  top: 3%;
+  right: 3%;
+  width: 42%;
+  height: 42%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* 글리프는 타일 크기에 비례해야 한다. 타일은 컨테이너 쿼리 대상이 아니므로
+     크기 계보(--ts)를 그대로 읽는다 — game.js layout() 이 #board 에 심고 타일이
+     상속받는 그 값이고, 숫자 뱃지(`.48`)가 이미 같은 자를 쓴다(§7 line 1560). */
+  font-size: calc(var(--ts, 40px) * .26);
+  line-height: 1;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 3;
+  /* ⚠ 롱핸드 둘로 나눈다(단축 금지 규율). 나누는 것이 기능상으로도 옳다: 아래
+     `--mk-disc` 는 radial-gradient 라 background-color 에 못 들어가고, 대비용
+     흰 원반은 색이라 background-image 에 못 들어간다. 변수가 없는 mk 값이
+     생기면 흰 원반만 남아 배지가 사라지지 않는다. */
+  background-color: rgba(255, 255, 255, .92);
+  background-image: var(--mk-disc, none);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, .38),
+    inset 0 0 0 1.5px rgba(255, 255, 255, .85);
+  animation: mkpulse 1.5s var(--ease) infinite;
+}
+.tile[data-mk="pet"] {
+  --mk-glyph: '🐾';
+  --mk-disc: radial-gradient(circle at 38% 32%, #FFE3F0 0 30%, #FFB6D5 62%, #FF8FC5 100%);
+}
+.tile[data-mk="star"] {
+  --mk-glyph: '⭐';
+  --mk-disc: radial-gradient(circle at 38% 32%, #FFF6D2 0 30%, #FFE08A 62%, #FFC53D 100%);
+}
+/* 터지는 중·죽은 칸에서는 배지가 먼저 사라진다. §7A 의 gold/ice ::after 가
+   `.pop`/`.rowgo` 에서 opacity:0 이 되는 것과 **같은 문법**이다 — 빈 우물 위에
+   발자국만 떠 있으면 그 칸이 아직 살아 있는 것으로 읽힌다. */
+.tile[data-mk].pop::after,
+.tile[data-mk].bombgo::after,
+.tile[data-mk].rowgo::after,
+.tile[data-mk].dead::after { opacity: 0; animation: none; }
+@keyframes mkpulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.12); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tile[data-mk]:not(.dead)::after { animation: none; }
 }
 
 /* ---- 17.10 모험 중 화면 상태 ----------------------------------------------
@@ -19494,7 +19586,12 @@ window.TT_SFX = {
   var SKILL_BASE = 1.5;
   var SKILL_COMBO = 0.18;
   var SKILL_COMBO_CAP = 20;
-  var SKILL_CUTIN_MS = 800;          // 전면 컷인 (타임스톱 포함, 탭으로 스킵)
+  /* W2.5 ③ (2026-08-20) — 사용자 확정 "스탑모션이 너무 짧아 조금 더 여유를".
+     800 → 1000. 컷인은 startCutin/endCutin 이 판 시계를 **통째로 세우고**
+     shiftDeadlines 가 멈춘 만큼을 전부 밀어 주므로, 늘어난 200ms 는 제한시간에서
+     한 톨도 새지 않는다(§25 정지 규율). 스킵은 그대로 SKILL_CUTIN_MIN_MS 뒤부터.
+     옛 값: 800. */
+  var SKILL_CUTIN_MS = 1000;         // 전면 컷인 (타임스톱 포함, 탭으로 스킵)
   var SKILL_CUTIN_MIN_MS = 260;      // 이보다 일찍은 스킵되지 않는다 (오폭 방지)
   /* 지속시간 — 스펙 고정값. 왕자 6초 / 공주 8초. */
   /* E3 W7 — 신규 둘은 **길이만** 다른 변주다(효과 자체는 위 둘 중 하나 그대로).
@@ -19599,9 +19696,16 @@ window.TT_SFX = {
      아래 넷은 **연출 전용**이다. 밸런스 표에 들어가는 값은 하나도 없다:
      타격감을 만드는 것은 밀리초 셋(히트스톱)이고, 나머지 둘은 아직 등록되지
      않은 동료 둘의 예약 상수라 지금 이 판에서 읽히는 경로가 없다. */
-  var HITSTOP_LIGHT_MS = 60;         // 작은 사건 — 적 스킬 착탄·방패
-  var HITSTOP_MS = 78;               // 보통 — 펫 발동
-  var HITSTOP_HEAVY_MS = 90;         // 필살기 착탄. 90ms 를 넘기면 "멈췄다"가 아니라 "끊겼다"
+  /* W2.5 ③ (2026-08-20) — 사용자 확정 상향. 옛 값 60·78·90 은 "멈췄다"가 아니라
+     "살짝 걸렸다"로 읽혔다(사용자: "스탑모션이 너무 짧아 조금 더 여유를").
+     ⚠ 이 셋이 걸리는 자리는 **전부 스킬·펫·적 스킬 착탄**이다 — 일반 매치는
+     hitStop 을 한 번도 부르지 않는다(resolveMatch 에 호출이 없다). 그래서 상향이
+     연타 리듬을 건드릴 경로가 아예 없고, 정지 중에는 판 시계도 함께 서므로
+     제한시간 손해도 0 이다.
+     옛 값: 60 / 78 / 90. */
+  var HITSTOP_LIGHT_MS = 110;        // 작은 사건 — 적 스킬 착탄·방패
+  var HITSTOP_MS = 140;              // 보통 — 펫 발동
+  var HITSTOP_HEAVY_MS = 180;        // 필살기 착탄. 여기가 이 게임에서 가장 무거운 한 방이다
   var DUEL_MONGLE_FREEZE_MS = 4000;  // (다음 파도 예약) 몽글 "시간 웅덩이" — 뭉치의 짧은 변주
   var DUEL_CHURUP_ROWS = 1;          // (다음 파도 예약) 츄릅 "한 입 재굴림" — 다시 굴릴 행 수
 
@@ -20434,6 +20538,10 @@ window.TT_SFX = {
       var o = { v: c.v, dead: !!c.dead };
       if (c.sp) o.sp = c.sp;
       if (c.ice) o.ice = c.ice | 0;
+      /* W2.5 ④ — 마크도 EXT 필드다. 여기서 빠지면 Undo 한 번에 판 위의 펫/각성
+         과일이 조용히 증발하거나(되돌린 판에 마크 없음) 되살아난다(이미 쓴
+         마크가 다시 생김). sp/ice 와 같은 이유로 같은 줄에 산다. */
+      if (c.mk) o.mk = c.mk;
       out.push(o);
     }
     return out;
@@ -20833,6 +20941,46 @@ window.TT_SFX = {
   var popBurstAt = 0;
   var POP_BURST_MS = POP_MS * 2;
 
+  /* =========================================================================
+   * W2.5 ① - 무대기 연속 매칭 (낙하·리필 중에도 매칭 허용)
+   *
+   * W2 가 연 것은 **팝 단계**뿐이었다. 재배치 단계(중력/리필/행소거)는 그대로
+   * S.busy 로 막혀 있었고, 그 구간이 전투에서 340ms · 타모드에서 460ms 다.
+   * 사용자 반려: "과일 내려오는 것 기다리는 게 답답해".
+   *
+   * 관찰 하나로 그 대기가 통째로 사라진다: 재배치의 **배열 스왑과 재인덱싱은
+   * 동기적으로 끝난다**. runBattleRefill 을 예로 들면
+   *   S.cells = res.cells → tileEls = next → paintTile(전원, data-i 재부여)
+   *   → 출발 위치 찍기 → .fall → layout()
+   * 이 전부가 한 태스크 안에서 끝나고, 그 뒤에 남는 것은 CSS transition 이
+   * translate3d 를 300ms 동안 보간하는 일뿐이다. 즉 **논리 그리드는 애니메이션이
+   * 시작되는 시점에 이미 최종값**이고, 매치 판정이 읽는 자료(S.cells / data-i /
+   * tileEls 순서)는 그 순간부터 완전히 정합하다.
+   *
+   * 그래서 잠금 해제를 "애니 완료(FALL_MS+40 뒤 콜백)"가 아니라 **동기 재인덱싱
+   * 직후**로 앞당긴다. 두 접점 모두 layout() 바로 다음 줄이다.
+   *   - runBattleRefill : 전투 (BATTLE_FALL_MS+40 = 340ms 회수)
+   *   - runRowCollapse  : 타모드의 마지막 단계 (FALL_MS+40 = 460ms 회수)
+   *     행 플래시·좌→우 스윕(약 470ms)은 **연출**이라 그대로 잠가 둔다 —
+   *     그 구간은 판이 아직 안 갈렸고, 여기서까지 열면 두 번째 popSettle 이
+   *     첫 소거가 착지하기 전에 또 소거를 걸어 W2 주석 (b) 가 되살아난다.
+   *
+   * 뒤에 남는 것은 `.fall` 클래스를 걷는 청소 타이머 하나뿐인데, 이제 그 타이머가
+   * 도는 동안 **다음 낙하가 이미 시작돼 있을 수 있다**. 옛 타이머가 새 낙하의
+   * .fall 을 걷어 버리면 진행 중인 타일이 그 자리에서 뚝 끊긴다. 그래서 세대를
+   * 하나 둔다: 청소는 **가장 새로운 낙하의 타이머만** 한다.
+   *
+   * 연쇄가 겹칠 때 화면이 성립하는 근거(코드 변경 없이 성립한다):
+   *   - positionTile 은 index → transform 순수 함수라, 재배열이 몇 번 겹쳐도
+   *     각 엘리먼트는 자기 최종 인덱스의 자리를 받는다.
+   *   - 이미 .fall 을 달고 날아가던 타일은 layout() 이 목표만 새로 찍으므로
+   *     **현재 보간 위치에서 새 목표로 재지향**된다(끊기지 않는다).
+   *   - 팝 연출은 W2 필수수리 1 이 이미 엘리먼트 참조와 좌표를 캡처해 두었으므로,
+   *     이동 중인 타일을 터뜨려도 그 타일 자신에서 파편이 난다.
+   * 스킬·컷인·연출(fxBusy) 중 정지는 이 변경과 무관하게 그대로다.
+   * ========================================================================= */
+  var fallGen = 0;
+
   function later(fn, ms) {
     var id = setTimeout(function () {
       var k = timers.indexOf(id);
@@ -20850,6 +20998,9 @@ window.TT_SFX = {
     popLive = 0;
     popGen = 0;
     popBurstAt = 0;
+    /* W2.5 - 낙하 세대도 타이머와 한 몸이다. 여기서 버려지는 later() 중에
+       `.fall` 청소가 섞여 있으므로 같이 0 으로 돌린다. */
+    fallGen = 0;
   }
 
   function now() {
@@ -21984,6 +22135,10 @@ window.TT_SFX = {
       'duel.petout': 'No pet skill left this round.',
       'duel.petempty': 'Nothing left to peck.',
       'duel.petpeck': 'Peck! {n} tiles cleared',
+      /* W2.5 ④ — 마크 과일의 플로트 문구. 토스트가 아니라 **보드 위 플로트**라
+         짧아야 한다: 터진 그 자리에서 한 줄로 읽히고 사라지는 글자다. */
+      'mk.pet': '+1 PET!',
+      'mk.star': 'SPECIAL MAX!',
       /* W3 — 기술이 "숫자 멈춤"으로 승격되면서 문구도 두 사실을 다 말한다:
          시계도 멈추고 악당 게이지도 멈춘다. 하나만 말하면 나머지 하나는
          플레이어가 영영 모르는 효과가 된다. */
@@ -22657,6 +22812,9 @@ window.TT_SFX = {
       'duel.petout': '이번 판 펫 스킬을 다 썼어요.',
       'duel.petempty': '쪼아먹을 타일이 없어요.',
       'duel.petpeck': '쪼아먹기! {n}칸 정리',
+      /* W2.5 ④ — 마크 과일의 플로트 문구(사용자 확정 문구 그대로). */
+      'mk.pet': '+1 펫!',
+      'mk.star': '각성 MAX!',
       /* W3 — 기술이 "숫자 멈춤"으로 승격되면서 문구도 두 사실을 다 말한다:
          시계도 멈추고 악당 게이지도 멈춘다. 하나만 말하면 나머지 하나는
          플레이어가 영영 모르는 효과가 된다. */
@@ -23366,6 +23524,15 @@ window.TT_SFX = {
       el.removeAttribute('data-sp');
     }
     el.classList.toggle('iced1', sp === 'ice' && (c.ice | 0) >= 1);
+    /* W2.5 ④ — 특수 마크. sp 와 **같은 문법**(속성 하나, CSS 가 그림 전부 소유)
+       이지만 칸이 달라서 서로를 덮지 않는다: 과일 스킨은 [data-sp] 만 보므로
+       마크 과일은 끝까지 과일로 남고, 배지는 `.tile[data-mk]::after` 가 그린다. */
+    var mk = c.mk || '';
+    if (mk) {
+      if (el.getAttribute('data-mk') !== mk) el.setAttribute('data-mk', mk);
+    } else if (el.hasAttribute && el.hasAttribute('data-mk')) {
+      el.removeAttribute('data-mk');
+    }
     positionTile(el, i);
   }
 
@@ -27334,6 +27501,27 @@ window.TT_SFX = {
       }
     }
 
+    /* --- 4d. W2.5 ④ 특수 마크 과일의 **수확** -------------------------------
+     * 여기서는 세고 **지우기만** 한다. 효과 적용은 아래 4e 로 미루는데, 이유는
+     * ⭐ 각성 하나 때문이다: 각성은 게이지를 MAX 로 **못박는** 것이라 gaugeBump
+     * 뒤에 와야 한다 — 앞에 두면 같은 매치의 gaugeBump 가 이미 MAX 인 값에
+     * clamp 를 한 번 더 걸 뿐이라 결과는 같지만, "찼다"를 알리는 gaugeBump 의
+     * 만땅 전이 감지(was → gaugeFull)가 각성이 아니라 콤보의 공으로 기록된다.
+     * 폭탄에 휩쓸린 마크도 센다(blown) — 플레이어 입장에서 "내가 터뜨렸다"는
+     * 같은 사실이고, 여기서 예외를 두면 폭탄 옆의 마크가 그냥 사라져 보인다.
+     * 마크를 **즉시 지우는** 것이 이중 발동을 막는 유일한 장치다: 이 셀은 곧
+     * dead 가 되어 리필에 밀려 나가지만, 그 사이에 판을 읽는 경로(스냅샷·저장·
+     * findFullDeadRows)가 아직 마크를 볼 수 있다. */
+    var mkPet = 0, mkStar = 0;
+    for (var mki = 0; mki < dying.length + blown.length; mki++) {
+      var mkIdx = mki < dying.length ? dying[mki] : blown[mki - dying.length];
+      var mkc = S.cells[mkIdx];
+      if (!mkc || !mkc.mk) continue;
+      if (mkc.mk === 'pet') mkPet++;
+      else if (mkc.mk === 'star') mkStar++;
+      mkc.mk = '';
+    }
+
     // --- 6. score: base × gold × fever, then the bomb bonus -----------------
     /* 배수 합성 (SECTION 8B 계약):
      *   round( 10 × stage × comboScoreMult(combo) × gold × fever × passive )
@@ -27392,6 +27580,43 @@ window.TT_SFX = {
          TW_BATTLE=false 원복이 성립해야 하기 때문이다. */
       if (!battleOn() && S.mode === 'adv' && S.advPlan && S.advPlan.boss) {
         bossOnMatch(gain + bombGain, va, vb, tw);
+      }
+    }
+
+    /* --- 4e. W2.5 ④ 마크 효과 적용 -----------------------------------------
+     * 4d 가 센 것을 여기서 쓴다. gaugeBump 다음 줄인 이유는 4d 주석 참조.
+     * 두 효과 다 **전투 전용**이다. 마크 자체가 battleRefill 에서만 나므로
+     * 비전투 판에는 mk 가 존재할 수 없지만, 방어적으로 게이트를 한 겹 둔다 —
+     * 저장된 옛 판이나 손잡이(window.Game)로 심어진 셀이 여기 닿을 수 있다. */
+    if ((mkPet || mkStar) && battleOn()) {
+      var mkC = tileCenter(dying.length ? dying[0] : a);
+      if (mkPet) {
+        /* 🐾 펫 과일 — 잔여 +1. 상한은 DUEL_PET_MAX 가 아니라 MK_PET_CAP(= +2)이다:
+           기본 상한을 그대로 쓰면 판을 시작하자마자 꽉 차 있는 잔여 때문에 마크가
+           **아무 일도 안 하는** 순간이 흔해지고, 그러면 배지가 거짓말이 된다.
+           상한을 아주 풀지 않는 것은 반대쪽 이유다 — 펫은 비데미지 유틸이라
+           쌓이면 전투가 통째로 안전해진다. */
+        var pl = S.duel.petLeft | 0;
+        var pn = Math.min(pl + mkPet, MK_PET_CAP);
+        S.duel.petLeft = pn;
+        if (pn > pl) {
+          floatOnBoard(mkC.x, mkC.y - 44, t('mk.pet'), '#FF8FC5');
+          badgePop('undo-badge');
+        }
+        J.sfx.mission();
+        J.vibrate(20);
+      }
+      if (mkStar) {
+        /* ⭐ 각성 과일 — 게이지를 즉시 만땅. gaugeBump 와 같은 저장 규율을 따른다
+           (여기서 persist 하지 않는다 — 모험의 saveProgress 가 매 매치 쓴다). */
+        store.gauge = SKILL_MAX;
+        syncSkill();
+        floatOnBoard(mkC.x, mkC.y - 72, t('mk.star'), '#FFD34D');
+        J.sfx.mission();
+        J.vibrate(28);
+        if (typeof window !== 'undefined') {
+          J.shockwave(mkC.x, mkC.y, '#FFD34D');
+        }
       }
     }
 
@@ -27669,6 +27894,33 @@ window.TT_SFX = {
   var DUEL_REROLL_MAX = 8;
   var BATTLE_SALT = 0x5EED1A11;
 
+  /* =========================================================================
+   * W2.5 ④ — 특수 마크 과일 2종 (밸런스 손잡이는 **여기 넷이 전부**다)
+   *
+   * 왜 sp 가 아니라 새 칸(mk)인가. 기존 특수 타일(wild/gold/ice/bomb/block)은
+   * 전부 `c.sp` 한 칸을 나눠 쓰고, 그 칸은 **규칙**에 물려 있다 — isValidPairEx
+   * 의 wild, resolveMatch 의 ice 차감·bomb 폭발, applySpecials 의 후보 선정,
+   * 그리고 스킨 쪽 `html[data-fruit="1"] .tile:not([data-sp])` 까지. sp 에 값을
+   * 하나 더 얹으면 그 다섯 곳이 전부 "모르는 특수"를 만나고, 무엇보다 과일
+   * 스킨이 벗겨져 **과일이 아닌 타일**이 된다 — 사용자가 주문한 것은 "특수 마크
+   * 과일", 즉 과일 그대로에 마크만 붙은 것이다.
+   * 그래서 mk 는 sp 와 **직교하는 칸**이다. 규칙은 한 글자도 안 읽고, 읽는 곳은
+   * 셋뿐이다: 스폰(battleRefill) · 소비(resolveMatch) · 그림(paintTile).
+   *
+   * 등장은 **전투 전용**이다 — 스폰이 battleRefill 안에만 있고, 그 함수는
+   * battleOn() 인 판에서만 불린다. 비전투 3모드(엔들리스/러시/데일리)의 판
+   * 생성기(genBoardExt/applySpecials/applyBombs)는 한 글자도 안 바뀐다.
+   *
+   * 확률은 **스폰 1칸당**이다(리필 1회당이 아니다). 그리고 동시 존재 상한이
+   * 각 1개라, 판에 이미 하나 떠 있으면 그 회차의 추첨은 버려진다 — rng 는 상한과
+   * 무관하게 **언제나 소비한다**. 그래야 (gridSeed, refillSeq) 재현성이 깨지지
+   * 않는다(재도전하면 같은 판 · 같은 스폰).
+   * ========================================================================= */
+  var MK_PET_RATE  = 0.03;     // 🐾 펫 과일 — 스폰 칸당 3%
+  var MK_STAR_RATE = 0.015;    // ⭐ 각성 과일 — 스폰 칸당 1.5%
+  var MK_MAX_EACH  = 1;        // 판에 동시에 떠 있을 수 있는 수 (종류별)
+  var MK_PET_CAP   = DUEL_PET_MAX + 2;  // 펫 과일로 넘길 수 있는 잔여 상한 (기본 2 → 4)
+
   /** 스폰 난수. (gridSeed, refillSeq) 파생이라 재도전하면 같은 판 · 같은 스폰이다.
    *  단계 2에서 순번의 집이 S.duel 로 옮겨졌다 — 값은 같은 0에서 같은 폭으로 오르
    *  므로 스트림 자체는 한 글자도 달라지지 않는다(단계 1의 판 재현성 그대로). */
@@ -27704,6 +27956,29 @@ window.TT_SFX = {
         var v = 1 + ((rng() * 9) | 0); if (v > 9) v = 9;
         out[w * COLS + c] = { v: v, dead: false };
         spawns.push({ to: w * COLS + c, stack: k + 1 });
+      }
+    }
+    /* W2.5 ④ — 특수 마크 추첨. 컬럼 루프가 **다 끝난 뒤**에 도는 것이 요점이다:
+       상한(종류별 1개)을 세려면 살아남아 내려온 칸까지 포함한 판 전체를 봐야 하고,
+       컬럼 루프 안에서 세면 왼쪽 컬럼이 오른쪽 컬럼보다 유리해진다.
+       rng() 는 상한에 걸려 마크를 못 받는 회차에도 **반드시 소비한다** — 소비를
+       건너뛰면 판 상태가 난수 스트림을 갈라 (gridSeed, refillSeq) 재현성이 깨진다.
+       sp 가 붙은 칸은 건너뛴다: 지금 battleRefill 의 스폰은 sp 를 안 붙이므로 이
+       분기는 늘 거짓이지만, 뒷날 스폰이 특수를 얹게 되면 "폭탄이면서 펫"이라는
+       읽을 수 없는 타일이 나는 것을 여기서 막는다. */
+    var mkHave = { pet: 0, star: 0 };
+    for (var q = 0; q < out.length; q++) {
+      var oc = out[q];
+      if (oc && !oc.dead && oc.mk && mkHave[oc.mk] !== undefined) mkHave[oc.mk]++;
+    }
+    for (var si = 0; si < spawns.length; si++) {
+      var r2 = rng();                                   // 상한과 무관하게 언제나 1회
+      var sc = out[spawns[si].to];
+      if (!sc || sc.sp) continue;
+      if (r2 < MK_PET_RATE) {
+        if (mkHave.pet < MK_MAX_EACH) { sc.mk = 'pet'; mkHave.pet++; }
+      } else if (r2 < MK_PET_RATE + MK_STAR_RATE) {
+        if (mkHave.star < MK_MAX_EACH) { sc.mk = 'star'; mkHave.star++; }
       }
     }
     return { cells: out, moves: moves, spawns: spawns };
@@ -27809,12 +28084,31 @@ window.TT_SFX = {
     for (n = 0; n < tileEls.length; n++) tileEls[n].classList.add('fall');
     layout();
 
+    /* W2.5 ① - 여기가 **논리 정착점**이다. 위 다섯 단계가 전부 동기라, 이 줄에
+     * 닿은 시점의 S.cells / tileEls / data-i 는 이미 최종값이다. 옛 코드는 이
+     * 셋을 아래 later() 안에 두어 낙하 애니가 끝날 때까지(340ms) 판을 잠갔다 —
+     * 그 대기가 사용자 반려의 실체였다. 되돌릴 근거로 옛 꼬리를 남긴다:
+     *
+     *   later(function () {
+     *     for (var m = 0; m < tileEls.length; m++) tileEls[m].classList.remove('fall');
+     *     S.busy = false;
+     *     saveProgress();
+     *     afterMove();
+     *   }, BATTLE_FALL_MS + 40);
+     *
+     * 계약은 하나도 안 옮겨간다: 이 함수는 정착 사이클당 1회만 불리므로
+     * (popSettle 합류점) battleRng 의 refillSeq 소비도, afterMove 도, 저장도
+     * 여전히 정확히 1회다. 바뀐 것은 그 1회가 **언제** 나느냐뿐이다. */
+    var myFall = ++fallGen;
     later(function () {
+      /* 더 새 낙하가 이미 시작됐으면 청소는 그쪽 타이머의 몫이다. 여기서 걷으면
+         진행 중인 타일의 transition 이 그 자리에서 끊긴다. */
+      if (myFall !== fallGen) return;
       for (var m = 0; m < tileEls.length; m++) tileEls[m].classList.remove('fall');
-      S.busy = false;
-      saveProgress();
-      afterMove();
     }, BATTLE_FALL_MS + 40);   // 옛 값: FALL_MS + 40 (=460ms). CSS 300ms 와 어긋나 있었다
+    S.busy = false;
+    saveProgress();
+    afterMove();
   }
 
   function runRowCollapse(rows) {
@@ -27882,12 +28176,29 @@ window.TT_SFX = {
       }
       layout(); // applies the new transforms; .fall supplies the spring easing
 
+      /* W2.5 ① - runBattleRefill 과 같은 자리, 같은 근거. 행 소거의 재인덱싱
+       * (collapseRows → tileEls 재배열 → data-i 재부여)은 바로 위에서 **동기로**
+       * 끝났고, 아래 later 에 남는 일은 `.fall` 을 걷는 것뿐이다.
+       * 옛 꼬리(되돌릴 근거):
+       *
+       *   later(function () {
+       *     for (var m = 0; m < tileEls.length; m++) tileEls[m].classList.remove('fall');
+       *     S.busy = false;
+       *     saveProgress();
+       *     afterMove();
+       *   }, FALL_MS + 40);
+       *
+       * 앞단의 플래시·스윕(FLASH_MS + maxDelay + 320)은 **열지 않는다** — 그
+       * 구간은 판이 아직 안 갈린 연출 구간이라, 거기서 새 매치를 받으면 두 번째
+       * popSettle 이 첫 소거가 착지하기 전에 소거를 또 걸 수 있다(W2 주석 (b)). */
+      var myFall = ++fallGen;
       later(function () {
+        if (myFall !== fallGen) return;   // 더 새 낙하가 시작됐다
         for (var m = 0; m < tileEls.length; m++) tileEls[m].classList.remove('fall');
-        S.busy = false;
-        saveProgress();
-        afterMove();
       }, FALL_MS + 40);
+      S.busy = false;
+      saveProgress();
+      afterMove();
     }, FLASH_MS + maxDelay + 320);
   }
 
@@ -30150,6 +30461,24 @@ window.TT_SFX = {
         if (meFull) me.style.setProperty('--me-full', meFull);
         else me.style.removeProperty('--me-full');
       }
+    }
+    /* W2.5 ② (2026-08-20) — 사용자 반려 "HUD 우상단 방울 아이콘이 내가 고른 펫과
+       무관하다". 원인은 #duel-baby 가 시안의 구름(duel-cloud-baby.webp)을 CSS 에
+       **고정**으로 물고 있어서였다 — W4 가 #duel-me-av 에서 고친 것과 **같은
+       결함**이라 고치는 문법도 같다: CSS 는 변수(--pet-face)를 읽고 폴백만 쥐고,
+       값은 여기 duelHudMount 가 넣는다.
+       주인공과 달리 'full' 이 아니라 'face' 인 이유: 이 자리는 12.4% × 39.9%
+       짜리 작은 방울이라 전신을 넣으면 얼굴이 안 읽힌다.
+       펫 미선택이면 **변수를 지운다** — 남기면 앞 펫 그림이 그대로 남고, 지우면
+       CSS 폴백(시안 구름)이 정확히 되돌아온다(setArt 규약과 같다).
+       판당 1회로 충분하다: 판이 도는 동안 동료는 바뀌지 않는다.
+       MATE_IDS 넷(몽글·츄릅·삐약·뭉치)은 모두 CHAR_STD 에 있어 stdArt 가 값을
+       돌려준다 — 넷 중 하나라도 표준 에셋이 빠지면 그 펫만 구름으로 폴백한다. */
+    var baby = $('duel-baby');
+    if (baby && baby.style) {
+      var petFace = stdArt(mateId(), 'face');
+      if (petFace) baby.style.setProperty('--pet-face', petFace);
+      else baby.style.removeProperty('--pet-face');
     }
   }
 
@@ -34334,6 +34663,40 @@ window.TT_SFX = {
      비싸다 — 무거우면 이 한 줄만 none 으로 바꿔 전투 화면 흐림을 통째로 끈다
      (팝업은 승인값 blur(5px) 를 따로 들고 있어 영향받지 않는다). */
   --jbox-frost:blur(3px);
+  /* ---- W2.5 ⑤ 모달 등급의 유리 (2026-08-20) --------------------------------
+     사용자 반려: "모달 젤리판이 전부 무채색·혼탁 — 더 투명하게, 은은한 핑크빛
+     젤리로. 모달로 쓰이는 판은 전부 같은 색." 정본 목표는
+     assets/art/incoming/mockup/gm-modal-pink-target.jpg (768×1376, "플레이" 팝업).
+
+     ── 시안 실측 (PIL, 판 경계 x65..700 · y305..1008) ──
+       판 안쪽 평균          RGB(190, 187, 199)   채도 ≈ 5% · 색상 ≈ 262°(라벤더-핑크)
+       같은 나무줄기, 판 밖   RGB(155, 150, 153)   (판 바로 아래 y1030..1100)
+       같은 나무줄기, 판 안   RGB(190, 184, 196)
+       → 판은 뒤를 **덮는 게 아니라 들어 올린다**: 채널별 배율 ×1.22/×1.23/×1.28.
+       대비 유지율 σ안/σ밖 = 0.82 / 0.64 / 1.02 (평균 0.83)
+       → 뒤 형체가 살아 있다는 뜻이고, 틴트 α 는 **0.2 언저리**여야 한다는 뜻이다
+         (α 가 .50 이면 유지율이 .50 으로 떨어진다 — 옛 크림 값이 정확히 그랬다).
+       고주파 에너지 σ: 판 안 6.80 vs 판 밖 2.36~2.71 → **판 뒤 배경은 안 흐리다**.
+
+     ── 채택값과 그 산술 ──
+       뒤를 들어 올리는 몫은 틴트 α 가 아니라 backdrop-filter 의 brightness 가
+       맡는다(§#duel-hud 가 이미 쓰는 문법 — "α 를 더 올리면 다시 판이 덮여 뒤가
+       죽는다"). 흐림은 시안대로 거의 0 에 가깝게 2px 만 남긴다 — 0 으로 두면
+       판이 유리가 아니라 색유리막이 된다.
+         brightness(1.18) 후 줄기 = (183,177,181)
+         + rgba(255,228,244,.22) 합성 = (199,188,195)
+         시안 실측 (190,184,196) 과 Δ(9,4,-1) — 채널 최대 오차 3.6%.
+       색은 옛 크림 rgb(255,241,216)(B 최저 = 누런 기운)에서 rgb(255,228,244)
+       (B 가 G 위 = 분홍)로 옮긴다. 실측의 라벤더 기울기를 그대로 따르면 판이
+       "보랏빛"으로 읽혀 사용자 낱말("핑크빛")과 어긋나므로, 기울기의 **크기**만
+       가져오고 방향은 분홍으로 세운다.
+
+     ⚠ 이 두 값은 `.jbox--modal` **등급**에 산다 — W6 은 `.w6m` 소비처에 걸어
+     견본(노드 카드·플레이 시트)을 제외했었지만, 이번 사용자 지시가 "모달로
+     쓰이는 건 전부 동일 색상"이라 견본도 편입한다. 등급에 두면 창이 늘어도
+     고칠 자리가 여기 한 곳이다. */
+  --modal-tint:rgba(255,228,244,.22);
+  --modal-glass:blur(2px) saturate(1.04) brightness(1.18);
 }
 .jbox,
 #app.battle #actionbar{
@@ -34353,10 +34716,14 @@ window.TT_SFX = {
   backdrop-filter:var(--jbox-blur,none) !important;
 }
 /* ---- 등급 3종 = 유일한 분기축 (틴트는 --jbox-tint 로 색감만 나눈다) ---- */
-.jbox--modal{           /* 팝업/노드카드 — 흐림·그림자는 승인값 그대로, 판만 v2 */
+.jbox--modal{           /* 팝업/노드카드 — 열 창 + 견본 둘이 **한 색**을 쓴다 */
   --jbox-biw:48px; --jbox-radius:40px; --jbox-bw:1.5px;
   --jbox-shadow:0 14px 34px rgba(83,28,40,.26);
-  --jbox-blur:blur(5px) saturate(1.18);
+  /* W2.5 ⑤ — 값의 유래와 실측은 위 :root 의 --modal-tint/--modal-glass 주석.
+     옛 값: --jbox-blur:blur(5px) saturate(1.18); (틴트는 등급에 없었다 —
+     `.w6m` 소비처가 크림 .50 을 따로 들고 있었고 견본 둘은 무틴트였다). */
+  --jbox-tint:var(--modal-tint);
+  --jbox-blur:var(--modal-glass);
 }
 .jbox--slab{            /* 전투 상단 슬래브 — 그림자는 그림 알파를 따라야 해서 filter */
   --jbox-biw:15px; --jbox-radius:13px;
@@ -34576,7 +34943,30 @@ window.TT_SFX = {
    견본(노드 카드·플레이 시트)까지 함께 밝아져 "견본 불변" 계약이 깨진다.
    `--jbox-tint` 는 젤리박스 주석이 명시한 소비처별 손잡이이고(슬래브·띠도
    각자 자기 값을 들고 있다), 판 자체는 여전히 한 장이다. */
-.w6m .sheet{ --jbox-tint:rgba(255,241,216,.50); }
+/* W2.5 ⑤ (2026-08-20) — 사용자 반려로 **크림 .50 이 폐기**됐다. 위 스윕은 그
+   판단의 기록으로 그대로 둔다(대비만 보면 .50 이 옳았다). 사용자가 산 것은
+   대비가 아니라 재질이다: "무채색·혼탁 — 투명도의 은은한 핑크빛 젤리 느낌".
+   값은 이제 `.jbox--modal` 등급 한 곳(:root --modal-tint)에 살고, 이 줄은 그
+   토큰을 가리키기만 한다 — 지우지 않는 이유는 둘이다. (1) W6 이 왜 소비처에
+   걸었는지(견본 제외 계약)의 기록이고, (2) 훗날 열 창만 다시 갈라야 할 때
+   손잡이가 여기 그대로 있다.
+   옛 값: --jbox-tint:rgba(255,241,216,.50);
+   대비 손실은 틴트가 아니라 **글자 쪽**으로 갚는다(바로 아래 ⑤b). */
+.w6m .sheet{ --jbox-tint:var(--modal-tint); }
+
+/* --- ⑤b W2.5 글자 대비 보강 --------------------------------------------------
+   틴트 α 가 .50 → .22 로 내려가면서 판 뒤의 판(보드·지도)이 그대로 비친다. 즉
+   글자 뒤 밝기가 **고정값이 아니라 장면마다 다른 값**이 됐다 — W6 이 쟀던
+   "판 위 잉크 5.69:1" 같은 단일 수치가 성립하지 않는다는 뜻이다.
+   그래서 하한을 색이 아니라 **획**으로 세운다: 흰 1px 리프트 + 얇은 흰 헤일로.
+   잉크(#5C4033)와 판(합성 rgb(199,188,195)) 사이의 계산 대비는 5.08:1 로 여전히
+   AA(4.5:1)를 넘고, 헤일로는 배경이 어두운 쪽으로 흔들리는 순간의 바닥을 받친다.
+   버튼은 이 값을 안 받는다 — `.w6m .sheet .btn` 이 자기 text-shadow 를 이미
+   (0,3,0) 으로 선언하고 있어 상속이 아니라 **덮기**가 일어난다(실측 근거:
+   그 규칙이 이 절 아래에 그대로 있다). 리본 h2 도 같은 이유로 안전하다. */
+.w6m .sheet{
+  text-shadow:0 1px 0 rgba(255,255,255,.62), 0 0 3px rgba(255,255,255,.45);
+}
 
 /* --- ⑥ 유리 줄 (조각 ①) ----------------------------------------------------
    베이지 민판(--j-rim + 연어색 테두리)과 어두운 반투명 줄(rgba 255/.05) 두
@@ -34918,7 +35308,15 @@ window.TT_SFX = {
 #app.battle #duel-baby{
   left:84.62%;top:2.69%;
   width:12.41%;height:39.88%;
-  background-image:url("catalog/duel-cloud-baby.webp");
+  /* W2.5 ② (2026-08-20) — 사용자 반려 "우상단 방울이 내가 고른 펫이 아니다".
+     #duel-me-av 와 같은 개방 문법이다: duelHudMount 가 선택 동료의 face 를
+     --pet-face 로 주입하고, 주입이 없을 때만(= 펫 미선택) 시안 구름이 선다.
+     구름 파일은 지우지 않는다 — 폴백이자 롤백 밸브다.
+     구판 한 줄(되돌릴 근거):
+       background-image:url("catalog/duel-cloud-baby.webp");
+     배경 크기·정렬은 위 §1 의 `.dh-av, .dh-baby` 공통 규칙이 이미 contain·center
+     로 잡아 둔다 — 여기서 다시 쓰지 않는다. */
+  background-image:var(--pet-face,url("catalog/duel-cloud-baby.webp"));
   filter:drop-shadow(0 2px 4px rgba(40,70,100,.26));
   z-index:3;
 }
@@ -35056,6 +35454,32 @@ window.TT_SFX = {
 #app.battle .dh-me .dh-lv{
   left:76.8%;width:15.3%;top:1.9%;height:33.1%;
   font-size:10px;font-size:2.50cqw;font-weight:800;
+}
+/* ---- W2.5 ④b 영문 보스명 잘림 수리 (2026-08-20, itch 업로드 차단 사유) --------
+   증상: 영문 모드에서 "Grape Gobbler" 가 HP 바 명패에 **"rape Gobble"** 로 뜬다.
+   앞뒤 한 글자씩 잘리는 것이 단서다 — 말줄임(…)이면 뒤만 잘린다.
+
+   원인(실측, 390×844 · HUD 폭 382px):
+     명패 상자 65.8px · 실제 글자 폭 77.1px  → 넘침 11.3px
+     한국어 "포도 먹깨비" 는 49.1px 라 16.7px 이 남는다(그래서 여태 안 드러났다).
+   그리고 이 상자는 `display:flex; justify-content:center; overflow:hidden` 이다.
+   **text-overflow 는 flex 컨테이너에 효과가 없다** — 넘친 글자는 익명 flex 아이템이
+   되고, 가운데 정렬이라 넘침 11.3px 이 좌우로 5.65px 씩 갈려 양쪽이 잘린다.
+   위 블록의 `text-overflow:ellipsis` 는 그래서 한 번도 값을 한 적이 없다(지우지
+   않는다 — 상자가 block 으로 돌아가면 그날 바로 값을 한다).
+
+   수리는 "잘리게 두고 …를 붙인다"가 아니라 **글자를 담는다**. 잘림이 민망한 것은
+   기호가 없어서가 아니라 이름이 안 읽혀서다.
+     (a) 상자를 넓히되 **광학 중심을 고정**한다: 중심 = left + width/2 이 27.5% 로
+         같아야 명패 그림 위에서 글자가 안 밀린다. 10+35/2 = 4+47/2 = 27.5 ✔
+     (b) 라틴 한 급 축소 2.90 → 2.62cqw. (a) 만으로도 담기지만 그러면 글자가 옛
+         상자 밖으로 5.65px 씩 삐져나와 명패 민무늬 림을 넘본다. 둘을 같이 쓰면
+         글자 폭이 71.5px 로 줄어 **옛 상자 안(10~45%)** 에 그대로 들어앉는다.
+   한국어는 이 규칙에 안 걸린다(`html[lang="en"]` 스코프) — 위 블록이 그대로 산다.
+   `html[lang="ko"] .act-t` 가 쓰는 것과 같은 로케일 분기 문법이다. */
+html[lang="en"] #app.battle .dh-foe .dh-name{
+  left:4.0%;width:47.0%;
+  font-size:10px;font-size:2.62cqw;
 }
 
 /* 게이지. .dh-fill 은 여전히 scaleX(var(--hp)) 다 — syncDuel 이 쓰는 그 변수고,
@@ -35327,7 +35751,31 @@ window.TT_SFX = {
   --jbox-blur: var(--jbox-frost) brightness(1.06);
   height: calc(25.61cqw + var(--safe-b));
   padding: 0 0 var(--safe-b);
+  /* ---- W2.5 ⑤ PC 노드 클릭 불가 수리 (2026-08-20) -------------------------
+     사용자 결함: 데스크톱 마우스로 지도 노드를 눌러도 정보 카드가 안 열린다.
+
+     원인(실측, 헤드리스 1280×800):
+       이 띠의 높이는 `25.61cqw` 라 **컨테이너 폭에 비례**한다.
+         390px  → 100px (상단 y=744) — 노드(y 650~714)와 안 겹친다
+         1280px → 195px (상단 y=605) — **현재 탄 노드(y 615~675)를 통째로 덮는다**
+       `document.elementFromPoint(노드중앙)` 이 `map-bot` / 그 자식 `map-plate` 를
+       돌려준다. 즉 마우스는 노드가 아니라 띠를 누르고 있었다(브라우저 히트테스트가
+       쓰는 바로 그 함수다). 실측 10개 노드 중 3개가 이렇게 막혔다.
+     대조군: 이 띠에 pointer-events:none 을 주면 **막힘 0개**가 된다.
+
+     수리는 높이가 아니라 **투과**로 한다. 높이를 캡으로 조이면 큰 폰(414/430px)의
+     띠까지 같이 줄고, cqw 로 배치된 자식들(`> * { top: 14.0cqw }`)의 좌표도 함께
+     고쳐야 해서 손댈 곳이 늘어난다. 반면 띠 자신은 **장식 판**이고 실제로 눌러야
+     하는 것은 버튼 넷뿐이다(map-char · map-rec · map-ch-prev · map-ch-next —
+     33070~33073 의 핸들러 전부가 button 이다). 칩 둘(별·점수)과 챕터 명패 글자는
+     표시 전용이라 투과해도 잃는 것이 없다.
+     화면은 한 픽셀도 안 바뀐다 — pointer-events 는 그리기에 관여하지 않는다.
+     ⚠ 남은 PC 결함(맵 전체가 데스크톱 폭으로 늘어나 잘려 보이는 것)은 이 두 줄이
+       고치는 것이 아니다. 그것은 지도 화면에 데스크톱 최대폭이 없다는 **구조**의
+       문제이고, PC 전용 파도(W9)의 몫이다 — 증거는 evidence-14/25-pc-map-1280.png. */
+  pointer-events: none;
 }
+#screen-map #map-bot button { pointer-events: auto; }
 #screen-map #map-bot > * {
   top: 14.0cqw;
   right: auto;
