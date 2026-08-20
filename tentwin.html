@@ -9536,6 +9536,51 @@ html.no-art-logo .logo-img  { display: none; }
 }
 /* ==SKIN-ART:END== */
 
+/* ==CUT-N3:BEGIN== W-E — 형제 2인컷(N3) 배선 ================================
+   13차-b 가 보류했던 그 배선을 재개한다. 보류 사유는 **그림의 규격**이었고
+   (구판 cut-n3-brothers 는 1024×572 = 가로 1.790 이라 390×844 세로 틀의
+   `background-size: cover` 에서 폭의 26%만 남고 두 머리만 확대돼 나왔다),
+   세로 재발주판이 그 사유를 정확히 소멸시킨다:
+     catalog/cut-n3-v2.webp — 780×1688 = **390:844**(비 0.4621), #cut-bg 의
+     cover 비율과 소수 넷째 자리까지 같다. 알파 없음(RIFF…WEBPVP8 , 반투명
+     0.00%) = 배경용 완성 컷이고 캐스트용 컷아웃이 아니다.
+   그래서 13차-b 가 시도했던 그대로 **배경 칸에 넣고 캐스트 칸을 비운다** —
+   두 형제가 이미 그려진 그림 위에 --ch-ten-full 을 또 세우면 텐텐이 두 번
+   선다(f1·f2 와 o11b 가 같은 근거로 캐스트를 비웠다).
+
+   ▣ 왜 표의 배경 칸이 아니라 여기(:root)인가
+     cutPaint 는 `var(--cut-<id>-img, var(<표의 배경칸>))` 순서로 읽는다.
+     o10 은 ART 블록(:9497)이 이미 `--cut-o10-img: var(--art-throne)` 을
+     정의해 두어 표의 배경 칸이 **닿지 못한다**(p3b·o11b 가 쓴 배경-칸 수법이
+     이 컷에는 안 통하는 유일한 이유다). 그래서 다섯을 한자리에서 --cut-*-img
+     로 덮는다 — 같은 :root 라 특이도가 같고 **뒤에 온 선언이 이긴다**.
+   ▣ 왜 ART 블록 안이 아닌가
+     :9382 ~ :9511 은 tools/art-embed.js 생성물이라 손으로 고치면 다음 실행에
+     지워진다. 바로 위 SKIN-ART 블록이 같은 이유로 밖에 나와 있다.
+   ▣ 대상 다섯 컷 (STORY-CUTS.md :173 「N3 = 텐텐·트윈 2인 — 컷10·12, T2·W2」
+     + W-B 가 세운 f0「왕자들의 늦은 도착」)
+       o10  컷10 결의   — 이름표가 이미 `bros`(W-B ②)인데 화면엔 텐텐뿐이었다
+       o12  컷12 출발   — 이름표 없는 나레이션 컷. 둘이 함께 떠나는 장면이다
+       t2   T2 텐텐 출정 / w2  W2 트윈 출정
+       f0   해방 §2-C 유머 — `…이미 없는데?` / `우리 왜 온 거야?` 두 대사가
+            형제 것이라 2인컷이 아니면 개그가 성립하지 않는다
+     다섯 컷의 「⚠ 화면에 서는 것은 텐텐 하나다」 한계가 여기서 소멸한다.
+   ▣ base64 가 아니라 상대 URL 인 이유: catalog/ 는 tentwin.html 옆에 함께
+     실리고, 이 파일은 이미 catalog/*.webp 를 CSS 에서 직접 참조한다
+     (#modal-classic 의 모드 아이콘 넷 :12379~). 120KB 를 인라인하면 파일만
+     160KB 불어나고 캐시 단위도 잃는다. 해방 컷 두 장(--cut-f1-img/--cut-f2-img)이
+     이미 같은 형식으로 아래 :root(:40449 부근)에 살아 있다 — 그 블록은 이 다섯을
+     재선언하지 않으므로 뒤에 있어도 이 배선을 덮지 않는다(전수 확인). */
+:root {
+  --cut-n3-v2: url("catalog/cut-n3-v2.webp");
+  --cut-o10-img: var(--cut-n3-v2);
+  --cut-o12-img: var(--cut-n3-v2);
+  --cut-t2-img:  var(--cut-n3-v2);
+  --cut-w2-img:  var(--cut-n3-v2);
+  --cut-f0-img:  var(--cut-n3-v2);
+}
+/* ==CUT-N3:END== */
+
 /* ==========================================================================
    SECTION 25 — v4 10차
      §A 일러스트 맵 · §B 스테이지 정보 팝업 · §C 메뉴 4버튼 + 모드 시트 ·
@@ -13256,10 +13301,26 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
           syncClassicSkin 이 `.classic` 클래스를 그 자리에서 붙이는 것과 같은 근거).
          클래식이 아니면 [hidden] 이라 **높이가 정확히 0** 이다(#duel-hud 규약).
          ============================================================ -->
+    <!-- W-E(2026-08-21) — 시안 정합 3점 추가. 구 근사치 마크업 봉인(롤백은 이 셋을 지우는 것):
+           <div id="classic-hud" hidden aria-hidden="true">
+             <div id="ch-cap">…</div><div id="ch-l" …></div><div id="ch-r" …></div>
+           </div>
+         ① #ch-castle — 시안에서 캡슐 꼭대기에 걸터앉은 성. 그림은 전투가 이미 쓰는
+            duel-castle-hd.webp(202×188) 하나이고 새 조각을 굽지 않는다.
+         ② #ch-cap-v 안의 <i> 글리프 — 시안의 젤리 숫자는 CSS 그라데이션 글자가
+            아니라 그림이다(W4 가 전투에서 같은 이유로 이미 갈아 끼웠다: 안드로이드
+            크롬에서 속 빈 외곽선만 렌더된 그 함정). duelTimerGlyphs() 를 그대로 부른다.
+         ③ .ch-t 세 줄 — 시안 하단의 게이지 트랙 셋(좌 미션·중앙 진행·우 점수).
+            `.ch-g` 알약이 "값", `.ch-t` 가 "채움"이다. 시안이 그 둘을 위·아래로
+            나눠 놓았고, 알약 안에 막대를 넣으면 4.0cqw 글자가 설 자리가 없다. -->
     <div id="classic-hud" hidden aria-hidden="true">
+      <i id="ch-castle" aria-hidden="true"></i>
       <div id="ch-cap"><span id="ch-cap-v">0</span></div>
       <div id="ch-l" class="ch-g"><i class="ch-i ch-i-goal" aria-hidden="true"></i><b id="ch-l-v">0</b></div>
       <div id="ch-r" class="ch-g"><i class="ch-i ch-i-score" aria-hidden="true"></i><b id="ch-r-v">0</b></div>
+      <div id="ch-tl" class="ch-t" aria-hidden="true"><span></span></div>
+      <div id="ch-tc" class="ch-t" aria-hidden="true"><span></span></div>
+      <div id="ch-tr" class="ch-t" aria-hidden="true"><span></span></div>
     </div>
     <!-- ============================================================
          전투 개편 §4 — 전투 HUD (#duel-hud).
@@ -20421,7 +20482,40 @@ window.TT_SFX = {
      푸딩 방패 7초: 소환(6초)보다 한 박자 길다 — "버틴다"가 이 캐릭터의 성격이다.
      탄산 폭발 6.5초: 젤리 타임(8초)보다 짧다 — 같은 잭팟 창을 더 짧게 쓰므로
      공주의 자리를 뺏지 않는다(둘 중 무엇을 고를 이유가 서로 남는다). */
-  var SKILL_MS = { ten: 6000, twin: 6000, jelly: 8000, pudding: 7000, sodawitch: 6500 };
+  /* 🚨 W-E ④ (2026-08-21) 사용자 승인 — 각성 **가동률 50~65%** 를 이 손잡이로 닫는다.
+     바로 위 W10 ④ 주석이 "목표 대역은 AWAKEN_GAIN_K 로는 못 닿는다 — 닿으려면
+     SKILL_MS 를 올려야 하고 그것은 이 파도의 권한 밖" 이라고 남겨 둔 그 손잡이다.
+     AWAKEN_GAIN_K=2 는 **한 글자도 안 건드렸다**(충전 속도는 이미 포화다).
+
+     실측(gates/awaken-ms.mjs · 사람 속도 800ms/수 · 스테이지 3·7·12 평균 ·
+     젤리 기준값을 서버가 한 줄 치환해 스윕. 봇·판·정책은 W10 ④ 와 동일):
+       8초(구값) → 42.6%   [대역 밖]   스테이지별 40.6 / 32.5 / 54.6
+       10초      → 52.3%   [대역 안]   스테이지별 52.2 / 40.3 / 64.4  ← 채택
+       11초      → 52.3%   [대역 안]   스테이지별 52.2 / 36.5 / 68.2
+       12초      → 52.3%   [대역 안]   스테이지별 48.4 / 40.2 / 68.3
+     10·11·12 의 평균이 **같은 값에서 겹치는 것**이 채택 근거다. 8→10 은 +9.7%p 를
+     사는데 10→12 는 0.0%p 다 — 병목이 충전도 지속도 아니라 W10 ④ 가 적어 둔 셋
+     (지속 중 재발동 금지 · 전투 한 판 25~30초 · 판당 발동 4회)로 옮겨 갔기 때문이다.
+     그 지점 너머의 연장은 판이 끝난 뒤로 새어 나가 화면에서 아무 일도 하지 않고,
+     대신 "한 발이 판의 절반"이라는 체감만 무겁게 만든다. 그래서 대역에 닿는
+     **최소값**에서 멈춘다(과상향 금지).
+
+     ▣ 왜 젤리만이 아니라 다섯 전부인가
+       봇이 잰 것은 젤리(공주) 한 캐릭터지만, 위 문단이 못박은 "왕자 6 / 공주 8"과
+       "푸딩은 소환보다 한 박자 길다 / 탄산은 젤리보다 짧다"는 **비율 설계**다.
+       젤리만 8→10 으로 올리면 그 간격이 통째로 뒤틀린다. 그래서 젤리 기준
+       배율 10000/8000 = **×1.25** 를 다섯에 똑같이 건다 — 순서도 간격비도
+       그대로 보존되고, 측정한 52.3% 가 기준 캐릭터에 그대로 성립한다.
+       나온 값은 전부 나눗셈 없이 떨어진다(6000·8000·7000·6500 × 1.25).
+     ▣ 133 계수 계약: SKILL_MS 는 tools/balance-baseline.json 의 133 키에 **없다**
+       (SKILL_MAX·SKILL_BASE·SKILL_COMBO·SKILL_COMBO_CAP·SKILL_CUTIN_MS·
+       SKILL_CUTIN_MIN_MS·SKILL_TW_HEAD 만 있다). 그래서 baseline 은 한 키도
+       안 바뀌었고, 이 변경은 계약 밖이다.
+     ▣ 클래식 3종과 무관: canFireSkill 이 `S.mode === 'adv'` 를 요구하고
+       (:27767), 다른 유일한 시전자인 보스 확정 발동도 advPlan 안에 있다(:32782).
+       classic / classic-rush / classic-daily 는 이 상수에 닿지 않는다.
+     옛 값: { ten: 6000, twin: 6000, jelly: 8000, pudding: 7000, sodawitch: 6500 }. */
+  var SKILL_MS = { ten: 7500, twin: 7500, jelly: 10000, pudding: 8750, sodawitch: 8125 };
   /* 젤리 타임의 잭팟 확률. 평시 JELLY_P(0.10) → 0.40. */
   var JELLY_TIME_P = 0.40;
   /* 소환 필살기가 사슬에 주는 선물. 형제는 이미 리듬을 맞춘 채로 도착한다 —
@@ -25155,6 +25249,9 @@ window.TT_SFX = {
    *   오른쪽  가운데가 시간이면 점수, 가운데가 점수면 최고점.
    * 클래식이 아니면 [hidden] 이라 높이가 정확히 0 이다 — #duel-hud 와 같은 규약.
    */
+  /* W-E — 트랙 분모 둘. 모듈 지역이라 저장·세이브·밸런스 어디에도 안 실린다. */
+  var chRunAt = 0, chP0 = 0;
+
   function syncClassicHud() {
     var box = $('classic-hud');
     if (!box) return;
@@ -25164,13 +25261,56 @@ window.TT_SFX = {
     var timed = isRush() || isDaily();
     var sec = isRush() ? Math.ceil(rushLeftMs() / 1000)
                        : Math.floor((Date.now() - S.startedAt) / 1000);
-    setText('ch-cap-v', timed ? fmtTime(Math.max(0, sec)) : String(S.score));
+    /* W-E — 캡슐 숫자는 **글리프 스프라이트**다(시안의 젤리 숫자). 전투가 쓰는
+       duelTimerGlyphs 를 그대로 부른다 — 같은 스프라이트·같은 tg-* 클래스·같은
+       "바뀐 자리만 쓴다" 규율이라 이 자리에 새 코드가 하나도 안 생긴다.
+       구판 한 줄 봉인(롤백은 이 줄로 되돌리고 CSS 절을 지우는 것):
+         setText('ch-cap-v', timed ? fmtTime(Math.max(0, sec)) : String(S.score)); */
+    var capTxt = timed ? fmtTime(Math.max(0, sec)) : String(S.score);
+    duelTimerGlyphs($('ch-cap-v'), capTxt);
     var m = S.mission;
     var mLive = !!m && missionsOn();
     setText('ch-l-v', mLive
       ? (m.prog + '/' + (m.id === 'col' ? 1 : m.goal))
       : String(S.pairsLeft));
     setText('ch-r-v', timed ? String(S.score) : String(store[bestKey()] || 0));
+    /* W-E — 시안 하단의 게이지 트랙 셋. **새 계수를 하나도 안 만든다** — 이미
+       화면에 떠 있는 값 셋을 같은 값의 비율로 다시 쓸 뿐이다.
+         좌   미션 진행(없으면 남은 짝이 처음 대비 얼마나 줄었나)
+         중앙 시간판이면 남은 시간 / 아케이드면 판 진행(지운 짝 비율)
+         우   점수 ÷ 그 판의 최고점(최고점이 0이면 0 — 나눗셈을 만들지 않는다) */
+    var best = Number(store[bestKey()] || 0);
+    var pl = Number(S.pairsLeft) || 0;
+    /* 판이 시작될 때의 짝 수를 기준으로 삼는다. 새 계수도, S 의 새 칸도 만들지
+       않는다 — `S.startedAt` 이 바뀌는 순간이 곧 "새 판"이라 그때 한 번만 적는다
+       (섞기·추가로 짝이 늘면 분모도 같이 올려 진행이 뒤로 가지 않게 한다). */
+    if (chRunAt !== S.startedAt) { chRunAt = S.startedAt; chP0 = pl; }
+    if (pl > chP0) chP0 = pl;
+    var cleared = chP0 > 0 ? (chP0 - pl) / chP0 : 0;
+    var lp = mLive
+      ? (m.id === 'col' ? Math.min(1, m.prog) : (m.goal > 0 ? m.prog / m.goal : 0))
+      : cleared;
+    var cp = timed
+      ? (isRush() ? Math.max(0, rushLeftMs()) / RUSH_MS : cleared)
+      : cleared;
+    var rp = best > 0 ? S.score / best : 0;
+    setBarPct('ch-tl', lp);
+    setBarPct('ch-tc', cp);
+    setBarPct('ch-tr', rp);
+  }
+
+  /* W-E — 트랙 채움 한 줄 도우미. 0~1 을 % 로 자르고, 값이 그대로면 DOM 을
+     건드리지 않는다(syncHud 가 러시에서 초당 5회 도는 그 규율을 지킨다). */
+  function setBarPct(id, ratio) {
+    var box = $(id);
+    if (!box) return;
+    var fill = box.firstChild;
+    if (!fill || !fill.style) return;
+    var pct = Math.round(Math.max(0, Math.min(1, ratio || 0)) * 1000) / 10;
+    var next = pct + '%';
+    if (fill.getAttribute('data-p') === next) return;
+    fill.style.width = next;
+    fill.setAttribute('data-p', next);
   }
 
   function syncHud() {
@@ -35382,6 +35522,16 @@ window.TT_SFX = {
        틀은 390×844(세로 0.462)이고 `#cut-bg` 가 `background-size: cover` 라
        폭의 26%만 남기고 잘린다. 투명 픽셀 0.0% 라 캐스트용 컷아웃도 아니다.
        규격 밖 그림을 억지로 얹는 대신 되돌린다 — 자세한 근거는 art-embed.js §13차-b ③. */
+    /* W-E: 세로 재발주판 cut-n3-v2 도착 → 배선 재개.
+       위 보류 사유는 **비율 하나**였고 그것이 사라졌다: catalog/cut-n3-v2.webp 는
+       780×1688 = 390:844(0.4621)로 #cut-bg 의 cover 비율과 같아 한 픽셀도 안
+       잘린다. 13차-b 가 시도했던 그 형태(배경 칸에 원화 · 캐스트 칸 비움)를
+       그대로 되살린다 — 다만 배선은 표가 아니라 :root 가 한다(o10 은 ART 생성
+       블록이 이미 --cut-o10-img 를 쥐고 있어 표의 배경 칸이 안 닿는다).
+       근거·대상 다섯 컷은 §CUT-N3 블록(:9539) 참조.
+       캐스트 칸을 비우는 이유: 그림에 형제가 이미 둘 다 서 있다. --ch-ten-full 을
+       그대로 두면 텐텐이 두 번 선다(f1·f2·o11b 와 같은 근거). */
+    /* W-E — 구판 봉인: ['o10', '--art-stage', 'center', '--ch-ten-full', 1, '', 'bros'], */
     /* W-B ② 대본 정합 — STORY-CUTS §1 컷10 의 화자는 **텐텐과 트윈 둘**이다
        (`가자, 트윈.` = 텐텐 / `이미 신발 신었어!` = 트윈). 자막은 이미 두 대사를
        `—` 로 잇고 있는데 이름표만 'ten' 이라 화면이 트윈의 대사를 텐텐 것으로
@@ -35389,7 +35539,7 @@ window.TT_SFX = {
        이미 있고 소비처가 0 인 **고아**였다 — i18n 추가 0줄로 대본과 맞는다.
        ⚠ 그림은 그대로다: 2인컷 N3 는 아직 규격 밖이라(아래 13차-b 주석) 화면에는
        텐텐만 선다. 이름표가 대사 둘을 정직하게 말하는 것이 지금 할 수 있는 최선. */
-    ['o10', '--art-stage',      'center',      '--ch-ten-full', 1, '',                  'bros'],
+    ['o10', '--art-stage',      'center',      '',              1, '',                  'bros'],
     /* W-B ② 대본 정합 — 컷11 도 같다. STORY-CUTS §1 컷11 의 화자는 삐약과 뭉치
        둘이고 자막도 두 대사를 잇는다. 고아 `cut.who.mates`(ko '삐약 · 뭉치')를
        소진한다. 아래 13차-b 주석이 말하는 "화면엔 삐약뿐" 은 그대로지만,
@@ -35406,17 +35556,30 @@ window.TT_SFX = {
        덮개가 없고, 뷰어의 `var(--cut-o11b-img, var(--art-throne))` 폴백이 곧장
        왕궁을 집는다 — style.css 를 한 줄도 건드리지 않고 형제와 같은 배경이 된다. */
     ['o11b','--art-throne',     'center',      '--ch-mungchi-full',1,'',                'mungchi'],
-    ['o12', '--art-map-bg',     '18% center',  '--ch-twin-full',-1,'',                  '']
+    /* W-E — N3 2인컷 배선(§CUT-N3 :9539). 컷12 는 STORY-CUTS :173 이 N3 에 배정한
+       네 컷 중 하나다. 배경 칸의 --art-map-bg 는 --cut-o12-img 가 정의된 지금은
+       **폴백으로 물러난다** — 지우지 않는 이유는 §E "교체 자리" 규약이다.
+       캐스트를 비운 근거는 o10 과 같다(그림에 트윈이 이미 서 있다).
+       W-E — 구판 봉인: ['o12', '--art-map-bg', '18% center', '--ch-twin-full',-1,'',''] */
+    ['o12', '--art-map-bg',     '18% center',  '',             -1,'',                  '']
   ];
   var CUTS_SORTIE = {
     ten: [
       ['t1', '--art-map-bg', '30% center', '',             1, '', 'ten'],
-      ['t2', '--art-stage',  'center',     '--ch-ten-full', 1, '', 'ten'],
+      /* W-E — N3 2인컷 배선(§CUT-N3 :9539). STORY-CUTS :173 이 T2 를 N3 에 배정했다:
+         출정의 이 한 컷은 떠나는 형제 **둘**을 보여 주는 자리라 1인 캐스트로는
+         대본과 어긋난다. 이름표는 'ten' 그대로다 — 대사가 텐텐 것 하나뿐이라
+         o10 의 'bros'(대사 둘)와 사정이 다르다.
+         W-E — 구판 봉인: ['t2', '--art-stage', 'center', '--ch-ten-full', 1, '', 'ten'], */
+      ['t2', '--art-stage',  'center',     '',              1, '', 'ten'],
       ['t3', '--art-map-bg', '18% center', '--ch-ten-full', 1, '', 'ten']
     ],
     twin: [
       ['w1', '--art-map-bg', '30% center', '',           1, '', 'twin'],
-      ['w2', '--art-stage',  'center',     '--ch-twin-full', 1, '', 'twin'],
+      /* W-E — N3 2인컷 배선(§CUT-N3 :9539). W2 는 T2 의 트윈 대칭판이고
+         STORY-CUTS :173 이 같이 N3 에 배정했다. 근거·형식 모두 T2 와 같다.
+         W-E — 구판 봉인: ['w2', '--art-stage', 'center', '--ch-twin-full', 1, '', 'twin'], */
+      ['w2', '--art-stage',  'center',     '',               1, '', 'twin'],
       ['w3', '--art-map-bg', '18% center', '--ch-twin-full', 1, '', 'twin']
     ],
     /* 공주 반전판이 긴 것은 이 분기가 게임의 백미이기 때문이다(STORY-CUTS §2-C).
@@ -35523,7 +35686,13 @@ window.TT_SFX = {
     ['p3e','--art-prison', 'center',     '--art-cut-smirk',1, 'rgba(150,40,60,.22)', 'jelly'],
     ['p3f','--art-prison', 'center',     '--art-cut-smirk',1, 'rgba(150,40,60,.14)', 'jelly', 1],
     ['p4', '--art-map-bg', '18% center', '--art-cut-kick', 1, '', 'jelly'],
-    ['f0', '--art-map-bg', '30% center', '--ch-ten-full',  1, '', 'bros'],
+    /* W-E — N3 2인컷 배선(§CUT-N3 :9539). 위 「▣ f0」 문단의 마지막 줄
+       (`⚠ 화면에 서는 것은 텐텐 하나다(2인컷 N3 미도착). o10 과 같은 한계다.`)이
+       여기서 소멸한다 — 세로 재발주판이 도착했다. 이 컷의 개그는 두 대사가
+       **서로 다른 두 사람** 것이라는 데서 나오므로, 2인컷은 장식이 아니라
+       성립 조건이다. 캐스트를 비운 근거는 o10 과 같다.
+       W-E — 구판 봉인: ['f0', '--art-map-bg', '30% center', '--ch-ten-full', 1, '', 'bros'], */
+    ['f0', '--art-map-bg', '30% center', '',               1, '', 'bros'],
     ['f1', '--art-map-bg', 'center',     '',               1, '', 'jelly'],
     /* 마지막 컷에서 한 번 튄다(여덟째 칸 = 펄스 티어). 형제 p3c 와 같은 문법이고,
        이야기의 착지점이 화면에서도 착지하게 하는 유일한 장치다. */
@@ -41652,6 +41821,135 @@ html[lang="ko"] #modal-mode .r10-ribbon > h2{
    전투가 같은 자리에서 같은 처분을 하고 있다(:6569 `#app.battle #rush-timer`). */
 #app.classic #rush-timer{ display:none !important; }
 #app.classic #tb-stats{ display:none !important; }
+
+/* ===========================================================================
+   W-E(2026-08-21) — 클래식 인게임 상단 **시안 정합**
+   정본: tentwin/assets/art/incoming/mockup/gm-classic-target.jpg
+
+   시안을 실측하면 상단은 유리 **한 몸**이 아니라 세 층이다(정화 통짜
+   glass-hud-v2 의 구조 그대로다):
+     ① 위 슬래브  — 일시정지(좌) · 펫 슬롯(우) 이 앉는 넓은 판. 가운데가 파여
+        있고 그 홈으로 캡슐이 솟는다.               → #topbar 가 그 상자다
+     ② 가운데 캡슐 — 슬래브 위로 돌출한 알약 + 그 꼭대기의 성.  → #ch-cap
+     ③ 아래 명패 밴드 — 좌 미션값·우 점수값 + **게이지 트랙 셋**. → #classic-hud
+
+   지금까지 ①이 베이지 리본 그대로였다(실측: #topbar 의 베이지는
+   background 가 아니라 **border-image 데이터 URI**라, 배경만 갈면 안 지워진다).
+   그래서 시안의 "유리 한 덩어리"가 화면에서는 베이지 띠 + 유리 띠 두 개로
+   읽혔다 — 사용자가 시안을 붙이며 요구한 그 구조가 아니다.
+
+   🚨 W6.5b 의 보류 초안(:41391~)은 **여전히 봉인이다**. 다만 그 봉인은
+   실제로 닫혀 있지 않다: 41411 행의 배경 한 줄이 자기 안에 `/* … *​/` 를
+   품고 있어 바깥 주석이 거기서 끊긴다(CSS 주석은 중첩이 안 된다). 그래서
+   그 아래 몇 줄이 살아 있었다. 그 줄들을 지우지 않고, 이 절이 **뒤에서**
+   같은 선택자를 다시 못 박는다(이 파일의 "앞을 지우지 말고 뒤에서 덮는다" 규약).
+   =========================================================================== */
+/* ① 위 슬래브 — 베이지 리본을 유리로 갈아 끼운다. border-image 를 먼저 끄지
+   않으면 배경이 그 뒤에 깔려 안 보인다(그것이 지금까지의 실패 지점이다). */
+#app.classic #topbar{
+  border-image-source:none !important;
+  border-image-slice:0 !important;
+  border-image-width:0 !important;
+  border-style:none !important;
+  border-width:0 !important;
+  background-color:transparent !important;
+  background-image:url("catalog/glass-slab-v2.webp") !important;
+  background-repeat:no-repeat !important;
+  background-position:center top !important;
+  background-size:100% 100% !important;
+  box-shadow:none !important;
+  overflow:visible !important;
+}
+/* ② 성 — 캡슐 꼭대기에 걸터앉는다. 시안 실측(768 원판): 성 잉크 폭이 캡슐 폭의
+   30.2%, 밑변이 캡슐 상변보다 8px(캡슐 높이의 6.5%) 아래에 잠긴다. */
+#app.classic #ch-castle{
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  /* 좌표 산수(밴드 높이 H 기준): 캡슐은 `top:-57.4%; height:100%` 이므로 그
+     상변은 밴드 **밑변에서 1.574H** 위다. 성은 그 상변보다 캡슐 높이의 6.5%
+     만큼 잠기므로 밑변이 1.509H — 아래 한 줄이 그 값이다.
+     ⚠ 첫 판에서 `calc(100% - 57.4% + 6.5%)`(=49.1%)로 잘못 적어 성이 숫자
+        한가운데 앉았다. 기준이 캡슐이 아니라 **밴드**라는 것이 함정이었다. */
+  bottom:150.9%;
+  width:9.8%;                         /* 시안 실측: 성 잉크 폭 145px ÷ 캡슐 폭 660px
+                                         = 22.0%, 캡슐이 밴드의 43.816% 이므로 9.6% */
+  aspect-ratio:202/188;
+  background-image:url("catalog/duel-castle-hd.webp");
+  background-repeat:no-repeat;
+  background-position:center bottom;
+  background-size:contain;
+  filter:drop-shadow(0 2px 3px rgba(70,40,90,.30));
+  pointer-events:none;
+  z-index:2;
+}
+/* ②-b 캡슐 안 숫자 = 글리프 스프라이트. 전투(:39950 계열)와 **같은 장**을 쓰고
+   같은 클래스 이름(tg-*)을 쓴다 — duelTimerGlyphs() 를 그대로 부르기 때문이다.
+   구판(글자) 봉인: 아래 #ch-cap-v 의 font-size 규칙(:41628)은 지우지 않는다.
+   글리프가 서면 글자 노드가 없어 그 규칙이 무해하게 비활성이 된다. */
+#app.classic #ch-cap-v{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:0;
+  width:100%;
+  height:100%;
+}
+#app.classic #ch-cap-v > i{
+  flex:0 1 auto;
+  height:64%;                 /* 전투와 같은 값 — 같은 스프라이트의 같은 잉크 비율 */
+  width:auto;
+  aspect-ratio:172/209;
+  margin-left:-1%;
+  margin-right:-1%;
+  background-repeat:no-repeat;
+  background-position:center;
+  background-size:contain;
+  filter:drop-shadow(0 1px 2px rgba(70,40,90,.34));
+}
+#app.classic #ch-cap-v > i.tg-colon{ margin-left:-3%; margin-right:-3%; }
+#app.classic #ch-cap-v > i.tg-0{background-image:url("catalog/tmr-0.webp");}
+#app.classic #ch-cap-v > i.tg-1{background-image:url("catalog/tmr-1.webp");}
+#app.classic #ch-cap-v > i.tg-2{background-image:url("catalog/tmr-2.webp");}
+#app.classic #ch-cap-v > i.tg-3{background-image:url("catalog/tmr-3.webp");}
+#app.classic #ch-cap-v > i.tg-4{background-image:url("catalog/tmr-4.webp");}
+#app.classic #ch-cap-v > i.tg-5{background-image:url("catalog/tmr-5.webp");}
+#app.classic #ch-cap-v > i.tg-6{background-image:url("catalog/tmr-6.webp");}
+#app.classic #ch-cap-v > i.tg-7{background-image:url("catalog/tmr-7.webp");}
+#app.classic #ch-cap-v > i.tg-8{background-image:url("catalog/tmr-8.webp");}
+#app.classic #ch-cap-v > i.tg-9{background-image:url("catalog/tmr-9.webp");}
+#app.classic #ch-cap-v > i.tg-colon{background-image:url("catalog/tmr-colon.webp");}
+/* ③ 게이지 트랙 셋 — 시안 실측(768 원판, 밴드 상자 기준 %):
+      좌 x 4.0~27.4% · 중앙 31.2~61.2% · 우 72.6~95.4% · y 55~74%.
+   알약(.ch-g)을 위로 올려(top 22% → 14%) 그 아래 자리를 낸다. */
+#app.classic #classic-hud .ch-g{ top:14%; height:38%; }
+#app.classic #classic-hud .ch-t{
+  position:absolute;
+  top:55%;
+  height:19%;
+  border-radius:999px;
+  /* 트랙은 유리 위의 **홈**이다 — 새 그림을 굽지 않고, 이 파일이 이미 쓰는
+     안쪽 그림자 문법으로 파인 느낌을 낸다(#duel-hud HP 트랙과 같은 문법). */
+  background-color:rgba(58,44,86,.30);
+  box-shadow:inset 0 1px 2px rgba(40,26,64,.42), 0 1px 0 rgba(255,255,255,.45);
+  overflow:hidden;
+  z-index:1;
+}
+#app.classic #classic-hud .ch-t > span{
+  display:block;
+  height:100%;
+  width:0%;                   /* syncClassicHud 가 그 판의 실제 비율로 쓴다 */
+  border-radius:999px;
+  background-image:linear-gradient(180deg,#BFEFFF 0%,#7FD4F2 52%,#4FA9DC 100%);
+  box-shadow:0 0 6px rgba(150,225,255,.55);
+  transition:width .18s ease-out;
+}
+#app.classic #ch-tl{ left:4.0%;  width:23.4%; }
+#app.classic #ch-tc{ left:31.2%; width:30.0%; }
+#app.classic #ch-tr{ left:72.6%; width:22.8%; }
+/* 좌·우 알약을 시안의 트랙 위에 맞춰 세운다(트랙과 좌우 끝을 공유한다). */
+#app.classic #ch-l{ left:4.0%;  width:23.4%; }
+#app.classic #ch-r{ left:72.6%; width:22.8%; right:auto; }
 
 /* ===========================================================================
    W6.5b — **텐트윈 각성 연쇄 루프** (사용자 전략 확정)
