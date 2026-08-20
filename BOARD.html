@@ -114,6 +114,25 @@ summary .cnt{margin-left:auto;font-weight:400;font-size:.72rem;color:var(--sub);
 .s-queued{background:var(--queued)}.s-empty{background:var(--empty)}
 .slab{font-size:.62rem;color:var(--sub)}
 
+/* ── 3-E. "이게 지금 게임이 쓰는 그림" 배지 ────────────────────────────
+   usage-map.json(= tools/build-usage-map.py 가 tentwin.html 을 실측해 굽는 표)
+   에 이름이 오른 에셋에만 붙는다. 카탈로그에 같은 자리를 노리는 그림이 둘 있을 때
+   어느 쪽이 배선돼 있는지가 카드에서 바로 보인다. */
+.ub{display:block;margin-top:4px;padding:2px 6px;border-radius:6px;
+  font-size:.6rem;font-weight:800;line-height:1.3;word-break:keep-all;
+  background:#E7F3EA;color:#1F6B3E;border:1px solid #BEE0CA}
+.ub.bg{background:var(--ok);color:#FFF;border-color:#1F6B3E}
+.bgcard .ub{margin-top:5px;font-size:.58rem}
+.acard.usein{border-color:var(--ok)}
+.bgcard.usein{border-color:var(--ok);box-shadow:0 0 0 2px rgba(46,158,91,.35)}
+
+/* ── 3-F. 🎨 코드 구현 섹션 (부품표 맨 끝) ────────────────────────────── */
+section.cat.codecat>h2{background:#DCE8F4;border-bottom-color:#BFD4E8}
+section.cat.codecat>h2 .rn{background:var(--css)}
+.pvthumb{background:#F3F7FB}
+.pvthumb img{max-width:100%;max-height:74px}
+.acard .nopv{display:block;margin-top:2px;font-size:.6rem;color:var(--sub)}
+
 /* ── 4. 그룹 안 조립 화면 미리보기 (한 번에 하나만 산다) ── */
 .gbody{display:flex;align-items:flex-start;gap:10px;padding:10px 12px 15px}
 .gbody>.grid{flex:1 1 auto;min-width:0;padding:0}
@@ -201,6 +220,9 @@ details.avgrp[open]>summary::before{transform:rotate(90deg)}
 .avb{position:absolute;left:4px;top:4px;font-size:.58rem;padding:1px 7px;border-radius:6px;
   color:#FFF;font-weight:700;z-index:2}
 .avb.wait{background:var(--temp)}.avb.ok{background:var(--ok)}.avb.no{background:var(--empty)}
+.avb.code{background:var(--css)}
+.avthumb.pvthumb{background:#F3F7FB}
+.avthumb.pvthumb img{max-height:84px}
 .avold{position:absolute;right:4px;top:4px;font-size:.56rem;padding:1px 5px;border-radius:6px;
   background:#FBD86A;color:#4A3208;font-weight:700;z-index:2}
 .avnone{padding:18px;color:var(--sub);font-size:.8rem;background:var(--card);
@@ -286,7 +308,31 @@ const TABS=[['all','전체'],['bg','배경'],['char','캐릭터'],['fruit','과�
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 let M={};
 
-function thumbHTML(ref,st){
+/* ── 실배선 표 ────────────────────────────────────────────────────────
+   USE[카탈로그키] = ["메뉴(낮)","스플래시(낮)"]   — 게임이 지금 그 그림을 쓰는 자리
+   BGK[카탈로그키] = 1                            — 그중 "화면 배경" 인 것
+   원본은 site/usage-map.json 이고 tools/build-usage-map.py 가 tentwin.html 을
+   실측해 굽는다. 파일이 없으면 배지만 안 뜨고 나머지는 그대로 돈다.        */
+let USE={}, BGK={};
+
+/* ── 코드 구현 미리보기 ───────────────────────────────────────────────
+   PV[부품이름] = {file,px,kb,label,screen,selector}  — 게임 실렌더 캡처 한 장
+   PVL = 그 캡처 전체 목록(검수탭 그룹용).
+   원본은 catalog/_css-previews/index.json, 굽는 곳은 tools/render-css-previews.py. */
+let PV={}, PVL=[];
+
+function useLine(key){
+  const u=key&&USE[key];
+  if(!u||!u.length) return '';
+  const bg=!!BGK[key];
+  /* 카드가 좁으므로 앞 두 자리만 적고 나머지는 수로 접는다(전체는 title 로 남긴다). */
+  const short=(u.length>2?u.slice(0,2).concat(['외 '+(u.length-2)+'곳']):u).join(' · ');
+  return '<span class="ub'+(bg?' bg':'')+'" title="'+esc(u.join(' · '))+'">'
+    +(bg?'✅ 현재 게임 배경 — ':'✅ 현재 게임 배선 — ')+esc(short)+'</span>';
+}
+function refKey(ref){ return (ref&&ref.indexOf('img:')===0)?ref.slice(4):''; }
+
+function thumbHTML(ref,st,nm){
   if(ref&&ref.indexOf('img:')===0){
     const key=ref.slice(4),f=M[key];
     if(f) return '<div class="thumb"><img loading="lazy" src="catalog/'+f.file+'" alt=""></div>';
@@ -294,38 +340,47 @@ function thumbHTML(ref,st){
   }
   if(st==='empty')  return '<div class="thumb"><span class="ph">없음</span></div>';
   if(st==='queued') return '<div class="thumb"><span class="ph">발주·예약</span></div>';
+  const p=PV[nm];                                   /* 코드로 그린 것 = 게임 실렌더 한 컷 */
+  if(p) return '<div class="thumb pvthumb"><img loading="lazy" src="catalog/_css-previews/'
+    +esc(p.file)+'" alt=""></div>';
   return '<div class="thumb"><span class="ph">코드·CSS</span></div>';
 }
 
 function mkCard(it){
   const nm=it[0],ty=it[1],st=it[2],ref=it[3],note=it[4],cls=it[5],dyn=it[6];
+  const key=refKey(ref), pv=(st==='css')?PV[nm]:null;
   const el=document.createElement('div');
-  el.className='acard st-'+st;
+  el.className='acard st-'+st+(USE[key]?' usein':'');
   el.dataset.cls=cls; el.dataset.dyn=dyn;
-  el.innerHTML=thumbHTML(ref,st)
+  el.innerHTML=thumbHTML(ref,st,nm)
     +(ty!=='asset'?'<span class="tbadge '+ty+'">'+TB[ty]+'</span>':'')
     +(dyn?'<span class="dbadge">⚡동적</span>':'')
     +'<div class="meta"><span class="nm">'+esc(nm)+'</span>'
     +'<span><span class="sdot '+SD[st]+'"></span><span class="slab">'+SL[st]+'</span></span>'
+    +useLine(key)
+    +(st==='css'&&!pv?'<span class="nopv">미리보기 없음</span>':'')
     +(note?'<span class="nt">'+esc(note)+'</span>':'')+'</div>';
-  if(ref&&ref.indexOf('img:')===0&&M[ref.slice(4)]){ el.style.cursor='zoom-in';
-    el.addEventListener('click',function(){ openLB(ref.slice(4)); }); }   /* 부품 카드 → 라이트박스 */
+  if(key&&M[key]){ el.style.cursor='zoom-in';
+    el.addEventListener('click',function(){ openLB(key); }); }   /* 부품 카드 → 라이트박스 */
+  else if(pv){ el.style.cursor='zoom-in';
+    el.addEventListener('click',function(){ openPV(pv); }); }
   return el;
 }
 
 function mkBgCard(it,si){
   const nm=it[0],st=it[2],ref=it[3],dyn=it[6];
+  const key=refKey(ref);
   const el=document.createElement('div');
-  el.className='bgcard st-'+st;
+  el.className='bgcard st-'+st+(USE[key]?' usein':'');
   el.dataset.cls='bg'; el.dataset.dyn=dyn; el.dataset.si=String(si);
-  const f=(ref&&ref.indexOf('img:')===0)?M[ref.slice(4)]:null;
-  if(f){ el.classList.add('pick'); el.dataset.bg=ref.slice(4);
+  const f=key?M[key]:null;
+  if(f){ el.classList.add('pick'); el.dataset.bg=key;
          el.addEventListener('click',function(){ pickBg(el); }); }
   el.innerHTML='<div class="band">배경</div>'
     +(f?'<img loading="lazy" src="catalog/'+f.file+'" alt="">'
        :'<div class="bgph">'+(st==='empty'?'없음':st==='queued'?'발주·예약':'코드·CSS')+'</div>')
     +'<div class="bmeta">'+esc(nm)+'<br><span class="sdot '+SD[st]+'"></span>'
-    +'<span class="slab2">'+SL[st]+'</span></div>';
+    +'<span class="slab2">'+SL[st]+'</span>'+useLine(key)+'</div>';
   return el;
 }
 
@@ -469,13 +524,28 @@ function buildOldIndex(){
 function mkAvCard(k){
   const f=M[k], st=stOf(k), old=OLDV[k];
   const el=document.createElement('button');
-  el.type='button'; el.className='avcard'; el.dataset.k=k; el.dataset.st=st;
+  el.type='button'; el.className='avcard'+(USE[k]?' usein':''); el.dataset.k=k; el.dataset.st=st;
   el.innerHTML='<span class="avb '+STCLS[st]+'">'+esc(st)+'</span>'
     +(old?'<span class="avold">전판 '+old.length+'</span>':'')
     +'<span class="avthumb"><img loading="lazy" src="catalog/'+esc(f.file)+'" alt=""></span>'
     +'<span class="avmeta"><span class="nm">'+esc(k)+'</span>'
-    +'<span class="sz">'+f.kb+'KB · '+esc(f.px||'—')+'</span></span>';
+    +'<span class="sz">'+f.kb+'KB · '+esc(f.px||'—')+'</span>'+useLine(k)+'</span>';
   el.addEventListener('click',function(){ openLB(k); });
+  return el;
+}
+
+/* 🎨 코드 구현 미리보기 — manifest 에는 없는 그림들이라 별도 그룹으로 맨 끝에 선다.
+   검수(대기/적용/반려)의 대상이 아니므로 상태 필터의 집계에는 들어가지 않는다. */
+function mkPvCard(p){
+  const el=document.createElement('button');
+  el.type='button'; el.className='avcard'; el.dataset.k=p.id; el.dataset.st='코드';
+  el.dataset.lab=p.label||'';
+  el.innerHTML='<span class="avb code">코드</span>'
+    +'<span class="avthumb pvthumb"><img loading="lazy" src="catalog/_css-previews/'
+    +esc(p.file)+'" alt=""></span>'
+    +'<span class="avmeta"><span class="nm">'+esc(p.label||p.id)+'</span>'
+    +'<span class="sz">'+p.kb+'KB · '+esc(p.px||'—')+' · '+esc(p.screen||'스플래시')+'</span></span>';
+  el.addEventListener('click',function(){ openPV(p); });
   return el;
 }
 
@@ -509,6 +579,15 @@ function buildAssetView(){
     det.appendChild(grid); box.appendChild(det);
   });
 
+  if(PVL.length){
+    const det=document.createElement('details'); det.className='avgrp'; det.open=true;
+    det.dataset.g='_css';
+    det.innerHTML='<summary>🎨 코드 구현 미리보기<span class="cnt">'+PVL.length+'</span></summary>';
+    const grid=document.createElement('div'); grid.className='avgrid';
+    PVL.forEach(p=>grid.appendChild(mkPvCard(p)));
+    det.appendChild(grid); box.appendChild(det);
+  }
+
   const none=document.createElement('div'); none.className='avnone'; none.id='avnone';
   none.hidden=true; none.textContent='조건에 맞는 에셋이 없습니다.';
   box.appendChild(none);
@@ -530,15 +609,17 @@ function avFilter(){
   const st=on?on.dataset.st:'전체';
   let live=0;
   box.querySelectorAll('details.avgrp').forEach(function(det){
+    const pvg=det.dataset.g==='_css';        /* 코드 구현 그룹은 검수 집계 밖 */
     let n=0;
     det.querySelectorAll('.avcard').forEach(function(c){
-      const hit=(!q||c.dataset.k.toLowerCase().indexOf(q)>=0)
-             && (st==='전체'||c.dataset.st===st);
+      const name=(c.dataset.k+' '+(c.dataset.lab||'')).toLowerCase();
+      const hit=(!q||name.indexOf(q)>=0)
+             && (pvg ? st==='전체' : (st==='전체'||c.dataset.st===st));
       c.style.display=hit?'':'none'; if(hit) n++;
     });
     det.style.display=n?'':'none';
     det.querySelector('.cnt').textContent=n;
-    live+=n;
+    if(!pvg) live+=n;
   });
   box.querySelector('#avcnt').textContent=live+' / '+keysOf().length+'개';
   box.querySelector('#avnone').hidden=!!live;
@@ -652,6 +733,27 @@ function openLB(key){
   lbStage('');
 }
 
+/* 코드 구현 미리보기 — manifest 밖의 그림이라 전판 비교·게임 점프가 없다.
+   나머지(확대·이동·배경 갈아 보기)는 에셋과 똑같이 쓴다. */
+function openPV(p){
+  if(!p||!p.file) return;
+  if(ACT) resetPv(ACT.pv);
+  LB.key=null;
+  document.getElementById('lbTitle').textContent=p.label||p.id;
+  document.getElementById('lbInfo').textContent=
+    p.file+' · '+p.kb+'KB · '+(p.px||'—')+' · 게임 실렌더('+(p.screen||'스플래시')
+    +' / '+(p.selector||'')+')';
+  const sel=document.getElementById('lbOld'); sel.hidden=true; sel.innerHTML='';
+  document.getElementById('lbGame').hidden=true;
+  LBOX().hidden=false;
+  lbBg(LB.bg||'check');
+  const stage=document.getElementById('lbStage');
+  stage.innerHTML=''; LB.panes=[];
+  const pane=mkPane('catalog/_css-previews/'+p.file, p.label||p.id);
+  LB.panes.push(pane); stage.appendChild(pane.el);
+  lbFit();
+}
+
 function closeLB(){ LBOX().hidden=true; document.getElementById('lbStage').innerHTML='';
                     LB.panes=[]; }
 
@@ -670,7 +772,7 @@ function lbInit(){
   document.querySelectorAll('#lbox .lbtool .fb[data-bg]').forEach(function(b){
     b.addEventListener('click',function(){ lbBg(b.dataset.bg); }); });
   document.getElementById('lbOld').addEventListener('change',function(){
-    lbStage(this.value); });
+    if(LB.key) lbStage(this.value); });
   document.getElementById('lbGame').addEventListener('click',function(){
     const k=LB.key; closeLB();
     const fbox=document.getElementById('filters');
@@ -814,9 +916,21 @@ Promise.all([
   fetch('board-data.json?v='+Date.now()).then(r=>r.json()),
   fetch('catalog/manifest.json?v='+Date.now()).then(r=>r.json()),
   /* 승인 상태표 — 없으면 전부 "적용"으로 본다 */
-  fetch('staging.json?v='+Date.now()).then(r=>r.ok?r.json():{}).catch(()=>({}))
+  fetch('staging.json?v='+Date.now()).then(r=>r.ok?r.json():{}).catch(()=>({})),
+  /* 실배선 표 · 코드 구현 미리보기 — 둘 다 없어도 관제탑은 그대로 돈다 */
+  fetch('usage-map.json?v='+Date.now()).then(r=>r.ok?r.json():{}).catch(()=>({})),
+  fetch('catalog/_css-previews/index.json?v='+Date.now())
+    .then(r=>r.ok?r.json():{}).catch(()=>({}))
 ]).then(function(res){
   const D=res[0]; M=res[1]; AVS=res[2]||{};
+
+  const U=res[3]||{};
+  USE=U.byKey||{};
+  (U.slots||[]).concat(U.extras||[]).forEach(function(r){ if(r.kind==='bg') BGK[r.key]=1; });
+
+  PVL=((res[4]||{}).items)||[];
+  PVL.forEach(function(p){ (p.names||[]).forEach(function(n){ if(!PV[n]) PV[n]=p; }); });
+
   lbInit();
 
   const fbox=document.getElementById('filters');
@@ -836,6 +950,10 @@ Promise.all([
   renderWorklog(D.worklog);
 
   const cats=document.getElementById('cats');
+  /* 🎨 코드 구현 모으기 — 원 데이터(board-data.json)는 한 글자도 안 바꾼다.
+     **렌더 단계에서만** 상태 css 항목을 본문 흐름에서 빼서 맨 끝 섹션으로 옮긴다.
+     그래야 디자인 에셋(그림)이 사이에 끊기지 않고 한 줄로 읽힌다.               */
+  const CODE=[];
   D.sections.forEach(function(sec,si){
     const s=document.createElement('section'); s.className='cat';
     const m=sec.title.match(/^([Ⅰ-Ⅶ]+)\.\s*(.*)$/);
@@ -846,7 +964,8 @@ Promise.all([
 
     const body=document.createElement('div'); body.className='secbody';
     const bgItems=[];
-    sec.groups.forEach(g=>g.items.forEach(it=>{ if(it[5]==='bg') bgItems.push(it); }));
+    sec.groups.forEach(g=>g.items.forEach(it=>{
+      if(it[5]==='bg'&&it[2]!=='css') bgItems.push(it); }));   /* CSS 배경도 끝 섹션으로 */
 
     if(bgItems.length){
       const side=document.createElement('aside'); side.className='side';
@@ -858,7 +977,10 @@ Promise.all([
 
     const mb=document.createElement('div'); mb.className='mainbody';
     sec.groups.forEach(function(g){
-      const items=g.items.filter(it=>it[5]!=='bg');   /* 배경은 사이드 전용 */
+      const css=g.items.filter(it=>it[2]==='css');
+      const items=g.items.filter(it=>it[2]!=='css'&&it[5]!=='bg');  /* 배경은 사이드 전용 */
+      if(css.length) CODE.push({sec:secShort,name:g.name,scr:g.scr,si:si,
+                                items:css,orphan:!items.length});
       if(!items.length) return;
       const det=document.createElement('details'); det.className='grp'; det.open=true;
       const filled=items.filter(it=>it[2]==='ok'||it[2]==='css').length;
@@ -879,6 +1001,42 @@ Promise.all([
 
     body.appendChild(mb); s.appendChild(body); cats.appendChild(s);
   });
+
+  /* ── 맨 끝: 🎨 코드 구현 ────────────────────────────────────────────
+     그림이 아니라 **코드가 그리는 부품**만 모아 둔 방. 썸네일은 게임을 실제로
+     띄워 잘라 온 실렌더다(catalog/_css-previews/ · CSS 재현이 아니다).       */
+  if(CODE.length){
+    const n=CODE.reduce((a,G)=>a+G.items.length,0);
+    const withpv=CODE.reduce((a,G)=>a+G.items.filter(it=>PV[it[0]]).length,0);
+    const s=document.createElement('section'); s.className='cat codecat';
+    const h=document.createElement('h2');
+    h.innerHTML='<span class="rn">🎨</span>코드 구현 — 그림이 아니라 코드가 그리는 부품'
+      +'<span class="cnt" style="margin-left:auto;font-weight:400;font-size:.72rem;color:var(--sub)">'
+      +'미리보기 '+withpv+'/'+n+'</span>';
+    s.appendChild(h);
+    const body=document.createElement('div'); body.className='secbody';
+    const mb=document.createElement('div'); mb.className='mainbody';
+    CODE.forEach(function(G){
+      const where=G.sec+' › '+G.name;
+      const det=document.createElement('details'); det.className='grp'; det.open=true;
+      const k=G.items.filter(it=>PV[it[0]]).length;
+      det.innerHTML='<summary>'+esc(where)+'<span class="cnt">'+k+'/'+G.items.length+'</span></summary>';
+      const gb=document.createElement('div'); gb.className='gbody';
+      const grid=document.createElement('div'); grid.className='grid';
+      G.items.forEach(function(it){
+        const c=mkCard(it); regCard(c,it,where); grid.appendChild(c); });
+      gb.appendChild(grid);
+      /* 원 그룹이 통째로 여기로 옮겨 온 경우에만 조립 화면 버튼을 데려온다 —
+         안 그러면 같은 화면 버튼이 두 곳에 서게 된다. */
+      if(G.orphan&&G.scr) gb.appendChild(mkPreview(G.scr,G.si));
+      det.appendChild(gb);
+      det.addEventListener('toggle',function(){
+        if(!det.open&&ACT&&det.contains(ACT.pv)) resetPv(ACT.pv);
+      });
+      mb.appendChild(det);
+    });
+    body.appendChild(mb); s.appendChild(body); cats.appendChild(s);
+  }
 
   buildGapBar(D);          /* 카드가 다 깔린 뒤에 — 점프 대상 id 가 잡혀야 한다 */
 }).catch(function(e){
