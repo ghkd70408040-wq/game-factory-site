@@ -27,6 +27,33 @@ h1{font-size:1.35rem;margin:8px 0 10px}
 .fb:hover{border-color:var(--sub)}
 .fb.on{background:var(--ink);color:#FFF;border-color:var(--ink)}
 
+/* ── 2-B. 에셋 확보 현황 요약 바 (접이식) ── */
+.gapbar{border:1px solid var(--line);border-radius:14px;background:var(--card);
+  margin:-8px 0 18px;overflow:hidden}
+.gaphead{display:flex;align-items:center;gap:9px;flex-wrap:wrap;width:100%;
+  font-family:inherit;font-size:.79rem;color:var(--ink);text-align:left;
+  padding:10px 13px;background:#FCF7F1;border:0;cursor:pointer}
+.gaphead:hover{background:#F7EFE5}
+.gaphead .gtot{font-weight:800}
+.gaphead .gsep{color:var(--sub)}
+.gaphead .gk{display:inline-flex;align-items:center;gap:3px;white-space:nowrap;
+  font-variant-numeric:tabular-nums;color:var(--sub)}
+.gaphead .gk b{font-weight:800;color:var(--ink)}
+.gaphead .gcar{margin-left:auto;color:var(--sub);font-size:.72rem;white-space:nowrap}
+.gapbody{padding:0 13px 12px}
+.gaprow{padding:10px 0 4px;border-top:1px solid var(--line)}
+.gaprow>h3{margin:0 0 7px;font-size:.74rem;font-weight:800;color:var(--sub);letter-spacing:.03em}
+.gchips{display:flex;flex-wrap:wrap;gap:5px}
+.gchip{font-family:inherit;font-size:.71rem;padding:3px 10px;border-radius:99px;cursor:pointer;
+  border:1px solid var(--line);background:#FFF;color:var(--ink);max-width:100%;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}
+.gchip:hover{border-color:var(--sub);background:#FCF7F1}
+.gchip .gsec{color:var(--sub);font-size:.66rem;margin-right:5px}
+.gnone{font-size:.72rem;color:var(--sub)}
+@keyframes gflash{0%,100%{box-shadow:0 0 0 0 rgba(194,69,69,0)}
+  25%,65%{box-shadow:0 0 0 4px rgba(194,69,69,.55)}}
+.gjump{animation:gflash 1.6s ease-out}
+
 /* ── 3-A. 섹션 (큰 번호 제목) ── */
 section.cat{background:var(--card);border:1px solid var(--line);border-radius:16px;
   margin-bottom:22px;overflow:hidden}
@@ -208,6 +235,9 @@ details.avgrp[open]>summary::before{transform:rotate(90deg)}
   .avgrid{grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:7px;padding:9px 10px 13px}
   .avthumb{height:74px}.avthumb img{max-height:68px}
   .avsearch{max-width:none}
+  .gaphead{font-size:.73rem;gap:7px;padding:9px 11px}
+  .gaphead .gcar{margin-left:0;width:100%}
+  .gapbody{padding:0 11px 11px}
   .lbtool{padding:7px 9px;gap:4px}
   .lbtool .fb{font-size:.72rem;padding:4px 10px}
   .lbtitle{font-size:.82rem;width:100%}
@@ -219,6 +249,7 @@ details.avgrp[open]>summary::before{transform:rotate(90deg)}
 <main>
 <h1>🗼 틴트윈 관제탑</h1>
 <div class="filters" id="filters"></div>
+<div class="gapbar" id="gapbar" hidden></div>
 <div id="worklog" hidden></div>
 <div id="assetview" hidden></div>
 <div id="cats"></div>
@@ -681,6 +712,104 @@ function applyFilter(f){
   });
 }
 
+/* ── 에셋 확보 현황 요약 바 ────────────────────────────────────────────
+   렌더 시점의 순수 집계 — 데이터 파일은 읽기만 한다.
+   여기는 "무엇이 없는가"만 본다(있는 것의 품질 판정은 🧪 에셋 검수 탭).   */
+const GAPK=[['ok','🟢','확보'],['css','🎨','CSS'],['temp','🟠','임시'],
+            ['queued','🟣','발주대기'],['empty','🔴','비어있음']];
+const GAPS={temp:[],empty:[]};
+let CID=0;
+
+/* 카드 하나에 점프용 id 를 달고, 빈칸·임시면 목록에 등록한다. */
+function regCard(el,it,where){
+  el.id='gc'+(++CID);
+  const st=it[2];
+  if(st==='temp'||st==='empty') GAPS[st].push({id:el.id,nm:it[0],sec:where});
+}
+
+function gapCount(D){
+  const c={tot:0,ok:0,css:0,temp:0,queued:0,empty:0};
+  (D.sections||[]).forEach(s=>(s.groups||[]).forEach(g=>(g.items||[]).forEach(function(it){
+    c.tot++; if(c[it[2]]!==undefined) c[it[2]]++;
+  })));
+  return c;
+}
+function waitKeys(){
+  return Object.keys(AVS).filter(k=>AVS[k]&&AVS[k].state==='대기').sort();
+}
+
+function selTab(f){
+  document.getElementById('filters').querySelectorAll('.fb')
+    .forEach(x=>x.classList.toggle('on',x.dataset.f===f));
+}
+function flashEl(el){
+  el.classList.remove('gjump'); void el.offsetWidth; el.classList.add('gjump');
+  setTimeout(function(){ el.classList.remove('gjump'); },1700);
+}
+function jumpCard(id){
+  selTab('all'); showPane('cats'); applyFilter('all');
+  const el=document.getElementById(id); if(!el) return;
+  const det=el.closest('details.grp'); if(det) det.open=true;
+  el.scrollIntoView({block:'center',behavior:'smooth'}); flashEl(el);
+}
+function jumpAsset(k){
+  selTab('asset'); showPane('asset'); buildAssetView();
+  const box=document.getElementById('assetview');
+  const bar=box.querySelector('.avbar');
+  if(bar){
+    const q=bar.querySelector('#avq'); if(q) q.value='';
+    bar.querySelectorAll('.fb').forEach(x=>x.classList.toggle('on',x.dataset.st==='대기'));
+    avFilter();
+  }
+  const el=box.querySelector('.avcard[data-k="'+String(k).replace(/"/g,'')+'"]');
+  if(!el) return;
+  const det=el.closest('details.avgrp'); if(det) det.open=true;
+  el.scrollIntoView({block:'center',behavior:'smooth'}); flashEl(el);
+}
+
+function gapRow(title,list,kind){
+  const row=document.createElement('div'); row.className='gaprow';
+  const h=document.createElement('h3'); h.textContent=title; row.appendChild(h);
+  if(!list.length){
+    const p=document.createElement('div'); p.className='gnone';
+    p.textContent='없음 — 이 칸은 비어 있지 않습니다.'; row.appendChild(p); return row;
+  }
+  const wrap=document.createElement('div'); wrap.className='gchips';
+  list.forEach(function(o){
+    const b=document.createElement('button'); b.type='button'; b.className='gchip';
+    b.innerHTML=(o.sec?'<span class="gsec">'+esc(o.sec)+'</span>':'')+esc(o.nm);
+    b.addEventListener('click',function(){
+      if(kind==='asset') jumpAsset(o.nm); else jumpCard(o.id);
+    });
+    wrap.appendChild(b);
+  });
+  row.appendChild(wrap); return row;
+}
+
+function buildGapBar(D){
+  const box=document.getElementById('gapbar'), c=gapCount(D), wk=waitKeys();
+  box.innerHTML='';
+  const head=document.createElement('button');
+  head.type='button'; head.className='gaphead'; head.setAttribute('aria-expanded','false');
+  head.innerHTML='<span class="gtot">부품 전체 '+c.tot+'</span><span class="gsep">—</span>'
+    +GAPK.map(k=>'<span class="gk">'+k[1]+k[2]+' <b>'+c[k[0]]+'</b></span>').join('')
+    +'<span class="gk">🧪검수대기 <b>'+wk.length+'</b></span>'
+    +'<span class="gcar">▾ 빈칸·임시 펼치기</span>';
+  const body=document.createElement('div'); body.className='gapbody'; body.hidden=true;
+  body.appendChild(gapRow('🔴 비어있음 '+GAPS.empty.length+'건 — 아직 아무것도 없는 칸',
+                          GAPS.empty,'card'));
+  body.appendChild(gapRow('🟠 임시 '+GAPS.temp.length+'건 — 임시로 때워 둔 칸',
+                          GAPS.temp,'card'));
+  body.appendChild(gapRow('🧪 검수대기 '+wk.length+'건 — 올라왔지만 아직 판정 전',
+                          wk.map(k=>({nm:k,sec:''})),'asset'));
+  head.addEventListener('click',function(){
+    const open=body.hidden; body.hidden=!open;
+    head.setAttribute('aria-expanded',String(open));
+    head.querySelector('.gcar').textContent=open?'▴ 접기':'▾ 빈칸·임시 펼치기';
+  });
+  box.appendChild(head); box.appendChild(body); box.hidden=false;
+}
+
 Promise.all([
   fetch('board-data.json?v='+Date.now()).then(r=>r.json()),
   fetch('catalog/manifest.json?v='+Date.now()).then(r=>r.json()),
@@ -710,6 +839,7 @@ Promise.all([
   D.sections.forEach(function(sec,si){
     const s=document.createElement('section'); s.className='cat';
     const m=sec.title.match(/^([Ⅰ-Ⅶ]+)\.\s*(.*)$/);
+    const secShort=m?m[1]:sec.title;
     const h=document.createElement('h2');
     h.innerHTML = m ? '<span class="rn">'+esc(m[1])+'</span>'+esc(m[2]) : esc(sec.title);
     s.appendChild(h);
@@ -721,7 +851,8 @@ Promise.all([
     if(bgItems.length){
       const side=document.createElement('aside'); side.className='side';
       side.innerHTML='<div class="sidehead">배경</div>';
-      bgItems.forEach(it=>side.appendChild(mkBgCard(it,si)));
+      bgItems.forEach(function(it){
+        const c=mkBgCard(it,si); regCard(c,it,secShort+' 배경'); side.appendChild(c); });
       body.appendChild(side);
     }
 
@@ -735,7 +866,8 @@ Promise.all([
         +'<span class="cnt">'+filled+'/'+items.length+'</span></summary>';
       const gb=document.createElement('div'); gb.className='gbody';
       const grid=document.createElement('div'); grid.className='grid';
-      items.forEach(it=>grid.appendChild(mkCard(it)));
+      items.forEach(function(it){
+        const c=mkCard(it); regCard(c,it,g.name); grid.appendChild(c); });
       gb.appendChild(grid);
       if(g.scr) gb.appendChild(mkPreview(g.scr,si));   /* 화면에 대응하는 그룹만 */
       det.appendChild(gb);
@@ -747,6 +879,8 @@ Promise.all([
 
     body.appendChild(mb); s.appendChild(body); cats.appendChild(s);
   });
+
+  buildGapBar(D);          /* 카드가 다 깔린 뒤에 — 점프 대상 id 가 잡혀야 한다 */
 }).catch(function(e){
   document.getElementById('cats').innerHTML=
     '<p style="color:#C24545">데이터 로드 실패: '+esc(e.message)+'</p>';
