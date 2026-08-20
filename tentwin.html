@@ -38913,7 +38913,17 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
      프리멀티플라이드라 브라우저가 straight 로 해석하는 순간 반투명 구간의 RGB
      가 통째로 어두워져 유리가 **잿빛 판때기**로 보였다(중앙 실측 rgb(43,48,61)
      @a=80 → 언프리멀티 rgb(137,153,194)). 원본은 지우지 않고 남긴다. */
-  --w65-capsule:url("catalog/glass-hud-capsule-st.webp");
+  /* W-C2(2026-08-21) — 정화 재절단본 v3 으로 교체. 구판 한 줄은 지우지 않고
+     봉인한다(롤백은 이 두 줄을 맞바꾸는 것이 전부다):
+       --w65-capsule:url("catalog/glass-hud-capsule-st.webp");
+     교체 근거는 붓질이 아니라 **매팅 잔재**다. 구판 -st 는 체커 배경에서
+     알파를 역산한 판이라 400% 에서 격자 무늬가 유리 몸통에 남아 있었다
+     (staging: 체커 주기 진폭 0.789 → 0.172, −78%). v3 은 이미 정화된 통짜
+     glass-hud-v2.webp 에서 원판 좌표 px[494,136,716,273] 를 그대로 오려 낸
+     것이라 같은 그림의 같은 픽셀이고, 격자만 없다.
+     ⚠ 캔버스가 744×298 → 716×273 으로 바뀌었다. 9슬라이스 캡(--w65-cap)이
+     `200 × 높이 ÷ 원본높이` 로 정의돼 있으므로 아래 한 줄도 함께 움직인다. */
+  --w65-capsule:url("catalog/glass-capsule-v3.webp");
   /* 🚨 W6.5b 원복 — 무지개 X 전량 철회(사용자: "이전 게 완벽했는데 왜 바꿨냐").
      변수는 **지우지 않고 봉인**한다: 소비처 넷(③ 블록)이 함께 봉인돼 있으므로
      이 한 줄을 되살리는 것이 롤백의 전부다. staging 은 "반려".
@@ -39286,7 +39296,11 @@ html[lang="en"] .splash-logo{
      target.png)에도 이쪽이 가깝다. 12창 전부 같은 값이다.
      flex 중앙정렬은 글자를 그 고정 높이 안에 세우기 위한 것이다(글자 높이가
      상자를 정하던 관계를 뒤집는다). */
-  --w65-cap:54px;                /* = 200 × 80 ÷ 298. 높이를 바꾸면 같이 바꾼다 */
+  /* W-C2 — 캡슐이 v3(716×273)으로 갈리면서 분모가 298 → 273 이 됐다. 이 한 줄이
+     위 문단의 "둘을 같게 두면" 을 지키는 유일한 자리다: 세로 배율 H÷273 과
+     가로 배율 cap÷200 이 어긋나는 순간 알약이 다시 구겨진다.
+     구판(-st) 값 봉인 — 롤백은 이 값으로 되돌린다:  --w65-cap:54px;  (= 200 × 80 ÷ 298) */
+  --w65-cap:59px;                /* = 200 × 80 ÷ 273. 높이를 바꾸면 같이 바꾼다 */
   box-sizing:border-box;
   height:80px;
   display:flex;
@@ -39379,7 +39393,7 @@ html[lang="ko"] #modal-mode .r10-ribbon > h2{ color:transparent; text-shadow:non
    (color 만 투명하게 하면 background-clip:text 판이 그대로 남는다). */
 #modal-mode .r10-ribbon{
   border-style:solid !important;
-  border-width:0 var(--w65-cap,54px) !important;   /* W6.5b — 세로 슬라이스 폐지 */
+  border-width:0 var(--w65-cap,59px) !important;   /* W6.5b — 세로 슬라이스 폐지. W-C2: 폴백도 v3(÷273) 값으로 */
   border-image:var(--w65-capsule) 0 200 fill stretch !important;
   border-radius:0 !important;
   width:fit-content !important;
@@ -39892,7 +39906,7 @@ html[lang="ko"] #modal-mode .r10-ribbon > h2{
   border-image-width:0 !important;
   border-width:0 !important;
   background-color:transparent !important;
-  background-image:url("catalog/glass-hud-slab-st.webp") !important;
+  background-image:url("catalog/glass-slab-v2.webp") !important;   /* W-C2: 구판 glass-hud-slab-st.webp */
   background-repeat:no-repeat !important;
   background-position:center top !important;
   background-size:100% 100% !important;
@@ -40014,8 +40028,22 @@ html[lang="ko"] #modal-mode .r10-ribbon > h2{
      **상단 중앙에 홈**이 있어 캡슐이 앉을 자리를 그림이 이미 갖고 있다.
      원판(glass-hud-report.json)에서 캡슐 아래끝(419)은 plate(292~590) 안쪽
      42.6% 지점이다 — 아래 -57.4% 가 바로 그 값이고, 시안의 "튀어나온 시계"가
-     임의 배치가 아니라 원판의 겹침이라는 뜻이다. */
-  background-image:url("catalog/glass-hud-plate-st.webp");
+     임의 배치가 아니라 원판의 겹침이라는 뜻이다.
+
+     W-C2(2026-08-21) — 부재를 **정화 재절단본 glass-band-v2.webp** 로 갈았다.
+     구판 한 줄 봉인(롤백은 이 두 줄 맞바꾸기):
+       background-image:url("catalog/glass-hud-plate-st.webp");
+     plate-st 가 체커 매팅 잔재가 가장 심했던 자리다 — 400% 좌 명패 림에서
+     격자가 육안으로 보였고(staging: 격자 에너지 7.49 → 0.62, −92%), 그것이
+     사용자가 지적한 그 무늬다. band-v2 는 이미 정화된 통짜에서 원판 좌표
+     px[24,315,1660,243] 을 그대로 오려 낸 같은 그림의 같은 픽셀이다.
+     ⚠ 상자 기하는 **한 줄도 안 바꾼다**. 캔버스 비율이 5.688 → 6.831 로
+     달라졌지만 aspect-ratio 를 따라 바꾸면 클래식 상단 높이가 17% 줄어 판이
+     위로 밀리고, 그건 유리 교체가 요구한 적 없는 레이아웃 변경이다.
+     `background-size:100% 100%` 가 세로만 원본의 1.20 배로 펴는데, 이 부재는
+     세로 방향으로 균일한 서리유리 판이라 펴져도 형상이 안 바뀐다(림 두께만
+     비례해 두꺼워지고, 그건 구판이 이미 서 있던 두께다). */
+  background-image:url("catalog/glass-band-v2.webp");
   background-repeat:no-repeat;
   background-position:center top;
   background-size:100% 100%;
@@ -40033,7 +40061,8 @@ html[lang="ko"] #modal-mode .r10-ribbon > h2{
 }
 #app.classic #classic-hud::after{
   content:"";
-  background-image:url("catalog/glass-hud-capsule-st.webp");
+  /* W-C2 — 구판 봉인: background-image:url("catalog/glass-hud-capsule-st.webp"); */
+  background-image:url("catalog/glass-capsule-v3.webp");
   background-repeat:no-repeat;
   background-position:center;
   background-size:100% 100%;
@@ -40073,10 +40102,13 @@ html[lang="ko"] #modal-mode .r10-ribbon > h2{
   border-style:solid;
   border-color:transparent;
   border-width:0;
-  border-image-source:url("catalog/glass-hud-capsule-st.webp");
+  /* W-C2 — 구판 봉인: border-image-source:url("catalog/glass-hud-capsule-st.webp"); */
+  border-image-source:url("catalog/glass-capsule-v3.webp");
   border-image-slice:0 200 fill;
   border-image-repeat:stretch;
-  border-image-width:0 5.43cqw;   /* = 200 ÷ 298 × 8.09cqw(=46% 높이) */
+  /* W-C2 — 분모가 캡슐 원본 높이다. v3(273)으로 갈리며 5.43 → 5.93cqw.
+     구판 값 봉인: border-image-width:0 5.43cqw;  (= 200 ÷ 298 × 8.09cqw) */
+  border-image-width:0 5.93cqw;   /* = 200 ÷ 273 × 8.09cqw(=46% 높이) */
   z-index:1;
 }
 #app.classic #ch-l{ left:3.2%;  width:23%; }
@@ -40726,7 +40758,11 @@ var L=("jelly-box,duel-title-play,sian2-ribbon,sian2-btn-pink,sian2-btn-purple,"
       전투는 메뉴→맵→노드를 거쳐야 오므로 목록 끝으로도 늦지 않다. */
       /* W-B ① — 1층 유리가 v2 로 바뀌었다. 데울 대상도 함께 옮긴다.
          구판 한 조각(롤백 근거, 파일은 보존): "glass-hud-full," */
-      +"glass-hud-v2,glass-hud-capsule-st,glass-hud-plate-st,glass-hud-bar-st,"
+      /* W-C2 — 부재 셋이 정화 재절단본으로 갈렸다. 데울 대상도 같이 옮긴다:
+         구판 조각(롤백 근거, 파일은 보존)
+           "glass-hud-capsule-st,glass-hud-plate-st,"
+         glass-hud-bar-st(하단 액션바)는 재절단 대상이 아니라 그대로 둔다. */
+      +"glass-hud-v2,glass-capsule-v3,glass-band-v2,glass-hud-bar-st,"
       +"sian3-close,art-logo-en,"
       +"ttl-settings,ttl-pause,ttl-rank,ttl-play,ttl-clear,"
       +"ttl-over,ttl-daily,ttl-skin,ttl-chars,"
