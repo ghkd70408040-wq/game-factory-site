@@ -12032,19 +12032,56 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
 #modal-classic .mode-list .mode-row:active { transform: translateY(2px); }
 /* 세 줄의 색은 일반 시트의 같은 종목과 **같은 계열**로 맞춘다 — 아케이드=보라,
    러시=노랑, 데일리=민트. 클래식이 별세계가 아니라 같은 종목의 다른 규칙이라는
-   것이 색으로 먼저 읽혀야 한다. 채도만 한 단계 낮춰 "장식을 뺀 판"을 만든다. */
+   것이 색으로 먼저 읽혀야 한다. 채도만 한 단계 낮춰 "장식을 뺀 판"을 만든다.
+
+   🚨 W6.5b — 사용자 반려("밋밋한 선 글리프 · 판과 안 어울리는 단색"). 아래 세
+   줄은 **단색 그라데이션 두 칸**이었다. 옆 창(#modal-mode)의 같은 종목 행은
+   광택이 구워진 젤리 버튼인데, 그 옆에 두면 클래식만 종이로 읽힌다.
+   그래서 이 파일이 이미 쓰는 **캔디 문법**을 그대로 얹는다(발주 0 · 새 그림 0):
+     ① 상단 하드에지 스펙큘러 47%  ② 하단 바닥 밴드  ③ 딥 아웃라인(면색 34% 딥)
+   색은 한 톤도 안 바꾼다 — 바뀌는 것은 같은 색의 **질감**뿐이다. */
+#modal-classic .mode-list .mode-row {
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+}
 #modal-classic #classic-arcade {
   background-color: transparent;
-  background-image: linear-gradient(180deg, #C6A2F5 0%, #A97FE4 100%);
+  background-image:
+    linear-gradient(180deg, rgba(255,255,255,.42) 0%, rgba(255,255,255,.30) 44%, rgba(255,255,255,0) 47%),
+    linear-gradient(0deg, rgba(88,54,140,.30) 0%, rgba(88,54,140,0) 15%),
+    linear-gradient(180deg, #C6A2F5 0%, #A97FE4 100%);
+  box-shadow: 0 3px 0 rgba(88,54,140,.42), inset 0 0 0 1.5px rgba(120,78,180,.55),
+              inset 0 2px 0 rgba(255,255,255,.55);
 }
 #modal-classic #classic-rush {
   background-color: transparent;
-  background-image: linear-gradient(180deg, #FFD97A 0%, #EFB752 100%);
+  background-image:
+    linear-gradient(180deg, rgba(255,255,255,.46) 0%, rgba(255,255,255,.32) 44%, rgba(255,255,255,0) 47%),
+    linear-gradient(0deg, rgba(176,116,20,.30) 0%, rgba(176,116,20,0) 15%),
+    linear-gradient(180deg, #FFD97A 0%, #EFB752 100%);
+  box-shadow: 0 3px 0 rgba(176,116,20,.42), inset 0 0 0 1.5px rgba(206,146,40,.55),
+              inset 0 2px 0 rgba(255,255,255,.60);
 }
 #modal-classic #classic-daily {
   background-color: transparent;
-  background-image: linear-gradient(180deg, #93E2C7 0%, #5FC0A4 100%);
+  background-image:
+    linear-gradient(180deg, rgba(255,255,255,.44) 0%, rgba(255,255,255,.30) 44%, rgba(255,255,255,0) 47%),
+    linear-gradient(0deg, rgba(28,110,86,.30) 0%, rgba(28,110,86,0) 15%),
+    linear-gradient(180deg, #93E2C7 0%, #5FC0A4 100%);
+  box-shadow: 0 3px 0 rgba(28,110,86,.42), inset 0 0 0 1.5px rgba(58,148,120,.55),
+              inset 0 2px 0 rgba(255,255,255,.58);
 }
+/* ---- 행 아이콘 = **모드창 행 아트에서 떼어 온 젤리 아이콘** -----------------
+   사용자 반려의 본문이다: 선 글리프(--lib-glyph-inf/-cal/-clock)는 이 판에서
+   젤리 체계 위반이다. 새로 그리지 않는다 — 이미 통과한 #modal-mode 네 행의
+   왼쪽에 같은 뜻의 젤리 아이콘이 이미 그려져 있고, tools/mode-icon-extract.py 가
+   그 구운 그림에서 아이콘만 투명 웹피로 떠냈다(경계 세기 키잉, 발주 0).
+   `.nchip-*::before` 의 **앞칸을 덮는 방식이 아니라 값을 갈아 끼우는 방식**이라
+   되돌리려면 이 세 줄만 지우면 :10006 의 선 글리프가 되살아난다. */
+#modal-classic .nchip-arc::before  { background-image: url("catalog/mode-ico-arcade.webp"); }
+#modal-classic .nchip-rush::before { background-image: url("catalog/mode-ico-rush.webp"); }
+#modal-classic .nchip-day::before  { background-image: url("catalog/mode-ico-daily.webp"); }
 /* 단축(background:)이 아니라 롱핸드다 — 이 파일의 규율이고, .nchip 은 특히
    그렇다: 글리프를 background-image 로만 얹는 ::before 를 가진 계열이라
    단축 한 줄이 아이콘을 통째로 지운 전력이 있다. */
@@ -13509,7 +13546,7 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
         <span class="cp-sky" aria-hidden="true"></span>
         <div class="cp-head">
           <h2 id="cp-h" data-i18n="pick.head">Character Select</h2>
-          <button id="cp-close" class="icon-btn" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
+          <button id="cp-close" class="icon-btn x-btn" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
         </div>
         <div class="cp-view">
           <div id="char-pick" role="radiogroup" data-i18n-aria="aria.charpick" aria-label="Choose your character">
@@ -14030,7 +14067,7 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
        낱말을 지우는 것으로 끝난다. -->
   <div id="modal-howto" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="howto-h"><div class="sheet jbox jbox--modal">
     <h2 id="howto-h" data-i18n="howto.title">How to play</h2>
-    <button class="r10-x" type="button" data-w6x="howto-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
+    <button class="r10-x x-btn" type="button" data-w6x="howto-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
     <div id="howto-viewport"><div id="howto-track">
 
       <!-- 14차 #34 — 규칙 요약 카드. 도움말의 첫 장이고, 일시정지(#pz-howto) ·
@@ -14158,7 +14195,7 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
        missing i18n key can never leave an English string on a Korean screen. -->
   <div id="modal-tutorial" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="tut-h"><div class="sheet jbox jbox--modal">
     <h2 id="tut-h" data-i18n="howto.title">How to play</h2>
-    <button class="r10-x" type="button" data-w6x="tut-skip" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
+    <button class="r10-x x-btn" type="button" data-w6x="tut-skip" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
     <div id="tut-stage"></div>
     <p id="tut-text"></p>
     <div id="tut-dots"><i class="dot on"></i><i class="dot"></i><i class="dot"></i></div>
@@ -14180,7 +14217,7 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
        ============================================================ -->
   <div id="modal-settings" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="set-h"><div class="sheet jbox jbox--modal">
     <h2 id="set-h" data-i18n="settings.title">Settings</h2>
-    <button class="r10-x" type="button" data-w6x="st-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
+    <button class="r10-x x-btn" type="button" data-w6x="st-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
     <div class="set-list">
       <div class="set-row"><span class="set-k" data-i18n="settings.sound">Sound</span><button id="st-sound" class="set-tg" type="button" data-i18n-aria="aria.sound" aria-label="Sound" aria-pressed="true">On</button></div>
       <div class="set-row"><span class="set-k" data-i18n="settings.vibe">Vibration</span><button id="st-vibe" class="set-tg" type="button" data-i18n-aria="aria.vibe" aria-label="Vibration" aria-pressed="true">On</button></div>
@@ -14205,7 +14242,7 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
        ============================================================ -->
   <div id="modal-skin" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="sk-h"><div class="sheet jbox jbox--modal">
     <h2 id="sk-h" data-i18n="skin.title">Skins</h2>
-    <button class="r10-x" type="button" data-w6x="sk-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
+    <button class="r10-x x-btn" type="button" data-w6x="sk-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
     <p class="sk-bal"><span data-i18n="skin.balance">Jelly stars</span><b class="sk-bal-v"><i class="gem-ic" aria-hidden="true">★</i><span id="sk-gems">0</span></b></p>
     <div id="sk-list" class="sk-list"></div>
     <button id="sk-close" class="btn btn-primary" type="button" data-i18n="settings.close">Close</button>
@@ -14213,7 +14250,7 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
 
   <div id="modal-pause" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="pause-h"><div class="sheet jbox jbox--modal">
     <h2 id="pause-h" data-i18n="pause.title">Paused</h2>
-    <button class="r10-x" type="button" data-w6x="pz-resume" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
+    <button class="r10-x x-btn" type="button" data-w6x="pz-resume" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
     <!-- ============================================================
          W6 (사용자 지시) — "동일 구성요소는 반드시 동일 에셋/문법".
          소리·진동·테마·언어 넉 줄은 설정 창(#modal-settings)에도 **똑같이**
@@ -14276,7 +14313,7 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
     <!-- 10차 §B — "LEVEL 64" 문법. 리본이 패널 위에 걸쳐 앉고, 닫기는 리본 오른쪽
          바깥이 아니라 패널 우상단에 44pt 로 붙는다(엄지가 닿는 자리). -->
     <div class="r10-ribbon"><h2 id="node-title">Stage 1</h2></div>
-    <button id="node-close" class="r10-x" type="button" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
+    <button id="node-close" class="r10-x x-btn" type="button" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
     <span id="node-got" class="node-got" aria-hidden="true" hidden></span>
     <!-- ============================================================
          v4 5차 §4 — 보스전의 사전 공개.
@@ -14355,7 +14392,7 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
        ============================================================ -->
   <div id="modal-mode" class="modal r10m" hidden role="dialog" aria-modal="true" aria-labelledby="mode-h"><div class="sheet r10-panel jbox jbox--modal">
     <div class="r10-ribbon"><h2 id="mode-h" data-i18n="mode.title">Play</h2></div>
-    <button id="mode-close" class="r10-x" type="button" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
+    <button id="mode-close" class="r10-x x-btn" type="button" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
     <div class="mode-list">
       <button id="mode-adv" class="mode-row" type="button">
         <span class="nchip nchip-adv" aria-hidden="true"></span>
@@ -14393,7 +14430,7 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
        세 줄은 모험이 없다 — 클래식은 순수 실력 종목만 모으는 자리다. -->
   <div id="modal-classic" class="modal r10m" hidden role="dialog" aria-modal="true" aria-labelledby="classic-h"><div class="sheet r10-panel jbox jbox--modal">
     <div class="r10-ribbon"><h2 id="classic-h" data-i18n="classic.title">Classic</h2></div>
-    <button id="classic-close" class="r10-x" type="button" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
+    <button id="classic-close" class="r10-x x-btn" type="button" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
     <p id="classic-lead" data-i18n="classic.lead">No skills, no items, no passives. Just you and the board.</p>
     <div class="mode-list">
       <button id="classic-arcade" class="mode-row" type="button">
@@ -14469,7 +14506,7 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
        moment the sheet opens, and never between opens. -->
   <div id="modal-rank" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="rank-h"><div class="sheet jbox jbox--modal">
     <h2 id="rank-h" data-i18n="rank.title">Records</h2>
-    <button class="r10-x" type="button" data-w6x="rank-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
+    <button class="r10-x x-btn" type="button" data-w6x="rank-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
     <div id="rank-tabs" role="tablist" data-i18n-aria="aria.rankTab" aria-label="Pick which records to show">
       <button id="rank-tab-endless" class="rank-tab" role="tab" aria-selected="true" data-i18n="rank.tab.endless">Endless</button>
       <button id="rank-tab-rush" class="rank-tab" role="tab" aria-selected="false" data-i18n="rank.tab.rush">Time Rush</button>
@@ -35506,7 +35543,14 @@ window.TT_SFX = {
 #screen-menu .mbtn .mbtn-chip{display:none !important;}
 #screen-menu .mbtn .mbtn-lab{left:27% !important;right:8% !important;text-align:left;font-size:min(22px,5.2vw) !important;}
 #screen-menu .mbtn:active{transform:translateY(2px);filter:brightness(.95);}
-#screen-menu .tagline{position:relative;display:inline-block;margin:8px auto 0;padding:13px 42px 15px;max-width:88%;border:0;box-shadow:none;background:url("catalog/sian2-ribbon.webp") center/100% 100% no-repeat;color:#4F4953;font-weight:700;text-shadow:0 0 2px rgba(255,255,255,.35);}
+/* W6.5b — 리본 글자를 **띠 중심축**으로 올린다(사용자 반려: 문구가 리본 가운데보다
+   아래에 앉아 있다). 실측이 그 말을 확인한다: sian2-ribbon.webp(700×203)의 띠는
+   중앙 열에서 y 28~145 이고 중심이 **0.426H**인데, 글자 중심은 0.469H 였다
+   (상자 48px · padding 13/15 · line-height 20px · 글리프 13px).
+   background-size 가 100% 100% 라 띠 중심은 상자 높이에 비례해 늘 0.426 이므로,
+   패딩 합(28px)을 유지한 채 위쪽만 2px 덜어 13/15 → **11/17** 로 옮긴다.
+   → 글자 중심 0.469 → 0.427H (띠 중심과 0.001 차). 상자 높이·리본 크기 불변. */
+#screen-menu .tagline{position:relative;display:inline-block;margin:8px auto 0;padding:11px 42px 17px;max-width:88%;border:0;box-shadow:none;background:url("catalog/sian2-ribbon.webp") center/100% 100% no-repeat;color:#4F4953;font-weight:700;text-shadow:0 0 2px rgba(255,255,255,.35);}
 </style>
 
 <style id="sian-play-sprites">
@@ -35519,11 +35563,19 @@ window.TT_SFX = {
    유리판은 이미지가 아니다: panel-black.png 3점 샘플
      body #C4A4B6 · hl #F9F1F6 · rim #EFD1E9 를 CSS 로 재현.
    ============================================================ */
+/* 🚨 W6.5b 봉인 — **판 단일 소스**(사용자 원칙: 전 모달은 같은 판이다).
+   이 세 줄이 플레이 창만 다른 스크림을 쓰게 만들고 있었다(남보라 .22 · blur 2.5px
+   vs 공통 rgba(88,64,112,.12) · blur 1px). W2.5 ⑤ 가 "플레이 팝업의 값을 열 창
+   전체로 넓힌다"며 이 값을 공통으로 옮겨 갔는데, 그 뒤 공통값이 두 번 더 움직이는
+   동안(W7.5 · W6.5b 투명도 3차) 여기만 옛 값에 남아 **혼자 뿌옇고 혼자 어두웠다**.
+   판을 등급 하나에서만 정하기로 한 이상 이 자리는 비어 있어야 한다.
+   롤백: 이 주석 한 쌍을 벗긴다.
 #modal-mode.modal{
   background:rgba(26,14,38,.22) !important;
   -webkit-backdrop-filter:blur(2.5px) saturate(1.06) !important;
   backdrop-filter:blur(2.5px) saturate(1.06) !important;
 }
+   봉인 끝 */
 #modal-mode .sheet.r10-panel{
   max-width:min(326px,100%) !important;
   padding:16px 14px 26px !important;
@@ -35587,12 +35639,19 @@ window.TT_SFX = {
 #modal-mode .mode-list .mode-row .mode-t,
 #modal-mode .mode-list .mode-row .mode-b{display:none !important;}
 #modal-mode .mode-list .mode-row:active{transform:translateY(2px);filter:brightness(.96);}
+/* 🚨 W6.5b 봉인 — **무지개 X 완전 퇴출**(사용자 3차 격노: "모든 X 를 원래
+   쓰던 걸로, 아예 다 지워버려라"). 이 규칙이 사용자가 실측으로 짚은 그
+   자리다 — 플레이 창의 X 는 W6.5a 의 --w65-x 가 아니라 **시안 3호가 구워 둔
+   무지개 젤리 X**(96×99 base64)였고, 그래서 W6.5a 원복으로도 안 사라졌다.
+   같은 규칙이 X 를 39px 로 눌러 44pt 터치 타깃도 깨고 있었다 — 크기·자리는
+   이제 아래 `.x-btn` 단일 컴포넌트가 준다. 롤백: 이 주석 한 쌍 벗기기.
 #modal-mode .r10-x{background:url("data:image/webp;base64,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") center/100% 100% no-repeat !important;
   border:0 !important;border-radius:0 !important;box-shadow:none !important;
   width:39px !important;height:39px !important;min-width:39px !important;min-height:39px !important;
   top:12px !important;right:-3px !important;
   color:transparent !important;font-size:0 !important;line-height:0 !important;
   text-indent:-9999px;overflow:hidden;}
+   봉인 끝 */
 #modal-mode .r10-x:active{transform:scale(.92);}
 </style>
 
@@ -36180,9 +36239,16 @@ window.TT_SFX = {
   text-shadow:0 2px 0 rgba(110,70,58,.55);
 }
 .w6m .sheet .btn:active{ transform:translateY(2px); }
-/* 조각 버튼 공통 — 어느 자리든 상자는 같다. 14차가 캔디로 바꾸면서 padding 에
-   접어 넣었던 값(31/38/35/38 등)을 여기서 도로 풀어야 조각이 제 크기로 앉는다:
-   안 풀면 주황 캔디 배경이 파란 조각 뒤로 삐져나와 테두리처럼 보인다(실측). */
+/* 🚨🚨 W6.5b 전량 봉인 — **버튼 1종 통일**(사용자: "제대로 된 버튼 하나로
+   통일하고 색상만 바꿔 쓰라", 수백 번 말했다는 그 원칙).
+   아래 여섯 블록이 모달 버튼을 **조각 다섯 장**(cta-blue/pink/yellow/orange/
+   purple 9슬라이스)으로 갈라 놓고 있었다. 그래서 한 창 안에 족속이 셋이었다:
+   초록 젤리 알약(토글) · 민무늬 흰 띠(줄버튼) · 눌린 파란 사각(닫기).
+   정본은 **초록 젤리 알약**이고(사용자 판정: 화면에서 가장 완성도 높은 물건),
+   그 기하는 조각이 아니라 이 파일의 **캔디 문법**이라 색만 바꿔 끼울 수 있다.
+   새 정의는 파일 끝 `.btn-jelly` 한 블록이다 — 색 변주 일곱이 거기 한 표에 산다.
+   롤백: 아래 주석 한 쌍을 벗기고 `.btn-jelly` 블록을 지운다.
+
 .w6m .sheet #pz-resume, .w6m .sheet #howto-close, .w6m .sheet #st-close,
 .w6m .sheet #sk-close,  .w6m .sheet #rank-close,
 .w6m .sheet #btn-next,  .w6m .sheet #adv-again,   .w6m .sheet #btn-continue,
@@ -36218,6 +36284,7 @@ window.TT_SFX = {
 .w6m .sheet #pz-menu,
 .w6m .sheet #btn-menu,
 .w6m .sheet #btn-daily-menu{ border-style:solid; border-width:16px 20px 19px 20px; border-image:var(--lib-btn-purple) 31 39 37 39 fill stretch; }
+   버튼 조각 봉인 끝 */
 
 /* --- ④ 우상단 X --------------------------------------------------------------
    조각이 아니라 글자다(ROUND10-SPEC §B "글자만, 44pt"). `.r10-x` 를 그대로
@@ -38292,6 +38359,280 @@ html[lang="ko"] #modal-mode .r10-ribbon > h2{
   box-shadow:none;
 }
    ③ 봉인 끝 */
+
+/* ===========================================================================
+   W6.5b — 버튼 **단일 컴포넌트** `.btn-jelly` (색만 바뀐다)
+
+   사용자 원칙(재천명): "제대로 된 버튼 하나로 통일하고 **색상만** 바꿔 쓰라."
+   실측한 위반: 설정창 한 화면에 족속이 셋이었다.
+     ① 초록 젤리 알약(토글 켜짐)  ② 민무늬 흰 유리 띠(줄버튼)
+     ③ 눌린 파란 **사각** 조각(닫기) ← 9슬라이스 webp 다섯 장이 색마다 한 장
+
+   정본으로 고른 것은 ①이다. 이유가 둘 있다:
+     · 사용자가 화면에서 가장 완성도 높다고 지목한 물건이다.
+     · 그리고 그것은 **조각이 아니라 CSS**다 — 이 파일의 캔디 문법(하드에지 47%
+       + 딥 아웃라인 2.5px + 바닥 밴드 + 3px 드롭). 그래서 "색만 바꾸기"가
+       변수 넉 줄로 닫힌다. 조각이었다면 색마다 새 발주가 필요했다.
+       hue-rotate 필터는 안 쓴다: 필터는 아웃라인·그림자·글자까지 같이 돌려
+       색이 어긋나고, 무엇보다 각 색의 4단(면 상/면 하/드롭/밴드)이 **서로 다른
+       비율**로 어두워져야 젤리로 읽힌다.
+
+   변주는 일곱, 자리는 낱말이 정한다(같은 낱말 = 같은 색, 14차 규약 유지):
+     mint   기본·토글 켜짐        blue  주행동(계속하기·닫기 다섯)
+     pink   다음/진행             yellow 다시/복사        orange 재도전
+     purple 메인 메뉴             lilac  3순위 줄버튼(기록·갤러리·방법·제작진)
+
+   글자 정렬도 여기서 한 번에 닫는다 — flex 중앙정렬이라 line-height 로 맞추던
+   자리가 전부 사라진다(사용자 반려: 줄버튼·닫기·행 라벨의 세로 중앙 어긋남).
+   =========================================================================== */
+.btn-jelly,
+.cta-jelly,
+.w6m .sheet .btn,
+.w6m .sheet .btn-ghost,
+.w6m .sheet .btn-secondary{
+  --bj-a:#7ED9C0; --bj-b:#54BFA2; --bj-drop:#35866F; --bj-band:#43A184;
+  box-sizing:border-box;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:6px;
+  min-height:52px !important;
+  padding:0 18px !important;
+  border:0 !important;
+  border-image:none !important;
+  border-width:0 !important;
+  border-radius:999px !important;
+  background-color:transparent !important;
+  background-image:linear-gradient(180deg,var(--bj-a) 0%,var(--bj-a) 47%,
+                                          var(--bj-b) 47%,var(--bj-b) 100%) !important;
+  box-shadow:0 3px 0 var(--bj-drop),
+             0 7px 16px rgba(83,28,40,.22),
+             inset 0 0 0 2.5px var(--j-outline),
+             inset 0 -6px 0 var(--bj-band) !important;
+  color:#FFFFFF !important;
+  font-family:var(--font-display) !important;
+  font-size:16px;
+  line-height:1.15 !important;
+  text-align:center;
+  text-shadow:0 1.5px 0 rgba(110,70,58,.55) !important;
+  cursor:pointer;
+}
+.btn-jelly:active,
+.cta-jelly:active,
+.w6m .sheet .btn:active,
+.w6m .sheet .btn-ghost:active,
+.w6m .sheet .btn-secondary:active{ transform:translateY(2px); }
+/* ---- 색 변주 일곱 — 이 표가 색의 유일한 출처다 -----------------------------
+   선택자를 `.w6m .sheet #id`(1,2,0)로 잡는 이유는 SECTION 25-5 의
+   `#modal-clear .btn-primary`(1,1,0)가 클래스 셋(0,3,0)을 이기기 때문이다.
+   변주는 **변수 넉 줄만** 바꾼다 — 기하·정렬·그림자는 위 한 곳에서만 산다. */
+.w6m .sheet #pz-resume, .w6m .sheet #howto-close, .w6m .sheet #st-close,
+.w6m .sheet #sk-close,  .w6m .sheet #rank-close, .btn-jelly--blue{
+  --bj-a:#8ACDF0; --bj-b:#57A6DC; --bj-drop:#2E6F9C; --bj-band:#4290C8;
+}
+.w6m .sheet #btn-next, .w6m .sheet #adv-again, .w6m .sheet #btn-continue,
+.cta-jelly, .btn-jelly--pink{
+  --bj-a:#F8A2C4; --bj-b:#E8749F; --bj-drop:#A63C6A; --bj-band:#D25E8D;
+}
+.w6m .sheet #pz-restart, .w6m .sheet #btn-share, .btn-jelly--yellow{
+  --bj-a:#FFDC84; --bj-b:#F0BC55; --bj-drop:#B07C1C; --bj-band:#DFA63E;
+}
+.w6m .sheet #btn-retry, .btn-jelly--orange{
+  --bj-a:#FFB874; --bj-b:#F08E45; --bj-drop:#B15A16; --bj-band:#DF7A2E;
+}
+.w6m .sheet #pz-menu, .w6m .sheet #btn-menu, .w6m .sheet #btn-daily-menu,
+.btn-jelly--purple{
+  --bj-a:#C6A2F5; --bj-b:#A97FE4; --bj-drop:#6B47A8; --bj-band:#9468D2;
+}
+/* 3순위 줄버튼 — 토글 **꺼짐**이 쓰는 그 라일락이다(색 하나를 더 만들지 않는다).
+   기록·스토리 갤러리·게임 방법·제작진이 여기 산다: 같은 층은 같은 색이라는
+   W6-b ③ 의 층 구분을 색만 바꿔 그대로 잇는다. */
+.w6m .sheet .btn-ghost,
+.w6m .sheet .btn-secondary,
+.btn-jelly--lilac{
+  --bj-a:#CDC2D4; --bj-b:#B3A6BC; --bj-drop:#8B7E95; --bj-band:#A296AC;
+  min-height:48px !important;
+  font-size:15px;
+}
+/* 토글·기록탭은 **이미 정본**이다(W6-b ⑦ 이 만든 그 알약) — 여기서는 상자만
+   같은 규칙에 맞춘다. 색은 건드리지 않는다(켜짐 민트 · 꺼짐 라일락 유지). */
+.w6m .set-tg,
+.w6m .rank-tab{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  line-height:1.15 !important;
+  padding:0 16px !important;
+}
+
+/* ===========================================================================
+   W6.5b — X 버튼 **단일 컴포넌트** `.x-btn`
+
+   사용자 통찰: "창마다 X 가 여러 벌인 것 자체가 병이다." 실측이 그 말대로였다 —
+   이 파일의 X 는 넷이었다:
+     ① `.r10-x`                 글자 × (크림 판 · 잉크색)      :9313
+     ② `.r10-x[data-w6x]`       글자 × (젤리 판 · 흰색+자두)   :36208 계열
+     ③ `#modal-mode .r10-x`     **무지개 젤리 X**(시안 3호 구운 base64) — 봉인
+     ④ `#charpanel #cp-close`   크림 원판 `.icon-btn`
+   W6.5a 는 여기에 다섯째(무지개 ui-x-jelly)를 얹었고 반려됐다. 그런데 원복만
+   해서는 사용자가 본 무지개가 안 사라졌다 — 그것이 ③ 이었기 때문이다.
+   증상이 아니라 **구조**를 고친다: 열 자리 전부가 마크업에서 `x-btn` 한 낱말을
+   달고, 그 낱말의 정의가 **이 블록 한 곳**뿐이다. 앞으로 X 를 바꾸는 일은
+   이 규칙 하나를 고치는 일과 같아진다.
+
+   고른 그림: **글자 ×**(ROUND10-SPEC §B "글자만, 44pt"). 사용자가 "원래 쓰던
+   것"이라 부른 그 X 이고, 조각이 없으므로 다시 어긋날 부품 자체가 없다.
+   흰 글자 + 자두 그림자를 고른 이유는 판이 이제 열 창 모두 **같은 분홍 유리**
+   여서다(판 단일 소스). 크림 판 시절의 잉크색은 그 판이 사라진 지금 근거가 없다.
+   =========================================================================== */
+.x-btn,
+#charpanel #cp-close.x-btn{
+  box-sizing:border-box !important;
+  width:44px !important;
+  height:44px !important;
+  min-width:44px !important;
+  min-height:44px !important;
+  padding:0 !important;
+  border:0 !important;
+  border-radius:22px !important;
+  background:none !important;
+  background-image:none !important;
+  background-color:transparent !important;
+  box-shadow:none !important;
+  filter:none !important;
+  font:800 26px/1 var(--font-latin) !important;
+  color:#FFFFFF !important;
+  -webkit-text-fill-color:#FFFFFF !important;
+  text-indent:0 !important;
+  overflow:visible !important;
+  text-shadow:0 2px 0 rgba(83,28,40,.55), 0 0 6px rgba(83,28,40,.28) !important;
+  cursor:pointer;
+}
+.x-btn:active{ transform:scale(.92); }
+
+/* ===========================================================================
+   W6.5b (2026-08-20) — 전투 HUD 를 **사용자 유리판 세트**로
+
+   시안: tentwin/assets/art/incoming/mockup/gm-glass-hud-user.jpg
+   도착 부재 셋을 실측해서 시안의 조립을 그대로 읽었다 — 세 장은 따로 노는
+   조각이 아니라 **한 벌**이다:
+
+     glass-hud-slab.webp  1694×300  상단 림 없음 · 하단 둥근 모서리 + 중앙 아치
+                                    → 시안 **위 띠**. 본문 알파가 8 근처인
+                                      "거의 투명한 유리"이고 림만 또렷하다.
+     glass-hud-capsule    744×298   알약 → 시안 **가운데 캡슐**(타이머)
+     glass-hud-plate.webp 1695×298  사방 림 · 상단 중앙에 **홈**
+                                    → 시안 **아래 명패 바**. 그 홈이 캡슐이
+                                      얹히는 자리다(실측: 홈 x 27.7~73.7%,
+                                      이 HUD 의 타이머 x 31.5~71% — 우연이
+                                      아니라 같은 시안에서 나온 두 좌표다).
+
+   ▣ 프리멀티플라이드 → straight
+     slab·plate 도 캡슐과 같은 병을 앓는다(W6.5a 주석 참조). tools/
+     glass-hud-straight.py 로 -st 변환본을 만들어 그것만 배선한다. 원본은
+     catalog 에 그대로 남는다.
+
+   ▣ 하단 액션바는 왜 **새 부재**(glass-hud-bar-st)인가
+     사용자 확정은 "같은 유리 디자인의 사각 유리판"인데, 도착 셋 중 사각 판이
+     **하나도 없다**: slab 도 plate 도 가운데에 홈/아치를 갖고 있고, 그것은
+     그림의 모양이라 9슬라이스로도 상하반전으로도 못 지운다. 그래서 plate 의
+     **왼쪽 명패**(홈이 없는 구간, x 0~430)를 좌우로 접어 사각 판을 만들었다
+     (tools/glass-hud-bar.py). 붓질 0 · 새 색 0 — 같은 파일의 같은 픽셀이라
+     위아래 유리가 영원히 같은 유리다. 이음매 실측: x=430 에서 위 20 / 아래
+     277 로 양쪽이 같아 seam 이 안 보인다.
+
+   ▣ 9슬라이스를 **세로로 안 쪼갠다**(W6.5a 캡슐 반려에서 배운 규율)
+     캡슐·액션바 판 둘 다 `0 <cap> fill` + `border-width:0 <cap>` 이다.
+     세로는 원본 전체가 상자 높이로 균일 축소되고, 늘어나는 것은 가로로 균일한
+     허리뿐이라 구겨질 자리가 없다. cap 은 늘 `slice × H ÷ 298` 로 잡는다.
+
+   ▣ 쌓임 순서 — §18.4d 의 계약을 한 칸도 안 흔든다
+     슬래브(요소 배경, 유리 본판) < 명패 바(::before, z 0) < 타이머 유리(-1 을
+     .dh-mid 가 가둔다) · .dh-mid(1) < 데몬·구름(2) < 성·아기구름(3) <
+     날개바(4) < 뼈바(5). 바뀐 것은 **그림뿐**이고 z 값은 그대로다.
+   =========================================================================== */
+
+/* ---- ① 상단 본판 = slab ---------------------------------------------------
+   `.jbox--slab`(젤리박스 9슬라이스 + 틴트)를 이 자리에서만 유리로 갈아 끼운다.
+   .jbox 규칙은 클래스(0,1,0)이고 이쪽은 (2,1,0) 이라 !important 끼리도 이긴다 —
+   그 절은 한 줄도 안 지운다(다른 소비처 넷이 그대로 쓴다).
+   상단 림이 없는 것을 **결함이 아니라 배치**로 쓴다: 시안에서도 위 띠는 화면
+   상단으로 붙어 잘려 있고, 이 HUD 의 위쪽은 성·데몬·아기구름이 차지해 림이
+   설 자리가 아니다. background-size:100% 100% 로 상자를 꽉 채운다. */
+#app.battle #duel-hud{
+  border-image-source:none !important;
+  border-image-width:0 !important;
+  border-width:0 !important;
+  border-radius:0 !important;
+  background-color:transparent !important;
+  background-image:url("catalog/glass-hud-slab-st.webp") !important;
+  background-repeat:no-repeat !important;
+  background-position:center top !important;
+  background-size:100% 100% !important;
+}
+/* ---- ② 좌우 명패 바 = plate ------------------------------------------------
+   HP 바 두 장(뼈·날개, z 5/4)의 **받침**이다. 상자를 그 둘보다 조금 넓고 조금
+   높게 잡아 유리 림이 사방으로 한 줄 보이게 한다 — 시안의 아래 띠가 그렇다.
+   plate 의 홈이 타이머 폭과 이미 맞으므로 좌우는 그냥 전폭이다.
+   ::before 는 #duel-hud 가 아직 안 쓰던 자리다(자식 열넷은 전부 실제 노드). */
+#app.battle #duel-hud::before{
+  content:"";
+  position:absolute;
+  left:-1.2%;width:102.4%;
+  top:63.0%;height:38.5%;
+  background-image:url("catalog/glass-hud-plate-st.webp");
+  background-repeat:no-repeat;
+  background-position:center;
+  background-size:100% 100%;
+  filter:drop-shadow(0 2px 4px rgba(46,20,58,.28));
+  pointer-events:none;
+  z-index:0;
+}
+/* ---- ③ 타이머 캡슐 ---------------------------------------------------------
+   유리겹은 이미 `#duel-timer::before`(inset:0 · z-index:-1) 한 겹이 맡고 있다.
+   그 겹의 **배경만** 캡슐 그림으로 바꾼다 — 글자 젤리·얼음(chill)·데인저(danger)
+   세 상태는 요소 자신과 `> i` 글리프에 걸려 있어 한 줄도 안 건드린다.
+   cap 폭: 타이머 높이 = 50.5% × (100cqw ÷ 3.072) = 16.44cqw 이므로
+           cap = 200 ÷ 298 × 16.44cqw = **11.03cqw**. 세로·가로 배율이 같다.
+   ⚠ 칠은 `border-image-width` 로 넣고 `border-width` 는 0 으로 둔다 — .nchip
+     이 이미 쓰는 규약이다(그 주석이 본문): border-width 는 칠과 함께 **레이아웃
+     상자를 빼앗는다**. 여기 겹은 inset:0 짜리 장식층이라 상자를 뺏길 이유가 없고,
+     biw 는 칠만 넣으므로 둘이 정확히 분리된다. */
+#app.battle #duel-timer::before{
+  border-style:solid;
+  border-color:transparent;
+  border-width:0;
+  border-image-source:url("catalog/glass-hud-capsule-st.webp");
+  border-image-slice:0 200 fill;
+  border-image-repeat:stretch;
+  border-image-width:0 11.03cqw;
+  border-radius:0 !important;
+  background:none;
+}
+/* 14차 재조립 절(:36744)이 이 겹에 반경을 다시 준다 — 유리 알약에는 반경이
+   필요 없다(모양이 그림에 있다). 같은 특정도라 **뒤에 있는 이 줄**이 이긴다. */
+#app.battle #duel-timer{ border-radius:0 !important; }
+
+/* ---- ④ 하단 액션바 = 사각 유리판 -------------------------------------------
+   `.jbox, #app.battle #actionbar` 와 **같은 선택자**를 한 번 더 쓴다(특정도
+   동률 + 시트 뒤 = 이김). 메달 넉 장(z 위)은 한 픽셀도 안 바뀐다 — 이 절은
+   그 아래 받침 한 겹만 갈아 끼운다. 메달 배선은 사용자 판정 대기라 손대지 않는다.
+   cap 폭: 액션바 높이 **실측 111px** · slice 150 → 150 × 111 ÷ 298 = **56px**
+   (첫 배선의 53px 은 105px 어림값이었고 실측에서 캡이 5.1% 납작했다).
+   🚨 여기서도 `border-width` 가 아니라 `border-image-width` 다. border-width 로
+      53px 을 주면 메달 넉 장이 서는 콘텐츠 상자가 좌우로 106px 줄어든다 —
+      칠만 넣고 상자는 안 뺏는 것이 이 파일의 biw 규약이다(.nchip 주석 참조). */
+#app.battle #actionbar{
+  border-image-source:url("catalog/glass-hud-bar-st.webp") !important;
+  border-image-slice:0 150 fill !important;
+  border-image-repeat:stretch !important;
+  border-image-width:0 56px !important;
+  border-style:solid !important;
+  border-color:transparent !important;
+  border-width:0 !important;
+  border-radius:0 !important;
+  background-color:transparent !important;
+}
 </style>
 
 <script id="bg-preview-hook">
