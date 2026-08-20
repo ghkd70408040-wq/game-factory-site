@@ -32568,7 +32568,17 @@ window.TT_SFX = {
     if (ba) { ba.classList.remove('off'); ba.classList.remove('urge'); }
     if (bh) { bh.classList.toggle('off', !spFull); bh.classList.toggle('urge', spFull); }
     if (bu) { bu.classList.toggle('off', !petOk); bu.classList.remove('urge'); }
-    if (bsh) { bsh.classList.toggle('off', !gFull); bsh.classList.toggle('urge', gFull); }
+    /* W6.5b — 각성 연쇄 루프의 **장전 신호**.
+       `urge`(=지금 누를 수 있다)와 `primed`(=지속 중인데 다음 것이 이미 찼다)는
+       서로 다른 사실이라 클래스를 나눈다. 지속 중에 urge 를 켜면 "빛나는데 안
+       눌리는" 버튼이 되고, 아무 신호도 안 주면 연쇄를 노리는 플레이어가 게이지를
+       못 본다(사용자: 숫자 맞추다 보면 하단이 안 보인다). 그래서 셋째 상태다.
+       gFull 은 `gaugeFull() && !S.skillKind` 이므로 둘은 동시에 켜지지 않는다. */
+    if (bsh) {
+      bsh.classList.toggle('off', !gFull);
+      bsh.classList.toggle('urge', gFull);
+      bsh.classList.toggle('primed', gaugeFull() && !!S.skillKind);
+    }
     setActLabel(ba, 'act.attack', 'aria.attack');
     setActLabel(bh, 'act.special', 'aria.special');
     setActLabel(bu, 'act.pet', 'aria.pet');
@@ -38480,10 +38490,21 @@ html[lang="ko"] #modal-mode .r10-ribbon > h2{
    달고, 그 낱말의 정의가 **이 블록 한 곳**뿐이다. 앞으로 X 를 바꾸는 일은
    이 규칙 하나를 고치는 일과 같아진다.
 
-   고른 그림: **글자 ×**(ROUND10-SPEC §B "글자만, 44pt"). 사용자가 "원래 쓰던
-   것"이라 부른 그 X 이고, 조각이 없으므로 다시 어긋날 부품 자체가 없다.
-   흰 글자 + 자두 그림자를 고른 이유는 판이 이제 열 창 모두 **같은 분홍 유리**
-   여서다(판 단일 소스). 크림 판 시절의 잉크색은 그 판이 사라진 지금 근거가 없다.
+   ▣ 고른 그림 — **catalog/sian3-close.webp** (캔디 스틱 무지개 X · 96×99)
+     사용자 확정 3차의 결론이다. 경위를 남긴다(같은 실수를 두 번 하지 않기 위해):
+       1차 요구 "이전 게 완벽했는데 왜 바꿨냐" → W6.5a 의 ui-x-jelly 를 원복.
+       2차: 그래도 무지개가 남았다 → 그것은 ui-x-jelly 가 아니라 **시안 3호가
+            구워 둔 base64**, 즉 이 sian3-close 였다. 그 자리를 봉인하고 글자 ×
+            로 통일했다.
+       3차: 사용자가 정확히 말했다 — "무지개 X, **단 흰 배경/흰 테두리 없이**".
+            즉 반려 대상은 무지개가 아니라 ui-x-jelly 의 **흰 테두리**였고,
+            "이전 게 완벽했다"의 그 이전이 바로 이 캔디 X 였다. 글자 × 도 오답.
+     그래서 조각으로 돌아온다. 다른 점은 **자리가 하나**라는 것뿐이다 — 전에는
+     이 그림이 `#modal-mode` 한 창에만 구워져 있었고, 지금은 열 자리가 같은
+     파일을 본다. 다음에 X 를 바꾸는 일은 **아래 url 한 줄**을 고치는 일이다.
+     ui-x-jelly 는 staging "반려" 그대로이고 catalog 에는 남는다.
+     글자 `&times;` 는 지우지 않고 투명하게 둔다(스크린리더·aria 는 그 글자를 읽고,
+     그림이 못 오면 44pt 빈 버튼이 남을 뿐 자리는 안 무너진다).
    =========================================================================== */
 .x-btn,
 #charpanel #cp-close.x-btn{
@@ -38494,18 +38515,20 @@ html[lang="ko"] #modal-mode .r10-ribbon > h2{
   min-height:44px !important;
   padding:0 !important;
   border:0 !important;
-  border-radius:22px !important;
-  background:none !important;
-  background-image:none !important;
+  border-radius:0 !important;
   background-color:transparent !important;
+  background-image:url("catalog/sian3-close.webp") !important;
+  background-repeat:no-repeat !important;
+  background-position:center center !important;
+  background-size:contain !important;
   box-shadow:none !important;
   filter:none !important;
   font:800 26px/1 var(--font-latin) !important;
-  color:#FFFFFF !important;
-  -webkit-text-fill-color:#FFFFFF !important;
+  color:transparent !important;
+  -webkit-text-fill-color:transparent !important;
+  text-shadow:none !important;
   text-indent:0 !important;
   overflow:visible !important;
-  text-shadow:0 2px 0 rgba(83,28,40,.55), 0 0 6px rgba(83,28,40,.28) !important;
   cursor:pointer;
 }
 .x-btn:active{ transform:scale(.92); }
@@ -38552,13 +38575,38 @@ html[lang="ko"] #modal-mode .r10-ribbon > h2{
      날개바(4) < 뼈바(5). 바뀐 것은 **그림뿐**이고 z 값은 그대로다.
    =========================================================================== */
 
-/* ---- ① 상단 본판 = slab ---------------------------------------------------
-   `.jbox--slab`(젤리박스 9슬라이스 + 틴트)를 이 자리에서만 유리로 갈아 끼운다.
-   .jbox 규칙은 클래스(0,1,0)이고 이쪽은 (2,1,0) 이라 !important 끼리도 이긴다 —
-   그 절은 한 줄도 안 지운다(다른 소비처 넷이 그대로 쓴다).
-   상단 림이 없는 것을 **결함이 아니라 배치**로 쓴다: 시안에서도 위 띠는 화면
-   상단으로 붙어 잘려 있고, 이 HUD 의 위쪽은 성·데몬·아기구름이 차지해 림이
-   설 자리가 아니다. background-size:100% 100% 로 상자를 꽉 채운다. */
+/* ---- ①②③ 유리 세 부재 = **사용자 원판의 상대 배치 그대로** ---------------
+   사용자 재확정: "똑같이 만들어." 그래서 좌표를 새로 고르지 않는다 — 추출 당시의
+   판정 리포트(tentwin/assets/art/incoming/mockup/gemini/out/glass-hud-report.json)
+   가 세 부재를 **원판 캔버스 1698×608 어디서 오려 냈는지**를 이미 픽셀로 들고
+   있고, 그 세 상자를 그대로 되돌려 놓는 것이 곧 원판의 조립이다:
+
+     slab     src_box [   4,   0, 1698, 300]   1694×300
+     capsule  src_box [ 481, 121, 1225, 419]    744×298
+     plate    src_box [   3, 292, 1698, 590]   1695×298
+
+   여기서 시안의 "한 몸"이 왜 한 몸인지가 그대로 읽힌다 — capsule 의 위(121)는
+   slab 안(0~300)이고 아래(419)는 plate 안(292~590)이다. 즉 캡슐은 두 판에
+   **동시에 파묻혀** 있고, 겹치는 구간에서 서로의 밝은 림이 교차한다. 부재를
+   떼어 놓거나 캡슐을 타이머 상자에 9슬라이스로 씌우면 그 교차가 사라진다
+   (aaf6f03 이 그랬고 사용자가 "조립 티"로 반려했다).
+
+   ▣ 단위는 **HUD 상자의 %** 다 (cqw 가 아니다 — 실측으로 갈아탄 이유가 있다)
+     처음엔 `cqw` 로 썼는데 실렌더에서 세 부재의 배율이 서로 어긋났다. 원인은
+     컨테이너 질의 단위의 규칙이다: **요소는 자기 자신을 질의하지 못한다.**
+     그래서 `#duel-hud` 자신의 background-size 에 쓴 cqw 는 조상(뷰포트 390px)을
+     재고, 자식 ::before/::after 의 cqw 는 #duel-hud(372px)를 재서 둘이 5% 어긋난다
+     (실측: slab 이 원판 1694 대신 1729.5 로 나왔다).
+     %는 그 함정이 없다 — 배경은 자기 배경상자를, 절대배치 자식은 같은 패딩상자를
+     기준으로 하므로 셋이 **한 상자**를 공유한다.
+     환산: 원판 캔버스 1698 = HUD 폭 100%. HUD 는 aspect-ratio 1536/500 이므로
+     세로 1 원판px = (100/1698) × 3.072 = **0.18091%** 다.
+
+   ▣ 9슬라이스를 **한 장도 안 쓴다**
+     세 부재 다 자기 원본 비율 그대로 놓이므로 늘릴 이유가 없다. 캡슐의
+     43.816% : 53.91% 는 폭 기준으로 0.43816W : 0.17548W = 2.4966 = 744:298 —
+     왜곡 0 이 산술로 닫힌다.
+   ---------------------------------------------------------------------------- */
 #app.battle #duel-hud{
   border-image-source:none !important;
   border-image-width:0 !important;
@@ -38567,51 +38615,67 @@ html[lang="ko"] #modal-mode .r10-ribbon > h2{
   background-color:transparent !important;
   background-image:url("catalog/glass-hud-slab-st.webp") !important;
   background-repeat:no-repeat !important;
-  background-position:center top !important;
-  background-size:100% 100% !important;
+  background-position:left top !important;      /* src_box x=4 → 0.24%, 0.9px 이라 0 으로 둔다 */
+  background-size:99.764% 54.273% !important;   /* 원판 1694×300 */
 }
-/* ---- ② 좌우 명패 바 = plate ------------------------------------------------
-   HP 바 두 장(뼈·날개, z 5/4)의 **받침**이다. 상자를 그 둘보다 조금 넓고 조금
-   높게 잡아 유리 림이 사방으로 한 줄 보이게 한다 — 시안의 아래 띠가 그렇다.
-   plate 의 홈이 타이머 폭과 이미 맞으므로 좌우는 그냥 전폭이다.
-   ::before 는 #duel-hud 가 아직 안 쓰던 자리다(자식 열넷은 전부 실제 노드). */
+/* 명패 바 = plate. HP 바 두 장(뼈 z5 · 날개 z4)이 그 위에 앉는다. */
 #app.battle #duel-hud::before{
   content:"";
   position:absolute;
-  left:-1.2%;width:102.4%;
-  top:63.0%;height:38.5%;
+  left:0.177%;                   /* src_box x=3   */
+  top:52.826%;                   /* src_box y=292 × 0.18091 */
+  width:99.823%;                 /* 1695 */
+  height:53.911%;                /* 298  */
   background-image:url("catalog/glass-hud-plate-st.webp");
   background-repeat:no-repeat;
   background-position:center;
   background-size:100% 100%;
-  filter:drop-shadow(0 2px 4px rgba(46,20,58,.28));
   pointer-events:none;
   z-index:0;
 }
-/* ---- ③ 타이머 캡슐 ---------------------------------------------------------
-   유리겹은 이미 `#duel-timer::before`(inset:0 · z-index:-1) 한 겹이 맡고 있다.
-   그 겹의 **배경만** 캡슐 그림으로 바꾼다 — 글자 젤리·얼음(chill)·데인저(danger)
-   세 상태는 요소 자신과 `> i` 글리프에 걸려 있어 한 줄도 안 건드린다.
-   cap 폭: 타이머 높이 = 50.5% × (100cqw ÷ 3.072) = 16.44cqw 이므로
-           cap = 200 ÷ 298 × 16.44cqw = **11.03cqw**. 세로·가로 배율이 같다.
-   ⚠ 칠은 `border-image-width` 로 넣고 `border-width` 는 0 으로 둔다 — .nchip
-     이 이미 쓰는 규약이다(그 주석이 본문): border-width 는 칠과 함께 **레이아웃
-     상자를 빼앗는다**. 여기 겹은 inset:0 짜리 장식층이라 상자를 뺏길 이유가 없고,
-     biw 는 칠만 넣으므로 둘이 정확히 분리된다. */
+/* 타이머 캡슐 = capsule. ::before 와 같은 z 지만 **뒤에 있어 위에 그려진다** —
+   시안에서 캡슐이 두 판 위로 떠 있는 그 순서다. 숫자는 .dh-mid(z1) 안이라
+   캡슐보다 위에 서고, 성(z3)·데몬(z2)은 그대로 그 위다. */
+#app.battle #duel-hud::after{
+  content:"";
+  position:absolute;
+  left:28.328%;                  /* src_box x=481 */
+  top:21.890%;                   /* src_box y=121 × 0.18091 */
+  width:43.816%;                 /* 744 */
+  height:53.911%;                /* 298 */
+  background-image:url("catalog/glass-hud-capsule-st.webp");
+  background-repeat:no-repeat;
+  background-position:center;
+  background-size:100% 100%;
+  pointer-events:none;
+  z-index:0;
+}
+/* ---- 타이머 상자는 이제 **글자만** 든다 ------------------------------------
+   유리는 위 ::after 가 그리므로 이 겹은 비운다. 🚨 여기서 반드시 꺼야 하는 것이
+   `box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.86)` 다(:35832 의 시안 4호
+   유리겹) — 반경을 0 으로 두는 순간 그 흰 링이 **직사각형**이 되어 캡슐 둘레에
+   네모 자국으로 남는다(사용자 반려의 그 자국이다. 실측: 타이머 경계선 1.5px 흰색).
+   backdrop-filter 도 함께 끈다: 사각 상자 모양으로 뒤를 흐려 같은 자국을 만든다.
+   글자 젤리·얼음(chill)·데인저(danger) 세 상태는 요소 자신과 `> i` 글리프에
+   걸려 있어 이 절이 한 줄도 안 건드린다. */
 #app.battle #duel-timer::before{
-  border-style:solid;
-  border-color:transparent;
+  border-image-source:none;
   border-width:0;
-  border-image-source:url("catalog/glass-hud-capsule-st.webp");
-  border-image-slice:0 200 fill;
-  border-image-repeat:stretch;
-  border-image-width:0 11.03cqw;
   border-radius:0 !important;
   background:none;
+  box-shadow:none;
+  -webkit-backdrop-filter:none;
+  backdrop-filter:none;
 }
-/* 14차 재조립 절(:36744)이 이 겹에 반경을 다시 준다 — 유리 알약에는 반경이
-   필요 없다(모양이 그림에 있다). 같은 특정도라 **뒤에 있는 이 줄**이 이긴다. */
-#app.battle #duel-timer{ border-radius:0 !important; }
+/* 숫자를 캡슐 한가운데 세운다 — 상자를 캡슐과 **같은 좌표**로 옮기는 것이
+   가장 단순한 정렬이다(중앙정렬은 이미 flex 가 한다). */
+#app.battle #duel-timer{
+  left:28.328% !important;
+  width:43.816% !important;
+  top:23.596% !important;        /* 캡슐 중심(48.846%) − 글자상자 절반(25.25%) */
+  height:50.500% !important;
+  border-radius:0 !important;
+}
 
 /* ---- ④ 하단 액션바 = 사각 유리판 -------------------------------------------
    `.jbox, #app.battle #actionbar` 와 **같은 선택자**를 한 번 더 쓴다(특정도
@@ -38632,6 +38696,259 @@ html[lang="ko"] #modal-mode .r10-ribbon > h2{
   border-width:0 !important;
   border-radius:0 !important;
   background-color:transparent !important;
+}
+
+/* ===========================================================================
+   W6.5b — **클래식 인게임 상단**을 같은 유리 킷으로
+
+   사용자 반려: 클래식 인게임이 구버전 텍스트 상단바로 남아 있다. 정본 시안은
+   사용자가 클래식을 요청하며 붙인 스크린샷이다
+   (tentwin/assets/art/incoming/mockup/gm-classic-target.jpg · 768×1187 실측):
+     · 유리 본판          x 1~99%   y 10.5~20.2%
+     · 타이머 캡슐 "2:00" x 30~70%  y 4.2~19%   ← 본판 **위로 6% 돌출**
+     · 좌 목표 게이지 ◎   x 5~22%   y 13.3~16.2%
+     · 우 점수 게이지 ◆   x 73~96.5% y 13~16.5%
+     · 하단 스킬바 없음(이미 `#app.classic #actionbar{display:none}` 이 닫는다)
+
+   ▣ 새 마크업을 만들지 않는다.
+     상단바는 이미 `#tb-stats` 안에 다섯 칸(단계·점수·최고·남은짝·시간)을 갖고
+     있고, 시안이 요구하는 것은 그 중 **셋의 자리와 옷**뿐이다. 그래서 이 절은
+     그리드 한 줄과 유리 세 겹으로 끝난다 — JS 도 마크업도 한 글자도 안 바뀌고,
+     `[hidden]` 토글(모드마다 시간/단계가 다르다)도 그대로 산다.
+     칸을 지우지 않고 **접는다**: 단계·최고는 클래식 시안에 없지만 규칙은
+     display 하나뿐이라 되돌리기가 그 한 줄이다.
+
+   ▣ 캡슐이 본판 위로 돌출하는 것이 시안의 핵심이다(전투 HUD 와 같은 조립).
+     margin-top 음수로 올리고 `overflow:visible` 로 상단바 밖을 넘게 둔다.
+   ▣ 9슬라이스는 여기서도 **세로로 안 쪼갠다**: `0 200 fill` + biw `0 <cap>`,
+     cap = 200 × 높이 ÷ 298. 캡슐 52px → 35px · 곁알약 30px → 20px.
+   =========================================================================== */
+/* 🚨 W6.5b — **이 배선은 보류다(주석 봉인).** 임의 출고보다 폴백 보고를 고른다.
+   1차 실렌더가 시안에 못 미쳤고, 그 이유가 "CSS 만으로는 안 되는 것"이라 값을
+   더 만지는 것으로는 안 닫힌다. 실측한 세 가지가 그 근거다:
+     ① 러시·데일리의 시계는 `#stat-timer` 가 아니라 **`#rush-timer` 라는 다른
+        노드**다. 그래서 중앙 캡슐 자리가 클래식 러시에서 통째로 비었다.
+     ② 시안의 좌우는 "글자 스탯"이 아니라 **게이지**다(◎ 0/1 · ◆ 0/34980 에
+        각각 진행 필이 깔린다). `.stat` 칸에는 채움 막대가 없어서, 옷만 갈아
+        입혀서는 시안의 정보 구조가 안 나온다.
+     ③ 본판은 시안에서 화면 폭 1~99% · 높이 10.5~20.2% 의 **독립 띠**인데,
+        `#topbar` 는 일시정지·캐릭터 슬롯까지 담은 다른 상자다. 슬래브를 그
+        상자에 늘리면 하단 림이 띠 한가운데를 가로지른다(실렌더에서 그랬다).
+   → 필요한 것은 스킨이 아니라 **클래식 전용 상단 마크업 한 벌**(전투 HUD 가
+     `#duel-hud` 를 따로 갖는 것과 같은 구조)이다. 다음 파도의 일이다.
+   아래 초안은 지우지 않고 남긴다 — 좌표 실측(위 주석)과 함께 그대로 재활용된다.
+
+#app.classic #topbar{
+  border-image-source:none !important;
+  border-image-width:0 !important;
+  border-width:0 !important;
+  background-color:transparent !important;
+  background-image:url("catalog/glass-hud-slab-st.webp") !important;
+  background-repeat:no-repeat !important;
+  background-position:center top !important;
+  background-size:100% 100% !important;
+  overflow:visible;
+}
+#app.classic #tb-stats{
+  display:grid !important;
+  grid-template-columns:1fr auto 1fr;
+  grid-template-rows:auto;
+  align-items:center;
+  gap:6px;
+  overflow:visible;
+}
+/* 접는 둘 — 단계(클래식 아케이드에는 탄이 없다)와 최고(시안에 없다).
+   되돌리기: 이 두 줄을 지운다. */
+#app.classic #stat-stage,
+#app.classic #tb-stats > .stat:nth-child(3){ display:none !important; }
+/* 자리 셋 — 좌 남은짝(목표) · 중앙 시간 · 우 점수. 시안의 좌우 순서 그대로다. */
+#app.classic #stat-moves{ grid-column:1; }
+#app.classic #stat-timer{ grid-column:2; }
+#app.classic #tb-stats > .stat:nth-child(2){ grid-column:3; }
+/* 곁알약 둘 = 같은 캡슐 그림의 작은 판. 색을 새로 만들지 않는 것이 요점이다. */
+#app.classic #stat-moves,
+#app.classic #tb-stats > .stat:nth-child(2){
+  display:flex !important;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  min-height:30px;
+  padding:0 10px;
+  border-style:solid;
+  border-color:transparent;
+  border-width:0;
+  border-image-source:url("catalog/glass-hud-capsule-st.webp");
+  border-image-slice:0 200 fill;
+  border-image-repeat:stretch;
+  border-image-width:0 20px;      /* = 200 × 30 ÷ 298 */
+  border-radius:0;
+  background-color:transparent;
+  background-image:none;
+  box-shadow:none;
+}
+/* 중앙 타이머 캡슐 — 시안에서 본판 위로 솟는 그 알약. */
+#app.classic #stat-timer{
+  display:flex !important;
+  flex-direction:row;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  min-height:52px;
+  margin-top:-16px;               /* 시안의 6% 돌출 */
+  padding:0 12px;
+  border-style:solid;
+  border-color:transparent;
+  border-width:0;
+  border-image-source:url("catalog/glass-hud-capsule-st.webp");
+  border-image-slice:0 200 fill;
+  border-image-repeat:stretch;
+  border-image-width:0 35px;      /* = 200 × 52 ÷ 298 */
+  border-radius:0;
+  background-color:transparent;
+  background-image:none;
+  box-shadow:none;
+}
+/* 🚨 `[hidden]` 이 다시 이겨야 한다 — 위 세 규칙이 display 를 flex 로 못 박았고,
+   모드마다 시간/단계 칸이 꺼진다(러시만 시간, 데일리만 시간). 이 한 줄이 없으면
+   클래식 아케이드에서 빈 캡슐이 뜬다. */
+#app.classic #tb-stats > .stat[hidden]{ display:none !important; }
+#app.classic #stat-timer .stat-k{ display:none; }
+#app.classic #stat-timer .stat-v{
+  font-family:var(--font-display);
+  font-size:26px;
+  line-height:1;
+  color:var(--j-ink);
+  text-shadow:0 1px 0 rgba(255,255,255,.9), 0 2px 4px rgba(120,110,150,.35);
+}
+#app.classic #stat-moves .stat-k,
+#app.classic #tb-stats > .stat:nth-child(2) .stat-k{
+  font-size:10px;
+  opacity:.82;
+  color:var(--j-ink);
+}
+#app.classic #stat-moves .stat-v,
+#app.classic #tb-stats > .stat:nth-child(2) .stat-v{
+  font-family:var(--font-display);
+  font-size:15px;
+  line-height:1;
+  color:var(--j-ink);
+  text-shadow:0 1px 0 rgba(255,255,255,.85);
+}
+
+   클래식 상단 초안 봉인 끝 */
+
+/* ===========================================================================
+   W6.5b — **텐트윈 각성 연쇄 루프** (사용자 전략 확정)
+
+   ▣ (a) 지속 중 충전은 **이미 열려 있다** — 코드를 한 줄도 안 바꾼다.
+     실측 근거: `gaugeBump()` 의 게이트는 `isClassic()` 과 `S.mode!=='adv'` 둘
+     뿐이고 `S.skillKind`(지속 단계)를 보지 않는다. `fireSkill()` 이 발동 순간
+     store.gauge 를 0 으로 비우므로, 그 다음 매치부터 곧바로 다시 찬다. 설계
+     주석(:26731)도 같은 말을 이미 적어 두었다 — "지속 중에 다시 만땅이 되는
+     것은 정상이고, 그때는 끝나자마자 또 쓸 수 있다".
+     즉 연쇄 루프는 **막혀 있던 적이 없고**, 막고 있던 것은 화면이었다.
+
+   ▣ (b) 그래서 이 파도가 만드는 것은 **신호**다.
+     사용자 원문: "숫자 맞추다 보면 하단이 안 보이니까, 버튼이 빛나면 정신없이
+     누르게." 지금 만땅 신호는 `.urge` 하나이고, 그것은 필살기 버튼과 **똑같은**
+     연출이라 넷 중 어느 것이 찼는지 눈이 못 고른다. 각성만 다른 급이 된다:
+       ① 무지개 펄스 글로우 — 색이 도는 것이 이 게임에서 "각성"의 낱말이다
+          (무지개 = 텐트윈 연쇄). 노랑→민트→분홍→보라 네 칸을 1.15s 로 돈다.
+       ② 튀는 스케일 바운스 — 주기의 끝 30%에만 넣는다. 늘 흔들리면 배경이 되고,
+          가끔 튀어야 시야 주변부에서 잡힌다.
+       ③ 반짝 스파클 — ::after 한 겹(메달 위 우상단). 주기당 한 번만 번쩍인다.
+     ⚠ `.act::before` 는 메달 그림이고 `::after` 는 비어 있던 자리다(실측:
+       이 파일에서 `.act::after` 를 쓰는 규칙이 하나도 없다). 배지 칩은 별개
+       노드라 이 연출을 안 받는다 — "몇 %인가"는 늘 100% 선명해야 한다.
+     ⚠ 소리: 만땅이 되는 **그 순간 1회**는 이미 `gaugeBump()` 가 낸다
+       (J.sfx.mission() + J.vibrate(24)). 지속 중 재충전 완료도 같은 경로를
+       지나므로 연쇄 2회차·3회차에서도 같은 소리가 난다. 새 소리를 만들지 않는다.
+     ⚠ 클래식은 각성 자체가 없다(gaugeBump 첫 줄이 isClassic 을 막는다) —
+       이 연출도 `#app.battle` 스코프라 클래식 화면에 존재하지 않는다.
+     ⚠ 밸런스: 133 계수는 한 값도 안 건드린다. 연쇄를 유지하면 점수 기대치가
+       크게 벌어지는 것이 의도이고(사용자: "각성 유지 시간이 점수를 극심하게
+       가른다"), 그 벌어짐은 **배수가 아니라 플레이어의 손**이 만든다.
+   =========================================================================== */
+@keyframes w65-awk-glow{
+  0%,100%{ filter:drop-shadow(0 0 7px rgba(255,214,120,.95)) drop-shadow(0 0 18px rgba(255,120,220,.62)); }
+  25%    { filter:drop-shadow(0 0 11px rgba(120,255,214,.95)) drop-shadow(0 0 24px rgba(120,180,255,.66)); }
+  50%    { filter:drop-shadow(0 0 9px rgba(255,120,220,.95))  drop-shadow(0 0 22px rgba(255,214,120,.66)); }
+  75%    { filter:drop-shadow(0 0 13px rgba(190,140,255,.95)) drop-shadow(0 0 26px rgba(120,255,214,.62)); }
+}
+@keyframes w65-awk-bounce{
+  0%,70%,100%{ transform:translateY(0) scale(1); }
+  78%        { transform:translateY(-4px) scale(1.085); }
+  86%        { transform:translateY(0) scale(.972); }
+  93%        { transform:translateY(-2px) scale(1.028); }
+}
+@keyframes w65-awk-spark{
+  0%  { opacity:0; transform:scale(.35) rotate(0deg); }
+  8%  { opacity:1; transform:scale(1.18) rotate(28deg); }
+  24% { opacity:0; transform:scale(.55) rotate(64deg); }
+  100%{ opacity:0; transform:scale(.35) rotate(64deg); }
+}
+#app.battle #btn-shuffle.act.urge{
+  animation:w65-awk-bounce 1.15s var(--ease) infinite;
+}
+/* 위 §1 의 `.act.urge::before` 가 노랑·분홍 두 겹 드롭섀도를 이미 걸어 둔다 —
+   애니메이션은 일반 선언을 이기므로 이 한 줄이 그 값을 무지개로 돌린다. */
+#app.battle #btn-shuffle.act.urge::before{
+  animation:w65-awk-glow 1.15s linear infinite;
+}
+#app.battle #btn-shuffle.act.urge::after{
+  content:"";
+  position:absolute;
+  right:16%;
+  top:12%;
+  width:22%;
+  height:22%;
+  pointer-events:none;
+  background-image:
+    linear-gradient(90deg, rgba(255,255,255,0) 44%, rgba(255,255,255,.95) 50%, rgba(255,255,255,0) 56%),
+    linear-gradient(0deg,  rgba(255,255,255,0) 44%, rgba(255,255,255,.95) 50%, rgba(255,255,255,0) 56%);
+  background-repeat:no-repeat;
+  background-size:100% 100%, 100% 100%;
+  filter:drop-shadow(0 0 5px rgba(255,240,180,.95));
+  animation:w65-awk-spark 1.15s ease-out infinite;
+  z-index:1;
+}
+/* ---- 장전 신호 `.primed` — 지속 중인데 **다음 것이 이미 찼다** ---------------
+   연쇄 루프의 핵심 정보다. urge 와 같은 급으로 빛나면 "빛나는데 안 눌리는"
+   버튼이 되므로, 같은 무지개를 **절반 세기·두 배 느리게** 돌리고 튀지는 않는다.
+   흐림(.off 의 saturate .42)은 그대로 둔다 — 지금 못 쓴다는 사실이 먼저다. */
+#app.battle #btn-shuffle.act.primed::before{
+  animation:w65-awk-glow 2.3s linear infinite;
+  opacity:.92;
+}
+#app.battle #btn-shuffle.act.primed::after{
+  content:"";
+  position:absolute;
+  right:16%;
+  top:12%;
+  width:18%;
+  height:18%;
+  pointer-events:none;
+  background-image:
+    linear-gradient(90deg, rgba(255,255,255,0) 44%, rgba(255,255,255,.85) 50%, rgba(255,255,255,0) 56%),
+    linear-gradient(0deg,  rgba(255,255,255,0) 44%, rgba(255,255,255,.85) 50%, rgba(255,255,255,0) 56%);
+  background-repeat:no-repeat;
+  background-size:100% 100%, 100% 100%;
+  filter:drop-shadow(0 0 4px rgba(255,240,180,.9));
+  animation:w65-awk-spark 2.3s ease-out infinite;
+  z-index:1;
+}
+/* 접근성 — 이 파일의 다른 상시 애니메이션과 같은 처분(움직임은 끄고 빛만 남긴다:
+   "지금 쓸 수 있다"는 사실 자체는 축소하면 안 되는 정보다). */
+@media (prefers-reduced-motion: reduce){
+  #app.battle #btn-shuffle.act.urge,
+  #app.battle #btn-shuffle.act.urge::before,
+  #app.battle #btn-shuffle.act.urge::after,
+  #app.battle #btn-shuffle.act.primed::before,
+  #app.battle #btn-shuffle.act.primed::after{ animation:none; }
+  #app.battle #btn-shuffle.act.urge::before{
+    filter:drop-shadow(0 0 10px rgba(255,214,120,.95)) drop-shadow(0 0 20px rgba(255,120,220,.6));
+  }
+  #app.battle #btn-shuffle.act.urge::after{ opacity:.9; }
 }
 </style>
 
@@ -38744,7 +39061,8 @@ var L=("jelly-box,duel-title-play,sian2-ribbon,sian2-btn-pink,sian2-btn-purple,"
    🚨 W6.5b: `ui-x-jelly` 를 목록에서 뺐다(무지개 X 전량 원복 — 소비처 0).
       대신 유리 HUD 세트 셋을 더한다. 이 셋은 **전투 첫 프레임**에 필요하지만
       전투는 메뉴→맵→노드를 거쳐야 오므로 목록 끝으로도 늦지 않다. */
-      +"glass-hud-capsule-st,glass-hud-slab-st,glass-hud-plate-st,glass-hud-bar-st,art-logo-en,"
+      +"glass-hud-capsule-st,glass-hud-slab-st,glass-hud-plate-st,glass-hud-bar-st,"
+      +"sian3-close,art-logo-en,"
       +"ttl-settings,ttl-pause,ttl-rank,ttl-play,ttl-clear,"
       +"ttl-over,ttl-daily,ttl-skin,ttl-chars,"
       +"ch-mukmul-face,ch-tiktok-face,ch-kkultteok-face,ch-bangul-face,"
