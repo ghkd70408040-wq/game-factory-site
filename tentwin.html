@@ -13273,6 +13273,23 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
         <div id="bang-sub"></div>
       </div>
     </div>
+    <!-- ============================================================
+         W6.5a — 째깍이 타임스톱 오버레이 (PET-SYSTEM §4.3)
+
+         ⚠ 이 요소가 다른 연출과 다른 점이 **딱 하나** 있고, 그것이 존재 이유다:
+         #bang · #hurry · #cutin 셋은 전부 화면을 잡고 입력을 끊는데, 이것은
+         **끊지 않는다**(P3 — "연출이 입력을 잠그지 않는다", ART §8.4).
+         그래서 dim 자식이 없고(가릴 것이 없다), CSS 가 pointer-events:none 을
+         건다. 보드는 이 그림 아래에서 100% 인터랙티브다 — "시간을 잡아 준"
+         6초에 실제로 매치할 수 있어야 이 기술의 판타지가 성립하기 때문이다.
+
+         aria-hidden 인 이유: 대사는 이미 토스트(duel.pettiktok)가 읽어 준다.
+         같은 사실을 두 번 읽으면 스크린리더에서 6초가 겹쳐 들린다.
+         ============================================================ -->
+    <div id="ts-over" hidden aria-hidden="true">
+      <div id="ts-cast"></div>
+      <div id="ts-line"></div>
+    </div>
     <div id="hurry" hidden aria-hidden="true">
       <div id="hurry-dim"></div>
       <div id="hurry-big"></div>
@@ -13930,6 +13947,60 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
           </svg>
           <span class="cc-name" data-i18n="char.churup.name">Churup</span>
           <span class="cc-pass" data-i18n="char.churup.pass">Skill: one big bite re-roll</span>
+        </button>
+        <!-- ============================================================
+             W6.5a (2026-08-20) — 신규 동료 넷. 자리는 위 W7 주석의 계약 그대로다:
+             "없음" **앞**(그 카드는 선택지의 끝이고, 마지막 자리가 그 뜻의 일부).
+             인라인 SVG 가 넷 다 같은 이유도 그대로다 — 표준 4크롭이 data-art="std"
+             로 SVG 를 통째로 덮으므로, SVG 는 그림이 도착하기 전 한 프레임과
+             ART 블록이 없는 빌드만을 위한 폴백이다. 색은 .ch-<id> 가 준다.
+             ⚠ 그리드가 다섯 → **아홉 칸**이 됐다(동료 여덟 + 없음). flex 1 1 0
+             에 max 112px 이라 한 줄로는 390px 을 넘으므로, e3-catalog 블록의
+             `#mate-pick{flex-wrap:wrap}` 한 줄이 이 그리드를 두 줄로 접는다.
+             ============================================================ -->
+        <button class="char-card ch-mukmul" data-char="mukmul" type="button" role="radio" aria-checked="false">
+          <svg class="cav" viewBox="0 0 44 46" aria-hidden="true" focusable="false">
+            <rect class="cav-shell" x="6" y="10" width="32" height="30" rx="11"/>
+            <rect class="cav-gloss" x="11" y="14" width="22" height="6" rx="3"/>
+            <ellipse class="cav-eye" cx="16.5" cy="23" rx="3.4" ry="3.8"/><ellipse class="cav-eye" cx="27.5" cy="23" rx="3.4" ry="3.8"/>
+            <circle class="cav-glint" cx="17.7" cy="21.6" r="1.2"/><circle class="cav-glint" cx="28.7" cy="21.6" r="1.2"/>
+            <path class="cav-mouth" d="M18.4 30 C20.4 33.4 23.6 33.4 25.6 30"/>
+          </svg>
+          <span class="cc-name" data-i18n="char.mukmul.name">Inky</span>
+          <span class="cc-pass" data-i18n="char.mukmul.pass">Skill: ink-blast repaint</span>
+        </button>
+        <button class="char-card ch-tiktok" data-char="tiktok" type="button" role="radio" aria-checked="false">
+          <svg class="cav" viewBox="0 0 44 46" aria-hidden="true" focusable="false">
+            <rect class="cav-shell" x="6" y="10" width="32" height="30" rx="11"/>
+            <rect class="cav-gloss" x="11" y="14" width="22" height="6" rx="3"/>
+            <ellipse class="cav-eye" cx="16.5" cy="23" rx="3.4" ry="3.8"/><ellipse class="cav-eye" cx="27.5" cy="23" rx="3.4" ry="3.8"/>
+            <circle class="cav-glint" cx="17.7" cy="21.6" r="1.2"/><circle class="cav-glint" cx="28.7" cy="21.6" r="1.2"/>
+            <path class="cav-mouth" d="M18.4 30 C20.4 33.4 23.6 33.4 25.6 30"/>
+          </svg>
+          <span class="cc-name" data-i18n="char.tiktok.name">TikTok</span>
+          <span class="cc-pass" data-i18n="char.tiktok.pass">Skill: 6s time stop</span>
+        </button>
+        <button class="char-card ch-kkultteok" data-char="kkultteok" type="button" role="radio" aria-checked="false">
+          <svg class="cav" viewBox="0 0 44 46" aria-hidden="true" focusable="false">
+            <rect class="cav-shell" x="6" y="10" width="32" height="30" rx="11"/>
+            <rect class="cav-gloss" x="11" y="14" width="22" height="6" rx="3"/>
+            <ellipse class="cav-eye" cx="16.5" cy="23" rx="3.4" ry="3.8"/><ellipse class="cav-eye" cx="27.5" cy="23" rx="3.4" ry="3.8"/>
+            <circle class="cav-glint" cx="17.7" cy="21.6" r="1.2"/><circle class="cav-glint" cx="28.7" cy="21.6" r="1.2"/>
+            <path class="cav-mouth" d="M18.4 30 C20.4 33.4 23.6 33.4 25.6 30"/>
+          </svg>
+          <span class="cc-name" data-i18n="char.kkultteok.name">Honeybee</span>
+          <span class="cc-pass" data-i18n="char.kkultteok.pass">Skill: summon golden fruit</span>
+        </button>
+        <button class="char-card ch-bangul" data-char="bangul" type="button" role="radio" aria-checked="false">
+          <svg class="cav" viewBox="0 0 44 46" aria-hidden="true" focusable="false">
+            <rect class="cav-shell" x="6" y="10" width="32" height="30" rx="11"/>
+            <rect class="cav-gloss" x="11" y="14" width="22" height="6" rx="3"/>
+            <ellipse class="cav-eye" cx="16.5" cy="23" rx="3.4" ry="3.8"/><ellipse class="cav-eye" cx="27.5" cy="23" rx="3.4" ry="3.8"/>
+            <circle class="cav-glint" cx="17.7" cy="21.6" r="1.2"/><circle class="cav-glint" cx="28.7" cy="21.6" r="1.2"/>
+            <path class="cav-mouth" d="M18.4 30 C20.4 33.4 23.6 33.4 25.6 30"/>
+          </svg>
+          <span class="cc-name" data-i18n="char.bangul.name">Bubbly</span>
+          <span class="cc-pass" data-i18n="char.bangul.pass">Skill: wash blockers away</span>
         </button>
         <!-- "없음" 은 캐릭터가 아니라 선택지라서 아바타 자리에 기호가 온다.
              빈 카드로 두면 로딩에 실패한 것으로 읽힌다. -->
@@ -19951,6 +20022,29 @@ window.TT_SFX = {
   var DUEL_MONGLE_FREEZE_MS = 4000;  // (다음 파도 예약) 몽글 "시간 웅덩이" — 뭉치의 짧은 변주
   var DUEL_CHURUP_ROWS = 1;          // (다음 파도 예약) 츄릅 "한 입 재굴림" — 다시 굴릴 행 수
 
+  /* ---- W6.5a (2026-08-20) 신규 동료 넷의 계수 --------------------------------
+     ⚠ 전부 **신규 계수**다 — 기존 133 계수는 한 글자도 안 건드렸다(PET-SYSTEM P0).
+     위 표의 기존 넷(POP 4 · FREEZE 6000 · MONGLE 4000 · CHURUP 1)이 그대로 남아
+     있는 것이 그 증거이고, 아래 다섯 줄은 그 표에 **더해진** 것이다.
+
+     값의 출처:
+       TIKTOK_FREEZE  §4.4 의 진화 상한 6.0s. 뭉치의 DUEL_PET_FREEZE_MS 와 같은
+                      6000 인 것은 우연이 아니라 §4 이관의 계약이다 — "기존 뭉치
+                      시간정지를 참고하되"가 그 뜻이고, 다른 것은 **연출**뿐이다.
+       PPYAK_FREELINK §4.6 은 4→5→6s 를 주지만 이 파도의 확정 지시는 8초다
+                      (지시가 명세 위다 — 명세는 lv/evo 사다리의 중간값이고
+                      지시는 이 빌드의 단일 레벨 값이다).
+       MUKMUL_REPAINT §3.5 "N 권장 4~6" 의 중앙값.
+       KKULTTEOK_GOLD §16-B #6 은 "황금 열매 1개"지만 확정 지시는 2개다.
+       BANGUL_CLEAN   §16-B #5 정화. 이 빌드에 코팅/안개 기믹이 아직 없으므로
+                      정화 대상은 **현존하는 방해**(블로커·얼음)로 사상한다.
+     ---------------------------------------------------------------------- */
+  var DUEL_TIKTOK_FREEZE_MS = 6000;  // 째깍이 "타임스톱" — 시계 정지 길이(§4.4)
+  var DUEL_PPYAK_FREELINK_MS = 8000; // 삐약 "자유 연결" — 연결 판정 완화 창(§4.6 ⓑ)
+  var DUEL_MUKMUL_REPAINT = 5;       // 먹물이 "먹물 발사" — 같은 값으로 덮는 칸 수(§3.5)
+  var DUEL_KKULTTEOK_GOLD = 2;       // 꿀떡이 "황금 열매 소환" — 골드 스탬프 수(§16-B #6)
+  var DUEL_BANGUL_CLEAN = 2;         // 방울이 "거품 정화" — 지우는 방해 타일 수(§16-B #5)
+
   /* =========================================================================
    * SECTION 1 — PURE RULE / GENERATOR FUNCTIONS
    * No DOM. No Juice. No module state. Safe to unit-test in isolation.
@@ -20243,15 +20337,57 @@ window.TT_SFX = {
    * A legal move with specials. The connection requirement is PURE's
    * isConnected, unchanged — wilds bend the value rule, never the geometry.
    */
+  /* -------------------------------------------------------------------------
+   * W6.5a — 자유 연결 창 (PET-SYSTEM §4.6 ⓑ · §16-B-3 #10)
+   *
+   * 창의 상태는 **벽시계 하나**(S.duel.freeLinkUntil)뿐이다. 뭉치의 얼음이
+   * d.freezeUntil 하나로 세 화면을 몰고 가는 것과 같은 규율이고, 같은 이유다:
+   * 마감이 둘이면 언젠가 하나가 늦게 풀려 "이어진다고 했는데 안 이어지는" 순간이
+   * 생긴다. 그 벽시계는 shiftDeadlines 의 목록에도 들어가 있어(아래 §29 참조)
+   * 일시정지·컷인 동안 창이 조용히 새어 나가지 않는다.
+   *
+   * ⚠ 이 함수가 **PURE 밖**에 있는 것이 설계의 핵심이다. PURE 는 모듈 상태를
+   * 읽지 않는다는 것이 그 블록의 정의이고, 시계를 읽는 순간 그 정의가 깨진다.
+   * ----------------------------------------------------------------------- */
+  function connFreeOn() {
+    var d = S && S.duel;
+    return !!(d && d.freeLinkUntil > 0 && now() < d.freeLinkUntil);
+  }
+
+  /** 자유 연결 창의 후보 집합 — 살아 있는 칸 전부(자기 자신 제외). */
+  function allAliveEx(cells, a) {
+    var out = [];
+    for (var i = 0; i < cells.length; i++) {
+      if (i !== a && isAlive(cells, i)) out.push(i);
+    }
+    return out;
+  }
+
+  /* W6.5a — 삐약 "자유 연결"(§4.6 ⓑ)의 **유일한** 코드 자리다.
+     기하 완화를 여기 한 줄로 끝낸 이유가 이 주석의 전부다:
+       ① PURE 불변. isConnected 는 손대지 않는다 — 위 원문 주석의 "wilds bend the
+          value rule, never the geometry" 가 이제 반쪽만 참이 되지만, 굽히는 것은
+          PURE 밖의 이 래퍼이지 PURE 자신이 아니다. md5 는 그대로다.
+       ② 창이 닫히면(connFreeOn() === false) 이 항은 통째로 사라져 **옛 식과 글자
+          그대로 같아진다**. 그래서 §23 자가진단의 세 판(isValidPairEx 기대값)이
+          한 줄도 안 바뀌고 통과한다 — 창은 전투 중에만, 그것도 8초만 열린다.
+       ③ `a !== b` 를 명시하는 것이 필수다. 옛 식에서 그 가드는 isConnected 안에
+          있었고(isLineConnected 의 첫 줄), 완화가 그것을 우회하면 "자기 자신과
+          짝짓기"가 합법이 된다. */
   function isValidPairEx(cells, a, b) {
-    return canMatchEx(cells, a, b) && isConnected(cells, a, b);
+    return canMatchEx(cells, a, b) &&
+           ((a !== b && connFreeOn()) || isConnected(cells, a, b));
   }
 
   /** findAnyPair with the widened value rule. Candidate set is PURE's. */
   function findAnyPairEx(cells) {
     for (var a = 0; a < cells.length; a++) {
       if (!isAlive(cells, a)) continue;
-      var cand = connectCandidates(cells, a);
+      /* W6.5a — 창이 열려 있으면 후보 집합도 함께 넓힌다. 여기를 안 넓히면
+         "먼 숫자도 이어진다"고 말해 놓고 **막힘 판정만 옛 기하로** 도는 사고가
+         난다(이웃 짝이 없으면 게임오버 — 실제로는 먼 짝이 살아 있는데도).
+         힌트도 같은 함수를 타므로 한 자리를 고쳐 둘이 함께 옳아진다. */
+      var cand = connFreeOn() ? allAliveEx(cells, a) : connectCandidates(cells, a);
       for (var k = 0; k < cand.length; k++) {
         var b = cand[k];
         if (isValidPairEx(cells, a, b)) return a < b ? [a, b] : [b, a];
@@ -22084,6 +22220,23 @@ window.TT_SFX = {
       'char.mongle.pass': 'Skill: 4s time puddle',
       'char.churup.name': 'Churup',
       'char.churup.pass': 'Skill: one big bite re-roll',
+      /* --- W6.5a 신규 동료 넷. 영문명은 뜻이 통하는 이름으로 옮긴다(음차가 아니라
+             번역이다 — 먹물/째깍/꿀떡/방울은 전부 **의성·의태의 뜻**이 이름이라,
+             음차하면 영어권에서는 뜻 없는 음절이 된다):
+               먹물이 Inky(잉크) · 째깍이 TikTok(시계 소리) ·
+               꿀떡이 Honeybee(꿀벌 — §16-B "꿀떡벌"의 정체성) · 방울이 Bubbly(거품).
+             ⚠ 표시명만 갈리고 **코드 id 는 넷 다 그대로**다(mukmul/tiktok/
+             kkultteok/bangul) — 에셋 파일명·CSS 변수·기술 표가 전부 id 를 쓴다. --- */
+      'char.mukmul.name': 'Inky',
+      'char.mukmul.pass': 'Skill: ink-blast repaint',
+      'char.tiktok.name': 'TikTok',
+      'char.tiktok.pass': 'Skill: 6s time stop',
+      'char.kkultteok.name': 'Honeybee',
+      'char.kkultteok.pass': 'Skill: summon golden fruit',
+      'char.bangul.name': 'Bubbly',
+      'char.bangul.pass': 'Skill: wash blockers away',
+      /* W6.5a — 삐약의 소개도 갈린다(§16-B-3 이관). 이름은 그대로다. */
+      'char.ppyak.pass2': 'Skill: 8s free link',
       /* --- W7 리액션 말풍선. 여섯 사건 + 별 = 일곱 줄 × 신규 주인공 둘.
              한 줄 216px nowrap 규약은 기존 셋과 같다(길면 말줄임표가 된다). --- */
       'say.combo.pudding': 'Hold the line!',
@@ -22461,7 +22614,12 @@ window.TT_SFX = {
       'skill.sub.pet': 'PARTNER',
       'skill.sub.foe': 'VILLAIN',
       'skill.sp.name': 'FULL-POWER STRIKE!',
-      'skill.ppyak.name': 'PPYAK — PECK STORM!',
+      /* W6.5a — 삐약의 기술이 쪼아먹기 → 자유 연결로 갈렸다(§16-B-3 이관).
+         키는 그대로 두고 **값만** 간다: 이 키는 컷인 제목이고, 컷인은 "누가
+         무엇을 하는가"를 말하는 자리라 기술이 갈리면 제목도 갈려야 한다.
+         옛 값: 'PPYAK — PECK STORM!' (폴백 petPeck 가 살아 있으므로 지우지
+         않고 여기 남긴다 — 되돌리려면 이 한 줄을 도로 쓰면 된다). */
+      'skill.ppyak.name': 'PPYAK — FREE LINK!',
       'skill.mungchi.name': 'MUNGCHI — TIME FREEZE!',
       'skill.foe.name': 'BLOCKER RAIN!',
       'duel.tellwarn': 'INCOMING!',
@@ -22471,6 +22629,24 @@ window.TT_SFX = {
       'skill.churup.name': 'CHURUP — ONE BIG BITE!',
       'duel.petmongle': 'Time Puddle! The clock stops for {n}s',
       'duel.petchurup': 'One Big Bite! {n} row re-rolled',
+      /* --- W6.5a 신규 동료 넷 + 삐약 이관 -------------------------------------
+         ⚠ 'skill.ppyak.name' 은 위에 **그대로 남는다** — 삐약의 기술이 갈렸으므로
+         값만 갈고 자리는 안 옮긴다(폴백 petPeck 가 여전히 그 키를 쓸 수 있다).
+         아래 넷은 새 키다. */
+      'skill.tiktok.name': 'TIKTOK — TIME STOP!',
+      'skill.mukmul.name': 'INKY — INK BLAST!',
+      'skill.kkultteok.name': 'HONEYBEE — GOLDEN FRUIT!',
+      'skill.bangul.name': 'BUBBLY — BUBBLE WAVE!',
+      'duel.pettiktok': 'Time Stop! The clock is held for {n}s — keep popping!',
+      'duel.petppyak': 'Free Link! Far tiles connect for {n}s',
+      'duel.petmukmul': 'Ink Blast! {n} tiles repainted to {v}',
+      'duel.petkkultteok': 'Golden Fruit! {n} gold tiles summoned',
+      'duel.petbangul': 'Bubble Wave! {n} blockers washed away',
+      'duel.petclean0': 'Nothing to clean up.',
+      /* §4.3 · §4.6 의 대사. 화자는 각각 째깍이·삐약이다. */
+      'pet.timestop.hold': "I've got time held — go!",
+      'pet.timestop.go': 'Pop those fruits, quick!!',
+      'pet.freelink.go': 'Ppyak will clear the way!',
       'adv.heartkept': 'Cleared, so no heart was spent.',
       'adv.heartplus': 'Boss bonus: +1 heart!',
       'adv.heartlost': '-1 heart. {n} left.',
@@ -22792,6 +22968,16 @@ window.TT_SFX = {
       'char.mongle.pass': '기술: 시간 웅덩이 4초',
       'char.churup.name': '츄릅',
       'char.churup.pass': '기술: 한 입 재굴림',
+      /* --- W6.5a 신규 동료 넷. 사용자 확정 표시명이다. --- */
+      'char.mukmul.name': '먹물이',
+      'char.mukmul.pass': '기술: 먹물 발사(같은 숫자로 물들이기)',
+      'char.tiktok.name': '째깍이',
+      'char.tiktok.pass': '기술: 타임스톱 6초',
+      'char.kkultteok.name': '꿀떡이',
+      'char.kkultteok.pass': '기술: 황금 열매 소환',
+      'char.bangul.name': '방울이',
+      'char.bangul.pass': '기술: 거품 파도(방해 정화)',
+      'char.ppyak.pass2': '기술: 자유 연결 8초',
       /* --- W7 리액션 말풍선 (일곱 줄 × 둘). 짧게 — 말풍선은 nowrap 216px 이다 --- */
       'say.combo.pudding': '버텨, 계속!',
       'say.jackpot.pudding': '운이 따르는군!',
@@ -23155,7 +23341,8 @@ window.TT_SFX = {
       'skill.sub.pet': '동료 기술',
       'skill.sub.foe': '악당 기술',
       'skill.sp.name': '혼신의 일격!',
-      'skill.ppyak.name': '삐약 — 쪼아먹기 폭풍!',
+      /* W6.5a — 값만 갈린다(위 en 주석 참조). 옛 값: '삐약 — 쪼아먹기 폭풍!' */
+      'skill.ppyak.name': '삐약 — 자유 연결!',
       'skill.mungchi.name': '뭉치 — 시간 정지!',
       'skill.foe.name': '블로커 비!',
       'duel.tellwarn': '온다!',
@@ -23165,6 +23352,23 @@ window.TT_SFX = {
       'skill.churup.name': '츄릅 — 한 입 재굴림!',
       'duel.petmongle': '시간 웅덩이! {n}초 동안 시계가 멈춰요',
       'duel.petchurup': '한 입 재굴림! {n}줄을 다시 굴렸어요',
+      /* --- W6.5a 신규 동료 넷 + 삐약 이관 (PET-SYSTEM §3.5 · §4.3 · §4.6 · §16) --- */
+      'skill.tiktok.name': '째깍이 — 타임스톱!',
+      'skill.mukmul.name': '먹물이 — 먹물 발사!',
+      'skill.kkultteok.name': '꿀떡이 — 황금 열매!',
+      'skill.bangul.name': '방울이 — 거품 파도!',
+      'duel.pettiktok': '타임스톱! {n}초 동안 시계를 잡아 뒀어요 — 지금 터트려요!',
+      'duel.petppyak': '자유 연결! {n}초 동안 멀리 떨어진 숫자도 이어져요',
+      'duel.petmukmul': '먹물 발사! {n}칸이 {v}(으)로 물들었어요',
+      'duel.petkkultteok': '황금 열매! 골드 타일 {n}개가 열렸어요',
+      'duel.petbangul': '거품 파도! 방해 {n}개를 씻어 냈어요',
+      'duel.petclean0': '씻어 낼 방해가 없어요.',
+      /* §4.3 이 사용자 워딩으로 못박은 두 줄. 한 글자도 바꾸지 않는다 — 이 대사가
+         곧 째깍이의 정체성이고, 명세가 "사용자 핵심 창작"으로 표시한 자리다. */
+      'pet.timestop.hold': '내가 시간을 잡고 있을게!',
+      'pet.timestop.go': '어서 열매를 터트려!!',
+      /* §4.6 · DESIGN §11.6 의 정체성 대사 — 역시 원문 그대로다. */
+      'pet.freelink.go': '삐약이가 길을 터줄게!',
       'adv.heartkept': '클리어라 하트는 그대로예요.',
       'adv.heartplus': '보스 보상, 하트 +1!',
       'adv.heartlost': '하트 -1. {n}개 남았어요.',
@@ -24712,7 +24916,11 @@ window.TT_SFX = {
      푸딩 기사(#E8B84B 캐러멜)와 소다 마녀(#7FD4F0)는 style.css 가 아니라 이
      파일 끝의 e3-catalog 블록이 --ch-key 한 벌을 준다(기존 다섯과 같은 규약). */
   var HERO_IDS = ['ten', 'twin', 'jelly', 'pudding', 'sodawitch'];
-  var MATE_IDS = ['ppyak', 'mungchi', 'mongle', 'churup'];
+  /* W6.5a (2026-08-20) — 동료 여덟. 위 W7 주석의 "표에 이름을 더한 것이 전부"가
+     이번에도 그대로 참이다: 에셋 4종 세트(catalog/ch-<id>-*.webp)가 이름 규약대로
+     도착해 있어 CHARS·CHAR_STD·이 배열 셋과 기술 표 하나만 자랐다. */
+  var MATE_IDS = ['ppyak', 'mungchi', 'mongle', 'churup',
+                  'mukmul', 'tiktok', 'kkultteok', 'bangul'];
   var CHAR_DEFAULT = 'ten';
   /* key = HUD 칩·배너에 쓰는 캐릭터 고유색(쨍한 원색, style.css 의 --ch-key 와 동일값).
    * voice = juice.js VOICE_CHARS 의 키. cls = #mascot / .char-card 에 붙는 클래스. */
@@ -24731,10 +24939,20 @@ window.TT_SFX = {
     pudding:   { cls: 'ch-pudding',   key: '#E8B84B' },
     sodawitch: { cls: 'ch-sodawitch', key: '#7FD4F0' },
     mongle:    { cls: 'ch-mongle',    key: '#A8C8F0' },
-    churup:    { cls: 'ch-churup',    key: '#7ED9C0' }
+    churup:    { cls: 'ch-churup',    key: '#7ED9C0' },
+    /* W6.5a — 신규 동료 넷. 확정 키컬러이고, e3-catalog 블록의 --ch-key 선언과
+       **같은 값**이어야 한다(위 W7 주석의 계약 그대로). 넷을 고른 근거는 서로
+       안 헷갈리는 것 하나다: 먹물=남보라(가장 어두움) · 째깍=크림(가장 밝음) ·
+       꿀떡=금색(유일한 난색) · 방울=하늘(유일한 옅은 청록). 나란히 놓았을 때
+       명도·색상이 전부 갈려서, 펫 탭 여덟 칸이 아이콘 없이도 구분된다. */
+    mukmul:    { cls: 'ch-mukmul',    key: '#5B4B9E' },
+    tiktok:    { cls: 'ch-tiktok',    key: '#F3E3C0' },
+    kkultteok: { cls: 'ch-kkultteok', key: '#F2B822' },
+    bangul:    { cls: 'ch-bangul',    key: '#7EC8F0' }
   };
   var CHAR_CLASSES = ['ch-ten', 'ch-twin', 'ch-jelly', 'ch-ppyak', 'ch-mungchi',
-                      'ch-pudding', 'ch-sodawitch', 'ch-mongle', 'ch-churup'];
+                      'ch-pudding', 'ch-sodawitch', 'ch-mongle', 'ch-churup',
+                      'ch-mukmul', 'ch-tiktok', 'ch-kkultteok', 'ch-bangul'];
 
   /* =========================================================================
    * v4 13차-a — 표준 캐릭터 에셋 배선 (CHARACTER-PIPELINE §4)
@@ -24756,8 +24974,14 @@ window.TT_SFX = {
      기존 여섯은 art-embed.js 가 :root 에 인라인으로 구워 넣었고, 신규 넷은 파일 끝
      e3-catalog 블록이 catalog/ch-<id>-<종류>.webp 를 가리킨다. 이름 규약이 같으므로
      stdArt() 는 둘을 구분하지 않는다 — 그래서 여기 낱말 넷이 배선의 전부다. */
+  /* W6.5a — 신규 넷도 같은 규약(catalog/ch-<id>-{portrait,full,face,thumb}.webp).
+     ⚠ 이 배열에 이름을 더하는 것과 e3-catalog 블록에 변수 네 줄을 더하는 것은
+     **항상 같이** 한다. 여기만 더하면 stdArt() 가 존재하지 않는 변수를 가리켜
+     `var(--ch-tiktok-face)` 가 빈 값으로 풀리고, 카드가 SVG 폴백이 아니라
+     **빈칸**이 된다(data-art="std" 가 SVG 를 이미 껐기 때문이다). */
   var CHAR_STD = ['ten', 'twin', 'jelly', 'ppyak', 'mungchi', 'boss',
-                  'pudding', 'sodawitch', 'mongle', 'churup'];
+                  'pudding', 'sodawitch', 'mongle', 'churup',
+                  'mukmul', 'tiktok', 'kkultteok', 'bangul'];
   function hasStdArt(id) { return CHAR_STD.indexOf(id) >= 0; }
   /** 표준 에셋 변수 이름. 없는 캐릭터에는 '' 를 돌려준다(= 붙이지 않는다). */
   function stdArt(id, kind) {
@@ -27089,6 +27313,14 @@ window.TT_SFX = {
     setAppClass('hurry', false);
     var el = $('hurry');
     if (el) { el.classList.remove('go'); el.hidden = true; }
+    /* W6.5a — 째깍이 오버레이·삐약 창의 뒷정리도 여기다. 근거는 위 주석과 **글자
+       그대로 같다**: 두 연출 다 later() 로 자기를 끄는데, 도중에 메뉴로 나가면
+       clearTimers 가 그 later 를 잘라 화면에 유령이 남는다. 판이 시작될 때마다
+       도는 이 함수가 그 유일한 뒷정리 자리다(§4.3 "timestopReset 은 hurryReset
+       동형"의 그 자리 — 새 함수를 만들지 않고 동형 자리에 얹었다). */
+    tsOverlayClose();
+    setAppClass('freelink', false);
+    if (S.duel) { S.duel.freeLinkUntil = 0; S.duel.tsOverlayUntil = 0; }
   }
 
   function maybeHurry(left) {
@@ -29873,6 +30105,14 @@ window.TT_SFX = {
          advEndAt 줄이 한 번 밀고 커서가 또 한 번 밀어, 뭉치가 "시간을 멈추는"
          기술이 아니라 "시간을 버는" 기술이 된다. freezeUntil 바로 옆이 그 자리다. */
       if (S.duel.chillAt > 0) S.duel.chillAt += held;
+      /* W6.5a — 자유 연결 창(삐약)도 벽시계다. freezeUntil 바로 옆이 그 자리이고
+         근거도 같다: 컷인 2초가 8초 창에서 그대로 깎이면, 플레이어가 소비한
+         펫 횟수 하나가 **자기 발동 연출에게** 25% 를 먹힌다. */
+      if (S.duel.freeLinkUntil > 0) S.duel.freeLinkUntil += held;
+      /* W6.5a — 째깍이 타임스톱의 오버레이 마감. 오버레이는 입력을 잠그지 않으므로
+         (P3) fxBusy 목록에는 없지만, **벽시계인 것은 같다** — 여기 없으면 정지
+         중에 일시정지를 눌렀다 돌아왔을 때 째깍이가 이미 사라져 있다. */
+      if (S.duel.tsOverlayUntil > 0) S.duel.tsOverlayUntil += held;
     }
     // The run's age is a wall-clock field like every other one: without this
     // shift, a long pause would age the run and silently trigger the match decay.
@@ -31049,6 +31289,14 @@ window.TT_SFX = {
       /* W3 — 시간 정지 커서. "마지막으로 잔여시간을 밀어 준 시각"이고 0 이면
          정지가 안 돌고 있다. 마감(freezeUntil)과 짝이지 대체가 아니다. */
       chillAt: 0,
+      /* W6.5a — 삐약 자유 연결 창의 마감. freezeUntil 과 같은 문법이고 같은
+         이유다(마감 하나 = 해제 예약 0 + shiftDeadlines 한 줄). 0 이면 창이
+         닫혀 있고, 그때 isValidPairEx 는 옛 식과 글자 그대로 같아진다. */
+      freeLinkUntil: 0,
+      /* W6.5a — 째깍이 오버레이의 마감. **연출 전용**이고 규칙에 손대지 않는다
+         (규칙 쪽 마감은 위 freezeUntil 이다). 둘을 갈라 둔 이유는 P3 다:
+         오버레이는 입력을 잠그지 않으므로 규칙의 마감과 수명이 다를 수 있다. */
+      tsOverlayUntil: 0,
       meArm: false,
       down: false
     };
@@ -31937,10 +32185,294 @@ window.TT_SFX = {
      전부 같다: **비데미지**, 리턴은 성공 여부(false 면 횟수 미소비).
      삐약이 표에 없는 것은 실수가 아니라 기본값이다 — doPetSkill 의 `|| petPeck`
      이 그 자리이고, 그래서 표에 이름이 빠져도 화면이 조용히 멈추지 않는다. */
+  /* =========================================================================
+   * W6.5a (2026-08-20) — 신규 동료 넷의 기술 (PET-SYSTEM §3.5 · §4 · §16)
+   *
+   * 계약은 앞의 넷과 **글자 그대로 같다**: 비데미지, 리턴은 성공 여부(false 면
+   * 횟수 미소비), 판을 바꾸는 사슬은 전부 컷인 완료 콜백 안(doPetSkill 이 그
+   * 자리를 이미 갖고 있다). 그래서 아래 넷은 새 배선을 한 줄도 만들지 않고
+   * PET_SKILL 표에 이름 넷을 더하는 것으로 끝난다.
+   *
+   * ▣ 역할 중복 0 (§16-B 의 불변식)
+   *   여덟이 서로 다른 축을 판다 — 삐약=기하 · 뭉치/몽글=시간 · 츄릅=배치 ·
+   *   먹물=값 · 째깍=시간(연출축이 다르다, 아래) · 꿀떡=개수 · 방울=방해.
+   *   같은 축을 둘이 파면 둘째를 고를 이유가 사라지고, 그것이 수집형 로스터가
+   *   죽는 방식이다.
+   *
+   * ▣ 밸런스 — 신규 계수만
+   *   위 상수 블록의 다섯 줄이 전부다. 기존 133 계수는 한 글자도 안 건드렸고
+   *   (PET-SYSTEM P0), 여덟이 같은 판당 횟수(DUEL_PET_MAX)를 나눠 쓰므로
+   *   "새 펫이 오면 판이 길어진다"가 원리적으로 안 생긴다.
+   * ========================================================================= */
+
+  /**
+   * 째깍이 "타임스톱" — §4 이관 확정분.
+   *
+   * ▣ 왜 뭉치의 함수를 부르지 않고 새로 쓰는가
+   *   효과는 같다(같은 d.freezeUntil, 같은 6초). 다른 것은 **연출 계약**이고,
+   *   §4.3 이 그 계약을 시퀀스로 못박았다: 펫이 뛰어나와 대사를 던지고 타이머로
+   *   달려가 붙잡는다. 뭉치의 petShield 는 그 자리에 화면 전체 플로트텍스트
+   *   하나를 놓는다 — 두 연출을 한 함수의 분기로 합치면 그 함수가 "무엇을
+   *   하는가"가 아니라 "누가 불렀는가"로 갈라지고, 다음에 손대는 사람이 반드시
+   *   한쪽만 고친다.
+   *
+   * ▣ P3 — 연출이 입력을 잠그지 않는다 (§0 P3 · ART §8.4)
+   *   이 절의 **유일한 위험**이 여기다. 오버레이는 HUD 위에 뜨지만
+   *   pointer-events:none 이라 보드 탭이 그대로 통과하고, S.paused 는 건드리지
+   *   않는다. "시간을 잡아 준" 6초에 실제로 매치할 수 없으면 이 기술의 판타지
+   *   자체가 성립하지 않는다 — 그래서 이것은 연출 취향이 아니라 **기능**이다.
+   *   (발동 직전의 컷인 2초는 여전히 전체 정지다. 그건 여덟 펫이 공유하는
+   *   doPetSkill 의 계약이고, 정지한 만큼은 shiftDeadlines 가 전부 돌려준다.)
+   */
+  function petTimestop_tiktok() {
+    var d = S.duel;
+    if (!d || d.down) return false;
+    var until = now() + DUEL_TIKTOK_FREEZE_MS;
+    /* 이미 더 긴 얼음이 걸려 있으면 덮어쓰지 않는다 — 몽글과 같은 규율
+       (짧은 것이 긴 것을 자르지 않는다). */
+    if (until > d.freezeUntil) d.freezeUntil = until;
+    if (!(d.chillAt > 0)) d.chillAt = now();
+    duelChillSync();
+    tsOverlayOpen(DUEL_TIKTOK_FREEZE_MS);
+    J.sfx.ice();
+    J.sfx.mission();
+    J.screenPulse();
+    J.vignette(0.22);
+    hitStop(HITSTOP_LIGHT_MS);
+    shakeScreen(1);
+    J.vibrate(60);                     /* §4.2-3 의 값 그대로 */
+    toast(t('duel.pettiktok', { n: Math.round(DUEL_TIKTOK_FREEZE_MS / 1000) }));
+    return true;
+  }
+
+  /**
+   * §4.3 의 달려가기·붙잡기 오버레이. **입력을 잠그지 않는 유일한 연출**이라
+   * 기존 컷인 배선(runCutin/fxBusy)을 한 글자도 빌려 쓰지 않는다 — 빌리면
+   * 그 순간 S.paused 가 켜져 P3 가 깨진다.
+   *
+   * 마감(d.tsOverlayUntil)을 상태로 들고 있는 이유는 정리(reset)와 shiftDeadlines
+   * 때문이다. later() 한 방으로 끄면 일시정지 중에도 타이머가 흘러, 돌아왔을 때
+   * 째깍이가 이미 사라져 있고 시계만 멈춰 있는 화면이 된다.
+   */
+  function tsOverlayOpen(ms) {
+    var el = $('ts-over');
+    var d = S.duel;
+    if (d) d.tsOverlayUntil = now() + ms;
+    if (!el) return;
+    /* 그림은 표준 4크롭 규약을 그대로 탄다 — 새 변수도, 새 셀렉터도 없다.
+       'full'(전신)인 이유는 §4.3 이 "뛰어나와 달려간다"를 요구하기 때문이다:
+       얼굴 크롭으로는 달리는 몸이 없다. */
+    setStdArt($('ts-cast'), 'tiktok', 'full', '--slot-std');
+    setText('ts-line', t('pet.timestop.hold'));
+    el.hidden = false;
+    el.classList.remove('go');
+    if (el.offsetWidth !== undefined) void el.offsetWidth;
+    el.classList.add('go');
+    /* 대사 둘은 §4.3 의 시퀀스 그대로다: 등장에서 "잡고 있을게", 붙잡은 뒤
+       "터트려". 두 번째가 늦게 오는 것이 이 연출의 전부라, 한 줄로 합치면
+       "달려가서 잡았다"는 사실이 문장에서 사라진다. */
+    later(function () {
+      if (!el.hidden) { setText('ts-line', t('pet.timestop.go')); el.classList.add('grab'); }
+    }, 700);
+    later(function () { tsOverlayClose(); }, ms);
+  }
+
+  function tsOverlayClose() {
+    var el = $('ts-over');
+    var d = S.duel;
+    if (d) d.tsOverlayUntil = 0;
+    if (!el) return;
+    el.classList.remove('go');
+    el.classList.remove('grab');
+    el.hidden = true;
+  }
+
+  /**
+   * 삐약 "자유 연결" — §16-B-3 #10 의 이관분. 옛 쪼아먹기(petPeck)는 **지우지
+   * 않는다**: doPetSkill 의 `|| petPeck` 기본값이 여전히 그 함수를 가리키고,
+   * 표에 없는 동료(있을 리 없지만)의 안전망이 그것이다.
+   *
+   * 판을 한 칸도 안 건드리는 것이 이 기술의 정체성이다(§16-B-3 ①): 값도 개수도
+   * 배치도 그대로고, 8초 동안 **규칙만** 넓어진다. 그래서 여기서 하는 일은
+   * 벽시계 하나를 찍는 것뿐이고, 실제 완화는 isValidPairEx 의 한 항이 한다.
+   */
+  function petFreeLink_ppyak() {
+    var d = S.duel;
+    if (!d || d.down) return false;
+    var until = now() + DUEL_PPYAK_FREELINK_MS;
+    if (until > d.freeLinkUntil) d.freeLinkUntil = until;
+    setAppClass('freelink', true);
+    later(function () {
+      if (!connFreeOn()) setAppClass('freelink', false);
+    }, DUEL_PPYAK_FREELINK_MS + 40);
+    /* 창이 열리면 판이 넓어졌으므로 힌트·막힘 시계를 다시 센다. 안 하면 창
+       직전에 계산된 "막혔다"가 창 안에서도 그대로 살아 있다. */
+    clearHints();
+    d.idleAt = now() + DUEL_IDLE_MS;
+    J.sfx.petBell();
+    J.screenPulse();
+    J.vignette(0.18);
+    hitStop(HITSTOP_LIGHT_MS);
+    J.vibrate(30);
+    if (typeof window !== 'undefined') {
+      J.floatText(window.innerWidth / 2, window.innerHeight * 0.50,
+                  t('pet.freelink.go'), '#FFD84D', 28);
+    }
+    toast(t('duel.petppyak', { n: Math.round(DUEL_PPYAK_FREELINK_MS / 1000) }));
+    return true;
+  }
+
+  /**
+   * 먹물이 "먹물 발사" — §3.5 리페인트.
+   *
+   * 목표값을 **이미 판에 짝이 있는 값**에서 고른다. 아무 값이나 찍으면 리페인트가
+   * 짝을 못 만드는 판이 확률로 존재하고, 그 순간 §3.5 가 약속한 "수확 축제"가
+   * "아무 일도 안 일어남"이 된다. 값 풀 자체는 안 바뀐다(칸 수 불변).
+   *
+   * 블로커·얼음은 고르지 않는다 — petPeck·츄릅과 같은 계약이다(펫이 핸디캡을
+   * 우회하면 핸디캡이 사라진다). 점수도 게이지도 한 톨 안 움직인다: 이 기술이
+   * 파는 것은 **값**이고, 그 값을 점수로 바꾸는 것은 플레이어의 손이다.
+   */
+  function petInkRepaint_mukmul() {
+    var d = S.duel, i;
+    if (!d || d.down || S.busy) return false;
+    var live = [];
+    for (i = 0; i < S.cells.length; i++) {
+      var c = S.cells[i];
+      if (c && !c.dead && c.sp !== 'block' && !(c.ice > 0)) live.push(i);
+    }
+    if (live.length < 2) { toast(t('duel.petempty')); J.sfx.fail(); return false; }
+    /* 목표값 = 지금 판에서 가장 흔한 값. "이미 짝이 성립하는 값"의 가장 싼
+       근사이고, 최빈값이면 리페인트 뒤 그 값의 무더기가 확실히 둘 이상이다. */
+    var freq = Object.create(null), best = -1, bestN = -1;
+    for (i = 0; i < live.length; i++) {
+      var v = S.cells[live[i]].v;
+      freq[v] = (freq[v] | 0) + 1;
+      if (freq[v] > bestN) { bestN = freq[v]; best = v; }
+    }
+    if (best < 0) { toast(t('duel.petempty')); J.sfx.fail(); return false; }
+    /* 이미 그 값인 칸은 덮어 봐야 아무 일도 안 일어난다 — 후보에서 뺀다.
+       빼지 않으면 "5칸을 덮었는데 판이 그대로"인 판이 나온다. */
+    var pool = [];
+    for (i = 0; i < live.length; i++) {
+      if (S.cells[live[i]].v !== best) pool.push(live[i]);
+    }
+    if (!pool.length) { toast(t('duel.petempty')); J.sfx.fail(); return false; }
+    shuffleSeeded(pool, battleRng());
+    var take = Math.min(DUEL_MUKMUL_REPAINT, pool.length);
+    for (i = 0; i < take; i++) S.cells[pool[i]].v = best;
+    clearSelection();
+    clearHints();
+    renderAll();
+    d.idleAt = now() + DUEL_IDLE_MS;
+    J.sfx.petBell();
+    shakeScreen(1);
+    J.vibrate(26);
+    if (typeof window !== 'undefined') {
+      J.shockwave(window.innerWidth / 2, window.innerHeight * 0.55, '#5B4B9E');
+    }
+    toast(t('duel.petmukmul', { n: take, v: best }));
+    return true;
+  }
+
+  /**
+   * 꿀떡이 "황금 열매 소환" — §16-B #6.
+   *
+   * 골드는 이 파일에 **이미 있는 특수 타일**이다(applyStage1Gold 가 1탄에 하나를
+   * 심고, resolveMatch 가 gold 를 보너스로 계산한다). 그래서 이 기술은 새 규칙을
+   * 0줄 만들고 sp 칸 둘을 'gold' 로 찍는 것으로 끝난다 — 새 특수를 만들었다면
+   * 매치·리필·Undo·저장 네 곳을 모두 가르쳐야 했을 것이다.
+   *
+   * 이미 특수(와일드/폭탄/골드/얼음)인 칸은 고르지 않는다: 덮으면 플레이어가
+   * 이미 본 특수가 조용히 증발한다.
+   */
+  function petGoldFruit_kkultteok() {
+    var d = S.duel, i;
+    if (!d || d.down || S.busy) return false;
+    var pool = [];
+    for (i = 0; i < S.cells.length; i++) {
+      var c = S.cells[i];
+      if (c && !c.dead && !c.sp && !(c.ice > 0)) pool.push(i);
+    }
+    if (!pool.length) { toast(t('duel.petempty')); J.sfx.fail(); return false; }
+    shuffleSeeded(pool, battleRng());
+    var take = Math.min(DUEL_KKULTTEOK_GOLD, pool.length);
+    for (i = 0; i < take; i++) S.cells[pool[i]].sp = 'gold';
+    clearHints();
+    renderAll();
+    J.sfx.gold();
+    J.sfx.petBell();
+    shakeScreen(1);
+    J.vibrate(26);
+    if (typeof window !== 'undefined') {
+      J.shockwave(window.innerWidth / 2, window.innerHeight * 0.55, '#F2B822');
+    }
+    toast(t('duel.petkkultteok', { n: take }));
+    return true;
+  }
+
+  /**
+   * 방울이 "거품 정화" — §16-B #5.
+   *
+   * 명세의 정화 대상은 끈끈이 코팅·먹구름인데 이 빌드에는 그 두 기믹이 아직
+   * 없다. 없는 것을 지우는 기술은 **죽은 스킬**이라(§16-B 또록이 항이 같은
+   * 이유로 "힌트 1회 대체"를 붙였다), 여기서는 지금 판에 실제로 존재하는
+   * 방해 둘 — 블로커와 얼음 껍질 — 로 대상을 사상한다. 기믹이 도착하면 아래
+   * 후보 수집 루프에 조건 한 줄씩만 더하면 된다.
+   *
+   * 블로커를 **펫이 지우는 것이 여기서는 정당하다**: petPeck·츄릅이 블로커를
+   * 피하는 이유는 그 둘의 축이 칸/배치이고 블로커 해제는 곁다리 이득이기
+   * 때문이다. 방울이는 축 자체가 〔정화〕라, 지우지 않으면 할 일이 없다.
+   */
+  function petCleanse_bangul() {
+    var d = S.duel, i;
+    if (!d || d.down || S.busy) return false;
+    var pool = [];
+    for (i = 0; i < S.cells.length; i++) {
+      var c = S.cells[i];
+      if (!c || c.dead) continue;
+      if (c.sp === 'block' || c.ice > 0) pool.push(i);
+    }
+    if (!pool.length) { toast(t('duel.petclean0')); J.sfx.fail(); return false; }
+    shuffleSeeded(pool, battleRng());
+    var take = Math.min(DUEL_BANGUL_CLEAN, pool.length);
+    for (i = 0; i < take; i++) {
+      var cc = S.cells[pool[i]];
+      /* 얼음은 껍질만 벗긴다(타일은 산다) · 블로커는 통째로 지운다. 둘의 차이가
+         이 기술의 유일한 분기이고, 근거는 두 방해의 정의다: 얼음은 "덮개",
+         블로커는 "그 칸 자체"다. */
+      if (cc.ice > 0) { cc.ice = 0; delete cc.sp; }
+      else { cc.dead = true; delete cc.sp; }
+    }
+    clearSelection();
+    clearHints();
+    renderAll();
+    d.idleAt = now() + DUEL_IDLE_MS;
+    J.sfx.petBell();
+    J.screenPulse();
+    shakeScreen(1);
+    J.vibrate(26);
+    if (typeof window !== 'undefined') {
+      J.shockwave(window.innerWidth / 2, window.innerHeight * 0.55, '#7EC8F0');
+    }
+    toast(t('duel.petbangul', { n: take }));
+    return true;
+  }
+
   var PET_SKILL = {
     mungchi: petShield,
     mongle:  petFreeze4s_mongle,
-    churup:  petRowShuffle_churup
+    churup:  petRowShuffle_churup,
+    /* W6.5a — 신규 넷 + 삐약의 이관.
+       ⚠ 삐약이 **이제는 표에 있다**. 위 doPetSkill 주석의 "표에 없으면 삐약의
+       쪼아먹기가 기본값"은 여전히 참이지만(폴백 경로), 삐약 자신은 더 이상 그
+       기본값을 타지 않는다 — §16-B-3 이 삐약을 〔길 트기〕 축으로 옮겼고,
+       petPeck 는 지우지 않고 폴백으로만 남는다. */
+    ppyak:     petFreeLink_ppyak,
+    tiktok:    petTimestop_tiktok,
+    mukmul:    petInkRepaint_mukmul,
+    kkultteok: petGoldFruit_kkultteok,
+    bangul:    petCleanse_bangul
   };
 
   /** 동료 스프라이트가 한 번 뛴다 — "지금 저 애가 했다"를 화살표 없이 말한다. */
@@ -32531,6 +33063,13 @@ window.TT_SFX = {
     var again = $('adv-again');
     if (again) {
       again.textContent = win ? t('adv.next') : t('adv.retry');
+      /* W6.5a ④ — 실패판의 "다시 도전"이 .cta-jelly 의 **견본 한 자리**다.
+         왜 하필 여기인가: 이 버튼이 결함으로 지목된 그 버튼이다(핑크 조각의
+         모서리 흰 뭉개짐). 조각을 다른 조각으로 잠정 스왑하는 대신 코드 재현을
+         얹으면, W6.5b 가 표준 부품을 고를 때 **실패 모달이라는 최악의 조건**
+         (어두운 .lost 틴트 + 긴 한글 라벨)에서 이미 검증된 견본을 보게 된다.
+         성공판의 "다음 탄"은 조각 그대로다 — 한 파도에 한 자리만 바꾼다. */
+      if (again.classList) again.classList.toggle('cta-jelly', !win);
       /* 다음 탄이 없는 경우(아직 안 만든 탄은 없지만 하트가 0인 경우)에도 버튼은
          남는다 — 눌렀을 때 카드가 대기 안내를 띄우는 쪽이, 버튼이 사라져서
          "왜 못 가지"를 스스로 알아내야 하는 쪽보다 낫다. */
@@ -37123,6 +37662,584 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
 #charpanel[data-cptab="pet"] #mate-pick .char-card.ch-churup::after{
   background-image:var(--mate-churup-img,none);
 }
+
+/* ===========================================================================
+   W6.5a (2026-08-20) — 신규 동료 넷 · 영문 로고 · 모달 헤더 캡슐 · CTA 젤리
+
+   이 절도 위 e3-catalog 블록의 규율을 그대로 잇는다: **그림 주소와 색**이
+   주고, 레이아웃 규칙은 새로 만들지 않는다(신규 넷은 기존 넷과 똑같은 자리에
+   선다). 전부 catalog/ 외부 참조 — 인라인 base64 0 바이트.
+   =========================================================================== */
+:root{
+  /* ---- 표준 4크롭 × 4동료. CHAR_STD 의 낱말 넷과 짝이다 ---- */
+  --ch-mukmul-portrait:url("catalog/ch-mukmul-portrait.webp");
+  --ch-mukmul-full:url("catalog/ch-mukmul-full.webp");
+  --ch-mukmul-face:url("catalog/ch-mukmul-face.webp");
+  --ch-mukmul-thumb:url("catalog/ch-mukmul-thumb.webp");
+  --ch-tiktok-portrait:url("catalog/ch-tiktok-portrait.webp");
+  --ch-tiktok-full:url("catalog/ch-tiktok-full.webp");
+  --ch-tiktok-face:url("catalog/ch-tiktok-face.webp");
+  --ch-tiktok-thumb:url("catalog/ch-tiktok-thumb.webp");
+  --ch-kkultteok-portrait:url("catalog/ch-kkultteok-portrait.webp");
+  --ch-kkultteok-full:url("catalog/ch-kkultteok-full.webp");
+  --ch-kkultteok-face:url("catalog/ch-kkultteok-face.webp");
+  --ch-kkultteok-thumb:url("catalog/ch-kkultteok-thumb.webp");
+  --ch-bangul-portrait:url("catalog/ch-bangul-portrait.webp");
+  --ch-bangul-full:url("catalog/ch-bangul-full.webp");
+  --ch-bangul-face:url("catalog/ch-bangul-face.webp");
+  --ch-bangul-thumb:url("catalog/ch-bangul-thumb.webp");
+  /* ---- 펫 탭 그리드 전용 얼굴 스위치(11차 규약, W7 과 같은 문법) ---- */
+  --mate-mukmul-img:url("catalog/ch-mukmul-face.webp");
+  --mate-tiktok-img:url("catalog/ch-tiktok-face.webp");
+  --mate-kkultteok-img:url("catalog/ch-kkultteok-face.webp");
+  --mate-bangul-img:url("catalog/ch-bangul-face.webp");
+  /* ---- 모달 헤더 부속 ----
+     ⚠ 캡슐은 **-st** 판이다(straight alpha). 도착본 glass-hud-capsule.webp 는
+     프리멀티플라이드라 브라우저가 straight 로 해석하는 순간 반투명 구간의 RGB
+     가 통째로 어두워져 유리가 **잿빛 판때기**로 보였다(중앙 실측 rgb(43,48,61)
+     @a=80 → 언프리멀티 rgb(137,153,194)). 원본은 지우지 않고 남긴다. */
+  --w65-capsule:url("catalog/glass-hud-capsule-st.webp");
+  --w65-x:url("catalog/ui-x-jelly.webp");
+}
+
+/* ---- 신규 넷의 키색 한 벌 (W7 블록과 같은 여섯 자리 셀렉터 목록) ------------
+   값은 JS 의 CHARS[id].key 와 **반드시 같아야 한다** — HUD 칩·게이지 링은 JS
+   쪽을, 아바타 실루엣은 이쪽을 읽으므로 어긋나면 한 캐릭터가 두 색이 된다. */
+.char-card.ch-mukmul,#mate.ch-mukmul,.co-av.ch-mukmul,
+.mn-hero.ch-mukmul,.skill-av.ch-mukmul,.cutin-av.ch-mukmul{
+  --ch-key:#5B4B9E; --ch-body:#DCD6F2; --ch-name:#7B69C4;
+}
+.char-card.ch-tiktok,#mate.ch-tiktok,.co-av.ch-tiktok,
+.mn-hero.ch-tiktok,.skill-av.ch-tiktok,.cutin-av.ch-tiktok{
+  --ch-key:#F3E3C0; --ch-body:#FFF8E8; --ch-name:#D9BE86;
+}
+.char-card.ch-kkultteok,#mate.ch-kkultteok,.co-av.ch-kkultteok,
+.mn-hero.ch-kkultteok,.skill-av.ch-kkultteok,.cutin-av.ch-kkultteok{
+  --ch-key:#F2B822; --ch-body:#FFEFC4; --ch-name:#D99A0E;
+}
+.char-card.ch-bangul,#mate.ch-bangul,.co-av.ch-bangul,
+.mn-hero.ch-bangul,.skill-av.ch-bangul,.cutin-av.ch-bangul{
+  --ch-key:#7EC8F0; --ch-body:#DCF1FD; --ch-name:#4FA8DA;
+}
+
+/* ---- 펫 탭 그리드의 신규 넷 칸 (W7 블록의 규칙을 그대로 연장) -------------- */
+#charpanel[data-cptab="pet"] #mate-pick .char-card.ch-mukmul .cav,
+#charpanel[data-cptab="pet"] #mate-pick .char-card.ch-tiktok .cav,
+#charpanel[data-cptab="pet"] #mate-pick .char-card.ch-kkultteok .cav,
+#charpanel[data-cptab="pet"] #mate-pick .char-card.ch-bangul .cav{
+  opacity:calc(1 - var(--mate-img-on,0));
+}
+#charpanel[data-cptab="pet"] #mate-pick .char-card.ch-mukmul::after,
+#charpanel[data-cptab="pet"] #mate-pick .char-card.ch-tiktok::after,
+#charpanel[data-cptab="pet"] #mate-pick .char-card.ch-kkultteok::after,
+#charpanel[data-cptab="pet"] #mate-pick .char-card.ch-bangul::after{
+  content:"";
+  position:absolute;
+  left:6%;right:6%;top:5%;bottom:22%;
+  background-repeat:no-repeat;
+  background-position:center bottom;
+  background-size:contain;
+  opacity:var(--mate-img-on,0);
+  pointer-events:none;
+}
+#charpanel[data-cptab="pet"] #mate-pick .char-card.ch-mukmul::after{ background-image:var(--mate-mukmul-img,none); }
+#charpanel[data-cptab="pet"] #mate-pick .char-card.ch-tiktok::after{ background-image:var(--mate-tiktok-img,none); }
+#charpanel[data-cptab="pet"] #mate-pick .char-card.ch-kkultteok::after{ background-image:var(--mate-kkultteok-img,none); }
+#charpanel[data-cptab="pet"] #mate-pick .char-card.ch-bangul::after{ background-image:var(--mate-bangul-img,none); }
+
+/* ---- 그리드가 아홉 칸이 됐다 ---------------------------------------------
+   동료 넷 + "없음" = 다섯이던 줄에 넷이 더해져 아홉이다. flex 1 1 0 · max 112px
+   그대로면 390px 폭에서 칸당 43px 이 되어 이름이 통째로 말줄임표가 된다.
+   그래서 **줄을 접는다** — 칸을 줄이는 대신 두 줄로 가는 쪽이 "여덟 마리를
+   모았다"는 사실을 화면에서 지우지 않는다. 최소 폭을 박아 두 줄 × 다섯/넷로
+   자연히 갈린다. 다른 탭(#char-pick)은 이 규칙 밖이라 한 픽셀도 안 바뀐다. */
+/* 🚨 실측 수리 — 첫 렌더에서 **세 줄**이 났고 셋째 줄("없음")이 스킨 줄 아래로
+   잘렸다(#charpanel 은 높이가 고정이라 자라지 않는다).
+
+   flex-wrap + min/max-width 로 두 줄을 만들려다 실패했고, 그 실패가 이 규칙이
+   **그리드**인 이유다: 줄바꿈 지점이 flex-basis·gap·max-width·컨테이너 폭 넷의
+   곱으로 결정돼서, 한 값만 어긋나도 조용히 세 줄이 된다(실측이 그랬다).
+   grid-template-columns:repeat(5,1fr) 은 그 넷을 전부 무의미하게 만든다 —
+   **다섯 칸이라고 썼으니 다섯 칸**이고, 아홉 칸은 반드시 5+4 두 줄이다.
+   다른 탭(#char-pick)은 이 스코프 밖이라 한 픽셀도 안 바뀐다. */
+#charpanel[data-cptab="pet"] #mate-pick{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:6px;
+}
+#charpanel[data-cptab="pet"] #mate-pick .char-card{
+  flex:none;
+  width:auto;
+  min-width:0;
+  max-width:none;
+}
+/* 다섯 칸이면 칸당 약 60px 이라 두 줄짜리 소개(.cc-pass)가 들어갈 자리가 없다.
+   이름만 남긴다 — 기술 설명은 카드를 고르면 아래 정보 카드가 이미 말해 준다. */
+#charpanel[data-cptab="pet"] #mate-pick .char-card .cc-pass{ display:none; }
+/* 🚨 실측 수리 2 — 다섯 칸이 되면서 카드가 세로로 길어졌고, 얼굴 컷아웃의
+   `bottom:22%`(W7 값)가 이름줄 위로 정확히 내려앉아 **글자를 덮었다**
+   (스크린샷에서 "삐약"이 병아리 배 위에 겹쳤다). 컷아웃 바닥을 32% 로 올려
+   이름 몫을 비우고, 이름에는 z-index 를 줘 어떤 경우에도 그림 위에 선다.
+   두 줄을 함께 두는 이유는 하나가 실패해도 다른 하나가 남기 때문이다. */
+#charpanel[data-cptab="pet"] #mate-pick .char-card::after{ bottom:36%; }
+#charpanel[data-cptab="pet"] #mate-pick .char-card .cc-name{
+  position:relative;
+  z-index:2;
+  font-size:10px;
+  letter-spacing:-.02em;
+}
+
+/* ---- 째깍이 타임스톱 오버레이 (PET-SYSTEM §4.3) ---------------------------
+   🚨 이 절에서 **절대 지우면 안 되는 한 줄**은 pointer-events:none 이다.
+   P3(연출이 입력을 잠그지 않는다)가 이 한 줄에 통째로 걸려 있다 — 지우는
+   순간 6초 동안 보드가 죽고, 째깍이는 "시간을 잡아 주는 펫"이 아니라
+   "6초 동안 게임을 뺏는 펫"이 된다.
+   z-index 는 HUD 위 · 컷인(#cutin) 아래다: 컷인이 뜨면 전체 정지가 우선이라는
+   §4.3 「겹침 순서」 그대로다. */
+#ts-over{
+  position:fixed;
+  left:0;right:0;top:0;bottom:0;
+  z-index:64;
+  pointer-events:none;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  padding-top:16vh;
+  gap:6px;
+}
+#ts-over[hidden]{ display:none; }
+#ts-cast{
+  width:132px;
+  height:150px;
+  background-image:var(--slot-std,none);
+  background-repeat:no-repeat;
+  background-position:center bottom;
+  background-size:contain;
+  filter:drop-shadow(0 6px 10px rgba(40,26,58,.42));
+  transform:translateX(-26vw) translateY(8px);
+  transition:transform .42s cubic-bezier(.22,.9,.28,1.02);
+}
+#ts-over.go #ts-cast{ transform:translateX(0) translateY(0); }
+/* 붙잡기 — 타이머 쪽(위·오른쪽)으로 붙고 매달려 흔들린다(§4.3-3). */
+#ts-over.grab #ts-cast{
+  transform:translateX(16vw) translateY(-9vh) scale(.82);
+  animation:ts-hang 1.05s ease-in-out infinite;
+}
+@keyframes ts-hang{
+  0%,100%{ rotate:-5deg; }
+  50%{ rotate:5deg; }
+}
+#ts-line{
+  max-width:82vw;
+  padding:7px 16px 9px;
+  border-radius:999px;
+  background-color:rgba(255,255,255,.92);
+  background-image:linear-gradient(180deg,rgba(255,255,255,.98) 0%,rgba(240,236,255,.92) 100%);
+  box-shadow:0 3px 0 rgba(120,96,160,.30), 0 6px 14px rgba(40,26,58,.22);
+  color:#4A3A63;
+  font-family:var(--font-display);
+  font-weight:700;
+  font-size:15px;
+  line-height:1.25;
+  text-align:center;
+  opacity:0;
+  transform:translateY(6px);
+  transition:opacity .22s ease, transform .22s ease;
+}
+#ts-over.go #ts-line{ opacity:1; transform:translateY(0); }
+/* 동작 최소화 — 위치는 최종 상태로 고정하고 움직임만 끈다(컷인과 같은 규약). */
+@media (prefers-reduced-motion: reduce){
+  #ts-cast{ transition:none; transform:none; }
+  #ts-over.grab #ts-cast{ animation:none; transform:translateX(16vw) translateY(-9vh) scale(.82); }
+  #ts-line{ transition:none; }
+}
+
+/* ---- 삐약 자유 연결 창의 화면 표시 -----------------------------------------
+   창이 열려 있는 동안 보드 가장자리에 금빛 테를 두른다. 규칙이 바뀐 것을
+   화면이 말해 주지 않으면 플레이어는 "왜 갑자기 이어지지?"를 배울 수 없다.
+   보드 **안쪽**은 건드리지 않는다(ART §8.1 보드 대비 상한). */
+#app.freelink #board{
+  box-shadow:0 0 0 3px rgba(255,216,77,.85), 0 0 22px 6px rgba(255,196,40,.42);
+  border-radius:14px;
+}
+
+/* ---- 영문 로고 (art-logo-en.webp) -----------------------------------------
+   같은 560x326 판이라 aspect-ratio 도 자리도 한 줄 안 바뀐다 — 갈리는 것은
+   **그림 주소 하나**뿐이다. html[lang="en"] 스코프라 한국어판은 --art-logo
+   (art-embed 가 구운 data URI)를 그대로 쓴다.
+   background 단축을 쓰지 않고 background-image 만 덮는 이유는 이 파일의
+   상시 규율이다(단축은 background-clip 을 리셋한다 — 사고 전력).
+   캐시버스트 없음: 신규 파일이라 낡은 항목이 존재할 수 없다. */
+html[lang="en"] .logo-img,
+html[lang="en"] .splash-logo{
+  background-image:url("catalog/art-logo-en.webp");
+}
+
+/* ===========================================================================
+   W6.5a ④ — .cta-jelly : 발주 비트맵을 **코드로 재현한** 젤리 CTA
+
+   발주본 btn-jelly-grad.webp 는 377px 로 도착해 규격(471px)에 미달했다. 다시
+   발주하는 대신 CSS 로 재현한 이유는 셋이다:
+     ① 이 모양은 **재현 가능**하다 — 그라데이션 + 상단 광택 + 둥근 알약뿐이라
+        비트맵이 줄 수 있는 것(붓질·질감)이 애초에 없다.
+     ② 해상도가 없다. 조각 버튼은 폭이 바뀔 때마다 9슬라이스 연신이 얼룩을
+        가로띠로 번지게 하는데(14차 민트 사고), 코드는 그 실패 모드 자체가 없다.
+     ③ 색을 토큰으로 갈 수 있다 — W6.5b 의 CTA 체계가 색만 바꿔 쓰면 된다.
+
+   값은 시안 mockup/gm-howto-green-target.jpg 의 "건너뛰기" 알약 **실측**이다
+   (1079x1953 원본에서 픽셀 샘플):
+     본체 중간줄  좌 #9258C9 → 우 #56ACAD
+     상단 광택줄  좌 #B383D7 → 우 #7BBFBE  (= 본체 위에 흰빛 42%)
+     아래 테두리  좌 #823CB8 · 우 #4B919D  (= 본체보다 한 단 어두운 안쪽 그림자)
+   그래서 층이 셋이다: ① 보라→청록 본체 ② 위 42% 흰 광택 ③ 아래 안쪽 그림자.
+
+   ⚠ background 단축 금지 — 이 절도 전부 롱핸드다(이 파일의 상시 규율).
+   =========================================================================== */
+.cta-jelly{
+  position:relative;
+  border:0;
+  border-radius:999px;
+  padding:14px 26px 16px;
+  min-height:58px;
+  background-color:#7B84C8;
+  /* ② 상단 광택(위 42%) 위에 ① 본체. 두 겹을 한 속성에 쌓아 의사요소를 안 쓴다 —
+     .btn 은 이미 ::before/::after 를 다른 용도로 갖고 있을 수 있다. */
+  background-image:
+    linear-gradient(180deg,
+      rgba(255,255,255,.42) 0%,
+      rgba(255,255,255,.26) 24%,
+      rgba(255,255,255,.03) 42%,
+      rgba(255,255,255,0) 50%),
+    linear-gradient(96deg, #9A4FD6 0%, #8A5BD0 32%, #6D8FBE 62%, #47B7BA 100%);
+  background-repeat:no-repeat, no-repeat;
+  background-position:center, center;
+  background-size:100% 100%, 100% 100%;
+  /* ③ 안쪽 그림자(아래) + 밝은 림 + 바깥 그림자. 시안의 아래 테두리가 본체보다
+     한 단 어두운 것과, 위 가장자리에 흰 실선이 도는 것이 이 한 줄이다. */
+  box-shadow:
+    inset 0 -6px 10px rgba(60,26,96,.34),
+    inset 0 2px 2px rgba(255,255,255,.62),
+    0 0 0 2px rgba(226,214,250,.72),
+    0 5px 0 rgba(70,34,108,.52),
+    0 9px 16px rgba(40,26,58,.26);
+  color:#FFFFFF;
+  font-family:var(--font-display);
+  font-weight:700;
+  text-shadow:0 2px 0 rgba(72,36,104,.55);
+}
+.cta-jelly:active{
+  transform:translateY(3px);
+  box-shadow:
+    inset 0 -3px 8px rgba(60,26,96,.34),
+    inset 0 2px 2px rgba(255,255,255,.62),
+    0 0 0 2px rgba(226,214,250,.72),
+    0 2px 0 rgba(74,40,112,.34),
+    0 5px 10px rgba(40,26,58,.26);
+}
+/* 🚨 조각 버튼 절(`.w6m .sheet #adv-again` 의 핑크 border-image)을 **덮어야** 한다.
+   그 선택자는 (1,2,0) 이다. 처음에 `.w6m .sheet .btn.cta-jelly` 로 잡았다가
+   실렌더에서 그대로 핑크 조각이 남았고, 이유는 명세대로다 — **id 하나는 클래스
+   몇 개로도 못 이긴다**((1,2,0) > (0,4,0)). 그래서 id 를 선택자에 넣어 (1,3,0)
+   으로 올린다. 클래스 하나만 붙이면 되는 부품을 만들려던 원래 뜻과 어긋나 보이지만,
+   조각 절 자체가 id 로 쓰여 있는 한 이것이 유일한 정답이다. W6.5b 가 조각 절을
+   클래스로 정리하면 이 줄은 `.w6m .sheet .btn.cta-jelly` 로 돌아갈 수 있다. */
+.w6m .sheet #adv-again.cta-jelly,
+.w6m .sheet .btn.cta-jelly{
+  border-style:none;
+  border-width:0;
+  border-image:none;
+  border-radius:999px;
+  padding:14px 26px 16px;
+  background-color:#7B84C8;
+  background-image:
+    linear-gradient(180deg,
+      rgba(255,255,255,.42) 0%,
+      rgba(255,255,255,.26) 24%,
+      rgba(255,255,255,.03) 42%,
+      rgba(255,255,255,0) 50%),
+    linear-gradient(96deg, #9A4FD6 0%, #8A5BD0 32%, #6D8FBE 62%, #47B7BA 100%);
+  background-repeat:no-repeat, no-repeat;
+  background-position:center, center;
+  background-size:100% 100%, 100% 100%;
+  box-shadow:
+    inset 0 -6px 10px rgba(60,26,96,.34),
+    inset 0 2px 2px rgba(255,255,255,.62),
+    0 0 0 2px rgba(226,214,250,.72),
+    0 5px 0 rgba(70,34,108,.52),
+    0 9px 16px rgba(40,26,58,.26);
+  text-shadow:0 2px 0 rgba(72,36,104,.55);
+}
+
+/* ===========================================================================
+   W6.5a ③ — 결함 조각 긴급 교체
+
+   전수 감사 결과 이 파일이 **실제로 소비하는** 결함 조각은 하나뿐이었다:
+     · --lib-btn-mint  → #btn-add (인게임 액션바 "추가"). 좌하단 연두 얼룩과
+       우상단 검은 점이 있는 그 조각이다(35588 의 🚨 주석이 이미 못박은 결함).
+       14차가 `#modal-rank .btn-primary` 에서 같은 조각의 9슬라이스를 걷어냈는데,
+       액션바의 이 자리만 2026-08-15 부터 남아 있었다.
+     · --lib-btn-red   → 소비처 0. 결함이지만 화면에 안 나온다(교체 불요).
+   깨끗한 다섯(cta-blue·pink·yellow·orange·purple) 중 액션바에서 아직 안 쓰인
+   것은 **파랑 하나**다(hint=노랑 · undo=보라 · shuffle=핑크). 그래서 파랑이고,
+   그 배정은 35588 의 색 규약("파랑 = 주행동")과도 맞는다 — "추가"는 액션바에서
+   가장 자주 눌리는 칸이다.
+   slice 값은 조각 자체의 표(25 33 28 33)다.
+   ⚠ border-width 는 **`.act` 의 값을 그대로 둔다**(15px 17px 18px 17px). 조각의
+   slice×0.5 규약을 여기서 따르면 이 칸만 상자가 달라져 액션바 네 칸의 라벨 줄이
+   어긋난다 — 한 줄에 나란히 선 버튼들에서는 상자의 통일이 조각의 정확한 비율보다
+   앞선다. 조각은 25:33 을 15:17 로 앉는 만큼만 눌리고, 알약 모양이라 그 눌림이
+   눈에 안 띈다(실렌더 확인 대상).
+   ⚠ 잠정 교체다. 최종 CTA 체계는 W6.5b 소관이다. */
+#btn-add{
+  border-image:var(--lib-btn-cta-blue) 25 33 28 33 fill stretch;
+}
+
+/* ===========================================================================
+   W6.5a ⑤ — 모달 헤더: 유리 캡슐 + 레터링 · X 무지개 젤리
+   (사용자 A/B 판정 결과 = A안 확정 — catalog/glass-hud-capsule.webp 2차 수리본)
+
+   ▣ 리본 절은 **봉인이지 삭제가 아니다**
+     :10736 의 `--lib-ribbon-header` 여섯 줄과 :9285 의 `.r10-ribbon` 은 한 글자도
+     안 지웠다. 아래 규칙이 같은 선택자를 **뒤에서 덮을 뿐**이라, 되돌리려면 이
+     절 하나를 지우면 옛 리본이 그대로 선다. 이 파일의 상시 규율(삭제 금지)이고,
+     헤더처럼 사용자 판정이 오가는 자리에서는 특히 값을 한다.
+
+   ▣ 캡 보존 — 9슬라이스 값의 근거
+     원판 744x298. 캡(둥근 끝)의 지름 = 높이 = 298 이므로 좌우 반원의 폭도 각각
+     149 다. 슬라이스를 200 으로 잡아 반원 + 직선 51px 을 한 조각에 넣고, 중앙
+     344px 만 늘린다 → **캡은 절대 안 늘어난다**(사용자 반려의 그 결함).
+     세로 슬라이스 130/130 은 중앙 밴드를 38px 남긴다. border-width 는
+     22px/36px 이라 세로 배율 22/130=0.169 · 가로 36/200=0.180 — 6% 차이는
+     알약 형태에서 눈에 안 띄고, 이보다 더 맞추면 헤더가 필요 이상 높아진다.
+
+   ▣ 레터링이 **한국어에서만** 서는 이유
+     ttl-*.webp 열 장은 전부 한글 판이다(설정·일시정지·내 기록…). 영문 빌드에
+     그대로 얹으면 lang=en 화면에 한글 제목이 뜬다 — 로고를 영문판으로 가는
+     이 파도의 ②번 작업과 정면으로 어긋난다. 그래서 캡슐 **프레임은 두 언어
+     공통**이고 갈리는 것은 알맹이뿐이다: ko 는 레터링 그림, en 은 지금의 글자.
+     (레터링 영문판이 도착하면 아래 html[lang="ko"] 를 걷고 en 블록만 더하면 된다.)
+
+   ▣ 레터링이 캡슐 밖으로 안 나가는 보장
+     background-origin:border-box + background-size:auto 44% 다. 44% 는 캡슐
+     **전체 높이**의 44% 이고, 위아래 테두리(22px+22px)를 뺀 안쪽이 약 34% 이므로
+     44% 는 유리 면의 상하 여유까지 먹는 값이다 — 유리 캡슐은 테두리가 아니라
+     **반투명 판**이라 글자가 그 위에 걸쳐도 잘린 것으로 안 읽힌다(실렌더 확인
+     대상). 좌우는 nowrap 글자 폭이 캡슐 폭을 정하므로 항상 여유가 남는다.
+   =========================================================================== */
+
+/* ---- ① 캡슐 프레임 (열 모달 + r10 계열 셋) -------------------------------- */
+#modal-pause .sheet > h2,
+#modal-over .sheet > h2,
+#modal-tutorial .sheet > h2,
+#modal-settings .sheet > h2,
+#modal-howto .sheet > h2,
+#modal-skin .sheet > h2,
+#modal-adv .sheet > h2,
+#modal-daily .sheet > h2,
+#modal-clear .sheet > h2,
+#modal-rank .sheet > h2,
+#modal-node .r10-ribbon,
+#modal-mode .r10-ribbon,
+#modal-classic .r10-ribbon,
+#charpanel #cp-h{
+  align-self:center;
+  /* 🚨 높이를 **못 박는다**(66px). 캡슐은 9슬라이스라 세로 배율 = border-width ÷
+     slice 인데, 높이를 내용에 맡기면 창마다 그 배율이 달라진다 — 실측에서
+     #modal-mode 만 95px 이 나왔고(41px 짜리 제목 글자), 그 한 창에서만 캡이
+     세로로 늘어나 **둥근 끝이 각진 모서리**로 보였다(사용자 반려의 그 결함).
+     66px 에서 세로 배율은 22÷130 = 0.169, 가로는 36÷200 = 0.180 이라 캡이
+     원판 비율의 6% 안에서 재현된다.
+     flex 중앙정렬은 글자를 그 고정 높이 안에 세우기 위한 것이다(글자 높이가
+     상자를 정하던 관계를 뒤집는다). */
+  box-sizing:border-box;
+  height:66px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  /* 🚨 fit-content 가 이 절의 실측 수리다. 리본은 가로로 긴 판이라 블록 폭을 그대로
+     먹어도 자연스러웠지만, 캡슐은 **알약**이라 폭이 늘면 캡 사이 직선이 길어져
+     "늘린 캡슐"로 읽힌다(사용자 반려의 그 인상). 글자 폭 + 좌우 테두리만 먹고,
+     min-width 가 짧은 제목("설정")에서의 최소 길이를 지킨다. */
+  width:fit-content;
+  min-width:56%;
+  max-width:100%;
+  margin:-26px auto 6px;
+  padding:0 10px;
+  border-style:solid;
+  border-width:22px 36px 22px 36px;
+  border-image:var(--w65-capsule) 130 200 130 200 fill stretch;
+  border-radius:0;
+  background-color:transparent;
+  background-image:none;
+  box-shadow:none;
+  font-family:var(--font-display);
+  font-size:18px;
+  line-height:1.15;
+  white-space:nowrap;
+  text-align:center;
+  /* 유리는 밝다 — 리본의 흰 글씨 + 플럼 그림자를 그대로 두면 글자가 판 위에서
+     증발한다. 잉크색 + 흰 후광으로 갈아 대비를 뒤집는다(ART §7-1 순검정 금지). */
+  color:var(--j-ink);
+  text-shadow:0 1px 0 rgba(255,255,255,.9), 0 2px 4px rgba(120,110,150,.35);
+}
+/* r10 계열은 헤더가 <div class="r10-ribbon"><h2>…</h2></div> 라 안쪽 h2 가
+   자기 여백·배경을 또 갖고 있다. 캡슐 위에서는 그 한 겹이 이중 테두리로 읽힌다. */
+#modal-node .r10-ribbon > h2,
+#modal-mode .r10-ribbon > h2,
+#modal-classic .r10-ribbon > h2{
+  margin:0;
+  padding:0;
+  border:0;
+  background-color:transparent;
+  background-image:none;
+  box-shadow:none;
+  color:inherit;
+  text-shadow:inherit;
+  font-size:inherit;
+  line-height:inherit;
+}
+/* 실패판 헤더의 탈채도 필터(:36115)는 리본 빨강을 죽이려던 것이다. 유리 캡슐에
+   걸면 판이 누렇게 뜬다 — 같은 자리에서 끈다(그 절은 지우지 않는다). */
+#modal-over .sheet > h2,
+#modal-adv.lost .sheet > h2{ filter:none; }
+
+/* ---- ② 레터링 (한국어 빌드) ------------------------------------------------
+   글자는 **지우지 않고 투명하게** 둔다: 캡슐의 폭이 그 글자 폭에서 나오고,
+   스크린리더·aria-labelledby 도 그 글자를 읽는다. display:none 이면 셋이 한꺼번에
+   무너진다. */
+html[lang="ko"] #modal-settings .sheet > h2,
+html[lang="ko"] #modal-pause .sheet > h2,
+html[lang="ko"] #modal-rank .sheet > h2,
+html[lang="ko"] #modal-skin .sheet > h2,
+html[lang="ko"] #modal-clear .sheet > h2,
+html[lang="ko"] #modal-over .sheet > h2,
+html[lang="ko"] #modal-daily .sheet > h2,
+html[lang="ko"] #modal-mode .r10-ribbon,
+html[lang="ko"] #charpanel #cp-h{
+  color:transparent;
+  text-shadow:none;
+  background-repeat:no-repeat;
+  background-position:center center;
+  background-origin:border-box;
+  background-clip:border-box;
+  background-size:auto 44%;
+}
+html[lang="ko"] #modal-settings .sheet > h2{ background-image:url("catalog/ttl-settings.webp"); }
+html[lang="ko"] #modal-pause .sheet > h2   { background-image:url("catalog/ttl-pause.webp"); }
+html[lang="ko"] #modal-rank .sheet > h2    { background-image:url("catalog/ttl-rank.webp"); }
+html[lang="ko"] #modal-skin .sheet > h2    { background-image:url("catalog/ttl-skin.webp"); }
+html[lang="ko"] #modal-clear .sheet > h2   { background-image:url("catalog/ttl-clear.webp"); }
+html[lang="ko"] #modal-over .sheet > h2    { background-image:url("catalog/ttl-over.webp"); }
+html[lang="ko"] #modal-daily .sheet > h2   { background-image:url("catalog/ttl-daily.webp"); }
+html[lang="ko"] #modal-mode .r10-ribbon    { background-image:url("catalog/ttl-play.webp"); }
+html[lang="ko"] #charpanel #cp-h           { background-image:url("catalog/ttl-chars.webp"); }
+/* r10 계열은 안쪽 h2 의 글자도 함께 감춰야 한다(위 규칙은 바깥 div 에만 걸린다). */
+html[lang="ko"] #modal-mode .r10-ribbon > h2{ color:transparent; text-shadow:none; }
+/* 🚨 #modal-mode 만 !important 가 필요하다 — :35552 가 그 헤더의 리본을 통째로
+   걷어내고(border-image:none !important) 제목을 **그라디언트 글자**로 다시 그린
+   자리라, 캐스케이드로는 못 이긴다(실측: frame=none, bw=0px 로 캡슐이 안 섰다).
+   나머지 아홉 자리는 !important 를 한 번도 안 쓴다 — 여기만 예외이고, 그 예외의
+   이유가 위 한 줄이다. -webkit-text-fill-color 까지 같이 풀어야 글자가 감춰진다
+   (color 만 투명하게 하면 background-clip:text 판이 그대로 남는다). */
+#modal-mode .r10-ribbon{
+  border-style:solid !important;
+  border-width:22px 36px 22px 36px !important;
+  border-image:var(--w65-capsule) 130 200 130 200 fill stretch !important;
+  border-radius:0 !important;
+  width:fit-content !important;
+  min-width:56% !important;
+  padding:0 10px !important;
+  margin:-26px auto 6px !important;
+  /* 위 공통 규칙의 66px 을 여기서도 못 박는다 — :11883 의 padding:24px 34px 와
+     :35552 의 padding:0 !important 가 이 자리에서 싸우고 있어, !important 없이는
+     높이가 다시 내용에 끌려간다(실측 95px). */
+  box-sizing:border-box !important;
+  height:66px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+#modal-mode .r10-ribbon > h2{
+  /* 실측 95px(다른 아홉은 65px) — 41px 글자와 inline-block 판이 남긴 높이다.
+     margin/padding 까지 함께 눌러야 한 줄로 앉는다. */
+  margin:0 !important;
+  padding:0 !important;
+  display:block !important;
+  font-size:18px !important;
+  line-height:1.15 !important;
+  font-weight:800 !important;
+  -webkit-text-stroke:0 !important;
+  background-image:none !important;
+  color:var(--j-ink) !important;
+  -webkit-text-fill-color:var(--j-ink) !important;
+  text-shadow:0 1px 0 rgba(255,255,255,.9), 0 2px 4px rgba(120,110,150,.35) !important;
+}
+html[lang="ko"] #modal-mode .r10-ribbon{
+  background-image:url("catalog/ttl-play.webp") !important;
+  background-repeat:no-repeat !important;
+  background-position:center center !important;
+  background-origin:border-box !important;
+  background-clip:border-box !important;
+  background-size:auto 44% !important;
+}
+html[lang="ko"] #modal-mode .r10-ribbon > h2{
+  color:transparent !important;
+  -webkit-text-fill-color:transparent !important;
+  text-shadow:none !important;
+}
+/* #mode-close 도 같은 절이 크기를 눌러 놨다(실측 39x44 대신 39x39) — X 는 44pt
+   터치 타깃이 하한이다(ROUND10-SPEC §B). 그림만 얹고 크기는 되돌린다. */
+#modal-mode .r10-x{
+  width:44px !important;
+  height:44px !important;
+  background-image:var(--w65-x) !important;
+  background-repeat:no-repeat !important;
+  background-position:center center !important;
+  background-size:contain !important;
+  color:transparent !important;
+  -webkit-text-fill-color:transparent !important;
+}
+/* 🚨 배선하지 **않은** 자리 셋 — 의도된 공백이다.
+     · #modal-adv  제목이 "N탄 클리어!/실패" 라 스테이지 번호가 글자에 들어간다.
+       레터링은 고정 그림이라 번호를 못 그린다 → 글자 유지.
+     · #modal-node · #modal-classic · #modal-howto · #modal-tutorial
+       대응 ttl-*.webp 가 없다(노드는 제목이 스테이지 번호다).
+     · ttl-gallery.webp 는 이 빌드에 **헤더가 존재하지 않는다** — 스토리 갤러리는
+       설정창의 한 줄이고, 눌리면 전체화면 컷 뷰어로 간다(모달이 아니다).
+   넷 다 캡슐 프레임은 받고 글자만 남는다. 레터링이 도착하거나 화면이 생기면
+   위 표에 한 줄씩 더하는 것이 배선의 전부다. */
+
+/* ---- ③ X 버튼 전량 교체 — 무지개 젤리 (ui-x-jelly.webp) -------------------
+   글자 `&times;` 는 **지우지 않는다**: 마크업에 그대로 남고 여기서 투명해질 뿐이라,
+   그림이 못 오면 문자 X 가 되살아나는 것이 아니라(투명이라 안 보인다) —
+   되돌리려면 이 규칙 하나를 지우면 된다. 14차 「글자만, 44pt」 규약을 여는 자리라
+   주석으로 그 사실을 남긴다: 이 파도부터 X 는 조각이다.
+   [data-w6x] 스코프를 쓰지 않는다 — 코디 지시가 "모달 X 전부"다. 노드 카드의
+   X 도 같은 그림이 되고, 그것이 옳다(같은 낱말은 같은 그림). */
+.r10-x{
+  color:transparent;
+  text-shadow:none;
+  background-color:transparent;
+  background-image:var(--w65-x);
+  background-repeat:no-repeat;
+  background-position:center center;
+  background-size:contain;
+}
+.r10-x[data-w6x]{ color:transparent; text-shadow:none; }
+/* 캐릭터 패널의 닫기는 `.r10-x` 가 아니라 `.icon-btn` 이라 위 규칙 밖에 있었다 —
+   실렌더에서 이 한 자리만 크림 원판 × 로 남아 "모달 X 전부"를 못 채웠다. */
+#charpanel #cp-close{
+  border:0;
+  color:transparent;
+  text-shadow:none;
+  background-color:transparent;
+  background-image:var(--w65-x);
+  background-repeat:no-repeat;
+  background-position:center center;
+  background-size:contain;
+  box-shadow:none;
+}
 </style>
 
 <script id="bg-preview-hook">
@@ -37225,7 +38342,17 @@ var L=("jelly-box,duel-title-play,sian2-ribbon,sian2-btn-pink,sian2-btn-purple,"
    설계 판단이다: 컷은 10탄 보스를 깨는 그 한 번에만 열리므로 메뉴·맵·전투
    어느 첫 프레임과도 경쟁할 이유가 없고, 유휴 시간의 마지막 몫이면 충분하다.
    못 데워도 무해하다 — 그때는 컷 뷰어가 직접 받는다. */
-      +"cut-free-1,cut-free-2").split(",");
+      +"cut-free-1,cut-free-2,"
+/* W6.5a — 모달 헤더 부속과 신규 동료 넷. 자리는 목록 **끝**이다:
+   ① 헤더 캡슐·X 는 모달이 처음 열릴 때 필요하고, 모달은 첫 프레임이 아니다.
+   ② 레터링 아홉 장은 각각 자기 모달 하나에서만 쓰인다.
+   ③ 동료 얼굴 넷은 펫 탭에서만 뜬다(전투 슬롯은 setStdArt 가 직접 건다).
+   못 데워도 무해하다 — 그때 브라우저가 직접 받는다. */
+      +"glass-hud-capsule-st,ui-x-jelly,art-logo-en,"
+      +"ttl-settings,ttl-pause,ttl-rank,ttl-play,ttl-clear,"
+      +"ttl-over,ttl-daily,ttl-skin,ttl-chars,"
+      +"ch-mukmul-face,ch-tiktok-face,ch-kkultteok-face,ch-bangul-face,"
+      +"ch-tiktok-full").split(",");
 /* 이 세 장은 CSS 쪽도 ?v=4 로 캐시를 끊었다(조각 갱신) — 프리로더가 쿼리 없는
    주소를 데우면 서로 다른 캐시 항목이 되어 헛 요청이 되므로 여기서도 맞춘다.
    🚨 값은 아래 VQ 한 곳에서만 고치고, CSS 4곳(#map-back/#map-stars/#map-rec/
