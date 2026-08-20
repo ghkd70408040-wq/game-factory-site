@@ -13103,6 +13103,11 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
     <div id="board-scroll">
       <div id="board"></div>
     </div>
+    <!-- W9 PC 날개 판 2장. 세로에서는 `hidden` 그대로라 존재하지 않는 것과
+         같고, <style id="pc-landscape"> 가 가로 분기에서만 [hidden] 을 뚫어
+         켠다. 스타일 블록을 지우면 이 둘도 함께 사라진다(롤백 밸브 단일). -->
+    <div id="pc-left" hidden aria-hidden="true"></div>
+    <div id="pc-right" hidden aria-hidden="true"></div>
     <!-- ============================================================
          TENNY — 숫자 짝꿍 마스코트 (오리지널 벡터. 이모지 글리프 0)
          컨셉: 게임의 규칙이 그대로 캐릭터가 된 형태다. 몸통은 타일과 같은
@@ -13530,6 +13535,10 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
       <button id="btn-shuffle" class="act" data-i18n-aria="aria.shuffle" aria-label="Shuffle the board"><span class="act-ico"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-shuffle"/></svg></span><span class="act-t" data-i18n="act.shuffle">Shuffle</span><span id="shuffle-badge" class="act-badge">1</span></button>
     </footer>
   </section>
+
+  <!-- W9 PC 와이드 배경판. 세 스크린보다 **뒤**에 놓아야 일반 형제
+       결합자(#screen-map.active ~ #pc-bg)로 현재 화면을 읽을 수 있다. -->
+  <div id="pc-bg" hidden aria-hidden="true"></div>
 
   <!-- ===== Modals ===== -->
   <!-- How to play — 5 panels. The connection rule used to be crammed into one
@@ -39223,6 +39232,355 @@ html[lang="ko"] #modal-mode .r10-ribbon > h2{
     filter:drop-shadow(0 0 10px rgba(255,214,120,.95)) drop-shadow(0 0 20px rgba(255,120,220,.6));
   }
   #app.battle #btn-shuffle.act.urge::after{ opacity:.9; }
+}
+</style>
+
+<style id="pc-landscape">
+/* ============================================================
+   W9 — PC(가로/데스크톱) 레이아웃
+   설계 정본: evidence-14/31-pc-design-plan.md + 31-pc-design-{menu,map,game,battle}.png
+
+   ⚠ 롤백 밸브: **이 <style> 블록 하나만** 통째로 지우면 W9 이전으로 정확히
+     돌아간다. 신규 DOM 세 개(#pc-bg / #pc-left / #pc-right)는 마크업에서
+     `hidden` 을 달고 태어나므로, 이 블록이 없으면 한 픽셀도 그리지 않는다.
+     (그래서 봉인 규칙을 이 블록 안에 두지 않았다 — 블록을 지웠을 때 새 요소가
+      되살아나는 사고가 구조적으로 불가능하다.)
+
+   ⚠ 분기 밖 부수효과 0: 아래 규칙은 **전부** 하나의 미디어쿼리 안에 있다.
+     세로(폰·태블릿 세로·itch 420x880)와 가로 폰(844x390, min-width 미달)은
+     한 줄도 보지 못한다.
+
+   ⚠ 컨테이너를 넓히지 않는다 — 폭에 **캡**을 씌운다. #screen-map 과
+     #duel-hud 는 container-type:inline-size 라, 넓히는 순간 50여 개 cqw
+     좌표가 통째로 붕괴한다. 캡 방식이면 기존 cqw 자산이 전부 그대로 산다
+     (#screen-map 480px → 1cqw=4.8px, #duel-hud 860px → 1cqw=8.6px).
+
+   ⚠ 신규 에셋 0. 좌우 날개 배경은 재고 와이드 원판(--art-menu-day-w 1100x892,
+     --art-map-bg 2600x1271)을 흐림 확장해서 쓴다.
+   ============================================================ */
+@media (min-aspect-ratio: 1/1) and (min-width: 900px) {
+
+  /* ---- 0. 공통 껍데기 -----------------------------------------------------
+     760px 세로 기둥의 원인은 #app 의 폭 캡 하나뿐이다. 캡만 풀고, 각 화면이
+     자기 폭을 스스로 캡한다(맵 480 / 인게임 클러스터 1104 / HUD 860). */
+  #app { max-width: none; }
+
+  /* ---- 0-b. 와이드 배경판 (#pc-bg) ---------------------------------------
+     #app 안, **세 스크린 뒤**에 놓인 형제다. 그래서 일반 형제 결합자(~)로
+     "지금 켜져 있는 스크린"을 읽을 수 있다 — JS 도 :has() 도 필요 없다.
+     z-index:-2 는 #app 의 isolation:isolate 안에 갇히고, #app::before(=-1,
+     피버 비네트)보다 아래·#app 자기 배경보다 위에 앉는다. */
+  /* ⚠ `display` 세 곳의 !important 는 취향이 아니라 필수다: 브라우저 UA 시트가
+     `[hidden] { display: none !important }` 로 잠가 두어, 작성자 규칙이
+     아무리 특이해도 important 없이는 못 뚫는다. 대신 그 대가로 세로에서는
+     **CSS 한 줄 없이도** 세 요소가 확실히 사라진다(롤백 밸브 단일의 근거). */
+  #pc-bg[hidden] {
+    display: block !important;
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+    background-color: #1B1430;
+    background-image: none;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    /* 흐림이 가장자리에서 투명을 빨아들이지 않도록 12% 키워 둔다
+       (1920 기준 한쪽 115px 여유 > blur 반경 3x20=60px). */
+    transform: scale(1.12);
+  }
+  /* 메뉴는 자기 ::before 가 --art-menu-day-w 를 full-bleed 로 이미 깐다.
+     그래서 메뉴에서는 #pc-bg 가 배경을 그리지 않는다(빈 판 = 부수효과 0). */
+  #screen-map.active ~ #pc-bg {
+    background-image: var(--art-map-bg);
+    filter: blur(18px) saturate(.92) brightness(.60);
+  }
+  #screen-game.active ~ #pc-bg {
+    background-image: var(--art-menu-day-w);
+    filter: blur(20px) saturate(.90) brightness(.52);
+  }
+  #app.battle #screen-game.active ~ #pc-bg {
+    background-image: var(--art-map-bg);
+    filter: blur(20px) saturate(.95) brightness(.42);
+  }
+
+  /* ============================================================
+     1. 메뉴 — 31-pc-design-menu.png
+     ============================================================
+     기존 가로 분기(min-width:700px)가 이미 -w 원판으로 갈아 끼우고 스택을
+     왼쪽에 붙인다. 여기서 하는 일은 둘뿐이다: #app 캡이 풀린 만큼 좌측
+     앵커를 레퍼런스 비율로 다시 잡고, 스택 폭을 폰과 같은 실치수 380px 로
+     고정한다(이 화면은 cqw 를 안 쓰므로 실치수가 곧 구도다). */
+  #screen-menu {
+    align-items: flex-start;
+    padding-left: max(7vw, 84px);
+  }
+  #screen-menu .menu-inner {
+    max-width: 380px;
+    text-align: center;
+  }
+  /* --mbw 는 .menu-stack 이 들고 있고 버튼 넷이 그것을 읽는다(9차 규약).
+     폭 한 곳만 고치면 로고·버튼·명판이 같이 따라온다. */
+  #screen-menu .menu-stack {
+    width: 380px;
+    --mbw: 380px;
+    align-items: flex-start;
+  }
+
+  /* ============================================================
+     2. 맵 — 31-pc-design-map.png
+     ============================================================
+     사용자 확정 방침: 맵은 세로 유지(캔디크러쉬 PC 웹 방식).
+     중앙 480px 패널 + 좌우는 같은 원판의 흐림 확장. 드래그 맵(#map-layer,
+     aspect 2600/1272, translate3d(--mx,0,0))과 노드 % 좌표계는 한 줄도
+     건드리지 않는다 — 폰과 **완전히 같은 코드**가 돈다. */
+  #screen-map {
+    width: 480px;
+    max-width: 480px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+    box-shadow:
+      0 0 0 5px rgba(255, 255, 255, .55),
+      0 28px 80px rgba(20, 10, 40, .45);
+  }
+  /* 하단 띠 상수 동기화. #map-layer 의 --map-bar 는 아직 옛
+     clamp(48px,13.1vh,110px) 이라 실제 띠(#map-bot = 25.61cqw + safe)와
+     어긋나 최저 노드가 잠긴다. 480px 컨테이너에서 25.61cqw = 122.9px.
+     ⚠ 이 동기화를 **분기 안에만** 둔 것은 의도다: 세로에서 같은 식을 쓰면
+       110px -> 99.9px 로 값이 바뀌어 폰 화면이 움직인다. 이번 파도의 1순위
+       계약은 "분기 밖 부수효과 0" 이므로 세로는 옛 clamp 를 그대로 둔다.
+       (전역 동기화는 별건으로 분리 — 이식 패키지 ③ 참조.) */
+  #screen-map #map-layer { --map-bar: calc(25.61cqw + var(--safe-b)); }
+
+  /* ============================================================
+     3. 인게임 — 31-pc-design-game.png / 4. 전투 — 31-pc-design-battle.png
+     ============================================================
+     한 그리드가 두 화면을 다 든다. 6행 고정 템플릿:
+
+       row1  상단바            (3열 span)
+       row2  캐릭터 카드(#pc-left)  |  전투에서는 #duel-hud (3열 span)
+       row3  콤보·피버         (#combo-wrap)
+       row4  미션·목표         (#hud-row)
+       row5  보스 상태         (#boss-bar)
+       row6  1fr 채움
+
+     row2 를 #pc-left 와 #duel-hud 가 나눠 쓰는 것이 요점이다 — 둘은 절대
+     공존하지 않는다(#duel-hud 는 비전투에서 [hidden], #pc-left 는 전투에서
+     #app.battle 이 접는다. 후자는 이미 있던 `#app.battle #hero-slot{display:none}`
+     과 같은 판정이다).
+
+     **DOM 을 옮기지 않는다.** 날개는 grid-area 배치로만 만든다: 세로로
+     돌아갈 때 되돌릴 이동이 없으므로 matchMedia 리스너도, 양방향 재부착도,
+     JS 롤백 밸브도 필요 없다. 겹침은 z-index 로 못 박는다(판 0 / 알맹이 1).
+
+     보드는 cqw 가 아니라 JS px 계산(layout()/boardMaxPx())이라 --board-max
+     한 값만 #board 에 얹으면 되고, resize 리스너가 이미 재계산을 물고 있다. */
+  #screen-game.active {
+    display: grid;
+    /* 중앙 열만 minmax 로 접힌다 — 900~1104px 구간에서 가로 넘침 0. */
+    grid-template-columns: 264px minmax(0, 520px) 264px;
+    grid-template-rows: auto auto auto auto auto 1fr;
+    column-gap: 28px;
+    row-gap: 10px;
+    /* 264 + 28 + 520 + 28 + 264 = 1104 (설계 문서의 "1100" 은 합산 오차). */
+    width: 100%;
+    max-width: 1104px;
+    margin: 0 auto;
+    height: 100dvh;
+    max-height: 100dvh;
+  }
+  /* 전투 배경은 #pc-bg 가 full-bleed 로 든다 — 1104px 클러스터에만 깔리면
+     좌우 날개가 맨살이 된다. 기존 규칙의 그림만 끄고 그라데이션 스크림도
+     함께 내린다(단축 금지 → 롱핸드). */
+  #app.battle #screen-game.active {
+    background-image: none;
+  }
+
+  #screen-game.active #topbar {
+    grid-column: 1 / 4;
+    grid-row: 1;
+    /* 오른쪽 62px 은 #hero-slot 자리였다. 슬롯이 좌 날개로 갔으므로 회수. */
+    padding-right: calc(var(--safe-r) + 16px);
+  }
+  #screen-game.active #tb-stats {
+    max-width: 660px;
+    margin: 0 auto;
+  }
+
+  /* ---- 3-a. 날개 판 (#pc-left / #pc-right) -------------------------------
+     #pc-left 는 캐릭터 카드 그 자체이고(비전투 row2), #pc-right 는 액션·메달
+     넷이 앉는 세로 프레임이다. 둘 다 z-index:0 — 알맹이(z:1)가 언제나 위. */
+  #screen-game.active #pc-left[hidden],
+  #screen-game.active #pc-right[hidden] {
+    display: block !important;   /* UA 의 [hidden]{display:none !important} 를 뚫는다 */
+    position: relative;
+    z-index: 0;
+  }
+  #screen-game.active #pc-left[hidden] {
+    grid-column: 1;
+    grid-row: 2;
+    height: 200px;
+  }
+  /* 우 날개 판은 액션 넷을 **감싸는 만큼만** 높다(시안과 같은 비율). 높이를
+     실수로 쓴 것이 아니라 아래 두 줄에서 계산된 값이다:
+       비전투  4 x 76(.act) + 3 x 14(gap) + 32(padding) = 378
+       전투    4 x 94(메달)  + 3 x 10(gap) + 32(padding) = 438
+     span 안에 1fr 행(row6)이 들어 있으므로, 이 높이는 위쪽 자동 행들을
+     밀지 않는다 — 남는 몫은 전부 1fr 이 흡수한다. */
+  #screen-game.active #pc-right[hidden] {
+    grid-column: 3;
+    grid-row: 2 / 7;
+    align-self: start;
+    height: 378px;
+  }
+  /* 전투에는 캐릭터 카드가 없다(#app.battle #hero-slot{display:none} 과 짝). */
+  #app.battle #screen-game.active #pc-left[hidden] { display: none !important; }
+
+  /* 날개 유리 문법 — 판 넷이 같은 레시피를 쓴다(새 아트 0). */
+  #screen-game.active #pc-left[hidden],
+  #screen-game.active #pc-right[hidden],
+  #screen-game.active #combo-wrap,
+  #screen-game.active #hud-row,
+  #screen-game.active #boss-bar {
+    border-radius: 18px;
+    background-color: rgba(255, 255, 255, .10);
+    background-image: linear-gradient(180deg,
+                        rgba(255, 255, 255, .16) 0%,
+                        rgba(255, 255, 255, .05) 100%);
+    box-shadow:
+      inset 0 0 0 1.5px rgba(255, 255, 255, .28),
+      0 10px 26px rgba(16, 8, 32, .30);
+  }
+
+  /* ---- 3-b. 좌 날개 알맹이 ----------------------------------------------- */
+  /* 캐릭터: 슬롯을 44px 그대로 두고 2.6배로 확대한다. 안쪽 .hs-ring / #mascot
+     은 inset:0 절대배치라 슬롯을 늘리면 링만 타원으로 늘어난다 — 늘리지 않고
+     scale 로 키우는 것이 무손상 경로다(44 x 2.6 = 114.4px). */
+  #screen-game.active #hero-slot {
+    position: relative;
+    z-index: 1;
+    top: auto;
+    right: auto;
+    grid-column: 1;
+    grid-row: 2;
+    justify-self: center;
+    align-self: center;
+    transform: scale(2.6);
+  }
+  #screen-game.active #combo-wrap {
+    grid-column: 1;
+    grid-row: 3;
+    position: relative;
+    z-index: 1;
+    align-self: start;
+    height: auto;
+    min-height: 58px;
+    padding: 16px 16px 20px;
+  }
+  #screen-game.active #fever-bar {
+    left: 16px;
+    right: 16px;
+    bottom: 8px;
+  }
+  #screen-game.active #hud-row {
+    grid-column: 1;
+    grid-row: 4;
+    position: relative;
+    z-index: 1;
+    align-self: start;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    min-height: 58px;
+    padding: 14px 16px;
+  }
+  #screen-game.active #boss-bar {
+    grid-column: 1;
+    grid-row: 5;
+    position: relative;
+    z-index: 1;
+    align-self: start;
+    margin: 0;
+    padding: 14px 16px;
+  }
+
+  /* ---- 3-c. 보드 ---------------------------------------------------------
+     --board-max 를 #board 자신에게 얹는다. boardMaxPx() 가 읽는 곳이 정확히
+     여기이고(getComputedStyle(#board)), #board 의 max-width 도 같은 값을
+     본다 — 한 줄이 JS 와 CSS 두 소비자를 동시에 만족시킨다.
+     520px / 7열 / GAP 3 → floor((520 - 18) / 7) = 71px. */
+  #screen-game.active #board { --board-max: 520px; }
+  #screen-game.active #board-scroll {
+    grid-column: 2;
+    grid-row: 2 / 7;
+    min-height: 0;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  /* ---- 3-d. 우 날개 = 액션 4종 세로 --------------------------------------
+     #actionbar 를 통째로 3열로 옮겨 재사용한다. 버튼 DOM·배지·상태 클래스
+     (.off/.urge)와 전투 메달 표피는 한 글자도 안 바뀐다. */
+  #screen-game.active #actionbar {
+    grid-column: 3;
+    grid-row: 2 / 7;
+    align-self: start;
+    position: relative;
+    z-index: 1;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 14px;
+    padding: 16px;
+    /* 판 그리기는 #pc-right 한 장이 맡는다. 액션바 자신의 9-슬라이스 띠
+       (--lib-hud-bar / .jbox--strip)는 **가로 띠**로 구워진 그림이라 세로로
+       늘리면 줄무늬가 된다 — 그래서 이 화면에서만 벗긴다(원 규칙은 그대로 산다). */
+    background-color: transparent;
+    background-image: none;
+    border-top: 0;
+    border-style: none;
+    border-width: 0;
+    border-image-source: none;
+  }
+  #screen-game.active #actionbar .act {
+    flex: 0 0 auto;
+    width: 100%;
+    min-height: 76px;
+  }
+  /* 전투 메달: 기존 규칙이 gap/padding 을 !important 로 잠가 두었으므로
+     같은 무게로 맞선다(특이도는 이쪽이 위다). 메달 높이 94px 은 그대로 둔다. */
+  #app.battle #screen-game.active #actionbar {
+    gap: 10px !important;
+    padding: 16px !important;
+    border-style: none !important;
+    border-width: 0 !important;
+    border-image-source: none !important;
+    background-color: transparent !important;
+    background-image: none !important;
+  }
+  /* 메달 높이를 94px 로 못 박는다. 기존 규칙은 @media(max-height:739/659) 에서
+     80/70 으로 줄지만, 그러면 위 #pc-right 의 438px 계산이 어긋난다. PC 분기의
+     세로 예산은 항상 넉넉하므로(1280x800 기준 보드 열 452px) 94 로 고정한다. */
+  #app.battle #screen-game.active #actionbar .act { height: 94px !important; }
+
+  /* ---- 4. 전투 전용 재배치 ------------------------------------------------ */
+  /* HUD 는 상단 유지 + 폭만 캡. container-type:inline-size 는 그대로 둔다 —
+     폭을 860 으로 묶으면 안쪽 %·cqw 좌표계(아바타·HP바·타이머 유리)가
+     무손상으로 함께 축소된다. aspect 1536/500 → 높이 279.9px. */
+  #app.battle #screen-game.active #duel-hud {
+    grid-column: 1 / 4;
+    grid-row: 2;
+    width: 100%;
+    max-width: 860px;
+    margin: 0 auto;
+  }
+  /* 메달을 하단에서 우 날개로 빼면 세로 예산 111px 이 보드로 돌아온다. */
+  #app.battle #screen-game.active #board-scroll,
+  #app.battle #screen-game.active #pc-right[hidden],
+  #app.battle #screen-game.active #actionbar {
+    grid-row: 3 / 7;
+  }
+  #app.battle #screen-game.active #pc-right[hidden] { height: 438px; }
 }
 </style>
 
