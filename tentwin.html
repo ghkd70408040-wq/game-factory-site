@@ -5593,6 +5593,20 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
 .rw-ico[data-disc="pet"]  { --rw-disc: radial-gradient(circle at 38% 32%, #FFE3F0 0 30%, #FFB6D5 62%, #FF8FC5 100%); }
 .rw-ico[data-disc="star"] { --rw-disc: radial-gradient(circle at 38% 32%, #FFF6D2 0 30%, #FFE08A 62%, #FFC53D 100%); }
 .rw-ico[data-disc="gem"]  { --rw-disc: radial-gradient(circle at 38% 32%, #DFF6FF 0 30%, #9FD8F5 62%, #58AEE8 100%); }
+/* WD-2 §10.2 4·5번 슬롯 — 파편 4색·상자·아이템·펫. 위 세 줄과 **같은 이유**로
+   판 위 배지의 그라디언트를 그대로 옮겨 적었다(같은 것이 같게 생겨야 한다).
+   키는 화면색이 아니라 스탯 이름(STAT_KEYS)이다 — 색은 표현이고 뜻은 스탯이라,
+   저장·연출·statEff 가 같은 낱말 하나로 줄을 맞추는 쪽이 어긋날 자리가 없다. */
+.rw-ico[data-disc="shard-power"]   { --rw-disc: radial-gradient(circle at 38% 32%, #FFE2D8 0 30%, #FFA083 62%, #FF7A59 100%); }
+.rw-ico[data-disc="shard-steady"]  { --rw-disc: radial-gradient(circle at 38% 32%, #DFF6E7 0 30%, #8FE0B0 62%, #5FD08A 100%); }
+.rw-ico[data-disc="shard-agility"] { --rw-disc: radial-gradient(circle at 38% 32%, #DCEEFF 0 30%, #8FCEFF 62%, #59B7FF 100%); }
+.rw-ico[data-disc="shard-luck"]    { --rw-disc: radial-gradient(circle at 38% 32%, #FFF6D2 0 30%, #FFE58F 62%, #FFD34D 100%); }
+.rw-ico[data-disc="gift"] {
+  --rw-disc: radial-gradient(circle at 38% 32%,
+    #FFF6D2 0 20%, #FFB6D5 42%, #C4B0F5 62%, #8FCEFF 80%, #8FE0B0 100%);
+}
+.rw-ico[data-disc="item"]   { --rw-disc: radial-gradient(circle at 38% 32%, #F3E7FF 0 30%, #C9AEF5 62%, #A882E8 100%); }
+.rw-ico[data-disc="petnew"] { --rw-disc: radial-gradient(circle at 38% 32%, #FFE3F0 0 30%, #FFB6D5 62%, #FF8FC5 100%); }
 .rw-name { flex: 1 1 auto; text-align: left; }
 .rw-val {
   flex: 0 0 auto;
@@ -5849,6 +5863,43 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
 .tile[data-mk="star"] {
   --mk-glyph: '⭐';
   --mk-disc: radial-gradient(circle at 38% 32%, #FFF6D2 0 30%, #FFE08A 62%, #FFC53D 100%);
+}
+/* ---- WD-2 §11.5 · §11.6-D — 파편 4색 + 갓차 상자 -----------------------------
+   위 두 값(pet/star)과 **문법이 한 글자도 다르지 않다**: 값마다 `--mk-glyph`
+   하나와 `--mk-disc` 하나뿐이고, 공용 얼굴(위 `.tile[data-mk]:not(.dead)::after`)
+   은 손대지 않았다. 발주도 파일도 base64 도 여전히 0 이다 — 5800 주석의
+   "발주 0 — 코드 배지" 선례가 이번에도 그대로 참이다.
+
+   원반 색은 §11.1 의 색↔스탯 매핑 정본이고, 값은 JS 쪽 STAT_FX_COLOR 의 네 색
+   (#FF7A59 / #5FD08A / #59B7FF / #FFD34D)에서 그대로 뽑았다. 같은 스탯이 판
+   위에서와 발동 플로트에서 다른 색이면 "그 스탯"으로 안 읽힌다.
+
+   글리프를 넷 다 💎 로 둔 것은 의도다. 이 체계에서 **뜻을 나르는 것은 색**이고
+   (빨강=폭발력 …), 글리프까지 넷으로 갈라 놓으면 네 개가 "파편"이라는 한
+   덩어리로 안 읽혀 판 위에 서로 무관한 배지가 넷 떠 있는 것이 된다.
+   상자(gift)만 🎁 에 무지개 원반인데, 이유가 정반대다: 상자는 색이 내용을 뜻하지
+   **않아야** 한다 — "열기 전까지 미공개"가 §11.6 이 말한 기대감의 핵심이라,
+   색으로 내용이 새면 상자가 상자가 아니게 된다. */
+.tile[data-mk="shard-r"] {
+  --mk-glyph: '💎';
+  --mk-disc: radial-gradient(circle at 38% 32%, #FFE2D8 0 30%, #FFA083 62%, #FF7A59 100%);
+}
+.tile[data-mk="shard-g"] {
+  --mk-glyph: '💎';
+  --mk-disc: radial-gradient(circle at 38% 32%, #DFF6E7 0 30%, #8FE0B0 62%, #5FD08A 100%);
+}
+.tile[data-mk="shard-b"] {
+  --mk-glyph: '💎';
+  --mk-disc: radial-gradient(circle at 38% 32%, #DCEEFF 0 30%, #8FCEFF 62%, #59B7FF 100%);
+}
+.tile[data-mk="shard-gold"] {
+  --mk-glyph: '💎';
+  --mk-disc: radial-gradient(circle at 38% 32%, #FFF6D2 0 30%, #FFE58F 62%, #FFD34D 100%);
+}
+.tile[data-mk="gift"] {
+  --mk-glyph: '🎁';
+  --mk-disc: radial-gradient(circle at 38% 32%,
+    #FFF6D2 0 20%, #FFB6D5 42%, #C4B0F5 62%, #8FCEFF 80%, #8FE0B0 100%);
 }
 /* 터지는 중·죽은 칸에서는 배지가 먼저 사라진다. §7A 의 gold/ice ::after 가
    `.pop`/`.rowgo` 에서 opacity:0 이 되는 것과 **같은 문법**이다 — 빈 우물 위에
@@ -14337,6 +14388,18 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
         </button>
         </div>
         </div>
+        <!-- WD-2 §11.6-B — 아이템 보유/장착 **자리표**.
+             의도적으로 최소다. §12.4 가 아이템 슬롯의 진짜 집으로 지목한 곳은
+             "선택창 2.0"(14458 예약 자리)이고, 이 줄은 그것이 오기 전까지
+             "얻은 아이템이 어디에도 안 보인다"만 막는다. 그래서 새 시각 언어를
+             0 개 만든다 — 줄 이름표는 동료 줄과 같은 .pick-lab 이고, 칩은
+             .ci-chip / .cc-name 이 이미 쓰는 젤리 문법을 그대로 잇는다.
+             목록은 JS(syncItemList)가 그린다: 12종이 전부 나오는 것이 아니라
+             **가진 것만** 나오므로 마크업으로는 개수를 알 수 없다. -->
+        <div id="cp-items" class="cp-items">
+          <span class="pick-lab" data-i18n="cp.items">Items</span>
+          <div id="cp-item-list" class="cp-item-list"></div>
+        </div>
         <div class="cp-foot">
           <!-- 젤리별 잔액 + 스킨 시트 진입. 잔액을 버튼 안에 둔 이유는 스킨을
                열기 **전에** 살 수 있는지가 보여야 하기 때문이다. -->
@@ -22007,6 +22070,34 @@ window.TT_SFX = {
      * 있기 때문이다 — 구운 값이 남아 있으면 표를 고쳐도 기존 플레이어만
      * 옛 표를 계속 쓰게 된다. */
     statLv: {},
+    /* --- WD-2 §11 · §11.6 · §14: 파편 경제 · 갓차 · 펫 보유 -----------------
+     * 일곱 칸 전부 **신규**다. 기존 칸은 한 글자도 안 건드렸으므로, 이 블록을
+     * 통째로 지우면 세이브가 WD-1 시점의 모양으로 정확히 돌아간다.
+     *
+     *   shards      { power, steady, agility, luck } 누적 보유 파편 (§11.1 색=스탯).
+     *               키를 색(r/g/b/gold)이 아니라 **스탯 이름**으로 잡은 것이
+     *               요점이다 — 색은 화면의 것이고 뜻은 스탯이라, 저장이 스탯
+     *               이름을 쓰면 statEff·아이템·연출이 같은 낱말로 줄을 맞춘다.
+     *   shardDry    색별 마른 횟수 (§11.3 소프트 천장). 그 색을 실제로 **수확한**
+     *               순간 0 으로 돌아가고, 다른 색이 나온 수확마다 1 오른다.
+     *   items       { own: { itemId: lv }, eq: { charId: [itemId, …] } }.
+     *               모양을 최소로 잡은 것은 이 라운드의 UI 가 자리표(보유/장착
+     *               목록)뿐이기 때문이다 — 선택창 2.0 이 오면 여기 위에 얹는다.
+     *   giftNoItem  아이템 없이 지나간 연속 상자 수 (§11.6-A 소프트 천장 12).
+     *   pets        보유 펫 id 목록 (§14). ⚠ **기본값은 무료 둘뿐**이고, 옛
+     *               세이브는 readStore 가 여덟 전부를 채워 준다(소급 잠금 금지).
+     *   awkChainMax / noDelayMax / bossNoHit
+     *               §14.3 조건 카운터. 판이 아니라 **계정** 단위 최고 기록이라
+     *               여기 산다 — 판 단위면 조건 펫이 "그 판 안에서" 다시 증명해야
+     *               하는 것이 되어 서사(스승이 합류한다)가 성립하지 않는다. */
+    shards: { power: 0, steady: 0, agility: 0, luck: 0 },
+    shardDry: { power: 0, steady: 0, agility: 0, luck: 0 },
+    items: { own: {}, eq: {} },
+    giftNoItem: 0,
+    pets: ['ppyak', 'mungchi'],
+    awkChainMax: 0,
+    noDelayMax: 0,
+    bossNoHit: 0,
     /* --- v4 10차 §E: 컷툰 시청 기록 ---------------------------------------
      * { open: 1, ten: 1, … } — 본 묶음의 id 를 켜 둔다. 두 가지 일을 한다:
      *   ① 오프닝은 **최초 1회만** 자동으로 열린다(두 번째 모험 진입에서 또 12컷을
@@ -22221,6 +22312,101 @@ window.TT_SFX = {
             }
             if (dst) store.statLv[hid] = dst;
           }
+        }
+        /* ---- WD-2 §11 파편 · §11.6 갓차 · §14 펫 -----------------------------
+         * 소독 규율은 바로 위 statLv 블록과 한 글자도 다르지 않다: 아는 키 ·
+         * 유한한 숫자 · 범위 안의 정수만 살리고, **어긋난 항목은 그 항목만**
+         * 버린다. 맵을 통째로 버리면 손상된 칸 하나 때문에 파밍 진행 전부가
+         * 날아가는데, 그건 저장 손실보다 나쁜 실패 방식이다(9차 규율). */
+        if (o.shards && typeof o.shards === 'object') {
+          for (var wsi = 0; wsi < STAT_KEYS.length; wsi++) {
+            var wsk = STAT_KEYS[wsi], wsv = o.shards[wsk];
+            if (typeof wsv !== 'number' || !isFinite(wsv)) continue;
+            store.shards[wsk] = clamp(wsv | 0, 0, SHARD_HOLD_MAX);
+          }
+        }
+        if (o.shardDry && typeof o.shardDry === 'object') {
+          for (var wdi = 0; wdi < STAT_KEYS.length; wdi++) {
+            var wdk = STAT_KEYS[wdi], wdv = o.shardDry[wdk];
+            if (typeof wdv !== 'number' || !isFinite(wdv)) continue;
+            /* 천장 값에서 잘라 받는다. 남의 손을 탄 세이브가 10^9 을 들고 와도
+               가중치가 Infinity 가 되지 않아야 추첨이 한 색으로 굳지 않는다. */
+            store.shardDry[wdk] = clamp(wdv | 0, 0, SHARD_PITY);
+          }
+        }
+        /* 아이템. 모르는 id 는 **조용히 버린다** — 나중에 풀에서 한 종을 빼거나
+           이름을 바꿔도 세이브가 게임을 막지 않아야 한다(스킨 블록과 같은 규율).
+           장착 목록은 슬롯 수(ITEM_SLOTS)에서 자르고, 보유하지 않은 id 가 장착
+           칸에만 남아 있는 상태도 여기서 걷는다 — 그 상태가 남으면 statEff 가
+           가진 적 없는 아이템의 보정을 계속 얹는다. */
+        if (o.items && typeof o.items === 'object') {
+          var iown = o.items.own;
+          if (iown && typeof iown === 'object') {
+            for (var iok in iown) {
+              if (!Object.prototype.hasOwnProperty.call(iown, iok)) continue;
+              if (!itemById(iok)) continue;
+              var iov = iown[iok];
+              if (typeof iov !== 'number' || !isFinite(iov)) continue;
+              store.items.own[iok] = clamp(iov | 0, 1, ITEM_LV_MAX);
+            }
+          }
+          var ieq = o.items.eq;
+          if (ieq && typeof ieq === 'object') {
+            for (var ihi = 0; ihi < HERO_IDS.length; ihi++) {
+              var ihd = HERO_IDS[ihi], isrc = ieq[ihd];
+              if (!Array.isArray(isrc)) continue;
+              var ilist = [];
+              for (var iei = 0; iei < isrc.length; iei++) {
+                var iid = isrc[iei];
+                if (typeof iid !== 'string' || !itemById(iid)) continue;
+                if (!store.items.own[iid]) continue;
+                if (ilist.indexOf(iid) < 0) ilist.push(iid);
+              }
+              if (ilist.length) store.items.eq[ihd] = ilist.slice(0, ITEM_SLOTS.length);
+            }
+          }
+        }
+        if (typeof o.giftNoItem === 'number' && isFinite(o.giftNoItem)) {
+          store.giftNoItem = clamp(o.giftNoItem | 0, 0, GACHA_PITY);
+        }
+        /* ---- 펫 보유 — 이 파일에서 가장 조심스러운 마이그레이션 -------------
+         * ⚠ **소급 잠금 절대 금지**. 지금까지 모든 세이브는 펫 여덟을 전부 쓸 수
+         * 있었다(setMate 에 보유 검사가 없었다). 그 사람에게서 이번 업데이트가
+         * 펫을 빼앗으면, 그것은 새 기능이 아니라 세이브 손실로 읽힌다 —
+         * 젤리공주 해금(5차 §1)이 "이미 젤리로 놀던 사람"을 존중한 것과 같은
+         * 판단이고, 그때보다 대상이 여덟 배 넓다.
+         *
+         * 신규/기존을 가르는 **깨끗한 신호**는 이 함수 자체다: 위쪽
+         * `if (!raw) return;` 을 지나왔다는 것이 곧 "저장이 있다 = 돌아온
+         * 플레이어"다. 그러니 여기서 o.pets 가 없으면 그 세이브는 게이트보다
+         * 앞선 것이고, 답은 **MATE_IDS 전부**다. 새 설치는 이 블록에 아예 닿지
+         * 못하고 리터럴의 무료 둘(§14.1 ⓐ 삐약·뭉치)로 시작한다.
+         * 모르는 펫 id 는 버린다(스킨·아이템과 같은 규율). */
+        if (Array.isArray(o.pets)) {
+          var plist = [];
+          for (var ppi = 0; ppi < o.pets.length; ppi++) {
+            var pid = o.pets[ppi];
+            if (typeof pid === 'string' && MATE_IDS.indexOf(pid) >= 0 &&
+                plist.indexOf(pid) < 0) plist.push(pid);
+          }
+          /* 무료 둘은 언제나 보유다 — 손상된 목록이 그 둘을 지워도 튜토리얼이
+             펫 없이 도는 상태(§14.1 ⓐ "첫 판부터 펫 개념 학습")는 만들지 않는다. */
+          for (var pfi = 0; pfi < PET_FREE.length; pfi++) {
+            if (plist.indexOf(PET_FREE[pfi]) < 0) plist.push(PET_FREE[pfi]);
+          }
+          store.pets = plist;
+        } else {
+          store.pets = MATE_IDS.slice();
+        }
+        /* 조건 카운터(§14.3). 계정 단위 최고 기록이라 단조 증가만 뜻이 있다. */
+        if (typeof o.awkChainMax === 'number' && isFinite(o.awkChainMax)) {
+          store.awkChainMax = Math.max(0, o.awkChainMax | 0);
+        }
+        if (typeof o.noDelayMax === 'number' && isFinite(o.noDelayMax)) {
+          store.noDelayMax = Math.max(0, o.noDelayMax | 0);
+        }
+        if (typeof o.bossNoHit === 'number' && isFinite(o.bossNoHit)) {
+          store.bossNoHit = Math.max(0, o.bossNoHit | 0);
         }
         if (o.jellyOn === true) store.jellyOn = true;
         else if (o.charId === 'jelly') store.jellyOn = true;
@@ -22665,6 +22851,43 @@ window.TT_SFX = {
       'rw.starfruit': 'Awaken fruit',
       'rw.petfruit': 'Pet fruit',
       'rw.gem': 'Jelly stars',
+
+      /* WD-2 §11 파편 · §11.6 갓차 · §14 펫. 파편 이름은 색이 아니라 **스탯**을
+         말한다 — 색은 화면의 것이고, 결과창이 알려 줄 값어치가 있는 것은
+         "무엇이 세지는가"다(§11.1 매핑). */
+      'rw.shard.power': 'Power shard',
+      'rw.shard.steady': 'Steady shard',
+      'rw.shard.agility': 'Agility shard',
+      'rw.shard.luck': 'Luck shard',
+      'mk.gift': 'Gift box!',
+      'pet.get': '{n} joined you!',
+      'cp.items': 'Items',
+      'cp.items.none': 'No items yet. Pop a gift box in Adventure.',
+      /* §11.6-B 아이템 12종. 한국어 쪽이 확정 시트의 정본이고, 여기는 그 번역이다. */
+      'item.flint.nm': 'Spark Flint',
+      'item.flint.fl': 'One small ember is enough to awaken.',
+      'item.fizzjelly.nm': 'Firework Jelly',
+      'item.fizzjelly.fl': 'A jelly that knows when to burst.',
+      'item.flamescepter.nm': 'Flame Scepter',
+      'item.flamescepter.fl': 'A scepter holding the royal awakening.',
+      'item.softcushion.nm': 'Squishy Cushion',
+      'item.softcushion.fl': 'So it never hurts, even without a rest.',
+      'item.puddingarmor.nm': 'Pudding Armor',
+      'item.puddingarmor.fl': 'A wobble that takes every miss for you.',
+      'item.turtleshield.nm': 'Turtle Shell Shield',
+      'item.turtleshield.fl': 'A thousand hits and it never wavers.',
+      'item.windribbon.nm': 'Wind Ribbon',
+      'item.windribbon.fl': 'Half a beat ahead of the fall.',
+      'item.sodaboots.nm': 'Fizz Boots',
+      'item.sodaboots.fl': 'A step with a tingle in it.',
+      'item.boltshoes.nm': 'Bolt Sneakers',
+      'item.boltshoes.fl': 'Already on the next tile, mid-pop.',
+      'item.rabbitfoot.nm': "Rabbit's Foot Charm",
+      'item.rabbitfoot.fl': 'The hind foot of a jelly rabbit.',
+      'item.luckybell.nm': 'Lucky Bell',
+      'item.luckybell.fl': 'Ring it and the odds smile back.',
+      'item.goldclover.nm': 'Golden Four-Leaf Clover',
+      'item.goldclover.fl': 'The fourth leaf is always a jackpot.',
 
       'over.title': 'Out of moves',
       'over.best': 'Best',
@@ -23441,6 +23664,44 @@ window.TT_SFX = {
       'rw.starfruit': '각성 과일',
       'rw.petfruit': '펫 과일',
       'rw.gem': '젤리별',
+
+      /* WD-2 §11 파편 · §11.6 갓차 · §14 펫. 위 두 줄과 같은 규율이다 — 판 위
+         배지와 결과창이 **같은 말**을 써야 그게 그건 줄 안다. 파편 이름이 색이
+         아니라 스탯인 것도 그래서다: 판에서는 색으로 알아보고 결과창에서는
+         "무엇이 세지는가"로 알아보는데, 그 둘을 잇는 낱말이 스탯이다(§11.1). */
+      'rw.shard.power': '폭발력 파편',
+      'rw.shard.steady': '꾸준함 파편',
+      'rw.shard.agility': '순발력 파편',
+      'rw.shard.luck': '행운 파편',
+      'mk.gift': '선물 상자!',
+      'pet.get': '{n} 합류!',
+      'cp.items': '아이템',
+      'cp.items.none': '아직 아이템이 없어요. 모험에서 선물 상자를 터뜨려 보세요.',
+      /* §11.6-B 아이템 12종 — 이름·플레이버는 확정 시트 표 **그대로**다. */
+      'item.flint.nm': '반짝 부싯돌',
+      'item.flint.fl': '작은 불씨도 각성엔 충분해.',
+      'item.fizzjelly.nm': '폭죽 젤리',
+      'item.fizzjelly.fl': '터질 때를 아는 젤리.',
+      'item.flamescepter.nm': '불꽃 왕홀',
+      'item.flamescepter.fl': '왕가의 각성이 깃든 홀.',
+      'item.softcushion.nm': '말랑 쿠션',
+      'item.softcushion.fl': '쉬지 않아도 아프지 않게.',
+      'item.puddingarmor.nm': '푸딩 갑옷',
+      'item.puddingarmor.fl': '헛손질을 받아내는 몰랑함.',
+      'item.turtleshield.nm': '거북 등껍질 방패',
+      'item.turtleshield.fl': '천 번을 쳐도 흔들림 없다.',
+      'item.windribbon.nm': '바람 리본',
+      'item.windribbon.fl': '낙하보다 반 박자 빠르게.',
+      'item.sodaboots.nm': '탄산 부츠',
+      'item.sodaboots.fl': '톡 쏘는 스텝.',
+      'item.boltshoes.nm': '번개 운동화',
+      'item.boltshoes.fl': '터지는 와중에 이미 다음 칸.',
+      'item.rabbitfoot.nm': '토끼발 부적',
+      'item.rabbitfoot.fl': '젤리 토끼의 뒷발.',
+      'item.luckybell.nm': '행운 종',
+      'item.luckybell.fl': '딸랑이면 확률이 웃는다.',
+      'item.goldclover.nm': '황금 네잎클로버',
+      'item.goldclover.fl': '네 잎째는 언제나 잭팟.',
 
       'over.title': '더 이상 지울 수 없어요',
       'over.best': '최고',
@@ -24247,6 +24508,19 @@ window.TT_SFX = {
      * 것은 결과 시트가 "무엇을 얻었나"를 말하기 위한 사본일 뿐이다. 그래서
      * 저장하지 않는다 — 판이 끝나면 뜻이 없고, 다음 판은 0 에서 시작한다. */
     gainPet: 0, gainStar: 0,
+    /* WD-2 §11 · §11.6 · §14 — 같은 성질의 사본 넷. 지갑(store.shards)·아이템·
+     * 펫 보유는 **수확하는 그 순간** 이미 늘었고, 여기 쌓이는 것은 결과 시트가
+     * 읽을 목록뿐이다. 그래서 저장하지 않는다(판이 끝나면 뜻이 없다).
+     *   gainShard { power,… } 이번 판에 판에서 직접 주운 파편
+     *   gainGift  openGachaRoll() 이 돌려준 서술자 목록 (상자 개봉 결과)
+     *   gainPets  이번 판에 합류한 펫 id — §10.2 5번(최희귀) 자리를 쓴다
+     *   giftLeft  §11.6-C 이번 탄에 아직 심지 않은 상자 수 (0 또는 1) */
+    gainShard: { power: 0, steady: 0, agility: 0, luck: 0 },
+    gainGift: [], gainPets: [], giftLeft: 0,
+    /* §14.2 ⓑ/§14.3 — 이번 판에서 한 대라도 맞았는가. duelHitMe 한 곳에서만
+     * 켜진다. 딱지(ttakji)가 이 빌드에 없어 지금은 **카운터만** 남기지만,
+     * 그 사실이 기록되기 시작해야 나중에 소급으로 세지 않아도 된다. */
+    hitTaken: false,
     /* 이번 판이 **새로** 적립한 젤리별. advFinish 가 계산한 그 값의 사본이고,
      * 지갑(store.jstar)은 거기서 이미 늘었다 — 여기 있는 것은 시트가 읽을 숫자
      * 하나뿐이다. 모험 밖에서는 언제나 0 이다. */
@@ -25954,6 +26228,8 @@ window.TT_SFX = {
     syncPickGroup('char-pick', charId());
     syncPickGroup('mate-pick', mateId());
     syncHeroLocks();
+    syncMateLocks();      /* WD-2 §14 — 펫 카드도 같은 자리에서 잠금을 맞춘다 */
+    syncItemList();       /* WD-2 §11.6-B — 보유/장착 자리표 */
     syncCharSummary();
     applySkins();
     syncGems();
@@ -26420,6 +26696,11 @@ window.TT_SFX = {
   /** 동료 선택. ''(없음)도 정당한 값이라 CHARS 조회가 아니라 목록 검사로 거른다. */
   function setMate(id) {
     var v = (id === '' || MATE_IDS.indexOf(id) >= 0) ? id : '';
+    /* WD-2 §14 — 안 가진 펫은 고를 수 없다. 조용히 무시하지 않고 이유를 말하는
+       것이 중요한 것도 setChar 와 같다(카드가 눌리는데 아무 일도 안 일어나면
+       고장으로 읽힌다). 문구·소리까지 그대로 재사용한다 — 잠금이라는 사건이
+       주인공 카드와 펫 카드에서 다른 말을 하면 그것이 두 번째 체계가 된다. */
+    if (v && !petOwned(v)) { toast(t('char.locked.hint')); J.sfx.fail(); return; }
     if (v === mateId()) return;
     store.mateId = v;
     persist();
@@ -28242,6 +28523,22 @@ window.TT_SFX = {
     S.gainPet = 0;
     S.gainStar = 0;
     S.gainGem = 0;
+    /* WD-2 — 새 사본 넷도 판 단위다(위 주석의 이유 그대로). */
+    S.gainShard = { power: 0, steady: 0, agility: 0, luck: 0 };
+    S.gainGift = [];
+    S.gainPets = [];
+    S.hitTaken = false;
+    /* §11.6-C — 상자 추첨은 **탄 진입에 딱 한 번**이다. 매 리필마다 굴리면
+       "출현률 60%" 가 사실상 100% 가 되어(리필이 수십 번 돈다) 우연이 노동이
+       된다. Math.random 을 쓰는 것도 의도다: 판 난수(gridSeed 파생)에 얹으면
+       같은 탄을 다시 깰 때마다 언제나 같은 답이 나와, 상자가 "이 탄에는 있고
+       저 탄에는 없다"는 고정 지형이 되어 버린다 — 재도전마다 새로 굴려야
+       "우연히 상자가 붙은 판"이 성립한다.
+       모험 밖에서는 0 이다. 어차피 배지를 심는 battleRefill 이 전투 전용이라
+       이중 게이트지만, 조건을 여기서도 적어 두면 "클래식에 상자가 있는가"를
+       이 한 줄만 읽고 답할 수 있다. */
+    S.giftLeft = (S.mode === 'adv' && isGachaStage(stage) &&
+                  Math.random() < GACHA_STAGE_P) ? 1 : 0;
     /* WD-1 §12 — 스탯 발동 카운터도 판 단위다. 특히 awkStreak 은 각성 시전
        기록이라 판이 바뀌어도 저절로 안 줄어든다: 여기서 안 지우면 지난 판에서
        쌓은 연쇄가 다음 판 첫 매치에 폭발력 정점으로 그대로 얹힌다. */
@@ -29085,13 +29382,20 @@ window.TT_SFX = {
      * 마크를 **즉시 지우는** 것이 이중 발동을 막는 유일한 장치다: 이 셀은 곧
      * dead 가 되어 리필에 밀려 나가지만, 그 사이에 판을 읽는 경로(스냅샷·저장·
      * findFullDeadRows)가 아직 마크를 볼 수 있다. */
-    var mkPet = 0, mkStar = 0;
+    /* WD-2 §11.5 — 파편 넷과 상자가 같은 문법으로 합류한다. 세고 지우기만 하는
+       것도, 폭탄에 휩쓸린 것까지 세는 것도, 마크를 즉시 지워 이중 발동을 막는
+       것도 위 주석 그대로다. 파편은 스탯 이름으로 모은다(색은 화면의 것). */
+    var mkPet = 0, mkStar = 0, mkGift = 0;
+    var mkShard = { power: 0, steady: 0, agility: 0, luck: 0 };
+    var mkShardAny = 0;
     for (var mki = 0; mki < dying.length + blown.length; mki++) {
       var mkIdx = mki < dying.length ? dying[mki] : blown[mki - dying.length];
       var mkc = S.cells[mkIdx];
       if (!mkc || !mkc.mk) continue;
       if (mkc.mk === 'pet') mkPet++;
       else if (mkc.mk === 'star') mkStar++;
+      else if (mkc.mk === 'gift') mkGift++;
+      else if (SHARD_STAT[mkc.mk]) { mkShard[SHARD_STAT[mkc.mk]]++; mkShardAny++; }
       mkc.mk = '';
     }
 
@@ -29166,6 +29470,14 @@ window.TT_SFX = {
                      STAT_FX_COLOR[st.kind] || '#FFD34D');
       }
       statFxLast = st.kind;
+      /* WD-2 §14.3 — 조건 펫의 카운터. WD-1 이 이미 굴리고 있는 awkStreak/stdyRun
+         을 **읽기만** 하므로 새 감지 배선이 0 이고, 자리가 여기(얼음만 깬 매치
+         밖)인 것도 그 두 값의 규율을 그대로 잇는 것이다 — 매치가 아닌 것이
+         "각성 연쇄"나 "무딜레이 연속"의 증거일 수는 없다.
+         클래식·데일리를 막지 않는 것은 의도다: 이 블록은 점수에 닿지 않고(펫은
+         획득일 뿐 곱항이 아니다) §11.2 가 잠근 것은 **드랍**이지 실력의 증명이
+         아니다. 클래식에서 10연속을 해낸 사람에게 몽글이 안 오면 그게 더 이상하다. */
+      petCondBump();
       S.matches++;
       store.totalMatches = (store.totalMatches | 0) + 1;
       missionBump('noadd', 1);
@@ -29199,7 +29511,7 @@ window.TT_SFX = {
      * 두 효과 다 **전투 전용**이다. 마크 자체가 battleRefill 에서만 나므로
      * 비전투 판에는 mk 가 존재할 수 없지만, 방어적으로 게이트를 한 겹 둔다 —
      * 저장된 옛 판이나 손잡이(window.Game)로 심어진 셀이 여기 닿을 수 있다. */
-    if ((mkPet || mkStar) && battleOn()) {
+    if ((mkPet || mkStar || mkShardAny || mkGift) && battleOn()) {
       /* W-C §10 — 결과 시트가 읽을 사본. 효과 적용과 **같은 게이트 안**에 두는
          것이 요점이다: 게이트 밖에서 세면 전투가 아닌 판(마크가 존재할 수 없는
          판)에 손잡이로 심어진 셀까지 집계돼, 시트가 아무도 받지 못한 보상을
@@ -29233,6 +29545,45 @@ window.TT_SFX = {
         J.vibrate(28);
         if (typeof window !== 'undefined') {
           J.shockwave(mkC.x, mkC.y, '#FFD34D');
+        }
+      }
+      /* 💎 파편 (WD-2 §11.5) — 지갑에 넣고 천장 카운터를 굴린다. 효과가 즉발이
+         아니라 **적립**인 것이 위 둘과 다른 점이고, 그래서 여기서 persist 한다:
+         펫 잔여·게이지는 모험의 saveProgress 가 매 매치 쓰는 값이지만 파편은
+         그 저장 경로에 없던 신규 필드라, 탭이 닫히면 판 중에 모은 것이 통째로
+         사라진다. 플로트는 색별로 하나씩 — 넷을 한 줄로 합치면 "무슨 색을
+         얼마나 얻었나"가 §11.4 편중 메타에서 읽을 값어치가 있는 정보인데 그게
+         사라진다. 높이를 색마다 벌리는 것도 같은 이유(겹치면 안 읽힌다). */
+      if (mkShardAny) {
+        shardCredit(mkShard);
+        for (var shi = 0; shi < STAT_KEYS.length; shi++) {
+          var shk = STAT_KEYS[shi];
+          if (!mkShard[shk]) continue;
+          S.gainShard[shk] += mkShard[shk];
+          floatOnBoard(mkC.x, mkC.y - 44 - shi * 16,
+                       SHARD_ICO + '+' + mkShard[shk], STAT_FX_COLOR[shk]);
+        }
+        petShardCheck();          // §14.2 ⓓ 꿀떡이 천장
+        persist();
+        J.sfx.mission();
+        J.vibrate(18);
+      }
+      /* 🎁 갓차 상자 (WD-2 §11.6) — 여기서 **열기만** 하고, 무엇이 나왔는지는
+         결과 시트가 말한다. 판 위에서 내용을 다 보여 주면 "열기 전까지 미공개"
+         (§11.6)가 판 한복판에서 소비돼 버려 §10 의 띵-띵-띵이 이미 아는 것을
+         한 번 더 세는 일이 된다. 그래서 화면에는 상자를 땄다는 사실만 띄운다.
+         상자가 한 매치에 둘 이상 걸릴 일은 없지만(판당 1개), 루프로 도는 것이
+         mkPet/mkStar 문법과 같고 폭탄이 두 개를 동시에 쓸어 담는 미래에도 안전하다. */
+      if (mkGift) {
+        for (var gfi = 0; gfi < mkGift; gfi++) {
+          S.gainGift.push(openGachaRoll());
+        }
+        persist();
+        floatOnBoard(mkC.x, mkC.y - 88, t('mk.gift'), '#C9AEF5');
+        J.sfx.mission();
+        J.vibrate(30);
+        if (typeof window !== 'undefined') {
+          J.shockwave(mkC.x, mkC.y, '#C9AEF5');
         }
       }
     }
@@ -29537,6 +29888,33 @@ window.TT_SFX = {
   var MK_STAR_RATE = 0.015;    // ⭐ 각성 과일 — 스폰 칸당 1.5%
   var MK_MAX_EACH  = 1;        // 판에 동시에 떠 있을 수 있는 수 (종류별)
   var MK_PET_CAP   = DUEL_PET_MAX + 2;  // 펫 과일로 넘길 수 있는 잔여 상한 (기본 2 → 4)
+  /* ---- WD-2 §11.3 · §11.6-C — 파편·상자 스폰 계수 --------------------------
+     §11.3 기본 드랍률의 권고 밴드는 **8~12%** 이고 그 한가운데 10% 를 골랐다.
+     밴드 끝(8/12)이 아니라 가운데인 이유: 이 값은 아직 심 검증 전이고(§11.3 ⚠
+     "경제 인플레 가드"), 가운데 값은 위아래 어느 쪽으로 조정하든 한 자리만
+     고치면 되는 유일한 출발점이다. 단위는 위 두 값과 같은 **스폰 1칸당**이다.
+
+     MK_SHARD_MAX 는 MK_MAX_EACH 와 같은 일을 한다(동시 존재 상한). 값이 2 인
+     것은 파편이 네 색이라 1 이면 "이번 판엔 빨강만"이 되어 §11.4 의 편중 메타가
+     화면에서 안 읽히기 때문이고, 3 이상을 안 쓰는 것은 펫·각성·상자까지 합치면
+     배지가 여섯이 되어 짝 찾는 눈을 가리기 때문이다.
+
+     상자는 판당 1개(§11.6-C)라 스폰률이 "그 판 어딘가에서 한 번은 나온다"를
+     보장할 만큼만 있으면 된다 — 높이면 첫 리필에 몰려 나와 "우연"이 아니게 된다. */
+  var SHARD_RATE      = 0.10;
+  var MK_SHARD_MAX    = 2;
+  var GIFT_SPAWN_RATE = 0.02;
+  /* 누적 경계. 추첨 루프가 매 칸마다 덧셈을 다시 하지 않게 미리 접어 둔다.
+     밴드 순서는 확률 오름차순이 아니라 **도입 순서**다 — pet/star 의 구간이
+     종전과 한 톨도 안 움직여야 이미 저장된 판·기존 재현 테스트가 그대로 산다.
+       [0, .03)        pet
+       [.03, .045)     star
+       [.045, .145)    shard   (§11.3 8~12% 밴드의 가운데 10%)
+       [.145, .165)    gift    (§11.6-C 판당 1개라 낮게)
+     넷 다 상한이 걸려 있어 판 위 배지는 최대 pet1 + star1 + shard2 + gift1 = 5 다. */
+  var MK_STAR_HI  = MK_PET_RATE + MK_STAR_RATE;
+  var MK_SHARD_HI = MK_STAR_HI + SHARD_RATE;
+  var MK_GIFT_HI  = MK_SHARD_HI + GIFT_SPAWN_RATE;
 
   /** 스폰 난수. (gridSeed, refillSeq) 파생이라 재도전하면 같은 판 · 같은 스폰이다.
    *  단계 2에서 순번의 집이 S.duel 로 옮겨졌다 — 값은 같은 0에서 같은 폭으로 오르
@@ -29583,10 +29961,21 @@ window.TT_SFX = {
        sp 가 붙은 칸은 건너뛴다: 지금 battleRefill 의 스폰은 sp 를 안 붙이므로 이
        분기는 늘 거짓이지만, 뒷날 스폰이 특수를 얹게 되면 "폭탄이면서 펫"이라는
        읽을 수 없는 타일이 나는 것을 여기서 막는다. */
+    /* WD-2 §11.5 · §11.6-C — 파편 넷과 상자가 같은 추첨에 합류한다. 세는 칸이
+       둘에서 넷으로 는 것뿐이고, pet/star 의 판정은 한 글자도 안 바뀐다.
+       ⚠ **비전투 모드는 여기 못 닿는다**: 이 함수는 battleOn() 인 판에서만
+       불리고, 엔들리스/러시/데일리/클래식의 판 생성기(genBoardExt·applySpecials)
+       에는 mk 를 심는 줄이 없다. 그래서 §11.2 가 요구한 "데일리·클래식 드랍 0"
+       은 새 게이트 없이 **구조로** 성립한다 — 파편·상자가 mk 채널에 얹히는 순간
+       그 배제를 공짜로 물려받는다. */
     var mkHave = { pet: 0, star: 0 };
+    var mkShardHave = 0, mkGiftHave = 0;
     for (var q = 0; q < out.length; q++) {
       var oc = out[q];
-      if (oc && !oc.dead && oc.mk && mkHave[oc.mk] !== undefined) mkHave[oc.mk]++;
+      if (!oc || oc.dead || !oc.mk) continue;
+      if (mkHave[oc.mk] !== undefined) mkHave[oc.mk]++;
+      else if (oc.mk === 'gift') mkGiftHave++;
+      else if (SHARD_STAT[oc.mk]) mkShardHave++;
     }
     for (var si = 0; si < spawns.length; si++) {
       var r2 = rng();                                   // 상한과 무관하게 언제나 1회
@@ -29594,8 +29983,25 @@ window.TT_SFX = {
       if (!sc || sc.sp) continue;
       if (r2 < MK_PET_RATE) {
         if (mkHave.pet < MK_MAX_EACH) { sc.mk = 'pet'; mkHave.pet++; }
-      } else if (r2 < MK_PET_RATE + MK_STAR_RATE) {
+      } else if (r2 < MK_STAR_HI) {
         if (mkHave.star < MK_MAX_EACH) { sc.mk = 'star'; mkHave.star++; }
+      } else if (r2 < MK_SHARD_HI) {
+        /* 색 추첨도 **상한과 무관하게 언제나 1회** 뽑는다. 위 r2 와 같은 이유다:
+           상한에 걸린 회차에서 소비를 건너뛰면 판 상태가 난수 스트림을 갈라
+           (gridSeed, refillSeq) 재현성이 깨진다.
+           ⚠ 다만 색 자체는 세이브(shardDry 천장)를 읽으므로, 같은 탄을 다시
+           깨면 마크가 **같은 자리**에 뜨되 색은 달라질 수 있다. 천장이 계정
+           단위인 이상 피할 수 없고, 재현성이 지켜야 하는 것(판 모양·스폰 위치)
+           은 그대로다. */
+        var sk = shardDropFor(S.stage, rng);
+        if (mkShardHave < MK_SHARD_MAX) { sc.mk = SHARD_MK[sk]; mkShardHave++; }
+      } else if (r2 < MK_GIFT_HI) {
+        /* §11.6-C — 판당 1개. S.giftLeft 는 탄 진입에서 60% 로 한 번 굴린 결과
+           (1 = 이번 탄에 상자가 있다)이고, 여기서 하나를 심으면 0 이 되어 그
+           판에서는 두 번 다시 안 나온다. */
+        if ((S.giftLeft | 0) > 0 && !mkGiftHave) {
+          sc.mk = 'gift'; mkGiftHave++; S.giftLeft = 0;
+        }
       }
     }
     return { cells: out, moves: moves, spawns: spawns };
@@ -30156,6 +30562,47 @@ window.TT_SFX = {
     }
     if ((o.gem | 0) > 0) {
       out.push({ ico: '💎', disc: 'gem', key: 'rw.gem', val: o.gem | 0, rar: 'normal' });
+    }
+    /* ---- WD-2 §11 · §11.6 · §14 — 예약돼 있던 4·5번 슬롯이 내용을 얻는다 ------
+     * 위 각주가 약속한 그대로다: **push 몇 줄이 늘 뿐** 연출·CSS·사운드·타이밍은
+     * 한 줄도 안 바뀌었다. 자리도 §10.2 의 고정 순서 그대로 — 파편/상자가 4번,
+     * 펫 합류가 5번(최희귀)이라 여기(젤리별 뒤)가 정확히 그 자리다.
+     *
+     * 희귀도(rar) 배정은 **정직하게** 한다. 흔한 것을 희귀로 칠하면 그 다음에
+     * 정말 희귀한 것이 왔을 때 화면이 같은 말을 두 번 하게 되고, 4단 차등(§10.2)
+     * 이 통째로 뜻을 잃는다:
+     *   파편            common  (판에서 흔히 줍는다)
+     *   일반 아이템      normal
+     *   희귀 아이템      rare
+     *   영웅 아이템·펫   epic    (대형 컷인 급)
+     * ------------------------------------------------------------------------ */
+    var i, k;
+    for (i = 0; i < STAT_KEYS.length; i++) {
+      k = STAT_KEYS[i];
+      if ((S.gainShard[k] | 0) > 0) {
+        out.push({ ico: SHARD_ICO, disc: 'shard-' + k, key: 'rw.shard.' + k,
+                   val: S.gainShard[k] | 0, rar: 'common' });
+      }
+    }
+    /* 상자 개봉 결과. 펫이 나온 상자는 여기서 건너뛴다 — 펫은 아래 gainPets 가
+       한 번 더 들고 있고(grantPet 이 넣는다), 두 곳에서 밀면 같은 합류를 두 번
+       축하하게 된다. 목록의 소유자를 하나로 두는 쪽이 언제나 안전하다. */
+    for (i = 0; i < S.gainGift.length; i++) {
+      var g = S.gainGift[i];
+      if (!g) continue;
+      if (g.kind === 'shard') {
+        out.push({ ico: '🎁', disc: 'gift', key: 'rw.shard.' + g.stat,
+                   val: g.n | 0, rar: 'common' });
+      } else if (g.kind === 'item') {
+        var gi = itemById(g.id);
+        out.push({ ico: (gi && gi.ico) || '🎁', disc: 'item', key: 'item.' + g.id + '.nm',
+                   val: g.lv | 0,
+                   rar: g.tier === 'epic' ? 'epic' : (g.tier === 'rare' ? 'rare' : 'normal') });
+      }
+    }
+    for (i = 0; i < S.gainPets.length; i++) {
+      out.push({ ico: '🐾', disc: 'petnew', key: 'char.' + S.gainPets[i] + '.name',
+                 val: 1, rar: 'epic' });
     }
     return out;
   }
@@ -32528,6 +32975,10 @@ window.TT_SFX = {
     var n = Math.max(0, Math.round(dmg));
     if (n <= 0) return;
     d.me.hp = Math.max(0, d.me.hp - n);
+    /* WD-2 §14.3 — "보스 무피격 클리어"의 증거는 이 한 곳에서만 지워진다.
+       내가 맞는 경로가 이 함수뿐이라(KO 판정도 여기 없다), 조건을 따로 복제하지
+       않는 것이 요점이다. 실제 판정은 advFinish 가 한다. */
+    S.hitTaken = true;
     duelHudFlash('mhit', false);
     setAppClass('duel-hurt', true);
     later(function () { setAppClass('duel-hurt', false); }, 420);
@@ -33980,6 +34431,20 @@ window.TT_SFX = {
         store.jellyOn = true;
         freed = true;
       }
+      /* ---- WD-2 §14.2 ⓑ — 보스 격파 펫 --------------------------------------
+       * 위 젤리공주 블록과 **같은 문법**이고, 다른 것은 표를 읽는다는 점뿐이다:
+       * 보스2(20탄) → 먹물이 · 보스4(40탄) → 방울이. 10탄·30탄이 표에 없는 것은
+       * 그 자리의 헤드라인이 캐릭터(젤리공주·푸딩기사)이기 때문이다 —
+       * §14.2 각주 "매 보스가 헤드라인 해금 1개(중복 없음)".
+       * grantPet 이 멱등이라 이미 가진 사람에게는 아무 일도 안 일어난다. */
+      if (p.boss && PET_BOSS[p.n]) grantPet(PET_BOSS[p.n]);
+      /* §14.3 조건 카운터 ③ — 보스를 한 대도 안 맞고 깼는가.
+       * ⚠ **이 카운터로 열리는 펫은 없다**. §14.2 는 이 조건에 딱지(ttakji)를
+       * 걸어 뒀지만 딱지는 이 빌드의 MATE_IDS 에 없는 캐릭터라, 없는 id 를
+       * 지어내는 대신 **기록만** 남긴다. 지금부터 세어 두면 딱지가 도착하는 날
+       * 소급 집계 없이 바로 조건을 걸 수 있다. 아침 검토자가 "왜 카운터만
+       * 있느냐"로 멈추지 않도록 여기 적어 둔다. */
+      if (p.boss && !S.hitTaken) store.bossNoHit = (store.bossNoHit | 0) + 1;
       persist();
       J.sfx.win();
       J.vibrate(40);
@@ -35263,14 +35728,23 @@ window.TT_SFX = {
     return out;
   }
 
-  /** 기본값 + 강화, 스탯별 상한에서 잘린 **실효 스탯**. 모르는 id 는 텐텐표. */
+  /** 기본값 + 강화 + 장착 아이템, 스탯별 상한에서 잘린 **실효 스탯**.
+   *  모르는 id 는 텐텐표.
+   *
+   *  WD-2 §11.6-B — 아이템 보정이 여기 합류한다. 자리가 clamp **안**인 것이
+   *  전부다: 스펙이 "base+아이템 ≤ cap" 이라고 못박았고(§11.6-B), 상한을
+   *  아이템 쪽이 아니라 값 쪽에 계속 두어야 "아이템을 아무리 얹어도 §12.3 이
+   *  잠근 밴드를 못 넘는다"가 세이브 내용과 무관하게 성립한다.
+   *  statMult 의 산술은 한 줄도 안 바뀐다 — 그 함수는 이미 이 값을 읽고 있었고,
+   *  읽는 값이 조금 커질 뿐이다(PURE/133 무접촉). */
   function statEff(id) {
     var base = STAT_BASE[id] || STAT_BASE.ten;
     var lv = statLvOf(id);
+    var it = itemStatBonus(id);
     var out = {}, i, k;
     for (i = 0; i < STAT_KEYS.length; i++) {
       k = STAT_KEYS[i];
-      out[k] = clamp(base[k] + clamp(lv[k], 0, STAT_LV_MAX) * STAT_LV_STEP,
+      out[k] = clamp(base[k] + clamp(lv[k], 0, STAT_LV_MAX) * STAT_LV_STEP + (it[k] | 0),
                      0, STAT_CAP[k]);
     }
     return out;
@@ -35337,6 +35811,558 @@ window.TT_SFX = {
     agility: '#59B7FF',
     luck:    '#FFD34D'
   };
+
+  /* =========================================================================
+   * WD-2 §11 파편 경제 · §11.6 갓차 상자 · §14 펫 획득
+   *
+   * 이 블록의 모든 수치는 **신규 경제 계수**다. 기존 밸런스 계수·점수식·WD-1 의
+   * 스탯 엔진 산술에는 한 글자도 닿지 않는다(§11.5·§11.6-D "밸런스 무접촉,
+   * PURE·133 불변"). 아이템 효과가 스탯에 얹히는 자리도 statEff 의 clamp **안**
+   * 이라, §12.3 이 잠근 상한을 넘길 수 있는 경로가 새로 생기지 않는다.
+   *
+   * 색↔스탯 매핑은 §11.1 이 정본이다:
+   *   빨강 shard-r    → power   (폭발력)
+   *   초록 shard-g    → steady  (꾸준함)
+   *   파랑 shard-b    → agility (순발력)
+   *   금색 shard-gold → luck    (행운)
+   * 저장·계산은 전부 **스탯 이름**으로 하고 색은 화면에서만 쓴다 — 두 낱말을
+   * 섞으면 세이브·연출·statEff 셋이 서로 다른 키로 같은 것을 부르게 된다.
+   * ========================================================================= */
+
+  /** 판 위 mk 값 ← 스탯 이름. CSS 의 `.tile[data-mk="shard-*"]` 와 짝이다. */
+  var SHARD_MK = {
+    power: 'shard-r', steady: 'shard-g', agility: 'shard-b', luck: 'shard-gold'
+  };
+  /** 그 역. 수확 루프가 셀의 mk 를 스탯으로 되읽을 때 쓴다. */
+  var SHARD_STAT = {
+    'shard-r': 'power', 'shard-g': 'steady', 'shard-b': 'agility', 'shard-gold': 'luck'
+  };
+  /** 결과 시트 슬롯의 아이콘. 판 위 글리프(💎)와 같은 것이어야 한다(§10.3). */
+  var SHARD_ICO = '💎';
+
+  /* 드랍률 SHARD_RATE · 동시 상한 MK_SHARD_MAX · 상자 스폰률 GIFT_SPAWN_RATE 는
+     **스폰 계수**라 mk 상수표(MK_PET_RATE 옆)에 산다 — 밴드 경계를 그 자리에서
+     접어야 하고, 그러려면 값이 그 줄보다 먼저 초기화돼 있어야 한다. */
+
+  /* §11.3 소프트 천장. 그 색이 마른 채로 이 횟수를 넘기면 **다음 파편은 확정**
+     으로 그 색이다. 하드 천장(뽑기 N회 확정)은 §11.3 이 배제했다.
+     ⚠ 단위 이탈 명시: 스펙 문구는 "N판"인데 여기 세는 것은 **파편을 수확한
+     사건 1회**다. 판 단위로 세면 같은 20 이라도 한 판을 오래 붙든 사람과 짧게
+     끊는 사람에게 전혀 다른 천장이 되고, 무엇보다 파편이 한 판에 여러 번 나는
+     구조(스폰 1칸당 추첨)와 단위가 어긋난다. 드랍 단위가 더 촘촘하므로 천장은
+     스펙보다 **빨리** 오지 늦게 오지 않는다 — 안전한 방향의 이탈이다. */
+  var SHARD_PITY = 20;
+  /* 마른 횟수 1회당 붙는 가중치. 기본 가중이 2~4 이므로 20회면 가중이 22~24 가
+     되어 확정(위 SHARD_PITY 분기) 전에 이미 사실상 그 색이 나온다 = "점증"(§11.3). */
+  var SHARD_DRY_W = 1;
+  var SHARD_W_LEAD = 4;      // §11.4 우세색
+  var SHARD_W_REST = 2;      // §11.4 나머지 (편중은 "유리"지 "강제" 아님)
+  /* 세이브 소독용 안전 상한. 실제로 닿을 수 없는 값이고, 남의 손을 탄 세이브가
+     10^9 을 들고 와도 화면과 산술이 안 깨지게 입구에서 자른다(STAT_LV_MAX 규율). */
+  var SHARD_HOLD_MAX = 999999;
+
+  /* §11.4 드랍표. 챕터1·4 빨강 / 2·5 파랑 / 3·6 초록 — 3주기라 표를 여섯 줄로
+     적지 않고 `(ch-1) % 3` 으로 적었다. 두 표현은 1~6 에서 **완전히 같고**,
+     챕터가 7 이상으로 늘어도 같은 주기가 그대로 이어진다.
+     금색(행운)이 어느 챕터의 우세색도 아닌 것은 표 그대로다 — 금색의 자리는
+     "보석 전용 스테이지(주간 로테이션)"인데 그 모드가 아직 없다. 그래도 금색은
+     어디서나 나온다(가중 SHARD_W_REST) — §11.4 각주의 하드월 금지 원칙. */
+  var SHARD_LEAD_CYCLE = ['power', 'agility', 'steady'];
+
+  function shardLeadOf(ch) {
+    var i = ((ch | 0) - 1) % SHARD_LEAD_CYCLE.length;
+    if (i < 0) i += SHARD_LEAD_CYCLE.length;
+    return SHARD_LEAD_CYCLE[i];
+  }
+
+  /** store.shardDry 를 안전하게 읽는다. 손상·부재 = 0. */
+  function shardDryOf(k) {
+    var m = (store && store.shardDry && typeof store.shardDry === 'object')
+      ? store.shardDry : null;
+    var v = m ? m[k] : 0;
+    return (typeof v === 'number' && isFinite(v)) ? clamp(v | 0, 0, SHARD_PITY) : 0;
+  }
+
+  /**
+   * §11.4 + §11.3 — 이번 파편이 **무슨 색인가**. 챕터 편중 가중에 마른 색의
+   * 점증 가중을 더한 룰렛이고, 천장에 닿은 색이 있으면 그 색을 확정으로 낸다.
+   *
+   * @param stage 탄 번호. advChapter/advIsBoss 를 그대로 재사용한다.
+   * @param rnd   선택적 난수원. 하네스가 Math.random 을 전역으로 갈아 끼우지
+   *              않고도 표를 결정론적으로 돌려 볼 수 있게 하는 이음매다.
+   * @return STAT_KEYS 중 하나
+   */
+  function shardDropFor(stage, rnd) {
+    var r = (typeof rnd === 'function') ? rnd : Math.random;
+    /* ⚠ 난수는 **언제나 맨 먼저** 한 번 뽑는다 — 천장에 걸려 답이 이미 정해진
+       회차에도 그렇다. 호출부(battleRefill)가 "파편 밴드에 들어오면 rng 를
+       정확히 한 번 더 쓴다"에 기대어 (gridSeed, refillSeq) 재현성을 지키고
+       있어서, 소비를 건너뛰는 분기가 하나라도 있으면 **세이브 상태가 판의 난수
+       스트림을 가른다**(천장이 찬 사람과 안 찬 사람이 서로 다른 판을 본다).
+       마크 자리는 이 한 줄로 세이브와 무관해지고, 달라지는 것은 색뿐이다. */
+    var roll = r();
+    var n = stage | 0;
+    /* 보스탄은 **균등**(§11.4 "보스탄 = 균등 + 소량 보너스"). 우세색을 안 주는
+       것이 보너스의 뜻이다 — 보스는 원하는 색을 고르러 오는 자리가 아니다. */
+    var lead = advIsBoss(n) ? '' : shardLeadOf(advChapter(n));
+    var w = [], tot = 0, i, k, dry, forced = '';
+    for (i = 0; i < STAT_KEYS.length; i++) {
+      k = STAT_KEYS[i];
+      dry = shardDryOf(k);
+      /* 천장 — 소프트의 끝은 확정이다. 먼저 닿은 색이 이긴다(둘이 동시에 마를
+         일은 실제로 없다: 한 번의 수확이 한 색만 0 으로 되돌린다). */
+      if (dry >= SHARD_PITY && !forced) forced = k;
+      var wv = (k === lead ? SHARD_W_LEAD : SHARD_W_REST) + dry * SHARD_DRY_W;
+      w.push(wv);
+      tot += wv;
+    }
+    if (forced) return forced;
+    var t2 = roll * tot;
+    for (i = 0; i < w.length; i++) {
+      t2 -= w[i];
+      if (t2 < 0) return STAT_KEYS[i];
+    }
+    return STAT_KEYS[STAT_KEYS.length - 1];     // 부동소수 꼬리 방어
+  }
+
+  /**
+   * 수확한 파편을 지갑에 넣고 천장 카운터를 갱신한다. 카운터를 **스폰이 아니라
+   * 수확**에서 움직이는 것이 요점이다: §11.3 이 세는 것은 "미획득"이지 "미출현"이
+   * 아니고, 스폰에서 세면 판에 떠 있다가 못 터뜨린 파편이 획득으로 기록된다.
+   * 덤으로 리필 경로가 세이브를 안 건드리게 되어 (gridSeed, refillSeq) 재현성
+   * 논의에 새 변수가 끼지 않는다.
+   * @param got { power, steady, agility, luck } 이번에 실제로 딴 수
+   */
+  function shardCredit(got) {
+    var any = 0, i, k, n;
+    for (i = 0; i < STAT_KEYS.length; i++) {
+      k = STAT_KEYS[i];
+      n = got[k] | 0;
+      if (n > 0) any = 1;
+      store.shards[k] = clamp((store.shards[k] | 0) + n, 0, SHARD_HOLD_MAX);
+    }
+    if (!any) return;
+    for (i = 0; i < STAT_KEYS.length; i++) {
+      k = STAT_KEYS[i];
+      if ((got[k] | 0) > 0) store.shardDry[k] = 0;
+      else store.shardDry[k] = clamp(shardDryOf(k) + 1, 0, SHARD_PITY);
+    }
+  }
+
+  /** 지금까지 모은 파편의 총합. §14 ⓓ 천장이 읽는다. */
+  function shardTotal() {
+    var s = 0;
+    for (var i = 0; i < STAT_KEYS.length; i++) s += store.shards[STAT_KEYS[i]] | 0;
+    return s;
+  }
+
+  /* -------------------------------------------------------------------------
+   * §11.6-B 아이템 풀 — 12종 (3티어 × 4스탯)
+   *
+   * 이름·효과·플레이버는 §11.6-B 표 **그대로**다(한 글자도 고르지 않았다).
+   * 효과는 일반 +1 / 희귀 +2 / 영웅 +3 %p 이고, 레벨업 1당 +1%p 로 자란 뒤
+   * §12.3 의 스탯 상한(STAT_CAP)에서 포화한다 — 상한이 아이템 쪽이 아니라
+   * **스탯 쪽**에 있으므로, 아이템을 아무리 얹어도 확정 곱항은 안 폭주한다.
+   *
+   * ⚠ 슬롯의 4→3 접기는 **내 판단**이다. §11.6-B 는 "슬롯: 무기/보조/장신구
+   * (§13.4)" 라고만 적었고 §13.4 표에는 슬롯 열이 없다. 그래서 이름이 말하는
+   * 대로 접었다: 손에 드는 것 = 무기(폭발력) · 몸에 두르는 것 = 보조(꾸준함) ·
+   * 걸치는 소품 = 장신구(순발력·행운). 순발력과 행운이 한 칸을 다투게 되는데,
+   * 그 자체가 선택이 되므로 나쁜 접기는 아니지만 **스펙이 정한 것이 아니다** —
+   * 사용자가 다른 배치를 원하면 이 표의 slot 열만 고치면 된다.
+   * ---------------------------------------------------------------------- */
+  var ITEM_SLOTS = ['weapon', 'aux', 'trinket'];
+  var ITEM_TIER_EFF = { common: 1, rare: 2, epic: 3 };   // §11.6-B 일반/희귀/영웅
+  var ITEM_LV_MAX = 12;      // 세이브 소독용 안전 상한 (STAT_LV_MAX 와 같은 이유)
+  var ITEM_POOL = [
+    { id: 'flint',        stat: 'power',   tier: 'common', slot: 'weapon',  ico: '✨' },
+    { id: 'fizzjelly',    stat: 'power',   tier: 'rare',   slot: 'weapon',  ico: '🎆' },
+    { id: 'flamescepter', stat: 'power',   tier: 'epic',   slot: 'weapon',  ico: '🔱' },
+    { id: 'softcushion',  stat: 'steady',  tier: 'common', slot: 'aux',     ico: '☁' },
+    { id: 'puddingarmor', stat: 'steady',  tier: 'rare',   slot: 'aux',     ico: '🍮' },
+    { id: 'turtleshield', stat: 'steady',  tier: 'epic',   slot: 'aux',     ico: '🛡' },
+    { id: 'windribbon',   stat: 'agility', tier: 'common', slot: 'trinket', ico: '🎀' },
+    { id: 'sodaboots',    stat: 'agility', tier: 'rare',   slot: 'trinket', ico: '🥾' },
+    { id: 'boltshoes',    stat: 'agility', tier: 'epic',   slot: 'trinket', ico: '👟' },
+    { id: 'rabbitfoot',   stat: 'luck',    tier: 'common', slot: 'trinket', ico: '🐇' },
+    { id: 'luckybell',    stat: 'luck',    tier: 'rare',   slot: 'trinket', ico: '🔔' },
+    { id: 'goldclover',   stat: 'luck',    tier: 'epic',   slot: 'trinket', ico: '🍀' }
+  ];
+
+  function itemById(id) {
+    for (var i = 0; i < ITEM_POOL.length; i++) {
+      if (ITEM_POOL[i].id === id) return ITEM_POOL[i];
+    }
+    return null;
+  }
+
+  /** 그 아이템이 지금 주는 %p. 티어 시작값 + (레벨-1). 레벨 1 = 막 얻은 상태. */
+  function itemEffOf(id, lv) {
+    var it = itemById(id);
+    if (!it) return 0;
+    var n = clamp(lv | 0, 1, ITEM_LV_MAX);
+    return ITEM_TIER_EFF[it.tier] + (n - 1);
+  }
+
+  /** 그 캐릭터가 장착 중인 아이템 id 목록. 없는 키 = 빈 배열. */
+  function itemsEq(charKey) {
+    var m = (store && store.items && store.items.eq) ? store.items.eq[charKey] : null;
+    return Array.isArray(m) ? m : [];
+  }
+
+  /**
+   * §11.6-B — 장착 아이템이 더하는 %p 네 칸. statEff 가 base+강화 위에 이것을
+   * 얹고 **다시 STAT_CAP 에서 자른다**("base+아이템 ≤ cap"). 보유하지 않은 id 가
+   * 장착 칸에 남아 있으면 0 으로 친다 — 세이브 소독이 이미 걷지만, 손잡이로
+   * 심어진 값이 여기 닿을 수 있어 한 겹 더 둔다.
+   */
+  function itemStatBonus(charKey) {
+    var out = {}, i;
+    for (i = 0; i < STAT_KEYS.length; i++) out[STAT_KEYS[i]] = 0;
+    var eq = itemsEq(charKey), own = (store.items && store.items.own) || {};
+    for (i = 0; i < eq.length; i++) {
+      var it = itemById(eq[i]);
+      if (!it) continue;
+      var lv = own[eq[i]] | 0;
+      if (lv <= 0) continue;
+      out[it.stat] += itemEffOf(eq[i], lv);
+    }
+    return out;
+  }
+
+  /** 아이템 지급/강화. 이미 있으면 레벨이 오른다(§11.6-B "레벨업"). */
+  function grantItem(id) {
+    var it = itemById(id);
+    if (!it) return null;
+    var own = store.items.own;
+    var had = own[id] | 0;
+    var lv = clamp(had + 1, 1, ITEM_LV_MAX);
+    own[id] = lv;
+    /* 처음 얻은 아이템은 빈 슬롯이 있으면 바로 끼워 준다. 자리표 UI 뿐인 이번
+       라운드에서 "얻었는데 아무 일도 안 일어난다"를 막는 최소 장치다. */
+    if (!had) {
+      var cid = charId(), eq = itemsEq(cid).slice(), used = {}, j;
+      for (j = 0; j < eq.length; j++) {
+        var e = itemById(eq[j]);
+        if (e) used[e.slot] = 1;
+      }
+      if (!used[it.slot] && eq.length < ITEM_SLOTS.length) {
+        eq.push(id);
+        store.items.eq[cid] = eq;
+      }
+    }
+    return { id: id, lv: lv, isNew: !had, tier: it.tier, stat: it.stat };
+  }
+
+  /* -------------------------------------------------------------------------
+   * §11.6-C 상자 배치 · §11.6-A 개봉표
+   * ---------------------------------------------------------------------- */
+
+  /* §11.6-C — 상자 출현 탄. 표는 "챕터 n → (n−1)×10 + {3,6,9}" 인데, ADV_CHAPTER
+     가 10 이므로 그 집합은 **탄 번호를 10 으로 나눈 나머지가 3·6·9 인 탄**과
+     정확히 같다: (n−1)×10 + 3 ≡ 3 (mod 10). 나머지로 적으면 챕터가 몇 개로
+     늘어도 표를 다시 안 적어도 되고, 셋 다 비보스라는 성질(보스는 나머지 0)도
+     식에서 바로 읽힌다. */
+  var GACHA_BOX_STAGES = [3, 6, 9];
+  /* §11.6-C — 출현 탄 안에서의 출현률. "~60%(항상은 아님 = 우연)". 판마다가
+     아니라 **탄 진입 한 번**에만 굴린다(§11.6-C "매판 확정이면 파밍이 노동"). */
+  var GACHA_STAGE_P = 0.60;
+  /* §11.6-A 개봉표. 파편 70 / 아이템 25 / 희귀 5. */
+  var GACHA_OPEN_WEIGHTS = { shard: 0.70, item: 0.25, rare: 0.05 };
+  /* §11.6-A 소프트 천장 — 연속 12상자 아이템 미획득이면 다음 상자는 아이템 확정. */
+  var GACHA_PITY = 12;
+  /* 상자에서 나오는 파편 수. ⚠ **스펙에 수가 없다**(§11.6-A 는 "흔함 — 즉시
+     카운트업"까지만 적었다). 판에서 직접 줍는 한 알보다는 커야 상자가 상자답고,
+     한 판 수확분(대략 10~30알)을 넘으면 상자가 파밍을 대체해 버린다. 그 사이의
+     작은 수 3 을 골랐다 — 조정하려면 이 한 줄만 고치면 된다. */
+  var GACHA_SHARD_N = 3;
+  /* 아이템 슬롯이 걸렸을 때 티어 비율. ⚠ 이것도 스펙에 없다(§11.6-A 는
+     "아이템(일반/희귀)" 까지만). 영웅은 5% 희귀 슬롯의 몫이므로 여기서는 안
+     나온다 — 그 배타성이 "영웅"이라는 낱말의 값어치다. */
+  var GACHA_ITEM_RARE_P = 0.30;
+
+  /** §11.6-C — 이 탄이 상자 출현 탄인가. 위 주석의 나머지 등가를 그대로 쓴다. */
+  function isGachaStage(n) {
+    var m = ((n | 0) % ADV_CHAPTER + ADV_CHAPTER) % ADV_CHAPTER;
+    for (var i = 0; i < GACHA_BOX_STAGES.length; i++) {
+      if (m === GACHA_BOX_STAGES[i]) return true;
+    }
+    return false;
+  }
+
+  /** 풀에서 티어로 하나 뽑는다. */
+  function gachaPickItem(tier, r) {
+    var pool = [], i;
+    for (i = 0; i < ITEM_POOL.length; i++) {
+      if (ITEM_POOL[i].tier === tier) pool.push(ITEM_POOL[i].id);
+    }
+    if (!pool.length) return '';
+    return pool[Math.min(pool.length - 1, (r() * pool.length) | 0)];
+  }
+
+  /**
+   * §11.6-A — 상자 하나를 연다. **개봉의 유일한 소유자**다: 확률·천장·지급이 한
+   * 자리에 모여 있어야 "무엇이 나올 수 있는가"를 한 함수만 읽고 확인할 수 있다.
+   *
+   * @param rnd 선택적 난수원(하네스 이음매). 없으면 Math.random.
+   * @return 연출이 그대로 그릴 수 있는 서술자
+   *         { kind:'shard', stat, n } | { kind:'item', id, lv, isNew, tier }
+   *         | { kind:'pet', id }
+   */
+  function openGachaRoll(rnd) {
+    var r = (typeof rnd === 'function') ? rnd : Math.random;
+    var roll = r();
+    var w = GACHA_OPEN_WEIGHTS;
+    /* 천장 먼저. 연속 12상자를 아이템 없이 지났으면 이번은 아이템 확정이다 —
+       추첨을 굴린 **뒤에** 덮어쓰지 않고 앞에서 가르는 것이 요점이다(굴리고
+       덮으면 위 roll 이 무슨 뜻이었는지 코드에서 안 읽힌다). */
+    var forced = (store.giftNoItem | 0) >= GACHA_PITY;
+    var kind;
+    if (forced) kind = 'item';
+    else if (roll < w.shard) kind = 'shard';
+    else if (roll < w.shard + w.item) kind = 'item';
+    else kind = 'rare';
+
+    if (kind === 'shard') {
+      store.giftNoItem = (store.giftNoItem | 0) + 1;
+      var sk = shardDropFor(S.stage, r);
+      var got = {};
+      for (var i = 0; i < STAT_KEYS.length; i++) got[STAT_KEYS[i]] = 0;
+      got[sk] = GACHA_SHARD_N;
+      shardCredit(got);
+      return { kind: 'shard', stat: sk, n: GACHA_SHARD_N };
+    }
+    if (kind === 'item') {
+      store.giftNoItem = 0;
+      var tier = (r() < GACHA_ITEM_RARE_P) ? 'rare' : 'common';
+      var g = grantItem(gachaPickItem(tier, r));
+      if (g) return { kind: 'item', id: g.id, lv: g.lv, isNew: g.isNew, tier: tier };
+      return { kind: 'shard', stat: 'luck', n: GACHA_SHARD_N };   // 풀이 비면 폴백
+    }
+    /* 5% 희귀 슬롯 (§11.6-A · §14 ⓔ). **먼저 미보유 펫**을 시도하고, 다 가졌으면
+       영웅 아이템으로 떨어진다. 순서가 이렇게 정해진 것은 §14.1 의 배분 때문이다:
+       갓차는 펫 수집 경로 다섯 중 하나이고, 펫이 남아 있는 동안 그 자리를 아이템이
+       차지하면 츄릅에게 갈 길이 하나 줄어든다. */
+    var want = petGachaPool();
+    if (want.length) {
+      var pid = want[Math.min(want.length - 1, (r() * want.length) | 0)];
+      if (grantPet(pid)) return { kind: 'pet', id: pid };
+    }
+    store.giftNoItem = 0;
+    var eg = grantItem(gachaPickItem('epic', r));
+    if (eg) return { kind: 'item', id: eg.id, lv: eg.lv, isNew: eg.isNew, tier: 'epic' };
+    return { kind: 'shard', stat: 'luck', n: GACHA_SHARD_N };
+  }
+
+  /* -------------------------------------------------------------------------
+   * §14 펫 획득 조건
+   *
+   * ⚠ **코드에 있는 펫은 여덟뿐**이다(MATE_IDS). §14.2 표는 열하나를 적었지만
+   * 또록이(ttorok)·딱지(ttakji)·반짝이(banjjak)는 이 빌드에 캐릭터가 없다 —
+   * 여기서 id 를 새로 만들면 CHARS·에셋·i18n·선택창 카드가 전부 없는 이름을
+   * 가리키게 되므로 **만들지 않았다**. 표의 나머지 여덟만 아래처럼 옮겼다:
+   *
+   *   ⓐ 시작 보유      삐약 ppyak · 뭉치 mungchi
+   *   ⓑ 보스2(20탄)    먹물이 mukmul
+   *   ⓑ 보스4(40탄)    방울이 bangul
+   *   ⓒ 각성 연쇄 3회  째깍이 tiktok
+   *   ⓒ 무딜레이 10연속 몽글 mongle
+   *   ⓓ 파편 누적 천장 꿀떡이 kkultteok
+   *   ⓔ 갓차 희귀 5%   츄릅 churup
+   * ---------------------------------------------------------------------- */
+  var PET_FREE = ['ppyak', 'mungchi'];                    // §14.1 ⓐ
+  /* §14.2 ⓑ — 보스 격파. 키는 **탄 번호**다(보스2 = 20탄, 보스4 = 40탄).
+     10탄·30탄이 비어 있는 것은 표 그대로다 — 그 두 자리의 헤드라인 해금은
+     젤리공주·푸딩기사(캐릭터)이고, §14.2 각주가 "매 보스가 헤드라인 하나,
+     중복 없음"을 못박았다. */
+  var PET_BOSS = { 20: 'mukmul', 40: 'bangul' };
+  var PET_AWK_NEED = 3;        // §14.2 ⓒ 째깍이 — 각성 연쇄 3회 (= EXPL_STREAK_CAP)
+  var PET_NODELAY_NEED = 10;   // §14.2 ⓒ 몽글 — 무딜레이 10연속 매칭
+  /* §14.2 ⓓ 꿀떡이 — "파편 누적 N개 교환(천장)". ⚠ 스펙의 N 은 미정이고(§14.3
+     ⚠③ "파편 교환 비용 밸런스"가 사용자 확정 대상), 교환 UI 는 선택창 2.0 의
+     것이라 이번 라운드에 없다. 그래서 **누적 획득**이 이 수에 닿으면 자동으로
+     합류하는 형태로만 구현했다 — 파편은 차감하지 않는다. 천장의 뜻(확률에 안
+     걸려도 확정 획득하는 안전판, §14.2 각주)은 그대로 살고, 교환 UI 가 오면
+     이 한 줄이 그 버튼의 조건식으로 옮겨 가면 된다. */
+  var PET_SHARD_NEED = 300;
+  /* §14.2 ⓔ — 갓차 5% 희귀 슬롯이 줄 수 있는 펫. 츄릅 하나뿐인 것이 표 그대로다
+     (반짝이는 이벤트 예약이고, 이 빌드에 캐릭터가 없다). 조건 펫·보스 펫을 여기
+     넣지 않는 이유는 서사다 — 그 펫들은 "해낸 증거로" 오는 스승이라, 상자에서
+     떨어지면 조건이 장식이 된다(§14.2 각주 "조건 펫 = 스탯 스승 서사"). */
+  var PET_GACHA = ['churup'];
+
+  /** 보유 검사. 손상된 세이브가 배열이 아닌 것을 들고 와도 안 깨진다. */
+  function petOwned(id) {
+    return !!(store && Array.isArray(store.pets) && store.pets.indexOf(id) >= 0);
+  }
+
+  /** 갓차가 줄 수 있는 **미보유** 펫들. 다 가졌으면 빈 배열. */
+  function petGachaPool() {
+    var out = [];
+    for (var i = 0; i < PET_GACHA.length; i++) {
+      if (!petOwned(PET_GACHA[i])) out.push(PET_GACHA[i]);
+    }
+    return out;
+  }
+
+  /**
+   * 펫 지급. **멱등**이다 — 이미 가진 펫에는 아무 일도 안 일어나고 false 를
+   * 돌려준다. 호출부가 "두 번 주지 않기"를 각자 챙기지 않아도 되게 하는 것이
+   * 이 함수의 존재 이유다(조건 카운터는 매 매치 검사되므로 두 번은 기본값이다).
+   */
+  function grantPet(id) {
+    if (MATE_IDS.indexOf(id) < 0) return false;
+    if (!Array.isArray(store.pets)) store.pets = PET_FREE.slice();
+    if (store.pets.indexOf(id) >= 0) return false;
+    store.pets.push(id);
+    persist();
+    /* 획득 연출 = §10 최희귀 자리 + 토스트 한 줄(§14.3 "신규 연출 0"). 결과
+       시트의 컷인 몫은 S.gainPets 가 들고 가고, 여기서는 그 순간 화면에
+       무슨 일이 났는지만 알린다. */
+    S.gainPets.push(id);
+    toast(t('pet.get', { n: t('char.' + id + '.name') }));
+    J.sfx.tierUp(4);
+    J.vibrate(70);
+    if (typeof window !== 'undefined') {
+      J.confetti(window.innerWidth / 2, window.innerHeight * 0.42);
+    }
+    syncMateLocks();
+    return true;
+  }
+
+  /**
+   * §14.3 조건 카운터 — 판 중에 매 매치 불린다. 카운터는 WD-1 이 이미 굴리고
+   * 있는 awkStreak/stdyRun 을 **읽기만** 한다(새 감지 배선 0). 여기서 하는 일은
+   * 계정 최고치를 갱신하고, 그 최고치가 조건을 넘는 순간 스승을 부르는 것뿐이다.
+   */
+  function petCondBump() {
+    var dirty = false;
+    if (awkStreak > (store.awkChainMax | 0)) { store.awkChainMax = awkStreak; dirty = true; }
+    if (stdyRun > (store.noDelayMax | 0)) { store.noDelayMax = stdyRun; dirty = true; }
+    if ((store.awkChainMax | 0) >= PET_AWK_NEED && !petOwned('tiktok')) grantPet('tiktok');
+    if ((store.noDelayMax | 0) >= PET_NODELAY_NEED && !petOwned('mongle')) grantPet('mongle');
+    if (dirty) persist();
+  }
+
+  /** §14.2 ⓓ — 파편 천장. 파편이 늘어난 직후에만 볼 값이라 따로 떼어 뒀다. */
+  function petShardCheck() {
+    if (!petOwned('kkultteok') && shardTotal() >= PET_SHARD_NEED) grantPet('kkultteok');
+  }
+
+  /**
+   * 잠긴 펫 카드. syncHeroLocks() 의 문법을 **그대로** 따른다 — 같은 `.locked`
+   * 클래스, 같은 aria-disabled, 같은 t('char.locked.aria'). 두 번째 잠금 체계를
+   * 만들지 않는 것이 요점이다: 자물쇠가 두 종류면 CSS·번역·접근성이 두 벌이 된다.
+   *
+   * 마크업에 `.cc-lock` 뱃지가 없는 것만 다르다(펫 카드 여덟은 잠글 일이 없던
+   * 시절에 만들어졌다). 그래서 없으면 여기서 한 번 만들어 붙인다 — HTML 여덟
+   * 곳에 같은 조각을 붙여 넣는 것보다 이쪽이 되돌리기도 쉽다.
+   */
+  function syncMateLocks() {
+    var wrap = $('mate-pick');
+    if (!wrap || !wrap.querySelectorAll) return;
+    var cards = wrap.querySelectorAll('.char-card');
+    for (var i = 0; i < cards.length; i++) {
+      var id = cards[i].getAttribute('data-char') || '';
+      /* ''(솔로) 카드는 언제나 열려 있다 — "동료 없음"은 얻는 것이 아니다. */
+      var lock = !!id && !petOwned(id);
+      cards[i].classList.toggle('locked', lock);
+      if (lock && !cards[i].querySelector('.cc-lock')) {
+        var lk = document.createElement('span');
+        lk.className = 'cc-lock';
+        lk.setAttribute('aria-hidden', 'true');
+        var q = document.createElement('span');
+        q.className = 'cl-q';
+        q.textContent = '???';
+        lk.appendChild(q);
+        cards[i].appendChild(lk);
+      }
+      if (lock) {
+        cards[i].setAttribute('aria-disabled', 'true');
+        cards[i].setAttribute('aria-label', t('char.locked.aria'));
+      } else {
+        cards[i].removeAttribute('aria-disabled');
+        cards[i].removeAttribute('aria-label');
+      }
+    }
+  }
+
+  /**
+   * §11.6-B 아이템 **자리표**. 가진 것만 칩으로 늘어놓고, 지금 캐릭터가 낀 것에
+   * `.on` 을 붙인다. 탭하면 그 슬롯을 채우거나 비운다.
+   *
+   * 여기서 하지 **않는** 일을 적어 두는 편이 낫다: 강화(파편 소비)도, 슬롯별
+   * 필터도, 캐릭터별 비교도 없다. 셋 다 선택창 2.0 의 IA 가 정해야 하는
+   * 것들이라(§12.4 · §13.5 ⚠③), 지금 임의로 그려 두면 그 화면이 도착할 때
+   * 두 벌이 된다.
+   */
+  function syncItemList() {
+    var wrap = $('cp-item-list');
+    if (!wrap) return;
+    var cid = charId(), eq = itemsEq(cid), own = (store.items && store.items.own) || {};
+    wrap.innerHTML = '';
+    var any = 0;
+    for (var i = 0; i < ITEM_POOL.length; i++) {
+      var it = ITEM_POOL[i], lv = own[it.id] | 0;
+      if (lv <= 0) continue;
+      any = 1;
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'cp-item' + (eq.indexOf(it.id) >= 0 ? ' on' : '');
+      b.setAttribute('data-item', it.id);
+      b.setAttribute('data-tier', it.tier);
+      var ic = document.createElement('span');
+      ic.className = 'ci-chip';
+      ic.setAttribute('aria-hidden', 'true');
+      ic.textContent = it.ico;
+      var nm = document.createElement('span');
+      nm.className = 'cc-name';
+      nm.setAttribute('data-i18n', 'item.' + it.id + '.nm');
+      nm.textContent = t('item.' + it.id + '.nm');
+      var vb = document.createElement('b');
+      vb.className = 'cp-item-v';
+      /* 표시값은 레벨이 아니라 **지금 주는 %p** 다. 레벨은 내부 사정이고,
+         플레이어가 비교하고 싶은 것은 "이걸 끼면 얼마나 오르나"다. */
+      vb.textContent = '+' + itemEffOf(it.id, lv) + '%';
+      b.appendChild(ic);
+      b.appendChild(nm);
+      b.appendChild(vb);
+      wrap.appendChild(b);
+    }
+    if (!any) {
+      var em = document.createElement('p');
+      em.className = 'cp-item-none';
+      em.setAttribute('data-i18n', 'cp.items.none');
+      em.textContent = t('cp.items.none');
+      wrap.appendChild(em);
+    }
+  }
+
+  /** 칩 탭 = 장착 토글. 슬롯(무기/보조/장신구)당 한 개라, 같은 슬롯의 것을 새로
+   *  끼면 먼저 끼어 있던 것이 자동으로 빠진다 — 빼고 끼우기를 두 번 시키는 UI 는
+   *  슬롯이 셋뿐일 때 손해만 크다. */
+  function toggleItem(id) {
+    var it = itemById(id);
+    if (!it) return;
+    var own = (store.items && store.items.own) || {};
+    if (!(own[id] | 0)) return;
+    var cid = charId(), eq = itemsEq(cid).slice(), at = eq.indexOf(id), j;
+    if (at >= 0) {
+      eq.splice(at, 1);
+    } else {
+      for (j = eq.length - 1; j >= 0; j--) {
+        var e = itemById(eq[j]);
+        if (e && e.slot === it.slot) eq.splice(j, 1);
+      }
+      eq.push(id);
+      if (eq.length > ITEM_SLOTS.length) eq.shift();
+    }
+    store.items.eq[cid] = eq;
+    persist();
+    syncItemList();
+    applyHeroStats();          /* 막대가 곧바로 새 실효값을 그린다 */
+    J.sfx.ui();
+  }
 
   var pairPCache = null;
 
@@ -35710,6 +36736,17 @@ window.TT_SFX = {
     on($('mate-pick'), 'click', function (ev) {
       var el = pickTarget(ev, this);
       if (el) setMate(el.getAttribute('data-char'));
+    });
+    /* WD-2 §11.6-B — 아이템 칩. 목록을 JS 가 다시 그리므로(syncItemList) 칩마다
+       리스너를 달면 갈아 끼울 때마다 새로 달아야 한다. 위임 한 줄이면 그 문제가
+       아예 없다 — #mate-pick 이 카드 아홉을 한 줄로 받는 것과 같은 문법이다. */
+    on($('cp-item-list'), 'click', function (ev) {
+      var el = ev.target;
+      while (el && el !== this && !(el.getAttribute && el.getAttribute('data-item'))) {
+        el = el.parentNode;
+      }
+      if (!el || el === this) return;
+      toggleItem(el.getAttribute('data-item'));
     });
 
     /* ---- v4 6차 §B: 캐릭터 패널 ------------------------------------------ */
@@ -36656,6 +37693,29 @@ window.TT_SFX = {
       if (v) { awkStreak = v.awk | 0; stdyRun = v.stdy | 0; statAgil = !!v.agil; }
       return { awk: awkStreak, stdy: stdyRun, agil: statAgil };
     },
+    /* WD-2 §11·§11.6·§14 — DEBUG HANDLES ONLY, 위 규약 그대로다: 게임 코드는 이
+       중 무엇도 window.Game 을 거쳐 부르지 않는다.
+       관문이 확인해야 하는 것은 "표에 적힌 확률이 정말 그 확률인가"인데, 그것을
+       실제 플레이로 재려면 수천 판이 필요하다. 그래서 **난수원을 인자로 받는**
+       이음매를 뒀다: shardDropFor(stage, rnd) · openGachaRoll(rnd) 둘 다 함수
+       하나를 넘기면 그 스트림만 쓴다. Math.random 을 전역으로 갈아 끼우지
+       않는 것이 요점이다 — 그 방법은 판 생성·연출·다른 확률까지 함께 물들여서
+       "무엇을 쟀는지"가 흐려지고, 되돌리기를 잊으면 다음 시나리오가 조용히
+       오염된다. store 는 이미 위에서 나가 있으므로 하네스가 store.shards /
+       store.shardDry / store.giftNoItem / store.pets 를 직접 읽고 심으면 된다. */
+    ITEM_POOL: ITEM_POOL, ITEM_SLOTS: ITEM_SLOTS, ITEM_TIER_EFF: ITEM_TIER_EFF,
+    GACHA_OPEN_WEIGHTS: GACHA_OPEN_WEIGHTS, GACHA_BOX_STAGES: GACHA_BOX_STAGES,
+    GACHA_STAGE_P: GACHA_STAGE_P, GACHA_PITY: GACHA_PITY,
+    SHARD_RATE: SHARD_RATE, SHARD_PITY: SHARD_PITY, SHARD_MK: SHARD_MK,
+    MK_SHARD_MAX: MK_SHARD_MAX, GIFT_SPAWN_RATE: GIFT_SPAWN_RATE,
+    shardDropFor: shardDropFor, shardCredit: shardCredit, shardTotal: shardTotal,
+    openGachaRoll: openGachaRoll, isGachaStage: isGachaStage,
+    itemById: itemById, itemEffOf: itemEffOf, itemStatBonus: itemStatBonus,
+    grantItem: grantItem, toggleItem: toggleItem, syncItemList: syncItemList,
+    petOwned: petOwned, grantPet: grantPet, petCondBump: petCondBump,
+    petShardCheck: petShardCheck, petGachaPool: petGachaPool,
+    syncMateLocks: syncMateLocks,
+    PET_FREE: PET_FREE, PET_BOSS: PET_BOSS, MATE_IDS: MATE_IDS,
     playCuts: playCuts, CUTS_OPEN: CUTS_OPEN, CUTS_SORTIE: CUTS_SORTIE,
     /* E3 — 하네스 손잡이. 위 debug handles 와 같은 규약이다: 게임 코드는 이 중
        무엇도 window.Game 을 거쳐 부르지 않는다. 해방 컷툰은 "10탄 보스를 처음
@@ -38982,6 +40042,80 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
    :8774 가로 flex)가 이 자리를 이미 못 박고 있기 때문이다 — 탭이 그보다 세야
    한다. 그 두 줄은 지우지 않는다: 탭 구조를 되돌리면 다시 값을 한다. */
 #charpanel:not([data-cptab="pet"]) .pick-row.pick-mate{ display:none !important; }
+/* ---- WD-2 §11.6-B 아이템 자리표 -------------------------------------------
+   위 한 줄과 **정확히 대칭**이다: 동료 줄이 캐릭터 탭에서 숨듯이 아이템 줄은
+   펫 탭에서 숨는다. 두 탭의 세로 총합이 같아야 카드 예산 산식(:8769)이 안
+   흔들린다는 그 계약을 그대로 잇는다.
+   새 시각 토큰은 0 개다 — 색은 전부 이 파일이 이미 쓰는 --tx-dim / --j-ink-2 /
+   --ease 계보이고, 판은 젤리 문법의 둥근 알약 하나뿐이다.
+   ⚠ background 단축은 쓰지 않는다(파일 전체 규율): 색과 그림을 롱핸드 둘로
+   나눠 적어야 나중에 한쪽만 갈아 끼울 수 있다. */
+#charpanel[data-cptab="pet"] #cp-items{ display:none !important; }
+#cp-items{
+  display:flex;
+  align-items:flex-start;
+  gap:8px;
+  margin-top:6px;
+  min-height:0;
+}
+#cp-items .pick-lab{ flex:0 0 auto; padding-top:5px; }
+.cp-item-list{
+  flex:1 1 auto;
+  display:flex;
+  flex-wrap:wrap;
+  gap:5px;
+  min-width:0;
+}
+.cp-item{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  padding:3px 8px 3px 4px;
+  border:0;
+  border-radius:999px;
+  cursor:pointer;
+  font:inherit;
+  color:var(--tx-dim);
+  background-color:rgba(255,255,255,.10);
+  background-image:none;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.16);
+  transition:transform 140ms var(--ease), box-shadow 140ms var(--ease);
+}
+.cp-item:active{ transform:scale(.94); }
+/* 장착 = 켜진 것. 티어 색을 테두리로만 쓰는 이유는 대비다 — 칩 열두 개가
+   전부 다른 바탕색을 갖는 순간 어느 것이 켜져 있는지가 안 읽힌다. */
+.cp-item.on{
+  color:var(--j-ink-2, #FFF6E2);
+  background-color:rgba(255,255,255,.20);
+  box-shadow:inset 0 0 0 2px rgba(245,216,74,.72);
+}
+.cp-item[data-tier="rare"].on{ box-shadow:inset 0 0 0 2px rgba(122,200,255,.80); }
+.cp-item[data-tier="epic"].on{ box-shadow:inset 0 0 0 2px rgba(201,174,245,.86); }
+.cp-item .ci-chip{
+  width:18px;
+  height:18px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-size:12px;
+  line-height:1;
+}
+.cp-item .cc-name{ font-size:11px; opacity:1; visibility:visible; }
+.cp-item-v{
+  font-size:11px;
+  font-variant-numeric:tabular-nums;
+  opacity:.82;
+}
+.cp-item-none{
+  margin:4px 0 0;
+  font-size:11px;
+  color:var(--tx-dim);
+  opacity:.72;
+}
+@media (prefers-reduced-motion: reduce){
+  .cp-item{ transition:none; }
+  .cp-item:active{ transform:none; }
+}
 
 /* 펫 탭: 정보 카드가 물러나고 그 세로 예산을 펫 그리드가 통째로 받는다.
    두 탭의 세로 총합이 같으므로 카드 예산 산식(:8769)이 그대로 유효하다. */
@@ -39316,6 +40450,12 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
 #charpanel[data-cptab="pet"] #mate-pick .char-card.ch-tiktok::after{ background-image:var(--mate-tiktok-img,none); }
 #charpanel[data-cptab="pet"] #mate-pick .char-card.ch-kkultteok::after{ background-image:var(--mate-kkultteok-img,none); }
 #charpanel[data-cptab="pet"] #mate-pick .char-card.ch-bangul::after{ background-image:var(--mate-bangul-img,none); }
+/* WD-2 §14 — 잠긴 펫 카드에서는 그림도 걷는다. 이 한 줄이 **여기**(아트 규칙
+   전부의 뒤)에 사는 이유는 순전히 캐스케이드다: 위 여덟 줄과 특정도가 같아서
+   앞에 두면 진다. `.cc-lock` 은 카드의 자식이고 이 art 는 카드의 ::after 라,
+   걷지 않으면 자물쇠 판 **위에** 펫이 그대로 서서 잠금이 안 읽힌다.
+   §7A 의 `.pop::after { opacity:0 }` 와 같은 문법이다 — 지우지 않고 걷는다. */
+#charpanel[data-cptab="pet"] #mate-pick .char-card.locked::after{ opacity:0; }
 
 /* ---- 그리드가 아홉 칸이 됐다 ---------------------------------------------
    동료 넷 + "없음" = 다섯이던 줄에 넷이 더해져 아홉이다. flex 1 1 0 · max 112px
