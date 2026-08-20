@@ -37066,8 +37066,14 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
      여유를 붙여 18.50% 로 잡았다(3.072 는 유리판 aspect-ratio — 높이% 를 폭% 로
      옮기는 환산 상수다). left = 22.31 − 18.50/2 = 13.06%.
      화면 결과: 그림 53.3×57.6 → 67.6×73 (**높이 +26.7%**). */
-  left:13.06%;top:22.44%;
-  width:18.50% !important;height:58.72% !important;
+  /* W-B ① — v2 재검(avatar_demon px[273,125,233,328] → 상자 % 16.10/22.64/13.74/59.41).
+     W10 ② 의 수리 원칙을 **그대로** 다시 적용한다: 높이·중심은 문서, 폭만 여유.
+       cx = 16.10 + 13.74/2 = 22.97% (구판 22.31 → +0.66%p)
+       height 59.41% · 그림 비 0.926 이 높이로 차려면 59.41×0.926/3.072 = 17.91%
+       → 여유 붙인 18.50% 를 유지한다. left = 22.97 − 9.25 = 13.72%.
+     구판 한 줄(롤백 근거): left:13.06%;top:22.44%;height:58.72% */
+  left:13.72%;top:22.64%;
+  width:18.50% !important;height:59.41% !important;
   background-position:center bottom;
   /* E3 W8 — 한 장으로 못박혀 있던 자리가 .bs-* 표에 **열렸다**. 폴백을 그대로
      남긴 것이 계약이다: 클래스가 아직 안 붙은 첫 프레임이나 표에 없는 종(種)이
@@ -37095,7 +37101,12 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
        86.52~98.21) 그쪽 "구름"은 왕관이 없다 — 우리 그림에서는 겹침이 곧
        머리 절단이다. 옮긴 뒤 겹침은 약 3px 로 줄고 왕관은 온전히 선다.
        left = 80.30 − 20.00/2 = 70.30%. */
-  left:70.30%;top:14.54%;
+  /* W-B ① — v2 재검(avatar_cloud px[1253,157,298,231] → 상자 % 73.88/28.44/17.57/41.84).
+     문서 cx 82.67% · 아랫변 70.28%. W10 ② 의 두 결정을 그대로 잇는다:
+       ① 높이는 면적 보정값 55.00% 유지 → top = 70.28 − 55.00 = 15.28%
+       ② 왕관 보호를 위한 **cx −2.5%p** 유지 → 80.17%, left = 80.17 − 10 = 70.17%
+     구판 한 줄(롤백 근거): left:70.30%;top:14.54% */
+  left:70.17%;top:15.28%;
   width:20.00% !important;height:55.00% !important;
   background-position:center bottom;
   /* W4 (2026-08-20) — 사용자 반려 "내가 선택한 캐릭터가 아니라 이상한 구름이 나옴".
@@ -37130,7 +37141,11 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
        합쳐야 겹침이 3px 로 떨어진다 — 한쪽만으로는 부족했다.
      ⚠ 윗변(5.01%)을 고정하고 **아래로** 키운다. 위로 키우면 유리판이 화면
      최상단에 붙은 지금(W10 ①) 방울 머리가 화면 밖으로 잘린다. */
-  left:86.01%;top:5.01%;
+  /* W-B ① — v2 재검(avatar_cloud_baby px[1464,28,196,207] → 상자 % 86.32/5.07/11.56/37.49).
+     문서 cx 92.10% · 윗변 5.07%. W10 ② 의 결정(높이 40.00% · 윗변 고정)을 잇는다:
+       left = 92.10 − 12.70/2 = 85.75%.
+     구판 한 줄(롤백 근거): left:86.01%;top:5.01% */
+  left:85.75%;top:5.07%;
   width:12.70%;height:40.00%;
   background-position:center bottom;
   /* W2.5 ② (2026-08-20) — 사용자 반려 "우상단 방울이 내가 고른 펫이 아니다".
@@ -37159,9 +37174,12 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
 }
 #app.battle .dh-castle{
   position:absolute;
-  /* W6.5b-5 — 시안 실측(gm-hud-placement2.json · castle) */
-  left:45.55%;top:2.40%;
-  width:9.03% !important;height:24.65% !important;
+  /* W6.5b-5 — 시안 실측(gm-hud-placement2.json · castle) — 구판: 45.55 / 2.40 / 9.03 / 24.65
+     W-B ① — v2 재검(gm-hud-layers.json · contents.castle px[779,13,151,138]).
+     성은 **유리 구조의 중앙**에 서야 하는데, v2 캔버스는 구조가 0.94~99.65%
+     라 중심이 50.29% 다(50.00 이 아니다). 그래서 좌표가 0.4%p 오른쪽으로 간다. */
+  left:45.93%;top:2.35%;
+  width:8.90% !important;height:25.00% !important;
   margin:0 !important;
   font-size:0 !important;line-height:0 !important;
   background-image:url("catalog/duel-castle-hd.webp");
@@ -37191,7 +37209,19 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
 
 /* ---- 3. HP 바 두 장 = 한 캡슐 ----------------------------------------------
    .dh-side 는 이제 **조각 한 장의 상자 그 자체**다(픽셀 좌표 = 이 상자의 %).
-   그래서 아래의 트랙·명패 좌표는 전부 조각 기준 실측값을 그대로 쓴다. */
+   그래서 아래의 트랙·명패 좌표는 전부 조각 기준 실측값을 그대로 쓴다.
+
+   ▣ W-B ① — v2 재검 결과 **무보정**(차이가 1%p 미만이라 손대지 않는다).
+     두 판의 하단 명패 밴드를 실측으로 비교했다(알파 행 프로파일):
+       v1 밴드 윗변 y318/590 → 상자 57.53% · 구조 아랫변 y577 → 104.39%
+       v2 밴드 윗변 y315/608 → 상자 57.06% · 구조 아랫변 y565 → 102.34%
+     밴드 윗변이 0.47%p 올라가고 밴드가 3.4% 짧아졌을 뿐이다. 현 .dh-foe 를
+     밴드 안 같은 비율로 옮기면 top −0.90%p · height −0.98%p(390 폭에서 1.1px)
+     이고, 문서의 name_tag_L(71.37%)은 오히려 현 값(70.54%)보다 **낮다** —
+     두 추정이 서로 반대 방향으로 1%p 안에 있으니 잡음이다.
+     뼈·날개 두 조각은 gm-hud-layers.json 이 "유지 확정"으로 못 박은 부품이고
+     사용자 판정(evidence-14/33-hpbar-compare.png)도 끝났다. 잡음으로 확정품을
+     흔들지 않는다. */
 #app.battle .dh-side{
   position:absolute;
   display:block;
@@ -38996,7 +39026,33 @@ html[lang="ko"] #modal-mode .r10-ribbon > h2{
      날개바(4) < 뼈바(5). 바뀐 것은 **그림뿐**이고 z 값은 그대로다.
    =========================================================================== */
 
-/* ---- ①②③ 유리 = **통짜 한 장**(glass-hud-full.webp) -----------------------
+/* ===========================================================================
+   W-B ① (2026-08-21) — 유리 1층을 **v2 로 교체**한다.
+   catalog/glass-hud-v2.webp (1696×608) 는 v1(glass-hud-full 1698×590)의
+   **우측 소실 결함**을 고친 판이다. v1 은 배경 추정으로 알파를 뽑아 오른쪽
+   절반의 저알파 구간이 뭉개졌고(실측: 우측 끝 열들의 유효 픽셀이 좌측 대비
+   확연히 얕다), v2 는 사용자가 제공한 **흰 배경판 + 동일 렌더의 체커 배경판**
+   2배경 매팅으로 알파를 역산해 그 결함이 없다(staging.json · glass-hud-v2 참조).
+
+   ▣ 좌표계가 바뀐 것이 이 교체의 핵심이고, 그래서 아래 자식 슬롯도 함께 옮긴다.
+     v1 은 유리 구조가 캔버스를 거의 꽉 채웠지만, v2 는 캔버스 1696×608 안에서
+     구조가 **기준상자 [16,0,1674,558]** 만 차지한다(하단 50px 이 빈칸이다).
+     기준상자는 mockup/gm-hud-layers.json 의 정본 값이고, 그 문서의 % 규칙은
+     gm-hud-placement2.json 과 호환된다(환산배율 x1.1116 · y1.1182).
+
+   ▣ 왜 상자 aspect-ratio(1536/500)를 그대로 두는가
+     `background-size:100% auto` 아래서 캔버스 폭이 상자 폭에 맞으므로
+     실제 그림 좌표는 (x/1696, y/1696 ÷ (500/1536)) 로 상자 % 가 된다.
+     그 셈으로 v2 기준상자는 가로 0.94~99.65% · 세로 0~101.07% 에 앉는다 —
+     **상자를 한 픽셀도 안 바꾸고** 유리 구조가 상자에 거의 정확히 포개진다.
+     상자 비를 1696/608 로 바꾸면 상자가 10.1% 높아져 보드가 그만큼 내려간다
+     (D1 관문이 지키는 타일 크기가 흔들린다). 캔버스 하단 50px 빈칸은 상자
+     밖으로 1.07% 만 흘러넘치고, 그 자리는 #hud-row 의 D1 예약 34px 이다.
+
+   ▣ 구 v1(glass-hud-full.webp)은 **파일로 남는다**. 지우지도 옮기지도 않고
+     화면 참조만 끊었다 — 이 한 줄(background-image)을 되돌리면 곧 롤백이다.
+   =========================================================================== */
+/* ---- ①②③ 유리 = **통짜 한 장**(v1 시절 주석 — 근거는 그대로 유효하다) -----
    사용자 3차 반려: "유리에 모자이크 얼룩 · 조각 조립 티 · HP 바가 분리돼 떠 있다."
    조각 셋을 화면에서 겹치던 앞 판(W6.5b-3)은 좌표는 원판과 정확히 같았지만
    두 가지를 못 고쳤다:
@@ -39028,10 +39084,15 @@ html[lang="ko"] #modal-mode .r10-ribbon > h2{
   border-width:0 !important;
   border-radius:0 !important;
   background-color:transparent !important;
-  background-image:url("catalog/glass-hud-full.webp") !important;
+  /* W-B ① — v1 한 줄(롤백 근거, 파일은 보존):
+       background-image:url("catalog/glass-hud-full.webp") !important; */
+  background-image:url("catalog/glass-hud-v2.webp") !important;
   background-repeat:no-repeat !important;
   background-position:center top !important;
   /* 🚨 W10 ③ — 비율 스캔이 잡은 **유일한 원본 비율 위반**이 이 줄이었다.
+     (W-B ①: v2 는 1696×608(비 2.790) 이라 넘침이 8.4px → 12.9px 로 늘지만,
+      그 자리 역시 아래 주석이 말하는 D1 예약 34px 안이다. `100% auto` 규율은
+      그대로다 — 폭만 맞추고 높이는 원본이 정한다.)
      glass-hud-full.webp 는 1698×590(비 2.878)인데 상자는 aspect-ratio:1536/500
      (비 3.072)이라, `100% 100%` 는 그림을 세로로 6.3% 눌러 그렸다.
      `contain` 은 좌우에 24px 의 빈 틈을 내고 `cover` 는 유리의 둥근 윗변을
@@ -39076,15 +39137,28 @@ html[lang="ko"] #modal-mode .r10-ribbon > h2{
   -webkit-backdrop-filter:none;
   backdrop-filter:none;
 }
-/* 숫자를 캡슐 한가운데 세운다. 좌표는 통짜 판 안에서의 캡슐 위치다
-   (src_box [481,121,1225,419] ÷ 1698×590 = 28.328% · 20.508% · 43.816% · 50.508%)
-   — 글자상자를 캡슐과 **같은 상자**로 두는 것이 가장 단순한 정렬이고,
-   중앙정렬은 이미 flex 가 한다. */
+/* 숫자를 캡슐 한가운데 세운다.
+   구판(v1) 한 줄 — 롤백 근거:
+     src_box [481,121,1225,419] ÷ 1698×590 = 28.328% · 20.508% · 43.816% · 50.508%
+     left:28.328% / width:43.816% / top:20.508% / height:50.508%
+   ⚠ 그 값은 세로를 **캔버스 비율로** 나눠 놓은 것이라(y÷590), `100% auto` 로
+     바뀐 뒤로는 상자 % 와 1.4%p 어긋나 있었다. W-B ① 에서 그 셈을 바로잡는다.
+
+   W-B ① — v2 좌표(mockup/gm-hud-layers.json · 기준상자 [16,0,1674,558]).
+   가로는 3층 `timer_capsule_슬롯` px[488,134,724,264] 을 그대로 옮긴다:
+     left = 488/1696 = 28.77% · width = 724/1696 = 42.69%
+   세로는 **글자가 서야 할 자리**가 정한다. `> i` 글리프 높이는 이 상자의
+   64%(:37876) 이므로, 문서의 `timer_digits` px[625,173,465,179] 가 말하는
+   상자 % 잉크 띠(31.34%~63.76%)를 정확히 채우려면
+     height = 32.42 ÷ 0.64 = 50.66% · top = 47.55 − 50.66/2 = 22.22%
+   가 된다(세로 환산: y% = y_px ÷ 1696 ÷ (500/1536) × 100 = y_px × 0.18113).
+   상자 윗변이 구조 캡슐(24.63%)보다 2.4%p 높지만 글자는 가운데 64% 만 쓰므로
+   화면에서는 잉크가 문서 좌표에 그대로 앉는다 — 상자가 아니라 잉크를 맞춘다. */
 #app.battle #duel-timer{
-  left:28.328% !important;
-  width:43.816% !important;
-  top:20.508% !important;
-  height:50.508% !important;
+  left:28.77% !important;
+  width:42.69% !important;
+  top:22.22% !important;
+  height:50.66% !important;
   border-radius:0 !important;
 }
 
@@ -39986,7 +40060,9 @@ var L=("jelly-box,duel-title-play,sian2-ribbon,sian2-btn-pink,sian2-btn-purple,"
    🚨 W6.5b: `ui-x-jelly` 를 목록에서 뺐다(무지개 X 전량 원복 — 소비처 0).
       대신 유리 HUD 세트 셋을 더한다. 이 셋은 **전투 첫 프레임**에 필요하지만
       전투는 메뉴→맵→노드를 거쳐야 오므로 목록 끝으로도 늦지 않다. */
-      +"glass-hud-full,glass-hud-capsule-st,glass-hud-plate-st,glass-hud-bar-st,"
+      /* W-B ① — 1층 유리가 v2 로 바뀌었다. 데울 대상도 함께 옮긴다.
+         구판 한 조각(롤백 근거, 파일은 보존): "glass-hud-full," */
+      +"glass-hud-v2,glass-hud-capsule-st,glass-hud-plate-st,glass-hud-bar-st,"
       +"sian3-close,art-logo-en,"
       +"ttl-settings,ttl-pause,ttl-rank,ttl-play,ttl-clear,"
       +"ttl-over,ttl-daily,ttl-skin,ttl-chars,"
