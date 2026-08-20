@@ -2,6 +2,33 @@
  "updated": "2026-08-21",
  "worklog": [
   {
+   "t": "2026-08-21 00:07",
+   "wave": "W9",
+   "title": "PC(가로) 레이아웃 — 폭 캡 + 날개 배치, 세로 무영향을 '증명'으로 닫았다",
+   "summary": [
+    "① **넓히지 않고 캡을 씌웠다.** PC 대응의 흔한 실패는 컨테이너를 넓히는 것이다 — 그 순간 #screen-map / #duel-hud 의 container-type:inline-size 가 1cqw 를 다시 계산하고, 그 위에 얹힌 cqw 좌표 50여 개와 노드 % 좌표표가 통째로 어긋난다. 그래서 반대로 갔다: #screen-map 480px 캡(1cqw=4.8px 유지) · #duel-hud 860px 캡(1cqw=8.6px) · 인게임 클러스터 1104px · --board-max 520px. 넓어진 화면은 컨테이너가 아니라 **여백**이 먹고, 그 여백에 날개를 앉힌다. 좌표는 한 줄도 안 바뀐다.",
+    "② **날개는 DOM 이동이 아니라 grid-area 다.** 설계 권고는 matchMedia 리스너로 자식을 양방향 이동시키는 것이었지만, 그러면 롤백 밸브가 둘이 된다(스타일 + 스크립트). #hero-slot·#combo-wrap·#hud-row·#boss-bar·#actionbar 를 **제자리에 둔 채** grid-column/grid-row 로만 좌우 날개에 앉혔다. 세로로 돌아갈 때 되돌릴 이동이 없으므로 리스너도 재부착도 없다. #pc-left/#pc-right 는 그 알맹이들이 앉는 판이 된다.",
+    "③ **롤백 밸브 하나.** 신규 DOM 셋(#pc-bg/#pc-left/#pc-right)은 `hidden` 을 달고 태어나고, 가로 분기 안에서만 스타일이 [hidden] 을 뚫어 켠다. 봉인 규칙을 스타일 블록 **안에 두지 않은** 것이 핵심이다 — 블록을 지웠을 때 새 요소가 되살아나는 사고가 구조적으로 불가능하다. 되돌리기 = <style id=\"pc-landscape\"> 한 블록 삭제.",
+    "④ **--map-bar 는 전역이 아니라 분기 안에서만 동기화했다.** 설계 각주는 10229줄의 `clamp(48px,13.1vh,110px)` 을 `calc(25.61cqw + var(--safe-b))` 로 전역 교체하라고 했다. 실측이 계약 충돌을 짚었다 — 390x844 에서 옛 식 110px vs 새 식 99.9px 이라 전역으로 고치면 **폰 화면이 10px 움직인다**. 이번 파도의 1순위 계약은 '분기 밖 부수효과 0' 이고 그 계약이 이긴다. 그래서 `#screen-map #map-layer`(특이도 2-0-0)로 PC 분기 안에서만 걸었다. 480px 컨테이너에서 25.61cqw = 122.9px = 실제 #map-bot 높이(123px). 실측: 최저 노드 아래끝 947 vs 하단띠 위끝 957 → **잠김 0**(1920x1080), 1280x800 도 667 vs 677 로 동형. ▶ 세로의 어긋남 진단 자체는 유효하다 — 전역 동기화를 원하면 별건 파도 + 별건 회귀 캡처가 필요하다.",
+    "⑤ **설계 표 대비 바꾼 값 셋(전부 근거).** ㉠ 클러스터 폭 1100 → **1104px** — 표의 합산(264+28+520+28+264)이 실제로 1104 라 1100 으로 잡으면 4px 이 넘친다. 중앙 열만 minmax(0,520px) 로 접어 900~1104px 구간의 넘침도 0. ㉡ 전투 메달 높이는 표의 86px 이 아니라 **기존 94px 유지** — @media(max-height:739/659) 가 80/70 으로 줄여 #pc-right 의 438px 계산을 어긋내기 때문. ㉢ #actionbar 의 9슬라이스 띠(--lib-hud-bar)는 border-image-source:none — **가로 띠로 구운 그림**이라 세로로 늘리면 줄무늬가 된다. 판 그리기는 #pc-right 한 장이 맡는다.",
+    "⑥ **신규 에셋 0.** 좌우가 맨살이 되는 문제(1104px 클러스터에만 배경이 깔림)는 #app.battle #screen-game 의 background-image 를 분기 안에서 끄고, 같은 그림을 #pc-bg 가 full-bleed 로 드는 것으로 닫았다. 재고 원판만 쓴다(--art-menu-day-w 1100x892 / --art-map-bg 2600x1271, 흐림 확장). 화면 선택은 일반 형제 결합자 `#screen-map.active ~ #pc-bg` — JS 도 :has() 도 안 쓴다. 그래서 #pc-bg 가 세 스크린보다 **뒤쪽** 형제여야 한다(앞에 두면 결합자 방향이 반대라 못 읽는다).",
+    "⑦ **세로 무영향은 샘플이 아니라 증명이다.** 하네스가 CSSOM 을 직접 읽어 pc-landscape 시트의 최상위 규칙이 `@media (min-aspect-ratio:1/1) and (min-width:900px)` **하나뿐**임을 확인하고, 390x844 · 가로 폰 844x390 · itch 임베드 420x880 세 곳에서 그 미디어가 matches=false 임을 확인한다(1280x800 에서만 true). 최상위 규칙이 그 하나뿐이므로 기여분이 **정의상 0** 이다. 그 위에 실물 증거를 겹쳤다 — 390x844 4화면을 이식 전 원본과 나란히 찍어 **캡처 sha256 동일** + 전 요소 레이아웃 지문(1498/1566/1638/1887개) 동일.",
+    "⑧ **삽입만 358줄.** git diff = 358 insertions(+) / **0 deletions(-)** — 기존 줄을 한 글자도 안 바꿨다. 분기 안에서 '덮은' 자리(#app max-width, .menu-stack --mbw, #board --board-max, #topbar padding-right 62→16px 회수 등)는 전부 되살아난다. --board-max 를 #board **자신에게** 얹은 것도 의도다 — boardMaxPx() 가 읽는 곳이 정확히 거기라 CSS·JS 두 소비자가 한 줄을 공유한다.",
+    "⚑ 검증 규율: 헤드리스 msedge **1대** · --mute-audio · try/finally · 판정과 무관하게 종료 코드 0(합격은 리포트의 ALL PASS 줄로 읽는다). 1280x800 / 1920x1080 x 메뉴·맵·인게임·전투 8장 + 390x844 회귀 8장 = **89 PASS / 0 FAIL**. 실측 요지: 맵 480 캡·상단바 96·하단바 123·노드 세로 잘림 0·바 뒤 침범 0, 인게임 3열 264-520-264·타일 71px(1920)/67px(1280, 현행 52), 전투 HUD 860x280 중앙·메달 우 날개 264x438·타일 71/57px, 맵 가로 드래그 --mx 0.00 → -289.59px, 1920 가로 넘침 0. ⚠ 하네스 함정 하나: `child.kill()` 은 Windows 에서 **직계만** 죽인다 — Edge 는 크래시패드·GPU·렌더러를 별도 트리로 띄우므로 종료 후 taskkill /T 나 user-data-dir 태그로 트리를 훑어 잔존을 0 으로 만들어야 한다(이번 회차 55+11개 회수)."
+   ],
+   "commits": [
+    "a1ff43a"
+   ],
+   "evidence": [
+    "evidence-14/w9-verify-report.txt (89 PASS / 0 FAIL · ALL PASS)",
+    "evidence-14/w9-verify-metrics.json (전 화면 실측 원자료)",
+    "evidence-14/w9-1280x800-{menu,map,game,battle}.png",
+    "evidence-14/w9-1920x1080-{menu,map,game,battle}.png",
+    "evidence-14/w9-portrait-390x844-{menu,map,game,battle}.png (이식 전 원본과 sha256 동일 — 리포트에 해시 4쌍)",
+    "evidence-14/31-pc-design-plan.md (설계 정본)"
+   ]
+  },
+  {
    "t": "2026-08-21 01:30",
    "wave": "W6.5b",
    "title": "전투 화면 완성(유리 통짜 HUD·메달 v3·각성 연쇄) + X/버튼/판 단일 소스화 + 클래식 상단 유리 + 초반 템포·P0 미션 수리",
