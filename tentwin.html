@@ -8347,6 +8347,47 @@ html.no-art-logo .logo-img  { display: none; }
   background: var(--art-stage) center / cover no-repeat;
   box-shadow: inset 0 0 0 3px var(--j-outline), inset 0 -30px 46px rgba(58, 30, 48, .42);
 }
+/* ⭐ W-B ③ (백로그 B1) — 펫 무대 --------------------------------------------
+   반려 이전 상태: 펫 탭에서 동료를 골라도 무대에는 **히어로가 그대로** 서
+   있었다(`cpTab()` 은 data-cptab 만 바꾸고 무대를 한 번도 안 건드렸다).
+   고른 것이 화면에 안 서는 것은 선택창의 존재 이유를 지우는 결함이다.
+
+   ▣ 상자는 `.cp-view` 와 **같은 자리**다(:8428 / 가로모드 :8978 와 짝).
+     히어로가 서던 그 무대 칸에 동료가 서야 "캐릭터처럼 크게"가 성립한다.
+   ▣ 그림은 `--pet-full` 한 칸으로만 들어온다 — JS 는 setStdArt 규약대로
+     `var(--ch-<id>-full)` 을 넣고 `data-art="std"` 를 찍는다. 8종 전부
+     `--ch-<pet>-full` 이 이미 구워져 있어 **새 에셋 0장**이다.
+   ▣ 보이는 조건이 `[data-art]` 인 것이 안전핀이다: 펫 미선택('없음')이면
+     setStdArt 가 속성을 지우므로 이 칸은 사라지고 히어로가 그대로 남는다.
+     JS 가 한 번도 안 불린 첫 프레임도 같다 — 종전 화면과 픽셀이 같다.
+   ▣ 히어로를 `display:none` 이 아니라 opacity 로 접는 이유: `#char-pick` 은
+     translateX 캐러셀이라 display 를 만지면 레이아웃이 다시 서면서 현재
+     인덱스가 튄다. 투명도만 바꾸면 탭을 되돌릴 때 있던 자리에 그대로 있다
+     (cpTab 이 무엇도 리셋하지 않는다는 계약을 여기서도 지킨다).
+   -------------------------------------------------------------------------- */
+.cp-petart {
+  position: absolute;
+  left: 0;
+  right: 62px;
+  top: 12.73%;
+  bottom: 0;
+  z-index: 1;
+  opacity: 0;
+  pointer-events: none;
+  background-image: var(--pet-full, none);
+  background-size: contain;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  filter: drop-shadow(0 6px 14px rgba(58, 30, 48, .38));
+  transition: opacity .18s ease;
+}
+#charpanel[data-cptab="pet"] .cp-petart[data-art] { opacity: 1; }
+/* 일반 형제 선택자 — 그래서 마크업에서 .cp-petart 가 .cp-view 보다 **앞**에 선다. */
+#charpanel[data-cptab="pet"] .cp-petart[data-art] ~ .cp-view { opacity: 0; }
+.cp-view { transition: opacity .18s ease; }
+@media (prefers-reduced-motion: reduce) {
+  .cp-petart, .cp-view { transition: none; }
+}
 .cp-head {
   position: absolute;
   left: 0;
@@ -8555,24 +8596,48 @@ html.no-art-logo .logo-img  { display: none; }
   justify-content: center;
   gap: 7px;
 }
+/* ⭐ W-B ④ (백로그 B3) — 썸네일 액자를 **펫 카드 문법**으로 통일한다.
+   반려: "캐릭터 선택 우측 썸네일 액자의 경계선이 지저분하다."
+   원인은 액자가 `border-image`(목업에서 오린 그림)였다는 데 있다:
+     ① 링 두께가 24/92px 인데 슬라이스가 40 이라 11px 보더 중 **안쪽 4.4px 이
+        투명**이다. 그 띠를 메우려고 .ct-art 가 `inset:-4px` 로 비어져 나가고,
+        `.cav` 는 또 -3px 로 나간다 — 보정이 보정을 부르는 구조였다.
+     ② 그림 액자라 라운드 모서리에서 크림 배경과 액자 픽셀이 어긋나 링이 남는다.
+   펫 카드(:8048)는 같은 일을 **한 겹의 inset box-shadow** 로 한다 — 그림이 아닌
+   선이라 어긋날 자리가 없고, 라운드도 border-radius 하나가 정확히 낸다.
+   그 문법을 그대로 가져온다(색도 같은 팔레트: 평소 rim+salmon · 선택 plate+outline).
+   ▣ 바깥 상자는 한 픽셀도 안 바뀐다 — box-sizing 이 border-box(:199) 라
+     52×52 는 보더가 있든 없든 52×52 다. 랙 배치·간격은 그대로고, 대신 그림이
+     안쪽 30px 이 아니라 52px 전체를 쓰게 되어 얼굴이 커진다.
+   ▣ --ui-chip / --ui-chip-on 은 **지우지 않는다** — .ci-chip(:8722)·.sk-th(:8072)
+     가 같은 변수를 쓴다. 여기서 참조만 끊는다(롤백은 아래 봉인 주석 한 쌍).
+   구판 봉인(되돌리기는 이 두 규칙을 되살리고 아래 .ct-art/.cav 의 inset 을
+   각각 -4px / -3px 로 돌리면 된다):
+     .cp-th{ border:11px solid transparent; border-image:var(--ui-chip) 40 stretch;
+             border-radius:15px;
+             background:linear-gradient(180deg,rgba(255,243,220,.92),rgba(240,220,184,.92));
+             background-clip:border-box; }
+     .cp-th[aria-current="true"]{ border-image:var(--ui-chip-on) 36 stretch; }
+   봉인 끝 */
 .cp-th {
   flex: 0 0 auto;
   position: relative;
   width: 52px;
   height: 52px;
   padding: 0;
-  border: 11px solid transparent;
-  border-image: var(--ui-chip) 40 stretch;
-  border-radius: 15px;
-  background: linear-gradient(180deg, rgba(255, 243, 220, .92), rgba(240, 220, 184, .92));
-  /* 14차 — 원래 padding-box. 액자 안쪽 투명 띠(위 .ct-art 주석)가 라운드 모서리에
-     조금 남는데, 그 자리에 무대가 비치는 대신 크림이 깔리게 한다. */
-  background-clip: border-box;
+  border: 0;
+  border-radius: 14px;
+  background: var(--j-rim);
+  box-shadow: inset 0 0 0 2.5px var(--j-salmon);
+  /* 그림이 상자 전체를 쓰므로 모서리는 여기서 한 번만 자른다 — .ct-art 가
+     자기 radius 를 또 들 이유가 없어진다(보정의 보정을 없앤 자리다). */
+  overflow: hidden;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
 .cp-th[aria-current="true"] {
-  border-image: var(--ui-chip-on) 36 stretch;
+  background: var(--j-plate);
+  box-shadow: inset 0 0 0 2.5px var(--j-outline);
   filter: drop-shadow(0 0 8px rgba(255, 211, 74, .75));
 }
 .cp-th:active { transform: scale(.94); }
@@ -8581,13 +8646,12 @@ html.no-art-logo .logo-img  { display: none; }
    있으므로 화면이 다시 프레이밍할 이유가 없다. */
 .ct-art {
   position: absolute;
-  /* 14차 흰 띠 수리 — 원래 inset: -1px.
-     --ui-chip 의 액자 링은 24/92 px 두께인데 슬라이스가 40 이라, 11px 보더 중
-     바깥 6.6px 만 실제 액자이고 안쪽 4.4px 은 투명이다. 그 띠에 뒤의 무대가
-     비쳐 **썸네일마다 회청색 링**이 보였다(= "흰 띠 얼룩"의 선택창 실물).
-     -4px 은 그 투명 구간만 정확히 덮는다(액자 픽셀은 한 줄도 먹지 않는다). */
-  inset: -4px;
-  border-radius: 11px;
+  /* W-B ④ — 구판은 `inset:-4px; border-radius:11px` 이었다. 그 -4px 은
+     border-image 액자의 **투명 안쪽 띠**(위 봉인 주석 ①)를 덮으려던 보정이고,
+     액자가 사라진 지금은 덮을 띠가 없다. 0 으로 돌리면 그림이 상자와 정확히
+     같은 자리에 앉고, 모서리는 .cp-th 의 overflow:hidden 이 한 번만 자른다.
+     14차 주석이 말한 "썸네일마다 회청색 링"의 원인 자체가 없어진 자리다. */
+  inset: 0;
   background-image: var(--char-thumb, none);
   background-size: cover;
   background-position: center;
@@ -8596,10 +8660,9 @@ html.no-art-logo .logo-img  { display: none; }
 /* 표준 썸네일이 없는 캐릭터는 SVG 폴백이 액자를 채운다 — 회색 빈칸 금지(§9-4). */
 .cp-th .cav {
   position: absolute;
-  left: -3px;
-  right: -3px;
-  top: -3px;
-  bottom: -3px;
+  /* W-B ④ — 구판은 사방 -3px 이었다. .ct-art 의 -4px 과 같은 성격의 보정
+     (액자 안쪽 투명 띠 메우기)이라 액자와 함께 걷는다. 이제 상자 = 그림 상자다. */
+  inset: 0;
   width: auto;
   height: auto;
   overflow: visible;
@@ -8976,6 +9039,9 @@ html.no-art-logo .logo-img  { display: none; }
   .cp-head { left: -66.67%; width: 66.67%; right: auto; height: clamp(42px, calc(50vh - 135px), 60px); }
   #charpanel #cp-close { right: -66%; }
   .cp-view { left: 62px; right: 0; top: 0; }
+  /* W-B ③ — 펫 무대는 언제나 `.cp-view` 와 같은 상자다. 가로에서는 랙이
+     왼쪽으로 가므로(바로 아래 줄) 비는 쪽도 반대가 된다. */
+  .cp-petart { left: 62px; right: 0; top: 0; }
   .cp-rack { left: 3px; right: auto; top: 8%; bottom: 8%; }
   /* 14차 #판정 — .cp-arrow 제거(가로 배치 override). 근거는 1/4 블록 참조.
      가로에서 랙이 실제로 살아 있는지 **실렌더로 먼저 확인**하고 지웠다:
@@ -13637,6 +13703,13 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
     <div class="cp-frame">
       <div class="cp-stage">
         <span class="cp-sky" aria-hidden="true"></span>
+        <!-- W-B ③ (백로그 B1) — 펫 무대. 히어로가 `.cp-view` 안 카드의 `.cc-art`
+             로 서듯, 동료는 이 한 칸에 자기 full 아트로 **캐릭터처럼 크게** 선다.
+             빈 칸으로 태어나고 `data-art` 가 붙을 때만 보이므로(setStdArt 규약),
+             배선 전이나 펫 미선택('없음')에서는 종전 화면과 픽셀이 같다.
+             `.cp-sky` 바로 뒤에 두는 것이 요점 — 뒤따르는 `.cp-view` 를
+             일반 형제 선택자(`~`)로 접을 수 있는 유일한 자리다. -->
+        <span class="cp-petart" aria-hidden="true"></span>
         <div class="cp-head">
           <h2 id="cp-h" data-i18n="pick.head">Character Select</h2>
           <button id="cp-close" class="icon-btn x-btn" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
@@ -25963,12 +26036,33 @@ window.TT_SFX = {
     cpTabCur = (k === 'pet') ? 'pet' : 'char';
     if (!root || !root.setAttribute) return;
     root.setAttribute('data-cptab', cpTabCur);
+    cpPetStage();             /* W-B ③ — 탭이 곧 무대의 주인을 바꾼다 */
     var tabs = root.querySelectorAll ? root.querySelectorAll('.cp-tab') : null;
     if (!tabs) return;
     for (var i = 0; i < tabs.length; i++) {
       tabs[i].setAttribute('aria-selected',
         tabs[i].getAttribute('data-cptab') === cpTabCur ? 'true' : 'false');
     }
+  }
+
+  /** W-B ③ (백로그 B1) — 펫 무대. 고른 동료가 무대에 **캐릭터처럼 크게** 선다.
+   *
+   *  이 함수가 하는 일은 딱 하나다: `.cp-petart` 에 --pet-full 을 채우거나 비운다.
+   *  보이고 숨는 판단은 전부 CSS 가 한다(`[data-cptab="pet"]` × `[data-art]`) —
+   *  cpTab 이 세운 "JS 는 display 를 만지지 않는다" 는 계약을 그대로 잇는다.
+   *
+   *  setStdArt 는 표준 아트가 있으면 `var(--ch-<id>-full)` 을 넣고 data-art 를
+   *  찍고, 없으면 **둘 다 지운다**. 그래서 세 경우가 한 줄로 닫힌다:
+   *    · 동료 선택  → 그 동료가 서고 히어로는 접힌다
+   *    · '없음'     → data-art 가 없어 무대는 히어로 그대로(종전 화면)
+   *    · 캐릭터 탭 → 같은 이유로 무대는 히어로(위 CSS 의 [data-cptab] 조건)
+   *  MATE_IDS 8종은 전부 CHAR_STD 에 있어 `--ch-<pet>-full` 이 이미 구워져 있다.
+   */
+  function cpPetStage() {
+    var el = $('charpanel');
+    var art = el && el.querySelector ? el.querySelector('.cp-petart') : null;
+    if (!art) return;
+    setStdArt(art, cpTabCur === 'pet' ? mateId() : '', 'full', '--pet-full');
   }
 
   function openCharPanel() {
@@ -26052,6 +26146,7 @@ window.TT_SFX = {
     store.mateId = v;
     persist();
     syncCharPick();
+    cpPetStage();             /* W-B ③ — 고른 동료가 곧바로 무대에 선다 */
     applyCharSkin();
     J.sfx.ui();
     if (v) J.sfx.voice(v, 3);
