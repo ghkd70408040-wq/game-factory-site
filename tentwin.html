@@ -36784,8 +36784,10 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
   pointer-events:none;
 }
 #app.battle #duel-foe-av{
-  left:11.32%;top:22.16%;
-  width:16.91% !important;height:56.12% !important;
+  /* W6.5b-5 — 시안 실측(avatar_demon). 시안에서 데몬은 **발이 HP 바 뒤로 물린다** —
+     z-index:2 가 뼈바(5)보다 아래라 그 물림이 이미 성립한다. */
+  left:15.34%;top:22.44%;
+  width:13.94% !important;height:58.72% !important;
   /* E3 W8 — 한 장으로 못박혀 있던 자리가 .bs-* 표에 **열렸다**. 폴백을 그대로
      남긴 것이 계약이다: 클래스가 아직 안 붙은 첫 프레임이나 표에 없는 종(種)이
      오면 종전의 그 한 장이 선다 — 빈 사각형이 생길 자리가 없다. */
@@ -36794,8 +36796,11 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
   z-index:2;
 }
 #app.battle #duel-me-av{
-  left:73.30%;top:20.95%;
-  width:17.09% !important;height:49.81% !important;
+  /* W6.5b-5 — 시안 실측(avatar_cloud). 시안에서 구름은 명패 **위에 얹힌다**(데몬과
+     앉힘 방식이 다르다) — 날개바가 z 4 이고 이쪽이 2 라 지금은 뒤로 물린다.
+     그 차이는 조각의 알파가 결정하므로 좌표만 옮기고 z 는 안 건드린다. */
+  left:73.90%;top:28.06%;
+  width:17.80% !important;height:41.48% !important;
   /* W4 (2026-08-20) — 사용자 반려 "내가 선택한 캐릭터가 아니라 이상한 구름이 나옴".
      원인은 정확히 아래 한 줄이었다: !important 로 못 박힌 시안 구름이라
      duelHudMount 가 --duel-me-face 에 무엇을 넣든 화면에서는 늘 구름이 이겼다.
@@ -36817,8 +36822,9 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
   z-index:2;
 }
 #app.battle #duel-baby{
-  left:84.62%;top:2.69%;
-  width:12.41%;height:39.88%;
+  /* W6.5b-5 — 시안 실측(avatar_cloud_baby) */
+  left:86.52%;top:5.01%;
+  width:11.69%;height:37.07%;
   /* W2.5 ② (2026-08-20) — 사용자 반려 "우상단 방울이 내가 고른 펫이 아니다".
      #duel-me-av 와 같은 개방 문법이다: duelHudMount 가 선택 동료의 face 를
      --pet-face 로 주입하고, 주입이 없을 때만(= 펫 미선택) 시안 구름이 선다.
@@ -36845,8 +36851,9 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
 }
 #app.battle .dh-castle{
   position:absolute;
-  left:45.63%;top:1.22%;
-  width:8.83% !important;height:25.24% !important;
+  /* W6.5b-5 — 시안 실측(gm-hud-placement2.json · castle) */
+  left:45.55%;top:2.40%;
+  width:9.03% !important;height:24.65% !important;
   margin:0 !important;
   font-size:0 !important;line-height:0 !important;
   background-image:url("catalog/duel-castle-hd.webp");
@@ -36900,7 +36907,11 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
   z-index:2;
 }
 #app.battle .dh-foe{
-  left:1.40%;top:68.89%;width:49.21%;height:30.75%;
+  /* W6.5b-5 — 시안 실측: 조각의 좌우 끝은 뼈 캡이다(bone_cap_L_left 2.06% ~
+     bone_cap_L_right 오른끝 49.53%), 세로는 이름표 위(70.54%)부터 바 아래까지.
+     ⚠ 시안의 좌우 HP 바는 **비대칭**이다(좌 622px · 우 498px) — 대칭으로
+     맞추면 그게 곧 시안 위반이라 각자 자기 폭을 갖는다. */
+  left:2.06%;top:70.54%;width:47.47%;height:29.10%;
   /* 좌상단 모서리는 원본에서 직각으로 잘렸다(절단 노트 ②) — CSS 로 라운딩한다. */
   border-top-left-radius:6% 22%;
   overflow:hidden;
@@ -36908,7 +36919,11 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
 }
 #app.battle .dh-foe::after{background-image:url("catalog/duel-hpbar-bone.webp");}
 #app.battle .dh-me{
-  left:49.83%;top:69.42%;width:49.04%;height:30.21%;
+  /* W6.5b-5 — 시안 실측: 날개 캡 좌 53.52% ~ 우 끝 100.34%. 사용자 반려
+     "HP 바가 분리돼 떠 있다"의 절반이 여기 있었다 — 종전 49.83% 는 왼쪽 바와
+     0.78% 겹쳐 있었고(절단면을 가리려던 값), 시안은 그 둘 사이를 **벌려** 놓고
+     그 틈으로 명패 유리가 보이게 한다. */
+  left:53.52%;top:70.54%;width:46.82%;height:29.10%;
   z-index:4;
 }
 #app.battle .dh-me::after{background-image:url("catalog/duel-hpbar-wing.webp");}
@@ -38673,102 +38688,61 @@ html[lang="ko"] #modal-mode .r10-ribbon > h2{
      날개바(4) < 뼈바(5). 바뀐 것은 **그림뿐**이고 z 값은 그대로다.
    =========================================================================== */
 
-/* ---- ①②③ 유리 세 부재 = **사용자 원판의 상대 배치 그대로** ---------------
-   사용자 재확정: "똑같이 만들어." 그래서 좌표를 새로 고르지 않는다 — 추출 당시의
-   판정 리포트(tentwin/assets/art/incoming/mockup/gemini/out/glass-hud-report.json)
-   가 세 부재를 **원판 캔버스 1698×608 어디서 오려 냈는지**를 이미 픽셀로 들고
-   있고, 그 세 상자를 그대로 되돌려 놓는 것이 곧 원판의 조립이다:
+/* ---- ①②③ 유리 = **통짜 한 장**(glass-hud-full.webp) -----------------------
+   사용자 3차 반려: "유리에 모자이크 얼룩 · 조각 조립 티 · HP 바가 분리돼 떠 있다."
+   조각 셋을 화면에서 겹치던 앞 판(W6.5b-3)은 좌표는 원판과 정확히 같았지만
+   두 가지를 못 고쳤다:
+     ① 겹치는 구간에서 두 부재의 반투명이 **두 번 곱해져** 이음매가 진해진다.
+        (알파 합성은 곱셈이라 CSS 로 겹치는 한 피할 수 없다.)
+     ② 추출 당시 체커보드 배경의 잔재가 본문 저알파 구간에 남아 모자이크로 읽힌다.
+   그래서 원판 좌표(glass-hud-report.json 의 src_box)로 **한 장**을 합성하고 면의
+   얼룩만 평탄화한 통짜 판을 배경으로 쓴다 — 1698×590, straight alpha, 무손실.
+   조각 3장 배선(슬래브 배경 + ::before 명패 + ::after 캡슐)은 아래에 주석 봉인.
 
-     slab     src_box [   4,   0, 1698, 300]   1694×300
-     capsule  src_box [ 481, 121, 1225, 419]    744×298
-     plate    src_box [   3, 292, 1698, 590]   1695×298
-
-   여기서 시안의 "한 몸"이 왜 한 몸인지가 그대로 읽힌다 — capsule 의 위(121)는
-   slab 안(0~300)이고 아래(419)는 plate 안(292~590)이다. 즉 캡슐은 두 판에
-   **동시에 파묻혀** 있고, 겹치는 구간에서 서로의 밝은 림이 교차한다. 부재를
-   떼어 놓거나 캡슐을 타이머 상자에 9슬라이스로 씌우면 그 교차가 사라진다
-   (aaf6f03 이 그랬고 사용자가 "조립 티"로 반려했다).
-
-   ▣ 단위는 **HUD 상자의 %** 다 (cqw 가 아니다 — 실측으로 갈아탄 이유가 있다)
-     처음엔 `cqw` 로 썼는데 실렌더에서 세 부재의 배율이 서로 어긋났다. 원인은
-     컨테이너 질의 단위의 규칙이다: **요소는 자기 자신을 질의하지 못한다.**
-     그래서 `#duel-hud` 자신의 background-size 에 쓴 cqw 는 조상(뷰포트 390px)을
-     재고, 자식 ::before/::after 의 cqw 는 #duel-hud(372px)를 재서 둘이 5% 어긋난다
-     (실측: slab 이 원판 1694 대신 1729.5 로 나왔다).
-     %는 그 함정이 없다 — 배경은 자기 배경상자를, 절대배치 자식은 같은 패딩상자를
-     기준으로 하므로 셋이 **한 상자**를 공유한다.
-     환산: 원판 캔버스 1698 = HUD 폭 100%. HUD 는 aspect-ratio 1536/500 이므로
-     세로 1 원판px = (100/1698) × 3.072 = **0.18091%** 다.
-
-   ▣ 9슬라이스를 **한 장도 안 쓴다**
-     세 부재 다 자기 원본 비율 그대로 놓이므로 늘릴 이유가 없다. 캡슐의
-     43.816% : 53.91% 는 폭 기준으로 0.43816W : 0.17548W = 2.4966 = 744:298 —
-     왜곡 0 이 산술로 닫힌다.
+   ▣ 왜 aspect 를 1698/590 으로 안 바꾸는가
+     시안(gm-ingame-battle.png) 실측에서 유리 조립은 1520×490(비 3.102)이다.
+     원판 자체는 1698×590(비 2.878) 이므로 **시안이 이미 세로로 7.8% 눌러 놨다**.
+     HUD 상자(1536/500 = 3.072)는 그 눌린 비와 1% 안에서 같다. 즉 통짜 판을
+     이 상자에 100% 100% 로 채우는 것이 시안의 그 눌림을 그대로 재현하는 길이고,
+     상자 비를 원판으로 되돌리면 오히려 시안보다 8px 두꺼워진다.
    ---------------------------------------------------------------------------- */
 #app.battle #duel-hud{
-  /* 🚨 W6.5b — 사용자 반려 "상단 유리 HUD 가 잘려 있다". 실측이 그 말대로였다:
-     HUD 상자가 y=48 에서 시작하는데(전투에서도 #topbar 가 48px 를 먹는다) 슬래브는
-     **위쪽 림이 없는 부재**라, 그 48px 아래에서 시작하면 위가 잘린 판으로 읽힌다.
-     시안(gm-ingame-battle.png)에서 슬래브는 화면 맨 위에 붙고 일시정지 버튼이
-     그 위에 뜬다 — 즉 원래 배치가 "붙어서 잘린 것처럼 보이는" 것이 아니라
-     **붙어 있는** 것이다.
-     그래서 압축이 아니라 **위치 교정**이다: 비율·크기는 한 값도 안 바꾸고 상자만
-     34px 끌어올린다. 아래로는 명패 바가 상자 밖으로 6.7%(약 8px) 내려오므로
-     그만큼을 margin-bottom 에서 되찾는다 — 두 값이 합쳐 **약 40px** 를
-     보드에 돌려주고, 그 40px 이 곧 열매 크기다(byH = (area.h − gap×(rows−1)) ÷ rows).
-     ⚠ 성 꼭대기(.dh-castle top 1.22%)는 상자 안이라 잘리지 않는다 — 끌어올린
-       뒤에도 화면 위쪽에 그만큼 여유가 남는지가 검증의 관문이다. */
+  /* 위치 교정(W6.5b-4) 유지 — 근거는 그 파도의 주석. */
   margin-top:-34px !important;
   margin-bottom:-8px !important;
-  /* ⑥ 열매 확대의 나머지 몫 — 아래 `#app.battle #hud-row` 주석이 본문이다. */
   border-image-source:none !important;
   border-image-width:0 !important;
   border-width:0 !important;
   border-radius:0 !important;
   background-color:transparent !important;
-  background-image:url("catalog/glass-hud-slab-st.webp") !important;
+  background-image:url("catalog/glass-hud-full.webp") !important;
   background-repeat:no-repeat !important;
-  background-position:left top !important;      /* src_box x=4 → 0.24%, 0.9px 이라 0 으로 둔다 */
-  background-size:99.764% 54.273% !important;   /* 원판 1694×300 */
+  background-position:center top !important;
+  background-size:100% 100% !important;
 }
-/* 명패 바 = plate. HP 바 두 장(뼈 z5 · 날개 z4)이 그 위에 앉는다. */
+/* 조각 3장 배선 — 통짜 판으로 대체되어 봉인(삭제 0). 되돌리기는 이 주석 한 쌍.
 #app.battle #duel-hud::before{
-  content:"";
-  position:absolute;
-  left:0.177%;                   /* src_box x=3   */
-  top:52.826%;                   /* src_box y=292 × 0.18091 */
-  width:99.823%;                 /* 1695 */
-  height:53.911%;                /* 298  */
+  content:"";position:absolute;
+  left:0.177%;top:52.826%;width:99.823%;height:53.911%;
   background-image:url("catalog/glass-hud-plate-st.webp");
-  background-repeat:no-repeat;
-  background-position:center;
-  background-size:100% 100%;
-  pointer-events:none;
-  z-index:0;
+  background-repeat:no-repeat;background-position:center;background-size:100% 100%;
+  filter:drop-shadow(0 2px 4px rgba(46,20,58,.28));pointer-events:none;z-index:0;
 }
-/* 타이머 캡슐 = capsule. ::before 와 같은 z 지만 **뒤에 있어 위에 그려진다** —
-   시안에서 캡슐이 두 판 위로 떠 있는 그 순서다. 숫자는 .dh-mid(z1) 안이라
-   캡슐보다 위에 서고, 성(z3)·데몬(z2)은 그대로 그 위다. */
 #app.battle #duel-hud::after{
-  content:"";
-  position:absolute;
-  left:28.328%;                  /* src_box x=481 */
-  top:21.890%;                   /* src_box y=121 × 0.18091 */
-  width:43.816%;                 /* 744 */
-  height:53.911%;                /* 298 */
+  content:"";position:absolute;
+  left:28.328%;top:21.890%;width:43.816%;height:53.911%;
   background-image:url("catalog/glass-hud-capsule-st.webp");
-  background-repeat:no-repeat;
-  background-position:center;
-  background-size:100% 100%;
-  pointer-events:none;
-  z-index:0;
+  background-repeat:no-repeat;background-position:center;background-size:100% 100%;
+  pointer-events:none;z-index:0;
 }
-/* ---- 타이머 상자는 이제 **글자만** 든다 ------------------------------------
-   유리는 위 ::after 가 그리므로 이 겹은 비운다. 🚨 여기서 반드시 꺼야 하는 것이
+   조각 배선 봉인 끝 */
+
+/* ---- 타이머 상자는 **글자만** 든다 -----------------------------------------
+   유리는 통짜 판이 그린다. 🚨 여기서 반드시 꺼야 하는 것이
    `box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.86)` 다(:35832 의 시안 4호
    유리겹) — 반경을 0 으로 두는 순간 그 흰 링이 **직사각형**이 되어 캡슐 둘레에
-   네모 자국으로 남는다(사용자 반려의 그 자국이다. 실측: 타이머 경계선 1.5px 흰색).
-   backdrop-filter 도 함께 끈다: 사각 상자 모양으로 뒤를 흐려 같은 자국을 만든다.
+   네모 자국으로 남는다(사용자 반려의 그 자국). backdrop-filter 도 사각 상자
+   모양으로 뒤를 흐려 같은 자국을 만든다. 둘 다 끈다.
    글자 젤리·얼음(chill)·데인저(danger) 세 상태는 요소 자신과 `> i` 글리프에
    걸려 있어 이 절이 한 줄도 안 건드린다. */
 #app.battle #duel-timer::before{
@@ -38780,13 +38754,15 @@ html[lang="ko"] #modal-mode .r10-ribbon > h2{
   -webkit-backdrop-filter:none;
   backdrop-filter:none;
 }
-/* 숫자를 캡슐 한가운데 세운다 — 상자를 캡슐과 **같은 좌표**로 옮기는 것이
-   가장 단순한 정렬이다(중앙정렬은 이미 flex 가 한다). */
+/* 숫자를 캡슐 한가운데 세운다. 좌표는 통짜 판 안에서의 캡슐 위치다
+   (src_box [481,121,1225,419] ÷ 1698×590 = 28.328% · 20.508% · 43.816% · 50.508%)
+   — 글자상자를 캡슐과 **같은 상자**로 두는 것이 가장 단순한 정렬이고,
+   중앙정렬은 이미 flex 가 한다. */
 #app.battle #duel-timer{
   left:28.328% !important;
   width:43.816% !important;
-  top:23.596% !important;        /* 캡슐 중심(48.846%) − 글자상자 절반(25.25%) */
-  height:50.500% !important;
+  top:20.508% !important;
+  height:50.508% !important;
   border-radius:0 !important;
 }
 
@@ -39307,7 +39283,7 @@ var L=("jelly-box,duel-title-play,sian2-ribbon,sian2-btn-pink,sian2-btn-purple,"
    🚨 W6.5b: `ui-x-jelly` 를 목록에서 뺐다(무지개 X 전량 원복 — 소비처 0).
       대신 유리 HUD 세트 셋을 더한다. 이 셋은 **전투 첫 프레임**에 필요하지만
       전투는 메뉴→맵→노드를 거쳐야 오므로 목록 끝으로도 늦지 않다. */
-      +"glass-hud-capsule-st,glass-hud-slab-st,glass-hud-plate-st,glass-hud-bar-st,"
+      +"glass-hud-full,glass-hud-capsule-st,glass-hud-plate-st,glass-hud-bar-st,"
       +"sian3-close,art-logo-en,"
       +"ttl-settings,ttl-pause,ttl-rank,ttl-play,ttl-clear,"
       +"ttl-over,ttl-daily,ttl-skin,ttl-chars,"
