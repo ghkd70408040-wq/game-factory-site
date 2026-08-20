@@ -5529,6 +5529,126 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
 #modal-adv .sheet.lost { box-shadow: 0 0 0 1px rgba(255, 122, 107, .35), 0 26px 70px rgba(0, 0, 0, .6); }
 #modal-adv .sheet.lost #adv-title { color: var(--t9); }
 
+/* ---- 17.6b W-C 루트 리빌 — 보상 순차 공개 (STAGE-OPS §10) ------------------
+   결과 시트가 획득물을 "이미 다 반영된 최종 상태"로 한 번에 보여 주던 자리를
+   **하나씩 튀어나오는** 슬롯 리스트로 바꾼다. 값은 판 중에 이미 확정된 것을
+   보여 주기만 하므로(§10.3 밸런스 위치) 여기에는 판정에 닿는 규칙이 없다.
+
+   신규 에셋 0 이 이 블록의 설계 제약이었고, 지켜졌다:
+     · 아이콘 글리프  = 판 위의 mk 배지와 **같은 🐾⭐**(§7 .tile[data-mk])
+     · 원반           = 그 배지의 `--mk-disc` radial-gradient 를 그대로 복사
+     · 팝             = mkpulse 의 스쿼시 문법을 한 번만 재생하는 형태
+     · 별 3슬롯       = 기존 `adv-star-in` 키프레임을 픽마다 재생
+   슬롯은 기본이 opacity:0 이다 — JS 가 자기 차례에 .in 을 붙일 때만 보인다.
+   획득이 0 이면 <ul> 이 [hidden] 인 채로 남아 연출 자체가 생략된다. */
+.reward-reveal {
+  list-style: none;
+  margin: 10px 0 4px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.reward-reveal[hidden] { display: none; }
+.rw-slot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px 5px 6px;
+  border-radius: 13px;
+  font-size: 14px;
+  font-weight: 800;
+  opacity: 0;
+  transform: scale(.4);
+  /* ⚠ 롱핸드 둘로 나눈다(단축 금지 규율). 나누는 것이 기능상으로도 옳다:
+     희귀 등급이 아래에서 background-image 만 갈아 끼우기 때문이다. */
+  background-color: rgba(255, 255, 255, .07);
+  background-image: none;
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.rw-slot.in { animation: rw-pop 420ms var(--spring) forwards; }
+@keyframes rw-pop {
+  0%   { opacity: 0; transform: scale(.4); }
+  62%  { opacity: 1; transform: scale(1.14); }
+  100% { opacity: 1; transform: scale(1); }
+}
+/* 원반 = §7 mk 배지와 같은 얼굴. 같은 과일이 판에서와 결과창에서 다르게 생기면
+   "그 과일"로 안 읽힌다 — 그래서 그라디언트 세 줄을 그대로 옮겼다. */
+.rw-ico {
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  line-height: 1;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, .92);
+  background-image: var(--rw-disc, none);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, .38),
+    inset 0 0 0 1.5px rgba(255, 255, 255, .85);
+}
+.rw-ico[data-disc="pet"]  { --rw-disc: radial-gradient(circle at 38% 32%, #FFE3F0 0 30%, #FFB6D5 62%, #FF8FC5 100%); }
+.rw-ico[data-disc="star"] { --rw-disc: radial-gradient(circle at 38% 32%, #FFF6D2 0 30%, #FFE08A 62%, #FFC53D 100%); }
+.rw-ico[data-disc="gem"]  { --rw-disc: radial-gradient(circle at 38% 32%, #DFF6FF 0 30%, #9FD8F5 62%, #58AEE8 100%); }
+.rw-name { flex: 1 1 auto; text-align: left; }
+.rw-val {
+  flex: 0 0 auto;
+  font-variant-numeric: tabular-nums;
+  color: var(--t8);
+}
+/* 획득이라는 사실은 부호가 말한다. countUp 이 쓰는 것은 숫자뿐이라(그 함수를
+   한 줄도 고치지 않으려고) 부호는 CSS 가 붙인다. */
+.rw-val::before { content: '+'; }
+
+/* 희귀도 4단(§10.2 표). 등급이 오를수록 **화면 점유가 넓어진다** — 흔함은 팝만,
+   보통은 테두리가 물들고, 희귀는 광채가 슬롯을 훑고, 최희귀는 거기에 전면
+   플래시(J.screenPulse·J.vignette 재사용, JS 쪽)가 얹힌다. 넷 다 같은 rw-pop
+   위에 얹히므로 transform 은 한 곳에서만 쓰인다(애니메이션 충돌 0). */
+.rw-slot[data-rar="normal"] { box-shadow: inset 0 0 0 1px rgba(245, 216, 74, .40); }
+.rw-slot[data-rar="rare"] {
+  background-image: linear-gradient(100deg, rgba(255, 255, 255, 0) 38%, rgba(255, 255, 255, .22) 50%, rgba(255, 255, 255, 0) 62%);
+  background-size: 260% 100%;
+  background-position: 120% 0;
+  box-shadow: inset 0 0 0 1px var(--rw-glow, rgba(160, 220, 255, .55));
+}
+.rw-slot[data-rar="rare"].in  { animation: rw-pop 460ms var(--spring) forwards, rw-shine 900ms var(--ease) 300ms 1; }
+.rw-slot[data-rar="epic"] {
+  background-image: linear-gradient(100deg, rgba(255, 255, 255, 0) 34%, rgba(255, 255, 255, .34) 50%, rgba(255, 255, 255, 0) 66%);
+  background-size: 260% 100%;
+  background-position: 120% 0;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 231, 143, .85),
+    0 0 22px rgba(245, 216, 74, .45);
+}
+.rw-slot[data-rar="epic"].in  { animation: rw-pop 520ms var(--spring) forwards, rw-shine 1100ms var(--ease) 300ms 2; }
+@keyframes rw-shine {
+  0%   { background-position: 120% 0; }
+  100% { background-position: -60% 0; }
+}
+
+/* 별 3슬롯. 컨테이너의 통짜 등장(adv-star-in)을 끄고, 픽마다 **같은 키프레임**을
+   시차로 다시 튼다 — 새 키프레임을 만들지 않은 이유가 그것이다(별의 등장 곡선은
+   이미 확정된 것이고, 바뀌는 것은 몇 개가 언제냐 뿐이다). */
+#adv-stars.rw-seq { animation: none; }
+#adv-stars.rw-seq .rw-pip { display: inline-block; opacity: 0; }
+#adv-stars.rw-seq .rw-pip.on { animation: adv-star-in 520ms var(--spring) forwards; }
+
+@media (prefers-reduced-motion: reduce) {
+  /* 동작 최소화 = **애니 없이 최종값 정적 표시**(§10.2 스킵 존중 문단). JS 도
+     같은 판단을 따로 내려 간격을 0 으로 접지만, 둘 중 하나만 남아도 화면은
+     정지 상태로 옳다. */
+  .rw-slot, .rw-slot.in,
+  .rw-slot[data-rar="rare"].in, .rw-slot[data-rar="epic"].in {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+  #adv-stars.rw-seq .rw-pip, #adv-stars.rw-seq .rw-pip.on { opacity: 1; animation: none; }
+}
+
 /* ---- 17.7 HUD: 목표 칩 + 미션 시계 ---------------------------------------- */
 #adv-goal {
   display: flex;
@@ -14451,6 +14571,11 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
     <!-- Grade slot. game.js injects e.g. `<span class="grade s">S</span><span class="grade-note">…</span>`.
          Hides itself while empty, so a mode without grading needs no extra toggling. -->
     <div id="clear-grade"></div>
+    <!-- W-C §10 루트 리빌. 점수 정산표(#clear-rollup)보다 **위**에 있는 것이
+         이 한 줄의 설계다: 정산은 "얼마였나"이고 리빌은 "무엇을 얻었나"인데,
+         반려 사유가 후자의 부재였다. 마크업은 비어 있고 [hidden] 이다 —
+         획득이 0 인 판에서는 game.js 가 이 자리를 열지 않는다(연출 생략). -->
+    <ul id="clear-reward" class="reward-reveal" aria-live="polite" hidden></ul>
     <ul id="clear-rollup"></ul>
     <p class="rollup-total"><span data-i18n="clear.total">Total</span> <b id="clear-total">0</b></p>
     <!-- v4 C-4: one honest line about the next board, built by nextStagePreview()
@@ -14622,6 +14747,10 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
        어긋나 "다시 도전"을 누르려다 "지도로"를 누르는 사고가 난다. -->
   <div id="modal-adv" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="adv-title"><div class="sheet jbox jbox--modal">
     <h2 id="adv-title">Stage 1 clear!</h2>
+    <!-- W-C §10 루트 리빌. 순서가 사양 그대로다: 파편(현재는 🐾⭐ 특수과일
+         수확분) → 코인/젤리별 → **별 3슬롯**(아래 #adv-stars 가 그 슬롯이고,
+         리빌이 픽을 하나씩 점등한다). 그래서 리스트가 별보다 위에 앉는다. -->
+    <ul id="adv-reward" class="reward-reveal" aria-live="polite" hidden></ul>
     <div id="adv-stars" class="adv-stars" aria-hidden="true"></div>
     <p class="big-score"><b id="adv-score">0</b></p>
     <p id="adv-note" class="sub-score"></p>
@@ -14639,6 +14768,10 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
          No data-i18n on purpose — paintOverModal() owns it and re-paints it after
          every language switch, exactly like #over-title and #over-best-label. -->
     <p id="over-rank-line" class="rank-line" hidden></p>
+    <!-- W-C §10 루트 리빌. 게임오버에도 붙는 이유: 진 판에서도 이미 벌어 놓은
+         것은 벌어 놓은 것이다(수확은 판 중에 확정된다). 다만 **획득이 있을 때만**
+         열린다 — 빈 리스트를 띄우면 "0을 얻었다"를 축하하는 꼴이 된다. -->
+    <ul id="over-reward" class="reward-reveal" aria-live="polite" hidden></ul>
     <!-- AD SLOT: rewarded video, grants +2 Add to continue. Hidden by default;
          the portal rewarded-ad wrapper replaces this div and adds .ad-live. -->
     <div class="ad-slot ad-reward" data-ad-slot="rewarded">Ad</div>
@@ -17126,6 +17259,39 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
       if (!gate('missionFail')) return;
       if (playSfxClip('mission-fail', at(), MATCH_PEAK * 0.75)) return;
       SFX.fail();
+    },
+
+    /**
+     * W-C §10 — 보상 슬롯의 "띵". 신규 클립 0: milestone 의 착지 벨(A6 + 배음 +
+     * 받침 + 시머)이 **그대로 골격**이고, 바뀐 것은 기음 하나다.
+     *
+     * `step` = 몇 번째 슬롯인가. 슬롯마다 **장2도(2반음)씩 올라간다** — 여기서
+     * 상행을 쓰는 근거는 이 신스의 관용구다: 위로 가는 소리는 팡파르(tierUp)·
+     * 필살기 스윕·그리고 여기뿐이라(§SFX 주석), 드물기 때문에 "쌓인다"로 읽힌다.
+     * 등차 상행 자체가 8비트 서명이라는 v4 의 반성은 **콤보 사다리**를 겨눈
+     * 것이었고(초당 여러 번 울리는 축), 이 소리는 판당 두어 번, 240ms 간격으로
+     * 서너 발이 끝이다 — 같은 패턴이 같은 문제를 만들지 않는 자리다.
+     *
+     * 5 에서 포화시킨 것은 대역 보호다. 슬롯이 §11 파편·§12 아이템으로 늘어도
+     * 최고음은 C#6+10반음(약 1.98kHz)을 넘지 않는다 — 매치 팡의 바디 위지만
+     * 잭팟 착지 벨(E7)보다는 아래라, 서열이 뒤집히지 않는다.
+     * 피크 0.105 = 콤보 스팅(0.100)과 같은 급. 결과창에는 매치음이 없으므로
+     * 조연 자리로도 충분히 들리고, win() 팡파르를 가리지도 않는다.
+     */
+    reward: function (step) {
+      if (!gate('reward')) return;
+      var n = clamp(step | 0, 0, 5);
+      var t0 = at();
+      var f  = 1108.73 * Math.pow(2, (n * 2) / 12);        // C#6 에서 2반음씩
+      // ① 어택 — 짧은 삼각 + 옥타브 사인. milestone 의 3음 아르페지오 자리다.
+      tone('triangle', f, f, t0, 0.16, 0.105, 0.004);
+      tone('sine', f * 2, f * 2, t0, 0.10, 0.030, 0.004);
+      // ② 벨 꼬리 — 완전5도 위와 옥타브 아래 받침. "띵"의 여운은 여기서 난다.
+      var bt = t0 + 0.055;
+      tone('sine', f * 1.5, f * 1.5, bt, 0.46, 0.062, 0.005);
+      tone('sine', f * 0.5, f * 0.5, bt, 0.40, 0.036, 0.010);
+      // ③ 시머 — milestone 과 같은 고역 노이즈, 길이만 절반.
+      noise(bt, 0.26, 0.022, 'highpass', 3000, 8600, 0.6, 0.03);
     }
   };
 
@@ -21403,7 +21569,18 @@ window.TT_SFX = {
                     * 이름이 없으면 J.sfx.awakenMax 자체가 안 만들어져 호출이
                     * TypeError 로 터진다. 구버전 juice.js 면 no-op 이 되어
                     * 만땅이 조용해질 뿐, 게이지 회계는 그대로 돈다. */
-                   'awakenMax'];
+                   'awakenMax',
+                   /* W-C §10 — 보상 슬롯 "띵"(슬롯 번호마다 피치 상승). 위 넷과
+                    * 같은 계약이다: 이 표에 이름이 없으면 J.sfx.reward 자체가
+                    * 안 만들어져 호출이 TypeError 로 터진다. 구버전 juice.js 면
+                    * no-op 이 되어 리빌이 조용해질 뿐, 슬롯 등장·카운트업·스킵은
+                    * 사운드와 무관하게 그대로 돈다. */
+                   'reward',
+                   /* W-C §10 — 별 3슬롯의 "챠랑". 신스가 아니라 **이미 구워져
+                    * 있던** star-get/0..2 클립(3단 [0,4,7] 반음)이고, 여태
+                    * 아무도 부르지 않아 이 표에 이름이 없었다. 리빌이 첫
+                    * 소비자다 — 새로 만든 소리가 아니라 놀고 있던 소리다. */
+                   'starGet'];
 
   /* 14차 수리 3 — 한 번의 탭 안에서 ui() 가 여러 번 불려도 소리는 한 번만.
      쓰이는 자리는 bindJuice 의 셔임 하나뿐이다(그 주석에 근거를 적어 뒀다). */
@@ -22428,6 +22605,11 @@ window.TT_SFX = {
       'clear.next': 'Next stage',
       'aria.next': 'Go to next stage',
 
+      /* W-C §10 루트 리빌 — 결과 시트의 획득 슬롯 라벨. */
+      'rw.starfruit': 'Awaken fruit',
+      'rw.petfruit': 'Pet fruit',
+      'rw.gem': 'Jelly stars',
+
       'over.title': 'Out of moves',
       'over.best': 'Best',
       'over.stage': 'Stage',
@@ -23188,6 +23370,13 @@ window.TT_SFX = {
       'clear.total': '합계',
       'clear.next': '다음 단계',
       'aria.next': '다음 단계로',
+
+      /* W-C §10 루트 리빌 — 결과 시트의 획득 슬롯 라벨. 판 위의 마크 이름
+         (mk.pet·mk.star)과 **다른 말**을 쓰지 않는다: 같은 과일을 판에서는
+         "각성", 결과창에서는 다른 이름으로 부르면 그게 그건 줄 모른다. */
+      'rw.starfruit': '각성 과일',
+      'rw.petfruit': '펫 과일',
+      'rw.gem': '젤리별',
 
       'over.title': '더 이상 지울 수 없어요',
       'over.best': '최고',
@@ -23984,6 +24173,15 @@ window.TT_SFX = {
     stageStartedAt: 0,       // per-stage clock, feeds the clear grade
     stageMaxCombo: 1,        // per-stage best combo, feeds the clear grade
     mission: null,           // {id, goal, prog, done} — endless only
+    /* W-C §10 — 이 판이 수확한 특수과일 수. **연출만 읽는 칸**이다: 실제 효과
+     * (펫 잔여 +1 · 각성 만땅)는 수확하는 그 순간 이미 적용되고, 여기 쌓이는
+     * 것은 결과 시트가 "무엇을 얻었나"를 말하기 위한 사본일 뿐이다. 그래서
+     * 저장하지 않는다 — 판이 끝나면 뜻이 없고, 다음 판은 0 에서 시작한다. */
+    gainPet: 0, gainStar: 0,
+    /* 이번 판이 **새로** 적립한 젤리별. advFinish 가 계산한 그 값의 사본이고,
+     * 지갑(store.jstar)은 거기서 이미 늘었다 — 여기 있는 것은 시트가 읽을 숫자
+     * 하나뿐이다. 모험 밖에서는 언제나 0 이다. */
+    gainGem: 0,
     feverOn: false, feverUntil: 0, feverScore: 0, feverCdUntil: 0,
     rushEndAt: 0, addCdUntil: 0, rushBeatAt: 0,
     pausedAt: 0,             // wall clock at pause, used to shift deadlines
@@ -27951,6 +28149,14 @@ window.TT_SFX = {
     passiveReset();     // v3: 새 판 = 패시브의 누적·장전·배너 기억 전부 초기화
     pvChip('');
     layoutRowsReset();  // D1: 타일 크기의 행 기준도 판마다 새로 잡는다
+    /* W-C §10 — 수확 사본은 판 단위다. 여기서 지우지 않으면 다음 판의 결과 시트가
+       지난 판의 획득을 다시 축하한다(엔들리스는 한 세션에서 startStage 를 몇 번씩
+       탄다). rewardReveal 의 진행 중 타이머도 같이 끊는다 — clearTimers() 가 바로
+       위에서 later() 큐를 비웠으므로 남는 것은 리스너뿐이다. */
+    S.gainPet = 0;
+    S.gainStar = 0;
+    S.gainGem = 0;
+    rwReset();
     applyCharSkin();    // 마스코트 슬롯을 선택 캐릭터로 (메뉴에서 바꿨을 수 있다)
     S.stage = stage;
     /* genBoardBanded (EXT) wraps PURE genBoard with a valid-pair target band.
@@ -28862,6 +29068,12 @@ window.TT_SFX = {
      * 비전투 판에는 mk 가 존재할 수 없지만, 방어적으로 게이트를 한 겹 둔다 —
      * 저장된 옛 판이나 손잡이(window.Game)로 심어진 셀이 여기 닿을 수 있다. */
     if ((mkPet || mkStar) && battleOn()) {
+      /* W-C §10 — 결과 시트가 읽을 사본. 효과 적용과 **같은 게이트 안**에 두는
+         것이 요점이다: 게이트 밖에서 세면 전투가 아닌 판(마크가 존재할 수 없는
+         판)에 손잡이로 심어진 셀까지 집계돼, 시트가 아무도 받지 못한 보상을
+         축하하게 된다. 여기서 세는 것은 언제나 "실제로 걸린 것"이다. */
+      S.gainPet  += mkPet;
+      S.gainStar += mkStar;
       var mkC = tileCenter(dying.length ? dying[0] : a);
       if (mkPet) {
         /* 🐾 펫 과일 — 잔여 +1. 상한은 DUEL_PET_MAX 가 아니라 MK_PET_CAP(= +2)이다:
@@ -29743,6 +29955,237 @@ window.TT_SFX = {
     return id;
   }
 
+  /* =========================================================================
+   * SECTION 12b — W-C 보상 연출 "루트 리빌" (STAGE-OPS §10)
+   *
+   * 반려 사유는 "뭘 얻었는지 불명확"이었고, 원인은 획득이 **판 중에 조용히**
+   * 일어나는데 결과창은 정지 요약이라는 데 있었다. 그래서 이 절이 하는 일은
+   * 딱 하나다: **이미 확정된 값을 하나씩 늦게 보여 주는 것**.
+   *
+   * ⚠ 계수 0. 여기에는 점수·별·게이지·저장을 건드리는 줄이 없다 — 값을 만드는
+   *   곳은 전부 판 안(mk 수확 루프 · advFinish 의 젤리별 적립)이고, 이 절은
+   *   그 결과를 읽기만 한다. 로얄매치의 "코인이 총합으로 빨려드는" 연출과 같은
+   *   자리이고, PURE·133 어느 쪽에도 닿지 않는다.
+   *
+   * 세 창(엔들리스 클리어 · 모험 결과 · 게임오버)이 **같은 컴포넌트 하나**를
+   * 부른다. 창마다 다른 것은 넘기는 리스트 id 와 별 슬롯 유무뿐이다.
+   * ========================================================================= */
+
+  var RW_LEAD_MS = 220;      // 시트가 뜨고 첫 슬롯이 튀기까지
+  var RW_STEP_MS = 240;      // 슬롯 사이 간격 — reward 피치 사다리의 보폭이기도 하다
+  var RW_PIP_MS  = 170;      // 별 픽 점등 간격 (슬롯보다 촘촘해야 "한 세트"로 읽힌다)
+  var RW_TAIL_MS = 120;      // 마지막 픽이 뜨고 done 까지의 여유
+
+  var rwTimers = [];         // 진행 중인 리빌이 예약한 later() id
+  var rwOff    = null;       // 탭-스킵 리스너 해제자 (없으면 null)
+
+  /** 동작 최소화 = 애니 없이 최종값 정적 표시(§10.2). cutinHoldMs 와 같은 문법. */
+  function rwReduced() {
+    var mq = (typeof window !== 'undefined' && window.matchMedia)
+      ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+    return !!(mq && mq.matches);
+  }
+
+  /** 진행 중인 리빌을 흔적 없이 걷는다. 새 리빌·새 판이 시작할 때 불린다. */
+  function rwReset() {
+    for (var i = 0; i < rwTimers.length; i++) clearTimeout(rwTimers[i]);
+    rwTimers.length = 0;
+    if (rwOff) { try { rwOff(); } catch (e) {} rwOff = null; }
+    /* 별 컨테이너의 통짜 등장 애니를 껐던 표식을 되돌린다. 여기서 지우지 않으면
+       리빌을 타지 않는 다음 시트(획득 0)에서 별이 애니 없이 튀어 나온다. */
+    var sv = $('adv-stars');
+    if (sv && sv.classList) sv.classList.remove('rw-seq');
+  }
+
+  function rwAt(fn, ms) { rwTimers.push(later(fn, ms)); }
+
+  /**
+   * 이 판의 획득물, §10.2 의 **고정 순서** 그대로. 순서가 고정이라 학습 부담이
+   * 0 이고, 희귀도 오름차순이라 클라이맥스가 뒤에 온다.
+   *
+   *   1) 파편 조각   §11 파편이 붙기 전에는 특수과일 수확분(⭐🐾)이 이 자리를 쓴다
+   *   2) 코인/젤리별 이번 판에 **새로 딴 별**만큼 적립된 젤리별 (advFinish 가 준다)
+   *   3) 별 3슬롯    리스트가 아니라 #adv-stars 가 맡는다 (rewardReveal opt.stars)
+   *   4) 파편 보석   §11 예약 — 지금은 생산자가 없다. rar:'rare' 가 그 자리다.
+   *   5) 최희귀      §12 예약 — 마찬가지. rar:'epic' 이 컷인 급 연출을 받는다.
+   *
+   * 4·5 를 "언젠가"가 아니라 **지금 받을 수 있게** 열어 둔 것이 §10.3 의 정합
+   * 각주다: 파편/아이템이 도착하면 이 함수에 push 두 줄이 늘 뿐, 연출·CSS·
+   * 사운드는 한 줄도 안 바뀐다.
+   */
+  function rewardItems(opt) {
+    var o = opt || {};
+    var out = [];
+    if ((S.gainStar | 0) > 0) {
+      out.push({ ico: '⭐', disc: 'star', key: 'rw.starfruit', val: S.gainStar | 0, rar: 'common' });
+    }
+    if ((S.gainPet | 0) > 0) {
+      out.push({ ico: '🐾', disc: 'pet', key: 'rw.petfruit', val: S.gainPet | 0, rar: 'common' });
+    }
+    if ((o.gem | 0) > 0) {
+      out.push({ ico: '💎', disc: 'gem', key: 'rw.gem', val: o.gem | 0, rar: 'normal' });
+    }
+    return out;
+  }
+
+  /**
+   * 순차 공개를 튼다. 세 결과창의 **유일한** 연출 소유자다.
+   *
+   * @param listId  슬롯이 들어갈 <ul class="reward-reveal"> 의 id
+   * @param items   rewardItems() 가 만든 목록 (빈 배열 가능)
+   * @param opt     { starEl, stars, sheetId, done }
+   *                 starEl  별 3슬롯 컨테이너 id (모험만). 픽을 하나씩 점등한다.
+   *                 stars   그중 **채워진** 별 수 — 소리는 이만큼만 난다
+   *                 sheetId 탭-스킵을 받을 모달 id
+   *                 done    전량 공개가 끝난 뒤 한 번 불린다
+   * @return 연출을 실제로 켰는가 (false = 획득 0 → 생략)
+   */
+  function rewardReveal(listId, items, opt) {
+    var o = opt || {};
+    rwReset();
+    var list   = $(listId);
+    var starEl = o.starEl ? $(o.starEl) : null;
+    var stars  = clamp(o.stars | 0, 0, 3);
+    var i;
+    items = items || [];
+    if (list) { list.innerHTML = ''; list.hidden = true; }
+
+    /* 획득이 0 이면 아무것도 열지 않는다. 빈 리스트를 띄우는 것은 "0 을 얻었다"를
+       축하하는 꼴이고, 그건 반려당한 정지 요약보다 나쁘다. 시트 자체는 종전
+       그대로 뜬다 — 이 함수는 시트의 소유자가 아니라 그 위의 한 겹일 뿐이다. */
+    var seqStars = !!(starEl && starEl.textContent);
+    if (!list || (!items.length && !seqStars)) {
+      if (o.done) o.done();
+      return false;
+    }
+
+    /* ---- 슬롯 DOM. 전부 opacity:0 으로 태어난다(CSS §17.6b) ---------------- */
+    if (items.length) list.hidden = false;
+    for (i = 0; i < items.length; i++) {
+      var it = items[i];
+      var li = document.createElement('li');
+      li.className = 'rw-slot';
+      li.setAttribute('data-rar', it.rar || 'common');
+      var ic = document.createElement('span');
+      ic.className = 'rw-ico';
+      if (it.disc) ic.setAttribute('data-disc', it.disc);
+      ic.textContent = it.ico || '';
+      var nm = document.createElement('span');
+      nm.className = 'rw-name';
+      /* data-i18n 을 찍는 이유는 rollupRow 와 같다 — 언어를 바꿔도 applyI18n()
+         이 이 자리를 다시 번역한다(시트가 떠 있는 채로 토글할 수 있다). */
+      nm.setAttribute('data-i18n', it.key);
+      nm.textContent = t(it.key);
+      var vb = document.createElement('b');
+      vb.className = 'rw-val';
+      vb.textContent = '0';
+      li.appendChild(ic);
+      li.appendChild(nm);
+      li.appendChild(vb);
+      list.appendChild(li);
+      it._el = li;
+      it._num = vb;
+      it._on = false;
+    }
+
+    /* ---- 별 3슬롯. 통짜 문자열을 픽 단위로 쪼갠다 --------------------------
+       ★☆ 를 지우고 새 DOM 을 만드는 것이 아니라, paintAdvSheet 가 이미 써 놓은
+       **그 글자 그대로** 를 span 에 나눠 담는다. 시트 내용의 소유자는 끝까지
+       paintAdvSheet 이고, 여기서 바뀌는 것은 몇 개가 언제 보이느냐 뿐이다. */
+    var pips = [];
+    if (seqStars) {
+      var txt = String(starEl.textContent || '');
+      starEl.innerHTML = '';
+      for (i = 0; i < txt.length; i++) {
+        var sp = document.createElement('span');
+        sp.className = 'rw-pip';
+        sp.textContent = txt.charAt(i);
+        starEl.appendChild(sp);
+        pips.push(sp);
+      }
+      if (starEl.classList) starEl.classList.add('rw-seq');
+    }
+
+    var reduced = rwReduced();
+
+    /** 한 슬롯이 "띵!" 하고 착지한다. 등급이 화면 점유를 정한다(§10.2 표). */
+    function land(idx) {
+      var e = items[idx];
+      if (!e || e._on) return;
+      e._on = true;
+      if (e._el.classList) e._el.classList.add('in');
+      J.sfx.reward(idx);                 // 슬롯 번호 = 피치 계단
+      J.vibrate(idx === 0 ? 18 : 12);
+      /* 최희귀(§12 예약)만 화면 전체를 잡는다. 컷인 인프라를 **새로 세우지 않고**
+         그 인프라가 쓰는 두 연출만 재사용한다 — 결과 시트가 이미 떠 있는데 그
+         위에 컷인을 또 세우면 버튼이 2초간 가려진다. */
+      if (e.rar === 'epic' && typeof window !== 'undefined') {
+        J.screenPulse();
+        J.vignette(0.42);
+      }
+      countUp([{ el: e._num, target: e.val }], null, 0, null);
+    }
+
+    /** 별 픽 하나. `snd` 가 거짓이면 빈 별(☆)이라 보이기만 하고 울지 않는다. */
+    function lightPip(k, snd) {
+      if (pips[k] && pips[k].classList) pips[k].classList.add('on');
+      if (snd) J.sfx.starGet(k);
+    }
+
+    /** 전량 공개. 예약된 나머지를 즉시 끝내고 리스너·타이머를 걷는다. */
+    function finish(skipped) {
+      var k, pending = false;
+      for (k = 0; k < items.length; k++) {
+        if (!items[k]._on) { pending = true; items[k]._on = true; }
+        if (items[k]._el.classList) items[k]._el.classList.add('in');
+        items[k]._num.textContent = String(items[k].val);
+      }
+      for (k = 0; k < pips.length; k++) {
+        if (pips[k].classList && !pips[k].classList.contains('on')) {
+          pending = true;
+          pips[k].classList.add('on');
+        }
+      }
+      for (k = 0; k < rwTimers.length; k++) clearTimeout(rwTimers[k]);
+      rwTimers.length = 0;
+      if (rwOff) { try { rwOff(); } catch (e) {} rwOff = null; }
+      /* 스킵은 **한 발**로 닫는다. 남은 슬롯 수만큼 띵을 몰아 치면 스킵이 벌처럼
+         들리고, 무음으로 끝내면 눌린 것이 먹혔는지 알 수 없다. 새 소리를 만들지
+         않고 같은 reward 의 최고음 한 발을 쓴다. */
+      if (skipped && pending) J.sfx.reward(items.length ? items.length - 1 : 0);
+      if (o.done) o.done();
+    }
+
+    /* ---- 스킵 존중: 탭 = 완성 (§10.2 · STORY-CUTS §4-2 계승) --------------
+       pointerdown 인 이유는 버튼 위를 눌러도 스킵이 **먼저** 들리게 하기
+       위해서다. 아무것도 막지 않으므로 그 버튼의 click 은 그대로 제 일을 한다. */
+    var host = o.sheetId ? $(o.sheetId) : null;
+    if (host && host.addEventListener && !reduced) {
+      var onTap = function () { finish(true); };
+      host.addEventListener('pointerdown', onTap);
+      host.addEventListener('touchstart', onTap, { passive: true });
+      rwOff = function () {
+        host.removeEventListener('pointerdown', onTap);
+        host.removeEventListener('touchstart', onTap);
+      };
+    }
+
+    if (reduced) { finish(false); return true; }
+
+    var acc = RW_LEAD_MS;
+    for (i = 0; i < items.length; i++) {
+      (function (idx, ms) { rwAt(function () { land(idx); }, ms); })(i, acc);
+      acc += RW_STEP_MS;
+    }
+    for (i = 0; i < pips.length; i++) {
+      (function (k, ms, snd) { rwAt(function () { lightPip(k, snd); }, ms); })(
+        i, acc + i * RW_PIP_MS, i < stars);
+    }
+    rwAt(function () { finish(false); },
+         acc + pips.length * RW_PIP_MS + RW_TAIL_MS);
+    return true;
+  }
+
   /**
    * What a stage actually generates, mirroring applySpecials' own gates rather
    * than specialKinds() alone. specialKinds(1) reports wild:true, but applySpecials
@@ -29889,6 +30332,11 @@ window.TT_SFX = {
     if (inter) inter.hidden = !(S.stage % 3 === 0);
 
     openModal('modal-clear');
+    /* W-C §10 — 루트 리빌. 엔들리스에는 아직 마크 과일이 없어(수확은 전투 판의
+       것이다) 이 자리는 대개 조용하지만, 배선을 여기 두는 것이 §10.3 의 "점진
+       확장" 그대로다: §11 파편이 붙는 순간 이 창이 **한 줄도 안 고치고** 같은
+       연출을 얻는다. 획득이 0 인 판에서는 rewardReveal 이 스스로 생략한다. */
+    rewardReveal('clear-reward', rewardItems({}), { sheetId: 'modal-clear' });
 
     /* Time Rush exists but nothing has ever pointed at it. The first stage clear is
      * the moment the player has proved they understand the board, which is when a
@@ -30076,6 +30524,10 @@ window.TT_SFX = {
       // Fired with the sheet, not before it: the float text is drawn on #fx
       // above the modal, and landing it on an empty board reads as a glitch.
       celebrateRank(newRank);
+      /* W-C §10 — 진 판에도 리빌이 붙는다. 수확은 판 중에 확정되므로 "졌지만
+         얻은 것"은 실재하고, 그걸 안 보여 주면 게임오버가 손해로만 읽힌다.
+         **획득이 있을 때만** 열리는 것은 rewardReveal 이 보장한다. */
+      rewardReveal('over-reward', rewardItems({}), { sheetId: 'modal-over' });
     }, 520);
   }
 
@@ -33419,6 +33871,9 @@ window.TT_SFX = {
       J.vibrate(60);
       mascotSad();
     }
+    /* W-C §10 — 시트가 읽을 사본 한 줄. 지갑은 위에서 이미 늘었고(store.jstar),
+       여기서 하는 일은 "이번 판이 새로 딴 몫"을 결과창까지 들고 가는 것뿐이다. */
+    S.gainGem = gemGain | 0;
     paintAdvSheet(win, stars, why, p);
     /* 해금 연출이 결과 시트보다 **먼저** 온다. 순서가 반대면 "격파했다 → 점수는
        이만큼 → 아 그리고 공주도 풀려났다"가 되어, 챕터 하나를 통째로 건 사건이
@@ -33442,7 +33897,32 @@ window.TT_SFX = {
       }, 900);
       return;
     }
-    later(function () { openModal('modal-adv'); }, win ? 420 : 520);
+    later(function () { openAdvSheet(); }, win ? 420 : 520);
+  }
+
+  /**
+   * W-C §10 — 모험 결과 시트를 여는 **유일한 자리**.
+   *
+   * openModal('modal-adv') 을 직접 부르던 세 곳이 여기로 모인다. 모은 이유는
+   * 리빌이 "시트가 실제로 뜨는 순간"에 시작해야 하기 때문이다: 진입은 세 갈래
+   * (정상 종료 · unlock DOM 부재 폴백 · 해금 확인 버튼)이고, 어느 하나를
+   * 놓치면 그 경로에서만 연출이 조용히 빠진다 — 재현이 어려운 종류의 결함이다.
+   *
+   * 별 개수를 인자로 받지 않고 **#adv-stars 를 세는** 것이 의도다. 그 자리의
+   * 소유자는 paintAdvSheet 이고, 시트가 뜨는 순간 화면에 실제로 서 있는 별이
+   * 곧 리빌이 점등해야 할 별이다. 인자로 들고 다니면 두 값이 갈라질 수 있다.
+   */
+  function openAdvSheet() {
+    openModal('modal-adv');
+    var sv = $('adv-stars');
+    var txt = (sv && !sv.hidden) ? String(sv.textContent || '') : '';
+    var full = 0;
+    for (var i = 0; i < txt.length; i++) { if (txt.charAt(i) === '★') full++; }
+    rewardReveal('adv-reward', rewardItems({ gem: S.gainGem }), {
+      starEl: 'adv-stars',
+      stars: full,
+      sheetId: 'modal-adv'
+    });
   }
 
   /* ---- 젤리공주 해금 이벤트 (v4 5차 §1) -------------------------------------
@@ -33454,7 +33934,7 @@ window.TT_SFX = {
    * -------------------------------------------------------------------------- */
   function runUnlock() {
     var el = $('unlock');
-    if (!el) { openModal('modal-adv'); return; }   // DOM 이 없어도 진행은 막히지 않는다
+    if (!el) { openAdvSheet(); return; }           // DOM 이 없어도 진행은 막히지 않는다
     setText('unlock-h', t('unlock.title'));
     setText('unlock-line', t('unlock.line'));
     setText('unlock-sub', t('unlock.sub'));
@@ -33478,7 +33958,7 @@ window.TT_SFX = {
     var el = $('unlock');
     if (el) { el.classList.remove('go'); el.hidden = true; }
     J.sfx.ui();
-    openModal('modal-adv');
+    openAdvSheet();
   }
 
   function paintAdvSheet(win, stars, why, p) {
@@ -35840,6 +36320,14 @@ window.TT_SFX = {
     celebrateRank: celebrateRank, openRankModal: openRank, setRankTab: setRankTab,
     onGameOver: onGameOver, onStageClear: onStageClear, finishDaily: finishDaily,
     store: store,
+    /* W-C §10 루트 리빌 — DEBUG HANDLES ONLY, 위 규약 그대로다(게임 코드는 이
+     * 중 무엇도 window.Game 을 거쳐 부르지 않는다). 관문이 슬롯 순서·타이밍·
+     * 스킵·"획득 0 이면 생략"을 판정하려면 ① 목록을 직접 만들어 넣고 ② 실제로
+     * 울린 소리를 세야 한다. `J` 를 함께 내보내는 것이 ②의 전부다 — 호출부가
+     * J.sfx.reward 를 매번 조회하므로, 하네스가 그 자리를 스파이로 갈아 끼우면
+     * 트리거가 그대로 잡힌다. */
+    rewardReveal: rewardReveal, rewardItems: rewardItems, openAdvSheet: openAdvSheet,
+    J: J,
     /* v4 4차-a 모험 — 난이도 기준표 대조·하트 상태머신·별 판정을 DOM 없이
      * 돌려 보기 위한 핸들. 게임 코드는 이 중 무엇도 window.Game 을 거쳐
      * 부르지 않는다 (위 debug handles 와 같은 규약). */
