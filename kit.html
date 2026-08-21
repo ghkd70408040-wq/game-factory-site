@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>🧱 기준 킷 — 틴트윈</title>
+
+<!-- 정본 토큰·부품. 게임과 **같은 파일**을 읽는다(불일치 원천 차단). -->
+<link rel="stylesheet" href="catalog/ui-kit.css">
+
+<style>
+/* 갤러리 껍데기 전용 CSS. 부품 자체 모양은 절대 여기서 손대지 않는다 —
+   손대는 순간 "갤러리에선 되는데 게임에선 안 된다"가 생긴다. */
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; padding:0 0 40px;
+  font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  background:#F4EFE6; color:#3A2B22;
+  /* 다크/라이트 무관하게 읽히도록 배경·글자를 명시 고정한다. */
+  color-scheme:light;
+}
+.wrap{max-width:390px;margin:0 auto;padding:0 12px}
+
+header.top{
+  position:sticky; top:0; z-index:9;
+  background:#FFF8EC; border-bottom:2px solid #E4D3B8;
+  padding:10px 12px 8px;
+  box-shadow:0 2px 8px rgba(83,28,40,.10);
+}
+header.top h1{margin:0;font-size:1.05rem;letter-spacing:-.01em}
+header.top .sub{margin:2px 0 0;font-size:.72rem;color:#7A5F4E}
+
+.sum{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.sum b{
+  font:700 .74rem/1 inherit; padding:6px 10px; border-radius:999px;
+  background:#EFE2CB; color:#5C4033; white-space:nowrap;
+}
+.sum b.ok{background:#DFF3E8;color:#1F6B52}
+.sum b.wait{background:#FDF0CE;color:#7A5A12}
+.sum b.no{background:#FADFD9;color:#8E2F24}
+
+.bar{height:8px;border-radius:999px;background:#E4D3B8;overflow:hidden;margin-top:8px}
+.bar>i{display:block;height:100%;background:#54B99D;width:0}
+
+.card{
+  background:#FFFCF5; border:1px solid #E4D3B8; border-radius:14px;
+  margin:12px 0; overflow:hidden;
+  box-shadow:0 2px 6px rgba(83,28,40,.08);
+}
+.card>summary{
+  list-style:none; cursor:pointer; padding:10px 12px;
+  display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+}
+.card>summary::-webkit-details-marker{display:none}
+.card>summary .nm{font-weight:800;font-size:.92rem}
+.card>summary .id{font:600 .68rem/1 ui-monospace,Menlo,Consolas,monospace;color:#8A6553}
+.badge{font:700 .68rem/1 inherit;padding:5px 9px;border-radius:999px;white-space:nowrap}
+.badge.wait{background:#FDF0CE;color:#7A5A12}
+.badge.ok{background:#DFF3E8;color:#1F6B52}
+.badge.no{background:#FADFD9;color:#8E2F24}
+.meta{display:flex;gap:5px;flex-wrap:wrap;width:100%;margin-top:2px}
+.meta span{
+  font:600 .66rem/1 inherit;padding:4px 7px;border-radius:6px;
+  background:#F2E8D6;color:#6E5544;
+}
+.body{padding:0 12px 12px;border-top:1px dashed #E4D3B8}
+.body h3{margin:12px 0 6px;font-size:.74rem;color:#8A6553;letter-spacing:.02em}
+.rows{display:flex;flex-direction:column;gap:8px}
+.row{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  padding:8px;border-radius:10px;background:#F7F0E2;
+}
+.row .lab{font:700 .68rem/1 inherit;color:#6E5544;min-width:64px}
+.stage{
+  flex:1 1 150px;min-width:0;display:flex;align-items:center;justify-content:center;
+  min-height:56px;padding:8px;border-radius:8px;
+  background:
+    linear-gradient(45deg,#E9DFCC 25%,transparent 25%,transparent 75%,#E9DFCC 75%),
+    linear-gradient(45deg,#E9DFCC 25%,#FBF6EA 25%,#FBF6EA 75%,#E9DFCC 75%);
+  background-size:14px 14px; background-position:0 0,7px 7px;
+  overflow-x:auto;
+}
+.note{margin:10px 0 0;font-size:.72rem;line-height:1.5;color:#6E5544}
+.tok{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+.tok code{
+  font:600 .64rem/1 ui-monospace,Menlo,Consolas,monospace;
+  padding:4px 6px;border-radius:5px;background:#EFE6D3;color:#5C4033;
+}
+.swat{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.swat i{
+  width:52px;flex:0 0 auto;font:600 .58rem/1.35 ui-monospace,Menlo,Consolas,monospace;
+  font-style:normal;color:#6E5544;text-align:center;
+}
+.swat i b{display:block;height:34px;border-radius:8px;border:1px solid rgba(110,70,58,.22);margin-bottom:3px}
+.err{margin:16px 12px;padding:12px;border-radius:10px;background:#FADFD9;color:#8E2F24;font-size:.8rem}
+.foot{margin:18px 12px 0;font-size:.68rem;color:#8A6553;line-height:1.6}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <h1>🧱 기준 킷 — 살아있는 갤러리</h1>
+  <p class="sub">부품 × 변주 × 상태를 <b>kit-registry.json</b> 에서 그대로 읽어 나열한다. 모양은 <b>catalog/ui-kit.css</b> 하나뿐 — 게임과 같은 파일.</p>
+  <div class="sum" id="sum"></div>
+  <div class="bar"><i id="barfill"></i></div>
+</header>
+
+<div class="wrap" id="app"></div>
+<p class="foot" id="foot"></p>
+
+<script>
+/* 배지 3종 — 대장의 status 문자열이 정본. 여기서 새 상태를 만들지 않는다. */
+var BADGE = {
+  '승인'  : ['ok'  , '🟢 승인'],
+  '검토중': ['wait', '🟡 검토중'],
+  '반려'  : ['no'  , '🔴 반려']
+};
+
+function el(tag, cls, txt){
+  var e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (txt !== undefined && txt !== null) e.textContent = txt;
+  return e;
+}
+
+/* 부품 id → 갤러리 무대에 세울 실제 DOM. ui-kit.css 의 .k-<id> 를 그대로 쓴다.
+   T1-b 시점의 부품은 골격뿐이라 "자리"만 보이는 게 정상이다.            */
+function sample(id, variant, state){
+  var box = el('div');
+  var mod = ' is-' + state + (variant ? ' v-' + variant : '');
+  switch (id) {
+    case 'panel':
+      box.className = 'k k-panel' + mod;
+      box.style.cssText = 'width:150px;min-height:64px';
+      box.appendChild(el('div', null, variant));
+      break;
+    case 'pill':
+      box.className = 'k k-pill' + mod;
+      box.style.width = '160px';
+      box.appendChild(el('span', null, variant));
+      break;
+    case 'button':
+      box = el('button', 'k k-button' + mod, variant);
+      box.type = 'button';
+      box.style.setProperty('--k-brand', 'var(--k-' + variant + ')');
+      break;
+    case 'chip':
+      box = el('span', 'k k-chip' + mod, variant + '·' + state);
+      box.style.background = 'var(--k-' + variant + ')';
+      break;
+    case 'bar':
+      box.className = 'k k-bar' + mod;
+      box.style.width = '150px';
+      var f = el('i', 'k-bar__fill');
+      var pct = {full:'100%', mid:'55%', low:'18%', empty:'0%', animating:'70%'}[state] || '50%';
+      f.style.cssText = 'display:block;width:' + pct;
+      box.appendChild(f);
+      break;
+    case 'frame':
+      box.className = 'k k-frame' + mod;
+      box.style.width = '56px';
+      break;
+    case 'header':
+      box.className = 'k k-header' + mod;
+      box.style.width = '160px';
+      box.appendChild(el('span', null, variant));
+      break;
+    case 'tab':
+      box = el('button', 'k k-tab' + mod, variant);
+      box.type = 'button';
+      break;
+    case 'icon-slot':
+      box.className = 'k k-icon-slot' + mod;
+      box.style.width = (parseInt(state, 10) > 0 ? state : 40) + 'px';
+      break;
+    case 'overlay':
+      /* 전체화면 고정이라 갤러리에선 축소 상자에 가둬 보여준다. */
+      box.className = 'k';
+      box.style.cssText = 'position:relative;width:110px;height:64px;border-radius:8px;overflow:hidden';
+      var ov = el('div', 'k-overlay' + mod);
+      ov.style.position = 'absolute';
+      box.appendChild(ov);
+      break;
+    default:
+      box.textContent = '(미정의)';
+  }
+  return box;
+}
+
+function sizeSample(id, step){
+  var s = sample(id, (id === 'button' || id === 'chip') ? 'pink' : 'md', 'default');
+  var px = parseInt(step, 10);
+  if (px > 0) { s.style.width = px + 'px'; }
+  else { s.style.transform = 'scale(' + ({sm:.8, md:1, lg:1.15, full:1}[step] || 1) + ')'; }
+  return s;
+}
+
+function tokenSwatches(){
+  var groups = [
+    ['브랜드 5', ['pink','purple','sky','orange','mint']],
+    ['의미 4',   ['success','warn','danger','info']],
+    ['잉크 3',   ['ink-1','ink-2','ink-3']]
+  ];
+  var cs = getComputedStyle(document.documentElement);
+  var card = el('details', 'card'); card.open = true;
+  var sm = el('summary');
+  sm.appendChild(el('span', 'nm', '색 토큰 12'));
+  sm.appendChild(el('span', 'id', '--k-*'));
+  sm.appendChild(el('span', 'badge ok', '실측 확정'));
+  card.appendChild(sm);
+  var b = el('div', 'body');
+  groups.forEach(function(g){
+    b.appendChild(el('h3', null, g[0]));
+    var w = el('div', 'swat');
+    g[1].forEach(function(n){
+      var v = cs.getPropertyValue('--k-' + n).trim();
+      var i = el('i');
+      var sw = el('b'); sw.style.background = 'var(--k-' + n + ')';
+      i.appendChild(sw);
+      i.appendChild(document.createTextNode(v || ('--k-' + n)));
+      w.appendChild(i);
+    });
+    b.appendChild(w);
+  });
+  card.appendChild(b);
+  return card;
+}
+
+function render(reg){
+  var app  = document.getElementById('app');
+  var comps = reg.components || [];
+  var count = {'승인':0, '검토중':0, '반려':0};
+
+  app.appendChild(tokenSwatches());
+
+  comps.forEach(function(c){
+    if (count[c.approval && c.approval.status] !== undefined) count[c.approval.status]++;
+
+    var st  = (c.approval && c.approval.status) || '검토중';
+    var bd  = BADGE[st] || BADGE['검토중'];
+    var card = el('details', 'card');
+    card.open = true;          /* 전량 나열이 기본 — 접는 건 사람이 정한다 */
+    card.dataset.id = c.id;
+
+    var sm = el('summary');
+    sm.appendChild(el('span', 'nm', c.name || c.id));
+    sm.appendChild(el('span', 'id', c.id));
+    sm.appendChild(el('span', 'badge ' + bd[0], bd[1]));
+
+    var meta = el('div', 'meta');
+    meta.appendChild(el('span', null, '층 ' + c.layer));
+    meta.appendChild(el('span', null, c['class']));
+    var cv = c.converge || {};
+    var cvTxt = (cv.edge_px === null || cv.edge_px === undefined)
+      ? '수렴 미측정'
+      : '경계 ' + cv.edge_px + 'px · ΔE ' + cv.dE + ' · 불일치 ' + cv.mismatch_pct + '%';
+    meta.appendChild(el('span', null, cvTxt));
+    meta.appendChild(el('span', null, '소비처 ' + ((c.consumers || []).length) + '곳'));
+    sm.appendChild(meta);
+    card.appendChild(sm);
+
+    var body = el('div', 'body');
+
+    body.appendChild(el('h3', null, '변주 ' + (c.variants || []).length + '종'));
+    var vr = el('div', 'rows');
+    (c.variants || []).forEach(function(v){
+      var r = el('div', 'row');
+      r.appendChild(el('span', 'lab', v));
+      var stg = el('div', 'stage'); stg.appendChild(sample(c.id, v, 'default'));
+      r.appendChild(stg);
+      vr.appendChild(r);
+    });
+    body.appendChild(vr);
+
+    body.appendChild(el('h3', null, '상태 ' + (c.states || []).length + '종'));
+    var sr = el('div', 'rows');
+    (c.states || []).forEach(function(s){
+      var r = el('div', 'row');
+      r.appendChild(el('span', 'lab', s));
+      var stg = el('div', 'stage');
+      stg.appendChild(sample(c.id, (c.variants || ['md'])[0], s));
+      r.appendChild(stg);
+      sr.appendChild(r);
+    });
+    body.appendChild(sr);
+
+    body.appendChild(el('h3', null, '크기 ' + (c.size_steps || []).length + '단'));
+    var zr = el('div', 'row');
+    (c.size_steps || []).forEach(function(z){
+      var stg = el('div', 'stage');
+      stg.style.flex = '0 1 auto';
+      stg.appendChild(sizeSample(c.id, z));
+      zr.appendChild(stg);
+    });
+    body.appendChild(zr);
+
+    body.appendChild(el('h3', null, '토큰 ' + (c.tokens || []).length + '개'));
+    var tk = el('div', 'tok');
+    (c.tokens || []).forEach(function(t){ tk.appendChild(el('code', null, t)); });
+    body.appendChild(tk);
+
+    if (c.notes) body.appendChild(el('p', 'note', c.notes));
+    card.appendChild(body);
+    app.appendChild(card);
+  });
+
+  /* 상단 승인 현황 N/10 */
+  var sum = document.getElementById('sum');
+  var tot = comps.length;
+  sum.appendChild(el('b', 'ok',   '🟢 승인 ' + count['승인'] + '/' + tot));
+  sum.appendChild(el('b', 'wait', '🟡 검토중 ' + count['검토중']));
+  sum.appendChild(el('b', 'no',   '🔴 반려 ' + count['반려']));
+  sum.appendChild(el('b', null,   '부품 ' + tot + '종'));
+  document.getElementById('barfill').style.width =
+    (tot ? Math.round(count['승인'] / tot * 100) : 0) + '%';
+
+  document.getElementById('foot').textContent =
+    '대장 ' + (reg.updated || '') + ' · 수렴 관문 경계 ≤' +
+    ((reg.converge_gate || {}).edge_px) + 'px · ΔE ≤' +
+    ((reg.converge_gate || {}).dE) + ' · 구조 불일치 ≤' +
+    ((reg.converge_gate || {}).mismatch_pct) + '% · 승인 전 화면 배선 금지';
+}
+
+fetch('catalog/kit-registry.json', {cache: 'no-store'})
+  .then(function(r){
+    if (!r.ok) throw new Error('kit-registry.json ' + r.status);
+    return r.json();
+  })
+  .then(render)
+  .catch(function(e){
+    var d = el('div', 'err', '대장을 못 읽었다: ' + e.message +
+      ' — file:// 로 열면 fetch 가 막힌다. http 로 서빙해서 볼 것.');
+    document.body.insertBefore(d, document.getElementById('app'));
+  });
+</script>
+</body>
+</html>

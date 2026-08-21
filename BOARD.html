@@ -26,6 +26,12 @@ h1{font-size:1.35rem;margin:8px 0 10px}
   border:1px solid var(--line);background:#FFF;color:var(--ink)}
 .fb:hover{border-color:var(--sub)}
 .fb.on{background:var(--ink);color:#FFF;border-color:var(--ink)}
+/* 🧱 기준 킷 — 새 창으로 나가는 바깥 링크. applyFilter/selTab 이 훑는 .fb 와
+   일부러 클래스를 분리해 필터 상태에 절대 끼어들지 않게 한다. */
+.kitfb{font-family:inherit;font-size:.78rem;padding:5px 13px;border-radius:99px;cursor:pointer;
+  border:1px dashed #C08A4A;background:#FFF6E6;color:#7A5A12;margin-left:auto;text-decoration:none;
+  display:inline-flex;align-items:center;gap:4px}
+.kitfb:hover{background:#FFEFCE;border-style:solid}
 
 /* ── 2-B. 에셋 확보 현황 요약 바 (접이식) ── */
 .gapbar{border:1px solid var(--line);border-radius:14px;background:var(--card);
@@ -946,6 +952,15 @@ Promise.all([
     });
     fbox.appendChild(b);
   });
+  /* 🧱 기준 킷 — 탭 줄 맨 끝에 붙는 바깥 링크(새 창). .fb 가 아니라 .kitfb 라
+     selTab/applyFilter 의 querySelectorAll('.fb') 에 걸리지 않는다.        */
+  (function(){
+    const k=document.createElement('a');
+    k.className='kitfb'; k.textContent='🧱 기준 킷';
+    k.href='kit.html'; k.target='_blank'; k.rel='noopener';
+    k.title='정본 부품 대장·승인 현황 (kit.html)';
+    fbox.appendChild(k);
+  })();
 
   renderWorklog(D.worklog);
 

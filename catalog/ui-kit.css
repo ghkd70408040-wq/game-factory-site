@@ -1,0 +1,243 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   ui-kit.css — 틴트윈 기준 킷(정본 토큰 + 부품 골격)             T1-b / S1
+   ───────────────────────────────────────────────────────────────────────
+   이 파일은 **게임과 갤러리가 같이 읽는 단 하나의 원본**이다(계획서 §3).
+   토큰은 발명이 아니라 정본화다 — 값의 출처는 두 갈래뿐:
+     [측정] 시안 3장 픽셀 실측 (k-means 최빈 클러스터 · 경계 프로파일 · 곡률)
+     [현행] tentwin.html 실사용 토큰(--j-* / --jbox-* / --r-* / --w65-*)
+   두 출처가 갈리면 주석에 둘 다 적고 채택근거를 남긴다. 임의 변형 금지.
+
+   시안 출처
+     A 전투  tentwin/assets/art/incoming/mockup/gm-ingame-battle.png   1536×2750
+     B 모달  …/gm-modal-pink-target.jpg                                 768×1376
+     C 설정  …/gm-settings-target.png                                    365× 535
+   실측은 C(365px ≈ 390 기준폭 1.07배)를 CSS px 기준자로 쓴다.
+
+   ⚠ 이번 단계(T1-b)는 **토큰 전량 + 부품 정의 자리**만 잡는다.
+      부품 내부 구현은 T3에서 채운다. 게임(tentwin.html)은 아직 링크하지 않는다.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+:root{
+
+  /* ── 1. 색 12 ────────────────────────────────────────────────────────
+     브랜드 5 · 의미 4 · 잉크 3. 전투 시안 젤리판(y560–2250)에서 채도
+     0.34 초과 픽셀 4만개를 k-means(k=10)로 묶은 최빈 클러스터가 근거.  */
+
+  /* 1-1 브랜드 5 — 젤리 5색. 각 색은 face(면)·deep(아래)·edge(테) 3단. */
+  --k-pink:      #F37F9B;  /* [측정] 클러스터 #ED6D76·#F37F9B (10.8%)
+                              [현행] --j-pink #FF8FB8 — 시안이 더 붉다  */
+  --k-pink-d:    #E0637F;  /* face V×0.90 */
+  --k-pink-e:    #B44A63;  /* [측정] 젤리 어두운 테 V비 0.67 (전 색 공통) */
+  --k-purple:    #C760D7;  /* [측정] #D160D4 (14.6%·최빈) [현행] #C79BE8 */
+  --k-purple-d:  #B24CC2;
+  --k-purple-e:  #8E4281;  /* [측정] 어두운 보라 클러스터 (7.1%) */
+  --k-sky:       #8EA3E4;  /* [측정] #8EA3E4 (11.2%) [현행] --j-sky #6FA8F5 */
+  --k-sky-d:     #7189D3;
+  --k-sky-e:     #476792;  /* [측정] 어두운 청 클러스터 (8.4%) */
+  --k-orange:    #F09B31;  /* [측정] #F7A12C·#F09B31 (10.9%) [현행] #FFA05C */
+  --k-orange-d:  #DC8420;
+  --k-orange-e:  #923E21;  /* [측정] 어두운 주황 클러스터 (8.0%) */
+  --k-mint:      #6DDDA7;  /* [측정] #6DDDA7 (6.3%) [현행] --j-mint #7ED9C0 */
+  --k-mint-d:    #4FC48C;
+  --k-mint-e:    #2E8A72;  /* [현행] --j-mint-e — 측정 어두운 민트와 일치 */
+
+  /* 1-2 의미 4 — 상태 전달 전용. 브랜드색과 겹치지 않게 고정한다. */
+  --k-success:   #54B99D;  /* [측정] 설정 토글칩 #54B99D (켜짐)            */
+  --k-warn:      #FFD34A;  /* [현행] --j-gold — 측정 #F7A12C 계열 밝은 끝  */
+  --k-danger:    #D16347;  /* [측정] 전투 #D16347 · 설정 리본 #C6585F 사이 */
+  --k-info:      #6FA8F5;  /* [현행] --j-sky — 측정 설정 버튼 #8DA1DA      */
+
+  /* 1-3 잉크 3 — 순검정 금지(ART §7-1). 크림 위 대비비 병기. */
+  --k-ink-1:     #5C4033;  /* [현행] --j-ink   본문   8.51:1              */
+  --k-ink-2:     #8A6553;  /* [현행] --j-ink-2 보조   4.68:1              */
+  --k-ink-3:     #6E463A;  /* [현행] --j-outline 딥 아웃라인 = 이 게임의 검정 */
+
+  /* 1-4 바탕(색 12에는 안 세지만 부품이 반드시 쓴다) */
+  --k-cream:     #FDF3DC;  /* [현행] --j-cream   판 바탕 위               */
+  --k-cream-2:   #F5E5C4;  /* [현행] --j-cream-2 판 바탕 아래             */
+  --k-rim:       #FFFBEE;  /* [현행] --j-rim     내부 1px 밝은 크림 보더  */
+  --k-track:     #E8D2B0;  /* [현행] --j-track   스탯 트랙                */
+  --k-scrim:     rgba(46,26,40,.80);  /* [현행] --j-scrim 오버레이 막     */
+
+  /* ── 2. 반경 4단 ────────────────────────────────────────────────────
+     설정 시안 판 좌상 모서리 곡률 역산: y22→x37, y28→x28.6, y34→x24
+     ⇒ r=30px @365폭 ⇒ 32px @390. 나머지는 현행 --r-sm/md/lg 승계.      */
+  --k-r-1: 10px;   /* [현행] --r-sm  칩·배지                              */
+  --k-r-2: 16px;   /* [현행] --r-md  알약·버튼 (--jbox-radius 16 과 일치) */
+  --k-r-3: 24px;   /* [현행] --r-lg  틀·카드                              */
+  --k-r-4: 32px;   /* [측정] 설정 판 r=30@365 → 32@390. 대형 모달은 40    */
+  --k-r-full: 999px;
+
+  /* ── 3. 간격 5단 (4px 그리드) ───────────────────────────────────────
+     설정 시안 실측: 판 안쪽 여백 20→44 = 24px, 행 사이 틈 117→124 = 7px.
+     @390 환산 25.6 / 7.5 ⇒ 4px 그리드의 24 / 8 에 정확히 앉는다.        */
+  --k-sp-1:  4px;
+  --k-sp-2:  8px;   /* [측정] 행 간 틈 7px@365                            */
+  --k-sp-3: 12px;
+  --k-sp-4: 16px;
+  --k-sp-5: 24px;   /* [측정] 판 안쪽 여백 24px@365                       */
+
+  /* ── 4. 그림자 3단 + inset 림 2 ────────────────────────────────────
+     무채색 그림자 금지 — 전부 자두빛(ART §1·§7-3).                      */
+  --k-sh-1: 0 2px 5px rgba(46,20,58,.30);    /* [현행] --jbox-filter 값   */
+  --k-sh-2: 0 6px 14px rgba(83,28,40,.22);   /* 1·3 사이 보간             */
+  --k-sh-3: 0 14px 34px rgba(83,28,40,.26);  /* [현행] --jbox-shadow      */
+  --k-rim-in-hi: inset 0 1.5px 0 rgba(255,251,238,.85); /* 위 밝은 림     */
+  --k-rim-in-lo: inset 0 -2px 0 rgba(110,70,58,.20);    /* 아래 눌린 림   */
+
+  /* ── 5. 유리 6값 ────────────────────────────────────────────────────
+     모달 시안 좌경계(y700) 프로파일: x65 #A78697(밖) → x67 #FEEFF4(림 정점)
+     → x80까지 밝은 falloff → x96 안정. 위경계(x384): y293 #83435B(밖)
+     → y298 #F4CAE2(림) → y318 #A9A1B8(글로스 바닥), 폭 20px@768 ≈10 CSS.
+     틴트 알파는 설정 판에서 역산: 밖 bg≈(110,115,90)·틴트(255,250,240)일 때
+     a=.70 이면 #D3D1C3 — 실측 #D4D1CD 와 1 이내로 맞는다.               */
+  --k-glass-blur:   3px;                     /* [현행] --jbox-frost blur(3px) */
+  --k-glass-sat:    1.06;                    /* [현행] --modal-glass saturate */
+  --k-glass-tint-a: .18;                     /* 시스루(모달) — 뒤 그림이 읽힌다 */
+  --k-glass-tint:   rgba(255,246,250,.18);   /* = 틴트색 + 위 알파       */
+  --k-glass-rim-w:  1.5px;                   /* [측정] 768폭 2~3px → 1.2 CSS */
+  --k-glass-rim-c:  rgba(255,250,252,.92);   /* [측정] 림 정점 #FEEFF4·#EFEBF2 */
+  --k-glass-gloss:  linear-gradient(180deg,
+                      rgba(255,255,255,.38) 0,
+                      rgba(255,255,255,.10) 10px,
+                      rgba(255,255,255,0)   22px);
+  --k-glass-filter: blur(var(--k-glass-blur)) saturate(var(--k-glass-sat));
+  /* 불투명 변주(설정 판처럼 뒤가 거의 안 비치는 판) */
+  --k-glass-tint-solid: rgba(255,250,240,.70);  /* [측정] a=.70 역산      */
+
+  /* ── 6. 글자 3단 ────────────────────────────────────────────────────
+     설정 시안 헤더 리본 / 행 라벨 / 토글칩 라벨 높이 실측을 @390 환산.  */
+  --k-t-1: 12px;  --k-t-1-w: 700;   /* 칩·배지·보조                       */
+  --k-t-2: 15px;  --k-t-2-w: 700;   /* 행 라벨·버튼 본문                  */
+  --k-t-3: 20px;  --k-t-3-w: 800;   /* 헤더 제목·수치                     */
+  --k-t-lh: 1.25;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   부품 10종 — **정의 자리만** 잡는다(T1-b). 구현은 T3.
+   각 블록은 kit-registry.json 의 같은 id 와 1:1 로 붙어 있다.
+   층(layer) 표기: L0 배경 · L1 판틀 · L2 림/광택/질감 · L3 그림 · L4 값 · L5 연출
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* 공통 바닥 — 모든 부품이 무채색 그림자·순검정을 안 쓰게 강제하는 기준선 */
+.k{
+  box-sizing: border-box;
+  font-family: inherit;
+  line-height: var(--k-t-lh);
+  color: var(--k-ink-1);
+}
+.k *, .k *::before, .k *::after{ box-sizing: border-box; }
+
+/* ── ① k-panel  L1 · 코드 — 유리/크림 판. 모든 모달·시트의 바닥. ───── */
+.k-panel{
+  position: relative;
+  border-radius: var(--k-r-4);
+  padding: var(--k-sp-5);
+  background: var(--k-glass-tint);
+  box-shadow: var(--k-sh-3);
+  /* TODO(T3): backdrop-filter·림·글로스 의사요소 */
+}
+
+/* ── ② k-pill  L1 · 코드 — 행/라벨용 가로 알약. 설정 목록의 한 줄. ─── */
+.k-pill{
+  display: flex; align-items: center;
+  min-height: 44px;
+  padding: 0 var(--k-sp-4);
+  border-radius: var(--k-r-2);
+  background: rgba(255,252,246,.86);
+  box-shadow: var(--k-sh-1);
+  font-size: var(--k-t-2); font-weight: var(--k-t-2-w);
+  /* TODO(T3): 눌림 상태·아이콘 슬롯 결합 */
+}
+
+/* ── ③ k-button  L1 · 코드 — 젤리 버튼. 브랜드 5색 변주. ──────────── */
+.k-button{
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 48px;
+  padding: 0 var(--k-sp-5);
+  border: 0; border-radius: var(--k-r-2);
+  background: var(--k-brand, var(--k-pink));
+  color: #FFF;
+  font-size: var(--k-t-2); font-weight: var(--k-t-2-w);
+  box-shadow: var(--k-sh-2), var(--k-rim-in-hi), var(--k-rim-in-lo);
+  cursor: pointer;
+  /* TODO(T3): face/deep 2단 그라디언트·edge 테·눌림 3px 이동 */
+}
+
+/* ── ④ k-chip  L4 · 코드 — 값 배지/토글칩. 짧은 상태 문구. ────────── */
+.k-chip{
+  display: inline-flex; align-items: center;
+  height: 28px; padding: 0 var(--k-sp-3);
+  border-radius: var(--k-r-full);
+  background: var(--k-success);
+  color: #FFF;
+  font-size: var(--k-t-1); font-weight: var(--k-t-1-w);
+  /* TODO(T3): 의미 4색 매핑·off 상태 */
+}
+
+/* ── ⑤ k-bar  L4 · 하이브리드 — HP/게이지. 틀(그림)+트랙(코드). ───── */
+.k-bar{
+  position: relative;
+  height: 18px;
+  border-radius: var(--k-r-full);
+  background: var(--k-track);
+  overflow: hidden;
+  /* TODO(T3): 눈금·채움 그라디언트·뼈/날개 캡 슬라이스 */
+}
+.k-bar__fill{ height:100%; width:var(--k-bar-v,50%); background:var(--k-danger); }
+
+/* ── ⑥ k-frame  L1 · 하이브리드 — 스킬/초상 액자. 9슬라이스 후보. ── */
+.k-frame{
+  position: relative;
+  aspect-ratio: 1/1;
+  border-radius: var(--k-r-3);
+  background: rgba(255,252,246,.55);
+  box-shadow: var(--k-sh-2);
+  /* TODO(T3): 금테·보석·등급별 색 변주 */
+}
+
+/* ── ⑦ k-header  L1 · 하이브리드 — 리본 헤더. 판 위에 얹히는 제목대. */
+.k-header{
+  display: flex; align-items: center; justify-content: center;
+  min-height: 52px;
+  padding: 0 var(--k-sp-5);
+  border-radius: var(--k-r-3);
+  background: var(--k-danger);
+  color: #FFF;
+  font-size: var(--k-t-3); font-weight: var(--k-t-3-w);
+  box-shadow: var(--k-sh-2);
+  /* TODO(T3): 리본 꼬리·덩굴 장식·글자 그림자 */
+}
+
+/* ── ⑧ k-tab  L1 · 코드 — 시트 상단 전환 탭. ───────────────────────── */
+.k-tab{
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 40px; padding: 0 var(--k-sp-4);
+  border: 0; border-radius: var(--k-r-2) var(--k-r-2) 0 0;
+  background: rgba(255,252,246,.55);
+  color: var(--k-ink-2);
+  font-size: var(--k-t-2); font-weight: var(--k-t-2-w);
+  cursor: pointer;
+  /* TODO(T3): 선택 상태 올라오기·아래 판과 이어붙기 */
+}
+
+/* ── ⑨ k-icon-slot  L3 · 하이브리드 — 그림 1장이 들어앉는 정사각 구멍 */
+.k-icon-slot{
+  display: grid; place-items: center;
+  width: 40px; aspect-ratio: 1/1;
+  border-radius: var(--k-r-1);
+  background: rgba(255,252,246,.40);
+  overflow: hidden;
+  /* TODO(T3): 크기 3단·비어있을 때 자리표시 */
+}
+.k-icon-slot > img{ width:100%; height:100%; object-fit:contain; display:block; }
+
+/* ── ⑩ k-overlay  L0 · 코드 — 모달 뒤 막. 판을 띄우는 바닥. ───────── */
+.k-overlay{
+  position: fixed; inset: 0;
+  background: var(--k-scrim);
+  display: grid; place-items: center;
+  padding: var(--k-sp-4);
+  /* TODO(T3): 열림/닫힘 전환·스크롤 잠금 */
+}
