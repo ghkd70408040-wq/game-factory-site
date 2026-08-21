@@ -39153,7 +39153,25 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
      얹는다 — 틴트 α 를 더 올리면 다시 판이 덮여 뒤가 죽기 때문이다.
      원본: --jbox-tint: rgba(215, 236, 253, .40); */
   --jbox-tint: rgba(170, 218, 255, .30);
-  --jbox-blur: var(--jbox-frost) brightness(1.06);
+  /* W-E ① — 구판 봉인: `--jbox-blur: var(--jbox-frost) brightness(1.06);`
+     (2026-08-21) 사용자 반려 "상단 캡슐 파란색 느낌 조금 낮춰줘".
+     실측이 범인을 바꿔 놨다 — 유리가 파란 것이 아니라 **유리 뒤로 비치는 전투
+     배경**이 청록이다. 같은 장면을 네 벌 찍어 HUD 띠(382x124.34) 평균을 쟀다:
+       유리 끄고 배경만(visibility:hidden)  B-R = +63.6 · G-R = +33.2  ← 청록
+       현행(통짜 유리판 얹은 상태)          B-R = +33.0 · G-R =  +7.1
+       시안 gm-ingame-battle.png            B-R = +17.4 · G-R =  -4.7  ← 은은한 라벤더
+     glass-hud-v2.webp 자체는 이미 중성 라벤더다(캡슐면 실측 rgba(219,220,239)
+     알파 64/255 · 슬래브면 rgba(177,183,225) 알파 75/255). 알파가 0.18~0.5 로
+     얕아 뒤의 청록이 그대로 뚫고 올라오는 것이 파란기의 정체였다.
+     그래서 **에셋은 다시 굽지 않고** 두 축만 만진다:
+       ① 여기 — 배경(backdrop)의 채도만 .74 로 내린다. 밝기 1.06 은 그대로.
+       ② 아래 `#app.battle #duel-hud::before` — 유리 알파를 마스크로 쓴 라벤더 한 겹.
+     ⚠ saturate 는 상자(사각형)에 걸려 이음매가 걱정이었으나 실측에서 HUD
+       아랫변(y=124.34px) 위아래 색차가 28.8 → 26.8 로 **줄었다**: 그 자리의
+       경계선은 필터 상자가 아니라 유리 그림 자체의 아랫변이다.
+     결과(같은 장면 A/B): B-R +27.3 → +18.8 · G-R -1.7 → -8.2 (시안 +17.4/-4.7).
+     롤백: 아래 한 줄에서 ` saturate(.74)` 만 지운다. */
+  --jbox-blur: var(--jbox-frost) brightness(1.06) saturate(.74);
   margin:0 calc(var(--safe-r) + 4px) 4px calc(var(--safe-l) + 4px);
   padding:4px 5px 5px;
   gap:5px;
@@ -39321,8 +39339,28 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
        height 59.41% · 그림 비 0.926 이 높이로 차려면 59.41×0.926/3.072 = 17.91%
        → 여유 붙인 18.50% 를 유지한다. left = 22.97 − 9.25 = 13.72%.
      구판 한 줄(롤백 근거): left:13.06%;top:22.44%;height:58.72% */
-  left:13.72%;top:22.64%;
-  width:18.50% !important;height:59.41% !important;
+  /* 🚨 W-E ③ (2026-08-21) 사용자 반려 재차 — "캐릭터 더 확대"(직전 +27~33% 미달).
+     이번에는 **상자가 아니라 잉크**(투명 여백 제외 알파 bbox)로 다시 쟀다.
+     실렌더 390x844 · HUD 상자 382x124.34 기준:
+       데몬  duel-demon-full-*.webp 387x418 · 투명 여백 0 → 잉크 = 상자 그대로
+             잉크 높이 73.86px = HUD 의 59.40%  (시안 avatar_demon 58.72%)
+             잉크 면적비 (17.90 x 59.40) / (13.94 x 58.72) = **1.30배**
+     즉 데몬은 이미 시안을 넘겼다. 그래도 "더"라는 요청이 두 번째라 **아랫변을
+     못 박은 채** 한 뼘 더 올린다: 잉크 높이 59.40% → 66.00%(+11.1%).
+     아랫변 82.05%(= 구판 22.64 + 59.41)는 한 픽셀도 안 움직인다 — 발이 뼈바
+     뒤로 물리는 시안의 그 앉힘점이다. top = 82.05 − 66.00 = 16.05%.
+     폭 21.60% 는 여유칸이다(보스 전신 넉 장이 전부 비 0.926 이라 높이로 차려면
+     66.00 x 0.926 / 3.072 = 19.89% 면 되고, 남는 폭은 contain 아래서 무해하다).
+     left = 22.97(시안 cx) − 10.80 = 12.17%.
+     검산 ① 윗변 16.05% = 19.96px → 화면 최상단(0) 안쪽, 잘림 없음.
+     검산 ② 잉크 오른끝 129.8px vs 타이머 첫 글리프 왼끝 133.9px → 4.1px 여유.
+     검산 ③ 잉크 왼끝 53.8px 이 일시정지(18.5~55.2px)와 1.4px 겹치지만
+             #btn-pause 는 z-index:6 이라 **버튼이 위에 선다**(시안도 지팡이가
+             버튼 옆으로 물린다). 가림 없음.
+     구판 두 줄(롤백 근거): left:13.72%;top:22.64%;
+                            width:18.50% !important;height:59.41% !important; */
+  left:12.17%;top:16.05%;
+  width:21.60% !important;height:66.00% !important;
   background-position:center bottom;
   /* E3 W8 — 한 장으로 못박혀 있던 자리가 .bs-* 표에 **열렸다**. 폴백을 그대로
      남긴 것이 계약이다: 클래스가 아직 안 붙은 첫 프레임이나 표에 없는 종(種)이
@@ -39355,8 +39393,41 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
        ① 높이는 면적 보정값 55.00% 유지 → top = 70.28 − 55.00 = 15.28%
        ② 왕관 보호를 위한 **cx −2.5%p** 유지 → 80.17%, left = 80.17 − 10 = 70.17%
      구판 한 줄(롤백 근거): left:70.30%;top:14.54% */
-  left:70.17%;top:15.28%;
-  width:20.00% !important;height:55.00% !important;
+  /* 🚨 W-E ③ (2026-08-21) — 여기가 "작다"의 **진짜 자리**였다.
+     잉크(투명 여백 제외 알파 bbox)로 다시 재니 셋 중 이쪽만 시안에 못 미쳤다:
+       데몬  387x418 · 여백 0        → 잉크 h 59.40% / 시안 58.72% · 면적 1.30배
+       펫    284x297 · 여백 0        → 잉크 h 40.00% / 시안 37.07% · 면적 1.15배
+       아군  900x1200 · **여백 10%** → 잉크 721x1080, 잉크 h **49.49%**
+             / 시안 avatar_cloud 41.48% 지만 면적은 (10.76 x 49.49)/(17.80 x 41.48)
+             = **0.72배** — 시안의 '구름 무리'는 가로로 퍼진 덩어리인데 우리 그림은
+             세로 인물 한 장이라, 높이를 맞춰도 **면적이 28% 모자란다**.
+     그래서 아군만 면적 기준으로 다시 올린다: 잉크 h 49.49% → **62.01%**(+25.3%),
+     면적비 0.72 → 1.13배(데몬 1.30 · 펫 1.15 과 같은 대역).
+     상자 높이는 그 잉크를 담는 값이다 — 이 그림은 상하 10% 가 투명이라
+       상자 h = 62.01 / 0.90 = **68.90%**
+     아랫변 70.28%(시안 avatar_cloud 의 앉힘점)는 그대로 못 박는다:
+       top = 70.28 − 68.90 = **1.38%**
+     폭 21.00%: 동료 전신 표는 대개 비 0.750 이지만 뭉치만 0.930 이라, 그 비까지
+     높이로 차게 하려면 68.90 x 0.930 / 3.072 = 20.86% 가 필요하다.
+     가로 중심은 **−1.0%p**(80.17 → 79.17%) — 커진 만큼 오른쪽 펫 방울과 다시
+     부딪히기 때문이다. left = 79.17 − 10.50 = 68.67%.
+     검산 ① 잉크 280.7~332.2px · 펫 방울 331.6px → 겹침 0.6px(종전 0px, 왕관 무사).
+     검산 ② 잉크 왼끝 280.7px vs 타이머 캡슐 오른끝 277.0px → 3.7px 여유.
+     검산 ③ 잉크 윗변 10.3px → 화면 최상단(0) 안쪽, 왕관 잘림 없음.
+
+     ▣ 새 축 `--me-scale` — **캐릭터별 스케일 보정**(기본 1, 미주입이면 지금 값 그대로).
+       투명 여백 비율은 캐릭터마다 다르므로(젤리공주처럼 세로로 긴 그림은 더
+       작아 보인다) 한 명만 따로 키우고 싶을 때 duelHudMount 가 이 변수 하나만
+       주입하면 된다. 아랫변은 배율과 무관하게 70.28% 에 고정된다 —
+       top 이 같은 식으로 함께 줄기 때문이다. transform 을 안 쓴 이유가 이것이다:
+       scale() 은 쌓임 컨텍스트를 만들어 §18.4d 의 z-index 계약을 흔들고,
+       background 는 상자에 클립되므로 상자 자체를 키우는 것이 유일한 안전한 길이다.
+     구판 두 줄(롤백 근거): left:70.17%;top:15.28%;
+                            width:20.00% !important;height:55.00% !important; */
+  --me-scale:1;
+  left:68.67%;
+  top:calc(70.28% - 68.90% * var(--me-scale,1));
+  width:21.00% !important;height:calc(68.90% * var(--me-scale,1)) !important;
   background-position:center bottom;
   /* W4 (2026-08-20) — 사용자 반려 "내가 선택한 캐릭터가 아니라 이상한 구름이 나옴".
      원인은 정확히 아래 한 줄이었다: !important 로 못 박힌 시안 구름이라
@@ -39816,9 +39887,9 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
      파일명이 그대로이므로 **버스트 없이는 구판이 그대로 뜬다** — 그래서 이
      커밋이 네 곳 + VQ 를 함께 올린다. 수리 커밋이 이 커밋보다 늦어도 v=7 은
      그대로 유효하다(주소가 달라졌을 뿐 그림은 언제 와도 그 주소로 온다). */
-#screen-map #map-back   { left: 3.76cqw;  top: 3.83cqw; width: 14.99cqw; height: 15.46cqw; background-image: url("catalog/stage-btn_back.webp?v=7"); }
+#screen-map #map-back   { left: 3.76cqw;  top: 3.83cqw; width: 14.99cqw; height: 15.46cqw; background-image: url("catalog/stage-btn_back.webp?v=8"); }
 #screen-map #map-hearts { left: 21.91cqw; top: 5.51cqw; width: 33.32cqw; height: 12.60cqw; background-image: url("catalog/stage-pill_life.webp"); }
-#screen-map #map-stars  { left: 56.31cqw; top: 5.87cqw; width: 21.75cqw; height: 11.71cqw; background-image: url("catalog/stage-pill_coin.webp?v=7"); }
+#screen-map #map-stars  { left: 56.31cqw; top: 5.87cqw; width: 21.75cqw; height: 11.71cqw; background-image: url("catalog/stage-pill_coin.webp?v=8"); }
 #screen-map #map-gear   { left: 81.40cqw; top: 3.85cqw; width: 14.92cqw; height: 15.43cqw; background-image: url("catalog/stage-btn_settings.webp"); }
 #screen-map #map-top .hc-ico { display: none; }   /* 봉인 — 하트·코인·톱니·화살표는 조각에 그려져 있다 */
 /* 하트 수·회복 타이머는 조각의 글자 상자 자리에 코드가 얹는다. */
@@ -39919,10 +39990,10 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
    얹힌다(언어 토글 생존). 나머지 셋은 sep3 정리판에서 나왔다.
    세로가 구판보다 큰 것은 헤일로가 빠지면서 조각의 참 비율이 드러난 결과다
    — 띠(높이 25.61cqw) 안에 그대로 들어간다(가장 큰 명판이 4.5~24.0cqw). */
-#screen-map #map-b1    { left: 2.14%;  width: 30.39%; height: 12.47cqw; background-image: url("catalog/stage-pill_star.webp?v=7"); }
+#screen-map #map-b1    { left: 2.14%;  width: 30.39%; height: 12.47cqw; background-image: url("catalog/stage-pill_star.webp?v=8"); }
 #screen-map #map-plate { left: 34.22%; width: 31.66%; height: 18.97cqw; background-image: url("catalog/stage-pill_chapter.webp"); }
 #screen-map #map-char  { left: 66.84%; width: 15.43%; height: 18.62cqw; background-image: url("catalog/stage-btn_chars.webp"); }
-#screen-map #map-rec   { left: 82.91%; width: 15.15%; height: 18.78cqw; background-image: url("catalog/stage-btn_records.webp?v=7"); }
+#screen-map #map-rec   { left: 82.91%; width: 15.15%; height: 18.78cqw; background-image: url("catalog/stage-btn_records.webp?v=8"); }
 #screen-map #map-b1-v {
   position: absolute; left: 57.7%; top: 41.7%;
   transform: translate(-50%, -50%);
@@ -41520,6 +41591,44 @@ html[lang="ko"] #modal-mode .r10-ribbon > h2{
 }
    조각 배선 봉인 끝 */
 
+/* ---- W-E ① 라벤더 보정 한 겹 (2026-08-21) ---------------------------------
+   위 `--jbox-blur` 주석의 ② 축이다. 배경 채도만 낮추면 판이 **회색으로** 가라앉고
+   시안의 은은한 라벤더가 안 선다. 그래서 유리와 같은 모양으로 라벤더를 한 겹 얹는다.
+
+   🚨 왜 `background-color` 가 아니라 **마스크 얹은 ::before** 인가
+     #duel-hud 는 `border-radius:0` + `background-color:transparent !important` 다.
+     여기에 그냥 배경색을 넣으면 유리의 둥근 네 귀퉁이 **바깥까지 사각형으로**
+     칠해져, 이 파일이 이미 두 번 반려당한 "캡슐 둘레 네모 자국"이 그대로 재현된다
+     (:41560 절의 그 자국). 그래서 같은 그림(glass-hud-v2.webp)을 **마스크**로 써
+     유리가 있는 자리에만, 유리 알파에 비례해 칠한다 — 모양 위반이 원천적으로 없다.
+     마스크의 size/position 은 배경 그림과 **한 글자도 다르면 안 된다**
+     (`100% auto` · `center top`) — 어긋나면 라벤더가 유리에서 미끄러진다.
+
+   자리: z-index:0. 유리(요소 배경)보다 위, 자식 전부(방울 3 · 데몬/아군 2 ·
+   HP 바 4·5 · 타이머 1)보다 아래다. 즉 캐릭터·숫자·HP 바에는 한 픽셀도 안 닿는다.
+   pointer-events:none — 탭 판정은 종전 그대로다.
+
+   색 rgba(212,178,232,.55): 배경의 청록(G>R)을 되돌리려면 R>G 인 라벤더여야 한다.
+   실측 A/B(같은 장면)에서 이 겹까지 얹었을 때 HUD 띠가 시안에 가장 가까웠다
+   (B-R +27.3 → +18.8 · G-R -1.7 → -8.2 · 시안 +17.4 / -4.7).
+   롤백: 이 규칙 한 덩이를 지우면 종전 화면이다(다른 규칙과 얽힌 곳이 없다). */
+#app.battle #duel-hud::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  background-color:rgba(212,178,232,.55);
+  -webkit-mask-image:url("catalog/glass-hud-v2.webp");
+  mask-image:url("catalog/glass-hud-v2.webp");
+  -webkit-mask-size:100% auto;
+  mask-size:100% auto;
+  -webkit-mask-position:center top;
+  mask-position:center top;
+  -webkit-mask-repeat:no-repeat;
+  mask-repeat:no-repeat;
+}
+
 /* ---- 타이머 상자는 **글자만** 든다 -----------------------------------------
    유리는 통짜 판이 그린다. 🚨 여기서 반드시 꺼야 하는 것이
    `box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.86)` 다(:35832 의 시안 4호
@@ -42602,12 +42711,15 @@ html[lang="ko"] #modal-mode .r10-ribbon > h2{
 #app.battle #actionbar{
   /* 한 칸의 중심 간격. 안쪽 폭 = 100vw − 안전영역 − 좌우 패딩(4+4), 간격 6px. */
   --medal-pitch: calc((100vw - var(--safe-l) - var(--safe-r) - 2px) / 4);
-  --medal-h: min(138px, calc(var(--medal-pitch) / 0.6934));
-  /* 바 높이 = 메달 + 위 패딩 6 + 아래 패딩(safe-b + 7). 캡·서리 들여쓰기가
+  --medal-h: min(120px, calc(var(--medal-pitch) / 0.6934));
+  /* 그림만 위로 더 넘치는 몫. **바 높이에는 안 들어간다** = 보드가 한 픽셀도
+     안 잃는다. 상한의 근거는 414×896 10행 분기의 실측이다(아래 세로 예산 절). */
+  --medal-up: 9px;
+  /* 바 높이 = 메달 + 위 패딩 4 + 아래 패딩(safe-b + 5). 캡·서리 들여쓰기가
      전부 이 한 수에서 파생된다 — 상수로 두면 ①의 "111px" 사고가 재발한다. */
-  --gbar-h: calc(var(--medal-h) + 13px + var(--safe-b));
+  --gbar-h: calc(var(--medal-h) + 9px + var(--safe-b));
   gap: 6px !important;
-  padding: 6px calc(var(--safe-r) + 4px) calc(var(--safe-b) + 7px) calc(var(--safe-l) + 4px) !important;
+  padding: 4px calc(var(--safe-r) + 4px) calc(var(--safe-b) + 5px) calc(var(--safe-l) + 4px) !important;
   position: relative;
   /* 그림과 서리를 아래 두 겹으로 내린다(원 선언은 위 절에 그대로 살아 있다). */
   border-image-source: none !important;
@@ -42646,11 +42758,16 @@ html[lang="ko"] #modal-mode .r10-ribbon > h2{
   height: var(--medal-h) !important;
   z-index: 1;
 }
-/* 그림 상자만 좌우로 넘친다 — 넘치는 것은 캔버스의 투명 여백뿐이다. */
-#app.battle #actionbar .act::before{ inset: 0 -14px; }
+/* 그림 상자만 넘친다 — 좌우로 넘치는 것은 캔버스의 투명 여백이고, 위로 넘치는
+   --medal-up 은 **보드와 바 사이에서 아무도 안 쓰던 틈**이다(보드는 자기 상자
+   안에서 가운데 정렬이라 그 틈이 늘 남는다). 상자(=바 높이)는 안 커지므로
+   layout() 의 byH 가 안 줄고, 그래서 타일이 안 준다. */
+#app.battle #actionbar .act::before{
+  inset: calc(0px - var(--medal-up)) -14px 0 -14px;
+}
 #app.battle #actionbar .act .act-badge{
-  top: calc(var(--medal-h) * .047) !important;
-  right: 0 !important;
+  top: calc((var(--medal-h) + var(--medal-up)) * .047 - var(--medal-up)) !important;
+  right: 2px !important;
   min-width: 24px !important;
   height: 24px !important;
   padding: 0 6px !important;
@@ -42666,7 +42783,7 @@ html[lang="ko"] #modal-mode .r10-ribbon > h2{
   #app.battle #screen-game.active #actionbar::before,
   #app.battle #screen-game.active #actionbar::after{ display: none; }
   #app.battle #screen-game.active #actionbar .act{ height: 94px !important; }
-  #app.battle #screen-game.active #actionbar .act::before{ inset: 0; }
+  #app.battle #screen-game.active #actionbar .act::before{ inset: 0 !important; }
   #app.battle #screen-game.active #actionbar .act .act-badge{
     top: 5px !important; right: 9px !important;
     min-width: 19px !important; height: 19px !important;
@@ -42880,7 +42997,7 @@ var L=("jelly-box,duel-title-play,sian2-ribbon,sian2-btn-pink,sian2-btn-purple,"
    #map-b1)과 반드시 같은 숫자로 맞춘다. 어긋나면 프리로드가 통째로 헛 요청이 된다.
    W6: stage-pill_star 가 수리 교체되면서 목록이 셋 → 넷이 됐다. */
 var V="stage-btn_back,stage-pill_coin,stage-btn_records,stage-pill_star";
-var VQ="?v=7";                                     /* CSS 4곳과 반드시 같은 값 */
+var VQ="?v=8";                                     /* CSS 4곳과 반드시 같은 값 */
 var i=0,bgmQueued=0;
 function next(){
   if(i>=L.length){ if(!bgmQueued){ bgmQueued=1; warmBgm(); } return; }  /* 그림 끝 → BGM */
