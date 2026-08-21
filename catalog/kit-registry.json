@@ -50,14 +50,37 @@
       "name": "젤리 버튼",
       "layer": "L1",
       "class": "코드",
-      "tokens": ["--k-pink", "--k-purple", "--k-sky", "--k-orange", "--k-mint", "--k-r-2", "--k-sh-2", "--k-rim-in-hi", "--k-rim-in-lo", "--k-t-2"],
-      "variants": ["pink", "purple", "sky", "orange", "mint"],
-      "states": ["default", "hover", "pressed", "disabled"],
+      "lineage": "jelly",
+      "roles": ["ACT", "SUB"],
+      "impl": ".kit-btn (ui-kit.css) · 실험대 catalog/kit-lab.html",
+      "tokens": [
+        "--btn-face  ← 입력 토큰은 이것 하나뿐",
+        "--btn-h · --btn-rr(.265) · --btn-r = h×rr",
+        "--btn-ring = h×.025 · --btn-ring-soft(색별: 오렌지만 .25)",
+        "--btn-lip = clamp(2px,h×.05,4px) · --btn-px = h×.38 · --btn-fs = h×.37 · --btn-ico = h×.70",
+        "파생 가능: --btn-top = mix(face,흰 3%) · --btn-low = mix(face,흰 2%)",
+        "파생 불가(색별 실측): --btn-rim · --btn-rim-2 · --btn-back · --btn-band · --btn-band-2 · --btn-edge · --btn-plum"
+      ],
+      "variants": ["pink", "purple", "orange", "mint", "sky"],
+      "states": ["default", "pressed", "disabled", "featured"],
       "size_steps": ["sm", "md", "lg"],
+      "icon_slots": ["none", "left", "right", "both"],
       "approval": { "status": "검토중", "date": "2026-08-21", "by": "" },
-      "converge": { "edge_px": null, "dE": null, "mismatch_pct": null },
-      "consumers": [],
-      "notes": "면(face)/아래(deep)/테(edge) 3단. 시안 A 젤리 클러스터에서 edge = face 명도×0.67 로 5색 공통 확인."
+      "converge": { "edge_px": 1.0, "dE": 1.354, "mismatch_pct": 0.0, "verdict": "PASS (4색 전량)" },
+      "converge_by_variant": {
+        "pink":   { "edge_px": 0.0, "dE": 1.032, "mismatch_pct": 0.0, "verdict": "PASS" },
+        "purple": { "edge_px": 1.0, "dE": 1.354, "mismatch_pct": 0.0, "verdict": "PASS" },
+        "orange": { "edge_px": 0.0, "dE": 1.301, "mismatch_pct": 0.0, "verdict": "PASS" },
+        "mint":   { "edge_px": 1.0, "dE": 0.840, "mismatch_pct": 0.0, "verdict": "PASS" },
+        "sky":    { "edge_px": null, "dE": null, "mismatch_pct": null, "verdict": "N/A — 시안에 없는 파생 전용 색" }
+      },
+      "converge_method": "ref = main-menu-sian@4x.png 버튼 상자(1375×319 @4x, 4색 동일) 중 라벨·아이콘이 없는 깨끗한 열 280px × (H+40). 양쪽에 알파를 실어 판정한다 — render 알파는 듀얼 매트(흰/검 2회 캡처)로 풀고 ref 알파는 실측 상자에서 만든다. 평평한 crop 만 쓰면 converge.py 가 ref/render 에 독립 Otsu 를 돌려 전경 마스크가 서로 반전된다(핑크 XOR 100% 인공물). 이 함정 때문에 crop 방법론을 두 번 갈아엎었다.",
+      "consumers": [
+        "메인화면 4버튼 (#btn-play·#btn-cont·#char-open·#btn-settings) — 비트맵 4장 + 리본 121KB 대체",
+        "모달 CTA·닫기 4곳 — 결함 R2 2건",
+        "베이지 계보 잔존 6곳 — 결함 R3 6건"
+      ],
+      "notes": "★ ×0.67 파생 공식은 **거짓으로 확정**(2026-08-21, 원본 시안 실측). L*(테)/L*(면) = 핑크 .518 · 퍼플 .376 · 오렌지 .558 · 민트 .438 → 평균 **.472**, 색별 폭 **.182**. ① 단일 파생 공식으로 4색을 덮을 수 없다 — 테·림·밴드는 **색별 실측 토큰이 정본**이다. ② 파생식(≈×0.505 = 출고물 기준)은 **새 색을 추가할 때의 시작값**으로만 쓴다. ③ 킷 토큰 ×0.655 는 오답이었다 — 세 계보(킷 .655 / 출고물 .505 / 원본 시안 .472) 중 **출고물이 정본**. ④ 부산물 `deep = face V × 0.90` 도 시안 실측 **×0.84**(.781~.870) → 재측정 필요로 강등. ★ 브랜드 토큰 --k-pink 등 **재사용 금지**: --k-* 는 전투 목업 출처라 계보가 다르다(핑크 면색이 원본 시안 L* 49.6 / 9964 --cl 77.7 / --k-pink 67.0 으로 갈렸다 = ΔE 게이트의 10배). 버튼 전용 계보 --k-btn-<색>-face 신설. ★ 구조는 tentwin.html 9964~10071 계승하되 둘을 실측으로 고쳤다: 반경비 .245 → **.265**(코너 MAE 1변수 스윕 최소점, .245 대비 13% 개선), 상단 림 스톱 `4%→12% 선형 램프` → `3.6/7.6% 고원 + 9.8% 급락`(시안의 1px 단차를 램프가 뭉갰다). ★ --btn-ring-soft 는 색별 실측 토큰: 시안 링→림 전이 sobel 세기 핑크 515·퍼플 582·민트 575 인데 오렌지만 378 로 무르다(전이 폭은 4색 모두 3px 동일) → 오렌지만 .25. ★ 계보 판정 = jelly (면색 전량이 main-menu-sian@4x.png 실측)."
     },
     {
       "id": "chip",
@@ -105,15 +128,24 @@
       "id": "header",
       "name": "리본 헤더",
       "layer": "L1",
-      "class": "하이브리드",
-      "tokens": ["--k-danger", "--k-r-3", "--k-sh-2", "--k-t-3"],
+      "class": "코드",
+      "lineage": "jelly",
+      "roles": ["DESC"],
+      "impl": ".kit-ribbon (ui-kit.css) · 실험대 catalog/kit-lab.html",
+      "tokens": [
+        "--rbn-face ← 입력 토큰",
+        "--rbn-w · --rbn-h = w×.122 (시안 상자비 실측 1648×200 @4x)",
+        "--rbn-ring = clamp(1.5px, h×.075, 10px) · --rbn-tail 6.5%",
+        "파생: --rbn-top = mix(face,흰 26%) · --rbn-bot = mix(face,검 13%) · --rbn-back = mix(face,흰 6%) · --rbn-edge = mix(face,검 46%)"
+      ],
       "variants": ["ribbon", "capsule", "plain"],
       "states": ["default"],
-      "size_steps": ["sm", "md"],
+      "size_steps": ["sm", "md", "lg"],
       "approval": { "status": "검토중", "date": "2026-08-21", "by": "" },
       "converge": { "edge_px": null, "dE": null, "mismatch_pct": null },
-      "consumers": [],
-      "notes": "설정 시안 리본 실측: 위 #DC775E → 아래 #CD5863, 높이 55px@365. 덩굴 장식은 그림."
+      "converge_method": "N/A — **색 수렴 판정 대상이 아니다.** 원본 시안의 리본(x340~2030 · y1322~1528 @4x)은 반투명 유리라 뒤 배경(나뭇잎·하늘)이 면색에 섞여 든다. 그대로 ΔE 를 재면 부품이 아니라 배경 그림을 판정하게 된다. 상자비·2톤·외곽선만 실측해 **불투명 정본**으로 세웠다 — 승인 시 '유리를 재현한 게 아니라 대역한 것'임을 눈으로 확인할 것.",
+      "consumers": ["메인화면 안내 리본 (sian2-ribbon.webp 45KB 대체)"],
+      "notes": "원본 시안 실측(main-menu-sian@4x): 위 #F4BDCC → 아래 #C88A98, 하단 역광 #D7969E, 외곽선 #844666, 상자 1648×200. 글자 높이/리본 높이 ≈ .24 → 굵기 보정해 .30 채택. clip-path 로 양끝 꼬리 노치를 파고, inset 그림자는 clip-path 를 못 따라가므로 림을 의사요소 2겹으로 만든다. 계보 판정 = jelly (메인화면 시안 실측). 이전 기록의 설정 시안 리본(#DC775E→#CD5863)은 **다른 화면·다른 계보**라 여기 섞지 않았다."
     },
     {
       "id": "tab",

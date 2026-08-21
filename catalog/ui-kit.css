@@ -241,3 +241,346 @@
   padding: var(--k-sp-4);
   /* TODO(T3): 열림/닫힘 전환·스크롤 잠금 */
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   T3 / 실험1 — 기준 부품 2종 실제 구현:  .kit-btn (젤리 버튼) · .kit-ribbon
+   ───────────────────────────────────────────────────────────────────────
+   ⚠ 위쪽 골격(.k-*)은 **한 줄도 건드리지 않는다**. 여기부터는 순수 추가분이다.
+     새 이름 `.kit-*` 은 tentwin.html 에 0회 등장(grep 확인) — 충돌 없음.
+
+   ── 출처와 방침 ────────────────────────────────────────────────────────
+   [구조] tentwin.html 9964~10071 계승. 5겹 세로 그라데이션의 **스톱 위치
+          10개(4/12/20/48/57/68/78/87/89/100%)**, 반경비 `.245`, 3중 그림자
+          레시피(`0 Npx 0 plum` + 확산 + `inset 0 0 0 ring edge`), 눌림 거동.
+   [색]   **전량 재실측**. 기준자는 원본 시안
+          `tentwin/assets/art/incoming/mockup/main-menu-sian@4x.png` (2340×4096).
+          버튼 상자 4개 모두 **1375×319 @4x (aspect 4.31)** 로 동일했다.
+          각 스톱 y = 상자상단 + H×스톱% 에서 라벨·아이콘이 없는 세로 띠
+          (핑크/퍼플/오렌지 x1560~1810 · 민트 x1150~1560)의 **중앙값**.
+          가로 균일성 확인 완료(스페큘러 점 제외) → 세로 그라데만으로 재현된다.
+          그래서 tentwin 의 `::before` 유리광택 판은 **얹지 않는다**(이중 계상).
+
+   🚨 브랜드 토큰 `--k-pink` 등을 버튼에 **재사용하지 않는다.**
+      --k-* 은 *전투 목업* 젤리 클러스터 출처라 메인 버튼과 계보가 다르다.
+      실측 대조: 핑크 면색이 세 계보에서 L* 49.6 / 77.7 / 67.0 로 갈렸다
+      (원본 시안 · 9964 --cl · --k-pink). ΔE 게이트의 10배 차이다.
+      → 버튼 전용 계보 `--k-btn-<색>-face` 신설. 사유는 kit-registry.json notes.
+
+   ── ×0.67 파생 공식 최종 판정 (이번 실험의 핵심 산출물) ────────────────
+   원본 시안 실측 L*(edge)/L*(face):
+       핑크 0.518 · 퍼플 0.376 · 오렌지 0.558 · 민트 0.438  → **평균 0.472**
+   ⇒ `×0.67` 은 **거짓**. 계보 3개 중 「실제 배선된 버튼 ×0.505」에 가깝고
+     「킷 토큰 ×0.655」와는 멀다. **원본 시안이 최종 심판이므로 킷 토큰 쪽이
+     틀렸다.** 게다가 색별 폭이 0.18(L*)로 벌어져 **단일 비율로는 4색을 못 덮는다**
+     → 외곽선·림·밴드는 **색별 실측 토큰으로 못 박고**, 파생식은 시안에 없는
+     새 색(sky 등)을 위한 **기본값**으로만 남긴다.
+   부산물 `deep = face × 0.90` 도 시안에서는 성립하지 않는다:
+       하단 밴드/면 V비 = 핑크 .870 · 퍼플 .844 · 오렌지 .864 · 민트 .781
+       → 평균 **0.840** (L*비 0.828). 시안 기준 채택값은 ×0.84 다.
+
+   ── 파생 공식(oklab 혼합비) — 잔차는 위 실측 대비 ΔE00 ─────────────────
+       4%  상단 림    face + 흰 31%      12% 림아래  face + 흰 7%
+       20% 윗면       face + 흰 2%       48/57/68%   face 그대로
+       78% 아랫면     face + 흰 2%       87% 역광 림 face + 흰 31%
+       89% 밴드 시작  face + 검 14%     100% 밴드 끝 face + 검 40%
+       외곽선 ring    face + 검 42%      하단 립     face + 검 41%
+     4색 공통 비율일 때 면(48~78%)은 ΔE00 ≤0.5 로 정확하지만 얇은 띠는
+     4~9 까지 벌어진다(오렌지·민트가 최악). 그래서 실측 토큰이 이긴다.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+:root{
+  /* ── 버튼 전용 색 계보. 브랜드 --k-* 와 **의도적으로 분리**되어 있다. ──
+     값 출처: main-menu-sian@4x.png 각 버튼 상자 42~62% 높이 중앙값.        */
+  --k-btn-pink-face:   #C0476A;   /* [측정] 게임을 시작  L* 48.0 */
+  --k-btn-purple-face: #925AD4;   /* [측정] 새로운 모험  L* 49.7 */
+  --k-btn-orange-face: #EBA235;   /* [측정] 이어하기     L* 72.1 */
+  --k-btn-mint-face:   #69B2A5;   /* [측정] 설정         L* 67.7 */
+  --k-btn-sky-face:    #6C8FE0;   /* [파생 전용] 시안에 없음 — 수렴 판정 제외 */
+}
+
+/* ─────────────────────────── ① .kit-btn ─────────────────────────────── */
+.kit-btn{
+  /* ■ 입력 토큰은 이 한 줄뿐이다. 나머지는 전부 파생되거나 변주가 덮어쓴다. */
+  --btn-face: var(--k-btn-pink-face);
+
+  /* ■ 크기 — 반경·링·립·글자·아이콘이 전부 --btn-h 에 비례한다(무단위 배율). */
+  --btn-h: 56px;                                    /* md 기본 */
+  /* 모서리 반지름비. [계승] 9964 는 `.245`(다른 레퍼런스 크롭에서 잰 값)였다.
+     원본 시안에 대고 **반경 1변수 스윕**(.19~.30 → .255~.285 정밀)으로 코너
+     150×150 MAE 를 최소화하니 **.265** 에서 최소였다(핑크 5.96 · 퍼플 7.46 ·
+     오렌지 6.55, 평균 6.66. `.245` 는 7.55 로 13% 나쁘다). 민트는 렌치가 코너를
+     덮어 판정에서 뺐다. ⇒ 시안이 계승값보다 **8% 더 둥글다**. 더 가까운 자가 이긴다. */
+  --btn-rr: .265;
+  --btn-r:    calc(var(--btn-h) * var(--btn-rr));
+  --btn-ring: clamp(1.5px, calc(var(--btn-h) * .025), 12px);
+                          /* [측정] 시안 상단 외곽선 8px / H319 = 2.51% — 4색 동일 */
+  /* 링 ↔ 상단 림 전이의 무름. **색별 실측 토큰**이다(땜질 아님).
+     시안에서 전이의 sobel 세기를 재면 핑크 515 · 퍼플 582 · 민트 575 인데
+     **오렌지만 378** 로 유독 무르다(전이 폭은 4색 모두 3px 로 같다 —
+     핑크 27→83→140→155 · 퍼플 12→62→136→160 · 오렌지 82→142→193→208 ·
+     민트 41→76→155→201. 다른 건 폭이 아니라 세기다).
+     코드가 4색을 같은 하드 단차로 그리면 **오렌지만 원화보다 날카로워져**
+     띠 crop 경계 p95 가 9px 로 떨어진다. 반대로 4색 모두에 번짐을 주면
+     나머지 3색이 원화보다 물러져 8px 로 뒤집힌다(2변수 스윕 8조합 전수 확인).
+     ⇒ 원화가 색마다 다르게 무른 것이므로 토큰도 색별이어야 한다. */
+  --btn-ring-soft: 0;
+  --btn-lip:  clamp(2px,   calc(var(--btn-h) * .050), 4px);
+                          /* [계승] `0 3px 0` 의 비례화. 시안에는 링 밖 립이
+                             없으므로 상한 4px 로 묶어 실루엣을 안 키운다. */
+  --btn-px:   calc(var(--btn-h) * .38);             /* 좌우 안쪽 여백 */
+  --btn-fs:   calc(var(--btn-h) * .37);             /* [측정] 라벨 높이비 */
+  --btn-ico:  calc(var(--btn-h) * .70);             /* [계승] 9964 아이콘 0.70H */
+  --btn-gap:  calc(var(--btn-h) * .13);
+
+  /* ■ 파생 색 — 변주 클래스가 실측값으로 덮어쓴다(아래). 여기 값은
+       "시안에 없는 새 색"이 --btn-face 하나만으로도 완전한 버튼이 되게 하는
+       **기본값**이다. 파생식의 근거·잔차는 위 머리말 표 참고. */
+  --btn-rim:    color-mix(in oklab, var(--btn-face), #FFF 31%);
+  --btn-rim-2:  color-mix(in oklab, var(--btn-face), #FFF  9%);
+  --btn-top:    color-mix(in oklab, var(--btn-face), #FFF  3%);
+  --btn-low:    color-mix(in oklab, var(--btn-face), #FFF  2%);
+  --btn-back:   color-mix(in oklab, var(--btn-face), #FFF 31%);
+  --btn-band:   color-mix(in oklab, var(--btn-face), #000 14%);
+  --btn-band-2: color-mix(in oklab, var(--btn-face), #000 11%);
+  --btn-edge:   color-mix(in oklab, var(--btn-face), #000 42%);
+  --btn-plum:   color-mix(in oklab, var(--btn-face), #000 41%);
+
+  position: relative;
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: var(--btn-gap);
+  /* ★ 가변폭 — `aspect-ratio` 고정 금지. 라벨이 길어지면 가로로 늘어난다.
+       min-height 는 터치 타깃(≥44px) 하한도 겸한다. */
+  min-height: var(--btn-h);
+  padding: 0 var(--btn-px);
+  border: 0; border-image: none;
+  border-radius: var(--btn-r);
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: var(--btn-fs);
+  font-weight: 800;
+  line-height: 1.1;
+  color: #FFF;
+  text-shadow:
+    0 calc(var(--btn-h) * .022) 0 var(--btn-edge),
+    calc(var(--btn-h) * .016) 0 0 var(--btn-edge),
+    calc(var(--btn-h) * -.016) 0 0 var(--btn-edge),
+    0 calc(var(--btn-h) * -.014) 0 var(--btn-edge);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  /* [계승+보정] 9964 의 5겹 세로 그라데이션. 색은 시안 실측, **스톱 위치는
+     시안 세로 단면의 기울기 변곡점으로 옮겼다.**
+     ── 왜 옮겼나(수렴 판정이 잡아낸 것) ──────────────────────────────
+     9964 는 상단 림을 `4%→12% 선형 램프` 로 그렸다. 그런데 시안의 상단 림은
+     **2.8~8.0% 고원 + 8.0~9.8% 급락** 이다(오렌지 y2519→2520 에서 루마
+     192.7→181.8, 1px 단차). 램프는 이 단차를 뭉개서 오렌지 띠 crop 의
+     경계 오차 p95 가 9px 로 떨어졌다(다른 3색은 대비가 낮아 통과).
+     같은 이유로 하단 역광 림(87%)도 얇은 정점 + 88.8% 급락으로 잡는다.
+     ⇒ **레시피(5겹·같은 토큰 8개)는 그대로, 스톱만 실측 변곡점으로.**   */
+  background:
+    linear-gradient(180deg,
+      var(--btn-rim)     3.6%,   /* 상단 림 고원 시작 */
+      var(--btn-rim)     7.6%,   /* 상단 림 고원 끝  */
+      var(--btn-rim-2)   9.8%,   /* 급락 후 윗면 머리 */
+      var(--btn-top)    20%,
+      var(--btn-face)   48%,
+      var(--btn-face)   68%,
+      var(--btn-low)    78%,
+      var(--btn-back)   87%,     /* 하단 역광 림 정점 */
+      var(--btn-band)   88.8%,   /* 3D 밴드 시작(급락) */
+      var(--btn-band-2) 96.5%,   /* 밴드 끝 — 아래로 갈수록 다시 밝아진다 */
+      var(--btn-band-2)100%);
+  box-shadow:
+    0 var(--btn-lip) 0 var(--btn-plum),
+    0 calc(var(--btn-h) * .145) calc(var(--btn-h) * .32) rgba(83,28,40,.26),
+    /* ★ 외곽선 링에 **안쪽 번짐 2px** 을 준다(blur = 링두께 × .42).
+       원화의 외곽선은 면으로 2px 걸쳐 번진다(핑크 y1722→1725 루마 27→83→
+       140→155 · 퍼플 12→62→136→160 · 민트 41→76→155→201 — 4색 공통 2px).
+       하드 1px 단차로 두면 링↔림 대비가 가장 큰 **오렌지에서만** 유령 경계가
+       생겨 띠 crop 경계 p95 가 9px 로 떨어진다(다른 3색은 대비가 낮아 통과).
+       원화에 있는 번짐을 안 그린 쪽이 틀린 것이다. */
+    inset 0 0 calc(var(--btn-ring) * var(--btn-ring-soft)) var(--btn-ring) var(--btn-edge);
+  transition: transform .08s ease-out, box-shadow .08s ease-out, filter .15s;
+}
+
+/* ── 변주 5색. 실측 토큰이 파생 기본값을 덮는다(위 §×0.67 판정 근거). ── */
+.kit-btn--pink{
+  --btn-face: #C0476A;
+  --btn-rim: #E78294;  --btn-rim-2: #CF5C75; --btn-top: #C54D6D;
+  --btn-low: #C34B6B;  --btn-back:  #F28498;
+  --btn-band: #A9405A; --btn-band-2:#B63E5C;
+  --btn-edge: #6D1D33; --btn-plum:  #74223D;   /* L*비 0.518 */
+}
+.kit-btn--purple{
+  --btn-face: #925AD4;
+  --btn-rim: #C18EF2;  --btn-rim-2: #9F6ADB; --btn-top: #955ED4;
+  --btn-low: #955FD6;  --btn-back:  #CD8FF8;
+  --btn-band: #7749B4; --btn-band-2:#7D4AB7;
+  --btn-edge: #39196D; --btn-plum:  #3F2772;   /* L*비 0.376 <- 4색 최저 */
+}
+.kit-btn--orange{
+  --btn-face: #EBA235;
+  --btn-rim: #FBCE62;  --btn-rim-2: #F0AC41; --btn-top: #ECA539;
+  --btn-low: #ECA338;  --btn-back:  #F9CC53;
+  --btn-band: #CB7931; --btn-band-2:#D68031;
+  --btn-edge: #8A511D; --btn-plum:  #834A19;   /* L*비 0.558 <- 4색 최고 */
+  --btn-ring-soft: .25;   /* [측정] 시안 전이 세기 378 (다른 3색 515~582) */
+}
+.kit-btn--mint{
+  --btn-face: #69B2A5;
+  --btn-rim: #93DACC;  --btn-rim-2: #70BAAD; --btn-top: #6AB3A6;
+  --btn-low: #6DB5A9;  --btn-back:  #8CD6C2;
+  --btn-band: #508D8C; --btn-band-2:#519492;
+  --btn-edge: #294B51; --btn-plum:  #2B4D52;   /* L*비 0.438 */
+}
+/* sky 는 시안에 없다 — **파생식만으로** 만든 대조군(수렴 판정 대상 아님). */
+.kit-btn--sky{ --btn-face: var(--k-btn-sky-face); }
+
+/* ── 크기 3단. --btn-h 만 바뀌고 반경은 .245 비례로 저절로 따라간다. ── */
+.kit-btn--sm{ --btn-h: 44px; }   /* 터치 타깃 하한 */
+.kit-btn--md{ --btn-h: 56px; }
+.kit-btn--lg{ --btn-h: 70px; }
+
+/* ── 상태 4종 ────────────────────────────────────────────────────────── */
+/* ② 눌림 — [계승] 9964 `:active` 는 그림자만 줄였다. 여기에 2px 하강을 더해
+      "판이 실제로 내려앉는" 감각을 만든다(현행 비트맵에는 아예 없던 것). */
+.kit-btn:active,
+.kit-btn.is-pressed{
+  transform: translateY(2px);
+  box-shadow:
+    0 calc(var(--btn-lip) * .34) 0 var(--btn-plum),
+    0 calc(var(--btn-h) * .055) calc(var(--btn-h) * .145) rgba(83,28,40,.22),
+    inset 0 0 calc(var(--btn-ring) * var(--btn-ring-soft)) var(--btn-ring) var(--btn-edge);
+}
+/* ③ 비활성 — 채도↓ + 투명 .5. 순회색으로 죽이지 않는다(ART §7-1 무채색 금지). */
+.kit-btn[disabled],
+.kit-btn.is-disabled{
+  filter: saturate(.32);
+  opacity: .5;
+  cursor: not-allowed;
+  transform: none;
+  pointer-events: none;
+}
+/* ④ 강조 — 펄스 글로우. 그림자 계보는 유지하고 바깥 글로우만 호흡시킨다. */
+.kit-btn.is-featured{ animation: kit-btn-pulse 1.6s ease-in-out infinite; }
+@keyframes kit-btn-pulse{
+  0%,100%{
+    box-shadow:
+      0 var(--btn-lip) 0 var(--btn-plum),
+      0 calc(var(--btn-h) * .145) calc(var(--btn-h) * .32) rgba(83,28,40,.26),
+      0 0 0 0 color-mix(in oklab, var(--btn-rim), transparent 35%),
+      inset 0 0 calc(var(--btn-ring) * var(--btn-ring-soft)) var(--btn-ring) var(--btn-edge);
+  }
+  50%{
+    box-shadow:
+      0 var(--btn-lip) 0 var(--btn-plum),
+      0 calc(var(--btn-h) * .145) calc(var(--btn-h) * .32) rgba(83,28,40,.26),
+      0 0 0 calc(var(--btn-h) * .16) color-mix(in oklab, var(--btn-rim), transparent 100%),
+      inset 0 0 calc(var(--btn-ring) * var(--btn-ring-soft)) var(--btn-ring) var(--btn-edge);
+  }
+}
+@media (prefers-reduced-motion: reduce){
+  .kit-btn.is-featured{ animation: none; outline: 2px solid var(--btn-rim); outline-offset: 2px; }
+}
+
+/* ── 아이콘 슬롯 4종 (none / left / right / both) ──────────────────────
+   설정 버튼이 **좌 기어 + 우 렌치 동시**라 both 가 실사용 조합이다.
+   글리프는 배경 이미지로 들어오는 조각이라 상자만 잡아 준다.            */
+.kit-btn__ico{
+  flex: 0 0 auto;
+  width: var(--btn-ico); height: var(--btn-ico);
+  background: center/contain no-repeat;
+  display: block;
+}
+.kit-btn__label{ flex: 0 1 auto; white-space: nowrap; }
+/* 라벨을 늘 가운데 두기 위해 반대편에 같은 폭의 빈 자리를 만든다. */
+.kit-btn--icon-none  { }
+.kit-btn--icon-left  .kit-btn__ico:last-child,
+.kit-btn--icon-right .kit-btn__ico:first-child{ visibility: hidden; }
+.kit-btn--icon-left  { padding-left:  calc(var(--btn-px) * .55); }
+.kit-btn--icon-right { padding-right: calc(var(--btn-px) * .55); }
+.kit-btn--icon-both  {
+  padding-left:  calc(var(--btn-px) * .55);
+  padding-right: calc(var(--btn-px) * .55);
+  justify-content: space-between;
+}
+
+/* ── 수렴 판정 전용: 시안 1:1 대조용 무장식 모드 ───────────────────────
+   `--btn-h: 319px` 로 시안 상자와 픽셀 동일하게 세우고 라벨·아이콘·바깥
+   그림자를 끈다. **부품의 성분 판정이지 화면 판정이 아니다.**            */
+.kit-btn--bare{
+  padding: 0; gap: 0; font-size: 0; text-shadow: none;
+  box-shadow: inset 0 0 calc(var(--btn-ring) * var(--btn-ring-soft)) var(--btn-ring) var(--btn-edge);
+  transition: none; animation: none;
+}
+
+
+/* ─────────────────────────── ② .kit-ribbon ───────────────────────────
+   안내 리본. 시안(x340~2030 · y1322~1528 @4x, 상자비 8.2)은 **반투명 유리
+   리본**이라 뒤 배경이 비쳐 든다 — 그래서 색 수렴 판정 대상이 아니다
+   (배경이 값에 섞여 ΔE 가 배경 그림 판정으로 변질된다). 여기서는 시안의
+   면 2톤·외곽선·상자비만 가져와 **불투명 정본**으로 세운다.
+   실측: 위 #F4BDCC → 아래 #C88A98, 하단 역광 #D7969E, 외곽선 #844666.  */
+.kit-ribbon{
+  --rbn-w: 320px;
+  --rbn-h: calc(var(--rbn-w) * .122);        /* [측정] 206/1690 = .122 */
+  --rbn-face: #DCA3B3;
+  --rbn-top:  color-mix(in oklab, var(--rbn-face), #FFF 26%);   /* ≈ #F4BDCC */
+  --rbn-bot:  color-mix(in oklab, var(--rbn-face), #000 13%);   /* ≈ #C88A98 */
+  --rbn-back: color-mix(in oklab, var(--rbn-face), #FFF  6%);   /* ≈ #D7969E */
+  --rbn-edge: color-mix(in oklab, var(--rbn-face), #000 46%);   /* ≈ #844666 */
+  --rbn-ring: clamp(1.5px, calc(var(--rbn-h) * .075), 10px);
+  --rbn-tail: 6.5%;                          /* 양끝 꼬리 노치 깊이 */
+  --rbn-clip: polygon(
+      0 0, 100% 0,
+      calc(100% - var(--rbn-tail)) 50%,
+      100% 100%, 0 100%,
+      var(--rbn-tail) 50%);
+
+  position: relative;
+  display: inline-flex; align-items: center; justify-content: center;
+  box-sizing: border-box;
+  width: var(--rbn-w); min-height: var(--rbn-h);
+  padding: 0 calc(var(--rbn-tail) + 4%);
+  background: var(--rbn-edge);
+  clip-path: var(--rbn-clip);
+  filter: drop-shadow(0 calc(var(--rbn-h) * .10) calc(var(--rbn-h) * .22) rgba(83,28,40,.28));
+  font-family: inherit;
+  /* [측정] 시안 리본 글자 높이 / 리본 높이 ≈ .24 → 굵기 보정해 .30 채택. */
+  font-size: calc(var(--rbn-h) * .30);
+  font-weight: 800;
+  white-space: nowrap;
+  color: #FFF;
+  text-shadow: 0 1px 0 var(--rbn-edge), 0 0 3px rgba(96,40,60,.5);
+}
+/* 면(2톤 + 하단 역광) — 외곽선 위에 --rbn-ring 만큼 안쪽으로 얹는다.
+   inset 그림자는 clip-path 노치를 못 따라가므로 의사요소로 림을 만든다. */
+.kit-ribbon::before{
+  content: '';
+  position: absolute; inset: var(--rbn-ring);
+  clip-path: var(--rbn-clip);
+  background: linear-gradient(180deg,
+    var(--rbn-top)   0%,
+    var(--rbn-face) 46%,
+    var(--rbn-bot)  82%,
+    var(--rbn-back)100%);
+  pointer-events: none;
+}
+/* 안쪽 밝은 림 — 유리 리본의 가장자리 반사. */
+.kit-ribbon::after{
+  content: '';
+  position: absolute; inset: var(--rbn-ring);
+  clip-path: var(--rbn-clip);
+  background: linear-gradient(180deg,
+    rgba(255,251,238,.85) 0,
+    rgba(255,251,238,0) calc(var(--rbn-ring) * 1.6));
+  pointer-events: none;
+}
+.kit-ribbon > *{ position: relative; z-index: 1; }
+
+.kit-ribbon--sm{ --rbn-w: 240px; }
+.kit-ribbon--md{ --rbn-w: 320px; }
+.kit-ribbon--lg{ --rbn-w: 366px; }   /* 390 뷰포트 실사용 폭 */
+/* 변주 — 캡슐(꼬리 없음) · 민짜(외곽선 없음). registry header.variants 와 1:1 */
+.kit-ribbon--capsule{ --rbn-tail: 0%; border-radius: 999px; }
+.kit-ribbon--plain{ --rbn-tail: 0%; --rbn-ring: 0px; }
