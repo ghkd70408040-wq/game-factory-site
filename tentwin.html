@@ -8499,11 +8499,22 @@ html.no-art-logo .logo-img  { display: none; }
   box-shadow: none;
   overflow: hidden;
 }
-.cp-frame::after { content: ""; flex: 0 0 7%; }
+/* W-E(2026-08-21) — 아래 두 줄의 flex-shrink 를 0 → 양수로 연다. 이유는
+   `.cp-card` 의 새 min-height(:8864 주석) 하나다: 카드가 바닥값을 요구할 때
+   줄어들 형제가 하나도 없으면 `.cp-frame{overflow:hidden}` 이 **아래(버튼)부터**
+   잘라 낸다. 바닥 여백(::after)이 먼저 사라지고 무대가 그 다음이라는 우선순위를
+   shrink 계수 6:1 로 못박는다 — 390x664 에서 필요한 68px 중 ::after 가 40.4px
+   (7%=46.1 의 대부분), 무대가 27.6px 을 낸다(무대 361.9 → 334.3, -7.6%).
+   H>=770 에서는 카드가 38% 기준을 넘지 않으므로 이 두 줄은 **한 번도 발동하지
+   않는다**(390x844 픽셀 불변 검증 완료).
+   구판 봉인:
+     .cp-frame::after { content: ""; flex: 0 0 7%; }
+     .cp-stage { … flex: 0 0 55%; … } */
+.cp-frame::after { content: ""; flex: 0 6 7%; }
 
 .cp-stage {
   position: relative;
-  flex: 0 0 55%;
+  flex: 0 1 55%;
   min-height: 0;
   display: block;
   align-items: stretch;
@@ -8864,7 +8875,31 @@ html.no-art-logo .logo-img  { display: none; }
 .cp-card {
   position: relative;
   flex: 0 0 38%;
-  min-height: 0;
+  /* 🚨 W-E(2026-08-21) 사용자 실기기 반려 — "폭발력·꾸준함까지만 보이고 순발력이
+     반쯤 잘리고 행운은 안 보인다". 원래 `min-height: 0`.
+     ── 왜 났나(실측) ────────────────────────────────────────────────────────
+     카드 세로는 `flex: 0 0 38%` **한 값에만** 매여 있었다. 카드 안의 고정 몫은
+     화면 높이와 무관하게 138px 이다(padding 14x2 + 탭띠 26 + gap 5 + gap 5 +
+     #cp-items margin-top 6 + 아이템 줄 17 + gap 5 + 풋 46), 그래서
+         #cp-info = 0.38 x (H - 6) - 138
+     이고 정보 카드가 요구하는 압축불가 높이는
+         ci-id 52 + ci-tag 18 + cc-stats 73 + gap 4x3 = 151px (스탯 4바 바닥)
+     이다. 이 둘이 만나는 지점이 **H = 769.2px** — 즉 세로 770 미만인 모든 기기에서
+     4번째 바가 `.ci{overflow:hidden}` 에 잘려 나갔다. 실측:
+         390x844  #cp-info 180.4  → 4바 전부 보임 (그래서 헤드리스 대조군은 멀쩡)
+         390x664  #cp-info 112.0  → 꾸준함 +1 / 순발력 +20 / 행운 +39px 넘침
+         360x640  #cp-info 102.9  → 꾸준함 +10 / 순발력 +29 / 행운 +48px 넘침
+     사용자 기기(주소창 포함 가시높이 ~660)가 정확히 두 번째 줄이다.
+     ── 수리 ────────────────────────────────────────────────────────────────
+     비율 하나로 못 하는 일이므로 **바닥값**을 준다. 318px = 고정 몫 138 +
+     #cp-info 180 이고, 180 은 390x844(승인된 대조군)의 #cp-info 실측 그대로다 —
+     즉 "짧은 기기도 844 와 같은 카드 속을 본다"가 이 숫자의 뜻이고, 그래서
+     H>=770 에서는 38% 가 이미 318 을 넘어 **한 번도 발동하지 않는다**(대조군 불변).
+     모자란 몫은 `.cp-frame::after` 바닥여백과 무대가 shrink 로 낸다(:8502 주석).
+     ⚠ 가로 배치(min-aspect-ratio 블록)에서는 이 바닥이 교차축이 되므로 그쪽에서
+     0 으로 되돌린다(:9204 부근) — 그 블록은 H=360 예산을 산술로 맞춰 둔 곳이라
+     여기서 끼어들면 안 된다. */
+  min-height: 318px;
   display: flex;
   flex-direction: column;
   gap: 5px;              /* 14차 — 원래 6px (카드 세로 예산 회수) */
@@ -9201,7 +9236,14 @@ html.no-art-logo .logo-img  { display: none; }
   .cp-frame { flex-direction: row-reverse; align-items: stretch; gap: 10px; padding-bottom: calc(var(--safe-b) + 6px); }
   .cp-frame::after { content: none; }
   .cp-stage { flex: 0 0 58%; }
-  .cp-card { flex: 1 1 40%; margin-top: 0; }
+  /* W-E(2026-08-21) — `min-height: 0` 한 낱말이 새로 붙었다. 세로 배치에서
+     카드 바닥값 318px 을 세웠는데(:8864 주석), 가로에서는 카드가 row-reverse 의
+     **교차축**이라 그 318 이 "높이 하한"으로 그대로 살아난다. H=360 가로폰은
+     프레임 안쪽이 348px 뿐이고 이 블록은 그 348 을 margin 43 + 카드 305 로
+     산술로 맞춰 둔 자리다(바로 아래 .cp-card margin-top 주석의 검산) — 318 이
+     끼어들면 그 검산이 통째로 깨진다. 그래서 가로에서는 명시적으로 되돌린다.
+     구판 봉인:  .cp-card { flex: 1 1 40%; margin-top: 0; } */
+  .cp-card { flex: 1 1 40%; margin-top: 0; min-height: 0; }
   /* 14차 B절 — 원래 height: 60px (고정). 리본은 카드 위를 덮는 absolute 층이라
      margin-top 과 한 쌍으로 움직여야 한다. 기울기 50vh 는 **H=390 에서 정확히
      60px** 이 되도록 잡은 값이다(390*0.5-135=60) — 즉 844x390 과 모든 데스크톱은
@@ -20509,8 +20551,10 @@ window.TT_SFX = {
        나온 값은 전부 나눗셈 없이 떨어진다(6000·8000·7000·6500 × 1.25).
      ▣ 133 계수 계약: SKILL_MS 는 tools/balance-baseline.json 의 133 키에 **없다**
        (SKILL_MAX·SKILL_BASE·SKILL_COMBO·SKILL_COMBO_CAP·SKILL_CUTIN_MS·
-       SKILL_CUTIN_MIN_MS·SKILL_TW_HEAD 만 있다). 그래서 baseline 은 한 키도
-       안 바뀌었고, 이 변경은 계약 밖이다.
+       SKILL_CUTIN_MIN_MS·SKILL_TW_HEAD 만 있다). 우연이 아니라 구조다 —
+       tools/verify.js :400 의 추출기는 `var NAME = <숫자>;` 꼴만 뜨는데
+       SKILL_MS 는 **객체 리터럴**이라 애초에 걸리지 않는다. 그래서 baseline 은
+       한 키도 안 바뀌었고(133 그대로 · md5 dfede62a…), 이 변경은 계약 밖이다.
      ▣ 클래식 3종과 무관: canFireSkill 이 `S.mode === 'adv'` 를 요구하고
        (:27767), 다른 유일한 시전자인 보스 확정 발동도 advPlan 안에 있다(:32782).
        classic / classic-rush / classic-daily 는 이 상수에 닿지 않는다.
@@ -35560,8 +35604,13 @@ window.TT_SFX = {
        네 컷 중 하나다. 배경 칸의 --art-map-bg 는 --cut-o12-img 가 정의된 지금은
        **폴백으로 물러난다** — 지우지 않는 이유는 §E "교체 자리" 규약이다.
        캐스트를 비운 근거는 o10 과 같다(그림에 트윈이 이미 서 있다).
+       배경 위치도 '18% center' → 'center' 로 옮긴다. 18% 는 **지도 원화를 왼쪽으로
+       당겨 보던 값**이라 두 형제가 가운데 선 컷에는 맞지 않는다. 390:844 화면에서는
+       비가 정확히 같아 잘림이 0 이라 차이가 안 보이지만, 조금 더 넓은 기기
+       (430×932 등)에서는 cover 가 폭을 깎으면서 구도가 왼쪽으로 밀린다.
+       f1·f2 같은 전용 세로 컷이 전부 'center' 인 것과 같은 이유다.
        W-E — 구판 봉인: ['o12', '--art-map-bg', '18% center', '--ch-twin-full',-1,'',''] */
-    ['o12', '--art-map-bg',     '18% center',  '',             -1,'',                  '']
+    ['o12', '--art-map-bg',     'center',      '',             -1,'',                  '']
   ];
   var CUTS_SORTIE = {
     ten: [
@@ -35691,8 +35740,10 @@ window.TT_SFX = {
        여기서 소멸한다 — 세로 재발주판이 도착했다. 이 컷의 개그는 두 대사가
        **서로 다른 두 사람** 것이라는 데서 나오므로, 2인컷은 장식이 아니라
        성립 조건이다. 캐스트를 비운 근거는 o10 과 같다.
+       배경 위치 '30% center' → 'center' 도 o12 와 같은 근거다(지도 원화용 값이라
+       2인 구도에는 안 맞는다 — 넓은 기기에서만 드러난다).
        W-E — 구판 봉인: ['f0', '--art-map-bg', '30% center', '--ch-ten-full', 1, '', 'bros'], */
-    ['f0', '--art-map-bg', '30% center', '',               1, '', 'bros'],
+    ['f0', '--art-map-bg', 'center',     '',               1, '', 'bros'],
     ['f1', '--art-map-bg', 'center',     '',               1, '', 'jelly'],
     /* 마지막 컷에서 한 번 튄다(여덟째 칸 = 펄스 티어). 형제 p3c 와 같은 문법이고,
        이야기의 착지점이 화면에서도 착지하게 하는 유일한 장치다. */
