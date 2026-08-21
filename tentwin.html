@@ -42498,6 +42498,256 @@ html[lang="ko"] #modal-mode .r10-ribbon > h2{
 }
 </style>
 
+<style id="we-wave">
+/* ===========================================================================
+   W-E (2026-08-21) — 사용자 반려 3건.
+     ① 하단 유리바 **테두리 블러**
+     ② 하단 메달 **확대**(사용자 명시 1.5배 · 가로 예산이 닫는다 — 아래 산술)
+     ③ 인게임 **칩 줄 유리화**(패시브 % · "다음: 텐!" · 미션/목표 배지)
+   앞선 절은 한 줄도 안 지운다. 이 블록은 문서 순서로 맨 뒤에 서서 값만 덮고,
+   되돌리기는 이 <style> 하나를 지우는 것이다.
+   =========================================================================== */
+
+/* ---- ① 하단 유리바 **테두리 블러** -----------------------------------------
+   ▣ 원인 실측 (390×844 · dpr2 · advStart(1) 직후 · 하네스 A/B 6종)
+     후보 셋을 하나씩 껐다 켜서 갈랐다(evidence-14/we1-diag-corner-2x2.png).
+
+     ① 에셋 확대 보간 — **아니다**. 세 축이 전부 축소다:
+          가로 캡  원본 150px → 56 CSS px (112 device px) = 0.747×
+          세로     원본 298px → 123 CSS px (246 device px) = 0.826×
+          허리     원본 560px → 278 CSS px (556 device px) = 0.993×
+        확대가 한 축도 없으니 보간이 흐림을 만들 자리가 없다. 실제로 왼쪽 림의
+        전이는 켜든 끄든 **device 1px** 이다(수평 밝기 프로파일 122→221).
+
+     ② `backdrop-filter: blur(3px) brightness(1.06)` — **이것이다**.
+        이 필터가 칠하는 범위는 요소의 **테두리 상자**(390×123 · radius 0)인데,
+        유리 그림(catalog/glass-hud-bar-st.webp 860×298)의 실루엣은 그 상자
+        **안쪽에 들어앉은 둥근 사각**이다. 그림 실측(알파≥128 bbox):
+          x 16~843 / 860 · y 26~275 / 298
+          → 화면 환산 들여쓰기 좌우 6.6px · 위 10.7px · 아래 9.5px, 모서리 R≈19px
+        그래서 유리가 **없는** 네 직각 모서리와 사방 띠에 "흐려지고 6% 밝아진
+        배경"이 그대로 남는다. 그것이 사용자가 본 "테두리에 낀 이상한 블러"다.
+        수치 증거(2x 픽셀 · 유리 실루엣 **밖** 8×8 블록 평균 밝기):
+          현행                 127.8
+          backdrop 만 끔       112.2   (필터 없는 맨 배경 110.6 과 사실상 동일)
+        같은 자리에서 지도 원화의 청록 사선이 필터를 끄면 **또렷하게** 돌아온다.
+
+     ③ box-shadow / filter — 이 요소에서 둘 다 계산값 `none` 이다. 무관.
+
+     ▣ 곁가지(같은 축 ①의 **산술 오류**) — `border-image-width:0 56px` 는
+       "액션바 높이 실측 111px"에서 나온 값인데 **실측은 123px** 이었다.
+       옳은 캡은 150 × 123 ÷ 298 = 61.9px 이고, 56px 이면 캡만 가로 0.373×
+       세로 0.413× 로 **9.6% 눌린다**(림·모서리가 가로로 찌그러진다).
+       아래에서 캡을 바 높이 --gbar-h 에서 **파생**시켜 이 어긋남을 산술로
+       닫는다 — ② 의 메달 확대로 바 높이가 또 바뀌기 때문에 상수로 두면 안 된다.
+
+   ▣ 수리 — 서리를 요소 사각형에서 떼어 **유리 실루엣 모양**으로 옮긴다.
+     backdrop-filter 는 자기 **아래에 이미 칠해진 것 전부**를 표본으로 삼으므로,
+     서리만 ::before 로 옮기고 그림을 요소에 남기면 이번엔 **그림이 서리에
+     먹혀서** 림이 오히려 더 흐려진다. 그래서 그림도 함께 ::after 로 내려
+     현행 칠 순서를 그대로 보존한다:
+       배경 → ::before(서리, 실루엣 모양) → ::after(유리 그림) → 메달(z 1)
+     들여쓰기·반경·캡은 전부 원본 픽셀에서 나온 비율 하나씩이다(÷298):
+       위 26/298=.0873 · 아래 22/298=.0738 · 좌우 16/298=.0537
+       모서리 46/298=.1544 · 캡 150/298=.5034
+   -------------------------------------------------------------------------- */
+
+/* ---- ② 메달 확대 — **가로 예산이 1.5배를 닫는다**(실측 보고) ---------------
+   사용자 지시는 "현재(106px)의 1.5배 = 159px" 인데, 390px 폭에서는 **불가능**
+   하다. 산술이 이렇게 닫힌다(그림 비 718/907 = 0.7916):
+     메달 넷이 한 줄에 서므로 한 칸의 중심 간격(피치)이 크기의 상한이다.
+     159px 높이면 그려지는 폭이 159 × 0.7916 = **125.9px** 이고, 넷이 겹치지
+     않으려면 바 안쪽 폭이 4 × 125.9 = **503.6px** 이어야 한다. 패딩 0 · 간격 0
+     으로 짜내도 화면이 390px 이므로 한 칸은 97.5px, 높이 상한 **123.2px**
+     (= 1.162배)에서 끝난다.
+
+   ▣ 그래서 두 번째 지렛대를 쓴다 — **캔버스의 죽은 여백**.
+     메달 원판 718×907 에서 실제 잉크는 x 44~672(폭의 **87.6%**)뿐이고 좌우
+     6.2% 씩이 완전 투명이다. 그러니 그림 상자를 버튼보다 좌우로 넓혀 그 투명
+     여백이 이웃 위로 **넘치게** 두면, 잉크끼리는 안 닿으면서 그림만 커진다.
+       잉크 폭 = 그려진 폭 × 0.876 = 높이 × 0.7916 × 0.876 = 높이 × **0.6934**
+       충돌 조건: 높이 × 0.6934 ≤ 피치
+     좌우 패딩을 10 → 4px 로 줄이고 간격을 4 → 6px 로 잡으면(피치 = (안쪽폭 +
+     간격) ÷ 4 이므로 간격은 피치를 **키운다**)
+       390px: 피치 = (390 − 8 + 6) ÷ 4 = 97.0px → 높이 상한 139.9px
+       360px: 피치 = (360 − 8 + 6) ÷ 4 = 89.5px → 높이 상한 129.1px
+       414px: 피치 = (414 − 8 + 6) ÷ 4 = 103.0px → 높이 상한 148.5px
+     그래서 `--medal-h = min(138px, 피치 ÷ 0.6934)` 한 줄로 어느 폭에서나
+     상한 바로 아래에 붙인다. 390px 실효 **138px = 현재의 1.302배**
+     (그려지는 그림 83.9×106 → 109.2×138, 면적 +69%).
+     ⚠ **1.5배는 여기서 못 준다**. 억지로 밀면 잉크가 겹치거나(넷이 서로 파먹는다)
+       메달을 세로로 늘려야 하는데(비율 파괴) 둘 다 금지다. 1.5배를 진짜로
+       원한다면 필요한 것은 CSS 가 아니라 **한 줄에 넷 배치를 버리는 결정**
+       (2×2 또는 우측 세로 날개)이고, 그건 이 파도의 범위 밖이다.
+
+   ▣ 세로 예산 — **보드 타일은 한 픽셀도 안 준다**(관문).
+     실측(390×844 전투): 타일 --ts 53px 은 **가로 구속**이다.
+       byW = (389 − 6×3) ÷ 7 = 53.0   ← min 을 쥔 항
+       byH = (540.66 − 8×3) ÷ 9 = 57.4
+     즉 #board-scroll 안에 세로 여유가 540.66 − 501 = **39.66px** 놀고 있다.
+     바가 123 → 151px 로 **+28px** 두꺼워져도 byH = (512.66 − 24) ÷ 9 = 54.3
+     이라 여전히 byW(53) 가 min 을 쥔다 → 타일 크기 불변. 27개 rect 실측이
+     전/후 동일함을 관문으로 확인한다.
+     (padding 은 위 6px · 아래 safe-b + 7px 이라 바 높이 = --medal-h + 13px.)
+
+   ▣ 동반 재배치 — 명패는 그림에 구워져 있어 저절로 따라 커지고, 남은 것은
+     우상단 배지(게이지 % · 펫 잔여 횟수) 하나다. 배지는 **돔의 오른쪽 어깨**에
+     걸려야 하는데 그 어깨는 그림 좌표로 잉크 오른끝 92.6% · 잉크 윗끝 4.7%
+     (원판 y 39~188 구간 실측)이다. 그림 상자가 `inset:0 -14px` 로 자기 중심에
+     맞춰 커지므로 배지의 오른끝은 390/360/414 어디서나 버튼 오른변 ±2px 안에
+     떨어진다 → `right:0`. 위는 높이에 비례시킨다(`--medal-h × .047`).
+     크기는 19 → 24px(×1.26 — 메달 배율 1.30 과 나란하다), 글자 10 → 12px.
+   -------------------------------------------------------------------------- */
+
+#app.battle #actionbar{
+  /* 한 칸의 중심 간격. 안쪽 폭 = 100vw − 안전영역 − 좌우 패딩(4+4), 간격 6px. */
+  --medal-pitch: calc((100vw - var(--safe-l) - var(--safe-r) - 2px) / 4);
+  --medal-h: min(138px, calc(var(--medal-pitch) / 0.6934));
+  /* 바 높이 = 메달 + 위 패딩 6 + 아래 패딩(safe-b + 7). 캡·서리 들여쓰기가
+     전부 이 한 수에서 파생된다 — 상수로 두면 ①의 "111px" 사고가 재발한다. */
+  --gbar-h: calc(var(--medal-h) + 13px + var(--safe-b));
+  gap: 6px !important;
+  padding: 6px calc(var(--safe-r) + 4px) calc(var(--safe-b) + 7px) calc(var(--safe-l) + 4px) !important;
+  position: relative;
+  /* 그림과 서리를 아래 두 겹으로 내린다(원 선언은 위 절에 그대로 살아 있다). */
+  border-image-source: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+#app.battle #actionbar::before,
+#app.battle #actionbar::after{
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+/* 서리 = 유리 실루엣 **모양**. 직각 모서리에 남던 흐린 사각이 여기서 사라진다. */
+#app.battle #actionbar::before{
+  top: calc(var(--gbar-h) * .0873);
+  right: calc(var(--gbar-h) * .0537);
+  bottom: calc(var(--gbar-h) * .0738);
+  left: calc(var(--gbar-h) * .0537);
+  border-radius: calc(var(--gbar-h) * .1544);
+  -webkit-backdrop-filter: var(--jbox-frost) brightness(1.06);
+  backdrop-filter: var(--jbox-frost) brightness(1.06);
+}
+/* 유리 그림 = 서리 **위**. 캡은 바 높이에서 파생(150 × H ÷ 298). */
+#app.battle #actionbar::after{
+  inset: 0;
+  border-style: solid;
+  border-color: transparent;
+  border-width: 0;
+  border-image-source: url("catalog/glass-hud-bar-st.webp");
+  border-image-slice: 0 150 fill;
+  border-image-repeat: stretch;
+  border-image-width: 0 calc(var(--gbar-h) * .5034);
+}
+/* 메달은 두 겹 위. z-index 1 이 곧 "배경 → 서리 → 유리 → 메달" 계약이다. */
+#app.battle #actionbar .act{
+  height: var(--medal-h) !important;
+  z-index: 1;
+}
+/* 그림 상자만 좌우로 넘친다 — 넘치는 것은 캔버스의 투명 여백뿐이다. */
+#app.battle #actionbar .act::before{ inset: 0 -14px; }
+#app.battle #actionbar .act .act-badge{
+  top: calc(var(--medal-h) * .047) !important;
+  right: 0 !important;
+  min-width: 24px !important;
+  height: 24px !important;
+  padding: 0 6px !important;
+  font-size: 12px !important;
+}
+/* 짧은 화면 두 단계는 앞 절의 80/70px 을 그대로 잇는다 — 같은 수를 변수로도
+   써 줘야 --gbar-h(=캡·서리)가 함께 따라온다. */
+@media (max-height: 739px){ #app.battle #actionbar{ --medal-h: 80px; } }
+@media (max-height: 659px){ #app.battle #actionbar{ --medal-h: 70px; } }
+/* 가로(PC) 분기는 액션바가 **우 날개**로 가고 유리 띠를 이미 벗은 자리다.
+   세로용 두 겹이 거기서 살아나면 세로 띠가 유령처럼 남으므로 여기서 닫는다. */
+@media (min-aspect-ratio: 1/1) and (min-width: 900px){
+  #app.battle #screen-game.active #actionbar::before,
+  #app.battle #screen-game.active #actionbar::after{ display: none; }
+  #app.battle #screen-game.active #actionbar .act{ height: 94px !important; }
+  #app.battle #screen-game.active #actionbar .act::before{ inset: 0; }
+  #app.battle #screen-game.active #actionbar .act .act-badge{
+    top: 5px !important; right: 9px !important;
+    min-width: 19px !important; height: 19px !important;
+    padding: 0 5px !important; font-size: 10px !important;
+  }
+}
+
+/* ---- ③ 인게임 칩 줄 **유리화** ---------------------------------------------
+   대상 넷은 지금까지 크림-베이지 캔디 상자였다(§'인게임 상단 목표 판때기':
+   linear-gradient #FFFAEC→#F6CE97 + `inset 0 0 0 2.5px #8A5A33` 갈색 윤곽 +
+   `0 3px 0 #C88F55` 굽). 화면의 나머지가 전부 유리로 넘어간 뒤로 이 줄만
+   혼자 옛 문법이라 "따로 논다"는 반려를 받았다.
+
+   ▣ 새 그림 0장 — 이미 있는 `catalog/glass-capsule-v4.webp` 를 **축소 재사용**
+     한다(v3 는 캡이 잘린 폐기판이라 _superseded 로 물러났다).
+     원판 733×286 실측: 좌우 끝에서 x=3 부터 알파가 서고 x=5~6 에서 253 으로
+     림이 가장 밝다가 x≈190 에서 몸통값 35 로 평탄해진다 → 슬라이스 190 이
+     "림이 완전히 잦아드는 지점"과 정확히 겹친다. 그래서 `0 190 fill stretch`,
+     세로는 **안 쪼갠다**(원판 전체가 칩 높이로 균일 축소되고 늘어나는 것은
+     가로로 균일한 허리뿐 — W6.5b 캡슐 규율 그대로).
+     캡 폭 = 190 × 높이 ÷ 286 이므로 30px 칩에서 **19.93px**. 이 값을 상수로
+     박지 않고 --chip-h 에서 파생시킨다(칩이 커져도 캡이 안 눌린다).
+
+   ▣ **D1 예약 34px 불변** — 칩 높이는 30px 그대로다(min-height:30px), 따라서
+     #hud-row 의 min-height:34px(= game.js BATTLE_HUD_RESERVE)도 손대지 않는다.
+     이 절은 칠만 바꾸고 세로 예산은 한 픽셀도 안 건드린다.
+
+   ▣ 글자 — 유리 몸통은 알파 35/255(14%)라 뒤가 그대로 비친다. 그래서 잉크는
+     --j-ink(#5C4033 · 크림 위 8.51:1)를 그대로 쓰고 **흰 후광**을 한 겹 붙여
+     밝든 어둡든 획이 살게 한다(이 파일의 배너/명판이 쓰는 같은 문법).
+   ▣ 반경 15px 은 `border-image` 와 무관하다 — .done 의 초록 틴트와 .pv-armed 의
+     글로우가 **알약 모양으로** 잘리게 하는 클립일 뿐이다(안 주면 직각 모서리에
+     초록 사각이 남는다 — ①에서 본 것과 같은 종류의 결함).
+   -------------------------------------------------------------------------- */
+#screen-game #hud-row #mission-badge,
+#screen-game #hud-row #adv-goal,
+#screen-game #hud-row #pv-chip,
+#screen-game #hud-row #tw-chip{
+  --chip-h: 30px;
+  border-style: solid;
+  border-color: transparent;
+  border-width: 0;
+  border-image-source: url("catalog/glass-capsule-v4.webp");
+  border-image-slice: 0 190 fill;
+  border-image-repeat: stretch;
+  border-image-width: 0 calc(var(--chip-h) * 190 / 286);
+  border-radius: 15px;
+  background-color: transparent;
+  background-image: none;
+  box-shadow: none;
+  min-height: var(--chip-h);
+  height: auto;
+  padding: 5px 13px;
+  color: var(--j-ink);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, .92), 0 0 4px rgba(255, 255, 255, .75);
+}
+/* 안쪽 글자·글리프 — 색은 앞 절의 잉크/진행색을 잇고 후광만 물려받는다. */
+#screen-game #hud-row #mission-badge #mission-text,
+#screen-game #hud-row #adv-goal #adv-goal-t{ color: var(--j-ink); }
+#screen-game #hud-row #mission-badge #mission-prog,
+#screen-game #hud-row #mission-badge #mission-time,
+#screen-game #hud-row #tw-chip #tw-next,
+#screen-game #hud-row #pv-chip #pv-val{ text-shadow: inherit; }
+/* 달성 = 초록 유리. 판을 지우지 않고 **틴트만** 갈아 끼운다(흑백에서도 밝기로
+   갈린다). 틴트는 그림 **아래**에 깔리므로 유리의 림·광택이 그대로 산다. */
+#screen-game #hud-row #mission-badge.done,
+#screen-game #hud-row #adv-goal.done{
+  background-color: rgba(122, 203, 139, .55);
+  background-image: none;
+  box-shadow: none;
+  color: #1F4A2E;
+  filter: drop-shadow(0 0 10px rgba(102, 240, 159, .45));
+}
+#screen-game #hud-row #mission-badge.done #mission-text,
+#screen-game #hud-row #adv-goal.done .ag-ico{ color: #1F4A2E; }
+/* 삐약의 장전 완료 글로우는 신호라 살린다 — 위 `box-shadow:none` 의 예외 한 줄. */
+#screen-game #hud-row #pv-chip.pv-armed{
+  box-shadow: 0 0 10px 1px var(--pv-key, var(--accent));
+}
+</style>
+
 <script id="bg-preview-hook">
 /* 관제탑 배경 미리보기 훅 — ?bg=<카탈로그키>, 파라미터 없으면 무동작 */
 (function(){var k=new URLSearchParams(location.search).get('bg');if(!k)return;
