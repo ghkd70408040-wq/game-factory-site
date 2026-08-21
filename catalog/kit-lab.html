@@ -11,9 +11,21 @@ body{margin:0;background:#F4EFE6;color:#3A2B22;
      font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif}
 
 /* ── ① 수렴 모드: 시안 상자와 **픽셀 동일**(1375×319 @4x)하게 세운다 ── */
-#converge{display:none;background:#FFF;padding:0}
+/* padding 16px = 캡처 여백. 버튼 바깥 1px 까지 판정에 들어가야 외곽선·림을
+   프로파일로 잴 수 있다(여백 0 이면 왼/오른 끝에서 바깥 표본이 잘린다). */
+#converge{display:none;background:#FFF;padding:16px}
 #converge .slab{position:relative;width:1375px;height:319px;margin:0;background:#FFF}
 #converge .kit-btn{width:1375px;height:319px;min-height:319px;--btn-h:319px}
+/* ── 관문 생존 검증 대조군 (?mode=converge&rim=off / &rim=none) ────────────
+   **부품 레시피를 여기서 다시 쓰지 않는다.** ui-kit.css 의 토큰 하나만 꺼서
+   "밝은 림이 없는 렌더" 를 만든다. 지표가 살아 있다면 이 두 판에서 값이
+   유의미하게 올라야 한다 — 안 오르면 지표가 죽은 것이다(2026-08-21 관문 수리).
+     rim=off  : 림 띠(::before)만 제거 → **직전 반려판과 같은 림 위상**
+                (측면·코너 림 없음, 상단 띠만 세로 그라데로 남음)
+     rim=none : 림 띠 + 상단 림 색까지 제거 → 밝은 림 완전 소멸             */
+#converge.rim-off  .kit-btn::before{ display:none; }
+#converge.rim-none .kit-btn::before{ display:none; }
+#converge.rim-none .kit-btn{ --btn-rim: var(--btn-rim-2); }
 
 /* ── ② 매트릭스 모드: 색4 × 크기3 × 상태4 = 48셀 + 아이콘4 + 가변폭3 ── */
 #matrix{display:none;width:1180px;padding:22px 22px 30px;background:#F7F1E4}
@@ -78,6 +90,9 @@ function btn(opts){
 /* ───────────────── 수렴 모드 ───────────────── */
 function buildConverge(){
   var root=document.getElementById('converge'); root.style.display='block';
+  var rim=(location.search.match(/rim=([a-z]+)/)||[])[1];
+  if(rim==='off')  root.classList.add('rim-off');
+  if(rim==='none') root.classList.add('rim-none');
   COLORS.forEach(function(c){
     var slab=el('div','slab'); slab.id='cv-'+c;
     slab.appendChild(btn({color:c, bare:true}));
@@ -94,7 +109,7 @@ function buildMatrix(){
   root.appendChild(el('h2',null,'① 색 4 × 크기 3 × 상태 4 = 48셀'));
   root.appendChild(el('p','cap',
     '색은 원본 시안 main-menu-sian@4x.png 실측 토큰. 크기는 --btn-h 만 바뀌고 '
-    +'반경(.245H)·외곽선(.030H)·라벨(.37H)·아이콘(.70H)이 전부 비례로 따라간다.'));
+    +'반경(.265H)·외곽선(.029H)·밝은 림 띠(.041H)·라벨(.37H)·아이콘(.70H)이 전부 비례로 따라간다.'));
   COLORS.forEach(function(c){
     var g=el('div','grp'); g.appendChild(el('p','hdr',KO[c]));
     var t=el('table','mx'); var tr=el('tr'); tr.appendChild(el('th',null,''));

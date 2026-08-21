@@ -233,7 +233,7 @@
 }
 .k-icon-slot > img{ width:100%; height:100%; object-fit:contain; display:block; }
 
-/* ── ⑩ k-overlay  L0 · 코드 — 모달 뒤 막. 판을 띄우는 바닥. ───────── */
+/* ── ⑩ k-overlay  L0 · 코드 — 모달 뒤 막. 판을 띠우는 바닥. ───────── */
 .k-overlay{
   position: fixed; inset: 0;
   background: var(--k-scrim);
@@ -313,8 +313,11 @@
      덮어 판정에서 뺐다. ⇒ 시안이 계승값보다 **8% 더 둥글다**. 더 가까운 자가 이긴다. */
   --btn-rr: .265;
   --btn-r:    calc(var(--btn-h) * var(--btn-rr));
-  --btn-ring: clamp(1.5px, calc(var(--btn-h) * .025), 12px);
-                          /* [측정] 시안 상단 외곽선 8px / H319 = 2.51% — 4색 동일 */
+  --btn-ring: clamp(1.5px, calc(var(--btn-h) * .029), 12px);
+                          /* [측정·재실측 2026-08-21] 직전 값 .025 는 **상단만** 잰 값이다
+                             (상단 8px/319 = 2.51%). 둘레 12지점 x 4색으로 다시 재니
+                             상 7~8 · 좌우 10~11 · 하 9px 로 **평균 9.25px = 2.90%H**.
+                             상단만 재면 외곽선이 얇아져 림·면이 2px 씩 밀린다. */
   /* 링 ↔ 상단 림 전이의 무름. **색별 실측 토큰**이다(땜질 아님).
      시안에서 전이의 sobel 세기를 재면 핑크 515 · 퍼플 582 · 민트 575 인데
      **오렌지만 378** 로 유독 무르다(전이 폭은 4색 모두 3px 로 같다 —
@@ -325,6 +328,46 @@
      나머지 3색이 원화보다 물러져 8px 로 뒤집힌다(2변수 스윕 8조합 전수 확인).
      ⇒ 원화가 색마다 다르게 무른 것이므로 토큰도 색별이어야 한다. */
   --btn-ring-soft: 0;
+  /* ★ 밝은 내부 림 — 버튼을 **한 바퀴 완전히** 두른다.
+     ── 왜 새로 생겼나(2026-08-21 사용자 반려 ①) ─────────────
+     직전 판까지 밝은 림은 **세로 그라데이션의 상단 정지점 하나뿐**이었다.
+     세로 그라데는 정의상 y 로만 변하므로 좌·우 변에는 림이 아예 안 생기고,
+     상단 림 띠(y 2.8~7.5%H)는 코너 호 안쪽에서 어두운 외곽선에 먹혀
+     **오른쪽 끝에서 소리 없이 사라졌다.** 사용자가 본 그대로다.
+     ⇒ 림은 정지점이 아니라 **윤곽을 따라가는 띠**여야 한다.
+     ── 실측(main-menu-sian@4x, H319, 둘레 12지점 x 4색) ──────────
+       외곽선 두께   상 7~8 · 좌우 10~11 · 하 9px   (평균 9.25 = 2.90%H)
+       밝은 림 깊이   상  9~25 · 좌 12~24 · 우 22~37 · 하 39~54px
+       봉우리 대비     면 대비 +19~+118 루마 (4색 12지점 전부 존재)
+     깊이가 위는 얇고 아래는 깊다 — 빛이 위에서 오기 때문이다. 그래서 림은
+     **균일한 링이 아니라 위로 밀린 안쪽 베벨**로 그린다: 의사요소 ::before 가
+     띠의 **안쪽 경계**(4변 값이 서로 다른 inset)를 잡고, 그 밖으로 퍼지는
+     그림자(spread)가 곧 림 띠다. 코너에서 끊기지 않는다(둘레 48점 검사 통과).
+
+     ⚠ 균일 링(inset 0 0 0 Npx)으로 먼저 해 봤고 되돌렸다: 상·좌는 맞지만
+     우·하에서 림이 시안보다 13~30px 얇게 앞으로 나와, 수렴 판정의 구조
+     불일치가 림을 **지운 판보다 더 나쁘게** 나왔다(26.7% vs 13.2%).
+     지표가 맞고 구현이 틀렸던 것이다.                                       */
+  --btn-rim-t: calc(var(--btn-h) * .078);   /* [측정] 상 띠 안쪽 경계 25px/319 */
+  --btn-rim-l: calc(var(--btn-h) * .075);   /* [측정] 좌 24px */
+  --btn-rim-r: calc(var(--btn-h) * .100);   /* [측정] 우 32px (봉우리 24 · 반값폭 20~30) */
+  --btn-rim-b: calc(var(--btn-h) * .163);   /* [측정] 하 52px */
+  --btn-rim-w: calc(var(--btn-h) * .041);   /* 띠 폭 13px — 4변 평균(상 17 · 좌 13 · 우 10 · 하 15) */
+  /* 띠의 **바깥 경계는 날카롭고 안쪽 경계는 무르다** — 시안 단면이 그렇다.
+     핑크 좌변 실측: 외곽선 45 →(1px)→ 155 고원(12~24px) →(8px 완만)→ 면 95.
+     ::before 의 바깥 그림자는 요소 경계에서 잘려 **안쪽이 하드**가 되므로,
+     같은 색 inset 그림자를 하나 더 얹어 안쪽 falloff 를 만든다. 이걸 안 하면
+     띠의 안쪽에 시안에 없는 급단차가 생겨 구조 불일치가 **림을 지운 판보다
+     더 나빠진다**(실측 16.9% vs 12.9% — 2026-08-21). */
+  --btn-rim-blur: calc(var(--btn-h) * .008);   /* 바깥 경계 번짐 2.5px */
+  --btn-rim-fade: calc(var(--btn-h) * .022);   /* 안쪽 falloff 7px */
+  /* ★ 띠 색은 **반투명**이다. 시안의 림은 위가 가장 밝고(면 대비 +61) 옆은
+     절제돼 있으며(+33) 아래는 역광으로 다시 밝다(+48). 불투명 한 색으로
+     칠하면 옆구리만 원화보다 허옇게 뜬다(실측 +49 vs 원화 +33).
+     반투명이면 밑에 깔린 세로 그라데가 그대로 비쳐서 **위=림색 그대로 ·
+     옆=면에 살짝 얹힘 · 아래=역광에 얹힘** 이 저절로 맞는다.
+     알파 .68 은 우변 봉우리를 원화값(면+33)에 맞춘 실측 역산이다. */
+  --btn-rim-c: color-mix(in oklab, var(--btn-rim), transparent 32%);
   --btn-lip:  clamp(2px,   calc(var(--btn-h) * .050), 4px);
                           /* [계승] `0 3px 0` 의 비례화. 시안에는 링 밖 립이
                              없으므로 상한 4px 로 묶어 실루엣을 안 키운다. */
@@ -370,18 +413,30 @@
   -webkit-tap-highlight-color: transparent;
   /* [계승+보정] 9964 의 5겹 세로 그라데이션. 색은 시안 실측, **스톱 위치는
      시안 세로 단면의 기울기 변곡점으로 옮겼다.**
-     ── 왜 옮겼나(수렴 판정이 잡아낸 것) ──────────────────────────────
-     9964 는 상단 림을 `4%→12% 선형 램프` 로 그렸다. 그런데 시안의 상단 림은
-     **2.8~8.0% 고원 + 8.0~9.8% 급락** 이다(오렌지 y2519→2520 에서 루마
-     192.7→181.8, 1px 단차). 램프는 이 단차를 뭉개서 오렌지 띠 crop 의
-     경계 오차 p95 가 9px 로 떨어졌다(다른 3색은 대비가 낮아 통과).
-     같은 이유로 하단 역광 림(87%)도 얇은 정점 + 88.8% 급락으로 잡는다.
-     ⇒ **레시피(5겹·같은 토큰 8개)는 그대로, 스톱만 실측 변곡점으로.**   */
+     ── 상단 하이라이트 단차 (2026-08-21 사용자 반려 ② "광택이 약하다") ──
+     라벨 없는 4개 열 x 4색의 중앙값 세로 단면을 다시 떴다(깊이 0..45px, H319):
+        깊이  0..7   외곽선          (2.5%H)
+        깊이  8      전이            1px
+        깊이  9..24  **밝은 림 고원** (2.8% ~ 7.5%H)
+        깊이 25..26  **급락 2px**    (7.8% ~ 8.2%H)  루마 -14~-20
+        깊이 27..    윗면
+     직전 판은 이 급락을 `7.6% → 9.8%` 로 적어 **2px 짜리 단차를 7px 로
+     늘여 뭉갰다**(정확히 사용자가 "부드럽다"고 한 그 자리다).
+     ⇒ 고원 2.8~7.5% · 급락 7.5~8.2% 로 **실측 폭 그대로** 되돌린다.
+     하단 역광 림(87%)과 밴드 급락(88.8%)은 실측과 일치해 손대지 않는다.
+
+     ★ 첫 층은 **우하단 스페큘러**다. 시안 4색 전부 (오른끝에서 .205H,
+       바닥에서 .24H) 자리에 흰 물방울 하이라이트가 있다(봉우리 루마
+       222/232/241/242, 면 대비 +72~+130). 가로가 늘어나도 오른쪽 끝에
+       붙어 있어야 하므로 100%- 로 잡는다.                                  */
   background:
+    radial-gradient(calc(var(--btn-h) * .075) calc(var(--btn-h) * .050)
+      at calc(100% - var(--btn-h) * .205) calc(100% - var(--btn-h) * .24),
+      rgba(255,255,255,.88), rgba(255,255,255,0) 72%),
     linear-gradient(180deg,
-      var(--btn-rim)     3.6%,   /* 상단 림 고원 시작 */
-      var(--btn-rim)     7.6%,   /* 상단 림 고원 끝  */
-      var(--btn-rim-2)   9.8%,   /* 급락 후 윗면 머리 */
+      var(--btn-rim)     2.8%,   /* 상단 림 고원 시작(외곽선 바로 안) */
+      var(--btn-rim)     7.5%,   /* 상단 림 고원 끝  */
+      var(--btn-rim-2)   8.2%,   /* ★ 급락 0.7%H = 실측 2px 단차 */
       var(--btn-top)    20%,
       var(--btn-face)   48%,
       var(--btn-face)   68%,
@@ -390,17 +445,41 @@
       var(--btn-band)   88.8%,   /* 3D 밴드 시작(급락) */
       var(--btn-band-2) 96.5%,   /* 밴드 끝 — 아래로 갈수록 다시 밝아진다 */
       var(--btn-band-2)100%);
+  /* 바깥 그림자만 남는다. 어두운 외곽선·밝은 림은 의사요소 2개로 옮겼다
+     (아래 ::before / ::after) — 림 띠의 깊이가 4변마다 달라서 inset 링
+     하나로는 못 그린다. */
   box-shadow:
     0 var(--btn-lip) 0 var(--btn-plum),
-    0 calc(var(--btn-h) * .145) calc(var(--btn-h) * .32) rgba(83,28,40,.26),
-    /* ★ 외곽선 링에 **안쪽 번짐 2px** 을 준다(blur = 링두께 × .42).
-       원화의 외곽선은 면으로 2px 걸쳐 번진다(핑크 y1722→1725 루마 27→83→
-       140→155 · 퍼플 12→62→136→160 · 민트 41→76→155→201 — 4색 공통 2px).
-       하드 1px 단차로 두면 링↔림 대비가 가장 큰 **오렌지에서만** 유령 경계가
-       생겨 띠 crop 경계 p95 가 9px 로 떨어진다(다른 3색은 대비가 낮아 통과).
-       원화에 있는 번짐을 안 그린 쪽이 틀린 것이다. */
-    inset 0 0 calc(var(--btn-ring) * var(--btn-ring-soft)) var(--btn-ring) var(--btn-edge);
+    0 calc(var(--btn-h) * .145) calc(var(--btn-h) * .32) rgba(83,28,40,.26);
   transition: transform .08s ease-out, box-shadow .08s ease-out, filter .15s;
+}
+
+/* ① 밝은 내부 림 — 한 바퀴. ::before 는 띠의 **안쪽 경계**를 그린 투명 판이고
+      바깥으로 퍼지는 그림자가 곧 띠다. 4변 inset 이 다르므로 위로 밀린 베벨이
+      되고, 그래서 상단은 얇고 하단은 깊다(시안과 같은 광원 방향).            */
+.kit-btn::before{
+  content: '';
+  position: absolute;
+  inset: var(--btn-rim-t) var(--btn-rim-r) var(--btn-rim-b) var(--btn-rim-l);
+  border-radius: calc(var(--btn-r) - var(--btn-rim-t));
+  box-shadow:
+    0 0 var(--btn-rim-blur) var(--btn-rim-w) var(--btn-rim-c),
+    inset 0 0 var(--btn-rim-fade) 0 var(--btn-rim-c);
+  pointer-events: none;
+}
+/* ② 어두운 외곽선 — 림 위에 덮는다(DOM 순서상 ::after 가 위).
+      [측정] 원화의 외곽선은 면으로 2px 걸쳐 번진다(핑크 y1722→1725 루마
+      27→83→140→155 · 퍼플 12→62→136→160 · 민트 41→76→155→201).
+      하드 1px 단차로 두면 링↔림 대비가 가장 큰 **오렌지에서만** 유령 경계가
+      생기므로 번짐 세기는 --btn-ring-soft 로 색별 실측 토큰이다.            */
+.kit-btn::after{
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 calc(var(--btn-ring) * var(--btn-ring-soft))
+                    var(--btn-ring) var(--btn-edge);
+  pointer-events: none;
 }
 
 /* ── 변주 5색. 실측 토큰이 파생 기본값을 덮는다(위 §×0.67 판정 근거). ── */
@@ -436,7 +515,8 @@
 /* sky 는 시안에 없다 — **파생식만으로** 만든 대조군(수렴 판정 대상 아님). */
 .kit-btn--sky{ --btn-face: var(--k-btn-sky-face); }
 
-/* ── 크기 3단. --btn-h 만 바뀌고 반경은 .245 비례로 저절로 따라간다. ── */
+/* ── 크기 3단. --btn-h 만 바뀌고 반경(.265)·외곽선(.029)·림 띠(.041)가
+      전부 비례로 저절로 따라간다. ── */
 .kit-btn--sm{ --btn-h: 44px; }   /* 터치 타깃 하한 */
 .kit-btn--md{ --btn-h: 56px; }
 .kit-btn--lg{ --btn-h: 70px; }
@@ -449,8 +529,7 @@
   transform: translateY(2px);
   box-shadow:
     0 calc(var(--btn-lip) * .34) 0 var(--btn-plum),
-    0 calc(var(--btn-h) * .055) calc(var(--btn-h) * .145) rgba(83,28,40,.22),
-    inset 0 0 calc(var(--btn-ring) * var(--btn-ring-soft)) var(--btn-ring) var(--btn-edge);
+    0 calc(var(--btn-h) * .055) calc(var(--btn-h) * .145) rgba(83,28,40,.22);
 }
 /* ③ 비활성 — 채도↓ + 투명 .5. 순회색으로 죽이지 않는다(ART §7-1 무채색 금지). */
 .kit-btn[disabled],
@@ -468,15 +547,13 @@
     box-shadow:
       0 var(--btn-lip) 0 var(--btn-plum),
       0 calc(var(--btn-h) * .145) calc(var(--btn-h) * .32) rgba(83,28,40,.26),
-      0 0 0 0 color-mix(in oklab, var(--btn-rim), transparent 35%),
-      inset 0 0 calc(var(--btn-ring) * var(--btn-ring-soft)) var(--btn-ring) var(--btn-edge);
+      0 0 0 0 color-mix(in oklab, var(--btn-rim), transparent 35%);
   }
   50%{
     box-shadow:
       0 var(--btn-lip) 0 var(--btn-plum),
       0 calc(var(--btn-h) * .145) calc(var(--btn-h) * .32) rgba(83,28,40,.26),
-      0 0 0 calc(var(--btn-h) * .16) color-mix(in oklab, var(--btn-rim), transparent 100%),
-      inset 0 0 calc(var(--btn-ring) * var(--btn-ring-soft)) var(--btn-ring) var(--btn-edge);
+      0 0 0 calc(var(--btn-h) * .16) color-mix(in oklab, var(--btn-rim), transparent 100%);
   }
 }
 @media (prefers-reduced-motion: reduce){
@@ -510,7 +587,7 @@
    그림자를 끈다. **부품의 성분 판정이지 화면 판정이 아니다.**            */
 .kit-btn--bare{
   padding: 0; gap: 0; font-size: 0; text-shadow: none;
-  box-shadow: inset 0 0 calc(var(--btn-ring) * var(--btn-ring-soft)) var(--btn-ring) var(--btn-edge);
+  box-shadow: none;      /* 바깥 그림자만 끈다 — 림·외곽선은 의사요소라 남는다 */
   transition: none; animation: none;
 }
 
