@@ -306,13 +306,56 @@
 
   /* ■ 크기 — 반경·링·립·글자·아이콘이 전부 --btn-h 에 비례한다(무단위 배율). */
   --btn-h: 56px;                                    /* md 기본 */
-  /* 모서리 반지름비. [계승] 9964 는 `.245`(다른 레퍼런스 크롭에서 잰 값)였다.
-     원본 시안에 대고 **반경 1변수 스윕**(.19~.30 → .255~.285 정밀)으로 코너
-     150×150 MAE 를 최소화하니 **.265** 에서 최소였다(핑크 5.96 · 퍼플 7.46 ·
-     오렌지 6.55, 평균 6.66. `.245` 는 7.55 로 13% 나쁘다). 민트는 렌치가 코너를
-     덮어 판정에서 뺐다. ⇒ 시안이 계승값보다 **8% 더 둥글다**. 더 가까운 자가 이긴다. */
+  /* ★ 모서리 반지름 — **코너 4개가 서로 다르고, 코너마다 가로≠세로(타원)다.**
+     ── 직전 판정 오류 정정 (2026-08-21) ───────────────────────────────────
+     직전 판은 "시안이 왼쪽 끝 r≈138 · 오른쪽 끝 r≈72 로 좌우를 다르게 그려서
+     CSS 단일 border-radius 로는 못 맞춘다" 로 결론냈다. **틀렸다.**
+     border-radius 는 코너 4개를 개별 지정하고 `가로/세로` 로 타원까지 준다.
+     한계가 아니라 미사용 기능이었다.
+
+     ── 실측 절차 ─────────────────────────────────────────────────────────
+     실루엣을 「어두운 외곽선 골짜기 → 밝은 반등 → **면색 계열 확인**」 3단으로
+     뽑았다(면색 확인이 없으면 배경 장식이 실루엣으로 잡혀 좌측 끝 측정이
+     30~180px 씩 튄다 — 직전 판의 138px 이 그렇게 나온 값으로 보인다).
+     그렇게 뽑은 둘레 곡선에 대고 코너마다 (rx, ry) 2변수를 면적 XOR 최소로
+     스윕했다. 표본은 핑크·퍼플(rmse .004~.008 로 가장 깨끗한 두 색).
+
+        코너   실측 rx/H   실측 ry/H   평균 오차   현행 단일 .265 의 오차
+        TL      .390        .465        0.52px       6.79px
+        TR      .230        .245        0.25px       0.81px
+        BR      .185        .240        0.19px       1.70px
+        BL      .495        .500        0.59px      16.60px  ← 압도적 최대
+     ⇒ 구조 불일치가 **왼쪽 끝에 몰려 있던 원인이 이것**이다. 왼쪽 아래 코너
+       하나에서만 둘레가 평균 16.6px 어긋나 있었다.
+
+     ── 왜 좌우가 이렇게 다른가(원화의 실제 도형) ──────────────────────────
+     시안의 왼쪽 끝은 **아이콘 배지 원**이다. 반지름 ≈171px(=.534H)로 바 높이의
+     절반(159.5)보다 크고, 중심이 바 중앙보다 5~6px 위에 있어 바의 위·아래로
+     각각 16px·6px 씩 삐져나온다(크롭 밖이라 판정에는 안 들어온다).
+     크롭 안쪽만 놓고 보면 그 원호는 위 표의 TL/BL 타원과 1px 이내로 같다.
+     TL 의 rx(.390)가 BL(.495)보다 작은 것도 원 중심이 위로 밀린 결과다.
+
+     ⚠ CSS 겹침 규칙 확인: 좌변 .465+.500=.965 ≤ 1, 우변 .245+.240=.485 ≤ 1,
+       상/하변 합 .620/.680 × H = 198/217px ≤ 최소 버튼 폭. **축소 보정 안 걸린다.**
+       (한 변이라도 넘으면 CSS 가 8개 값 **전부**를 같은 비율로 줄여서 우측
+        코너까지 같이 망가진다 — 그래서 .5 를 넘기지 않는다.)                */
+  --btn-rrx-tl: .390;  --btn-rry-tl: .465;
+  --btn-rrx-tr: .230;  --btn-rry-tr: .245;
+  --btn-rrx-br: .185;  --btn-rry-br: .240;
+  --btn-rrx-bl: .495;  --btn-rry-bl: .500;
+  /* 전부 --btn-h 비례라 크기 3단(sm/md/lg)이 그대로 살아 있다. 고정 px 없음. */
+  --btn-rx-tl: calc(var(--btn-h) * var(--btn-rrx-tl));
+  --btn-ry-tl: calc(var(--btn-h) * var(--btn-rry-tl));
+  --btn-rx-tr: calc(var(--btn-h) * var(--btn-rrx-tr));
+  --btn-ry-tr: calc(var(--btn-h) * var(--btn-rry-tr));
+  --btn-rx-br: calc(var(--btn-h) * var(--btn-rrx-br));
+  --btn-ry-br: calc(var(--btn-h) * var(--btn-rry-br));
+  --btn-rx-bl: calc(var(--btn-h) * var(--btn-rrx-bl));
+  --btn-ry-bl: calc(var(--btn-h) * var(--btn-rry-bl));
+  /* 둘레 검사(tools/rim-continuity.py)가 쓰는 **대표 반경 1값**. 도형 자체는
+     위 8값이 정본이고 이건 샘플 링을 세우는 근사치일 뿐이다(법선 스냅 창이
+     ±.13H 라 이 정도 근사는 흡수된다). 모양 계산에는 쓰지 않는다. */
   --btn-rr: .265;
-  --btn-r:    calc(var(--btn-h) * var(--btn-rr));
   --btn-ring: clamp(1.5px, calc(var(--btn-h) * .029), 12px);
                           /* [측정·재실측 2026-08-21] 직전 값 .025 는 **상단만** 잰 값이다
                              (상단 8px/319 = 2.51%). 둘레 12지점 x 4색으로 다시 재니
@@ -397,7 +440,10 @@
   min-height: var(--btn-h);
   padding: 0 var(--btn-px);
   border: 0; border-image: none;
-  border-radius: var(--btn-r);
+  /* 가로반경 4개 / 세로반경 4개 (TL TR BR BL). 코너마다 타원이다. */
+  border-radius:
+    var(--btn-rx-tl) var(--btn-rx-tr) var(--btn-rx-br) var(--btn-rx-bl) /
+    var(--btn-ry-tl) var(--btn-ry-tr) var(--btn-ry-br) var(--btn-ry-bl);
   box-sizing: border-box;
   font-family: inherit;
   font-size: var(--btn-fs);
@@ -461,7 +507,21 @@
   content: '';
   position: absolute;
   inset: var(--btn-rim-t) var(--btn-rim-r) var(--btn-rim-b) var(--btn-rim-l);
-  border-radius: calc(var(--btn-r) - var(--btn-rim-t));
+  /* ★ 림도 **같은 4코너 타원**을 따라간다. 안 그러면 코너에서 띠가 윤곽을
+     벗어나 끊긴다(둘레 48점 검사가 그 자리에서 떨어진다).
+     안쪽 판이니 코너마다 자기 변의 inset 만큼 반경을 줄인다:
+       가로 ← 좌/우 inset · 세로 ← 상/하 inset. 음수 방지로 max(0px,·).
+     검산(H=319): 좌변 세로합 123.4+107.5=230.9 ≤ 판 높이 242.1 →
+     여기서도 CSS 축소 보정이 안 걸린다.                                     */
+  border-radius:
+    max(0px, calc(var(--btn-rx-tl) - var(--btn-rim-l)))
+    max(0px, calc(var(--btn-rx-tr) - var(--btn-rim-r)))
+    max(0px, calc(var(--btn-rx-br) - var(--btn-rim-r)))
+    max(0px, calc(var(--btn-rx-bl) - var(--btn-rim-l))) /
+    max(0px, calc(var(--btn-ry-tl) - var(--btn-rim-t)))
+    max(0px, calc(var(--btn-ry-tr) - var(--btn-rim-t)))
+    max(0px, calc(var(--btn-ry-br) - var(--btn-rim-b)))
+    max(0px, calc(var(--btn-ry-bl) - var(--btn-rim-b)));
   box-shadow:
     0 0 var(--btn-rim-blur) var(--btn-rim-w) var(--btn-rim-c),
     inset 0 0 var(--btn-rim-fade) 0 var(--btn-rim-c);
@@ -515,8 +575,8 @@
 /* sky 는 시안에 없다 — **파생식만으로** 만든 대조군(수렴 판정 대상 아님). */
 .kit-btn--sky{ --btn-face: var(--k-btn-sky-face); }
 
-/* ── 크기 3단. --btn-h 만 바뀌고 반경(.265)·외곽선(.029)·림 띠(.041)가
-      전부 비례로 저절로 따라간다. ── */
+/* ── 크기 3단. --btn-h 만 바뀌고 코너 반경 8값(.185~.500)·외곽선(.029)·
+      림 띠(.041)가 전부 비례로 저절로 따라간다. **고정 px 은 하나도 없다.** ── */
 .kit-btn--sm{ --btn-h: 44px; }   /* 터치 타깃 하한 */
 .kit-btn--md{ --btn-h: 56px; }
 .kit-btn--lg{ --btn-h: 70px; }
