@@ -423,10 +423,23 @@
   --btn-lip:  clamp(2px,   calc(var(--btn-h) * .050), 4px);
                           /* [계승] `0 3px 0` 의 비례화. 시안에는 링 밖 립이
                              없으므로 상한 4px 로 묶어 실루엣을 안 키운다. */
-  --btn-px:   calc(var(--btn-h) * .38);             /* 좌우 안쪽 여백 */
-  --btn-fs:   calc(var(--btn-h) * .37);             /* [측정] 라벨 높이비 */
-  --btn-ico:  calc(var(--btn-h) * .70);             /* [계승] 9964 아이콘 0.70H */
-  --btn-gap:  calc(var(--btn-h) * .13);
+  --btn-px:   calc(var(--btn-h) * .38);             /* 좌우 안쪽 여백(아이콘 없을 때) */
+  /* ── 라벨 — 2026-08-22 재실측. 직전 .37H 은 «잉크 높이» 가 아니라 감으로 잡은
+        font-size 였다. 시안을 다시 재면:
+          흰 글자 잉크 상자 높이  128px / H317 = **.404H**  (핑크·퍼플 동일)
+          자당 어드밴스          120px       = .379H
+          잉크높이 / 어드밴스     1.067       ← **글꼴 판별의 지문**
+        후보 3종을 100px 로 렌더해 같은 지문을 재면
+          Jua(=TentwinDisplay)  1.035 · h/em .840 · adv .811em   ← 채택(3% 오차)
+          Malgun Gothic Bold    0.940 · h/em .940
+          Pretendard Bold       0.94 대 (게임 현행) — 시안보다 납작·넓다
+        ⇒ 글꼴은 **TentwinDisplay(Jua)**, font-size = .404H / .840 = **.481H**.
+        폭 검산: .481 × .811 × 5.35자 = 2.087H vs 시안 1.981H → 자간 −.041em. */
+  --btn-fs:   calc(var(--btn-h) * .481);
+  --btn-ls:   -.041em;
+  --btn-tstroke: calc(var(--btn-h) * .022);         /* [측정] 글자 테두리 7px/317 */
+  --btn-ico:  calc(var(--btn-h) * .60);             /* [측정] 시안 글리프 상자 .60H */
+  --btn-gap:  calc(var(--btn-h) * .076);            /* [측정] 칩 우끝→글자 24px/317 */
 
   /* ■ 파생 색 — 변주 클래스가 실측값으로 덮어쓴다(아래). 여기 값은
        "시안에 없는 새 색"이 --btn-face 하나만으로도 완전한 버튼이 되게 하는
@@ -454,16 +467,26 @@
     var(--btn-rx-tl) var(--btn-rx-tr) var(--btn-rx-br) var(--btn-rx-bl) /
     var(--btn-ry-tl) var(--btn-ry-tr) var(--btn-ry-br) var(--btn-ry-bl);
   box-sizing: border-box;
-  font-family: inherit;
+  /* 호스트가 --kit-font-display 로 표시용 글꼴을 준다(tentwin.html 은 이미
+     "TentwinDisplay" = Jua 를 @font-face 로 싣고 있다 — 새 웹폰트 없음). */
+  font-family: var(--kit-font-display,
+      "TentwinDisplay", "Jua", "PretendardKO", "Pretendard",
+      "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif);
   font-size: var(--btn-fs);
-  font-weight: 800;
-  line-height: 1.1;
+  font-weight: 400;          /* Jua 는 굵기 1종. 합성 굵힘은 획을 뭉갠다. */
+  font-synthesis-weight: none;
+  letter-spacing: var(--btn-ls);
+  line-height: 1;
   color: #FFF;
-  text-shadow:
-    0 calc(var(--btn-h) * .022) 0 var(--btn-edge),
-    calc(var(--btn-h) * .016) 0 0 var(--btn-edge),
-    calc(var(--btn-h) * -.016) 0 0 var(--btn-edge),
-    0 calc(var(--btn-h) * -.014) 0 var(--btn-edge);
+  /* 테두리는 **8방 text-shadow 가 아니라 stroke** 다. 시안 테두리는 둘레
+     어디서나 7px(=.022H)로 균일한데, 4~8방 그림자는 대각에서 √2 배 두꺼워지고
+     획 안쪽 오목한 곳에서 끊긴다(시안에는 그런 끊김이 없다).
+     paint-order:stroke fill 이라 획이 안쪽으로 먹지 않는다. */
+  -webkit-text-stroke: var(--btn-tstroke) var(--btn-edge);
+  paint-order: stroke fill;
+  /* [측정] 글자 **아래쪽**에만 남는 어두운 띠 10px = .031H. 테두리와 별개다. */
+  text-shadow: 0 calc(var(--btn-h) * .022) calc(var(--btn-h) * .012)
+               rgba(0,0,0,.30);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   /* ═══ 면색 — **평판이다.** 광택·림·밴드·스페큘러는 전부 .kit-jelly 오버레이로
@@ -495,10 +518,20 @@
       var(--btn-face) 30%,
       var(--btn-face) 72%,
       var(--btn-low)  100%);
-  /* 바깥 립 + 접지 그림자만 남는다. */
+  /* 바깥 립 + **바닥 그림자**. 몸통 안쪽의 3D 접지 밴드와 혼동 금지 —
+     밴드는 .kit-jelly 의 border-bottom(.118H · 검 α.17)이고 여기 것은
+     **배경에 드리우는 그림자**다. 둘을 따로 쟀다.
+     ── 실측(시안 4색, 버튼 아래 배경을 열별로 정규화) ──────────────────
+        버튼 바닥 +8~16px  배경 대비 −38%   (그림자 본체)
+        +26px  −20%  ← 50% 지점 = 그림자 기하 경계
+        +40px   −8%
+        +60px   −3%  거의 소멸
+     ⇒ dy = 26px = .082H · blur = 32px = .101H · spread 0 · α ≈ .40
+     직전 값(.145H / .32H / .26)은 **2배 아래로 · 3배 넓게 · 옅게** 퍼져 있었다.
+     사용자 반려 «하단 그림자 크기도 달라» 가 이것이다.                   */
   box-shadow:
     0 var(--btn-lip) 0 var(--btn-plum),
-    0 calc(var(--btn-h) * .145) calc(var(--btn-h) * .32) rgba(83,28,40,.26);
+    0 calc(var(--btn-h) * .082) calc(var(--btn-h) * .101) rgba(46,26,34,.40);
   transition: transform .08s ease-out, box-shadow .08s ease-out, filter .15s;
 }
 
@@ -587,10 +620,17 @@
         그린다. 네 변 색을 같게 두어 코너에 이음선이 생기지 않게 했다.
         상·좌·우는 .030H 로 얇아 어두운 외곽선(::after, .029H) 밑에 숨는다.
         아래만 .118H 로 두꺼워 실측 밴드(깊이 .03~.118H)가 그대로 나온다. ── */
+     [2026-08-22 추가] 상·측 두께를 **토큰으로 노출**한다. 기본값은 종전 상수
+        그대로(.030 / .050)라 버튼 렌더는 1px 도 안 바뀐다. 노출하는 이유:
+        정원(.kit-chip)처럼 둘레가 짧은 밑판에서는 .050 이 밑판 외곽선(.027d)
+        보다 넓어 «숨어야 할 띠» 가 밖으로 삐져나온다. 밑판이 자기 외곽선
+        두께에 맞춰 줄일 수 있어야 오버레이가 진짜 재사용 가능한 것이다.  ── */
   border-style: solid;
   border-width:
-    calc(var(--jh) * .030) calc(var(--jh) * .050)
-    calc(var(--jh) * var(--jelly-band-w, .118)) calc(var(--jh) * .050);
+    calc(var(--jh) * var(--jelly-band-t, .030))
+    calc(var(--jh) * var(--jelly-band-x, .050))
+    calc(var(--jh) * var(--jelly-band-w, .118))
+    calc(var(--jh) * var(--jelly-band-x, .050));
   border-color: rgba(0,0,0, calc(.17 * var(--j-b)));
 
   /* ── ② 윤곽 림 + 발광 + 광택 꼬리 = padding-box 를 따르는 inset 그림자.
@@ -672,7 +712,7 @@
   transform: translateY(2px);
   box-shadow:
     0 calc(var(--btn-lip) * .34) 0 var(--btn-plum),
-    0 calc(var(--btn-h) * .055) calc(var(--btn-h) * .145) rgba(83,28,40,.22);
+    0 calc(var(--btn-h) * .034) calc(var(--btn-h) * .046) rgba(46,26,34,.34);
 }
 /* ③ 비활성 — 채도↓ + 투명 .5. 순회색으로 죽이지 않는다(ART §7-1 무채색 금지). */
 .kit-btn[disabled],
@@ -689,13 +729,13 @@
   0%,100%{
     box-shadow:
       0 var(--btn-lip) 0 var(--btn-plum),
-      0 calc(var(--btn-h) * .145) calc(var(--btn-h) * .32) rgba(83,28,40,.26),
+      0 calc(var(--btn-h) * .082) calc(var(--btn-h) * .101) rgba(46,26,34,.40),
       0 0 0 0 color-mix(in oklab, var(--btn-rim), transparent 35%);
   }
   50%{
     box-shadow:
       0 var(--btn-lip) 0 var(--btn-plum),
-      0 calc(var(--btn-h) * .145) calc(var(--btn-h) * .32) rgba(83,28,40,.26),
+      0 calc(var(--btn-h) * .082) calc(var(--btn-h) * .101) rgba(46,26,34,.40),
       0 0 0 calc(var(--btn-h) * .16) color-mix(in oklab, var(--btn-rim), transparent 100%);
   }
 }
@@ -713,7 +753,6 @@
   display: block;
 }
 .kit-btn__label{ flex: 0 1 auto; white-space: nowrap; }
-/* 라벨을 늘 가운데 두기 위해 반대편에 같은 폭의 빈 자리를 만든다. */
 .kit-btn--icon-none  { }
 .kit-btn--icon-left  .kit-btn__ico:last-child,
 .kit-btn--icon-right .kit-btn__ico:first-child{ visibility: hidden; }
@@ -724,6 +763,140 @@
   padding-right: calc(var(--btn-px) * .55);
   justify-content: space-between;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   ③ .kit-chip — 원형 칩 **독립 부품** (2026-08-22 신설)
+   ═══════════════════════════════════════════════════════════════════════
+   버튼 안에 박아 넣지 않는다. 지름 하나만 주면 어디서나 서는 원판이다
+   (메인 메뉴 버튼 · 상점 슬롯 · 프로필 배지 · 보상 팝업 전부 같은 부품).
+
+   ── 시안 실측 (main-menu-sian@4x · 4색 · 버튼 상자 H=317) ─────────────
+     칩 외경          341px = **1.076 H**   (핑크 359·퍼플 336·오렌지 346)
+     칩 중심 x        버튼 좌끝 +171px = .539H  ⇒ **칩이 버튼 좌끝에 접한다**
+     칩 중심 y        바 중심 −6px = −.019H     (사실상 수직 중앙)
+     칩 면색          **버튼 면색과 동일**(r .40~.44H 고리에서 루마비 .95~1.05)
+                      안쪽으로 갈수록 −10~18% ⇒ 색이 아니라 **오목 웰 그림자**다
+     밝은 안쪽 림     r .46~.50H 에서 면 대비 +25~+45 루마
+     어두운 외곽선    r .53~.55H · 두께 ~9px = .029H  (버튼 외곽선과 같은 규격)
+     글리프 상자      ≈ .60H = **.56 d**
+   ⇒ 「칩 = 지름 1.076H 원 + 버튼과 같은 면색 + 같은 외곽선 + 오목 웰」이고
+     **밝은 림·광택·접지 밴드는 하나도 칩이 직접 그리지 않는다.**
+     전부 .kit-jelly 가 border-radius:inherit(=50%) 로 따라 그린다.
+     ← 이게 오버레이 분리의 실전 시험이다. 칩은 «판 + 웰» 만 책임진다.       */
+
+.kit-chip{
+  --chip-d:    56px;                                   /* 지름. 호스트가 준다 */
+  --chip-face: var(--btn-face, var(--k-pink));
+  --chip-edge: var(--btn-edge,
+               color-mix(in oklab, var(--chip-face), #000 42%));
+  --chip-ring: clamp(1.5px, calc(var(--chip-d) * .027), 12px);  /* .029H ÷ 1.076 */
+  --chip-well: .07;      /* 오목 웰 세기 — 실측: 중심 −10~18% · .74R 에서 0.
+                            젤리의 접지 밴드가 이미 둘레를 눌러 주므로 그만큼 뺐다. */
+
+  position: relative;
+  flex: 0 0 auto;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: var(--chip-d); height: var(--chip-d);
+  border: 0; padding: 0;
+  border-radius: 50%;
+  box-sizing: border-box;
+  background: var(--chip-face);
+  /* 젤리 오버레이의 길이 기준. 원은 «높이 = 지름» 이라 그대로 넘긴다. */
+  --jelly-h: var(--chip-d);
+  /* 실측 밴드 깊이(.118H)를 «지름» 기준으로 환산하면 .118 ÷ 1.076 = .110.
+     상·측 띠는 밑판의 어두운 외곽선 **밑에 숨는 것이 규격**이므로 칩의
+     외곽선 두께(.027d)에 맞춰 줄인다. 버튼 기본값(.030/.050)을 그대로 쓰면
+     둘레가 짧은 원에서 띠가 링 밖으로 삐져나와 칩만 시커메진다(실측). */
+  --jelly-band-w: .110;
+  --jelly-band-t: .027;
+  --jelly-band-x: .027;
+}
+/* ── ① 오목 웰 — 칩 안쪽이 중심으로 갈수록 어두워진다(글리프가 얹힌 바닥).
+      radial 이라 원 실루엣을 그대로 따라가고 코너 잘림 문제가 없다. ── */
+.kit-chip::before{
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: inherit;
+  /* closest-side 라 100% = 칩 반지름 R. 실측 감광 곡선을 R 단위로 그대로 옮긴다:
+     중심 −10~18% · .65R −4~18% · .74R ±0 · .82R 부터는 오히려 밝다(림 담당). */
+  background: radial-gradient(circle closest-side at 50% 46%,
+      rgba(0,0,0, var(--chip-well)) 0%,
+      rgba(0,0,0, calc(var(--chip-well) * .80)) 58%,
+      rgba(0,0,0, 0) 80%);
+  pointer-events: none;
+}
+/* ── ② 어두운 외곽선 — 버튼 ::after 와 같은 규격(inset ring). 젤리 위에 덮는다. ── */
+.kit-chip::after{
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 var(--chip-ring) var(--chip-edge);
+  pointer-events: none;
+  z-index: 2;
+}
+/* ── ③ 글리프. 배경 이미지로 들어오는 3D 일러스트 조각이다.
+      **납작한 흰 실루엣으로 대체하지 마라** — 시안은 입체 일러스트다. ── */
+.kit-chip__glyph{
+  position: relative;
+  z-index: 3;
+  /* [측정] 시안 글리프 잉크 상자 4색 평균 231px / H317 = .729H = **.677 d**
+     (핑크 228×242 · 퍼플 222×248 · 오렌지 236×215 · 민트 225×231) */
+  width: calc(var(--chip-d) * var(--chip-glyph, .677));
+  height: calc(var(--chip-d) * var(--chip-glyph, .677));
+  background: center/contain no-repeat;
+  display: block;
+}
+/* 크기 3단 — 버튼 sm/md/lg 와 짝이 맞는다(각 --btn-h × 1.076). */
+.kit-chip--sm{ --chip-d: 47px; }
+.kit-chip--md{ --chip-d: 57px; }
+.kit-chip--lg{ --chip-d: 75px; }
+
+
+/* ═══ .kit-btn 안의 칩 자리 — 「메뉴 버튼」 배치 ═══════════════════════
+   시안 메인 메뉴 4줄의 배치는 **화면 폭에 비례**한다(시안 2340 폭 기준):
+       버튼 폭 / 화면 폭   1375/2340 = **.5876**
+       버튼 가로:세로      1375/317  = **4.338**
+       버튼 높이 / 화면 폭 317/2340  = **.1354**
+       세로 피치 / 버튼 H  390/317   = **1.230**  (틈 = .230H)
+       라벨 좌측 시작      버튼 좌끝 +1.14H  (= 칩 1.076H + 간격 .076H)
+       라벨 세로 중심      버튼 중심 −.033H
+   390px 폭으로 환산하면 H 52.8 · W 229.2 · 피치 65.0 · 틈 12.2 이다.
+   (게임 실화면 현행: H 56.4 · W 226.2 · 피치 76 — 높이 +6.8% · 피치 +17%) */
+.kit-btnrow{
+  --kit-w: 390px;                 /* 화면 폭. 호스트가 준다. */
+  display: flex; flex-direction: column; align-items: flex-start;
+  gap: calc(var(--kit-w) * .1354 * .230);
+}
+.kit-btn--menu{
+  --btn-h: calc(var(--kit-w, 390px) * .1354);
+  width: calc(var(--kit-w, 390px) * .5876);
+  justify-content: flex-start;    /* ★ 왼쪽 정렬 — 시안이 그렇다 */
+  /* 우측 아이콘(설정의 렌치)은 시안에서 버튼 오른쪽 끝에 **거의 붙어** 있다
+     (렌치 잉크 x1600~1849 vs 버튼 우끝 1844). 여백을 크게 두면 안 된다. */
+  padding: 0 calc(var(--btn-h) * .03) 0 0;
+  gap: var(--btn-gap);
+}
+/* 우측 아이콘 — [측정] 렌치 잉크 .79H × .95H. 버튼 높이를 거의 다 쓴다. */
+.kit-btn--menu .kit-btn__ico{ --btn-ico: calc(var(--btn-h) * .82); }
+/* 칩은 버튼보다 크고(1.076H) 좌끝에 **접한다** — 위·아래로 .038H 씩 삐져나온다.
+   flex 안에서 삐져나오게 두려면 자기 자리를 안 먹고 절대배치해야 한다. */
+.kit-btn--menu .kit-chip{
+  --chip-d: calc(var(--btn-h) * 1.076);
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(calc(-50% - var(--btn-h) * .019));
+  z-index: 1;
+}
+/* 라벨은 칩 지름 + 간격만큼 밀려 시작한다(= 좌끝 +1.14H, 실측 그대로). */
+.kit-btn--menu .kit-btn__label{
+  margin-left: calc(var(--btn-h) * 1.14);
+  transform: translateY(calc(var(--btn-h) * -.033));
+  position: relative; z-index: 1;
+}
+/* 우측 아이콘(설정의 렌치)은 오른쪽 끝에 붙는다. */
+.kit-btn--menu .kit-btn__ico{ margin-left: auto; position: relative; z-index: 1; }
 
 /* ── 수렴 판정 전용: 시안 1:1 대조용 무장식 모드 ───────────────────────
    `--btn-h: 319px` 로 시안 상자와 픽셀 동일하게 세우고 라벨·아이콘·바깥

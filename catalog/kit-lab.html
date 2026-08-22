@@ -6,6 +6,15 @@
 <link rel="stylesheet" href="ui-kit.css">
 <style>
 /* 실험대 껍데기. 부품 모양은 절대 여기서 손대지 않는다 — ui-kit.css 가 유일 원본. */
+/* 표시용 글꼴. **새 웹폰트를 받지 않는다** — tentwin.html 이 이미 싣고 있는
+   Jua(=TentwinDisplay)의 원본 TTF 를 그대로 가리킨다. 게임에 박혀 있는
+   서브셋(display-chars.ko.txt · 478자)에는 «새» 가 빠져 있어 실험대에서는
+   원본을 쓴다 — 배선 시 서브셋에 1자 추가 필요(별도 보고). */
+@font-face{
+  font-family:"TentwinDisplay";
+  src:url("../../tentwin/assets/fonts/Jua-Regular.ttf") format("truetype");
+  font-weight:400; font-style:normal; font-display:block;
+}
 *{box-sizing:border-box}
 body{margin:0;background:#F4EFE6;color:#3A2B22;
      font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif}
@@ -67,6 +76,23 @@ body{margin:0;background:#F4EFE6;color:#3A2B22;
 #jelly .chip{position:relative;width:110px;height:110px;border-radius:50%;
   background:#EBA235;--jelly-h:110px}
 
+/* ── ⑤ 맞춤 모드 (?mode=fit) — 시안 비율 그대로 세운 메뉴 4줄 ─────────────
+   화면 폭 390 · --kit-w 로 크기 전량이 파생된다. 여기서 px 를 직접 쓰지 않는다. */
+#fit{display:none;width:390px;background:#F4EFE6}
+#fit .pane{padding:16px 0 20px}
+#fit .kit-btnrow{--kit-w:390px;padding-left:12px}
+/* 칩 단독 시험 (?mode=chip) */
+#chip{display:none;width:840px;padding:20px;background:#F4EFE6}
+#chip .band{display:flex;gap:22px;align-items:flex-end;margin:0 0 18px}
+#chip .cell{text-align:center}
+#chip .cap2{font:700 11px/1.4 inherit;color:#7A5F4E;margin:7px 0 0}
+/* 재고 없음 표시 — **이모지·기본도형으로 때우지 않는다.** 발주 대상임을 명시. */
+.glyph-gap{
+  background-image:
+    repeating-linear-gradient(45deg,rgba(90,60,50,.55) 0 3px,rgba(255,255,255,.35) 3px 7px);
+  border-radius:6px;
+}
+
 /* ── ② 매트릭스 모드: 색4 × 크기3 × 상태4 = 48셀 + 아이콘4 + 가변폭3 ── */
 #matrix{display:none;width:1180px;padding:22px 22px 30px;background:#F7F1E4}
 #matrix h2{margin:26px 0 8px;font-size:15px;letter-spacing:-.01em;color:#5C4033}
@@ -95,11 +121,38 @@ table.mx td .cellnote{display:block;margin-top:6px;font:600 10px/1 ui-monospace,
 <div id="matrix"></div>
 <div id="onex"></div>
 <div id="jelly"></div>
+<div id="fit"></div>
+<div id="chip"></div>
 
 <script>
 var COLORS = ['pink','purple','orange','mint'];
 var KO = {pink:'핑크 · 게임을 시작', purple:'퍼플 · 새로운 모험',
           orange:'오렌지 · 이어하기', mint:'민트 · 설정'};
+var LABEL = {pink:'게임을 시작', purple:'새로운 모험',
+             orange:'이어하기', mint:'설정'};
+/* ── 글리프 재고 대조 (2026-08-22) ─────────────────────────────────────
+   시안이 요구하는 4+1 개를 site/catalog 재고와 대조한 결과다.
+     별      → lib-star-gold.webp     ✔ 재사용 (시안은 분홍, 재고는 금색)
+     나침반  → mode-ico-rush.webp     △ 근사 재사용 (스톱워치 — 바늘 형태 다름)
+     펼친 책 → **투명 조각 없음**     ✘ 추출 발주
+     기어    → lib-glyph-gear.webp    ✔ 재사용 (형태·입체감 일치)
+     렌치    → **투명 조각 없음**     ✘ 추출 발주
+   ⚠ «없음» 은 «그려야 한다» 가 아니다. 게임 실화면(tentwin.html 38070~)은
+     버튼 **통짜 비트맵** catalog/sian2-btn-{pink,purple,orange,mint}.webp 을
+     깔고 있고 이 글리프들은 거기 구워져 있다. 원본 시안 좌표도 실측해 뒀다
+     (main-menu-sian@4x.png · @4x 잉크 상자):
+        나침반 x527..748  y2129..2376
+        펼친책 x529..764  y2518..2732
+        렌치   x1600..1849 y2900..3199
+     ⇒ 신규 일러스트 발주가 아니라 **누끼 추출 1건**이다(gemini-extract 사이클).
+   ✘ 는 임의로 이모지·평면 도형을 넣지 않고 «발주» 해치로 표시한다.       */
+var GLYPH = {
+  pink:   {src:'lib-star-gold.webp',  note:'✔ 재사용'},
+  purple: {src:'mode-ico-rush.webp',  note:'△ 근사'},
+  orange: {gap:true,                  note:'✘ 발주'},
+  mint:   {src:'lib-glyph-gear.webp', note:'✔ 재사용'}
+};
+var GLYPH_R = { mint: {gap:true, note:'✘ 발주(렌치)'} };
 
 function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;
   if(x!==undefined&&x!==null)e.textContent=x;return e;}
@@ -273,10 +326,74 @@ function buildJelly(){
   }
 }
 
+/* ───────────────── 칩 부품 ─────────────────
+   칩은 «판 + 웰» 만 그린다. 밝은 림·광택·접지 밴드는 .kit-jelly 가 얹는다.  */
+function chip(color, glyph, opt){
+  opt = opt || {};
+  var c = el('span','kit-chip');
+  if(color) c.classList.add('kit-chip--on-'+color);
+  if(opt.size) c.classList.add('kit-chip--'+opt.size);
+  if(opt.standalone && color){
+    /* 단독으로 세울 땐 버튼이 안 물려 주므로 색 토큰을 직접 준다. */
+    c.style.setProperty('--chip-face', FACE[color]);
+    c.style.setProperty('--chip-edge', EDGE[color]);
+  }
+  if(opt.jelly !== false) c.appendChild(el('div','kit-jelly'));
+  if(glyph){
+    var g = el('i','kit-chip__glyph' + (glyph.gap ? ' glyph-gap' : ''));
+    if(glyph.src) g.style.backgroundImage = 'url("'+glyph.src+'")';
+    c.appendChild(g);
+  }
+  return c;
+}
+var FACE={pink:'#C0476A',purple:'#925AD4',orange:'#EBA235',mint:'#69B2A5'};
+var EDGE={pink:'#6D1D33',purple:'#39196D',orange:'#8A511D',mint:'#294B51'};
+
+/* ───────────────── 맞춤 모드 (시안 비율 메뉴 4줄) ───────────────── */
+function buildFit(){
+  var root=document.getElementById('fit'); root.style.display='block';
+  var noChip = /nochip=1/.test(location.search);
+  var noJelly= /chipjelly=off/.test(location.search);
+  var pane=el('div','pane'); var row=el('div','kit-btnrow');
+  COLORS.forEach(function(c){
+    var b=el('button','kit-btn kit-btn--'+c+' kit-btn--menu'); b.type='button';
+    if(!noChip) b.appendChild(chip(c, GLYPH[c], {jelly:!noJelly}));
+    b.appendChild(el('span','kit-btn__label',LABEL[c]));
+    if(GLYPH_R[c]){
+      var i=el('i','kit-btn__ico'+(GLYPH_R[c].gap?' glyph-gap':''));
+      if(GLYPH_R[c].src) i.style.backgroundImage='url("'+GLYPH_R[c].src+'")';
+      b.appendChild(i);
+    }
+    row.appendChild(b);
+  });
+  pane.appendChild(row); root.appendChild(pane);
+}
+
+/* ───────────────── 칩 단독 시험 ───────────────── */
+function buildChip(){
+  var root=document.getElementById('chip'); root.style.display='block';
+  var b1=el('div','band');
+  COLORS.forEach(function(c){
+    var cell=el('div','cell');
+    cell.appendChild(chip(c, GLYPH[c], {size:'lg',standalone:true}));
+    cell.appendChild(el('p','cap2', c+' · 젤리 얹음'));
+    b1.appendChild(cell);
+  });
+  COLORS.forEach(function(c){
+    var cell=el('div','cell');
+    cell.appendChild(chip(c, GLYPH[c], {size:'lg',standalone:true,jelly:false}));
+    cell.appendChild(el('p','cap2', c+' · 젤리 뺌'));
+    b1.appendChild(cell);
+  });
+  root.appendChild(b1);
+}
+
 var mode=(location.search.match(/mode=([a-z]+)/)||[])[1]||'matrix';
 if(mode==='converge') buildConverge();
 else if(mode==='onex') buildOnex();
 else if(mode==='jelly') buildJelly();
+else if(mode==='fit') buildFit();
+else if(mode==='chip') buildChip();
 else buildMatrix();
 </script>
 </body>
