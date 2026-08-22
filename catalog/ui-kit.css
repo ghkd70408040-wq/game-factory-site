@@ -844,13 +844,43 @@
      (핑크 228×242 · 퍼플 222×248 · 오렌지 236×215 · 민트 225×231) */
   width: calc(var(--chip-d) * var(--chip-glyph, .677));
   height: calc(var(--chip-d) * var(--chip-glyph, .677));
-  background: center/contain no-repeat;
+  background: var(--chip-glyph-img, none) center/contain no-repeat;
   display: block;
 }
 /* 크기 3단 — 버튼 sm/md/lg 와 짝이 맞는다(각 --btn-h × 1.076). */
 .kit-chip--sm{ --chip-d: 47px; }
 .kit-chip--md{ --chip-d: 57px; }
 .kit-chip--lg{ --chip-d: 75px; }
+
+/* ── ④ 글리프 재고 5종 — 새로 그린 것 0개 ─────────────────────────────
+   시안 메인 메뉴가 요구하는 글리프는 4칩 + 우측 렌치 = 5개다. 전부 재고이거나
+   **원화에서 오려낸 조각**이고, 신규 일러스트 발주는 한 장도 없다.
+     별      lib-star-gold      ✔ 재고 재사용 (시안은 분홍 — 색은 토큰으로 조절)
+     나침반  mode-ico-rush      △ 근사 재사용 (스톱워치 — 바늘 형태만 다름)
+     펼친 책 lib-glyph-book     ★ 원화 누끼 (2026-08-22 신규 추출)
+     기어    lib-glyph-gear     ✔ 재고 재사용 (형태·입체감 일치, 무보정)
+     렌치    lib-glyph-wrench   ★ 원화 누끼 (2026-08-22 신규 추출)
+
+   ★ 2건은 `tools/chip-glyph-extract.py` 가 main-menu-sian@4x.png 에서 떠냈다.
+     경계-세기 키잉(mode-icon-extract.py 와 동일 규칙) + 면색 프린지 제거.
+     [측정] 잉크 상자 @4x — 책 (532,2554)-(768,2735) 236×181
+                            렌치 (1586,2925)-(1776,3134) 190×209
+     ⚠ 렌치 실측 정정: 위 §메뉴 버튼 주석의 «잉크 x1600~1849»(249×299)는
+       버튼 우측 라운드 모서리를 물고 있던 느슨한 상자였다. 진짜 잉크는
+       190×209 = **.60H × .66H** 이고 우끝은 1776 (버튼 우끝 1844에서 −68 =
+       −.21H 떨어져 있다). 아이콘 상자 --btn-ico 도 이 값으로 재검할 것.
+     산출 규격은 기존 lib-glyph-* 와 같다 — 잉크 타이트 크롭 · 긴 변 96px ·
+     무손실 webp (책 96×74 · 렌치 87×96 vs 기어 96×96 · 별 96×99).
+
+   var(--lib-*, url(파일)) 2단 참조는 §1 .kit-res 와 같은 규약이다:
+   tentwin.html 에 배선하면 거기 인라인 data-URL 이 이기고, 카탈로그 단독
+   (kit-lab)에서는 옆 webp 파일이 쓰인다. 어느 쪽도 파일을 고치지 않는다.  ── */
+.kit-chip--star   { --chip-glyph-img: var(--lib-star-gold,    url("lib-star-gold.webp")); }
+.kit-chip--compass{ --chip-glyph-img: var(--mode-ico-rush,    url("mode-ico-rush.webp")); }
+.kit-chip--book   { --chip-glyph-img: var(--lib-glyph-book,   url("lib-glyph-book.webp")); }
+.kit-chip--gear   { --chip-glyph-img: var(--lib-glyph-gear,   url("lib-glyph-gear.webp")); }
+/* 렌치는 칩 안이 아니라 버튼 **우측 아이콘 슬롯**에 선다(시안: 설정 버튼 오른쪽 끝). */
+.kit-btn__ico--wrench{ background-image: var(--lib-glyph-wrench, url("lib-glyph-wrench.webp")); }
 
 
 /* ═══ .kit-btn 안의 칩 자리 — 「메뉴 버튼」 배치 ═══════════════════════
