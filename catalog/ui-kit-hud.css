@@ -1,0 +1,364 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   ui-kit-hud.css — 인게임 HUD 부품 2종                       14차 / HUD-1
+   ───────────────────────────────────────────────────────────────────────
+   대상 화면 : tentwin 게임 플레이 화면(인게임 HUD)
+   시안      : tentwin/assets/art/incoming/mockup/gm-classic-target.jpg
+               (768×1187 · 2026-08-20 · 클래식 모드 플레이 화면 = 최신)
+               보조 대조 gm-ingame-battle-hd.png (전투 모드 HUD)
+   규격 상속 : tentwin/JELLY-SPEC.md (.kit-jelly 오버레이)
+   실험대    : site/catalog/hud-lab.html
+
+   ⚠ 이 파일은 **ui-kit.css 를 수정하지 않는다.** 두 파일을 함께 링크해서 쓴다.
+     .kit-jelly · .kit-jelly-host · --k-* 토큰은 ui-kit.css 것을 **읽어서 재사용**한다.
+
+   ── 역할(F층) 대응 ────────────────────────────────────────────────────
+     RES  재화·소지품  →  .kit-res    (하트·코인·별·젬·목표·시계…)
+     STAT 속성·게이지  →  .kit-gauge  (틀 / 트랙 / 필 / 수치 라벨 4분할)
+   두 부품 모두 L4(값)는 **예외 없이 코드**다 — 글자를 그림에 굽지 않는다.
+
+   ── 층 배치 ───────────────────────────────────────────────────────────
+     .kit-res     L1 원형 판(코드) + L2 .kit-jelly + L3 글리프 실루엣(마스크) + L4 값
+     .kit-gauge   L1 틀·트랙·필(코드) + L2 .kit-jelly(필 위) + L4 값
+   ═══════════════════════════════════════════════════════════════════════ */
+
+
+/* ═══ §0. 토큰 ══════════════════════════════════════════════════════════
+   시안 실측(gm-classic-target.jpg, 768폭 ≈ 390 CSS 의 1.97배):
+     · 게이지 트랙 세로 y198~221 = 23px@768  → 11.7 CSS px  ⇒ 14px 채택(md)
+       (11.7 은 실측 하한이다. 시안 트랙은 유리판 안에 잠겨 위 1~2px 이
+        판 그림자에 먹혀 있고, 우리 트랙은 유리 밖에서도 서므로 md 를
+        4px 그리드의 14 로 올린다. sm 10 / lg 18 이 같은 그리드 위에 선다)
+     · 빈 트랙 면색  (110,133,187) = #6E85BB   · 위 눌린 테 (78,103,157) = #4E679D
+     · 아군 채움 상단 하이라이트 (204,236,255) = #CCECFF
+     · 채움 본색  #A4DAE8  [kit-registry bar.notes 실측 — 시안 A 전투 HUD]
+     · 적 트랙   #9C5977   [같은 출처]
+     · 수치 라벨 "0/1" 글자상자 y163~185 = 22px@768 → 11 CSS px 캡높이
+       ⇒ font-size 15px / weight 800 (--k-t-2 와 같은 단)                */
+
+:root{
+  /* — RES 재화칩 — */
+  --res-d:        22px;                 /* 아이콘 지름(md) */
+  --res-gap:      6px;                  /* 아이콘↔값 */
+  --res-fs:       15px;                 /* 값 글자 */
+  --res-fw:       800;
+  --res-ink:      #FFFFFF;              /* 시안: HUD 값은 흰 글자 + 딥 아웃라인 */
+  --res-ink-edge: rgba(46,26,40,.78);   /* 무채색 그림자 금지(ART §1) */
+
+  /* — STAT 게이지 — */
+  --gauge-h:      14px;                 /* 트랙 높이(md) */
+  --gauge-track:  #6E85BB;              /* [측정] 시안 빈 트랙 */
+  --gauge-track-e:#4E679D;              /* [측정] 트랙 위 눌린 테 */
+  --gauge-fill:   #A4DAE8;              /* [측정] 아군 채움 */
+  --gauge-fill-2: #CCECFF;              /* [측정] 채움 상단 하이라이트 */
+  --gauge-over:   var(--k-warn, #FFD34A);   /* 초과분 */
+  --gauge-pad:    3px;                  /* 틀 안쪽 여백(트랙이 틀에 잠기는 깊이) */
+}
+
+
+/* ═══ §1. .kit-res — 재화·상태 칩 (역할 RES) ════════════════════════════
+   마크업
+     <span class="kit-res kit-res--heart">
+       <i class="kit-res__ico kit-jelly-host"></i>
+       <b class="kit-res__val">5</b>
+     </span>
+
+   ── 두 가지 모드. 기본은 «맨 글리프» 다 (실측 근거로 이렇게 정했다) ──
+     ① 기본 (.kit-res)        시안 그대로 — 도서관 글리프 비트맵을 그대로 쓴다.
+        글리프(lib-glyph-*.webp)는 **광택·딥아웃라인이 이미 구워진 완성 그림**
+        이라 그 위에 .kit-jelly 를 얹으면 JELLY-SPEC §6 이 경고한 «광택 이중
+        계상» 이 일어나고, 더 나쁜 것은 오버레이가 비트맵의 **실루엣이 아니라
+        사각 상자**를 따라 그린다는 점이다(border-radius 는 상자의 것이지
+        그림의 것이 아니다). 그래서 기본 모드는 --jelly: 0 이다.
+     ② .kit-res--disc         원형 젤리판 + 글리프 **단색 실루엣**(mask-image).
+        광택은 판의 .kit-jelly 하나가 전담하므로 이중 계상이 구조적으로 없다.
+        ⚠ 실루엣이 «속이 빈 형태»(하트·별·왕관·자물쇠·시계·∞)일 때만 읽힌다.
+          coin(=lib-glyph-score) · target 처럼 **글리프 자체가 꽉 찬 원반**이면
+          실루엣이 그냥 검은 원이 되어 무의미하다 — 그 둘은 기본 모드로 쓴다.
+        판정 근거: site/evidence-14/_hud58/lab-zoom-circle.png (1배율 육안) */
+
+.kit-res{
+  display: inline-flex;
+  align-items: center;
+  gap: var(--res-gap);
+  vertical-align: middle;
+  line-height: 1;
+}
+
+/* ── 아이콘 자리 (기본 모드 = 맨 글리프 · L3) ── */
+.kit-res__ico{
+  position: relative;                    /* .kit-jelly-host 가 이미 주지만 명시 */
+  display: block;
+  flex: 0 0 auto;
+  width: var(--res-d);
+  height: var(--res-d);
+  border-radius: 50%;                    /* ★ --disc 모드에서 오버레이가 inherit 한다 */
+  box-sizing: border-box;
+  --jelly: 0;                            /* 기본은 오버레이 없음 — 이중 계상 차단 */
+  --jelly-h: var(--res-d);
+}
+.kit-res__ico::after{
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--res-glyph) center / contain no-repeat;
+  filter: drop-shadow(0 1px 1.5px rgba(46,20,58,.35));
+  pointer-events: none;
+}
+
+/* ── .kit-res--disc : L1 원형 판 + L2 .kit-jelly(ui-kit.css §② 재사용)
+      + L3 글리프 단색 실루엣 ── */
+.kit-res--disc .kit-res__ico{
+  background: var(--res-face, var(--k-pink, #F37F9B));
+  /* 어두운 외곽선 — 젤리 계보 공통(--btn-edge 와 같은 자리) */
+  box-shadow: 0 0 0 calc(var(--res-d) * .045) var(--res-edge, var(--k-pink-e, #B44A63)),
+              0 1px 2px rgba(46,20,58,.30);
+  --jelly: 1;                            /* ★ 오버레이 켬 */
+  /* 지름 22px 짜리 작은 원이라 접지 밴드를 시안 기본(.118)보다 얕게 둔다.
+     .118×22 = 2.6px 는 반지름의 24% 라 원이 «아래가 잘린» 것처럼 보인다. */
+  --jelly-band-w: .085;
+}
+.kit-res--disc .kit-res__ico::after{
+  z-index: 0;                            /* 젤리(::before) 밑에 깐다 */
+  background: var(--res-glyph-ink, rgba(46,26,40,.62));
+  filter: none;
+  -webkit-mask: var(--res-glyph) center / var(--res-glyph-s, 62%) auto no-repeat;
+          mask: var(--res-glyph) center / var(--res-glyph-s, 62%) auto no-repeat;
+}
+/* 젤리 오버레이를 실루엣 위로 — 사탕 «안에» 무늬가 든 것처럼 보이게 한다. */
+.kit-res--disc .kit-res__ico.kit-jelly-host::before{ z-index: 1; }
+
+/* ── L4 값 — 항상 코드. i18n·가변폭 ── */
+.kit-res__val{
+  font: var(--res-fw) var(--res-fs)/1 var(--hud-font, "Pretendard", system-ui,
+        -apple-system, "Segoe UI", sans-serif);
+  color: var(--res-ink);
+  letter-spacing: .01em;
+  font-variant-numeric: tabular-nums;    /* 값이 뛰어도 폭이 안 흔들린다 */
+  text-shadow:
+     0 1px 0 var(--res-ink-edge),
+     1px 0 0 var(--res-ink-edge),
+    -1px 0 0 var(--res-ink-edge),
+     0 -1px 0 var(--res-ink-edge),
+     0 2px 3px rgba(46,20,58,.35);
+  white-space: nowrap;
+}
+.kit-res__val .kit-res__max{ opacity: .72; font-weight: 700; }
+
+/* ── 크기 3단 (4px 그리드) ── */
+.kit-res--sm{ --res-d: 18px; --res-fs: 13px; --res-gap: 5px; }
+.kit-res--lg{ --res-d: 28px; --res-fs: 18px; --res-gap: 8px; }
+
+/* ── 변주 — 글리프는 전부 **기존 도서관 재고**다. 새로 그린 것 0개.
+      var(--lib-*, url(파일)) 2단 참조인 이유: tentwin.html 에 배선하면
+      거기 인라인 data-URL 이 이기고, 카탈로그 단독(hud-lab)에서는
+      옆에 있는 webp 파일이 쓰인다. 어느 쪽도 파일을 고치지 않는다.  ── */
+.kit-res--heart{
+  --res-glyph: var(--lib-glyph-heart, url("lib-glyph-heart.webp"));
+  --res-face: var(--k-pink, #F37F9B);   --res-edge: var(--k-pink-e, #B44A63);
+}
+.kit-res--coin{
+  --res-glyph: var(--lib-glyph-score, url("lib-glyph-score.webp"));
+  --res-face: var(--k-warn, #FFD34A);   --res-edge: var(--k-orange-e, #923E21);
+}
+.kit-res--star{
+  --res-glyph: var(--lib-star-gold, url("lib-star-gold.webp"));
+  --res-face: var(--k-orange, #F09B31); --res-edge: var(--k-orange-e, #923E21);
+  --res-glyph-s: 72%;
+}
+.kit-res--target{
+  --res-glyph: var(--lib-glyph-target, url("lib-glyph-target.webp"));
+  --res-face: var(--k-info, #6FA8F5);   --res-edge: var(--k-sky-e, #476792);
+}
+.kit-res--clock{
+  --res-glyph: var(--lib-glyph-clock, url("lib-glyph-clock.webp"));
+  --res-face: var(--k-sky, #8EA3E4);    --res-edge: var(--k-sky-e, #476792);
+}
+.kit-res--crown{
+  --res-glyph: var(--lib-glyph-crown, url("lib-glyph-crown.webp"));
+  --res-face: var(--k-purple, #C760D7); --res-edge: var(--k-purple-e, #8E4281);
+  --res-glyph-s: 74%;
+}
+.kit-res--lock{
+  --res-glyph: var(--lib-glyph-lock, url("lib-glyph-lock.webp"));
+  --res-face: #B9A79C;                  --res-edge: var(--k-ink-3, #6E463A);
+}
+.kit-res--inf{
+  --res-glyph: var(--lib-glyph-inf, url("lib-glyph-inf.webp"));
+  --res-face: var(--k-mint, #6DDDA7);   --res-edge: var(--k-mint-e, #2E8A72);
+}
+
+/* ── 상태 ── */
+.kit-res.is-zero  .kit-res__ico{ filter: grayscale(.85); }
+.kit-res--disc.is-zero .kit-res__ico{ --jelly: .35; }
+.kit-res.is-zero  .kit-res__val{ opacity: .70; }
+.kit-res.is-full  .kit-res__val{ color: var(--k-warn, #FFD34A); }
+.kit-res.is-gain  .kit-res__ico{ animation: kit-res-pop .32s ease-out; }
+@keyframes kit-res-pop{ 0%{transform:scale(1)} 45%{transform:scale(1.22)} 100%{transform:scale(1)} }
+@media (prefers-reduced-motion: reduce){ .kit-res.is-gain .kit-res__ico{ animation: none } }
+
+
+/* ═══ §2. .kit-gauge — 에너지바 (역할 STAT) ═════════════════════════════
+   ⛔ 통짜 금지. 네 조각은 **상태가 따로 변한다** (스킬 §0-C 통짜 실패표):
+        틀   .kit-gauge          — 안 변한다 (레이아웃·유리판)
+        트랙 .kit-gauge__track   — 최대치가 바뀌면 변한다
+        필   .kit-gauge__fill    — 매 프레임 변한다
+        라벨 .kit-gauge__label   — 값·서식·i18n 이 변한다
+   ⛔ 비트맵 늘리기 금지 — 필은 width 계산 하나로 늘어난다(무한 해상도·0KB).
+
+   마크업
+     <div class="kit-gauge kit-gauge--hp" style="--gauge-v:.4">
+       <div class="kit-gauge__track">
+         <div class="kit-gauge__fill"><div class="kit-jelly"></div></div>
+         <div class="kit-gauge__over"></div>
+       </div>
+       <b class="kit-gauge__label">40 / 100</b>
+     </div>
+
+   값 입력은 토큰 **--gauge-v (0~1, 1 초과 허용)** 하나뿐이다.              */
+
+.kit-gauge{
+  --_v:    var(--gauge-v, 0);
+  --_fill: clamp(0, var(--_v), 1);
+  --_over: clamp(0, calc(var(--_v) - 1), 1);   /* 100% 를 넘긴 몫 */
+
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: var(--gauge-pad);
+  border-radius: 999px;
+  box-sizing: border-box;
+}
+
+/* ── 틀 변주 ①: 유리판 안에 잠긴 트랙 (시안 그대로) ── */
+.kit-gauge--glass{
+  padding: 5px 9px 7px;                   /* [측정] 시안 유리판 안쪽 여백 ≈ 9/7 CSS px */
+  border-radius: var(--k-r-3, 24px);
+  background: var(--k-glass-tint, rgba(255,246,250,.18));
+  -webkit-backdrop-filter: var(--k-glass-filter, blur(3px) saturate(1.06));
+          backdrop-filter: var(--k-glass-filter, blur(3px) saturate(1.06));
+  box-shadow: inset 0 0 0 var(--k-glass-rim-w, 1.5px)
+                    var(--k-glass-rim-c, rgba(255,250,252,.92)),
+              var(--k-sh-1, 0 2px 5px rgba(46,20,58,.30));
+}
+/* ── 틀 변주 ②: 틀 없이 트랙만 (좁은 자리 · 콤보/피버) ── */
+.kit-gauge--bare{ padding: 0; background: none; box-shadow: none; }
+
+/* ── 트랙 (L1) — 눌려 들어간 홈. inset 그림자가 반경을 따라간다 ── */
+.kit-gauge__track{
+  position: relative;
+  height: var(--gauge-h);
+  border-radius: 999px;
+  overflow: hidden;                       /* 필이 트랙 밖으로 안 넘친다 */
+  background: var(--gauge-track);
+  box-shadow:
+    inset 0 calc(var(--gauge-h) * .13) calc(var(--gauge-h) * .16) 0
+      var(--gauge-track-e),               /* [측정] 위 눌린 테 #4E679D */
+    inset 0 calc(var(--gauge-h) * -.07) 0 0 rgba(255,255,255,.14);
+}
+
+/* ── 필 (L1+L2) — **코드로 늘어난다.** width 하나가 값이다 ── */
+.kit-gauge__fill{
+  position: relative;                     /* .kit-jelly 자식의 기준 */
+  height: 100%;
+  width: calc(var(--_fill) * 100%);
+  min-width: 0;
+  border-radius: 999px;
+  background: linear-gradient(180deg,
+                var(--gauge-fill-2) 0,
+                var(--gauge-fill)  52%,
+                color-mix(in srgb, var(--gauge-fill) 82%, #2E1A28) 100%);
+  transition: width .22s cubic-bezier(.2,.9,.3,1);
+
+  /* ★ .kit-jelly 오버레이의 길이 기준.
+     JELLY-SPEC §9 권장(게이지 = 하단 발광만)을 그대로 채용한다.
+     --jelly-h 는 «밑판의 대표 높이» 이므로 바 높이 그 자체다. */
+  --jelly-h: var(--gauge-h);
+  --jelly-rim:  .45;
+  --jelly-band: 0;                        /* 캡슐 아래에 검은 접지선은 어색하다 */
+  --jelly-spec: 0;                        /* 가로로 긴 판에 물방울 1개는 어색하다 */
+  --jelly-band-w: .16;                    /* 밴드 색은 껐지만 «아래가 깊은» 광원은 유지 */
+}
+.kit-gauge__fill > .kit-jelly{ z-index: 1; }
+
+/* ── 초과분 (>100%) — 필 위에 덧그리는 별도 층. 색·연출이 다르다 ── */
+.kit-gauge__over{
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: calc(var(--_over) * 100%);
+  border-radius: 999px;
+  background: linear-gradient(180deg,
+                color-mix(in srgb, var(--gauge-over) 62%, #FFFFFF) 0,
+                var(--gauge-over) 58%,
+                color-mix(in srgb, var(--gauge-over) 78%, #2E1A28) 100%);
+  box-shadow: 0 0 calc(var(--gauge-h) * .8) rgba(255,211,74,.65);
+  animation: kit-gauge-over 1.1s ease-in-out infinite;
+  transition: width .22s cubic-bezier(.2,.9,.3,1);
+}
+@keyframes kit-gauge-over{ 0%,100%{ filter: brightness(1) } 50%{ filter: brightness(1.18) } }
+@media (prefers-reduced-motion: reduce){ .kit-gauge__over{ animation: none } }
+
+/* ── 라벨 (L4) — 항상 코드. 트랙 위에 얹거나 옆에 세운다 ── */
+.kit-gauge__label{
+  display: block;
+  margin: 0 0 3px;
+  font: 800 var(--res-fs)/1 var(--hud-font, "Pretendard", system-ui,
+        -apple-system, "Segoe UI", sans-serif);
+  color: var(--res-ink);
+  font-variant-numeric: tabular-nums;
+  text-shadow:
+     0 1px 0 var(--res-ink-edge), 1px 0 0 var(--res-ink-edge),
+    -1px 0 0 var(--res-ink-edge), 0 -1px 0 var(--res-ink-edge),
+     0 2px 3px rgba(46,20,58,.35);
+}
+/* 라벨을 트랙 한가운데에 겹쳐 놓는 배치 (시안 A 전투 HUD 방식) */
+.kit-gauge--inlabel{ display: grid; }
+.kit-gauge--inlabel .kit-gauge__track{ grid-area: 1/1; }
+.kit-gauge--inlabel .kit-gauge__label{
+  grid-area: 1/1; margin: 0; align-self: center; justify-self: center;
+  z-index: 2; font-size: calc(var(--gauge-h) * .78); pointer-events: none;
+}
+
+/* ── 크기 3단 ── */
+.kit-gauge--sm{ --gauge-h: 10px; --gauge-pad: 2px; }
+.kit-gauge--lg{ --gauge-h: 18px; --gauge-pad: 4px; }
+
+/* ── 색 변주 — 출처를 주석에 남긴다 ── */
+.kit-gauge--hp{        /* 아군 HP — [측정] 시안 A #A4DAE8 / 시안 D 트랙 #6E85BB */
+  --gauge-fill: #A4DAE8; --gauge-fill-2: #CCECFF;
+  --gauge-track: #6E85BB; --gauge-track-e: #4E679D;
+}
+.kit-gauge--hp-enemy{  /* 적 HP — [측정] kit-registry bar.notes 빈 트랙 #9C5977 */
+  --gauge-fill: var(--k-danger, #D16347); --gauge-fill-2: #F09B85;
+  --gauge-track: #9C5977; --gauge-track-e: #6E3A54;
+}
+.kit-gauge--combo{     /* 콤보 — 현행 tentwin #combo-fill 계보 */
+  --gauge-fill: var(--k-orange, #F09B31); --gauge-fill-2: #FFD98A;
+  --gauge-track: #8B6E8A; --gauge-track-e: #5E4560;
+}
+.kit-gauge--fever{     /* 피버 — 현행 tentwin #fever-fill 계보 */
+  --gauge-fill: var(--k-purple, #C760D7); --gauge-fill-2: #F0A8F8;
+  --gauge-track: #6B5480; --gauge-track-e: #453456;
+}
+.kit-gauge--exp{
+  --gauge-fill: var(--k-mint, #6DDDA7); --gauge-fill-2: #B6F3D6;
+  --gauge-track: #5E8878; --gauge-track-e: #3B5C50;
+}
+
+/* ── 상태 ── */
+.kit-gauge.is-empty  .kit-gauge__fill{ box-shadow: none; }
+.kit-gauge.is-low    .kit-gauge__fill{ animation: kit-gauge-low .8s ease-in-out infinite; }
+@keyframes kit-gauge-low{ 0%,100%{ filter: brightness(1) } 50%{ filter: brightness(1.3) } }
+@media (prefers-reduced-motion: reduce){ .kit-gauge.is-low .kit-gauge__fill{ animation: none } }
+
+
+/* ═══ §3. .kit-hud-row — 두 부품이 함께 서는 한 줄 (배치 전용) ═══════════
+   부품이 아니라 **자리**다. 게임의 #topbar / #hud-row 예산에 맞춘 얇은 줄. */
+.kit-hud-row{
+  display: flex;
+  align-items: center;
+  gap: var(--k-sp-3, 12px);
+  width: 100%;
+  box-sizing: border-box;
+}
+.kit-hud-row > .kit-gauge{ flex: 1 1 auto; min-width: 0; }
+.kit-hud-row > .kit-res{ flex: 0 0 auto; }

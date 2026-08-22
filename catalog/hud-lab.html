@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HUD 실험대 — .kit-res / .kit-gauge</title>
+
+<!-- ★ 두 파일을 함께 링크한다. ui-kit.css 는 읽기 전용(다른 작업 중) —
+     .kit-jelly · .kit-jelly-host · --k-* 토큰을 그대로 재사용하기 위한 것이다. -->
+<link rel="stylesheet" href="ui-kit.css">
+<link rel="stylesheet" href="ui-kit-hud.css">
+
+<style>
+  /* 실험대 전용 껍데기 — 부품이 아니다. */
+  html,body{ margin:0; padding:0; }
+  body{
+    /* 판정용 바탕 — 게임 하늘색 계열의 잔잔한 그라데이션.
+       실제 배경 원화는 무늬가 많아 1배율 육안 판정을 방해한다(부품이 아니라
+       배경을 보게 된다). 유리·흰 글자가 서는지는 이 정도 명도면 충분히 걸린다. */
+    background: linear-gradient(180deg,#8FC4E8 0,#A8C8E0 32%,#B9C4DE 62%,#9FB0D2 100%) fixed;
+    font: 400 14px/1.4 "Pretendard", system-ui, -apple-system, "Segoe UI", sans-serif;
+    color: #FFF;
+    padding: 14px 12px 40px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .lab-h{
+    font: 800 13px/1 system-ui, sans-serif; letter-spacing:.04em;
+    color:#FFE9C9; margin: 20px 0 8px; text-shadow: 0 1px 2px rgba(46,20,58,.8);
+  }
+  .lab-h:first-of-type{ margin-top: 4px; }
+  .lab-sub{ font: 700 11px/1 system-ui,sans-serif; color:#D7C4D8; margin:10px 0 6px; }
+  .lab-card{
+    background: rgba(46,26,40,.42);
+    border: 1px solid rgba(255,255,255,.16);
+    border-radius: 14px;
+    padding: 12px;
+  }
+  .lab-grid{ display:flex; flex-wrap:wrap; gap: 14px 18px; align-items:center; }
+  .lab-cap{ font: 600 10px/1.2 system-ui,sans-serif; color:#CBB9CB; margin-top:4px; }
+  .lab-cell{ display:flex; flex-direction:column; align-items:center; gap:2px; }
+  .lab-stack{ display:flex; flex-direction:column; gap:10px; }
+  .lab-row2{ display:grid; grid-template-columns: 52px 1fr; gap:8px; align-items:center; }
+  .lab-row2 > span{ font:700 10px/1 system-ui,sans-serif; color:#CBB9CB; }
+</style>
+</head>
+<body>
+
+<!-- ══════════ §1. RES — 재화·상태 칩 (전 변주) ══════════ -->
+<div class="lab-h">§1 RES 재화·상태 칩 — 변주 전량 (md 22px · 기본 = 맨 글리프 = 시안 방식)</div>
+<div class="lab-card" id="lab-res-all">
+  <div class="lab-grid">
+    <div class="lab-cell"><span class="kit-res kit-res--heart"><i class="kit-res__ico kit-jelly-host"></i><b class="kit-res__val">5</b></span><span class="lab-cap">heart</span></div>
+    <div class="lab-cell"><span class="kit-res kit-res--coin"><i class="kit-res__ico kit-jelly-host"></i><b class="kit-res__val">1,240</b></span><span class="lab-cap">coin</span></div>
+    <div class="lab-cell"><span class="kit-res kit-res--star"><i class="kit-res__ico kit-jelly-host"></i><b class="kit-res__val">86</b></span><span class="lab-cap">star</span></div>
+    <div class="lab-cell"><span class="kit-res kit-res--target"><i class="kit-res__ico kit-jelly-host"></i><b class="kit-res__val">0<span class="kit-res__max">/7</span></b></span><span class="lab-cap">target</span></div>
+    <div class="lab-cell"><span class="kit-res kit-res--clock"><i class="kit-res__ico kit-jelly-host"></i><b class="kit-res__val">1:30</b></span><span class="lab-cap">clock</span></div>
+    <div class="lab-cell"><span class="kit-res kit-res--crown"><i class="kit-res__ico kit-jelly-host"></i><b class="kit-res__val">S</b></span><span class="lab-cap">crown</span></div>
+    <div class="lab-cell"><span class="kit-res kit-res--inf"><i class="kit-res__ico kit-jelly-host"></i><b class="kit-res__val">∞</b></span><span class="lab-cap">inf</span></div>
+    <div class="lab-cell"><span class="kit-res kit-res--lock"><i class="kit-res__ico kit-jelly-host"></i><b class="kit-res__val">—</b></span><span class="lab-cap">lock</span></div>
+  </div>
+
+  <div class="lab-sub">.kit-res--disc — 원형 젤리판 + 글리프 실루엣 (.kit-jelly 재사용 자리)</div>
+  <div class="lab-grid">
+    <div class="lab-cell"><span class="kit-res kit-res--disc kit-res--heart"><i class="kit-res__ico kit-jelly-host"></i><b class="kit-res__val">5</b></span><span class="lab-cap">heart ○</span></div>
+    <div class="lab-cell"><span class="kit-res kit-res--disc kit-res--star"><i class="kit-res__ico kit-jelly-host"></i><b class="kit-res__val">86</b></span><span class="lab-cap">star ○</span></div>
+    <div class="lab-cell"><span class="kit-res kit-res--disc kit-res--crown"><i class="kit-res__ico kit-jelly-host"></i><b class="kit-res__val">S</b></span><span class="lab-cap">crown ○</span></div>
+    <div class="lab-cell"><span class="kit-res kit-res--disc kit-res--lock"><i class="kit-res__ico kit-jelly-host"></i><b class="kit-res__val">—</b></span><span class="lab-cap">lock ○</span></div>
+    <div class="lab-cell"><span class="kit-res kit-res--disc kit-res--inf"><i class="kit-res__ico kit-jelly-host"></i><b class="kit-res__val">∞</b></span><span class="lab-cap">inf ○</span></div>
+    <div class="lab-cell"><span class="kit-res kit-res--disc kit-res--clock"><i class="kit-res__ico kit-jelly-host"></i><b class="kit-res__val">1:30</b></span><span class="lab-cap">clock ○</span></div>
+    <div class="lab-cell"><span class="kit-res kit-res--disc kit-res--coin"><i class="kit-res__ico kit-jelly-host"></i><b class="kit-res__val">1,240</b></span><span class="lab-cap">coin ✗검은원반</span></div>
+    <div class="lab-cell"><span class="kit-res kit-res--disc kit-res--target"><i class="kit-res__ico kit-jelly-host"></i><b class="kit-res__val">0/7</b></span><span class="lab-cap">target ✗</span></div>
+  </div>
+
+  <div class="lab-sub">크기 3단 · 상태 3종</div>
+  <div class="lab-grid">
+    <div class="lab-cell"><span class="kit-res kit-res--coin kit-res--sm"><i class="kit-res__ico kit-jelly-host"></i><b class="kit-res__val">18</b></span><span class="lab-cap">sm 18</span></div>
+    <div class="lab-cell"><span class="kit-res kit-res--coin"><i class="kit-res__ico kit-jelly-host"></i><b class="kit-res__val">18</b></span><span class="lab-cap">md 22</span></div>
+    <div class="lab-cell"><span class="kit-res kit-res--coin kit-res--lg"><i class="kit-res__ico kit-jelly-host"></i><b class="kit-res__val">18</b></span><span class="lab-cap">lg 28</span></div>
+    <div class="lab-cell"><span class="kit-res kit-res--heart is-zero"><i class="kit-res__ico kit-jelly-host"></i><b class="kit-res__val">0</b></span><span class="lab-cap">is-zero</span></div>
+    <div class="lab-cell"><span class="kit-res kit-res--star is-full"><i class="kit-res__ico kit-jelly-host"></i><b class="kit-res__val">MAX</b></span><span class="lab-cap">is-full</span></div>
+    <div class="lab-cell"><span class="kit-res kit-res--disc kit-res--heart is-zero"><i class="kit-res__ico kit-jelly-host"></i><b class="kit-res__val">0</b></span><span class="lab-cap">disc is-zero</span></div>
+  </div>
+</div>
+
+<!-- ══════════ §2. .kit-jelly 재사용 시험 — 원형 ══════════ -->
+<div class="lab-h">§2 .kit-jelly 재사용 시험 A — 원형 아이콘 (같은 판, 오버레이만 껐다 켬)</div>
+<div class="lab-card" id="lab-jelly-circle">
+  <div class="lab-grid">
+    <div class="lab-cell"><span class="kit-res kit-res--disc kit-res--heart"><i class="kit-res__ico kit-jelly-host" style="--jelly:0"></i></span><span class="lab-cap">22 off</span></div>
+    <div class="lab-cell"><span class="kit-res kit-res--disc kit-res--heart"><i class="kit-res__ico kit-jelly-host"></i></span><span class="lab-cap">22 on</span></div>
+    <div class="lab-cell"><span class="kit-res kit-res--disc kit-res--heart kit-res--lg"><i class="kit-res__ico kit-jelly-host" style="--jelly:0"></i></span><span class="lab-cap">28 off</span></div>
+    <div class="lab-cell"><span class="kit-res kit-res--disc kit-res--heart kit-res--lg"><i class="kit-res__ico kit-jelly-host"></i></span><span class="lab-cap">28 on</span></div>
+    <div class="lab-cell"><span class="kit-res kit-res--disc kit-res--star" style="--res-d:56px"><i class="kit-res__ico kit-jelly-host" style="--jelly:0"></i></span><span class="lab-cap">56 off</span></div>
+    <div class="lab-cell"><span class="kit-res kit-res--disc kit-res--star" style="--res-d:56px"><i class="kit-res__ico kit-jelly-host"></i></span><span class="lab-cap">56 on</span></div>
+  </div>
+</div>
+
+<!-- ══════════ §3. STAT — 에너지바 4단계 ══════════ -->
+<div class="lab-h">§3 STAT 에너지바 — 채움 0 / 40 / 100 / 초과(130%)</div>
+<div class="lab-card" id="lab-gauge-steps">
+  <div class="lab-stack">
+    <div class="lab-row2"><span>0%</span>
+      <div class="kit-gauge kit-gauge--glass kit-gauge--hp is-empty" style="--gauge-v:0">
+        <b class="kit-gauge__label">0 / 100</b>
+        <div class="kit-gauge__track"><div class="kit-gauge__fill"><div class="kit-jelly"></div></div><div class="kit-gauge__over"></div></div>
+      </div></div>
+    <div class="lab-row2"><span>40%</span>
+      <div class="kit-gauge kit-gauge--glass kit-gauge--hp" style="--gauge-v:.4">
+        <b class="kit-gauge__label">40 / 100</b>
+        <div class="kit-gauge__track"><div class="kit-gauge__fill"><div class="kit-jelly"></div></div><div class="kit-gauge__over"></div></div>
+      </div></div>
+    <div class="lab-row2"><span>100%</span>
+      <div class="kit-gauge kit-gauge--glass kit-gauge--hp" style="--gauge-v:1">
+        <b class="kit-gauge__label">100 / 100</b>
+        <div class="kit-gauge__track"><div class="kit-gauge__fill"><div class="kit-jelly"></div></div><div class="kit-gauge__over"></div></div>
+      </div></div>
+    <div class="lab-row2"><span>130%</span>
+      <div class="kit-gauge kit-gauge--glass kit-gauge--hp" style="--gauge-v:1.3">
+        <b class="kit-gauge__label">130 / 100 초과</b>
+        <div class="kit-gauge__track"><div class="kit-gauge__fill"><div class="kit-jelly"></div></div><div class="kit-gauge__over"></div></div>
+      </div></div>
+  </div>
+</div>
+
+<!-- ══════════ §4. 색 변주 × 라벨 배치 ══════════ -->
+<div class="lab-h">§4 색 변주 5종 (틀 없음 · 라벨 겹침) · 크기 3단</div>
+<div class="lab-card" id="lab-gauge-variants">
+  <div class="lab-stack">
+    <div class="lab-row2"><span>hp</span><div class="kit-gauge kit-gauge--bare kit-gauge--hp kit-gauge--inlabel kit-gauge--lg" style="--gauge-v:.72"><div class="kit-gauge__track"><div class="kit-gauge__fill"><div class="kit-jelly"></div></div><div class="kit-gauge__over"></div></div><b class="kit-gauge__label">7200 / 10000</b></div></div>
+    <div class="lab-row2"><span>enemy</span><div class="kit-gauge kit-gauge--bare kit-gauge--hp-enemy kit-gauge--inlabel kit-gauge--lg is-low" style="--gauge-v:.18"><div class="kit-gauge__track"><div class="kit-gauge__fill"><div class="kit-jelly"></div></div><div class="kit-gauge__over"></div></div><b class="kit-gauge__label">18%</b></div></div>
+    <div class="lab-row2"><span>combo</span><div class="kit-gauge kit-gauge--bare kit-gauge--combo" style="--gauge-v:.62"><div class="kit-gauge__track"><div class="kit-gauge__fill"><div class="kit-jelly"></div></div><div class="kit-gauge__over"></div></div></div></div>
+    <div class="lab-row2"><span>fever</span><div class="kit-gauge kit-gauge--bare kit-gauge--fever" style="--gauge-v:.45"><div class="kit-gauge__track"><div class="kit-gauge__fill"><div class="kit-jelly"></div></div><div class="kit-gauge__over"></div></div></div></div>
+    <div class="lab-row2"><span>exp</span><div class="kit-gauge kit-gauge--bare kit-gauge--exp" style="--gauge-v:.9"><div class="kit-gauge__track"><div class="kit-gauge__fill"><div class="kit-jelly"></div></div><div class="kit-gauge__over"></div></div></div></div>
+    <div class="lab-row2"><span>sm 10</span><div class="kit-gauge kit-gauge--bare kit-gauge--hp kit-gauge--sm" style="--gauge-v:.6"><div class="kit-gauge__track"><div class="kit-gauge__fill"><div class="kit-jelly"></div></div><div class="kit-gauge__over"></div></div></div></div>
+    <div class="lab-row2"><span>lg 18</span><div class="kit-gauge kit-gauge--bare kit-gauge--hp kit-gauge--lg" style="--gauge-v:.6"><div class="kit-gauge__track"><div class="kit-gauge__fill"><div class="kit-jelly"></div></div><div class="kit-gauge__over"></div></div></div></div>
+  </div>
+</div>
+
+<!-- ══════════ §5. .kit-jelly 재사용 시험 — 캡슐(바) ══════════ -->
+<div class="lab-h">§5 .kit-jelly 재사용 시험 B — 캡슐(바). 위=오버레이 없음 / 아래=오버레이 있음</div>
+<div class="lab-card" id="lab-jelly-bar">
+  <div class="lab-stack">
+    <div class="lab-row2"><span>14 off</span><div class="kit-gauge kit-gauge--bare kit-gauge--hp" style="--gauge-v:.6"><div class="kit-gauge__track"><div class="kit-gauge__fill" style="--jelly:0"></div><div class="kit-gauge__over"></div></div></div></div>
+    <div class="lab-row2"><span>14 on</span><div class="kit-gauge kit-gauge--bare kit-gauge--hp" style="--gauge-v:.6"><div class="kit-gauge__track"><div class="kit-gauge__fill"><div class="kit-jelly"></div></div><div class="kit-gauge__over"></div></div></div></div>
+    <div class="lab-row2"><span>28 off</span><div class="kit-gauge kit-gauge--bare kit-gauge--hp" style="--gauge-v:.6;--gauge-h:28px"><div class="kit-gauge__track"><div class="kit-gauge__fill" style="--jelly:0"></div><div class="kit-gauge__over"></div></div></div></div>
+    <div class="lab-row2"><span>28 on</span><div class="kit-gauge kit-gauge--bare kit-gauge--hp" style="--gauge-v:.6;--gauge-h:28px"><div class="kit-gauge__track"><div class="kit-gauge__fill"><div class="kit-jelly"></div></div><div class="kit-gauge__over"></div></div></div></div>
+    <div class="lab-row2"><span>극소 3%</span><div class="kit-gauge kit-gauge--bare kit-gauge--hp" style="--gauge-v:.03;--gauge-h:18px"><div class="kit-gauge__track"><div class="kit-gauge__fill"><div class="kit-jelly"></div></div><div class="kit-gauge__over"></div></div></div></div>
+  </div>
+
+  <div class="lab-sub">진단 — --jelly-h 배율 스윕 (바 높이 14px 고정). 오버레이가 몇 배부터 눈에 잡히는가</div>
+  <div class="lab-stack">
+    <div class="lab-row2"><span>h×1.0</span><div class="kit-gauge kit-gauge--bare kit-gauge--hp" style="--gauge-v:.6"><div class="kit-gauge__track"><div class="kit-gauge__fill" style="--jelly-h:14px"><div class="kit-jelly"></div></div></div></div></div>
+    <div class="lab-row2"><span>h×1.8</span><div class="kit-gauge kit-gauge--bare kit-gauge--hp" style="--gauge-v:.6"><div class="kit-gauge__track"><div class="kit-gauge__fill" style="--jelly-h:25px"><div class="kit-jelly"></div></div></div></div></div>
+    <div class="lab-row2"><span>h×2.6</span><div class="kit-gauge kit-gauge--bare kit-gauge--hp" style="--gauge-v:.6"><div class="kit-gauge__track"><div class="kit-gauge__fill" style="--jelly-h:36px"><div class="kit-jelly"></div></div></div></div></div>
+    <div class="lab-row2"><span>h×4.0</span><div class="kit-gauge kit-gauge--bare kit-gauge--hp" style="--gauge-v:.6"><div class="kit-gauge__track"><div class="kit-gauge__fill" style="--jelly-h:56px"><div class="kit-jelly"></div></div></div></div></div>
+    <div class="lab-row2"><span>기본값</span><div class="kit-gauge kit-gauge--bare kit-gauge--hp" style="--gauge-v:.6"><div class="kit-gauge__track"><div class="kit-gauge__fill" style="--jelly-rim:1;--jelly-band:1;--jelly-spec:1;--jelly-band-w:.118"><div class="kit-jelly"></div></div></div></div></div>
+  </div>
+</div>
+
+<!-- ══════════ §6. 실사용 조립 — 게임 상단바 한 줄 ══════════ -->
+<div class="lab-h">§6 실사용 조립 — 인게임 HUD 한 줄 (390 폭 그대로)</div>
+<div class="lab-card" id="lab-hud-assembly">
+  <div class="kit-hud-row" style="margin-bottom:10px">
+    <span class="kit-res kit-res--heart"><i class="kit-res__ico kit-jelly-host"></i><b class="kit-res__val">5</b></span>
+    <span class="kit-res kit-res--coin"><i class="kit-res__ico kit-jelly-host"></i><b class="kit-res__val">1,240</b></span>
+    <span class="kit-res kit-res--star"><i class="kit-res__ico kit-jelly-host"></i><b class="kit-res__val">86</b></span>
+    <span class="kit-res kit-res--target"><i class="kit-res__ico kit-jelly-host"></i><b class="kit-res__val">3<span class="kit-res__max">/7</span></b></span>
+  </div>
+  <div class="kit-hud-row">
+    <span class="kit-res kit-res--clock kit-res--sm"><i class="kit-res__ico kit-jelly-host"></i><b class="kit-res__val">1:30</b></span>
+    <div class="kit-gauge kit-gauge--bare kit-gauge--combo kit-gauge--inlabel" style="--gauge-v:.62">
+      <div class="kit-gauge__track"><div class="kit-gauge__fill"><div class="kit-jelly"></div></div><div class="kit-gauge__over"></div></div>
+      <b class="kit-gauge__label">x7</b>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
