@@ -1222,7 +1222,9 @@ button {
   border-radius: 999px;
   background: linear-gradient(90deg, #FFDD55 0%, #FF7A3D 48%, #FF4D8D 100%);
   transform-origin: left center;
-  transition: width 100ms linear;
+  /* 2026-08-23 — width -> scaleX. 값은 --p(0~1) 이고 kit-hud-v15 가
+     transform 트랜지션을 준다. game-motion §5 · VERIFY-motion M-2. */
+  transition: none;
 }
 
 #combo-bar {
@@ -1239,7 +1241,9 @@ button {
   border-radius: 999px;
   background: linear-gradient(90deg, var(--c8), var(--c9) 60%, var(--c4));
   transform-origin: left center;
-  transition: width 120ms linear;
+  /* 2026-08-23 — width -> scaleX. reduce 모드에서 유일하게 살아남던
+     애니메이션이 바로 이 줄이었다(VERIFY-motion M-4). */
+  transition: none;
 }
 
 #combo-label {
@@ -2106,8 +2110,14 @@ button {
 /* --- .fall : row collapse drop (spring), tile's own transform --- */
 .tile.fall { transition: transform 420ms cubic-bezier(.22, 1.4, .36, 1); }
 /* 전투: 판이 자라지 않으므로 스크롤을 잠그고, 낙하 체감은 FALL_MS 상수 대신
-   여기서만 조인다 (.battle 클래스는 단계 4에서 켜진다). */
-#app.battle #board-scroll { overflow: hidden; }
+   여기서만 조인다 (.battle 클래스는 단계 4에서 켜진다).
+   ⚠ 잠금만 `.adv.battle` 로 좁혔다. 이 규칙의 전제는 클래스가 아니라 **"판이
+   자라지 않는다"** 인데, 아케이드 대전은 같은 .battle 을 켜면서도 러시 보드를
+   쓴다(무한 Add · 행 추가). 거기서 스크롤을 잠그면 Add 로 덧붙은 줄이 화면 밖에
+   숨은 채 데드락 판정에는 들어가는 — 이 파일이 가장 경계하는 종류의 결함이 된다.
+   모험은 언제나 .adv 와 .battle 을 함께 켜므로(advStart → duelStart) 동작 불변.
+   아래 낙하 속도는 연출이라 두 모드가 같이 써도 무해하다. */
+#app.adv.battle #board-scroll { overflow: hidden; }
 #app.battle .tile.fall { transition-duration: 300ms; }
 
 /* --- .rowflash : whole-row flash, works on tiles or on a bar element --- */
@@ -12499,6 +12509,88 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
   text-shadow: 0 2px 0 rgba(110, 70, 58, .55);
 }
 
+/* ===== 아케이드 대전 — 허브 · 진입 버튼 · 결과 시트 ======================
+   #modal-classic 블록의 **복제가 아니라 상속**이다: 판·리본·행 모양은 위
+   `.r10m` / `.mode-list .mode-row` 공용 규칙이 이미 준다. 여기서 더하는 것은
+   ① `#modal-mode` 안에 앉힌 진입 버튼 한 개(스프라이트 규칙 밖의 새 클래스라
+   그림 규칙이 한 줄도 안 닿는다) ② 세 줄의 색 ③ 결과 시트의 숫자 크기뿐이다.
+   기존 어느 선택자도 여기서 다시 쓰지 않으므로 다른 화면에 닿을 수 없다. */
+#modal-arcade .sheet.r10-panel { text-align: center; }
+#modal-arcade #arcade-lead {
+  margin: 0 0 10px;
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: rgba(78, 46, 66, .92);
+}
+/* 세 줄의 색. 클래식 세 줄과 같은 문법(면 그라데이션 + 외곽선 링)이고 색만 다르다 —
+   대전은 붉은 계열로 두어 "싸우는 종목"이라는 사실이 색으로 먼저 읽히게 한다. */
+#modal-arcade #arcrow-time {
+  background: linear-gradient(180deg, #FF9E7A 0%, #F0724F 62%, #D9552F 100%);
+  box-shadow: 0 3px 0 #8E3A1F, inset 0 0 0 3px #6F2E19;
+}
+#modal-arcade #arcrow-surv {
+  background: linear-gradient(180deg, #F58BB4 0%, #E4608F 62%, #C8446F 100%);
+  box-shadow: 0 3px 0 #8A2A4C, inset 0 0 0 3px #6E2039;
+}
+#modal-arcade #arcrow-dmg {
+  background: linear-gradient(180deg, #A98BF0 0%, #8A63DE 62%, #6F49C2 100%);
+  box-shadow: 0 3px 0 #4A2C8A, inset 0 0 0 3px #3A2270;
+}
+#modal-arcade .mode-t > b,
+#modal-arcade .mode-b { color: #FFFFFF; text-shadow: 0 2px 0 rgba(110, 70, 58, .55); }
+#modal-arcade .mode-t > i {
+  color: rgba(255, 255, 255, .94);
+  text-shadow: 0 1px 0 rgba(110, 70, 58, .45);
+}
+
+/* 진입 버튼 — `.mode-list` **밖**에 있어 스프라이트 규칙이 닿지 않는다. */
+#modal-mode .arc-entry {
+  display: block;
+  width: 100%;
+  margin: 8px 0 0;
+  padding: 9px 12px;
+  border: 0;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #FF9E7A 0%, #F0724F 62%, #D9552F 100%);
+  box-shadow: 0 3px 0 #8E3A1F, inset 0 0 0 3px #6F2E19;
+  color: #FFFFFF;
+  font-family: var(--font-display);
+  text-align: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+#modal-mode .arc-entry:active { transform: translateY(2px); }
+#modal-mode .arc-entry > b {
+  display: block;
+  font-size: 17px;
+  line-height: 1.2;
+  text-shadow: 0 2px 0 rgba(110, 70, 58, .55);
+}
+#modal-mode .arc-entry > i {
+  display: block;
+  font-style: normal;
+  font-size: 12px;
+  line-height: 1.3;
+  color: rgba(255, 255, 255, .94);
+}
+
+/* 결과 시트 — 숫자만 크게. 한 장 스크린샷에서 가장 먼저 읽혀야 하는 것이 기록이다. */
+#modal-arc .big-score { margin: 2px 0 4px; }
+#modal-arc .big-score > b { font-size: clamp(46px, 15vw, 68px); line-height: 1.05; }
+#modal-arc #arc-dir { font-weight: 800; }
+#modal-arc #arc-when { opacity: .72; font-size: 12px; }
+#modal-arc #arc-who { opacity: .86; font-size: 13px; }
+
+/* 기록창에 덧붙는 아케이드 3줄. 위 여섯 탭의 규칙은 한 줄도 안 바뀐다. */
+.rank-arc { margin-top: 12px; }
+.rank-arc-h {
+  margin: 0 0 6px;
+  font-family: var(--font-display);
+  font-size: 14px;
+  opacity: .86;
+}
+.rank-arc-row .rank-main { font-weight: 800; }
+
 /* ---- W7.5 — 기록창 탭이 여섯이 됐다 -------------------------------------
    규칙은 여기가 아니라 **`.w6m .rank-tab` 옆**에 있다(파일 끝 시안 젤리 블록).
    이 자리에 `.rank-tab { … }` 로 써 봤지만 화면이 안 바뀌었다: 기록창은
@@ -14872,6 +14964,44 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
         <span id="mode-rush-b" class="mode-b"></span>
       </button>
     </div>
+    <!-- ===== 아케이드 대전 진입 =====================================
+         네 줄(.mode-row)은 글자까지 통짜로 베이크된 **그림 버튼**이라 다섯째
+         줄을 그 규약으로 만들려면 발주가 필요하다(§0). 그래서 #modal-classic 이
+         쓴 것과 같은 수를 썼다: 스프라이트 규칙이 전부 `.mode-list .mode-row`
+         에만 걸려 있다는 사실을 이용해, **.mode-list 밖·다른 클래스**로 앉힌다.
+         그러면 그림 규칙이 한 줄도 닿지 않고 코드 텍스트 라벨이 그대로 산다.
+         기존 네 줄의 마크업·위치·크기는 한 글자도 안 바뀐다. -->
+    <button id="mode-arcduel" class="arc-entry" type="button">
+      <b data-i18n="arc.hub">Arcade Duel</b><i data-i18n="arc.hub.d">Three ways to fight a villain.</i>
+    </button>
+  </div></div>
+
+  <!-- ===== 아케이드 대전 허브 ==============================================
+       #modal-classic 과 **같은 문법**이다(.r10m 판 + .r10-ribbon + .mode-list /
+       .mode-row 세 줄). 같은 이유로 `#modal-mode` 스코프 밖에 앉아 있어 스프라이트
+       덮어쓰기가 닿지 않고, 색만 전용 CSS 블록이 준다.
+       세 줄은 전부 러시 기계 위에서 돌고, 다른 것은 **무엇이 기록인가**뿐이다. -->
+  <div id="modal-arcade" class="modal r10m" hidden role="dialog" aria-modal="true" aria-labelledby="arcade-h"><div class="sheet r10-panel jbox jbox--modal">
+    <div class="r10-ribbon"><h2 id="arcade-h" data-i18n="arc.title">Arcade Duel</h2></div>
+    <button id="arcade-close" class="r10-x x-btn" type="button" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
+    <p id="arcade-lead" data-i18n="arc.lead">Fight a villain on the rush clock. Compare your record with a friend.</p>
+    <div class="mode-list">
+      <button id="arcrow-time" class="mode-row" type="button">
+        <span class="nchip nchip-rush" aria-hidden="true"></span>
+        <span class="mode-t"><b data-i18n="arc.time.name">Time Attack</b><i data-i18n="arc.time.d">Beat the villain. Fastest time wins.</i></span>
+        <span id="arcrow-time-b" class="mode-b"></span>
+      </button>
+      <button id="arcrow-surv" class="mode-row" type="button">
+        <span class="nchip nchip-arc" aria-hidden="true"></span>
+        <span class="mode-t"><b data-i18n="arc.surv.name">Survival</b><i data-i18n="arc.surv.d">Endless villains. Longest time wins.</i></span>
+        <span id="arcrow-surv-b" class="mode-b"></span>
+      </button>
+      <button id="arcrow-dmg" class="mode-row" type="button">
+        <span class="nchip nchip-day" aria-hidden="true"></span>
+        <span class="mode-t"><b data-i18n="arc.dmg.name">90s Damage</b><i data-i18n="arc.dmg.d">Ninety seconds. Most damage wins.</i></span>
+        <span id="arcrow-dmg-b" class="mode-b"></span>
+      </button>
+    </div>
   </div></div>
 
   <!-- ===== W7.5 클래식 허브 =================================================
@@ -14950,6 +15080,32 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
          land?" is the question in the player's head before "leave". -->
     <button id="btn-over-rank" class="btn btn-ghost" data-i18n-aria="aria.rank" data-i18n="rank.open" aria-label="Records">Records</button>
     <button id="btn-menu" class="btn btn-ghost" data-i18n-aria="aria.overMenu" data-i18n="over.menu" aria-label="Back to main menu">Main menu</button>
+  </div></div>
+
+  <!-- ===== 아케이드 대전 결과 ==============================================
+       ▣ 이 시트의 유일한 요구: **390×844 한 장을 찍으면 승부가 판정돼야 한다.**
+         사용자와 친구가 각자 폰에서 플레이하고 결과 화면을 스크린샷으로 주고받는
+         것이 이 모드의 경쟁 루프라, 스크롤해야 보이는 정보는 없는 것과 같다.
+         줄 순서가 곧 우선순위다: 모드명 → 기록(가장 크게) → 방향 → 결과 →
+         처치 → 캐릭터·펫 → 최고기록 → 날짜.
+       ▣ 디자인을 새로 만들지 않았다 — 바로 위 #modal-over 의 시트 문법
+         (.modal.w6m > .sheet.jbox.jbox--modal / .big-score / .sub-score)을 그대로
+         쓰고, 숫자 크기만 전용 규칙 하나로 키웠다.
+       ▣ 본문은 전부 paintArcSheet() 가 t() 로 칠한다. 그래서 data-i18n 이 없다
+         (있으면 applyI18n 이 값을 지운다 — #over-title 과 같은 규약). -->
+  <div id="modal-arc" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="arc-title"><div class="sheet jbox jbox--modal">
+    <h2 id="arc-title">Arcade</h2>
+    <p class="big-score"><b id="arc-value">0</b></p>
+    <p id="arc-dir" class="sub-score"></p>
+    <p id="arc-note" class="sub-score"></p>
+    <p id="arc-kos" class="sub-score"></p>
+    <p id="arc-who" class="sub-score"></p>
+    <p id="arc-best" class="rank-line"></p>
+    <p id="arc-when" class="sub-score"></p>
+    <div class="sheet-row">
+      <button id="arc-again" class="btn btn-primary" data-i18n="arc.again">Retry</button>
+      <button id="arc-menu" class="btn btn-ghost" data-i18n="arc.menu">Main menu</button>
+    </div>
   </div></div>
 
   <div id="modal-daily" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="daily-title"><div class="sheet jbox jbox--modal">
@@ -22242,7 +22398,21 @@ window.TT_SFX = {
      *      보게 하면 그것은 이야기가 아니라 장애물이다).
      *   ② 설정창 "갤러리" 줄은 여기 뭔가 켜져 있을 때만 나타난다 — 아직 아무것도
      *      못 본 사람에게 "다시 보기"는 열어 봐야 빈 목록이다. */
-    seenCuts: {}
+    seenCuts: {},
+    /* --- 아케이드 대전 개인 기록판 -----------------------------------------
+     * { 'arc-time': {mode,value,lowerIsBetter,date,ts,char,pet}, … } 모양의
+     * **모드당 한 칸**이다. store.ranks(RANK_MODES 6종)를 건드리지 않은 이유는
+     * arcSubmitBest 주석에 있다 — 한 줄로 말하면 그 기계는 "클수록 승"이라는
+     * 방향 하나에 단단히 물려 있고, 타임어택은 반대 방향이라 끼우는 순간 기존
+     * 6모드의 정렬이 회귀 위험에 든다.
+     * 항목이 방향(lowerIsBetter)과 캐릭터·펫까지 통째로 들고 있는 것은 의도다:
+     * 나중에 서버 랭킹으로 옮길 때 이 객체 하나를 그대로 올리면 되고, 화면 쪽은
+     * 방향을 **데이터에서 읽으므로** 코드가 모드를 손으로 세지 않는다. */
+    arcadeBest: {},
+    /* bestKey() 가 아케이드에 내주는 **격리 칸**. 화면 어디에서도 읽지 않는다 —
+       존재 이유는 오직 하나, 아케이드 판의 점수가 store.bestRush 로 새어 들어가는
+       경로를 문법적으로 없애는 것이다(bestKey 주석 참조). */
+    bestArcade: 0
   };
 
   /**
@@ -22257,6 +22427,7 @@ window.TT_SFX = {
   function loadStore() {
     readStore();
     reconcileRanks();
+    ensureArcadeBest();     // 아케이드 대전 기록판 — 위 reconcile 과 같은 이유로 무조건
   }
 
   function readStore() {
@@ -22355,6 +22526,19 @@ window.TT_SFX = {
           for (var ri = 0; ri < RANK_MODES.length; ri++) {
             var rm = RANK_MODES[ri];
             if (Array.isArray(o.ranks[rm])) store.ranks[rm] = o.ranks[rm];
+          }
+        }
+        /* 아케이드 대전 기록판. 위 ranks 와 같은 규약이다 — 모양이 아니면 채택하지
+           않고, 그 모드만 빈 기본값에 남는다. 항목 하나가 손상됐다고 셋을 다 버리지
+           않는 것도 같은 이유다(손상 한 칸 < 기록 전부). */
+        if (o.arcadeBest && typeof o.arcadeBest === 'object') {
+          store.arcadeBest = {};
+          for (var abk in o.arcadeBest) {
+            if (!Object.prototype.hasOwnProperty.call(o.arcadeBest, abk)) continue;
+            var abe = o.arcadeBest[abk];
+            if (!abe || typeof abe !== 'object') continue;
+            if (typeof abe.value !== 'number' || !isFinite(abe.value)) continue;
+            store.arcadeBest[abk] = abe;
           }
         }
         /* --- v4 4차-a: 모험 진행 ------------------------------------------
@@ -22781,6 +22965,14 @@ window.TT_SFX = {
     for (var i = 0; i < RANK_MODES.length; i++) {
       if (!Array.isArray(store.ranks[RANK_MODES[i]])) store.ranks[RANK_MODES[i]] = [];
     }
+  }
+
+  /** 아케이드 대전 기록판의 구조 방어. ensureRankArrays 와 **같은 문법·같은
+   *  성질**이다: 컨테이너만 만들고 다른 것은 한 칸도 안 건드리며, 몇 번 불러도
+   *  같다. 방어를 이 한 곳에 모아 두면 읽는 자리(기록창·결과 시트·제출)가 각자
+   *  `|| {}` 를 손으로 적지 않아도 되고, 그것이 곧 "빠뜨린 자리"가 안 생기는 이유다. */
+  function ensureArcadeBest() {
+    if (!store.arcadeBest || typeof store.arcadeBest !== 'object') store.arcadeBest = {};
   }
 
   function reconcileRanks() {
@@ -23374,6 +23566,32 @@ window.TT_SFX = {
       'classic.rush.d': 'Sixty seconds. Skill only.',
       'classic.daily': 'Daily',
       'classic.daily.d': "Today's board, on even ground.",
+      /* --- 아케이드 대전 (러시 기계 + 모험의 악당) ---------------------- */
+      'arc.hub': 'Arcade Duel',
+      'arc.hub.d': 'Three ways to fight a villain.',
+      'arc.title': 'Arcade Duel',
+      'arc.lead': 'Fight a villain on the rush clock. Screenshot the result and compare.',
+      'arc.time.name': 'Time Attack',
+      'arc.time.d': 'Beat the villain. Fastest time wins.',
+      'arc.surv.name': 'Survival',
+      'arc.surv.d': 'Endless villains. Longest time wins.',
+      'arc.dmg.name': '90s Damage',
+      'arc.dmg.d': 'Ninety seconds. Most damage wins.',
+      'arc.dir.low': 'Shorter wins',
+      'arc.dir.high': 'Longer wins',
+      'arc.dir.more': 'Higher wins',
+      'arc.clear': 'Villain defeated!',
+      'arc.ko': 'You were knocked out',
+      'arc.timeup': "Time's up",
+      'arc.norecord': 'no record',
+      'arc.foe': 'Villain {name}',
+      'arc.kos': 'Defeated {n}',
+      'arc.best': 'Best {v}',
+      'arc.nobest': 'First record!',
+      'arc.new': 'NEW RECORD!',
+      'arc.again': 'Retry',
+      'arc.menu': 'Main menu',
+      'rank.arc.title': 'Arcade Duel',
       'aria.cont': 'Classic — pure skill modes',
       'aria.chprev': 'Previous chapter',
       'aria.chnext': 'Next chapter',
@@ -24172,6 +24390,32 @@ window.TT_SFX = {
       'classic.rush.d': '60초. 실력만으로.',
       'classic.daily': '데일리',
       'classic.daily.d': '오늘의 판을, 같은 조건으로.',
+      /* --- 아케이드 대전 (러시 기계 + 모험의 악당) ---------------------- */
+      'arc.hub': '아케이드 대전',
+      'arc.hub.d': '악당과 겨루는 세 종목.',
+      'arc.title': '아케이드 대전',
+      'arc.lead': '러시 시계 위에서 악당과 겨뤄요. 결과를 찍어 친구와 비교하세요.',
+      'arc.time.name': '타임어택',
+      'arc.time.d': '악당을 쓰러뜨려요. 빠를수록 승리.',
+      'arc.surv.name': '서바이벌',
+      'arc.surv.d': '악당이 계속 나와요. 오래 버틸수록 승리.',
+      'arc.dmg.name': '90초 누적',
+      'arc.dmg.d': '90초 동안 누적 데미지로 겨뤄요.',
+      'arc.dir.low': '짧을수록 승리',
+      'arc.dir.high': '길수록 승리',
+      'arc.dir.more': '많을수록 승리',
+      'arc.clear': '악당 격파!',
+      'arc.ko': '쓰러졌어요',
+      'arc.timeup': '시간 종료',
+      'arc.norecord': '기록 없음',
+      'arc.foe': '상대 {name}',
+      'arc.kos': '처치 {n}',
+      'arc.best': '최고 {v}',
+      'arc.nobest': '첫 기록!',
+      'arc.new': '신기록!',
+      'arc.again': '다시하기',
+      'arc.menu': '메인메뉴',
+      'rank.arc.title': '아케이드 대전',
       'aria.cont': '클래식 — 순수 실력 모드',
       'aria.chprev': '이전 챕터',
       'aria.chnext': '다음 챕터',
@@ -24870,10 +25114,42 @@ window.TT_SFX = {
   function isClassic() {
     return S.mode === 'classic' || S.mode === 'classic-rush' || S.mode === 'classic-daily';
   }
-  /** 러시 기계(90초 시계 · 러시 HUD · 무한 Add · 중간저장 금지)를 쓰는 모드. */
-  function isRush() { return S.mode === 'rush' || S.mode === 'classic-rush'; }
+  /** 러시 기계(90초 시계 · 러시 HUD · 무한 Add · 중간저장 금지)를 쓰는 모드.
+   *  아케이드 대전 3종이 여기에 논리합으로 얹혔다 — 러시 기계를 통째로 물려받는
+   *  것이 이 한 항의 전부이고, 기존 다섯 모드에 대해서는 추가 항이 언제나 false 라
+   *  값이 한 치도 안 달라진다(위 W7.5 주석이 정당화한 바로 그 관용구다). */
+  function isRush() {
+    return S.mode === 'rush' || S.mode === 'classic-rush' || isArcadeDuel();
+  }
   /** 데일리 기계(결정론 시드 · 타이머 · 결과창)를 쓰는 모드. */
   function isDaily() { return S.mode === 'daily' || S.mode === 'classic-daily'; }
+
+  /* ---- 아케이드 대전 3종 (러시 기계 + 모험의 전투) --------------------------
+   *
+   * 한 문장: **러시의 보드·시계 위에 모험의 악당을 올린 것**이다. 새로 만든 것이
+   * 아니라 이미 모드 중립적으로 배관된 전투(SECTION 14C)의 게이트를 연 것뿐이고,
+   * 그래서 전투 코드는 한 줄도 복제되지 않았다 — 모험과 **같은 함수**가 돈다.
+   *
+   *   arc-time  타임어택   악당 HP 고정 · 격파까지 걸린 시간이 기록 (작을수록 승)
+   *   arc-surv  서바이벌   악당 무한(웨이브) · 버틴 시간이 기록   (클수록 승)
+   *   arc-dmg   90초 누적  악당 무한(웨이브) · 누적 DMG 가 기록   (클수록 승)
+   *
+   * 위 세 문자열은 클래식과 정확히 같은 규약이다: 플래그가 아니라 **값**이라,
+   * (모드, 플래그) 두 값을 짝지어 들고 다니는 자리가 한 곳도 안 생긴다.
+   *
+   * ★ 밸런스 손잡이는 아래 넷이 전부다. 새 밸런스 표를 만들지 않은 것은 의도다 —
+   *   아케이드에는 탄 번호가 없으므로 **고정 레벨 ARC_LV** 하나를 모험의 스케일
+   *   함수(duelFoeHpMax/duelAtkMax/duelFoeHit/duelFoeDef)에 그대로 먹인다. 표가
+   *   둘이 되면 모험을 조일 때마다 아케이드가 조용히 갈라진다. */
+  var ARC_MODES = { 'arc-time': 1, 'arc-surv': 1, 'arc-dmg': 1 };
+  var ARC_LV = 5;              // 아케이드가 쓰는 고정 탄 번호(악당 스케일의 유일한 입력)
+  var ARC_TIME_HP_K = 3;       // 타임어택만 악당 HP ×3 — 한 판이 1~3분이 되게
+  var ARC_ATK_TIME_MS = 6000;  // 자동공격 1회분(atkMax)만큼 때리면 버는 시간
+  /** 아케이드 대전인가. 아래 isRush()/battleOn() 두 서술어가 이 한 함수를 읽는다. */
+  function isArcadeDuel() { return !!ARC_MODES[S.mode]; }
+  /** 타임어택만 "짧을수록 승"이다. 방향을 함수 하나로 두는 이유는 arcSubmitBest
+   *  주석 참조 — 방향 판정이 두 곳에 흩어지면 그 둘이 언젠가 갈라진다. */
+  function arcLowerIsBetter(mode) { return mode === 'arc-time'; }
 
   /* ---- W7.5 기록 칸 선택 ---------------------------------------------------
    * "기록 완전 분리"는 여기 한 곳에서 성립한다. 최고점·최고단계·랭킹 보드를
@@ -24881,6 +25157,14 @@ window.TT_SFX = {
    * 칸을 쓰게 하면, 클래식이 일반 기록에 닿을 수 있는 경로가 문법적으로
    * 사라진다 — 분리를 규율이 아니라 배관으로 세우는 것이 요점이다. */
   function bestKey() {
+    /* ★ 아케이드 오염 차단 ①. isRush() 가 넓어졌으므로 이 분기가 **없으면**
+       아케이드 판의 점수가 일반 타임러시 최고점(store.bestRush)에 그대로 쓰인다 —
+       전투가 붙은 판과 안 붙은 판이 같은 칸을 다투는 것이라 기록의 뜻이 무너진다.
+       별도 칸으로 보내는 쪽을 골랐다(제거가 아니라 격리): onStageClear 의 러시
+       경로(판을 다 비우면 다음 판)가 이 칸에 쓰는데, 그 경로는 아케이드에도
+       필요하기 때문이다. store.bestArcade 는 화면 어디에서도 읽지 않는 **격리
+       칸**이고, 아케이드의 진짜 기록은 store.arcadeBest 가 따로 든다. */
+    if (isArcadeDuel()) return 'bestArcade';
     if (S.mode === 'classic-rush') return 'bestClassicRush';
     if (S.mode === 'classic') return 'bestClassic';
     return isRush() ? 'bestRush' : 'best';
@@ -24889,6 +25173,12 @@ window.TT_SFX = {
   /** 이 모드의 랭킹 보드 키. RANK_MODES 의 원소이거나 '' (제출 안 함 = 모험). */
   function rankKeyOf() {
     if (S.mode === 'adv') return '';
+    /* ★ 아케이드 오염 차단 ②. 이 분기가 없으면 아케이드가 아래 fall-through 로
+       'endless' 를 돌려주어 **아케이드 판이 엔들리스 랭킹 보드에 올라간다**.
+       모험과 같은 값('')을 쓰는 것이 맞다 — 아케이드는 RANK_MODES 의 종목이
+       아니고(submitRank 가 목록에 없는 키를 0 으로 되돌린다), 자기 기록은
+       store.arcadeBest 라는 자기 칸에 따로 남긴다. */
+    if (isArcadeDuel()) return '';
     if (isClassic()) return S.mode;          // 'classic' / 'classic-rush' / 'classic-daily'
     if (S.mode === 'rush') return 'rush';
     if (S.mode === 'daily') return 'daily';
@@ -25199,7 +25489,12 @@ window.TT_SFX = {
       * closeAllModals() 를 부른다. 그 한 번으로 허브까지 걷히려면 목록에 있어야
       * 한다(허브의 행 핸들러도 닫지만, 그것 하나에만 기대면 다른 경로로 진입할
       * 때 허브가 판 위에 남는다). */
-     'modal-classic']
+     'modal-classic',
+     /* 아케이드 대전 — 허브는 클래식 허브와 **같은 이유**로 이 목록에 있다:
+        startArcade 가 자기 안에서 closeAllModals() 를 부르므로, 그 한 번으로
+        허브까지 걷히려면 목록에 있어야 한다. 결과 시트도 함께 둔다 — 시트를 열어
+        둔 채 메뉴로 나가면 판이 끝난 화면이 메뉴 위에 남는다. */
+     'modal-arcade', 'modal-arc']
       .forEach(closeModal);
   }
 
@@ -25353,7 +25648,8 @@ window.TT_SFX = {
     var pct = Math.round(Math.max(0, Math.min(1, ratio || 0)) * 1000) / 10;
     var next = pct + '%';
     if (fill.getAttribute('data-p') === next) return;
-    fill.style.width = next;
+    /* game-motion §5: width → scaleX. 값은 0~1 이다(--p). */
+    fill.style.setProperty('--p', (pct / 100).toFixed(3));
     fill.setAttribute('data-p', next);
   }
 
@@ -25753,7 +26049,7 @@ window.TT_SFX = {
     rafCombo = 0;
     var fill = $('combo-fill'), label = $('combo-label');
     if (S.combo <= 1) {
-      if (fill) fill.style.width = '0%';
+      if (fill) fill.style.setProperty('--p', '0');
       if (label) label.textContent = '';
       return;
     }
@@ -25761,7 +26057,7 @@ window.TT_SFX = {
     if (left <= 0) {
       var prevC = S.combo;
       S.combo = 1;
-      if (fill) fill.style.width = '0%';
+      if (fill) fill.style.setProperty('--p', '0');
       if (label) { label.textContent = ''; label.style.color = ''; }
       syncBgmIntensity();   // the chain died: drop the combo lift back out of the mix
       /* 전투(단계 2) 실수 소스 ② — 콤보 끊김. 사슬이 **실제로 있었을 때만** 센다
@@ -25770,7 +26066,8 @@ window.TT_SFX = {
       if (battleOn() && prevC > 1) foeDriver.onBreak();
       return;
     }
-    if (fill) fill.style.width = (clamp(left / COMBO_MS, 0, 1) * 100).toFixed(1) + '%';
+    /* game-motion §5: width → scaleX. 값은 0~1 이다(--p). */
+    if (fill) fill.style.setProperty('--p', clamp(left / COMBO_MS, 0, 1).toFixed(3));
     rafCombo = requestAnimationFrame(comboLoop);
   }
 
@@ -27967,7 +28264,8 @@ window.TT_SFX = {
     var left = S.feverUntil - now();
     var fill = $('fever-fill');
     if (left <= 0) { endFever(); return; }
-    if (fill) fill.style.width = (clamp(left / FEVER_MS, 0, 1) * 100).toFixed(1) + '%';
+    /* game-motion §5: width → scaleX. 값은 0~1 이다(--p). */
+    if (fill) fill.style.setProperty('--p', clamp(left / FEVER_MS, 0, 1).toFixed(3));
     if (!S.paused) rafFever = requestAnimationFrame(feverLoop);
   }
 
@@ -28034,7 +28332,7 @@ window.TT_SFX = {
     if (was) S.feverCdUntil = now() + FEVER_CD_MS;
     stopFeverLoop();
     var fill = $('fever-fill');
-    if (fill) fill.style.width = '0%';
+    if (fill) fill.style.setProperty('--p', '0');
     var bar = $('fever-bar');
     if (bar) bar.hidden = true;
     setAppClass('fever', false);
@@ -28409,6 +28707,11 @@ window.TT_SFX = {
     rushInt = setInterval(function () {
       if (!isRush() || !S.running) return;
       if (S.paused) return;
+      /* 아케이드 대전 — 뭉치의 시간 정지는 **잔여시간을 읽기 전에** 정산한다.
+         순서가 계약이다: 뒤집히면 이 틱 한 번(200ms)만큼 숫자가 먼저 줄었다가
+         되돌아와 멈춘 시계가 떤다(startAdvLoop 과 같은 이유·같은 순서).
+         비전투 러시에서는 battleOn() 이 false 라 이 줄이 없는 것과 같다. */
+      if (battleOn()) duelChillTick();
       var left = rushLeftMs();
       syncRushHud();
       syncHud();
@@ -28423,7 +28726,20 @@ window.TT_SFX = {
         J.sfx.heartbeat();
       }
       maybeHurry(left);          // v4 §6.5 — 20초 지점. 10초 패닉의 윗단이다
-      if (left <= 0) { stopRush(); onGameOver(); }
+      /* 전투의 심장. startAdvLoop 이 하는 것과 **같은 세 줄**을 같은 순서로
+         이식했다(복제가 아니라 같은 함수 호출이다). 격파·KO 는 duelTick 안에서
+         판을 끝낼 수 있으므로, 그 직후 S.running 을 다시 물어야 한다. */
+      if (battleOn()) duelTick();
+      if (!S.running) return;    // 위에서 격파·KO 로 판이 끝났을 수 있다
+      /* 시간 종료. 비전투 러시(rush / classic-rush)의 경로는 종전 그대로
+         onGameOver 다 — 한 글자도 안 바뀐다. 아케이드는 자기 종료로 간다:
+         서바이벌·90초누적은 시간 종료가 곧 **정상 종료**이고, 타임어택은
+         패배다(그 판정은 arcFinish 안에서 모드가 낸다). */
+      if (left <= 0) {
+        stopRush();
+        if (isArcadeDuel()) arcFinish('timeup');
+        else onGameOver();
+      }
     }, 200);
   }
 
@@ -28747,7 +29063,14 @@ window.TT_SFX = {
        바로 아래의 직사각형 보정이 이미 읽기 때문이다. duelInit 은 DOM 을 건드리지
        않아서 여기 설 수 있다(화면 몫은 판이 다 그려진 뒤의 duelStart 가 맡는다).
        모험이 아니면 항상 null — 전투 분기가 다른 모드로 새지 않는 근거다. */
-    if (advp && TW_BATTLE) duelInit(advp); else S.duel = null;
+    /* 아케이드 대전만 예외다: 판을 다 비우면 rushNextBoard 가 **같은 판 안에서**
+       다음 보드를 깔고(러시의 규약), 그때 여기서 S.duel 을 비우면 악당이 판과 함께
+       사라진다 — 러시가 S.rushEndAt 을 startStage 너머로 지켜 내는 것과 정확히 같은
+       성질의 보존이다. 아케이드의 전투를 세우는 자리는 startArcade 한 곳뿐이고,
+       기존 여섯 모드에서는 isArcadeDuel() 이 언제나 false 라 이 줄은 종전과 글자
+       그대로 같은 값을 한다. */
+    if (advp && TW_BATTLE) duelInit(advp);
+    else if (!isArcadeDuel()) S.duel = null;
     var gen = advp
       ? genBoardBanded(stage, advp.seed, advp.density)
       : genBoardBanded(isDaily() ? 3 : stage, seed);
@@ -29026,6 +29349,285 @@ window.TT_SFX = {
     layout();
     startTimer();
   }
+
+  /* =========================================================================
+   * 아케이드 대전 — 진입 · 종료 · 기록
+   *
+   * 러시의 기계(90초 시계 · 무한 Add · 러시 HUD)와 모험의 전투(SECTION 14C)를
+   * **둘 다 그대로 쓴다**. 새로 쓴 것은 이 절의 다섯 함수뿐이고, 그중 어느 것도
+   * 전투 코드를 복제하지 않는다 — duelInit/duelStart/duelTick 은 모험이 부르는
+   * 바로 그 함수다.
+   *
+   * ⚠ 이 절은 advFinish 를 **절대** 부르지 않는다. 그 함수는 별·하트·
+   *   store.advStars / store.advMax / 젤리별 지갑을 움직이므로, 아케이드가 한 번만
+   *   닿아도 모험의 진행이 조용히 바뀐다. 그래서 종료를 따로 썼다(arcFinish).
+   * ========================================================================= */
+
+  /** 결과 시트의 [다시하기]가 읽는다 — 판이 끝난 뒤 S.mode 가 흔들려도 안전하게. */
+  var arcLast = '';
+
+  /**
+   * 전투 상태를 아케이드 규격으로 세운다. duelInit 이 받는 plan 모양은 `.n`(탄
+   * 번호) 하나면 충분하므로 최소 객체를 만들어 넘긴다. **S.advPlan 은 세우지
+   * 않는다** — null 로 남아 있어야 모험 경로(보스·별·직사각형 보정)가 안 샌다.
+   */
+  function arcDuelInit() {
+    var d = duelInit({ n: ARC_LV });
+    d.kos = 0;                       // 이 판에서 쓰러뜨린 악당 수 (웨이브 카운터)
+    /* 악당은 첫 정의에서 시작한다. duelInit 은 탄 번호로 고르는데(ARC_LV=5 이면
+       둘째 악당) 아케이드에는 탄이 없으니, 웨이브 순환의 0번째와 줄을 맞춘다. */
+    d.def = BOSS_DEFS[0];
+    if (S.mode === 'arc-time') {
+      /* 타임어택만 HP 를 키운다. 고정 HP 를 그대로 쓰면 한 판이 20~30초에 끝나
+         "기록"이라 부를 만한 폭이 안 나온다 — ×3 이 1~3분을 만든다. */
+      var hp = Math.max(1, Math.round(duelFoeHpMax(ARC_LV) * ARC_TIME_HP_K));
+      d.foe.hp = hp;
+      d.foe.hpMax = hp;
+    }
+    return d;
+  }
+
+  /**
+   * 아케이드 대전 진입. startRush() 의 **구조**를 따르되 복제가 아니다 — 러시가
+   * 세우는 값 여섯(점수·매치·콤보·시계 셋)은 같은 뜻이라 같은 값을 세우고, 다른
+   * 것은 전투를 세운다는 점뿐이다.
+   *
+   * ⚠ 순서가 계약이다:
+   *   startStage → arcDuelInit  : startStage 가 비-모험 판에서 S.duel 을 비우므로
+   *                               전투는 그 **뒤**에 서야 한다
+   *   showScreen → duelStart    : duelStart 가 .battle 클래스와 HUD 마운트를 하므로
+   *                               화면이 보여진 **뒤**라야 한다
+   * duelStart(p) 의 p 는 본문에서 쓰이지 않는다(상태는 이미 S.duel 에 있다).
+   * 그래도 null 을 명시적으로 넘기는 것은 "가짜 plan 이 없다"를 코드로 적기 위해서다.
+   */
+  function startArcade(kind) {
+    if (!ARC_MODES[kind]) return;
+    leaveAdvSkin();            // 모험 잔상(오라·보스바·전투 HUD) 제거
+    S.mode = kind;
+    S.score = 0;
+    S.matches = 0;
+    S.maxCombo = 1;
+    S.startedAt = Date.now();
+    S.rushEndAt = now() + RUSH_MS;
+    S.rushStartedAt = now();   // the run's age — only a rush entry may set this
+    S.rushBeatAt = 0;
+    S.addCdUntil = 0;
+    /* 걸린 시간·버틴 시간의 기준점. now()(성능 시계) 위에 두는 것은 러시의 시계
+       셋과 같은 자를 쓰기 위해서다 — 두 시계를 섞으면 일시정지 보정이 갈라진다. */
+    S.arcStartedAt = now();
+    arcLast = kind;
+    hurryReset();              // v4 §6.5 — 허리 업은 러시 세션당 1회다
+    startStage(1, (Math.random() * 0x7fffffff) | 0);
+    arcDuelInit();
+    closeAllModals();
+    showScreen('screen-game');
+    layout();
+    duelStart(null);           // .battle · HUD 마운트 · 벽시계 출발 (모험과 같은 함수)
+    syncRushHud();
+    startRushLoop();
+  }
+
+  /**
+   * 아케이드 판의 종료. advFinish 의 **정리 부분만** 계보로 삼았고, 별·하트·
+   * 진행도에 닿는 줄은 한 줄도 옮겨 오지 않았다(위 절 머리말의 ⚠).
+   * @param why 'clear'(격파) | 'ko'(내 HP 0) | 'timeup'(시간 종료)
+   */
+  function arcFinish(why) {
+    if (!S.running) return;                       // 두 번 들어오지 않는다
+    S.running = false;
+    S.busy = true;
+    stopComboLoop();
+    stopRush();
+    endFever(true);
+    clearSelection();
+    endSkill();
+    bangReset();
+    S.bossArm = false;
+    /* 전투의 문을 닫는다 — 시트가 떠 있는 동안 200ms 틱이 한 번 더 들어와 같은
+       판정을 두 번 내지 않게. duel 자체는 남겨 둔다(결과 시트가 d.dmg·d.kos 를 읽는다). */
+    if (S.duel) { S.duel.down = true; S.duel.meArm = false; }
+    setAppClass('duel-hurt', false);
+    setAppClass('boss-tell', false);
+    S.bossTellAt = 0;
+    /* 화면 상태는 내리되 HUD 는 **아직 안 지운다** — 격파 연출이 이 직후에 재생되고
+       결과 시트가 그 위를 덮는다. 실제 철거는 모드를 떠나는 leaveAdvSkin 의 몫이다
+       (advFinish 와 같은 규약). */
+    setAppClass('battle', false);
+
+    var d = S.duel;
+    var mode = S.mode;
+    arcLast = mode;
+    var value, submit;
+    if (mode === 'arc-dmg') {
+      value = d ? (d.dmg | 0) : 0;
+      submit = true;
+    } else {
+      value = Math.max(0, now() - (S.arcStartedAt || now()));
+      /* 타임어택만 조건부 제출이다: 시간초과·KO 는 악당을 못 쓰러뜨린 **미달**이라
+         "걸린 시간"이라는 기록이 성립하지 않는다. 미달을 기록으로 받으면 아무것도
+         안 하고 죽는 것이 최고 기록이 된다. */
+      submit = (mode !== 'arc-time') || (why === 'clear');
+    }
+    ensureArcadeBest();
+    var res = submit ? arcSubmitBest(mode, value)
+                     : { best: store.arcadeBest[mode] || null, fresh: false };
+    dropProgress();
+    persist();
+
+    var board = $('board');
+    if (why === 'clear') {
+      J.sfx.win();
+      J.vibrate(40);
+      if (typeof window !== 'undefined') {
+        J.confetti(window.innerWidth / 2, window.innerHeight * 0.42);
+      }
+    } else {
+      if (board) board.classList.add('grayed');
+      J.sfx.lose();
+      J.vibrate(60);
+      mascotSad();
+    }
+    paintArcSheet(mode, why, value, res);
+    /* onGameOver 와 같은 리듬(520ms). 연출이 끝나기 전에 시트를 올리면 격파
+       이펙트가 시트 뒤에서 혼자 돌다 끝난다. */
+    later(function () { openModal('modal-arc'); }, 520);
+  }
+
+  /**
+   * 개인 기록판에 제출한다. **RANK_MODES 를 건드리지 않은 이유**가 이 함수의
+   * 존재 이유다: 그 기계(정규화·비교자·행 그리기·6개 탭)는 "점수가 클수록 위"라는
+   * 방향 하나에 물려 있고, 타임어택은 방향이 반대다. 반대 방향의 종목을 그 표에
+   * 끼우면 비교자가 모드를 손으로 세기 시작하고, 그 순간 기존 여섯 모드가 회귀
+   * 위험에 든다. 세 종목의 기록은 모드당 한 칸이면 충분하므로 별도 칸에 둔다.
+   *
+   * 방향은 **데이터에서 읽는다**(entry.lowerIsBetter). 코드가 모드 이름으로 방향을
+   * 다시 세지 않는다는 뜻이고, 그래야 나중에 항목을 서버로 그대로 올려도 화면 쪽
+   * 판정이 갈라지지 않는다.
+   * @return {{best:Object, fresh:boolean}} 갱신 여부와 갱신 뒤의 기록
+   */
+  function arcSubmitBest(mode, value) {
+    ensureArcadeBest();
+    var prev = store.arcadeBest[mode] || null;
+    var low = arcLowerIsBetter(mode);
+    var v = Math.max(0, value | 0);
+    /* ★ 가장 틀리기 쉬운 한 줄. 타임어택은 **작을수록** 승이라 느린 기록이 빠른
+       기록을 덮으면 그것이 곧 버그다. 기존 기록이 없으면 무조건 저장한다. */
+    var better = !prev || (typeof prev.value !== 'number') ||
+                 (low ? (v < prev.value) : (v > prev.value));
+    if (!better) return { best: prev, fresh: false };
+    var e = {
+      mode: mode,
+      value: v,
+      lowerIsBetter: low,
+      date: todayKey(),
+      ts: Date.now(),
+      char: charId(),
+      pet: mateId()
+    };
+    store.arcadeBest[mode] = e;
+    persist();
+    return { best: e, fresh: true };
+  }
+
+  /* ---- 결과 시트의 글자 만들기 ------------------------------------------- */
+
+  /** i18n 키의 짧은 조각. 'arc-time' -> 'time' (키에 하이픈을 안 넣기 위해서다). */
+  var ARC_KEY = { 'arc-time': 'time', 'arc-surv': 'surv', 'arc-dmg': 'dmg' };
+
+  function arcModeName(mode) { return t('arc.' + (ARC_KEY[mode] || 'time') + '.name'); }
+
+  /** 승부의 방향 한 줄. 친구와 스크린샷을 주고받을 때 **이 줄이 판정 규칙이다**. */
+  function arcDirText(mode) {
+    if (mode === 'arc-time') return t('arc.dir.low');
+    if (mode === 'arc-dmg') return t('arc.dir.more');
+    return t('arc.dir.high');
+  }
+
+  /** 천단위 콤마. 누적 DMG 는 여섯 자리까지 가므로 콤마가 없으면 못 읽는다. */
+  function arcComma(n) {
+    var s = String(Math.max(0, n | 0)), out = '', c = 0, i;
+    for (i = s.length - 1; i >= 0; i--) {
+      out = s.charAt(i) + out;
+      c++;
+      if (c % 3 === 0 && i > 0) out = ',' + out;
+    }
+    return out;
+  }
+
+  /** 기록 한 값의 표시형. 시간 두 종목은 fmtTime 재사용(1:42), 누적은 콤마. */
+  function arcValueText(mode, v) {
+    if (mode === 'arc-dmg') return arcComma(v);
+    return fmtTime(Math.round(Math.max(0, v | 0) / 1000));
+  }
+
+  function arcPad2(n) { return (n < 10 ? '0' : '') + n; }
+
+  /**
+   * 결과 시트를 칠한다.
+   *
+   * ▣ 이 화면의 유일한 요구: **390×844 한 장을 찍으면 승부가 판정돼야 한다.**
+   *   사용자와 친구가 각자 폰에서 플레이하고 스크린샷을 주고받는 것이 이 모드의
+   *   경쟁 루프라, 스크롤해야 보이는 정보는 없는 것과 같다. 그래서 줄이 일곱이고
+   *   그 순서가 곧 우선순위다: 모드명 → 기록(가장 크게) → 방향 → 결과 → 처치 →
+   *   캐릭터·펫 → 최고기록 → 날짜.
+   * ▣ 디자인은 새로 만들지 않았다. #modal-over 의 시트 문법(.sheet.jbox--modal /
+   *   .big-score / .sub-score)을 그대로 쓰고 숫자 크기만 전용 규칙으로 키웠다.
+   */
+  function paintArcSheet(mode, why, value, res) {
+    setText('arc-title', arcModeName(mode));
+    setText('arc-value', arcValueText(mode, value));
+    setText('arc-dir', arcDirText(mode));
+    /* 왜 끝났는가. 타임어택에서만 승패가 갈리므로(격파=성공) 그 한 줄이 필요하고,
+       무한 두 종목에서는 시간 종료가 정상 종료라 담담하게 적는다. */
+    var note = why === 'clear' ? t('arc.clear')
+             : why === 'ko' ? t('arc.ko')
+             : t('arc.timeup');
+    if (mode === 'arc-time' && why !== 'clear') note = note + ' · ' + t('arc.norecord');
+    setText('arc-note', note);
+    /* 타임어택은 **누구를** 쓰러뜨렸는지가 기록의 조건이고, 무한 두 종목은
+       **몇을** 쓰러뜨렸는지가 그 판의 이야기다. */
+    var d = S.duel;
+    if (mode === 'arc-time') {
+      setText('arc-kos', t('arc.foe', { name: d && d.def ? bossName(d.def) : '' }));
+    } else {
+      setText('arc-kos', t('arc.kos', { n: d ? (d.kos | 0) : 0 }));
+    }
+    var pid = mateId();
+    setText('arc-who', t('char.' + charId() + '.name') +
+                       (pid ? ' · ' + t('char.' + pid + '.name') : ''));
+    var best = res ? res.best : null;
+    var bl = $('arc-best');
+    if (bl) {
+      if (!best) bl.textContent = t('arc.nobest');
+      else if (res && res.fresh) bl.textContent = t('arc.new') + ' · ' +
+                                                  t('arc.best', { v: arcValueText(mode, best.value) });
+      else bl.textContent = t('arc.best', { v: arcValueText(mode, best.value) });
+    }
+    var dt = new Date();
+    setText('arc-when', dt.getFullYear() + '-' + arcPad2(dt.getMonth() + 1) + '-' +
+                        arcPad2(dt.getDate()) + ' ' + arcPad2(dt.getHours()) + ':' +
+                        arcPad2(dt.getMinutes()));
+  }
+
+  /* ---- 허브 시트 ---------------------------------------------------------- */
+
+  /** 배지는 이미 store 에 있는 사실을 읽어 쓸 뿐이다(클래식 허브와 같은 규약). */
+  function syncArcadeSheet() {
+    ensureArcadeBest();
+    var ids = ['arc-time', 'arc-surv', 'arc-dmg'], i;
+    for (i = 0; i < ids.length; i++) {
+      var e = store.arcadeBest[ids[i]];
+      setText('arcrow-' + ARC_KEY[ids[i]] + '-b',
+              e && typeof e.value === 'number' ? arcValueText(ids[i], e.value) : '');
+    }
+  }
+
+  function openArcadeHub() {
+    syncArcadeSheet();
+    openModal('modal-arcade');
+    J.sfx.ui();
+  }
+  function closeArcadeHub() { closeModal('modal-arcade'); }
 
   /** Board emptied in Time Rush: roll straight into the next one, no modal. */
   function rushNextBoard() {
@@ -29670,7 +30272,26 @@ window.TT_SFX = {
       else if (va + vb === 10) missionBump('sum10', 1);
       if (specialsUsed) missionBump('special', specialsUsed);
       if (blown.length) missionBump('bomb', blown.length);
-      if (isRush()) addRushTime(rushMatchMs());   // decays past 60s
+      /* 러시의 시간 경제. 비전투 러시(rush / classic-rush)는 **한 글자도 안
+         바뀐다** — 고정 +2초(60초 뒤 감쇠)의 옛 경로 그대로다.
+         아케이드 대전만 시간 가산이 **데미지 비례**가 된다: 자동공격 1회분
+         (me.atkMax)만큼 때리면 ARC_ATK_TIME_MS(6초)를 번다. 왜 그렇게 하나 —
+         전투가 붙은 판에서 시간이 매치 수에 비례하면 "악당을 무시하고 쉬운 짝만
+         줍는 것"이 최적해가 되어, 붙여 놓은 전투가 장식이 된다. 잔여 45초 상한은
+         addRushTime 이 이미 지키므로 여기서 다시 세지 않는다.
+         ⚠ arc-dmg 만 가산을 통째로 건너뛴다: 90초 고정이 그 종목의 정의다.
+         ▣ 점수 배율은 **일부러 안 건드렸다**. 누적 DMG 자체가 기록인 종목에서
+           배율을 얹으면 "얼마나 때렸나"와 "무엇을 곱했나"가 섞여 기록의 뜻이
+           흐려진다 — 배율은 기록이 점수인 모드의 도구다. */
+      if (isRush()) {
+        if (battleOn()) {
+          if (S.mode !== 'arc-dmg') {
+            var arcD = S.duel;
+            var arcMax = (arcD && arcD.me && arcD.me.atkMax > 0) ? arcD.me.atkMax : 1;
+            addRushTime(Math.round(ARC_ATK_TIME_MS * Math.max(0, gain + bombGain) / arcMax));
+          }
+        } else addRushTime(rushMatchMs());        // decays past 60s
+      }
       // Fever ignites at combo x4 and only ever ends on its own timer.
       if (featuresOn()) {
         if (S.feverOn) extendFever();
@@ -29940,8 +30561,10 @@ window.TT_SFX = {
        선택은 여기까지 살아 있을 수 있다. */
     clearSelection();
     clearHints();
-    /* 전투는 행 소거가 없다 - 컬럼 중력이 즉시 판을 메운다. */
-    if (battleOn()) { runBattleRefill(); return; }
+    /* 전투는 행 소거가 없다 - 컬럼 중력이 즉시 판을 메운다.
+       ⚠ battleOn() 이 아니라 battleBoard() 다: 아케이드 대전도 전투지만 보드는
+       러시의 것(무한 Add · 행 소거)이라 이 리필에 들어오면 안 된다. */
+    if (battleBoard()) { runBattleRefill(); return; }
     /* 필수수리 2 - 행 목록을 **실행 직전에** 다시 센다. */
     var rows = findFullDeadRows(S.cells);
     if (rows.length) { runRowCollapse(rows); return; }
@@ -30040,7 +30663,21 @@ window.TT_SFX = {
   }
   /** 전투인가. 단계 2에서 예고한 대로 S.duel 기반으로 정식화됐다 — 전투 분기의
    *  유일한 스위치이고, TW_BATTLE=false 면 S.duel 이 아예 세워지지 않는다. */
-  function battleOn() { return TW_BATTLE && S.mode === 'adv' && !!S.duel; }
+  function battleOn() {
+    return TW_BATTLE && (S.mode === 'adv' || isArcadeDuel()) && !!S.duel;
+  }
+
+  /**
+   * 전투 **보드 규약**이 도는가 — 직사각형 보정 · 컬럼 중력 리필 · Add 금지.
+   *
+   * battleOn() 과 갈라 둔 것이 이 파도의 핵심 안전장치다. 전투의 나머지 53개
+   * 호출처(게이지·데미지·HUD·버튼 얼굴)는 보드 모양과 무관해서 아케이드가 그대로
+   * 따라가도 되지만, **보드만은 다르다**: 아케이드는 러시의 보드(무한 Add · 행
+   * 추가 · 행 소거)를 쓰는데 컬럼 중력 리필은 직사각형을 전제로 하므로, 둘을 한
+   * 판에서 돌리면 Add 가 판 뒤에 덧붙인 칸이 중력의 전제를 깨뜨린다.
+   * 그래서 보드 규약만 모험으로 좁힌다 — 아케이드는 여기 못 들어온다.
+   */
+  function battleBoard() { return battleOn() && S.mode === 'adv'; }
 
   var DUEL_MIN_PAIRS = 3;      // 리필 직후 최소 짝 수. 미달이면 스폰 값만 다시 뽑는다.
   var DUEL_REROLL_MAX = 8;
@@ -30476,8 +31113,10 @@ window.TT_SFX = {
   function doAdd() {
     if (S.busy || S.paused || !S.running) return;
     /* 전투에서 Add 는 없다. buildAddCells 는 판 뒤에 칸을 덧붙여 직사각형을
-       깨뜨리므로(컬럼 중력의 전제), 버튼이 교체되는 단계 3 전까지 여기서 막는다. */
-    if (battleOn()) { toast(t('toast.noadds')); J.sfx.fail(); return; }
+       깨뜨리므로(컬럼 중력의 전제), 버튼이 교체되는 단계 3 전까지 여기서 막는다.
+       ⚠ battleOn() 이 아니라 battleBoard() 다: 막아야 하는 것은 "전투"가 아니라
+       **컬럼 중력 보드**이고, 아케이드 대전은 러시 보드를 쓰므로 Add 가 규칙이다. */
+    if (battleBoard()) { toast(t('toast.noadds')); J.sfx.fail(); return; }
     if (isRush()) {
       // Unlimited, but rate-limited: Add becomes a timing decision.
       var cdLeft = S.addCdUntil - now();
@@ -31227,6 +31866,13 @@ window.TT_SFX = {
       advFinish(battleOn() ? duelTimeoutWin() : advGoalMet(), 'stuck');
       return;
     }
+    /* 아케이드 대전도 여기 서지 않는다. 정상 경로는 startRushLoop(시간 종료)와
+       duelTick(격파·KO)이 전부이고 무한 Add 라 addsExhausted() 가 영영 false 지만,
+       재배치 실패(doShuffle 의 `!res.ok`)라는 **가드 없는 한 경로**가 남아 있다.
+       그 한 경로가 열리면 일반 결과 시트가 뜨고 러시용 기록 배관이 도는데, 그것은
+       "아케이드는 자기 종료로만 끝난다"는 이 파도의 계약을 깨는 유일한 구멍이다.
+       한 줄로 막는다 — 기존 다섯 모드는 isArcadeDuel() 이 false 라 무영향이다. */
+    if (isArcadeDuel()) { stopRush(); arcFinish('timeup'); return; }
     S.running = false;
     S.busy = true;
     stopComboLoop();
@@ -31577,6 +32223,48 @@ window.TT_SFX = {
     var arr = (store.ranks && Array.isArray(store.ranks[rankMode])) ? store.ranks[rankMode] : [];
     list.textContent = '';                     // cheapest full clear, no parser
     for (i = 0; i < RANK_CAP; i++) list.appendChild(buildRankRow(i, arr[i]));
+    buildArcRankSection(list);
+  }
+
+  /**
+   * 아케이드 대전 3종을 목록 **아래에 덧붙이는** 섹션.
+   *
+   * 왜 탭을 안 늘렸는가: 탭은 RANK_MODES 의 것이고 그 표는 6모드에 단단히 물려
+   * 있다(정규화·비교자·행 모양·탭 배선이 전부 그 배열을 돈다). 방향이 반대인
+   * 종목을 그 표에 끼우는 순간 기존 여섯 모드가 회귀 위험에 드는 것이,
+   * arcSubmitBest 가 별도 칸을 쓴 이유와 정확히 같다. 그래서 화면에서도 별도
+   * 구획으로 산다 — 기존 여섯 탭의 동작은 한 줄도 안 바뀐다.
+   *
+   * ⚠ 순위 숫자(.rank-pos)를 일부러 넣지 않았다. 기록창의 메달 조각 CSS 가
+   *   `.rank-row:nth-child(n) .rank-pos` 로 1~3위를 칠하는데, 여기 줄들은 순위가
+   *   아니라 **종목**이라 메달이 붙으면 거짓말이 된다.
+   */
+  function buildArcRankSection(list) {
+    ensureArcadeBest();
+    var modes = ['arc-time', 'arc-surv', 'arc-dmg'], i;
+    var sec = document.createElement('div');
+    sec.className = 'rank-arc';
+    var h = document.createElement('div');
+    h.className = 'rank-arc-h';
+    h.textContent = t('rank.arc.title');
+    sec.appendChild(h);
+    for (i = 0; i < modes.length; i++) {
+      var m = modes[i];
+      var e = store.arcadeBest[m];
+      var row = document.createElement('div');
+      row.className = 'rank-row rank-arc-row' + (e ? '' : ' rank-empty');
+      var main = document.createElement('span');
+      main.className = 'rank-main';
+      main.textContent = arcModeName(m) + '  ' +
+        (e && typeof e.value === 'number' ? arcValueText(m, e.value) : '-');
+      var meta = document.createElement('span');
+      meta.className = 'rank-meta';
+      meta.textContent = arcDirText(m) + (e && e.date ? ' · ' + rankDateText(e.date) : '');
+      row.appendChild(main);
+      row.appendChild(meta);
+      sec.appendChild(row);
+    }
+    list.appendChild(sec);
   }
 
   function openRank(mode) {
@@ -33351,18 +34039,39 @@ window.TT_SFX = {
    */
   function duelTick() {
     var d = S.duel;
-    if (!d || !S.running || S.mode !== 'adv') return;
+    /* 모드 조건이 `S.mode !== 'adv'` 에서 `!battleOn()` 이 됐다. 두 서술어는
+       모험에서 **정의상 같은 값**이라(battleOn 이 S.mode==='adv' 를 포함) 모험의
+       동작은 한 프레임도 안 바뀌고, 아케이드 대전만 새로 들어온다. */
+    if (!d || !S.running || !battleOn()) return;
     if (!d.down && d.foe.hp <= 0) {
-      d.down = true;
-      d.meArm = false;
-      bossDefeatFx();
-      advFinish(true, 'boss');
+      /* 격파의 뜻이 모드마다 다르다. 모험은 **스테이지 승리**, 타임어택은 **판
+         종료**, 서바이벌·90초누적은 **다음 웨이브**다 — 뒤 둘에서 판을 끝내면
+         "무한"이라는 말이 거짓이 되고, 반대로 HP 바를 0 에 세워 두면 화면이
+         고장난 것으로 읽힌다. 그래서 리스폰이 그 자리를 메운다. */
+      if (S.mode === 'adv') {
+        d.down = true;
+        d.meArm = false;
+        bossDefeatFx();
+        advFinish(true, 'boss');
+        return;
+      }
+      if (S.mode === 'arc-time') {
+        d.down = true;
+        d.meArm = false;
+        bossDefeatFx();
+        arcFinish('clear');
+        return;
+      }
+      arcWaveNext();            // arc-surv / arc-dmg — 판은 계속된다
       return;
     }
     if (!d.down && d.me.hp <= 0) {
       d.down = true;
       d.meArm = false;
-      advFinish(false, 'ko');
+      /* ⚠ 아케이드는 advFinish 를 절대 부르지 않는다 — 그 함수는 별·하트·
+         store.advStars/advMax 를 움직인다. 아케이드 전용 종료가 따로 있다. */
+      if (S.mode === 'adv') advFinish(false, 'ko');
+      else arcFinish('ko');
       return;
     }
     if (d.down) return;
@@ -33382,6 +34091,32 @@ window.TT_SFX = {
       d.foeSkillAt = now() + DUEL_SKILL_MS;
       foeDriver.onTick();
     }
+  }
+
+  /**
+   * 아케이드 무한 모드의 **웨이브 리스폰**. 악당을 쓰러뜨려도 판이 끝나지 않는
+   * 두 종목(arc-surv / arc-dmg)에서 duelTick 이 격파를 접수한 자리에 선다.
+   *
+   * 새 전투를 세우지 **않는다**: 같은 S.duel 을 그대로 쓰고 악당 쪽 세 칸(초상·
+   * HP·게이지)만 갈아 끼운다. duelInit 을 다시 부르면 내 HP·필살기 게이지·펫
+   * 잔여까지 통째로 초기화되어, 버틴 시간이 웨이브마다 리셋되는 다른 게임이 된다.
+   * 내 게이지(me.atk/meArm)에 손대지 않는 것도 같은 이유다 — 격파 순간에 차 있던
+   * 공격은 다음 악당에게 그대로 이어지는 것이 플레이어가 기대하는 인과다.
+   */
+  function arcWaveNext() {
+    var d = S.duel;
+    if (!d) return;
+    bossDefeatFx();
+    d.kos = (d.kos | 0) + 1;
+    /* 악당은 BOSS_DEFS 셋을 순환한다. 정의가 셋뿐이라 넷째 웨이브는 첫 악당으로
+       돌아오는데, 그것이 v1 이고 전투가 모든 탄에서 이미 하는 일과 같다. */
+    d.def = BOSS_DEFS[(d.kos % BOSS_DEFS.length + BOSS_DEFS.length) % BOSS_DEFS.length];
+    d.foe.hp = d.foe.hpMax;
+    d.foe.atk = 0;
+    /* 초상·이름은 **판당 1회**의 duelHudMount 소유라, 악당이 바뀌는 이 순간이
+       그 "판당 1회"에 해당한다(값 캐시 d.hud 도 여기서 비워진다). */
+    duelHudMount(d);
+    syncDuel();
   }
 
   /* =========================================================================
@@ -33427,6 +34162,19 @@ window.TT_SFX = {
     return on;
   }
 
+  /**
+   * 밀어 줄 시계를 **모드가 고른다**. 모험은 S.advEndAt, 아케이드 대전은
+   * S.rushEndAt 이다 — 두 모드가 서로 다른 시계 위에서 같은 전투를 돌리므로,
+   * 시계 이름을 코드에 직접 적는 대신 소유자를 한 함수에 모은다. `>0` 가드는
+   * 양쪽 다 유지한다: 시계가 안 서 있는 판(정지가 도는 중에 판이 끝난 경우)에서
+   * 0 에 더하면 "1970년부터 흐르던 시계"가 갑자기 생긴다.
+   */
+  function arcAddClock(held) {
+    if (!(held > 0)) return;
+    if (S.mode === 'adv') { if (S.advEndAt > 0) S.advEndAt += held; return; }
+    if (isArcadeDuel() && S.rushEndAt > 0) S.rushEndAt += held;
+  }
+
   /** @return 이번 틱에 밀어 준 밀리초 (0 이면 정지가 안 돌고 있다) */
   function duelChillTick() {
     var d = S.duel;
@@ -33442,14 +34190,14 @@ window.TT_SFX = {
       held = d.chillAt > 0 ? Math.max(0, d.freezeUntil - d.chillAt) : 0;
       d.chillAt = 0;
       d.freezeUntil = 0;
-      if (held > 0 && S.advEndAt > 0) S.advEndAt += held;
+      arcAddClock(held);       // 모험이면 S.advEndAt, 아케이드면 S.rushEndAt
       duelChillSync();
       return held;
     }
     if (!(d.chillAt > 0)) { d.chillAt = t; duelChillSync(); return 0; }
     held = Math.max(0, t - d.chillAt);
     d.chillAt = t;
-    if (held > 0 && S.advEndAt > 0) S.advEndAt += held;
+    arcAddClock(held);         // 모험이면 S.advEndAt, 아케이드면 S.rushEndAt
     duelChillSync();
     return held;
   }
@@ -36824,6 +37572,24 @@ window.TT_SFX = {
       if (classicDailyDoneToday()) showDailyResult(0, true);
       else startClassicDaily(false);
     });
+    /* 아케이드 대전 — 모드 시트의 다섯째 진입점. 기존 네 줄의 핸들러는 한 글자도
+       안 바뀌었고, 이 배선은 새 버튼 하나가 새 허브를 여는 것이 전부다. */
+    on($('mode-arcduel'), 'click', function () { closeModeSheet(); J.sfx.ui(); openArcadeHub(); });
+    on($('arcade-close'), 'click', function () { closeArcadeHub(); J.sfx.ui(); });
+    on($('arcrow-time'), 'click', function () { closeArcadeHub(); J.sfx.ui(); startArcade('arc-time'); });
+    on($('arcrow-surv'), 'click', function () { closeArcadeHub(); J.sfx.ui(); startArcade('arc-surv'); });
+    on($('arcrow-dmg'), 'click', function () { closeArcadeHub(); J.sfx.ui(); startArcade('arc-dmg'); });
+    /* 결과 시트의 두 버튼. [다시하기]가 S.mode 가 아니라 arcLast 를 읽는 것은
+       의도다 — 시트가 떠 있는 동안 다른 경로가 S.mode 를 옮겨도 같은 종목으로
+       다시 시작한다(종목이 바뀌면 기록의 뜻이 바뀐다). */
+    on($('arc-again'), 'click', function () {
+      closeModal('modal-arc');
+      J.sfx.ui();
+      var bd0 = $('board');
+      if (bd0) bd0.classList.remove('grayed');
+      startArcade(arcLast || 'arc-time');
+    });
+    on($('arc-menu'), 'click', goMenu);
     on($('mode-close'), 'click', function () { closeModeSheet(); J.sfx.ui(); });
     on($('mode-adv'), 'click', function () { closeModeSheet(); J.sfx.ui(); openAdventure(); });
     on($('mode-arcade'), 'click', function () { closeModeSheet(); J.sfx.ui(); startEndless(false); });
@@ -37153,7 +37919,15 @@ window.TT_SFX = {
     /* 전투 개편 단계 3 — 네 버튼의 배선은 **디스패처**다. 기존 네 핸들러는 한
        글자도 안 바뀌었고, 전투가 아니면 클릭이 종전과 완전히 같은 함수로 간다
        (endless/daily/rush 회귀 0). 전투 얼굴은 SECTION 14D 에 있다. */
-    on($('btn-add'), 'click', function () { if (battleOn()) duelAtkInfo(); else doAdd(); });
+    /* ⚠ 첫 버튼만 battleBoard() 다 — 아케이드에서 **Add 는 Add 로 남는다**(무한
+       Add 가 러시의 규칙이고, 전투에서 이 버튼의 원래 얼굴 duelAtkInfo 는 게이지
+       안내 토스트라 기능 손실이 0 이다).
+       ▣ 알고 하는 타협 하나: `#app.battle #btn-add` 에 **공격 메달 그림**이 깔려
+         있어(파일 끝 시안 블록) 아케이드에서는 "공격 메달처럼 생겼는데 누르면
+         줄이 추가되는" 버튼이 된다. 그림을 따로 발주하지 않고 기능을 살린 쪽을
+         고른 것이고, 되돌리려면 이 한 줄을 battleOn() 으로 되돌리면 된다.
+       나머지 셋은 battleOn() 그대로다 — 그림과 기능이 함께 전투 스킬이 된다. */
+    on($('btn-add'), 'click', function () { if (battleBoard()) duelAtkInfo(); else doAdd(); });
     on($('btn-hint'), 'click', function () { if (battleOn()) doSpecial(); else doHint(); });
     on($('btn-undo'), 'click', function () { if (battleOn()) doPetSkill(); else doUndo(); });
     on($('btn-shuffle'), 'click', function () { if (battleOn()) doAwaken(); else doShuffle(false); });
@@ -37238,6 +38012,8 @@ window.TT_SFX = {
         if ($('modal-mode') && !$('modal-mode').hidden) { closeModeSheet(); return; }
       // W7.5 — 클래식 허브도 메뉴 위의 한 겹이라 모드 시트와 같은 우선순위다.
       if ($('modal-classic') && !$('modal-classic').hidden) { closeClassicHub(); return; }
+      // 아케이드 대전 허브도 같은 겹·같은 우선순위다.
+      if ($('modal-arcade') && !$('modal-arcade').hidden) { closeArcadeHub(); return; }
         /* 모험의 두 시트. 미션 카드는 지도 위에 떠 있으므로 먼저 닫히고, 결과
          * 시트는 닫는 것이 아니라 **지도로 돌아가는 것**이다 — 그냥 닫으면
          * 판이 끝난 화면에 갇힌다. */
@@ -37803,6 +38579,12 @@ window.TT_SFX = {
        위한 핸들. 게임 코드는 이 중 무엇도 window.Game 을 거쳐 부르지 않는다. */
     battleRefill: battleRefill, battleRefillEx: battleRefillEx,
     battleFitBoard: battleFitBoard, battleRows: battleRows, battleOn: battleOn,
+    /* 아케이드 대전 — 검증 하네스가 DOM 없이 모드를 세우고 끝낼 수 있도록 낸
+       손잡이 넷. battleBoard 가 함께 있는 것은 "전투인가"와 "전투 **보드**인가"를
+       하네스가 따로 물을 수 있어야 하기 때문이다(이 둘이 갈라진 것이 이 파도의
+       안전장치다). 게임 코드는 이 중 무엇도 window.Game 을 거쳐 부르지 않는다. */
+    isArcadeDuel: isArcadeDuel, battleBoard: battleBoard,
+    startArcade: startArcade, arcFinish: arcFinish, arcSubmitBest: arcSubmitBest,
     /* 전투 코어(단계 2) — 값은 `Game.state.duel`, 화면은 #duel-hud(단계 4)다.
        승패 경로는 아래 손잡이로 곧장 몰아 볼 수 있고, syncDuel 은 하네스가 값을
        강제로 바꾼 뒤 화면을 한 번 맞추기 위한 것이다(전투 루프는 자기 힘으로
@@ -42102,7 +42884,8 @@ html[lang="ko"] #modal-mode .r10-ribbon > h2{
   border-radius:999px;
   background-image:linear-gradient(180deg,#BFEFFF 0%,#7FD4F2 52%,#4FA9DC 100%);
   box-shadow:0 0 6px rgba(150,225,255,.55);
-  transition:width .18s ease-out;
+  /* 2026-08-23 — width -> scaleX(--p). kit-hud-v15 가 transform 을 준다. */
+  transition:none;
 }
 #app.classic #ch-tl{ left:4.0%;  width:23.4%; }
 #app.classic #ch-tc{ left:31.2%; width:30.0%; }
@@ -42880,6 +43663,475 @@ html[lang="ko"] #modal-mode .r10-ribbon > h2{
 /* 삐약의 장전 완료 글로우는 신호라 살린다 — 위 `box-shadow:none` 의 예외 한 줄. */
 #screen-game #hud-row #pv-chip.pv-armed{
   box-shadow: 0 0 10px 1px var(--pv-key, var(--accent));
+}
+</style>
+
+<style id="kit-hud-v15">
+/* ===========================================================================
+   14차 HUD 수리 — 킷 부품 **인라인 배선** (2026-08-23)
+   ---------------------------------------------------------------------------
+   출처(정본): site/catalog/ui-kit.css §② .kit-jelly · §③ .kit-cap
+               site/catalog/ui-kit-hud.css §2 (구획선)
+   이 블록은 그 정본을 **기계적으로 옮겨 온 사본**이다. 정본을 고치면 여기도
+   같이 고친다 — 두 벌이 갈라지면 계보 분열이 재발한다.
+
+   ▣ 왜 <link> 가 아니라 인라인인가 (판단 근거)
+     ⓐ 이 게임은 **오프라인 단일 HTML** 로 itch.io iframe 에 올라간다
+        (game-ship G 관문). 외부 CSS 를 링크하면 요청이 생겨 오프라인·CSP
+        적합성이 깨지고 단일 파일 배포 전제가 무너진다.
+     ⓑ 기존 규칙을 킷 문법으로 **치환**하는 안은 기각했다 — 캡슐·게이지·라벨판
+        규칙이 .w6m / #app.battle / #app.classic 스코프에 흩어져 있고 !important
+        가 겹겹이라, 치환하면 «이번 3요소 밖은 건드리지 않는다» 를 필연적으로
+        위반한다.
+     ⓒ 이 블록은 **파일 맨 끝**이다. 동률 특정도에서 뒤가 이기므로 기존 줄을
+        한 줄도 지우지 않고 덮는다. **롤백 = 이 style 블록 하나 삭제.**
+
+   ▣ 손대는 것 (그 밖은 건드리지 않는다)
+     1 모달 타이틀 캡슐 12자리    비트맵 glass-capsule-v4.webp → 코드 .kit-cap
+     2 클래식 상단 캡슐·좌우 알약  같은 비트맵 → 같은 코드 부품
+     3 전투 하단 액션바 받침       glass-hud-bar-st.webp → 코드 · **격자 소멸**
+     4 전투 스킬 4칸 라벨판        메달에 구워진 명패 → 코드 캡슐
+     5 HP·에너지 게이지 구획선     신설
+     6 게이지 채움 width → scaleX  #fever-fill · #combo-fill · 클래식 .ch-t
+     7 reduced-motion 속성 화이트리스트
+
+   ▣ 격자(체커) 실측 — 사용자가 지적한 «그림자처럼 박힌 체크 무늬»
+     glass-hud-bar-st.webp 를 50% 회색 위에 합성 → 21px 하이패스 → 자기상관:
+       **주기 48px 정사각 래티스 · r = 0.417**
+       (원 통짜 glass-hud-full.webp 도 48px · r 0.356 — 여기서 상속됐다.
+        정화 재절단본 glass-capsule-v4 는 r 0.109 로 거의 빠졌지만
+        **액션바는 재절단 대상에서 빠져 있었다** — 이 파일 W-C2 절의
+        「glass-hud-bar-st(하단 액션바)는 재절단 대상이 아니라 그대로 둔다」
+        가 그 자백이다.)
+     화면 격자 = 소스 48px x 가로 .496 · 세로 .433 = 약 24 x 21 CSS px.
+     → 받침을 코드로 그리면 이 결함은 **구조적으로 소멸한다.**
+   =========================================================================== */
+
+/* ═══ A. 부품 .kit-cap — 캡슐 **하나**. 변주는 곡률과 색뿐 ════════════════ */
+.kit-cap{
+  --cap-r: 999px;  --cap-h: 52px;
+  --cap-a:#7ED9C0; --cap-b:#54BFA2; --cap-drop:#35866F; --cap-band:#43A184;
+  --cap-edge:var(--j-outline,#6E463A);
+  --cap-s:.706;
+  position:relative; box-sizing:border-box;
+  display:flex; align-items:center; justify-content:center; gap:6px;
+  min-height:var(--cap-h); padding:0 18px;
+  border:0; border-radius:var(--cap-r);
+  background-color:transparent;
+  background-image:linear-gradient(180deg,var(--cap-a) 0%,var(--cap-a) 47%,
+                                          var(--cap-b) 47%,var(--cap-b) 100%);
+  box-shadow:0 3px 0 var(--cap-drop),
+             0 7px 16px rgba(83,28,40,.22),
+             inset 0 0 0 2.5px var(--cap-edge),
+             inset 0 -6px 0 var(--cap-band);
+  color:#FFFFFF; line-height:1.15; text-align:center;
+  text-shadow:0 1.5px 0 rgba(110,70,58,.55);
+  --jelly-h:var(--cap-h); --jelly-s:var(--cap-s); --jelly-spec:0;
+}
+.kit-cap > *{ position:relative; z-index:2; }
+
+/* ═══ B. 부품 .kit-jelly — 상대 휘도 기반 젤리 오버레이 ═══════════════════
+   흰/검 α 를 고정하지 않고 **밑판 sRGB 루마 --jelly-s 의 함수 하나**로 낸다:
+     흰 α = D/(1-S)   ·   검 α = D'/S     (D = 기준α x (1-S0) · D' = 기준α x S0)
+   S0 = 버튼 4색 평균 .5305. --jelly-s 를 선언하지 않으면 두 배율이 정확히 1 이
+   되어 종전 상수(.31/.18/.12/.11/.17/.88) 그대로다 — 버튼 무회귀가 «확인» 이
+   아니라 **구조**인 이유다(실측 diff 0px).
+   밝은 캡슐(S .901)에서 림-밴드 총 진폭 7.8 → **48.2 sRGB** (6.2배).
+   길이에는 절대 하한(--n-ring 1px / --n-blur .6px)을 씌워 얇은 바에서
+   서브픽셀로 사라지던 성분을 살린다(하한은 --btn-h 최소 44px 의 비례값보다
+   작으므로 버튼에서는 발동하지 않는다).                                    */
+.kit-jelly,
+.kit-jelly-host::before,
+.kit-cap::before{
+  content:''; position:absolute; inset:0;
+  border-radius:inherit; box-sizing:border-box; pointer-events:none;
+  --jh:var(--jelly-h,56px);
+  --jelly-s0:.5305;
+  --js:var(--jelly-s,var(--jelly-s0));
+  --_hw:calc((1 - var(--jelly-s0)) / (1 - var(--js)));
+  --_hb:calc(var(--jelly-s0) / var(--js));
+  --a-rim:min(1,calc(.31 * var(--_hw)));
+  --a-gl1:min(1,calc(.18 * var(--_hw)));
+  --a-gl2:min(1,calc(.12 * var(--_hw)));
+  --a-top:min(1,calc(.11 * var(--_hw)));
+  --a-spec:min(1,calc(.88 * var(--_hw)));
+  --a-band:min(1,calc(.17 * var(--_hb)));
+  --n-ring:1px; --n-blur:.6px;
+  --j:var(--jelly,1);
+  --j-r:calc(var(--j) * var(--jelly-rim,1));
+  --j-g:calc(var(--j) * var(--jelly-glow,1));
+  --j-b:calc(var(--j) * var(--jelly-band,1));
+  --j-t:calc(var(--j) * var(--jelly-top,1));
+  --j-s:calc(var(--j) * var(--jelly-spec,1));
+  border-style:solid;
+  border-width:
+    max(var(--n-ring),calc(var(--jh) * var(--jelly-band-t,.030)))
+    max(var(--n-ring),calc(var(--jh) * var(--jelly-band-x,.050)))
+    max(var(--n-ring),calc(var(--jh) * var(--jelly-band-w,.118)))
+    max(var(--n-ring),calc(var(--jh) * var(--jelly-band-x,.050)));
+  border-color:rgba(0,0,0,calc(var(--a-band) * var(--j-b)));
+  box-shadow:
+    inset 0 0 max(var(--n-blur),calc(var(--jh) * .014))
+              max(var(--n-ring),calc(var(--jh) * .048))
+      rgba(255,255,255,calc(var(--a-rim) * var(--j-r))),
+    inset 0 calc(var(--jh) * -1.055) max(var(--n-blur),calc(var(--jh) * .040)) calc(var(--jh) * -1)
+      rgba(255,255,255,calc(var(--a-gl1) * var(--j-g))),
+    inset 0 calc(var(--jh) * -1.13) max(var(--n-blur),calc(var(--jh) * .085)) calc(var(--jh) * -1)
+      rgba(255,255,255,calc(var(--a-gl2) * var(--j-g))),
+    inset 0 calc(var(--jh) * 1.13) max(var(--n-blur),calc(var(--jh) * .085)) calc(var(--jh) * -1)
+      rgba(255,255,255,calc(var(--a-top) * var(--j-t)));
+  background:
+    radial-gradient(max(var(--n-ring),calc(var(--jh) * .075))
+                    max(var(--n-ring),calc(var(--jh) * .050))
+      at calc(100% - var(--jh) * .208) calc(100% - var(--jh) * .265),
+      rgba(255,255,255,calc(var(--a-spec) * var(--j-s))),rgba(255,255,255,0) 72%);
+  background-clip:padding-box;
+}
+.kit-jelly{ z-index:1; }
+
+/* 색 변주 — catalog 표 그대로. --cap-s 는 면 두 단의 47/53 가중 sRGB 루마. */
+.kit-cap--mint  { --cap-a:#7ED9C0; --cap-b:#54BFA2; --cap-drop:#35866F; --cap-band:#43A184; --cap-s:.706; }
+.kit-cap--blue  { --cap-a:#8ACDF0; --cap-b:#57A6DC; --cap-drop:#2E6F9C; --cap-band:#4290C8; --cap-s:.674; }
+.kit-cap--pink  { --cap-a:#F8A2C4; --cap-b:#E8749F; --cap-drop:#A63C6A; --cap-band:#D25E8D; --cap-s:.636; }
+.kit-cap--yellow{ --cap-a:#FFDC84; --cap-b:#F0BC55; --cap-drop:#B07C1C; --cap-band:#DFA63E; --cap-s:.806; }
+.kit-cap--orange{ --cap-a:#FFB874; --cap-b:#F08E45; --cap-drop:#B15A16; --cap-band:#DF7A2E; --cap-s:.685; }
+.kit-cap--purple{ --cap-a:#C6A2F5; --cap-b:#A97FE4; --cap-drop:#6B47A8; --cap-band:#9468D2; --cap-s:.621; }
+.kit-cap--lilac { --cap-a:#CDC2D4; --cap-b:#B3A6BC; --cap-drop:#8B7E95; --cap-band:#A296AC; --cap-s:.718; }
+/* 진주 유리 — 옛 비트맵 캡슐이 서던 자리(모달 헤더·클래식 상단)를 잇는 색.
+   «유리» 정체성은 유지하고 기하만 젤리 문법으로 바꾼다.                    */
+.kit-cap--glass { --cap-a:#F2EAF2; --cap-b:#DCCFE0; --cap-drop:#A896AE; --cap-band:#CBBAD1; --cap-s:.874; }
+.kit-cap--tray  { --cap-a:#E4DAE8; --cap-b:#CBBED4; --cap-drop:#9A89A6; --cap-band:#BAAAC6; --cap-s:.812; }
+
+/* ═══ C. 구획선 — 사용자 요구 «에너지 바에 라인을 쳐야 한다» ══════════════
+   ⚠ **트랙에 얹는다. 채움에 얹지 않는다** — 채움은 scaleX 로 늘어나므로 거기
+     얹으면 구획 간격이 값에 따라 변한다(눈금이 아니게 된다).
+   간격 실측(2026-08-23 · 390x844 DPR3 전투 HUD 1배율 캡처):
+     플레이어 레일 눈금 7개 · 간격 **50 device px = 16.67 CSS px** → **8구간**. */
+.kit-ticks-host{ --gauge-seg:8; --gauge-tick-w:1.5px; --gauge-tick-c:rgba(46,20,58,.34); }
+.kit-ticks-host::after{
+  content:''; position:absolute; inset:0; border-radius:inherit;
+  pointer-events:none; z-index:4;
+  background:
+    repeating-linear-gradient(90deg,
+      rgba(255,255,255,0) 0,
+      rgba(255,255,255,0) calc(100% / var(--gauge-seg)),
+      rgba(255,255,255,.26) calc(100% / var(--gauge-seg)),
+      rgba(255,255,255,.26) calc(100% / var(--gauge-seg) + var(--gauge-tick-w) * .7)),
+    repeating-linear-gradient(90deg,
+      rgba(0,0,0,0) 0,
+      rgba(0,0,0,0) calc(100% / var(--gauge-seg) - var(--gauge-tick-w)),
+      var(--gauge-tick-c) calc(100% / var(--gauge-seg) - var(--gauge-tick-w)),
+      var(--gauge-tick-c) calc(100% / var(--gauge-seg)));
+  -webkit-mask:linear-gradient(90deg,#000 0 calc(100% - var(--gauge-tick-w)),transparent 0);
+          mask:linear-gradient(90deg,#000 0 calc(100% - var(--gauge-tick-w)),transparent 0);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   D. 소비처 ① — 모달 타이틀 캡슐 12자리
+   ---------------------------------------------------------------------------
+   사용자 반려: 「내 기록」 캡슐이 «뿌옇고 회보라색이며 젤리로 안 보인다.
+   림이 가늘고 탁하다». 그 자리가 비트맵 9슬라이스(glass-capsule-v4.webp)였다.
+   12자리가 **같은 부품**이므로 12자리를 함께 바꾼다 — 하나만 바꾸면 사용자가
+   방금 지적한 계보 분열을 우리가 다시 만드는 것이다.
+   ⚠ 상자 기하(height 80 · width fit-content · min-width 56% · margin -32px)는
+     **한 줄도 안 바꾼다.** 칠만 바꾼다 → 레이아웃 이동 0.
+   ⚠ 한국어 레터링(ttl-*.webp)은 h2 의 background-image 였는데 그 자리를 캔디
+     그라데가 쓰게 되므로 **::after 로 옮겨 다시 그린다**(--ttl 변수 9줄).
+   ═══════════════════════════════════════════════════════════════════════════ */
+#modal-pause .sheet > h2,
+#modal-over .sheet > h2,
+#modal-tutorial .sheet > h2,
+#modal-settings .sheet > h2,
+#modal-howto .sheet > h2,
+#modal-skin .sheet > h2,
+#modal-adv .sheet > h2,
+#modal-daily .sheet > h2,
+#modal-clear .sheet > h2,
+#modal-rank .sheet > h2,
+#modal-node .r10-ribbon,
+#modal-mode .r10-ribbon,
+#modal-classic .r10-ribbon,
+#charpanel #cp-h{
+  --cap-h:80px;
+  --cap-a:#F2EAF2; --cap-b:#DCCFE0; --cap-drop:#A896AE; --cap-band:#CBBAD1;
+  --cap-edge:var(--j-outline,#6E463A);
+  --cap-s:.874;
+  --jelly-h:80px; --jelly-s:.874; --jelly-spec:0;
+  position:relative;
+  border:0 !important;
+  border-image:none !important;
+  border-radius:999px !important;
+  background-color:transparent !important;
+  background-image:linear-gradient(180deg,var(--cap-a) 0%,var(--cap-a) 47%,
+                                          var(--cap-b) 47%,var(--cap-b) 100%) !important;
+  background-size:100% 100% !important;
+  background-position:center !important;
+  background-repeat:no-repeat !important;
+  box-shadow:0 3px 0 var(--cap-drop),
+             0 7px 16px rgba(83,28,40,.22),
+             inset 0 0 0 2.5px var(--cap-edge),
+             inset 0 -6px 0 var(--cap-band) !important;
+  padding:0 18px !important;
+}
+/* 젤리 오버레이 — 위 .kit-cap::before 와 같은 레시피를 이 선택자들에도 건다. */
+#modal-pause .sheet > h2::before,
+#modal-over .sheet > h2::before,
+#modal-tutorial .sheet > h2::before,
+#modal-settings .sheet > h2::before,
+#modal-howto .sheet > h2::before,
+#modal-skin .sheet > h2::before,
+#modal-adv .sheet > h2::before,
+#modal-daily .sheet > h2::before,
+#modal-clear .sheet > h2::before,
+#modal-rank .sheet > h2::before,
+#modal-node .r10-ribbon::before,
+#modal-mode .r10-ribbon::before,
+#modal-classic .r10-ribbon::before,
+#charpanel #cp-h::before{
+  content:''; position:absolute; inset:0;
+  border-radius:inherit; box-sizing:border-box; pointer-events:none; z-index:1;
+  --jh:80px; --js:.874;
+  --_hw:calc((1 - .5305) / (1 - var(--js)));
+  --_hb:calc(.5305 / var(--js));
+  border-style:solid;
+  border-width:max(1px,calc(var(--jh) * .030)) max(1px,calc(var(--jh) * .050))
+               max(1px,calc(var(--jh) * .118)) max(1px,calc(var(--jh) * .050));
+  border-color:rgba(0,0,0,min(1,calc(.17 * var(--_hb))));
+  box-shadow:
+    inset 0 0 max(.6px,calc(var(--jh) * .014)) max(1px,calc(var(--jh) * .048))
+      rgba(255,255,255,min(1,calc(.31 * var(--_hw)))),
+    inset 0 calc(var(--jh) * -1.055) max(.6px,calc(var(--jh) * .040)) calc(var(--jh) * -1)
+      rgba(255,255,255,min(1,calc(.18 * var(--_hw)))),
+    inset 0 calc(var(--jh) * -1.13) max(.6px,calc(var(--jh) * .085)) calc(var(--jh) * -1)
+      rgba(255,255,255,min(1,calc(.12 * var(--_hw)))),
+    inset 0 calc(var(--jh) * 1.13) max(.6px,calc(var(--jh) * .085)) calc(var(--jh) * -1)
+      rgba(255,255,255,min(1,calc(.11 * var(--_hw))));
+}
+/* 레터링 재배치 — 원래 h2 배경이던 것을 ::after 로 올린다. 그림·크기·정렬은
+   옛 규칙 그대로(auto 44% · center · no-repeat)라 글자 크기가 안 바뀐다. */
+html[lang="ko"] #modal-settings .sheet > h2{ --ttl:url("catalog/ttl-settings.webp"); }
+html[lang="ko"] #modal-pause .sheet > h2   { --ttl:url("catalog/ttl-pause.webp"); }
+html[lang="ko"] #modal-rank .sheet > h2    { --ttl:url("catalog/ttl-rank.webp"); }
+html[lang="ko"] #modal-skin .sheet > h2    { --ttl:url("catalog/ttl-skin.webp"); }
+html[lang="ko"] #modal-clear .sheet > h2   { --ttl:url("catalog/ttl-clear.webp"); }
+html[lang="ko"] #modal-over .sheet > h2    { --ttl:url("catalog/ttl-over.webp"); }
+html[lang="ko"] #modal-daily .sheet > h2   { --ttl:url("catalog/ttl-daily.webp"); }
+html[lang="ko"] #modal-mode .r10-ribbon    { --ttl:url("catalog/ttl-play.webp"); }
+html[lang="ko"] #charpanel #cp-h           { --ttl:url("catalog/ttl-chars.webp"); }
+html[lang="ko"] #modal-settings .sheet > h2::after,
+html[lang="ko"] #modal-pause .sheet > h2::after,
+html[lang="ko"] #modal-rank .sheet > h2::after,
+html[lang="ko"] #modal-skin .sheet > h2::after,
+html[lang="ko"] #modal-clear .sheet > h2::after,
+html[lang="ko"] #modal-over .sheet > h2::after,
+html[lang="ko"] #modal-daily .sheet > h2::after,
+html[lang="ko"] #modal-mode .r10-ribbon::after,
+html[lang="ko"] #charpanel #cp-h::after{
+  content:''; position:absolute; inset:0; z-index:3; pointer-events:none;
+  background-image:var(--ttl);
+  background-repeat:no-repeat;
+  background-position:center center;
+  background-size:auto 44%;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   E. 소비처 ② — 클래식 상단 캡슐 · 좌우 알약 (같은 부품 · 곡률만 같은 알약)
+   ═══════════════════════════════════════════════════════════════════════════ */
+/* 중앙 캡슐 그림을 끄고, 같은 상자에 이미 서 있는 #ch-cap 이 코드로 그린다. */
+#app.classic #classic-hud::after{ background-image:none !important; }
+#app.classic #ch-cap,
+#app.classic #classic-hud .ch-g{
+  --cap-a:#F2EAF2; --cap-b:#DCCFE0; --cap-drop:#A896AE; --cap-band:#CBBAD1;
+  --cap-edge:var(--j-outline,#6E463A);
+  --jelly-s:.874;
+  border:0 !important;
+  border-image:none !important;
+  border-radius:999px !important;
+  background-color:transparent !important;
+  background-image:linear-gradient(180deg,var(--cap-a) 0%,var(--cap-a) 47%,
+                                          var(--cap-b) 47%,var(--cap-b) 100%) !important;
+  background-size:100% 100% !important;
+  background-repeat:no-repeat !important;
+  box-shadow:0 3px 0 var(--cap-drop),
+             0 6px 14px rgba(83,28,40,.20),
+             inset 0 0 0 2.5px var(--cap-edge),
+             inset 0 -5px 0 var(--cap-band) !important;
+}
+#app.classic #ch-cap::before,
+#app.classic #classic-hud .ch-g::before{
+  content:''; position:absolute; inset:0;
+  border-radius:inherit; box-sizing:border-box; pointer-events:none; z-index:1;
+  --js:.874;
+  --_hw:calc((1 - .5305) / (1 - var(--js)));
+  --_hb:calc(.5305 / var(--js));
+  border-style:solid;
+  border-width:max(1px,calc(var(--jh) * .030)) max(1px,calc(var(--jh) * .050))
+               max(1px,calc(var(--jh) * .118)) max(1px,calc(var(--jh) * .050));
+  border-color:rgba(0,0,0,min(1,calc(.17 * var(--_hb))));
+  box-shadow:
+    inset 0 0 max(.6px,calc(var(--jh) * .014)) max(1px,calc(var(--jh) * .048))
+      rgba(255,255,255,min(1,calc(.31 * var(--_hw)))),
+    inset 0 calc(var(--jh) * -1.055) max(.6px,calc(var(--jh) * .040)) calc(var(--jh) * -1)
+      rgba(255,255,255,min(1,calc(.18 * var(--_hw)))),
+    inset 0 calc(var(--jh) * 1.13) max(.6px,calc(var(--jh) * .085)) calc(var(--jh) * -1)
+      rgba(255,255,255,min(1,calc(.11 * var(--_hw))));
+}
+#app.classic #ch-cap{ --jh:13.6cqw; pointer-events:none; }
+#app.classic #classic-hud .ch-g{ --jh:8.09cqw; }
+#app.classic #ch-cap-v,
+#app.classic #classic-hud .ch-g b{ position:relative; z-index:2; }
+/* 클래식 게이지 — 구획선 + scaleX */
+#app.classic #classic-hud .ch-t{
+  --gauge-seg:8; --gauge-tick-w:1.2px; --gauge-tick-c:rgba(46,20,58,.30);
+}
+#app.classic #classic-hud .ch-t::after{
+  content:''; position:absolute; inset:0; border-radius:inherit;
+  pointer-events:none; z-index:4;
+  background:repeating-linear-gradient(90deg,
+    rgba(0,0,0,0) 0,
+    rgba(0,0,0,0) calc(100% / var(--gauge-seg) - var(--gauge-tick-w)),
+    var(--gauge-tick-c) calc(100% / var(--gauge-seg) - var(--gauge-tick-w)),
+    var(--gauge-tick-c) calc(100% / var(--gauge-seg)));
+  -webkit-mask:linear-gradient(90deg,#000 0 calc(100% - var(--gauge-tick-w)),transparent 0);
+          mask:linear-gradient(90deg,#000 0 calc(100% - var(--gauge-tick-w)),transparent 0);
+}
+/* 채움 — width 트랜지션 폐기. JS 는 --p 만 쓴다(game-motion §5 · §10-3). */
+#app.classic #classic-hud .ch-t > span{
+  width:100% !important;
+  transform-origin:left center;
+  transform:scaleX(var(--p,0));
+  transition:transform 260ms linear !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   F. 소비처 ③ — 전투 하단 액션바 받침 (격자 소멸) + ④ 스킬 4칸 라벨판
+   ═══════════════════════════════════════════════════════════════════════════ */
+/* ③ 받침: 비트맵 border-image 를 끄고 같은 자리에 코드 트레이를 그린다.
+      곡률만 다른 같은 부품이다(--cap-r 24px 상당). */
+#app.battle #actionbar::after{
+  border-image:none !important;
+  border:0 !important;
+  border-radius:26px !important;
+  inset:2px 4px 4px 4px !important;
+  background-color:transparent !important;
+  background-image:linear-gradient(180deg,#E4DAE8 0%,#E4DAE8 47%,
+                                          #CBBED4 47%,#CBBED4 100%) !important;
+  background-size:100% 100% !important;
+  background-repeat:no-repeat !important;
+  box-shadow:0 3px 0 #9A89A6,
+             0 7px 16px rgba(83,28,40,.22),
+             inset 0 0 0 2.5px var(--j-outline,#6E463A),
+             inset 0 -6px 0 #BAAAC6,
+             inset 0 0 3px 5px rgba(255,255,255,.62),
+             inset 0 -14px 5px -12px rgba(255,255,255,.36) !important;
+}
+/* ④ 라벨판: 명패는 메달 그림(medal-*-ko.webp)에 **구워져 있다** — 그림을 못
+      고치므로 같은 자리에 코드 캡슐을 **정확히 덮어** 세운다. 그림은 그대로 두고
+      (신규 발주 0 · 아트 회귀 0) 명패만 젤리 부품으로 갈리는 것이 요점이다.
+      ⚠ 구판 duel-medal-*.webp 로 되돌리는 안은 **실렌더에서 기각**했다: 그 넉
+        장은 «명패가 빈 판» 이 아니라 옛 디자인의 **다른 명패가 이미 구워진**
+        판이라(「고격」·「핀사기」·「Attack (V.5)」…) 라벨이 두 겹으로 겹쳤다.
+      기하 실측: 원판 718x907 · 명패 645x249 → 폭비 .8983 · 높이비 .2745.
+      background-size:contain + center bottom 이므로 명패 상자는
+      height 27.45% · aspect-ratio 645/249 · bottom 0 · 가로 중앙이다.
+      덮는 판이므로 높이를 29% 로 한 칸 키워 그림 명패의 그림자까지 가린다. */
+#app.battle #actionbar .act .act-t{
+  display:flex !important;
+  align-items:center; justify-content:center;
+  position:absolute; left:50%; bottom:2.6%;
+  transform:translateX(-50%);
+  /* 실측(medal-attack-ko.webp 718x907 알파 스캔): 구워진 명패는 최대 폭
+     624px(=.8691W) · 높이 약 272px(=.300H) · 바닥에서 .035H 띄어 있다.
+     background-size:contain 이라 그림 높이 = .act 높이이므로 명패 상자는
+     height .300 · bottom .035 · 폭/높이 624/272 이다. 덮는 판이라 각 축을
+     한 칸씩 키워(32% · 2.28) 그림 명패의 그림자까지 가린다. */
+  height:32%;
+  aspect-ratio:2.28;
+  max-width:88%;
+  padding:0 4px;
+  box-sizing:border-box;
+  border:0; border-radius:999px;
+  background-image:linear-gradient(180deg,var(--cap-a) 0%,var(--cap-a) 47%,
+                                          var(--cap-b) 47%,var(--cap-b) 100%);
+  box-shadow:0 2px 0 var(--cap-drop),
+             0 4px 9px rgba(83,28,40,.24),
+             inset 0 0 0 2px var(--j-outline,#6E463A),
+             inset 0 -4px 0 var(--cap-band),
+             inset 0 0 1px 1.5px rgba(255,255,255,.42);
+  color:#FFFFFF;
+  font-family:var(--font-display);
+  font-size:13px;
+  letter-spacing:0;
+  line-height:1;
+  white-space:nowrap;
+  text-shadow:0 1.5px 0 rgba(110,70,58,.62);
+  z-index:2;
+}
+#app.battle #btn-add.act     .act-t{ --cap-a:#F8A2C4; --cap-b:#E8749F; --cap-drop:#A63C6A; --cap-band:#D25E8D; }
+#app.battle #btn-hint.act    .act-t{ --cap-a:#FFDC84; --cap-b:#F0BC55; --cap-drop:#B07C1C; --cap-band:#DFA63E; }
+#app.battle #btn-undo.act    .act-t{ --cap-a:#C6A2F5; --cap-b:#A97FE4; --cap-drop:#6B47A8; --cap-band:#9468D2; }
+#app.battle #btn-shuffle.act .act-t{ --cap-a:#7ED9C0; --cap-b:#54BFA2; --cap-drop:#35866F; --cap-band:#43A184; }
+html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   G. 소비처 ⑤ — 전투 HP 레일 구획선 (채움은 이미 scaleX 라 손대지 않는다)
+   ═══════════════════════════════════════════════════════════════════════════ */
+#app.battle .dh-foe .dh-bar,
+#app.battle .dh-me  .dh-bar{
+  --gauge-seg:8; --gauge-tick-w:1.4px;
+}
+#app.battle .dh-foe .dh-bar{ --gauge-tick-c:rgba(40,6,16,.40); }
+#app.battle .dh-me  .dh-bar{ --gauge-tick-c:rgba(22,55,78,.34); }
+#app.battle .dh-foe .dh-bar::after,
+#app.battle .dh-me  .dh-bar::after{
+  content:''; position:absolute; inset:0; border-radius:inherit;
+  pointer-events:none; z-index:4;
+  background:
+    repeating-linear-gradient(90deg,
+      rgba(255,255,255,0) 0,
+      rgba(255,255,255,0) calc(100% / var(--gauge-seg)),
+      rgba(255,255,255,.24) calc(100% / var(--gauge-seg)),
+      rgba(255,255,255,.24) calc(100% / var(--gauge-seg) + var(--gauge-tick-w) * .7)),
+    repeating-linear-gradient(90deg,
+      rgba(0,0,0,0) 0,
+      rgba(0,0,0,0) calc(100% / var(--gauge-seg) - var(--gauge-tick-w)),
+      var(--gauge-tick-c) calc(100% / var(--gauge-seg) - var(--gauge-tick-w)),
+      var(--gauge-tick-c) calc(100% / var(--gauge-seg)));
+  -webkit-mask:linear-gradient(90deg,#000 0 calc(100% - var(--gauge-tick-w)),transparent 0);
+          mask:linear-gradient(90deg,#000 0 calc(100% - var(--gauge-tick-w)),transparent 0);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   H. 소비처 ⑥ — 콤보·피버 게이지 width → scaleX
+   근거: game-motion §5 · VERIFY-motion M-2/M-4. 두 요소 모두 transform-origin:
+   left center 가 **이미 선언돼 있어** 전환 비용이 사실상 0 이다.
+   JS 는 style.width 대신 --p (0~1) 를 쓴다(아래 스크립트 패치).
+   ═══════════════════════════════════════════════════════════════════════════ */
+#fever-fill{
+  width:100% !important;
+  transform-origin:left center;
+  transform:scaleX(var(--p,1));
+  transition:transform 100ms linear !important;
+}
+#combo-fill{
+  width:100% !important;
+  transform-origin:left center;
+  transform:scaleX(var(--p,0));
+  transition:transform 120ms linear !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   I. reduced-motion 속성 화이트리스트 (game-motion §7.2)
+   VERIFY-motion C-1 실측: reduce 를 켜도 살아남는 애니메이션이 정확히 하나였고
+   그것이 #combo-fill 의 **width** 트랜지션이었다. 전역 리셋이 트랜지션을 끄지
+   않고 80ms 로 «줄이기만» 하기 때문이다. 지속시간이 아니라 **속성**을 거른다 —
+   블랙리스트는 앞으로 새로 들어올 레이아웃 트랜지션을 자동으로 놓친다.
+   ⚠ 기존 리셋 줄은 지우지 않는다(정적 대체 설계를 낮추지 않는다).
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce){
+  *, *::before, *::after{
+    transition-property: transform, opacity, color, background-color !important;
+  }
 }
 </style>
 
