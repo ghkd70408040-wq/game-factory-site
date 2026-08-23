@@ -12574,14 +12574,80 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
   color: rgba(255, 255, 255, .94);
 }
 
-/* 결과 시트 — 숫자만 크게. 한 장 스크린샷에서 가장 먼저 읽혀야 하는 것이 기록이다. */
-#modal-arc .big-score { margin: 2px 0 4px; }
-#modal-arc .big-score > b { font-size: clamp(46px, 15vw, 68px); line-height: 1.05; }
-#modal-arc #arc-dir { font-weight: 800; }
-#modal-arc #arc-when { opacity: .72; font-size: 12px; }
-#modal-arc #arc-who { opacity: .86; font-size: 13px; }
+/* ===== 결과 시트 — 가독성이 스타일을 이긴다 ==============================
+   ▣ 이 화면에 한해 **가독성이 스타일보다 우선**이라고 판단한 근거.
+     다른 결과창은 "내가 방금 얼마 했나"를 자기 폰에서 한 번 읽고 닫는 화면이다.
+     이 시트는 다르다 — **찍어서 남에게 보내는 화면**이고, 받는 사람은 이 판을
+     보지 않았으므로 스크린샷의 숫자가 승부의 유일한 증거다. 숫자가 안 읽히면
+     이 모드의 경쟁 루프 자체가 성립하지 않는다. 그래서 집 문법(크림 유리판 +
+     크림 그라디언트 숫자)을 여기서만 깬다.
+   ▣ 반려 근거: `tentwin\DEFECTS-D2.md` #35 「옅은 크림 그라디언트 숫자가 밝은
+     유리 판 위 — 대비 부족」. 특히 타임어택은 격파 경로라 뒤 보드가 안 죽어서
+     **원색 판이 그대로 비친다**.
+   ▣ 전역 `.big-score` 는 **한 글자도 안 고쳤다** — 고치면 게임오버·모험 결과
+     까지 같이 바뀐다. 모든 규칙이 `#modal-arc` 스코프 안에 있다.
+   ▣ 스크림(모달 뒤 어둠)은 **일부러 안 건드렸다**. W6.5b 가 "전 모달은 같은
+     판"이라며 모달별 스크림 분기를 봉인했고, 그 원칙을 이 한 화면 때문에 깰
+     이유가 없다 — 비침은 판을 불투명하게 만드는 것으로 이미 해결된다. */
 
-/* 기록창에 덧붙는 아케이드 3줄. 위 여섯 탭의 규칙은 한 줄도 안 바뀐다. */
+/* ① 판을 받친다. --jbox-tint 는 .jbox 가 background-color 로 읽는 값이라,
+   여기서 값만 갈아 끼우면 조각(jelly-box.webp)·모서리·그림자는 그대로 두고
+   **뒤 비침만** 사라진다(테두리 그림은 한 픽셀도 안 바뀐다).
+   옛 값: rgba(255,242,255,.17) + blur(0px) — 그것이 보드가 비친 원인이다. */
+#modal-arc .sheet.jbox--modal {
+  --jbox-tint: rgba(255, 247, 251, .96);
+  --jbox-blur: blur(10px) saturate(1.06);
+}
+/* ② 본문 잉크. #modal-arc 는 :11158 의 크림-잉크 목록에 없어서 본문이 아직
+   var(--tx-dim)(어두운 판 전제의 옅은 회색)이었다 — 크림 판 위에서는 그것이
+   곧 저대비다. 같은 토큰(--j-ink, 크림 위 8.51:1)을 여기서 쓴다.
+   ⚠ 목록 자체를 늘리지 않고 같은 값을 이 스코프에 다시 적는다: 그 줄은 다른
+   에이전트가 지금 만지는 공용 규칙이라 손대지 않는 쪽이 안전하다. */
+#modal-arc .sheet,
+#modal-arc .sheet p,
+#modal-arc .sheet .sub-score,
+#modal-arc .sheet .sub-score b { color: var(--j-ink); }
+#modal-arc .sheet > h2 {
+  color: var(--j-ink);
+  font-size: 21px;
+  font-weight: 800;
+}
+/* ③ 기록 숫자 — 이 판에서 **가장 대비가 높은 요소**. 그라디언트·투명 채움을
+   전부 걷어내고 불투명 잉크로 덮는다(--j-ink 보다 더 진하게: 다른 줄과 층이
+   갈려야 "이것이 기록"이라고 읽힌다). 순검정은 ART §7-1 이 금지하므로 쓰지
+   않는다. 흰 그림자 한 겹은 조각의 어두운 얼룩 위에서도 획이 끊기지 않게 한다. */
+#modal-arc .big-score { margin: 2px 0 6px; }
+#modal-arc .big-score > b {
+  font-size: clamp(58px, 19vw, 86px);
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: -.02em;
+  background: none;
+  -webkit-background-clip: border-box;
+  background-clip: border-box;
+  color: #3B2114;
+  -webkit-text-fill-color: #3B2114;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, .72);
+}
+/* ④ 나머지 줄. 전부 --j-ink 위에서 크기·굵기로만 층을 나눈다 — opacity 로
+   층을 나누면 그것이 곧 대비를 깎는 일이라, 여기서는 쓰지 않는다. */
+#modal-arc #arc-dir { font-weight: 800; font-size: 15px; }
+#modal-arc #arc-note { font-weight: 700; }
+#modal-arc #arc-kos { font-size: 13.5px; }
+#modal-arc #arc-who { font-size: 13.5px; }
+#modal-arc #arc-best { color: #8A5A06; font-weight: 800; }
+#modal-arc #arc-when { font-size: 12px; color: #7A6154; }
+
+/* ===== 기록창에 덧붙는 아케이드 3줄 ======================================
+   위 여섯 탭의 규칙은 한 줄도 안 바뀐다 — 전부 `.rank-arc*` 스코프다.
+   ⚠ 행을 **두 줄 블록**으로 바꾼 이유(반려: 「90초 누적 5…」로 기록이 잘림).
+     공용 `.rank-row` 는 한 줄 flex 이고 `.rank-main`(flex 0 1 auto)과
+     `.rank-meta`(flex 1 1 auto)가 같은 줄의 폭을 다툰다. 아케이드는 모드명이
+     한글 다섯 자에 메타도 「많을수록 승리 · 2026-08-23」로 길어서, 6종목용으로
+     맞춰진 그 배분에서는 **숫자가 있는 쪽**이 먼저 말줄임된다.
+     기록판에서 잘려도 되는 것은 날짜지 숫자가 아니므로, 다투게 두지 않고 줄을
+     나눈다: 첫 줄이 [모드명 + 기록], 둘째 줄이 [방향 · 날짜]. 이러면 폭이
+     아무리 좁아도 숫자가 사라질 수 있는 경로가 없다. */
 .rank-arc { margin-top: 12px; }
 .rank-arc-h {
   margin: 0 0 6px;
@@ -12589,7 +12655,33 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
   font-size: 14px;
   opacity: .86;
 }
-.rank-arc-row .rank-main { font-weight: 800; }
+.rank-arc-row {
+  display: block;          /* 공용 행의 한 줄 flex 를 이 세 줄에서만 푼다 */
+  min-width: 0;
+}
+.rank-arc-row .rank-main,
+.rank-arc-row .rank-meta {
+  display: block;
+  flex: none;
+  overflow: visible;       /* 말줄임을 끈다 — 잘릴 바에는 줄을 넘긴다 */
+  text-overflow: clip;
+  white-space: normal;
+  text-align: left;
+  min-width: 0;
+}
+.rank-arc-row .rank-main {
+  font-size: 17px;
+  font-weight: 800;
+  word-break: keep-all;    /* 한글 낱말이 가운데서 끊기지 않게 */
+}
+/* 기록 숫자는 모드명과 **같은 줄이되 오른쪽 끝**에 세운다. 눈이 세 줄의 숫자를
+   세로로 훑을 수 있어야 종목 비교가 한 번에 된다. */
+.rank-arc-row .rank-main .arc-v {
+  float: right;
+  margin-left: 10px;
+  font-variant-numeric: tabular-nums;
+}
+.rank-arc-row .rank-meta { margin-top: 2px; font-size: 11px; }
 
 /* ---- W7.5 — 기록창 탭이 여섯이 됐다 -------------------------------------
    규칙은 여기가 아니라 **`.w6m .rank-tab` 옆**에 있다(파일 끝 시안 젤리 블록).
@@ -32253,10 +32345,17 @@ window.TT_SFX = {
       var e = store.arcadeBest[m];
       var row = document.createElement('div');
       row.className = 'rank-row rank-arc-row' + (e ? '' : ' rank-empty');
+      /* 기록 숫자는 **자기 요소**로 낸다(모드명과 한 텍스트로 붙이지 않는다).
+         한 문자열이면 폭이 모자랄 때 브라우저가 어디를 자를지 고르는데, 그때
+         잘리는 쪽이 하필 뒤에 붙은 숫자였다(반려: 「90초 누적 5…」). 요소를
+         가르면 CSS 가 "숫자는 오른쪽 끝에 세우고 절대 안 자른다"를 말할 수 있다. */
       var main = document.createElement('span');
       main.className = 'rank-main';
-      main.textContent = arcModeName(m) + '  ' +
-        (e && typeof e.value === 'number' ? arcValueText(m, e.value) : '-');
+      var val = document.createElement('b');
+      val.className = 'arc-v';
+      val.textContent = e && typeof e.value === 'number' ? arcValueText(m, e.value) : '-';
+      main.appendChild(val);
+      main.appendChild(document.createTextNode(arcModeName(m)));
       var meta = document.createElement('span');
       meta.className = 'rank-meta';
       meta.textContent = arcDirText(m) + (e && e.date ? ' · ' + rankDateText(e.date) : '');
