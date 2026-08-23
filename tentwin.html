@@ -29170,7 +29170,14 @@ window.TT_SFX = {
     /* 전투 판은 완전 직사각형이어야 한다 — 컬럼 중력의 전제다. 특수·핸디캡보다
        **먼저** 맞춰서 그 개수가 실제 판 크기를 따르게 한다. 전투에는 Add 가 없으
        므로 한 번 맞추면 그 뒤로 판 크기는 불변이다. */
-    if (advp && battleOn()) S.cells = battleFitBoard(S.cells, gen.seed);
+    /* 🚨 정정(아케이드 낙하 반려) — 종전 `advp && battleOn()`. 두 군데가 틀렸다:
+       ① 아케이드도 전투 보드를 쓰기로 정정됐으므로 advp 한정이 아니다.
+       ② startArcade 는 startStage **뒤**에 arcDuelInit 을 부르므로(그 절의 순서
+          계약) 첫 진입에서는 S.duel 이 아직 없다 — battleOn() 을 읽으면 첫 판만
+          보정이 빠져 판이 직사각형이 아니게 되고 컬럼 중력이 그 판에서 깨진다.
+       그래서 S.duel 이 아니라 **모드**로 묻는다. 기존 여섯 모드에서는
+       isArcadeDuel() 이 언제나 false 라 이 줄의 값은 종전과 글자 그대로 같다. */
+    if (TW_BATTLE && (advp || isArcadeDuel())) S.cells = battleFitBoard(S.cells, gen.seed);
     S.seed = gen.seed;
     S.gridSeed = gen.seed;
     // Specials ride on top of the PURE board, from a seed-derived stream, so a
@@ -30654,8 +30661,10 @@ window.TT_SFX = {
     clearSelection();
     clearHints();
     /* 전투는 행 소거가 없다 - 컬럼 중력이 즉시 판을 메운다.
-       ⚠ battleOn() 이 아니라 battleBoard() 다: 아케이드 대전도 전투지만 보드는
-       러시의 것(무한 Add · 행 소거)이라 이 리필에 들어오면 안 된다. */
+       ⚠ battleOn() 이 아니라 battleBoard() 다: 묻는 것은 "전투"가 아니라 "전투
+       **보드**"이고, 그 둘이 갈릴 여지를 이름으로 남겨 둔다(battleBoard 주석).
+       🚨 정정: 아케이드 대전도 이제 여기 들어온다 — 사용자 반려("과일이 제자리에
+       있어")가 그 판정이었다. */
     if (battleBoard()) { runBattleRefill(); return; }
     /* 필수수리 2 - 행 목록을 **실행 직전에** 다시 센다. */
     var rows = findFullDeadRows(S.cells);
@@ -30769,7 +30778,16 @@ window.TT_SFX = {
    * 판에서 돌리면 Add 가 판 뒤에 덧붙인 칸이 중력의 전제를 깨뜨린다.
    * 그래서 보드 규약만 모험으로 좁힌다 — 아케이드는 여기 못 들어온다.
    */
-  function battleBoard() { return battleOn() && S.mode === 'adv'; }
+  /* 🚨 정정(사용자 반려: "아케이드 대전, 과일이 제자리에 있어") — 종전
+     `battleOn() && S.mode === 'adv'`. 위 문단의 전제(아케이드는 러시 보드)가
+     **폐기**됐다: 낙하 리필이 있으면 판이 마르지 않으므로 Add(행 추가)는 존재
+     이유가 사라진다. 그래서 아케이드는 모험과 **같은 보드 규약**을 쓴다 —
+     직사각형 보정 · 컬럼 중력 낙하 · Add 차단(버튼은 공격 안내로 되돌아간다).
+     이제 이 서술어는 battleOn() 과 같은 값이지만, 이름을 남긴다: 세 호출처가
+     묻는 것은 "전투인가"가 아니라 "전투 **보드**인가"이고, 뒷날 보드만 다른
+     전투 종목이 생기면 되돌릴 자리가 여기 하나로 남아 있어야 한다.
+     롤백: `return battleOn() && S.mode === 'adv';` */
+  function battleBoard() { return battleOn(); }
 
   var DUEL_MIN_PAIRS = 3;      // 리필 직후 최소 짝 수. 미달이면 스폰 값만 다시 뽑는다.
   var DUEL_REROLL_MAX = 8;
@@ -31207,7 +31225,10 @@ window.TT_SFX = {
     /* 전투에서 Add 는 없다. buildAddCells 는 판 뒤에 칸을 덧붙여 직사각형을
        깨뜨리므로(컬럼 중력의 전제), 버튼이 교체되는 단계 3 전까지 여기서 막는다.
        ⚠ battleOn() 이 아니라 battleBoard() 다: 막아야 하는 것은 "전투"가 아니라
-       **컬럼 중력 보드**이고, 아케이드 대전은 러시 보드를 쓰므로 Add 가 규칙이다. */
+       **컬럼 중력 보드**다.
+       🚨 정정: 아케이드 대전도 이제 차단된다(사용자 판정 "낙하가 있으면 Add 는
+       필요 없는 기능이다"). 러시·클래식 러시는 여전히 아래 isRush() 갈래로
+       내려가 무한 Add 를 그대로 쓴다 — 이 줄은 전투 판에서만 참이다. */
     if (battleBoard()) { toast(t('toast.noadds')); J.sfx.fail(); return; }
     if (isRush()) {
       // Unlimited, but rate-limited: Add becomes a timing decision.
@@ -38018,13 +38039,11 @@ window.TT_SFX = {
     /* 전투 개편 단계 3 — 네 버튼의 배선은 **디스패처**다. 기존 네 핸들러는 한
        글자도 안 바뀌었고, 전투가 아니면 클릭이 종전과 완전히 같은 함수로 간다
        (endless/daily/rush 회귀 0). 전투 얼굴은 SECTION 14D 에 있다. */
-    /* ⚠ 첫 버튼만 battleBoard() 다 — 아케이드에서 **Add 는 Add 로 남는다**(무한
-       Add 가 러시의 규칙이고, 전투에서 이 버튼의 원래 얼굴 duelAtkInfo 는 게이지
-       안내 토스트라 기능 손실이 0 이다).
-       ▣ 알고 하는 타협 하나: `#app.battle #btn-add` 에 **공격 메달 그림**이 깔려
-         있어(파일 끝 시안 블록) 아케이드에서는 "공격 메달처럼 생겼는데 누르면
-         줄이 추가되는" 버튼이 된다. 그림을 따로 발주하지 않고 기능을 살린 쪽을
-         고른 것이고, 되돌리려면 이 한 줄을 battleOn() 으로 되돌리면 된다.
+    /* 첫 버튼이 battleBoard() 인 것은 이제 battleOn() 과 같은 값이다(그 함수의
+       정정 주석 참조). 아케이드가 전투 보드를 채용하면서 Add 가 사라졌으므로,
+       이 자리는 `#app.battle #btn-add` 에 이미 깔려 있는 **공격 메달 그림**과
+       기능(duelAtkInfo 게이지 안내)이 다시 일치한다 — 직전 파도의 "메달처럼
+       생겼는데 줄이 추가되는 버튼" 타협이 여기서 해소된다.
        나머지 셋은 battleOn() 그대로다 — 그림과 기능이 함께 전투 스킬이 된다. */
     on($('btn-add'), 'click', function () { if (battleBoard()) duelAtkInfo(); else doAdd(); });
     on($('btn-hint'), 'click', function () { if (battleOn()) doSpecial(); else doHint(); });
