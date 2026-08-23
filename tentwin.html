@@ -10409,6 +10409,10 @@ html.no-art-logo .logo-img  { display: none; }
 .nchip-arc::before  { background-image: var(--lib-glyph-inf); }
 .nchip-day::before  { background-image: var(--lib-glyph-cal); }
 .nchip-rush::before { background-image: var(--lib-glyph-clock); }
+/* 14차 — 90초 누적 전용. 원래 .nchip-day(달력)를 쓰고 있었는데, 플레이 시트가
+   5줄로 합쳐지면서 같은 시트 안의 「데일리」와 아이콘이 겹쳤다. 새 그림 발주 없이
+   이미 있는 점수 글리프로 갈라 준다. */
+.nchip-dmg::before  { background-image: var(--lib-glyph-score); }
 
 .nrow-t { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .nrow-t > b {
@@ -12380,6 +12384,48 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
     inset 0 0 0 2.5px #8A5510,
     inset 0 2.5px 0 rgba(255, 255, 255, .45),
     inset 0 -8px 0 #D89826;
+}
+
+/* --- 14차 5줄 통합: 「아케이드 대전」 2단 시트에서 올라온 세 줄 ------------
+   버튼 셋은 id·data-i18n 을 그대로 들고 자리만 옮겨 왔다(클릭 배선·-b 동기화가
+   id 로 걸려 있어 한 줄도 안 고쳤다). 색은 **새로 만들지 않았다** — 숨긴
+   #mode-rush 의 노랑, #mode-arcade 의 보라, .arc-entry 의 주황을 그대로 물려
+   받아 다섯 줄이 전부 다른 색이 된다. 그라디언트·박스섀도 모양은 위 네 줄과
+   글자 하나 다르지 않다(47% 하드에지 + 3px 바닥 + inset 윤곽/광택/밴드). */
+#modal-mode #arcrow-time {
+  background:
+    radial-gradient(ellipse 26% 32% at 15% 24%, rgba(255, 255, 255, .60), rgba(255, 255, 255, 0) 70%),
+    linear-gradient(180deg, #FFD65F 0%, #FFD65F 47%, #F4B23A 47%, #F4B23A 100%);
+  box-shadow:
+    0 3px 0 #B57717,
+    0 8px 18px rgba(83, 28, 40, .26),
+    inset 0 0 0 2.5px #8A5510,
+    inset 0 2.5px 0 rgba(255, 255, 255, .45),
+    inset 0 -8px 0 #D89826;
+}
+#modal-mode #arcrow-surv {
+  background:
+    radial-gradient(ellipse 26% 32% at 15% 24%, rgba(255, 255, 255, .60), rgba(255, 255, 255, 0) 70%),
+    linear-gradient(180deg, #BE92F8 0%, #BE92F8 47%, #A26FEA 47%, #A26FEA 100%);
+  box-shadow:
+    0 3px 0 #6B3FA6,
+    0 8px 18px rgba(83, 28, 40, .26),
+    inset 0 0 0 2.5px #4F2D6A,
+    inset 0 2.5px 0 rgba(255, 255, 255, .45),
+    inset 0 -8px 0 #8B57D2;
+}
+/* 주황은 .arc-entry(:12632 부근)에서 실측해 옮긴 값이다:
+   면 #FFAE8B→#EE6A46 · 그림자 rgba(142,58,31)=#8E3A1F · 윤곽 rgba(184,78,42)=#B84E2A */
+#modal-mode #arcrow-dmg {
+  background:
+    radial-gradient(ellipse 26% 32% at 15% 24%, rgba(255, 255, 255, .60), rgba(255, 255, 255, 0) 70%),
+    linear-gradient(180deg, #FFAE8B 0%, #FFAE8B 47%, #EE6A46 47%, #EE6A46 100%);
+  box-shadow:
+    0 3px 0 #B84E2A,
+    0 8px 18px rgba(83, 28, 40, .26),
+    inset 0 0 0 2.5px #8E3A1F,
+    inset 0 2.5px 0 rgba(255, 255, 255, .45),
+    inset 0 -8px 0 #D9612F;
 }
 
 /* --- 채도 올라간 면 위 글자 가독성 --- */
@@ -15199,7 +15245,13 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
         <span class="mode-t"><b data-i18n="menu.adv">Adventure</b><i data-i18n="menu.advsub">Rescue the Jelly Princess</i></span>
         <span id="mode-adv-b" class="mode-b"></span>
       </button>
-      <button id="mode-arcade" class="mode-row" type="button">
+      <!-- 🚨 14차 — **숨김이지 삭제가 아니다**. 플레이 시트를 다섯 줄 한 단으로
+           합치면서 「아케이드(무한)」와 「타임러시」는 입구만 닫았다. 마크업·CSS·
+           클릭 핸들러·startEndless()/러시 시작 코드는 한 줄도 손대지 않았다 —
+           데일리·클래식이 같은 코드 길을 지나가고, 되돌리려면 이 hidden 한 낱말만
+           지우면 되기 때문이다. 기록도 그대로다: store.ranks(RANK_MODES 6종)가
+           endless/rush 를 계속 들고 있어 「내 기록」에서 코드 수정 0 으로 보인다. -->
+      <button id="mode-arcade" class="mode-row" type="button" hidden>
         <span class="nchip nchip-arc" aria-hidden="true"></span>
         <span class="mode-t"><b data-i18n="mode.arcade">Arcade</b><i data-i18n="mode.arcade.d">Endless. Chase your best.</i></span>
         <span id="mode-arcade-b" class="mode-b"></span>
@@ -15209,10 +15261,32 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
         <span class="mode-t"><b data-i18n="menu.daily">Daily</b><i data-i18n="mode.daily.d">One board a day, same for everyone.</i></span>
         <span id="mode-daily-b" class="mode-b"></span>
       </button>
-      <button id="mode-rush" class="mode-row" type="button">
+      <!-- 🚨 14차 — 위 #mode-arcade 와 같은 이유의 숨김. 삭제 아님. -->
+      <button id="mode-rush" class="mode-row" type="button" hidden>
         <span class="nchip nchip-rush" aria-hidden="true"></span>
         <span class="mode-t"><b data-i18n="menu.rush">Time Rush</b><i data-i18n="mode.rush.d">Sixty seconds. Every match buys time.</i></span>
         <span id="mode-rush-b" class="mode-b"></span>
+      </button>
+      <!-- ===== 14차 — 「아케이드 대전」 2단 시트에서 올라온 세 줄 ==============
+           2단 시트를 지운 것이 아니라 **한 단으로 폈다**. 세 버튼은 #modal-arcade
+           .mode-list 에 있던 그 마크업 그대로이며 id 와 data-i18n 키를 한 글자도
+           안 바꿨다 — 그래야 클릭 배선(wire())과 -b 기록 동기화(syncArcadeSheet)가
+           그대로 성립한다. 바뀐 것은 부모와, #arcrow-dmg 의 칩 클래스 하나뿐이다
+           (nchip-day 는 바로 위 「데일리」와 아이콘이 겹쳐 nchip-dmg 로 갈랐다). -->
+      <button id="arcrow-time" class="mode-row" type="button">
+        <span class="nchip nchip-rush" aria-hidden="true"></span>
+        <span class="mode-t"><b data-i18n="arc.time.name">Time Attack</b><i data-i18n="arc.time.d">Beat the villain. Fastest time wins.</i></span>
+        <span id="arcrow-time-b" class="mode-b"></span>
+      </button>
+      <button id="arcrow-surv" class="mode-row" type="button">
+        <span class="nchip nchip-arc" aria-hidden="true"></span>
+        <span class="mode-t"><b data-i18n="arc.surv.name">Survival</b><i data-i18n="arc.surv.d">Endless villains. Longest time wins.</i></span>
+        <span id="arcrow-surv-b" class="mode-b"></span>
+      </button>
+      <button id="arcrow-dmg" class="mode-row" type="button">
+        <span class="nchip nchip-dmg" aria-hidden="true"></span>
+        <span class="mode-t"><b data-i18n="arc.dmg.name">90s Damage</b><i data-i18n="arc.dmg.d">Ninety seconds. Most damage wins.</i></span>
+        <span id="arcrow-dmg-b" class="mode-b"></span>
       </button>
     </div>
     <!-- ===== 아케이드 대전 진입 =====================================
@@ -15224,7 +15298,12 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
          기존 네 줄의 마크업·위치·크기는 한 글자도 안 바뀐다. -->
     <!-- 🚨 0823 — 위 네 줄의 [칩][제목+한 줄] 리듬을 그대로 받는다. 칩 한 개가
          더해진 것이 마크업 변경의 전부이고, 위 네 줄은 한 글자도 안 바뀐다. -->
-    <button id="mode-arcduel" class="arc-entry" type="button">
+    <!-- 🚨 14차 — **숨김이지 삭제가 아니다**. 이 줄은 2단 시트(#modal-arcade)로
+         가는 문이었는데, 그 시트의 세 종목이 바로 위 .mode-list 로 올라와 한 단이
+         됐다. 문이 가리키는 곳이 없어졌을 뿐, 마크업·CSS(.arc-entry 주황)·클릭
+         핸들러·openArcadeHub() 는 전부 살아 있다. hidden 한 낱말만 지우면 2단
+         구조가 그대로 돌아온다. -->
+    <button id="mode-arcduel" class="arc-entry" type="button" hidden>
       <span class="nchip nchip-arc" aria-hidden="true"></span>
       <span class="mode-t"><b data-i18n="arc.hub">Arcade Duel</b><i data-i18n="arc.hub.d">Three ways to fight a villain.</i></span>
     </button>
@@ -15239,23 +15318,13 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
     <div class="r10-ribbon"><h2 id="arcade-h" data-i18n="arc.title">Arcade Duel</h2></div>
     <button id="arcade-close" class="r10-x x-btn" type="button" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
     <p id="arcade-lead" data-i18n="arc.lead">Fight a villain on the rush clock. Compare your record with a friend.</p>
-    <div class="mode-list">
-      <button id="arcrow-time" class="mode-row" type="button">
-        <span class="nchip nchip-rush" aria-hidden="true"></span>
-        <span class="mode-t"><b data-i18n="arc.time.name">Time Attack</b><i data-i18n="arc.time.d">Beat the villain. Fastest time wins.</i></span>
-        <span id="arcrow-time-b" class="mode-b"></span>
-      </button>
-      <button id="arcrow-surv" class="mode-row" type="button">
-        <span class="nchip nchip-arc" aria-hidden="true"></span>
-        <span class="mode-t"><b data-i18n="arc.surv.name">Survival</b><i data-i18n="arc.surv.d">Endless villains. Longest time wins.</i></span>
-        <span id="arcrow-surv-b" class="mode-b"></span>
-      </button>
-      <button id="arcrow-dmg" class="mode-row" type="button">
-        <span class="nchip nchip-day" aria-hidden="true"></span>
-        <span class="mode-t"><b data-i18n="arc.dmg.name">90s Damage</b><i data-i18n="arc.dmg.d">Ninety seconds. Most damage wins.</i></span>
-        <span id="arcrow-dmg-b" class="mode-b"></span>
-      </button>
-    </div>
+    <!-- 🚨 14차 — 세 줄(#arcrow-time/-surv/-dmg)은 **여기서 위 #modal-mode
+         .mode-list 로 옮겨 갔다**(복제 아님 — id 는 문서에 하나뿐이어야 한다).
+         이 시트 자체는 지우지 않았다: 판·리본·닫기·리드 문구·CSS(#modal-arcade
+         .mode-list .mode-row)·openArcadeHub()/closeArcadeHub()·ESC 처리까지 전부
+         그대로다. 입구(#mode-arcduel)가 hidden 이라 지금은 열리지 않을 뿐이고,
+         세 버튼을 이 자리로 되돌리고 hidden 을 지우면 2단 구조가 복구된다. -->
+    <div class="mode-list"></div>
   </div></div>
 
   <!-- ===== W7.5 클래식 허브 =================================================
@@ -36642,6 +36711,10 @@ window.TT_SFX = {
     setText('mode-rush-b', store.rushSeen ? '' : t('menu.new'));
     setText('mode-arcade-b', store.best > 0 ? String(store.best) : '');
     setText('mode-adv-b', t('adv.stagen', { n: Math.max(1, store.advMax | 0) }));
+    /* 14차 — 아케이드 대전 세 줄이 이 시트로 올라왔으니 그 기록 라벨도 여기서
+       채운다. 함수는 그대로 재사용한다(store.arcadeBest 를 읽어 arcrow-*-b 에
+       쓰는 그 함수다). 2단 시트가 살아난다면 openArcadeHub() 쪽 호출도 그대로다. */
+    syncArcadeSheet();
   }
 
   function openModeSheet() {
@@ -37995,9 +38068,12 @@ window.TT_SFX = {
        안 바뀌었고, 이 배선은 새 버튼 하나가 새 허브를 여는 것이 전부다. */
     on($('mode-arcduel'), 'click', function () { closeModeSheet(); J.sfx.ui(); openArcadeHub(); });
     on($('arcade-close'), 'click', function () { closeArcadeHub(); J.sfx.ui(); });
-    on($('arcrow-time'), 'click', function () { closeArcadeHub(); J.sfx.ui(); startArcade('arc-time'); });
-    on($('arcrow-surv'), 'click', function () { closeArcadeHub(); J.sfx.ui(); startArcade('arc-surv'); });
-    on($('arcrow-dmg'), 'click', function () { closeArcadeHub(); J.sfx.ui(); startArcade('arc-dmg'); });
+    /* 14차 — 세 줄이 2단 허브에서 **플레이 시트로 올라왔다**. 닫을 창이 바뀌었을
+       뿐 시작 코드(startArcade)는 그대로다. closeArcadeHub() 를 그냥 두면 이미
+       닫혀 있는 창을 닫고 정작 열려 있는 플레이 시트가 게임 뒤에 남는다. */
+    on($('arcrow-time'), 'click', function () { closeModeSheet(); J.sfx.ui(); startArcade('arc-time'); });
+    on($('arcrow-surv'), 'click', function () { closeModeSheet(); J.sfx.ui(); startArcade('arc-surv'); });
+    on($('arcrow-dmg'), 'click', function () { closeModeSheet(); J.sfx.ui(); startArcade('arc-dmg'); });
     /* 결과 시트의 두 버튼. [다시하기]가 S.mode 가 아니라 arcLast 를 읽는 것은
        의도다 — 시트가 떠 있는 동안 다른 경로가 S.mode 를 옮겨도 같은 종목으로
        다시 시작한다(종목이 바뀌면 기록의 뜻이 바뀐다). */
@@ -39357,6 +39433,20 @@ window.TT_SFX = {
   color:transparent !important;-webkit-text-fill-color:transparent !important;}
 }
 #modal-mode .mode-list{gap:2px !important;background:none !important;}
+/* 🚨 14차 봉인 — **그림 버튼 4장 퇴출**(플레이 시트 5줄 통합).
+   이 아래 규칙 묶음이 하는 일은 셋이었다: ① .mode-row 의 골격(padding·min-height·
+   border·box-shadow)을 전부 0 으로 눌러 그림 한 장이 aspect-ratio 로만 서게 하고,
+   ② 행마다 글자가 통짜로 구워진 base64 웹피를 배경으로 깔고,
+   ③ 코드 쪽 칩·제목·설명·기록을 display:none 으로 지운다.
+   두 가지가 이걸 끝냈다:
+     (가) i18n 파탄 — 글자가 그림 안에 있으니 en 로케일에서도 네 줄이 **한국어**로
+          나왔다(EN 캡처로 실측). applyI18n() 이 아무리 돌아도 그림은 안 바뀐다.
+     (나) 5줄 통합 차단 — 「아케이드 대전」 2단 시트를 없애고 타임어택·서바이벌·
+          90초 누적을 이 시트로 올리려면 다섯 줄이 **같은 문법**이어야 하는데,
+          그림 4 + 코드 1 은 발주 없이는 한 계보가 될 수 없다.
+   봉인하면 :12331~12398 에 이미 살아 있는 CSS 캔디 행 문법(골격 + 행별 색 +
+   글자색)이 그대로 드러난다 — 새 디자인을 쓴 것이 아니라 덮여 있던 것을 벗겼다.
+   그림 4장(base64)은 한 바이트도 지우지 않았다. 롤백: 이 주석 한 쌍을 벗긴다.
 #modal-mode .mode-list .mode-row{
   border-image:none !important;border:0 !important;border-radius:0 !important;
   border-top:0 !important;border-bottom:0 !important;outline:0 !important;
@@ -39373,6 +39463,7 @@ window.TT_SFX = {
 #modal-mode .mode-list .mode-row .nchip,
 #modal-mode .mode-list .mode-row .mode-t,
 #modal-mode .mode-list .mode-row .mode-b{display:none !important;}
+   봉인 끝 */
 #modal-mode .mode-list .mode-row:active{transform:translateY(2px);filter:brightness(.96);}
 /* 🚨 W6.5b 봉인 — **무지개 X 완전 퇴출**(사용자 3차 격노: "모든 X 를 원래
    쓰던 걸로, 아예 다 지워버려라"). 이 규칙이 사용자가 실측으로 짚은 그
@@ -40422,6 +40513,38 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
      차지한다 — 글자 크기를 구판과 같게 두려고 폭만 116 → 122px(25 → 26vw) 미조정. */
   width:min(26vw, 122px) !important;aspect-ratio:647/275 !important;height:auto !important;
   margin:2px auto 6px !important;
+}
+/* ---- 4-b. 영어 로케일: 레터링 그림을 끄고 코드 글자를 되살린다 (14차) ----
+   바로 위 규칙의 예고("영어 로케일 대응 필요 시 en에선 이 룰을 :lang로 끄는 게
+   후속")를 그대로 이행한다. **한국어는 손대지 않는다** — 저 그림은 사용자가
+   승인한 자산이다("코드 그라데이션으로는 시안의 통통한 젤리 레터링이 안 나와
+   반려됨"). 영어에는 애초에 대응하는 레터링이 없으니 en 에서만 내린다.
+   이 파일의 관례대로 html[lang=..] 로 건다(참고: html[lang="ko"] #rank-hint).
+   위 규칙이 id 하나(1,0,0)인데 !important 를 쓰므로, 특정도가 더 높아도
+   !important 끼리 겨루도록 여기서도 !important 를 붙인다.
+   되살리는 모습은 새로 만들지 않았다 — 같은 파일 <style id="sian-play-sprites">
+   가 이미 갖고 있던 그라디언트 클립 제목(#modal-mode .r10-ribbon h2)이 그대로
+   드러나게 배경만 걷고 크기 잠금을 푼다. */
+html[lang="en"] #modal-mode .r10-ribbon h2,
+html[lang="en"] #modal-mode #mode-h{
+  background:none !important;background-image:none !important;
+  color:#E58AC8 !important;-webkit-text-fill-color:#E58AC8 !important;
+  -webkit-text-stroke:2.4px #7A3B65 !important;paint-order:stroke fill;
+  text-shadow:0 0 9px rgba(255,166,224,.95),0 0 20px rgba(255,140,212,.65),
+    0 3px 0 rgba(122,59,101,.28) !important;
+  font-size:min(41px,10.5vw) !important;line-height:1.12 !important;
+  font-weight:900 !important;letter-spacing:.005em;
+  width:auto !important;aspect-ratio:auto !important;height:auto !important;
+  margin:2px auto 6px !important;
+}
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+html[lang="en"] #modal-mode .r10-ribbon h2,
+html[lang="en"] #modal-mode #mode-h{
+  display:inline-block !important;
+  background-image:linear-gradient(180deg,#F2F7FF 0%,#C9D9F2 24%,#D1A8ED 58%,#EAA2D9 84%,#F58FCE 100%) !important;
+  background-color:transparent !important;
+  -webkit-background-clip:text !important;background-clip:text !important;
+  color:transparent !important;-webkit-text-fill-color:transparent !important;}
 }
 </style>
 
