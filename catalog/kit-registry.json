@@ -2,6 +2,28 @@
  "schema": 1,
  "updated": "2026-08-22",
  "note": "부품 정본 대장. ui-kit.css 의 .k-<id> 와 1:1. approval.status 가 '승인'이 아니면 화면 배선 금지(계획서 §1 스킬B-5). T1-b 시점: 토큰·정의 자리만 잡혀 있어 10종 전부 '검토중'.",
+ "citation_rule": "인용 규약(2026-08-23): 이 파일의 문서·코드 인용은 절 번호 또는 고유 문자열(상수명·선택자명)로만 한다. 줄번호 인용 금지 — 대상 파일이 바뀌면 죽는다. 심기 전에 대상 절/식별자가 실재하는지 열어서 확인할 것. (근거: research/AUDIT-round3.md §1 「N-2」)",
+ "field_backfill_status": {
+  "updated": "2026-08-23",
+  "roles": {
+   "filled": "5/11",
+   "verdict": "이번에 2건 백필(bar → [\"STAT\"], tab → [\"TAB\"]). 둘 다 design-decompose §0-A 닫힌 어휘 11종의 판정 문장과 예시가 레코드 내용과 **문자 그대로** 일치해 추론이 개입하지 않았다 — STAT=「수치·게이지·등급을 보이는가 / 예: 공격력 바」 vs bar 레코드(HP·EXP 게이지) · TAB=「화면 안 내용을 교체하는가 / 예: 캐릭터/펫 탭」 vs tab 레코드(시트 상단 전환 탭). 기존 3건은 button([\"ACT\",\"SUB\"]) · header([\"DESC\"]) · icon-chip([\"ICON\"]). **단 icon-chip 의 [\"ICON\"] 은 어휘 위반이라 유효 roles 는 4/11 이다**(아래 icon-chip.roles_violation). 미충전 6종(panel·pill·chip·frame·icon-slot·overlay)은 **의도적으로 비웠다**: panel·icon-slot 은 역할이 아니라 다른 역할을 담는 그릇이고, chip(값 배지+토글칩)·frame(스킬/초상/보상)·pill(행/라벨/읽기전용)·overlay(막)는 변주마다 다른 역할로 갈려 11종 중 하나로 단정할 수 없다. 어휘 추가는 사용자 승인제(design-decompose §0-A 판정 규약 4항)이므로 **12번째 코드를 만들지 않았다.**"
+  },
+  "scale": {
+   "filled": "0/11",
+   "verdict": "**전량 미충전. 근거 없음.** ⚠ 착수 지시의 전제(「1배율 정본 규율에 따라 렌더/실측이 1배율 기준이면 scale: 1」)는 **필드 정의를 잘못 짚은 것**이라 따르지 않았다. asset-standardize §4단계 레코드 스키마와 design-decompose §0-A 「역할 레코드 필수 필드」가 정의하는 registry 의 scale 은 **배율이 아니라 수용량**이다 — 스키마 예시가 `{\"count_max\": 40, \"text_len\": [2, 12]}` 이고, 필수 사유도 「시안의 LIST 가 8개용인데 우리는 40개용이면 같은 역할이라도 채택하면 안 된다」이다. 1배율(390px·DPR3)은 **캡처 도구 인자**(`kit-shot.mjs --scale 1`)로서의 동음이의어이며 레코드 필드와 무관하다. 11개 레코드 어디에도 수용가능 개수·글자수 범위 실측이 없고 산출 경로(kit-lab.html·tools/)에도 없어 **오늘은 한 건도 채울 수 없다.** 각 부품의 수용량을 실제로 재기 전까지 이 필드를 1 로도, 어떤 숫자로도 채우지 말 것."
+  },
+  "cell_id_pattern": {
+   "filled": "0/11",
+   "verdict": "**전량 미충전. 기계적 도출의 전제 자체가 없다.** 스키마가 정의한 규칙은 「kit.html 칸 id 규약 = kit-shot.mjs --sel 값」인데, **site/kit.html 은 부품 칸에 id 를 하나도 부여하지 않는다** — 갤러리를 그리는 `sample(id, variant, state)` / `sizeSample(id, step)` 함수는 className 만 설정하고(`box.className = 'k k-panel' + mod`), 파일 전체의 id 는 `app`·`sum`·`foot`·`barfill` 4개(전부 레이아웃 골격)뿐이다. 즉 지금 어떤 패턴을 적어도 `--sel` 로 실제 선택되는 칸이 0개인 **허구의 규약**이 된다. 선행 조건은 kit.html 이 칸마다 id 를 내보내도록 고치는 것이고, 그것은 이 작업의 범위(주석·대장 정정) 밖이다."
+  },
+  "reuse_rate": {
+   "value": null,
+   "verdict": "**산출 불가.** 역할 단위 선(先) 조회의 입력인 roles/scale 이 전량 채워지지 않아 재사용률(목표 ≥80%)은 오늘 계산할 수 없다. 이 값을 추정치로 채우지 말 것. (덮인다의 정의 자체가 「kit_candidates[] 가 비어 있지 않고 **그 부품의 scale 수용량이 이 역할의 scale 이상**」이라 scale 0/11 이면 분자가 정의되지 않는다.)"
+  },
+  "blocks": "design-decompose 1단계 합격조건 「필수 필드 공백 0」은 이 상태에서 달성 불가다. 다음 부품 승인 전에 백필이 선행되어야 한다. 선행 작업 3건: ① 부품별 수용량 실측(scale) ② kit.html 칸 id 부여(cell_id_pattern 의 전제) ③ icon-chip 역할 재판정 또는 어휘 추가 승인.",
+  "ref": "research/AUDIT-round3.md §6 「#10」 · research/AUDIT-skills.md §E-2"
+ },
  "sources": [
   "tentwin/assets/art/incoming/mockup/gm-ingame-battle.png",
   "tentwin/assets/art/incoming/mockup/gm-modal-pink-target.jpg",
@@ -16,9 +38,34 @@
   "L5": "연출"
  },
  "converge_gate": {
-  "edge_px": 2,
-  "dE": 3,
-  "mismatch_pct": 5
+  "note": "❌ 정정됨(2026-08-23) — 구 3지표 일괄 관문 {edge_px:2, dE:3, mismatch_pct:5} 는 더 이상 정본 합격선이 아니다. mismatch_pct 5% 는 지표 바닥값(1px 시프트 6.5~6.9% · σ=2 블러 7.4~10.2%) 아래라 **도달 불가로 폐기**됐다(tools/stage-gates.py 헤더 · DESIGN-KNOWLEDGE.md §2.12 조건①·§2.28). 정본은 아래 stage_gates 의 단계별 합격선이다(출처: tools/converge.py 「DEF_FORM_OUTLINE_P95」~「DEF_TEXTURE_RATIO_HI」 상수 블록 — DEF_FORM_OUTLINE_P95 3.0 · DEF_FORM_IOU 0.980 · DEF_COLOR_DE00 2.0 · DEF_TEXTURE_PCT 12.0 · DEF_TEXTURE_RATIO_LO 0.70 · DEF_TEXTURE_RATIO_HI 1.45, 각 상수에 바닥값 대비 배수가 주석으로 붙어 있다. ❌ 정정됨(2026-08-23): 옛 인용 ~~tools/converge.py:641-648~~ 은 줄번호 인용이라 폐기 — research/AUDIT-round3.md §1 「N-2」 인용 규약).",
+  "stage_gates": {
+   "form": {
+    "outline_p95_px": 3.0,
+    "iou": 0.980,
+    "note": "윤곽 p95 ≤3.0px **그리고** 실루엣 IoU ≥0.980. 바닥 1.00px/0.9890 위, 손상 6.0px/0.9526 아래."
+   },
+   "color": {
+    "dE00": 2.0,
+    "note": "대표색 ΔE00 ≤2.0. 바닥 0.279 의 7배, 손상 4.37 의 절반. 옛 all 모드 3.0 보다 오히려 더 조인다 — 질감·형태 잡음이 색 지표에서 빠졌기 때문."
+   },
+   "texture": {
+    "mismatch_pct": 12.0,
+    "energy_ratio_lo": 0.70,
+    "energy_ratio_hi": 1.45,
+    "note": "에너지비가 **주 판정자**다(바닥 0.999~1.064 / σ=2 블러 0.75~0.77 / 고주파 제거 0.591~0.603 로 세 구간이 안 겹친다). 불일치 %는 보조 — 회화 그림결 대 CSS 그라디언트라 실물 바닥이 이미 높다."
+   },
+   "value": {
+    "method": "육안 (1배율 390px·DPR3)",
+    "note": "converge.py --stage choices 에 'value' 가 없다(form|color|texture|all). 4단계는 도구 판정 수단이 없으므로 converge-*.json 이 아니라 **육안 판정 기록**(무엇을 봤는지 + 1배율 캡처 경로)으로 남긴다."
+   }
+  },
+  "legacy_all_mode": {
+   "note": "converge.py --stage all 하위호환 전용. **합격 판정 근거로 쓰지 않는다.** mismatch_pct 5 는 폐기된 값이며 여기 남긴 것은 옛 레코드 해석용이다.",
+   "edge_px": 2,
+   "dE": 3,
+   "mismatch_pct": 5
+  }
  },
  "components": [
   {
@@ -26,6 +73,10 @@
    "name": "판",
    "layer": "L1",
    "class": "코드",
+   "roles": null,
+   "roles_basis": "미충전(2026-08-23) — 판은 역할이 아니라 **다른 역할을 담는 그릇**이라 11종 어휘 중 대응하는 것이 없다. 지어내지 않는다. field_backfill_status.roles 참조.",
+   "scale": null,
+   "cell_id_pattern": null,
    "tokens": [
     "--k-r-4",
     "--k-sp-5",
@@ -70,6 +121,10 @@
    "name": "알약",
    "layer": "L1",
    "class": "코드",
+   "roles": null,
+   "roles_basis": "미충전(2026-08-23) — variants row/label/readonly 가 서로 다른 역할로 갈려(나열의 한 줄인지·서술인지·상태 표시인지) 11종 중 하나로 단정할 수 없다. 지어내지 않는다. field_backfill_status.roles 참조.",
+   "scale": null,
+   "cell_id_pattern": null,
    "tokens": [
     "--k-r-2",
     "--k-sp-4",
@@ -117,6 +172,8 @@
     "ACT",
     "SUB"
    ],
+   "scale": null,
+   "cell_id_pattern": null,
    "impl": ".kit-btn (ui-kit.css) · 실험대 catalog/kit-lab.html",
    "tokens": [
     "--btn-face  ← 입력 토큰은 이것 하나뿐",
@@ -161,7 +218,35 @@
     "edge_px": 8.0,
     "dE": 3.297,
     "mismatch_pct": 16.151,
-    "verdict": "FAIL (전체 크롭 기준) — 직전 «PASS 4색 전량» 은 거짓 통과였다"
+    "verdict": "FAIL (전체 크롭 기준) — 직전 «PASS 4색 전량» 은 거짓 통과였다",
+    "gate_basis": "구 3지표 일괄(legacy_all_mode). 이 관문의 mismatch_pct 5 는 폐기된 값이다 → 아래 restaged 참조"
+   },
+   "converge_restaged": {
+    "note": "**잠정 FAIL — 확정 아님.** 합격선은 도달 가능한 기준으로 교체됐으나, 형태 축의 실루엣 IoU 와 텍스처 축의 고주파 에너지비가 **둘 다 미측정**이라 판정이 닫히지 않았다. 이 레코드는 승인 근거로 쓸 수 없다(action_required 참조). → research/AUDIT-round3.md §1 「N-6」",
+    "note_superseded": "❌ 정정됨(2026-08-23) — 원문 보존. ~~\"재판정(2026-08-23) — 폐기된 5% 관문이 아니라 converge_gate.stage_gates 단계별 합격선으로 다시 판정했다. **결론은 그대로 FAIL이며, 이번엔 도달 가능한 합격선 기준이라 이 FAIL 은 진짜다.** 즉 '관문이 불가능해서 떨어진 것'이 아니다.\"~~ 완화 사유: 같은 블록의 하위 필드(form.iou: null · texture.energy_ratio: null · value.verdict '미판정' · action_required)는 전부 미측정을 정직하게 적고 있는데, **가장 인용될 확률이 높은 최상단 note 만 단정형**이었다. 관문이 도달 가능해진 것은 사실이나 그것이 판정이 닫혔다는 뜻은 아니다. → research/AUDIT-round3.md §1 「N-6」",
+    "form": {
+     "outline_p95_px": 8.0,
+     "gate": 3.0,
+     "iou": null,
+     "iou_gate": 0.980,
+     "verdict": "FAIL — 윤곽 p95 8.0px 이 합격선 3.0px 의 2.7배. 실루엣 IoU 는 **미측정**(재실행 필요)"
+    },
+    "color": {
+     "dE00": 3.297,
+     "gate": 2.0,
+     "verdict": "FAIL — 옛 관문 3.0 으로도 초과였고, 새 합격선 2.0 기준으로는 1.65배 초과"
+    },
+    "texture": {
+     "mismatch_pct": 16.151,
+     "gate": 12.0,
+     "energy_ratio": null,
+     "energy_ratio_gate": "0.70~1.45",
+     "verdict": "FAIL — 16.151% 가 도달 가능한 합격선 12.0% 마저 넘는다(바닥값 5.63% 의 2.9배). 단 **주 판정자인 고주파 에너지비가 미측정**이라 이 판정은 보조 지표만으로 내려졌다 — 확정 전 재실행 필요"
+    },
+    "value": {
+     "verdict": "미판정 — 육안(1배율 390px·DPR3) 기록 없음"
+    },
+    "action_required": "python tools/converge.py <ref> <render> --stage form|color|texture 로 재실행해 IoU·에너지비를 채울 것. 그 전까지 이 레코드는 승인 근거로 쓸 수 없다."
    },
    "converge_by_variant": {
     "pink": {
@@ -209,7 +294,7 @@
     "모달 CTA·닫기 4곳 — 결함 R2 2건",
     "베이지 계보 잔존 6곳 — 결함 R3 6건"
    ],
-   "notes": "★ ×0.67 파생 공식은 **거짓으로 확정**(2026-08-21, 원본 시안 실측). L*(테)/L*(면) = 핑크 .518 · 퍼플 .376 · 오렌지 .558 · 민트 .438 → 평균 **.472**, 색별 폭 **.182**. ① 단일 파생 공식으로 4색을 덮을 수 없다 — 테·림·밴드는 **색별 실측 토큰이 정본**이다. ② 파생식(≈×0.505 = 출고물 기준)은 **새 색을 추가할 때의 시작값**으로만 쓴다. ③ 킷 토큰 ×0.655 는 오답이었다 — 세 계보(킷 .655 / 출고물 .505 / 원본 시안 .472) 중 **출고물이 정본**. ④ 부산물 `deep = face V × 0.90` 도 시안 실측 **×0.84**(.781~.870) → 재측정 필요로 강등. ★ 브랜드 토큰 --k-pink 등 **재사용 금지**: --k-* 는 전투 목업 출처라 계보가 다르다(핑크 면색이 원본 시안 L* 49.6 / 9964 --cl 77.7 / --k-pink 67.0 으로 갈렸다 = ΔE 게이트의 10배). 버튼 전용 계보 --k-btn-<색>-face 신설. ★ 구조는 tentwin.html 9964~10071 계승하되 둘을 실측으로 고쳤다: 반경비 .245 → **.265**(코너 MAE 1변수 스윕 최소점, .245 대비 13% 개선), 상단 림 스톱 `4%→12% 선형 램프` → `3.6/7.6% 고원 + 9.8% 급락`(시안의 1px 단차를 램프가 뭉갰다). ★ --btn-ring-soft 는 색별 실측 토큰: 시안 링→림 전이 sobel 세기 핑크 515·퍼플 582·민트 575 인데 오렌지만 378 로 무르다(전이 폭은 4색 모두 3px 동일) → 오렌지만 .25. ★ 계보 판정 = jelly (면색 전량이 main-menu-sian@4x.png 실측). ★★ 2026-08-21 사용자 반려 2건 + 관문 수리: ① 밝은 내부 림이 **오른쪽 끝에서 끊겼다** — 림이 세로 그라데이션의 상단 정지점 하나뿐이라 좌우 변에는 아예 없었고 코너 호 안에서 외곽선에 먹혔다. → 의사요소 ::before 의 **안쪽 베벨**(4변 inset 실측: 상 .078H · 좌 .075H · 우 .100H · 하 .163H, 띠 폭 .041H, 반투명 68%)로 다시 그려 둘레 48점 전량 통과. ② 상단 광택이 뭉갰다 — 시안의 급락은 **2px**(7.5%→8.2%H)인데 직전 판이 7.6%→9.8% 로 7px 로 늘여 놓았다. 실측 폭으로 되돌림. 부수: 우하단 스페큘러(오른끝 .205H · 바닥 .24H) 재현, 외곽선 .025 → **.029**(둘레 실측 평균). ★ 시안의 좌우 끝 반지름이 서로 다르다 — 왼쪽 r≈138px(알약), 오른쪽 r≈72px. CSS 단일 border-radius 로는 동시에 못 맞추므로 --btn-rr .265 는 타협값이고, 이것이 구조 불일치 바닥값 13~18% 의 원인이다. ★★ 2026-08-22 사용자 반려 4건(가로세로 크기 · 하단 그림자 크기 · 좌측 원형 아이콘 없음 · 폰트 이상) 실측 수리. ① 크기는 **화면 폭 비례**가 정본이다 — 시안 2340폭에서 버튼 1375×317 이므로 폭비 .5876 · 가로세로비 4.338 · 높이비 .1354 · 세로 피치 390(=1.230H). 390폭 환산 H 52.81 · W 229.16 · 피치 64.95. 게임 실화면은 H 56.42(+6.8%) · 피치 75.66(+16.5%) 였다. ② 바닥 그림자는 **몸통 안 3D 접지 밴드와 다른 물건**이다. 버튼 아래 배경을 열별로 정규화해 재니 +8~16px 에서 -38%, 50% 지점 +26px, 거의 소멸 +60px → dy .082H · blur .101H · spread 0 · α .40. 직전 값 .145H/.32H/.26 은 2배 아래로 3배 넓게 퍼져 있었다. 접지 밴드(.kit-jelly border-bottom .118H α.17)는 실측(깊이 .09H · -9~18%)과 일치해 손대지 않았다. ④ 글꼴은 **잉크높이/어드밴스 지문**으로 판별했다 — 시안 1.067 vs Jua 1.035 · Malgun/Pretendard 0.94. Jua(=TentwinDisplay, 게임이 이미 싣고 있다)가 정답이고 font-size = .404H/.840 = .481H, 자간 -.041em, 테두리 .022H(균일 stroke — 8방 그림자는 대각이 √2배 두꺼워져 실측과 안 맞는다), 아래 그림자 .031H, **왼쪽 정렬**(좌끝 +1.14H). ⚠ 게임에 박힌 Jua 서브셋(display-chars.ko.txt 478자)에 «새» 가 빠져 있다 — «새로운 모험» 배선 전 1자 추가 필요.",
+   "notes": "★ ×0.67 파생 공식은 **거짓으로 확정**(2026-08-21, 원본 시안 실측). L*(테)/L*(면) = 핑크 .518 · 퍼플 .376 · 오렌지 .558 · 민트 .438 → 평균 **.472**, 색별 폭 **.182**. ① 단일 파생 공식으로 4색을 덮을 수 없다 — 테·림·밴드는 **색별 실측 토큰이 정본**이다. ② 파생식(≈×0.505 = 출고물 기준)은 **새 색을 추가할 때의 시작값**으로만 쓴다. ③ 킷 토큰 ×0.655 는 오답이었다 — 세 계보(킷 .655 / 출고물 .505 / 원본 시안 .472) 중 **출고물이 정본**. ④ 부산물 `deep = face V × 0.90` 도 시안 실측 **×0.84**(.781~.870) → 재측정 필요로 강등. ★ 브랜드 토큰 --k-pink 등 **재사용 금지**: --k-* 는 전투 목업 출처라 계보가 다르다(핑크 면색이 원본 시안 L* 49.6 / tentwin.html 「#screen-menu #btn-play.mbtn」 의 --cl 77.7 / --k-pink 67.0 으로 갈렸다 = ΔE 게이트의 10배). 버튼 전용 계보 --k-btn-<색>-face 신설. ★ 구조는 tentwin.html 「#screen-menu #btn-play.mbtn」 ~ 「#screen-menu #btn-settings.mbtn:active」 메인 메뉴 버튼 규칙 블록(--crt/--cl/--clb/--cb/--cbb/--crb 5겹)을 계승하되 둘을 실측으로 고쳤다(❌ 정정됨 2026-08-23: 옛 인용 ~~9964~10071~~ 은 줄번호 인용이라 폐기 — research/AUDIT-round3.md §1 「N-2」 인용 규약): 반경비 .245 → **.265**(코너 MAE 1변수 스윕 최소점, .245 대비 13% 개선), 상단 림 스톱 `4%→12% 선형 램프` → `3.6/7.6% 고원 + 9.8% 급락`(시안의 1px 단차를 램프가 뭉갰다). ★ --btn-ring-soft 는 색별 실측 토큰: 시안 링→림 전이 sobel 세기 핑크 515·퍼플 582·민트 575 인데 오렌지만 378 로 무르다(전이 폭은 4색 모두 3px 동일) → 오렌지만 .25. ★ 계보 판정 = jelly (면색 전량이 main-menu-sian@4x.png 실측). ★★ 2026-08-21 사용자 반려 2건 + 관문 수리: ① 밝은 내부 림이 **오른쪽 끝에서 끊겼다** — 림이 세로 그라데이션의 상단 정지점 하나뿐이라 좌우 변에는 아예 없었고 코너 호 안에서 외곽선에 먹혔다. → 의사요소 ::before 의 **안쪽 베벨**(4변 inset 실측: 상 .078H · 좌 .075H · 우 .100H · 하 .163H, 띠 폭 .041H, 반투명 68%)로 다시 그려 둘레 48점 전량 통과. ② 상단 광택이 뭉갰다 — 시안의 급락은 **2px**(7.5%→8.2%H)인데 직전 판이 7.6%→9.8% 로 7px 로 늘여 놓았다. 실측 폭으로 되돌림. 부수: 우하단 스페큘러(오른끝 .205H · 바닥 .24H) 재현, 외곽선 .025 → **.029**(둘레 실측 평균). ★ 시안의 좌우 끝 반지름이 서로 다르다 — 왼쪽 r≈138px(알약), 오른쪽 r≈72px. CSS 단일 border-radius 로는 동시에 못 맞추므로 --btn-rr .265 는 타협값이고, 이것이 구조 불일치 바닥값 13~18% 의 원인이다. ★★ 2026-08-22 사용자 반려 4건(가로세로 크기 · 하단 그림자 크기 · 좌측 원형 아이콘 없음 · 폰트 이상) 실측 수리. ① 크기는 **화면 폭 비례**가 정본이다 — 시안 2340폭에서 버튼 1375×317 이므로 폭비 .5876 · 가로세로비 4.338 · 높이비 .1354 · 세로 피치 390(=1.230H). 390폭 환산 H 52.81 · W 229.16 · 피치 64.95. 게임 실화면은 H 56.42(+6.8%) · 피치 75.66(+16.5%) 였다. ② 바닥 그림자는 **몸통 안 3D 접지 밴드와 다른 물건**이다. 버튼 아래 배경을 열별로 정규화해 재니 +8~16px 에서 -38%, 50% 지점 +26px, 거의 소멸 +60px → dy .082H · blur .101H · spread 0 · α .40. 직전 값 .145H/.32H/.26 은 2배 아래로 3배 넓게 퍼져 있었다. 접지 밴드(.kit-jelly border-bottom .118H α.17)는 실측(깊이 .09H · -9~18%)과 일치해 손대지 않았다. ④ 글꼴은 **잉크높이/어드밴스 지문**으로 판별했다 — 시안 1.067 vs Jua 1.035 · Malgun/Pretendard 0.94. Jua(=TentwinDisplay, 게임이 이미 싣고 있다)가 정답이고 font-size = .404H/.840 = .481H, 자간 -.041em, 테두리 .022H(균일 stroke — 8방 그림자는 대각이 √2배 두꺼워져 실측과 안 맞는다), 아래 그림자 .031H, **왼쪽 정렬**(좌끝 +1.14H). ⚠ 게임에 박힌 Jua 서브셋(display-chars.ko.txt 478자)에 «새» 가 빠져 있다 — «새로운 모험» 배선 전 1자 추가 필요.",
    "gates": {
     "converge": "tools/converge.py — 경계 p95 · ΔE00 · 구조 불일치(실루엣 XOR + 내부 구조 국소대비)",
     "rim_continuity": "tools/rim-continuity.py — 둘레 48점에서 «어두운 외곽선 → 밝은 림 → 면» 패턴 검사. 한 점이라도 밝은 림이 없으면 FAIL",
@@ -221,6 +306,10 @@
    "name": "칩",
    "layer": "L4",
    "class": "코드",
+   "roles": null,
+   "roles_basis": "미충전(2026-08-23) — 이 레코드는 «값 배지»(상태를 보이기만 함 → STATE 계열)와 «토글칩»(눌러서 설정을 바꿈 → SUB 계열)이 한 부품에 섞여 있다. design-decompose §0-A 판정 규약 3항이 «두 역할을 겸하는 것처럼 보이면 역할이 겹친 것 — 분리하라» 고 하므로 임의로 하나를 고르지 않는다. field_backfill_status.roles 참조.",
+   "scale": null,
+   "cell_id_pattern": null,
    "tokens": [
     "--k-success",
     "--k-warn",
@@ -266,6 +355,16 @@
    "roles": [
     "ICON"
    ],
+   "roles_violation": {
+    "flagged": "2026-08-23",
+    "fact": "\"ICON\" 은 design-decompose §0-A 「닫힌 역할 어휘 11종」(NAV·TAB·LIST·FOCUS·STAT·DESC·ACT·SUB·RES·STATE·AMB)에 **없는 코드**다. 어휘표를 직접 열어 11종 전량을 대조해 확인했다.",
+    "correction": "**교정하지 않고 위반 사실만 기록한다.** 11종 중 이 레코드를 단정할 수 있는 어휘가 없기 때문이다 — 메인 메뉴 버튼 안의 글리프 칩은 기능 없이 정체성만이면 AMB 이지만, 이 레코드가 예정 소비처로 적은 「상점 슬롯·프로필 배지·보상 팝업」에서는 RES(재화·소지품)나 STATE(잠금·보유·신규)로 갈린다. 소비처마다 역할이 다르므로 하나로 고르는 것은 근거 없는 창작이 된다. 어휘 추가 역시 사용자 승인제(§0-A 판정 규약 4항)라 임의로 12번째 코드를 만들 수 없다.",
+    "impact": "이 값이 남아 있는 동안 icon-chip 은 **역할 단위 선(先) 조회에서 어느 역할로도 매칭되지 않는다**(11종 중 어느 것도 아니므로). 재사용률 분자에 세지 말 것.",
+    "action_required": "사용자 판정 필요 — ① 소비처별로 레코드를 쪼개 각각 11종 중 하나를 부여하거나, ② 12번째 어휘 「ICON」 추가를 승인하거나, ③ 이 부품을 역할 없는 «그릇»으로 재분류(panel·icon-slot 과 같은 취급)한다.",
+    "ref": "research/AUDIT-skills.md §D-6 「닫힌 역할 어휘 11종을 대장이 이미 위반」 · design-decompose §0-A 「닫힌 역할 어휘 11종」"
+   },
+   "scale": null,
+   "cell_id_pattern": null,
    "impl": ".kit-chip (ui-kit.css) · 실험대 catalog/kit-lab.html?mode=chip",
    "tokens": [
     "--chip-d  ← 입력 토큰은 지름 하나뿐 (버튼 안에서는 --btn-h × 1.076)",
@@ -307,6 +406,12 @@
    "name": "게이지",
    "layer": "L4",
    "class": "하이브리드",
+   "roles": [
+    "STAT"
+   ],
+   "roles_basis": "백필(2026-08-23). design-decompose §0-A 닫힌 어휘 11종의 STAT 판정 문장 「수치·게이지·등급을 보이는가」 + 예시 「공격력 바」 와 이 레코드(HP·EXP 게이지, variants hp-enemy/hp-ally/exp)가 그대로 일치한다. 추론 없음.",
+   "scale": null,
+   "cell_id_pattern": null,
    "tokens": [
     "--k-track",
     "--k-danger",
@@ -349,6 +454,10 @@
    "name": "액자",
    "layer": "L1",
    "class": "하이브리드",
+   "roles": null,
+   "roles_basis": "미충전(2026-08-23) — variants skill/portrait/reward 가 각각 다른 역할(선택 후보 나열 · 선택 대상 상세 · 재화/보상)로 갈려 11종 중 하나로 단정할 수 없다. 지어내지 않는다. field_backfill_status.roles 참조.",
+   "scale": null,
+   "cell_id_pattern": null,
    "tokens": [
     "--k-r-3",
     "--k-sh-2",
@@ -394,6 +503,8 @@
    "roles": [
     "DESC"
    ],
+   "scale": null,
+   "cell_id_pattern": null,
    "impl": ".kit-ribbon (ui-kit.css) · 실험대 catalog/kit-lab.html",
    "tokens": [
     "--rbn-face ← 입력 토큰",
@@ -435,6 +546,12 @@
    "name": "탭",
    "layer": "L1",
    "class": "코드",
+   "roles": [
+    "TAB"
+   ],
+   "roles_basis": "백필(2026-08-23). design-decompose §0-A TAB 판정 문장 「화면 안 내용을 교체하는가」 + 예시 「캐릭터/펫 탭」 과 이 레코드(시트 상단 전환 탭, variants top/side, states default/selected/disabled)가 그대로 일치한다. 추론 없음.",
+   "scale": null,
+   "cell_id_pattern": null,
    "tokens": [
     "--k-r-2",
     "--k-sp-4",
@@ -472,6 +589,10 @@
    "name": "아이콘 슬롯",
    "layer": "L3",
    "class": "하이브리드",
+   "roles": null,
+   "roles_basis": "미충전(2026-08-23) — 「그림 1장이 앉는 구멍」은 역할이 아니라 **그릇**이라 11종 어휘 중 대응하는 것이 없다. 지어내지 않는다. field_backfill_status.roles 참조.",
+   "scale": null,
+   "cell_id_pattern": null,
    "tokens": [
     "--k-r-1",
     "--k-sp-1"
@@ -508,6 +629,10 @@
    "name": "막",
    "layer": "L0",
    "class": "코드",
+   "roles": null,
+   "roles_basis": "미충전(2026-08-23) — 막은 뒤를 가리는 바닥층이다. AMB(「기능 없이 정체성만인가」)로 보기에는 기능이 있고, NAV(「이 화면을 벗어나는가」)로 보려면 «탭하면 닫힌다» 는 거동이 이 레코드에 기록돼 있어야 하는데 없다. 근거가 생기기 전에는 비워 둔다. field_backfill_status.roles 참조.",
+   "scale": null,
+   "cell_id_pattern": null,
    "tokens": [
     "--k-scrim",
     "--k-sp-4"

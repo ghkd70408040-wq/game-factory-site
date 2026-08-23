@@ -52,6 +52,16 @@
   --gauge-fill-2: #CCECFF;              /* [측정] 채움 상단 하이라이트 */
   --gauge-over:   var(--k-warn, #FFD34A);   /* 초과분 */
   --gauge-pad:    3px;                  /* 틀 안쪽 여백(트랙이 틀에 잠기는 깊이) */
+  /* [2026-08-23] 채움 면색의 sRGB 루마 — ui-kit.css §② 상대 휘도 규칙 입력.
+     밝은 판(#A4DAE8 = .814)에 흰 α 고정을 얹으면 젤리가 사라진다. 색 변주마다
+     자기 값을 준다. 산출: .2126R+.7152G+.0722B / 255 (감마 인코딩 sRGB 루마). */
+  --gauge-s:      .814;
+  /* [2026-08-23] 구획선 — 사용자 요구 «에너지 바에 라인을 쳐야 한다».
+     실측: 전투 HUD 플레이어 레일 눈금 7개 · 간격 50 device px @DPR3
+     = 16.67 CSS px → **8구간**. */
+  --gauge-seg:    8;
+  --gauge-tick-w: 1.5px;
+  --gauge-tick-c: rgba(46,20,58,.34);
 }
 
 
@@ -210,11 +220,13 @@
        <div class="kit-gauge__track">
          <div class="kit-gauge__fill"><div class="kit-jelly"></div></div>
          <div class="kit-gauge__over"></div>
+         <div class="kit-gauge__ticks"></div>
        </div>
        <b class="kit-gauge__label">40 / 100</b>
      </div>
 
-   값 입력은 토큰 **--gauge-v (0~1, 1 초과 허용)** 하나뿐이다.              */
+   값 입력은 토큰 **--gauge-v (0~1, 1 초과 허용)** 하나뿐이다.
+   구간 수는 **--gauge-seg** (기본 8 · 실측 근거는 __ticks 절 주석).           */
 
 .kit-gauge{
   --_v:    var(--gauge-v, 0);
@@ -256,35 +268,84 @@
     inset 0 calc(var(--gauge-h) * -.07) 0 0 rgba(255,255,255,.14);
 }
 
-/* ── 필 (L1+L2) — **코드로 늘어난다.** width 하나가 값이다 ── */
+/* ── 필 (L1+L2) — **코드로 늘어난다.** scaleX 하나가 값이다 ──
+   🚨 2026-08-23 — `width` 트랜지션을 `transform: scaleX()` 로 치환했다.
+   근거: `game-motion §5`(게이지는 width 금지 → scaleX) · `VERIFY-motion §A-2`
+   (레이아웃 유발 6건 중 이 부품이 두 건이었다 — «신설 부품이 본체의 결함을
+   그대로 복제했다» 로 M-14 에 등재된 그 자리다).
+   필은 텍스트를 담지 않는 순수 막대이므로 역스케일이 필요 없다(라벨은
+   .kit-gauge__label 로 분리돼 있다 — 이 부품이 처음부터 4조각인 이유).      */
 .kit-gauge__fill{
   position: relative;                     /* .kit-jelly 자식의 기준 */
   height: 100%;
-  width: calc(var(--_fill) * 100%);
+  width: 100%;
   min-width: 0;
   border-radius: 999px;
   background: linear-gradient(180deg,
                 var(--gauge-fill-2) 0,
                 var(--gauge-fill)  52%,
                 color-mix(in srgb, var(--gauge-fill) 82%, #2E1A28) 100%);
-  transition: width .22s cubic-bezier(.2,.9,.3,1);
+  transform-origin: left center;
+  transform: scaleX(var(--_fill));
+  transition: transform .26s linear;      /* game-motion §3-9: --dur-2 · linear */
 
   /* ★ .kit-jelly 오버레이의 길이 기준.
-     JELLY-SPEC §9 권장(게이지 = 하단 발광만)을 그대로 채용한다.
-     --jelly-h 는 «밑판의 대표 높이» 이므로 바 높이 그 자체다. */
+     --jelly-h 는 «밑판의 대표 높이» 이므로 바 높이 그 자체다.
+     🚨 2026-08-23 — JELLY-SPEC §9 의 게이지 권장(rim .4 / band 0 / spec 0)을
+        **철회한다.** 그 권장이 «절대 크기를 갖는 성분» 을 전부 꺼 버려
+        캡슐·게이지에서 젤리가 사라진 직접 원인이었다(사용자 반려 ①).
+        밴드는 다시 켠다 — 밝은 판에서 형태를 그리는 것은 흰 림이 아니라
+        **림과 밴드의 진폭 차**이고, 흰 성분만 남기면 밝은 판에서 0 이 된다.
+        α 는 ui-kit.css §② 의 상대 휘도 규칙이 --gauge-s 를 보고 정한다.  */
   --jelly-h: var(--gauge-h);
-  --jelly-rim:  .45;
-  --jelly-band: 0;                        /* 캡슐 아래에 검은 접지선은 어색하다 */
+  --jelly-s: var(--gauge-s, .70);         /* 채움 면색 sRGB 루마 — 색 변주가 준다 */
+  --jelly-rim:  1;
+  --jelly-band: .8;                       /* 얇게 — 캡슐 아래 접지선이 굵으면 어색하다 */
   --jelly-spec: 0;                        /* 가로로 긴 판에 물방울 1개는 어색하다 */
-  --jelly-band-w: .16;                    /* 밴드 색은 껐지만 «아래가 깊은» 광원은 유지 */
+  --jelly-band-w: .16;                    /* «아래가 깊은» 광원 방향 유지 */
 }
 .kit-gauge__fill > .kit-jelly{ z-index: 1; }
+
+/* ── 구획선 (신설 · 사용자 요구 «에너지 바에 라인을 쳐야 한다») ────────────
+   ⚠ **트랙 위에 얹는다. 필 위가 아니다.** 필은 scaleX 로 늘어나므로 거기
+     얹으면 구획선 간격이 값에 따라 변한다(= 눈금이 아니게 된다).
+   간격 실측(2026-08-23 · 390x844 DPR3 전투 HUD 1배율 캡처):
+     플레이어 HP 레일 아래 눈금 7개, 간격 **50 device px = 16.67 CSS px**
+     → 레일을 **8구간**으로 나눈다. --gauge-seg 기본값이 그 8이다.
+   구획선은 트랙 폭의 비율로 잡으므로 바가 길어져도 구간 수가 유지된다.      */
+.kit-gauge__ticks{
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 2;
+  background: repeating-linear-gradient(90deg,
+    rgba(0,0,0,0) 0,
+    rgba(0,0,0,0) calc(100% / var(--gauge-seg, 8) - var(--gauge-tick-w, 1.5px)),
+    var(--gauge-tick-c, rgba(46,20,58,.34)) calc(100% / var(--gauge-seg, 8) - var(--gauge-tick-w, 1.5px)),
+    var(--gauge-tick-c, rgba(46,20,58,.34)) calc(100% / var(--gauge-seg, 8)));
+  /* 마지막 구획선은 트랙 오른쪽 끝과 겹치므로 지운다(테두리가 두 번 그려진다) */
+  -webkit-mask: linear-gradient(90deg, #000 0 calc(100% - var(--gauge-tick-w, 1.5px)), transparent 0);
+          mask: linear-gradient(90deg, #000 0 calc(100% - var(--gauge-tick-w, 1.5px)), transparent 0);
+}
+/* 구획선 위에 얇은 하이라이트를 얹어 «파인 홈» 으로 읽히게 한다 */
+.kit-gauge__ticks::after{
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: repeating-linear-gradient(90deg,
+    rgba(255,255,255,0) 0,
+    rgba(255,255,255,0) calc(100% / var(--gauge-seg, 8)),
+    rgba(255,255,255,.30) calc(100% / var(--gauge-seg, 8)),
+    rgba(255,255,255,.30) calc(100% / var(--gauge-seg, 8) + var(--gauge-tick-w, 1.5px) * .6));
+}
 
 /* ── 초과분 (>100%) — 필 위에 덧그리는 별도 층. 색·연출이 다르다 ── */
 .kit-gauge__over{
   position: absolute;
   inset: 0 auto 0 0;
-  width: calc(var(--_over) * 100%);
+  width: 100%;
   border-radius: 999px;
   background: linear-gradient(180deg,
                 color-mix(in srgb, var(--gauge-over) 62%, #FFFFFF) 0,
@@ -292,7 +353,10 @@
                 color-mix(in srgb, var(--gauge-over) 78%, #2E1A28) 100%);
   box-shadow: 0 0 calc(var(--gauge-h) * .8) rgba(255,211,74,.65);
   animation: kit-gauge-over 1.1s ease-in-out infinite;
-  transition: width .22s cubic-bezier(.2,.9,.3,1);
+  /* 🚨 2026-08-23 — width → scaleX (game-motion §5). 위 __fill 과 같은 이유다. */
+  transform-origin: left center;
+  transform: scaleX(var(--_over));
+  transition: transform .26s linear;
 }
 @keyframes kit-gauge-over{ 0%,100%{ filter: brightness(1) } 50%{ filter: brightness(1.18) } }
 @media (prefers-reduced-motion: reduce){ .kit-gauge__over{ animation: none } }
@@ -326,22 +390,27 @@
 .kit-gauge--hp{        /* 아군 HP — [측정] 시안 A #A4DAE8 / 시안 D 트랙 #6E85BB */
   --gauge-fill: #A4DAE8; --gauge-fill-2: #CCECFF;
   --gauge-track: #6E85BB; --gauge-track-e: #4E679D;
+  --gauge-s: .814;
 }
 .kit-gauge--hp-enemy{  /* 적 HP — [측정] kit-registry bar.notes 빈 트랙 #9C5977 */
   --gauge-fill: var(--k-danger, #D16347); --gauge-fill-2: #F09B85;
   --gauge-track: #9C5977; --gauge-track-e: #6E3A54;
+  --gauge-s: .472;
 }
 .kit-gauge--combo{     /* 콤보 — 현행 tentwin #combo-fill 계보 */
   --gauge-fill: var(--k-orange, #F09B31); --gauge-fill-2: #FFD98A;
   --gauge-track: #8B6E8A; --gauge-track-e: #5E4560;
+  --gauge-s: .649;
 }
 .kit-gauge--fever{     /* 피버 — 현행 tentwin #fever-fill 계보 */
   --gauge-fill: var(--k-purple, #C760D7); --gauge-fill-2: #F0A8F8;
   --gauge-track: #6B5480; --gauge-track-e: #453456;
+  --gauge-s: .496;
 }
 .kit-gauge--exp{
   --gauge-fill: var(--k-mint, #6DDDA7); --gauge-fill-2: #B6F3D6;
   --gauge-track: #5E8878; --gauge-track-e: #3B5C50;
+  --gauge-s: .758;
 }
 
 /* ── 상태 ── */
