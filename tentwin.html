@@ -21063,6 +21063,20 @@ window.TT_SFX = {
      피해는 게이지 한 문으로만 들어온다는 단계 2의 계약을 펫이 뚫으면 안 된다. */
   var DUEL_PET_POP = 4;              // 삐약 "쪼아먹기" — 한 번에 지우는 산 칸 수
   var DUEL_PET_FREEZE_MS = 6000;     // 뭉치 "덩어리 방패" — 적 게이지 동결 시간
+  /* ---- 자동공격 광선의 **출발점** (2026-08-24, 사용자 지시) ----------------
+     옛 광선은 화면 아래 한 점(innerWidth/2, innerHeight*0.74)에서 나갔다. 그
+     자리에는 아무것도 없다 — 인터페이스가 아니라 허공이다. 사용자 지시는
+     "터트린 그 과일 패드 쪽에서 레이저가 나게" 였고, 그게 맞다: 원인(내가 지운
+     과일)과 결과(악당이 맞음)가 한 선으로 이어져야 짜릿하다.
+     좌표는 **새로 재지 않는다**. resolveMatch 가 이미 배치로 읽어 둔
+     dyingC/blownC 를 그대로 물려받는다(tileCenter 는 강제 리플로우의 주범이라
+     한 번도 더 부르지 않는 것이 이 구현의 제1 조건이다).
+     개수 상한이 있는 이유: 연쇄 한 번에 지워지는 칸이 열 칸을 넘길 수 있는데
+     그만큼 광선을 다 쏘면 입자 예산(canSpawn/alloc)이 그 한 프레임에 다 타고
+     뒤이어 올 폭발이 조용히 사라진다. 넷이면 "여러 곳에서 나간다"가 읽히고
+     예산도 남는다. 간격은 프레임 하나(≈16ms)보다 넉넉히 커야 순차로 보인다. */
+  var DUEL_BEAM_MAX = 4;             // 자동공격 1회가 쏘는 광선 최대 개수
+  var DUEL_BEAM_GAP_MS = 45;         // 광선 사이 간격 — 이보다 짧으면 동시로 읽힌다
   /* ---- W3 (2026-08-20) 스킬 연출 강화 상수 -------------------------------
      아래 넷은 **연출 전용**이다. 밸런스 표에 들어가는 값은 하나도 없다:
      타격감을 만드는 것은 밀리초 셋(히트스톱)이고, 나머지 둘은 아직 등록되지
@@ -30805,6 +30819,16 @@ window.TT_SFX = {
     var chippedE = chipped.map(function (ix) { return tileEls[ix] || null; });
     var dyingC = dying.map(function (ix) { return tileCenter(ix); });
     var blownC = blown.map(function (ix) { return tileCenter(ix); });
+    /* 자동공격 광선의 출발점을 **여기서** 챙긴다. duelMeAttack 은 리필이 끝난
+       뒤(meArm && !S.busy && !fxBusy())에야 불리는데 그때는 이 타일들이 이미
+       사라져 있어 자리를 물어볼 대상이 없다. 위 두 줄은 순수한 읽기 배치라
+       여기에 얹어도 새 getBoundingClientRect 는 **0개**다 — 읽은 값을 담아만
+       둔다(읽기 0, 쓰기 1). 얼음만 깎인 매치처럼 죽은 칸이 하나도 없으면
+       비워 두고, 그때는 매치한 두 칸(ca/cb, 위에서 이미 읽었다)이 대신 선다. */
+    if (S.duel && !S.duel.down) {
+      var srcC = dyingC.concat(blownC);
+      S.duel.srcPts = srcC.length ? srcC : [ca, cb];
+    }
     (function (blownList, dyingEls, blownEls, chippedEls, dyingVals, blownVals, dyingCs, blownCs) {
       later(function () {
         var n;
@@ -34211,7 +34235,24 @@ window.TT_SFX = {
     if (me.atk < 0) me.atk = 0;
     if (typeof window !== 'undefined') {
       var at = duelFoeAt();
-      J.beam(window.innerWidth / 2, window.innerHeight * 0.74, at.x, at.y, '#ffb03d');
+      /* 광선은 **터진 과일 패드**에서 나간다(상수 주석 참조). 좌표는
+         resolveMatch 가 매치 순간에 담아 둔 것이고, 여기서는 읽기만 한다.
+         한 발째는 즉발이어야 타격음·피격 처리와 어긋나지 않는다. 나머지는
+         DUEL_BEAM_GAP_MS 씩 밀어 "여러 군데서 차례로 날아간다"로 읽히게 한다.
+         비어 있으면(판의 첫 공격 등) 옛 고정 출발점으로 돌아간다. */
+      var src = (d.srcPts && d.srcPts.length) ? d.srcPts : null;
+      if (!src) {
+        J.beam(window.innerWidth / 2, window.innerHeight * 0.74, at.x, at.y, '#ffb03d');
+      } else {
+        var nBeam = Math.min(src.length, DUEL_BEAM_MAX);
+        for (var bi = 0; bi < nBeam; bi++) {
+          (function (p, k) {
+            if (!p) return;
+            if (k === 0) J.beam(p.x, p.y, at.x, at.y, '#ffb03d');
+            else later(function () { J.beam(p.x, p.y, at.x, at.y, '#ffb03d'); }, k * DUEL_BEAM_GAP_MS);
+          })(src[bi], bi);
+        }
+      }
     }
     J.sfx.bomb();
     duelHitFoe(me.atkMax, true);
