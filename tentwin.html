@@ -2694,26 +2694,27 @@ li.roll-in { animation: rollin 380ms var(--spring) backwards; }
 }
 
 /* ============================================================
-   10. HOW TO PLAY — 5 panels, art is pure SVG/CSS
+   10. HOW TO PLAY — 7 panels, art is pure SVG/CSS
    ============================================================ */
 #howto-viewport { width: 100%; overflow: hidden; }
 
 /* The connection rule was one dense slide that nobody finished reading (review 2);
    it is now three, for five panels total.
    14차 #34 — 앞에 규칙 요약 카드가 한 장 붙어 **여섯 장**이 되었다.
-   The track is 6 viewports wide and each panel is one sixth of it, so a percentage
-   transform on the track resolves against 600% — game.js therefore steps by
-   100/6 % per panel, and clamps the index to 0..5. 세 숫자(600% · 16.6667% ·
-   100/6)는 한 몸이다. 패널을 더 넣거나 뺄 때 셋을 같이 고치지 않으면 트랙이
+   그 뒤 맨 끝에 전투 기술 카드(하단 네 버튼 안내)가 붙어 **일곱 장**이다.
+   The track is 7 viewports wide and each panel is one seventh of it, so a percentage
+   transform on the track resolves against 700% — game.js therefore steps by
+   100/7 % per panel, and clamps the index to 0..6. 세 숫자(700% · 14.2857% ·
+   100/7)는 한 몸이다. 패널을 더 넣거나 뺄 때 셋을 같이 고치지 않으면 트랙이
    패널 경계에서 멈추지 않고 두 장이 걸쳐 보인다. */
 #howto-track {
   display: flex;
-  width: 600%;
+  width: 700%;
   transition: transform 340ms var(--ease);
 }
 
 .howto-panel {
-  flex: 0 0 16.6667%;
+  flex: 0 0 14.2857%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -14954,9 +14955,32 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
         <p data-i18n-html="howto.p5">Empty a whole row and it <b>collapses</b> &mdash; everything above drops down.</p>
       </div>
 
+      <!-- 전투 기술 카드 — 도움말의 **마지막** 장. 맨 뒤에 두는 이유는 두 가지다:
+           ① 앞의 규칙 흐름(0번 요약 → p1~p5 그림)이 한 칸도 밀리지 않는다.
+           ② 마지막 장의 Next 는 튜토리얼 재생 버튼이라(setHowto 참고) "네 버튼을
+              읽었으니 직접 해 보라"로 자연스럽게 이어진다.
+           껍데기는 0번 규칙 카드와 **같은 문법**을 그대로 복사했다 — .howto-panel >
+           .howto-art.rules-card > .rules-title + .rules-list + .rules-note.
+           신규 CSS 0줄, 신규 에셋 0개. 목록이 셋이 아니라 넷이라 번호 원판도 4까지
+           간다(.rules-num 은 개수를 가정하지 않는다). 마크업 안의 대체 텍스트는
+           집 규약대로 EN 문안이고, 두 언어는 i18n 표에만 산다. -->
+      <div class="howto-panel">
+        <div class="howto-art rules-card">
+          <h3 class="rules-title" data-i18n="skills.title">Four buttons in battle</h3>
+          <ol class="rules-list">
+            <li><span class="rules-num" aria-hidden="true">1</span><span data-i18n-html="skills.s1"><b>Attack</b> &mdash; fills with every point you score, and fires on its own when full.</span></li>
+            <li><span class="rules-num" aria-hidden="true">2</span><span data-i18n-html="skills.s2"><b>Special</b> &mdash; fills only when you <b>alternate</b> sum-10 and same-number matches. One hit is worth two attacks.</span></li>
+            <li><span class="rules-num" aria-hidden="true">3</span><span data-i18n-html="skills.s3"><b>Awakening</b> &mdash; every match charges it, faster the higher your combo. It turns the board your way for a few seconds.</span></li>
+            <li><span class="rules-num" aria-hidden="true">4</span><span data-i18n-html="skills.s4"><b>Partner</b> &mdash; your chosen partner&rsquo;s skill, a few uses each round.</span></li>
+          </ol>
+          <p class="rules-note" data-i18n-html="skills.note">A <b>star fruit</b> fills Awakening at once; a <b>pet fruit</b> gives one more Partner use.</p>
+        </div>
+      </div>
+
     </div></div>
-    <!-- #34: 6번째 점 = 앞에 들어온 규칙 요약 카드. setHowto() 가 인덱스로 켠다. -->
-    <div id="howto-dots"><i class="dot on"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i></div>
+    <!-- #34: 6번째 점 = 맨 앞에 들어온 규칙 요약 카드.
+         7번째 점 = 맨 뒤에 붙은 전투 기술 카드. setHowto() 가 인덱스로 켠다. -->
+    <div id="howto-dots"><i class="dot on"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i></div>
     <div class="sheet-row"><button id="howto-prev" class="btn btn-ghost" data-i18n-aria="aria.howtoPrev" data-i18n="howto.prev" aria-label="Previous panel">Prev</button><button id="howto-next" class="btn btn-ghost" data-i18n-aria="aria.howtoNext" data-i18n="howto.next" aria-label="Next panel">Next</button></div>
     <button id="howto-close" class="btn btn-primary" data-i18n-aria="aria.howtoClose" data-i18n="howto.close" aria-label="Close how to play">Got it</button>
   </div></div>
@@ -23685,6 +23709,21 @@ window.TT_SFX = {
       'rules.r2': 'Joined by a <b>straight path</b> — across, down, or diagonal.',
       'rules.r3': 'Or the <b>end</b> of a row to the <b>start</b> of the next.',
       'rules.note': 'Either way, nothing may be left standing in between.',
+      /* 전투 기술 카드(도움말 마지막 장). 만든 사람 본인도 필살기가 무엇으로 차는지
+         모르고 있었다 — 코드를 다시 읽고서야 "합이 10 ↔ 같은 숫자를 번갈아 맞춰
+         연쇄가 오를 때만"(34327)이라는 걸 알았다. 플레이어가 알 리가 없다.
+         그래서 네 버튼을 한 장에 세우고 각 줄이 세 가지를 다 말하게 한다:
+         **무엇인가 / 어떻게 차는가 / 쓰면 무슨 일이 일어나는가**.
+         낱말은 하단 버튼 라벨(act.attack·act.special·act.pet·act.awaken)과
+         미충전 토스트(duel.atkstat·duel.spstat·skill.notyet)와 **똑같이** 맞춘다 —
+         카드에서 "각성", 버튼에서 "awaken", 토스트에서 "게이지"라고 부르면 셋이
+         같은 것인 줄 모른다. EN·KO 키 순서도 같게 유지한다. */
+      'skills.title': 'Four buttons in battle',
+      'skills.s1': '<b>Attack</b> — fills with every point you score, and fires on its own when full.',
+      'skills.s2': '<b>Special</b> — fills only when you <b>alternate</b> sum-10 and same-number matches. One hit is worth two attacks.',
+      'skills.s3': '<b>Awakening</b> — every match charges it, faster the higher your combo. It turns the board your way for a few seconds.',
+      'skills.s4': '<b>Partner</b> — your chosen partner\'s skill, a few uses each round.',
+      'skills.note': 'A <b>star fruit</b> fills Awakening at once; a <b>pet fruit</b> gives one more Partner use.',
       'menu.dailydone': "Today's daily: cleared",
       'menu.dailytodo': "Today's daily is waiting",
       'hud.daily': 'Daily',
@@ -23935,11 +23974,17 @@ window.TT_SFX = {
       'aria.special': 'Fire your special attack',
       'aria.pet': 'Use your partner skill',
       'aria.awaken': 'TenTwin Awakening',
-      'duel.atkstat': 'Attack gauge {n}% — it fires on its own when it fills.',
-      'duel.spstat': 'Special {n}% — fill it up first.',
+      /* 게이지 토스트는 "안 찼다"가 아니라 **채우는 법**을 말한다. 안 찼다는 것은
+         게이지 바를 보면 이미 아는 사실이고, 정작 모르는 것은 무엇을 하면 차는가다
+         — 특히 필살기는 매치마다 차는 것이 아니라 합이 10 ↔ 같은 숫자를 **번갈아**
+         맞춰 연쇄가 오를 때만 찬다(34327: tw.chain > twPrev 일 때만 sp += 2*pts).
+         각성은 반대로 얼음 아닌 모든 매치가 채우고 콤보가 높을수록 빨리 찬다
+         (30590 의 gaugeBump(S.combo), 잔량 안내는 28121 계열 fireSkill 경로). */
+      'duel.atkstat': 'Attack {n}% — it fills with every point you score, and fires on its own when full.',
+      'duel.spstat': 'Special {n}% — it only fills when you alternate sum-10 and same-number matches.',
       'duel.spgo': 'SPECIAL! -{n}',
-      'duel.petnone': 'No partner yet — pick one to get a pet skill.',
-      'duel.petout': 'No pet skill left this round.',
+      'duel.petnone': 'No partner yet — pick one and you get their skill a few times each round.',
+      'duel.petout': 'No partner skill left this round — break a pet fruit on the board for one more.',
       'duel.petempty': 'Nothing left to peck.',
       'duel.petpeck': 'Peck! {n} tiles cleared',
       /* W2.5 ④ — 마크 과일의 플로트 문구. 토스트가 아니라 **보드 위 플로트**라
@@ -24014,7 +24059,7 @@ window.TT_SFX = {
       /* --- v4 5차 §2: 스킬 게이지 · 필살기 --- */
       'aria.skill': 'Use your ultimate',
       'skill.ready': 'GO!',
-      'skill.notyet': 'The gauge is still charging.',
+      'skill.notyet': 'Awakening {n}% — every match charges it, and a higher combo charges it faster.',
       'skill.sub': 'ULTIMATE',
       /* 단계 3 개명: "소환" → "각성". 키는 그대로다 — castSkill 의 분기가 이 키로
          갈리므로 문구만 바뀌고 코드 경로는 한 글자도 안 움직인다. */
@@ -24515,6 +24560,21 @@ window.TT_SFX = {
       'rules.r2': '가로·세로·대각선 <b>곧은 길</b>로 이어질 것',
       'rules.r3': '또는 줄 <b>끝</b>에서 다음 줄 <b>첫 칸</b>으로',
       'rules.note': '어느 쪽이든 사이에 타일이 남아 있으면 안 돼.',
+      /* 전투 기술 카드(도움말 마지막 장). 만든 사람 본인도 필살기가 무엇으로 차는지
+         모르고 있었다 — 코드를 다시 읽고서야 "합이 10 ↔ 같은 숫자를 번갈아 맞춰
+         연쇄가 오를 때만"(34327)이라는 걸 알았다. 플레이어가 알 리가 없다.
+         그래서 네 버튼을 한 장에 세우고 각 줄이 세 가지를 다 말하게 한다:
+         **무엇인가 / 어떻게 차는가 / 쓰면 무슨 일이 일어나는가**.
+         낱말은 하단 버튼 라벨(act.attack·act.special·act.pet·act.awaken)과
+         미충전 토스트(duel.atkstat·duel.spstat·skill.notyet)와 **똑같이** 맞춘다 —
+         카드에서 "각성", 버튼에서 "awaken", 토스트에서 "게이지"라고 부르면 셋이
+         같은 것인 줄 모른다. EN·KO 키 순서도 같게 유지한다. */
+      'skills.title': '전투의 네 버튼',
+      'skills.s1': '<b>공격</b> — 점수를 낼수록 차고, 다 차면 저절로 나가요.',
+      'skills.s2': '<b>필살기</b> — <b>합이 10</b>과 <b>같은 숫자</b>를 <b>번갈아</b> 맞춰야 차요. 한 방이 공격 두 번치예요.',
+      'skills.s3': '<b>각성</b> — 매치마다 차고, 콤보가 높을수록 빨리 차요. 잠깐 동안 판이 내 편이 돼요.',
+      'skills.s4': '<b>펫소환</b> — 고른 동료의 기술이에요. 한 판에 쓸 수 있는 횟수가 정해져 있어요.',
+      'skills.note': '<b>각성 과일</b>은 각성을 단번에 채우고, <b>펫 과일</b>은 펫 횟수를 하나 늘려 줘요.',
       'menu.dailydone': '오늘 데일리 완료',
       'menu.dailytodo': '오늘의 데일리가 기다려요',
       'hud.daily': '데일리',
@@ -24753,11 +24813,18 @@ window.TT_SFX = {
       'aria.special': '필살기 발동',
       'aria.pet': '펫 스킬 사용',
       'aria.awaken': '텐트윈 각성',
-      'duel.atkstat': '공격 게이지 {n}% — 다 차면 저절로 나가요.',
-      'duel.spstat': '필살기 {n}% — 아직 덜 찼어요.',
+      /* 게이지 토스트는 "안 찼다"가 아니라 **채우는 법**을 말한다. 안 찼다는 것은
+         게이지 바를 보면 이미 아는 사실이고, 정작 모르는 것은 무엇을 하면 차는가다
+         — 특히 필살기는 매치마다 차는 것이 아니라 합이 10 ↔ 같은 숫자를 **번갈아**
+         맞춰 연쇄가 오를 때만 찬다(34327: tw.chain > twPrev 일 때만 sp += 2*pts).
+         각성은 반대로 얼음 아닌 모든 매치가 채우고 콤보가 높을수록 빨리 찬다
+         (30590 의 gaugeBump(S.combo), 잔량 안내는 28121 계열 fireSkill 경로).
+         토스트는 평문이라 <b> 를 쓰지 않는다 — 강조는 낱말 순서로만 준다. */
+      'duel.atkstat': '공격 {n}% — 점수를 낼수록 차고, 다 차면 저절로 나가요.',
+      'duel.spstat': '필살기 {n}% — 합이 10과 같은 숫자를 번갈아 맞춰야 차요.',
       'duel.spgo': '필살기! -{n}',
-      'duel.petnone': '동료가 없어요. 먼저 동료를 골라 주세요.',
-      'duel.petout': '이번 판 펫 스킬을 다 썼어요.',
+      'duel.petnone': '동료가 없어요 — 동료를 고르면 그 기술을 판마다 몇 번 쓸 수 있어요.',
+      'duel.petout': '이번 판 펫 기술을 다 썼어요 — 판 위의 펫 과일을 깨면 한 번 더 생겨요.',
       'duel.petempty': '쪼아먹을 타일이 없어요.',
       'duel.petpeck': '쪼아먹기! {n}칸 정리',
       /* W2.5 ④ — 마크 과일의 플로트 문구(사용자 확정 문구 그대로). */
@@ -24823,7 +24890,7 @@ window.TT_SFX = {
       /* --- v4 5차 §2: 스킬 게이지 · 필살기 --- */
       'aria.skill': '필살기 쓰기',
       'skill.ready': '발동!',
-      'skill.notyet': '게이지가 아직 안 찼어요.',
+      'skill.notyet': '각성 {n}% — 매치마다 차고, 콤보가 높을수록 빨리 차요.',
       'skill.sub': '필살기',
       /* 단계 3 개명: "소환" → "각성". 키는 그대로 (castSkill 무수정). */
       'skill.ten.name': '텐트윈 각성 — 트윈 왕자!',
@@ -28363,7 +28430,7 @@ window.TT_SFX = {
          각성을 눌렀을 때 토스트도 소리도 없어 "버튼이 죽었다"로 읽힌다 — 사용자
          반려 문장이 정확히 그것이었다. 미만땅에서도 반드시 응답한다. */
       if ((battleOn() || S.mode === 'adv') && S.running && !S.skillKind && !gaugeFull()) {
-        toast(t('skill.notyet'));
+        toast(t('skill.notyet', { n: duelGaugePct() }));
         J.sfx.fail();
       }
       return;
@@ -32825,16 +32892,19 @@ window.TT_SFX = {
 
   function setHowto(i) {
     /* 14차 #34 — 패널이 5장에서 **6장**이 되었다. 0번이 새로 들어온 규칙 요약
-     * 카드이고, 옛 5장(howto.p1~p5)은 1~5번으로 한 칸씩 밀렸다. 마지막 장이
-     * 튜토리얼 진입이라는 계약은 그대로이므로, 아래 두 곳의 "마지막 인덱스"만
-     * 4 → 5 로 바뀐다(#howto-next 핸들러에 하나 더 있다).
-     * 카드를 **맨 앞**에 둔 이유: 도움말을 여는 사람은 대개 "규칙이 뭐였지"를
+     * 카드이고, 옛 5장(howto.p1~p5)은 1~5번으로 한 칸씩 밀렸다. 그 뒤 **7장**이
+     * 되었다 — 6번이 맨 뒤에 붙은 전투 기술 카드(하단 네 버튼 안내)다. 마지막
+     * 장이 튜토리얼 진입이라는 계약은 그대로이므로, 아래 두 곳의 "마지막
+     * 인덱스"만 5 → 6 으로 바뀐다(#howto-next 핸들러에 하나 더 있다).
+     * 규칙 카드를 **맨 앞**에 둔 이유: 도움말을 여는 사람은 대개 "규칙이 뭐였지"를
      * 묻는 것이지 5장을 읽고 싶은 것이 아니다. 요약 → 그림 설명 → 직접 해보기
-     * 순서면 어느 지점에서 덮어도 답을 얻고 나간다. */
-    howtoIdx = clamp(i, 0, 5);
+     * 순서면 어느 지점에서 덮어도 답을 얻고 나간다. 기술 카드를 **맨 뒤**에 둔
+     * 이유도 같다 — 규칙 흐름을 한 칸도 밀지 않으면서, 다 읽은 사람이 곧바로
+     * 튜토리얼로 이어지는 자리가 거기다. */
+    howtoIdx = clamp(i, 0, 6);
     var track = $('howto-track');
-    // The track is 600% wide (6 panels), so one panel step is 100/6 % of it.
-    if (track) track.style.transform = 'translate3d(' + (-howtoIdx * 100 / 6) + '%,0,0)';
+    // The track is 700% wide (7 panels), so one panel step is 100/7 % of it.
+    if (track) track.style.transform = 'translate3d(' + (-howtoIdx * 100 / 7) + '%,0,0)';
     var dots = $('howto-dots');
     if (dots && dots.children) {
       for (var k = 0; k < dots.children.length; k++) {
@@ -32848,7 +32918,7 @@ window.TT_SFX = {
      * rewrites it from data-i18n="howto.next" on every language switch;
      * syncDynamicI18n() calls setHowto(howtoIdx) straight afterwards to restore it. */
     var nx = $('howto-next');
-    if (nx) nx.textContent = (howtoIdx >= 5) ? t('tut.replay') : t('howto.next');
+    if (nx) nx.textContent = (howtoIdx >= 6) ? t('tut.replay') : t('howto.next');
   }
 
   /* =========================================================================
@@ -38204,7 +38274,7 @@ window.TT_SFX = {
     // On the last panel Next has nothing to advance to (see setHowto): it is the
     // tutorial entry instead, which is also the only way back in once it is done.
     on($('howto-next'), 'click', function () {
-      if (howtoIdx >= 5) { openTutorial(true); return; }   // #34: 5장 → 6장
+      if (howtoIdx >= 6) { openTutorial(true); return; }   // #34: 5장 → 6장 → 7장(기술 카드)
       setHowto(howtoIdx + 1);
       J.sfx.ui();
     });
