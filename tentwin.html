@@ -2111,13 +2111,21 @@ button {
 .tile.fall { transition: transform 420ms cubic-bezier(.22, 1.4, .36, 1); }
 /* 전투: 판이 자라지 않으므로 스크롤을 잠그고, 낙하 체감은 FALL_MS 상수 대신
    여기서만 조인다 (.battle 클래스는 단계 4에서 켜진다).
-   ⚠ 잠금만 `.adv.battle` 로 좁혔다. 이 규칙의 전제는 클래스가 아니라 **"판이
-   자라지 않는다"** 인데, 아케이드 대전은 같은 .battle 을 켜면서도 러시 보드를
-   쓴다(무한 Add · 행 추가). 거기서 스크롤을 잠그면 Add 로 덧붙은 줄이 화면 밖에
-   숨은 채 데드락 판정에는 들어가는 — 이 파일이 가장 경계하는 종류의 결함이 된다.
-   모험은 언제나 .adv 와 .battle 을 함께 켜므로(advStart → duelStart) 동작 불변.
-   아래 낙하 속도는 연출이라 두 모드가 같이 써도 무해하다. */
-#app.adv.battle #board-scroll { overflow: hidden; }
+   🚨 정정(0823, 사용자 반려 3건: "타일이 너무 크다 · 매치하면 작아진다 ·
+   보드가 위아래로 드래그된다"). 위 문단이 `.adv.battle` 로 좁힌 전제 — "아케이드는
+   러시 보드를 쓴다" — 는 **폐기**됐다(battleBoard() 정정 주석). 이제 아케이드도
+   Add 가 없고 판이 자라지 않으므로, 이 규칙의 진짜 전제를 다시 만족한다.
+
+   ▣ 좁힌 한 줄이 반려 3건을 **전부** 낳았다(실측 390×740):
+       모험   overflow:hidden → 진입 --ts 49px, 첫 매치 뒤에도 49px
+       아케이드 overflow:auto  → 진입 --ts **53px**, 첫 매치 뒤 **49px**
+     스크롤이 열려 있으면 판이 컨테이너보다 커도 되므로 첫 계산이 한 단계 큰
+     타일을 고르고(= "너무 크다"), 스크롤이 생기고(= "드래그된다"), 첫 매치의
+     재계산에서 실제 높이로 줄어든다(= "작아지면서 비율이 바뀐다").
+     844 에서만 우연히 세 시점이 같아 상설 관문 d1 이 이것을 못 잡았다 —
+     그래서 이번에 관문의 검사 대상에 아케이드 3모드와 짧은 화면을 더했다.
+   롤백: `#app.adv.battle` 로 되돌린다. */
+#app.battle #board-scroll { overflow: hidden; }
 #app.battle .tile.fall { transition-duration: 300ms; }
 
 /* --- .rowflash : whole-row flash, works on tiles or on a bar element --- */
@@ -12522,19 +12530,78 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
   line-height: 1.45;
   color: rgba(78, 46, 66, .92);
 }
-/* 세 줄의 색. 클래식 세 줄과 같은 문법(면 그라데이션 + 외곽선 링)이고 색만 다르다 —
-   대전은 붉은 계열로 두어 "싸우는 종목"이라는 사실이 색으로 먼저 읽히게 한다. */
+/* 🚨 사용자 반려(0823) — "와 이 끔찍한 버튼은 뭐냐". 아래 세 줄은 **면
+   그라데이션 두 칸 + 3px 하드 링**이었다. 옆 창(#modal-classic)의 같은 자리는
+   이미 캔디 3중 그라디언트인데, 그 옆에 두면 대전만 납작한 사각형으로 읽힌다 —
+   W6.5b 가 클래식에서 이미 한 번 반려당한 것과 **글자 그대로 같은 결함**이다.
+
+   그래서 새로 그리지 않고 `#modal-classic .mode-list .mode-row` 의 **캔디
+   문법을 그대로 재사용**한다(발주 0 · 새 그림 0):
+     ① 상단 하드에지 스펙큘러 47%  ② 하단 바닥 밴드  ③ 딥 아웃라인 inset 1.5px
+     ④ 0 3px 0 드롭  ⑤ border-radius 12px · min-height 60px
+   바뀌는 것은 색이 아니라 **질감**이다 — 대전의 붉은 계열(주황·분홍·보라)은
+   한 톤도 안 옮겼다. 아이콘도 클래식이 쓰는 mode-ico-*.webp 세 장 그대로다.
+   롤백: 이 블록을 지우면 위 두 칸 그라데가 되살아난다. */
+#modal-arcade .mode-list .mode-row {
+  border-image: none;
+  border: 0;
+  border-radius: 12px;
+  padding: 9px 12px;
+  min-height: 60px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+}
+#modal-arcade .mode-list .mode-row:active { transform: translateY(2px); }
 #modal-arcade #arcrow-time {
-  background: linear-gradient(180deg, #FF9E7A 0%, #F0724F 62%, #D9552F 100%);
-  box-shadow: 0 3px 0 #8E3A1F, inset 0 0 0 3px #6F2E19;
+  background-color: transparent;
+  background-image:
+    linear-gradient(180deg, rgba(255,255,255,.44) 0%, rgba(255,255,255,.30) 44%, rgba(255,255,255,0) 47%),
+    linear-gradient(0deg, rgba(142,58,31,.30) 0%, rgba(142,58,31,0) 15%),
+    linear-gradient(180deg, #FFAE8B 0%, #EE6A46 100%);
+  box-shadow: 0 3px 0 rgba(142,58,31,.42), inset 0 0 0 1.5px rgba(184,78,42,.55),
+              inset 0 2px 0 rgba(255,255,255,.58);
 }
 #modal-arcade #arcrow-surv {
-  background: linear-gradient(180deg, #F58BB4 0%, #E4608F 62%, #C8446F 100%);
-  box-shadow: 0 3px 0 #8A2A4C, inset 0 0 0 3px #6E2039;
+  background-color: transparent;
+  background-image:
+    linear-gradient(180deg, rgba(255,255,255,.44) 0%, rgba(255,255,255,.30) 44%, rgba(255,255,255,0) 47%),
+    linear-gradient(0deg, rgba(138,42,76,.30) 0%, rgba(138,42,76,0) 15%),
+    linear-gradient(180deg, #F79BC0 0%, #DF5886 100%);
+  box-shadow: 0 3px 0 rgba(138,42,76,.42), inset 0 0 0 1.5px rgba(182,62,104,.55),
+              inset 0 2px 0 rgba(255,255,255,.58);
 }
 #modal-arcade #arcrow-dmg {
-  background: linear-gradient(180deg, #A98BF0 0%, #8A63DE 62%, #6F49C2 100%);
-  box-shadow: 0 3px 0 #4A2C8A, inset 0 0 0 3px #3A2270;
+  background-color: transparent;
+  background-image:
+    linear-gradient(180deg, rgba(255,255,255,.42) 0%, rgba(255,255,255,.30) 44%, rgba(255,255,255,0) 47%),
+    linear-gradient(0deg, rgba(74,44,138,.30) 0%, rgba(74,44,138,0) 15%),
+    linear-gradient(180deg, #B79AF6 0%, #8A63DE 100%);
+  box-shadow: 0 3px 0 rgba(74,44,138,.42), inset 0 0 0 1.5px rgba(106,72,178,.55),
+              inset 0 2px 0 rgba(255,255,255,.55);
+}
+/* 행 아이콘 — #modal-classic 이 쓰는 것과 **같은 세 장**이다(:12476 세 줄의
+   재사용). 선 글리프(--lib-glyph-*)는 이 판에서 젤리 체계 위반이라는 판정이
+   이미 났고, 그 판정은 시트가 달라도 그대로다. */
+#modal-arcade .nchip-arc::before  { background-image: url("catalog/mode-ico-arcade.webp"); }
+#modal-arcade .nchip-rush::before { background-image: url("catalog/mode-ico-rush.webp"); }
+#modal-arcade .nchip-day::before  { background-image: url("catalog/mode-ico-daily.webp"); }
+/* 🚨 background 단축 금지 — .nchip::before 가 background-image 로만 글리프를
+   얹으므로 덮으면 아이콘이 사라진다(#modal-classic 의 같은 주석과 같은 함정). */
+#modal-arcade .nchip {
+  background-color: transparent;
+  background-image: none;
+  box-shadow: none;
+  border-image: none;
+  border: 0;
+  width: 34px;
+  height: 34px;
+  overflow: visible;
+}
+#modal-arcade .nchip::before {
+  width: 32px;
+  height: 32px;
+  filter: drop-shadow(0 2px 0 rgba(110, 70, 58, .45));
 }
 #modal-arcade .mode-t > b,
 #modal-arcade .mode-b { color: #FFFFFF; text-shadow: 0 2px 0 rgba(110, 70, 58, .55); }
@@ -12543,35 +12610,103 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
   text-shadow: 0 1px 0 rgba(110, 70, 58, .45);
 }
 
-/* 진입 버튼 — `.mode-list` **밖**에 있어 스프라이트 규칙이 닿지 않는다. */
+/* 진입 버튼 — `.mode-list` **밖**에 있어 스프라이트 규칙이 닿지 않는다.
+
+   🚨 사용자 반려(0823) — "「아케이드 대전」만 혼자 주황 납작 사각형". 위 네 줄은
+   [아이콘][제목+한 줄][배지] 리듬의 젤리 행인데, 이 줄만 **가운데 정렬 텍스트
+   블록 + 3px 하드 링**이라 혼자 다른 계보로 읽혔다.
+
+   ▣ 두 길 중 이쪽을 고른 근거(적은 변경).
+     (가) 다섯을 통짜 그림 계보로 통일  → 다섯째 그림 **발주 1장**이 필요하다.
+          이 파도의 규율이 "새 에셋 발주·제작 금지"라 애초에 닫힌 길이다.
+     (나) 다섯을 CSS 캔디로 통일        → 위 네 줄의 base64 스프라이트 4개와
+          `.nchip/.mode-t/.mode-b{display:none !important}` 를 전부 덮어야 하고,
+          그러면 이미 통과한 네 줄의 그림을 통째로 버리는 것이며 규율의
+          "기존 행은 건드리지 마라"를 정면으로 어긴다(수정 4행 + 아이콘 4장).
+     (다) **이 줄 하나를 네 줄의 리듬에 맞춘다** → 고치는 선택자 1개, 마크업
+          1줄(칩 추가), 아이콘은 이미 있는 mode-ico-arcade.webp 재사용.
+   (다)가 압도적으로 적고, 합격 기준("다섯이 한 계보로 보이는가")을 똑같이
+   만족한다. 그림 계보와 CSS 계보가 **같은 골격·같은 리듬**을 쓰면 나란히 놔도
+   한 줄로 읽힌다는 것은 #modal-classic 이 이미 증명한 사실이다. */
 #modal-mode .arc-entry {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   width: 100%;
-  margin: 8px 0 0;
-  padding: 9px 12px;
+  margin: 2px 0 0;             /* 위 네 줄의 .mode-list gap(2px)과 같은 자 */
+  padding: 6px 12px;
+  min-height: 65px;            /* = 296 × 238/1076, 위 네 줄의 실측 높이 */
   border: 0;
-  border-radius: 14px;
-  background: linear-gradient(180deg, #FF9E7A 0%, #F0724F 62%, #D9552F 100%);
-  box-shadow: 0 3px 0 #8E3A1F, inset 0 0 0 3px #6F2E19;
+  border-radius: 12px;
+  /* #modal-classic .mode-row 와 **같은 캔디 3중 그라디언트**다(47% 하드에지
+     스펙큘러 + 바닥 밴드 + 면색). 색만 대전의 주황으로 변주한다. */
+  background-color: transparent;
+  background-image:
+    linear-gradient(180deg, rgba(255,255,255,.44) 0%, rgba(255,255,255,.30) 44%, rgba(255,255,255,0) 47%),
+    linear-gradient(0deg, rgba(142,58,31,.30) 0%, rgba(142,58,31,0) 15%),
+    linear-gradient(180deg, #FFAE8B 0%, #EE6A46 100%);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+  box-shadow: 0 3px 0 rgba(142,58,31,.42), inset 0 0 0 1.5px rgba(184,78,42,.55),
+              inset 0 2px 0 rgba(255,255,255,.58);
   color: #FFFFFF;
   font-family: var(--font-display);
-  text-align: center;
+  text-align: left;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
 #modal-mode .arc-entry:active { transform: translateY(2px); }
-#modal-mode .arc-entry > b {
+/* 아이콘은 클래식·허브가 쓰는 그 그림이다(발주 0). `.mode-list` 밖이라
+   스프라이트의 display:none 이 안 닿고, `#modal-mode .nchip`(:12300)이 칩
+   배경을 이미 걷어내 글리프만 남는다. */
+#modal-mode .arc-entry .nchip::before {
+  background-image: url("catalog/mode-ico-arcade.webp");
+}
+#modal-mode .arc-entry > .mode-t { flex: 1 1 auto; min-width: 0; }
+/* 글자 크기는 **위 네 줄에서 잰 값**이다. 그 넷은 aspect-ratio 1076/238 짜리
+   그림이라 폭 296px 에서 높이 65px 이고, 구워진 제목 글자가 그 안에서 19px 로
+   앉는다. 코드 줄이 16px/11.5px 이면 나란히 놨을 때 다섯째만 작아 보인다 —
+   합격 기준이 "한 계보로 보이는가"이므로 리듬을 같은 자로 맞춘다. */
+#modal-mode .arc-entry b {
   display: block;
-  font-size: 17px;
+  font-size: 18px;
   line-height: 1.2;
   text-shadow: 0 2px 0 rgba(110, 70, 58, .55);
 }
-#modal-mode .arc-entry > i {
+#modal-mode .arc-entry i {
   display: block;
   font-style: normal;
   font-size: 12px;
   line-height: 1.3;
   color: rgba(255, 255, 255, .94);
+  text-shadow: 0 1px 0 rgba(110, 70, 58, .45);
+}
+
+/* 🚨 사용자 반려(0823) — "저거 플레이 판 겹치는 거 일부러 저런 거야?".
+   「플레이」 명판이 Ten Twin 로고를 덮는다.
+
+   실측(390×844, 헤드리스):
+     로고 .logo-img   y 120 → 258
+     리본 .r10-ribbon y 191 → 271        겹침 **67px**
+     시트 .sheet      y 206 → 638 (높이 432), 뷰포트 844 → 아래로 206px 이 남는다
+   즉 시트가 화면에 안 들어가서 밀린 것이 **아니다**. `.modal` 은
+   `align-items:center` 라 시트를 세로 정중앙에 놓는데, 리본은 `margin:-32px` 로
+   판 위로 걸터앉는 부품이라 **판이 커질수록 리본이 위로 올라간다**. 다섯째 줄
+   (60px + 6px)이 붙으면서 시트 상단이 33px 올라갔고, 그만큼 리본이 로고 안으로
+   들어갔다(다섯째 줄 전에도 34px 겹쳐 있었다 — 이번에 두 배가 됐을 뿐이다).
+
+   그래서 고치는 자리는 행 높이가 아니라 **시트의 세로 앵커**다. 남는 206px 중
+   75px 을 아래로 옮기면 리본 상단이 266 이 되어 로고 아래 8px 여백이 선다.
+   `align-items:center` 를 그대로 두고 위쪽 패딩만 더하는 것이 요점이다 —
+   그래야 짧은 화면(640·740)에서는 패딩이 자동으로 잡아먹히며 다시 가운데로
+   돌아가고, 시트가 화면 밖으로 나가는 일이 없다. 계산: top = (p + 412) / 2.
+   ⚠ `#modal-mode` 한 창에만 건다. 같은 `.r10m` 인 #modal-classic·#modal-node 는
+     리본이 더 낮은 자리에 떠서 로고와 애초에 안 겹친다(실측). */
+#modal-mode.modal {
+  /* 실측 보정: 150px 은 리본 상단 257(로고 바닥 258)로 1px 모자랐다. 패딩 1px 이
+     시트를 0.5px 내리므로(중앙정렬) 20px 을 더해 리본 267 · 여백 9px 로 앉힌다. */
+  padding-top: calc(var(--safe-t) + 170px);
 }
 
 /* ===== 결과 시트 — 가독성이 스타일을 이긴다 ==============================
@@ -15063,8 +15198,11 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
          에만 걸려 있다는 사실을 이용해, **.mode-list 밖·다른 클래스**로 앉힌다.
          그러면 그림 규칙이 한 줄도 닿지 않고 코드 텍스트 라벨이 그대로 산다.
          기존 네 줄의 마크업·위치·크기는 한 글자도 안 바뀐다. -->
+    <!-- 🚨 0823 — 위 네 줄의 [칩][제목+한 줄] 리듬을 그대로 받는다. 칩 한 개가
+         더해진 것이 마크업 변경의 전부이고, 위 네 줄은 한 글자도 안 바뀐다. -->
     <button id="mode-arcduel" class="arc-entry" type="button">
-      <b data-i18n="arc.hub">Arcade Duel</b><i data-i18n="arc.hub.d">Three ways to fight a villain.</i>
+      <span class="nchip nchip-arc" aria-hidden="true"></span>
+      <span class="mode-t"><b data-i18n="arc.hub">Arcade Duel</b><i data-i18n="arc.hub.d">Three ways to fight a villain.</i></span>
     </button>
   </div></div>
 
@@ -29520,8 +29658,15 @@ window.TT_SFX = {
     arcDuelInit();
     closeAllModals();
     showScreen('screen-game');
-    layout();
     duelStart(null);           // .battle · HUD 마운트 · 벽시계 출발 (모험과 같은 함수)
+    /* 🚨 순서 정정(0823, 사용자 반려 "매치하면 타일 크기가 작아지면서 비율이
+       바뀐다"). 종전에는 `layout(); duelStart();` 였다. duelStart 는 **124px 짜리
+       #duel-hud 를 마운트**하므로, 그 앞에서 잰 layout() 은 아직 없는 HUD 만큼
+       넓은 판을 보고 타일을 한 단계 크게 고른다(실측 390×740: 53px). 그 뒤로
+       layout() 을 다시 부르는 것은 **첫 매치**뿐이라, 그때 49px 로 줄면서 판이
+       흔들렸다 — D1 이 세 번 잡았던 그 결함의 네 번째 얼굴이다.
+       HUD 가 선 **뒤에** 재는 한 줄이 그 길을 닫는다. 모험은 원래 이 순서다. */
+    layout();
     syncRushHud();
     startRushLoop();
   }
@@ -43971,7 +44116,24 @@ html[lang="ko"] #modal-mode .r10-ribbon > h2{
 #modal-classic .r10-ribbon,
 #charpanel #cp-h{
   --cap-h:80px;
-  --cap-a:#F2EAF2; --cap-b:#DCCFE0; --cap-drop:#A896AE; --cap-band:#CBBAD1;
+  /* 🚨 사용자 반려(0823) — "버튼 흰색 고체 젤리가 됐다? 투명 캡슐 젤리가 돼야 해".
+     이 블록이 비트맵을 코드로 갈면서 `--kit-cap--glass` 의 **불투명** 두 톤
+     (#F2EAF2 / #DCCFE0)을 그대로 들고 왔다. 킷 갤러리에서는 맞는 값이다 —
+     거기 캡슐은 흰 판 위에 홀로 서 있으니까. 그러나 게임의 명판 14자리는
+     **판·보드 위에 얹히는 유리**라, 불투명하면 뒤가 죽고 "고체"로 읽힌다.
+
+     새 값은 짐작이 아니라 이 자리가 원래 쓰던 그림 catalog/glass-capsule-v4.webp
+     의 **실측**이다(733×286, 중앙 밴드 표본):
+       상단부 y20%  rgb(196,209,234) a=.20    하단부 y50%  rgb(187,204,234) a=.13
+       바닥 밴드 y85% rgb(200,205,233) a=.27
+     여기에 47% 하드에지 문법을 유지하려고 두 톤으로 정리했다. 알파를 실측보다
+     조금 올린 것은 코드판에는 그림의 캡(양끝 a≈.88)이 없어 몸통 혼자 유리를
+     설명해야 하기 때문이다.
+     ⚠ 곡률·상자 기하·아웃라인·드롭은 **한 톨도 안 바꾼다** — 반려는 "투과율"
+       하나였고, 직전 파도가 답한 반려("림이 가늘고 탁하다")를 되살리면 안 된다.
+     롤백: 아래 세 줄을 #F2EAF2 / #DCCFE0 / #CBBAD1 로 되돌린다. */
+  --cap-a:rgba(201,213,237,.34); --cap-b:rgba(187,204,234,.22);
+  --cap-drop:#A896AE; --cap-band:rgba(172,190,227,.44);
   --cap-edge:var(--j-outline,#6E463A);
   --cap-s:.874;
   --jelly-h:80px; --jelly-s:.874; --jelly-spec:0;
@@ -44050,6 +44212,36 @@ html[lang="ko"] #charpanel #cp-h::after{
   background-repeat:no-repeat;
   background-position:center center;
   background-size:auto 44%;
+}
+/* 🚨 사용자 반려(0823) — "캐릭터 선택 창 ... 캐릭터 글자 없앤 것도 일부러 그런
+   거야?". 14자리 중 **#charpanel 한 자리만** 레터링이 사라졌고, 원인은 위 두
+   블록이 아니라 :8035 의 **옛 리본 노치**다:
+
+     .cp-head h2::before, .cp-head h2::after {
+       content:''; position:absolute; top:50%;
+       width:13px; height:22px; margin-top:-11px;   ← 이 세 줄
+       background-image:linear-gradient(...); box-shadow:0 0 0 3px var(--j-outline); }
+
+   위 블록들은 `inset:0` 만 준다. inset 은 top/right/bottom/left 를 0 으로
+   놓을 뿐이고, **width/height 가 함께 지정되면 그쪽이 이긴다** — 그래서
+   #cp-h 의 레터링 ::after 는 13×22px 상자가 되고, 그 안에서
+   `background-size:auto 44%` 는 9.7px 짜리 글자를 13px 폭에 잘라 넣어
+   사실상 안 보인다. 젤리 오버레이 ::before 도 같은 이유로 13×22 였다.
+   나머지 13자리는 `.sheet > h2` / `.r10-ribbon` 이라 이 규칙에 안 걸린다 —
+   그래서 딱 한 자리만 비어 보였다.
+
+   고치는 법은 **크기를 되돌려 놓는 것**뿐이다. 노치 규칙 자체는 :8649 가 이미
+   `content:none` 으로 껐으므로 지우지 않는다(되돌릴 근거로 남는다).
+   box-shadow 는 ::after 에서만 끈다 — ::before 의 그림자는 젤리 오버레이의
+   본체라 끄면 림이 통째로 사라진다. */
+#charpanel #cp-h::before,
+html[lang="ko"] #charpanel #cp-h::after{
+  width:auto; height:auto; margin:0;
+}
+html[lang="ko"] #charpanel #cp-h::after{
+  background-color:transparent;
+  box-shadow:none;
+  border-radius:inherit;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
