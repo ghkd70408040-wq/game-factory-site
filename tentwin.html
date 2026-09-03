@@ -14684,7 +14684,16 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
     <p class="big-score"><b id="adv-score">0</b></p>
     <p id="adv-note" class="sub-score"></p>
     <p id="adv-hearts" class="adv-hearts"></p>
-    <button id="adv-again" class="btn btn-primary" data-n="1">Next stage</button>
+    <!-- [G-0903] 정적 라벨이 ko 회차에서도 영문 「Next stage」로 떴다(REPAIR-LOG 45절 3항
+         곁다리 발견). 값은 advResult 가 t('adv.next') / t('adv.retry') 로 넣지만, 결과창이
+         한 번도 안 열린 상태에서는 이 마크업 리터럴이 그대로 보인다 - 그래서 키를 단다.
+         키는 이 버튼이 «이길 때» 쓰는 그 키(adv.next)와 같게 맞춘다(대칭 검사).
+         ⚠ ko 정본값은 '다음 탄' 이다. '다음 단계'는 클리어창 #btn-next 가 쓰는 **다른**
+         키(clear.next)의 값이므로 여기 끌어오지 않았다 - 키를 바꾸면 결과창이 열린 뒤의
+         런타임 라벨과 갈라진다.
+         ⚠ 진 판에서 언어를 바꾸면 applyI18n 이 이 자리를 adv.next 로 되돌린다. 설정창은
+         결과창 위에서 못 열리므로 지금 경로에서는 도달 불가다. -->
+    <button id="adv-again" class="btn btn-primary" data-n="1" data-i18n="adv.next">Next stage</button>
     <button id="adv-map" class="btn btn-ghost" data-i18n="adv.map">Map</button>
   </div></div>
 
@@ -41496,6 +41505,17 @@ window.TT_SFX = {
       cpShow(parseInt(el.getAttribute('data-i'), 10) || 0);
       J.sfx.ui();
     });
+    /* [H-0903] 아래 다섯 줄은 **은퇴한 배선**이다 - 다섯 id 가 마크업에 없다.
+       실측: 현행 `id="btn-howto|btn-sound|btn-vibe|btn-theme|btn-lang"` 각 **0건** ·
+       배포본(scratchpad/deployed-ref/tentwin.deployed.html)도 다섯 다 **0건** ·
+       시안 S10(tentwin/assets/sian-src/메인화면, 버튼.png)의 메뉴도
+       [게임을 시작 · 새로운 모험 · 이어하기 · 설정] 넉 줄뿐이라 «게임 방법» 줄이 없다.
+       => 배포본에도 시안에도 없던 것이므로 **복원하지 않는다**. 10차 C·E 가 그 다섯을
+       설정창 안으로 옮기면서 마크업만 지우고 이 배선을 남긴 것이 고아의 정체다.
+       on() 은 el 이 없으면 아무 것도 안 한다(같은 파일 function on 정의) - 고장도
+       콘솔 오류도 없다. 지우지 않는 이유: 마크업이 다시 서면 그날 그대로 값을 한다.
+       지금 살아 있는 입구 - 게임 방법 = #st-howto · #pz-howto / 소리·진동·테마·언어
+       = 설정창 .set-tg 넷. */
     on($('btn-howto'), 'click', function () { openHowto(false); });
     on($('btn-sound'), 'click', toggleSound);
     on($('btn-vibe'), 'click', toggleVibe);
