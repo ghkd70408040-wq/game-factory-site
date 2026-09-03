@@ -49491,6 +49491,12 @@ body:has(.modal:not([hidden])) #screen-menu .mbtn-lab{
   opacity: 0;
 }
 
+/* C안(블러 강, 0904) — 모달이 열리면 뒤 화면만 blur(6px). 모달은 #screen-* 밖 형제라 흐려지지 않는다.
+   기존 스크림·backdrop-filter는 무접촉. :has() 미지원 엔진은 선상무변. */
+#screen-menu, #screen-map { transition: filter 160ms var(--ease); }
+body:has(.modal:not([hidden])) #screen-menu,
+body:has(.modal:not([hidden])) #screen-map { filter: blur(6px); }
+
 /* ---- 1. 판 = kit-frame-v2 ------------------------------------------------ */
 .modal-v2 .mv2-sheet {
   box-sizing: border-box;
