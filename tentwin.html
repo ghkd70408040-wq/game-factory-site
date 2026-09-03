@@ -55803,6 +55803,12 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
   --wcap-glow-c:  #C2BCC3;
   /* [A5] 그림층 좌우 자 — 같은 13.18 % 를 «캡슐 폭» 기준으로 준다 */
   --ttl-pad: 13.18%;
+  /* ④ (0904) 제목 그림을 나머지 14창과 같은 규칙(아래 generic ::after = contain
+     + --ttl-s .880)에 넣었다. chars-ko.webp 잉크비 0.740 ≈ play-ko 0.745 라
+     같은 ttl-s .880 이면 글자/캡슐 비가 자동으로 통일된다(charsel .651 ≈ play .656,
+     Δ.005). 종전 `auto 88%` 는 좁은 뷰포트에서 폭이 캡슐을 넘어 「가로로 눌린」
+     찌부로 보였는데 contain 은 정의상 폭·세로 어느 쪽도 넘지 않는다. ttl-s 는
+     기본값(.880)을 그대로 쓴다 — 별도 지정 없음. */
   align-self: center;
   width:  var(--wcap-w);
   height: var(--wcap-h);
@@ -56022,7 +56028,13 @@ html[lang="en"] #modal-arc.is-arcdmg .sheet > h2{ --ttl:url("catalog/ttl-arcdmg-
 #modal-arc.is-arcsurv .sheet > h2::after,
 #modal-arc.is-arcdmg .sheet > h2::after,
 #modal-mode .r10-ribbon::after,
-#modal-classic .r10-ribbon::after{
+#modal-classic .r10-ribbon::after,
+/* ④ (0904) 캐릭터 선택 제목도 나머지 14창과 **같은 규칙**으로 — 종전 charsel 은
+   #cp-h::after 가 `auto 88%` 라 글자가 캡슐 세로 82.3% 를 채워 「가로로 눌려
+   들어간」(찌부) 상태였다. 여기 넣으면 contain + --ttl-s .880 이 되어 플레이
+   모달과 같은 글자/캡슐 비 0.64 로 통일된다(webp 비율 보존·찌부 0).
+   특정도 2-id 라 위 #charpanel .cp-head h2::after 의 auto 88% 를 덮는다. */
+#charpanel .cp-head > #cp-h::after{
   content:''; position:absolute; z-index:3; pointer-events:none;
   top:calc(50% * (1 - var(--ttl-s, .880)));
   bottom:calc(50% * (1 - var(--ttl-s, .880)));
