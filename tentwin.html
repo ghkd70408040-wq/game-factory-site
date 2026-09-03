@@ -52871,7 +52871,32 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
   --wcap-Y1:  calc(100% - var(--wcap-L0-bx));
 
   /* ---- [L1] 색 · [L1.5] 비침 ---- */
-  --wcap-face: #BEBEE4; --wcap-face-top: #D4DCF7; --wcap-face-y: 100%; --wcap-rim-c: #D0DBF1;
+  /* [E52-0903 - S9 정본 - 캡슐 색 계열 통일] 지시서 ②: 「.wf-cap 은 한 부품이다
+     (HUD 타이머 캡슐 + 모달 제목 캡슐). 색·재질은 S9 와 같은 개념으로 - 무색 유백 유리 .
+     얇은 옅은 겉선 . 가는 흰 림 . 같은 광 문법. 캡슐만 분홍/자두로 가는 별개 색 계열은 금지.」
+     착수 전 이 부품은 **계열이 둘**이었다 - HUD 는 푸른 회청(#8286B4 / #D0DBF1 / #96BDC9),
+     제목은 자두(#AA6FA2 / #EDC6EF / #D9ACD8). 둘 다 S9 실측 한 벌로 모은다.
+     S9 실측(scratchpad/s9-0903/s9_colors.json . 판 폭 W=897 . 좌·우 변 표본 860쌍.
+     위 변은 로고, 아래 변은 접지가 섞여 뺐다):
+       겉선(L3)  T(겉선 골) = a.C + (1-a).U(바깥 배경 d=-14)
+                 a **0.5742** . 재료색 **#76547A** (117.6, 83.8, 121.6)
+                 잔차 dRGB p50 7.32 / p90 14.53 . corr 0.71 . 폭 FWHM 6px = 0.669%W
+       림(L2-1)  T(림 봉우리 d=+7) = a.C + (1-a).U(판 속 d=+70)
+                 a 0.6974 . 재료색 **#E3D8DF** (227.1, 216.0, 223.5) . 크로마 11.1
+                 잔차 dRGB p50 14.45 . corr **0.33** . 폭 FWHM 8px = 0.892%W
+       림 안쪽 띠 합성색 **#C2BCC3** (193.9, 188.2, 195.3) . 크로마 7.1
+       판 속 깊은 곳 합성색 **#B9BCC4** (185.3, 187.8, 196.2) . 크로마 10.9
+     ⚠ 안 옮긴 것 하나 - **--wcap-rim-a 는 0.5500 그대로 둔다**. S9 림 알파 0.6974 는
+       corr 0.33 . 잔차 14.45 로 신뢰구간이 나쁘고(림 봉우리 밑의 판 값이 거의 안 변해
+       기울기가 안 선다), 위 [E29-0903] 이 「시안의 가장 밝은 안쪽 띠는 면 대비 dL* +13
+       뿐」이라는 **다른 실측**으로 이미 .55 로 내려 둔 자리다. 색만 옮기고 세기는 둔다.
+     ⚠ 접지 그림자는 이 부품에 **0** 이다(부품 계약 그대로 - 선언 자체가 없다).
+     ⚠ 폭·기하는 한 자리도 안 건드렸다(2영역 규칙 영역 B).
+     되돌리기: 아래 네 값을 #BEBEE4 / #D4DCF7 / 100% / #D0DBF1 로 되돌린다. */
+  /* face / face-top 은 --wcap-a-in 0 . --wcap-a-fill 0 . --wcap-haze 0 이라 지금
+     **화소를 0개 칠한다**. 그래도 S9 값으로 옮긴다 - 훗날 면을 켜면 계열이 갈리기 때문이다.
+     이 두 줄의 실화면 dRGB 는 0 이다(그렇게 보고한다). */
+  --wcap-face: #B9BCC4; --wcap-face-top: #C2BCC3; --wcap-face-y: 100%; --wcap-rim-c: #E3D8DF;
   --wcap-a-fill: 0;        /* 색 바탕 없음 = 맑은 유리 (시안) */
   /* [E17-0903 · 재질층 §3] 캡슐 판 α .010 -> **.622** (zoneb_hud · 흩어짐 .03).
      hud 판 위에 얹힌 자기 층의 α 이고 맨 장면 대비 실효는 .87 이다. */
@@ -52898,7 +52923,10 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
        부품 폭 대비 CV 60%. 그래서 --f2-ref-w(캔버스 자)에 매단다.
        띠 두 값은 alpha(d)=0.90*(1-d/D)^1.7 에 최소자승으로 맞춘 것이다
        (spread=0.307246 D · blur=0.624734 D · rmse 0.0144). */
-  --wcap-glow-c: #96BDC9;   /* 글로 면색 — 시안 캡슐 d6..19 실측 (150,190,201) */
+  /* [E52-0903 - S9] 글로 면색. 옛 값 #96BDC9 (시안 캡슐 d6..19 실측 150,190,201 - 청록).
+     S9 의 같은 자리(림 바로 안쪽 띠)는 #C2BCC3 (193.9, 188.2, 195.3) 로 **거의 무채**다.
+     되돌리기: 아래 한 줄을 #96BDC9 로 바꾼다. */
+  --wcap-glow-c: #C2BCC3;
   --wcap-band-w: calc(var(--f2-ref-w) * 0.027739);   /* 글로 번짐 (도달 D 34.1 시안px) */
   --wcap-band-s: calc(var(--f2-ref-w) * 0.013642);   /* 글로 퍼짐 */
   --wcap-haze: 0;
@@ -52934,7 +52962,10 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
   /* ---- [L2-4] 접지 그림자 — 정본 캡슐은 --wf-L2d: 0 (없다) ---- */
   /* ---- [L3] 외곽선 ---- */
   --wcap-L3-w: calc(var(--f2-ref-w) * 0.00400);
-  --wcap-L3-a: .700;
+  /* [E52-0903 - S9] 겉선 알파 .700 -> **.574** (S9 좌·우 변 실측 a 0.5742 .
+     잔차 dRGB p50 7.32 . corr 0.71). 「얇은 옅은 겉선」의 «옅은» 이 이 값이다.
+     되돌리기: .700 */
+  --wcap-L3-a: .574;
   /* 겉선 **재료색** — 시안 59a8eccc 실측이 정한다.
      정본 중간부는 #9B4697(자두빛)인데 그 값은 「모달 판(민무늬 라벤더) 위에서
      합성이 시안과 같아지는 재료색」을 역산한 것이라(그 절의 판정 2 주석) 배경이
@@ -52947,7 +52978,9 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
      그 값을 쓴다 — 두 자(시안 실측 · 정본 최신 맞춤)가 같은 답을 준다.
      겉선 두께도 함께 확인: 시안 어두운 골 x4~10 = 7px / 캡슐 폭 736 = 0.95%W
      (우리 --wcap-L3-w 1.00%W). 림은 x11~18 = 1.09%W (우리 시작 1.00 + 폭 0.83). */
-  --wcap-L3-line: #8286B4;
+  /* [E52-0903 - S9] 겉선 재료색 #8286B4 (푸른 회청) -> **#76547A** (S9 실측 117.6,83.8,121.6).
+     되돌리기: #8286B4 */
+  --wcap-L3-line: #76547A;
   --wcap-L3-blur: calc(var(--wcap-L3-w) * 0.28);
 
   position: relative;
@@ -54365,7 +54398,10 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
 #duel-hud > .dh-low > .dl-jelly{ --dlj-L3-line: #7276B8; --dlj-face: #8DA6E6; --dlj-face-top: #B0C7FE; --dlj-face-y: 100%; --dlj-rim-c: #B0C7FE; }
 #classic-hud .ch-fx > .ch-jelly,
 #app.classic #classic-hud .ch-fx > .ch-jelly{ --chj-L3-line: #6F6BB4; --chj-face: #92A5DF; --chj-face-top: #92A5DF; --chj-face-y: 100%; --chj-rim-c: #BFCBFA; }
-.wf-cap{ --wcap-L3-line: #8286B4; --wcap-face: #BEBEE4; --wcap-face-top: #D4DCF7; --wcap-face-y: 100%; --wcap-rim-c: #D0DBF1; }
+/* [E52-0903 - S9] 이 줄은 [W7-0901] 이 「푸른 회청」계열로 세운 자리다. S9 정본이
+   그 위에 오므로 같은 네 값을 S9 로 옮긴다(위 부품 기준 블록과 **같은 값**).
+   되돌리기: .wf-cap{ --wcap-L3-line: #8286B4; --wcap-face: #BEBEE4; --wcap-face-top: #D4DCF7; --wcap-face-y: 100%; --wcap-rim-c: #D0DBF1; } */
+.wf-cap{ --wcap-L3-line: #76547A; --wcap-face: #B9BCC4; --wcap-face-top: #C2BCC3; --wcap-face-y: 100%; --wcap-rim-c: #E3D8DF; }
 .wf-chip{ --wchip-L3-line: #685568; }
 #charpanel .cp-crystal{ --wslot-L3-line: #6C4A72; }
 
@@ -55520,9 +55556,17 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
   /* 색만 테마 분기. 면(--wcap-a-fill/-a-in/--wcap-milk-a)은 부품 계약대로 전부 0 —
      ㊳ 「면 제거」가 두 자리에 똑같이 걸린다. 글로 색은 HUD 가 제 림·겉선을
      7:3 으로 섞은 값이라 제목 색으로 같은 비율을 옮겼다. */
-  --wcap-L3-line: #AA6FA2;   /* 시안 제목 겉선 (170,111,162) */
-  --wcap-rim-c:   #EDC6EF;   /* 시안 제목 속 림 (237,198,239) */
-  --wcap-glow-c:  #D9ACD8;
+  /* [E52-0903 - S9] 제목 캡슐의 «자두» 세 값을 걷는다. 지시서 ②: 「캡슐만 분홍/자두로
+     가는 별개 색 계열은 금지 . .wf-cap 은 한 부품이다」. 값은 HUD 캡슐과 **같은 S9 실측**
+     한 벌이다(위 부품 기준 블록 참조). 기하·글자(--wcap-h . --ttl-pad . --ttl-s)는
+     한 자리도 안 건드렸다.
+     되돌리기(옛 자두 세 값):
+       --wcap-L3-line: #AA6FA2;   시안 제목 겉선 (170,111,162)
+       --wcap-rim-c:   #EDC6EF;   시안 제목 속 림 (237,198,239)
+       --wcap-glow-c:  #D9ACD8; */
+  --wcap-L3-line: #76547A;
+  --wcap-rim-c:   #E3D8DF;
+  --wcap-glow-c:  #C2BCC3;
   /* [A5] 그림층 좌우 자 — 같은 13.18 % 를 «캡슐 폭» 기준으로 준다 */
   --ttl-pad: 13.18%;
   align-self: center;
