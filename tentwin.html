@@ -2802,6 +2802,10 @@ li.roll-in { animation: rollin 380ms var(--spring) backwards; }
   display: flex;
   flex-direction: column;
   align-items: center;
+  /* ⑱ — 반려 「판 중앙 절반이 빈 공간」. 트랙은 flex-row 라 일곱 패널이 모두
+     제일 긴 패널(전투 4버튼) 높이로 늘어나고, 짧은 패널은 내용이 위로 몰려
+     아래가 휑했다. 세로 가운데 정렬로 카드가 판 중앙에 앉는다. */
+  justify-content: center;
   gap: 12px;
   padding: 4px 6px 2px;
 }
@@ -2814,6 +2818,59 @@ li.roll-in { animation: rollin 380ms var(--spring) backwards; }
   box-shadow: inset 0 0 0 1px var(--line);
 }
 .howto-art svg { display: block; width: 100%; height: auto; overflow: visible; }
+
+/* ── ⑱ 게임 방법 안쪽 젤리 카드 ─────────────────────────────────────────────
+   반려(사용자 실기기 c1cee6cb): 규칙 글이 무색 젤리판(S9) 위 맨글자로 떠서
+   배경과 섞여 안 읽혔다 — 라이트 테마에서 `.howto-art` 배경이 rgba(34,27,46,.04)
+   = 사실상 투명이었기 때문이다(:3203/:3400). 캐릭터 선택창 [패시브 스킬]
+   카드(#charpanel .ci-desc.kit-box-v2)와 **같은 층 어휘·같은 계열 값**의 안쪽
+   카드를 깔아 글·그림이 읽히는 면을 만든다.
+     · 봉인값 출처: 커밋 58511ae(정보판·설명상자 젤리 투명 복원) +
+       #charpanel 토큰(--cs-desc-box / .kit-box-v2).
+     · 그 카드는 #charpanel 스코프라 여기로 **상속되지 않는다**. 그래서 값을 이
+       여섯 변수에 **거울**로 둔다 — wave/cscard 에서 S5 실측으로 그 카드가
+       바뀌면 이 블록 한 곳만 맞추면 된다(카드 값을 직접 안 박는 유일한 이유).
+   특정도: `#modal-howto .howto-art` (1,1,0) 이 테마 오버라이드(:where … .howto-art
+   = 0,1,0)를 순서와 무관하게 이겨서 세 테마(다크/라이트auto/라이트강제)를 한
+   규칙으로 덮는다. -------------------------------------------------------------- */
+#modal-howto{
+  --hcard-fill:   #E2D7D7;                /* = --cs-desc-box   (설명상자 면색) */
+  --hcard-fill-2: #E2D7D7;                /* = --cs-desc-box-2 */
+  --hcard-line:   rgba(140,116,146,.60);  /* = .kit-box-v2 겉선 */
+  --hcard-rim:    rgba(255,255,255,.55);  /* = .kit-box-v2::after 안쪽 흰 림 */
+  --hcard-lo:     rgba(0,0,0,.07);         /* = .kit-box-v2::after 밑동 그림자 */
+  --hcard-r:      18px;                     /* 코너 (.kit-box-v2 = .0354×판폭) */
+}
+#modal-howto .howto-art{
+  position: relative;
+  border-radius: var(--hcard-r);
+  border: 1.5px solid var(--hcard-line);
+  background: linear-gradient(180deg, var(--hcard-fill), var(--hcard-fill-2));
+  box-shadow: none;
+}
+#modal-howto .howto-art::after{
+  content:""; position:absolute; inset:0;
+  border-radius: inherit; pointer-events:none;
+  box-shadow: inset 0 0 0 1.5px var(--hcard-rim),
+              inset 0 -2px 0 var(--hcard-lo);
+}
+/* 개념 5장(p1~p5)의 규칙 글도 판이 아니라 **카드 위**에 올린다. S9 판은 무색
+   유리라 판 위 맨글자는 반려 대상이다. 캡션마다 같은 젤리 카드를 깔고 잉크를
+   가장 어두운 본문 잉크(--ink)로 둔다. `> p` = 패널 직계 캡션만(규칙 카드 안의
+   .rules-note 는 이미 카드 안이라 무접촉). */
+#modal-howto .howto-panel > p{
+  position: relative;
+  align-self: stretch;
+  margin: 0;
+  padding: 9px 12px;
+  border: 1.5px solid var(--hcard-line);
+  border-radius: var(--hcard-r);
+  background: linear-gradient(180deg, var(--hcard-fill), var(--hcard-fill-2));
+  box-shadow: inset 0 0 0 1.5px var(--hcard-rim), inset 0 -2px 0 var(--hcard-lo);
+  color: var(--ink);
+  min-height: 0;
+}
+#modal-howto .howto-panel > p b{ color: var(--ink); }
 
 /* ---- 14차 #34 — 규칙 요약 카드 (도움말 1장) --------------------------------
    조각을 하나도 새로 들이지 않는다. 껍데기는 바로 위 .howto-art (어두운 인셋 판 +
