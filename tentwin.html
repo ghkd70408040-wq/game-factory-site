@@ -8921,8 +8921,11 @@ html.no-art-logo .logo-img  { display: none; }
      14차 주석이 말한 "썸네일마다 회청색 링"의 원인 자체가 없어진 자리다. */
   inset: 0;
   background-image: var(--char-thumb, none);
-  background-size: cover;
-  background-position: center;
+  /* ⑭ (0904) 얼굴 크기 통일 — 자산별 얼굴 bbox 메타(아래 #charpanel .cp-th.ch-<id>
+     블록)를 읽어 **방울 안 그림의 배율·위치만** 조정한다. 값이 없으면(스킨 폴백 등)
+     종전 cover/center 로 되돌아간다. 방울 상자(.cp-th) 크기·테두리 무접촉. */
+  background-size: var(--face-s, cover);
+  background-position: var(--face-x, 50%) var(--face-y, 50%);
   background-repeat: no-repeat;
 }
 /* 표준 썸네일이 없는 캐릭터는 SVG 폴백이 액자를 채운다 — 회색 빈칸 금지(§9-4). */
@@ -48251,7 +48254,10 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   position: absolute;
   inset: 6%;
   border-radius: 50%;
-  background: var(--char-thumb, none) center / cover no-repeat;
+  /* ⑭ (0904) 방울 안 그림의 배율·위치 = 자산 얼굴 bbox 메타(#charpanel .cp-th.ch-<id>).
+     상자(inset·지름·테두리)는 그대로 — 그림만 얼굴폭/방울지름을 한 값으로 맞춘다.
+     값 없으면 종전 center/cover(펫 cc-art·폴백). */
+  background: var(--char-thumb, none) var(--face-x, 50%) var(--face-y, 50%) / var(--face-s, cover) no-repeat;
   z-index: 1;
 }
 #charpanel .cp-th .cav,
@@ -49204,7 +49210,7 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
      ·같은 규칙(center / cover). 캐릭별 예외 없이 다섯이 한 규칙으로 잘린다.
      face 는 폴백으로만 남긴다. (applySkins 가 이 칩에 --char-thumb 를 심는다) */
   background:
-    var(--char-thumb, var(--char-face, none)) center / cover no-repeat,
+    var(--char-thumb, var(--char-face, none)) var(--face-x, 50%) var(--face-y, 50%) / var(--face-s, cover) no-repeat,
     var(--f2-slot);
   overflow: hidden;
   /* ① S5(ead03bb6) 실측 — 칩은 알약 위로 솟은 볼록 젤리 블록이다(홈 아님).
@@ -49565,6 +49571,26 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
 #charpanel .cs-bar.kit-gauge-v2 {
   box-shadow: 0 calc(var(--f2-gh) * .07) 0 rgba(255, 255, 255, .22);
 }
+
+/* ---- ⑭ (0904) 초상 얼굴 크기 통일 — 자산 얼굴 bbox 메타 -------------------
+   5개 thumb 자산은 168² 프레임 안에서 얼굴 크기·위치가 제각각이라(자산 실측:
+   얼굴폭/자산폭 = 텐텐 .452 · 곰 .458 · 젤리 .369 · 푸딩 .494 · 소다 .333) 같은
+   cover/center 로 깔면 방울마다 얼굴이 다른 크기로 읽혔다(텐텐 작고 곰·푸딩 큼).
+   캐릭별 디자인 예외가 아니라 **자산 메타 보정**이다:
+   · 얼굴 oval bbox 를 PIL 로 한 번 실측 → scratchpad/cscard-0904/face-bbox.json
+     (얼굴 = 눈·코·입·볼·이마·턱의 정면 얼굴 타원. 귀·왕관·모자·머리·몸통 제외).
+   · 방울 지름 대비 얼굴 폭을 **한 값 0.55** 로 통일(S5 방울 실측: 곰 0.68·왕자
+     0.78·토끼 0.47 의 통일 대표값 — 과크롭으로 정체성 잃지 않는 선).
+   · --face-s = background-size %(= 100·0.55/얼굴폭프랙) · --face-x/y =
+     얼굴 중심을 방울 중앙(50%,50%)에 놓는 background-position %.
+   상단 방울(.ct-art)과 하단 칩(.ci-chip)이 **같은 메타**를 읽는다(둘 다 .ch-<id>
+   를 달고 있고, 두 소비 규칙이 var(--face-*) 로 이 값을 읽는다). 스킨 crop 은
+   자기 규칙(.cp-th[data-art="crop"] .ct-art)이 배율·위치를 다시 못박으므로 무영향. */
+#charpanel .cp-th.ch-ten,       #charpanel .ci-chip.ch-ten       { --face-s: 121.6%; --face-x:  53.4%; --face-y: 157.3%; }
+#charpanel .cp-th.ch-twin,      #charpanel .ci-chip.ch-twin      { --face-s: 120.0%; --face-x:  55.4%; --face-y:  85.7%; }
+#charpanel .cp-th.ch-jelly,     #charpanel .ci-chip.ch-jelly     { --face-s: 149.0%; --face-x:  75.3%; --face-y: 122.4%; }
+#charpanel .cp-th.ch-pudding,   #charpanel .ci-chip.ch-pudding   { --face-s: 111.3%; --face-x: 123.1%; --face-y: 257.7%; }
+#charpanel .cp-th.ch-sodawitch, #charpanel .ci-chip.ch-sodawitch { --face-s: 165.0%; --face-x:  33.4%; --face-y:  37.2%; }
 
 /* ---- [패시브 스킬] 박스 --------------------------------------------------- */
 #charpanel .ci-desc {
