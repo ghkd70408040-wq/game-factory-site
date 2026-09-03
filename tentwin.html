@@ -13686,15 +13686,14 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
              이 숫자를 그대로 쓴다). 세로 예산은 52×5 + 7×4 = 288px 로,
              .cp-rack 이 잡는 구간(무대의 14%~97%)보다 여전히 작다. -->
         <div id="cp-rack" class="cp-rack" data-i18n-aria="aria.charrack" aria-label="Character thumbnails">
-        <!-- ⑧ (0904) 방울 줄 양끝 젤리 물방울 화살표(시안 S5 ead03bb6). 클릭 = 기존
-             전환 진입점 cpShow(cpIdx∓1) 그대로(드래그·스와이프와 같은 함수, 복제 0).
-             줄은 justify-content:center 로 캡슐 아래 가로중앙, 방울 간격 균일(gap). -->
+        <!-- ⑰ (0904) 중앙 픽 캐러셀 — 금테(#cp-ring)는 정중앙 고정, 방울 줄(#cp-track)이
+             그 안으로 이동한다. 방울은 cpBuild()가 HERO_IDS 로 3벌 복제해 지으므로
+             마크업엔 컨테이너만 둔다(순환이 끊기지 않게 양옆에 같은 방울이 늘 있다).
+             양끝 물방울 화살표(⑮ 시안 S5 형태)는 트랙 밖 고정 — cpShow(cpIdx∓1)로
+             드래그·스와이프·탭과 같은 선택 함수(cpSelectPos)를 부른다(복제 0). -->
         <button id="cp-prev" class="cp-arrow cp-arrow-l" type="button" data-i18n-aria="aria.prevchar" aria-label="Previous character"></button>
-        <button class="cp-th kit-chip-v2 ch-ten" type="button" data-i="0" data-char="ten" data-i18n-aria="char.ten.name" aria-label="Tenten" aria-current="true"><span class="ct-art" aria-hidden="true"></span></button>
-        <button class="cp-th kit-chip-v2 ch-twin" type="button" data-i="1" data-char="twin" data-i18n-aria="char.twin.name" aria-label="Twin"><span class="ct-art" aria-hidden="true"></span></button>
-        <button class="cp-th kit-chip-v2 ch-jelly" type="button" data-i="2" data-char="jelly" data-i18n-aria="char.jelly.name" aria-label="Jelly"><span class="ct-art" aria-hidden="true"></span></button>
-        <button class="cp-th kit-chip-v2 ch-pudding" type="button" data-i="3" data-char="pudding" data-i18n-aria="char.pudding.name" aria-label="Pudding Knight"><span class="ct-art" aria-hidden="true"></span></button>
-        <button class="cp-th kit-chip-v2 ch-sodawitch" type="button" data-i="4" data-char="sodawitch" data-i18n-aria="char.sodawitch.name" aria-label="Soda Witch"><span class="ct-art" aria-hidden="true"></span></button>
+        <div id="cp-track" class="cp-track"></div>
+        <span id="cp-ring" class="cp-ring" aria-hidden="true"></span>
         <button id="cp-next" class="cp-arrow cp-arrow-r" type="button" data-i18n-aria="aria.nextchar" aria-label="Next character"></button>
         </div>
         <!-- 14차 #판정 — 좌우 화살표(.cp-arrow) 제거. 되돌릴 근거를 남긴다.
@@ -27624,6 +27623,7 @@ window.TT_SFX = {
    */
   function applySkins() {
     if (typeof document === 'undefined' || !document.querySelectorAll) return;
+    cpBuild();   /* ⑰ — 얼굴을 붙이기 전에 방울(3벌)이 서 있게 한다(멱등) */
     var nodes = document.querySelectorAll('#char-pick .char-card, #cp-info .ci-chip, #cp-rack .cp-th');
     for (var i = 0; i < nodes.length; i++) {
       var el = nodes[i];
@@ -27721,50 +27721,146 @@ window.TT_SFX = {
     }
   }
 
-  function cpShow(i) {
+  /* ⑰ (0904) 중앙 픽 캐러셀 — 상태·엔진.
+     ┌ cpIdx = 논리 선택(0..n-1, 저장 선택과 분리된 "구경" 값 · 종전 의미 그대로).
+     └ cpPos = 렌더 위치(0..3n-1) — 트랙(#cp-track)에서 지금 정중앙(금테 자리)에
+       온 방울. 방울을 3벌 복제(prev·main·next)해 어느 방향으로 밀어도 이웃 방울이
+       늘 있어 순환이 끊기지 않는다. 한 벌(n칸)은 픽셀이 동일하므로, 가운데 벌 밖으로
+       샌 cpPos 를 n의 배수만큼 순간 이동(정규화)하면 눈에 안 보인다.
+     전환 진입점은 cpSelectPos() 하나다 — 화살표·드래그·스와이프·탭·키가 모두
+     이 함수를 부른다(선택 함수 공유 · 복제 0). */
+  var cpPos = 0;
+  var cpNormT = 0;
+
+  /** 트랙을 HERO_IDS 로 짓는다(3벌 = n*3 방울). 멱등 — 이미 서 있으면 그대로 둔다.
+      applySkins() 첫 줄에서 불러, 얼굴이 채워지기 전에 방울이 서 있게 한다. */
+  function cpBuild() {
+    if (typeof document === 'undefined') return;
+    var track = $('cp-track');
+    if (!track) return;
     var n = HERO_IDS.length;
-    cpIdx = ((i % n) + n) % n;
-    /* --cp-i 는 이제 **패널 루트**에 산다. 트랙이 둘(무대 #char-pick · 정보
-       #cp-info)이 됐고, 둘이 같은 변수를 상속받아야 영원히 어긋나지 않는다. */
+    if (track.children && track.children.length === n * 3) return;
+    track.innerHTML = '';
+    for (var c = 0; c < 3; c++) {
+      for (var i = 0; i < n; i++) {
+        var id = HERO_IDS[i];
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'cp-th kit-chip-v2 ch-' + id;
+        b.setAttribute('data-i', String(i));
+        b.setAttribute('data-char', id);
+        b.setAttribute('data-i18n-aria', 'char.' + id + '.name');
+        b.setAttribute('aria-label', t('char.' + id + '.name'));
+        var s = document.createElement('span');
+        s.className = 'ct-art';
+        s.setAttribute('aria-hidden', 'true');
+        b.appendChild(s);
+        track.appendChild(b);
+      }
+    }
+  }
+
+  /** 렌더 위치 pos 방울에 중앙 표식(금테는 #cp-ring 고정 · 크기는 .cp-center scale). */
+  function cpApplyRing(pos) {
+    var track = $('cp-track');
+    if (!track || !track.children) return;
+    for (var k = 0; k < track.children.length; k++) {
+      var b = track.children[k];
+      if (!b.classList) continue;
+      if (k === pos) { b.classList.add('cp-center'); if (b.setAttribute) b.setAttribute('aria-current', 'true'); }
+      else { b.classList.remove('cp-center'); if (b.removeAttribute) b.removeAttribute('aria-current'); }
+    }
+  }
+
+  /** pos 방울이 뷰포트 정중앙에 오도록 트랙만 translateX. scale 은 레이아웃을 안
+      바꾸므로 offsetLeft 측정이 안정적이다. animate=false = 순간(정규화·열기). */
+  function cpTranslate(pos, animate) {
+    var track = $('cp-track'), rack = $('cp-rack');
+    if (!track || !rack || !rack.clientWidth) return;
+    var b = track.children[pos];
+    if (!b) return;
+    var tx = rack.clientWidth / 2 - (b.offsetLeft + b.offsetWidth / 2);
+    track.style.transition = animate ? 'transform .16s var(--ease)' : 'none';
+    track.style.transform = 'translateX(' + tx.toFixed(2) + 'px)';
+    if (!animate) { void track.offsetWidth; }   /* 순간 이동을 커밋(다음 애니의 출발점 고정) */
+  }
+
+  /* --cp-i · data-cp · dots · 버튼 라벨 · 우측 레일 · 무대. cpIdx 하나에서 갈리는
+     모든 층을 한 자리에서 갱신한다(⑯ 원인이던 "층마다 다른 인덱스"를 원천 차단). */
+  function cpTail() {
     var root = $('charpanel');
     if (root && root.style) root.style.setProperty('--cp-i', String(cpIdx));
     var tr = $('char-pick');
     if (tr && tr.style) tr.style.setProperty('--cp-i', String(cpIdx));
-    /* 14차 #25 — **레이어 분리**. 무대(#char-pick)는 --cp-i 로 계속 슬라이드하고,
-       정보 카드(#cp-info)는 이제 움직이지 않는다: data-cp 가 가리키는 .ci 한 장만
-       CSS 가 크로스페이드로 보여 준다("무대만 슬라이드 / 카드는 값만 갱신").
-       --cp-i 를 카드에서 떼지 않고 attribute 를 새로 쓰는 이유는, 두 층이 여전히
-       cpShow 라는 **한 자리**에서만 갱신되어야 어긋날 수 없기 때문이다. */
     var info = $('cp-info');
     if (info && info.setAttribute) info.setAttribute('data-cp', String(cpIdx));
-    /* 썸네일 랙 동기화. 근거는 aria-current 다 — aria-checked 는 #char-pick
-       카드 전용이고(선택의 유일한 근거), 랙은 "보고 있는 것"만 말한다. */
-    var rack = $('cp-rack');
-    if (rack && rack.children) {
-      for (var r = 0; r < rack.children.length; r++) {
-        var th = rack.children[r];
-        if (th.setAttribute) {
-          if (r === cpIdx) th.setAttribute('aria-current', 'true');
-          else th.removeAttribute('aria-current');
-        }
-      }
-    }
     var dots = $('cp-dots');
     if (dots && dots.children) {
       for (var k = 0; k < dots.children.length; k++) {
         if (dots.children[k].classList) dots.children[k].classList.toggle('on', k === cpIdx);
       }
     }
-    /* 잠긴 캐릭터를 보고 있으면 버튼이 그렇게 말한다. 누를 수는 있고, 누르면
-       setChar 과 같은 안내가 뜬다 — 버튼이 죽어 있으면 "왜 안 되지"를 스스로
-       알아내야 하고, 그건 5차에서 이미 폐기한 형태다. */
     var go = $('cp-go');
     if (go) go.textContent = heroUnlocked(HERO_IDS[cpIdx]) ? t('pick.go') : t('pick.locked');
-    syncSidePanes();          /* charsel v2 — 우측 레일도 보고 있는 그 캐릭터를 말한다 */
-    cpCenterAll();
-    /* v4 10차 §G — 무대 위 한 장에만 생동감이 걸린다. 여기가 "무대에 누가 서
-       있는가"를 아는 유일한 자리이므로, 클래스도 여기서 옮긴다. */
+    syncSidePanes();
     cpStage(cpIdx);
+  }
+
+  /** ★ 유일한 선택 함수. 렌더 위치 pos 를 정중앙으로 옮긴다. */
+  function cpSelectPos(pos, animate) {
+    var n = HERO_IDS.length;
+    if (cpNormT) { clearTimeout(cpNormT); cpNormT = 0; }
+    /* 이동 전, 현재 위치를 가운데 벌로 순간 정규화한다(cpPos - mid 는 항상 n의
+       배수라 같은 방울 · 안 보인다). 그래야 pos 가 [0,3n) 밖으로 새지 않는다. */
+    if (animate && $('cp-rack') && $('cp-rack').clientWidth) {
+      var mid = (((cpPos % n) + n) % n) + n;
+      if (cpPos !== mid) {
+        var d0 = pos - cpPos;
+        cpPos = mid; pos = mid + d0;
+        cpApplyRing(cpPos);
+        cpTranslate(cpPos, false);
+      }
+    }
+    cpPos = pos;
+    cpIdx = ((pos % n) + n) % n;
+    cpApplyRing(pos);
+    cpTranslate(pos, animate);
+    cpTail();
+    if (animate) {
+      cpNormT = setTimeout(function () {
+        cpNormT = 0;
+        var mid2 = cpIdx + n;
+        if (cpPos !== mid2) { cpPos = mid2; cpApplyRing(mid2); cpTranslate(mid2, false); }
+      }, 200);
+    }
+  }
+
+  /** 논리 인덱스 i 로 고른다(외부·화살표·키·스와이프의 진입점). 지금 중앙에서
+      가장 가까운 벌로 최단 순환 거리만큼 이동한다. 패널이 닫혀 있으면 순간 배치. */
+  function cpShow(i) {
+    var n = HERO_IDS.length;
+    var target = ((i % n) + n) % n;
+    var rack = $('cp-rack'), panel = $('charpanel'), track = $('cp-track');
+    var vis = panel && !panel.hidden && rack && rack.clientWidth > 0 &&
+              track && track.children && track.children.length;
+    if (!vis) { cpSeed(target); return; }
+    var d = target - cpIdx;
+    while (d > n / 2) d -= n;
+    while (d < -n / 2) d += n;
+    cpSelectPos(cpPos + d, true);
+  }
+
+  /** 순간 배치(열기·부팅). 가운데 벌에 정본을 세운다 — 애니메이션 없이. */
+  function cpSeed(i) {
+    var n = HERO_IDS.length;
+    var target = ((i % n) + n) % n;
+    cpBuild();
+    if (cpNormT) { clearTimeout(cpNormT); cpNormT = 0; }
+    cpPos = target + n;
+    cpIdx = target;
+    cpApplyRing(cpPos);
+    cpTranslate(cpPos, false);
+    cpTail();
   }
 
   /* =========================================================================
@@ -28068,8 +28164,9 @@ window.TT_SFX = {
   }
   function cpCenterAll() {
     if (typeof document === 'undefined' || !document.querySelector) return;
-    var rack = $('cp-rack');
-    if (rack) cpCenter(rack, rack.querySelector('[aria-current="true"]'));
+    /* ⑰ — 캐릭터 방울 줄(#cp-rack)의 센터링은 이제 트랙 transform(cpTranslate)이
+       전담한다. 여기서는 스크롤을 만지지 않는다(overflow:hidden 이라 무의미하고,
+       프로그램적 scrollLeft 가 transform 센터와 충돌할 여지를 없앤다). 펫 줄만 센터. */
     var mrow = document.querySelector('#charpanel .pick-row.pick-mate');
     if (mrow) {
       var pid = cpPetId();
@@ -28118,7 +28215,7 @@ window.TT_SFX = {
     cpSide(cpSideCur);
     syncCharPick();
     var cur = HERO_IDS.indexOf(charId());
-    cpShow(cur < 0 ? 0 : cur);
+    cpSeed(cur < 0 ? 0 : cur);   /* ⑰ 열 때는 애니 없이 정중앙 seed(가운데 벌) */
     J.sfx.ui();
   }
 
@@ -28159,8 +28256,11 @@ window.TT_SFX = {
          빠지면 실루엣 옆에 이름이 남아 스포일러가 새 나간다. */
       var ci = document.querySelector('#cp-info .ci[data-char="' + id + '"]');
       if (ci && ci.classList) ci.classList.toggle('locked', lock);
-      var th = document.querySelector('#cp-rack .cp-th[data-char="' + id + '"]');
-      if (th && th.classList) th.classList.toggle('locked', lock);
+      /* ⑰ — 방울이 3벌 복제라 한 캐릭터당 썸네일이 셋이다. 전부에 잠금을 건다. */
+      var ths = document.querySelectorAll('#cp-rack .cp-th[data-char="' + id + '"]');
+      for (var ti = 0; ti < ths.length; ti++) {
+        if (ths[ti].classList) ths[ti].classList.toggle('locked', lock);
+      }
       if (lock) {
         cards[i].setAttribute('aria-disabled', 'true');
         cards[i].setAttribute('aria-label', t('char.locked.aria'));
@@ -41565,11 +41665,18 @@ window.TT_SFX = {
     });
     /* 썸네일 랙 = **보기** 전환. setChar 을 부르지 않는 것이 요점이다 —
        구경과 결정을 가르는 6차의 규약이 랙에서도 그대로다. */
+    /* ⑰ 방울 탭 = 그 방울이 정중앙으로. 논리 인덱스가 아니라 **탭한 렌더 방울**의
+       위치를 그대로 중앙에 실어야, 순환 벌 중 손가락이 짚은 그 방울이 온다(화살표·
+       드래그·스와이프와 같은 cpSelectPos 공유). */
     on($('cp-rack'), 'click', function (ev) {
+      if (now() - cpSwipeAt < 400) return;   /* 스와이프 직후의 합성 클릭 무시 */
       var el = ev && ev.target;
-      while (el && el !== this && !(el.getAttribute && el.getAttribute('data-i'))) el = el.parentNode;
-      if (!el || el === this || !el.getAttribute) return;
-      cpShow(parseInt(el.getAttribute('data-i'), 10) || 0);
+      while (el && el !== this && !(el.classList && el.classList.contains('cp-th'))) el = el.parentNode;
+      if (!el || el === this || !el.classList) return;
+      var track = $('cp-track');
+      var pos = track ? Array.prototype.indexOf.call(track.children, el) : -1;
+      if (pos < 0) return;
+      cpSelectPos(pos, true);
       J.sfx.ui();
     });
     /* [H-0903] 아래 다섯 줄은 **은퇴한 배선**이다 - 다섯 id 가 마크업에 없다.
@@ -48059,39 +48166,78 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   overflow: hidden;
   border-radius: 0;
 }
-/* ⑧ (0904) 방울 줄 양끝 젤리 물방울 화살표 — 시안 S5 ead03bb6 실측(분홍 물방울
-   ·둥근 세 모서리 + 한 꼭지 = pick 형·상단 광택·아래 짙은 접지·마우브 겉선).
-   젤리 재질은 정본 칩(①) 층 어휘 상속 — 새 디자인 발명 0. 글리프 없이 꼭지
-   방향이 곧 화살표다(좌=이전·우=다음). 크기 = 방울 .1307W 의 ~.56 배. */
+/* ⑰ — 양끝 화살표는 트랙(#cp-track) 밖 뷰포트 양끝에 절대 고정한다(이동하지 않음).
+   모양·색은 ⑮ 에서 시안 S5 대로 다듬는다. 여기서는 자리만 잡는다. */
 #charpanel .cp-arrow {
-  flex: 0 0 auto;
-  align-self: center;
-  width:  calc(var(--f2-w) * .073);
-  height: calc(var(--f2-w) * .073);
+  position: absolute;
+  top: 50%;
+  width:  calc(var(--f2-w) * .076);
+  height: calc(var(--f2-w) * .076);
   padding: 0;
   border: 0;
   font-size: 0;
   line-height: 0;
   color: transparent;
   cursor: pointer;
-  position: relative;
   z-index: 6;
-  background: radial-gradient(135% 135% at 42% 30%,
-    #FBE2EA 0%, #F2B2C6 44%, #E793AE 80%, #DC80A1 100%);
-  /* 물방울(pick) 실루엣: 세 모서리 둥글고 한 꼭지 뾰족 — rotate 로 좌/우를 향한다 */
-  border-radius: 54% 54% 54% 10%;
-  box-shadow:
-    0 calc(var(--f2-w) * .0060) calc(var(--f2-w) * .0080) rgba(150,70,110,.30),
-    inset 0 calc(var(--f2-w) * .0042) calc(var(--f2-w) * .0042) rgba(255,255,255,.78),
-    inset 0 calc(var(--f2-w) * -.0060) calc(var(--f2-w) * .0058) rgba(150,80,120,.34),
-    inset 0 0 0 calc(var(--f2-w) * .0028) rgba(176,104,136,.60);
+  background: rgba(244,186,205,.9);
+  border-radius: 50%;
   -webkit-tap-highlight-color: transparent;
 }
-/* 꼭지(border-radius 4번째 = 좌하)를 왼쪽/오른쪽으로 돌린다 */
-#charpanel .cp-arrow-l { transform: rotate(45deg); }
-#charpanel .cp-arrow-r { transform: rotate(225deg); }
+#charpanel .cp-arrow-l { left:  calc(var(--f2-w) * .026); transform: translateY(-50%); }
+#charpanel .cp-arrow-r { right: calc(var(--f2-w) * .026); transform: translateY(-50%); }
 #charpanel .cp-arrow:active { filter: brightness(.94); }
 #charpanel .cp-dots  { display: none; }
+
+/* ⑰ (0904) 중앙 픽 캐러셀 — 뷰포트(#cp-rack)는 고정, 트랙(#cp-track)만 이동한다.
+   방울은 cpBuild()가 3벌 복제해 지으며(순환 무결), cpTranslate 가 고른 방울을
+   정중앙(금테 #cp-ring 자리)으로 translateX 한다. */
+#charpanel .cp-rack { overflow: hidden; padding: 0; }
+#charpanel .cp-track {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  /* 실측(rackW≈416·방울≈54·화살표 안쪽 48~367)에서 gap .030W 면 밝은 구간에
+     정확히 중앙+양옆 2개(=S5 의 5방울)가 들어차고 3번째 이웃은 화살표 뒤로 간다. */
+  gap: calc(var(--f2-w) * .030);
+  z-index: 1;
+  will-change: transform;
+  /* transform·transition 은 JS(cpTranslate)가 인라인으로 — 이동할 때만 애니(160ms) */
+}
+#charpanel #cp-track .cp-th { flex: 0 0 auto; }
+/* 금테는 정중앙에 고정된 오버레이가 그린다("금테 중앙 고정 · 방울이 그 안으로"). */
+#charpanel .cp-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width:  calc(var(--f2-w) * .1307 * 1.30);
+  height: calc(var(--f2-w) * .1307 * 1.30);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 3;
+  box-shadow:
+    inset 0 0 0 calc(var(--f2-w) * .0040) var(--f2-chip-line),
+    0 0 0 calc(var(--f2-w) * .1307 * .022) var(--f2-hi),
+    0 0 calc(var(--f2-w) * .1307 * .120) calc(var(--f2-w) * .1307 * .030) var(--f2-hi-halo);
+}
+/* 정중앙 방울만 살짝 크게 — scale 은 레이아웃을 안 바꿔 offsetLeft 측정이 안정적. */
+#charpanel #cp-track .cp-th.cp-center {
+  transform: scale(1.28);
+  z-index: 2;
+  transition: transform .16s var(--ease);
+}
+/* 트랙 안에서는 aria-current 의 크기 확대·금테 box-shadow 를 끈다(크기는 위 scale,
+   금테는 #cp-ring). 특이성으로 공용 규칙(#charpanel .cp-th[aria-current])만 이기고
+   펫 줄(#mate-pick)은 건드리지 않는다. */
+#charpanel #cp-track .cp-th[aria-current="true"] {
+  --f2-cd: calc(var(--f2-w) * .1307);
+  box-shadow: inset 0 0 0 var(--f2-cring) var(--f2-chip-line);
+}
 
 /* ---- 우측 세로 탭 (아이템 · 스킨 · 스킬) -------------------------------- */
 #charpanel .cp-side {
