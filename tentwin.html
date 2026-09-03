@@ -48063,8 +48063,20 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
      상자용 토큰을 떼고 자기 실측값을 준다. 소비처는 `#charpanel .ci-desc`
      한 줄뿐이다(DOM 의 .kit-box-v2 6개가 전부 .ci-desc 다).
      ※ 텐텐 이름칸 (221.4,204.0,208.0) 은 또 다른 색이고 이번 범위 밖이다. */
-  --cs-desc-box:   #E2D7D7;
-  --cs-desc-box-2: #E2D7D7;
+  /* ⑬ (0904) 사용자 반려 「[패시브 스킬] 카드가 왜 불투명하냐」 — E32-0903 이 이
+     카드를 **불투명** 크림(#E2D7D7 α1)으로 깔아 뒤 무대(연못·풀)가 완전히 막혔다.
+     시안 S5 의 이 카드는 연보라 반투명 젤리(뒤가 비침·얇은 겉선·둥근 코너)다.
+     ⑤ 커밋 58511ae 가 정보판·레일에 쓴 것과 **같은 층 어휘**(면색 토큰 × α 토큰을
+     color-mix 로 투과)로 되돌린다:
+       면색 = S5 카드 실측 연보라. S5 맑은 거터 (230,222,223) 은 밝은 바닥 위 합성이라
+              α1 재료색은 S9 림 실측 #E3D8DF(227,216,223 · 크로마 11.1)를 쓴다 —
+              같은 캐릭창 계열의 봉인 연보라이고 S5 카드 색상/채도와 한 벌이다.
+       α    = .58 (면 58% · 투과 42%). ⑤ 레일 .425 보다 높다 — 이 카드는 이미 반투명한
+              .cp-card 젤리 **위**에 얹혀 두 겹을 통과하므로, 같은 「비침」을 내는 데
+              면 α 가 더 필요하다. 세로 램프는 S5 에 사실상 없어 두 정지점을 같은 값으로 둔다. */
+  --cs-desc-box:   #E3D8DF;
+  --cs-desc-box-2: #E3D8DF;
+  --cs-desc-a:     .58;
   /* 수리 0831 — 정본 캡슐의 속(--wf-a-in .010) */
   --f2-pill:     color-mix(in srgb, #F8E3EF 1%, transparent);
   --f2-pill-line:#A38FA5;
@@ -49573,12 +49585,17 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   gap: calc(var(--f2-w) * .008);
   margin: 0;
   padding: calc(var(--f2-w) * .022) calc(var(--f2-w) * .026);
-  border: calc(var(--f2-w) * .0027) solid rgba(140,116,146,.60);
+  /* ⑬ (0904) 겉선 폭 = 영역 B(소형 부품) = 캔버스 자 --f2-ref-w * 0.00350(19 항).
+     종전 calc(--f2-w * .0027) 은 부품 폭에 매여 있어 「테두리 끝맺음은 형태 무관 동일」
+     원칙 위반이었다 — 자를 캔버스 상수로 바꾼다(폭·색만, 기하 무변경). */
+  border: calc(var(--f2-ref-w) * 0.00350) solid rgba(140,116,146,.60);
   border-image: none;
   border-radius: calc(var(--f2-w) * .0354);
-  /* [E32-0903 · 토큰 분리] 레일 뒤판과 갈라졌다. 위 #charpanel 블록 주석 참조.
-     복구: var(--f2-box), var(--f2-box-2). */
-  background: linear-gradient(180deg, var(--cs-desc-box), var(--cs-desc-box-2));
+  /* ⑬ (0904) 젤리 투명 복원 — ⑤ 레일(.cp-side-body :48093)과 **같은 색 어휘**:
+     면색 토큰 × α 토큰을 color-mix 로 투과시켜 뒤 무대가 카드 너머로 비친다. */
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--cs-desc-box) calc(var(--cs-desc-a) * 100%), transparent),
+    color-mix(in srgb, var(--cs-desc-box-2) calc(var(--cs-desc-a) * 100%), transparent));
   overflow: hidden;
   font-size: calc(var(--f2-w) * .0285);
   line-height: 1.30;
