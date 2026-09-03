@@ -26170,12 +26170,21 @@ window.TT_SFX = {
     return true;
   }
 
+  /* ⑫ 토스트의 숨김 타이머는 판(round)의 timers[] 에 넣지 않는다(later() 금지).
+     넣으면 clearTimers() 가 화면 전환에서 그 타이머까지 버려 'show' 가 안 걷히고,
+     토스트가 다음 화면까지 눌어붙는다 — advAbandon() 이 toast('스테이지를 나왔어요.
+     하트 -1.') 직후 clearTimers() 를 부르는 탓에 그 안내가 지도·캐릭터 창까지
+     남았다(사용자 실기기 결함). 토스트는 판이 아니라 전역 UI 라 전용 타이머로
+     산다 — 새 토스트가 오면 직전 숨김 타이머를 덮어써 조기 숨김·중복 누수도
+     함께 막는다. (line 31124 의 순서 맞춤 우회는 이제 불필요하나 무해하다.) */
+  var toastTimer = 0;
   function toast(msg) {
     var t = $('toast');
     if (!t) return;
+    clearTimeout(toastTimer);
     t.textContent = msg;
     t.classList.add('show');
-    later(function () { t.classList.remove('show'); }, 1700);
+    toastTimer = setTimeout(function () { t.classList.remove('show'); }, 1700);
   }
 
   /* =========================================================================
