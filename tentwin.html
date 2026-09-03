@@ -13686,11 +13686,16 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
              이 숫자를 그대로 쓴다). 세로 예산은 52×5 + 7×4 = 288px 로,
              .cp-rack 이 잡는 구간(무대의 14%~97%)보다 여전히 작다. -->
         <div id="cp-rack" class="cp-rack" data-i18n-aria="aria.charrack" aria-label="Character thumbnails">
+        <!-- ⑧ (0904) 방울 줄 양끝 젤리 물방울 화살표(시안 S5 ead03bb6). 클릭 = 기존
+             전환 진입점 cpShow(cpIdx∓1) 그대로(드래그·스와이프와 같은 함수, 복제 0).
+             줄은 justify-content:center 로 캡슐 아래 가로중앙, 방울 간격 균일(gap). -->
+        <button id="cp-prev" class="cp-arrow cp-arrow-l" type="button" data-i18n-aria="aria.prevchar" aria-label="Previous character"></button>
         <button class="cp-th kit-chip-v2 ch-ten" type="button" data-i="0" data-char="ten" data-i18n-aria="char.ten.name" aria-label="Tenten" aria-current="true"><span class="ct-art" aria-hidden="true"></span></button>
         <button class="cp-th kit-chip-v2 ch-twin" type="button" data-i="1" data-char="twin" data-i18n-aria="char.twin.name" aria-label="Twin"><span class="ct-art" aria-hidden="true"></span></button>
         <button class="cp-th kit-chip-v2 ch-jelly" type="button" data-i="2" data-char="jelly" data-i18n-aria="char.jelly.name" aria-label="Jelly"><span class="ct-art" aria-hidden="true"></span></button>
         <button class="cp-th kit-chip-v2 ch-pudding" type="button" data-i="3" data-char="pudding" data-i18n-aria="char.pudding.name" aria-label="Pudding Knight"><span class="ct-art" aria-hidden="true"></span></button>
         <button class="cp-th kit-chip-v2 ch-sodawitch" type="button" data-i="4" data-char="sodawitch" data-i18n-aria="char.sodawitch.name" aria-label="Soda Witch"><span class="ct-art" aria-hidden="true"></span></button>
+        <button id="cp-next" class="cp-arrow cp-arrow-r" type="button" data-i18n-aria="aria.nextchar" aria-label="Next character"></button>
         </div>
         <!-- 14차 #판정 — 좌우 화살표(.cp-arrow) 제거. 되돌릴 근거를 남긴다.
              레퍼런스 BG-01-01 에 화살표가 없고(§0 "극한 동일"), 3뷰포트 실측에서
@@ -41499,6 +41504,11 @@ window.TT_SFX = {
     });
     on($('cp-skin'), 'click', openSkins);
     on($('cp-side-skin'), 'click', openSkins);
+    /* ⑧ (0904) 방울 줄 양끝 물방울 화살표 = 이전/다음 캐릭터. 전환 진입점은
+       cpShow(i) 하나이고 드래그·스와이프·썸네일 탭이 모두 이 함수를 부른다 —
+       화살표도 같은 함수를 부른다(새 선택 경로·복제 0). */
+    on($('cp-prev'), 'click', function () { cpShow(cpIdx - 1); J.sfx.ui(); });
+    on($('cp-next'), 'click', function () { cpShow(cpIdx + 1); J.sfx.ui(); });
     /* charsel v2 — 우측 세로 탭. cp-tabs 와 같은 위임 한 줄. */
     on($('cp-side'), 'click', function (ev) {
       var el = ev && ev.target;
@@ -47858,10 +47868,10 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;          /* ⑧ 방울 줄을 캡슐 아래 가로중앙에 */
   gap: calc(var(--f2-w) * .018);
   margin: 0;
-  padding: 0 calc(var(--f2-w) * .05);
+  padding: 0 calc(var(--f2-w) * .03);
   overflow-x: auto;
   overflow-y: hidden;
   scrollbar-width: none;
@@ -47968,7 +47978,38 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   overflow: hidden;
   border-radius: 0;
 }
-#charpanel .cp-arrow { display: none; }
+/* ⑧ (0904) 방울 줄 양끝 젤리 물방울 화살표 — 시안 S5 ead03bb6 실측(분홍 물방울
+   ·둥근 세 모서리 + 한 꼭지 = pick 형·상단 광택·아래 짙은 접지·마우브 겉선).
+   젤리 재질은 정본 칩(①) 층 어휘 상속 — 새 디자인 발명 0. 글리프 없이 꼭지
+   방향이 곧 화살표다(좌=이전·우=다음). 크기 = 방울 .1307W 의 ~.56 배. */
+#charpanel .cp-arrow {
+  flex: 0 0 auto;
+  align-self: center;
+  width:  calc(var(--f2-w) * .073);
+  height: calc(var(--f2-w) * .073);
+  padding: 0;
+  border: 0;
+  font-size: 0;
+  line-height: 0;
+  color: transparent;
+  cursor: pointer;
+  position: relative;
+  z-index: 6;
+  background: radial-gradient(135% 135% at 42% 30%,
+    #FBE2EA 0%, #F2B2C6 44%, #E793AE 80%, #DC80A1 100%);
+  /* 물방울(pick) 실루엣: 세 모서리 둥글고 한 꼭지 뾰족 — rotate 로 좌/우를 향한다 */
+  border-radius: 54% 54% 54% 10%;
+  box-shadow:
+    0 calc(var(--f2-w) * .0060) calc(var(--f2-w) * .0080) rgba(150,70,110,.30),
+    inset 0 calc(var(--f2-w) * .0042) calc(var(--f2-w) * .0042) rgba(255,255,255,.78),
+    inset 0 calc(var(--f2-w) * -.0060) calc(var(--f2-w) * .0058) rgba(150,80,120,.34),
+    inset 0 0 0 calc(var(--f2-w) * .0028) rgba(176,104,136,.60);
+  -webkit-tap-highlight-color: transparent;
+}
+/* 꼭지(border-radius 4번째 = 좌하)를 왼쪽/오른쪽으로 돌린다 */
+#charpanel .cp-arrow-l { transform: rotate(45deg); }
+#charpanel .cp-arrow-r { transform: rotate(225deg); }
+#charpanel .cp-arrow:active { filter: brightness(.94); }
 #charpanel .cp-dots  { display: none; }
 
 /* ---- 우측 세로 탭 (아이템 · 스킨 · 스킬) -------------------------------- */
