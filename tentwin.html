@@ -48301,7 +48301,14 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
 }
 /* 잠긴 칩 — 자물쇠 뱃지는 칩 안에 남는다(잠금은 여기서만 읽힌다) */
 #charpanel #mate-pick .char-card.locked::after,
-#charpanel .cp-th.locked .ct-art { opacity: .18; }
+/* [잠금 실루엣 0904] 잠긴 캐릭 방울 = 얼굴 크기 그대로의 **회색 실루엣**.
+   종전 opacity .18 이 기반 필터의 opacity(.5)와 곱해져 ~9% → 표준 thumb 가
+   깔려 있어도 사실상 안 보였다(빈 유리). thumb 는 ⑭ 메타로 이미 얼굴 크기·위치가
+   맞으므로 그 얼굴을 납작한 회색 실루엣으로 드러낸다. contrast(0) 이 모든 화소를
+   중간 회색으로 뭉개 **배경(푸른 유리)에 물들지 않는 균일한 회색**을 만든다
+   (brightness(0) 만 쓰면 유리색이 배어 남색으로 어두워졌다 — 사용자 시안은 옅은
+   회색 실루엣). brightness 로 밝기·opacity 로 부드러움을 맞춘다. */
+#charpanel .cp-th.locked .ct-art { opacity: .6; filter: grayscale(1) contrast(0) brightness(1.15); }
 #charpanel #mate-pick .char-card.locked .cav,
 #charpanel .cp-th.locked .cav { filter: grayscale(1) brightness(0) opacity(.32); }
 #charpanel #mate-pick .char-card .cc-lock {
