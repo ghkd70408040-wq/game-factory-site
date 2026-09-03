@@ -43269,7 +43269,11 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
    폭을 채우므로 **옛 화면은 한 픽셀도 안 바뀐다**.
    min-width:0 은 뺐다 — shrink 가 0 이면 값을 할 일이 없고, 남겨 두면 "여기서
    줄어들 수 있다"는 거짓 신호가 된다. 말줄임은 남긴다(긴 번역 대비). */
-.w6m .rank-tab{ flex:1 0 28%; overflow:hidden; text-overflow:ellipsis; }
+/* [E44-0903] 기록창 탭은 «설정 창 버튼»이 아니고, 위 알약 규칙의 15.9px 를 그대로
+   받으면 「클래식 데일리」가 칸(101px)을 넘어 말줄임된다(실측 잉크 폭 106px).
+   폭 자동 맞춤의 «하한»을 낮추는 대신 이 자리에서 옛 자 13.5px 를 지킨다 —
+   착수 전과 한 픽셀도 다르지 않다. 롤백: 아래 font-size 한 줄을 지운다. */
+.w6m .rank-tab{ flex:1 0 28%; overflow:hidden; text-overflow:ellipsis; font-size:13.5px; }
 .w6m #rank-tabs{ flex-wrap:wrap; row-gap:8px; }
 /* 꺼짐 · 비선택 — 같은 캔디에서 채도만 뺀다 */
 .w6m .set-tg[aria-pressed="false"],
@@ -44667,15 +44671,15 @@ html[lang="en"] .splash-logo{
      「버튼 높이」는 겉선 바깥면 border-box, 둥근 캡이 아닌 직선 허리 구간이다.
      우리 잉크(흰 글자 + 1.5px 드롭 그림자) 실측 = 0.83 x font-size + 1.5px
      (dsf4 · 글자 숨김 차분 · 한글 라벨 19표본, scratchpad/btn2-0903/ink.py).
-       52px 버튼 → (0.4089 x 52 − 1.5) ÷ k = 23.5px    전 16px (비 0.2837)
+       52px 버튼 → (0.4089 x 52 − 1.5) ÷ k = 23.1px    전 16px (비 0.2837)
      k 는 라벨의 자모 구성에 따라 0.819~0.882 로 흔들린다(한글 조판의 성질이다).
      ko 라벨 실측 6종의 «가장 큰 편차를 가장 작게» 하는 값으로 23.5px 를 골랐다 —
-     그 값에서 여섯 중 다섯이 목표비 0.4089 의 ±3 % 안에 든다(「확인」만 +4.6 %).
+     그 값에서 ko 라벨 여섯이 전부 목표비 0.4089 의 ±3 % 안에 든다.
      행버튼 제목 0.3409 · 부제 0.2250 은 시안 32f6be9b 의 «2행 행버튼» 값이고
      그 넷은 사용자 제작 조각(catalog/sian2-btn-*.webp)이라 이 규칙이 안 닿는다 —
      쓰지 않았다. 높이·여백·정렬은 한 자리도 안 건드렸다(글자 크기만).
      롤백: 이 주석을 지우고 아래 한 줄을 16px 로 되돌린다. */
-  font-size:23.5px;
+  font-size:23.1px;
   line-height:1.15 !important;
   text-align:center;
   text-shadow:0 1.5px 0 rgba(110,70,58,.55) !important;
@@ -44800,9 +44804,9 @@ html[lang="en"] .splash-logo{
 .w6m .sheet .btn-secondary{
   --bj-a:#CDC2D4; --bj-b:#B3A6BC; --bj-drop:#8B7E95; --bj-band:#A296AC;
   min-height:48px !important;
-  /* [E44-0903] 같은 자(B1 0.4089)를 48px 줄버튼에 : (0.4089 x 48 − 1.5) ÷ k = 21.65px.
+  /* [E44-0903] 같은 자(B1 0.4089)를 48px 줄버튼에 : (0.4089 x 48 − 1.5) ÷ k = 21.5px.
      롤백: 15px. */
-  font-size:21.65px;
+  font-size:21.5px;
 }
 /* 토글·기록탭은 **이미 정본**이다(W6-b ⑦ 이 만든 그 알약) — 여기서는 상자만
    같은 규칙에 맞춘다. 색은 건드리지 않는다(켜짐 민트 · 꺼짐 라일락 유지). */
@@ -49121,6 +49125,15 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
 }
 #charpanel .cp-skinbtn .gem-ic { color: #FFE07A; font-style: normal; }
 #charpanel .cp-go {
+  /* [E44-0903] 캐릭창 주버튼도 같은 자(B1 0.4089)로 올린다. 이 버튼은 젤리가 아니라
+     kit-btn-v2 라 글자 자가 calc(var(--f2-bh) x .30) 이고, 그 자는 이 빌드의 킷 버튼
+     전부가 공유한다 — 그래서 킷 규칙이 아니라 **이 한 자리**에서만 덮는다.
+     실측(dsf4 · 글자 숨김 차분): 잉크 = 0.856 x font-size (이 버튼은 text-shadow 가
+     none 이라 드롭 몫이 없다). 높이 --f2-bh 기준으로
+       0.4089 ÷ 0.856 = 0.478  →  font-size = --f2-bh x .478   전 .30 (비 0.2569)
+     #cp-skin 은 «라벨 + 잔액» 2행이라 단일행 CTA 의 자가 안 맞고 시안 표본도 없다 —
+     안 건드렸다. 롤백: 아래 font-size 한 줄을 지운다. */
+  font-size: calc(var(--f2-bh) * .478);
   flex: 1 1 auto;
   min-height: 0;
   margin: 0;
