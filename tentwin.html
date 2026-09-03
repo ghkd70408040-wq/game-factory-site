@@ -2832,8 +2832,12 @@ li.roll-in { animation: rollin 380ms var(--spring) backwards; }
        바뀌면 이 블록 한 곳만 맞추면 된다(카드 값을 직접 안 박는 유일한 이유).
    특정도: `#modal-howto .howto-art` (1,1,0) 이 테마 오버라이드(:where … .howto-art
    = 0,1,0)를 순서와 무관하게 이겨서 세 테마(다크/라이트auto/라이트강제)를 한
-   규칙으로 덮는다. -------------------------------------------------------------- */
-#modal-howto{
+   규칙으로 덮는다.
+   ⑲(0904) — 결과 모달(#modal-clear 엔들리스 · #modal-adv 모험 · #modal-over
+   실패/타임업)도 같은 반려였다: 별·점수·안내가 무색 젤리판 위 맨글자로 떠 뒤
+   보드 타일이 비쳐 안 읽힘. **같은 CSS 변수**를 그 세 창까지 넓혀 `.result-card`
+   가 물려 쓴다(하나의 봉인값 출처). ------------------------------------------- */
+#modal-howto, #modal-clear, #modal-adv, #modal-over{
   --hcard-fill:   #E2D7D7;                /* = --cs-desc-box   (설명상자 면색) */
   --hcard-fill-2: #E2D7D7;                /* = --cs-desc-box-2 */
   --hcard-line:   rgba(140,116,146,.60);  /* = .kit-box-v2 겉선 */
@@ -2871,6 +2875,32 @@ li.roll-in { animation: rollin 380ms var(--spring) backwards; }
   min-height: 0;
 }
 #modal-howto .howto-panel > p b{ color: var(--ink); }
+
+/* ── ⑲ 결과 모달 안쪽 젤리 카드 ─────────────────────────────────────────────
+   반려(사용자 실기기 acd0360d): #modal-adv(모험 「N탄 클리어!」) 의 별·점수·안내
+   두 줄이 무색 젤리판 위 맨글자로 떠서 뒤 보드 타일이 비쳐 안 읽힘. ⑱과 **같은
+   방법·같은 CSS 변수(--hcard-*)** 의 안쪽 카드를 그 셋 아래에 깐다. #modal-clear
+   (엔들리스)·#modal-over(실패/타임업)도 같은 부품이라 함께.
+   전역 `.big-score`/`.sub-score` 는 무접촉(11862 경고: 고치면 다른 결과창이 함께
+   바뀜) — 카드 스코프 안에서만 판 위 대비 잉크(--ink)로 덮는다. */
+.result-card{
+  position: relative;
+  align-self: stretch;
+  margin: 4px 0 10px;
+  padding: 12px 14px 14px;
+  border: 1.5px solid var(--hcard-line);
+  border-radius: var(--hcard-r);
+  background: linear-gradient(180deg, var(--hcard-fill), var(--hcard-fill-2));
+  box-shadow: inset 0 0 0 1.5px var(--hcard-rim), inset 0 -2px 0 var(--hcard-lo);
+  color: var(--ink);
+}
+/* 판 위 대비 — `#modal-X .sheet p`(1,1,1)·`#clear-rollup li b`(1,0,2) 를 이겨야
+   해서 모달 id 를 함께 건다(1,3,1). 전역 토큰·전역 .big-score/.sub-score 무접촉. */
+#modal-clear .sheet .result-card p, #modal-adv .sheet .result-card p, #modal-over .sheet .result-card p,
+#modal-clear .result-card .rollup-total, #modal-clear .result-card #clear-rollup li span,
+#modal-clear .result-card .rollup-total b, #modal-clear .result-card #clear-rollup li b{ color: var(--ink); }
+/* 카드 안에선 옅은 인셋 알약 배경이 카드면과 겹쳐 지저분하니 정리 */
+#modal-clear .result-card #clear-next-preview{ background: rgba(255,255,255,.28); box-shadow: inset 0 0 0 1px var(--hcard-line); }
 
 /* ---- 14차 #34 — 규칙 요약 카드 (도움말 1장) --------------------------------
    조각을 하나도 새로 들이지 않는다. 껍데기는 바로 위 .howto-art (어두운 인셋 판 +
@@ -14488,6 +14518,9 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
     <h2 id="clear-title">Stage 1 clear!</h2>
     <!-- Grade slot. game.js injects e.g. `<span class="grade s">S</span><span class="grade-note">…</span>`.
          Hides itself while empty, so a mode without grading needs no extra toggling. -->
+    <!-- ⑲ 안쪽 젤리 카드: 별(등급)·점수 정산·다음 미리보기를 판 위 맨글자에서
+         카드 위로. id 무변 → showGrade/countUp/paintNextPreview 배선 무접촉. -->
+    <div class="result-card">
     <div id="clear-grade"></div>
     <!-- W-C §10 루트 리빌. 점수 정산표(#clear-rollup)보다 **위**에 있는 것이
          이 한 줄의 설계다: 정산은 "얼마였나"이고 리빌은 "무엇을 얻었나"인데,
@@ -14501,6 +14534,7 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
          un-filled promise is worse than no promise, so game.js hides it whenever
          it has nothing true to say (and always in daily / rush). -->
     <p id="clear-next-preview"></p>
+    </div><!-- /.result-card -->
     <!-- AD SLOT: interstitial, shown once every 3 stages. Hidden by default; the
          portal SDK call goes here and adds .ad-live alongside clearing [hidden]. -->
     <div class="ad-slot ad-inter" data-ad-slot="interstitial" hidden>Ad</div>
@@ -14773,10 +14807,14 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
          수확분) → 코인/젤리별 → **별 3슬롯**(아래 #adv-stars 가 그 슬롯이고,
          리빌이 픽을 하나씩 점등한다). 그래서 리스트가 별보다 위에 앉는다. -->
     <ul id="adv-reward" class="reward-reveal" aria-live="polite" hidden></ul>
+    <!-- ⑲ 안쪽 젤리 카드: 별·점수·안내 두 줄을 판 위 맨글자에서 카드 위로.
+         id 는 한 글자도 안 바뀌므로 paintAdvSheet/countUp 배선 무접촉. -->
+    <div class="result-card">
     <div id="adv-stars" class="adv-stars" aria-hidden="true"></div>
     <p class="big-score"><b id="adv-score">0</b></p>
     <p id="adv-note" class="sub-score"></p>
     <p id="adv-hearts" class="adv-hearts"></p>
+    </div>
     <!-- [G-0903] 정적 라벨이 ko 회차에서도 영문 「Next stage」로 떴다(REPAIR-LOG 45절 3항
          곁다리 발견). 값은 advResult 가 t('adv.next') / t('adv.retry') 로 넣지만, 결과창이
          한 번도 안 열린 상태에서는 이 마크업 리터럴이 그대로 보인다 - 그래서 키를 단다.
@@ -14792,9 +14830,12 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
 
   <div id="modal-over" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="over-title"><div class="sheet jbox jbox--modal">
     <h2 id="over-title" data-i18n="over.title">Out of moves</h2>
+    <!-- ⑲ 안쪽 젤리 카드: 점수·최고·스테이지를 판 위 맨글자에서 카드 위로. -->
+    <div class="result-card">
     <p class="big-score"><b id="over-score">0</b></p>
     <!-- #over-best-label is swapped to the Time Rush best label by game.js -->
     <p class="sub-score"><span id="over-best-label" data-i18n="over.best">Best</span> <b id="over-best">0</b> &middot; <span data-i18n="over.stage">Stage</span> <b id="over-stage">1</b></p>
+    </div>
     <!-- v5 E-1: the rank this run earned, as text that survives the confetti.
          No data-i18n on purpose — paintOverModal() owns it and re-paints it after
          every language switch, exactly like #over-title and #over-best-label. -->
@@ -49896,9 +49937,15 @@ body:has(.modal:not([hidden])) #screen-menu .mbtn-lab{
 
 /* C안(블러 강, 0904) — 모달이 열리면 뒤 화면만 blur(6px). 모달은 #screen-* 밖 형제라 흐려지지 않는다.
    기존 스크림·backdrop-filter는 무접촉. :has() 미지원 엔진은 선상무변. */
-#screen-menu, #screen-map { transition: filter 160ms var(--ease); }
+#screen-menu, #screen-map, #screen-game { transition: filter 160ms var(--ease); }
 body:has(.modal:not([hidden])) #screen-menu,
-body:has(.modal:not([hidden])) #screen-map { filter: blur(6px); }
+body:has(.modal:not([hidden])) #screen-map,
+/* ⑲(0904) — 결과 모달(#modal-clear·#modal-adv·#modal-over)이 열리면 뒤 게임
+   화면도 6px 블러. 반려 사유(뒤 보드 타일이 판 너머로 비쳐 별·점수·문구가 안
+   읽힘)의 절반은 여기서 갚는다(나머지 절반은 .result-card). 보드 애니메이션이
+   filter 위에서 계속 돌지만 rAF 측정 참고치 정상(보고 참조). 모달이 닫히면
+   `:has()` 조건이 풀려 filter 는 자동으로 none 으로 복귀(160ms) → 보드 입력 정상. */
+body:has(.modal:not([hidden])) #screen-game { filter: blur(6px); }
 
 /* ---- 1. 판 = kit-frame-v2 ------------------------------------------------ */
 .modal-v2 .mv2-sheet {
