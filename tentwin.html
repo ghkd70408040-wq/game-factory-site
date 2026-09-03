@@ -13744,7 +13744,10 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
              양끝 물방울 화살표(⑮ 시안 S5 형태)는 트랙 밖 고정 — cpShow(cpIdx∓1)로
              드래그·스와이프·탭과 같은 선택 함수(cpSelectPos)를 부른다(복제 0). -->
         <button id="cp-prev" class="cp-arrow cp-arrow-l" type="button" data-i18n-aria="aria.prevchar" aria-label="Previous character"></button>
-        <div id="cp-track" class="cp-track"></div>
+        <!-- 가시 창(#cp-win) = 정확히 방울 5슬롯 폭. 트랙은 이 안에서 이동하고
+             overflow:hidden 이 6번째 방울을 정지 상태에서 잘라 낸다(부분 방울 0).
+             양끝 화살표는 이 창 밖(랙 양끝)에 있어 방울과 겹치지 않는다. -->
+        <div id="cp-win" class="cp-win"><div id="cp-track" class="cp-track"></div></div>
         <span id="cp-ring" class="cp-ring" aria-hidden="true"></span>
         <button id="cp-next" class="cp-arrow cp-arrow-r" type="button" data-i18n-aria="aria.nextchar" aria-label="Next character"></button>
         </div>
@@ -27838,11 +27841,13 @@ window.TT_SFX = {
   /** pos 방울이 뷰포트 정중앙에 오도록 트랙만 translateX. scale 은 레이아웃을 안
       바꾸므로 offsetLeft 측정이 안정적이다. animate=false = 순간(정규화·열기). */
   function cpTranslate(pos, animate) {
-    var track = $('cp-track'), rack = $('cp-rack');
-    if (!track || !rack || !rack.clientWidth) return;
+    var track = $('cp-track'), win = $('cp-win');
+    if (!track || !win || !win.clientWidth) return;
     var b = track.children[pos];
     if (!b) return;
-    var tx = rack.clientWidth / 2 - (b.offsetLeft + b.offsetWidth / 2);
+    /* 중앙 기준은 이제 가시 창(#cp-win)이다 — 트랙의 offsetParent 이고, 방울을
+       이 창의 정중앙에 실어야 금테(#cp-ring, 랙=창 정중앙)와 정확히 맞는다. */
+    var tx = win.clientWidth / 2 - (b.offsetLeft + b.offsetWidth / 2);
     track.style.transition = animate ? 'transform .16s var(--ease)' : 'none';
     track.style.transform = 'translateX(' + tx.toFixed(2) + 'px)';
     if (!animate) { void track.offsetWidth; }   /* 순간 이동을 커밋(다음 애니의 출발점 고정) */
@@ -27875,7 +27880,7 @@ window.TT_SFX = {
     if (cpNormT) { clearTimeout(cpNormT); cpNormT = 0; }
     /* 이동 전, 현재 위치를 가운데 벌로 순간 정규화한다(cpPos - mid 는 항상 n의
        배수라 같은 방울 · 안 보인다). 그래야 pos 가 [0,3n) 밖으로 새지 않는다. */
-    if (animate && $('cp-rack') && $('cp-rack').clientWidth) {
+    if (animate && $('cp-win') && $('cp-win').clientWidth) {
       var mid = (((cpPos % n) + n) % n) + n;
       if (cpPos !== mid) {
         var d0 = pos - cpPos;
@@ -48277,6 +48282,21 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
    방울은 cpBuild()가 3벌 복제해 지으며(순환 무결), cpTranslate 가 고른 방울을
    정중앙(금테 #cp-ring 자리)으로 translateX 한다. */
 #charpanel .cp-rack { overflow: hidden; padding: 0; }
+/* 가시 창 = 정확히 방울 5슬롯(5×.1307W + 4×gap) + 아주 작은 여유(.010W)로 5번째
+   방울이 서브픽셀로 잘리지 않게. 랙 정중앙에 두고 overflow:hidden 이 6번째 방울을
+   정지 상태에서 잘라 낸다(부분 방울 0 · 이동 중에만 들어옴). 창 폭(≈.784W)과 랙
+   폭(≈1.0W)의 차(양끝 ≈.11W)에 화살표가 겹치지 않고 들어간다. 페이드 마스크는
+   쓰지 않는다 — 그만한 폭을 두면 5번째 방울 가장자리나 화살표 자리를 침범한다. */
+#charpanel .cp-win {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  width: calc(var(--f2-w) * (.1307 * 5 + .030 * 4 + .010));
+  height: 100%;
+  overflow: hidden;
+  z-index: 1;
+}
 #charpanel .cp-track {
   position: absolute;
   left: 0;
@@ -48285,8 +48305,7 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   display: flex;
   flex-direction: row;
   align-items: center;
-  /* 실측(rackW≈416·방울≈54·화살표 안쪽 48~367)에서 gap .030W 면 밝은 구간에
-     정확히 중앙+양옆 2개(=S5 의 5방울)가 들어차고 3번째 이웃은 화살표 뒤로 간다. */
+  /* gap .030W → 밝은 창 안에 정확히 중앙+양옆 2개(=S5 의 5방울)가 들어찬다. */
   gap: calc(var(--f2-w) * .030);
   z-index: 1;
   will-change: transform;
