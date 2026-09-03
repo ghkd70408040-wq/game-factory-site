@@ -48040,7 +48040,10 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
      ⚠ 남는 36.4 는 α 가 아니라 **면색**이다 — a=1 에서 (217.1,206.0,232.1) 로
        시안보다 어둡고 푸르다(--f2-box 계열). 이번 발주는 α 만이라 안 건드린다.
      봉인: --cps-body-a: .425; */
-  --cps-body-a: 1.000;
+  /* ⑤ (0904) 아이템/스킨/필살기 레일 판도 같은 반려 — E30-0903 이 α 를 1.000 으로
+     올려 불투명 무광이 됐다. 봉인값 .425 로 되돌려 나무가 판 너머로 비치게 한다
+     (우리 렌더 image3·시안 S5 = 판만 투명·내용 또렷). */
+  --cps-body-a: .425;
   background: linear-gradient(180deg,
     color-mix(in srgb, var(--f2-box) calc(var(--cps-body-a) * 100%), transparent),
     color-mix(in srgb, var(--f2-box-2) calc(var(--cps-body-a) * 100%), transparent));
@@ -48365,7 +48368,11 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
        꽂으면 배경을 두 번 세게 되고, 실측에서 맨 판 ΔRGB 가 0.8 → 16.1 로 **벌어졌다**
        (flat-0903/gate1b.json).
      봉인(되돌리기): --cpj-a-fill: 0; --cpj-fill-c: #EFE6F6; */
-  --cpj-a-fill: 1;
+  /* ⑤ (0904) 사용자 반려 「젤리판이 불투명하다」 — E36-0903 이 깐 **불투명 평탄
+     backing**(a-fill 1 · #EEEBE6)이 뒤 무대(나무)를 완전히 막고 있었다. 사용자가
+     기대한 우리 렌더(image3 = wave7-0901)는 backing 없이 나무가 판 너머로 비치는
+     상태다. 봉인값으로 되돌린다: a-fill 0(평탄 backing 제거) + a-in .5440(wave7). */
+  --cpj-a-fill: 0;
   /* [L1.5] 속 — 정본 `[data-part="charsel"]` 의 .490 **원값**.
      수리 0831: 종전 .218 은 「오늘의 투과 .425 를 지키려고」 역산한 값이었다.
      역산은 재해석이다 — 정본 값으로 되돌린다. */
@@ -48414,7 +48421,7 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   --cpj-L3-w: calc(var(--f2-ref-w) * 0.00400);
   --cpj-L3-line: #9F8896;   /* [E32-0903] 실측 (159,136,150) L3-a .70 역산 · 복구 #955579 */
   --cpj-L3-a: .700;
-  --cpj-fill-c: #EEEBE6;
+  --cpj-fill-c: #EFE6F6;   /* ⑤ a-fill 0 이라 무효지만 봉인값으로 되돌림 */
 }
 /* 탭과 본체는 언제나 덮개 위. 오늘의 겹침 순서 그대로다. */
 #charpanel .cp-card > .cp-tabs,
@@ -54926,7 +54933,7 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
      실현가능 상한 위반 화소 0%). 1.000 은 「불투명으로 도망가는 해법」이었고
      사용자 반려 「어째서 젤리판이 투명하지 않은 거야?」가 정확히 이 자리다.
      봉인(되돌리기): --cpj-a-in: 1.000; */
-  --cpj-a-in: .4822;
+  --cpj-a-in: .5440;
   --cpj-rim-w: calc(var(--f2-ref-w) * 0.00350);
   --cpj-rim-a: 0.9800;
   --cpj-L3-w: calc(var(--f2-ref-w) * 0.00400);
