@@ -14524,28 +14524,35 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
     <!-- 0826 6단계 — 신필드 다섯. 값은 전부 openNodeCard() 가 채운다(마크업에
          고정 수치 0). 보스 두 줄은 보스탄이 아니면 [hidden] 이라 카드 높이가
          일반탄에서 6단계 이전과 같다 — #node-boss 블록의 규약 그대로다. -->
+    <!-- ⑪ 스테이지 카드 재편(0904 · wave/node). 순서: 캐릭터 칩 → 미션 → 악당 기술 칩
+         → 별 조건 → 내 최고 → 추천 펫 칩 → 시작. 이 상단 판에는 미션·악당 기술·(보스)약점만
+         선다. 「악당 체력」·「이 펫인 이유」는 표시만 걷어 아래 .node-seal 로 옮겼다 —
+         데이터·i18n 키는 유지되고 openNodeCard() 는 계속 값을 채운다(다른 화면 grep:
+         node-hp-v·node-rec-v·node.foehp·node.rec 은 이 카드 전용). -->
     <ul id="node-info" class="node-info">
-      <!-- B4·B9 — 체력·기술은 **모든 탄**에 선다. duelFoeDef(n) 이 일반탄에도 악당과
-           기술을 주고 있는데(실측) 카드만 `hidden = !p.boss` 로 가리고 있었다.
-           숨기는 대신 보스탄에서 크기 클래스(.is-boss)를 준다. 라벨도 「보스」에서
-           「악당」으로 — 보스 전용 낱말이 일반탄에 서면 안 된다. -->
-      <li id="node-i-hp"><b data-i18n="node.foehp">Villain HP</b><i id="node-hp-v"></i></li>
-      <li id="node-i-atk"><b data-i18n="node.foeatk">Villain skill</b><i id="node-atk-v"></i></li>
-      <!-- B8 — 공략 조건의 **이사**. 종전 자리는 악당 이름 바로 밑(#node-boss-c)이라
-           승리 조건처럼 읽혔다. 승리는 체력이고 이 문장은 그 아래 붙는 조건이므로,
-           체력 줄 **다음**에 세운다. 보스탄이 아니면 비어 있어 접힌다. -->
+      <!-- 미션 한 줄 — 「미션」 라벨을 걷고 목표 아이콘(target) + 문구. -->
+      <li id="node-i-mis" hidden><span class="ni-ic ni-ic-mis" aria-hidden="true"></span><i id="node-mission"></i></li>
+      <!-- 악당 기술 칩 — 라벨·숫자를 걷고 악당 얼굴 아이콘 + 기술 이름만(bossAtkText). -->
+      <li id="node-i-atk"><span class="ni-foe-ic" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path class="nf-horn" d="M6 6 L3.6 1.6 L9 4.4 Z"/><path class="nf-horn" d="M18 6 L20.4 1.6 L15 4.4 Z"/><ellipse class="nf-body" cx="12" cy="13" rx="9.4" ry="8.2"/><ellipse class="nf-eye" cx="8.4" cy="12.6" rx="2" ry="2.2"/><ellipse class="nf-eye" cx="15.6" cy="12.6" rx="2" ry="2.2"/><circle class="nf-pup" cx="8.4" cy="12.9" r=".95"/><circle class="nf-pup" cx="15.6" cy="12.9" r=".95"/><path class="nf-mouth" d="M7 16.4 Q12 21 17 16.4 Q12 18 7 16.4 Z"/></svg></span><i id="node-atk-v"></i></li>
+      <!-- 보스 약점(사전 공개) — 보스탄에서만 선다(비보스는 [hidden]). 라벨+값 유지. -->
       <li id="node-i-cond" hidden><b data-i18n="node.cond">Weak point</b><i id="node-cond-v"></i></li>
-      <!-- B2 — 강등된 미션 문장. -->
-      <li id="node-i-mis" hidden><b data-i18n="adv.mission">Mission</b><i id="node-mission"></i></li>
-      <li id="node-i-best"><b data-i18n="node.best">Your best</b><i id="node-best-v"></i></li>
-      <li id="node-i-rec"><b id="node-rec-k" data-i18n="node.rec">Why this hero</b><i id="node-rec-v"></i></li>
-      <li id="node-i-pet"><b data-i18n="node.pet">Buddy pick</b><i id="node-pet-v"></i></li>
     </ul>
     <!-- ③ 별 3슬롯 — 획득/미획득 + 조건 힌트 한 줄 -->
     <ul class="node-stars">
       <li class="nstar" id="node-s1"><span class="nst-ic" aria-hidden="true"></span><span id="node-star1"></span></li>
       <li class="nstar" id="node-s2"><span class="nst-ic" aria-hidden="true"></span><span id="node-star2"></span></li>
       <li class="nstar" id="node-s3"><span class="nst-ic" aria-hidden="true"></span><span id="node-star3"></span></li>
+    </ul>
+    <!-- 별 조건 아래: 내 최고(점수만, 없으면 「—」) · 추천 펫 칩(초상+이름). -->
+    <ul id="node-info-b" class="node-info">
+      <li id="node-i-best"><b data-i18n="node.best">Your best</b><i id="node-best-v"></i></li>
+      <li id="node-i-pet"><span id="node-pet-av" class="ni-pet-av" aria-hidden="true"></span><i id="node-pet-v"></i></li>
+    </ul>
+    <!-- 봉인 슬롯 — 「악당 체력」·「이 펫인 이유」의 데이터·i18n 키 보존용. openNodeCard()
+         가 계속 채우지만 .node-seal(display:none)이 화면에서 감춘다(표시만 삭제). -->
+    <ul class="node-info node-seal" aria-hidden="true">
+      <li id="node-i-hp"><b data-i18n="node.foehp">Villain HP</b><i id="node-hp-v"></i></li>
+      <li id="node-i-rec"><b id="node-rec-k" data-i18n="node.rec">Why this hero</b><i id="node-rec-v"></i></li>
     </ul>
     <!-- ④ 동료 줄 — 아바타 토글. 부스터 줄 문법을 빌린 자리라, 이후 아이템 슬롯이
          늘어나도 줄 하나가 더 생길 뿐이다. 목록은 game.js buildNodeMates() 가
@@ -21767,7 +21774,7 @@ window.TT_SFX = {
   function isCapsuleHead(el) {
     try {
       return !!(el && el.matches &&
-        el.matches('.modal-v2 .mv2-sheet > h2, .modal-v2 .mv2-head > h2'));
+        el.matches('.modal-v2 .mv2-sheet > h2, .modal-v2 .mv2-head > h2, #modal-node .r10-ribbon > h2'));
     } catch (e) { return false; }
   }
   function headText(el, s) {
@@ -39464,10 +39471,8 @@ window.TT_SFX = {
       if (p.boss) setText('node-cond-v', bossCondText(p.bossDef));
     }
     var bestV = store.advBest[String(n)] | 0;
-    setText('node-best-v', bestV > 0
-      ? t('node.bestv', { b: fmtNum(bestV), g: fmtNum(star2Need),
-                          p: Math.round(bestV / Math.max(1, star2Need) * 100) })
-      : t('node.bestnone', { g: fmtNum(star2Need) }));
+    /* ⑪(0904) 내 최고 = 점수만(없으면 「—」). node.bestv/node.bestnone 키는 사전에 남는다. */
+    setText('node-best-v', bestV > 0 ? fmtNum(bestV) : '—');
     /* ★ 0826 8단계 — 펫을 기술 축으로 골랐으면 이유도 그 기술을 말해야 한다.
        카드가 두 개의 서로 다른 축을 동시에 말하면 그것은 조언이 아니라 소음이다. */
     var recAtk = advPetRecAtk(p);
@@ -39482,6 +39487,17 @@ window.TT_SFX = {
     var petId = advPetRecommend(p), liPet = $('node-i-pet');
     if (liPet) liPet.hidden = !petId;
     if (petId) setText('node-pet-v', t('char.' + petId + '.name'));
+    /* ⑪(0904) 추천 펫 칩 — 초상+이름. 얼굴은 캐릭터/동료 카드에서 복제(cavClone) —
+       메뉴 요약 줄과 같은 길이라 새 SVG 0개다. 펫이 없으면 초상 칸은 비운다. */
+    var petAv = $('node-pet-av');
+    if (petAv) {
+      petAv.innerHTML = '';
+      petAv.className = 'ni-pet-av' + (petId && CHARS[petId] ? ' ' + (CHARS[petId].cls || '') : '');
+      if (petId) {
+        var pcl = cavClone(petId); if (pcl) petAv.appendChild(pcl);
+        setStdArt(petAv, petId, 'face', '--slot-std');   /* 투명셋이 있으면 PNG 가 이긴다 */
+      }
+    }
 
     setText('node-star1', t('adv.star1'));
     /* 0826 — 카드가 말하는 수는 advStarsFor 가 실제로 재는 수여야 한다(D(ch) 포함). */
@@ -50514,7 +50530,8 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
      둘 다 **상속되는** 속성이라, 끄지 않으면 위 문단의 그 사고가 그대로 난다.
    --------------------------------------------------------------------------- */
 .modal-v2 .mv2-sheet > h2 > .mvh-title,
-.modal-v2 .mv2-head  > h2 > .mvh-title {
+.modal-v2 .mv2-head  > h2 > .mvh-title,
+#modal-node .r10-ribbon > h2 > .mvh-title {
   /* [E14-0902] 정본 work-lettering.css 동기. 위 주석의 「paint-order 가 테를
      채움 아래로 내리므로 바깥 절반만 보인다」는 **틀렸다** — 채움이 transparent
      라 -webkit-text-stroke 는 폭 전체가 보인다(.060em 이 렌더에서 6.25px
@@ -50579,7 +50596,8 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
    캡슐과 붙어 안 읽힌다. */
 @supports not ((-webkit-background-clip: text) or (background-clip: text)) {
   .modal-v2 .mv2-sheet > h2 > .mvh-title,
-  .modal-v2 .mv2-head  > h2 > .mvh-title {
+  .modal-v2 .mv2-head  > h2 > .mvh-title,
+  #modal-node .r10-ribbon > h2 > .mvh-title {
     background-image: none;
     color: #FFFFFF;
     -webkit-text-fill-color: #FFFFFF;
@@ -56435,6 +56453,146 @@ html[lang="en"] #modal-arc.is-arcdmg .sheet > h2{ --ttl:url("catalog/ttl-arcdmg-
   box-shadow: none;
 }
 
+</style>
+
+<style id="node-card-0904">
+/* ===== ⑪ 스테이지 카드 재편(0904 · wave/node) — 칩/초상/봉인 =====================
+   미션·악당 기술·추천 펫 줄을 「라벨:값」에서 「아이콘/초상 + 값」으로 바꾼다.
+   별(현행 별 아이콘)·판·캡슐·X·접지 그림자(S9 정본)는 무접촉. 삭제 두 줄은
+   .node-seal 로 표시만 봉인(데이터·i18n 키 유지). */
+#modal-node .node-seal { display: none !important; }
+
+/* 아이콘/초상을 든 줄만 가운데 정렬(글리프·얼굴이 글자 밑선에 안 걸린다). */
+#modal-node #node-i-mis,
+#modal-node #node-i-atk,
+#modal-node #node-i-pet { align-items: center; }
+
+/* 미션 목표 아이콘 — 정본 글리프(target) 재사용. */
+#modal-node .node-info > li > .ni-ic {
+  flex: 0 0 auto;
+  width: 22px; height: 22px;
+  /* 롱핸드로 둔다 — background 단축은 background-image 를 none 으로 되돌려
+     아래 .ni-ic-mis 의 글리프를 지운다(이 규칙이 특정도가 더 높다). */
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  filter: drop-shadow(0 1px 1px rgba(83, 28, 40, .22));
+}
+#modal-node .node-info > li > .ni-ic-mis { background-image: var(--lib-glyph-target); }
+
+/* 악당 얼굴 아이콘 — 인라인 SVG(외부 에셋 0). #node-boss 의 자두 악당과 같은 계열색. */
+#modal-node .node-info > li > .ni-foe-ic {
+  flex: 0 0 auto;
+  width: 24px; height: 24px;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+#modal-node .ni-foe-ic svg {
+  width: 24px; height: 24px; display: block; overflow: visible;
+  filter: drop-shadow(0 1px 1px rgba(83, 28, 40, .28));
+}
+#modal-node .ni-foe-ic .nf-body  { fill: #A96BD6; }
+#modal-node .ni-foe-ic .nf-horn  { fill: #7A4AA8; }
+#modal-node .ni-foe-ic .nf-eye   { fill: #FFFFFF; }
+#modal-node .ni-foe-ic .nf-pup   { fill: #3A2350; }
+#modal-node .ni-foe-ic .nf-mouth { fill: #4A2A66; }
+
+/* 추천 펫 초상 — 동료 액자(.nmate)와 같은 크림 캔디의 작은 판. 얼굴은 JS 가 채운다. */
+#modal-node .node-info > li > .ni-pet-av {
+  flex: 0 0 auto;
+  position: relative;
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  overflow: hidden;
+  display: inline-flex; align-items: center; justify-content: center;
+  background:
+    radial-gradient(ellipse 26% 32% at 15% 24%, rgba(255,255,255,.55), rgba(255,255,255,0) 70%),
+    linear-gradient(180deg, #FFF1DA 0%, #FFF1DA 47%, #F3DCB8 47%, #F3DCB8 100%);
+  box-shadow:
+    0 2px 0 #C99A63,
+    inset 0 0 0 2px #8A5F3C,
+    inset 0 2px 0 rgba(255,255,255,.45);
+}
+#modal-node .ni-pet-av .cav { display: block; width: 100%; height: 100%; }
+#modal-node .ni-pet-av svg,
+#modal-node .ni-pet-av img { width: 100%; height: 100%; object-fit: contain; }
+/* 표준 투명셋(PNG)이 있으면 그것이 초상이다 — SVG 폴백은 끈다(동료 토글과 같은 계약). */
+#modal-node .ni-pet-av[data-art="std"]::after {
+  content: ""; position: absolute; inset: 0; z-index: 1;
+  border-radius: inherit; pointer-events: none;
+  background: var(--slot-std, none) center / contain no-repeat;
+}
+#modal-node .ni-pet-av[data-art="std"] .cav,
+#modal-node .ni-pet-av[data-art="std"] svg { display: none; }
+</style>
+
+<style id="work-btn-core">
+/* ===== work-btn-core (0904 · wave/node) — 시작 버튼 첫 배선 =======================
+   정본 기준 버튼(tentwin/ref-v2/work-btn.css 「기준 1」 = 「건너뛰기」)을 게임에 실린
+   캔디 문법으로 이 버튼에 처음 배선한다. primary 역할색 --bj-a #DB54F0 / --bj-b #34D4B2
+   (= 판정판 버튼 작업판 값 = 모달 주버튼 #pz-resume 계열과 같은 색·층). 정본 파일은
+   무수정 — 필요한 규칙만 여기로 이식했다. 슬롯 [아이콘 없음][「시작」][우측 보조 ❤1].
+   판·캡슐·X·접지 그림자(S9)와 무관하다(버튼 한 조각만 바꾼다). */
+#modal-node #node-go.ncta {
+  --bj-a: #DB54F0; --bj-b: #34D4B2; --bj-drop: #4F5A7C;
+  --bj-band: rgba(255,255,255,.26);
+  --bj-line-l: #643578; --bj-line-r: #356566;
+  --bj-rim-l: #CC80E6;  --bj-rim-r: #7BCCD2;
+  --bj-lw: calc(var(--f2-ref-w) * 0.00350);
+  position: relative;
+  box-sizing: border-box;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%;
+  min-height: 52px;
+  height: calc(var(--pw) * .16);
+  padding: 0 18px;
+  border: 0 !important; border-image: none !important; border-width: 0 !important;
+  border-radius: 999px;
+  background-color: transparent;
+  background-image:
+    radial-gradient(closest-side, rgba(255,240,253,.951) 0%, rgba(255,240,253,.55) 55%, rgba(255,240,253,0) 100%),
+    radial-gradient(closest-side, rgba(255,240,253,.45) 0%, rgba(255,240,253,0) 100%),
+    radial-gradient(closest-side, rgba(255,255,255,.30) 0 60%, rgba(255,255,255,0) 100%),
+    linear-gradient(180deg, rgba(255,255,255,.16) 0%, rgba(0,0,0,.10) 100%),
+    linear-gradient(90deg, var(--bj-a) 0%, var(--bj-b) 100%);
+  background-position: 6.62% 15.15%, 15.04% 13.37%, 50% 6.60%, 0 0, 0 0;
+  background-size: 6.4% 16.5%, 3.02% 10.99%, 74.2% 2.5%, 100% 100%, 100% 100%;
+  background-repeat: no-repeat;
+  box-shadow:
+    0 3px 0 var(--bj-drop),
+    0 7px 16px rgba(83,28,40,.22),
+    inset 0 -6px 0 var(--bj-band);
+  color: #FFFFFF;
+  font-family: var(--font-display);
+}
+/* 겉선·림 고리 — 좌우 색이 다르므로 단색 inset 이 아니라 마스크 고리 두 겹(기준 버튼과 같은 자). */
+#modal-node #node-go.ncta::before,
+#modal-node #node-go.ncta::after {
+  content: ''; position: absolute; inset: 0; box-sizing: border-box;
+  border-radius: inherit; pointer-events: none;
+  padding: var(--bj-lw);
+  background: linear-gradient(90deg, var(--bj-line-l) 0%, var(--bj-line-r) 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+          mask-composite: exclude;
+}
+#modal-node #node-go.ncta::after {
+  inset: var(--bj-lw);
+  background: linear-gradient(90deg, var(--bj-rim-l) 0%, var(--bj-rim-r) 100%);
+  opacity: .70;
+}
+#modal-node #node-go.ncta:active { transform: translateY(2px); }
+/* 슬롯 — [「시작」] 가운데, [❤1] 우측 보조. 자주 면 위 가독성용 그림자. */
+#modal-node #node-go .ncta-lab {
+  position: relative; z-index: 1;
+  color: #FFFFFF; font-size: 23.1px; line-height: 1.15;
+  text-shadow: 0 1.5px 0 rgba(79, 58, 92, .70);
+}
+#modal-node #node-go .ncta-cost {
+  position: relative; z-index: 1;
+  color: #FFFFFF; opacity: 1; font-size: 15px;
+  text-shadow: 0 1px 0 rgba(79, 58, 92, .70);
+}
 </style>
 
 <script id="bg-preview-hook">
