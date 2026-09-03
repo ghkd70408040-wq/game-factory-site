@@ -12873,62 +12873,27 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
          --hv2-* 네임스페이스 근거: kit-hud-v2.css 정본의 --hp* 를 그대로 :root 에
          올리면 #boss-bar/#boss-hp-fill 의 --hp 와 이름이 겹친다(전투 밖이 바뀐다).
          구판 마크업 봉인은 _backup/0826/tentwin.phase3-hud-pre.html 이다. -->
-    <div id="duel-hud" class="kit-hud-v2" hidden>
-      <div class="kit-hud-v2__plate" aria-hidden="true"><i class="dh-gnd"></i><i class="dh-jelly"></i></div>
-      <!-- ②-C/D(0901) — 시안 조립: 아래 굴곡 «단일» 판 + 그 안에 파인 홈 2개.
-           홈은 판을 자른 것이 아니라 판 위에 앉는 인셋 서브판이다(계단 탭 포함). -->
-      <div class="dh-low" aria-hidden="true"><i class="dl-jelly"></i></div>
-      <div class="dh-groove dh-groove--foe" aria-hidden="true"></div>
-      <div class="dh-groove dh-groove--me" aria-hidden="true"></div>
-      <!-- 우상 방울 = 정본 chip 변주. 종전에는 내 진영 안의 kit-chip-v2 였다. -->
-      <span id="duel-baby" class="wf-chip" aria-hidden="true"><i class="hv2-face hv2-face--pet"></i></span>
-      <!-- 초상 2칸 — 시안 틀에는 초상 자리가 **없다**(빈 틀·조립본 둘 다). 전투가
-           «누구와 누구인가»를 말해야 하므로 지우지 않고, 위 직사각 바(판 A)의
-           빈 칸에 세운다: 그 판은 시안에서 이미 «둥근 부속이 앉는 판»이다
-           (좌상 일시정지 · 우상 펫 방울). 같은 chip 변주 한 벌을 쓴다.
-           DMG 도 시안엔 없는 칸이라 두 홈 사이 빈 자리로 옮겼다. -->
-      <span id="duel-foe-av" class="wf-chip dh-av dh-av--foe bs-grape" aria-hidden="true"><i class="hv2-face hv2-face--foe"></i></span>
-      <span id="duel-me-av" class="wf-chip dh-av dh-av--me" aria-hidden="true"><i class="hv2-face hv2-face--me"></i></span>
-      <span id="duel-dmg" class="kit-hud-v2__dmg"></span>
-
-      <!-- 중: 타이머(1순위) + 성 + DMG(3순위). 자기 행 전폭이라 진영 폭을 안 먹는다 -->
-      <div class="kit-hud-v2__center">
-        <!-- 성은 캡슐 **밖**이다: .wf-cap 의 clip-path(스타디움)가 자식을 함께
-             자르므로, 안에 두면 캡슐 위로 솟은 몫이 통째로 잘린다(실측함).
-             시안 59a8eccc 도 성이 캡슐 위에 «걸터앉는다». -->
-        <span class="kit-hud-v2__castle" aria-hidden="true"></span>
-        <div class="wf-cap kit-hud-v2__timerpill">
-          <div id="duel-timer" class="kit-hud-v2__timer" role="timer">0:00</div>
-        </div>
+    <div id="duel-hud" class="jbox jbox--slab" hidden>
+      <span id="duel-foe-av" class="dh-av boss-av bs-grape" aria-hidden="true"></span>
+      <span id="duel-me-av" class="dh-av dh-av-me" aria-hidden="true"></span>
+      <i id="duel-baby" class="dh-baby" aria-hidden="true"></i>
+      <!-- .dh-mid 는 자리를 차지하지 않는 **쌓임 상자**다(inset:0 · z-index:1):
+           #duel-timer 의 유리겹이 z-index:-1 이라 그 -1 을 여기 가둬 둔다. -->
+      <div class="dh-mid">
+        <span class="dh-castle" aria-hidden="true">&#127984;</span>
+        <div id="duel-timer" role="timer">0:00</div>
       </div>
-
-      <!-- 좌: 악당 (2순위 HP · 3순위 이름/Lv) -->
-      <div class="kit-hud-v2__side kit-hud-v2__side--foe">
-        <div class="kit-hud-v2__line">
-          <b id="duel-foe-name" class="kit-hud-v2__name"></b><span id="duel-foe-lv" class="kit-hud-v2__lv">Lv.1</span>
-        </div>
-        <div id="duel-foe-fill" class="kit-hpbar-v2 kit-hpbar-v2--foe">
-          <i class="kit-hpbar-v2__ghost" aria-hidden="true"></i>
-          <i class="kit-hpbar-v2__fill" aria-hidden="true"></i>
-          <i class="kit-hpbar-v2__cap" aria-hidden="true"></i>
-          <span id="duel-foe-n" class="kit-hpbar-v2__num">0 / 0</span>
-        </div>
-        <div class="hv2-atk" aria-hidden="true"><i id="duel-foe-atk" class="hv2-atk__fill"></i></div>
+      <div class="dh-side dh-foe">
+        <b id="duel-foe-name" class="dh-name"></b><span id="duel-foe-lv" class="dh-lv">Lv.1</span>
+        <div class="dh-bar"><i id="duel-foe-fill" class="dh-fill"></i><span id="duel-foe-n" class="dh-num">0 / 0</span></div>
+        <div class="dh-sub"><i id="duel-foe-atk" class="dh-subfill"></i></div>
       </div>
-
-      <!-- 우: 나 (1순위 HP) + 펫 칩 -->
-      <div class="kit-hud-v2__side kit-hud-v2__side--me">
-        <div class="kit-hud-v2__line">
-          <b id="duel-me-name" class="kit-hud-v2__name"></b><span id="duel-me-lv" class="kit-hud-v2__lv">Lv.1</span>
-        </div>
-        <div id="duel-me-fill" class="kit-hpbar-v2">
-          <i class="kit-hpbar-v2__ghost" aria-hidden="true"></i>
-          <i class="kit-hpbar-v2__fill" aria-hidden="true"></i>
-          <i class="kit-hpbar-v2__cap" aria-hidden="true"></i>
-          <span id="duel-me-n" class="kit-hpbar-v2__num">0 / 0</span>
-        </div>
-        <div class="hv2-atk" aria-hidden="true"><i id="duel-me-atk" class="hv2-atk__fill"></i></div>
+      <div class="dh-side dh-me">
+        <b id="duel-me-name" class="dh-name"></b><span id="duel-me-lv" class="dh-lv">Lv.1</span>
+        <div class="dh-bar"><i id="duel-me-fill" class="dh-fill"></i><span id="duel-me-n" class="dh-num">0 / 0</span></div>
+        <div class="dh-sub"><i id="duel-me-atk" class="dh-subfill"></i></div>
       </div>
+      <span id="duel-dmg" class="dh-dmg"></span>
     </div>
     <!-- v2 HUD strip. Collapses to 0px when both children are [hidden] (no vertical
          padding of its own), so classic Endless / Daily keep the v1 board height. -->
@@ -36340,7 +36305,7 @@ window.TT_SFX = {
        ②-C(0901) — 그 부품이 kit-chip-v2 에서 **정본 chip 변주 `.wf-chip`** 으로
        갈렸다. 이 한 줄이 마크업의 class 를 통째로 덮어쓰므로 여기도 같이 간다
        (안 고치면 판이 도는 순간 초상 하나만 옛 칩으로 되돌아간다 — 실측함). */
-    if (av) av.className = 'wf-chip dh-av dh-av--foe bs-' + (d.def ? d.def.id : 'grape');
+    if (av) av.className = 'dh-av boss-av bs-' + (d.def ? d.def.id : 'grape');
     setText('duel-foe-name', d.def ? bossName(d.def) : '');
     /* Lv 은 탄 번호다. 양쪽에 같은 값이 서는 것이 시안이고, 실제로도 이 판의
        난이도(HP·공격력·게이지 캡)를 정하는 단 하나의 수가 탄 번호다. */
@@ -36446,8 +36411,8 @@ window.TT_SFX = {
     if (!hud || hud.hidden) return;
     var c = d.hud || (d.hud = {});
     var f = d.foe, m = d.me;
-    dhBar(c, 'fr', 'duel-foe-fill', f.hpMax > 0 ? Math.max(0, f.hp) / f.hpMax : 0);
-    dhBar(c, 'mr', 'duel-me-fill', m.hpMax > 0 ? Math.max(0, m.hp) / m.hpMax : 0);
+    dhVar(c, 'fr', 'duel-foe-fill', '--hp', f.hpMax > 0 ? Math.max(0, f.hp) / f.hpMax : 0);
+    dhVar(c, 'mr', 'duel-me-fill', '--hp', m.hpMax > 0 ? Math.max(0, m.hp) / m.hpMax : 0);
     dhVar(c, 'fa', 'duel-foe-atk', '--atk', f.atkMax > 0 ? Math.min(1, f.atk / f.atkMax) : 0);
     dhVar(c, 'ma', 'duel-me-atk', '--atk', m.atkMax > 0 ? Math.min(1, m.atk / m.atkMax) : 0);
     dhText(c, 'fn', 'duel-foe-n', Math.max(0, Math.ceil(f.hp)) + ' / ' + f.hpMax);
@@ -57053,5 +57018,1197 @@ if(document.readyState==="complete") start();
 else window.addEventListener("load",start);
 })();
 </script>
+<style id="hud-restore-0904">
+/* ============================================================
+   전투 HUD 배포본(8c4b30a) 구조 복귀 (2026-09-04).
+   kit-hud-v2 재설계를 배포본 jbox--slab 조립으로 되돌린다 — 마크업/JS 는
+   본문에서 교체했고, 이 블록은 배포본의 HUD CSS(#duel/.dh-/jbox--slab)만
+   선별 이식해 캐스케이드 마지막에 둔다(kit-hud-v2 잔여 규칙을 이긴다).
+   위 위에 S6 색·(c)캡슐 홈·게이지 몸통은 별도 커밋에서 얹는다.
+   ============================================================ */
+/* ---- 18.4b 전투 HUD (#duel-hud) — 전투 개편 단계 4 ---------------------------
+   시안 gm-ingame-battle.png 의 배치를 **코드 스킨**으로 세운 절이다:
+   좌 악당(뼈 장식 · 검붉은 채움 · 현재/최대) · 중앙 젤리 유리 캡슐 타이머 ·
+   우 내 진영(날개 장식 · 하늘색 채움). 아트는 아직 한 장도 없다.
+
+   ★ 에셋 교체 규약 — 이 절의 유일한 계약 ★
+   임시 스킨의 전부가 아래 #duel-hud 의 --duel-* 한 블록에 모여 있다. 그림이
+   도착하면 **그 변수들만** url(...)/9-slice 로 갈아 끼운다: 프레임 넷
+   (--duel-foe-frame · --duel-me-frame · --duel-cap-frame · --duel-castle-img)과
+   장식 둘(--duel-orn-l · --duel-orn-r)은 지금 none 이라 배경 사슬의 **앞칸**이
+   비어 있고, 값이 들어오는 순간 그 칸이 뒤의 그라데이션 폴백을 그대로 덮는다.
+   마크업·JS·선택자는 그날 한 글자도 안 바뀐다(--char-img 규약과 같다).
+
+   높이 예산: 진영 캡슐 = 4+34+5 = 43px, 중앙 = 15(성)+1+28(캡슐) = 44px.
+   #boss-bar(약 41px)와 같은 급이고, 전투에서는 #tb-stats 두 줄(44px)이 대신
+   비므로 보드가 잃는 높이는 실질 0 이다. */
+#duel-hud {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 0 calc(var(--safe-r) + 8px) 4px calc(var(--safe-l) + 8px);
+
+  /* --- 임시 코드 스킨. 에셋 도착 시 갈아 끼우는 칸은 여기가 전부다 --- */
+  --duel-foe-frame: none;
+  --duel-me-frame: none;
+  --duel-cap-frame: none;
+  --duel-castle-img: none;
+  --duel-orn-l: none;
+  --duel-orn-r: none;
+  --duel-foe-panel: linear-gradient(180deg, rgba(78, 32, 60, .86) 0%, rgba(36, 11, 28, .90) 100%);
+  --duel-me-panel:  linear-gradient(180deg, rgba(232, 247, 255, .92) 0%, rgba(180, 220, 246, .94) 100%);
+  --duel-foe-track: rgba(18, 4, 11, .74);
+  --duel-me-track:  rgba(34, 74, 108, .28);
+  --duel-foe-fill:  linear-gradient(180deg, #D22B44 0%, #90112A 55%, #56091A 100%);
+  --duel-me-fill:   linear-gradient(180deg, #CFF4FF 0%, #86D8F7 52%, #4FB6E8 100%);
+  --duel-foe-atk:   linear-gradient(90deg, #FF5A3D, #FFB03D);
+  --duel-me-atk:    linear-gradient(90deg, #FFD24D, #FF8A3D);
+  --duel-cap-bg: linear-gradient(180deg, rgba(255, 255, 255, .40) 0%, rgba(255, 255, 255, .12) 48%, rgba(146, 196, 234, .26) 100%);
+  --duel-orn-fb-foe: radial-gradient(closest-side, rgba(244, 232, 220, .46) 92%, transparent 100%);
+  --duel-orn-fb-me:  radial-gradient(closest-side, rgba(255, 255, 255, .72) 92%, transparent 100%);
+  --duel-tm-color: #F0537D;
+}
+#duel-hud[hidden] { display: none; }
+.dh-side {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px 5px;
+  border-radius: 13px;
+  background-size: 100% 100%, auto;
+  background-repeat: no-repeat, repeat;
+}
+.dh-foe {
+  background-image: var(--duel-foe-frame), var(--duel-foe-panel);
+  box-shadow: inset 0 0 0 1px rgba(255, 170, 170, .22), 0 2px 6px rgba(0, 0, 0, .30);
+}
+.dh-me {
+  background-image: var(--duel-me-frame), var(--duel-me-panel);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .60), 0 2px 6px rgba(0, 0, 0, .20);
+}
+/* 장식(악당=뼈, 내 쪽=날개)의 **자리**. 지금은 캡슐 양끝의 부드러운 도형이고,
+   --duel-orn-l/r 에 url 이 들어오면 앞칸이 그 도형을 덮어 그림이 된다. */
+.dh-side::before,
+.dh-side::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  margin-top: -9px;
+  width: 11px;
+  height: 18px;
+  pointer-events: none;
+  background-size: contain, contain;
+  background-repeat: no-repeat, no-repeat;
+  background-position: center, center;
+}
+.dh-side::before { left: 0; }
+.dh-side::after  { right: 0; }
+.dh-foe::before { background-image: var(--duel-orn-l), var(--duel-orn-fb-foe); }
+.dh-foe::after  { background-image: var(--duel-orn-r), var(--duel-orn-fb-foe); }
+.dh-me::before  { background-image: var(--duel-orn-l), var(--duel-orn-fb-me); }
+.dh-me::after   { background-image: var(--duel-orn-r), var(--duel-orn-fb-me); }
+#duel-hud .dh-av { flex: 0 0 auto; width: 36px; height: 34px; }
+/* 내 초상은 선택 캐릭터의 표준 face 다 — applyCharSkin 의 --slot-face 와 같은
+   setStdArt 규약이고, 표준 얼굴이 없는 캐릭터에서는 변수가 비어 빈 칸이 된다. */
+.dh-av-me {
+  background-image: var(--duel-me-face, none);
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.dh-info { flex: 1 1 auto; min-width: 0; position: relative; z-index: 1; }
+.dh-top { display: flex; align-items: baseline; justify-content: space-between; gap: 5px; }
+.dh-name {
+  flex: 0 1 auto;
+  min-width: 0;
+  font: 800 11px/1.2 var(--font);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dh-lv { flex: 0 0 auto; font: 800 9px/1 var(--font-latin); }
+.dh-foe .dh-name { color: #FFE4E9; }
+.dh-foe .dh-lv   { color: #FFB4A6; }
+.dh-me  .dh-name { color: #204464; }
+.dh-me  .dh-lv   { color: #2C6E96; }
+.dh-bar {
+  position: relative;
+  height: 13px;
+  margin-top: 2px;
+  border-radius: 7px;
+  overflow: hidden;
+}
+.dh-foe .dh-bar { background: var(--duel-foe-track); box-shadow: inset 0 0 0 1px rgba(255, 150, 150, .24); }
+.dh-me  .dh-bar { background: var(--duel-me-track);  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .55); }
+/* width 가 아니라 scaleX — #boss-hp-fill 과 같은 이유다(체력은 매치마다 줄어드는
+   값이라 레이아웃을 건드리면 그 프레임에 보드 전체가 다시 배치된다). */
+.dh-fill {
+  position: absolute;
+  inset: 0;
+  transform-origin: 0 50%;
+  transform: scaleX(var(--hp, 1));
+  transition: transform 300ms var(--ease);
+}
+.dh-foe .dh-fill { background-image: var(--duel-foe-fill); }
+.dh-me  .dh-fill { background-image: var(--duel-me-fill); }
+.dh-num {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: 800 9px/1 var(--font-latin);
+  white-space: nowrap;
+}
+.dh-foe .dh-num { color: #FFF1F1; text-shadow: 0 1px 2px rgba(0, 0, 0, .85); }
+.dh-me  .dh-num { color: #16374E; text-shadow: 0 1px 1px rgba(255, 255, 255, .70); }
+/* 공격 게이지. 시안에는 없지만 전투 정보로는 필수다 — 만땅이 곧 자동 발동이라
+   "언제 나가나"가 화면에 없으면 공격도 피격도 사고처럼 읽힌다. 주 HP 바 아래
+   2px 로만 눕혀서 시안의 구도(두 체력바 + 가운데 시계)를 흔들지 않는다. */
+.dh-sub { height: 2px; margin-top: 2px; border-radius: 1px; overflow: hidden; background: rgba(0, 0, 0, .34); }
+.dh-me .dh-sub { background: rgba(34, 74, 108, .26); }
+.dh-subfill {
+  display: block;
+  height: 100%;
+  transform-origin: 0 50%;
+  transform: scaleX(var(--atk, 0));
+  transition: transform 200ms linear;
+}
+.dh-foe .dh-subfill { background-image: var(--duel-foe-atk); }
+.dh-me  .dh-subfill { background-image: var(--duel-me-atk); }
+/* 가한 누적 데미지 — 전투의 '점수'다. #tb-stats 가 전투에서 비는 자리를 이
+   한 줄이 대신한다(별·best 는 여전히 S.score 로 계산된다 — 두 계좌는 다르다). */
+.dh-dmg {
+  display: block;
+  margin-top: 2px;
+  font: 800 9px/1.2 var(--font-latin);
+  color: #2C6E96;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dh-mid { flex: 0 0 auto; width: 92px; display: flex; flex-direction: column; align-items: center; }
+.dh-castle {
+  display: block;
+  width: 22px;
+  height: 15px;
+  font-size: 13px;
+  line-height: 15px;
+  text-align: center;
+  background-image: var(--duel-castle-img);
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+/* 젤리 유리 캡슐. 시안 중앙의 그 캡슐이고, 아트가 오면 --duel-cap-frame 이 덮는다. */
+#duel-timer {
+  width: 100%;
+  margin-top: 1px;
+  padding: 3px 4px 4px;
+  border-radius: 14px;
+  text-align: center;
+  font: 900 21px/1 var(--font-latin);
+  letter-spacing: .5px;
+  color: var(--duel-tm-color);
+  background-image: var(--duel-cap-frame), var(--duel-cap-bg);
+  background-size: 100% 100%, auto;
+  background-repeat: no-repeat, repeat;
+  box-shadow:
+    inset 0 0 0 1.5px rgba(255, 255, 255, .62),
+    inset 0 3px 7px rgba(255, 255, 255, .34),
+    0 2px 7px rgba(0, 0, 0, .22);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, .55), 0 2px 3px rgba(0, 0, 0, .22);
+}
+/* 마지막 10초의 박동은 #rush-timer 와 **같은 keyframes** 를 쓴다 — 시계가 자리를
+   옮겼다고 긴장의 문법까지 새로 만들지 않는다. */
+#app.danger #duel-timer { color: #FF3D2E; animation: rushbeat 1s infinite; }
+/* 전투에서 자리를 비우는 둘. **숨김이지 삭제가 아니다**: .battle 은 battleOn()
+   계보만 켜므로 TW_BATTLE=false 면 영영 안 켜지고, 세 모드는 이 줄을 지나지
+   않는다. 시간은 #duel-timer 가, 점수는 .dh-dmg 가 대신 말한다 — 같은 사실이
+   화면에 두 번 서면 어느 쪽이 나를 죽이는지가 흐려진다(syncRushHud 의 규율). */
+#app.battle #tb-stats { display: none; }
+/* ---- 실기기 반려 ①④ (0819) — 배경 원화 · 상단 이중 HUD 정리 -----------------
+   ① "인게임 배경이 검정이다."
+      원인은 전투가 아니라 **게임 화면 전체**에 있었다: #screen-game 은 배경을
+      한 겹도 갖지 않는 컨테이너이고(§6 주석 "no pseudo-element background of
+      its own"), 그래서 화면에 실제로 보이던 것은 #app 의 어두운 그라데이션
+      (linear-gradient(180deg, var(--panel), #191426)) 이었다. 전투가 그 경로를
+      건너뛴 것도, .battle 이 무언가를 덮은 것도, board-scroll 의 overflow 도
+      아니다 — 깔 배경이 처음부터 없었다.
+      시안(gm-ingame-battle.png)의 첫 사실은 "판이 **밝은 원화 위에** 떠 있다"
+      이므로, 이미 임베드돼 있는 챕터 원화(--art-map-bg — #map-layer 가 쓰는
+      바로 그 그림)를 전투 화면의 배경으로 깐다. 새 이미지는 0 장이고 번들은
+      한 바이트도 안 늘어난다.
+      **요소 배경**으로 까는 것이 중요하다: ::before 한 겹을 세우면 z-index 를
+      갖게 되고, 그 순간 #board-scroll(2) · #hero-slot(3) · #fx(60) 와 순서를
+      다투게 된다. 요소 배경은 언제나 모든 자식 아래이므로 쌓임 순서에 관해
+      아무 약속도 새로 하지 않는다.
+      위·아래의 얕은 스크림(.30/.06/.06/.34)은 §17 .map-scrim 과 같은 문법이다 —
+      가운데(판이 앉는 띠)는 열어 두고 HUD 가 앉는 양 끝만 눌러, 그림이 밝든
+      어둡든 상단 HUD 와 하단 버튼의 대비를 다시 재지 않아도 되게 한다.
+   ④ "주황 topbar 와 #duel-hud 가 겹쳐 정신없다."
+      #tb-stats 는 이미 숨었으므로 남은 중복은 둘이었다: (a) #hero-slot 의
+      주인공 초상 — #duel-hud 의 .dh-av-me 가 **같은 얼굴**을 이미 들고 있다,
+      (b) --lib-hud-bar 띠 그 자체 — 시안의 좌상단은 띠 없이 뜬 알약 버튼
+      하나다. 둘 다 전투에서만 벗긴다(세 모드는 이 줄을 지나지 않는다).
+      슬롯을 접으면 #topbar 의 오른쪽 예산 100px 도 의미를 잃으므로 12px 로
+      되돌린다 — 벗긴 띠 두께(7px×2)와 함께 약 20px 이 보드로 넘어간다.
+   ------------------------------------------------------------------------- */
+#app.battle #screen-game {
+  background-image:
+    linear-gradient(180deg,
+      rgba(12, 8, 24, .30) 0%,
+      rgba(12, 8, 24, .06) 18%,
+      rgba(12, 8, 24, .06) 78%,
+      rgba(12, 8, 24, .34) 100%),
+    var(--art-map-bg);
+  background-size: cover, cover;
+  background-position: center center, center center;
+  background-repeat: no-repeat, no-repeat;
+}
+/* 🚨 W10 ① (2026-08-21) 사용자 반려 — "유리 판을 화면 최상단에 붙여라".
+   전까지 유리판 위에 14px 의 빈 띠가 있었고, 그 14px 의 출처는 **상단바의 키**
+   였다. 산술이 정확히 이랬다:
+     #topbar 높이 = padding-top 6 + 가장 큰 자식(#btn-pause 40) + padding-bottom 2
+                  = 48px
+     #duel-hud 는 margin-top:-34px 로 그중 34 를 끌어올린다 → 48 − 34 = **14px**
+   전투의 상단바는 **일시정지 버튼 하나**만 든다(#tb-stats·#rush-timer·#hero-slot
+   이 전부 이 절과 위 줄에서 접힌다). 즉 그 48px 은 버튼 한 개를 세우려고 판을
+   14px 아래로 미는 값이었다. 그래서 버튼을 흐름에서 빼고(아래 #btn-pause 절이
+   position:absolute 로 시안 자리에 박는다) 상단바를 **높이 0** 으로 접는다.
+   남기는 것은 safe-area 뿐이다 — "최상단"이 노치 밑을 뜻하지는 않는다.
+   ⚠ overflow 를 visible 로 두는 것이 필수다: 접힌 상단바 밖으로 버튼이 나간다. */
+#app.battle #screen-game #topbar {
+  border-width: 0;
+  border-image: none;
+  background: none;
+  padding: var(--safe-t) 0 0 0;
+  position: relative;
+  overflow: visible;
+  /* 🚨 cqw 이지 % 가 아니다. 아래 #btn-pause 는 이 길이를 `width` 와 `top` 두
+     곳에서 쓰는데, 커스텀 속성은 **토큰 치환**이라 `100%` 를 넣으면 width 에서는
+     폭의 100%, top 에서는 **높이**의 100% 로 각각 풀린다. 이 상단바는 높이가 0
+     이므로 top 이 −0.3px 이 되어 버튼 머리가 화면 밖으로 잘렸다(실측).
+     cqw 는 어느 속성에서 쓰든 컨테이너의 **인라인 크기**라 그 함정이 없다.
+     그래서 container-type 이 장식이 아니라 필수다. */
+  container-type: inline-size;
+  /* 유리판의 실폭. 아래 #btn-pause 의 좌표가 전부 이 길이의 비율이다 —
+     시안(gm-hud-placement2.json)이 재는 기준상자가 곧 유리판이기 때문이다.
+     8px 은 #duel-hud 의 좌우 마진 4+4(:36741)와 **같은 수**다(함께 고칠 것). */
+  --dh-w: calc(100cqw - var(--safe-l) - var(--safe-r) - 8px);
+}
+/* 피격. 맞은 쪽 진영만 밝게 튀고 흔들린다 — #app.duel-hurt 의 붉은 톤과 같은
+   계열이되 판 전체를 덮지 않는다(맞은 뒤에도 판은 계속 읽혀야 한다). */
+#duel-hud.fhit .dh-foe .dh-fill,
+#duel-hud.mhit .dh-me .dh-fill { animation: dhflash 300ms var(--ease); }
+#duel-hud.fhit .dh-foe,
+#duel-hud.mhit .dh-me { animation: dhknock 300ms var(--ease); }
+#duel-hud.fhit.big .dh-foe { animation: dhknock 460ms var(--spring) 2; }
+/* 예고 — #boss-bar.tell 과 같은 문법(테두리가 경고색으로 뛴다). 화면을 덮지
+   않는 것이 규칙이다: 예고 1.8초 동안 플레이어는 계속 매치할 수 있어야 한다. */
+#duel-hud.tell .dh-foe { animation: dhtell .6s ease-in-out infinite; }
+/* 격파 — 보스바와 같은 keyframes(bossdown). 바는 비워진다. */
+#duel-hud.down .dh-foe { animation: bossdown .6s var(--ease) forwards; }
+#duel-hud.down .dh-foe .dh-fill { transform: scaleX(0); }
+@media (prefers-reduced-motion: reduce) {
+  #duel-hud.tell .dh-foe,
+  #duel-hud.fhit .dh-foe,
+  #duel-hud.mhit .dh-me,
+  #duel-hud.fhit .dh-foe .dh-fill,
+  #duel-hud.mhit .dh-me .dh-fill,
+  #app.danger #duel-timer { animation: none; }
+  .dh-fill, .dh-subfill { transition: none; }
+}
+/* ---- 2. 일시정지 · 성 · 아바타 (실물) ------------------------------------ */
+/* 🚨 W10 ② (2026-08-21) 사용자 반려 — "일시정지가 찌그러진 주황 사각으로 보인다".
+   실측은 **찌그러짐이 아니라 자리와 크기**를 지목했다:
+     · 그림  catalog/duel-btn-pause.webp (152×151) · background-size:contain
+       → skew 0.7%. 늘어난 곳은 한 군데도 없다(비율 스캔 관문의 수치).
+     · 자리  시안(gm-hud-placement2.json pause_button)은 유리판 기준 cy 26.35%
+       — **유리 위에 떠 있는** 버튼이다. 그런데 실측은 cy 9.65% 였다: 버튼이
+       상단바의 흐름에 서 있어서 유리판보다 **위**에 있었고, 그래서 유리 밖
+       빈 하늘에 40px 짜리 코랄 덩어리 하나가 떠 있는 그림이 됐다.
+     · 크기  실측 폭 10.47% vs 시안 9.63%.
+   그래서 흐름에서 빼고 시안 좌표에 박는다. 기준은 유리판 폭(--dh-w, :6646 절):
+     w  = 9.63%   · h 는 원본 비율(152/151)이 정한다 — 늘림 금지
+     cx = 8.60%   → left = (8.60 − 9.63/2)% = 3.785%
+     cy = 26.35%  → top  = (26.35 − 28.66/2)% 의 **높이** 비율이고, 유리판 높이는
+                    폭/3.072(aspect-ratio:1536/500)이므로 폭 기준으로 환산하면
+                    12.02% ÷ 3.072 = 3.913% 다. 좌표계를 폭 하나로 통일해야
+                    유리판이 커지고 작아져도 버튼이 같은 자리에 남는다.
+   ⚠ 시안 rect 의 비(145/143)와 그림의 비(152/151)는 0.7% 차이라 폭을 시안에
+     맞추고 높이는 그림에 맡긴다 — 둘 다 시안에 맞추면 그때 진짜로 찌그러진다.
+   z-index 6 은 W6.5b 의 근거를 그대로 잇는다: #duel-hud 가 DOM 에서 #topbar
+   **다음**이라 나중에 칠해지므로, 버튼 하나만 유리 위로 올린다(상단바를 올리면
+   그 배경까지 함께 올라간다). */
+#app.battle #btn-pause{
+  background:url("catalog/duel-btn-pause.webp") center/contain no-repeat !important;
+  box-shadow:none !important;border-radius:0 !important;
+  position:absolute;
+  left:calc(var(--safe-l) + 4px + 0.03785 * var(--dh-w));
+  top:calc(0.03913 * var(--dh-w));
+  width:calc(0.0963 * var(--dh-w)) !important;
+  height:auto !important;
+  aspect-ratio:152/151;
+  z-index:6;
+}
+#app.battle #duel-hud{
+  /* 14차 재조립(시안 6호)으로 성 그림은 --duel-castle-img 를 떠나 .dh-castle 의
+     직접 배경(duel-castle-hd, 202×188 고해상)이 됐다. 구판 duel-icon-castle.webp
+     은 **파일로 남아 있고** 참조만 끊었다 — 되돌리려면 이 한 줄만 되살린다. */
+  /* HP 바 3점 샘플의 자리. 임시 파스텔을 시안 색으로 갈아 끼운다. */
+  --duel-foe-panel:linear-gradient(180deg,rgba(163,113,166,.94) 0%,rgba(122,66,124,.95) 52%,rgba(85,9,71,.96) 100%);
+  --duel-me-panel:linear-gradient(180deg,rgba(232,244,252,.94) 0%,rgba(198,222,240,.94) 54%,rgba(160,192,216,.95) 100%);
+  --duel-foe-track:rgba(46,6,32,.86);
+  --duel-me-track:rgba(87,118,149,.30);
+  --duel-foe-fill:linear-gradient(180deg,#C0304F 0%,#A01830 46%,#6B0B22 78%,#4A0013 100%);
+  --duel-me-fill:linear-gradient(180deg,#E6F7FF 0%,#C8E8F0 38%,#A5DCE6 70%,#74BBD7 100%);
+  --duel-tm-color:#EE6A88;
+}
+#app.battle .dh-castle{
+  width:24px !important;height:21px !important;
+  margin-bottom:-5px;
+  position:relative;z-index:1;
+  filter:drop-shadow(0 1px 2px rgba(60,20,60,.45));
+}
+/* 아바타 둘. 14차 재조립(시안 6호) 전에는 **머리만** 잘린 작은 초상 두 장
+   (duel-portrait-demon / -cloud)이 여기 섰다. 사용자 반려 "똑같이 만들라고"의
+   핵심이 바로 이 자리였다 — 시안은 작은 초상이 아니라 **서 있는 전신 데몬**과
+   **큰 왕관 구름**이다. 그림·크기·자리는 전부 아래 시안 6호 절이 정하고, 이
+   두 규칙에는 그림자만 남긴다. 구판 두 장은 catalog 에 **파일로 남아 있다**.
+   (내 초상은 여전히 setStdArt 의 --duel-me-face 대신 시안 그림이 선다.) */
+#app.battle #duel-foe-av{
+  filter:drop-shadow(0 2px 3px rgba(30,4,24,.55));
+}
+#app.battle #duel-me-av{
+  background-size:contain;background-position:center;background-repeat:no-repeat;
+  filter:drop-shadow(0 2px 3px rgba(40,70,100,.35));
+}
+/* ---- 3. 타이머 유리 캡슐 + 젤리 숫자 --------------------------------------
+   유리는 ::before 한 겹이 맡고(z-index:-1), 요소 자신의 배경은 **글자 젤리**가
+   쓴다 — 한 요소의 배경을 둘로 쪼개는 유일한 방법이고, .dh-mid 에 스태킹
+   컨텍스트(z-index:0)를 세워 그 -1 이 화면 배경까지 내려가지 않게 묶는다.
+   글자 그라데이션은 팝업 제목에서 검증된 롱핸드 패턴 그대로다(@supports 폴백). */
+#app.battle .dh-mid{position:relative;z-index:0;}
+#app.battle #duel-timer{
+  position:relative;
+  background:none !important;background-image:none !important;
+  box-shadow:none !important;
+  padding:4px 6px 5px !important;
+  border-radius:16px !important;
+  font-size:22px !important;
+  color:var(--duel-tm-color) !important;
+  text-shadow:0 1px 0 rgba(255,255,255,.62),0 2px 4px rgba(70,40,90,.35);
+}
+#app.battle #duel-timer::before{
+  content:"";position:absolute;inset:0;z-index:-1;
+  border-radius:16px;
+  background:
+    radial-gradient(ellipse 38% 26% at 22% 16%,rgba(250,247,254,.92),rgba(250,247,254,0) 70%),
+    radial-gradient(ellipse 12% 9% at 74% 12%,rgba(250,247,254,.72),rgba(250,247,254,0) 72%),
+    radial-gradient(ellipse 40% 24% at 82% 92%,rgba(221,219,255,.42),rgba(221,219,255,0) 74%),
+    linear-gradient(180deg,rgba(238,237,255,.80) 0%,rgba(214,211,238,.62) 38%,
+      rgba(196,192,218,.56) 72%,rgba(168,164,204,.62) 100%);
+  -webkit-backdrop-filter:blur(7px) saturate(1.5) brightness(1.12);
+  backdrop-filter:blur(7px) saturate(1.5) brightness(1.12);
+  box-shadow:
+    inset 0 0 0 1.5px rgba(255,255,255,.86),
+    inset 0 3px 6px rgba(255,255,255,.54),
+    inset 0 -6px 12px rgba(89,86,141,.30),
+    0 2px 7px rgba(41,26,66,.34);
+}
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+  #app.battle #duel-timer{
+    background-image:linear-gradient(180deg,#FFF4C0 0%,#FFE585 22%,#FDC377 50%,
+      #FD9A78 74%,#FB7E93 100%) !important;
+    background-color:transparent !important;
+    -webkit-background-clip:text !important;background-clip:text !important;
+    color:transparent !important;-webkit-text-fill-color:transparent !important;
+    text-shadow:none;
+    /* filter 를 걸지 않는 것이 이 절의 함정이다: filter 는 스태킹 컨텍스트를
+       만들고, 그 순간 z-index:-1 인 유리 겹이 **요소 배경(=글자 젤리) 위로**
+       올라와 숫자를 덮는다(실측 — 숫자가 뿌옇게 죽었다). 그래서 윤곽은
+       drop-shadow 가 아니라 획(text-stroke)이 만든다. */
+    -webkit-text-stroke:1px rgba(177,100,84,.80);
+    paint-order:stroke fill;
+  }
+}
+/* 마지막 10초. 여기서는 **젤리 클립을 아예 내린다**: rushbeat 가 transform 을
+   애니메이션하는 순간 #duel-timer 가 스태킹 컨텍스트가 되고, 그러면 z-index:-1
+   유리 겹이 요소 배경(=글자 젤리) 위로 올라와 숫자가 뿌옇게 죽는다(실측).
+   글자를 **내용**으로 되돌리면 어떤 쌓임 순서에서도 유리 위에 선다 —
+   그리고 마지막 10초에 필요한 것은 그라데이션이 아니라 붉은 한 톤이다. */
+#app.danger.battle #duel-timer{
+  background-image:none !important;
+  color:#FF4432 !important;-webkit-text-fill-color:#FF4432 !important;
+  -webkit-text-stroke:1px rgba(122,20,10,.55);
+  text-shadow:0 1px 0 rgba(255,255,255,.55),0 2px 4px rgba(122,20,10,.35);
+}
+/* ---- 4. HP 바 유리화 ------------------------------------------------------
+   좌(적) = 어두운 자주 틀 + 검붉은 채움 + 분홍 라벨, 우(내) = 밝은 하늘 유리 +
+   흰 라벨. 위 --duel-* 가 면을 칠했고, 여기서는 그 위의 **림·광택**만 얹는다. */
+#app.battle .dh-side{
+  background-size:100% 100%,auto !important;
+  -webkit-backdrop-filter:blur(4px) saturate(1.2);
+  backdrop-filter:blur(4px) saturate(1.2);
+}
+/* !important 를 쓰지 않는다 — 예고(dhtell)·격파는 **애니메이션으로** 테두리를
+   바꾸는데, !important 선언은 애니메이션보다 세다(CSS 우선순위 규칙). 여기서
+   림을 못 박으면 "1.8초 뒤에 맞는다"는 신호가 통째로 사라진다. 선택자
+   특이도(#app.battle .dh-foe)만으로 이미 기본 규칙을 이긴다. */
+#app.battle .dh-foe{
+  box-shadow:
+    inset 0 0 0 1.5px rgba(200,154,200,.78),
+    inset 0 2px 5px rgba(255,214,246,.32),
+    inset 0 -6px 10px rgba(85,9,71,.55),
+    0 2px 6px rgba(24,4,20,.44);
+}
+#app.battle .dh-me{
+  box-shadow:
+    inset 0 0 0 1.5px rgba(255,255,255,.88),
+    inset 0 2px 5px rgba(255,255,255,.60),
+    inset 0 -6px 10px rgba(87,118,149,.30),
+    0 2px 6px rgba(40,70,100,.28);
+}
+#app.battle .dh-foe .dh-bar{
+  box-shadow:
+    inset 0 0 0 1px rgba(85,9,71,.95),
+    inset 0 2px 4px rgba(0,0,0,.55);
+}
+#app.battle .dh-me .dh-bar{
+  box-shadow:
+    inset 0 0 0 1px rgba(87,118,149,.70),
+    inset 0 2px 4px rgba(87,118,149,.28);
+}
+/* 채움 위의 유리 광택 한 겹 — 두 진영 모두 같은 문법이라 색만 다르다. */
+#app.battle .dh-fill::after{
+  content:"";position:absolute;inset:0 0 52% 0;
+  border-radius:7px 7px 0 0;
+  background:linear-gradient(180deg,rgba(255,255,255,.42),rgba(255,255,255,0));
+  pointer-events:none;
+}
+#app.battle .dh-foe .dh-name{color:#FED7EA !important;text-shadow:0 1px 2px rgba(66,11,53,.92);}
+#app.battle .dh-foe .dh-lv  {color:#FFC2DE !important;text-shadow:0 1px 2px rgba(66,11,53,.92);}
+#app.battle .dh-foe .dh-num {color:#FFF1F6 !important;text-shadow:0 1px 2px rgba(40,0,16,.95);}
+/* 흰 라벨은 밝은 하늘 유리 위에 선다 — 흰 대 흰이라 **획 외곽선**이 대비를
+   만든다(시안의 Cloud HP 가 쓰는 바로 그 수법). 사방 1px 짙은 강청 그림자. */
+#app.battle .dh-me .dh-name{color:#FFFFFF !important;
+  text-shadow:0 1px 0 rgba(43,71,99,.95),0 -1px 0 rgba(43,71,99,.80),
+    1px 0 0 rgba(43,71,99,.80),-1px 0 0 rgba(43,71,99,.80),0 2px 4px rgba(43,71,99,.55);}
+#app.battle .dh-me .dh-lv  {color:#F2FBFF !important;
+  text-shadow:0 1px 0 rgba(43,71,99,.95),0 -1px 0 rgba(43,71,99,.80),
+    1px 0 0 rgba(43,71,99,.80),-1px 0 0 rgba(43,71,99,.80);}
+#app.battle .dh-me .dh-num {color:#16374E !important;text-shadow:0 1px 1px rgba(255,255,255,.80);}
+#app.battle .dh-me .dh-dmg {color:#255C82 !important;text-shadow:0 1px 1px rgba(255,255,255,.72);}
+<style id="jelly-box-core">
+/* ============================================================
+   공통 젤리박스 컴포넌트 `.jbox` — 다섯 자리가 **한 판**을 공유한다.
+   사용자 지시(14차): "투명 젤리 박스가 먼저 깔리고 그 위에 에셋이 레이어로
+   쌓인다 — 공통 에셋으로 젤리박스를 먼저 만들고 색감 정도만 나눠 동일하게 써라."
+   판 원본: catalog/jelly-box.webp (1294×1480 = 2x · 9-슬라이스 190 fill).
+
+   ⚠ 2026-08-19 **정본 교체 v2** — 사용자 합격본("된 거 같아 적용해봐")으로 갈아
+   끼웠다. 구판(460×524 · 전역 알파 ×0.75 베이크 분홍)은 지우지 않고
+   catalog/_superseded/jelly-box-v1.webp 로 물러났다. 아래 <style id=
+   "sian-jelly-panel-v4"> 의 판 서술(460×524·슬라이스 120·모서리 20px)은 **구판
+   기준의 봉인된 기록**이니 그대로 두고, 살아 있는 값은 이 블록만 믿을 것.
+   신품 실측(2x 원본 기준): 하드 외곽선 α>0.9 2~7px · 림 램프 α1.0→0.35 ≈65px ·
+   평탄 도달 ≈140px · 내부 알파 0.243 균질(행방향 σ=0) · 내부색 RGB(191,177,199) ·
+   모서리는 스퀘어클(원 근사 R≈160@2x).
+
+   분기는 **등급 3종뿐**이다. 화면별로 판을 다시 선언하지 말 것 — 그 복붙이
+   !important 3종·반경 제각각·그림자 문법 3종을 낳은 원인이었다.
+     .jbox--modal  팝업/노드카드   biw 48px (k .253)
+     .jbox--slab   전투 상단 슬래브 biw 15px (k .079)
+     .jbox--strip  하단 메달 받침·맵 띠 biw 19px (k .100)
+   k = biw/190 이 네 변에서 같아야 모서리가 안 늘어난다.
+
+   ── 슬라이스 190 의 근거 ──
+   램프 65 + 평탄 도달 145 를 삼키면서 스퀘어클 모서리를 모서리 타일 안에 온전히
+   담아야 한다. 170~200 을 PIL 9-슬라이스 시뮬로 훑어 190 채택 — 이 지점에서
+   직선 변과의 어긋남이 8px@2x(=화면 1px 미만)까지 줄고, 늘어나는 것은 여전히
+   민무늬 몸통뿐이라 어떤 비율에서도 안 뭉개진다.
+
+   ── 등급 biw 의 근거 = **사용자 목표 이미지 비율** ──
+   목표(assets/art/incoming/mockup/gm-jellybox-target.jpg): 판 폭 647px 에
+   림 램프 33px = 판폭의 5.1%. 신품을 1:1(647 = 1294/2)로 놓으면 램프가 정확히
+   32.5px 라 목표와 같은 비율이 된다 ⇒ 등급 배율은 **판을 통째로 축소한 비율**.
+     모달   k = 시트 폭 326 / 판 폭 1294 = .2519 → biw 190×.2519 ≒ 48px
+            (화면 림 = 65×.2519 = 16.4px = 시트 폭의 5.0% ✔ 목표 5.1%)
+     슬래브·띠는 구판의 상대 관계를 그대로 옮긴다(구판 k .2167/.2833 ÷ .7083
+     = 모달의 .306 / .400 배):
+       슬래브 48×.306 ≒ 15px (화면 림 5.1px — 63px 띠에 15+15 이 들어간다)
+       띠     48×.400 ≒ 19px (화면 림 6.5px)
+   반경은 backdrop-filter 의 클립 경계다(기존 규약) — 그림 모서리 R160@2x × k 와
+   어긋나면 흐림이 판 밖으로 삐져나온다. 구판 R20 이 R160 으로 커졌으므로 14→40:
+     모달 160×48/190 = 40px · 슬래브 13px · 띠 16px
+     (14/28/40/52 를 좌상 모서리 시뮬로 대조 — 14·28 은 흐림이 판 밖으로 샜고,
+      52 는 판 안쪽에 안 흐린 띠가 남았다. 40 이 판 윤곽과 정확히 겹친다.)
+   ⚠ background 단축 금지(clip 리셋 사고 전력) — 롱핸드 두 줄만.
+   ⚠ border-image 단축 금지(biw 를 1 로 되돌린다) — 롱핸드 넷만.
+   ⚠ #actionbar 는 전 화면 공용이라 마크업에 클래스를 못 박으면 비전투 화면의
+     주황 띠까지 젤리로 바뀐다. 그래서 그 한 자리만 `#app.battle #actionbar`
+     별칭으로 편입한다 — 값은 여전히 등급 한 곳에만 산다.
+   ============================================================ */
+:root{
+  /* 프로스티드 유리 세기. 슬래브·받침 두 겹의 backdrop-filter 는 저사양 폰에서
+     비싸다 — 무거우면 이 한 줄만 none 으로 바꿔 전투 화면 흐림을 통째로 끈다
+     (팝업은 승인값 blur(5px) 를 따로 들고 있어 영향받지 않는다). */
+  --jbox-frost:blur(3px);
+  /* ---- W2.5 ⑤ 모달 등급의 유리 (2026-08-20) --------------------------------
+     사용자 반려: "모달 젤리판이 전부 무채색·혼탁 — 더 투명하게, 은은한 핑크빛
+     젤리로. 모달로 쓰이는 판은 전부 같은 색." 정본 목표는
+     assets/art/incoming/mockup/gm-modal-pink-target.jpg (768×1376, "플레이" 팝업).
+
+     ── 시안 실측 (PIL, 판 경계 x65..700 · y305..1008) ──
+       판 안쪽 평균          RGB(190, 187, 199)   채도 ≈ 5% · 색상 ≈ 262°(라벤더-핑크)
+       같은 나무줄기, 판 밖   RGB(155, 150, 153)   (판 바로 아래 y1030..1100)
+       같은 나무줄기, 판 안   RGB(190, 184, 196)
+       → 판은 뒤를 **덮는 게 아니라 들어 올린다**: 채널별 배율 ×1.22/×1.23/×1.28.
+       대비 유지율 σ안/σ밖 = 0.82 / 0.64 / 1.02 (평균 0.83)
+       → 뒤 형체가 살아 있다는 뜻이고, 틴트 α 는 **0.2 언저리**여야 한다는 뜻이다
+         (α 가 .50 이면 유지율이 .50 으로 떨어진다 — 옛 크림 값이 정확히 그랬다).
+       고주파 에너지 σ: 판 안 6.80 vs 판 밖 2.36~2.71 → **판 뒤 배경은 안 흐리다**.
+
+     ── 채택값과 그 산술 ──
+       뒤를 들어 올리는 몫은 틴트 α 가 아니라 backdrop-filter 의 brightness 가
+       맡는다(§#duel-hud 가 이미 쓰는 문법 — "α 를 더 올리면 다시 판이 덮여 뒤가
+       죽는다"). 흐림은 시안대로 거의 0 에 가깝게 2px 만 남긴다 — 0 으로 두면
+       판이 유리가 아니라 색유리막이 된다.
+         brightness(1.18) 후 줄기 = (183,177,181)
+         + rgba(255,228,244,.22) 합성 = (199,188,195)
+         시안 실측 (190,184,196) 과 Δ(9,4,-1) — 채널 최대 오차 3.6%.
+       색은 옛 크림 rgb(255,241,216)(B 최저 = 누런 기운)에서 rgb(255,228,244)
+       (B 가 G 위 = 분홍)로 옮긴다. 실측의 라벤더 기울기를 그대로 따르면 판이
+       "보랏빛"으로 읽혀 사용자 낱말("핑크빛")과 어긋나므로, 기울기의 **크기**만
+       가져오고 방향은 분홍으로 세운다.
+
+     ⚠ 이 두 값은 `.jbox--modal` **등급**에 산다 — W6 은 `.w6m` 소비처에 걸어
+     견본(노드 카드·플레이 시트)을 제외했었지만, 이번 사용자 지시가 "모달로
+     쓰이는 건 전부 동일 색상"이라 견본도 편입한다. 등급에 두면 창이 늘어도
+     고칠 자리가 여기 한 곳이다. */
+  /* ===== W7.5 — 모달 젤리판 틴트 **2차** 재조색 =============================
+     1차(바로 위 W2.5 주석의 값)가 사용자 반려됐다. 낱말 셋: ①더 투명하게(뒤가
+     더 비쳐야) ②연핑크와 연보라의 **중간** 파스텔이어야 하는데 지금은 아니다
+     ③"제대로 시안처럼". 정본 시안(gm-modal-pink-target.jpg)을 다시 실측했다.
+
+     ▸ 실측 방법 — 판 경계 안팎으로 **같은 배경 조각**을 짝지어 147쌍을 떴다
+       (바깥 띠 rim+3~17px / 안쪽 띠 rim+14~28px). 합성 모형
+         inside = clamp(outside × b) × (1−a) + tint × a
+       에서 관측으로 식별 가능한 것은 대비이득 k = b(1−a) 와 베일 offset = a·tint
+       둘뿐이다. 강건회귀 + 내용자기상관(ρ=0.837) 보정 결과:
+         **k = 0.62 (0.53~0.70)** · **offset = (101, 96, 102) ±6**
+       내용이 실제로 일치하는 짝(나무줄기·아래 수풀·연못)에서 잔차 ±1~8.
+
+     ▸ 가장 결정적인 한 쌍 — 판 바깥의 **무채색 회색 (132,132,131)** 이 판 안에서
+       **(182,164,189)** 이 된다. R·B 가 +51/+56 오르는 동안 G 는 +32 만 오른다.
+       베일은 흰색도 분홍도 아닌 **마젠타-보라**다. 사용자 낱말이 옳았다.
+
+     ▸ 색상각 — offset(101,96,102) = **HSL 290°**, b=1.0 최적합 틴트
+       (255,243,255) = **298.5°**. 실측 틴트 색상각 **295° ± 8°**.
+       1차 값 rgb(255,228,244) 은 **324°(분홍)** 로 약 30° 분홍 쪽으로 치우쳐 있었다.
+       분홍 330~350° / 라벤더 270~290° 의 **중간이 정확히 300°** 이고 실측이
+       그 값을 가리킨다. 그래서 rgb(255,242,255) — R 과 B 를 같게 두고 G 만 13 내린
+       HSL(300, 100%, 97.5%). 이것이 "연핑크와 연보라의 중간 파스텔"이다.
+
+     ▸ ⚠ 사용자의 "더 투명하게"와 실측이 **겉보기에 어긋난다**: 시안의 판은 1차보다
+       오히려 **더 불투명**하다(1차 k=0.92 offset=(56,50,54) / 시안 k=0.62
+       offset=(101,96,102)). 그런데도 시안이 더 비쳐 보이는 이유를 실측이 말한다 —
+       1차에서 뒤 화면을 죽인 것은 틴트 α 가 아니라 **다른 셋**이었다:
+         ⑴ brightness(1.18) 이 216 이상인 backdrop 채널을 전부 흰색으로 **클리핑**해
+            밝은 하늘·구름을 납작한 우윳빛 덩어리로 만들었다.
+         ⑵ 화면 전체 스크림 rgba(26,14,38,.28) 이 판에 닿기도 **전에** 장면의
+            중간톤 대비를 이미 눌러 놓았다(시안 실측: 판 바깥 p99.9 = (254,244,246),
+            최대 (255,250,251) — 시안에는 스크림이 아예 **없다**).
+         ⑶ blur(2px) 가 뒤를 서리유리로 만들었다.
+       그래서 α 를 더 내리는 대신 저 셋을 걷는다. α 는 .22 → **.40** 으로 오르지만
+       장면이 선명함과 전체 계조를 되찾으므로 **더 비쳐 보인다** — 사용자가 말한
+       것은 α 가 아니라 "뒤가 읽히는가"였다.
+       (덧: offset 101 을 만들려면 어떤 색역 내 틴트로도 α ≥ 101/255 = 0.40 이
+        필요하다. .12~.16 대역으로는 시안에 **도달할 수 없다** — 산술로 닫힌다.)
+
+     ▸ 흐림 — 시안은 판 뒤를 **안 흐린다**. 판 안팎 캐노피 타일의 방사평균 파워
+       스펙트럼 비 P_in/P_out 가 주파수와 함께 0.37 → 0.49 → 0.60 → 0.86 → 0.94
+       → 2.43 으로 **오른다**. 가우시안 흐림이면 exp(−4π²σ²f²) 로 떨어져야 하므로
+       적합값은 σ = 0.00px (f² 계수가 양수로 나온다). 상한 σ < 0.7 시안px = **0.4 CSS px**.
+       그래서 blur(0px). 시안의 매력은 나무가 판 너머로 **선명하게 읽히는** 것이다.
+
+     옛 값(되돌릴 근거):
+       --modal-tint:rgba(255,228,244,.22);
+       --modal-glass:blur(2px) saturate(1.04) brightness(1.18);
+     ========================================================================= */
+  /* ▣▣ W6.5b — 투명도 3차. **수치 논리를 버리고 감각을 따른다** ▣▣
+     2차(α .40)는 시안 역산이 낸 값이고 산술은 지금도 옳다 — offset 101 을 만들려면
+     α ≥ .40 이 필요하다는 그 계산 말이다. 그런데 사용자가 3차로 같은 말을 했다:
+     "더 더 투명하게, 은은하게 비치는 핑크. 여전히 뿌옇다."
+
+     그러면 틀린 것은 값이 아니라 **목표**다. 2차의 목표는 "시안의 판 색을 재현"
+     이었는데, 사용자가 원한 것은 시안의 **색**이 아니라 "뒤가 비치는 정도"였다.
+     같은 α 라도 시안은 밝고 대비 큰 일러스트 위에 있고 이 게임은 어두운 숲 배경
+     위에 있어, 같은 베일이 여기서는 두 배로 뿌옇다. 역산이 옳아도 옮겨 붙일 수
+     없는 값이었다.
+     그래서 α 를 .40 → **.17** 로 내린다(요청 대역 .15~.20 의 가운데). 색상각
+     300° 는 그대로다 — 사용자가 "핑크"라고 부른 그 색이 맞다고 두 번 확인됐다.
+     brightness(1.03) 도 뺀다: 이득이 1 을 넘는 순간 밝은 화소가 클리핑돼
+     "우윳빛 덩어리"가 되는데, 그것이 1차에서 이미 지목당한 결함이었다(1.18).
+     1.03 은 그 결함의 작은 판일 뿐 방향이 같다. 흐림은 이미 0px 이다.
+     글자 가독은 판을 희생해 지키지 않는다 — 텍스트 헤일로(흰 그림자)가 이미
+     모든 제목·본문에 붙어 있고, 그것이 이 파도에서 판을 밀 수 있는 이유다.
+     옛 값: rgba(255,242,255,.40) · blur(0px) saturate(1.04) brightness(1.03) */
+  --modal-tint:rgba(255,242,255,.17);
+  --modal-glass:blur(0px) saturate(1.06);
+}
+.jbox--slab{            /* 전투 상단 슬래브 — 그림자는 그림 알파를 따라야 해서 filter */
+  --jbox-biw:15px; --jbox-radius:13px;
+  --jbox-filter:drop-shadow(0 2px 5px rgba(46,20,58,.30));
+  --jbox-blur:var(--jbox-frost);
+}
+.jbox--strip,
+#app.battle #actionbar{ /* 하단 메달 받침 · 맵 하단 띠 */
+  --jbox-biw:19px; --jbox-radius:16px;
+  --jbox-blur:var(--jbox-frost);
+}
+<style id="sian-hud-rebuild">
+/* ============================================================
+   시안 6호 — 전투 상단 HUD **구조 재조립** (사용자 반려: "탑부터 제대로")
+   지금까지의 상단은 [작은 초상+이름+얇은 바] 셋을 한 줄 flex 로 늘어놓은
+   **요약판**이었다. 시안(gm-ingame-battle.png)의 상단은 그런 줄이 아니라
+   조각 여섯이 서로 겹쳐 앉은 **그림**이다. 그래서 줄을 버리고 절대배치로 간다.
+
+   ---- 좌표의 출처 (추측 0, 실측 100) ----------------------------------------
+   조각은 hud-pieces.json(원본 hud-black-4x.png 2288×4096 기준 절단 좌표)이
+   그대로 알려 준다. 시안 PNG 는 1536×2750 이므로 배율 s = 2288/1536 = 1.48958
+   하나로 두 좌표계가 정확히 겹친다(세로도 4096/2750 = 1.48958 로 같다).
+   HUD 컨테이너 = 시안의 y 6..506 전폭 띠(1536×500)로 잡았다: 위는 성 꼭대기
+   (y 12), 아래는 HP 바 바닥(y 504)이다. 그래서 **aspect-ratio: 1536/500**.
+
+     조각          left      top       width    height   (컨테이너 %)
+     데몬 전신     11.32%    22.16%    16.91%   56.12%
+     성            45.63%     1.22%     8.83%   25.24%
+     큰 왕관구름   73.30%    20.95%    17.09%   49.81%
+     아기구름버블  84.62%     2.69%    12.41%   39.88%
+     뼈 HP바        1.40%    68.89%    49.21%   30.75%
+     날개 HP바     49.83%    69.42%    49.04%   30.21%
+     타이머 유리   31.50%    19.50%    39.50%   50.50%  (실측 사각형, 코드 재현)
+
+   두 HP 바는 원본에서 **한 장의 연속 유리 캡슐**이었고 x≈1150 에서 잘렸다.
+   위 좌표대로 놓으면 원본 스케일 18px(= 1.40+49.21 − 49.83 = 0.78%)이 겹쳐
+   서로의 절단면을 가린다 — 둘 다 둥근 캡이 아니라 **직각 단면**이라 겹치지
+   않으면 이음매가 그대로 드러난다. 뼈바를 위(z 5)에 두는 것이 그 계약이다.
+   ⚠ 이 값들은 tools 없이도 재검증된다: evidence-14/09-hud-rebuild-sim.png 가
+     "시안 상단 크롭 : 같은 %로 합성한 시뮬"을 나란히 놓은 판정 시트다.
+
+   ---- 이 절이 **하지 않는** 것 ----------------------------------------------
+   ① 젤리 슬래브(#duel-hud 의 border-image 선언, 시안 5호 §2)는 손대지 않는다 —
+      직후에 .jbox 공통 컴포넌트로 통합될 예정이라 여기서 건드리면 충돌한다.
+      display 도 안 건드린다: 자식이 전부 absolute 라 flex 여도 결과가 같고,
+      #duel-hud[hidden]{display:none}
+의 0px 계약을 흔들 이유가 없다
+      (endless/daily/rush 는 [hidden] 이라 이 절 전체가 무의미하다).
+   ② DOM id 열넷은 하나도 안 바꾼다. duelHudMount()/syncDuel() 은 이 커밋에서
+      한 글자도 안 바뀌었다 — 갱신 경로(--hp/--atk/setText)를 그대로 물려받는다.
+
+   ---- 추출에서 빠진 조각 둘: "Lv. 1" 유리 명패 ------------------------------
+   두 바의 "Demon HP"/"Cloud HP" 명패는 조각 안에 들어왔지만 **Lv 명패 둘은
+   안 들어왔다**(실측: 두 조각의 해당 자리가 완전 투명 — 반투명 유리라 키잉에서
+   날아갔다. 시안 3호가 "유리는 이미지가 아니다"라며 타이머판을 코드로 세운 것과
+   같은 사정이다). 그래서 .dh-side::before 한 겹이 그 알약을 대신 그린다.
+   ::before 를 쓰는 이유는 **쌓임 순서**다: 시안에서 뼈·날개 장식이 Lv 명패의
+   바깥쪽 끝을 덮으므로, 명패는 바 그림(::after)보다 반드시 아래여야 한다.
+
+   ---- 알려진 손실 한 가지 -------------------------------------------------
+   조각의 트랙(홈)은 불투명하게 구워져 있어 채움 막대는 그림 **위**에 선다.
+   그래서 채워진 구간에서는 트랙 바닥의 눈금(tick)이 가린다. 눈금을 살리려면
+   조각을 트랙만 투명하게 다시 따야 하므로 이번 범위 밖이다.
+   ============================================================ */
+
+#app.battle #duel-hud{
+  position:relative;
+  /* 폰트가 전부 cqw(컨테이너 폭 %)라 이 한 줄이 HUD 전체의 배율기다.
+     inline-size 컨테인먼트는 절대 자식의 컨테이닝 블록도 함께 세운다. */
+  container-type:inline-size;
+  aspect-ratio:1536/500;
+  height:auto;
+  overflow:visible;
+}
+/* 비전투 3모드의 0px 계약을 이중으로 못 박는다 — duelHudUnmount() 는 hidden 만
+   세우고 .battle 을 같은 프레임에 벗기지 않는 경로가 있다. */
+#app.battle #duel-hud[hidden]{display:none !important;}
+/* ---- 1. 큰 조각 넷 --------------------------------------------------------
+   넷 다 같은 문법이다: 컨테이너 % 절대배치 + contain 배경 + 그림자 한 겹.
+   데몬·큰구름의 아래쪽 평평한 절단면은 z-index 로 HP 바 뒤에 눕혀 감춘다. */
+#app.battle #duel-hud .dh-av,
+#app.battle #duel-hud .dh-baby{
+  position:absolute;
+  background-repeat:no-repeat;
+  background-position:center;
+  background-size:contain;
+  pointer-events:none;
+}
+/* 🚨 W10 ② (2026-08-21) 사용자 반려 — "적·아군·펫 아바타가 너무 작다".
+   실측이 낸 답은 뜻밖이었다: **상자는 이미 시안 그대로다**(아래 세 절의 % 가
+   gm-hud-placement2.json 의 avatar_* 와 소수점까지 같다). 작아 보인 것은 상자가
+   아니라 **그림**이었고, 범인은 `background-size:contain`(:36907) 이다.
+   contain 은 상자 안에 그림을 넣되 **비율을 지켜** 넣으므로, 상자 비와 그림 비가
+   다르면 짧은 축이 남는다. 실측(390×844, 상자 382×124.3):
+     #duel-foe-av  상자 53.3×73(비 0.730) · 그림 387×418(비 0.926)
+                   → 폭이 먼저 차서 그림은 53.3×57.6 — 상자 높이의 **79%** 만 씀
+     #duel-me-av   상자 68×51.6(비 1.318) · 그림 900×1200(비 0.750)
+                   → 높이가 먼저 차서 그림은 38.7×51.6 — 상자 폭의 **57%** 만 씀
+   즉 시안 rect 는 "구름에 얹힌 무리"를 잰 가로 상자인데 우리 그림은 세로 인물
+   한 장이라, 같은 rect 를 줘도 화면에서는 절반만 찬다. 시안 rect 를 그대로 두면
+   영원히 작다.
+   수리 원칙 — **면적을 시안에 맞추고, 비율은 그림에 맡긴다**:
+     ① 상자를 그림이 확실히 높이로 차게 넓힌다(폭이 남는 상자는 contain 아래서
+        아무 해가 없다 — 늘어나지 않고 가운데 설 뿐이다. 이것이 aspect-ratio 를
+        박지 않는 이유이기도 하다: --bs-full/--me-full 은 종·캐릭터마다 비가
+        다르고, 박는 순간 어느 하나는 반드시 여백을 뒤집어쓴다).
+     ② 앉힘점은 시안 그대로 유지한다 — 데몬은 **아랫변**(발이 뼈바 뒤로 물리는
+        자리 = top+height = 81.16%), 아군·펫도 같은 셈으로 아랫변을 고정한다.
+   ⚠ background-position 을 center bottom 으로 내리는 것이 짝이다. 폭이 남는
+     상자에서 center(=center center)면 그림이 공중에 뜬다. */
+#app.battle #duel-foe-av{
+  /* W6.5b-5 — 시안 실측(avatar_demon). 시안에서 데몬은 **발이 HP 바 뒤로 물린다** —
+     z-index:2 가 뼈바(5)보다 아래라 그 물림이 이미 성립한다.
+     W10 ② — 높이(58.72%)와 중심(cx 22.31%)은 시안 그대로 두고 **폭만** 넓혔다:
+     그림 비 0.926 이 높이로 차려면 최소 58.72×0.926/3.072 = 17.70% 가 필요해서
+     여유를 붙여 18.50% 로 잡았다(3.072 는 유리판 aspect-ratio — 높이% 를 폭% 로
+     옮기는 환산 상수다). left = 22.31 − 18.50/2 = 13.06%.
+     화면 결과: 그림 53.3×57.6 → 67.6×73 (**높이 +26.7%**). */
+  /* W-B ① — v2 재검(avatar_demon px[273,125,233,328] → 상자 % 16.10/22.64/13.74/59.41).
+     W10 ② 의 수리 원칙을 **그대로** 다시 적용한다: 높이·중심은 문서, 폭만 여유.
+       cx = 16.10 + 13.74/2 = 22.97% (구판 22.31 → +0.66%p)
+       height 59.41% · 그림 비 0.926 이 높이로 차려면 59.41×0.926/3.072 = 17.91%
+       → 여유 붙인 18.50% 를 유지한다. left = 22.97 − 9.25 = 13.72%.
+     구판 한 줄(롤백 근거): left:13.06%;top:22.44%;height:58.72% */
+  /* 🚨 W-E ③ (2026-08-21) 사용자 반려 재차 — "캐릭터 더 확대"(직전 +27~33% 미달).
+     이번에는 **상자가 아니라 잉크**(투명 여백 제외 알파 bbox)로 다시 쟀다.
+     실렌더 390x844 · HUD 상자 382x124.34 기준:
+       데몬  duel-demon-full-*.webp 387x418 · 투명 여백 0 → 잉크 = 상자 그대로
+             잉크 높이 73.86px = HUD 의 59.40%  (시안 avatar_demon 58.72%)
+             잉크 면적비 (17.90 x 59.40) / (13.94 x 58.72) = **1.30배**
+     즉 데몬은 이미 시안을 넘겼다. 그래도 "더"라는 요청이 두 번째라 **아랫변을
+     못 박은 채** 한 뼘 더 올린다: 잉크 높이 59.40% → 66.00%(+11.1%).
+     아랫변 82.05%(= 구판 22.64 + 59.41)는 한 픽셀도 안 움직인다 — 발이 뼈바
+     뒤로 물리는 시안의 그 앉힘점이다. top = 82.05 − 66.00 = 16.05%.
+     폭 21.60% 는 여유칸이다(보스 전신 넉 장이 전부 비 0.926 이라 높이로 차려면
+     66.00 x 0.926 / 3.072 = 19.89% 면 되고, 남는 폭은 contain 아래서 무해하다).
+     left = 22.97(시안 cx) − 10.80 = 12.17%.
+     검산 ① 윗변 16.05% = 19.96px → 화면 최상단(0) 안쪽, 잘림 없음.
+     검산 ② 잉크 오른끝 129.8px vs 타이머 첫 글리프 왼끝 133.9px → 4.1px 여유.
+     검산 ③ 잉크 왼끝 53.8px 이 일시정지(18.5~55.2px)와 1.4px 겹치지만
+             #btn-pause 는 z-index:6 이라 **버튼이 위에 선다**(시안도 지팡이가
+             버튼 옆으로 물린다). 가림 없음.
+     구판 두 줄(롤백 근거): left:13.72%;top:22.64%;
+                            width:18.50% !important;height:59.41% !important; */
+  left:12.17%;top:16.05%;
+  width:21.60% !important;height:66.00% !important;
+  background-position:center bottom;
+  /* E3 W8 — 한 장으로 못박혀 있던 자리가 .bs-* 표에 **열렸다**. 폴백을 그대로
+     남긴 것이 계약이다: 클래스가 아직 안 붙은 첫 프레임이나 표에 없는 종(種)이
+     오면 종전의 그 한 장이 선다 — 빈 사각형이 생길 자리가 없다. */
+  background-image:var(--bs-full,url("catalog/duel-demon-full.webp")) !important;
+  filter:drop-shadow(0 2px 4px rgba(30,4,24,.42));
+  z-index:2;
+}
+#app.battle #duel-me-av{
+  /* W6.5b-5 — 시안 실측(avatar_cloud). 시안에서 구름은 명패 **위에 얹힌다**(데몬과
+     앉힘 방식이 다르다) — 날개바가 z 4 이고 이쪽이 2 라 지금은 뒤로 물린다.
+     그 차이는 조각의 알파가 결정하므로 좌표만 옮기고 z 는 안 건드린다. */
+  /* W10 ② — 여기는 데몬과 계산이 다르다. 시안 rect(268×207, 비 1.294)는 가로
+     상자인데 그림(900×1200, 비 0.750)은 세로 인물이라 **높이가 먼저 차서** 상자를
+     넓혀도 그림은 안 커진다(위 절의 실측 ②). 그래서 이쪽만은 높이를 올린다.
+     기준은 시안의 **면적**이다: 68×51.6 = 3509px² 를 비 0.750 으로 채우면
+     51.3×68.4 → 높이 68.4/124.3 = **55.00%**(41.48% → +32.6%).
+     폭 20.00% 는 여유칸이다(비 0.93 인 뭉치까지 높이로 차게 한다 —
+     55.00×0.93/3.072 = 16.65% < 20.00%). left = 82.80(시안 cx) − 10 = 72.80%.
+     아랫변은 시안 그대로 69.54%(=28.06+41.48) 에 못 박는다 → top = 69.54 − 55.00.
+     시안이 "구름은 명패 **위에 얹힌다**"고 한 그 얹힘점이 이 아랫변이다.
+     ⚠ 가로 중심만 시안(82.80%)에서 **2.5%p 왼쪽**으로 옮겼다(80.30%). 셋을 한꺼번에
+       키우자 왕자의 왕관 오른쪽이 펫 방울(z-index 3, 위에 선다)에 먹히는 실측이
+       나왔기 때문이다. 시안에서도 둘은 겹치지만(구름 73.90~91.70 vs 방울
+       86.52~98.21) 그쪽 "구름"은 왕관이 없다 — 우리 그림에서는 겹침이 곧
+       머리 절단이다. 옮긴 뒤 겹침은 약 3px 로 줄고 왕관은 온전히 선다.
+       left = 80.30 − 20.00/2 = 70.30%. */
+  /* W-B ① — v2 재검(avatar_cloud px[1253,157,298,231] → 상자 % 73.88/28.44/17.57/41.84).
+     문서 cx 82.67% · 아랫변 70.28%. W10 ② 의 두 결정을 그대로 잇는다:
+       ① 높이는 면적 보정값 55.00% 유지 → top = 70.28 − 55.00 = 15.28%
+       ② 왕관 보호를 위한 **cx −2.5%p** 유지 → 80.17%, left = 80.17 − 10 = 70.17%
+     구판 한 줄(롤백 근거): left:70.30%;top:14.54% */
+  /* 🚨 W-E ③ (2026-08-21) — 여기가 "작다"의 **진짜 자리**였다.
+     잉크(투명 여백 제외 알파 bbox)로 다시 재니 셋 중 이쪽만 시안에 못 미쳤다:
+       데몬  387x418 · 여백 0        → 잉크 h 59.40% / 시안 58.72% · 면적 1.30배
+       펫    284x297 · 여백 0        → 잉크 h 40.00% / 시안 37.07% · 면적 1.15배
+       아군  900x1200 · **여백 10%** → 잉크 721x1080, 잉크 h **49.49%**
+             / 시안 avatar_cloud 41.48% 지만 면적은 (10.76 x 49.49)/(17.80 x 41.48)
+             = **0.72배** — 시안의 '구름 무리'는 가로로 퍼진 덩어리인데 우리 그림은
+             세로 인물 한 장이라, 높이를 맞춰도 **면적이 28% 모자란다**.
+     그래서 아군만 면적 기준으로 다시 올린다: 잉크 h 49.49% → **62.01%**(+25.3%),
+     면적비 0.72 → 1.13배(데몬 1.30 · 펫 1.15 과 같은 대역).
+     상자 높이는 그 잉크를 담는 값이다 — 이 그림은 상하 10% 가 투명이라
+       상자 h = 62.01 / 0.90 = **68.90%**
+     아랫변 70.28%(시안 avatar_cloud 의 앉힘점)는 그대로 못 박는다:
+       top = 70.28 − 68.90 = **1.38%**
+     폭 21.00%: 동료 전신 표는 대개 비 0.750 이지만 뭉치만 0.930 이라, 그 비까지
+     높이로 차게 하려면 68.90 x 0.930 / 3.072 = 20.86% 가 필요하다.
+     가로 중심은 **−1.0%p**(80.17 → 79.17%) — 커진 만큼 오른쪽 펫 방울과 다시
+     부딪히기 때문이다. left = 79.17 − 10.50 = 68.67%.
+     검산 ① 잉크 280.7~332.2px · 펫 방울 331.6px → 겹침 0.6px(종전 0px, 왕관 무사).
+     검산 ② 잉크 왼끝 280.7px vs 타이머 캡슐 오른끝 277.0px → 3.7px 여유.
+     검산 ③ 잉크 윗변 10.3px → 화면 최상단(0) 안쪽, 왕관 잘림 없음.
+
+     ▣ 새 축 `--me-scale` — **캐릭터별 스케일 보정**(기본 1, 미주입이면 지금 값 그대로).
+       투명 여백 비율은 캐릭터마다 다르므로(젤리공주처럼 세로로 긴 그림은 더
+       작아 보인다) 한 명만 따로 키우고 싶을 때 duelHudMount 가 이 변수 하나만
+       주입하면 된다. 아랫변은 배율과 무관하게 70.28% 에 고정된다 —
+       top 이 같은 식으로 함께 줄기 때문이다. transform 을 안 쓴 이유가 이것이다:
+       scale() 은 쌓임 컨텍스트를 만들어 §18.4d 의 z-index 계약을 흔들고,
+       background 는 상자에 클립되므로 상자 자체를 키우는 것이 유일한 안전한 길이다.
+     구판 두 줄(롤백 근거): left:70.17%;top:15.28%;
+                            width:20.00% !important;height:55.00% !important; */
+  --me-scale:1;
+  left:68.67%;
+  top:calc(70.28% - 68.90% * var(--me-scale,1));
+  width:21.00% !important;height:calc(68.90% * var(--me-scale,1)) !important;
+  background-position:center bottom;
+  /* W4 (2026-08-20) — 사용자 반려 "내가 선택한 캐릭터가 아니라 이상한 구름이 나옴".
+     원인은 정확히 아래 한 줄이었다: !important 로 못 박힌 시안 구름이라
+     duelHudMount 가 --duel-me-face 에 무엇을 넣든 화면에서는 늘 구름이 이겼다.
+     이제 이 자리는 **개방돼 있다** — duelHudMount 가 선택 주인공의 전신(full)
+     아트를 --me-full 로 주입하고, 주입이 없을 때만(= 표준 에셋이 없는 캐릭터)
+     시안 구름이 그대로 선다. 구름 파일은 지우지 않는다: 폴백이자 롤백 밸브다.
+     ⚠ 실측으로 확인한 사실 하나 — catalog/duel-cloud-big.webp 는 왕관 쓴 **구름**
+     이고 주인공 셋(텐텐 = 흰 비숑 왕자 / 트윈 = 주황 곰 / 젤리 = 토끼 공주) 중
+     누구도 아니다. 즉 이 자리에 구름이 서는 한 어떤 캐릭터를 골라도 사용자 반려가
+     그대로 재현된다. 그래서 셋 다 자기 그림을 받는다.
+     구판 한 줄(되돌릴 근거):
+       background-image:url("catalog/duel-cloud-big.webp") !important; */
+  background-image:var(--me-full,url("catalog/duel-cloud-big.webp")) !important;
+  /* 캐릭터별 좌우반전·미세 보정이 필요해지면 이 변수만 주입한다.
+     미주입이면 none 이라 지금 화면과 픽셀이 같고, transform:none 은 쌓임
+     컨텍스트를 만들지 않으므로 위 §18.4d 의 z-index 계약도 안 흔든다. */
+  transform:var(--me-flip,none);
+  filter:drop-shadow(0 2px 4px rgba(40,70,100,.30));
+  z-index:2;
+}
+#app.battle #duel-baby{
+  /* W6.5b-5 — 시안 실측(avatar_cloud_baby)
+     W10 ② — 펫 방울은 셋 중 그림이 상자를 가장 잘 채우고 있었다(비 0.956 대
+     0.968 — 실측 44.6×46.1 of 44.6×46.1). 그래도 사용자가 "작다"에 함께 꼽았고,
+     화면에서 이 조각은 46px 짜리다. 그래서 상자 자체를 키운다: 높이 37.07 →
+     40.00%(**+7.9%**), 폭은 그 비에 맞춰 12.70%(40.00×0.956/3.072 = 12.45% 에
+     여유). 중심은 시안 cx 92.36% 유지 → left = 92.36 − 6.35 = 86.01%.
+     ⚠ 44% 까지 갔다가 40% 로 되돌렸다: 44% 에서는 방울이 왕자의 왕관을 덮었다
+       (위 #duel-me-av 절의 그 실측). 왕자를 왼쪽으로 옮기는 것과 이 4%p 를
+       합쳐야 겹침이 3px 로 떨어진다 — 한쪽만으로는 부족했다.
+     ⚠ 윗변(5.01%)을 고정하고 **아래로** 키운다. 위로 키우면 유리판이 화면
+     최상단에 붙은 지금(W10 ①) 방울 머리가 화면 밖으로 잘린다. */
+  /* W-B ① — v2 재검(avatar_cloud_baby px[1464,28,196,207] → 상자 % 86.32/5.07/11.56/37.49).
+     문서 cx 92.10% · 윗변 5.07%. W10 ② 의 결정(높이 40.00% · 윗변 고정)을 잇는다:
+       left = 92.10 − 12.70/2 = 85.75%.
+     구판 한 줄(롤백 근거): left:86.01%;top:5.01% */
+  left:85.75%;top:5.07%;
+  width:12.70%;height:40.00%;
+  background-position:center bottom;
+  /* W2.5 ② (2026-08-20) — 사용자 반려 "우상단 방울이 내가 고른 펫이 아니다".
+     #duel-me-av 와 같은 개방 문법이다: duelHudMount 가 선택 동료의 face 를
+     --pet-face 로 주입하고, 주입이 없을 때만(= 펫 미선택) 시안 구름이 선다.
+     구름 파일은 지우지 않는다 — 폴백이자 롤백 밸브다.
+     구판 한 줄(되돌릴 근거):
+       background-image:url("catalog/duel-cloud-baby.webp");
+     배경 크기·정렬은 위 §1 의 `.dh-av, .dh-baby` 공통 규칙이 이미 contain·center
+     로 잡아 둔다 — 여기서 다시 쓰지 않는다. */
+  background-image:var(--pet-face,url("catalog/duel-cloud-baby.webp"));
+  filter:drop-shadow(0 2px 4px rgba(40,70,100,.26));
+  z-index:3;
+}
+/* .dh-mid 는 92px 짜리 flex 칸이었다 — 이제 자리를 안 차지하는 **쌓임 상자**다.
+   z-index 를 auto 로 두지 않는 것이 핵심이다(0 이든 1 이든 상관없다 — 값이
+   auto 만 아니면 쌓임 컨텍스트가 선다): #duel-timer 의 유리겹(z-index:-1)이
+   화면 배경까지 내려가지 않게 가두는 시안 4호 §3 의 계약을 그대로 잇는다.
+   1 을 고른 이유는 슬래브(요소 배경)보다 위, 데몬(2)보다 아래여야 하기 때문이다. */
+#app.battle .dh-mid{
+  position:absolute;inset:0;
+  width:auto !important;
+  display:block;
+  z-index:1;
+  pointer-events:none;
+}
+#app.battle .dh-castle{
+  position:absolute;
+  /* W6.5b-5 — 시안 실측(gm-hud-placement2.json · castle) — 구판: 45.55 / 2.40 / 9.03 / 24.65
+     W-B ① — v2 재검(gm-hud-layers.json · contents.castle px[779,13,151,138]).
+     성은 **유리 구조의 중앙**에 서야 하는데, v2 캔버스는 구조가 0.94~99.65%
+     라 중심이 50.29% 다(50.00 이 아니다). 그래서 좌표가 0.4%p 오른쪽으로 간다. */
+  left:45.93%;top:2.35%;
+  width:8.90% !important;height:25.00% !important;
+  margin:0 !important;
+  font-size:0 !important;line-height:0 !important;
+  background-image:url("catalog/duel-castle-hd.webp");
+  background-size:contain;background-position:center;background-repeat:no-repeat;
+  filter:drop-shadow(0 1px 3px rgba(60,20,60,.40));
+  z-index:3;
+}
+/* ---- 2. 타이머 유리 캡슐 + 젤리 숫자 ---------------------------------------
+   유리겹(::before)·글자 젤리·danger 붉은 톤은 시안 4호 §3 이 이미 세워 뒀다.
+   여기서는 **자리와 크기만** 시안 실측으로 옮긴다. 반경은 실측 90px/1536 을
+   두 축으로 나눠 준 값이다(가로 15% · 세로 36%) — 999px 로 주면 완전한 알약이
+   되어 시안보다 둥글어진다. */
+#app.battle #duel-timer{
+  position:absolute;
+  left:31.50%;top:19.50%;
+  width:39.50% !important;height:50.50%;
+  margin:0 !important;padding:0 !important;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:15%/36% !important;
+  font-size:44px !important;               /* @container 미지원 폴백 */
+  font-size:14.3cqw !important;
+  letter-spacing:.02em;
+  z-index:1;
+}
+#app.battle #duel-timer::before{border-radius:15%/36%;}
+/* ---- 3. HP 바 두 장 = 한 캡슐 ----------------------------------------------
+   .dh-side 는 이제 **조각 한 장의 상자 그 자체**다(픽셀 좌표 = 이 상자의 %).
+   그래서 아래의 트랙·명패 좌표는 전부 조각 기준 실측값을 그대로 쓴다.
+
+   ▣ W-B ① — v2 재검 결과 **무보정**(차이가 1%p 미만이라 손대지 않는다).
+     두 판의 하단 명패 밴드를 실측으로 비교했다(알파 행 프로파일):
+       v1 밴드 윗변 y318/590 → 상자 57.53% · 구조 아랫변 y577 → 104.39%
+       v2 밴드 윗변 y315/608 → 상자 57.06% · 구조 아랫변 y565 → 102.34%
+     밴드 윗변이 0.47%p 올라가고 밴드가 3.4% 짧아졌을 뿐이다. 현 .dh-foe 를
+     밴드 안 같은 비율로 옮기면 top −0.90%p · height −0.98%p(390 폭에서 1.1px)
+     이고, 문서의 name_tag_L(71.37%)은 오히려 현 값(70.54%)보다 **낮다** —
+     두 추정이 서로 반대 방향으로 1%p 안에 있으니 잡음이다.
+     뼈·날개 두 조각은 gm-hud-layers.json 이 "유지 확정"으로 못 박은 부품이고
+     사용자 판정(evidence-14/33-hpbar-compare.png)도 끝났다. 잡음으로 확정품을
+     흔들지 않는다. */
+#app.battle .dh-side{
+  position:absolute;
+  display:block;
+  overflow:visible;
+  padding:0 !important;
+  border-radius:0;
+  background:none !important;background-image:none !important;
+  background-size:auto !important;
+  box-shadow:none;
+  -webkit-backdrop-filter:none;backdrop-filter:none;
+}
+/* 조각 실물. ::after 라서 ::before(Lv 명패)보다 위에 선다 — 뼈·날개 장식이
+   명패의 바깥 끝을 덮는 시안의 겹침이 이 한 줄로 재현된다. */
+#app.battle .dh-side::after{
+  content:"";position:absolute;inset:0;
+  width:auto;height:auto;margin:0;
+  background-repeat:no-repeat;
+  background-position:center;
+  background-size:100% 100%;
+  pointer-events:none;
+  z-index:2;
+}
+#app.battle .dh-foe{
+  /* W6.5b-5 — 시안 실측: 조각의 좌우 끝은 뼈 캡이다(bone_cap_L_left 2.06% ~
+     bone_cap_L_right 오른끝 49.53%), 세로는 이름표 위(70.54%)부터 바 아래까지.
+     ⚠ 시안의 좌우 HP 바는 **비대칭**이다(좌 622px · 우 498px) — 대칭으로
+     맞추면 그게 곧 시안 위반이라 각자 자기 폭을 갖는다. */
+  left:2.06%;top:70.54%;width:47.47%;height:29.10%;
+  /* 좌상단 모서리는 원본에서 직각으로 잘렸다(절단 노트 ②) — CSS 로 라운딩한다. */
+  border-top-left-radius:6% 22%;
+  overflow:hidden;
+  z-index:5;
+}
+#app.battle .dh-foe::after{background-image:url("catalog/duel-hpbar-bone.webp");}
+#app.battle .dh-me{
+  /* W6.5b-5 — 시안 실측: 날개 캡 좌 53.52% ~ 우 끝 100.34%. 사용자 반려
+     "HP 바가 분리돼 떠 있다"의 절반이 여기 있었다 — 종전 49.83% 는 왼쪽 바와
+     0.78% 겹쳐 있었고(절단면을 가리려던 값), 시안은 그 둘 사이를 **벌려** 놓고
+     그 틈으로 명패 유리가 보이게 한다. */
+  left:53.52%;top:70.54%;width:46.82%;height:29.10%;
+  z-index:4;
+}
+#app.battle .dh-me::after{background-image:url("catalog/duel-hpbar-wing.webp");}
+/* Lv 유리 명패(추출에서 빠진 조각 둘). 색은 시안 픽셀 샘플이다:
+   악당 #6C366A~#7A3F71 자주 유리 · 내 쪽은 흰 림이 대비를 만드는 밝은 유리. */
+#app.battle .dh-side::before{
+  content:"";position:absolute;
+  top:3.6%;height:32.5%;
+  left:76.0%;width:17.3%;
+  margin:0;
+  border-radius:24% 24% 34% 34% / 34% 34% 48% 48%;
+  background-image:none;
+  pointer-events:none;
+  z-index:1;
+}
+#app.battle .dh-foe::before{
+  background-color:rgba(124,58,116,.90);
+  box-shadow:inset 0 0 0 1px rgba(200,154,200,.55),inset 0 2px 4px rgba(255,214,246,.22);
+}
+#app.battle .dh-me::before{
+  left:76.8%;width:15.3%;top:1.9%;height:33.1%;
+  background-color:rgba(226,238,250,.38);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.60),inset 0 2px 4px rgba(255,255,255,.34);
+}
+/* 명패 글자. 값은 전부 syncHud 계보(duelHudMount)가 넣는다 — 보스 이름과
+   캐릭터 이름이라 시안의 영문 "Demon HP / Cloud HP" 자리에 **한국어가 선다**
+   (기존 HUD 표기 규약 유지). 폭이 좁으므로 말줄임은 그대로 켜 둔다. */
+#app.battle #duel-hud .dh-name,
+#app.battle #duel-hud .dh-lv{
+  position:absolute;
+  display:flex;align-items:center;justify-content:center;
+  margin:0;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  z-index:3;
+}
+/* 글자 크기는 시안의 **명패 폭**이 정한다 — 명패가 시안 실측이라 폰트를 시안의
+   글자 높이(H 의 8%)에 맞추면 라틴 8글자가 명패를 넘친다(판정 시트 1차에서
+   실제로 넘쳤다). 한국어 이름(보스명·캐릭터명)이 서는 자리이므로 폭을 기준으로
+   깎고, 명패 밖 민무늬 림까지 상자를 조금 넓혔다. 넘치면 종전대로 말줄임. */
+#app.battle .dh-foe .dh-name{
+  left:10.0%;width:35.0%;top:4.6%;height:29.3%;
+  font-size:11px;font-size:2.90cqw;font-weight:800;
+}
+#app.battle .dh-me .dh-name{
+  left:40.0%;width:30.0%;top:1.9%;height:33.1%;
+  font-size:11px;font-size:2.90cqw;font-weight:800;
+}
+#app.battle .dh-foe .dh-lv{
+  left:76.0%;width:17.3%;top:3.6%;height:32.5%;
+  font-size:10px;font-size:2.50cqw;font-weight:800;
+}
+#app.battle .dh-me .dh-lv{
+  left:76.8%;width:15.3%;top:1.9%;height:33.1%;
+  font-size:10px;font-size:2.50cqw;font-weight:800;
+}
+/* ---- W2.5 ④b 영문 보스명 잘림 수리 (2026-08-20, itch 업로드 차단 사유) --------
+   증상: 영문 모드에서 "Grape Gobbler" 가 HP 바 명패에 **"rape Gobble"** 로 뜬다.
+   앞뒤 한 글자씩 잘리는 것이 단서다 — 말줄임(…)이면 뒤만 잘린다.
+
+   원인(실측, 390×844 · HUD 폭 382px):
+     명패 상자 65.8px · 실제 글자 폭 77.1px  → 넘침 11.3px
+     한국어 "포도 먹깨비" 는 49.1px 라 16.7px 이 남는다(그래서 여태 안 드러났다).
+   그리고 이 상자는 `display:flex; justify-content:center; overflow:hidden` 이다.
+   **text-overflow 는 flex 컨테이너에 효과가 없다** — 넘친 글자는 익명 flex 아이템이
+   되고, 가운데 정렬이라 넘침 11.3px 이 좌우로 5.65px 씩 갈려 양쪽이 잘린다.
+   위 블록의 `text-overflow:ellipsis` 는 그래서 한 번도 값을 한 적이 없다(지우지
+   않는다 — 상자가 block 으로 돌아가면 그날 바로 값을 한다).
+
+   수리는 "잘리게 두고 …를 붙인다"가 아니라 **글자를 담는다**. 잘림이 민망한 것은
+   기호가 없어서가 아니라 이름이 안 읽혀서다.
+     (a) 상자를 넓히되 **광학 중심을 고정**한다: 중심 = left + width/2 이 27.5% 로
+         같아야 명패 그림 위에서 글자가 안 밀린다. 10+35/2 = 4+47/2 = 27.5 ✔
+     (b) 라틴 한 급 축소 2.90 → 2.62cqw. (a) 만으로도 담기지만 그러면 글자가 옛
+         상자 밖으로 5.65px 씩 삐져나와 명패 민무늬 림을 넘본다. 둘을 같이 쓰면
+         글자 폭이 71.5px 로 줄어 **옛 상자 안(10~45%)** 에 그대로 들어앉는다.
+   한국어는 이 규칙에 안 걸린다(`html[lang="en"]` 스코프) — 위 블록이 그대로 산다.
+   `html[lang="ko"] .act-t` 가 쓰는 것과 같은 로케일 분기 문법이다. */
+html[lang="en"] #app.battle .dh-foe .dh-name{
+  left:4.0%;width:47.0%;
+  font-size:10px;font-size:2.62cqw;
+}
+/* 게이지. .dh-fill 은 여전히 scaleX(var(--hp)) 다 — syncDuel 이 쓰는 그 변수고,
+   레이아웃을 건드리지 않는 이유(§18.4b)도 그대로다. 바뀐 것은 **상자의 자리**
+   뿐이며, 그 자리는 조각 안 유리 홈의 픽셀 실측이다:
+     뼈 조각 1126×229 → 홈 x 10.5..89.5% · y 39..75%
+     날개 조각 1122×225 → 홈 x 17.5..84.0% · y 38..75%
+   공격 게이지(.dh-sub)는 시안에 없지만 전투 정보로는 필수라, 그 홈의 **아래
+   끝**에 얇게 눕혀 시안의 두 줄 구도를 흔들지 않는다. */
+#app.battle .dh-bar{
+  position:absolute;
+  height:auto;margin:0;
+  border-radius:999px;
+  overflow:hidden;
+  box-shadow:none;
+  z-index:3;
+}
+#app.battle .dh-foe .dh-bar{left:10.5%;top:42%;width:79.0%;height:26%;}
+#app.battle .dh-me  .dh-bar{left:17.5%;top:42%;width:66.5%;height:26%;}
+#app.battle .dh-sub{
+  position:absolute;
+  margin:0;
+  border-radius:999px;
+  overflow:hidden;
+  z-index:3;
+}
+#app.battle .dh-foe .dh-sub{left:10.5%;top:70.5%;width:79.0%;height:5%;}
+#app.battle .dh-me  .dh-sub{left:17.5%;top:70.5%;width:66.5%;height:5%;}
+#app.battle .dh-fill::after{border-radius:999px 999px 0 0;}
+#app.battle #duel-hud .dh-num{
+  font-size:10px;font-size:2.80cqw;
+  z-index:1;
+}
+/* 누적 데미지 — 시안에 자리가 없어 성과 큰구름 사이의 빈 하늘에 눕힌다. */
+#app.battle #duel-dmg{
+  position:absolute;
+  left:55%;top:1.5%;width:17%;height:12%;
+  display:flex;align-items:center;justify-content:flex-end;
+  margin:0;
+  font-size:10px;font-size:2.44cqw;
+  color:#FFFFFF !important;
+  text-shadow:0 1px 2px rgba(46,20,58,.85),0 0 3px rgba(46,20,58,.55) !important;
+  z-index:3;
+}
+/* ============================================================================
+   W3 (2026-08-20) — 뭉치의 "숫자 멈춤" 표시 · 적 예고 글로우
+
+   이 절이 전투 스킨 블록의 **끝**에 있는 이유는 우선순위 하나 때문이다:
+   위쪽 #app.danger.battle #duel-timer 가 마지막 10초를 붉게 못 박는데, 얼음은
+   그 위에 서야 한다(시간이 멈춘 마지막 10초에 숫자가 빨간색이면 "얼었다"가
+   거짓말이 된다). 특이도가 같으므로 **뒤에 오는 쪽**이 이긴다.
+   ========================================================================== */
+
+/* 얼음 틴트. 판을 **가리지 않고 물들인다** — 시간이 멈춰 있는 동안에도
+   플레이어는 계속 판을 읽고 탭해야 하므로 pointer-events 는 none 이고,
+   불투명도도 숫자가 그대로 읽히는 선에서 멈춘다. JS 가 하는 일은
+   #app 에 .chill 한 글자를 켜고 끄는 것뿐이다(duelChillSync). */
+#app.chill #board::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 18px;
+  /* 두 겹이다. ① 서리 — 네 귀퉁이에서 안쪽으로 스미는 흰 얼음(radial).
+     ② 물빛 — 위아래가 짙고 가운데가 옅은 파랑(linear). 가운데를 비워 두는 것이
+     가독성 예산이다: 숫자가 앉는 띠에서 알파를 가장 낮게 잡아, 판이 얼어도
+     읽기는 안 얼게 한다. 실측 1차의 .30/.11/.27 은 화면에서 "얼었다"로 안
+     읽혔다(캡처 대조) — 값을 올린 근거가 그 실측이다. */
+  background-image:
+    radial-gradient(120% 78% at 50% 50%, rgba(255, 255, 255, 0) 42%, rgba(214, 246, 255, .52) 100%),
+    linear-gradient(180deg,
+      rgba(96, 206, 255, .44) 0%,
+      rgba(122, 224, 255, .26) 46%,
+      rgba(150, 232, 255, .42) 100%);
+  box-shadow:
+    inset 0 0 0 3px rgba(190, 244, 255, .80),
+    inset 0 0 46px rgba(90, 196, 255, .60),
+    0 0 22px rgba(122, 224, 255, .45);
+  pointer-events: none;
+  z-index: 6;
+  animation: chillpulse 1.6s ease-in-out infinite;
+}
+/* 타이머 숫자. 젤리 클립(background-clip:text)을 내리고 통짜 얼음색으로
+   되돌린다 — danger 절이 붉은 톤에서 같은 이유로 같은 일을 한다(그 절의
+   주석: 클립이 남으면 유리 겹이 숫자를 덮는다). */
+#app.chill.battle #duel-timer,
+#app.chill #duel-timer.chill {
+  background-image: none !important;
+  color: #9FE8FF !important;
+  -webkit-text-fill-color: #9FE8FF !important;
+  -webkit-text-stroke: 1px rgba(10, 62, 92, .60);
+  text-shadow: 0 0 12px rgba(122, 224, 255, .90), 0 1px 0 rgba(255, 255, 255, .45);
+  animation: none !important;          /* rushbeat 를 세운다 — 멈춘 시계는 뛰지 않는다 */
+}
+/* 적 반격 예고(1.8초)의 글로우. 토스트를 못 본 사람도 **판을 보면서** 읽는다.
+   filter 를 애니메이션하므로 위쪽 #app.battle #duel-foe-av 의 drop-shadow
+   선언을 자연히 이긴다(애니메이션 > 일반 선언). 끝나면 클래스가 걷히고
+   원래 그림자로 돌아간다. */
+#app.battle #duel-foe-av.foewarn { animation: foewarn 360ms ease-in-out 5; }
+@media (prefers-reduced-motion: reduce) {
+  #app.chill #board::after { animation: none; }
+  #app.battle #duel-foe-av.foewarn { animation: none; filter: drop-shadow(0 0 10px rgba(255, 61, 46, .9)); }
+}
+</style>
 </body>
 </html>
