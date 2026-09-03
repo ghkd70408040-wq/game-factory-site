@@ -33889,7 +33889,10 @@ window.TT_SFX = {
    */
   function buildRankRow(i, e) {
     var row = document.createElement('div');
-    var cls = 'rank-row';
+    /* ⑩ [0904] set-row 겸용 — 설정창 젤리 알약 줄(.set-row)과 **같은 부품**으로
+       읽히게 한다(별도 스킨 아님). 메달·순위·점수 슬롯(.rank-pos/.rank-main/
+       .rank-meta)은 그대로 — nth-child 메달 로직도 안 바뀐다. */
+    var cls = 'rank-row set-row';
     if (!e) cls += ' rank-empty';
     else if (rankFresh.mode === rankMode && rankFresh.pos === i + 1) cls += ' rank-fresh';
     row.className = cls;
@@ -33977,7 +33980,7 @@ window.TT_SFX = {
       var m = modes[i];
       var e = store.arcadeBest[m];
       var row = document.createElement('div');
-      row.className = 'rank-row rank-arc-row' + (e ? '' : ' rank-empty');
+      row.className = 'rank-row rank-arc-row set-row' + (e ? '' : ' rank-empty');  /* ⑩ [0904] 설정창 .set-row 부품 통일 */
       /* 기록 숫자는 **자기 요소**로 낸다(모드명과 한 텍스트로 붙이지 않는다).
          한 문자열이면 폭이 모자랄 때 브라우저가 어디를 자를지 고르는데, 그때
          잘리는 쪽이 하필 뒤에 붙은 숫자였다(반려: 「90초 누적 5…」). 요소를
@@ -43406,6 +43409,59 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
 }
 .w6m .set-tg:active,
 .w6m .rank-tab:active{ transform:translateY(2px); }
+
+/* --- ⑩ [0904] 내 기록 — 판 안 스크롤 ---------------------------------------
+   실기 반려(records-0904.jpg): TOP5 + 아케이드 3줄이 판을 넘겨 아케이드 마지막
+   줄과 닫기 버튼이 판 **밖으로** 흘렀다. `.w6m .sheet` 는 리본이 판 위로 걸터
+   앉아야 해 overflow:visible !important 라, 판 자신을 스크롤 상자로 못 쓴다
+   (그 !important 가 base `.sheet` 의 overflow-y:auto 를 죽여 내용이 그대로 흘렀다).
+   스킨창 `.sk-list`(:8999)와 같은 처방 — **목록만** 안에서 스크롤하는 구획으로
+   만든다. 판은 flex 열, tabs·hint 는 위·#rank-close 는 아래에 고정(flex:0 0 auto),
+   그 사이 #rank-list(+아케이드)만 min-height:0 으로 줄며 스크롤한다. 판 높이는
+   base `.sheet` 의 max-height:100% 가 이미 .modal 안쪽(상하 18px+safe)으로 가둔다
+   — 다른 w6m 창(#modal-settings)과 같은 여백이다. 스크롤바는 감춘다(줄이 잘려
+   보이는 것이 곧 「더 있다」는 신호). */
+#modal-rank .sheet > h2,
+#modal-rank #rank-tabs,
+#modal-rank #rank-hint,
+#modal-rank #rank-close{ flex:0 0 auto; }
+#modal-rank #rank-list{
+  flex:0 1 auto;
+  min-height:0;
+  overflow-y:auto;
+  overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+#modal-rank #rank-list::-webkit-scrollbar{ width:0; height:0; }
+
+/* --- ⑩ [0904] 탭 알약 면색을 정본 역할토큰(--bj-*)으로 ----------------------
+   반려 사유였던 **갈색 겉선**(#6E463A = --j-outline)과 크림을 걷는다. 면·겉선·
+   드롭·접지밴드가 전부 --bj-* 에서 나온다: 켜짐 = 엔들리스 포화 변주(민트),
+   꺼짐 = 라일락 저채도 역할토큰. 이 규칙은 `.rank-tab` 만 잡아 설정 토글
+   `.set-tg` 는 손대지 않는다(⑦ 그룹 규칙보다 뒤라 같은 특이도로 이긴다). */
+.w6m .rank-tab{
+  --bj-a:#7ED9C0; --bj-b:#54BFA2; --bj-drop:#35866F; --bj-band:#43A184;
+  background-image:linear-gradient(180deg, var(--bj-a) 0%, var(--bj-a) 47%,
+                                          var(--bj-b) 47%, var(--bj-b) 100%);
+  box-shadow:
+    0 3px 0 var(--bj-drop),
+    0 6px 14px rgba(83,28,40,.22),
+    inset 0 0 0 2.5px var(--bj-drop),
+    inset 0 -5px 0 var(--bj-band);
+  text-shadow:0 1.5px 0 color-mix(in srgb, var(--bj-drop) 55%, transparent);
+}
+.w6m .rank-tab[aria-selected="false"]{
+  --bj-a:#CDC2D4; --bj-b:#B3A6BC; --bj-drop:#8B7E95; --bj-band:#A296AC;
+  background-image:linear-gradient(180deg, var(--bj-a) 0%, var(--bj-a) 47%,
+                                          var(--bj-b) 47%, var(--bj-b) 100%);
+  box-shadow:
+    0 3px 0 var(--bj-drop),
+    0 6px 14px rgba(83,28,40,.18),
+    inset 0 0 0 2.5px var(--bj-drop),
+    inset 0 -5px 0 var(--bj-band);
+  text-shadow:0 1px 0 rgba(255,255,255,.42);
+}
 
 /* --- ⑧ 기록 탭 줄 간격 ------------------------------------------------------
    알약이 커졌으니 탭 줄도 유리 줄들과 같은 리듬(8px)으로 띄운다. */
