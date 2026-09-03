@@ -48048,6 +48048,28 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
     color-mix(in srgb, var(--f2-box) calc(var(--cps-body-a) * 100%), transparent),
     color-mix(in srgb, var(--f2-box-2) calc(var(--cps-body-a) * 100%), transparent));
 }
+/* ⑥ (0904) 사용자 반려 「세로탭 눌러도 오른쪽 판 내용이 안 바뀜」 — 원인은
+   젬 슬롯 3단(.cp-side-rack = 왕관/재킷/지팡이 아이템 슬롯)이 **모든 탭에서**
+   서 있어서, 탭을 바꿔도 지배적 시각(젬 3단)이 그대로였다(바뀌는 건 아래 작은
+   판 문구뿐). 아이템 슬롯은 아이템 탭에서만 세운다 — 스킨/필살기 탭은 자기
+   카테고리 판 내용만 보인다. 데이터는 이미 있는 것만 연결(스킨=jstar 개수·
+   필살기=char.<id>.ult), 새 카테고리 발명 없음. */
+#charpanel:not([data-cpside="item"]) .cp-side-rack { display: none; }
+/* 스킨·필살기 판은 젬 슬롯이 사라진 자리를 채우도록 세로 중앙에 앉히되,
+   윗변 추천 배지(버티기파, cp-side-rec top .024W)와 겹치지 않게 그 아래에서 시작 */
+#charpanel[data-cpside="skin"]  .cp-pane[data-pane="skin"],
+#charpanel[data-cpside="skill"] .cp-pane[data-pane="skill"] {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: calc(var(--f2-w) * .14) calc(var(--f2-w) * .028) calc(var(--f2-w) * .04);
+}
+#charpanel[data-cpside="skin"]  .cp-pane[data-pane="skin"] .cp-side-txt,
+#charpanel[data-cpside="skill"] .cp-pane[data-pane="skill"] .cp-side-txt {
+  font-size: calc(var(--f2-w) * .046);
+  line-height: 1.35;
+  color: var(--f2-ink);
+}
 #charpanel .cp-side-panes {
   position: absolute;
   inset: calc(var(--f2-w) * .018);
