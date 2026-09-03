@@ -43242,7 +43242,9 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
   border-radius:999px;
   color:#FFFFFF;
   font-family:var(--font-display);
-  font-size:13.5px;
+  /* [E44-0903] 같은 자(B1 0.4089)를 36px 알약에 : (0.4089 x 36 − 1.5) ÷ 0.83 = 15.9px.
+     롤백: 13.5px. */
+  font-size:15.9px;
   line-height:36px;
   white-space:nowrap;
   cursor:pointer;
@@ -44659,7 +44661,21 @@ html[lang="en"] .splash-logo{
              inset 0 -6px 0 var(--bj-band) !important;
   color:#FFFFFF !important;
   font-family:var(--font-display) !important;
-  font-size:16px;
+  /* [E44-0903 . 버튼 글자] 사용자 반려 「설정 창 버튼 글씨 크기 시안대로 키워」.
+     자 = scratchpad/p0meas-0903/CSS-VALUES.txt [B1] — 시안 90127e38 「건너뛰기」
+     단일행 CTA 의 «잉크 높이 ÷ 버튼 높이» = 0.4089 (40.75 / 99.65).
+     「버튼 높이」는 겉선 바깥면 border-box, 둥근 캡이 아닌 직선 허리 구간이다.
+     우리 잉크(흰 글자 + 1.5px 드롭 그림자) 실측 = 0.83 x font-size + 1.5px
+     (dsf4 · 글자 숨김 차분 · 한글 라벨 19표본, scratchpad/btn2-0903/ink.py).
+       52px 버튼 → (0.4089 x 52 − 1.5) ÷ k = 23.5px    전 16px (비 0.2837)
+     k 는 라벨의 자모 구성에 따라 0.819~0.882 로 흔들린다(한글 조판의 성질이다).
+     ko 라벨 실측 6종의 «가장 큰 편차를 가장 작게» 하는 값으로 23.5px 를 골랐다 —
+     그 값에서 여섯 중 다섯이 목표비 0.4089 의 ±3 % 안에 든다(「확인」만 +4.6 %).
+     행버튼 제목 0.3409 · 부제 0.2250 은 시안 32f6be9b 의 «2행 행버튼» 값이고
+     그 넷은 사용자 제작 조각(catalog/sian2-btn-*.webp)이라 이 규칙이 안 닿는다 —
+     쓰지 않았다. 높이·여백·정렬은 한 자리도 안 건드렸다(글자 크기만).
+     롤백: 이 주석을 지우고 아래 한 줄을 16px 로 되돌린다. */
+  font-size:23.5px;
   line-height:1.15 !important;
   text-align:center;
   text-shadow:0 1.5px 0 rgba(110,70,58,.55) !important;
@@ -44697,7 +44713,26 @@ html[lang="en"] .splash-logo{
      롤백: 이 주석과 아래 선언을 지우고 한 줄
            `--bj-a:#8ACDF0; --bj-b:#57A6DC; --bj-drop:#2E6F9C; --bj-band:#4290C8;`
            로 되돌린다(::before/::after 절도 함께 지운다). */
-  --bj-a:#B563D9; --bj-b:#4AC0B6; --bj-drop:#4F5A7C;
+  /* [E45-0903 . 재질 끝점] 지휘자 판정 「버튼 그라데 끝점이 시안보다 연하다」 확인.
+     자 = 합성 on-screen 픽셀(scratchpad/btn2-0903/field.py). 시안 버튼 상자
+     (232.35, 920.99)–(535.53, 1020.64) 와 우리 버튼 border-box 를 같은 606x200 으로
+     정규화하고, 겉선·상단 스페큘러·글자·접지밴드를 뺀 세로 띠 10개(v .09–.27 ·
+     .72–.84)마다 가로 강건 선형적합(광택 제거)을 해 평균한다.
+     캘리브레이션: 시안 → 우리 장치 해상도 → 되돌림 3점 ΔRGB 0.18 ⇒ 자 채택.
+       전   t .12 / .50 / .88  ΔRGB 17.40 / 5.63 / 9.04 (평균 10.69)
+       시안 합성 끝점 t=0 rgb(212.9, 97.0, 231.1) · t=1 rgb(68.9, 206.7, 177.5)
+       우리 층 이득 g = 0.8637 · 오버레이 몫 P = 24.02
+         (손 산술과 실측이 ΔRGB 1 이내로 일치 — 빠진 층이 없음을 여기서 확인했다)
+       ⇒ A = (212.9 − P) ÷ g = rgb(219, 84, 240) · B = rgb(52, 212, 178)
+     ⚠ 「시안의 CSS 정지점 숫자」 자체는 **못 쟀다**. 시안의 세로 구조가 2정지점
+       오버레이 모델과 안 맞는다 — 채널별 m1/m0 가 .10 / .44 / .35 로 갈리고
+       (모델이 맞으면 셋이 같아야 한다) v 0.86 근처에 접지 밴드가 한 겹 더 있다.
+       그래서 v=0/1 외삽이 채널마다 다른 답을 준다. 아래 두 색은 「우리 층 위에서
+       시안 합성 화소를 재현하는 값」이고, 시안 원료 색의 확정값이 아니다.
+     --bj-drop · --bj-band 는 예전대로 실측 없음(시안 버튼 아래는 판에 묻힌다) —
+     한 자리도 안 건드렸다. 나머지 여섯 변주도 시안 표본이 없어 그대로다.
+     롤백: 이 주석을 지우고 아래 한 줄을 #B563D9 / #4AC0B6 으로 되돌린다. */
+  --bj-a:#DB54F0; --bj-b:#34D4B2; --bj-drop:#4F5A7C;
   --bj-band:rgba(255,255,255,.26);
   --bj-line-l:#643578; --bj-line-r:#356566;
   --bj-rim-l:#CC80E6;  --bj-rim-r:#7BCCD2;
@@ -44765,7 +44800,9 @@ html[lang="en"] .splash-logo{
 .w6m .sheet .btn-secondary{
   --bj-a:#CDC2D4; --bj-b:#B3A6BC; --bj-drop:#8B7E95; --bj-band:#A296AC;
   min-height:48px !important;
-  font-size:15px;
+  /* [E44-0903] 같은 자(B1 0.4089)를 48px 줄버튼에 : (0.4089 x 48 − 1.5) ÷ k = 21.65px.
+     롤백: 15px. */
+  font-size:21.65px;
 }
 /* 토글·기록탭은 **이미 정본**이다(W6-b ⑦ 이 만든 그 알약) — 여기서는 상자만
    같은 규칙에 맞춘다. 색은 건드리지 않는다(켜짐 민트 · 꺼짐 라일락 유지). */
@@ -47678,10 +47715,14 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
      직접 준다. 가로 여유 계산: chars-en 캔버스 512x160 -> 폭 225.3px 대 알약
      231.83px 이고 잉크는 좌우 각 18.7px 안쪽에 선다(모달의 padding 18px 과 같다). */
   background:
-    var(--ttl, none) center center / auto 88% no-repeat,
-    radial-gradient(closest-side, rgba(255,255,255,.95), rgba(255,255,255,0)) 4% 16%/9% 30% no-repeat,
-    radial-gradient(closest-side, rgba(255,255,255,.9),  rgba(255,255,255,0)) 12% 11%/4.5% 14% no-repeat,
-    radial-gradient(closest-side, rgba(255,255,255,.85), rgba(255,255,255,0)) 96% 74%/4% 18% no-repeat;
+    var(--ttl, none) center center / auto 88% no-repeat;
+  /* [P0CAP-0903 . 44 봉인] 옛 캐릭터판 알약의 «광택 세 점». 이 자리는 이제 부품
+     (.wf-cap 배경의 광택 2점)이 받는다 — 두 계열 공존 금지. 그림층 한 줄만 남긴다.
+     봉인한 세 줄(원문, 주석 기호만 괄호로 바꿈):
+       radial-gradient(closest-side, rgba(255,255,255,.95), rgba(255,255,255,0)) 4% 16%/9% 30% no-repeat,
+       radial-gradient(closest-side, rgba(255,255,255,.9),  rgba(255,255,255,0)) 12% 11%/4.5% 14% no-repeat,
+       radial-gradient(closest-side, rgba(255,255,255,.85), rgba(255,255,255,0)) 96% 74%/4% 18% no-repeat;
+     되돌리려면 위 한 줄의 ; 를 , 로 바꾸고 세 줄을 그대로 되돌린다. */
 }
 #charpanel #cp-close {
   position: absolute;
@@ -52668,6 +52709,22 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
      시안 실측 a13c656f: 캡슐 바깥 상자 735x277 @W1694
        = 판 폭의 43.39% · 세로비 0.377 (정본 0.3797 과 차 0.7%)
    =========================================================================== */
+/* [P0CAP-0903 · ㊸] 제목 캡슐 15자리를 이 부품 목록에 편입한다. 겉선(L3)만 제목이 자기 box-shadow 로 받는다 — ::after 는 ㉞ 제목 그림이 쓴다. */
+#modal-pause .sheet > h2,
+#modal-over .sheet > h2,
+#modal-tutorial .sheet > h2,
+#modal-settings .sheet > h2,
+#modal-howto .sheet > h2,
+#modal-skin .sheet > h2,
+#modal-adv .sheet > h2,
+#modal-arc .sheet > h2,
+#modal-daily .sheet > h2,
+#modal-clear .sheet > h2,
+#modal-rank .sheet > h2,
+#modal-node .r10-ribbon,
+#modal-mode .r10-ribbon,
+#modal-classic .r10-ribbon,
+#charpanel #cp-h,
 .wf-cap{
   --wcap-h: calc(var(--wcap-w) * .3797);   /* 정본 [data-part=capsule] 세로비 */
 
@@ -52850,6 +52907,21 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
 @supports (clip-path: shape(from 0px 0px, close)) {
   /* [L0] 실루엣 — 스타디움. 반지름(border-radius)은 살려 둔다: 띠(inset
      그림자)가 두 끝 반원을 그대로 돌아야 하고, 바깥은 클립이 다시 자른다. */
+  #modal-pause .sheet > h2,
+  #modal-over .sheet > h2,
+  #modal-tutorial .sheet > h2,
+  #modal-settings .sheet > h2,
+  #modal-howto .sheet > h2,
+  #modal-skin .sheet > h2,
+  #modal-adv .sheet > h2,
+  #modal-arc .sheet > h2,
+  #modal-daily .sheet > h2,
+  #modal-clear .sheet > h2,
+  #modal-rank .sheet > h2,
+  #modal-node .r10-ribbon,
+  #modal-mode .r10-ribbon,
+  #modal-classic .r10-ribbon,
+  #charpanel #cp-h,
   .wf-cap{
     box-shadow:
       inset 0 0 0 var(--wcap-rim-tc) color-mix(in srgb, var(--wcap-rim-c)
@@ -52870,6 +52942,21 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
       close);
   }
   /* [L2-1] 측면 림 — 고리(evenodd)라 코너를 그대로 돈다 */
+  #modal-pause .sheet > h2::before,
+  #modal-over .sheet > h2::before,
+  #modal-tutorial .sheet > h2::before,
+  #modal-settings .sheet > h2::before,
+  #modal-howto .sheet > h2::before,
+  #modal-skin .sheet > h2::before,
+  #modal-adv .sheet > h2::before,
+  #modal-arc .sheet > h2::before,
+  #modal-daily .sheet > h2::before,
+  #modal-clear .sheet > h2::before,
+  #modal-rank .sheet > h2::before,
+  #modal-node .r10-ribbon::before,
+  #modal-mode .r10-ribbon::before,
+  #modal-classic .r10-ribbon::before,
+  #charpanel #cp-h::before,
   .wf-cap::before{
     content: "";
     position: absolute; inset: 0;
@@ -55008,7 +55095,13 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
 #modal-classic .r10-ribbon,
 #charpanel #cp-h{
   align-self:center;
-  /* 🚨🚨 W6.5b — **세로 슬라이스 폐지**. 사용자 3차 반려("캡슐이 쭈글쭈글
+/* [P0CAP-0903 · ㊸ 봉인] 옛 제목 캡슐 «기하» (--w65-cap · height:80px · border-image ·
+   margin:-32px · padding:0 10px · fit-content/min-width:56%). 아래 ㊸ 블록이 시안
+   실측(A1 .5684 · A3 0 · A5 .1318)으로 다시 잡는다. 상자·정렬은 부품 계약이 준다.
+   ⚠ 타이포그래피(font-family/size · line-height · white-space · text-align · color ·
+     text-shadow · align-self)는 **안 지운다** — 캡슐 부품이 아니고, 지우면 CSS
+     레터링 자리(node · clear · daily · 동적 제목)의 글자가 사라진다.
+  (* 🚨🚨 W6.5b — **세로 슬라이스 폐지**. 사용자 3차 반려("캡슐이 쭈글쭈글
      구겨졌다")의 원인이 여기 있었다.
 
      W6.5a 는 양축 9슬라이스였다: `130 200 130 200 / 22px 36px`. 그러면 세로가
@@ -55030,22 +55123,22 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
      실선이 됐다. 80px 이면 2.6px 이고, 사용자 시안 헤더 비율(gm-settings-
      target.png)에도 이쪽이 가깝다. 12창 전부 같은 값이다.
      flex 중앙정렬은 글자를 그 고정 높이 안에 세우기 위한 것이다(글자 높이가
-     상자를 정하던 관계를 뒤집는다). */
-  /* W-C2 — 캡슐이 v3(716×273)으로 갈리면서 분모가 298 → 273 이 됐다. 이 한 줄이
+     상자를 정하던 관계를 뒤집는다). *)
+  (* W-C2 — 캡슐이 v3(716×273)으로 갈리면서 분모가 298 → 273 이 됐다. 이 한 줄이
      위 문단의 "둘을 같게 두면" 을 지키는 유일한 자리다: 세로 배율 H÷273 과
      가로 배율 cap÷200 이 어긋나는 순간 알약이 다시 구겨진다.
      구판(-st) 값 봉인 — 롤백은 이 값으로 되돌린다:  --w65-cap:54px;  (= 200 × 80 ÷ 298)
-     W-E: v4(733×286·캡 슬라이스 190)로 갈리며 59 → 53px. 봉인:  --w65-cap:59px; */
-  --w65-cap:53px;                /* = 190 × 80 ÷ 286. 높이를 바꾸면 같이 바꾼다 */
+     W-E: v4(733×286·캡 슬라이스 190)로 갈리며 59 → 53px. 봉인:  --w65-cap:59px; *)
+  --w65-cap:53px;                (* = 190 × 80 ÷ 286. 높이를 바꾸면 같이 바꾼다 *)
   box-sizing:border-box;
   height:80px;
   display:flex;
   align-items:center;
   justify-content:center;
-  /* 🚨 fit-content 가 이 절의 실측 수리다. 리본은 가로로 긴 판이라 블록 폭을 그대로
+  (* 🚨 fit-content 가 이 절의 실측 수리다. 리본은 가로로 긴 판이라 블록 폭을 그대로
      먹어도 자연스러웠지만, 캡슐은 **알약**이라 폭이 늘면 캡 사이 직선이 길어져
      "늘린 캡슐"로 읽힌다(사용자 반려의 그 인상). 글자 폭 + 좌우 테두리만 먹고,
-     min-width 가 짧은 제목("설정")에서의 최소 길이를 지킨다. */
+     min-width 가 짧은 제목("설정")에서의 최소 길이를 지킨다. *)
   width:fit-content;
   min-width:56%;
   max-width:100%;
@@ -55053,11 +55146,12 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
   padding:0 10px;
   border-style:solid;
   border-width:0 var(--w65-cap);
-  border-image:var(--w65-capsule) 0 190 fill stretch;   /* W-E: v4 캡 슬라이스 190(구판 200 봉인) */
+  border-image:var(--w65-capsule) 0 190 fill stretch;   (* W-E: v4 캡 슬라이스 190(구판 200 봉인) *)
   border-radius:0;
   background-color:transparent;
   background-image:none;
   box-shadow:none;
+   (봉인 끝) */
   font-family:var(--font-display);
   font-size:18px;
   line-height:1.15;
@@ -55069,6 +55163,10 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
   text-shadow:0 1px 0 rgba(255,255,255,.9), 0 2px 4px rgba(120,110,150,.35);
 }
 
+/* [P0CAP-0903 · ㊸ 봉인] 옛 제목 캡슐 «재질» (--cap-a/b/drop/band/edge/-s · --jelly-* ·
+   box-shadow !important). 부품(.wf-cap)의 광택 2점 · 림 3겹 · 글로 · 겉선이 대신 받는다.
+   --cap-h/--jelly-* 를 읽는 곳은 `.kit-cap`(:46193) 하나이고 그 요소는 여기 15자리가
+   아니므로(사용자 정의 속성은 자기 서브트리에만 상속) 봉인이 안전함을 확인했다.
 #modal-pause .sheet > h2,
 #modal-over .sheet > h2,
 #modal-tutorial .sheet > h2,
@@ -55085,7 +55183,7 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
 #modal-classic .r10-ribbon,
 #charpanel #cp-h{
   --cap-h:80px;
-  /* 🚨 사용자 반려(0823) — "버튼 흰색 고체 젤리가 됐다? 투명 캡슐 젤리가 돼야 해".
+  (* 🚨 사용자 반려(0823) — "버튼 흰색 고체 젤리가 됐다? 투명 캡슐 젤리가 돼야 해".
      이 블록이 비트맵을 코드로 갈면서 `--kit-cap--glass` 의 **불투명** 두 톤
      (#F2EAF2 / #DCCFE0)을 그대로 들고 왔다. 킷 갤러리에서는 맞는 값이다 —
      거기 캡슐은 흰 판 위에 홀로 서 있으니까. 그러나 게임의 명판 14자리는
@@ -55100,8 +55198,8 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
      설명해야 하기 때문이다.
      ⚠ 곡률·상자 기하·아웃라인·드롭은 **한 톨도 안 바꾼다** — 반려는 "투과율"
        하나였고, 직전 파도가 답한 반려("림이 가늘고 탁하다")를 되살리면 안 된다.
-     롤백: 아래 세 줄을 #F2EAF2 / #DCCFE0 / #CBBAD1 로 되돌린다. */
-  /* [E29-0903 . 면색] 시안 150b30d1 제목 캡슐 실측 이식.
+     롤백: 아래 세 줄을 #F2EAF2 / #DCCFE0 / #CBBAD1 로 되돌린다. *)
+  (* [E29-0903 . 면색] 시안 150b30d1 제목 캡슐 실측 이식.
      감사(scratchpad/face-apply-0903/audit_btn.json)로 확정한 실효 규칙이 **이 줄**이다 -
      `--mvh-*`(work-frame 층)도 `border-image:var(--w65-capsule)` 도 아니다:
      전자는 `.modal-v2` 가 DOM 에 없어 무매칭, 후자는 바로 아래
@@ -55112,8 +55210,8 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
      y26 #F4A8CF -> y136 #DABAE3 단조). 착수 전 갈색 겉선(--j-outline #6E463A)과
      푸른 회백 속은 여기서 폐기된다. --cap-drop 은 실측이 없어 그대로 둔다.
      롤백: 아래 세 줄을 rgba(201,213,237,.34) / rgba(187,204,234,.22) /
-           rgba(172,190,227,.44) / var(--j-outline,#6E463A) 로 되돌린다. */
-  /* [E30-0903 · 판 α 재판정] 제목 캡슐 속 α .69 -> .010 (맑은 유리).
+           rgba(172,190,227,.44) / var(--j-outline,#6E463A) 로 되돌린다. *)
+  (* [E30-0903 · 판 α 재판정] 제목 캡슐 속 α .69 -> .010 (맑은 유리).
      최소자승 해가 raw -0.208 로 음수 -> [0,1] 상한에서 0 이고, 0 대신 이
      계열이 쓰는 「맑은 유리」 값 .010 을 쓴다(타이머 알약과 같은 처방).
        표본 33,308 화소(캡 안쪽 · 글자 밖 · 시트 위 y>=190 만)
@@ -55125,7 +55223,7 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
        **바깥**이다. 시안 알약은 판보다 G 가 낮은데(자주빛) 우리 재료색
        (238,207,243)·(219,196,232) 과 그 밑 판이 둘 다 G 가 높다 — 면색 몫이다.
      림(--cap-band) · 겉선(--cap-edge) · 드롭은 그대로라 알약 모양은 남는다.
-     봉인: --cap-a:rgba(238,207,243,.69); --cap-b:rgba(219,196,232,.69); */
+     봉인: --cap-a:rgba(238,207,243,.69); --cap-b:rgba(219,196,232,.69); *)
   --cap-a:rgba(238,207,243,.010); --cap-b:rgba(219,196,232,.010);
   --cap-drop:#A896AE; --cap-band:rgba(242,211,253,.44);
   --cap-edge:#865890;
@@ -55141,7 +55239,7 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
   background-size:100% 100% !important;
   background-position:center !important;
   background-repeat:no-repeat !important;
-  /* [E19-0903] 겉선 굵기 통일 — 이 캔디 문법의 겉선만 다른 자였다.
+  (* [E19-0903] 겉선 굵기 통일 — 이 캔디 문법의 겉선만 다른 자였다.
      2.5px  ->  calc(var(--f2-ref-w) * 0.00350) = 1.505px.
      근거는 렌더 실측이다(scratchpad/strokecheck-0903 · dsf4 · 430 CSS px):
        전  제목캡슐 2.722 / 모달버튼 2.592 / 주버튼 2.624 px
@@ -55153,18 +55251,22 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
      가려지지도 번지지도 않아 명목이 거의 그대로 선다(알약 캡 곡률·어깨 비대칭
      탓에 오히려 +0.07~+0.20). 판정은 토큰이 아니라 화면 픽셀이므로,
      두 문법의 **렌더가 같아지는** 명목을 실측으로 잡았다.
-     롤백: 이 주석을 지우고 아래 스프레드를 2.5px 로 되돌린다. */
+     롤백: 이 주석을 지우고 아래 스프레드를 2.5px 로 되돌린다. *)
   box-shadow:0 3px 0 var(--cap-drop),
              0 7px 16px rgba(83,28,40,.22),
              inset 0 0 0 calc(var(--f2-ref-w) * 0.00350) var(--cap-edge),
              inset 0 -6px 0 var(--cap-band) !important;
   padding:0 18px !important;
 }
+   (봉인 끝) */
 /* [E29-0903 . 면색] 이 유리겹의 흰 고리가 제목 캡슐에 남은 마지막 「흰 안개」다.
    `.31 * _hw` 는 _hw=3.726 이라 **1.0 으로 클램프**돼 순백 고리로 선다.
    알파.기하는 (18) 승인값이라 안 건드리고 **색만** 시안 실측 림색
    #F2D3FD(rgb 242,211,253)로 옮긴다 - 시안 캡슐의 안쪽 띠는 흰색이 아니라
    분홍-라일락이다. 롤백: rgba(242,211,253 -> rgba(255,255,255. */
+/* [P0CAP-0903 · ㊸ 봉인] 옛 제목 캡슐 «유리겹 ::before». 이 자리는 이제 부품의
+   `.wf-cap::before`(측면 림 고리)가 받는다. 두 계열 공존 금지 — 사용자 「지금 모달
+   캡슐은 지워버려」. 되돌리려면 이 주석만 걷고 (* *) 두 기호를 원래 주석 기호로 되돌린다.
 #modal-pause .sheet > h2::before,
 #modal-over .sheet > h2::before,
 #modal-tutorial .sheet > h2::before,
@@ -55199,6 +55301,129 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
     inset 0 calc(var(--jh) * 1.13) max(.6px,calc(var(--jh) * .085)) calc(var(--jh) * -1)
       rgba(242,211,253,min(1,calc(.11 * var(--_hw))));
 }
+   (봉인 끝) */
+
+/* ===========================================================================
+   [P0CAP-0903 · ㊸] 제목 캡슐 = HUD 타이머 캡슐과 **같은 부품**
+   ---------------------------------------------------------------------------
+   위 세 자리(`.wf-cap` 계약 · `@supports` 실루엣 · `::before` 림)에 제목 15자리를
+   넣었으므로 겉선·림·광택·실루엣은 HUD 와 **한 토큰**을 쓴다. 이 블록이 하는 일은
+   두 가지뿐이다 — ① 색만 테마로 가르고 ② 기하를 시안 실측값(A1·A2·A3·A5)에 맞춘다.
+
+   자 = scratchpad/p0meas-0903/CSS-VALUES.txt [A] (시안 90127e38 서브픽셀 실측)
+     A1 캡슐 폭 ÷ 판 폭            0.5684   (367.47 / 646.52)
+     A2 캡슐 높이 ÷ 캡슐 폭        0.3263   ← 상수로 «안» 쓴다(아래 높이 산술 참조)
+     A3 판 윗변 걸침 ÷ 캡슐 높이   0        ★ 판 위로 안 튀어나온다.
+                                    캡슐 상단은 판 윗변보다 0.13H «아래»
+     A5 글자 좌우 여백 ÷ 캡슐 폭   0.1318   (잉크폭/캡슐폭 0.7363)
+     색  제목 겉선 (170,111,162) · 제목 림 (237,198,239)
+         HUD  겉선 ( 98,117,131) · HUD  림 (176,219,212)  ← HUD 는 안 건드린다
+
+   ▣ 높이는 A2 를 상수로 쓰지 않고 **HUD 캡슐과 같은 산술**을 쓴다(지시서 확정).
+       --wcap-h = (--f2-ref-w - 16px) * .4404 * .3797
+       430 폭에서 69.2294 px — HUD `#ch-cap` 실측 69.219 와 Δ 0.01 px.
+     그 결과 제목 캡슐의 실효 A2 = 69.229 / 216.00 = **0.3205** (시안 0.3263, Δ 1.8 %).
+     A2 를 그대로 박으면 캡슐이 HUD 보다 1.3 px 높아져 「같은 부품」이 깨진다 —
+     둘 중 «같은 부품» 을 택했다. 근거: 지시서 「HUD 캡슐 182.313 x 69.219 와 같은
+     부품 높이 산술」.
+
+   ▣ A1 은 판의 **겉상자** 기준인데 CSS 백분율은 판의 **안상자**에 걸린다. 그래서
+     계열마다 안여백을 되맞춘 상수를 더한다(아래 네 변주). 실측 근거(430 / 390 두 폭):
+       .sheet.jbox--modal   판 380/354 · 안상자 318/292   → 차 62 px «고정»
+                            K = .5684 * 62 = 35.2408px
+       #modal-tutorial      차 = 2px + --f2-w * .1608     → K = 1.1368px + --f2-w * .09141
+       .sheet.r10-panel     차 = 36px + --pw * .14        → K = 20.4624px + --pw * .079576
+       #charpanel .cp-head  차 0 (여백 없음)              → K = 0
+     (A5 는 padding 이라 % 가 «판 안상자» 에, --ttl-pad 는 절대배치 left/right 라
+      % 가 «캡슐 자기 폭» 에 걸린다. 그래서 표현이 다르고 값은 같은 13.18 % 다.)
+
+   ▣ 글자 비율(--ttl-s .880)은 **한 자리도 안 건드렸다** — 지시서 명령.
+   =========================================================================== */
+#modal-pause .sheet > h2,
+#modal-over .sheet > h2,
+#modal-tutorial .sheet > h2,
+#modal-settings .sheet > h2,
+#modal-howto .sheet > h2,
+#modal-skin .sheet > h2,
+#modal-adv .sheet > h2,
+#modal-arc .sheet > h2,
+#modal-daily .sheet > h2,
+#modal-clear .sheet > h2,
+#modal-rank .sheet > h2,
+#modal-node .r10-ribbon,
+#modal-mode .r10-ribbon,
+#modal-classic .r10-ribbon,
+#charpanel #cp-h{
+  /* [A2] 높이 — HUD 와 같은 산술 */
+  --wcap-h: calc((var(--f2-ref-w) - 16px) * .4404 * .3797);
+  /* 색만 테마 분기. 면(--wcap-a-fill/-a-in/--wcap-milk-a)은 부품 계약대로 전부 0 —
+     ㊳ 「면 제거」가 두 자리에 똑같이 걸린다. 글로 색은 HUD 가 제 림·겉선을
+     7:3 으로 섞은 값이라 제목 색으로 같은 비율을 옮겼다. */
+  --wcap-L3-line: #AA6FA2;   /* 시안 제목 겉선 (170,111,162) */
+  --wcap-rim-c:   #EDC6EF;   /* 시안 제목 속 림 (237,198,239) */
+  --wcap-glow-c:  #D9ACD8;
+  /* [A5] 그림층 좌우 자 — 같은 13.18 % 를 «캡슐 폭» 기준으로 준다 */
+  --ttl-pad: 13.18%;
+  align-self: center;
+  width:  var(--wcap-w);
+  height: var(--wcap-h);
+  min-width: 0;
+  max-width: 100%;
+  /* [A3] 캡슐 상단 = 판 윗변 + 0.13H. 걸침 0. */
+  margin: calc(var(--wcap-h) * .13 - var(--wcap-panT)) auto 6px;
+  /* [A5] 안여백 */
+  padding: 0 calc(var(--wcap-w) * .1318);
+  /* 겉선(L3) + 림 두 겹 + 안쪽 글로. 림·글로 세 줄은 위 `@supports .wf-cap` 과
+     **같은 문자열**이고, 맨 앞 한 줄만 제목 몫이다 — HUD 는 그 자리를 ::after 고리로
+     그리는데 제목의 ::after 는 ㉞ 제목 그림이 이미 쓰고 있다. 두께·색·알파는 같은
+     토큰(--wcap-L3-w / -line / -a)이라 「같은 부품」이 깨지지 않는다. */
+  box-shadow:
+    inset 0 0 calc(var(--wcap-L3-w) * .56) var(--wcap-L3-w) color-mix(in srgb,
+      var(--wcap-L3-line) calc(var(--wcap-L3-a) * 100%), transparent),
+    inset 0 0 0 var(--wcap-rim-tc) color-mix(in srgb, var(--wcap-rim-c)
+      calc(var(--wcap-rim-p2) * 100%), transparent),
+    inset 0 0 0 var(--wcap-rim-td) color-mix(in srgb, var(--wcap-rim-c)
+      calc(var(--wcap-rim-p3) * 100%), transparent),
+    inset 0 0 var(--wcap-band-w) var(--wcap-band-s) color-mix(in srgb, var(--wcap-glow-c)
+      calc((var(--wcap-a-rim) - var(--wcap-a-in)) * 100%), transparent);
+}
+/* [A1 · A3] 판 계열 네 변주 — 위 계약의 두 토큰만 갈아 끼운다(선언 중복 없음). */
+#modal-pause .sheet > h2,
+#modal-over .sheet > h2,
+#modal-settings .sheet > h2,
+#modal-howto .sheet > h2,
+#modal-skin .sheet > h2,
+#modal-adv .sheet > h2,
+#modal-arc .sheet > h2,
+#modal-daily .sheet > h2,
+#modal-clear .sheet > h2,
+#modal-rank .sheet > h2{
+  --wcap-w: calc(56.84% + 35.2408px);      /* .sheet.jbox--modal — 안여백 차 62px 고정 */
+  --wcap-panT: 24px;                        /* border-top 1 + padding-top 23 */
+}
+#modal-tutorial .sheet > h2{
+  --wcap-w: calc(56.84% + var(--f2-w) * .09141 + 1.1368px);
+  --wcap-panT: calc(1px + var(--f2-w) * .0210);
+}
+#modal-node .r10-ribbon,
+#modal-mode .r10-ribbon,
+#modal-classic .r10-ribbon{
+  /* --pw 는 `min(360px, 100%)` 라 소비처에서 % 가 «자기 포함블록» 에 다시 걸린다
+     (리본 자리에서 273.6px 로 접혔다 — 실측). 그래서 판 폭을 안상자로 역산해 푼다:
+       gap = 36px + .14 * 판폭  ·  판폭 = 안상자 + gap
+       -> gap = 41.86047px + .1627907 * 안상자
+       -> 목표 .5684 * 판폭 = .6609225 * 안상자 + 23.7935px */
+  --wcap-w: calc(66.09225% + 23.7935px);
+  --wcap-panT: 18px;                        /* border-top 1 + padding-top 17 */
+}
+#charpanel #cp-h{
+  --wcap-w: 56.84%;                         /* .cp-head 는 안여백이 0 이라 그대로 */
+  --wcap-panT: 0px;
+  /* .cp-head 는 align-items:center 라 세로 가운데로 끌린다. A3 를 판 윗변 기준으로
+     재려면 위쪽에 붙인 뒤 margin-top 이 0.13H 를 준다. */
+  align-self: flex-start;
+}
+
 
 /* ===========================================================================
    [E31-0903 . 제목 글자] 그림 배선 확대 + 시안 비율 배치
