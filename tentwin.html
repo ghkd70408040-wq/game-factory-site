@@ -53675,6 +53675,62 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
   align-items: center;
   font-size: calc(var(--dhW) * .0262);
 }
+/* B (2026-09-03 · ㊾) — 이름/Lv 「탭 판」 복원. 배포본 CSS 원문 이식.
+   ─ 무엇을 어디서 옮겼나
+     판 모양·색 = 배포본 .dh-side::before (tentwin.deployed.html:40915~40935)
+       공통  border-radius:24% 24% 34% 34% / 34% 34% 48% 48%
+       foe   background-color:rgba(124,58,116,.90)
+             box-shadow:inset 0 0 0 1px rgba(200,154,200,.55),inset 0 2px 4px rgba(255,214,246,.22)
+       me    background-color:rgba(226,238,250,.38)
+             box-shadow:inset 0 0 0 1px rgba(255,255,255,.60),inset 0 2px 4px rgba(255,255,255,.34)
+     글자색 = 배포본 :39811~39822 (.dh-foe/.dh-me 의 .dh-name · .dh-lv)
+   ─ 왜 «요소 자신» 에 얹었나 (::before 가 아니라)
+     이 두 상자는 display:flex 다. ::before 를 쓰면 그 의사요소가 **flex 아이템**이
+     되어 글자를 밀어내고 중앙정렬(justify-content:center)이 깨진다. 판을 상자 자신의
+     배경으로 두면 layout 을 안 건드리고, 덕분에 ::before/::after 두 자리는
+     A(돈·날개 캡)가 쓸 수 있게 비어 둔다.
+   ─ 색 근거의 예외 범위 (반드시 좁게 읽을 것)
+     S8 은 «위치·조립 기준» 이지 색 근거가 아니다. 그러나 이번엔 지휘자 판정으로
+     **탭 판 색과 그 위에 앉는 글자색 둘만** 배포본 실측값을 그대로 쓴다.
+     글자색까지 같이 옮기는 이유: 어두운 탭을 얹고 현행 --h2-ink(#4B3F52) 어두운
+     글자를 남기면 글자가 안 읽힌다 — 가독은 판정 이전 문제다.
+     이 예외는 아래 여섯 선택자 안쪽에서 끝난다. .dh-groove · 판 실루엑 ·
+     .kit-hpbar-v2 · ②-A 가 정한 것에는 한 자도 닿지 않는다.
+   ─ 상자(자리·크기)는 바로 위 두 블록 그대로다: top 0 · height 39.18% ·
+     foe left 6.72%/width 33.61% · me left 37.85%/width 33.23% · lv right 1.5%.
+     한 자리도 안 바꿨다.
+   ─ !important 는 안 썼다. 이 선택자는 (1,2,0) 이고 종전 글자색을 주던
+     .kit-hud-v2__name / __lv 는 (0,1,0) 이라 계산값에서 그냥 이긴다(실화면 확인함). */
+#duel-hud .kit-hud-v2__side .kit-hud-v2__name,
+#duel-hud .kit-hud-v2__side .kit-hud-v2__lv{
+  border-radius: 24% 24% 34% 34% / 34% 34% 48% 48%;
+}
+#duel-hud .kit-hud-v2__side--foe .kit-hud-v2__name,
+#duel-hud .kit-hud-v2__side--foe .kit-hud-v2__lv{
+  background-color: rgba(124,58,116,.90);
+  box-shadow: inset 0 0 0 1px rgba(200,154,200,.55), inset 0 2px 4px rgba(255,214,246,.22);
+}
+#duel-hud .kit-hud-v2__side--me .kit-hud-v2__name,
+#duel-hud .kit-hud-v2__side--me .kit-hud-v2__lv{
+  background-color: rgba(226,238,250,.38);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.60), inset 0 2px 4px rgba(255,255,255,.34);
+}
+#duel-hud .kit-hud-v2__side--foe .kit-hud-v2__name{
+  color: #FED7EA; text-shadow: 0 1px 2px rgba(66,11,53,.92);
+}
+#duel-hud .kit-hud-v2__side--foe .kit-hud-v2__lv{
+  color: #FFC2DE; text-shadow: 0 1px 2px rgba(66,11,53,.92);
+}
+#duel-hud .kit-hud-v2__side--me .kit-hud-v2__name{
+  color: #FFFFFF;
+  text-shadow: 0 1px 0 rgba(43,71,99,.95), 0 -1px 0 rgba(43,71,99,.80),
+    1px 0 0 rgba(43,71,99,.80), -1px 0 0 rgba(43,71,99,.80), 0 2px 4px rgba(43,71,99,.55);
+}
+#duel-hud .kit-hud-v2__side--me .kit-hud-v2__lv{
+  color: #F2FBFF;
+  text-shadow: 0 1px 0 rgba(43,71,99,.95), 0 -1px 0 rgba(43,71,99,.80),
+    1px 0 0 rgba(43,71,99,.80), -1px 0 0 rgba(43,71,99,.80);
+}
 /* 체력바 = 홈 몸통 */
 #duel-hud .kit-hud-v2__side > .kit-hpbar-v2{
   position: absolute;
