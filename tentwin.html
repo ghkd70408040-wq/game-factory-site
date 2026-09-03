@@ -36121,12 +36121,15 @@ window.TT_SFX = {
       var petFace = stdArt(mateId(), 'face');
       if (petFace) baby.style.setProperty('--pet-face', petFace);
       else baby.style.removeProperty('--pet-face');
-      /* 3단계 — 폴백 그림(duel-cloud-baby)이 사라졌으므로 «없으면 칸도 없다».
-         종전에는 값이 비면 시안 구름이 섰는데, 그 구름이 곧 W2.5 ② 반려("내가
-         고른 펫이 아니다")의 원인이었다. 빈 유리 칩을 남기는 대신 칩을 접는다 —
-         SPEC-hud-v2 §6 이 좁은 화면에서 펫 칩부터 접는 것과 같은 처분이다.
-         display 로 접는 이유: [hidden] 은 .kit-chip-v2 의 display:grid 에 진다. */
-      baby.style.display = petFace ? '' : 'none';
+      /* 은퇴 (2026-09-03 · ㊾ C) — 「없으면 칸도 없다」로 칩을 접던 한 줄을 걷었다.
+         걷은 이유: 그 처분의 전제(「폴백 그림 duel-cloud-baby 가 사라졌다」)가 이제
+         거짓이다 — 같은 파도가 .hv2-face--pet 의 CSS 폴백을 배포본 원문대로
+         되돌려 구름을 다시 쥐어 줬다. 배포본 JS 원문(tentwin.deployed.html:34190~34195)에는
+         이 접기 줄이 아예 없고, 그래서 배포본은 **같은 1단**에서 펫 방울을
+         53.59 x 54.94 app px 로 렌더한다. 현행만 0x0 이었다 — 회귀다.
+         되돌릴 한 줄(원문 그대로):
+           baby.style.display = petFace ? '' : 'none';
+         되돌린다면 .hv2-face--pet 의 폴백도 함께 none 으로 돌려야 짝이 맞는다. */
     }
   }
 
@@ -51235,7 +51238,15 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
 }
 .hv2-face--foe{ background-image: var(--bs-face, var(--ch-boss-face, none)); }
 .hv2-face--me { background-image: var(--duel-me-face, none); }
-.hv2-face--pet{ background-image: var(--pet-face, none); }
+/* C (2026-09-03 · ㊾) — 배포본 회귀 복원. 폴백이 `none` 이라 펫 미장착 1단에서
+   그림이 한 장도 없었다 — #duel-baby 상자가 0x0 으로 접혔다.
+   배포본 원문(scratchpad/deployed-ref/tentwin.deployed.html:40802)이 쥐고 있던
+   시안 구름을 그대로 되돌린다 — 구름 파일은 폴백이자 롤백 밸브다.
+   되돌릴 한 줄(원문 그대로):
+     .hv2-face--pet{ background-image: var(--pet-face, none); }
+   ※ 재질(면 없는 유리 · --wchip-a-in 0 · --wchip-milk-a 0)과 자리는 현행 chip 정본이다 —
+     이 파도는 그쪽을 한 자리도 안 건드렸다. */
+.hv2-face--pet{ background-image: var(--pet-face, url("catalog/duel-cloud-baby.webp")); }
 
 /* ============================================================
    3. .kit-hpbar-v2 — 체력바 = 시안 스탯 게이지 홈 문법
