@@ -27621,8 +27621,12 @@ window.TT_SFX = {
          배율과 위치로 나눠 쓰다가 시트 크롭이 그대로 노출됐고, 그것이 실기기
          반려의 첫 항목이었다(레지스트리 톱10 #2). 판정은 요소가 아니라 그
          요소가 무엇인지로 한다 — 클래스가 자리의 이름이다. */
+      /* ② 초상 칩도 랙 방울과 **같은 파생본(thumb·얼굴중심)**을 쓴다. 8차의
+         face(눈중심)는 캐릭터마다 프레이밍이 달라 칩 크롭이 들쭉날쭉했다
+         (푸딩=머리만·소다=머리 잘림). 방울 줄이 이미 thumb 로 5캐릭 정합이라
+         칩을 같은 자산·같은 규칙으로 맞춘다. CSS 는 --char-thumb 를 읽는다. */
       var kind = el.classList && el.classList.contains('cp-th') ? 'thumb'
-               : (el.classList && el.classList.contains('ci-chip')) ? 'face'
+               : (el.classList && el.classList.contains('ci-chip')) ? 'thumb'
                : 'portrait';
       /* 기본 스킨일 때만 표준 에셋이 이긴다. 스킨을 갈아 끼우면 그 스킨의 렌더가
          화면에 나와야 하고(그것이 스킨을 산 이유다), 그 렌더는 아직 시트 크롭이라
@@ -48698,11 +48702,25 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   border: 0;
   border-image: none;
   border-radius: calc(var(--f2-w) * .0327);
+  /* ② 얼굴 크롭 = 상단 방울 줄(.cp-th .ct-art)과 같은 자산(thumb·얼굴중심 정사각)
+     ·같은 규칙(center / cover). 캐릭별 예외 없이 다섯이 한 규칙으로 잘린다.
+     face 는 폴백으로만 남긴다. (applySkins 가 이 칩에 --char-thumb 를 심는다) */
   background:
-    var(--char-face, none) center 18% / cover no-repeat,
+    var(--char-thumb, var(--char-face, none)) center / cover no-repeat,
     var(--f2-slot);
   overflow: hidden;
+  /* ① S5(ead03bb6) 실측 — 칩은 알약 위로 솟은 볼록 젤리 블록이다(홈 아님).
+     정본 칩(kit-slot-v2) 층 어휘를 상속하되 오목 그림자를 볼록으로 뒤집는다:
+     바깥 접지 드롭(솟음) + 안쪽 상단 광택 + 안쪽 하단 짙은 접지. */
+  box-shadow:
+    0 calc(var(--f2-w) * .0090) calc(var(--f2-w) * .0110) rgba(92,64,106,.34),
+    0 calc(var(--f2-w) * .0016) 0 rgba(255,255,255,.55),
+    inset 0 calc(var(--f2-w) * .0060) calc(var(--f2-w) * .0060) rgba(255,255,255,.72),
+    inset 0 calc(var(--f2-w) * -.0110) calc(var(--f2-w) * .0105) rgba(118,90,138,.40);
+  z-index: 2;
 }
+/* 볼록 뒤집기: kit-slot-v2::after 의 오목(안쪽 상단 어둠) 질감을 칩에서만 끈다 */
+#charpanel .ci-chip.kit-slot-v2::after { box-shadow: none; }
 #charpanel .ci-chip .cav {
   position: absolute;
   left: 8%; right: 8%; top: 4%; bottom: 4%;
@@ -48716,6 +48734,7 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   height: calc(var(--f2-w) * .1088);
   display: flex;
   align-items: center;
+  justify-content: center;                   /* ③ 이름 알약 안 수평 중앙 */
   margin: 0;
   padding: 0 calc(var(--f2-w) * .034);
   border: 0;
@@ -48723,9 +48742,14 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   border-radius: calc(var(--f2-w) * .0327);
 }
 #charpanel .ci-name {
+  /* ③ 서체 1(게임 제목 서체 = --font-display) 고정, 크기 고정(.058W),
+     알약 안 수직(line-height 1 + 부모 align-items:center)·수평(justify-content:center)
+     중앙. 긴 이름도 자간/축소 없이 같은 크기 — 넘치면 알약 폭 안에서 말줄임. */
   font-family: var(--font-display);
   font-size: calc(var(--f2-w) * .058);
   line-height: 1;
+  letter-spacing: normal;
+  text-align: center;
   color: var(--f2-ink);
   white-space: nowrap;
   overflow: hidden;
