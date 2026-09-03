@@ -42545,9 +42545,19 @@ window.TT_SFX = {
      Cloud HP(970,320~1470,500) 판 #E0F0F8→#A0C0D8 · 윤곽 #557695
                                  트랙 #577695(30%) · 채움 #E6F7FF→#74BBD7 · 라벨 #FFF
 
-   ※ 다음 발주 메모: 시안 좌우의 **뼈 장식(악당)·날개 장식(내 진영)** 은 이번
-     수확에 없다(--duel-orn-l/-r 은 계속 none 폴백). 투명 PNG 두 장이 오면
-     이 파일은 한 줄도 안 바뀌고 그 변수 두 칸만 채우면 된다.
+   ※ 은퇴 (2026-09-03 · ㊾ A) — 여기 있던 「다음 발주 메모」는 거짓이 됐다.
+     그 메모는 「뼈 장식(악당)·날개 장식(내 진영)은 이번 수확에 없다
+     (--duel-orn-l/-r 은 계속 none 폴백). 투명 PNG 두 장이 오면 이 파일은 한 줄도 안
+     바뀌고 그 변수 두 칸만 채우면 된다」고 적었다. 그 약속은 성립한 적이 없다 — 그 변수
+     두 칸은 이 파일 어디에도 선언·소비가 0건이었고(이 은퇴 주석 말고는 파일 전체
+     grep 0건), 투명 PNG 두 장도 끝내 오지 않았다. 약속 파기를 사실로 적어 남긴다.
+     지금 배선 자리 — 장식은 «구운 에셋» 두 장으로 배선됐다:
+       catalog/duel-hpbar-bone.webp (악당) · catalog/duel-hpbar-wing.webp (내 진영)
+       선택자 = #duel-hud .kit-hud-v2__side--foe / --me 의 ::before(좌 캡) · ::after(우 캡)
+       자리  = 이 파일 아래쪽 「A — 뼈·날개 «바 끝» 장식 복원」 절
+     되돌릴 근거 — 그 절을 통째로 지우면 장식이 사라지고 화면은 이 메모가 쓰이던 때로
+     돌아간다. 배포본처럼 «통짜 에셋을 inset:0 로 덮는» 문법은 쓰지 않았다 — 그러면
+     사용자 승인 구역(판 · 홈 clip-path · .kit-hpbar-v2, ②-A 「완료·재작업 금지」)을 지운다.
    ============================================================ */
 
 /* ---- 1. 하단 4버튼 = 메달 실물 ------------------------------------------
@@ -48667,12 +48677,12 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   /* [E37-0903 · ㊲-3] 트랙 폭·줄 고랑을 시안 실측값으로 내린다.
      시안 fffae90b(832x1288 · 832px = 430 app px) 새 실측
      (채도 마스크 트랙 상자 · scratchpad/layout-0903/sian_gauge.json):
-       트랙 폭(젠 왼끕~트랙 오른끕) 254.0 px = **131.274 app px**
+       트랙 폭(젠 왼끝~트랙 오른끝) 254.0 px = **131.274 app px**
        줄 피치 42.25 px = **21.836 app px** · 트랙 외곽 H 29 px = 14.988 app px
      착수 전 우리: 폭 154.359 · 피치 18.172 · 고랑 2.797(=.18 H)
      폭 은 .cc-stats 의 width 하나로만 줄인다 — cs-k 기준폭(.140)·
      사이 간격(.028)은 그대로라 라벨·젠은 한 화소도 안 움직이고
-     막대의 **오른끕만** 당겨온다(관문 4 · 트랙 왼끕·젠 오른변 불변).
+     막대의 **오른끝만** 당겨온다(관문 4 · 트랙 왼끝·젠 오른변 불변).
        막대폭 = (W - .140 - .028) x --f2-w · 젠이 막대 왼변을 .618 x --f2-gh 만큼 덮는다
        목표 폭 131.274 = .618 x 15.391 + 막대폭  ->  막대폭 121.762
        W = 121.762 / 411.51 + .140 + .028 = **.46389**
@@ -53688,13 +53698,13 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
      이 두 상자는 display:flex 다. ::before 를 쓰면 그 의사요소가 **flex 아이템**이
      되어 글자를 밀어내고 중앙정렬(justify-content:center)이 깨진다. 판을 상자 자신의
      배경으로 두면 layout 을 안 건드리고, 덕분에 ::before/::after 두 자리는
-     A(돈·날개 캡)가 쓸 수 있게 비어 둔다.
+     A(뼈·날개 캡)가 쓸 수 있게 비어 둔다.
    ─ 색 근거의 예외 범위 (반드시 좁게 읽을 것)
      S8 은 «위치·조립 기준» 이지 색 근거가 아니다. 그러나 이번엔 지휘자 판정으로
      **탭 판 색과 그 위에 앉는 글자색 둘만** 배포본 실측값을 그대로 쓴다.
      글자색까지 같이 옮기는 이유: 어두운 탭을 얹고 현행 --h2-ink(#4B3F52) 어두운
      글자를 남기면 글자가 안 읽힌다 — 가독은 판정 이전 문제다.
-     이 예외는 아래 여섯 선택자 안쪽에서 끝난다. .dh-groove · 판 실루엑 ·
+     이 예외는 아래 여섯 선택자 안쪽에서 끝난다. .dh-groove · 판 실루엣 ·
      .kit-hpbar-v2 · ②-A 가 정한 것에는 한 자도 닿지 않는다.
    ─ 상자(자리·크기)는 바로 위 두 블록 그대로다: top 0 · height 39.18% ·
      foe left 6.72%/width 33.61% · me left 37.85%/width 33.23% · lv right 1.5%.
@@ -53731,6 +53741,87 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
   text-shadow: 0 1px 0 rgba(43,71,99,.95), 0 -1px 0 rgba(43,71,99,.80),
     1px 0 0 rgba(43,71,99,.80), -1px 0 0 rgba(43,71,99,.80);
 }
+/* A (2026-09-03 · ㊾) — 뼈·날개 «바 끝» 장식 복원 (구운 에셋 재배선).
+   에셋은 배포본이 쓰던 바로 그 두 장이다:
+     catalog/duel-hpbar-bone.webp 1126x229 RGBA (악당) · catalog/duel-hpbar-wing.webp 1122x225 RGBA (내 진영)
+   문법도 배포본과 같다(tentwin.deployed.html:40880~40912):
+     의사요소 + 같은 에셋 + background-repeat:no-repeat + pointer-events:none.
+
+   ⚠ 범위 제한 — 배포본처럼 inset:0 로 통짜를 덮지 않는다. 그 에셋은 «바 틀 통짜»다
+   (어두운 트랙 + 눈금 + 양 끝 뼈/날개 캡 + 이름 탭 판). 통짜로 덮으면 사용자 승인 구역
+   (판 · .dh-groove clip-path · .kit-hpbar-v2 · ②-A 「완료·재작업 금지」)을 지우므로,
+   «뼈·날개 바 끝 캡» 두 조각만 스프라이트로 잘라 보인다. 애매하면 더 많이 보존하는 쪽이 기본값이다.
+
+   — 실측 (scratchpad/hudfix-0903/ : cap_meas.py · groove_h.py · gen_cap_css.py → caps.json · capcss.json)
+     캡 바운딩 박스(asset px) — 색으로 갈랐다(뼈=따뜻한 크림 R>B · 날개=무채·고휘도).
+     트랙·눈금은 캡이 아니라 연결성분 최소크기로 걷어냈다:
+       bone 좌 x 46..135 y 51..206 (90 x 156) · 우 x 984..1087 y 49..206 (104 x 158)
+       wing 좌 x 79..245 y 32..198 (167 x 167) · 우 x 935..1114 y 32..198 (180 x 167)
+     에셋 안 트랙(홈 몸통) 세로 두께 — bone y 89..204 = 116 · wing y 85..201 = 117
+     캡 높이 = 현행 바 높이 x (캡h / 트랙h) — bone 1.3448 / 1.3621 · wing 1.4274. 임의 확대 0.
+     캡 폭  = 높이 x 캡 자체 비(w/h). 가로·세로 같은 배율이라 원본 비가 안 일그러진다.
+   — 자리: 캡 가로중심 = 현행 체력바 상자(#duel-hud .kit-hud-v2__side > .kit-hpbar-v2,
+     left 2.2% · width 95.6% · top 44.0% · height 43.0%)의 좌/우 끝 · 캡 세로중심 = 그 바의 세로중심.
+   — 좌표계는 --dhW(=#duel-hud 폭) 단위다. % 로 쓰면 가로는 side 폭 · 세로는 side 높이
+     기준이라 배율이 축마다 달라진다(foe 176.03x35.88 · me 160.27x35.88 — 비가 다르다).
+   — 의사요소 이름: B 가 .kit-hud-v2__name / __lv «요소 자신» 을 썼기 때문에
+     .kit-hud-v2__side 의 ::before/::after 두 자리가 비어 있었다(편집 전 grep 확인 — 0건).
+     ::before = 좌 캡 · ::after = 우 캡.
+   — 겹침 순서: 장식(z 2)은 홈·바(z auto=0) 위 · 이름/Lv 글자(z 3) 아래다.
+     배포본도 같은 순서였다(.dh-name/.dh-lv z-index:3 > .dh-side::after 2 > ::before 1).
+     배포본이 ::after 를 ::before(명패)보다 위에 둔 이유를 원문 그대로 옮긴다:
+       「조각 실물. ::after 라서 ::before(Lv 명패)보다 위에 선다 — 뼈·날개 장식이
+        명패의 바깥 끝을 덮는 시안의 겹침이 이 한 줄로 재현된다.」
+     여기서는 명패가 의사요소가 아니라 글자 요소 자신(B)이므로, «장식이 판을 덮고
+     글자는 그 위» 로 같은 순서가 선다. */
+#duel-hud .kit-hud-v2__side::before,
+#duel-hud .kit-hud-v2__side::after{
+  content: "";
+  position: absolute;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  z-index: 2;
+}
+#duel-hud .kit-hud-v2__side--foe::before,
+#duel-hud .kit-hud-v2__side--foe::after{ background-image: url("catalog/duel-hpbar-bone.webp"); }
+#duel-hud .kit-hud-v2__side--me::before,
+#duel-hud .kit-hud-v2__side--me::after{ background-image: url("catalog/duel-hpbar-wing.webp"); }
+#duel-hud .kit-hud-v2__side--foe::before{
+  left:   calc(var(--dhW) * -.005056);
+  top:    calc(var(--dhW) * .031428);
+  width:  calc(var(--dhW) * .028658);
+  height: calc(var(--dhW) * .049674);
+  background-size: 1251.111% 146.795%;
+  background-position: 4.440% 69.863%;
+}
+#duel-hud .kit-hud-v2__side--foe::after{
+  left:   calc(var(--dhW) * .395659);
+  top:    calc(var(--dhW) * .031109);
+  width:  calc(var(--dhW) * .033116);
+  height: calc(var(--dhW) * .050311);
+  background-size: 1082.692% 144.937%;
+  background-position: 96.282% 69.014%;
+}
+#duel-hud .kit-hud-v2__side--me::before{
+  left:   calc(var(--dhW) * -.017919);
+  top:    calc(var(--dhW) * .029903);
+  width:  calc(var(--dhW) * .052722);
+  height: calc(var(--dhW) * .052722);
+  background-size: 671.856% 134.731%;
+  background-position: 8.272% 55.172%;
+}
+#duel-hud .kit-hud-v2__side--me::after{
+  left:   calc(var(--dhW) * .346855);
+  top:    calc(var(--dhW) * .029903);
+  width:  calc(var(--dhW) * .056826);
+  height: calc(var(--dhW) * .052722);
+  background-size: 623.333% 134.731%;
+  background-position: 99.257% 55.172%;
+}
+/* 글자는 장식 위 — 배포본 .dh-name/.dh-lv 의 z-index:3 을 그대로 옮겼다.
+   상자(자리·크기)는 안 건드렸다 — 걹침 순서만 정한다. */
+#duel-hud .kit-hud-v2__side .kit-hud-v2__name,
+#duel-hud .kit-hud-v2__side .kit-hud-v2__lv{ z-index: 3; }
 /* 체력바 = 홈 몸통 */
 #duel-hud .kit-hud-v2__side > .kit-hpbar-v2{
   position: absolute;
@@ -54330,7 +54421,7 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
                      -> 판 경계 노치 = 1.3450 - 0.4283 = **0.9167 %W**
        착수 전 우리 : 1.0909 %W (선중심 실측 1.5048 = 1.0909 + 겷선 0.4141, 모형 일치)
        후       : 0.9255 %W  -> 시안 대비 오차 +0.0088 %W = **+0.037 app px**
-     대칭으로 좁혔다 — 노치 중심 .500935 는 불변(탭 바깥끕 t1a·t2b 무변).
+     대칭으로 좁혔다 — 노치 중심 .500935 는 불변(탭 바깥끝 t1a·t2b 무변).
      ⚠ 세 번째 자(밝은틈 절반깊이 폭)는 반대로 말한다(시안 .8788 · 전 .8392 · 후 .7376) —
        우리 겷선이 안쪽으로 그라데 꼬리를 끌어 그 자가 우리 쪽을 좁게 재기 때문이다.
        선중심 자와 「노치/띄깊이」비(시안 .19177 · 전 .22722 · 후 .19086) 둘이 일치하고
