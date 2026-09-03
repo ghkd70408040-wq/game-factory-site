@@ -9,6 +9,11 @@
 :root{
   --bg:#FBF6EF; --card:#FFFFFF; --ink:#3D2B26; --sub:#8A7468; --line:#EADFD6;
   --ok:#2E9E5B; --css:#2B7DC7; --temp:#C98A1B; --queued:#7B6AC7; --empty:#C24545;
+  /* 2026-08-31 — 실측 정합으로 늘어난 세 상태.
+     shelf  = 파일/base64 는 실재하는데 tentwin.html 참조가 0 인 것(보관).
+     rewire = 지금 배선을 되살리는 중인 것.
+     ready  = 기준은 확정됐고 게임 배선만 남은 것(🟡). */
+  --shelf:#7A8B99; --rewire:#C7622B; --ready:#C9A21B;
   --dark:#2B2320;
 }
 *{box-sizing:border-box}
@@ -118,6 +123,13 @@ summary .cnt{margin-left:auto;font-weight:400;font-size:.72rem;color:var(--sub);
 .sdot{display:inline-block;width:.55em;height:.55em;border-radius:50%;margin-right:4px}
 .s-ok{background:var(--ok)}.s-css{background:var(--css)}.s-temp{background:var(--temp)}
 .s-queued{background:var(--queued)}.s-empty{background:var(--empty)}
+.s-shelf{background:var(--shelf)}.s-rewire{background:var(--rewire)}.s-ready{background:var(--ready)}
+/* 보관 카드는 흐리게 — "있긴 한데 화면엔 안 쓰인다" 를 한눈에 */
+.acard.st-shelf{background:#F4F2F0;border-color:#D8D2CC}
+.acard.st-shelf .thumb img{opacity:.55;filter:saturate(.55)}
+.bgcard.st-shelf img{opacity:.55;filter:saturate(.55)}
+.acard.st-rewire{border-color:var(--rewire)}
+.acard.st-ready{border-color:var(--ready)}
 .slab{font-size:.62rem;color:var(--sub)}
 
 /* ── 3-E. "이게 지금 게임이 쓰는 그림" 배지 ────────────────────────────
@@ -305,8 +317,10 @@ details.avgrp[open]>summary::before{transform:rotate(90deg)}
 </div>
 
 <script>
-const SD={ok:'s-ok',css:'s-css',temp:'s-temp',queued:'s-queued',empty:'s-empty'};
-const SL={ok:'확보',css:'CSS',temp:'임시',queued:'발주·예약',empty:'빈칸'};
+const SD={ok:'s-ok',css:'s-css',temp:'s-temp',queued:'s-queued',empty:'s-empty',
+          shelf:'s-shelf',rewire:'s-rewire',ready:'s-ready'};
+const SL={ok:'확보',css:'CSS',temp:'임시',queued:'발주·예약',empty:'빈칸',
+          shelf:'보관 · 참조 0',rewire:'재배선 중',ready:'기준확정 · 배선대기'};
 const TB={bg:'배경',code:'코드',motion:'모션',plan:'기획'};
 const TABS=[['all','전체'],['bg','배경'],['char','캐릭터'],['fruit','과일'],
             ['fx','효과'],['ui','인터페이스'],['time','시간'],['dyn','⚡동적'],
@@ -326,6 +340,12 @@ let USE={}, BGK={};
    PVL = 그 캡처 전체 목록(검수탭 그룹용).
    원본은 catalog/_css-previews/index.json, 굽는 곳은 tools/render-css-previews.py. */
 let PV={}, PVL=[];
+
+/* 미리보기 파일이 사는 폴더는 한 곳이 아니다.
+   _css-previews  = tools/render-css-previews.py 가 굽는 게임 실렌더
+   previews-v2    = 젤리 v1.0 작업판(LAYERS3) 셀 렌더 + ref-v2 시안 축소본
+   항목의 dir 를 그대로 믿고, 없으면 옛 폴더로 본다(구 index.json 호환).      */
+function pvSrc(p){ return 'catalog/'+(p.dir||'_css-previews')+'/'+p.file; }
 
 function useLine(key){
   const u=key&&USE[key];
@@ -347,14 +367,16 @@ function thumbHTML(ref,st,nm){
   if(st==='empty')  return '<div class="thumb"><span class="ph">없음</span></div>';
   if(st==='queued') return '<div class="thumb"><span class="ph">발주·예약</span></div>';
   const p=PV[nm];                                   /* 코드로 그린 것 = 게임 실렌더 한 컷 */
-  if(p) return '<div class="thumb pvthumb"><img loading="lazy" src="catalog/_css-previews/'
-    +esc(p.file)+'" alt=""></div>';
+  if(p) return '<div class="thumb pvthumb"><img loading="lazy" src="'+esc(pvSrc(p))
+    +'" alt=""></div>';
   return '<div class="thumb"><span class="ph">코드·CSS</span></div>';
 }
 
 function mkCard(it){
   const nm=it[0],ty=it[1],st=it[2],ref=it[3],note=it[4],cls=it[5],dyn=it[6];
-  const key=refKey(ref), pv=(st==='css')?PV[nm]:null;
+  /* 미리보기는 상태와 무관하게 붙인다 — 젤리 v1.0 처럼 status 가 css 가 아닌
+     코드 부품도 작업판 셀 렌더를 갖는다(2026-08-31). */
+  const key=refKey(ref), pv=PV[nm]||null;
   const el=document.createElement('div');
   el.className='acard st-'+st+(USE[key]?' usein':'');
   el.dataset.cls=cls; el.dataset.dyn=dyn;
@@ -547,8 +569,7 @@ function mkPvCard(p){
   el.type='button'; el.className='avcard'; el.dataset.k=p.id; el.dataset.st='코드';
   el.dataset.lab=p.label||'';
   el.innerHTML='<span class="avb code">코드</span>'
-    +'<span class="avthumb pvthumb"><img loading="lazy" src="catalog/_css-previews/'
-    +esc(p.file)+'" alt=""></span>'
+    +'<span class="avthumb pvthumb"><img loading="lazy" src="'+esc(pvSrc(p))+'" alt=""></span>'
     +'<span class="avmeta"><span class="nm">'+esc(p.label||p.id)+'</span>'
     +'<span class="sz">'+p.kb+'KB · '+esc(p.px||'—')+' · '+esc(p.screen||'스플래시')+'</span></span>';
   el.addEventListener('click',function(){ openPV(p); });
@@ -755,7 +776,7 @@ function openPV(p){
   lbBg(LB.bg||'check');
   const stage=document.getElementById('lbStage');
   stage.innerHTML=''; LB.panes=[];
-  const pane=mkPane('catalog/_css-previews/'+p.file, p.label||p.id);
+  const pane=mkPane(pvSrc(p), p.label||p.id);
   LB.panes.push(pane); stage.appendChild(pane.el);
   lbFit();
 }
@@ -823,20 +844,21 @@ function applyFilter(f){
 /* ── 에셋 확보 현황 요약 바 ────────────────────────────────────────────
    렌더 시점의 순수 집계 — 데이터 파일은 읽기만 한다.
    여기는 "무엇이 없는가"만 본다(있는 것의 품질 판정은 🧪 에셋 검수 탭).   */
-const GAPK=[['ok','🟢','확보'],['css','🎨','CSS'],['temp','🟠','임시'],
-            ['queued','🟣','발주대기'],['empty','🔴','비어있음']];
-const GAPS={temp:[],empty:[]};
+const GAPK=[['ok','🟢','확보'],['css','🎨','CSS'],['ready','🟡','배선대기'],
+            ['temp','🟠','임시'],['queued','🟣','발주대기'],['empty','🔴','비어있음'],
+            ['shelf','🔵','보관(참조0)'],['rewire','🔁','재배선중']];
+const GAPS={temp:[],empty:[],shelf:[],rewire:[]};
 let CID=0;
 
 /* 카드 하나에 점프용 id 를 달고, 빈칸·임시면 목록에 등록한다. */
 function regCard(el,it,where){
   el.id='gc'+(++CID);
   const st=it[2];
-  if(st==='temp'||st==='empty') GAPS[st].push({id:el.id,nm:it[0],sec:where});
+  if(GAPS[st]) GAPS[st].push({id:el.id,nm:it[0],sec:where});
 }
 
 function gapCount(D){
-  const c={tot:0,ok:0,css:0,temp:0,queued:0,empty:0};
+  const c={tot:0,ok:0,css:0,temp:0,queued:0,empty:0,shelf:0,rewire:0,ready:0};
   (D.sections||[]).forEach(s=>(s.groups||[]).forEach(g=>(g.items||[]).forEach(function(it){
     c.tot++; if(c[it[2]]!==undefined) c[it[2]]++;
   })));
@@ -902,12 +924,18 @@ function buildGapBar(D){
   head.innerHTML='<span class="gtot">부품 전체 '+c.tot+'</span><span class="gsep">—</span>'
     +GAPK.map(k=>'<span class="gk">'+k[1]+k[2]+' <b>'+c[k[0]]+'</b></span>').join('')
     +'<span class="gk">🧪검수대기 <b>'+wk.length+'</b></span>'
-    +'<span class="gcar">▾ 빈칸·임시 펼치기</span>';
+    +'<span class="gcar">▾ 빈칸·임시·보관 펼치기</span>';
   const body=document.createElement('div'); body.className='gapbody'; body.hidden=true;
   body.appendChild(gapRow('🔴 비어있음 '+GAPS.empty.length+'건 — 아직 아무것도 없는 칸',
                           GAPS.empty,'card'));
   body.appendChild(gapRow('🟠 임시 '+GAPS.temp.length+'건 — 임시로 때워 둔 칸',
                           GAPS.temp,'card'));
+  /* 2026-08-31 — 「있는데 안 쓰인다」를 빈칸과 같은 눈높이로 올린다.
+     이 줄이 없어서 관제탑이 참조 0 짜리를 ok 로 달고 있었다. */
+  body.appendChild(gapRow('🔵 보관 '+GAPS.shelf.length+'건 — 파일은 실재하나 tentwin.html 참조 0',
+                          GAPS.shelf,'card'));
+  body.appendChild(gapRow('🔁 재배선 중 '+GAPS.rewire.length+'건 — 지금 배선을 되살리는 중',
+                          GAPS.rewire,'card'));
   body.appendChild(gapRow('🧪 검수대기 '+wk.length+'건 — 올라왔지만 아직 판정 전',
                           wk.map(k=>({nm:k,sec:''})),'asset'));
   head.addEventListener('click',function(){
@@ -926,6 +954,9 @@ Promise.all([
   /* 실배선 표 · 코드 구현 미리보기 — 둘 다 없어도 관제탑은 그대로 돈다 */
   fetch('usage-map.json?v='+Date.now()).then(r=>r.ok?r.json():{}).catch(()=>({})),
   fetch('catalog/_css-previews/index.json?v='+Date.now())
+    .then(r=>r.ok?r.json():{}).catch(()=>({})),
+  /* 젤리 v1.0 미리보기 — 작업판 셀 렌더 + ref-v2 시안 축소본 (2026-08-31) */
+  fetch('catalog/previews-v2/index.json?v='+Date.now())
     .then(r=>r.ok?r.json():{}).catch(()=>({}))
 ]).then(function(res){
   const D=res[0]; M=res[1]; AVS=res[2]||{};
@@ -934,7 +965,13 @@ Promise.all([
   USE=U.byKey||{};
   (U.slots||[]).concat(U.extras||[]).forEach(function(r){ if(r.kind==='bg') BGK[r.key]=1; });
 
-  PVL=((res[4]||{}).items)||[];
+  /* 두 폴더의 목록을 한 줄로 잇는다. 항목마다 dir 가 붙어 있어 경로가 안 섞인다
+     (구 _css-previews/index.json 은 dir 가 없으므로 여기서 채워 준다). */
+  const PA=(((res[4]||{}).items)||[]).map(function(p){
+             return Object.assign({dir:'_css-previews'},p); });
+  const PB=(((res[5]||{}).items)||[]).map(function(p){
+             return Object.assign({dir:'previews-v2'},p); });
+  PVL=PA.concat(PB);
   PVL.forEach(function(p){ (p.names||[]).forEach(function(n){ if(!PV[n]) PV[n]=p; }); });
 
   lbInit();
@@ -971,7 +1008,8 @@ Promise.all([
   const CODE=[];
   D.sections.forEach(function(sec,si){
     const s=document.createElement('section'); s.className='cat';
-    const m=sec.title.match(/^([Ⅰ-Ⅶ]+)\.\s*(.*)$/);
+    /* Ⅷ 이후(젤리 v1.0)까지 받도록 범위를 Ⅻ 로 넓혔다 — 2026-08-31 */
+    const m=sec.title.match(/^([Ⅰ-Ⅻ]+)\.\s*(.*)$/);
     const secShort=m?m[1]:sec.title;
     const h=document.createElement('h2');
     h.innerHTML = m ? '<span class="rn">'+esc(m[1])+'</span>'+esc(m[2]) : esc(sec.title);

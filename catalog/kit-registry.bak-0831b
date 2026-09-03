@@ -1,0 +1,1238 @@
+{
+    "schema":  1,
+    "updated":  "2026-08-31",
+    "note":  "부품 정본 대장. ui-kit.css 의 .k-\u003cid\u003e 와 1:1. approval.status 가 \u0027승인\u0027이 아니면 화면 배선 금지(계획서 §1 스킬B-5). T1-b 시점: 토큰·정의 자리만 잡혀 있어 10종 전부 \u0027검토중\u0027.",
+    "citation_rule":  "인용 규약(2026-08-23): 이 파일의 문서·코드 인용은 절 번호 또는 고유 문자열(상수명·선택자명)로만 한다. 줄번호 인용 금지 — 대상 파일이 바뀌면 죽는다. 심기 전에 대상 절/식별자가 실재하는지 열어서 확인할 것. (근거: research/AUDIT-round3.md §1 「N-2」)",
+    "field_backfill_status":  {
+                                  "updated":  "2026-08-23",
+                                  "roles":  {
+                                                "filled":  "5/11",
+                                                "verdict":  "이번에 2건 백필(bar → [\"STAT\"], tab → [\"TAB\"]). 둘 다 design-decompose §0-A 닫힌 어휘 11종의 판정 문장과 예시가 레코드 내용과 **문자 그대로** 일치해 추론이 개입하지 않았다 — STAT=「수치·게이지·등급을 보이는가 / 예: 공격력 바」 vs bar 레코드(HP·EXP 게이지) · TAB=「화면 안 내용을 교체하는가 / 예: 캐릭터/펫 탭」 vs tab 레코드(시트 상단 전환 탭). 기존 3건은 button([\"ACT\",\"SUB\"]) · header([\"DESC\"]) · icon-chip([\"ICON\"]). **단 icon-chip 의 [\"ICON\"] 은 어휘 위반이라 유효 roles 는 4/11 이다**(아래 icon-chip.roles_violation). 미충전 6종(panel·pill·chip·frame·icon-slot·overlay)은 **의도적으로 비웠다**: panel·icon-slot 은 역할이 아니라 다른 역할을 담는 그릇이고, chip(값 배지+토글칩)·frame(스킬/초상/보상)·pill(행/라벨/읽기전용)·overlay(막)는 변주마다 다른 역할로 갈려 11종 중 하나로 단정할 수 없다. 어휘 추가는 사용자 승인제(design-decompose §0-A 판정 규약 4항)이므로 **12번째 코드를 만들지 않았다.**"
+                                            },
+                                  "scale":  {
+                                                "filled":  "0/11",
+                                                "verdict":  "**전량 미충전. 근거 없음.** ⚠ 착수 지시의 전제(「1배율 정본 규율에 따라 렌더/실측이 1배율 기준이면 scale: 1」)는 **필드 정의를 잘못 짚은 것**이라 따르지 않았다. asset-standardize §4단계 레코드 스키마와 design-decompose §0-A 「역할 레코드 필수 필드」가 정의하는 registry 의 scale 은 **배율이 아니라 수용량**이다 — 스키마 예시가 `{\"count_max\": 40, \"text_len\": [2, 12]}` 이고, 필수 사유도 「시안의 LIST 가 8개용인데 우리는 40개용이면 같은 역할이라도 채택하면 안 된다」이다. 1배율(390px·DPR3)은 **캡처 도구 인자**(`kit-shot.mjs --scale 1`)로서의 동음이의어이며 레코드 필드와 무관하다. 11개 레코드 어디에도 수용가능 개수·글자수 범위 실측이 없고 산출 경로(kit-lab.html·tools/)에도 없어 **오늘은 한 건도 채울 수 없다.** 각 부품의 수용량을 실제로 재기 전까지 이 필드를 1 로도, 어떤 숫자로도 채우지 말 것."
+                                            },
+                                  "cell_id_pattern":  {
+                                                          "filled":  "0/11",
+                                                          "verdict":  "**전량 미충전. 기계적 도출의 전제 자체가 없다.** 스키마가 정의한 규칙은 「kit.html 칸 id 규약 = kit-shot.mjs --sel 값」인데, **site/kit.html 은 부품 칸에 id 를 하나도 부여하지 않는다** — 갤러리를 그리는 `sample(id, variant, state)` / `sizeSample(id, step)` 함수는 className 만 설정하고(`box.className = \u0027k k-panel\u0027 + mod`), 파일 전체의 id 는 `app`·`sum`·`foot`·`barfill` 4개(전부 레이아웃 골격)뿐이다. 즉 지금 어떤 패턴을 적어도 `--sel` 로 실제 선택되는 칸이 0개인 **허구의 규약**이 된다. 선행 조건은 kit.html 이 칸마다 id 를 내보내도록 고치는 것이고, 그것은 이 작업의 범위(주석·대장 정정) 밖이다."
+                                                      },
+                                  "reuse_rate":  {
+                                                     "value":  null,
+                                                     "verdict":  "**산출 불가.** 역할 단위 선(先) 조회의 입력인 roles/scale 이 전량 채워지지 않아 재사용률(목표 ≥80%)은 오늘 계산할 수 없다. 이 값을 추정치로 채우지 말 것. (덮인다의 정의 자체가 「kit_candidates[] 가 비어 있지 않고 **그 부품의 scale 수용량이 이 역할의 scale 이상**」이라 scale 0/11 이면 분자가 정의되지 않는다.)"
+                                                 },
+                                  "blocks":  "design-decompose 1단계 합격조건 「필수 필드 공백 0」은 이 상태에서 달성 불가다. 다음 부품 승인 전에 백필이 선행되어야 한다. 선행 작업 3건: ① 부품별 수용량 실측(scale) ② kit.html 칸 id 부여(cell_id_pattern 의 전제) ③ icon-chip 역할 재판정 또는 어휘 추가 승인.",
+                                  "ref":  "research/AUDIT-round3.md §6 「#10」 · research/AUDIT-skills.md §E-2"
+                              },
+    "sources":  [
+                    "tentwin/assets/art/incoming/mockup/gm-ingame-battle.png",
+                    "tentwin/assets/art/incoming/mockup/gm-modal-pink-target.jpg",
+                    "tentwin/assets/art/incoming/mockup/gm-settings-target.png"
+                ],
+    "layers":  {
+                   "L0":  "배경",
+                   "L1":  "판틀",
+                   "L2":  "림·광택·질감",
+                   "L3":  "그림",
+                   "L4":  "값",
+                   "L5":  "연출"
+               },
+    "converge_gate":  {
+                          "note":  "❌ 정정됨(2026-08-23) — 구 3지표 일괄 관문 {edge_px:2, dE:3, mismatch_pct:5} 는 더 이상 정본 합격선이 아니다. mismatch_pct 5% 는 지표 바닥값(1px 시프트 6.5~6.9% · σ=2 블러 7.4~10.2%) 아래라 **도달 불가로 폐기**됐다(tools/stage-gates.py 헤더 · DESIGN-KNOWLEDGE.md §2.12 조건①·§2.28). 정본은 아래 stage_gates 의 단계별 합격선이다(출처: tools/converge.py 「DEF_FORM_OUTLINE_P95」~「DEF_TEXTURE_RATIO_HI」 상수 블록 — DEF_FORM_OUTLINE_P95 3.0 · DEF_FORM_IOU 0.980 · DEF_COLOR_DE00 2.0 · DEF_TEXTURE_PCT 12.0 · DEF_TEXTURE_RATIO_LO 0.70 · DEF_TEXTURE_RATIO_HI 1.45, 각 상수에 바닥값 대비 배수가 주석으로 붙어 있다. ❌ 정정됨(2026-08-23): 옛 인용 ~~tools/converge.py:641-648~~ 은 줄번호 인용이라 폐기 — research/AUDIT-round3.md §1 「N-2」 인용 규약).",
+                          "stage_gates":  {
+                                              "form":  {
+                                                           "outline_p95_px":  3,
+                                                           "iou":  0.98,
+                                                           "note":  "윤곽 p95 ≤3.0px **그리고** 실루엣 IoU ≥0.980. 바닥 1.00px/0.9890 위, 손상 6.0px/0.9526 아래."
+                                                       },
+                                              "color":  {
+                                                            "dE00":  2,
+                                                            "note":  "대표색 ΔE00 ≤2.0. 바닥 0.279 의 7배, 손상 4.37 의 절반. 옛 all 모드 3.0 보다 오히려 더 조인다 — 질감·형태 잡음이 색 지표에서 빠졌기 때문."
+                                                        },
+                                              "texture":  {
+                                                              "mismatch_pct":  12,
+                                                              "energy_ratio_lo":  0.7,
+                                                              "energy_ratio_hi":  1.45,
+                                                              "note":  "에너지비가 **주 판정자**다(바닥 0.999~1.064 / σ=2 블러 0.75~0.77 / 고주파 제거 0.591~0.603 로 세 구간이 안 겹친다). 불일치 %는 보조 — 회화 그림결 대 CSS 그라디언트라 실물 바닥이 이미 높다."
+                                                          },
+                                              "value":  {
+                                                            "method":  "육안 (1배율 390px·DPR3)",
+                                                            "note":  "converge.py --stage choices 에 \u0027value\u0027 가 없다(form|color|texture|all). 4단계는 도구 판정 수단이 없으므로 converge-*.json 이 아니라 **육안 판정 기록**(무엇을 봤는지 + 1배율 캡처 경로)으로 남긴다."
+                                                        }
+                                          },
+                          "legacy_all_mode":  {
+                                                  "note":  "converge.py --stage all 하위호환 전용. **합격 판정 근거로 쓰지 않는다.** mismatch_pct 5 는 폐기된 값이며 여기 남긴 것은 옛 레코드 해석용이다.",
+                                                  "edge_px":  2,
+                                                  "dE":  3,
+                                                  "mismatch_pct":  5
+                                              }
+                      },
+    "components":  [
+                       {
+                           "id":  "panel",
+                           "name":  "판",
+                           "layer":  "L1",
+                           "class":  "코드",
+                           "roles":  null,
+                           "roles_basis":  "미충전(2026-08-23) — 판은 역할이 아니라 **다른 역할을 담는 그릇**이라 11종 어휘 중 대응하는 것이 없다. 지어내지 않는다. field_backfill_status.roles 참조.",
+                           "scale":  null,
+                           "cell_id_pattern":  null,
+                           "tokens":  [
+                                          "--k-r-4",
+                                          "--k-sp-5",
+                                          "--k-glass-tint",
+                                          "--k-glass-blur",
+                                          "--k-glass-sat",
+                                          "--k-glass-rim-w",
+                                          "--k-glass-rim-c",
+                                          "--k-glass-gloss",
+                                          "--k-sh-3"
+                                      ],
+                           "variants":  [
+                                            "sheer",
+                                            "solid",
+                                            "cream"
+                                        ],
+                           "states":  [
+                                          "default",
+                                          "opening",
+                                          "closing"
+                                      ],
+                           "size_steps":  [
+                                              "sm",
+                                              "md",
+                                              "lg"
+                                          ],
+                           "approval":  {
+                                            "status":  "검토중",
+                                            "date":  "2026-08-21",
+                                            "by":  ""
+                                        },
+                           "converge":  {
+                                            "edge_px":  null,
+                                            "dE":  null,
+                                            "mismatch_pct":  null
+                                        },
+                           "consumers":  [
+
+                                         ],
+                           "notes":  "모달·시트 바닥. 시안 B 좌경계 프로파일에서 림 정점 #FEEFF4·글로스 폭 10 CSS px 측정. 반경 32(시안 C 곡률 역산), 대형 모달만 40."
+                       },
+                       {
+                           "id":  "pill",
+                           "name":  "알약",
+                           "layer":  "L1",
+                           "class":  "코드",
+                           "roles":  null,
+                           "roles_basis":  "미충전(2026-08-23) — variants row/label/readonly 가 서로 다른 역할로 갈려(나열의 한 줄인지·서술인지·상태 표시인지) 11종 중 하나로 단정할 수 없다. 지어내지 않는다. field_backfill_status.roles 참조.",
+                           "scale":  null,
+                           "cell_id_pattern":  null,
+                           "tokens":  [
+                                          "--k-r-2",
+                                          "--k-sp-4",
+                                          "--k-sp-2",
+                                          "--k-sh-1",
+                                          "--k-t-2",
+                                          "--k-ink-1"
+                                      ],
+                           "variants":  [
+                                            "row",
+                                            "label",
+                                            "readonly"
+                                        ],
+                           "states":  [
+                                          "default",
+                                          "hover",
+                                          "pressed",
+                                          "disabled"
+                                      ],
+                           "size_steps":  [
+                                              "sm",
+                                              "md",
+                                              "lg"
+                                          ],
+                           "approval":  {
+                                            "status":  "검토중",
+                                            "date":  "2026-08-21",
+                                            "by":  ""
+                                        },
+                           "converge":  {
+                                            "edge_px":  null,
+                                            "dE":  null,
+                                            "mismatch_pct":  null
+                                        },
+                           "consumers":  [
+
+                                         ],
+                           "notes":  "설정 시안 목록 한 줄. 실측 높이 40px@365 → 44@390, 행 간 틈 7 → --k-sp-2."
+                       },
+                       {
+                           "id":  "button",
+                           "name":  "젤리 버튼",
+                           "layer":  "L1",
+                           "class":  "코드",
+                           "lineage":  "jelly",
+                           "roles":  [
+                                         "ACT",
+                                         "SUB"
+                                     ],
+                           "scale":  null,
+                           "cell_id_pattern":  null,
+                           "impl":  ".kit-btn (ui-kit.css) · 실험대 catalog/kit-lab.html",
+                           "tokens":  [
+                                          "--btn-face  ← 입력 토큰은 이것 하나뿐",
+                                          "--btn-h · 코너 반경은 **4코너 개별 타원**: --btn-rrx/rry-tl(.390/.465) -tr(.230/.245) -br(.185/.240) -bl(.495/.500) → --btn-rx/ry-* = h×비율. (--btn-rr .265 는 둘레 검사 샘플링용 대표값일 뿐 도형에 안 쓴다)",
+                                          "--btn-ring = h×.029 (둘레 12지점×4색 실측 평균 9.25px/319) · --btn-ring-soft(색별: 오렌지만 .25)",
+                                          "밝은 내부 림 띠: --btn-rim-t(.078) · -l(.075) · -r(.100) · -b(.163) · -w(.041) · -blur(.008) · -fade(.022) · -c(rim 68%)",
+                                          "--btn-lip = clamp(2px,h×.05,4px) · --btn-px = h×.38 · --btn-fs = h×**.481** · --btn-ls = **-.041em** · --btn-tstroke = h×**.022** · --btn-ico = h×**.60** · --btn-gap = h×**.076**  (2026-08-22 라벨 재실측: 잉크높이 .404H · 자당 어드밴스 .379H)",
+                                          "파생 가능: --btn-top = mix(face,흰 3%) · --btn-low = mix(face,흰 2%)",
+                                          "파생 불가(색별 실측): --btn-rim · --btn-rim-2 · --btn-back · --btn-band · --btn-band-2 · --btn-edge · --btn-plum",
+                                          "메뉴 배치 .kit-btn--menu / .kit-btnrow (화면폭 --kit-w 파생): 버튼폭 = w×.5876 · 버튼높이 = w×.1354 · 가로세로비 4.338 · 세로 틈 = h×.230 · 라벨 좌측 시작 = 좌끝 + 1.14h · 라벨 세로 = 중심 -.033h"
+                                      ],
+                           "variants":  [
+                                            "pink",
+                                            "purple",
+                                            "orange",
+                                            "mint",
+                                            "sky"
+                                        ],
+                           "states":  [
+                                          "default",
+                                          "pressed",
+                                          "disabled",
+                                          "featured"
+                                      ],
+                           "size_steps":  [
+                                              "sm",
+                                              "md",
+                                              "lg"
+                                          ],
+                           "icon_slots":  [
+                                              "none",
+                                              "left",
+                                              "right",
+                                              "both"
+                                          ],
+                           "approval":  {
+                                            "status":  "검토중(2026-08-22 반려 4건 수리 후 재상신 — evidence-14/57-btn-fit.png)",
+                                            "date":  "2026-08-22",
+                                            "by":  ""
+                                        },
+                           "converge":  {
+                                            "edge_px":  8,
+                                            "dE":  3.297,
+                                            "mismatch_pct":  16.151,
+                                            "verdict":  "FAIL (전체 크롭 기준) — 직전 «PASS 4색 전량» 은 거짓 통과였다",
+                                            "gate_basis":  "구 3지표 일괄(legacy_all_mode). 이 관문의 mismatch_pct 5 는 폐기된 값이다 → 아래 restaged 참조"
+                                        },
+                           "converge_restaged":  {
+                                                     "note":  "**잠정 FAIL — 확정 아님.** 합격선은 도달 가능한 기준으로 교체됐으나, 형태 축의 실루엣 IoU 와 텍스처 축의 고주파 에너지비가 **둘 다 미측정**이라 판정이 닫히지 않았다. 이 레코드는 승인 근거로 쓸 수 없다(action_required 참조). → research/AUDIT-round3.md §1 「N-6」",
+                                                     "note_superseded":  "❌ 정정됨(2026-08-23) — 원문 보존. ~~\"재판정(2026-08-23) — 폐기된 5% 관문이 아니라 converge_gate.stage_gates 단계별 합격선으로 다시 판정했다. **결론은 그대로 FAIL이며, 이번엔 도달 가능한 합격선 기준이라 이 FAIL 은 진짜다.** 즉 \u0027관문이 불가능해서 떨어진 것\u0027이 아니다.\"~~ 완화 사유: 같은 블록의 하위 필드(form.iou: null · texture.energy_ratio: null · value.verdict \u0027미판정\u0027 · action_required)는 전부 미측정을 정직하게 적고 있는데, **가장 인용될 확률이 높은 최상단 note 만 단정형**이었다. 관문이 도달 가능해진 것은 사실이나 그것이 판정이 닫혔다는 뜻은 아니다. → research/AUDIT-round3.md §1 「N-6」",
+                                                     "form":  {
+                                                                  "outline_p95_px":  8,
+                                                                  "gate":  3,
+                                                                  "iou":  null,
+                                                                  "iou_gate":  0.98,
+                                                                  "verdict":  "FAIL — 윤곽 p95 8.0px 이 합격선 3.0px 의 2.7배. 실루엣 IoU 는 **미측정**(재실행 필요)"
+                                                              },
+                                                     "color":  {
+                                                                   "dE00":  3.297,
+                                                                   "gate":  2,
+                                                                   "verdict":  "FAIL — 옛 관문 3.0 으로도 초과였고, 새 합격선 2.0 기준으로는 1.65배 초과"
+                                                               },
+                                                     "texture":  {
+                                                                     "mismatch_pct":  16.151,
+                                                                     "gate":  12,
+                                                                     "energy_ratio":  null,
+                                                                     "energy_ratio_gate":  "0.70~1.45",
+                                                                     "verdict":  "FAIL — 16.151% 가 도달 가능한 합격선 12.0% 마저 넘는다(바닥값 5.63% 의 2.9배). 단 **주 판정자인 고주파 에너지비가 미측정**이라 이 판정은 보조 지표만으로 내려졌다 — 확정 전 재실행 필요"
+                                                                 },
+                                                     "value":  {
+                                                                   "verdict":  "미판정 — 육안(1배율 390px·DPR3) 기록 없음"
+                                                               },
+                                                     "action_required":  "python tools/converge.py \u003cref\u003e \u003crender\u003e --stage form|color|texture 로 재실행해 IoU·에너지비를 채울 것. 그 전까지 이 레코드는 승인 근거로 쓸 수 없다."
+                                                 },
+                           "converge_by_variant":  {
+                                                       "pink":  {
+                                                                    "edge_px":  0,
+                                                                    "dE":  3.069,
+                                                                    "mismatch_pct":  14.263,
+                                                                    "silhouette_pct":  0,
+                                                                    "rim_continuity":  "48/48 (시안 47/48)",
+                                                                    "verdict":  "FAIL"
+                                                                },
+                                                       "purple":  {
+                                                                      "edge_px":  8,
+                                                                      "dE":  3.733,
+                                                                      "mismatch_pct":  17.57,
+                                                                      "silhouette_pct":  0,
+                                                                      "rim_continuity":  "48/48 (시안 48/48)",
+                                                                      "verdict":  "FAIL"
+                                                                  },
+                                                       "orange":  {
+                                                                      "edge_px":  0,
+                                                                      "dE":  2.989,
+                                                                      "mismatch_pct":  15.332,
+                                                                      "silhouette_pct":  0,
+                                                                      "rim_continuity":  "48/48 (시안 47/48)",
+                                                                      "verdict":  "FAIL"
+                                                                  },
+                                                       "mint":  {
+                                                                    "edge_px":  3,
+                                                                    "dE":  3.397,
+                                                                    "mismatch_pct":  17.439,
+                                                                    "silhouette_pct":  0,
+                                                                    "rim_continuity":  "48/48 (시안 45/48)",
+                                                                    "verdict":  "FAIL"
+                                                                },
+                                                       "sky":  {
+                                                                   "edge_px":  null,
+                                                                   "dE":  null,
+                                                                   "mismatch_pct":  null,
+                                                                   "verdict":  "N/A — 시안에 없는 파생 전용 색"
+                                                               }
+                                                   },
+                           "converge_method":  "ref = main-menu-sian@4x.png 버튼 상자 **전체**(1375×319 @4x, 4변 + 4코너 전부). 라벨·아이콘은 행별 면색 대비 34루마 이탈 화소를 12px 팽창시킨 **글리프 마스크**로만 빼고, 테두리 밴드(좌우 .034W · 상하 .094H)는 절대 안 뺀다. 같은 마스크를 코드 크롭에도 그대로 쓴다. 재현: `python tools/btn-sheet.py`. ★ 2026-08-21 관문 수리 전에는 crop 이 «라벨 없는 깨끗한 열 280×(H+40)» = 버튼 가운데 세로 기둥이라 **좌우 끝과 4코너가 판정에 아예 안 들어갔고**, converge.py 의 구조 지표도 실루엣 XOR 만 봐서 밝은 림이 통째로 없어져도 0.000% 였다. 그래서 4색 전량 PASS 라는 거짓 판정이 나왔다.",
+                           "consumers":  [
+                                             "메인화면 4버튼 (#btn-play·#btn-cont·#char-open·#btn-settings) — 비트맵 4장 + 리본 121KB 대체",
+                                             "모달 CTA·닫기 4곳 — 결함 R2 2건",
+                                             "베이지 계보 잔존 6곳 — 결함 R3 6건"
+                                         ],
+                           "notes":  "★ ×0.67 파생 공식은 **거짓으로 확정**(2026-08-21, 원본 시안 실측). L*(테)/L*(면) = 핑크 .518 · 퍼플 .376 · 오렌지 .558 · 민트 .438 → 평균 **.472**, 색별 폭 **.182**. ① 단일 파생 공식으로 4색을 덮을 수 없다 — 테·림·밴드는 **색별 실측 토큰이 정본**이다. ② 파생식(≈×0.505 = 출고물 기준)은 **새 색을 추가할 때의 시작값**으로만 쓴다. ③ 킷 토큰 ×0.655 는 오답이었다 — 세 계보(킷 .655 / 출고물 .505 / 원본 시안 .472) 중 **출고물이 정본**. ④ 부산물 `deep = face V × 0.90` 도 시안 실측 **×0.84**(.781~.870) → 재측정 필요로 강등. ★ 브랜드 토큰 --k-pink 등 **재사용 금지**: --k-* 는 전투 목업 출처라 계보가 다르다(핑크 면색이 원본 시안 L* 49.6 / tentwin.html 「#screen-menu #btn-play.mbtn」 의 --cl 77.7 / --k-pink 67.0 으로 갈렸다 = ΔE 게이트의 10배). 버튼 전용 계보 --k-btn-\u003c색\u003e-face 신설. ★ 구조는 tentwin.html 「#screen-menu #btn-play.mbtn」 ~ 「#screen-menu #btn-settings.mbtn:active」 메인 메뉴 버튼 규칙 블록(--crt/--cl/--clb/--cb/--cbb/--crb 5겹)을 계승하되 둘을 실측으로 고쳤다(❌ 정정됨 2026-08-23: 옛 인용 ~~9964~10071~~ 은 줄번호 인용이라 폐기 — research/AUDIT-round3.md §1 「N-2」 인용 규약): 반경비 .245 → **.265**(코너 MAE 1변수 스윕 최소점, .245 대비 13% 개선), 상단 림 스톱 `4%→12% 선형 램프` → `3.6/7.6% 고원 + 9.8% 급락`(시안의 1px 단차를 램프가 뭉갰다). ★ --btn-ring-soft 는 색별 실측 토큰: 시안 링→림 전이 sobel 세기 핑크 515·퍼플 582·민트 575 인데 오렌지만 378 로 무르다(전이 폭은 4색 모두 3px 동일) → 오렌지만 .25. ★ 계보 판정 = jelly (면색 전량이 main-menu-sian@4x.png 실측). ★★ 2026-08-21 사용자 반려 2건 + 관문 수리: ① 밝은 내부 림이 **오른쪽 끝에서 끊겼다** — 림이 세로 그라데이션의 상단 정지점 하나뿐이라 좌우 변에는 아예 없었고 코너 호 안에서 외곽선에 먹혔다. → 의사요소 ::before 의 **안쪽 베벨**(4변 inset 실측: 상 .078H · 좌 .075H · 우 .100H · 하 .163H, 띠 폭 .041H, 반투명 68%)로 다시 그려 둘레 48점 전량 통과. ② 상단 광택이 뭉갰다 — 시안의 급락은 **2px**(7.5%→8.2%H)인데 직전 판이 7.6%→9.8% 로 7px 로 늘여 놓았다. 실측 폭으로 되돌림. 부수: 우하단 스페큘러(오른끝 .205H · 바닥 .24H) 재현, 외곽선 .025 → **.029**(둘레 실측 평균). ★ 시안의 좌우 끝 반지름이 서로 다르다 — 왼쪽 r≈138px(알약), 오른쪽 r≈72px. CSS 단일 border-radius 로는 동시에 못 맞추므로 --btn-rr .265 는 타협값이고, 이것이 구조 불일치 바닥값 13~18% 의 원인이다. ★★ 2026-08-22 사용자 반려 4건(가로세로 크기 · 하단 그림자 크기 · 좌측 원형 아이콘 없음 · 폰트 이상) 실측 수리. ① 크기는 **화면 폭 비례**가 정본이다 — 시안 2340폭에서 버튼 1375×317 이므로 폭비 .5876 · 가로세로비 4.338 · 높이비 .1354 · 세로 피치 390(=1.230H). 390폭 환산 H 52.81 · W 229.16 · 피치 64.95. 게임 실화면은 H 56.42(+6.8%) · 피치 75.66(+16.5%) 였다. ② 바닥 그림자는 **몸통 안 3D 접지 밴드와 다른 물건**이다. 버튼 아래 배경을 열별로 정규화해 재니 +8~16px 에서 -38%, 50% 지점 +26px, 거의 소멸 +60px → dy .082H · blur .101H · spread 0 · α .40. 직전 값 .145H/.32H/.26 은 2배 아래로 3배 넓게 퍼져 있었다. 접지 밴드(.kit-jelly border-bottom .118H α.17)는 실측(깊이 .09H · -9~18%)과 일치해 손대지 않았다. ④ 글꼴은 **잉크높이/어드밴스 지문**으로 판별했다 — 시안 1.067 vs Jua 1.035 · Malgun/Pretendard 0.94. Jua(=TentwinDisplay, 게임이 이미 싣고 있다)가 정답이고 font-size = .404H/.840 = .481H, 자간 -.041em, 테두리 .022H(균일 stroke — 8방 그림자는 대각이 √2배 두꺼워져 실측과 안 맞는다), 아래 그림자 .031H, **왼쪽 정렬**(좌끝 +1.14H). ⚠ 게임에 박힌 Jua 서브셋(display-chars.ko.txt 478자)에 «새» 가 빠져 있다 — «새로운 모험» 배선 전 1자 추가 필요.",
+                           "gates":  {
+                                         "converge":  "tools/converge.py — 경계 p95 · ΔE00 · 구조 불일치(실루엣 XOR + 내부 구조 국소대비)",
+                                         "rim_continuity":  "tools/rim-continuity.py — 둘레 48점에서 «어두운 외곽선 → 밝은 림 → 면» 패턴 검사. 한 점이라도 밝은 림이 없으면 FAIL",
+                                         "survival_proof":  "시안에서 밝은 림만 지운 이미지를 같은 관문에 넣었을 때 — pink 옛 지표 0.000% → 새 지표 11.238% · purple 옛 지표 0.000% → 새 지표 12.121% · orange 옛 지표 0.000% → 새 지표 10.750% · mint 옛 지표 0.000% → 새 지표 16.539% (림 연속성 pink 21/48 · purple 20/48 · orange 22/48 · mint 24/48)"
+                                     }
+                       },
+                       {
+                           "id":  "chip",
+                           "name":  "칩",
+                           "layer":  "L4",
+                           "class":  "코드",
+                           "roles":  null,
+                           "roles_basis":  "미충전(2026-08-23) — 이 레코드는 «값 배지»(상태를 보이기만 함 → STATE 계열)와 «토글칩»(눌러서 설정을 바꿈 → SUB 계열)이 한 부품에 섞여 있다. design-decompose §0-A 판정 규약 3항이 «두 역할을 겸하는 것처럼 보이면 역할이 겹친 것 — 분리하라» 고 하므로 임의로 하나를 고르지 않는다. field_backfill_status.roles 참조.",
+                           "scale":  null,
+                           "cell_id_pattern":  null,
+                           "tokens":  [
+                                          "--k-success",
+                                          "--k-warn",
+                                          "--k-danger",
+                                          "--k-info",
+                                          "--k-r-full",
+                                          "--k-t-1"
+                                      ],
+                           "variants":  [
+                                            "success",
+                                            "warn",
+                                            "danger",
+                                            "info"
+                                        ],
+                           "states":  [
+                                          "on",
+                                          "off",
+                                          "disabled"
+                                      ],
+                           "size_steps":  [
+                                              "sm",
+                                              "md"
+                                          ],
+                           "approval":  {
+                                            "status":  "검토중",
+                                            "date":  "2026-08-21",
+                                            "by":  ""
+                                        },
+                           "converge":  {
+                                            "edge_px":  null,
+                                            "dE":  null,
+                                            "mismatch_pct":  null
+                                        },
+                           "consumers":  [
+
+                                         ],
+                           "notes":  "설정 시안 토글칩 켜짐 #54B99D 실측 → --k-success 의 근거."
+                       },
+                       {
+                           "id":  "icon-chip",
+                           "name":  "원형 아이콘 칩",
+                           "layer":  "L2",
+                           "class":  "코드",
+                           "lineage":  "jelly",
+                           "roles":  [
+                                         "ICON"
+                                     ],
+                           "roles_violation":  {
+                                                   "flagged":  "2026-08-23",
+                                                   "fact":  "\"ICON\" 은 design-decompose §0-A 「닫힌 역할 어휘 11종」(NAV·TAB·LIST·FOCUS·STAT·DESC·ACT·SUB·RES·STATE·AMB)에 **없는 코드**다. 어휘표를 직접 열어 11종 전량을 대조해 확인했다.",
+                                                   "correction":  "**교정하지 않고 위반 사실만 기록한다.** 11종 중 이 레코드를 단정할 수 있는 어휘가 없기 때문이다 — 메인 메뉴 버튼 안의 글리프 칩은 기능 없이 정체성만이면 AMB 이지만, 이 레코드가 예정 소비처로 적은 「상점 슬롯·프로필 배지·보상 팝업」에서는 RES(재화·소지품)나 STATE(잠금·보유·신규)로 갈린다. 소비처마다 역할이 다르므로 하나로 고르는 것은 근거 없는 창작이 된다. 어휘 추가 역시 사용자 승인제(§0-A 판정 규약 4항)라 임의로 12번째 코드를 만들 수 없다.",
+                                                   "impact":  "이 값이 남아 있는 동안 icon-chip 은 **역할 단위 선(先) 조회에서 어느 역할로도 매칭되지 않는다**(11종 중 어느 것도 아니므로). 재사용률 분자에 세지 말 것.",
+                                                   "action_required":  "사용자 판정 필요 — ① 소비처별로 레코드를 쪼개 각각 11종 중 하나를 부여하거나, ② 12번째 어휘 「ICON」 추가를 승인하거나, ③ 이 부품을 역할 없는 «그릇»으로 재분류(panel·icon-slot 과 같은 취급)한다.",
+                                                   "ref":  "research/AUDIT-skills.md §D-6 「닫힌 역할 어휘 11종을 대장이 이미 위반」 · design-decompose §0-A 「닫힌 역할 어휘 11종」"
+                                               },
+                           "scale":  null,
+                           "cell_id_pattern":  null,
+                           "impl":  ".kit-chip (ui-kit.css) · 실험대 catalog/kit-lab.html?mode=chip",
+                           "tokens":  [
+                                          "--chip-d  ← 입력 토큰은 지름 하나뿐 (버튼 안에서는 --btn-h × 1.076)",
+                                          "--chip-face(기본 --btn-face 상속) · --chip-edge(기본 --btn-edge 상속)",
+                                          "--chip-ring = d×.027  (= 버튼 외곽선 .029H 를 지름 기준으로 환산)",
+                                          "--chip-well = .07  (오목 웰. 실측 중심 -10~18% · .74R 에서 0)",
+                                          "--chip-glyph = .677  (글리프 잉크 상자 / 지름. 시안 4색 평균 .729H)",
+                                          "젤리 연동: --jelly-h = --chip-d · --jelly-band-w .110 · -band-t/-x .027"
+                                      ],
+                           "variants":  [
+                                            "(밑판 색을 그대로 상속 — 자체 변주 없음)"
+                                        ],
+                           "states":  [
+                                          "default"
+                                      ],
+                           "size_steps":  [
+                                              "sm 47",
+                                              "md 57",
+                                              "lg 75"
+                                          ],
+                           "approval":  {
+                                            "status":  "검토중(2026-08-22 신설 · 초회 상신)",
+                                            "date":  "2026-08-22",
+                                            "by":  ""
+                                        },
+                           "converge":  {
+                                            "edge_px":  null,
+                                            "dE":  null,
+                                            "mismatch_pct":  null
+                                        },
+                           "consumers":  [
+                                             "메인 메뉴 4버튼 좌측 아이콘 (.kit-btn--menu 안)",
+                                             "(예정) 상점 슬롯 · 프로필 배지 · 보상 팝업"
+                                         ],
+                           "notes":  "★ 버튼 안에 박지 않는다. 지름 하나만 주면 어디서나 서는 독립 원판이다. 실측(main-menu-sian@4x · 4색 · 버튼 상자 H=317): 외경 341px = 1.076H · 중심 x = 버튼 좌끝 +171px(.539H, 즉 좌끝에 접함) · 중심 y = 바 중심 -6px(-.019H) · 면색은 **버튼 면색과 동일**(r .40~.44H 고리에서 루마비 .95~1.05)이고 안쪽으로 -10~18% 어두워진다 — 색이 아니라 오목 웰 그림자다. 밝은 안쪽 림(r .46~.50H 에서 +25~45 루마)·상단 광택·하단 발광·스페큘러·접지 밴드는 **칩이 하나도 직접 그리지 않는다** — 같은 .kit-jelly 를 border-radius:inherit(=50%)로 얹어서 나온다. 이것이 오버레이 분리의 실전 시험이었고 통과했다(evidence-14/57-btn-fit.png 「.kit-jelly 를 칩에 얹은 결과」 컷). 이 과정에서 .kit-jelly 의 상·측 띠 두께를 --jelly-band-t/-x 토큰으로 노출했다 (기본값은 종전 상수 .030/.050 그대로라 버튼 렌더는 1px 도 안 바뀐다). 둘레가 짧은 정원에서는 .050 이 밑판 외곽선(.027d)보다 넓어 «숨어야 할 띠»가 밖으로 삐져나왔다. ★ 글리프 재고 대조: 별→lib-star-gold.webp(재사용, 색만 격차) · 나침반→mode-ico-rush.webp(근사, 바늘 형태 격차) · 기어→lib-glyph-gear.webp(무보정 재사용) · 펼친책·렌치→투명 조각 없음. 단 «없음»은 «그려야 한다»가 아니다 — 게임이 깔고 있는 catalog/sian2-btn-*.webp 통짜 비트맵에 이미 구워져 있고 원화 좌표도 실측했다(책 x529..764 y2518..2732 · 렌치 x1600..1849 y2900..3199 @4x) → **누끼 추출 1건**."
+                       },
+                       {
+                           "id":  "bar",
+                           "name":  "게이지",
+                           "layer":  "L4",
+                           "class":  "하이브리드",
+                           "roles":  [
+                                         "STAT"
+                                     ],
+                           "roles_basis":  "백필(2026-08-23). design-decompose §0-A 닫힌 어휘 11종의 STAT 판정 문장 「수치·게이지·등급을 보이는가」 + 예시 「공격력 바」 와 이 레코드(HP·EXP 게이지, variants hp-enemy/hp-ally/exp)가 그대로 일치한다. 추론 없음.",
+                           "scale":  null,
+                           "cell_id_pattern":  null,
+                           "tokens":  [
+                                          "--k-track",
+                                          "--k-danger",
+                                          "--k-info",
+                                          "--k-r-full",
+                                          "--k-rim-in-lo"
+                                      ],
+                           "variants":  [
+                                            "hp-enemy",
+                                            "hp-ally",
+                                            "exp"
+                                        ],
+                           "states":  [
+                                          "full",
+                                          "mid",
+                                          "low",
+                                          "empty",
+                                          "animating"
+                                      ],
+                           "size_steps":  [
+                                              "sm",
+                                              "md",
+                                              "lg"
+                                          ],
+                           "approval":  {
+                                            "status":  "검토중",
+                                            "date":  "2026-08-21",
+                                            "by":  ""
+                                        },
+                           "converge":  {
+                                            "edge_px":  null,
+                                            "dE":  null,
+                                            "mismatch_pct":  null
+                                        },
+                           "consumers":  [
+
+                                         ],
+                           "notes":  "트랙·채움은 코드, 양끝 캡(뼈·날개)은 그림. 시안 A 전투 HUD 실측: 빈 트랙 #9C5977, 아군 채움 #A4DAE8."
+                       },
+                       {
+                           "id":  "frame",
+                           "name":  "액자",
+                           "layer":  "L1",
+                           "class":  "하이브리드",
+                           "roles":  null,
+                           "roles_basis":  "미충전(2026-08-23) — variants skill/portrait/reward 가 각각 다른 역할(선택 후보 나열 · 선택 대상 상세 · 재화/보상)로 갈려 11종 중 하나로 단정할 수 없다. 지어내지 않는다. field_backfill_status.roles 참조.",
+                           "scale":  null,
+                           "cell_id_pattern":  null,
+                           "tokens":  [
+                                          "--k-r-3",
+                                          "--k-sh-2",
+                                          "--k-warn",
+                                          "--k-purple",
+                                          "--k-orange"
+                                      ],
+                           "variants":  [
+                                            "skill",
+                                            "portrait",
+                                            "reward"
+                                        ],
+                           "states":  [
+                                          "default",
+                                          "active",
+                                          "locked",
+                                          "cooldown"
+                                      ],
+                           "size_steps":  [
+                                              "sm",
+                                              "md",
+                                              "lg"
+                                          ],
+                           "approval":  {
+                                            "status":  "검토중",
+                                            "date":  "2026-08-21",
+                                            "by":  ""
+                                        },
+                           "converge":  {
+                                            "edge_px":  null,
+                                            "dE":  null,
+                                            "mismatch_pct":  null
+                                        },
+                           "consumers":  [
+
+                                         ],
+                           "notes":  "시안 A 하단 스킬 4칸. 금테·보석은 9슬라이스 그림 후보 — 수렴 판정 후 코드/그림 분기."
+                       },
+                       {
+                           "id":  "header",
+                           "name":  "리본 헤더",
+                           "layer":  "L1",
+                           "class":  "코드",
+                           "lineage":  "jelly",
+                           "roles":  [
+                                         "DESC"
+                                     ],
+                           "scale":  null,
+                           "cell_id_pattern":  null,
+                           "impl":  ".kit-ribbon (ui-kit.css) · 실험대 catalog/kit-lab.html",
+                           "tokens":  [
+                                          "--rbn-face ← 입력 토큰",
+                                          "--rbn-w · --rbn-h = w×.122 (시안 상자비 실측 1648×200 @4x)",
+                                          "--rbn-ring = clamp(1.5px, h×.075, 10px) · --rbn-tail 6.5%",
+                                          "파생: --rbn-top = mix(face,흰 26%) · --rbn-bot = mix(face,검 13%) · --rbn-back = mix(face,흰 6%) · --rbn-edge = mix(face,검 46%)"
+                                      ],
+                           "variants":  [
+                                            "ribbon",
+                                            "capsule",
+                                            "plain"
+                                        ],
+                           "states":  [
+                                          "default"
+                                      ],
+                           "size_steps":  [
+                                              "sm",
+                                              "md",
+                                              "lg"
+                                          ],
+                           "approval":  {
+                                            "status":  "검토중",
+                                            "date":  "2026-08-21",
+                                            "by":  ""
+                                        },
+                           "converge":  {
+                                            "edge_px":  null,
+                                            "dE":  null,
+                                            "mismatch_pct":  null
+                                        },
+                           "converge_method":  "N/A — **색 수렴 판정 대상이 아니다.** 원본 시안의 리본(x340~2030 · y1322~1528 @4x)은 반투명 유리라 뒤 배경(나뭇잎·하늘)이 면색에 섞여 든다. 그대로 ΔE 를 재면 부품이 아니라 배경 그림을 판정하게 된다. 상자비·2톤·외곽선만 실측해 **불투명 정본**으로 세웠다 — 승인 시 \u0027유리를 재현한 게 아니라 대역한 것\u0027임을 눈으로 확인할 것.",
+                           "consumers":  [
+                                             "메인화면 안내 리본 (sian2-ribbon.webp 45KB 대체)"
+                                         ],
+                           "notes":  "원본 시안 실측(main-menu-sian@4x): 위 #F4BDCC → 아래 #C88A98, 하단 역광 #D7969E, 외곽선 #844666, 상자 1648×200. 글자 높이/리본 높이 ≈ .24 → 굵기 보정해 .30 채택. clip-path 로 양끝 꼬리 노치를 파고, inset 그림자는 clip-path 를 못 따라가므로 림을 의사요소 2겹으로 만든다. 계보 판정 = jelly (메인화면 시안 실측). 이전 기록의 설정 시안 리본(#DC775E→#CD5863)은 **다른 화면·다른 계보**라 여기 섞지 않았다."
+                       },
+                       {
+                           "id":  "tab",
+                           "name":  "탭",
+                           "layer":  "L1",
+                           "class":  "코드",
+                           "roles":  [
+                                         "TAB"
+                                     ],
+                           "roles_basis":  "백필(2026-08-23). design-decompose §0-A TAB 판정 문장 「화면 안 내용을 교체하는가」 + 예시 「캐릭터/펫 탭」 과 이 레코드(시트 상단 전환 탭, variants top/side, states default/selected/disabled)가 그대로 일치한다. 추론 없음.",
+                           "scale":  null,
+                           "cell_id_pattern":  null,
+                           "tokens":  [
+                                          "--k-r-2",
+                                          "--k-sp-4",
+                                          "--k-ink-2",
+                                          "--k-t-2"
+                                      ],
+                           "variants":  [
+                                            "top",
+                                            "side"
+                                        ],
+                           "states":  [
+                                          "default",
+                                          "selected",
+                                          "disabled"
+                                      ],
+                           "size_steps":  [
+                                              "sm",
+                                              "md"
+                                          ],
+                           "approval":  {
+                                            "status":  "검토중",
+                                            "date":  "2026-08-21",
+                                            "by":  ""
+                                        },
+                           "converge":  {
+                                            "edge_px":  null,
+                                            "dE":  null,
+                                            "mismatch_pct":  null
+                                        },
+                           "consumers":  [
+
+                                         ],
+                           "notes":  "시안에 직접 등장하지 않는 파생 부품 — 판·알약 토큰만 재사용해 발명 폭을 0으로 둔다."
+                       },
+                       {
+                           "id":  "icon-slot",
+                           "name":  "아이콘 슬롯",
+                           "layer":  "L3",
+                           "class":  "하이브리드",
+                           "roles":  null,
+                           "roles_basis":  "미충전(2026-08-23) — 「그림 1장이 앉는 구멍」은 역할이 아니라 **그릇**이라 11종 어휘 중 대응하는 것이 없다. 지어내지 않는다. field_backfill_status.roles 참조.",
+                           "scale":  null,
+                           "cell_id_pattern":  null,
+                           "tokens":  [
+                                          "--k-r-1",
+                                          "--k-sp-1"
+                                      ],
+                           "variants":  [
+                                            "square",
+                                            "round"
+                                        ],
+                           "states":  [
+                                          "filled",
+                                          "empty",
+                                          "loading"
+                                      ],
+                           "size_steps":  [
+                                              "24",
+                                              "40",
+                                              "56"
+                                          ],
+                           "approval":  {
+                                            "status":  "검토중",
+                                            "date":  "2026-08-21",
+                                            "by":  ""
+                                        },
+                           "converge":  {
+                                            "edge_px":  null,
+                                            "dE":  null,
+                                            "mismatch_pct":  null
+                                        },
+                           "consumers":  [
+
+                                         ],
+                           "notes":  "그림 1장이 앉는 구멍. 크기 3단은 4px 그리드 배수(24/40/56)."
+                       },
+                       {
+                           "id":  "overlay",
+                           "name":  "막",
+                           "layer":  "L0",
+                           "class":  "코드",
+                           "roles":  null,
+                           "roles_basis":  "미충전(2026-08-23) — 막은 뒤를 가리는 바닥층이다. AMB(「기능 없이 정체성만인가」)로 보기에는 기능이 있고, NAV(「이 화면을 벗어나는가」)로 보려면 «탭하면 닫힌다» 는 거동이 이 레코드에 기록돼 있어야 하는데 없다. 근거가 생기기 전에는 비워 둔다. field_backfill_status.roles 참조.",
+                           "scale":  null,
+                           "cell_id_pattern":  null,
+                           "tokens":  [
+                                          "--k-scrim",
+                                          "--k-sp-4"
+                                      ],
+                           "variants":  [
+                                            "scrim",
+                                            "blur"
+                                        ],
+                           "states":  [
+                                          "open",
+                                          "closed"
+                                      ],
+                           "size_steps":  [
+                                              "full"
+                                          ],
+                           "approval":  {
+                                            "status":  "검토중",
+                                            "date":  "2026-08-21",
+                                            "by":  ""
+                                        },
+                           "converge":  {
+                                            "edge_px":  null,
+                                            "dE":  null,
+                                            "mismatch_pct":  null
+                                        },
+                           "consumers":  [
+
+                                         ],
+                           "notes":  "현행 --j-scrim rgba(46,26,40,.80) 승계. 무채색 막 금지."
+                       },
+                       {
+                           "id":  "jelly-modal",
+                           "name":  "젤리판 · 모달",
+                           "layer":  "L1",
+                           "class":  "코드",
+                           "roles":  null,
+                           "roles_basis":  "미충전(2026-08-28) — 이 여섯은 전부 **다른 역할을 담는 그릇**(판/틀)이라 닫힌 어휘 11종 중 대응하는 것이 없다. 기존 panel 레코드와 같은 사유로 비운다. 지어내지 않는다.",
+                           "scale":  null,
+                           "scale_basis":  "미충전(2026-08-28) — scale 은 배율이 아니라 수용량(count_max/text_len)이다. 이번 작업은 판의 **겉모양·질감**만 쟀고 수용량은 재지 않았다.",
+                           "cell_id_pattern":  null,
+                           "tokens":  [
+                                          "--wf-w",
+                                          "--wf-h",
+                                          "--wf-face",
+                                          "--wf-a-in",
+                                          "--wf-a-rim",
+                                          "--wf-band",
+                                          "--wf-haze",
+                                          "--wf-milk-a",
+                                          "--wf-rim-in",
+                                          "--wf-rim-w",
+                                          "--wf-rim-a",
+                                          "--wf-gl-a",
+                                          "--wf-gnd-a",
+                                          "--wf-L3-w",
+                                          "--wf-L3-a"
+                                      ],
+                           "variants":  [
+                                            "pink",
+                                            "sky"
+                                        ],
+                           "states":  [
+                                          "default",
+                                          "pressed",
+                                          "disabled",
+                                          "emphasis"
+                                      ],
+                           "states_basis":  "pressed/disabled/emphasis 는 **사양**이다 — 시안에 상태별 그림이 없어 실측 근거가 없다. 승인 전에 사용자 확인 필요.",
+                           "size_steps":  [
+                                              "sm",
+                                              "md",
+                                              "lg"
+                                          ],
+                           "approval":  {
+                                            "date":  "2026-08-31",
+                                            "by":  "사용자",
+                                            "evidence":  "LAYERS3 작업판 층별 검수 — 원문: \"전체적으로 완성도가 매우높아 젤리판 이대로 진행하자\"",
+                                            "artifact":  "https://claude.ai/code/artifact/c956076d-8f94-48e5-86fa-8f92445f2e76"
+                                        },
+                           "approval_note":  "대장 기존 표기는 \u0027검토중\u0027 이지만 이번 지시가 \u0027🟡review\u0027 로 못박아 그대로 적었다. 어느 쪽이든 \u0027승인\u0027 이 아니므로 화면 배선 금지는 그대로다.",
+                           "converge":  {
+                                            "edge_px":  null,
+                                            "dE":  null,
+                                            "mismatch_pct":  null
+                                        },
+                           "converge_basis":  "이번에 쓴 자는 **α 프로파일 오차**와 **L* 프로파일 오차**라 converge 의 세 칸(edge_px/dE/mismatch_pct)과 다른 지표다. 그 칸을 다른 지표로 채우면 관문이 거짓으로 통과된다 — 비워 둔다. 이번에 잰 값은 measured 에 있다.",
+                           "measured":  {
+                                            "src":  "modal-H-chroma.png",
+                                            "w_px":  600,
+                                            "h_px":  684,
+                                            "aspect_h_over_w":  null,
+                                            "a_inner":  0.3142,
+                                            "colour_band_tenth_frac_w":  0.04085,
+                                            "rim_start_frac_w":  null,
+                                            "rim_w_frac_w":  null,
+                                            "outline_w_frac_w":  null,
+                                            "ground_depth_frac_w":  0.025,
+                                            "headline":  null,
+                                            "method":  "크로마 그린 한 장 — 판이 거의 무채라는 가정으로 배경 소거 후 옅은 핑크 몫을 곱셈 상수로 보정. charsel-J/K 두 배경 정해와 맞대어 검증(반투명 구간 α 오차 평균 0.03)."
+                                        },
+                           "render_check":  {
+                                                "alpha_profile_err_mean":  0.05,
+                                                "alpha_profile_err_max":  0.5812,
+                                                "L_profile_err_mean":  2.73,
+                                                "note":  "기준 부품에서만 잰 값. 부품별 검증은 작업판 페이지의 단면 표."
+                                            },
+                           "evidence":  [
+                                            "scratchpad/jellybox-0827/LAYERS3.html",
+                                            "scratchpad/jellybox-0827/cells/p-modal-cmp.jpg",
+                                            "scratchpad/jellybox-0827/cells/p-modal-zoom.jpg",
+                                            "scratchpad/jellybox-0827/n/modal.json",
+                                            "tentwin/ref-v2/work-frame.css"
+                                        ],
+                           "consumers":  [
+
+                                         ],
+                           "notes":  "기준 부품. 이 판의 실측값이 .work-frame 기본값이다. 기준 부품 — [data-part] 없이 기본값 그대로.",
+                           "status":  "🟢approved"
+                       },
+                       {
+                           "id":  "jelly-hud",
+                           "name":  "젤리판 · HUD 넓은판",
+                           "layer":  "L1",
+                           "class":  "코드",
+                           "roles":  null,
+                           "roles_basis":  "미충전(2026-08-28) — 이 여섯은 전부 **다른 역할을 담는 그릇**(판/틀)이라 닫힌 어휘 11종 중 대응하는 것이 없다. 기존 panel 레코드와 같은 사유로 비운다. 지어내지 않는다.",
+                           "scale":  null,
+                           "scale_basis":  "미충전(2026-08-28) — scale 은 배율이 아니라 수용량(count_max/text_len)이다. 이번 작업은 판의 **겉모양·질감**만 쟀고 수용량은 재지 않았다.",
+                           "cell_id_pattern":  null,
+                           "tokens":  [
+                                          "--wf-w",
+                                          "--wf-h",
+                                          "--wf-face",
+                                          "--wf-a-in",
+                                          "--wf-a-rim",
+                                          "--wf-band",
+                                          "--wf-haze",
+                                          "--wf-milk-a",
+                                          "--wf-rim-in",
+                                          "--wf-rim-w",
+                                          "--wf-rim-a",
+                                          "--wf-gl-a",
+                                          "--wf-gnd-a",
+                                          "--wf-L3-w",
+                                          "--wf-L3-a"
+                                      ],
+                           "variants":  [
+                                            "pink",
+                                            "sky"
+                                        ],
+                           "states":  [
+                                          "default",
+                                          "pressed",
+                                          "disabled",
+                                          "emphasis"
+                                      ],
+                           "states_basis":  "pressed/disabled/emphasis 는 **사양**이다 — 시안에 상태별 그림이 없어 실측 근거가 없다. 승인 전에 사용자 확인 필요.",
+                           "size_steps":  [
+                                              "sm",
+                                              "md",
+                                              "lg"
+                                          ],
+                           "approval":  {
+                                            "date":  "2026-08-31",
+                                            "by":  "사용자",
+                                            "evidence":  "LAYERS3 작업판 층별 검수 — 원문: \"전체적으로 완성도가 매우높아 젤리판 이대로 진행하자\"",
+                                            "artifact":  "https://claude.ai/code/artifact/c956076d-8f94-48e5-86fa-8f92445f2e76"
+                                        },
+                           "approval_note":  "대장 기존 표기는 \u0027검토중\u0027 이지만 이번 지시가 \u0027🟡review\u0027 로 못박아 그대로 적었다. 어느 쪽이든 \u0027승인\u0027 이 아니므로 화면 배선 금지는 그대로다.",
+                           "converge":  {
+                                            "edge_px":  null,
+                                            "dE":  null,
+                                            "mismatch_pct":  null
+                                        },
+                           "converge_basis":  "이번에 쓴 자는 **α 프로파일 오차**와 **L* 프로파일 오차**라 converge 의 세 칸(edge_px/dE/mismatch_pct)과 다른 지표다. 그 칸을 다른 지표로 채우면 관문이 거짓으로 통과된다 — 비워 둔다. 이번에 잰 값은 measured 에 있다.",
+                           "measured":  {
+                                            "src":  "hud-I-frame-chroma.png",
+                                            "w_px":  1678,
+                                            "h_px":  301,
+                                            "aspect_h_over_w":  0.1794,
+                                            "a_inner":  0.1944,
+                                            "colour_band_tenth_frac_w":  0.0161,
+                                            "rim_start_frac_w":  0.00536,
+                                            "rim_w_frac_w":  0.00477,
+                                            "outline_w_frac_w":  0.00358,
+                                            "ground_depth_frac_w":  0,
+                                            "headline":  "색은 테두리 27px(폭의 1.6%)까지만, 안쪽 α ≈ 0.194",
+                                            "method":  "크로마 그린 한 장 — 판이 거의 무채라는 가정으로 배경 소거 후 옅은 핑크 몫을 곱셈 상수로 보정. charsel-J/K 두 배경 정해와 맞대어 검증(반투명 구간 α 오차 평균 0.03)."
+                                        },
+                           "render_check":  {
+                                                "note":  "부품별 단면 오차는 작업판 페이지(LAYERS3)의 \u0027단면 밝기 겹침\u0027 참조."
+                                            },
+                           "evidence":  [
+                                            "scratchpad/jellybox-0827/LAYERS3.html",
+                                            "scratchpad/jellybox-0827/cells/p-hud-cmp.jpg",
+                                            "scratchpad/jellybox-0827/cells/p-hud-zoom.jpg",
+                                            "scratchpad/jellybox-0827/n/hud.json",
+                                            "tentwin/ref-v2/work-frame.css"
+                                        ],
+                           "consumers":  [
+
+                                         ],
+                           "notes":  "화면 위 가로 판. 시안에서 위 변이 잘려 있어 위쪽은 못 쟀다. [data-part=hud] 로 달라지는 변수만 덮어쓴다.",
+                           "status":  "🟢approved"
+                       },
+                       {
+                           "id":  "jelly-wing",
+                           "name":  "젤리판 · HUD 날개판",
+                           "layer":  "L1",
+                           "class":  "코드",
+                           "roles":  null,
+                           "roles_basis":  "미충전(2026-08-28) — 이 여섯은 전부 **다른 역할을 담는 그릇**(판/틀)이라 닫힌 어휘 11종 중 대응하는 것이 없다. 기존 panel 레코드와 같은 사유로 비운다. 지어내지 않는다.",
+                           "scale":  null,
+                           "scale_basis":  "미충전(2026-08-28) — scale 은 배율이 아니라 수용량(count_max/text_len)이다. 이번 작업은 판의 **겉모양·질감**만 쟀고 수용량은 재지 않았다.",
+                           "cell_id_pattern":  null,
+                           "tokens":  [
+                                          "--wf-w",
+                                          "--wf-h",
+                                          "--wf-face",
+                                          "--wf-a-in",
+                                          "--wf-a-rim",
+                                          "--wf-band",
+                                          "--wf-haze",
+                                          "--wf-milk-a",
+                                          "--wf-rim-in",
+                                          "--wf-rim-w",
+                                          "--wf-rim-a",
+                                          "--wf-gl-a",
+                                          "--wf-gnd-a",
+                                          "--wf-L3-w",
+                                          "--wf-L3-a"
+                                      ],
+                           "variants":  [
+                                            "pink",
+                                            "sky"
+                                        ],
+                           "states":  [
+                                          "default",
+                                          "pressed",
+                                          "disabled",
+                                          "emphasis"
+                                      ],
+                           "states_basis":  "pressed/disabled/emphasis 는 **사양**이다 — 시안에 상태별 그림이 없어 실측 근거가 없다. 승인 전에 사용자 확인 필요.",
+                           "size_steps":  [
+                                              "sm",
+                                              "md",
+                                              "lg"
+                                          ],
+                           "approval":  {
+                                            "date":  "2026-08-31",
+                                            "by":  "사용자",
+                                            "evidence":  "LAYERS3 작업판 층별 검수 — 원문: \"전체적으로 완성도가 매우높아 젤리판 이대로 진행하자\"",
+                                            "artifact":  "https://claude.ai/code/artifact/c956076d-8f94-48e5-86fa-8f92445f2e76"
+                                        },
+                           "approval_note":  "대장 기존 표기는 \u0027검토중\u0027 이지만 이번 지시가 \u0027🟡review\u0027 로 못박아 그대로 적었다. 어느 쪽이든 \u0027승인\u0027 이 아니므로 화면 배선 금지는 그대로다.",
+                           "converge":  {
+                                            "edge_px":  null,
+                                            "dE":  null,
+                                            "mismatch_pct":  null
+                                        },
+                           "converge_basis":  "이번에 쓴 자는 **α 프로파일 오차**와 **L* 프로파일 오차**라 converge 의 세 칸(edge_px/dE/mismatch_pct)과 다른 지표다. 그 칸을 다른 지표로 채우면 관문이 거짓으로 통과된다 — 비워 둔다. 이번에 잰 값은 measured 에 있다.",
+                           "measured":  {
+                                            "src":  "hud-I-frame-chroma.png",
+                                            "w_px":  426,
+                                            "h_px":  188,
+                                            "aspect_h_over_w":  0.4413,
+                                            "a_inner":  0.4197,
+                                            "colour_band_tenth_frac_w":  0.0446,
+                                            "rim_start_frac_w":  0.02113,
+                                            "rim_w_frac_w":  0.02817,
+                                            "outline_w_frac_w":  0,
+                                            "ground_depth_frac_w":  0,
+                                            "headline":  "색은 테두리 19px(폭의 4.5%)까지만, 안쪽 α ≈ 0.420",
+                                            "method":  "크로마 그린 한 장 — 판이 거의 무채라는 가정으로 배경 소거 후 옅은 핑크 몫을 곱셈 상수로 보정. charsel-J/K 두 배경 정해와 맞대어 검증(반투명 구간 α 오차 평균 0.03)."
+                                        },
+                           "render_check":  {
+                                                "note":  "부품별 단면 오차는 작업판 페이지(LAYERS3)의 \u0027단면 밝기 겹침\u0027 참조."
+                                            },
+                           "evidence":  [
+                                            "scratchpad/jellybox-0827/LAYERS3.html",
+                                            "scratchpad/jellybox-0827/cells/p-wing-cmp.jpg",
+                                            "scratchpad/jellybox-0827/cells/p-wing-zoom.jpg",
+                                            "scratchpad/jellybox-0827/n/wing.json",
+                                            "tentwin/ref-v2/work-frame.css"
+                                        ],
+                           "consumers":  [
+
+                                         ],
+                           "notes":  "HUD 아래 좌·우 두 장. [data-part=wing] 로 달라지는 변수만 덮어쓴다.",
+                           "status":  "🟢approved"
+                       },
+                       {
+                           "id":  "jelly-capsule",
+                           "name":  "젤리판 · 캡슐",
+                           "layer":  "L1",
+                           "class":  "코드",
+                           "roles":  null,
+                           "roles_basis":  "미충전(2026-08-28) — 이 여섯은 전부 **다른 역할을 담는 그릇**(판/틀)이라 닫힌 어휘 11종 중 대응하는 것이 없다. 기존 panel 레코드와 같은 사유로 비운다. 지어내지 않는다.",
+                           "scale":  null,
+                           "scale_basis":  "미충전(2026-08-28) — scale 은 배율이 아니라 수용량(count_max/text_len)이다. 이번 작업은 판의 **겉모양·질감**만 쟀고 수용량은 재지 않았다.",
+                           "cell_id_pattern":  null,
+                           "tokens":  [
+                                          "--wf-w",
+                                          "--wf-h",
+                                          "--wf-face",
+                                          "--wf-a-in",
+                                          "--wf-a-rim",
+                                          "--wf-band",
+                                          "--wf-haze",
+                                          "--wf-milk-a",
+                                          "--wf-rim-in",
+                                          "--wf-rim-w",
+                                          "--wf-rim-a",
+                                          "--wf-gl-a",
+                                          "--wf-gnd-a",
+                                          "--wf-L3-w",
+                                          "--wf-L3-a"
+                                      ],
+                           "variants":  [
+                                            "pink",
+                                            "sky"
+                                        ],
+                           "states":  [
+                                          "default",
+                                          "pressed",
+                                          "disabled",
+                                          "emphasis"
+                                      ],
+                           "states_basis":  "pressed/disabled/emphasis 는 **사양**이다 — 시안에 상태별 그림이 없어 실측 근거가 없다. 승인 전에 사용자 확인 필요.",
+                           "size_steps":  [
+                                              "sm",
+                                              "md",
+                                              "lg"
+                                          ],
+                           "approval":  {
+                                            "date":  "2026-08-31",
+                                            "by":  "사용자",
+                                            "evidence":  "LAYERS3 작업판 층별 검수 — 원문: \"전체적으로 완성도가 매우높아 젤리판 이대로 진행하자\"",
+                                            "artifact":  "https://claude.ai/code/artifact/c956076d-8f94-48e5-86fa-8f92445f2e76"
+                                        },
+                           "approval_note":  "대장 기존 표기는 \u0027검토중\u0027 이지만 이번 지시가 \u0027🟡review\u0027 로 못박아 그대로 적었다. 어느 쪽이든 \u0027승인\u0027 이 아니므로 화면 배선 금지는 그대로다.",
+                           "converge":  {
+                                            "edge_px":  null,
+                                            "dE":  null,
+                                            "mismatch_pct":  null
+                                        },
+                           "converge_basis":  "이번에 쓴 자는 **α 프로파일 오차**와 **L* 프로파일 오차**라 converge 의 세 칸(edge_px/dE/mismatch_pct)과 다른 지표다. 그 칸을 다른 지표로 채우면 관문이 거짓으로 통과된다 — 비워 둔다. 이번에 잰 값은 measured 에 있다.",
+                           "measured":  {
+                                            "src":  "hud-I-frame-chroma.png",
+                                            "w_px":  740,
+                                            "h_px":  281,
+                                            "aspect_h_over_w":  0.3797,
+                                            "a_inner":  0.0162,
+                                            "colour_band_tenth_frac_w":  0.09055,
+                                            "rim_start_frac_w":  0.01351,
+                                            "rim_w_frac_w":  0.01081,
+                                            "outline_w_frac_w":  0.01216,
+                                            "ground_depth_frac_w":  0,
+                                            "headline":  "색은 테두리 67px(폭의 9.1%)까지만, 안쪽 α ≈ 0.016",
+                                            "method":  "크로마 그린 한 장 — 판이 거의 무채라는 가정으로 배경 소거 후 옅은 핑크 몫을 곱셈 상수로 보정. charsel-J/K 두 배경 정해와 맞대어 검증(반투명 구간 α 오차 평균 0.03)."
+                                        },
+                           "render_check":  {
+                                                "note":  "부품별 단면 오차는 작업판 페이지(LAYERS3)의 \u0027단면 밝기 겹침\u0027 참조."
+                                            },
+                           "evidence":  [
+                                            "scratchpad/jellybox-0827/LAYERS3.html",
+                                            "scratchpad/jellybox-0827/cells/p-capsule-cmp.jpg",
+                                            "scratchpad/jellybox-0827/cells/p-capsule-zoom.jpg",
+                                            "scratchpad/jellybox-0827/n/capsule.json",
+                                            "tentwin/ref-v2/work-frame.css"
+                                        ],
+                           "consumers":  [
+
+                                         ],
+                           "notes":  "양끝 반원. 안쪽이 거의 완전히 비어 있다(α 0.02). [data-part=capsule] 로 달라지는 변수만 덮어쓴다.",
+                           "status":  "🟢approved"
+                       },
+                       {
+                           "id":  "jelly-chip",
+                           "name":  "젤리판 · 원형 칩",
+                           "layer":  "L1",
+                           "class":  "코드",
+                           "roles":  null,
+                           "roles_basis":  "미충전(2026-08-28) — 이 여섯은 전부 **다른 역할을 담는 그릇**(판/틀)이라 닫힌 어휘 11종 중 대응하는 것이 없다. 기존 panel 레코드와 같은 사유로 비운다. 지어내지 않는다.",
+                           "scale":  null,
+                           "scale_basis":  "미충전(2026-08-28) — scale 은 배율이 아니라 수용량(count_max/text_len)이다. 이번 작업은 판의 **겉모양·질감**만 쟀고 수용량은 재지 않았다.",
+                           "cell_id_pattern":  null,
+                           "tokens":  [
+                                          "--wf-w",
+                                          "--wf-h",
+                                          "--wf-face",
+                                          "--wf-a-in",
+                                          "--wf-a-rim",
+                                          "--wf-band",
+                                          "--wf-haze",
+                                          "--wf-milk-a",
+                                          "--wf-rim-in",
+                                          "--wf-rim-w",
+                                          "--wf-rim-a",
+                                          "--wf-gl-a",
+                                          "--wf-gnd-a",
+                                          "--wf-L3-w",
+                                          "--wf-L3-a"
+                                      ],
+                           "variants":  [
+                                            "pink",
+                                            "sky"
+                                        ],
+                           "states":  [
+                                          "default",
+                                          "pressed",
+                                          "disabled",
+                                          "emphasis"
+                                      ],
+                           "states_basis":  "pressed/disabled/emphasis 는 **사양**이다 — 시안에 상태별 그림이 없어 실측 근거가 없다. 승인 전에 사용자 확인 필요.",
+                           "size_steps":  [
+                                              "sm",
+                                              "md",
+                                              "lg"
+                                          ],
+                           "approval":  {
+                                            "date":  "2026-08-31",
+                                            "by":  "사용자",
+                                            "evidence":  "LAYERS3 작업판 층별 검수 — 원문: \"전체적으로 완성도가 매우높아 젤리판 이대로 진행하자\"",
+                                            "artifact":  "https://claude.ai/code/artifact/c956076d-8f94-48e5-86fa-8f92445f2e76"
+                                        },
+                           "approval_note":  "대장 기존 표기는 \u0027검토중\u0027 이지만 이번 지시가 \u0027🟡review\u0027 로 못박아 그대로 적었다. 어느 쪽이든 \u0027승인\u0027 이 아니므로 화면 배선 금지는 그대로다.",
+                           "converge":  {
+                                            "edge_px":  null,
+                                            "dE":  null,
+                                            "mismatch_pct":  null
+                                        },
+                           "converge_basis":  "이번에 쓴 자는 **α 프로파일 오차**와 **L* 프로파일 오차**라 converge 의 세 칸(edge_px/dE/mismatch_pct)과 다른 지표다. 그 칸을 다른 지표로 채우면 관문이 거짓으로 통과된다 — 비워 둔다. 이번에 잰 값은 measured 에 있다.",
+                           "measured":  {
+                                            "src":  "hud-I-frame-chroma.png",
+                                            "w_px":  235,
+                                            "h_px":  237,
+                                            "aspect_h_over_w":  1.0085,
+                                            "a_inner":  0.0124,
+                                            "colour_band_tenth_frac_w":  0.2255,
+                                            "rim_start_frac_w":  0.02128,
+                                            "rim_w_frac_w":  0.08936,
+                                            "outline_w_frac_w":  0.01702,
+                                            "ground_depth_frac_w":  0.01702,
+                                            "headline":  "색은 테두리 53px(폭의 22.6%)까지만, 안쪽 α ≈ 0.012",
+                                            "method":  "크로마 그린 한 장 — 판이 거의 무채라는 가정으로 배경 소거 후 옅은 핑크 몫을 곱셈 상수로 보정. charsel-J/K 두 배경 정해와 맞대어 검증(반투명 구간 α 오차 평균 0.03)."
+                                        },
+                           "render_check":  {
+                                                "note":  "부품별 단면 오차는 작업판 페이지(LAYERS3)의 \u0027단면 밝기 겹침\u0027 참조."
+                                            },
+                           "evidence":  [
+                                            "scratchpad/jellybox-0827/LAYERS3.html",
+                                            "scratchpad/jellybox-0827/cells/p-chip-cmp.jpg",
+                                            "scratchpad/jellybox-0827/cells/p-chip-zoom.jpg",
+                                            "scratchpad/jellybox-0827/n/chip.json",
+                                            "tentwin/ref-v2/work-frame.css"
+                                        ],
+                           "consumers":  [
+
+                                         ],
+                           "notes":  "겉모양이 원이라 젤리판 실루엣으로는 못 만든다 — 기준 밖 별도 부품. [data-part=chip] 로 달라지는 변수만 덮어쓴다. **기준 밖 — 별도 부품.** 실루엣 층(--wf-L0)을 끄고 clip-path: circle(50%) 로 자른다.",
+                           "status":  "🟢approved"
+                       },
+                       {
+                           "id":  "jelly-charsel",
+                           "name":  "젤리판 · 캐릭터판",
+                           "layer":  "L1",
+                           "class":  "코드",
+                           "roles":  null,
+                           "roles_basis":  "미충전(2026-08-28) — 이 여섯은 전부 **다른 역할을 담는 그릇**(판/틀)이라 닫힌 어휘 11종 중 대응하는 것이 없다. 기존 panel 레코드와 같은 사유로 비운다. 지어내지 않는다.",
+                           "scale":  null,
+                           "scale_basis":  "미충전(2026-08-28) — scale 은 배율이 아니라 수용량(count_max/text_len)이다. 이번 작업은 판의 **겉모양·질감**만 쟀고 수용량은 재지 않았다.",
+                           "cell_id_pattern":  null,
+                           "tokens":  [
+                                          "--wf-w",
+                                          "--wf-h",
+                                          "--wf-face",
+                                          "--wf-a-in",
+                                          "--wf-a-rim",
+                                          "--wf-band",
+                                          "--wf-haze",
+                                          "--wf-milk-a",
+                                          "--wf-rim-in",
+                                          "--wf-rim-w",
+                                          "--wf-rim-a",
+                                          "--wf-gl-a",
+                                          "--wf-gnd-a",
+                                          "--wf-L3-w",
+                                          "--wf-L3-a"
+                                      ],
+                           "variants":  [
+                                            "pink",
+                                            "sky"
+                                        ],
+                           "states":  [
+                                          "default",
+                                          "pressed",
+                                          "disabled",
+                                          "emphasis"
+                                      ],
+                           "states_basis":  "pressed/disabled/emphasis 는 **사양**이다 — 시안에 상태별 그림이 없어 실측 근거가 없다. 승인 전에 사용자 확인 필요.",
+                           "size_steps":  [
+                                              "sm",
+                                              "md",
+                                              "lg"
+                                          ],
+                           "approval":  {
+                                            "date":  "2026-08-31",
+                                            "by":  "사용자",
+                                            "evidence":  "LAYERS3 작업판 층별 검수 — 원문: \"전체적으로 완성도가 매우높아 젤리판 이대로 진행하자\"",
+                                            "artifact":  "https://claude.ai/code/artifact/c956076d-8f94-48e5-86fa-8f92445f2e76"
+                                        },
+                           "approval_note":  "대장 기존 표기는 \u0027검토중\u0027 이지만 이번 지시가 \u0027🟡review\u0027 로 못박아 그대로 적었다. 어느 쪽이든 \u0027승인\u0027 이 아니므로 화면 배선 금지는 그대로다.",
+                           "converge":  {
+                                            "edge_px":  null,
+                                            "dE":  null,
+                                            "mismatch_pct":  null
+                                        },
+                           "converge_basis":  "이번에 쓴 자는 **α 프로파일 오차**와 **L* 프로파일 오차**라 converge 의 세 칸(edge_px/dE/mismatch_pct)과 다른 지표다. 그 칸을 다른 지표로 채우면 관문이 거짓으로 통과된다 — 비워 둔다. 이번에 잰 값은 measured 에 있다.",
+                           "measured":  {
+                                            "src":  "charsel-J-chroma.png + charsel-K-checker.png (두 배경 정해)",
+                                            "w_px":  828,
+                                            "h_px":  410,
+                                            "aspect_h_over_w":  0.4952,
+                                            "a_inner":  0.4781,
+                                            "colour_band_tenth_frac_w":  0.10205,
+                                            "rim_start_frac_w":  0.00845,
+                                            "rim_w_frac_w":  0.01691,
+                                            "outline_w_frac_w":  0,
+                                            "ground_depth_frac_w":  0,
+                                            "headline":  "색은 테두리 160px(폭의 19.3%)까지만, 안쪽 α ≈ 0.478",
+                                            "method":  "charsel-J(크로마)/K(체커) 두 배경 정해 — 창도 격자맞춤도 없이 테두리 1px 까지 정확히 풀림. 되찾은 체커값 196.2/240.7 로 자기검증."
+                                        },
+                           "render_check":  {
+                                                "note":  "부품별 단면 오차는 작업판 페이지(LAYERS3)의 \u0027단면 밝기 겹침\u0027 참조."
+                                            },
+                           "evidence":  [
+                                            "scratchpad/jellybox-0827/LAYERS3.html",
+                                            "scratchpad/jellybox-0827/cells/p-charsel-cmp.jpg",
+                                            "scratchpad/jellybox-0827/cells/p-charsel-zoom.jpg",
+                                            "scratchpad/jellybox-0827/n/charsel.json",
+                                            "tentwin/ref-v2/work-frame.css"
+                                        ],
+                           "consumers":  [
+
+                                         ],
+                           "notes":  "탭이 달린 판. 배경 2벌(J/K)로 정확히 풀었다. [data-part=charsel] 로 달라지는 변수만 덮어쓴다.",
+                           "status":  "🟢approved"
+                       },
+                       {
+                           "id":  "btn-close-x",
+                           "name":  "닫기 X (무지개)",
+                           "source":  "catalog/sian3-close.webp",
+                           "approval":  {
+                                            "date":  "2026-08-31",
+                                            "by":  "사용자",
+                                            "evidence":  "원문: \"지금 게임에서 돌고 있는 x 버튼은 그대로 가, 에셋으로 확정\"",
+                                            "note":  "모달 전 창 공용 .x-btn 1벌"
+                                        },
+                           "status":  "🟢approved",
+                           "roles":  [
+                                         "NAV"
+                                     ]
+                       }
+                   ],
+    "changelog":  [
+                      {
+                          "date":  "2026-08-28",
+                          "what":  "젤리판 부품 6종 추가 (🟡review). 기존 11종은 한 글자도 고치지 않았다.",
+                          "added":  [
+                                        "jelly-modal",
+                                        "jelly-hud",
+                                        "jelly-wing",
+                                        "jelly-capsule",
+                                        "jelly-chip",
+                                        "jelly-charsel"
+                                    ],
+                          "basis":  "modal-H / hud-I / charsel-J·K 시안 실측 + work-frame.css 재구성."
+                      },
+                      {
+                          "date":  "2026-08-31",
+                          "entry":  "젤리판 6종 🟢 승인 (사용자 육안, LAYERS3 작업판). work-frame.css v1.0 동결"
+                      },
+                      {
+                          "entry":  "X 버튼(sian3-close) 정본 🟢 확정",
+                          "date":  "2026-08-31"
+                      }
+                  ]
+}
