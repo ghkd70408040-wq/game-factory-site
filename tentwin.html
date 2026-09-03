@@ -2825,13 +2825,33 @@ li.roll-in { animation: rollin 380ms var(--spring) backwards; }
    ------------------------------------------------------------------------- */
 .rules-card { padding: 14px 14px 12px; text-align: left; }
 
+/* ---- 51 본문 잉크 = 자두 ink -----------------------------------------------
+   S9 젤리판(무색 유리)은 **무접촉**이다. 판을 다시 불투명하게 만들거나
+   --jbox-tint / --modal-tint 를 건드리는 해법은 반려됐다. 대비는 **글자 쪽**
+   으로만 갚는다 — 그 계약은 ⑤b 주석(:43263)이 이미 적어 둔 그대로다.
+
+   착수 전 실측(scratchpad/s9-0903/readability.json · 자 = 글자 숨김 차분 +
+   WCAG (L1+.05)/(L2+.05) · «최악» = 상자를 가로 8칸으로 쪼갠 최저 칸):
+     규칙 1줄 4.91 · 2줄 4.36 · 3줄 5.12 · 제목 4.53 · 부제 1.89
+   부제가 1.89 로 가장 나빴다. 원인은 색이 둘이다 — (1) --tx-dim 이 밝고
+   (2) ⑤b 의 흰 헤일로가 12px 가는 획을 덮어 «잉크» 자체가 밝게 잡힌다.
+
+   새 색은 **새로 짓지 않았다**: :root 의 --ink(#221B2E, "dark plum ink used on
+   every tile face" · :146)를 그대로 쓴다. 자두 계열이고 이 파일에서 가장 어두운
+   본문 잉크다. 다른 후보는 계산으로 떨어졌다 —
+     --j-ink  #5C4033 → 최악 판 rgb(148.54,131.60,165.41) 위 2.73:1 (탈락)
+     --tx(라이트) #2A2338 → 같은 판 위 4.43:1 (탈락 · 지금 값)
+     --ink    #221B2E → 같은 판 위 4.74:1 (채택)
+   :root 토큰은 한 자리도 안 갈았다 — 이 네 소비처에만 덮는다(다른 화면 무영향).
+   위계는 색이 아니라 크기·굵기가 진다(15/800 · 13/500 · 12/400).
+   ------------------------------------------------------------------------- */
 .rules-title {
   margin: 0 0 10px;
   font-size: 15px;
   font-weight: 800;
   line-height: 1.35;
   text-align: center;
-  color: var(--tx);
+  color: var(--ink);
 }
 
 .rules-list {
@@ -2848,9 +2868,11 @@ li.roll-in { animation: rollin 380ms var(--spring) backwards; }
   gap: 9px;
   font-size: 13px;
   line-height: 1.45;
-  color: var(--tx-dim);
+  color: var(--ink);            /* 51: --tx-dim -> --ink (위 절) */
 }
-.rules-list b { color: var(--tx); font-weight: 700; }
+/* 강조도 같은 잉크다. 굵기만 다르다 — 강조만 다른 색으로 남기면 그 자리가
+   새 «최악» 이 된다(착수 전에는 b 만 --tx 라 비강조 획이 안 잡혔다). */
+.rules-list b { color: var(--ink); font-weight: 700; }
 
 /* 번호 원판은 셋을 "목록"으로 읽히게 하는 최소 장치다. 일부러 .tile 을 닮게
    만들지 않는다 — 카드 위에서 타일처럼 생긴 것은 눌러야 하는 것으로 읽힌다. */
@@ -2865,7 +2887,7 @@ li.roll-in { animation: rollin 380ms var(--spring) backwards; }
   font-weight: 700;
   line-height: 18px;
   text-align: center;
-  color: var(--tx);
+  color: var(--ink);            /* 51: --tx -> --ink (위 절) */
 }
 
 /* `.howto-panel p` 가 min-height 60px · 13.5px 를 걸어 두었고(그리고 ko 는 한 줄 더
@@ -2878,7 +2900,10 @@ li.roll-in { animation: rollin 380ms var(--spring) backwards; }
   min-height: 0;
   font-size: 12px;
   line-height: 1.45;
-  color: var(--tx-dim);
+  color: var(--ink);            /* 51: --tx-dim -> --ink (위 절) */
+  /* ⑤b 의 흰 헤일로는 그대로 둔다. 착수 전 부제가 1.89:1 로 잡힌 것은 색이
+     밝아 헤일로가 «잉크» 보다 세게 잡혔기 때문이고, 잉크를 --ink 로 내리면
+     글리프 속이 다시 최대 차분이 된다(실측으로 확인 — 아래 관문 표). */
 }
 
 .howto-panel p {
