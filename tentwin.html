@@ -52829,8 +52829,10 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
    행 폭 = --f2-w x .896(판 가로 여백 .052x2 제외) 이므로 글자 자는
      제목 .896x.0579 = .0519 · 설명 .896x.0355 = .0318 · 배지 .896x.0447 = .0401.
    ============================================================ */
-#modal-arcade .mode-list{gap:2px !important;background:none !important;}
-#modal-arcade .mode-list .mode-row{
+#modal-arcade .mode-list,
+#modal-classic .mode-list{gap:2px !important;background:none !important;}
+#modal-arcade .mode-list .mode-row,
+#modal-classic .mode-list .mode-row{
   position:relative !important;
   border-image:none !important;border:0 !important;border-radius:0 !important;
   border-top:0 !important;border-bottom:0 !important;outline:0 !important;
@@ -52839,38 +52841,51 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
   box-shadow:none !important;background:none;
   display:block !important;
   aspect-ratio:760/168;}
-#modal-arcade .mode-list .mode-row[hidden]{display:none !important;}
+#modal-arcade .mode-list .mode-row[hidden],
+#modal-classic .mode-list .mode-row[hidden]{display:none !important;}
 #modal-arcade .mode-list .mode-row::before,
-#modal-arcade .mode-list .mode-row::after{
+#modal-arcade .mode-list .mode-row::after,
+#modal-classic .mode-list .mode-row::before,
+#modal-classic .mode-list .mode-row::after{
   content:none !important;display:none !important;border:0 !important;background:none !important;}
 #modal-arcade .mode-list #arcrow-time.mode-row{background:url("catalog/sian3-btn-timeattack-blank.webp") center/100% 100% no-repeat !important;}
 #modal-arcade .mode-list #arcrow-surv.mode-row{background:url("catalog/sian3-btn-survival-blank.webp") center/100% 100% no-repeat !important;}
 #modal-arcade .mode-list #arcrow-dmg.mode-row{background:url("catalog/sian3-btn-accum90-blank.webp") center/100% 100% no-repeat !important;}
+/* ⑨ (0904) 클래식 3행 — 같은 무글자판 레시피 재사용. 매핑: arcade→arcade-blank,
+   rush→timerush-blank, daily→daily-blank (모두 760x168, 좌표 그대로 전이). */
+#modal-classic .mode-list #classic-arcade.mode-row{background:url("catalog/sian3-btn-arcade-blank.webp") center/100% 100% no-repeat !important;}
+#modal-classic .mode-list #classic-rush.mode-row{background:url("catalog/sian3-btn-timerush-blank.webp") center/100% 100% no-repeat !important;}
+#modal-classic .mode-list #classic-daily.mode-row{background:url("catalog/sian3-btn-daily-blank.webp") center/100% 100% no-repeat !important;}
 /* 아이콘은 그림 안에 있다 — 코드 칩은 내린다(자리도 안 가져간다). */
-#modal-arcade .mode-list .mode-row .nchip{display:none !important;}
+#modal-arcade .mode-list .mode-row .nchip,
+#modal-classic .mode-list .mode-row .nchip{display:none !important;}
 /* 제목 + 설명 — 그림의 빈 몸통 위 x=200 자리에 절대배치. */
 /* 오른쪽 여백은 **배지가 있을 때만** 배지 폭만큼 물러난다. 고정 22% 로 두면
    기록이 없는 첫 판(배지 :empty = display:none)에서도 설명이 헛되이 잘린다
    — ko 「악당이 계속 나와요. 오래 버틸수록 승리.」 · en 「Ninety seconds. Most
    damage wins.」 둘 다 실측에서 말줄임이 걸렸다. */
-#modal-arcade .mode-list .mode-row .mode-t{
+#modal-arcade .mode-list .mode-row .mode-t,
+#modal-classic .mode-list .mode-row .mode-t{
   position:absolute !important;
   left:26.32%;right:7%;top:0;bottom:0;
   display:flex !important;flex-direction:column;justify-content:center;
   align-items:flex-start;gap:0 !important;
   text-align:left;pointer-events:none;}
-#modal-arcade .mode-list .mode-row .mode-t > b{
+#modal-arcade .mode-list .mode-row .mode-t > b,
+#modal-classic .mode-list .mode-row .mode-t > b{
   font-family:var(--font-display);
   font-size:calc(var(--f2-w) * .0519) !important;
   line-height:1.06 !important;
   white-space:nowrap;}
-#modal-arcade .mode-list .mode-row .mode-t > i{
+#modal-arcade .mode-list .mode-row .mode-t > i,
+#modal-classic .mode-list .mode-row .mode-t > i{
   font-style:normal;
   font-size:calc(var(--f2-w) * .0318) !important;
   line-height:1.18 !important;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;}
 /* 기록 배지 — 그림 우측 여백 40px 자리의 흰 알약. */
-#modal-arcade .mode-list .mode-row .mode-b{
+#modal-arcade .mode-list .mode-row .mode-b,
+#modal-classic .mode-list .mode-row .mode-b{
   position:absolute !important;
   right:5.26%;top:50%;
   transform:translateY(-50%);
@@ -52883,8 +52898,10 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
   font-family:var(--font-display);
   font-size:calc(var(--f2-w) * .0401) !important;
   font-weight:400;white-space:nowrap;text-shadow:none !important;}
-#modal-arcade .mode-list .mode-row .mode-b:empty{display:none !important;}
-#modal-arcade .mode-list .mode-row:has(.mode-b:not(:empty)) .mode-t{right:28% !important;}
+#modal-arcade .mode-list .mode-row .mode-b:empty,
+#modal-classic .mode-list .mode-row .mode-b:empty{display:none !important;}
+#modal-arcade .mode-list .mode-row:has(.mode-b:not(:empty)) .mode-t,
+#modal-classic .mode-list .mode-row:has(.mode-b:not(:empty)) .mode-t{right:28% !important;}
 /* 잉크 — 몸통 색별. 서바이벌만 흰 잉크(ORDER-modebtn-0831 §7 육안 판단거리). */
 #modal-arcade #arcrow-time .mode-t > b{color:#6B3410 !important;
   text-shadow:0 calc(var(--f2-w) * .0022) 0 rgba(255,255,255,.34) !important;}
@@ -52901,7 +52918,27 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
 #modal-arcade #arcrow-dmg .mode-t > i{color:rgba(22,57,91,.86) !important;text-shadow:none !important;}
 #modal-arcade #arcrow-dmg .mode-b{color:#16395B !important;
   box-shadow:0 0 0 calc(var(--f2-w) * .0034) rgba(67,107,142,.62) !important;}
-#modal-arcade .mode-list .mode-row:active{transform:translateY(2px);filter:brightness(.96);}
+#modal-arcade .mode-list .mode-row:active,
+#modal-classic .mode-list .mode-row:active{transform:translateY(2px);filter:brightness(.96);}
+/* ⑨ (0904) 클래식 3행 잉크 — 무글자판 몸통색 실측(measure.py) 대비 판단.
+   arcade 몸통 보라 #A471D8 → 흰 잉크(서바이벌 진보라판과 같은 판단) ·
+   rush 몸통 노랑 #EBC245 → 진갈색 잉크 · daily 몸통 민트 #7BCEBB → 진청록 잉크.
+   배지 알약은 흰색 유지 + 몸통 tint 링(아케이드 배지 규약 그대로). */
+#modal-classic #classic-arcade .mode-t > b{color:#FFFFFF !important;
+  text-shadow:0 calc(var(--f2-w) * .0022) 0 rgba(40,14,70,.42) !important;}
+#modal-classic #classic-arcade .mode-t > i{color:rgba(255,255,255,.88) !important;text-shadow:none !important;}
+#modal-classic #classic-arcade .mode-b{color:#3B1452 !important;
+  box-shadow:0 0 0 calc(var(--f2-w) * .0034) rgba(59,27,98,.62) !important;}
+#modal-classic #classic-rush .mode-t > b{color:#6B4410 !important;
+  text-shadow:0 calc(var(--f2-w) * .0022) 0 rgba(255,255,255,.34) !important;}
+#modal-classic #classic-rush .mode-t > i{color:rgba(107,68,16,.86) !important;text-shadow:none !important;}
+#modal-classic #classic-rush .mode-b{color:#6B4410 !important;
+  box-shadow:0 0 0 calc(var(--f2-w) * .0034) rgba(180,130,42,.62) !important;}
+#modal-classic #classic-daily .mode-t > b{color:#0F5348 !important;
+  text-shadow:0 calc(var(--f2-w) * .0022) 0 rgba(255,255,255,.34) !important;}
+#modal-classic #classic-daily .mode-t > i{color:rgba(15,83,72,.86) !important;text-shadow:none !important;}
+#modal-classic #classic-daily .mode-b{color:#0F5348 !important;
+  box-shadow:0 0 0 calc(var(--f2-w) * .0034) rgba(20,110,95,.62) !important;}
 
 /* ===========================================================================
    ②-B (2026-09-01) — 상단 타이머 캡슐 **한 벌로 통일** (`.wf-cap`)
