@@ -2862,17 +2862,17 @@ li.roll-in { animation: rollin 380ms var(--spring) backwards; }
    유리라 판 위 맨글자는 반려 대상이다. 캡션마다 같은 젤리 카드를 깔고 잉크를
    가장 어두운 본문 잉크(--ink)로 둔다. `> p` = 패널 직계 캡션만(규칙 카드 안의
    .rules-note 는 이미 카드 안이라 무접촉). */
+/* ⑱-b — S1 처럼 글은 **카드 아래 한 줄 캡션**(카드 아님). 판이 반투명이라
+   흰 헤일로로 대비를 갚는다(카드를 안 씌우는 대신). */
 #modal-howto .howto-panel > p{
-  position: relative;
   align-self: stretch;
-  margin: 0;
-  padding: 9px 12px;
-  border: 1.5px solid var(--hcard-line);
-  border-radius: var(--hcard-r);
-  background: linear-gradient(180deg, var(--hcard-fill), var(--hcard-fill-2));
-  box-shadow: inset 0 0 0 1.5px var(--hcard-rim), inset 0 -2px 0 var(--hcard-lo);
+  margin: 4px 6px 0;
+  padding: 0;
+  text-align: center;
+  font-weight: 600;
   color: var(--ink);
   min-height: 0;
+  text-shadow: 0 1px 0 rgba(255,255,255,.92), 0 0 7px rgba(255,255,255,.78), 0 0 2px rgba(255,255,255,.95);
 }
 #modal-howto .howto-panel > p b{ color: var(--ink); }
 
@@ -2901,6 +2901,74 @@ li.roll-in { animation: rollin 380ms var(--spring) backwards; }
 #modal-clear .result-card .rollup-total b, #modal-clear .result-card #clear-rollup li b{ color: var(--ink); }
 /* 카드 안에선 옅은 인셋 알약 배경이 카드면과 겹쳐 지저분하니 정리 */
 #modal-clear .result-card #clear-next-preview{ background: rgba(255,255,255,.28); box-shadow: inset 0 0 0 1px var(--hcard-line); }
+
+/* ── ⑱-b 게임 방법 카드 = S1 시안 실측 ──────────────────────────────────────
+   지휘자 판정: 크림 불투명 → S1 의 **회보라 반투명**(뒤가 은은히 비침).
+   S1(90127e38) 카드 면 실측 = rgb(168,177,185) (여러 점 평균), 코너 큼, 얇은
+   옅은 겉선. --hcard-* 는 결과 모달(#modal-clear/adv/over)과 **공유**하는데 그쪽은
+   게임 보드 위라 불투명 크림이 맞다 → 여기서 **#modal-howto 만** 덮어 분리한다
+   (캐릭창 패시브 카드는 별개 변수 --cs-desc-box 를 쓰므로 애초에 무영향).
+   렌더 면색은 반투명이라 뒤 판/블러 메뉴에 따라 변한다 — 관문(Δ채도≤3·α≤.05)은
+   캡처 실측으로 확인. */
+#modal-howto{
+  --hcard-fill:   rgba(172,180,191,.82);   /* S1 회보라 · 뒤 은은히 비침 */
+  --hcard-fill-2: rgba(159,167,181,.82);
+  --hcard-line:   rgba(120,126,144,.55);   /* S1 얇은 옅은 겉선 */
+  --hcard-rim:    rgba(255,255,255,.34);   /* S1 안쪽 옅은 광 (크림보다 약) */
+  --hcard-lo:     rgba(40,40,60,.10);
+  --hcard-r:      22px;                     /* S1 큰 코너 */
+}
+/* S1 색 점 — 빨·연두·민트·보라·핑크(+주황·파랑으로 7까지). `.dot` 은 튜토리얼
+   (#tut-dots)과 공유하는 부품이라 #howto-dots 로 스코프해 색만 얹는다(구조 무변). */
+#howto-dots{ gap: 9px; }
+#howto-dots .dot{
+  width: 10px; height: 10px;
+  background:
+    radial-gradient(circle at 34% 30%, rgba(255,255,255,.72), rgba(255,255,255,0) 46%),
+    var(--hd-c, #C9BFD6);
+  box-shadow: inset 0 -1px 1px rgba(0,0,0,.18), 0 1px 1px rgba(0,0,0,.16);
+}
+#howto-dots .dot:nth-child(1){ --hd-c:#D6402A; }   /* 빨 */
+#howto-dots .dot:nth-child(2){ --hd-c:#AEC21C; }   /* 연두 */
+#howto-dots .dot:nth-child(3){ --hd-c:#33D4AD; }   /* 민트 */
+#howto-dots .dot:nth-child(4){ --hd-c:#7B5FD1; }   /* 보라 */
+#howto-dots .dot:nth-child(5){ --hd-c:#E85B9B; }   /* 핑크 */
+#howto-dots .dot:nth-child(6){ --hd-c:#F09A2E; }   /* 주황 */
+#howto-dots .dot:nth-child(7){ --hd-c:#3AA6DE; }   /* 파랑 */
+#howto-dots .dot.on{
+  background:
+    radial-gradient(circle at 34% 30%, rgba(255,255,255,.82), rgba(255,255,255,0) 48%),
+    var(--hd-c);
+  transform: scale(1.5);
+}
+
+/* ⑱-b 그림 조립 — 기존 게임 자산만. S1 예시 배열용 젤리 타일 그리드 + 전투
+   메달 그리드. 타일은 인라인 base64 변수(--lib-tile-*, 배포 404 없음), 메달은
+   전투 HUD 가 이미 쓰는 catalog/duel-medal-*.webp(무접촉 참조). */
+.ht-tilegrid{
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: calc(var(--hcard-r) * .34); justify-items: center; align-items: center;
+  padding: 4px 2px;
+}
+.ht-tile{
+  position: relative; width: 100%; max-width: 62px; aspect-ratio: 1;
+  background: var(--ti) center/contain no-repeat;
+  display: grid; place-items: center;
+}
+.ht-tile > b{
+  font-family: var(--font); font-weight: 900;
+  font-size: clamp(15px, 5.2vw, 26px); color: #241a12;
+  text-shadow: 0 1px 0 rgba(255,255,255,.45);
+  transform: translateY(-2%);
+}
+/* 7장 전투 네 버튼: 번호 원판 자리를 **전투 메달 스프라이트**로 갈아 각 설명
+   줄이 자기 메달을 이고 서게 한다(높이 안 늘고 그림↔글 1:1). 메달은 전투 HUD 가
+   이미 쓰는 catalog/duel-medal-*.webp(무접촉 참조). */
+.rules-list li > .rules-medal{
+  flex: 0 0 auto; width: 30px; height: 30px; margin-top: -1px;
+  background: var(--mi) center/contain no-repeat;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,.22));
+}
 
 /* ---- 14차 #34 — 규칙 요약 카드 (도움말 1장) --------------------------------
    조각을 하나도 새로 들이지 않는다. 껍데기는 바로 위 .howto-art (어두운 인셋 판 +
@@ -14262,6 +14330,17 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
            있다 — 규칙 세 줄과 단서 한 줄. -->
       <div class="howto-panel">
         <div class="howto-art rules-card">
+          <!-- ⑱-b S1 시안(90127e38) 예시 배열 8·7·4·5 / 1·7 — 게임 젤리 타일
+               인라인 스프라이트(--lib-tile-*, :root, 배포 404 없음)로 조립. 숫자는
+               게임 타일과 같은 어두운 잉크. aria-hidden(장식) — 규칙은 아래 글이 말함. -->
+          <div class="ht-tilegrid" aria-hidden="true">
+            <i class="ht-tile" style="--ti:var(--lib-tile-08-lemon)"><b>8</b></i>
+            <i class="ht-tile" style="--ti:var(--lib-tile-07-greengrape)"><b>7</b></i>
+            <i class="ht-tile" style="--ti:var(--lib-tile-04-peach)"><b>4</b></i>
+            <i class="ht-tile" style="--ti:var(--lib-tile-05-tangerine)"><b>5</b></i>
+            <i class="ht-tile" style="--ti:var(--lib-tile-01-soda)"><b>1</b></i>
+            <i class="ht-tile" style="--ti:var(--lib-tile-07-greengrape)"><b>7</b></i>
+          </div>
           <h3 class="rules-title" data-i18n="rules.title">Three rules. That is all.</h3>
           <ol class="rules-list">
             <li><span class="rules-num" aria-hidden="true">1</span><span data-i18n-html="rules.r1">Same number, or two that make <b>10</b>.</span></li>
@@ -14374,11 +14453,14 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
       <div class="howto-panel">
         <div class="howto-art rules-card">
           <h3 class="rules-title" data-i18n="skills.title">Four buttons in battle</h3>
+          <!-- ⑱-b 번호 원판 → 전투 메달 스프라이트(하단 4버튼과 같은 자산,
+               catalog/duel-medal-*.webp · 전투 HUD 가 이미 소비 · 무접촉 참조).
+               각 설명 줄이 자기 메달을 이고 서서 그림↔글 1:1. -->
           <ol class="rules-list">
-            <li><span class="rules-num" aria-hidden="true">1</span><span data-i18n-html="skills.s1"><b>Attack</b> &mdash; fills with every point you score, and fires on its own when full.</span></li>
-            <li><span class="rules-num" aria-hidden="true">2</span><span data-i18n-html="skills.s2"><b>Special</b> &mdash; fills only when you <b>alternate</b> sum-10 and same-number matches. One hit is worth two attacks.</span></li>
-            <li><span class="rules-num" aria-hidden="true">3</span><span data-i18n-html="skills.s3"><b>Awakening</b> &mdash; every match charges it, faster the higher your combo. It turns the board your way for a few seconds.</span></li>
-            <li><span class="rules-num" aria-hidden="true">4</span><span data-i18n-html="skills.s4"><b>Partner</b> &mdash; your chosen partner&rsquo;s skill, a few uses each round.</span></li>
+            <li><i class="rules-medal" aria-hidden="true" style="--mi:url('catalog/duel-medal-attack.webp')"></i><span data-i18n-html="skills.s1"><b>Attack</b> &mdash; fills with every point you score, and fires on its own when full.</span></li>
+            <li><i class="rules-medal" aria-hidden="true" style="--mi:url('catalog/duel-medal-special.webp')"></i><span data-i18n-html="skills.s2"><b>Special</b> &mdash; fills only when you <b>alternate</b> sum-10 and same-number matches. One hit is worth two attacks.</span></li>
+            <li><i class="rules-medal" aria-hidden="true" style="--mi:url('catalog/duel-medal-awaken.webp')"></i><span data-i18n-html="skills.s3"><b>Awakening</b> &mdash; every match charges it, faster the higher your combo. It turns the board your way for a few seconds.</span></li>
+            <li><i class="rules-medal" aria-hidden="true" style="--mi:url('catalog/duel-medal-pet.webp')"></i><span data-i18n-html="skills.s4"><b>Partner</b> &mdash; your chosen partner&rsquo;s skill, a few uses each round.</span></li>
           </ol>
           <p class="rules-note" data-i18n-html="skills.note">A <b>star fruit</b> fills Awakening at once; a <b>pet fruit</b> gives one more Partner use.</p>
         </div>
