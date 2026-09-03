@@ -48166,8 +48166,11 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   overflow: hidden;
   border-radius: 0;
 }
-/* ⑰ — 양끝 화살표는 트랙(#cp-track) 밖 뷰포트 양끝에 절대 고정한다(이동하지 않음).
-   모양·색은 ⑮ 에서 시안 S5 대로 다듬는다. 여기서는 자리만 잡는다. */
+/* ⑮ (0904) 방울 줄 양끝 물방울 화살표 — 시안 S5 ead03bb6 실측. 종전(⑧)은 채도
+   높은 불투명 분홍이라 시안과 달랐다. S5 는 **반투명 연분홍-흰 유리** 물방울:
+   상단 광택, 얇은 마우브 겉선, 바깥(아래-외측)으로 향한 한 꼭지. 젤리 재질은 정본
+   칩(①) 층 어휘 상속 — 새 디자인 0. 글리프 없이 꼭지 방향이 곧 화살표다(좌=이전·
+   우=다음). 크기 = 방울 .1307W 의 ~.58 배. 트랙 밖 고정(양끝 절대 배치). */
 #charpanel .cp-arrow {
   position: absolute;
   top: 50%;
@@ -48180,13 +48183,31 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   color: transparent;
   cursor: pointer;
   z-index: 6;
-  background: rgba(244,186,205,.9);
-  border-radius: 50%;
+  /* 반투명 유리: 상단(40%,28%) 흰 광택 → 연분홍 → 살몬. S5 처럼 맑되, 뒤 방울이
+     비쳐 지저분해지지 않게 알파를 살짝 올렸다(유리감 유지 · 3번째 이웃 가림). */
+  background: radial-gradient(120% 120% at 40% 28%,
+    rgba(255,255,255,.97) 0%, rgba(253,232,239,.90) 40%,
+    rgba(246,192,210,.86) 74%, rgba(234,156,182,.84) 100%);
+  box-shadow:
+    inset 0 0 0 calc(var(--f2-w) * .0026) rgba(176,104,136,.55),                        /* 얇은 마우브 겉선 */
+    inset 0 calc(var(--f2-w) * .0062) calc(var(--f2-w) * .0060) rgba(255,255,255,.88),   /* 상단 광택 */
+    inset 0 calc(var(--f2-w) * -.0070) calc(var(--f2-w) * .0070) rgba(160,90,125,.26),   /* 아래 접지 */
+    0 calc(var(--f2-w) * .0050) calc(var(--f2-w) * .0080) rgba(150,70,110,.24);          /* 바깥 그림자 */
   -webkit-tap-highlight-color: transparent;
 }
-#charpanel .cp-arrow-l { left:  calc(var(--f2-w) * .026); transform: translateY(-50%); }
-#charpanel .cp-arrow-r { right: calc(var(--f2-w) * .026); transform: translateY(-50%); }
-#charpanel .cp-arrow:active { filter: brightness(.94); }
+/* 꼭지(둥근 물방울 + 한 모서리 뾰족)를 바깥으로 돌린다: 좌=왼쪽 · 우=오른쪽 */
+#charpanel .cp-arrow-l {
+  left: calc(var(--f2-w) * .026);
+  border-radius: 50% 50% 50% 8%;                 /* 뾰족 = 좌하 */
+  transform: translateY(-50%) rotate(-45deg);    /* 좌하 꼭지를 왼쪽으로 */
+}
+#charpanel .cp-arrow-r {
+  right: calc(var(--f2-w) * .026);
+  border-radius: 50% 50% 8% 50%;                 /* 뾰족 = 우하 */
+  transform: translateY(-50%) rotate(45deg);     /* 우하 꼭지를 오른쪽으로 */
+}
+#charpanel .cp-arrow-l:active { transform: translateY(-50%) rotate(-45deg) scale(.92); }
+#charpanel .cp-arrow-r:active { transform: translateY(-50%) rotate(45deg) scale(.92); }
 #charpanel .cp-dots  { display: none; }
 
 /* ⑰ (0904) 중앙 픽 캐러셀 — 뷰포트(#cp-rack)는 고정, 트랙(#cp-track)만 이동한다.
