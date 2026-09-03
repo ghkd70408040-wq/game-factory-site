@@ -14554,13 +14554,14 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
         <span class="mode-t"><b data-i18n="menu.adv">Adventure</b><i data-i18n="menu.advsub">Rescue the Jelly Princess</i></span>
         <span id="mode-adv-b" class="mode-b"></span>
       </button>
-      <!-- 🚨 14차 — **숨김이지 삭제가 아니다**. 플레이 시트를 다섯 줄 한 단으로
-           합치면서 「아케이드(무한)」와 「타임러시」는 입구만 닫았다. 마크업·CSS·
-           클릭 핸들러·startEndless()/러시 시작 코드는 한 줄도 손대지 않았다 —
-           데일리·클래식이 같은 코드 길을 지나가고, 되돌리려면 이 hidden 한 낱말만
-           지우면 되기 때문이다. 기록도 그대로다: store.ranks(RANK_MODES 6종)가
-           endless/rush 를 계속 들고 있어 「내 기록」에서 코드 수정 0 으로 보인다. -->
-      <button id="mode-arcade" class="mode-row" type="button" hidden>
+      <!-- ===== 0903 — 이 행은 **보인다**. hidden 없음 =====================
+           14차가 다섯 줄 한 단으로 합치면서 여기에 hidden 을 걸었고, 1cd0ae0 의
+           반쪽 원복이 CSS·JS 만 4줄 구조로 되돌리면서 마크업을 안 되돌려
+           「모험·데일리」 두 줄만 보이는 회귀가 됐다. E48 이 hidden 을 지워
+           정본 4줄(모험·아케이드·데일리·타임러시)로 복원했다. 이 행의 클릭은
+           openArcadeHub() 로 하위 시트(#modal-arcade)를 연다. 기록은 그대로다 —
+           store.ranks(RANK_MODES 6종)가 endless/rush 를 계속 들고 있다. -->
+      <button id="mode-arcade" class="mode-row" type="button">
         <span class="nchip nchip-arc" aria-hidden="true"></span>
         <span class="mode-t"><b data-i18n="mode.arcade">Arcade</b><i data-i18n="mode.arcade.d">Endless. Chase your best.</i></span>
         <span id="mode-arcade-b" class="mode-b"></span>
@@ -14570,33 +14571,17 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
         <span class="mode-t"><b data-i18n="menu.daily">Daily</b><i data-i18n="mode.daily.d">One board a day, same for everyone.</i></span>
         <span id="mode-daily-b" class="mode-b"></span>
       </button>
-      <!-- 🚨 14차 — 위 #mode-arcade 와 같은 이유의 숨김. 삭제 아님. -->
-      <button id="mode-rush" class="mode-row" type="button" hidden>
+      <!-- 0903 — 위 #mode-arcade 와 같은 이유로 hidden 을 지웠다. 정본 4줄째. -->
+      <button id="mode-rush" class="mode-row" type="button">
         <span class="nchip nchip-rush" aria-hidden="true"></span>
         <span class="mode-t"><b data-i18n="menu.rush">Time Rush</b><i data-i18n="mode.rush.d">Sixty seconds. Every match buys time.</i></span>
         <span id="mode-rush-b" class="mode-b"></span>
       </button>
-      <!-- ===== 14차 — 「아케이드 대전」 2단 시트에서 올라온 세 줄 ==============
-           2단 시트를 지운 것이 아니라 **한 단으로 폈다**. 세 버튼은 #modal-arcade
-           .mode-list 에 있던 그 마크업 그대로이며 id 와 data-i18n 키를 한 글자도
-           안 바꿨다 — 그래야 클릭 배선(wire())과 -b 기록 동기화(syncArcadeSheet)가
-           그대로 성립한다. 바뀐 것은 부모와, #arcrow-dmg 의 칩 클래스 하나뿐이다
-           (nchip-day 는 바로 위 「데일리」와 아이콘이 겹쳐 nchip-dmg 로 갈랐다). -->
-      <button id="arcrow-time" class="mode-row" type="button">
-        <span class="nchip nchip-rush" aria-hidden="true"></span>
-        <span class="mode-t"><b data-i18n="arc.time.name">Time Attack</b><i data-i18n="arc.time.d">Beat the villain. Fastest time wins.</i></span>
-        <span id="arcrow-time-b" class="mode-b"></span>
-      </button>
-      <button id="arcrow-surv" class="mode-row" type="button">
-        <span class="nchip nchip-arc" aria-hidden="true"></span>
-        <span class="mode-t"><b data-i18n="arc.surv.name">Survival</b><i data-i18n="arc.surv.d">Endless villains. Longest time wins.</i></span>
-        <span id="arcrow-surv-b" class="mode-b"></span>
-      </button>
-      <button id="arcrow-dmg" class="mode-row" type="button">
-        <span class="nchip nchip-dmg" aria-hidden="true"></span>
-        <span class="mode-t"><b data-i18n="arc.dmg.name">90s Damage</b><i data-i18n="arc.dmg.d">Ninety seconds. Most damage wins.</i></span>
-        <span id="arcrow-dmg-b" class="mode-b"></span>
-      </button>
+      <!-- ===== 0903 — 아케이드 3종목은 하위 시트(#modal-arcade)에 있다 ========
+           1cd0ae0 의 반쪽 원복으로 이 자리에 남아 있던 #arcrow-time, #arcrow-surv,
+           #arcrow-dmg 세 줄을 원문 자리인 #modal-arcade .mode-list 로 되돌렸다.
+           진입점은 위 #mode-arcade 행 자신이다(openArcadeHub). id 와 data-i18n
+           키는 한 글자도 안 바꿨고, #arcrow-dmg 의 칩만 nchip-dmg 로 유지한다. -->
     </div>
     <!-- ===== 아케이드 대전 진입 =====================================
          네 줄(.mode-row)은 글자까지 통짜로 베이크된 **그림 버튼**이라 다섯째
@@ -14607,11 +14592,11 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
          기존 네 줄의 마크업·위치·크기는 한 글자도 안 바뀐다. -->
     <!-- 🚨 0823 — 위 네 줄의 [칩][제목+한 줄] 리듬을 그대로 받는다. 칩 한 개가
          더해진 것이 마크업 변경의 전부이고, 위 네 줄은 한 글자도 안 바뀐다. -->
-    <!-- 🚨 14차 — **숨김이지 삭제가 아니다**. 이 줄은 2단 시트(#modal-arcade)로
-         가는 문이었는데, 그 시트의 세 종목이 바로 위 .mode-list 로 올라와 한 단이
-         됐다. 문이 가리키는 곳이 없어졌을 뿐, 마크업·CSS(.arc-entry 주황)·클릭
-         핸들러·openArcadeHub() 는 전부 살아 있다. hidden 한 낱말만 지우면 2단
-         구조가 그대로 돌아온다. -->
+    <!-- 🚨 0903 — **숨김이지 삭제가 아니다. 이 hidden 은 그대로 둔다.**
+       이 줄은 2단 시트(#modal-arcade)로 가는 옛 문이다. 지금 그 시트의 문은
+       위 #mode-arcade 행 자신이므로(openArcadeHub), 이 hidden 을 풀면 같은
+       곳으로 가는 진입 버튼이 둘이 된다. 마크업·CSS(.arc-entry 주황)·클릭
+       핸들러는 전부 살아 있으니 진입점을 다시 갈아끼울 때만 되살려라. -->
     <button id="mode-arcduel" class="arc-entry" type="button" hidden>
       <span class="nchip nchip-arc" aria-hidden="true"></span>
       <span class="mode-t"><b data-i18n="arc.hub">Arcade Duel</b><i data-i18n="arc.hub.d">Three ways to fight a villain.</i></span>
@@ -14633,7 +14618,23 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
          .mode-list .mode-row)·openArcadeHub()/closeArcadeHub()·ESC 처리까지 전부
          그대로다. 입구(#mode-arcduel)가 hidden 이라 지금은 열리지 않을 뿐이고,
          세 버튼을 이 자리로 되돌리고 hidden 을 지우면 2단 구조가 복구된다. -->
-    <div class="mode-list"></div>
+    <div class="mode-list">
+      <button id="arcrow-time" class="mode-row" type="button">
+        <span class="nchip nchip-rush" aria-hidden="true"></span>
+        <span class="mode-t"><b data-i18n="arc.time.name">Time Attack</b><i data-i18n="arc.time.d">Beat the villain. Fastest time wins.</i></span>
+        <span id="arcrow-time-b" class="mode-b"></span>
+      </button>
+      <button id="arcrow-surv" class="mode-row" type="button">
+        <span class="nchip nchip-arc" aria-hidden="true"></span>
+        <span class="mode-t"><b data-i18n="arc.surv.name">Survival</b><i data-i18n="arc.surv.d">Endless villains. Longest time wins.</i></span>
+        <span id="arcrow-surv-b" class="mode-b"></span>
+      </button>
+      <button id="arcrow-dmg" class="mode-row" type="button">
+        <span class="nchip nchip-dmg" aria-hidden="true"></span>
+        <span class="mode-t"><b data-i18n="arc.dmg.name">90s Damage</b><i data-i18n="arc.dmg.d">Ninety seconds. Most damage wins.</i></span>
+        <span id="arcrow-dmg-b" class="mode-b"></span>
+      </button>
+    </div>
   </div></div>
 
   <!-- ===== W7.5 클래식 허브 =================================================
