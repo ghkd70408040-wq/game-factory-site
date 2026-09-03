@@ -22010,7 +22010,7 @@ window.TT_SFX = {
   }
   function fitHeads(root) {
     var list = (root || document).querySelectorAll(
-      '.modal-v2 .mv2-sheet > h2, .modal-v2 .mv2-head > h2');
+      '.modal-v2 .mv2-sheet > h2, .modal-v2 .mv2-head > h2, #modal-node .r10-ribbon > h2');
     for (var i = 0; i < list.length; i++) fitHead(list[i]);
   }
   try {
@@ -22043,7 +22043,7 @@ window.TT_SFX = {
   /** 창이 열릴 때 한 번 더 — 내가 못 찾은 쓰기 경로가 있어도 여기서 되살아난다. */
   function healHeads(root) {
     var list = (root || document).querySelectorAll(
-      '.modal-v2 .mv2-sheet > h2, .modal-v2 .mv2-head > h2');
+      '.modal-v2 .mv2-sheet > h2, .modal-v2 .mv2-head > h2, #modal-node .r10-ribbon > h2');
     for (var i = 0; i < list.length; i++) {
       var h = list[i];
       if (h.firstElementChild && h.firstElementChild.className === 'mvh-title'
@@ -56855,6 +56855,25 @@ html[lang="en"] #modal-arc.is-arcdmg .sheet > h2{ --ttl:url("catalog/ttl-arcdmg-
    별(현행 별 아이콘)·판·캡슐·X·접지 그림자(S9 정본)는 무접촉. 삭제 두 줄은
    .node-seal 로 표시만 봉인(데이터·i18n 키 유지). */
 #modal-node .node-seal { display: none !important; }
+
+/* ⑪-b(0904) 규칙 ④(2026-09-03 사용자) — 캡슐 제목 글자높이/캡슐높이 비를 정본
+   채움비(시안 실측 높이 ≈0.6, work-lettering 「높이 0.592」)로 통일한다. 동적
+   레터링(.mvh-title)도 같은 비율이 되게 font-size 를 **캡슐 높이(--wcap-h)** 기준으로
+   잡는다(px 고정 18 → 캡슐 대비 0.2 였다). 3자리(100탄)가 캡슐 폭을 넘치면
+   fitHead 가 --mvh-fs 를 줄여 폭 우선으로 맞춘다(비율 유지). --wcap-h 는
+   .r10-ribbon 이 이미 갖고 있어 h2 가 상속한다. */
+#modal-node .r10-ribbon > h2 {
+  --mvh-fs: .80;
+  --mvh-fs-min: .42;
+  font-size: calc(var(--wcap-h) * var(--mvh-fs));
+  line-height: 1;
+  /* 캡슐 폭에 가둔다 — h2 는 리본의 flex 아이템이라 기본은 글자 폭까지 늘어난다
+     (그러면 fitHead 의 avail=need 가 되어 100탄이 안 줄어 캡슐 밖으로 넘쳤다).
+     max-width:100% + min-width:0 으로 캡슐 폭에 묶으면 fitHead 가 폭 초과분만
+     --mvh-fs 로 줄인다(짧은 제목은 그대로, 비율 유지). */
+  max-width: 100%;
+  min-width: 0;
+}
 
 /* 아이콘/초상을 든 줄만 가운데 정렬(글리프·얼굴이 글자 밑선에 안 걸린다). */
 #modal-node #node-i-mis,
