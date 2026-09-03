@@ -21924,7 +21924,7 @@ window.TT_SFX = {
   function isCapsuleHead(el) {
     try {
       return !!(el && el.matches &&
-        el.matches('.modal-v2 .mv2-sheet > h2, .modal-v2 .mv2-head > h2, #modal-node .r10-ribbon > h2'));
+        el.matches('.modal-v2 .mv2-sheet > h2, .modal-v2 .mv2-head > h2, #modal-node .r10-ribbon > h2, #modal-clear .sheet > h2, #modal-adv:not(.is-advscript):not(.is-advfinish) .sheet > h2'));
     } catch (e) { return false; }
   }
   function headText(el, s) {
@@ -22010,7 +22010,7 @@ window.TT_SFX = {
   }
   function fitHeads(root) {
     var list = (root || document).querySelectorAll(
-      '.modal-v2 .mv2-sheet > h2, .modal-v2 .mv2-head > h2, #modal-node .r10-ribbon > h2');
+      '.modal-v2 .mv2-sheet > h2, .modal-v2 .mv2-head > h2, #modal-node .r10-ribbon > h2, #modal-clear .sheet > h2, #modal-adv:not(.is-advscript):not(.is-advfinish) .sheet > h2');
     for (var i = 0; i < list.length; i++) fitHead(list[i]);
   }
   try {
@@ -22027,7 +22027,11 @@ window.TT_SFX = {
       var _mo = new MutationObserver(function (recs) {
         for (var i = 0; i < recs.length; i++) {
           var t = recs[i].target;
-          if (t && !t.hidden) { fitHeads(t); }
+          /* ⑲-c(0904) — 오픈 순간 **다시 감싼다**(healHeads=감싸기+맞춤). 결과 모달
+             제목은 setText('adv-title'/'clear-title'/'over-title')·applyI18n 이 매 오픈
+             textContent 로 덮으므로, 오픈 후 이 훅이 .mvh-title span 을 되살린다.
+             이미 감싼 제목(node·modal-v2)은 healHeads 가 건너뛰어 무해하다. */
+          if (t && !t.hidden) { healHeads(t); }
         }
       });
       var _ms = document.querySelectorAll('.modal, #charpanel');
@@ -22043,7 +22047,7 @@ window.TT_SFX = {
   /** 창이 열릴 때 한 번 더 — 내가 못 찾은 쓰기 경로가 있어도 여기서 되살아난다. */
   function healHeads(root) {
     var list = (root || document).querySelectorAll(
-      '.modal-v2 .mv2-sheet > h2, .modal-v2 .mv2-head > h2, #modal-node .r10-ribbon > h2');
+      '.modal-v2 .mv2-sheet > h2, .modal-v2 .mv2-head > h2, #modal-node .r10-ribbon > h2, #modal-clear .sheet > h2, #modal-adv:not(.is-advscript):not(.is-advfinish) .sheet > h2');
     for (var i = 0; i < list.length; i++) {
       var h = list[i];
       if (h.firstElementChild && h.firstElementChild.className === 'mvh-title'
@@ -50925,7 +50929,9 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
    --------------------------------------------------------------------------- */
 .modal-v2 .mv2-sheet > h2 > .mvh-title,
 .modal-v2 .mv2-head  > h2 > .mvh-title,
-#modal-node .r10-ribbon > h2 > .mvh-title {
+#modal-node .r10-ribbon > h2 > .mvh-title,
+#modal-clear .sheet > h2 > .mvh-title,
+#modal-adv:not(.is-advscript):not(.is-advfinish) .sheet > h2 > .mvh-title {
   /* [E14-0902] 정본 work-lettering.css 동기. 위 주석의 「paint-order 가 테를
      채움 아래로 내리므로 바깥 절반만 보인다」는 **틀렸다** — 채움이 transparent
      라 -webkit-text-stroke 는 폭 전체가 보인다(.060em 이 렌더에서 6.25px
@@ -50991,7 +50997,9 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
 @supports not ((-webkit-background-clip: text) or (background-clip: text)) {
   .modal-v2 .mv2-sheet > h2 > .mvh-title,
   .modal-v2 .mv2-head  > h2 > .mvh-title,
-  #modal-node .r10-ribbon > h2 > .mvh-title {
+  #modal-node .r10-ribbon > h2 > .mvh-title,
+  #modal-clear .sheet > h2 > .mvh-title,
+  #modal-adv:not(.is-advscript):not(.is-advfinish) .sheet > h2 > .mvh-title {
     background-image: none;
     color: #FFFFFF;
     -webkit-text-fill-color: #FFFFFF;
@@ -56478,6 +56486,27 @@ html[lang="ko"] #charpanel #cp-h{ --ttl:url("catalog/ttl-chars-ko.webp"); }
 html[lang="en"] #modal-mode .r10-ribbon{ --ttl:url("catalog/ttl-play-en.webp"); }
 html[lang="en"] #modal-classic .r10-ribbon{ --ttl:url("catalog/ttl-classic-en.webp"); }
 html[lang="en"] #charpanel #cp-h{ --ttl:url("catalog/ttl-chars-en.webp"); }
+
+/* ⑲-c(0904 · wave/node) — 결과 모달 **동적 번호** 제목만 정본 레터링 + ④ 비율 =====
+   #modal-clear(「N탄 클리어!」)·#modal-adv 승/패(「N탄 클리어!」/「N탄 실패」)는 값이
+   들어가는 동적 제목이고 ttl webp 가 없다(::after 그림층 밖). 그래서 node 와 같은
+   길로 CSS 레터링(.mvh-title)을 배선하고(isCapsuleHead + 오픈 시 healHeads 재감싸기),
+   글자높이/캡슐높이 비를 ④(≈0.65)로 맞춘다. px 18(비 0.22) → 캡슐 높이(--wcap-h)
+   기준 calc(--wcap-h*.80). 캡슐 폭은 --wcap-w 고정이라 긴 제목은 fitHead 가 폭
+   우선으로 줄인다(비율 유지).
+   ⚠ webp 정본 창은 무접촉(그림 유지) — 지시서 「동적 번호 창만」 준수:
+     · #modal-over(막힘 ttl-over·타임업 ttl-overrush): 동적 번호 없이 고정 문구 두
+       벌이 각자 webp 정본이라 **레터링 제외**(::after 그림층에 상주 — 겹치면 안 됨).
+     · #modal-adv.is-advscript / .is-advfinish(각본·완주): 이 둘만 webp 이므로
+       `:not()` 로 뺐다. 승·패·보스승 셋은 클래스가 없어 여기 레터링이 선다.
+     · howto·settings·skin·pause·rank·play·classic·chars 는 애초에 선택자 밖. */
+#modal-clear .sheet > h2,
+#modal-adv:not(.is-advscript):not(.is-advfinish) .sheet > h2 {
+  --mvh-fs: .80;
+  --mvh-fs-min: .42;
+  font-size: calc(var(--wcap-h) * var(--mvh-fs));
+  line-height: 1;
+}
 /* [E34-0903] JS 훅이 갈라 주는 자리 — 상태 클래스는 `is-` 접두어다
    (배포본 Δ 하네스 analyze.py 의 NOISE 가 is-* 를 서명에서 지운다).
      over : paintOverModal 이 #modal-over 에 .is-rush 를 토글한다 — 러시 종료
