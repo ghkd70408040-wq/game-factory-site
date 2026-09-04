@@ -53547,7 +53547,8 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
   /* face / face-top 은 --wcap-a-in 0 . --wcap-a-fill 0 . --wcap-haze 0 이라 지금
      **화소를 0개 칠한다**. 그래도 S9 값으로 옮긴다 - 훗날 면을 켜면 계열이 갈리기 때문이다.
      이 두 줄의 실화면 dRGB 는 0 이다(그렇게 보고한다). */
-  --wcap-face: #B9BCC4; --wcap-face-top: #C2BCC3; --wcap-face-y: 100%; --wcap-rim-c: #E3D8DF;
+  /* [E60-0904] 부품 기준 = 캐릭창 정보판 정석(라벤더핑크). 아래 .wf-cap 오버라이드와 같은 값. */
+  --wcap-face: #E6DCE2; --wcap-face-top: #ECE2E6; --wcap-face-y: 100%; --wcap-rim-c: #FAF5F4;
   --wcap-a-fill: 0;        /* 색 바탕 없음 = 맑은 유리 (시안) */
   /* [E17-0903 · 재질층 §3] 캡슐 판 α .010 -> **.622** (zoneb_hud · 흩어짐 .03).
      hud 판 위에 얹힌 자기 층의 α 이고 맨 장면 대비 실효는 .87 이다. */
@@ -53563,7 +53564,9 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
      봉인: --wcap-a-in: .622; */
   /* [E38-0903] 면 제거 — 시안 캡슐 속면 #0CF408 (키와 dE 4.9) -> alpha <= .033.
      봉인: --wcap-a-in: .010; */
-  --wcap-a-in: 0.000;
+  /* [E60-0904] 맑은 유리 0 -> 캐논 라벤더핑크 면 켬. 캐릭창 정보판 --cpj-a-in 과 같은 .544
+     로 두어 캡슐 면색이 정보판과 같은 see-through 로 합성되게 한다(gate 알파차 <= .03). */
+  --wcap-a-in: .544;
   --wcap-a-rim: 1.000;
   /* [E38-0903 · 면 제거 + 안쪽 글로] 시안에는 **면(균일 채움)이 없다**.
      빈 틀 시안 a13c656f 는 순크로마그린인데 이 부품 기하 속면이 키와 dE 3.3~4.9
@@ -53605,7 +53608,8 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
   --wcap-rim-p1: calc(1 - (1 - var(--wcap-rim-a)) / (1 - var(--wcap-rim-a) * var(--wcap-rim-k2)));
   /* ---- [L2-2] 광택 2점. 정본은 «중심» 으로 적고 여기는 배경 자리라
          px = (cx - w/2) / (100 - w) * 100 으로 옮겼다(같은 점이다). ---- */
-  --wcap-gl-a: .930;
+  /* [E60-0904] 광택 .930 -> .770 (캐논 soft gloss · 정보판 --cpj-gl-a 와 같은 값). */
+  --wcap-gl-a: .770;
   --wcap-gl1-w: 15.7%;  --wcap-gl1-h: 27.3%;
   --wcap-gl1-px: 6.45%;  --wcap-gl1-py: 2.95%;
   --wcap-gl2-w: 1.95%;   --wcap-gl2-h: 8.90%;
@@ -55160,7 +55164,9 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
 /* [E52-0903 - S9] 이 줄은 [W7-0901] 이 「푸른 회청」계열로 세운 자리다. S9 정본이
    그 위에 오므로 같은 네 값을 S9 로 옮긴다(위 부품 기준 블록과 **같은 값**).
    되돌리기: .wf-cap{ --wcap-L3-line: #8286B4; --wcap-face: #BEBEE4; --wcap-face-top: #D4DCF7; --wcap-face-y: 100%; --wcap-rim-c: #D0DBF1; } */
-.wf-cap{ --wcap-L3-line: #76547A; --wcap-face: #B9BCC4; --wcap-face-top: #C2BCC3; --wcap-face-y: 100%; --wcap-rim-c: #E3D8DF; }
+/* [E60-0904] 캡슐 재료색 = 캐릭창 정보판 정석(라벤더핑크). 크림/회청 S9 폐기.
+   기하(area B 폭·크기)는 불변 — 재료색만 바꾼다. face #E6DCE2 · rim #FAF5F4 · 겉선 #9F8896. */
+.wf-cap{ --wcap-L3-line: #9F8896; --wcap-face: #E6DCE2; --wcap-face-top: #ECE2E6; --wcap-face-y: 100%; --wcap-rim-c: #FAF5F4; }
 .wf-chip{ --wchip-L3-line: #685568; }
 #charpanel .cp-crystal{ --wslot-L3-line: #6C4A72; }
 
