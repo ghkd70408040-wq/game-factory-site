@@ -12947,7 +12947,9 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
     <div id="duel-hud" class="jbox jbox--slab" hidden>
       <span id="duel-foe-av" class="dh-av boss-av bs-grape" aria-hidden="true"></span>
       <span id="duel-me-av" class="dh-av dh-av-me" aria-hidden="true"></span>
-      <i id="duel-baby" class="dh-baby" aria-hidden="true"></i>
+      <!-- 펫 방울 = 캐릭창 랙 방울 부품 재사용(원형 젤리 kit-chip-v2 + .ct-art 얼굴).
+           8/19 남색 임시 스킨은 은퇴했다(아래 §펫방울 주석). -->
+      <span id="duel-baby" class="dh-baby cp-th kit-chip-v2" aria-hidden="true"><i class="ct-art" aria-hidden="true"></i></span>
       <!-- .dh-mid 는 자리를 차지하지 않는 **쌓임 상자**다(inset:0 · z-index:1):
            #duel-timer 의 유리겹이 z-index:-1 이라 그 -1 을 여기 가둬 둔다. -->
       <div class="dh-mid">
@@ -36445,9 +36447,12 @@ window.TT_SFX = {
        돌려준다 — 넷 중 하나라도 표준 에셋이 빠지면 그 펫만 구름으로 폴백한다. */
     var baby = $('duel-baby');
     if (baby && baby.style) {
+      /* 0904 — 펫 방울이 캐릭창 랙 방울 부품으로 갈렸다(.cp-th kit-chip-v2 + .ct-art).
+         얼굴은 자식 .ct-art 가 `--char-thumb` 를 읽어 그린다(캐릭창 방울과 같은 변수).
+         선택 펫의 face 를 주입하고, 미선택이면 시안 구름을 폴백으로 넣는다. */
       var petFace = stdArt(mateId(), 'face');
-      if (petFace) baby.style.setProperty('--pet-face', petFace);
-      else baby.style.removeProperty('--pet-face');
+      baby.style.setProperty('--char-thumb',
+        petFace || 'url("catalog/duel-cloud-baby.webp")');
       /* 은퇴 (2026-09-03 · ㊾ C) — 「없으면 칸도 없다」로 칩을 접던 한 줄을 걷었다.
          걷은 이유: 그 처분의 전제(「폴백 그림 duel-cloud-baby 가 사라졌다」)가 이제
          거짓이다 — 같은 파도가 .hv2-face--pet 의 CSS 폴백을 배포본 원문대로
@@ -48258,6 +48263,9 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
 #charpanel .pick-lab { display: none; }
 
 /* 칩 = kit-chip-v2. 초상은 --char-face / --pet-face 가 채운다. */
+/* HUD 펫 방울(#duel-baby)도 이 공용 방울 규칙을 쓴다 — #charpanel 스코프를 방울
+   부품 공용으로 풀되, #charpanel 셀렉터는 그대로라 캐릭창 렌더는 무변(픽셀 대조). */
+#app.battle #duel-baby,
 #charpanel .cp-th,
 #charpanel #mate-pick .char-card {
   flex: 0 0 auto;
@@ -48268,6 +48276,7 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   overflow: visible;
   scroll-snap-align: center;
 }
+#app.battle #duel-baby .ct-art,
 #charpanel .cp-th .ct-art,
 #charpanel #mate-pick .char-card .cc-art {
   position: absolute;
@@ -54798,6 +54807,10 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
    ▣ 치수는 종전 그대로 `--f2-cd` 하나가 다스린다(선택 시 1.334배도 그대로).
      그 값을 부품 손잡이 `--wchip-w` 에 그대로 물린다.
    =========================================================================== */
+/* HUD 펫 방울(#duel-baby)도 이 정본 chip 재질을 그대로 받는다 — 캐릭창 랙 방울과
+   같은 wf-chip 겉선·림·글로·광택 한 벌(부품 공용). --f2-ref-w/--f2-cd 는 방울
+   기하 규칙(#app.battle #duel-baby)이 랙과 같은 값으로 넣어 준다. */
+#app.battle #duel-baby,
 #charpanel .cp-th,
 #charpanel #mate-pick .char-card{
   --wchip-w: var(--f2-cd);
@@ -57977,14 +57990,15 @@ else window.addEventListener("load",start);
 /* ---- 1. 큰 조각 넷 --------------------------------------------------------
    넷 다 같은 문법이다: 컨테이너 % 절대배치 + contain 배경 + 그림자 한 겹.
    데몬·큰구름의 아래쪽 평평한 절단면은 z-index 로 HP 바 뒤에 눕혀 감춘다. */
-#app.battle #duel-hud .dh-av,
-#app.battle #duel-hud .dh-baby{
+#app.battle #duel-hud .dh-av{
   position:absolute;
   background-repeat:no-repeat;
   background-position:center;
   background-size:contain;
   pointer-events:none;
 }
+/* .dh-baby 는 이 공통(contain 배경) 규칙에서 빠졌다 — 펫 방울은 이제 캐릭창 랙
+   방울 부품(kit-chip-v2 원형 젤리 + .ct-art 얼굴)이라 자기 배경을 스스로 그린다. */
 /* 🚨 W10 ② (2026-08-21) 사용자 반려 — "적·아군·펫 아바타가 너무 작다".
    실측이 낸 답은 뜻밖이었다: **상자는 이미 시안 그대로다**(아래 세 절의 % 가
    gm-hud-placement2.json 의 avatar_* 와 소수점까지 같다). 작아 보인 것은 상자가
@@ -58131,35 +58145,32 @@ else window.addEventListener("load",start);
   filter:drop-shadow(0 2px 4px rgba(40,70,100,.30));
   z-index:2;
 }
+/* ================= 펫 방울 = 캐릭창 랙 방울 부품 재사용 =====================
+   0904 — 사용자 확정(11:45): 「HUD 우상단 펫 방울 = 캐릭터 선택창 초상 방울
+   (원형 젤리캡슐)」. 마크업이 `.cp-th kit-chip-v2` + 자식 `.ct-art` 로 갈렸고,
+   원형 유리는 전역 부품 `.kit-chip-v2`(:47832)가, 얼굴은 위 `#app.battle
+   #duel-baby .ct-art`(48263 그룹, inset 6% · cover)가 그린다. 얼굴 자산은
+   duelHudMount 가 선택 펫의 face 를 `--char-thumb` 로 주입한다(캐릭창 랙 방울과
+   같은 변수·같은 규칙). 펫 미선택이면 시안 구름이 그 자리를 폴백한다.
+   ---- 은퇴(2026-09-04) : 8/19 남색 임시 스킨 --------------------------------
+   종전 이 자리는 유리캡슐 프레임 없이 `background:contain` 펫 그림 한 장 +
+   `filter:drop-shadow(...rgba(40,70,100,.26))`(남색)뿐이었다. 사용자 경고
+   「캡슐/방울 안에 남색·어두운 배경 금지」에 따라 남색 드롭섀도와 contain 배경을
+   완전히 걷었다(위 `.dh-av` 공통 규칙에서도 `.dh-baby` 를 뺐다).
+   구판 세 줄(롤백 근거):
+     width:12.70%;height:40.00%; background-position:center bottom;
+     background-image:var(--pet-face,url("catalog/duel-cloud-baby.webp"));
+     filter:drop-shadow(0 2px 4px rgba(40,70,100,.26));
+   ---- 기하 : 자리·중심은 이전 배포 그대로, 지름만 그 자리 크기 ----------------
+   left/top(85.75%/5.07%)는 무변. 종전 12.70%×40.00% 는 세로가 더 길어 원이 아니라
+   타원이었다 — 랙 방울은 정원이므로 `aspect-ratio:1`로 폭을 지름 삼아 정원을 낸다
+   (윗변 고정, 폭 무변). */
 #app.battle #duel-baby{
-  /* W6.5b-5 — 시안 실측(avatar_cloud_baby)
-     W10 ② — 펫 방울은 셋 중 그림이 상자를 가장 잘 채우고 있었다(비 0.956 대
-     0.968 — 실측 44.6×46.1 of 44.6×46.1). 그래도 사용자가 "작다"에 함께 꼽았고,
-     화면에서 이 조각은 46px 짜리다. 그래서 상자 자체를 키운다: 높이 37.07 →
-     40.00%(**+7.9%**), 폭은 그 비에 맞춰 12.70%(40.00×0.956/3.072 = 12.45% 에
-     여유). 중심은 시안 cx 92.36% 유지 → left = 92.36 − 6.35 = 86.01%.
-     ⚠ 44% 까지 갔다가 40% 로 되돌렸다: 44% 에서는 방울이 왕자의 왕관을 덮었다
-       (위 #duel-me-av 절의 그 실측). 왕자를 왼쪽으로 옮기는 것과 이 4%p 를
-       합쳐야 겹침이 3px 로 떨어진다 — 한쪽만으로는 부족했다.
-     ⚠ 윗변(5.01%)을 고정하고 **아래로** 키운다. 위로 키우면 유리판이 화면
-     최상단에 붙은 지금(W10 ①) 방울 머리가 화면 밖으로 잘린다. */
-  /* W-B ① — v2 재검(avatar_cloud_baby px[1464,28,196,207] → 상자 % 86.32/5.07/11.56/37.49).
-     문서 cx 92.10% · 윗변 5.07%. W10 ② 의 결정(높이 40.00% · 윗변 고정)을 잇는다:
-       left = 92.10 − 12.70/2 = 85.75%.
-     구판 한 줄(롤백 근거): left:86.01%;top:5.01% */
   left:85.75%;top:5.07%;
-  width:12.70%;height:40.00%;
-  background-position:center bottom;
-  /* W2.5 ② (2026-08-20) — 사용자 반려 "우상단 방울이 내가 고른 펫이 아니다".
-     #duel-me-av 와 같은 개방 문법이다: duelHudMount 가 선택 동료의 face 를
-     --pet-face 로 주입하고, 주입이 없을 때만(= 펫 미선택) 시안 구름이 선다.
-     구름 파일은 지우지 않는다 — 폴백이자 롤백 밸브다.
-     구판 한 줄(되돌릴 근거):
-       background-image:url("catalog/duel-cloud-baby.webp");
-     배경 크기·정렬은 위 §1 의 `.dh-av, .dh-baby` 공통 규칙이 이미 contain·center
-     로 잡아 둔다 — 여기서 다시 쓰지 않는다. */
-  background-image:var(--pet-face,url("catalog/duel-cloud-baby.webp"));
-  filter:drop-shadow(0 2px 4px rgba(40,70,100,.26));
+  width:12.70%;aspect-ratio:1;height:auto;
+  /* wf-chip 재질(위 #charpanel .cp-th 그룹)이 겉선·림 두께를 이 자로 잰다 — 랙
+     방울과 같은 값. --f2-cd 는 kit-chip-v2 가 --f2-w 로 이미 준다(랙과 동일). */
+  --f2-ref-w: min(100vw, 480px);
   z-index:3;
 }
 /* .dh-mid 는 92px 짜리 flex 칸이었다 — 이제 자리를 안 차지하는 **쌓임 상자**다.
