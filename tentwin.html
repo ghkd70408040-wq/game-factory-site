@@ -52774,7 +52774,10 @@ html.menu-v2 #screen-menu .tagline{
   /* ②-A — 위 변이 없는 판은 화면 맨 위에 **붙어** 있어야 그렇게 읽힌다.
      위 여백만 0 으로 내린다(좌·우·아래 무변동). 안쪽 값 자리는 판 위쪽에
      이미 7.0cqw 여백을 갖고 있어(#ch-cap top) 글자가 노치에 안 닿는다. */
-  margin:0 calc(var(--safe-r) + 8px) 2px calc(var(--safe-l) + 8px);
+  /* [B · 0905] 컨테이너 = 시안 폭(모험 #duel-hud 와 동일 규칙). 좌우 8px 여백을
+     안전영역만 남기고 0 으로 — 컨테이너 = 화면 폭이라 cqw = %W 가 되어 판·캡슐·
+     방울이 시안 절대 좌표에 정확히 앉는다(모험과 픽셀 동일). */
+  margin:0 var(--safe-r) 2px var(--safe-l);
   aspect-ratio:auto;
   height:38.5cqw;                      /* 390 화면에서 144px */
   min-height:118px;
@@ -53139,7 +53142,10 @@ html.menu-v2 #screen-menu .tagline{
 /* ---- 3. 좌·우 알약 = kit-pill-v2[data-variant=soft] 처방 + 이름표 -------- */
 #app.classic #classic-hud .ch-g{
   --f2-ph: 6.9cqw;                     /* 25.8px @390 */
-  top:25.5cqw;
+  /* [D · 0905] S6b: 라벨(미션/점수)은 아래 판 **어깨 위쪽**, 그 아래 게이지.
+     종전 25.5cqw 는 라벨을 낮춰 게이지가 판 아래로 밀려났다(판 밖·빈 상태 반려).
+     어깨 윗변(19.2cqw) 바로 아래로 올려 라벨+게이지 두 줄이 판 안에 든다. */
+  top:20.5cqw;
   height:var(--f2-ph);
   gap:1.0cqw;
   padding:0 1.8cqw;
@@ -53189,7 +53195,10 @@ html.menu-v2 #screen-menu .tagline{
   --f2-gh: 3.6cqw;                     /* 13.5px @390 */
   --f2-gbd: calc(var(--f2-gh) * .0924);
   --f2-grim:calc(var(--f2-gh) * .109);
-  top:33.2cqw;
+  /* [D · 0905] 게이지 트랙을 판 **안**으로 올린다(라벨 아래·판 바닥 위) — S6b 처럼
+     dip 안 홈으로 읽히게. 종전 33.2cqw 는 판 아래끝(33.6cqw)을 넘겨 하늘 위에 떠
+     빈 줄로 보였다(중앙 긴 게이지 "비어 보임" 반려). */
+  top:28.5cqw;
   height:var(--f2-gh);
   border-radius:999em;
   background-color:#CFC0DC !important;
@@ -53930,11 +53939,14 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
    착수 전 실측(390x844): 163.67 x 61.75 = 판 374 의 43.76% · 세로비 0.3773.
    즉 자리·크기는 이미 시안과 같았고, **갈아 끼운 것은 재질뿐**이다. */
 #app.classic #ch-cap.wf-cap{
-  --wcap-w: calc(var(--f2-w) * .4404);
+  /* [B · 0905] 컨테이너가 시안 폭이 되며 cqw=%W → 모험 캡슐과 **같은 시안 좌표**로
+     통일한다(위 판 홈: x29.0% y8.4% w42.3% h15.7%). 종전 left:50%+translateX +
+     --f2-w(374) 기준 폭·top:7.0cqw 는 캡슐을 홈보다 위로 띄웠다(cy 15.0 vs 시안 16.3). */
+  --wcap-w: 42.3cqw;
+  --wcap-h: 15.7cqw;
   position: absolute;
-  left: 50%;
-  top: 7.0cqw;                 /* 은퇴 블록의 값 그대로 — 자리는 안 바꾼다 */
-  transform: translateX(-50%);
+  left: 29.0cqw;
+  top: 8.4cqw;
   width:  var(--wcap-w);
   height: var(--wcap-h);
   z-index: 1;
@@ -57330,7 +57342,12 @@ else window.addEventListener("load",start);
   display: flex;
   align-items: flex-start;
   gap: 6px;
-  margin: 0 calc(var(--safe-r) + 8px) 4px calc(var(--safe-l) + 8px);
+  /* [B · 0905] 컨테이너 = 시안 폭. 종전 좌우 8px 여백이 컨테이너를 374 로 줄여
+     cqw(=컨테이너 1%)가 시안 %W(390 기준)보다 0.959배 작았다 — 판·캡슐이 함께
+     ~4%W 좁아 시안과 어긋났다. 여백을 안전영역만 남기고 0 으로 내리면 컨테이너
+     = 화면 폭(390)이라 cqw = %W 가 되어 판(x1.04% w98.2%)·캡슐·방울이 시안 절대
+     좌표에 정확히 앉는다. 판 자체의 4px 들여쓰기는 left:1.04cqw 가 이미 갖는다. */
+  margin: 0 var(--safe-r) 4px var(--safe-l);
 
   /* --- 임시 코드 스킨. 에셋 도착 시 갈아 끼우는 칸은 여기가 전부다 --- */
   --duel-foe-frame: none;
@@ -58543,9 +58560,8 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
    -> `.wf-cap` 의 border-radius:calc(--wcap-h*.5) 붕괴 -> 알약 소멸(숫자만).
    .wf-cap 실루엣 자체는 이미 @supports(clip-path:shape()) 폴백(스타디움
    border-radius + box-shadow 림/겉선/광)을 갖고 있어, 여기서는 **cqw 를 못 읽는
-   경로에만** vw 등가값을 준다(컨테이너 = 시안 폭이라 cqw≈vw, Δ≈0px). cqw 지원
+   경로에만** vw 등가값을 준다(컨테이너 = 시안 폭이라 cqw≈vw, Δ≈2px). cqw 지원
    브라우저에서는 이 블록이 통째로 무효(@supports not)라 정식 경로가 그대로 이긴다.
-   폴백 강제 렌더(cqw 를 invalid 로 치환) 실측: 판·캡슐·방울 좌표가 정식과 0px 일치.
    ============================================================================ */
 @supports not (width: 1cqw) {
   /* 판 두 장(모험·클래식 공유) */
@@ -58564,7 +58580,7 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
   #app.classic #ch-castle{ top:0.4vw; width:9.9vw; }
   #app.classic #classic-hud #ch-baby{ left:73.5vw; top:6.2vw; width:7.8vw; }
   #app.classic #ch-cap-v{ padding:0 2.2vw; }
-  /* 클래식 내용물(미션·점수 알약 · 게이지) 세로 자리 = D 와 같은 판 안쪽 값 */
+  /* 클래식 내용물(미션·점수 알약 · 게이지) 세로 자리 */
   #app.classic #classic-hud .ch-g{ --f2-ph:6.9vw; top:20.5vw; gap:1.0vw; padding:0 1.8vw; }
   #app.classic #classic-hud .ch-g .ch-i{ width:3.8vw; height:3.8vw; }
   #app.classic #classic-hud .ch-t{ --f2-gh:3.6vw; top:28.5vw; }
