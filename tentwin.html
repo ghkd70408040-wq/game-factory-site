@@ -58042,8 +58042,12 @@ else window.addEventListener("load",start);
 /* 위 판 — 시안 bbox: x1.04% w98.2% h17.55% (%W) */
 #app.battle #duel-hud .dh-plate--top,
 #app.classic #classic-hud .dh-plate--top{
-  left:1.04cqw; top:0; width:98.2cqw; height:17.55cqw;
-  background-image:url("catalog/hud-plate-top.webp");
+  /* [단계 D · 0905] 위 판 + 캡슐 껍데기 **한 장**(시안 접합 그대로). bbox = 위 판 +
+     캡슐 아래 끝까지: 시안 y0~408/608 = %W 24.1%. z-index:1 로 아래 판(--bot z:0)
+     위에 서서 캡슐 아랫부분이 판 위로 올라온다(시안: 캡슐이 판 앞). */
+  left:1.04cqw; top:0; width:98.2cqw; height:24.1cqw;
+  z-index:1;
+  background-image:url("catalog/hud-plate-top-cap.webp");
 }
 /* 아래 판 — 시안 bbox: x1.47% w97.5% 어깨 top 19.2%~바닥 33.6% (%W) */
 #app.battle #duel-hud .dh-plate--bot,
@@ -58317,6 +58321,31 @@ else window.addEventListener("load",start);
   letter-spacing:.02em;
   z-index:1;
 }
+/* [단계 D · 0905] 캡슐은 이제 위 판 자산(hud-plate-top-cap.webp)이 그린다. HUD
+   타이머(#duel-timer)·클래식 캡슐(#ch-cap)의 .wf-cap **그림층 전부**를 HUD 스코프
+   에서만 끈다 — 면·광택(background) · 측면 림(::before) · 겉선(::after) · 폴백
+   box-shadow 링/알약(border-radius). 컨테이너는 글리프만 담는 투명 상자로 남고,
+   자리·크기(left29/top8.4/w42.3/h15.7cqw)는 그대로라 글리프가 자산 캡슐 안 중앙에
+   선다. 캐릭창·모달 제목 캡슐(.wf-cap)은 무접촉. 폴백(shape/cqw 미지원)도 동일. */
+#app.battle #duel-timer.wf-cap,
+#app.classic #classic-hud #ch-cap.wf-cap{
+  background:none !important;
+  box-shadow:none !important;
+  border:0 !important;
+  border-radius:0 !important;
+  clip-path:none !important;
+  -webkit-backdrop-filter:none !important;
+  backdrop-filter:none !important;
+}
+#app.battle #duel-timer.wf-cap::before,
+#app.battle #duel-timer.wf-cap::after,
+#app.classic #classic-hud #ch-cap.wf-cap::before,
+#app.classic #classic-hud #ch-cap.wf-cap::after{
+  display:none !important;
+  content:none !important;
+  background:none !important;
+  box-shadow:none !important;
+}
 /* ---- 3. HP 바 두 장 = 한 캡슐 ----------------------------------------------
    .dh-side 는 이제 **조각 한 장의 상자 그 자체**다(픽셀 좌표 = 이 상자의 %).
    그래서 아래의 트랙·명패 좌표는 전부 조각 기준 실측값을 그대로 쓴다.
@@ -58568,7 +58597,7 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
   #app.battle #duel-hud .dh-plate,
   #app.classic #classic-hud .dh-plate{ filter:drop-shadow(0 1.4vw 1.0vw rgba(46,20,58,.20)); }
   #app.battle #duel-hud .dh-plate--top,
-  #app.classic #classic-hud .dh-plate--top{ left:1.04vw; width:98.2vw; height:17.55vw; }
+  #app.classic #classic-hud .dh-plate--top{ left:1.04vw; width:98.2vw; height:24.1vw; }
   #app.battle #duel-hud .dh-plate--bot,
   #app.classic #classic-hud .dh-plate--bot{ left:1.47vw; top:19.2vw; width:97.5vw; height:14.4vw; }
   /* 모험 캡슐 = 위 판 홈 (핵심) */
