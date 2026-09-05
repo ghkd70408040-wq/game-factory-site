@@ -58536,6 +58536,39 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
   #app.chill #board::after { animation: none; }
   #app.battle #duel-foe-av.foewarn { animation: none; filter: drop-shadow(0 0 10px rgba(255, 61, 46, .9)); }
 }
+/* ============================================================================
+   [기기 폴백 · 0905] cqw(컨테이너 질의 길이) 미지원 브라우저 대비 — 실기기 반려
+   (Android Chrome, 784aa42c)에서 캡슐 알약이 안 그려지고 숫자만 뜬 결함.
+   원인: `width:42.3cqw`·`--wcap-w:42.3cqw` 가 cqw 미지원 시 invalid -> width auto
+   -> `.wf-cap` 의 border-radius:calc(--wcap-h*.5) 붕괴 -> 알약 소멸(숫자만).
+   .wf-cap 실루엣 자체는 이미 @supports(clip-path:shape()) 폴백(스타디움
+   border-radius + box-shadow 림/겉선/광)을 갖고 있어, 여기서는 **cqw 를 못 읽는
+   경로에만** vw 등가값을 준다(컨테이너 = 시안 폭이라 cqw≈vw, Δ≈0px). cqw 지원
+   브라우저에서는 이 블록이 통째로 무효(@supports not)라 정식 경로가 그대로 이긴다.
+   폴백 강제 렌더(cqw 를 invalid 로 치환) 실측: 판·캡슐·방울 좌표가 정식과 0px 일치.
+   ============================================================================ */
+@supports not (width: 1cqw) {
+  /* 판 두 장(모험·클래식 공유) */
+  #app.battle #duel-hud .dh-plate,
+  #app.classic #classic-hud .dh-plate{ filter:drop-shadow(0 1.4vw 1.0vw rgba(46,20,58,.20)); }
+  #app.battle #duel-hud .dh-plate--top,
+  #app.classic #classic-hud .dh-plate--top{ left:1.04vw; width:98.2vw; height:17.55vw; }
+  #app.battle #duel-hud .dh-plate--bot,
+  #app.classic #classic-hud .dh-plate--bot{ left:1.47vw; top:19.2vw; width:97.5vw; height:14.4vw; }
+  /* 모험 캡슐 = 위 판 홈 (핵심) */
+  #app.battle #duel-timer{ left:29.0vw; top:8.4vw; width:42.3vw; height:15.7vw; --wcap-w:42.3vw; --wcap-h:15.7vw; }
+  /* 모험 펫 방울 */
+  #app.battle #duel-baby{ left:84.8vw; top:1.6vw; width:13vw; }
+  /* 클래식 캡슐 · 성 · 방울 */
+  #app.classic #ch-cap{ left:29.0vw; top:8.4vw; width:42.3vw; height:15.7vw; --wcap-w:42.3vw; --wcap-h:15.7vw; }
+  #app.classic #ch-castle{ top:0.4vw; width:9.9vw; }
+  #app.classic #classic-hud #ch-baby{ left:73.5vw; top:6.2vw; width:7.8vw; }
+  #app.classic #ch-cap-v{ padding:0 2.2vw; }
+  /* 클래식 내용물(미션·점수 알약 · 게이지) 세로 자리 = D 와 같은 판 안쪽 값 */
+  #app.classic #classic-hud .ch-g{ --f2-ph:6.9vw; top:20.5vw; gap:1.0vw; padding:0 1.8vw; }
+  #app.classic #classic-hud .ch-g .ch-i{ width:3.8vw; height:3.8vw; }
+  #app.classic #classic-hud .ch-t{ --f2-gh:3.6vw; top:28.5vw; }
+}
 </style>
 </body>
 </html>
