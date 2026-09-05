@@ -12904,6 +12904,11 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
             `.ch-g` 알약이 "값", `.ch-t` 가 "채움"이다. 시안이 그 둘을 위·아래로
             나눠 놓았고, 알약 안에 막대를 넣으면 4.0cqw 글자가 설 자리가 없다. -->
     <div id="classic-hud" hidden aria-hidden="true">
+      <!-- 단계 C(0905) — 클래식도 모험과 같은 베이스: 판 2장 + sky 캡슐 + sky 방울.
+           내용물(미션·점수·게이지)만 클래식 것. -->
+      <i class="dh-plate dh-plate--top" aria-hidden="true"></i>
+      <i class="dh-plate dh-plate--bot" aria-hidden="true"></i>
+      <span id="ch-baby" class="dh-baby cp-th kit-chip-v2" aria-hidden="true"><i class="ct-art" aria-hidden="true"></i></span>
       <div class="ch-fx" aria-hidden="true"><i class="ch-gnd"></i><i class="ch-jelly"></i></div>
       <i id="ch-castle" aria-hidden="true"></i>
       <div id="ch-cap" class="wf-cap"><span id="ch-cap-v">0</span></div>
@@ -26451,6 +26456,13 @@ window.TT_SFX = {
       var chL0 = $('ch-l');
       if (chL0 && chL0.classList) chL0.classList.remove('low');
       return;
+    }
+    /* 단계 C(0905) — 클래식 펫 방울: 선택 펫 face 를 주입한다(모험 방울과 같은
+       `--char-thumb` 규약·같은 부품). 펫 선택 JS 는 건드리지 않고 값만 읽는다. */
+    var chBaby = $('ch-baby');
+    if (chBaby && chBaby.style) {
+      var pf = stdArt(mateId(), 'face');
+      chBaby.style.setProperty('--char-thumb', pf || 'url("catalog/duel-cloud-baby.webp")');
     }
     var timed = isRush() || isDaily();
     var sec = isRush() ? Math.ceil(rushLeftMs() / 1000)
@@ -45598,14 +45610,19 @@ html[lang="en"] .splash-logo{
 #classic-hud[hidden]{ display:none !important; }
 #app.classic #classic-hud{
   display:block;
-  position:relative;
+  /* [단계 C · 0905] 클래식도 모험과 **같은 베이스**(판 2장). 종전 밴드 한 장
+     (aspect 1695/298 · glass-band-v2)을 걷고 #duel-hud 와 같은 aspect 1536/500 +
+     판 2장 부품(.dh-plate)으로 간다. position:relative 는 absolute 자식 컨테이닝
+     블록용(밴드 filter 를 걷으므로 명시). */
+  position:relative !important;
   flex:0 0 auto;
-  /* 위쪽 여백이 캡슐 돌출분을 미리 비운다 — 그래야 캡슐이 상단바를 안 침범한다. */
   margin:30px calc(var(--safe-r) + 8px) 2px calc(var(--safe-l) + 8px);
-  aspect-ratio:1695/298;
+  aspect-ratio:1536/500;
   height:auto;
   overflow:visible;
   container-type:inline-size;
+  background-image:none !important;
+  filter:none !important;
   /* 🚨 부재는 slab 이 아니라 **plate** 다. 첫 배선은 slab 을 썼는데 실렌더에서
      띠가 거의 안 보였다: slab 은 본문 알파가 8 근처인 "거의 투명한 유리"라
      66px 높이(원본 300px 의 22%)로 줄면 림이 1px 이 되어 사라진다.
@@ -45628,39 +45645,40 @@ html[lang="en"] .splash-logo{
      `background-size:100% 100%` 가 세로만 원본의 1.20 배로 펴는데, 이 부재는
      세로 방향으로 균일한 서리유리 판이라 펴져도 형상이 안 바뀐다(림 두께만
      비례해 두꺼워지고, 그건 구판이 이미 서 있던 두께다). */
-  background-image:url("catalog/glass-band-v2.webp");
-  background-repeat:no-repeat;
-  background-position:center top;
-  background-size:100% 100%;
-  filter:drop-shadow(0 2px 5px rgba(46,20,58,.30));
 }
-/* 가운데 캡슐 — 폭 43.816% 는 전투 HUD 와 **같은 값**이다(같은 원판의 같은 부재).
-   plate 높이 = 원판 298 = 캡슐 높이와 같으므로 height:100% 가 곧 원본 비율이다. */
-#app.classic #classic-hud::after,
+/* [단계 C · 0905] 클래식 캡슐 = 모험 타이머와 **같은 부품 .wf-cap(sky)** — 위 판
+   홈 자리(시안 bbox 29%/8.4%/42.3%/15.7% = cqw). 종전 ::after glass-capsule-v4
+   이미지 캡슐 + 밴드 좌표(28.3%/-57.4%/43.8%)는 걷었다 — 부품이 그린다. */
+#app.classic #classic-hud::after{ content:none !important; }
 #app.classic #ch-cap{
   position:absolute;
-  left:28.328%;
-  width:43.816%;
-  top:-57.4%;
-  height:100%;
-}
-#app.classic #classic-hud::after{
-  content:"";
-  /* W-C2 — 구판 봉인: background-image:url("catalog/glass-hud-capsule-st.webp");
-     W-E — 캡 잘린 v3 봉인: background-image:url("catalog/glass-capsule-v3.webp"); */
-  background-image:url("catalog/glass-capsule-v4.webp");
-  background-repeat:no-repeat;
-  background-position:center;
-  background-size:100% 100%;
-  pointer-events:none;
-  z-index:0;
-}
-#app.classic #ch-cap{
+  left:29.0cqw; top:8.4cqw;
+  width:42.3cqw; height:15.7cqw;
+  --wcap-w:42.3cqw; --wcap-h:15.7cqw;
+  --wcap-face:#96A7F6; --wcap-face-top:#A2B2F8; --wcap-a-in:.657;
+  --wcap-L3-line:#6F6BB4; --wcap-rim-c:#C2D6FF; --wcap-glow-c:#B4CBF5;
   display:flex;
   align-items:center;
   justify-content:center;
   z-index:1;
   pointer-events:none;
+}
+/* [단계 C] 클래식 펫 방울 = 모험 방울과 같은 부품·같은 sky 재질·같은 자리. */
+#app.classic #classic-hud #ch-baby{
+  position:absolute;
+  left:84.8cqw; top:1.6cqw;
+  width:13cqw; aspect-ratio:1; height:auto;
+  --f2-ref-w: min(100vw, 480px);
+  z-index:3;
+  --wchip-L3-line:#6F6BB4;
+  --wchip-glow-c:#B4CBF5;
+  box-shadow:
+    inset 0 0 0 var(--wchip-L3-w) color-mix(in srgb, var(--wchip-L3-line)
+      calc(var(--wchip-L3-a) * 100%), transparent),
+    inset 0 0 0 calc(var(--wchip-rim-in) + var(--wchip-rim-w))
+      rgba(194,214,255, var(--wchip-rim-p1)),
+    inset 0 0 0 var(--wchip-rim-tc) rgba(194,214,255, var(--wchip-rim-p2)),
+    inset 0 0 0 var(--wchip-rim-td) rgba(194,214,255, var(--wchip-rim-p3));
 }
 #app.classic #ch-cap-v{
   font-family:var(--font-display);
@@ -48270,6 +48288,7 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
 /* HUD 펫 방울(#duel-baby)도 이 공용 방울 규칙을 쓴다 — #charpanel 스코프를 방울
    부품 공용으로 풀되, #charpanel 셀렉터는 그대로라 캐릭창 렌더는 무변(픽셀 대조). */
 #app.battle #duel-baby,
+#app.classic #classic-hud #ch-baby,
 #charpanel .cp-th,
 #charpanel #mate-pick .char-card {
   flex: 0 0 auto;
@@ -48281,6 +48300,7 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   scroll-snap-align: center;
 }
 #app.battle #duel-baby .ct-art,
+#app.classic #classic-hud #ch-baby .ct-art,
 #charpanel .cp-th .ct-art,
 #charpanel #mate-pick .char-card .cc-art {
   position: absolute;
@@ -54815,6 +54835,7 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
    같은 wf-chip 겉선·림·글로·광택 한 벌(부품 공용). --f2-ref-w/--f2-cd 는 방울
    기하 규칙(#app.battle #duel-baby)이 랙과 같은 값으로 넣어 준다. */
 #app.battle #duel-baby,
+#app.classic #classic-hud #ch-baby,
 #charpanel .cp-th,
 #charpanel #mate-pick .char-card{
   --wchip-w: var(--f2-cd);
@@ -57966,6 +57987,11 @@ else window.addEventListener("load",start);
      그 역할이 사라져 조각들이 #screen-game 기준으로 폭발한다. 여기서 position 으로
      같은 컨테이닝 블록을 명시적으로 세운다(컨테이너 질의는 아래 그대로 유지). */
   position:relative !important;
+  /* container-type 도 !important 로 못 박는다 — 57933 의 inline-size 가 어딘가에
+     눌려(실측: 계산값 normal) #duel-hud 자식 cqw 가 부모(#screen-game 390)로
+     새어 나갔다. 클래식 #classic-hud(제 폭 374 컨테이너)와 기준을 맞춰 판·캡슐·
+     방울이 두 모드에서 픽셀 동일하도록 여기서 강제한다(제 폭 374 기준). */
+  container-type:inline-size !important;
   border-image-source:none !important;
   border-width:0 !important;
   background-color:transparent !important;
@@ -57973,7 +57999,11 @@ else window.addEventListener("load",start);
   -webkit-backdrop-filter:none !important;
   backdrop-filter:none !important;
 }
-#app.battle #duel-hud .dh-plate{
+/* 판 부품은 모험(#duel-hud)·클래식(#classic-hud) 두 HUD가 **같은 규칙·같은 cqw
+   값**으로 공유한다 → 판 픽셀 동일(단계 C). 두 컨테이너 모두 폭이 같고
+   container-type:inline-size 라 cqw 가 같은 px 로 푼다. */
+#app.battle #duel-hud .dh-plate,
+#app.classic #classic-hud .dh-plate{
   position:absolute;
   z-index:0;                     /* 조각(대개 z-index:1~3 또는 DOM 뒤)보다 아래 */
   pointer-events:none;
@@ -57982,12 +58012,14 @@ else window.addEventListener("load",start);
   filter:drop-shadow(0 1.4cqw 1.0cqw rgba(46,20,58,.20));
 }
 /* 위 판 — 시안 bbox: x1.04% w98.2% h17.55% (%W) */
-#app.battle #duel-hud .dh-plate--top{
+#app.battle #duel-hud .dh-plate--top,
+#app.classic #classic-hud .dh-plate--top{
   left:1.04cqw; top:0; width:98.2cqw; height:17.55cqw;
   background-image:url("catalog/hud-plate-top.webp");
 }
 /* 아래 판 — 시안 bbox: x1.47% w97.5% 어깨 top 19.2%~바닥 33.6% (%W) */
-#app.battle #duel-hud .dh-plate--bot{
+#app.battle #duel-hud .dh-plate--bot,
+#app.classic #classic-hud .dh-plate--bot{
   left:1.47cqw; top:19.2cqw; width:97.5cqw; height:14.4cqw;
   background-image:url("catalog/hud-plate-bottom.webp");
 }
