@@ -12945,6 +12945,10 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
          올리면 #boss-bar/#boss-hp-fill 의 --hp 와 이름이 겹친다(전투 밖이 바뀐다).
          구판 마크업 봉인은 _backup/0826/tentwin.phase3-hud-pre.html 이다. -->
     <div id="duel-hud" class="jbox jbox--slab" hidden>
+      <!-- 단계 B(0905) — 시안 실루엣 판 2장(위/아래). 슬래브 한 장 대신 이 둘이
+           바탕이 되고, 나머지 조각은 이전 배포 위치 그대로 이 위에 얹힌다. -->
+      <i class="dh-plate dh-plate--top" aria-hidden="true"></i>
+      <i class="dh-plate dh-plate--bot" aria-hidden="true"></i>
       <span id="duel-foe-av" class="dh-av boss-av bs-grape" aria-hidden="true"></span>
       <span id="duel-me-av" class="dh-av dh-av-me" aria-hidden="true"></span>
       <!-- 펫 방울 = 캐릭창 랙 방울 부품 재사용(원형 젤리 kit-chip-v2 + .ct-art 얼굴).
@@ -57950,6 +57954,43 @@ else window.addEventListener("load",start);
   height:auto;
   overflow:visible;
 }
+/* ============================================================================
+   단계 B (0905) — 판 1·2 조립. 슬래브 한 장(.jbox--slab border-image + tint)을
+   시안 실루엣 판 2장(위/아래)으로 교체한다. .jbox 프레임/틴트/필터를 걷고
+   판 두 장(#duel-hud 자식 .dh-plate)이 바탕이 된다. 자리는 시안 bbox(%W = cqw,
+   #duel-hud container-type:inline-size). 나머지 조각은 이전 배포 위치 그대로.
+   ============================================================================ */
+#app.battle #duel-hud{
+  /* position:relative 를 !important 로 못 박는다 — 종전엔 .jbox 의 filter(드롭섀도)가
+     absolute 자식의 컨테이닝 블록을 세우고 있었는데, 아래서 그 filter 를 걷으면
+     그 역할이 사라져 조각들이 #screen-game 기준으로 폭발한다. 여기서 position 으로
+     같은 컨테이닝 블록을 명시적으로 세운다(컨테이너 질의는 아래 그대로 유지). */
+  position:relative !important;
+  border-image-source:none !important;
+  border-width:0 !important;
+  background-color:transparent !important;
+  filter:none !important;
+  -webkit-backdrop-filter:none !important;
+  backdrop-filter:none !important;
+}
+#app.battle #duel-hud .dh-plate{
+  position:absolute;
+  z-index:0;                     /* 조각(대개 z-index:1~3 또는 DOM 뒤)보다 아래 */
+  pointer-events:none;
+  background-repeat:no-repeat;
+  background-size:100% 100%;
+  filter:drop-shadow(0 1.4cqw 1.0cqw rgba(46,20,58,.20));
+}
+/* 위 판 — 시안 bbox: x1.04% w98.2% h17.55% (%W) */
+#app.battle #duel-hud .dh-plate--top{
+  left:1.04cqw; top:0; width:98.2cqw; height:17.55cqw;
+  background-image:url("catalog/hud-plate-top.webp");
+}
+/* 아래 판 — 시안 bbox: x1.47% w97.5% 어깨 top 19.2%~바닥 33.6% (%W) */
+#app.battle #duel-hud .dh-plate--bot{
+  left:1.47cqw; top:19.2cqw; width:97.5cqw; height:14.4cqw;
+  background-image:url("catalog/hud-plate-bottom.webp");
+}
 /* 비전투 3모드의 0px 계약을 이중으로 못 박는다 — duelHudUnmount() 는 hidden 만
    세우고 .battle 을 같은 프레임에 벗기지 않는 경로가 있다. */
 #app.battle #duel-hud[hidden]{display:none !important;}
@@ -58132,8 +58173,9 @@ else window.addEventListener("load",start);
    타원이었다 — 랙 방울은 정원이므로 `aspect-ratio:1`로 폭을 지름 삼아 정원을 낸다
    (윗변 고정, 폭 무변). */
 #app.battle #duel-baby{
-  left:85.75%;top:5.07%;
-  width:12.70%;aspect-ratio:1;height:auto;
+  /* [단계 B · 0905] 자리 = 우상단(시안 bbox): 중심 91.3%/8.1% 지름 13% (%W=cqw). */
+  left:84.8cqw;top:1.6cqw;
+  width:13cqw;aspect-ratio:1;height:auto;
   /* wf-chip 재질(위 #charpanel .cp-th 그룹)이 겉선·림 두께를 이 자로 잰다 — 랙
      방울과 같은 값. --f2-cd 는 kit-chip-v2 가 --f2-w 로 이미 준다(랙과 동일). */
   --f2-ref-w: min(100vw, 480px);
@@ -58189,8 +58231,9 @@ else window.addEventListener("load",start);
    되어 시안보다 둥글어진다. */
 #app.battle #duel-timer{
   position:absolute;
-  left:31.50%;top:19.50%;
-  width:39.50% !important;height:50.50%;
+  /* [단계 B · 0905] 자리 = 위 판 홈(시안 bbox): x29.0% y8.4% w42.3% h15.7% (%W=cqw). */
+  left:29.0cqw;top:8.4cqw;
+  width:42.3cqw !important;height:15.7cqw;
   margin:0 !important;padding:0 !important;
   display:flex;align-items:center;justify-content:center;
   /* 반경은 부품 .wf-cap 이 스타디움(R=높이/2)으로 못 박는다 — 종전 15%/36% 각진
@@ -58201,8 +58244,8 @@ else window.addEventListener("load",start);
      [단계 A · 0905] 색 = **판 1 기준 재질(sky 변주)** — material-measure-B(L*+5%):
      면 (150,167,246) #96A7F6 · α .657 · 림 피크 (194,214,255) #C2D6FF · 겉선 #6F6BB4.
      HUD 안에서만 덮는다(캐릭창 캡슐 무변). 종전 #cp-h 연보라는 이 sky 로 대체. */
-  --wcap-w:39.5cqw;
-  --wcap-h:16.44cqw;
+  --wcap-w:42.3cqw;
+  --wcap-h:15.7cqw;
   --wcap-face:#96A7F6;
   --wcap-face-top:#A2B2F8;
   --wcap-a-in:.657;
