@@ -28327,8 +28327,16 @@ window.TT_SFX = {
     var mrow = document.querySelector('#charpanel .pick-row.pick-mate');
     if (mrow) {
       var pid = cpPetId();
-      cpCenter(mrow, document.querySelector('#mate-pick .char-card[data-char="' +
-               (pid || '') + '"]') || mrow.querySelector('[aria-checked="true"]'));
+      if (!pid) {
+        /* P0(0905) '없음'(기본값)일 때는 가운데 맞추지 않고 맨 앞으로 돌린다.
+           '없음' 카드가 목록 **끝**이라 그것을 센터에 두면 scrollLeft 가 끝까지
+           밀려 보유 펫(맨 앞 삐약·뭉치)이 왼쪽으로 사라진다. 맨 앞으로 두면
+           보유 펫이 곧바로 보인다(고른 펫이 있으면 아래 else 가 그것을 센터). */
+        mrow.scrollLeft = 0;
+      } else {
+        cpCenter(mrow, document.querySelector('#mate-pick .char-card[data-char="' +
+                 pid + '"]') || mrow.querySelector('[aria-checked="true"]'));
+      }
     }
   }
 
@@ -49768,7 +49776,14 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
 #charpanel[data-cptab="pet"] .cp-info > .ci:not(#cp-petinfo) { display: none; }
 #charpanel[data-cptab="pet"] .cp-rack { display: none; }
 #charpanel:not([data-cptab="pet"]) .pick-row.pick-mate { display: none; }
-#charpanel[data-cptab="pet"] .pick-row.pick-mate { display: flex; }
+/* P0(0905) 펫 줄은 flex-start 로 편다. 공유 밴드 규칙(#charpanel .cp-rack,
+   .pick-row.pick-mate)은 justify-content:center 인데, 펫 카드 11장(펫 10 + 없음)이
+   밴드 폭(374px)을 넘어 넘칠 때 center 는 넘친 왼쪽 끝을 scrollLeft 로도 못 닿게
+   가둔다(실측: scrollLeft 0 에서도 삐약 x=-82). 그래서 보유 펫(맨 앞 삐약·뭉치)이
+   화면 밖으로 사라져 "펫이 전부 없어졌다"로 읽혔다. flex-start 면 왼쪽 끝이
+   scrollLeft 0 에서 닿는다(삐약 x=19). 캐릭터 랙(#cp-rack)은 transform 캐러셀이라
+   이 규칙의 대상이 아니다. */
+#charpanel[data-cptab="pet"] .pick-row.pick-mate { display: flex; justify-content: flex-start; }
 
 /* ---- 바닥 두 버튼 -------------------------------------------------------- */
 #charpanel .cp-foot {
