@@ -12954,7 +12954,7 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
            #duel-timer 의 유리겹이 z-index:-1 이라 그 -1 을 여기 가둬 둔다. -->
       <div class="dh-mid">
         <span class="dh-castle" aria-hidden="true">&#127984;</span>
-        <div id="duel-timer" role="timer">0:00</div>
+        <div id="duel-timer" class="wf-cap" role="timer">0:00</div>
       </div>
       <div class="dh-side dh-foe">
         <b id="duel-foe-name" class="dh-name"></b><span id="duel-foe-lv" class="dh-lv">Lv.1</span>
@@ -57453,23 +57453,15 @@ else window.addEventListener("load",start);
   background-position: center;
   background-repeat: no-repeat;
 }
-/* 젤리 유리 캡슐. 시안 중앙의 그 캡슐이고, 아트가 오면 --duel-cap-frame 이 덮는다. */
+/* 타이머 캡슐 = 캐릭창 제목 캡슐 부품(.wf-cap) 그대로 — 캡슐 그림/림/광은 부품이
+   그린다. 이 요소는 자기 캡슐을 더 이상 안 그린다(옛 --duel-cap-* 임시 스킨 은퇴).
+   글자색만 남긴다(글리프 이미지라 실사용은 없지만 danger 폴백에 쓰인다). */
 #duel-timer {
-  width: 100%;
   margin-top: 1px;
-  padding: 3px 4px 4px;
-  border-radius: 14px;
   text-align: center;
   font: 900 21px/1 var(--font-latin);
   letter-spacing: .5px;
   color: var(--duel-tm-color);
-  background-image: var(--duel-cap-frame), var(--duel-cap-bg);
-  background-size: 100% 100%, auto;
-  background-repeat: no-repeat, repeat;
-  box-shadow:
-    inset 0 0 0 1.5px rgba(255, 255, 255, .62),
-    inset 0 3px 7px rgba(255, 255, 255, .34),
-    0 2px 7px rgba(0, 0, 0, .22);
   text-shadow: 0 1px 0 rgba(255, 255, 255, .55), 0 2px 3px rgba(0, 0, 0, .22);
 }
 /* 마지막 10초의 박동은 #rush-timer 와 **같은 keyframes** 를 쓴다 — 시계가 자리를
@@ -57643,58 +57635,32 @@ else window.addEventListener("load",start);
    컨텍스트(z-index:0)를 세워 그 -1 이 화면 배경까지 내려가지 않게 묶는다.
    글자 그라데이션은 팝업 제목에서 검증된 롱핸드 패턴 그대로다(@supports 폴백). */
 #app.battle .dh-mid{position:relative;z-index:0;}
+/* 캡슐 그림/림/광은 이제 부품(.wf-cap)이 요소 배경·box-shadow·::before/::after 로
+   그린다 — 종전의 `background:none!important; box-shadow:none!important; border-radius`
+   억제 줄은 그 부품 페인트를 지워 버리므로 걷었다. 글자색·그림자만 남긴다. */
 #app.battle #duel-timer{
-  position:relative;
-  background:none !important;background-image:none !important;
-  box-shadow:none !important;
-  padding:4px 6px 5px !important;
-  border-radius:16px !important;
   font-size:22px !important;
   color:var(--duel-tm-color) !important;
   text-shadow:0 1px 0 rgba(255,255,255,.62),0 2px 4px rgba(70,40,90,.35);
 }
-#app.battle #duel-timer::before{
-  content:"";position:absolute;inset:0;z-index:-1;
-  border-radius:16px;
-  background:
-    radial-gradient(ellipse 38% 26% at 22% 16%,rgba(250,247,254,.92),rgba(250,247,254,0) 70%),
-    radial-gradient(ellipse 12% 9% at 74% 12%,rgba(250,247,254,.72),rgba(250,247,254,0) 72%),
-    radial-gradient(ellipse 40% 24% at 82% 92%,rgba(221,219,255,.42),rgba(221,219,255,0) 74%),
-    linear-gradient(180deg,rgba(238,237,255,.80) 0%,rgba(214,211,238,.62) 38%,
-      rgba(196,192,218,.56) 72%,rgba(168,164,204,.62) 100%);
-  -webkit-backdrop-filter:blur(7px) saturate(1.5) brightness(1.12);
-  backdrop-filter:blur(7px) saturate(1.5) brightness(1.12);
-  box-shadow:
-    inset 0 0 0 1.5px rgba(255,255,255,.86),
-    inset 0 3px 6px rgba(255,255,255,.54),
-    inset 0 -6px 12px rgba(89,86,141,.30),
-    0 2px 7px rgba(41,26,66,.34);
-}
-@supports ((-webkit-background-clip:text) or (background-clip:text)){
-  #app.battle #duel-timer{
-    background-image:linear-gradient(180deg,#FFF4C0 0%,#FFE585 22%,#FDC377 50%,
-      #FD9A78 74%,#FB7E93 100%) !important;
-    background-color:transparent !important;
-    -webkit-background-clip:text !important;background-clip:text !important;
-    color:transparent !important;-webkit-text-fill-color:transparent !important;
-    text-shadow:none;
-    /* filter 를 걸지 않는 것이 이 절의 함정이다: filter 는 스태킹 컨텍스트를
-       만들고, 그 순간 z-index:-1 인 유리 겹이 **요소 배경(=글자 젤리) 위로**
-       올라와 숫자를 덮는다(실측 — 숫자가 뿌옇게 죽었다). 그래서 윤곽은
-       drop-shadow 가 아니라 획(text-stroke)이 만든다. */
-    -webkit-text-stroke:1px rgba(177,100,84,.80);
-    paint-order:stroke fill;
-  }
-}
+/* 캡슐 유리겹(측면 림 ::before · 외곽선 ::after)은 이제 부품 .wf-cap 이 그린다 —
+   여기 있던 남보라 ::before 임시 유리(4겹 그라데+backdrop)는 부품 ::before 를
+   덮어 버리므로 걷어 은퇴했다. (되돌리기: .wf-cap 클래스를 빼고 이 ::before 를
+   남보라 스킨으로 되살린다.) */
+/* 은퇴 — 옛 「젤리 숫자」 텍스트-클립 그라데이션. 시계 숫자는 이제 자식 <i>
+   tmr-*.webp 그림이라 그릴 글자 노드가 없고, 이 블록의 `background-image ... !important`
+   `background-clip:text` 는 요소 배경(= .wf-cap 캡슐 광택)을 덮어 지워 버린다.
+   그래서 통째로 걷었다(캡슐 유리는 부품이, 숫자는 그림 글리프가 그린다). */
 /* 마지막 10초. 여기서는 **젤리 클립을 아예 내린다**: rushbeat 가 transform 을
    애니메이션하는 순간 #duel-timer 가 스태킹 컨텍스트가 되고, 그러면 z-index:-1
    유리 겹이 요소 배경(=글자 젤리) 위로 올라와 숫자가 뿌옇게 죽는다(실측).
    글자를 **내용**으로 되돌리면 어떤 쌓임 순서에서도 유리 위에 선다 —
    그리고 마지막 10초에 필요한 것은 그라데이션이 아니라 붉은 한 톤이다. */
+/* 마지막 10초 danger — 캡슐(부품 .wf-cap)은 그대로 두고 글자색만 붉게. 종전
+   `background-image:none!important` 는 캡슐 광택을 지우므로 걷었다(숫자는 그림
+   글리프라 색은 이미지가 쥔다 — 이 색 선언은 텍스트 폴백용으로만 남긴다). */
 #app.danger.battle #duel-timer{
-  background-image:none !important;
   color:#FF4432 !important;-webkit-text-fill-color:#FF4432 !important;
-  -webkit-text-stroke:1px rgba(122,20,10,.55);
   text-shadow:0 1px 0 rgba(255,255,255,.55),0 2px 4px rgba(122,20,10,.35);
 }
 /* ---- 4. HP 바 유리화 ------------------------------------------------------
@@ -58173,6 +58139,22 @@ else window.addEventListener("load",start);
   --f2-ref-w: min(100vw, 480px);
   z-index:3;
 }
+/* 단계 A(0905) — 펫 방울도 판 1 기준 재질(sky 변주)로. wf-chip 유리 방울은 속색이
+   없는(면 제거) 맑은 유리라 「면」은 안 채우고(펫 초상이 그 자리를 쓴다), **겉선·림·
+   안쪽 글로**를 sky 로 옮긴다 — 겉선 #6F6BB4 · 림 흰→sky (194,214,255) · 글로 sky.
+   HUD 안에서만 덮으므로(3 id) 캐릭창 랙 방울은 무변. box-shadow 는 wf-chip 원식
+   그대로에 림 색만 흰→(194,214,255)로 바꾼 것이다. */
+#app.battle #duel-hud #duel-baby{
+  --wchip-L3-line:#6F6BB4;
+  --wchip-glow-c:#B4CBF5;
+  box-shadow:
+    inset 0 0 0 var(--wchip-L3-w) color-mix(in srgb, var(--wchip-L3-line)
+      calc(var(--wchip-L3-a) * 100%), transparent),
+    inset 0 0 0 calc(var(--wchip-rim-in) + var(--wchip-rim-w))
+      rgba(194,214,255, var(--wchip-rim-p1)),
+    inset 0 0 0 var(--wchip-rim-tc) rgba(194,214,255, var(--wchip-rim-p2)),
+    inset 0 0 0 var(--wchip-rim-td) rgba(194,214,255, var(--wchip-rim-p3));
+}
 /* .dh-mid 는 92px 짜리 flex 칸이었다 — 이제 자리를 안 차지하는 **쌓임 상자**다.
    z-index 를 auto 로 두지 않는 것이 핵심이다(0 이든 1 이든 상관없다 — 값이
    auto 만 아니면 쌓임 컨텍스트가 선다): #duel-timer 의 유리겹(z-index:-1)이
@@ -58211,13 +58193,27 @@ else window.addEventListener("load",start);
   width:39.50% !important;height:50.50%;
   margin:0 !important;padding:0 !important;
   display:flex;align-items:center;justify-content:center;
-  border-radius:15%/36% !important;
+  /* 반경은 부품 .wf-cap 이 스타디움(R=높이/2)으로 못 박는다 — 종전 15%/36% 각진
+     반경은 제거. 캡슐 부품 손잡이만 HUD 슬롯 크기로 준다(#duel-hud 는
+     container-type:inline-size 라 cqw = HUD 폭 1%):
+       --wcap-w = 폭 39.5% = 39.5cqw
+       --wcap-h = 높이 50.5% × HUD세로비(500/1536) = 16.44cqw  (스타디움 R=8.22cqw)
+     [단계 A · 0905] 색 = **판 1 기준 재질(sky 변주)** — material-measure-B(L*+5%):
+     면 (150,167,246) #96A7F6 · α .657 · 림 피크 (194,214,255) #C2D6FF · 겉선 #6F6BB4.
+     HUD 안에서만 덮는다(캐릭창 캡슐 무변). 종전 #cp-h 연보라는 이 sky 로 대체. */
+  --wcap-w:39.5cqw;
+  --wcap-h:16.44cqw;
+  --wcap-face:#96A7F6;
+  --wcap-face-top:#A2B2F8;
+  --wcap-a-in:.657;
+  --wcap-L3-line:#6F6BB4;
+  --wcap-rim-c:#C2D6FF;
+  --wcap-glow-c:#B4CBF5;
   font-size:44px !important;               /* @container 미지원 폴백 */
   font-size:14.3cqw !important;
   letter-spacing:.02em;
   z-index:1;
 }
-#app.battle #duel-timer::before{border-radius:15%/36%;}
 /* ---- 3. HP 바 두 장 = 한 캡슐 ----------------------------------------------
    .dh-side 는 이제 **조각 한 장의 상자 그 자체**다(픽셀 좌표 = 이 상자의 %).
    그래서 아래의 트랙·명패 좌표는 전부 조각 기준 실측값을 그대로 쓴다.
