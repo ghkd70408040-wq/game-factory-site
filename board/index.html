@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ko"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>게임 공장 · 관리 페이지 v1</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="board.css">
+</head><body>
+<nav class="nav">
+  <span class="brand">🏭 게임 공장</span>
+  <a href="index.html" class="on">홈</a>
+  <a href="screen-hud.html">HUD</a>
+  <a href="screen-modal.html">모달</a>
+  <a href="screen-charsel.html">캐릭창</a>
+  <a href="screen-map.html">지도</a>
+  <a href="warehouse.html">창고</a>
+  <a href="factory.html">공장</a>
+</nav>
+<div class="wrap">
+  <h1 class="title">게임 공장 — 관리 페이지 v1</h1>
+  <div class="crumb">텐트윈 · DEV-STEPS §0 그릇 · 화면 4 · 창고 · 공장 · 2026-09-06</div>
+
+  <h2 class="sec">화면 페이지</h2>
+  <div class="hub">
+    <a class="hubcard" href="screen-hud.html"><div class="hn">전투 HUD</div>
+      <div class="hd">상단 조립 + 프레임 격리</div>
+      <div class="hk">S6 원본 · S6b 클래식 · 매니페스트 hud-components.json</div></a>
+    <a class="hubcard" href="screen-modal.html"><div class="hn">모달 (게임 방법·설정·플레이)</div>
+      <div class="hd">3화면 조립 + 프레임 격리</div>
+      <div class="hk">S9 판 · S11 캡슐 정석 · S4 플레이</div></a>
+    <a class="hubcard" href="screen-charsel.html"><div class="hn">캐릭터 선택창</div>
+      <div class="hd">캐릭/펫 조립 + 프레임 격리</div>
+      <div class="hk">S5 · S11 정석 · 틀2-3/2-4 확정</div></a>
+    <a class="hubcard" href="screen-map.html"><div class="hn">스테이지 지도</div>
+      <div class="hd">맵·노드카드 조립 + 프레임 격리</div>
+      <div class="hk">🔴 미확정 (오늘까지 손 안 댐)</div></a>
+  </div>
+
+  <h2 class="sec">창고 · 공장</h2>
+  <div class="hub">
+    <a class="hubcard" href="warehouse.html"><div class="hn">창고</div>
+      <div class="hd">등록 완성 에셋 전부 · 역할별 격자</div>
+      <div class="tallyrow" id="tally"></div></a>
+    <a class="hubcard" href="factory.html"><div class="hn">공장</div>
+      <div class="hd">프레임 원형 18종 · 층 6개 레시피 + 변주</div>
+      <div class="hk">정본 work-frame.css 렌더 · 앵커 = 프레임 id</div></a>
+  </div>
+
+  <h2 class="sec">상태 도장 규칙</h2>
+  <div class="tallyrow" style="gap:16px">
+    <span><span class="st g">🟢 확정</span> 등록부·매니페스트 확정 행만</span>
+    <span><span class="st y">🟡 값만 맞춤 / 배포 자산</span> 나머지</span>
+    <span><span class="st r">🔴 미확정</span> 지도 전체</span>
+  </div>
+  <div class="crumb" style="margin-top:10px">데이터 출처: COMPONENTS.md(18종·§1.1·§1.3) · SIAN-REGISTRY.md(S#) · hud-components.json · FRAME-AUDIT-0906.md. 상태는 등록부·매니페스트에서만.</div>
+</div>
+<script>
+fetch('board-data.json').then(function(r){return r.json();}).then(function(d){
+  var v=d.catalog.filter(function(c){return c.viol;}).length;
+  var u=d.catalog.filter(function(c){return !c.used;}).length;
+  document.getElementById('tally').innerHTML='총 <b>'+d.catalog.length+'</b> · 위반 <b>'+v+'</b> · 미사용 <b>'+u+'</b>';
+}).catch(function(){});
+</script>
+</body></html>
