@@ -12992,6 +12992,7 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
       <i class="dh-plate dh-plate--bot" aria-hidden="true"></i>
       <span id="ch-baby" class="dh-baby cp-th kit-chip-v2" aria-hidden="true"><i class="ct-art" aria-hidden="true"></i></span>
       <div class="ch-fx" aria-hidden="true"><i class="ch-gnd"></i><i class="ch-jelly"></i></div>
+      <i class="dh-cap" aria-hidden="true"></i>
       <i id="ch-castle" aria-hidden="true"></i>
       <div id="ch-cap" class="wf-cap"><span id="ch-cap-v">0</span></div>
       <div id="ch-l" class="ch-g"><i class="ch-i ch-i-goal" aria-hidden="true"></i><b id="ch-l-v">0</b></div>
@@ -13036,6 +13037,16 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
            바탕이 되고, 나머지 조각은 이전 배포 위치 그대로 이 위에 얹힌다. -->
       <i class="dh-plate dh-plate--top" aria-hidden="true"></i>
       <i class="dh-plate dh-plate--bot" aria-hidden="true"></i>
+      <!-- 프레임 재배선(0906): 체력바 4층 — 홈(트랙)·눈금(코드)·장식(뼈/날개) 각 별도 요소.
+           채움/이름탭 코드는 무접촉. 장식은 좌/우 캡 각각 한 요소(늘이지 않음). -->
+      <i class="dh-track dh-track--l" aria-hidden="true"></i>
+      <i class="dh-track dh-track--r" aria-hidden="true"></i>
+      <i class="dh-orn dh-orn--fl" aria-hidden="true"></i>
+      <i class="dh-orn dh-orn--fr" aria-hidden="true"></i>
+      <i class="dh-orn dh-orn--ml" aria-hidden="true"></i>
+      <i class="dh-orn dh-orn--mr" aria-hidden="true"></i>
+      <i class="dh-tick dh-tick--l" aria-hidden="true"></i>
+      <i class="dh-tick dh-tick--r" aria-hidden="true"></i>
       <span id="duel-foe-av" class="dh-av boss-av bs-grape" aria-hidden="true"></span>
       <span id="duel-me-av" class="dh-av dh-av-me" aria-hidden="true"></span>
       <!-- 펫 방울 = 캐릭창 랙 방울 부품 재사용(원형 젤리 kit-chip-v2 + .ct-art 얼굴).
@@ -13044,6 +13055,7 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
       <!-- .dh-mid 는 자리를 차지하지 않는 **쌓임 상자**다(inset:0 · z-index:1):
            #duel-timer 의 유리겹이 z-index:-1 이라 그 -1 을 여기 가둬 둔다. -->
       <div class="dh-mid">
+        <i class="dh-cap" aria-hidden="true"></i>
         <span class="dh-castle" aria-hidden="true">&#127984;</span>
         <div id="duel-timer" class="wf-cap" role="timer">0:00</div>
       </div>
@@ -58114,6 +58126,23 @@ else window.addEventListener("load",start);
 /* 판 부품은 모험(#duel-hud)·클래식(#classic-hud) 두 HUD가 **같은 규칙·같은 cqw
    값**으로 공유한다 → 판 픽셀 동일(단계 C). 두 컨테이너 모두 폭이 같고
    container-type:inline-size 라 cqw 가 같은 px 로 푼다. */
+/* ============================================================================
+   [프레임 단위 재배선 · 0906] 교체점 1/프레임 — 합쳐 구운 top-cap 폐기.
+   COMPONENTS §1.3: 파일 하나 = 프레임 하나. 각 프레임은 아래 변수 한 개로만 교체.
+   좌표계: bbox json(1694 캔버스) → cqw = px/1694*100 (컨테이너 = HUD 폭).
+   ============================================================================ */
+:root{
+  --hud-plate-top:url("catalog/hud-plate-top.webp");       /* 위 판(민무늬, 홈·캡슐 없음) */
+  --hud-plate-bottom:url("catalog/hud-plate-bottom.webp"); /* 아래 계단 판 */
+  --hud-capsule:url("catalog/hud-capsule.webp");           /* 타이머 캡슐 프레임 */
+  --hud-capsule-mask:url("catalog/hud-capsule-mask.webp"); /* 캡슐 뒤 판 지우개(알파) */
+  --hud-groove-l:url("catalog/hud-groove-left.webp");      /* 좌 체력바 홈(트랙) */
+  --hud-groove-r:url("catalog/hud-groove-right.webp");     /* 우 체력바 홈(트랙) */
+  --hud-orn-foe:url("catalog/duel-orn-bone.webp");         /* 좌 진영 뼈 장식 */
+  --hud-orn-me:url("catalog/duel-orn-wing.webp");          /* 우 진영 날개 장식 */
+  --hud-tick-c:rgba(255,255,255,.55);                      /* 눈금 색(코드 층) */
+  --hud-tick-w:0.42cqw;                                    /* 눈금 선 폭 */
+}
 #app.battle #duel-hud .dh-plate,
 #app.classic #classic-hud .dh-plate{
   position:absolute;
@@ -58123,22 +58152,73 @@ else window.addEventListener("load",start);
   background-size:100% 100%;
   filter:drop-shadow(0 1.4cqw 1.0cqw rgba(46,20,58,.20));
 }
-/* 위 판 — 시안 bbox: x1.04% w98.2% h17.55% (%W) */
+/* 위 판 — 민무늬(홈·캡슐 없음). bbox x0 y0 w1694 h327 → L0 T0 W100 H19.30cqw.
+   캡슐은 별도 프레임(.dh-cap)이 그리고, 그 발자국은 capsule-mask 로 판에서
+   빼(subtract) 판 선·면 중복을 없앤다 — 접합부 300%에서 판 선 0, 캡슐 겉선 1줄. */
 #app.battle #duel-hud .dh-plate--top,
 #app.classic #classic-hud .dh-plate--top{
-  /* [단계 D · 0905] 위 판 + 캡슐 껍데기 **한 장**(시안 접합 그대로). bbox = 위 판 +
-     캡슐 아래 끝까지: 시안 y0~408/608 = %W 24.1%. z-index:1 로 아래 판(--bot z:0)
-     위에 서서 캡슐 아랫부분이 판 위로 올라온다(시안: 캡슐이 판 앞). */
-  left:1.04cqw; top:0; width:98.2cqw; height:25.7cqw;
+  left:0cqw; top:0; width:100cqw; height:19.30cqw;
   z-index:1;
-  background-image:url("catalog/hud-plate-top-cap.webp");
+  background-image:var(--hud-plate-top);
+  /* 마스크는 캡슐 bbox 크기로 캡슐과 같은 자리(28.10/8.09cqw, 44.10×17.65cqw)에.
+     cqw 길이 단위라 퍼센트 위치 공식(container−image) 함정을 피한다. */
+  -webkit-mask-image:linear-gradient(#000,#000), var(--hud-capsule-mask);
+          mask-image:linear-gradient(#000,#000), var(--hud-capsule-mask);
+  -webkit-mask-repeat:no-repeat,no-repeat;
+          mask-repeat:no-repeat,no-repeat;
+  -webkit-mask-position:0 0, 28.10cqw 8.09cqw;
+          mask-position:0 0, 28.10cqw 8.09cqw;
+  -webkit-mask-size:100% 100%, 44.10cqw 17.65cqw;
+          mask-size:100% 100%, 44.10cqw 17.65cqw;
+  -webkit-mask-composite:xor;        /* 레거시 웹킷: 대칭차 = 판 − 캡슐(판이 캡슐을 덮음) */
+          mask-composite:subtract;   /* 표준: 판(아래층) − 캡슐(위층) */
 }
-/* 아래 판 — 시안 bbox: x1.47% w97.5% 어깨 top 19.2%~바닥 33.6% (%W) */
+/* 아래 판 — bbox x9 y317 w1683 h279 → L0.53 T18.71 W99.35 H16.47cqw. */
 #app.battle #duel-hud .dh-plate--bot,
 #app.classic #classic-hud .dh-plate--bot{
-  left:1.47cqw; top:19.2cqw; width:97.5cqw; height:14.4cqw;
-  background-image:url("catalog/hud-plate-bottom.webp");
+  left:0.53cqw; top:18.71cqw; width:99.35cqw; height:16.47cqw;
+  background-image:var(--hud-plate-bottom);
 }
+/* 캡슐 프레임 — 위 판 위(z), 타이머/성 글리프는 그 위. bbox = 캡슐 그대로. */
+#app.battle #duel-hud .dh-cap,
+#app.classic #classic-hud .dh-cap{
+  position:absolute; pointer-events:none;
+  left:28.10cqw; top:8.09cqw; width:44.10cqw; height:17.65cqw;
+  z-index:0;                        /* 모험: .dh-mid 안에서 타이머(1)·성(3) 아래 */
+  background:var(--hud-capsule) center/100% 100% no-repeat;
+  filter:drop-shadow(0 .5cqw .5cqw rgba(46,20,58,.14));
+}
+#app.classic #classic-hud .dh-cap{ z-index:1; }  /* 클래식: 판 위, #ch-cap 글리프 아래 */
+/* ── 체력바 4층: 홈(트랙)·채움(코드)·눈금(코드)·장식(뼈/날개) — 각 별도 요소·별도 교체점 ──
+   좌표는 코드 채움(.dh-bar, 무접촉)의 실렌더 박스에 앵커한다: S6 bbox 캔버스(1694×608)는
+   HUD(1536/500)와 세로비가 달라 세로값을 그대로 못 쓴다(홈 높이 = 렌더 트랙 높이 기준). */
+#app.battle #duel-hud .dh-track,
+#app.battle #duel-hud .dh-tick,
+#app.battle #duel-hud .dh-orn{ position:absolute; pointer-events:none; background-repeat:no-repeat; }
+/* 홈(트랙) — 채움을 감싸는 프레임(--hud-groove-l/r) */
+#app.battle #duel-hud .dh-track{ z-index:3; background-size:100% 100%; }
+#app.battle #duel-hud .dh-track--l{ left:5.8cqw;  top:26.1cqw; width:40.0cqw; height:4.2cqw; background-image:var(--hud-groove-l); }
+#app.battle #duel-hud .dh-track--r{ left:60.5cqw; top:26.1cqw; width:33.6cqw; height:4.2cqw; background-image:var(--hud-groove-r); }
+/* 눈금(코드 층) — 7칸(6분할) 흰 눈금. 규칙 기하라 코드(§1.1). 교체점 --hud-tick-c/w. */
+#app.battle #duel-hud .dh-tick{
+  z-index:6; top:26.98cqw; height:2.47cqw;
+  background-image:repeating-linear-gradient(90deg,
+    transparent 0, transparent calc(100%/7 - var(--hud-tick-w)),
+    var(--hud-tick-c) calc(100%/7 - var(--hud-tick-w)), var(--hud-tick-c) calc(100%/7));
+}
+#app.battle #duel-hud .dh-tick--l{ left:7.04cqw;  width:37.5cqw; }
+#app.battle #duel-hud .dh-tick--r{ left:61.72cqw; width:31.14cqw; }
+/* 장식(뼈/날개) — 자산을 **늘이지 않고** 양끝에 자연 비율로 앉힌다. 배경 크기·위치를
+   cqw 로 고정해 두 캡 중 한 개만 창으로 보여 준다(퍼센트 위치 공식 회피). 교체점 --hud-orn-foe/me. */
+#app.battle #duel-hud .dh-orn{ z-index:3; top:25.5cqw; height:5.4cqw; }
+#app.battle #duel-hud .dh-orn--fl,
+#app.battle #duel-hud .dh-orn--fr{ background-image:var(--hud-orn-foe); background-size:7.87cqw 5.60cqw; }
+#app.battle #duel-hud .dh-orn--ml,
+#app.battle #duel-hud .dh-orn--mr{ background-image:var(--hud-orn-me);  background-size:12.35cqw 5.53cqw; }
+#app.battle #duel-hud .dh-orn--fl{ left:4.77cqw;  width:3.27cqw; background-position:-0.33cqw -0.07cqw; }
+#app.battle #duel-hud .dh-orn--fr{ left:43.54cqw; width:3.77cqw; background-position:-4.00cqw -0.07cqw; }
+#app.battle #duel-hud .dh-orn--ml{ left:56.80cqw; width:5.92cqw; background-position:-0.10cqw -0.03cqw; }
+#app.battle #duel-hud .dh-orn--mr{ left:91.85cqw; width:5.98cqw; background-position:-6.27cqw -0.03cqw; }
 /* 비전투 3모드의 0px 계약을 이중으로 못 박는다 — duelHudUnmount() 는 hidden 만
    세우고 .battle 을 같은 프레임에 벗기지 않는 경로가 있다. */
 #app.battle #duel-hud[hidden]{display:none !important;}
@@ -58405,7 +58485,8 @@ else window.addEventListener("load",start);
   letter-spacing:.02em;
   z-index:1;
 }
-/* [단계 D · 0905] 캡슐은 이제 위 판 자산(hud-plate-top-cap.webp)이 그린다. HUD
+/* [프레임 재배선 0906] 캡슐은 이제 **별도 프레임(.dh-cap = --hud-capsule)** 이 그린다
+   (종전 합쳐 구운 위-판-자산 폐기). HUD
    타이머(#duel-timer)·클래식 캡슐(#ch-cap)의 .wf-cap **그림층 전부**를 HUD 스코프
    에서만 끈다 — 면·광택(background) · 측면 림(::before) · 겉선(::after) · 폴백
    box-shadow 링/알약(border-radius). 컨테이너는 글리프만 담는 투명 상자로 남고,
@@ -58458,9 +58539,14 @@ else window.addEventListener("load",start);
 }
 /* 조각 실물. ::after 라서 ::before(Lv 명패)보다 위에 선다 — 뼈·날개 장식이
    명패의 바깥 끝을 덮는 시안의 겹침이 이 한 줄로 재현된다. */
+/* [프레임 재배선 0906] ::after 는 이제 **뼈/날개 장식 프레임**만 그린다(합쳐 구운
+   완성 바 폐기 — 트랙은 .dh-track 홈 프레임, 채움은 .dh-fill 코드). 장식 자산은
+   좌·우 캡 두 개가 가운데 투명 간격을 두고 한 장에 들어 있어(합쳐 구운 바와 같은
+   등록), 상자 가득(100% 100%) 늘리면 두 캡이 양 끝에 그대로 앉는다. */
 #app.battle .dh-side::after{
-  content:"";position:absolute;inset:0;
-  width:auto;height:auto;margin:0;
+  content:"";position:absolute;
+  left:0;right:0;top:34%;height:44%;   /* 캡은 바 띠에만(이름탭 행 제외) — 합쳐 구운 바의 캡 위치 */
+  width:auto;margin:0;
   background-repeat:no-repeat;
   background-position:center;
   background-size:100% 100%;
@@ -58478,7 +58564,7 @@ else window.addEventListener("load",start);
   overflow:hidden;
   z-index:5;
 }
-#app.battle .dh-foe::after{background-image:url("catalog/duel-hpbar-bone.webp");}
+#app.battle .dh-foe::after{background-image:none;}  /* 장식은 이제 별도 요소(.dh-orn--fl/fr) */
 #app.battle .dh-me{
   /* W6.5b-5 — 시안 실측: 날개 캡 좌 53.52% ~ 우 끝 100.34%. 사용자 반려
      "HP 바가 분리돼 떠 있다"의 절반이 여기 있었다 — 종전 49.83% 는 왼쪽 바와
@@ -58487,7 +58573,11 @@ else window.addEventListener("load",start);
   left:53.52%;top:70.54%;width:46.82%;height:29.10%;
   z-index:4;
 }
-#app.battle .dh-me::after{background-image:url("catalog/duel-hpbar-wing.webp");}
+#app.battle .dh-me::after{background-image:none;}  /* 장식은 이제 별도 요소(.dh-orn--ml/mr) */
+/* [프레임 재배선 0906] 코드 트랙(홈) 대체 — 트랙은 이제 .dh-track 홈 프레임이 그린다.
+   .dh-bar 는 채움(.dh-fill)만 담는 투명 상자로 남긴다(채움·눈금 코드는 무접촉). */
+#app.battle .dh-foe .dh-bar,
+#app.battle .dh-me  .dh-bar{ background:transparent !important; box-shadow:none !important; }
 /* Lv 유리 명패(추출에서 빠진 조각 둘). 색은 시안 픽셀 샘플이다:
    악당 #6C366A~#7A3F71 자주 유리 · 내 쪽은 흰 림이 대비를 만드는 밝은 유리. */
 #app.battle .dh-side::before{
@@ -58681,9 +58771,30 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
   #app.battle #duel-hud .dh-plate,
   #app.classic #classic-hud .dh-plate{ filter:drop-shadow(0 1.4vw 1.0vw rgba(46,20,58,.20)); }
   #app.battle #duel-hud .dh-plate--top,
-  #app.classic #classic-hud .dh-plate--top{ left:1.04vw; width:98.2vw; height:25.7vw; }
+  #app.classic #classic-hud .dh-plate--top{
+    left:0vw; width:100vw; height:19.30vw;
+    -webkit-mask-position:0 0, 28.10vw 8.09vw; mask-position:0 0, 28.10vw 8.09vw;
+    -webkit-mask-size:100% 100%, 44.10vw 17.65vw; mask-size:100% 100%, 44.10vw 17.65vw;
+  }
   #app.battle #duel-hud .dh-plate--bot,
-  #app.classic #classic-hud .dh-plate--bot{ left:1.47vw; top:19.2vw; width:97.5vw; height:14.4vw; }
+  #app.classic #classic-hud .dh-plate--bot{ left:0.53vw; top:18.71vw; width:99.35vw; height:16.47vw; }
+  /* 캡슐 프레임 + 체력바 홈 트랙 (cqw 미지원 vw 등가) */
+  #app.battle #duel-hud .dh-cap,
+  #app.classic #classic-hud .dh-cap{ left:28.10vw; top:8.09vw; width:44.10vw; height:17.65vw; }
+  #app.battle #duel-hud .dh-track--l{ left:5.8vw;  top:26.1vw; width:40.0vw; height:4.2vw; }
+  #app.battle #duel-hud .dh-track--r{ left:60.5vw; top:26.1vw; width:33.6vw; height:4.2vw; }
+  #app.battle #duel-hud .dh-tick{ top:26.98vw; height:2.47vw; }
+  #app.battle #duel-hud .dh-tick--l{ left:7.04vw; width:37.5vw; }
+  #app.battle #duel-hud .dh-tick--r{ left:61.72vw; width:31.14vw; }
+  #app.battle #duel-hud .dh-orn{ top:25.5vw; height:5.4vw; }
+  #app.battle #duel-hud .dh-orn--fl,
+  #app.battle #duel-hud .dh-orn--fr{ background-size:7.87vw 5.60vw; }
+  #app.battle #duel-hud .dh-orn--ml,
+  #app.battle #duel-hud .dh-orn--mr{ background-size:12.35vw 5.53vw; }
+  #app.battle #duel-hud .dh-orn--fl{ left:4.77vw;  width:3.27vw; background-position:-0.33vw -0.07vw; }
+  #app.battle #duel-hud .dh-orn--fr{ left:43.54vw; width:3.77vw; background-position:-4.00vw -0.07vw; }
+  #app.battle #duel-hud .dh-orn--ml{ left:56.80vw; width:5.92vw; background-position:-0.10vw -0.03vw; }
+  #app.battle #duel-hud .dh-orn--mr{ left:91.85vw; width:5.98vw; background-position:-6.27vw -0.03vw; }
   /* 모험 캡슐 = 위 판 홈 (핵심) */
   #app.battle #duel-timer{ left:29.0vw; top:8.4vw; width:42.3vw; height:15.7vw; --wcap-w:42.3vw; --wcap-h:15.7vw; }
   /* 모험 펫 방울 */
