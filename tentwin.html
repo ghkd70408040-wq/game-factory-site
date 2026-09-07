@@ -51054,17 +51054,13 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
    ============================================================================ */
 
 :root{
-  /* ---- HUD 판 폭. 여기 하나가 모든 치수를 다스린다 ----------
-     min() 한 겹이 PC 가로 분기(<= 860px 칸)까지 겸한다 — 그래서 pc-landscape
-     절에서 width/max-width 를 뺐다. 안쪽 좌표가 전부 이 길이의 비율이라
-     폭을 두 곳에서 정하면 글자만 커진 HUD 가 나온다. */
+                                                                                                                                                                                                            
   --h2-w: min(95.7vw, 860px);
-  --h2-alpha: .425;               /* 시안 B 실측. 블러 없음 */
+  --h2-alpha: .425;                                   
 
-     /* 위험(HP<25%) */
-     /* 감소 잔상 */
-     /* 증가 잔상 */
-  --hv2-hp-track:   var(--f2-slot);
+                     
+                
+                
 
 }
 
@@ -51177,8 +51173,6 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
 }
 .kit-hud-v2__line{ grid-row:1; grid-column:2; }
 .kit-hud-v2__side--me .kit-hud-v2__line{ grid-column:1; justify-content:flex-end; }
-.kit-hud-v2__side > .kit-hpbar-v2{ grid-row:2; grid-column:2; }
-.kit-hud-v2__side--me > .kit-hpbar-v2{ grid-column:1; }
 .kit-hud-v2__side > .hv2-atk{ grid-row:3; grid-column:2; }
 .kit-hud-v2__side--me > .hv2-atk{ grid-column:1; }
 
@@ -51299,134 +51293,6 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
      이 파도는 그쪽을 한 자리도 안 건드렸다. */
 .hv2-face--pet{ background-image: var(--pet-face, url("catalog/duel-cloud-baby.webp")); }
 
-/* ============================================================
-   3. .kit-hpbar-v2 — 체력바 = 시안 스탯 게이지 홈 문법
-   H = 바 높이(--hv2-hp-h). 계수는 전부 charsel-A 1행 실측이다.
-   ============================================================ */
-.kit-hpbar-v2{
-  --hv2-hp: 1;                                   /* 0..1 — syncDuel 이 쓴다 */
-  --hv2-hp-prev: var(--hv2-hp);
-  --hv2-hp-h: calc(var(--f2-w) * .0449);         /* 33/735 = 시안 홈 규격 */
-  --hv2-hp-bd:    calc(var(--hv2-hp-h) * .068);
-  --hv2-hp-gloss: calc(var(--hv2-hp-h) * .107);
-  --hv2-hp-sd:    calc(var(--hv2-hp-h) * .121);
-  --hv2-hp-1: var(--role-hv2-hp-c1);
-  --hv2-hp-2: var(--role-hv2-hp-c2);
-  position:relative;
-  box-sizing:border-box;
-  container-type: inline-size;               /* __cap 이 100cqw 로 끝을 잡는다 */
-  width:100%;
-  height: var(--hv2-hp-h);
-  border-radius: 999em;
-  background: var(--hv2-hp-track);
-  overflow:hidden;
-  box-shadow: 0 calc(var(--hv2-hp-h) * .03) 0 rgba(255,255,255,.95);
-}
-.kit-hpbar-v2::before{
-  content:""; position:absolute; inset:0; z-index:0;
-  border-radius:inherit; pointer-events:none;
-  box-shadow:
-    inset 0 var(--hv2-hp-sd) calc(var(--hv2-hp-h) * .18) rgba(0,0,0,.15),
-    inset var(--hv2-hp-sd) 0 calc(var(--hv2-hp-h) * .18) rgba(0,0,0,.08),
-    inset 0 calc(var(--hv2-hp-h) * -.14) calc(var(--hv2-hp-h) * .14) rgba(0,0,0,.10);
-}
-/* 상태 오버레이 (피격 플래시 · 위험 맥동) */
-.kit-hpbar-v2::after{
-  content:""; position:absolute; inset:0; z-index:5;
-  border-radius:inherit; pointer-events:none;
-  background:#fff; opacity:0;
-}
-
-/* ---- 감소/증가 잔상 ------------------------------------------------ */
-.kit-hpbar-v2__ghost{
-  position:absolute; left:0; top:0; bottom:0; z-index:1;
-  right: calc(var(--hv2-hp-h) * .5);
-  border-radius: 0 999em 999em 0;
-  background: var(--prim-white);
-  opacity:.55;
-  transform-origin:left center;
-  transform: scaleX(var(--hv2-hp-prev));
-  transition: transform .42s cubic-bezier(.33,0,.2,1) .10s;
-}
-.kit-hpbar-v2[data-dir="up"] .kit-hpbar-v2__ghost{ background: var(--role-hv2-hp-gain); }
-
-/* ---- 필: transform: scaleX 만. width 애니 금지. --------------------- */
-.kit-hpbar-v2__fill{
-  position:absolute; left:0; top:0; bottom:0; z-index:2;
-  right: calc(var(--hv2-hp-h) * .5);
-  border-radius: 0;
-  transform-origin: left center;
-  transform: scaleX(var(--hv2-hp));
-  transition: transform .22s cubic-bezier(.33,0,.2,1);
-  background: linear-gradient(90deg,
-      var(--hv2-hp-1) 0%, var(--hv2-hp-1) 50%, var(--hv2-hp-2) 100%);
-}
-.kit-hpbar-v2__fill::after{
-  content:""; position:absolute; inset:0;
-  pointer-events:none;
-  background: linear-gradient(180deg,
-      rgba(255,255,255,.34) 0%,
-      rgba(255,255,255,0)   65%,
-      rgba(255,255,255,.30) 100%);
-  box-shadow:
-    inset 0 var(--hv2-hp-bd) 0 rgba(0,0,0,.32),
-    inset 0 calc(var(--hv2-hp-bd) * -1) 0 rgba(0,0,0,.32),
-    inset 0 calc(var(--hv2-hp-bd) + var(--hv2-hp-gloss)) 0 rgba(255,255,255,.30);
-}
-
-/* ---- 끝 처리: 정원 캡. 스케일과 무관하게 늘 정원이다. -------------- */
-.kit-hpbar-v2__cap{
-  position:absolute; left:0; top:0; z-index:3;
-  height:100%; aspect-ratio:1;
-  border-radius:50%;
-  background: var(--hv2-hp-2);
-  transform: translateX(calc(var(--hv2-hp) * (100cqw - var(--hv2-hp-h) * .5) - 50%));
-  transition: transform .22s cubic-bezier(.33,0,.2,1);
-}
-.kit-hpbar-v2__cap::before{
-  content:""; position:absolute; inset:0;
-  border-radius:inherit; pointer-events:none;
-  box-shadow: inset 0 0 0 var(--hv2-hp-bd) rgba(0,0,0,.32);
-  clip-path: inset(0 0 0 50%);
-}
-.kit-hpbar-v2__cap::after{
-  content:""; position:absolute; inset:0;
-  border-radius:inherit; pointer-events:none;
-  background:
-    radial-gradient(closest-side, rgba(255,255,255,.95) 0%,
-                    rgba(255,255,255,.60) 40%, rgba(255,255,255,0) 100%)
-      50% 30% / 50% 29% no-repeat,
-    linear-gradient(180deg,
-      rgba(255,255,255,.34) 0%, rgba(255,255,255,0) 65%, rgba(255,255,255,.30) 100%);
-  box-shadow: inset 0 var(--hv2-hp-gloss) 0 rgba(255,255,255,.30);
-}
-.kit-hpbar-v2[data-empty] .kit-hpbar-v2__cap,
-.kit-hpbar-v2[data-empty] .kit-hpbar-v2__fill{ opacity:0; }
-
-/* ---- 수치: 바 **안쪽** (줄 수를 안 늘린다) ------------------------- */
-/* z 6 — 정본은 4 였고 상태 오버레이(::after)가 5 다. 실측(34-low)에서 위험
-   맥동이 최고점(.30)에 닿는 프레임마다 «18 / 100» 이 안 읽혔다: HP 가 가장
-   중요해지는 순간에 수치가 가장 안 보이는 배치라 뒤집는다. 피격 플래시도 이제
-   숫자를 안 덮는다 — 플래시는 «맞았다» 를 말하지 «얼마 남았나» 를 지우지 않는다. */
-.kit-hpbar-v2__num{
-  position:absolute; inset:0; z-index:6;
-  display:flex; align-items:center; justify-content:center;
-  font-size: calc(var(--hv2-hp-h) * .64);
-  font-weight:800; line-height:1;
-  font-variant-numeric: tabular-nums;
-  color:#fff;
-  text-shadow: 0 .06em .08em rgba(74,52,80,.62);
-  white-space:nowrap;
-  pointer-events:none;
-}
-
-/* ---- 위계: 1순위 내 HP = 시안 규격 / 2순위 악당 = x.78 -------------- */
-.kit-hpbar-v2--foe{
-  --hv2-hp-h: calc(var(--f2-w) * .0350);
-  --hv2-hp-1: var(--role-hv2-hp-foe-c1);
-  --hv2-hp-2: var(--role-hv2-hp-foe-c2);
-}
-
 /* ---- 공격 게이지 (시안 밖 · 전투 정보) ----------------------------- */
 .hv2-atk{
   position:relative;
@@ -51461,27 +51327,9 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
   80%    { transform: translate3d(-.25%,0,0); }
 }
 @keyframes h2-awaken{ 0%,100%{opacity:.42} 50%{opacity:.95} }
-
-/* 위험 (HP < 25%) — dhBar 가 단다 */
-.kit-hpbar-v2[data-low]{ --hv2-hp-1: var(--role-hv2-hp-lo-c1); --hv2-hp-2: var(--role-hv2-hp-lo-c2); }
-.kit-hpbar-v2[data-low]::after{
-  background: var(--role-hv2-hp-lo-c2);
-  animation: h2-lowpulse 1.1s ease-in-out infinite;
-}
-/* 피격 — 맞은 쪽 진영만 튄다(§18.4b 의 그 규율 그대로). 위험보다 뒤라 이긴다. */
-#duel-hud.fhit .kit-hud-v2__side--foe .kit-hpbar-v2::after,
-#duel-hud.mhit .kit-hud-v2__side--me  .kit-hpbar-v2::after{
-  background:#fff;
-  animation: h2-flash .18s ease-out 1;
-}
 #duel-hud.mhit{ animation: h2-shake .18s ease-out 1; }
 #duel-hud.fhit .kit-hud-v2__side--foe{ animation: h2-shake .18s ease-out 1; }
 #duel-hud.fhit.big .kit-hud-v2__side--foe{ animation: h2-shake .30s ease-out 2; }
-/* 예고(1.8초) — 악당 바가 경고색으로 맥동한다. 화면을 덮지 않는다. */
-#duel-hud.tell .kit-hud-v2__side--foe .kit-hpbar-v2::after{
-  background: var(--role-hv2-hp-lo-c1);
-  animation: h2-tellpulse .6s ease-in-out infinite;
-}
 /* 격파 — 보스바와 같은 keyframes(bossdown). 바는 dhBar 의 [data-empty] 가 비운다. */
 #duel-hud.down .kit-hud-v2__side--foe{ animation: bossdown .6s var(--ease) forwards; }
 
@@ -51489,20 +51337,7 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
 #app.skill #duel-hud::before{ animation: h2-awaken 1.4s ease-in-out infinite; }
 
 #app.skill #duel-hud .kit-hud-v2__timer{ transform: scale(1.06); }
-
-@media (prefers-reduced-motion: reduce){
-  .kit-hud-v2, .kit-hud-v2 *, .kit-hpbar-v2, .kit-hpbar-v2 *{
-    animation: none !important;
-    transition-duration: .01ms !important;
-  }
 }
-
-/* ============================================================
-   5. 반응형 — 390 기준. 3순위부터 줄인다.
-   타이머와 내 HP 바 높이는 마지막까지 안 줄인다.
-   ============================================================ */
-@media (max-width: 372px){
-  .kit-hpbar-v2--foe .kit-hpbar-v2__num{ display:none; }
 }
 @media (max-width: 352px){
   .kit-hud-v2__pet{ display:none; }
@@ -53576,14 +53411,6 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
   color: #F2FBFF;
   text-shadow: 0 1px 0 rgba(43,71,99,.95), 0 -1px 0 rgba(43,71,99,.80),
     1px 0 0 rgba(43,71,99,.80), -1px 0 0 rgba(43,71,99,.80);
-}
-/* 체력바 = 홈 몸통 */
-#duel-hud .kit-hud-v2__side > .kit-hpbar-v2{
-  position: absolute;
-  left: 2.2%;
-  width: 95.6%;
-  top: 44.0%;
-  height: 43.0%;
 }
 /* ---------------------------------------------------------------------------
    장식 캡 — `--duel-orn-l` / `--duel-orn-r` 되살아난 배선 (2026-09-03 · 52)
