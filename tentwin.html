@@ -16442,9 +16442,11 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
         catch (e) { sfxClipBuf[url] = 'bad'; }
       };
       var bad = function () { sfxClipBuf[url] = 'bad'; };
+      var once = false, done1 = function (b) { if (once) return; once = true; done(b); };   /* perf-0908: 1회 */
+      var bad1 = function () { if (once) return; once = true; bad(); };
       try {
-        var pr = actx.decodeAudioData(ab, done, bad);
-        if (pr && typeof pr.then === 'function') pr.then(done, bad);
+        var pr = actx.decodeAudioData(ab, done1, bad1);
+        if (pr && typeof pr.then === 'function') pr.then(done1, bad1);
       } catch (e) { sfxClipBuf[url] = 'bad'; }
       return false;
     }
@@ -17958,12 +17960,15 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
     };
     mainSrcBytes(uri, function (ab) {
       if (!ab) { trkFail(T); return; }      // 못 받았다 → 조용히 신스로 (무음 폴백)
+      /* perf-0908: 콜백형 + Promise형을 둘 다 걸면 지원 브라우저에서 done 이 **두 번**
+         돌아 mainScan(전체 PCM 스캔, 메인스레드 롱태스크)도 두 번 돈다(실측: 곡마다
+         [BGM] 로그 2회). 한 번만 받는다. */
+      var once = false, done1 = function (b) { if (once) return; once = true; done(b); };
+      var fail1 = function () { if (once) return; once = true; trkFail(T); };
       try {
-        var pr = actx.decodeAudioData(ab, done, function () { trkFail(T); });
-        if (pr && typeof pr.then === 'function') {
-          pr.then(done, function () { trkFail(T); });
-        }
-      } catch (e) { trkFail(T); }
+        var pr = actx.decodeAudioData(ab, done1, fail1);
+        if (pr && typeof pr.then === 'function') pr.then(done1, fail1);
+      } catch (e) { fail1(); }
     });
   }
 
@@ -18202,9 +18207,11 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
         catch (e) { sfxClipBuf[url] = 'bad'; }
       };
       var bad = function () { sfxClipBuf[url] = 'bad'; };
+      var once = false, done1 = function (b) { if (once) return; once = true; done(b); };   /* perf-0908: 1회 */
+      var bad1 = function () { if (once) return; once = true; bad(); };
       try {
-        var pr = actx.decodeAudioData(ab, done, bad);
-        if (pr && typeof pr.then === 'function') pr.then(done, bad);   // 콜백형/Promise형 둘 다
+        var pr = actx.decodeAudioData(ab, done1, bad1);
+        if (pr && typeof pr.then === 'function') pr.then(done1, bad1);   // 콜백형/Promise형 둘 다 — 한 번만 받는다
       } catch (e) { sfxClipBuf[url] = 'bad'; }
     } catch (e) { try { sfxClipBuf[url] = 'bad'; } catch (e2) {} }
   }
@@ -22075,7 +22082,9 @@ window.TT_SFX = {
   }
   function headText(el, s) {
     if (!el) return;
-    if (!isCapsuleHead(el)) { el.textContent = s; return; }
+    /* perf-0908: 같은 값이면 쓰지 않는다 — 매 틱 textContent 재대입이 #text 노드를
+       갈아 끼워 스타일 무효화·레이아웃을 일으켰다(실측 15초에 1,770회). */
+    if (!isCapsuleHead(el)) { if (el.textContent !== s) el.textContent = s; return; }
     var sp = el.firstElementChild;
     if (!sp || sp.className !== 'mvh-title' || el.childNodes.length !== 1) {
       el.textContent = '';
@@ -22083,7 +22092,7 @@ window.TT_SFX = {
       sp.className = 'mvh-title';
       el.appendChild(sp);
     }
-    sp.textContent = s;
+    if (sp.textContent !== s) sp.textContent = s;
     fitHead(el);      // [E14-0902] 제목을 갈아 쓰는 세 경로가 전부 여기를 지난다
   }
   /* [E14-0902 · 지휘자 판정 2] 캡슐 제목 자동 맞춤.
@@ -26317,8 +26326,8 @@ window.TT_SFX = {
       if (tn) { if (tn.nodeValue !== txt) tn.nodeValue = txt; }
       else span.textContent = txt;
     }
-    el.setAttribute('data-i', String(i));
-    el.classList.toggle('dead', !!c.dead);
+    if (el.getAttribute('data-i') !== String(i)) el.setAttribute('data-i', String(i));
+    setCls(el, 'dead', !!c.dead);
     // Special-tile skin (contract §6). CSS owns every visual; we only label.
     var sp = c.sp || '';
     if (sp) {
@@ -26326,7 +26335,7 @@ window.TT_SFX = {
     } else if (el.hasAttribute && el.hasAttribute('data-sp')) {
       el.removeAttribute('data-sp');
     }
-    el.classList.toggle('iced1', sp === 'ice' && (c.ice | 0) >= 1);
+    setCls(el, 'iced1', sp === 'ice' && (c.ice | 0) >= 1);
     /* W2.5 ④ — 특수 마크. sp 와 **같은 문법**(속성 하나, CSS 가 그림 전부 소유)
        이지만 칸이 달라서 서로를 덮지 않는다: 과일 스킨은 [data-sp] 만 보므로
        마크 과일은 끝까지 과일로 남고, 배지는 `.tile[data-mk]::after` 가 그린다. */
@@ -26540,10 +26549,18 @@ window.TT_SFX = {
   }
 
   /** Paint-only half of the pair. Never counts anything; safe to call per repaint. */
+  /* perf-0908: classList.add/remove/toggle 은 값이 같아도 class 속성을 다시 써서
+     MutationObserver·속성 갱신 비용이 든다(실측 12초에 타일 클래스 쓰기 2.5만 회).
+     바뀔 때만 쓴다. 결과 DOM 은 동일하다. */
+  function setCls(el, name, on) {
+    if (!el || !el.classList) return;
+    on = !!on;
+    if (el.classList.contains(name) !== on) { if (on) el.classList.add(name); else el.classList.remove(name); }
+  }
   function paintMoves(pulse) {
     setText('moves-val', S.pairsLeft);
     var box = $('stat-moves');
-    if (box && box.classList) box.classList.toggle('low', S.pairsLeft <= MOVES_LOW);
+    setCls(box, 'low', S.pairsLeft <= MOVES_LOW);
     if (!pulse) return;
     var v = $('moves-val');
     if (!v || !v.classList) return;
@@ -26564,7 +26581,7 @@ window.TT_SFX = {
    */
   function syncClassicSkin() {
     var app = $('app');
-    if (app && app.classList) app.classList.toggle('classic', isClassic());
+    setCls(app, 'classic', isClassic());
   }
 
   /**
@@ -26583,13 +26600,13 @@ window.TT_SFX = {
     var box = $('classic-hud');
     if (!box) return;
     var live = isClassic() && S.running;
-    box.hidden = !live;
+    if (box.hidden !== !live) box.hidden = !live;
     if (!live) {
       /* P0 (D3) — 클래식을 떠날 때 경보를 걷는다. 판이 숨어 있어 화면에는
          안 보이지만, 남겨 두면 다음 클래식 진입 첫 프레임이 **앞 판의 경보**를
          이어받는다(실측: rush 로 나간 뒤에도 ch-l 이 'ch-g low' 로 남았다). */
       var chL0 = $('ch-l');
-      if (chL0 && chL0.classList) chL0.classList.remove('low');
+      setCls(chL0, 'low', false);
       return;
     }
     /* 단계 C(0905) — 클래식 펫 방울: 선택 펫 face 를 주입한다(모험 방울과 같은
@@ -26697,9 +26714,10 @@ window.TT_SFX = {
     setText('stage-val', isDaily() ? ('#' + dailyNumber()) : S.stage);
     var ss = $('stat-stage');
     if (ss) {
-      ss.hidden = isRush();
+      if (ss.hidden !== isRush()) ss.hidden = isRush();
       var sk = ss.querySelector ? ss.querySelector('.stat-k') : null;
-      if (sk) sk.textContent = isDaily() ? t('hud.daily') : t('hud.stage');
+      var skv = isDaily() ? t('hud.daily') : t('hud.stage');
+      if (sk && sk.textContent !== skv) sk.textContent = skv;
     }
     setText('score-val', S.score);
     /* "Best" must mean the best of the mode being played. Daily used to show the
@@ -26773,7 +26791,7 @@ window.TT_SFX = {
       actBattleLabels = false;
     }
     var st = $('stat-timer');
-    if (st) st.hidden = !isDaily();
+    if (st && st.hidden !== !isDaily()) st.hidden = !isDaily();
     syncMission();
     syncRushHud();
   }
@@ -30295,7 +30313,7 @@ window.TT_SFX = {
     /* §3 — 피니시 구간만 예외다. 그때 배지가 말하는 것은 "전투에서 달성 불가능한
        평시 미션"이 아니라 **10초 안에 해야 하는 그 한 가지**다(F1 과 같은 게이트). */
     var live = !!S.mission && missionsOn() && (!battleOn() || finishOn());
-    if (badge) badge.hidden = !live;
+    if (badge && badge.hidden !== !live) badge.hidden = !live;
     if (!live) return;
     setText('mission-text', missionText(S.mission));
     // `col`'s goal is a column NUMBER, so the progress readout is a plain 0/1.
@@ -30516,8 +30534,8 @@ window.TT_SFX = {
             : isRush() ? fmtTime(Math.ceil(rushLeftMs() / 1000))
             : S.mode === 'adv' ? fmtTime(Math.ceil(advLeftMs() / 1000)) : '';
     if (el) {
-      el.hidden = !timed;
-      if (txt) el.textContent = txt;
+      if (el.hidden !== !timed) el.hidden = !timed;
+      if (txt && el.textContent !== txt) el.textContent = txt;
     }
     /* 전투 개편 단계 4 — 같은 값이 #duel-hud 중앙에도 선다(#rush-timer 는 그때
        CSS 로 숨는다). 시계를 하나로 두는 규율은 그대로다: 자리만 옮겼을 뿐
@@ -31677,7 +31695,7 @@ window.TT_SFX = {
 
   function clearHints() {
     for (var i = 0; i < tileEls.length; i++) {
-      if (tileEls[i]) tileEls[i].classList.remove('hint');
+      if (tileEls[i]) setCls(tileEls[i], 'hint', false);
     }
   }
 
@@ -31687,9 +31705,9 @@ window.TT_SFX = {
   function clearCands() {
     for (var i = 0; i < tileEls.length; i++) {
       if (tileEls[i]) {
-        tileEls[i].classList.remove('cand');
-        tileEls[i].classList.remove('cand-ok');
-        tileEls[i].classList.remove('cand-far');
+        setCls(tileEls[i], 'cand', false);
+        setCls(tileEls[i], 'cand-ok', false);
+        setCls(tileEls[i], 'cand-far', false);
       }
     }
   }
@@ -38207,8 +38225,9 @@ window.TT_SFX = {
   function setActLabel(btn, key, ariaKey) {
     if (!btn) return;
     var lab = btn.querySelector ? btn.querySelector('.act-t') : null;
-    if (lab) lab.textContent = t(key);
-    btn.setAttribute('aria-label', t(ariaKey));
+    var lv = t(key), av = t(ariaKey);                      /* perf-0908: 같은 값 쓰기 생략 */
+    if (lab && lab.textContent !== lv) lab.textContent = lv;
+    if (btn.getAttribute('aria-label') !== av) btn.setAttribute('aria-label', av);
   }
   /** 마크업이 원래 갖고 있던 문구로 되돌린다 (applyI18n 과 같은 출처를 읽는다). */
   function resetActLabel(btn) {
@@ -38239,9 +38258,9 @@ window.TT_SFX = {
     /* 공격 버튼은 절대 흐려지지 않는다 — 표시기라서 항상 읽혀야 한다.
        필살기는 미만땅이면 흐리지만 **클릭은 살아 있다**: .act.off 는 시각뿐이고
        (opacity), 핸들러가 스스로 잔량을 말한다. */
-    if (ba) { ba.classList.remove('off'); ba.classList.remove('urge'); }
-    if (bh) { bh.classList.toggle('off', !spFull); bh.classList.toggle('urge', spFull); }
-    if (bu) { bu.classList.toggle('off', !petOk); bu.classList.remove('urge'); }
+    if (ba) { setCls(ba, 'off', false); setCls(ba, 'urge', false); }
+    if (bh) { setCls(bh, 'off', !spFull); setCls(bh, 'urge', spFull); }
+    if (bu) { setCls(bu, 'off', !petOk); setCls(bu, 'urge', false); }
     /* W6.5b — 각성 연쇄 루프의 **장전 신호**.
        `urge`(=지금 누를 수 있다)와 `primed`(=지속 중인데 다음 것이 이미 찼다)는
        서로 다른 사실이라 클래스를 나눈다. 지속 중에 urge 를 켜면 "빛나는데 안
@@ -38249,9 +38268,9 @@ window.TT_SFX = {
        못 본다(사용자: 숫자 맞추다 보면 하단이 안 보인다). 그래서 셋째 상태다.
        gFull 은 `gaugeFull() && !S.skillKind` 이므로 둘은 동시에 켜지지 않는다. */
     if (bsh) {
-      bsh.classList.toggle('off', !gFull);
-      bsh.classList.toggle('urge', gFull);
-      bsh.classList.toggle('primed', gaugeFull() && !!S.skillKind);
+      setCls(bsh, 'off', !gFull);
+      setCls(bsh, 'urge', gFull);
+      setCls(bsh, 'primed', gaugeFull() && !!S.skillKind);
     }
     setActLabel(ba, 'act.attack', 'aria.attack');
     setActLabel(bh, 'act.special', 'aria.special');
@@ -38488,7 +38507,7 @@ window.TT_SFX = {
     /* 단계 2: 전투에서도 숨긴다 — 승리 조건이 아닌 것을 목표 칩이 계속 말하면
        "저걸 채우면 이기는 줄" 알게 된다(보스탄에서 숨기는 것과 같은 이유). */
     var live = S.mode === 'adv' && !!S.advPlan && !S.advPlan.boss && !battleOn();
-    el.hidden = !live;
+    if (el.hidden !== !live) el.hidden = !live;
     if (!live) return;
     var p = S.advPlan, txt;
     if (p.goal.type === 'digit') {
