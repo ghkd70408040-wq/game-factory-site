@@ -12566,6 +12566,61 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
 /* ===== 14차 7호 끝 ===== */
 
 </style>
+<style id="tokens-semantic">
+/* ===== tokens-semantic — 정본 의미 토큰 1벌 (0908 · wave/norm-bj) ==============
+   GAME-FACTORY-STANDARD §2 「Variables/Modes = 값의 유일 출처」. COMPONENTS §8 의
+   첫 정규화 계열 `--bj-`(거울 접두)를 여기로 붕괴시킨다.
+
+   슬롯 어휘는 규격 §2 그대로다 — face / outline / rim / contact.
+     face-a   면 그라데 시작(좌·상)      face-b   면 그라데 끝(우·하)
+     outline  겉선 = 드롭 그림자 색      contact  접지 밴드
+     -l / -r  좌우 색이 다른 고리(기준 버튼만)   outline-w 고리 굵기
+
+   역할색 열 = 낱말이 자리를 정한다(14차 규약). 같은 낱말 = 같은 색.
+     mint   기본·기록 탭 켜짐          lilac  3순위 줄버튼·탭 꺼짐
+     primary 모달 주버튼(시안 90127e38 실측)  pink 다음/진행
+     yellow 다시/복사                  orange 재도전
+     purple 메인 메뉴                  sky    킷 v2 주버튼(닫기)
+     violet 킷 v2 보조버튼(줄버튼)     magenta 튜토리얼 건너뛰기
+   값은 한 자리도 새로 짓지 않았다 — 전부 옛 --bj-* 정의에서 그대로 옮겼다.
+   ========================================================================== */
+:root{
+  /* mint — 기본 CTA · 기록 탭 켜짐 */
+  --role-mint-face-a:#7ED9C0; --role-mint-face-b:#54BFA2;
+  --role-mint-outline:#35866F; --role-mint-contact:#43A184;
+  /* lilac — 3순위 줄버튼(기록·갤러리·방법·제작진) · 기록 탭 꺼짐 */
+  --role-lilac-face-a:#CDC2D4; --role-lilac-face-b:#B3A6BC;
+  --role-lilac-outline:#8B7E95; --role-lilac-contact:#A296AC;
+  /* primary — 모달 주버튼(계속하기·닫기 다섯). E45-0903 합성 픽셀 실측값 */
+  --role-primary-face-a:#DB54F0; --role-primary-face-b:#34D4B2;
+  --role-primary-outline:#4F5A7C; --role-primary-contact:rgba(255,255,255,.26);
+  --role-primary-outline-l:#643578; --role-primary-outline-r:#356566;
+  --role-primary-rim-l:#CC80E6;    --role-primary-rim-r:#7BCCD2;
+  /* pink — 다음/진행 */
+  --role-pink-face-a:#F8A2C4; --role-pink-face-b:#E8749F;
+  --role-pink-outline:#A63C6A; --role-pink-contact:#D25E8D;
+  /* yellow — 다시/복사 */
+  --role-yellow-face-a:#FFDC84; --role-yellow-face-b:#F0BC55;
+  --role-yellow-outline:#B07C1C; --role-yellow-contact:#DFA63E;
+  /* orange — 재도전 */
+  --role-orange-face-a:#FFB874; --role-orange-face-b:#F08E45;
+  --role-orange-outline:#B15A16; --role-orange-contact:#DF7A2E;
+  /* purple — 메인 메뉴 */
+  --role-purple-face-a:#C6A2F5; --role-purple-face-b:#A97FE4;
+  --role-purple-outline:#6B47A8; --role-purple-contact:#9468D2;
+  /* sky — 킷 v2 주버튼(모달 닫기 다섯) */
+  --role-sky-face-a:#93CFEE; --role-sky-face-b:#79ABE6;
+  --role-sky-outline:#436B8E; --role-sky-contact:#5E90C6;
+  /* violet — 킷 v2 보조버튼(줄버튼) */
+  --role-violet-face-a:#D3A9EC; --role-violet-face-b:#BB8FE0;
+  --role-violet-outline:#7A5A9C; --role-violet-contact:#A87FCF;
+  /* magenta — 튜토리얼 건너뛰기 */
+  --role-magenta-face-a:#B342D5; --role-magenta-face-b:#1FBBA0;
+  --role-magenta-outline:#5B4E9B; --role-magenta-contact:#7E8FC6;
+  /* 고리 굵기 — Mode 무관. (19)항의 자 그대로: --f2-ref-w * 0.00350 = 1.505px @430 */
+  --role-outline-w:calc(var(--f2-ref-w) * 0.00350);
+}
+</style>
 <!-- 최우선 2장만 preload — 젤리판(세 인터페이스 공용)과 플레이 팝업 레터링이다.
      나머지 31장은 부트 뒤 유휴 프리로더(#catalog-preload)가 데운다. 여기에 더
      얹으면 초기 로드 대역폭을 게임 코드와 다투게 되므로 늘리지 않는다. -->
@@ -43759,7 +43814,7 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
    꺼짐 = 라일락 저채도 역할토큰. 이 규칙은 `.rank-tab` 만 잡아 설정 토글
    `.set-tg` 는 손대지 않는다(⑦ 그룹 규칙보다 뒤라 같은 특이도로 이긴다). */
 .w6m .rank-tab{
-  --bj-a:#7ED9C0; --bj-b:#54BFA2; --bj-drop:#35866F; --bj-band:#43A184;
+  --bj-a:var(--role-mint-face-a); --bj-b:var(--role-mint-face-b); --bj-drop:var(--role-mint-outline); --bj-band:var(--role-mint-contact);
   background-image:linear-gradient(180deg, var(--bj-a) 0%, var(--bj-a) 47%,
                                           var(--bj-b) 47%, var(--bj-b) 100%);
   box-shadow:
@@ -43770,7 +43825,7 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
   text-shadow:0 1.5px 0 color-mix(in srgb, var(--bj-drop) 55%, transparent);
 }
 .w6m .rank-tab[aria-selected="false"]{
-  --bj-a:#CDC2D4; --bj-b:#B3A6BC; --bj-drop:#8B7E95; --bj-band:#A296AC;
+  --bj-a:var(--role-lilac-face-a); --bj-b:var(--role-lilac-face-b); --bj-drop:var(--role-lilac-outline); --bj-band:var(--role-lilac-contact);
   background-image:linear-gradient(180deg, var(--bj-a) 0%, var(--bj-a) 47%,
                                           var(--bj-b) 47%, var(--bj-b) 100%);
   box-shadow:
@@ -45094,7 +45149,7 @@ html[lang="en"] .splash-logo{
 .w6m .sheet .btn,
 .w6m .sheet .btn-ghost,
 .w6m .sheet .btn-secondary{
-  --bj-a:#7ED9C0; --bj-b:#54BFA2; --bj-drop:#35866F; --bj-band:#43A184;
+  --bj-a:var(--role-mint-face-a); --bj-b:var(--role-mint-face-b); --bj-drop:var(--role-mint-outline); --bj-band:var(--role-mint-contact);
   box-sizing:border-box;
   display:flex !important;
   align-items:center !important;
@@ -45228,11 +45283,12 @@ html[lang="en"] .splash-logo{
      --bj-drop · --bj-band 는 예전대로 실측 없음(시안 버튼 아래는 판에 묻힌다) —
      한 자리도 안 건드렸다. 나머지 여섯 변주도 시안 표본이 없어 그대로다.
      롤백: 이 주석을 지우고 아래 한 줄을 #B563D9 / #4AC0B6 으로 되돌린다. */
-  --bj-a:#DB54F0; --bj-b:#34D4B2; --bj-drop:#4F5A7C;
-  --bj-band:rgba(255,255,255,.26);
-  --bj-line-l:#643578; --bj-line-r:#356566;
-  --bj-rim-l:#CC80E6;  --bj-rim-r:#7BCCD2;
-  --bj-lw: calc(var(--f2-ref-w) * 0.00350);
+  --bj-a:var(--role-primary-face-a); --bj-b:var(--role-primary-face-b);
+  --bj-drop:var(--role-primary-outline);
+  --bj-band:var(--role-primary-contact);
+  --bj-line-l:var(--role-primary-outline-l); --bj-line-r:var(--role-primary-outline-r);
+  --bj-rim-l:var(--role-primary-rim-l);      --bj-rim-r:var(--role-primary-rim-r);
+  --bj-lw:var(--role-outline-w);
   position:relative;
   background-image:
     radial-gradient(closest-side, rgba(255,240,253,.951) 0%,
@@ -45278,23 +45334,23 @@ html[lang="en"] .splash-logo{
 }
 .w6m .sheet #btn-next, .w6m .sheet #adv-again, .w6m .sheet #btn-continue,
 .cta-jelly{
-  --bj-a:#F8A2C4; --bj-b:#E8749F; --bj-drop:#A63C6A; --bj-band:#D25E8D;
+  --bj-a:var(--role-pink-face-a); --bj-b:var(--role-pink-face-b); --bj-drop:var(--role-pink-outline); --bj-band:var(--role-pink-contact);
 }
 .w6m .sheet #pz-restart, .w6m .sheet #btn-share{
-  --bj-a:#FFDC84; --bj-b:#F0BC55; --bj-drop:#B07C1C; --bj-band:#DFA63E;
+  --bj-a:var(--role-yellow-face-a); --bj-b:var(--role-yellow-face-b); --bj-drop:var(--role-yellow-outline); --bj-band:var(--role-yellow-contact);
 }
 .w6m .sheet #btn-retry{
-  --bj-a:#FFB874; --bj-b:#F08E45; --bj-drop:#B15A16; --bj-band:#DF7A2E;
+  --bj-a:var(--role-orange-face-a); --bj-b:var(--role-orange-face-b); --bj-drop:var(--role-orange-outline); --bj-band:var(--role-orange-contact);
 }
 .w6m .sheet #pz-menu, .w6m .sheet #btn-menu, .w6m .sheet #btn-daily-menu{
-  --bj-a:#C6A2F5; --bj-b:#A97FE4; --bj-drop:#6B47A8; --bj-band:#9468D2;
+  --bj-a:var(--role-purple-face-a); --bj-b:var(--role-purple-face-b); --bj-drop:var(--role-purple-outline); --bj-band:var(--role-purple-contact);
 }
 /* 3순위 줄버튼 — 토글 **꺼짐**이 쓰는 그 라일락이다(색 하나를 더 만들지 않는다).
    기록·스토리 갤러리·게임 방법·제작진이 여기 산다: 같은 층은 같은 색이라는
    W6-b ③ 의 층 구분을 색만 바꿔 그대로 잇는다. */
 .w6m .sheet .btn-ghost,
 .w6m .sheet .btn-secondary{
-  --bj-a:#CDC2D4; --bj-b:#B3A6BC; --bj-drop:#8B7E95; --bj-band:#A296AC;
+  --bj-a:var(--role-lilac-face-a); --bj-b:var(--role-lilac-face-b); --bj-drop:var(--role-lilac-outline); --bj-band:var(--role-lilac-contact);
   min-height:48px !important;
   /* [E44-0903] 같은 자(B1 0.4089)를 48px 줄버튼에 : (0.4089 x 48 − 1.5) ÷ k = 21.5px.
      롤백: 15px. */
@@ -52376,7 +52432,7 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
    판(#EFE6F6)과 명도차가 8 L 밖에 안 돼 "버튼인지 줄인지"가 안 읽혔다. */
 .modal-v2 .sheet .btn-ghost,
 .modal-v2 .sheet .btn-secondary{
-  --bj-a:#D3A9EC; --bj-b:#BB8FE0; --bj-drop:#7A5A9C; --bj-band:#A87FCF;
+  --bj-a:var(--role-violet-face-a); --bj-b:var(--role-violet-face-b); --bj-drop:var(--role-violet-outline); --bj-band:var(--role-violet-contact);
 }
 /* 닫기 = 킷 주버튼 파랑 그대로 */
 .modal-v2 .sheet #st-close,
@@ -52384,7 +52440,7 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
 .modal-v2 .sheet #sk-close,
 .modal-v2 .sheet #rank-close,
 .modal-v2 .sheet #pz-resume{
-  --bj-a:#93CFEE; --bj-b:#79ABE6; --bj-drop:#436B8E; --bj-band:#5E90C6;
+  --bj-a:var(--role-sky-face-a); --bj-b:var(--role-sky-face-b); --bj-drop:var(--role-sky-outline); --bj-band:var(--role-sky-contact);
 }
 
 /* ---- 2. 토글 .set-tg — 민트 폐기, 킷 파랑/라일락 두 상태 ------------------ */
@@ -55990,10 +56046,10 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
   background: rgba(170, 178, 189, .88);
 }
 #modal-tutorial #tut-skip {
-  --bj-a: #B342D5;
-  --bj-b: #1FBBA0;
-  --bj-drop: #5B4E9B;
-  --bj-band: #7E8FC6;
+  --bj-a: var(--role-magenta-face-a);
+  --bj-b: var(--role-magenta-face-b);
+  --bj-drop: var(--role-magenta-outline);
+  --bj-band: var(--role-magenta-contact);
   background-image:
     linear-gradient(180deg, rgba(255,255,255,.34) 0%, rgba(255,255,255,0) 30%,
                             rgba(0,0,0,0) 72%, rgba(24,14,48,.26) 100%),
@@ -57064,11 +57120,12 @@ html[lang="en"] #modal-arc.is-arcdmg .sheet > h2{ --ttl:url("catalog/ttl-arcdmg-
    무수정 — 필요한 규칙만 여기로 이식했다. 슬롯 [아이콘 없음][「시작」][우측 보조 ❤1].
    판·캡슐·X·접지 그림자(S9)와 무관하다(버튼 한 조각만 바꾼다). */
 #modal-node #node-go.ncta {
-  --bj-a: #DB54F0; --bj-b: #34D4B2; --bj-drop: #4F5A7C;
-  --bj-band: rgba(255,255,255,.26);
-  --bj-line-l: #643578; --bj-line-r: #356566;
-  --bj-rim-l: #CC80E6;  --bj-rim-r: #7BCCD2;
-  --bj-lw: calc(var(--f2-ref-w) * 0.00350);
+  --bj-a: var(--role-primary-face-a); --bj-b: var(--role-primary-face-b);
+  --bj-drop: var(--role-primary-outline);
+  --bj-band: var(--role-primary-contact);
+  --bj-line-l: var(--role-primary-outline-l); --bj-line-r: var(--role-primary-outline-r);
+  --bj-rim-l: var(--role-primary-rim-l);      --bj-rim-r: var(--role-primary-rim-r);
+  --bj-lw: var(--role-outline-w);
   position: relative;
   box-sizing: border-box;
   display: flex; align-items: center; justify-content: center; gap: 8px;
