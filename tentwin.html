@@ -12569,7 +12569,8 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
 <style id="tokens-semantic">
 /* ===== tokens-semantic — 정본 의미 토큰 1벌 (0908 · wave/norm-bj) ==============
    GAME-FACTORY-STANDARD §2 「Variables/Modes = 값의 유일 출처」. COMPONENTS §8 의
-   첫 정규화 계열 `--bj-`(거울 접두)를 여기로 붕괴시킨다.
+   첫 정규화 계열(거울 접두 bj)을 여기로 붕괴시켰다 — 그 접두는 이 파일에서
+   은퇴했고, 부품은 아래 --btn-* 슬롯 토큰만 읽는다.
 
    슬롯 어휘는 규격 §2 그대로다 — face / outline / rim / contact.
      face-a   면 그라데 시작(좌·상)      face-b   면 그라데 끝(우·하)
@@ -12582,7 +12583,7 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
      yellow 다시/복사                  orange 재도전
      purple 메인 메뉴                  sky    킷 v2 주버튼(닫기)
      violet 킷 v2 보조버튼(줄버튼)     magenta 튜토리얼 건너뛰기
-   값은 한 자리도 새로 짓지 않았다 — 전부 옛 --bj-* 정의에서 그대로 옮겼다.
+   값은 한 자리도 새로 짓지 않았다 — 전부 은퇴한 옛 계열의 정의에서 그대로 옮겼다.
    ========================================================================== */
 :root{
   /* mint — 기본 CTA · 기록 탭 켜짐 */
@@ -43808,31 +43809,31 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
 }
 #modal-rank #rank-list::-webkit-scrollbar{ width:0; height:0; }
 
-/* --- ⑩ [0904] 탭 알약 면색을 정본 역할토큰(--bj-*)으로 ----------------------
+/* --- ⑩ [0904] 탭 알약 면색을 정본 역할토큰(--btn-*)으로 ----------------------
    반려 사유였던 **갈색 겉선**(#6E463A = --j-outline)과 크림을 걷는다. 면·겉선·
-   드롭·접지밴드가 전부 --bj-* 에서 나온다: 켜짐 = 엔들리스 포화 변주(민트),
+   드롭·접지밴드가 전부 --btn-* 에서 나온다: 켜짐 = 엔들리스 포화 변주(민트),
    꺼짐 = 라일락 저채도 역할토큰. 이 규칙은 `.rank-tab` 만 잡아 설정 토글
    `.set-tg` 는 손대지 않는다(⑦ 그룹 규칙보다 뒤라 같은 특이도로 이긴다). */
 .w6m .rank-tab{
-  --bj-a:var(--role-mint-face-a); --bj-b:var(--role-mint-face-b); --bj-drop:var(--role-mint-outline); --bj-band:var(--role-mint-contact);
-  background-image:linear-gradient(180deg, var(--bj-a) 0%, var(--bj-a) 47%,
-                                          var(--bj-b) 47%, var(--bj-b) 100%);
+  --btn-face-a:var(--role-mint-face-a); --btn-face-b:var(--role-mint-face-b); --btn-outline:var(--role-mint-outline); --btn-contact:var(--role-mint-contact);
+  background-image:linear-gradient(180deg, var(--btn-face-a) 0%, var(--btn-face-a) 47%,
+                                          var(--btn-face-b) 47%, var(--btn-face-b) 100%);
   box-shadow:
-    0 3px 0 var(--bj-drop),
+    0 3px 0 var(--btn-outline),
     0 6px 14px rgba(83,28,40,.22),
-    inset 0 0 0 2.5px var(--bj-drop),
-    inset 0 -5px 0 var(--bj-band);
-  text-shadow:0 1.5px 0 color-mix(in srgb, var(--bj-drop) 55%, transparent);
+    inset 0 0 0 2.5px var(--btn-outline),
+    inset 0 -5px 0 var(--btn-contact);
+  text-shadow:0 1.5px 0 color-mix(in srgb, var(--btn-outline) 55%, transparent);
 }
 .w6m .rank-tab[aria-selected="false"]{
-  --bj-a:var(--role-lilac-face-a); --bj-b:var(--role-lilac-face-b); --bj-drop:var(--role-lilac-outline); --bj-band:var(--role-lilac-contact);
-  background-image:linear-gradient(180deg, var(--bj-a) 0%, var(--bj-a) 47%,
-                                          var(--bj-b) 47%, var(--bj-b) 100%);
+  --btn-face-a:var(--role-lilac-face-a); --btn-face-b:var(--role-lilac-face-b); --btn-outline:var(--role-lilac-outline); --btn-contact:var(--role-lilac-contact);
+  background-image:linear-gradient(180deg, var(--btn-face-a) 0%, var(--btn-face-a) 47%,
+                                          var(--btn-face-b) 47%, var(--btn-face-b) 100%);
   box-shadow:
-    0 3px 0 var(--bj-drop),
+    0 3px 0 var(--btn-outline),
     0 6px 14px rgba(83,28,40,.18),
-    inset 0 0 0 2.5px var(--bj-drop),
-    inset 0 -5px 0 var(--bj-band);
+    inset 0 0 0 2.5px var(--btn-outline),
+    inset 0 -5px 0 var(--btn-contact);
   text-shadow:0 1px 0 rgba(255,255,255,.42);
 }
 
@@ -45149,7 +45150,7 @@ html[lang="en"] .splash-logo{
 .w6m .sheet .btn,
 .w6m .sheet .btn-ghost,
 .w6m .sheet .btn-secondary{
-  --bj-a:var(--role-mint-face-a); --bj-b:var(--role-mint-face-b); --bj-drop:var(--role-mint-outline); --bj-band:var(--role-mint-contact);
+  --btn-face-a:var(--role-mint-face-a); --btn-face-b:var(--role-mint-face-b); --btn-outline:var(--role-mint-outline); --btn-contact:var(--role-mint-contact);
   box-sizing:border-box;
   display:flex !important;
   align-items:center !important;
@@ -45167,20 +45168,20 @@ html[lang="en"] .splash-logo{
      #sk-close . #rank-close`(29 항이 시안 90127e38 「건너뛰기」로 실측한 그것).
      나머지 여섯(민트 기본 . 분홍 . 노랑 . 주황 . 보라 . 라일락)은 **시안 표본이
      없다**. 그래서 색은 한 자리도 새로 짓지 않았다 — 층 구조만 기준 버튼에서
-     그대로 내려받고, 면색은 각 변주가 이미 갖고 있는 --bj-a / --bj-b 두 토큰뿐이다.
+     그대로 내려받고, 면색은 각 변주가 이미 갖고 있는 --btn-face-a / --btn-face-b 두 토큰뿐이다.
      바뀌는 것 (몸통 배경 한 겹뿐):
        옛  세로 47% 하드에지 — 버튼 한가운데에 가로 이음매 한 줄이 그어졌다.
-       새  1. 면   가로 그라데 90deg  --bj-a -> --bj-b
+       새  1. 면   가로 그라데 90deg  --btn-face-a -> --btn-face-b
            2. 그 위 세로 오버레이 rgba(255,255,255,.16) -> rgba(0,0,0,.10)
            3. 광택 세 점 — 기준 버튼의 실측 자리.크기.알파 그대로
      안 바뀌는 것: 기하(높이 52 . r 999 . flex 중앙정렬) . 겉선 자
-       `--f2-ref-w * 0.00350`(19 항) . 접지 밴드 --bj-band . 드롭 --bj-drop .
+       `--f2-ref-w * 0.00350`(19 항) . 접지 밴드 --btn-contact . 드롭 --btn-outline .
        기준 버튼의 마스크 고리(29 항 — 좌우 색이 다른 값이라 여섯으로 못 내린다).
      기준 버튼 자신은 자기 규칙이 background-image.position.size.repeat 를
      !important 로 다시 덮으므로 이 줄에 안 흔들린다(전.후 계산값 대조로 확인).
      롤백: 이 주석과 아래 넉 줄을 지우고 한 줄로 되돌린다 —
-       background-image:linear-gradient(180deg,var(--bj-a) 0%,var(--bj-a) 47%,
-                                        var(--bj-b) 47%,var(--bj-b) 100%) !important; */
+       background-image:linear-gradient(180deg,var(--btn-face-a) 0%,var(--btn-face-a) 47%,
+                                        var(--btn-face-b) 47%,var(--btn-face-b) 100%) !important; */
   background-image:
     radial-gradient(closest-side, rgba(255,240,253,.951) 0%,
       rgba(255,240,253,.55) 55%, rgba(255,240,253,0) 100%),
@@ -45189,7 +45190,7 @@ html[lang="en"] .splash-logo{
     radial-gradient(closest-side, rgba(255,255,255,.30) 0 60%,
       rgba(255,255,255,0) 100%),
     linear-gradient(180deg, rgba(255,255,255,.16) 0%, rgba(0,0,0,.10) 100%),
-    linear-gradient(90deg, var(--bj-a) 0%, var(--bj-b) 100%) !important;
+    linear-gradient(90deg, var(--btn-face-a) 0%, var(--btn-face-b) 100%) !important;
   background-position:6.62% 15.15%, 15.04% 13.37%, 50% 6.60%, 0 0, 0 0 !important;
   background-size:6.4% 16.5%, 3.02% 10.99%, 74.2% 2.5%, 100% 100%, 100% 100% !important;
   background-repeat:no-repeat !important;
@@ -45206,10 +45207,10 @@ html[lang="en"] .splash-logo{
      탓에 오히려 +0.07~+0.20). 판정은 토큰이 아니라 화면 픽셀이므로,
      두 문법의 **렌더가 같아지는** 명목을 실측으로 잡았다.
      롤백: 이 주석을 지우고 아래 스프레드를 2.5px 로 되돌린다. */
-  box-shadow:0 3px 0 var(--bj-drop),
+  box-shadow:0 3px 0 var(--btn-outline),
              0 7px 16px rgba(83,28,40,.22),
              inset 0 0 0 calc(var(--f2-ref-w) * 0.00350) var(--j-outline),
-             inset 0 -6px 0 var(--bj-band) !important;
+             inset 0 -6px 0 var(--btn-contact) !important;
   color:#FFFFFF !important;
   font-family:var(--font-display) !important;
   /* [E44-0903 . 버튼 글자] 사용자 반려 「설정 창 버튼 글씨 크기 시안대로 키워」.
@@ -45244,7 +45245,7 @@ html[lang="en"] .splash-logo{
 .w6m .sheet #sk-close,  .w6m .sheet #rank-close{
   /* [E29-0903 . 면색] 시안 90127e38 「건너뛰기」 실측 이식.
      [1] 계산값 감사 결과(scratchpad/face-apply-0903/audit_btn.json) - 추정 아님:
-       실효 배경은 `.cta-jelly, .w6m .sheet .btn ...` 의 --bj-* 규칙(!important)이고
+       실효 배경은 `.cta-jelly, .w6m .sheet .btn ...` 의 --btn-* 규칙(!important)이고
        이 줄이 그 변수를 덮는다. 같은 선택자에 달린
        `border-image:var(--lib-btn-cta-blue) 25 33 28 33 fill stretch`(9슬라이스)는
        바로 위 `border-image:none !important` 에 눌린 **죽은 선언**이다.
@@ -45257,12 +45258,12 @@ html[lang="en"] .splash-logo{
        광택  본체 중심 (9.4%,20.9%) . 6.4%x16.5% 가로 렌즈 . 꼭지 #FFF0FD . a .951
              위성 (16.1%,17.4%) 3.02%x10.99% . 윗줄 스페큘러 74.2%x2.2% @ y6.6%
        자리 %는 정본 옮김식 p=(c-s/2)/(1-s) 를 거친 값이다.
-     [3] --bj-drop . --bj-band 는 **실측이 없다**(시안 버튼 아래는 판에 묻힌다).
+     [3] --btn-outline . --btn-contact 는 **실측이 없다**(시안 버튼 아래는 판에 묻힌다).
        다른 여섯 변주와 같은 비율식으로 파생한 값이고, 그 사실을 여기 적어 둔다.
      [4] 나머지 여섯 변주(분홍.노랑.주황.보라.라일락.민트)는 시안 표본이 없어
        한 자리도 안 건드렸다 - 세로 47% 문법 그대로다.
      롤백: 이 주석과 아래 선언을 지우고 한 줄
-           `--bj-a:#8ACDF0; --bj-b:#57A6DC; --bj-drop:#2E6F9C; --bj-band:#4290C8;`
+           `--btn-face-a:#8ACDF0; --btn-face-b:#57A6DC; --btn-outline:#2E6F9C; --btn-contact:#4290C8;`
            로 되돌린다(::before/::after 절도 함께 지운다). */
   /* [E45-0903 . 재질 끝점] 지휘자 판정 「버튼 그라데 끝점이 시안보다 연하다」 확인.
      자 = 합성 on-screen 픽셀(scratchpad/btn2-0903/field.py). 시안 버튼 상자
@@ -45280,15 +45281,15 @@ html[lang="en"] .splash-logo{
        (모델이 맞으면 셋이 같아야 한다) v 0.86 근처에 접지 밴드가 한 겹 더 있다.
        그래서 v=0/1 외삽이 채널마다 다른 답을 준다. 아래 두 색은 「우리 층 위에서
        시안 합성 화소를 재현하는 값」이고, 시안 원료 색의 확정값이 아니다.
-     --bj-drop · --bj-band 는 예전대로 실측 없음(시안 버튼 아래는 판에 묻힌다) —
+     --btn-outline · --btn-contact 는 예전대로 실측 없음(시안 버튼 아래는 판에 묻힌다) —
      한 자리도 안 건드렸다. 나머지 여섯 변주도 시안 표본이 없어 그대로다.
      롤백: 이 주석을 지우고 아래 한 줄을 #B563D9 / #4AC0B6 으로 되돌린다. */
-  --bj-a:var(--role-primary-face-a); --bj-b:var(--role-primary-face-b);
-  --bj-drop:var(--role-primary-outline);
-  --bj-band:var(--role-primary-contact);
-  --bj-line-l:var(--role-primary-outline-l); --bj-line-r:var(--role-primary-outline-r);
-  --bj-rim-l:var(--role-primary-rim-l);      --bj-rim-r:var(--role-primary-rim-r);
-  --bj-lw:var(--role-outline-w);
+  --btn-face-a:var(--role-primary-face-a); --btn-face-b:var(--role-primary-face-b);
+  --btn-outline:var(--role-primary-outline);
+  --btn-contact:var(--role-primary-contact);
+  --btn-outline-l:var(--role-primary-outline-l); --btn-outline-r:var(--role-primary-outline-r);
+  --btn-rim-l:var(--role-primary-rim-l);      --btn-rim-r:var(--role-primary-rim-r);
+  --btn-outline-w:var(--role-outline-w);
   position:relative;
   background-image:
     radial-gradient(closest-side, rgba(255,240,253,.951) 0%,
@@ -45298,13 +45299,13 @@ html[lang="en"] .splash-logo{
     radial-gradient(closest-side, rgba(255,255,255,.30) 0 60%,
       rgba(255,255,255,0) 100%),
     linear-gradient(180deg, rgba(255,255,255,.16) 0%, rgba(0,0,0,.10) 100%),
-    linear-gradient(90deg, var(--bj-a) 0%, var(--bj-b) 100%) !important;
+    linear-gradient(90deg, var(--btn-face-a) 0%, var(--btn-face-b) 100%) !important;
   background-position:6.62% 15.15%, 15.04% 13.37%, 50% 6.60%, 0 0, 0 0 !important;
   background-size:6.4% 16.5%, 3.02% 10.99%, 74.2% 2.5%, 100% 100%, 100% 100% !important;
   background-repeat:no-repeat !important;
-  box-shadow:0 3px 0 var(--bj-drop),
+  box-shadow:0 3px 0 var(--btn-outline),
              0 7px 16px rgba(83,28,40,.22),
-             inset 0 -6px 0 var(--bj-band) !important;
+             inset 0 -6px 0 var(--btn-contact) !important;
 }
 /* 겉선.림 고리 - 좌우 색이 다르므로 inset box-shadow(단색)로는 못 그린다.
    마스크 고리 두 겹이 그 자리를 대신한다. 고리는 겉선 굵기만 칠하고 속은
@@ -45318,8 +45319,8 @@ html[lang="en"] .splash-logo{
 .w6m .sheet #rank-close::after{
   content:''; position:absolute; inset:0; box-sizing:border-box;
   border-radius:inherit; pointer-events:none;
-  padding:var(--bj-lw);
-  background:linear-gradient(90deg, var(--bj-line-l) 0%, var(--bj-line-r) 100%);
+  padding:var(--btn-outline-w);
+  background:linear-gradient(90deg, var(--btn-outline-l) 0%, var(--btn-outline-r) 100%);
   -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite:xor;
           mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -45328,29 +45329,29 @@ html[lang="en"] .splash-logo{
 .w6m .sheet #pz-resume::after,  .w6m .sheet #howto-close::after,
 .w6m .sheet #st-close::after,   .w6m .sheet #sk-close::after,
 .w6m .sheet #rank-close::after{
-  inset:var(--bj-lw);
-  background:linear-gradient(90deg, var(--bj-rim-l) 0%, var(--bj-rim-r) 100%);
+  inset:var(--btn-outline-w);
+  background:linear-gradient(90deg, var(--btn-rim-l) 0%, var(--btn-rim-r) 100%);
   opacity:.70;
 }
 .w6m .sheet #btn-next, .w6m .sheet #adv-again, .w6m .sheet #btn-continue,
 .cta-jelly{
-  --bj-a:var(--role-pink-face-a); --bj-b:var(--role-pink-face-b); --bj-drop:var(--role-pink-outline); --bj-band:var(--role-pink-contact);
+  --btn-face-a:var(--role-pink-face-a); --btn-face-b:var(--role-pink-face-b); --btn-outline:var(--role-pink-outline); --btn-contact:var(--role-pink-contact);
 }
 .w6m .sheet #pz-restart, .w6m .sheet #btn-share{
-  --bj-a:var(--role-yellow-face-a); --bj-b:var(--role-yellow-face-b); --bj-drop:var(--role-yellow-outline); --bj-band:var(--role-yellow-contact);
+  --btn-face-a:var(--role-yellow-face-a); --btn-face-b:var(--role-yellow-face-b); --btn-outline:var(--role-yellow-outline); --btn-contact:var(--role-yellow-contact);
 }
 .w6m .sheet #btn-retry{
-  --bj-a:var(--role-orange-face-a); --bj-b:var(--role-orange-face-b); --bj-drop:var(--role-orange-outline); --bj-band:var(--role-orange-contact);
+  --btn-face-a:var(--role-orange-face-a); --btn-face-b:var(--role-orange-face-b); --btn-outline:var(--role-orange-outline); --btn-contact:var(--role-orange-contact);
 }
 .w6m .sheet #pz-menu, .w6m .sheet #btn-menu, .w6m .sheet #btn-daily-menu{
-  --bj-a:var(--role-purple-face-a); --bj-b:var(--role-purple-face-b); --bj-drop:var(--role-purple-outline); --bj-band:var(--role-purple-contact);
+  --btn-face-a:var(--role-purple-face-a); --btn-face-b:var(--role-purple-face-b); --btn-outline:var(--role-purple-outline); --btn-contact:var(--role-purple-contact);
 }
 /* 3순위 줄버튼 — 토글 **꺼짐**이 쓰는 그 라일락이다(색 하나를 더 만들지 않는다).
    기록·스토리 갤러리·게임 방법·제작진이 여기 산다: 같은 층은 같은 색이라는
    W6-b ③ 의 층 구분을 색만 바꿔 그대로 잇는다. */
 .w6m .sheet .btn-ghost,
 .w6m .sheet .btn-secondary{
-  --bj-a:var(--role-lilac-face-a); --bj-b:var(--role-lilac-face-b); --bj-drop:var(--role-lilac-outline); --bj-band:var(--role-lilac-contact);
+  --btn-face-a:var(--role-lilac-face-a); --btn-face-b:var(--role-lilac-face-b); --btn-outline:var(--role-lilac-outline); --btn-contact:var(--role-lilac-contact);
   min-height:48px !important;
   /* [E44-0903] 같은 자(B1 0.4089)를 48px 줄버튼에 : (0.4089 x 48 − 1.5) ÷ k = 21.5px.
      롤백: 15px. */
@@ -52405,7 +52406,7 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
    옮겼으므로 이 한 접두사가 곧 "2b 가 통일한 판 안" 이다.
    ########################################################################### */
 
-/* ---- 1. 시트 버튼 — 획을 킷 획으로. 색표(--bj-*)는 그대로 쓴다 ------------ */
+/* ---- 1. 시트 버튼 — 획을 킷 획으로. 색표(--btn-*)는 그대로 쓴다 ------------ */
 .modal-v2 .sheet .btn,
 .modal-v2 .sheet .btn-ghost,
 .modal-v2 .sheet .btn-secondary,
@@ -52414,17 +52415,17 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
   --f2-bh: 52px;
   box-shadow:
     /* 외곽선 — inset ring. 크로뮴 border 정수 내림이 없다(킷 §1 근거). */
-    inset 0 0 0 calc(var(--f2-bh) * .0349) var(--bj-drop),
+    inset 0 0 0 calc(var(--f2-bh) * .0349) var(--btn-outline),
     /* 측면 림 */
     inset 0 0 0 calc(var(--f2-bh) * .0355 + var(--f2-bh) * .0349) rgba(255,255,255,.50),
     /* 하단 내부 발광 -> 접지 밴드 2단 */
     inset 0 calc(var(--f2-bh) * -.1320) 0 rgba(255,255,255,.34),
-    inset 0 calc(var(--f2-bh) * -.0680) 0 var(--bj-band),
+    inset 0 calc(var(--f2-bh) * -.0680) 0 var(--btn-contact),
     /* 가장자리 어두워짐 (아주 약하게) */
     inset 0 calc(var(--f2-bh) * -.138) calc(var(--f2-bh) * .46) rgba(60,44,66,.06),
     /* 바깥 어깨 + 드리운 그림자 */
     0 0 var(--f2-soft-blur) var(--f2-soft-spread)
-      color-mix(in srgb, var(--bj-drop) 66%, transparent),
+      color-mix(in srgb, var(--btn-outline) 66%, transparent),
     0 calc(var(--f2-bh) * .045) calc(var(--f2-bh) * .11) rgba(120,95,125,.28) !important;
   text-shadow: 0 1.5px 0 rgba(70,52,80,.42) !important;
 }
@@ -52432,7 +52433,7 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
    판(#EFE6F6)과 명도차가 8 L 밖에 안 돼 "버튼인지 줄인지"가 안 읽혔다. */
 .modal-v2 .sheet .btn-ghost,
 .modal-v2 .sheet .btn-secondary{
-  --bj-a:var(--role-violet-face-a); --bj-b:var(--role-violet-face-b); --bj-drop:var(--role-violet-outline); --bj-band:var(--role-violet-contact);
+  --btn-face-a:var(--role-violet-face-a); --btn-face-b:var(--role-violet-face-b); --btn-outline:var(--role-violet-outline); --btn-contact:var(--role-violet-contact);
 }
 /* 닫기 = 킷 주버튼 파랑 그대로 */
 .modal-v2 .sheet #st-close,
@@ -52440,7 +52441,7 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
 .modal-v2 .sheet #sk-close,
 .modal-v2 .sheet #rank-close,
 .modal-v2 .sheet #pz-resume{
-  --bj-a:var(--role-sky-face-a); --bj-b:var(--role-sky-face-b); --bj-drop:var(--role-sky-outline); --bj-band:var(--role-sky-contact);
+  --btn-face-a:var(--role-sky-face-a); --btn-face-b:var(--role-sky-face-b); --btn-outline:var(--role-sky-outline); --btn-contact:var(--role-sky-contact);
 }
 
 /* ---- 2. 토글 .set-tg — 민트 폐기, 킷 파랑/라일락 두 상태 ------------------ */
@@ -52482,7 +52483,7 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
    그래서 배치·구성·문구·기하는 한 값도 안 건드린다. 바뀌는 것은 **몸통 두 겹**뿐이다.
      ① 옛 캔디 문법의 `a 0~47% / b 47~100%` **하드에지**가 버튼 한가운데에 가로
         이음매를 하나 그어 놓고 있었다 — 젤리가 아니라 스티커로 읽히는 원인이다.
-        같은 --bj-* 색표를 그대로 쓰되 정지 자리만 모드 젤리 바와 같은 실측값
+        같은 --btn-* 색표를 그대로 쓰되 정지 자리만 모드 젤리 바와 같은 실측값
         (0~4% c1 · 45~100% c2, 시안 띠 세로 단면)으로 옮긴다.
      ② 좌상 스페큘러가 없었다. 킷 .kit-btn-v2::before 와 **같은 두 점**을 준다.
    질감층(외곽선·측면 림·접지 밴드·발광)은 위 1번이 이미 킷 값이라 안 건드린다. */
@@ -52492,8 +52493,8 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
 .modal-v2 .sheet .cta-jelly{
   position: relative;
   isolation: isolate;
-  background-image: linear-gradient(180deg, var(--bj-a) 0%, var(--bj-a) 4%,
-                                            var(--bj-b) 45%, var(--bj-b) 100%) !important;
+  background-image: linear-gradient(180deg, var(--btn-face-a) 0%, var(--btn-face-a) 4%,
+                                            var(--btn-face-b) 45%, var(--btn-face-b) 100%) !important;
 }
 .modal-v2 .sheet .btn::before,
 .modal-v2 .sheet .btn-ghost::before,
@@ -56036,7 +56037,7 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
 /* ---- CV-10. 4회전 재측 보정 -------------------------------------------
    (가) 건너뛰기 그라데가 안 먹었다 — :51048 `.modal-v2 .sheet .btn*` 의
        `background-image: ... !important` 가 이긴다. 같은 문법으로 맞둔다.
-       색표(--bj-*)도 같이 갈아 질감층(외곽선·림·접지밴드)이 따라온다.
+       색표(--btn-*)도 같이 갈아 질감층(외곽선·림·접지밴드)이 따라온다.
    (나) 내용 셀은 시안에서 사실상 불투명하다 — 셀 안 화소 폭이
        (168,175,187)~(173,181,192) 로 5단위뿐이다(뒤 그림이 안 읽힌다).
        .26 알파로는 무대가 그대로 비친다 — 실측색 그대로 .88 로 깔는다. */
@@ -56046,14 +56047,14 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
   background: rgba(170, 178, 189, .88);
 }
 #modal-tutorial #tut-skip {
-  --bj-a: var(--role-magenta-face-a);
-  --bj-b: var(--role-magenta-face-b);
-  --bj-drop: var(--role-magenta-outline);
-  --bj-band: var(--role-magenta-contact);
+  --btn-face-a: var(--role-magenta-face-a);
+  --btn-face-b: var(--role-magenta-face-b);
+  --btn-outline: var(--role-magenta-outline);
+  --btn-contact: var(--role-magenta-contact);
   background-image:
     linear-gradient(180deg, rgba(255,255,255,.34) 0%, rgba(255,255,255,0) 30%,
                             rgba(0,0,0,0) 72%, rgba(24,14,48,.26) 100%),
-    linear-gradient(90deg, #B342D5 0%, #1FBBA0 100%) !important;
+    linear-gradient(90deg, var(--btn-face-a) 0%, var(--btn-face-b) 100%) !important;
   /* [E31-0903] 이 세 줄은 위 두 겹의 **짝**이다. 기준 버튼 문법을 여섯 변주에
      내리면서 `.cta-jelly, .w6m .sheet .btn ...` 이 다섯 겹짜리 background-size /
      -position 목록을 갖게 됐는데, 이 규칙은 background-image 만 !important 로
@@ -57115,17 +57116,17 @@ html[lang="en"] #modal-arc.is-arcdmg .sheet > h2{ --ttl:url("catalog/ttl-arcdmg-
 <style id="work-btn-core">
 /* ===== work-btn-core (0904 · wave/node) — 시작 버튼 첫 배선 =======================
    정본 기준 버튼(tentwin/ref-v2/work-btn.css 「기준 1」 = 「건너뛰기」)을 게임에 실린
-   캔디 문법으로 이 버튼에 처음 배선한다. primary 역할색 --bj-a #DB54F0 / --bj-b #34D4B2
+   캔디 문법으로 이 버튼에 처음 배선한다. primary 역할색 --btn-face-a #DB54F0 / --btn-face-b #34D4B2
    (= 판정판 버튼 작업판 값 = 모달 주버튼 #pz-resume 계열과 같은 색·층). 정본 파일은
    무수정 — 필요한 규칙만 여기로 이식했다. 슬롯 [아이콘 없음][「시작」][우측 보조 ❤1].
    판·캡슐·X·접지 그림자(S9)와 무관하다(버튼 한 조각만 바꾼다). */
 #modal-node #node-go.ncta {
-  --bj-a: var(--role-primary-face-a); --bj-b: var(--role-primary-face-b);
-  --bj-drop: var(--role-primary-outline);
-  --bj-band: var(--role-primary-contact);
-  --bj-line-l: var(--role-primary-outline-l); --bj-line-r: var(--role-primary-outline-r);
-  --bj-rim-l: var(--role-primary-rim-l);      --bj-rim-r: var(--role-primary-rim-r);
-  --bj-lw: var(--role-outline-w);
+  --btn-face-a: var(--role-primary-face-a); --btn-face-b: var(--role-primary-face-b);
+  --btn-outline: var(--role-primary-outline);
+  --btn-contact: var(--role-primary-contact);
+  --btn-outline-l: var(--role-primary-outline-l); --btn-outline-r: var(--role-primary-outline-r);
+  --btn-rim-l: var(--role-primary-rim-l);      --btn-rim-r: var(--role-primary-rim-r);
+  --btn-outline-w: var(--role-outline-w);
   position: relative;
   box-sizing: border-box;
   display: flex; align-items: center; justify-content: center; gap: 8px;
@@ -57141,14 +57142,14 @@ html[lang="en"] #modal-arc.is-arcdmg .sheet > h2{ --ttl:url("catalog/ttl-arcdmg-
     radial-gradient(closest-side, rgba(255,240,253,.45) 0%, rgba(255,240,253,0) 100%),
     radial-gradient(closest-side, rgba(255,255,255,.30) 0 60%, rgba(255,255,255,0) 100%),
     linear-gradient(180deg, rgba(255,255,255,.16) 0%, rgba(0,0,0,.10) 100%),
-    linear-gradient(90deg, var(--bj-a) 0%, var(--bj-b) 100%);
+    linear-gradient(90deg, var(--btn-face-a) 0%, var(--btn-face-b) 100%);
   background-position: 6.62% 15.15%, 15.04% 13.37%, 50% 6.60%, 0 0, 0 0;
   background-size: 6.4% 16.5%, 3.02% 10.99%, 74.2% 2.5%, 100% 100%, 100% 100%;
   background-repeat: no-repeat;
   box-shadow:
-    0 3px 0 var(--bj-drop),
+    0 3px 0 var(--btn-outline),
     0 7px 16px rgba(83,28,40,.22),
-    inset 0 -6px 0 var(--bj-band);
+    inset 0 -6px 0 var(--btn-contact);
   color: #FFFFFF;
   font-family: var(--font-display);
 }
@@ -57157,16 +57158,16 @@ html[lang="en"] #modal-arc.is-arcdmg .sheet > h2{ --ttl:url("catalog/ttl-arcdmg-
 #modal-node #node-go.ncta::after {
   content: ''; position: absolute; inset: 0; box-sizing: border-box;
   border-radius: inherit; pointer-events: none;
-  padding: var(--bj-lw);
-  background: linear-gradient(90deg, var(--bj-line-l) 0%, var(--bj-line-r) 100%);
+  padding: var(--btn-outline-w);
+  background: linear-gradient(90deg, var(--btn-outline-l) 0%, var(--btn-outline-r) 100%);
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
           mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
           mask-composite: exclude;
 }
 #modal-node #node-go.ncta::after {
-  inset: var(--bj-lw);
-  background: linear-gradient(90deg, var(--bj-rim-l) 0%, var(--bj-rim-r) 100%);
+  inset: var(--btn-outline-w);
+  background: linear-gradient(90deg, var(--btn-rim-l) 0%, var(--btn-rim-r) 100%);
   opacity: .70;
 }
 #modal-node #node-go.ncta:active { transform: translateY(2px); }
