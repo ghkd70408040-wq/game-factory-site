@@ -48402,6 +48402,15 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
      S5 이름 알약 실측 (220,204,206) 더스티 로즈. 종전 #CFC0DC(207,192,220)는 더
      푸르고 어두웠다(ΔL 12·Δ채도 5). α/구조 무변경 — 면색만 S5 로. */
   --f2-slot:     #DCCCCE;
+  /* [S5-0908] 화살표·아이템 슬롯 재질 토큰 — 리터럴을 이름으로(값 무변, 프레임 교체점 1) */
+  --f2-arrow-1: rgba(255,255,255,.97);
+  --f2-arrow-2: rgba(253,232,239,.90);
+  --f2-arrow-face: rgba(246,192,210,.86);
+  --f2-arrow-4: rgba(234,156,182,.84);
+  --f2-arrow-line: rgba(176,104,136,.55);
+  --f2-item-face: rgba(255,255,255,.42);
+  --f2-item-line: rgba(150,124,168,.45);
+  --f2-item-on: rgba(255, 246, 214, .82);
   /* [E32-0903 · 면색] 레일 뒤판(.cp-side-body). [색감 S5 0904] 색 정본을 우리
      렌더 실측(233,219,224)에서 **S5 실측**으로 옮긴다: S5 레일 본체 (236,232,225)
      — 종전보다 밝고(ΔL 9) 덜 분홍하다. α(.cps-body-a .425)·구조 무변경, 면색만.
@@ -48726,10 +48735,10 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   /* 반투명 유리: 상단(40%,28%) 흰 광택 → 연분홍 → 살몬. S5 처럼 맑되, 뒤 방울이
      비쳐 지저분해지지 않게 알파를 살짝 올렸다(유리감 유지 · 3번째 이웃 가림). */
   background: radial-gradient(120% 120% at 40% 28%,
-    rgba(255,255,255,.97) 0%, rgba(253,232,239,.90) 40%,
-    rgba(246,192,210,.86) 74%, rgba(234,156,182,.84) 100%);
+    var(--f2-arrow-1) 0%, var(--f2-arrow-2) 40%,
+    var(--f2-arrow-face) 74%, var(--f2-arrow-4) 100%);
   box-shadow:
-    inset 0 0 0 calc(var(--f2-w) * .0026) rgba(176,104,136,.55),                        /* 얇은 마우브 겉선 */
+    inset 0 0 0 calc(var(--f2-w) * .0026) var(--f2-arrow-line),                        /* 얇은 마우브 겉선 */
     inset 0 calc(var(--f2-w) * .0062) calc(var(--f2-w) * .0060) rgba(255,255,255,.88),   /* 상단 광택 */
     inset 0 calc(var(--f2-w) * -.0070) calc(var(--f2-w) * .0070) rgba(160,90,125,.26),   /* 아래 접지 */
     0 calc(var(--f2-w) * .0050) calc(var(--f2-w) * .0080) rgba(150,70,110,.24);          /* 바깥 그림자 */
@@ -48995,13 +49004,13 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   padding: calc(var(--f2-w) * .008) 0;
   border: 0;
   border-radius: calc(var(--f2-w) * .022);
-  background: rgba(255,255,255,.42);
-  box-shadow: inset 0 0 0 calc(var(--f2-w) * .0041) rgba(150,124,168,.45);
+  background: var(--f2-item-face);
+  box-shadow: inset 0 0 0 calc(var(--f2-w) * .0041) var(--f2-item-line);
   color: var(--f2-ink);
   cursor: pointer;
 }
 #charpanel .cp-side .cp-item.on {
-  background: rgba(255, 246, 214, .82);
+  background: var(--f2-item-on);
   box-shadow:
     inset 0 0 0 calc(var(--f2-w) * .0041) var(--f2-hi),
     0 0 calc(var(--f2-w) * .014) var(--f2-hi-halo);
