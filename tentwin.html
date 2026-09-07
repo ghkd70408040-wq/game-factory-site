@@ -12674,6 +12674,18 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
   --mode-a-outline-chip-base:#6B5A69;
   --mode-a-glow-chip:#9AC0CB;
   --mode-b-contact: 0.200;
+  /* [E74-0908 norm-duel] --duel- 계열 색 리프 — 대전 HUD(#duel-hud). 값은 #app.battle 실렌더값(0819 시안 6호 3점 샘플)을
+     이름만 붙여 옮긴 것(값 신설 0). 정지점 %·각도·기하·α 축은 부품 규칙(§0 ⑥) 무접촉.
+     패널 재질은 Mode B 정본(face #96A7F6)과 값이 달라(진영 그라데) --mode-b-face-duel-* 리프로, 트랙·채움·공격·문양 폴백·타이머 글자는
+     역할색 --role-foe-*/--role-me-*. 비전투 기본값(임시 파스텔, #duel-hud[hidden] 이라 렌더 0)은 같은 리프를 참조하고 옛 값은 은퇴. */
+  --mode-b-face-duel-foe-a:rgba(163,113,166,.94); --mode-b-face-duel-foe-b:rgba(122,66,124,.95); --mode-b-face-duel-foe-c:rgba(85,9,71,.96);
+  --mode-b-face-duel-me-a:rgba(232,244,252,.94);  --mode-b-face-duel-me-b:rgba(198,222,240,.94); --mode-b-face-duel-me-c:rgba(160,192,216,.95);
+  --role-foe-track:rgba(46,6,32,.86);    --role-me-track:rgba(87,118,149,.30);
+  --role-foe-fill-a:#C0304F; --role-foe-fill-b:#A01830; --role-foe-fill-c:#6B0B22; --role-foe-fill-d:#4A0013;
+  --role-me-fill-a:#E6F7FF;  --role-me-fill-b:#C8E8F0;  --role-me-fill-c:#A5DCE6;  --role-me-fill-d:#74BBD7;
+  --role-foe-atk-a:#FF5A3D;  --role-foe-atk-b:#FFB03D;  --role-me-atk-a:#FFD24D;   --role-me-atk-b:#FF8A3D;
+  --role-foe-orn-fb:rgba(244,232,220,.46); --role-me-orn-fb:rgba(255,255,255,.72);
+  --role-duel-tm:#EE6A88;
 }
 </style>
 <!-- 최우선 2장만 preload — 젤리판(세 인터페이스 공용)과 플레이 팝업 레터링이다.
@@ -56061,25 +56073,27 @@ else window.addEventListener("load",start);
      좌표에 정확히 앉는다. 판 자체의 4px 들여쓰기는 left:1.04cqw 가 이미 갖는다. */
   margin: 0 var(--safe-r) 4px var(--safe-l);
 
-  /* --- 임시 코드 스킨. 에셋 도착 시 갈아 끼우는 칸은 여기가 전부다 --- */
+  /* --- 임시 코드 스킨. 에셋 도착 시 갈아 끼우는 칸은 여기가 전부다 ---
+     [E74-0908 norm-duel] 색은 전부 tokens-semantic 리프 참조(--mode-b-face-duel-* / --role-foe-* / --role-me-*).
+     이 기본값은 #duel-hud[hidden]{display:none} 이라 #app.battle 밖에서 렌더되지 않는다(duelHudMount 만 hidden 을 내리고,
+     그 앞에 duelStart 가 .battle 을 켠다) — 옛 임시 파스텔(#D22B44·#CFF4FF·rgba(78,32,60)… #F0537D)은 도달 0 이라 은퇴,
+     --duel-cap-bg/--duel-cap-frame 은 소비처 0(캡슐은 .wf-cap 부품이 그림)이라 삭제. 정지점·각도는 부품값 그대로. */
   --duel-foe-frame: none;
   --duel-me-frame: none;
-  --duel-cap-frame: none;
   --duel-castle-img: none;
   --duel-orn-l: none;
   --duel-orn-r: none;
-  --duel-foe-panel: linear-gradient(180deg, rgba(78, 32, 60, .86) 0%, rgba(36, 11, 28, .90) 100%);
-  --duel-me-panel:  linear-gradient(180deg, rgba(232, 247, 255, .92) 0%, rgba(180, 220, 246, .94) 100%);
-  --duel-foe-track: rgba(18, 4, 11, .74);
-  --duel-me-track:  rgba(34, 74, 108, .28);
-  --duel-foe-fill:  linear-gradient(180deg, #D22B44 0%, #90112A 55%, #56091A 100%);
-  --duel-me-fill:   linear-gradient(180deg, #CFF4FF 0%, #86D8F7 52%, #4FB6E8 100%);
-  --duel-foe-atk:   linear-gradient(90deg, #FF5A3D, #FFB03D);
-  --duel-me-atk:    linear-gradient(90deg, #FFD24D, #FF8A3D);
-  --duel-cap-bg: linear-gradient(180deg, rgba(255, 255, 255, .40) 0%, rgba(255, 255, 255, .12) 48%, rgba(146, 196, 234, .26) 100%);
-  --duel-orn-fb-foe: radial-gradient(closest-side, rgba(244, 232, 220, .46) 92%, transparent 100%);
-  --duel-orn-fb-me:  radial-gradient(closest-side, rgba(255, 255, 255, .72) 92%, transparent 100%);
-  --duel-tm-color: #F0537D;
+  --duel-foe-panel: linear-gradient(180deg, var(--mode-b-face-duel-foe-a) 0%, var(--mode-b-face-duel-foe-b) 52%, var(--mode-b-face-duel-foe-c) 100%);
+  --duel-me-panel:  linear-gradient(180deg, var(--mode-b-face-duel-me-a) 0%, var(--mode-b-face-duel-me-b) 54%, var(--mode-b-face-duel-me-c) 100%);
+  --duel-foe-track: var(--role-foe-track);
+  --duel-me-track:  var(--role-me-track);
+  --duel-foe-fill:  linear-gradient(180deg, var(--role-foe-fill-a) 0%, var(--role-foe-fill-b) 46%, var(--role-foe-fill-c) 78%, var(--role-foe-fill-d) 100%);
+  --duel-me-fill:   linear-gradient(180deg, var(--role-me-fill-a) 0%, var(--role-me-fill-b) 38%, var(--role-me-fill-c) 70%, var(--role-me-fill-d) 100%);
+  --duel-foe-atk:   linear-gradient(90deg, var(--role-foe-atk-a), var(--role-foe-atk-b));
+  --duel-me-atk:    linear-gradient(90deg, var(--role-me-atk-a), var(--role-me-atk-b));
+  --duel-orn-fb-foe: radial-gradient(closest-side, var(--role-foe-orn-fb) 92%, transparent 100%);
+  --duel-orn-fb-me:  radial-gradient(closest-side, var(--role-me-orn-fb) 92%, transparent 100%);
+  --duel-tm-color: var(--role-duel-tm);
 }
 #duel-hud[hidden] { display: none; }
 .dh-side {
@@ -56385,13 +56399,14 @@ else window.addEventListener("load",start);
      직접 배경(duel-castle-hd, 202×188 고해상)이 됐다. 구판 duel-icon-castle.webp
      은 **파일로 남아 있고** 참조만 끊었다 — 되돌리려면 이 한 줄만 되살린다. */
   /* HP 바 3점 샘플의 자리. 임시 파스텔을 시안 색으로 갈아 끼운다. */
-  --duel-foe-panel:linear-gradient(180deg,rgba(163,113,166,.94) 0%,rgba(122,66,124,.95) 52%,rgba(85,9,71,.96) 100%);
-  --duel-me-panel:linear-gradient(180deg,rgba(232,244,252,.94) 0%,rgba(198,222,240,.94) 54%,rgba(160,192,216,.95) 100%);
-  --duel-foe-track:rgba(46,6,32,.86);
-  --duel-me-track:rgba(87,118,149,.30);
-  --duel-foe-fill:linear-gradient(180deg,#C0304F 0%,#A01830 46%,#6B0B22 78%,#4A0013 100%);
-  --duel-me-fill:linear-gradient(180deg,#E6F7FF 0%,#C8E8F0 38%,#A5DCE6 70%,#74BBD7 100%);
-  --duel-tm-color:#EE6A88;
+  /* [E74-0908 norm-duel] 값은 tokens-semantic 리프(진영 재질 --mode-b-face-duel-* · 역할색 --role-foe-*/--role-me-*)로 옮겼다 — 정지점 %는 여기 부품값. */
+  --duel-foe-panel:linear-gradient(180deg,var(--mode-b-face-duel-foe-a) 0%,var(--mode-b-face-duel-foe-b) 52%,var(--mode-b-face-duel-foe-c) 100%);
+  --duel-me-panel:linear-gradient(180deg,var(--mode-b-face-duel-me-a) 0%,var(--mode-b-face-duel-me-b) 54%,var(--mode-b-face-duel-me-c) 100%);
+  --duel-foe-track:var(--role-foe-track);
+  --duel-me-track:var(--role-me-track);
+  --duel-foe-fill:linear-gradient(180deg,var(--role-foe-fill-a) 0%,var(--role-foe-fill-b) 46%,var(--role-foe-fill-c) 78%,var(--role-foe-fill-d) 100%);
+  --duel-me-fill:linear-gradient(180deg,var(--role-me-fill-a) 0%,var(--role-me-fill-b) 38%,var(--role-me-fill-c) 70%,var(--role-me-fill-d) 100%);
+  --duel-tm-color:var(--role-duel-tm);
 }
 #app.battle .dh-castle{
   width:24px !important;height:21px !important;
