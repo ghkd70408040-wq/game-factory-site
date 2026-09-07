@@ -50254,55 +50254,6 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
    ########################################################################### */
 
 /* ---- 0. 창 뿌리 — 스크림 값 하나 + 킷 계약(--f2-w) ---------------------- */
-.modal-v2 {
-  /* 판 폭 하나가 모든 치수를 다스린다 (킷의 계약). CHARSEL v2 와 같은 값. */
-  --f2-w: min(95.7vw, 430px);
-  /* ⚠ 1 이다. 킷은 --f2-alpha 를 `opacity` 로 읽는데, 그것은 **자식까지** 묽게
-     만든다(글자·아이콘 전부). 판만 비치게 하려면 알파는 색(--f2-base)이 갖는다. */
-  --f2-alpha: 1;
-
-  /* 색 — CHARSEL v2 와 한 글자도 다르지 않다. 다른 것은 --f2-base 의 알파뿐. */
-  /* 수리 0831 — 판은 젤리 덮개가 그린다. 이 값은 판을 칠하지 않는다. */
-  --f2-base:     transparent;
-  --f2-line:     #8F7E9C;
-  --f2-tab-on:   #F3ECF8;
-  --f2-tab-off:  #C3ACD3;
-  --f2-slot:     #CFC0DC;
-  --f2-box:      #E4DCEF;
-  --f2-box-2:    #D2C5E4;
-  /* 수리 0831 — 정본 캡슐의 속(--wf-a-in .010). 단색 hex 는 재해석이다. */
-  --f2-pill:     color-mix(in srgb, #F8E3EF 1%, transparent);
-  --f2-pill-line:#A38FA5;
-  --f2-ink:      #5B4F62;
-
-  /* 스크림 — 값 하나다. 캐릭터 선택창이 쓰는 그 값이라 두 화면이 같은 어둠에서
-     뜬다(종전: 모달 rgba(88,64,112,.12) vs 캐릭터창 rgba(34,18,40,.46) 두 갈래). */
-  /* [E14-0902 · 사용자 확정 「시안처럼 밝게」] 알파 .46 -> **0**.
-     역산(발명 0) — 시안 조립본 90127e38 의 판 **밖** 배경을 네 띠(위/아래/좌/우,
-     51.7 만 화소)에서 재면 L* 중앙값 **62.4** (위 71.7 · 아래 54.1 · 좌 77.5 · 우 67.0).
-     우리 화면을 같은 자로 재면 —
-       스크림 .46 : L* 23.1      스크림 0 : L* 55.5   (낮 배경)
-       스크림 .46 : L* 11.6      스크림 0 : L* 20.9   (밤 배경)
-     즉 **알파를 0 으로 내려도 62.4 를 못 넘는다** — 0 이 역산의 경계값이고,
-     그 이상은 배경을 밝히는 층을 새로 지어내는 것이라 하지 않는다.
-     남는 차 6.9 L*(낮)는 우리 낮 아트가 시안 장면보다 그만큼 차가운 몫이고,
-     밤 배경의 34.6 L* 차는 `#screen-menu.is-night` 라는 **시각 분기**지 결함이
-     아니다(시안 조립본은 낮 장면 위에 서 있다). ⑭-12 에 수치로 적었다.
-     겹침 방지는 아래 `body:has(.modal:not([hidden]))` 글자 숨김이 계속 맡는다.
-     이 선언은 `.modal-v2` 안이라 **모달 15창에만** 걸린다 — 캐릭터 선택창의
-     하늘(.cp-sky)과 루트의 --j-scrim(rgba(46,26,40,.80))은 안 건드렸다.
-     되돌리려면 이 한 줄을 .46 으로. */
-  --j-scrim: rgba(34, 18, 40, 0);
-
-  --mv2-head: calc(var(--f2-w) * .1524);   /* 헤더 캡슐 = kit-pill-v2 높이 */
-  --mv2-gap:  calc(var(--f2-w) * .022);
-
-  background-color: var(--j-scrim);
-  -webkit-backdrop-filter: blur(1px) saturate(1.04);
-  backdrop-filter: blur(1px) saturate(1.04);
-  padding: calc(var(--safe-t) + 14px) calc(var(--safe-r) + 10px)
-           calc(var(--safe-b) + 14px) calc(var(--safe-l) + 10px);
-}
 
 /* ---- 1-b. 판 뒤 글자 국소 처리  [지휘자 판정 1 · 2026-09-01] -------------
    ▣ 왜 흐림이 아니라 이것인가
@@ -50366,73 +50317,18 @@ body:has(.modal:not([hidden])) #screen-map,
 body:has(.modal:not([hidden])) #screen-game { filter: blur(6px); }
 
 /* ---- 1. 판 = kit-frame-v2 ------------------------------------------------ */
-.modal-v2 .mv2-sheet {
-  box-sizing: border-box;
-  width: var(--f2-w);
-  max-width: var(--f2-w);
-  max-height: 100%;
-  /* W-C(0831) — 스크롤이 **안쪽 래퍼**(.mv2-scroll)로 내려갔다. 판 자신이
-     스크롤 상자이던 동안에는 절대배치 질감층이 내용과 함께 흘러 올라가서
-     킷 의사요소를 꺼야 했다(아래 ::before/::after 주석). 그 전제가 사라졌다. */
-  position: relative;
-  overflow: visible;
-  display: flex;
-  flex-direction: column;
-  gap: var(--mv2-gap);
-  padding: calc(var(--f2-w) * .045) calc(var(--f2-w) * .052) calc(var(--f2-w) * .062);
-  /* W-C(0831) 2b — 테두리·반경·면색·흐림·그림자는 전부 **덮개 두 장**으로
-     내려갔다(.mv2-gnd / .mv2-jelly, 아래 2b 절). 판은 이제 자리와 여백만
-     맡는다. 종전 일곱 겹 box-shadow 한 줄은 그 층들이 대신 그린다. */
-  /* 테두리는 **투명하게 남긴다** — 폭 계약(--f2-bd)이 판의 바깥 상자 크기를
-     정하고 있었다. 0 으로 지우면 15창이 전부 그만큼 줄어 승인된 레이아웃이
-     통째로 밀린다(실측: 422->420 · 655->653 · 158->156). 그리는 일은 이제
-     L3 고리가 하고, 이 줄은 **자리만** 지킨다. */
-  border: var(--f2-bd) solid transparent;
-  border-radius: 0;
-  background-color: transparent;
-  background-image: none;
-  /* 판 뒤 흐림 — 젤리의 반투명은 **색**으로만 남기고 뒤 **글자**는 못 올라오게 한다.
-     실측 근거: 알파만 .97 로 올린 상태에서도 메인 화면 리본의 「젤리 팡 월드」가
-     판 윗변에서 유령처럼 읽혔다. 알파를 1 로 올리면 젤리가 아니라 플라스틱이 되므로
-     남은 3% 는 흐림으로 닫는다(캐릭터 선택창이 무대를 흐리는 것과 같은 수). */
-  color: var(--f2-ink);
-  text-align: center;
-  text-shadow: none;
-  filter: none;
-  /* 킷 .kit-frame-v2 의 바깥 그림자 + ::before(안쪽 어깨) + ::after(질감층)를
-     한 줄로 합쳤다. 값은 킷 그대로 — 옮긴 것은 **그리는 면**뿐이다. */
-  box-shadow: none;
-  animation: sheetin 340ms var(--spring);   /* 모션은 종전 그대로 (transform+opacity) */
-}
 /* 킷 의사요소는 위에서 흡수했으므로 끈다(스크롤 상자 안에서 흘러 올라가는 층). */
-.modal-v2 .mv2-sheet::before,
-.modal-v2 .mv2-sheet::after { content: none; }
 /* 내용은 항상 질감층 위. 래퍼 안팎이 **같은 계약**을 쓴다. */
-.modal-v2 .mv2-sheet > *,
-.modal-v2 .mv2-scroll > * { position: relative; z-index: 1; flex: 0 0 auto; }
 /* W-C(0831) — 스크롤 래퍼. 판이 갖고 있던 세 줄(overflow / flex 열 / gap)을
    그대로 이어받는다. 다른 것은 **자기 자신이 줄어들 수 있다**는 한 가지뿐이다:
    flex 1 1 auto + min-height 0 이 없으면 긴 창에서 래퍼가 안 줄어 판이 화면을
    넘는다(flex 아이템의 기본 min-height 는 auto = 내용 높이다).
    ⚠ `.r10m .sheet > *`(:9868)와 바로 위 `.mv2-sheet > *` 가 둘 다 flex:0 0 auto
    를 걸므로 이 블록은 **그 뒤에** 서야 한다(같은 특이도, 나중 것이 이긴다). */
-.modal-v2 .mv2-scroll {
-  position: relative;
-  z-index: 1;
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  display: flex;
-  flex-direction: column;
-  gap: var(--mv2-gap);
-}
 
 /* 좁은 화면에서 판이 화면을 넘지 않게 — 킷 계약(--f2-w) 안에서만 논다. */
 @media (max-height: 700px) {
-  .modal-v2 .mv2-sheet { padding-top: calc(var(--f2-w) * .032); }
-}
+  }
 
 
 /* ---- 2b. 판 몸통 = 젤리판 v1.0 **기준 부품**(모달판) --------------------
@@ -50488,312 +50384,16 @@ body:has(.modal:not([hidden])) #screen-game { filter: blur(6px); }
    가 성립한다 — .mv2-sheet 자신은 높이가 내용에서 나와 이 자리에 못 선다.
    ▣ 절대배치의 기준은 **padding 상자**다. 판이 투명 테두리를 두르고 있으므로
      그만큼 밖으로 밀어야 덮개가 바깥 상자(= 승인된 판 크기)를 정확히 덮는다. */
-.modal-v2 .mv2-sheet > .mv2-fx {
-  position: absolute;
-  inset: calc(var(--f2-bd) * -1);
-  z-index: 0;
-  flex: 0 0 auto;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  pointer-events: none;
-  container-type: size;
-  /* 수리 0831 — [L2-4] 접지는 정본처럼 **drop-shadow** 다.
-     종전은 같은 실루엣의 **색층**(알파 .324 통째)을 윌리 밑에 깔았다. 판이
-     불투명(.97)일 때는 안 보였지만 정본 알파(.30)에서는 그 검은 판이 그대로
-     비친다(실측: 흰 바탕 253 -> 204). drop-shadow 는 그림자 알파가 **내용의
-     알파에 곱**해져 반투명 판 밑에서는 저절로 연해진다 — 정본이 .wf-wrap 에
-     건 이유가 그것이다. backdrop-filter 를 걷어서 이제 여기 걸 수 있다. */
-  /* ⚠ 정본 v1.0 은 이 줄을 `.wf-wrap` 에 적고 있지만, 그 선언이 쓰는
-     `--wf-gnd-a` 는 **자식**(.work-frame)에만 있어 상속으로 안 닿는다 —
-     그래서 정본 렌더에서 L2-4 는 **안 그려진다**(실측: 흰 바탕 253.1 =
-     그림자 없는 값). 나란히 대조가 기준이므로 여기도 그리지 않는다.
-     정본이 v1.1 에서 그 줄을 고치면 아래 두 줄의 주석만 벗기면 된다.
-  filter: drop-shadow(0 calc(var(--f2-w) * .01125) calc(var(--f2-w) * .02250)
-                        rgba(24, 12, 28, .324)); */
-}
-.modal-v2 .mv2-fx > .mv2-gnd { display: none; }
-.modal-v2 .mv2-fx > .mv2-gnd,
-.modal-v2 .mv2-fx > .mv2-jelly {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-
-  /* ▣ 짧은 판 — 코너 상한 [실측 판정]
-     정본 코너는 폭의 17.818% 이고, 기준판 비(h = 1.14w)에서 그것은 **높이의
-     31%** 다(2R = 214 / 684). 그 관계를 그대로 상한으로 박는다. 안 박으면
-     짧은 창에서 코너가 높이를 통째로 먹는다 — 실측: #modal-arcade(158px)에서
-     2R = 133 이라 판이 젤리가 아니라 **알약**이 됐다(c2-ab-modal-arcade.png).
-     기준 비 이상으로 긴 판에서는 폭 항이 언제나 작아 정본과 한 톨도 안 다르다
-     (h x .28 = .319w > .178w). 즉 이 min() 은 짧은 판에서만 일한다.
-     아래 파생값(C1X…Y1)이 여기 서 있는 이유: 커스텀 속성의 var() 치환은
-     **선언한 요소**에서 일어난다. 판에 두면 판의 R(상한 없는 값)이 박힌다. */
-  /* [E31-0903 . 은퇴] --mv2j-* 줄자 전량 — 선언 요소 `.modal-v2 ...` 가 DOM 에
-     0개다(위 은퇴 머리말의 실측표). 값은 그대로 남긴다. */
-  --mv2j-R:   min(var(--mv2j-L0-R), calc(100cqh * .28));
-  --mv2j-C1X: calc(var(--mv2j-R) * .209445);
-  --mv2j-C1Y: calc(var(--mv2j-R) * .127039);
-  --mv2j-C2X: calc(var(--mv2j-R) * .110601);
-  --mv2j-C2Y: calc(var(--mv2j-R) * .209445);
-  /* [E14-0902] 들여쓴 판본의 반지름 — 볼록 코너 R-t · 오목 필렛 r+t.
-     --mv2j-R 이 100cqh 상한을 쓰므로 **이 규칙 안에서** 파생해야 한다. */
-  --mv2j-c1x: .209445;  --mv2j-c1y: .127039;
-  --mv2j-c2x: .110601;  --mv2j-c2y: .209445;  --mv2j-cq: .4477;
-  --mv2j-R3: max(0px, calc(var(--mv2j-R) - var(--mv2j-L3-w)));
-  --mv2j-C1X3: calc(var(--mv2j-R3) * var(--mv2j-c1x));
-  --mv2j-C1Y3: calc(var(--mv2j-R3) * var(--mv2j-c1y));
-  --mv2j-C2X3: calc(var(--mv2j-R3) * var(--mv2j-c2x));
-  --mv2j-C2Y3: calc(var(--mv2j-R3) * var(--mv2j-c2y));
-  --mv2j-Ra: max(0px, calc(var(--mv2j-R) - var(--mv2j-rim-in)));
-  --mv2j-C1Xa: calc(var(--mv2j-Ra) * var(--mv2j-c1x));
-  --mv2j-C1Ya: calc(var(--mv2j-Ra) * var(--mv2j-c1y));
-  --mv2j-C2Xa: calc(var(--mv2j-Ra) * var(--mv2j-c2x));
-  --mv2j-C2Ya: calc(var(--mv2j-Ra) * var(--mv2j-c2y));
-  --mv2j-Rb: max(0px, calc(var(--mv2j-R) - calc(var(--mv2j-rim-in) + var(--mv2j-rim-w))));
-  --mv2j-C1Xb: calc(var(--mv2j-Rb) * var(--mv2j-c1x));
-  --mv2j-C1Yb: calc(var(--mv2j-Rb) * var(--mv2j-c1y));
-  --mv2j-C2Xb: calc(var(--mv2j-Rb) * var(--mv2j-c2x));
-  --mv2j-C2Yb: calc(var(--mv2j-Rb) * var(--mv2j-c2y));
-  --mv2j-KH:  calc(var(--mv2j-L0-bx) * 8.29727);
-  --mv2j-KV:  calc(var(--mv2j-L0-by) * 9.53043);
-  --mv2j-OX:  calc(var(--mv2j-L0-bx) * 1.333333);
-  --mv2j-OY:  calc(var(--mv2j-L0-by) * 1.333333);
-  --mv2j-X0:  var(--mv2j-L0-by);
-  --mv2j-X1:  calc(100% - var(--mv2j-L0-by));
-  --mv2j-Y0:  var(--mv2j-L0-bx);
-  --mv2j-Y1:  calc(100% - var(--mv2j-L0-bx));
-}
-.modal-v2 .mv2-sheet {
-  /* ==== 정본 줄자 — 기준 부품(모달판) 기본값 그대로 ==== */
-  --mv2j-w: var(--f2-w);
-  --mv2j-h: calc(var(--f2-w) * 1.1400);   /* 정본 기준판 세로비 실측 (위 ▣) */
-
-  /* [L0] 실루엣 */
-  --mv2j-L0-R:  calc(var(--mv2j-w) * .070000);
-  --mv2j-L0-bx: calc(var(--mv2j-w) * .016000);
-  --mv2j-L0-by: calc(var(--mv2j-h) * .015000);
-  /* 파생값(R·C1X…Y1)은 .mv2-fx 의 자식 쪽에 있다 — 코너 상한이 cqh 를
-     써야 하고, var() 치환은 선언한 요소에서 일어나기 때문이다. */
-
-  /* [L1] 색 + 그 밑 색 바탕(비침 재발 금지 층) */
-  --mv2j-face: #F0C4E1; --mv2j-face-top: #F0C4E1; --mv2j-face-y: 100%; --mv2j-rim-c: #FFDFFC;
-  --mv2j-a-fill: 0;             /* 수리 0831 — 정본에 없는 층. 0 = 안 칠한다 */
-
-  /* [L1.5] 비침 — 정본 기준판 값 그대로 */
-  /* [v1.1-user0901] 새 시안 재실측 이식 — 정본 work-frame.css 와 같은 값. 코너 0.178->0.070(시안 r45 0.0496W)·볼록 0.025->0.016·속 .300->.610·띠 .600->.950 / 93.0%->95.5%·유백 .050->.060 */
-  /* [E17-0903 · 재질층 §3] modal 판 α — zoneb_small `32f6be9b` 평탄창
-     (d10 .727 · d15 .714 · d20 .711 · d30 .759 · d40 .686) -> 합성 **.71**.
-     .610 -> .6915 (뒤에 오는 유백 몫 .060 과 합성해 1-(1-a)(1-.06)=.710). */
-  --mv2j-a-in: .6915;
-  --mv2j-a-rim: 1.000;
-  /* [P0-0901] --mv2j-band 는 **은퇴**했다. 타원(farthest-side)의 정지점이라
-     네 코너에서 s=141% 까지 같은 색을 깔아 판 안쪽에 납작한 고원을 만들었다
-     (실측: 코너 알파 .744 vs 속 .620 — 그 경계 호가 「두 번째 테두리」였다).
-     띠는 이제 실루엣을 그대로 도는 inset 그림자다 -> --mv2j-band-w.
-     되돌리려면 이 값과 아래 [L1.5-2] 블록만 옛 것으로 바꾸면 된다. */
-  --mv2j-band:   95.5%;
-  --mv2j-band-w: calc(var(--mv2j-w) * .0750);   /* 띠 번짐 — 안으로 사그라지는 길이 */
-  --mv2j-band-s: calc(var(--mv2j-w) * .0200);   /* 띠 퍼짐 — 림에 붙는 진한 몫 */
-  /* 두 값은 시안 단면(림에서 %W -> 알파)에 맞춘 것이다:
-       2.0%W .720 · 3.0 .692 · 4.0 .678 · 6.0 .658 · 8.0 .640 · 10.0 .637 (시안)
-     alpha_띠(d) = (a-rim - a-in) x Phi((s - d)/(w/2)) 로 그 여섯 점을 지난다. */
-  --mv2j-haze: 0;
-  --mv2j-haze-y: 14.0%;
-
-  /* [L2-0] 유백 워시 */
-  --mv2j-milk-a: .060;
-
-  /* [L2-1] 측면 림 */
-  /* [E18-0903 은퇴 · DOM 무매칭] 아래 선언은 화소를 안 칠한다. 직접 실측: document.querySelectorAll 로 .modal-v2 0개 · .mv2-sheet 0개 · .mv2-jelly 0개 · .mv2-head 0개(부팅 직후·모달 전부 연 뒤 둘 다). 실제 모달은 .modal.w6m > .sheet.jbox.jbox--modal 이다. 삭제가 아니라 은퇴다 - 되돌리려면 이 주석 껍데기만 벗기면 된다.  --mv2j-rim-in: calc(var(--f2-ref-w) * 0.00350); */
-  /* [E18-0903 은퇴 · DOM 무매칭]  --mv2j-rim-w: calc(var(--f2-ref-w) * 0.00400); */
-  /* [E18-0903 은퇴 · DOM 무매칭]  --mv2j-rim-a: 0.2688; */
-  /* [E18-0903 은퇴 · DOM 무매칭]  --mv2j-rim-blur: calc(var(--f2-ref-w) * 0.00340); */
-
-  /* [L2-2] 상단 광택 — 좌상 2점. 중심좌표 -> 배경자리 옮김식 p = (c - s/2)/(1 - s)
-       1점 중심 9.2%/5.5%,  크기 8.7% x 5.2%  ->  5.31% / 3.06%
-       2점 중심 19.3%/3.9%, 크기 4.5% x 2.4%  -> 17.85% / 2.77% */
-  --mv2j-gl-a: .770;
-  --mv2j-gl1-w: 12.7%;  --mv2j-gl1-h: 6.6%;
-  --mv2j-gl1-px: 2.95%;  --mv2j-gl1-py: 1.3%;
-  --mv2j-gl2-w: 5.1%;  --mv2j-gl2-h: 2.0%;
-  --mv2j-gl2-px: 19.45%; --mv2j-gl2-py: 1.7%;
-
-  /* [L2-4] 접지 그림자 — 아래 변 **바깥**. 별도 층(.mv2-gnd)이 그린다. */
-  --mv2j-gnd-a: .324;
-  --mv2j-gnd-y: calc(var(--mv2j-w) * .01125);
-  --mv2j-gnd-b: calc(var(--mv2j-w) * .01125);   /* drop-shadow .0225 의 절반 */
-
-  /* [L3] 외곽선 */
-  /* [E18-0903 은퇴 · DOM 무매칭]  --mv2j-L3-w: calc(var(--f2-ref-w) * 0.00400); */
-  --mv2j-L3-line: #966B92;
-  /* [E18-0903 은퇴 · DOM 무매칭]  --mv2j-L3-a: .700; */
-  /* [E18-0903 은퇴 · DOM 무매칭]  --mv2j-L3-blur: calc(var(--mv2j-L3-w) * 0.28);   ( 수리 0831 — 정본 --wf-L3-blur ) */
-}
 
 /* [L2-4] 접지 — 젤리보다 **밑**이고 클립 밖으로 번진다. */
-.modal-v2 .mv2-fx > .mv2-gnd {
-  background: rgba(24, 12, 28, var(--mv2j-gnd-a));
-  border-radius: var(--f2-r);            /* shape() 폴백 */
-  transform: translateY(var(--mv2j-gnd-y));
-  filter: blur(var(--mv2j-gnd-b));
-}
 
-.modal-v2 .mv2-fx > .mv2-jelly {
-  border-radius: var(--f2-r);            /* shape() 폴백 */
-  /* 수리 0831 — 판 뒤 흐림(backdrop-filter blur(7px))은 **정본에 없다**.
-     정본 kit-frame-v2 는 backdrop-filter 를 금지하고 work-frame.v1.0 은 한 줄도
-     쓰지 않는다. 뒤가 흐려지면 나란히 대조에서 정본과 바로 갈린다. 글자 가독은
-     판을 막는 대신 **글자 영역 국소 처리**로 푼다(아래 2c 절). */
-  background-color: transparent;
-  background-image:
-    /* [L2-2] 광택 2점 (흰 알파만) */
-    radial-gradient(closest-side,
-      rgba(255,255,255, calc(var(--mv2j-gl-a) * 1.00)) 0%,
-      rgba(255,255,255, calc(var(--mv2j-gl-a) *  .72)) 52%,
-      rgba(255,255,255, 0) 100%),
-    radial-gradient(closest-side,
-      rgba(255,255,255, calc(var(--mv2j-gl-a) * 1.00)) 0%,
-      rgba(255,255,255, calc(var(--mv2j-gl-a) *  .72)) 52%,
-      rgba(255,255,255, 0) 100%),
-    /* [L2-0] 유백 워시 — [P0-0901] 사발이 s=100%(타원) 에서 0 으로 죽어
-       타원 밖(코너 쪽)에 유백이 **한 방울도 없는 고리**가 돌았다. 시안 실측은
-       속이 림 안쪽까지 고르다(중심 .634 ↔ 가장자리 .616, 차 .018). 그래서
-       사발의 모양은 그대로 두고 **바닥값을 .75 로 잡아** 141%(코너)까지 편다. */
-    radial-gradient(farthest-side at 50% 50%,
-      rgba(255,255,255, calc(var(--mv2j-milk-a) * 1.00)) 0%,
-      rgba(255,255,255, calc(var(--mv2j-milk-a) *  .85)) 55%,
-      rgba(255,255,255, calc(var(--mv2j-milk-a) *  .78)) 88%,
-      rgba(255,255,255, calc(var(--mv2j-milk-a) *  .75)) 100%,
-      rgba(255,255,255, calc(var(--mv2j-milk-a) *  .75)) 141%),
-    /* [L1.5-3] 윗빛 */
-    linear-gradient(to bottom,
-      color-mix(in srgb, var(--mv2j-face) calc(var(--mv2j-haze) * 100%), transparent) 0%,
-      color-mix(in srgb, var(--mv2j-face) 0%, transparent) var(--mv2j-haze-y)),
-    /* [L1.5-2] 테두리 색 띠 — **층이 배경에서 box-shadow 로 옮겨졌다**
-       ([P0-0901]. 아래 box-shadow 참조. 알파 (a-rim - a-in) 는 무변동) */
-    /* [L1.5-1] 속 */
-    linear-gradient(to bottom,
-      color-mix(in srgb, var(--mv2j-face-top) calc(var(--mv2j-a-in) * 100%), transparent) 0%,
-      color-mix(in srgb, var(--mv2j-face) calc(var(--mv2j-a-in) * 100%), transparent) var(--mv2j-face-y),
-      color-mix(in srgb, var(--mv2j-face) calc(var(--mv2j-a-in) * 100%), transparent) 100%),
-    /* [L1] 색 바탕 — 비침 재발 금지 층. 현행 --f2-base 와 같은 값이다. */
-    linear-gradient(color-mix(in srgb, #EFE6F6
-      calc(var(--mv2j-a-fill) * 100%), transparent) 0 0);
-  background-position:
-    var(--mv2j-gl1-px) var(--mv2j-gl1-py),
-    var(--mv2j-gl2-px) var(--mv2j-gl2-py),
-    0 0, 0 0, 0 0, 0 0;
-  background-size:
-    var(--mv2j-gl1-w) var(--mv2j-gl1-h),
-    var(--mv2j-gl2-w) var(--mv2j-gl2-h),
-    100% 100%, 100% 100%, 100% 100%, 100% 100%;
-  background-repeat: no-repeat;
-  /* 폴백 링 둘 — shape() 가 있으면 아래 @supports 가 걷고 고리 두 장으로 다시
-     그린다(코너를 그대로 돈다). 캡슐과 같은 폴백 문법이다. */
-  box-shadow:
-    inset 0 0 0 var(--mv2j-L3-w) color-mix(in srgb, var(--mv2j-L3-line)
-      calc(var(--mv2j-L3-a) * 100%), transparent),
-    inset 0 0 0 calc(var(--mv2j-rim-in) + var(--mv2j-rim-w))
-      rgba(255,255,255, var(--mv2j-rim-a)),
-    /* [L1.5-2] 색 띠 — 실루엣을 그대로 도는 안쪽 번짐. 클립이 바깥을 자르고
-       번짐이 안으로 사그라진다. 어느 방향으로 가도 깊이가 같다. */
-    inset 0 0 var(--mv2j-band-w) var(--mv2j-band-s) color-mix(in srgb, var(--mv2j-face)
-      calc((var(--mv2j-a-rim) - var(--mv2j-a-in)) * 100%), transparent);
-}
 
 @supports (clip-path: shape(from 0px 0px, close)) {
   /* [L0] 실루엣 — 접선 사각형 + 코너 4(초타원 n=3) + 옆변 볼록 4. */
-  .modal-v2 .mv2-fx > .mv2-gnd {
-    border-radius: 0;
-    clip-path: shape(from calc(var(--mv2j-X0) + 0px + var(--mv2j-R)) calc(var(--mv2j-Y0) + 0px),
-      curve to calc(var(--mv2j-X1) - 0px - var(--mv2j-R)) calc(var(--mv2j-Y0) + 0px) with calc(var(--mv2j-X0) + 0px + var(--mv2j-R) + var(--mv2j-KH)) calc(var(--mv2j-Y0) + 0px - var(--mv2j-OX)) / calc(var(--mv2j-X1) - 0px - var(--mv2j-R) - var(--mv2j-KH)) calc(var(--mv2j-Y0) + 0px - var(--mv2j-OX)),
-      curve to calc(var(--mv2j-X1) - 0px) calc(var(--mv2j-Y0) + 0px + var(--mv2j-R)) with calc(var(--mv2j-X1) - 0px - var(--mv2j-C1X)) calc(var(--mv2j-Y0) + 0px + var(--mv2j-C1Y)) / calc(var(--mv2j-X1) - 0px - var(--mv2j-C2X)) calc(var(--mv2j-Y0) + 0px + var(--mv2j-C2Y)),
-      curve to calc(var(--mv2j-X1) - 0px) calc(var(--mv2j-Y1) - 0px - var(--mv2j-R)) with calc(var(--mv2j-X1) - 0px + var(--mv2j-OY)) calc(var(--mv2j-Y0) + 0px + var(--mv2j-R) + var(--mv2j-KV)) / calc(var(--mv2j-X1) - 0px + var(--mv2j-OY)) calc(var(--mv2j-Y1) - 0px - var(--mv2j-R) - var(--mv2j-KV)),
-      curve to calc(var(--mv2j-X1) - 0px - var(--mv2j-R)) calc(var(--mv2j-Y1) - 0px) with calc(var(--mv2j-X1) - 0px - var(--mv2j-C2X)) calc(var(--mv2j-Y1) - 0px - var(--mv2j-C2Y)) / calc(var(--mv2j-X1) - 0px - var(--mv2j-C1X)) calc(var(--mv2j-Y1) - 0px - var(--mv2j-C1Y)),
-      curve to calc(var(--mv2j-X0) + 0px + var(--mv2j-R)) calc(var(--mv2j-Y1) - 0px) with calc(var(--mv2j-X1) - 0px - var(--mv2j-R) - var(--mv2j-KH)) calc(var(--mv2j-Y1) - 0px + var(--mv2j-OX)) / calc(var(--mv2j-X0) + 0px + var(--mv2j-R) + var(--mv2j-KH)) calc(var(--mv2j-Y1) - 0px + var(--mv2j-OX)),
-      curve to calc(var(--mv2j-X0) + 0px) calc(var(--mv2j-Y1) - 0px - var(--mv2j-R)) with calc(var(--mv2j-X0) + 0px + var(--mv2j-C1X)) calc(var(--mv2j-Y1) - 0px - var(--mv2j-C1Y)) / calc(var(--mv2j-X0) + 0px + var(--mv2j-C2X)) calc(var(--mv2j-Y1) - 0px - var(--mv2j-C2Y)),
-      curve to calc(var(--mv2j-X0) + 0px) calc(var(--mv2j-Y0) + 0px + var(--mv2j-R)) with calc(var(--mv2j-X0) + 0px - var(--mv2j-OY)) calc(var(--mv2j-Y1) - 0px - var(--mv2j-R) - var(--mv2j-KV)) / calc(var(--mv2j-X0) + 0px - var(--mv2j-OY)) calc(var(--mv2j-Y0) + 0px + var(--mv2j-R) + var(--mv2j-KV)),
-      curve to calc(var(--mv2j-X0) + 0px + var(--mv2j-R)) calc(var(--mv2j-Y0) + 0px) with calc(var(--mv2j-X0) + 0px + var(--mv2j-C2X)) calc(var(--mv2j-Y0) + 0px + var(--mv2j-C2Y)) / calc(var(--mv2j-X0) + 0px + var(--mv2j-C1X)) calc(var(--mv2j-Y0) + 0px + var(--mv2j-C1Y)),
-      close);
-  }
-  .modal-v2 .mv2-fx > .mv2-jelly {
-    /* [P0-0901] 반지름을 0 으로 안 죽인다 — [L1.5-2] 띠(inset 그림자)가
-       코너를 돌아야 한다. 클립(shape)이 바깥 경계를 정확히 다시 자른다. */
-    border-radius: var(--mv2j-R);
-    box-shadow: inset 0 0 var(--mv2j-band-w) var(--mv2j-band-s) color-mix(in srgb, var(--mv2j-face)
-      calc((var(--mv2j-a-rim) - var(--mv2j-a-in)) * 100%), transparent);
-    clip-path: shape(from calc(var(--mv2j-X0) + 0px + var(--mv2j-R)) calc(var(--mv2j-Y0) + 0px),
-      curve to calc(var(--mv2j-X1) - 0px - var(--mv2j-R)) calc(var(--mv2j-Y0) + 0px) with calc(var(--mv2j-X0) + 0px + var(--mv2j-R) + var(--mv2j-KH)) calc(var(--mv2j-Y0) + 0px - var(--mv2j-OX)) / calc(var(--mv2j-X1) - 0px - var(--mv2j-R) - var(--mv2j-KH)) calc(var(--mv2j-Y0) + 0px - var(--mv2j-OX)),
-      curve to calc(var(--mv2j-X1) - 0px) calc(var(--mv2j-Y0) + 0px + var(--mv2j-R)) with calc(var(--mv2j-X1) - 0px - var(--mv2j-C1X)) calc(var(--mv2j-Y0) + 0px + var(--mv2j-C1Y)) / calc(var(--mv2j-X1) - 0px - var(--mv2j-C2X)) calc(var(--mv2j-Y0) + 0px + var(--mv2j-C2Y)),
-      curve to calc(var(--mv2j-X1) - 0px) calc(var(--mv2j-Y1) - 0px - var(--mv2j-R)) with calc(var(--mv2j-X1) - 0px + var(--mv2j-OY)) calc(var(--mv2j-Y0) + 0px + var(--mv2j-R) + var(--mv2j-KV)) / calc(var(--mv2j-X1) - 0px + var(--mv2j-OY)) calc(var(--mv2j-Y1) - 0px - var(--mv2j-R) - var(--mv2j-KV)),
-      curve to calc(var(--mv2j-X1) - 0px - var(--mv2j-R)) calc(var(--mv2j-Y1) - 0px) with calc(var(--mv2j-X1) - 0px - var(--mv2j-C2X)) calc(var(--mv2j-Y1) - 0px - var(--mv2j-C2Y)) / calc(var(--mv2j-X1) - 0px - var(--mv2j-C1X)) calc(var(--mv2j-Y1) - 0px - var(--mv2j-C1Y)),
-      curve to calc(var(--mv2j-X0) + 0px + var(--mv2j-R)) calc(var(--mv2j-Y1) - 0px) with calc(var(--mv2j-X1) - 0px - var(--mv2j-R) - var(--mv2j-KH)) calc(var(--mv2j-Y1) - 0px + var(--mv2j-OX)) / calc(var(--mv2j-X0) + 0px + var(--mv2j-R) + var(--mv2j-KH)) calc(var(--mv2j-Y1) - 0px + var(--mv2j-OX)),
-      curve to calc(var(--mv2j-X0) + 0px) calc(var(--mv2j-Y1) - 0px - var(--mv2j-R)) with calc(var(--mv2j-X0) + 0px + var(--mv2j-C1X)) calc(var(--mv2j-Y1) - 0px - var(--mv2j-C1Y)) / calc(var(--mv2j-X0) + 0px + var(--mv2j-C2X)) calc(var(--mv2j-Y1) - 0px - var(--mv2j-C2Y)),
-      curve to calc(var(--mv2j-X0) + 0px) calc(var(--mv2j-Y0) + 0px + var(--mv2j-R)) with calc(var(--mv2j-X0) + 0px - var(--mv2j-OY)) calc(var(--mv2j-Y1) - 0px - var(--mv2j-R) - var(--mv2j-KV)) / calc(var(--mv2j-X0) + 0px - var(--mv2j-OY)) calc(var(--mv2j-Y0) + 0px + var(--mv2j-R) + var(--mv2j-KV)),
-      curve to calc(var(--mv2j-X0) + 0px + var(--mv2j-R)) calc(var(--mv2j-Y0) + 0px) with calc(var(--mv2j-X0) + 0px + var(--mv2j-C2X)) calc(var(--mv2j-Y0) + 0px + var(--mv2j-C2Y)) / calc(var(--mv2j-X0) + 0px + var(--mv2j-C1X)) calc(var(--mv2j-Y0) + 0px + var(--mv2j-C1Y)),
-      close);
-  }
-  /* [L2-1] 측면 림 — 고리(evenodd)라 코너를 그대로 돈다
+      /* [L2-1] 측면 림 — 고리(evenodd)라 코너를 그대로 돈다
      (box-shadow inset 으로는 못 하는 일). */
-  .modal-v2 .mv2-fx > .mv2-jelly::before {
-    content: "";
-    position: absolute; inset: 0;
-    z-index: 1;
-    pointer-events: none;
-    background: color-mix(in srgb, var(--mv2j-rim-c) calc(var(--mv2j-rim-a) * 100%), transparent);
-    filter: blur(var(--mv2j-rim-blur));
-    clip-path: shape(evenodd from calc(var(--mv2j-X0) + var(--mv2j-rim-in) + var(--mv2j-Ra)) calc(var(--mv2j-Y0) + var(--mv2j-rim-in)),
-      curve to calc(var(--mv2j-X1) - var(--mv2j-rim-in) - var(--mv2j-Ra)) calc(var(--mv2j-Y0) + var(--mv2j-rim-in)) with calc(var(--mv2j-X0) + var(--mv2j-rim-in) + var(--mv2j-Ra) + var(--mv2j-KH)) calc(var(--mv2j-Y0) + var(--mv2j-rim-in) - var(--mv2j-OX)) / calc(var(--mv2j-X1) - var(--mv2j-rim-in) - var(--mv2j-Ra) - var(--mv2j-KH)) calc(var(--mv2j-Y0) + var(--mv2j-rim-in) - var(--mv2j-OX)),
-      curve to calc(var(--mv2j-X1) - var(--mv2j-rim-in)) calc(var(--mv2j-Y0) + var(--mv2j-rim-in) + var(--mv2j-Ra)) with calc(var(--mv2j-X1) - var(--mv2j-rim-in) - var(--mv2j-C1Xa)) calc(var(--mv2j-Y0) + var(--mv2j-rim-in) + var(--mv2j-C1Ya)) / calc(var(--mv2j-X1) - var(--mv2j-rim-in) - var(--mv2j-C2Xa)) calc(var(--mv2j-Y0) + var(--mv2j-rim-in) + var(--mv2j-C2Ya)),
-      curve to calc(var(--mv2j-X1) - var(--mv2j-rim-in)) calc(var(--mv2j-Y1) - var(--mv2j-rim-in) - var(--mv2j-Ra)) with calc(var(--mv2j-X1) - var(--mv2j-rim-in) + var(--mv2j-OY)) calc(var(--mv2j-Y0) + var(--mv2j-rim-in) + var(--mv2j-Ra) + var(--mv2j-KV)) / calc(var(--mv2j-X1) - var(--mv2j-rim-in) + var(--mv2j-OY)) calc(var(--mv2j-Y1) - var(--mv2j-rim-in) - var(--mv2j-Ra) - var(--mv2j-KV)),
-      curve to calc(var(--mv2j-X1) - var(--mv2j-rim-in) - var(--mv2j-Ra)) calc(var(--mv2j-Y1) - var(--mv2j-rim-in)) with calc(var(--mv2j-X1) - var(--mv2j-rim-in) - var(--mv2j-C2Xa)) calc(var(--mv2j-Y1) - var(--mv2j-rim-in) - var(--mv2j-C2Ya)) / calc(var(--mv2j-X1) - var(--mv2j-rim-in) - var(--mv2j-C1Xa)) calc(var(--mv2j-Y1) - var(--mv2j-rim-in) - var(--mv2j-C1Ya)),
-      curve to calc(var(--mv2j-X0) + var(--mv2j-rim-in) + var(--mv2j-Ra)) calc(var(--mv2j-Y1) - var(--mv2j-rim-in)) with calc(var(--mv2j-X1) - var(--mv2j-rim-in) - var(--mv2j-Ra) - var(--mv2j-KH)) calc(var(--mv2j-Y1) - var(--mv2j-rim-in) + var(--mv2j-OX)) / calc(var(--mv2j-X0) + var(--mv2j-rim-in) + var(--mv2j-Ra) + var(--mv2j-KH)) calc(var(--mv2j-Y1) - var(--mv2j-rim-in) + var(--mv2j-OX)),
-      curve to calc(var(--mv2j-X0) + var(--mv2j-rim-in)) calc(var(--mv2j-Y1) - var(--mv2j-rim-in) - var(--mv2j-Ra)) with calc(var(--mv2j-X0) + var(--mv2j-rim-in) + var(--mv2j-C1Xa)) calc(var(--mv2j-Y1) - var(--mv2j-rim-in) - var(--mv2j-C1Ya)) / calc(var(--mv2j-X0) + var(--mv2j-rim-in) + var(--mv2j-C2Xa)) calc(var(--mv2j-Y1) - var(--mv2j-rim-in) - var(--mv2j-C2Ya)),
-      curve to calc(var(--mv2j-X0) + var(--mv2j-rim-in)) calc(var(--mv2j-Y0) + var(--mv2j-rim-in) + var(--mv2j-Ra)) with calc(var(--mv2j-X0) + var(--mv2j-rim-in) - var(--mv2j-OY)) calc(var(--mv2j-Y1) - var(--mv2j-rim-in) - var(--mv2j-Ra) - var(--mv2j-KV)) / calc(var(--mv2j-X0) + var(--mv2j-rim-in) - var(--mv2j-OY)) calc(var(--mv2j-Y0) + var(--mv2j-rim-in) + var(--mv2j-Ra) + var(--mv2j-KV)),
-      curve to calc(var(--mv2j-X0) + var(--mv2j-rim-in) + var(--mv2j-Ra)) calc(var(--mv2j-Y0) + var(--mv2j-rim-in)) with calc(var(--mv2j-X0) + var(--mv2j-rim-in) + var(--mv2j-C2Xa)) calc(var(--mv2j-Y0) + var(--mv2j-rim-in) + var(--mv2j-C2Ya)) / calc(var(--mv2j-X0) + var(--mv2j-rim-in) + var(--mv2j-C1Xa)) calc(var(--mv2j-Y0) + var(--mv2j-rim-in) + var(--mv2j-C1Ya)),
-      close,
-      move to calc(var(--mv2j-X0) + calc(var(--mv2j-rim-in) + var(--mv2j-rim-w)) + var(--mv2j-Rb)) calc(var(--mv2j-Y0) + calc(var(--mv2j-rim-in) + var(--mv2j-rim-w))),
-      curve to calc(var(--mv2j-X1) - calc(var(--mv2j-rim-in) + var(--mv2j-rim-w)) - var(--mv2j-Rb)) calc(var(--mv2j-Y0) + calc(var(--mv2j-rim-in) + var(--mv2j-rim-w))) with calc(var(--mv2j-X0) + calc(var(--mv2j-rim-in) + var(--mv2j-rim-w)) + var(--mv2j-Rb) + var(--mv2j-KH)) calc(var(--mv2j-Y0) + calc(var(--mv2j-rim-in) + var(--mv2j-rim-w)) - var(--mv2j-OX)) / calc(var(--mv2j-X1) - calc(var(--mv2j-rim-in) + var(--mv2j-rim-w)) - var(--mv2j-Rb) - var(--mv2j-KH)) calc(var(--mv2j-Y0) + calc(var(--mv2j-rim-in) + var(--mv2j-rim-w)) - var(--mv2j-OX)),
-      curve to calc(var(--mv2j-X1) - calc(var(--mv2j-rim-in) + var(--mv2j-rim-w))) calc(var(--mv2j-Y0) + calc(var(--mv2j-rim-in) + var(--mv2j-rim-w)) + var(--mv2j-Rb)) with calc(var(--mv2j-X1) - calc(var(--mv2j-rim-in) + var(--mv2j-rim-w)) - var(--mv2j-C1Xb)) calc(var(--mv2j-Y0) + calc(var(--mv2j-rim-in) + var(--mv2j-rim-w)) + var(--mv2j-C1Yb)) / calc(var(--mv2j-X1) - calc(var(--mv2j-rim-in) + var(--mv2j-rim-w)) - var(--mv2j-C2Xb)) calc(var(--mv2j-Y0) + calc(var(--mv2j-rim-in) + var(--mv2j-rim-w)) + var(--mv2j-C2Yb)),
-      curve to calc(var(--mv2j-X1) - calc(var(--mv2j-rim-in) + var(--mv2j-rim-w))) calc(var(--mv2j-Y1) - calc(var(--mv2j-rim-in) + var(--mv2j-rim-w)) - var(--mv2j-Rb)) with calc(var(--mv2j-X1) - calc(var(--mv2j-rim-in) + var(--mv2j-rim-w)) + var(--mv2j-OY)) calc(var(--mv2j-Y0) + calc(var(--mv2j-rim-in) + var(--mv2j-rim-w)) + var(--mv2j-Rb) + var(--mv2j-KV)) / calc(var(--mv2j-X1) - calc(var(--mv2j-rim-in) + var(--mv2j-rim-w)) + var(--mv2j-OY)) calc(var(--mv2j-Y1) - calc(var(--mv2j-rim-in) + var(--mv2j-rim-w)) - var(--mv2j-Rb) - var(--mv2j-KV)),
-      curve to calc(var(--mv2j-X1) - calc(var(--mv2j-rim-in) + var(--mv2j-rim-w)) - var(--mv2j-Rb)) calc(var(--mv2j-Y1) - calc(var(--mv2j-rim-in) + var(--mv2j-rim-w))) with calc(var(--mv2j-X1) - calc(var(--mv2j-rim-in) + var(--mv2j-rim-w)) - var(--mv2j-C2Xb)) calc(var(--mv2j-Y1) - calc(var(--mv2j-rim-in) + var(--mv2j-rim-w)) - var(--mv2j-C2Yb)) / calc(var(--mv2j-X1) - calc(var(--mv2j-rim-in) + var(--mv2j-rim-w)) - var(--mv2j-C1Xb)) calc(var(--mv2j-Y1) - calc(var(--mv2j-rim-in) + var(--mv2j-rim-w)) - var(--mv2j-C1Yb)),
-      curve to calc(var(--mv2j-X0) + calc(var(--mv2j-rim-in) + var(--mv2j-rim-w)) + var(--mv2j-Rb)) calc(var(--mv2j-Y1) - calc(var(--mv2j-rim-in) + var(--mv2j-rim-w))) with calc(var(--mv2j-X1) - calc(var(--mv2j-rim-in) + var(--mv2j-rim-w)) - var(--mv2j-Rb) - var(--mv2j-KH)) calc(var(--mv2j-Y1) - calc(var(--mv2j-rim-in) + var(--mv2j-rim-w)) + var(--mv2j-OX)) / calc(var(--mv2j-X0) + calc(var(--mv2j-rim-in) + var(--mv2j-rim-w)) + var(--mv2j-Rb) + var(--mv2j-KH)) calc(var(--mv2j-Y1) - calc(var(--mv2j-rim-in) + var(--mv2j-rim-w)) + var(--mv2j-OX)),
-      curve to calc(var(--mv2j-X0) + calc(var(--mv2j-rim-in) + var(--mv2j-rim-w))) calc(var(--mv2j-Y1) - calc(var(--mv2j-rim-in) + var(--mv2j-rim-w)) - var(--mv2j-Rb)) with calc(var(--mv2j-X0) + calc(var(--mv2j-rim-in) + var(--mv2j-rim-w)) + var(--mv2j-C1Xb)) calc(var(--mv2j-Y1) - calc(var(--mv2j-rim-in) + var(--mv2j-rim-w)) - var(--mv2j-C1Yb)) / calc(var(--mv2j-X0) + calc(var(--mv2j-rim-in) + var(--mv2j-rim-w)) + var(--mv2j-C2Xb)) calc(var(--mv2j-Y1) - calc(var(--mv2j-rim-in) + var(--mv2j-rim-w)) - var(--mv2j-C2Yb)),
-      curve to calc(var(--mv2j-X0) + calc(var(--mv2j-rim-in) + var(--mv2j-rim-w))) calc(var(--mv2j-Y0) + calc(var(--mv2j-rim-in) + var(--mv2j-rim-w)) + var(--mv2j-Rb)) with calc(var(--mv2j-X0) + calc(var(--mv2j-rim-in) + var(--mv2j-rim-w)) - var(--mv2j-OY)) calc(var(--mv2j-Y1) - calc(var(--mv2j-rim-in) + var(--mv2j-rim-w)) - var(--mv2j-Rb) - var(--mv2j-KV)) / calc(var(--mv2j-X0) + calc(var(--mv2j-rim-in) + var(--mv2j-rim-w)) - var(--mv2j-OY)) calc(var(--mv2j-Y0) + calc(var(--mv2j-rim-in) + var(--mv2j-rim-w)) + var(--mv2j-Rb) + var(--mv2j-KV)),
-      curve to calc(var(--mv2j-X0) + calc(var(--mv2j-rim-in) + var(--mv2j-rim-w)) + var(--mv2j-Rb)) calc(var(--mv2j-Y0) + calc(var(--mv2j-rim-in) + var(--mv2j-rim-w))) with calc(var(--mv2j-X0) + calc(var(--mv2j-rim-in) + var(--mv2j-rim-w)) + var(--mv2j-C2Xb)) calc(var(--mv2j-Y0) + calc(var(--mv2j-rim-in) + var(--mv2j-rim-w)) + var(--mv2j-C2Yb)) / calc(var(--mv2j-X0) + calc(var(--mv2j-rim-in) + var(--mv2j-rim-w)) + var(--mv2j-C1Xb)) calc(var(--mv2j-Y0) + calc(var(--mv2j-rim-in) + var(--mv2j-rim-w)) + var(--mv2j-C1Yb)),
-      close);
+    /* [L3] 외곽선 — 같은 고리 문법. */
   }
-  /* [L3] 외곽선 — 같은 고리 문법. */
-  .modal-v2 .mv2-fx > .mv2-jelly::after {
-    content: "";
-    position: absolute; inset: 0;
-    z-index: 2;
-    pointer-events: none;
-    background: color-mix(in srgb, var(--mv2j-L3-line)
-      calc(var(--mv2j-L3-a) * 100%), transparent);
-    clip-path: shape(evenodd from calc(var(--mv2j-X0) + 0px + var(--mv2j-R)) calc(var(--mv2j-Y0) + 0px),
-      curve to calc(var(--mv2j-X1) - 0px - var(--mv2j-R)) calc(var(--mv2j-Y0) + 0px) with calc(var(--mv2j-X0) + 0px + var(--mv2j-R) + var(--mv2j-KH)) calc(var(--mv2j-Y0) + 0px - var(--mv2j-OX)) / calc(var(--mv2j-X1) - 0px - var(--mv2j-R) - var(--mv2j-KH)) calc(var(--mv2j-Y0) + 0px - var(--mv2j-OX)),
-      curve to calc(var(--mv2j-X1) - 0px) calc(var(--mv2j-Y0) + 0px + var(--mv2j-R)) with calc(var(--mv2j-X1) - 0px - var(--mv2j-C1X)) calc(var(--mv2j-Y0) + 0px + var(--mv2j-C1Y)) / calc(var(--mv2j-X1) - 0px - var(--mv2j-C2X)) calc(var(--mv2j-Y0) + 0px + var(--mv2j-C2Y)),
-      curve to calc(var(--mv2j-X1) - 0px) calc(var(--mv2j-Y1) - 0px - var(--mv2j-R)) with calc(var(--mv2j-X1) - 0px + var(--mv2j-OY)) calc(var(--mv2j-Y0) + 0px + var(--mv2j-R) + var(--mv2j-KV)) / calc(var(--mv2j-X1) - 0px + var(--mv2j-OY)) calc(var(--mv2j-Y1) - 0px - var(--mv2j-R) - var(--mv2j-KV)),
-      curve to calc(var(--mv2j-X1) - 0px - var(--mv2j-R)) calc(var(--mv2j-Y1) - 0px) with calc(var(--mv2j-X1) - 0px - var(--mv2j-C2X)) calc(var(--mv2j-Y1) - 0px - var(--mv2j-C2Y)) / calc(var(--mv2j-X1) - 0px - var(--mv2j-C1X)) calc(var(--mv2j-Y1) - 0px - var(--mv2j-C1Y)),
-      curve to calc(var(--mv2j-X0) + 0px + var(--mv2j-R)) calc(var(--mv2j-Y1) - 0px) with calc(var(--mv2j-X1) - 0px - var(--mv2j-R) - var(--mv2j-KH)) calc(var(--mv2j-Y1) - 0px + var(--mv2j-OX)) / calc(var(--mv2j-X0) + 0px + var(--mv2j-R) + var(--mv2j-KH)) calc(var(--mv2j-Y1) - 0px + var(--mv2j-OX)),
-      curve to calc(var(--mv2j-X0) + 0px) calc(var(--mv2j-Y1) - 0px - var(--mv2j-R)) with calc(var(--mv2j-X0) + 0px + var(--mv2j-C1X)) calc(var(--mv2j-Y1) - 0px - var(--mv2j-C1Y)) / calc(var(--mv2j-X0) + 0px + var(--mv2j-C2X)) calc(var(--mv2j-Y1) - 0px - var(--mv2j-C2Y)),
-      curve to calc(var(--mv2j-X0) + 0px) calc(var(--mv2j-Y0) + 0px + var(--mv2j-R)) with calc(var(--mv2j-X0) + 0px - var(--mv2j-OY)) calc(var(--mv2j-Y1) - 0px - var(--mv2j-R) - var(--mv2j-KV)) / calc(var(--mv2j-X0) + 0px - var(--mv2j-OY)) calc(var(--mv2j-Y0) + 0px + var(--mv2j-R) + var(--mv2j-KV)),
-      curve to calc(var(--mv2j-X0) + 0px + var(--mv2j-R)) calc(var(--mv2j-Y0) + 0px) with calc(var(--mv2j-X0) + 0px + var(--mv2j-C2X)) calc(var(--mv2j-Y0) + 0px + var(--mv2j-C2Y)) / calc(var(--mv2j-X0) + 0px + var(--mv2j-C1X)) calc(var(--mv2j-Y0) + 0px + var(--mv2j-C1Y)),
-      close,
-      move to calc(var(--mv2j-X0) + var(--mv2j-L3-w) + var(--mv2j-R3)) calc(var(--mv2j-Y0) + var(--mv2j-L3-w)),
-      curve to calc(var(--mv2j-X1) - var(--mv2j-L3-w) - var(--mv2j-R3)) calc(var(--mv2j-Y0) + var(--mv2j-L3-w)) with calc(var(--mv2j-X0) + var(--mv2j-L3-w) + var(--mv2j-R3) + var(--mv2j-KH)) calc(var(--mv2j-Y0) + var(--mv2j-L3-w) - var(--mv2j-OX)) / calc(var(--mv2j-X1) - var(--mv2j-L3-w) - var(--mv2j-R3) - var(--mv2j-KH)) calc(var(--mv2j-Y0) + var(--mv2j-L3-w) - var(--mv2j-OX)),
-      curve to calc(var(--mv2j-X1) - var(--mv2j-L3-w)) calc(var(--mv2j-Y0) + var(--mv2j-L3-w) + var(--mv2j-R3)) with calc(var(--mv2j-X1) - var(--mv2j-L3-w) - var(--mv2j-C1X3)) calc(var(--mv2j-Y0) + var(--mv2j-L3-w) + var(--mv2j-C1Y3)) / calc(var(--mv2j-X1) - var(--mv2j-L3-w) - var(--mv2j-C2X3)) calc(var(--mv2j-Y0) + var(--mv2j-L3-w) + var(--mv2j-C2Y3)),
-      curve to calc(var(--mv2j-X1) - var(--mv2j-L3-w)) calc(var(--mv2j-Y1) - var(--mv2j-L3-w) - var(--mv2j-R3)) with calc(var(--mv2j-X1) - var(--mv2j-L3-w) + var(--mv2j-OY)) calc(var(--mv2j-Y0) + var(--mv2j-L3-w) + var(--mv2j-R3) + var(--mv2j-KV)) / calc(var(--mv2j-X1) - var(--mv2j-L3-w) + var(--mv2j-OY)) calc(var(--mv2j-Y1) - var(--mv2j-L3-w) - var(--mv2j-R3) - var(--mv2j-KV)),
-      curve to calc(var(--mv2j-X1) - var(--mv2j-L3-w) - var(--mv2j-R3)) calc(var(--mv2j-Y1) - var(--mv2j-L3-w)) with calc(var(--mv2j-X1) - var(--mv2j-L3-w) - var(--mv2j-C2X3)) calc(var(--mv2j-Y1) - var(--mv2j-L3-w) - var(--mv2j-C2Y3)) / calc(var(--mv2j-X1) - var(--mv2j-L3-w) - var(--mv2j-C1X3)) calc(var(--mv2j-Y1) - var(--mv2j-L3-w) - var(--mv2j-C1Y3)),
-      curve to calc(var(--mv2j-X0) + var(--mv2j-L3-w) + var(--mv2j-R3)) calc(var(--mv2j-Y1) - var(--mv2j-L3-w)) with calc(var(--mv2j-X1) - var(--mv2j-L3-w) - var(--mv2j-R3) - var(--mv2j-KH)) calc(var(--mv2j-Y1) - var(--mv2j-L3-w) + var(--mv2j-OX)) / calc(var(--mv2j-X0) + var(--mv2j-L3-w) + var(--mv2j-R3) + var(--mv2j-KH)) calc(var(--mv2j-Y1) - var(--mv2j-L3-w) + var(--mv2j-OX)),
-      curve to calc(var(--mv2j-X0) + var(--mv2j-L3-w)) calc(var(--mv2j-Y1) - var(--mv2j-L3-w) - var(--mv2j-R3)) with calc(var(--mv2j-X0) + var(--mv2j-L3-w) + var(--mv2j-C1X3)) calc(var(--mv2j-Y1) - var(--mv2j-L3-w) - var(--mv2j-C1Y3)) / calc(var(--mv2j-X0) + var(--mv2j-L3-w) + var(--mv2j-C2X3)) calc(var(--mv2j-Y1) - var(--mv2j-L3-w) - var(--mv2j-C2Y3)),
-      curve to calc(var(--mv2j-X0) + var(--mv2j-L3-w)) calc(var(--mv2j-Y0) + var(--mv2j-L3-w) + var(--mv2j-R3)) with calc(var(--mv2j-X0) + var(--mv2j-L3-w) - var(--mv2j-OY)) calc(var(--mv2j-Y1) - var(--mv2j-L3-w) - var(--mv2j-R3) - var(--mv2j-KV)) / calc(var(--mv2j-X0) + var(--mv2j-L3-w) - var(--mv2j-OY)) calc(var(--mv2j-Y0) + var(--mv2j-L3-w) + var(--mv2j-R3) + var(--mv2j-KV)),
-      curve to calc(var(--mv2j-X0) + var(--mv2j-L3-w) + var(--mv2j-R3)) calc(var(--mv2j-Y0) + var(--mv2j-L3-w)) with calc(var(--mv2j-X0) + var(--mv2j-L3-w) + var(--mv2j-C2X3)) calc(var(--mv2j-Y0) + var(--mv2j-L3-w) + var(--mv2j-C2Y3)) / calc(var(--mv2j-X0) + var(--mv2j-L3-w) + var(--mv2j-C1X3)) calc(var(--mv2j-Y0) + var(--mv2j-L3-w) + var(--mv2j-C1Y3)),
-      close);
-    filter: blur(var(--mv2j-L3-blur));   /* 수리 0831 — 정본 §L3 의 번짐 */
-  }
-}
 
 /* ---- 2. 헤더 캡슐 = 젤리판 v1.0 `[data-part="capsule"]` -----------------
    출처(정본, 읽기만 함): tentwin/ref-v2/work-frame.v1.0.css
@@ -50844,238 +50444,6 @@ body:has(.modal:not([hidden])) #screen-game { filter: blur(6px); }
    ▣ clip-path: shape() 를 못 읽는 브라우저(Safari 18.3 이하)는 @supports 밖
      폴백으로 간다 — 같은 색 층 + border-radius 알약 + 링 둘(inset box-shadow).
    ------------------------------------------------------------------------- */
-.modal-v2 .mv2-head {
-  position: relative;
-  z-index: 3;
-  align-self: center;
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  min-width: 0;
-  max-width: 100%;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  background: none;
-  box-shadow: none;
-}
-.modal-v2 .mv2-sheet > h2,
-.modal-v2 .mv2-head > h2 {
-  /* ==== 정본 줄자 — 캡슐은 자기 **높이**에 매인다 (part=capsule) ==== */
-  /* [E31-0903 . 은퇴] --mvh-* 줄자 전량 — 이 선택자가 DOM 에 0개다(위 은퇴
-     머리말의 실측표). 값은 그대로 남긴다. 실효 제목 알약은 이 파일 뒤쪽
-     `#modal-pause .sheet > h2` 계열 + `.r10-ribbon` 이다. */
-  --mvh-w: calc(var(--f2-w) * .62);      /* 캡슐 폭 = 아래 width 와 같은 값 */
-  --mvh-h: var(--mv2-head);              /* 캡슐 높이 */
-
-  /* [L0] 실루엣 — 4변 알약. 코너 .550h · 볼록 .0020/.0012h (정본 캡슐 변주) */
-  /* [v1.1-user0901] 시안 캡슐 양 끝은 정확한 반원(스타디움)이다. 기준 코너는 n=3 초타원이라 R 을 키워도 모서리가 각졌다 — 그것이 사용자 반려의 실체. 원호 3차 베지에 근사 k=0.5523 -> 제어점 (1-k)R = 0.4477R. */
-  --mvh-L0-R:  calc(var(--mvh-h) * .500);
-  --mvh-L0-bx: calc(var(--mvh-h) * .0020);
-  --mvh-L0-by: calc(var(--mvh-h) * .0012);
-  --mvh-R:   var(--mvh-L0-R);
-  --mvh-C1X: calc(var(--mvh-R) * .4477);
-  --mvh-C1Y: 0px;
-  --mvh-C2X: 0px;
-  --mvh-C2Y: calc(var(--mvh-R) * .4477);
-  /* [E14-0902] 들여쓴 판본의 반지름 — 볼록 코너 R-t · 오목 필렛 r+t.
-     --mvh-R 이 100cqh 상한을 쓰므로 **이 규칙 안에서** 파생해야 한다. */
-  --mvh-c1x: .4477;  --mvh-c1y: 0;
-  --mvh-c2x: 0;  --mvh-c2y: .4477;  --mvh-cq: .4477;
-  --mvh-R3: max(0px, calc(var(--mvh-R) - var(--mvh-L3-w)));
-  --mvh-C1X3: calc(var(--mvh-R3) * var(--mvh-c1x));
-  --mvh-C1Y3: calc(var(--mvh-R3) * var(--mvh-c1y));
-  --mvh-C2X3: calc(var(--mvh-R3) * var(--mvh-c2x));
-  --mvh-C2Y3: calc(var(--mvh-R3) * var(--mvh-c2y));
-  --mvh-Ra: max(0px, calc(var(--mvh-R) - var(--mvh-rim-in)));
-  --mvh-C1Xa: calc(var(--mvh-Ra) * var(--mvh-c1x));
-  --mvh-C1Ya: calc(var(--mvh-Ra) * var(--mvh-c1y));
-  --mvh-C2Xa: calc(var(--mvh-Ra) * var(--mvh-c2x));
-  --mvh-C2Ya: calc(var(--mvh-Ra) * var(--mvh-c2y));
-  --mvh-Rb: max(0px, calc(var(--mvh-R) - calc(var(--mvh-rim-in) + var(--mvh-rim-w))));
-  --mvh-C1Xb: calc(var(--mvh-Rb) * var(--mvh-c1x));
-  --mvh-C1Yb: calc(var(--mvh-Rb) * var(--mvh-c1y));
-  --mvh-C2Xb: calc(var(--mvh-Rb) * var(--mvh-c2x));
-  --mvh-C2Yb: calc(var(--mvh-Rb) * var(--mvh-c2y));
-  --mvh-KH:  calc(var(--mvh-L0-bx) * 8.29727);
-  --mvh-KV:  calc(var(--mvh-L0-by) * 9.53043);
-  --mvh-OX:  calc(var(--mvh-L0-bx) * 1.333333);
-  --mvh-OY:  calc(var(--mvh-L0-by) * 1.333333);
-  --mvh-X0:  var(--mvh-L0-by);
-  --mvh-X1:  calc(100% - var(--mvh-L0-by));
-  --mvh-Y0:  var(--mvh-L0-bx);
-  --mvh-Y1:  calc(100% - var(--mvh-L0-bx));
-
-  /* [L1] 색 — 젤리 살(정본 --wf-face). 색 바탕은 **정본에 없다**(수리 0831). */
-  --mvh-face: #DBC4E8; --mvh-face-top: #EECFF3; --mvh-face-y: 100%; --mvh-rim-c: #F2D3FD;
-  --mvh-a-fill: 0;
-
-  /* [L1.5] 비침 — 캡슐 변주. [E17-0903 · §3] .010 -> **.622** (캡슐 실측). */
-  --mvh-a-in: .622;
-  --mvh-a-rim: 1.000;
-  /* [P0-0901] --mvh-band 은퇴 — 모달 판과 같은 사유이고 캡슐에서 더 심했다.
-     캡슐은 가로세로비 4.07 이라 타원(farthest-side)의 띠가 가운데 위/아래에서
-     0.6px, 두 끝에서 반높이 전부(28px)를 먹었다 — 100배 부푼다. 그래서 캡슐이
-     양 끝만 뿌옇고 가운데는 맨살인, 테두리가 둘로 읽히는 모양이 됐다. */
-  --mvh-band:   99.0%;
-  --mvh-band-w: calc(var(--mvh-w) * .0800);   /* 띠 번짐 */
-  --mvh-band-s: calc(var(--mvh-w) * .0300);   /* 띠 퍼짐 */
-  /* 시안 캡슐 단면(오른 반원 기준, 림에서 %W -> 알파):
-       1.7%W .770 · 2.8 .680 · 3.9 .650 · 5.1 .630 · 6.2 .620 · 8.4 .610 · 11.8 .590
-     캡슐은 판보다 얇아(반높이 = 12.3%W) 띠의 꼬리가 세로 한가운데까지 닿는다 —
-     시안도 그렇다(세로 단면이 13.8%W 에서야 평평해진다). */
-  --mvh-haze: 0;
-  --mvh-haze-y: 14.0%;
-
-  /* [L2-0] 유백 워시 */
-  --mvh-milk-a: .030;
-
-  /* [L2-1] 측면 림 — 전부 폭 비율(정본 기준값, 캡슐 변주가 안 건드린다) */
-  /* [E18-0903 은퇴 · DOM 무매칭]  --mvh-rim-in: calc(var(--f2-ref-w) * 0.00350); */
-  /* [E18-0903 은퇴 · DOM 무매칭]  --mvh-rim-w: calc(var(--f2-ref-w) * 0.00400); */
-  /* [E18-0903 은퇴 · DOM 무매칭]  --mvh-rim-a: 0.1023; */
-  /* [E18-0903 은퇴 · DOM 무매칭]  --mvh-rim-blur: calc(var(--f2-ref-w) * 0.00340); */
-
-  /* [L2-2] 상단 광택 — 좌상 2점. 정본은 중심 좌표(left/top + translate(-50%))라
-     배경 자리로 옮길 때 옮김식을 한 번 거친다:  p = (c - s/2) / (1 - s)
-     [v1.1-user0901 §6-2] 종전 값은 **기준판(모달판)의 광택**을 그대로 물려받은
-     것이었다. 기준판은 세로로 길고 캡슐은 납작해서, 세로 5.2% 짜리 점이 캡슐에서
-     3.4px 로 눌리며 위 변에 붙어 사라졌다(실측: 흰 알파 .583 대 시안 .909).
-     시안 90127e38 의 캡슐 광택을 **캡슐 자신의 상자 비율로** 다시 쟀다 —
-       큰 점   중심 11.13% / 20.88%,  중심핵(a>.75) 6.04% x 16.48%,  꼭짓 a 0.92
-       작은 점 중심  6.18% / 36.26%,  중심핵        1.10% x  5.49%,  꼭짓 a 0.84
-     타원 크기는 중심핵이 시안과 같아지는 값으로 렌더 대조 수렴시켰다
-     (20.0% x 36.0% -> 중심핵 5.63% x 19.84% · 중심 10.13%/19.84% · 꼭짓 a 0.77).
-     자리 %는 옮김식 뒤에, 배경 그리기 상자와 겉상자의 차만큼 한 번 더 보정한다 —
-     그 보정까지 넣은 최종값이 아래다. */
-  --mvh-gl-a: .930;
-  --mvh-gl1-w: 15.7%;  --mvh-gl1-h: 27.3%;
-  --mvh-gl1-px: 6.45%;  --mvh-gl1-py: 2.95%;
-  --mvh-gl2-w: 1.95%;  --mvh-gl2-h: 8.9%;
-  --mvh-gl2-px: 7.17%; --mvh-gl2-py: 38.30%;
-
-  /* [L3] 외곽선 — 회보라 얇은 선.
-     [v1.1-user0901 §6-1] 1.40% 는 **기준판** 값이다. 캡슐에서 렌더 반값폭이
-     1.231%capW 로 나와 시안(0.984%capW)보다 25% 두꺼웠다. 같은 자리에서
-     시안의 선은 오히려 **더 진하다**(상대 대비 0.307 대 우리 0.151) — v1.1 §6
-     이 적어 둔 「우리 것이 더 어둡다」는 반대였고, 이 줄이 그 정정이다.
-     두께 .01400 -> .01000 · 진하기 .400 -> .900 으로 두 지표를 함께 맞췄다
-     (수렴 결과 반값폭 0.966%capW · 상대 대비 0.313). 선 **색**(#6B5A69)은
-     v1.0 승인값이라 안 건드린다 — 시안 선은 자두빛이라 아직 다르다(보고 대상). */
-  /* [E18-0903 은퇴 · DOM 무매칭]  --mvh-L3-w: calc(var(--f2-ref-w) * 0.00400); */
-  /* [v1.1-user0901 §6-1b · 지휘자 판정 2] 선 **색**도 시안 실측을 쓴다.
-     이 P0 자체가 「시안 보고 다시」라는 사용자 지시라, 이 부품에서는 시안이
-     v1.0 위다. 시안 캡슐 겉선의 합성색은 RGB(172,104,168) 자두빛인데
-     #6B5A69 은 우리 화면에서 RGB(141,124,139) 무채 회보라로 났다
-     (초록 빠짐 비 dG/dR 0.98 = 색이 안 빠짐 = 회색). 우리 판 뒤 배경이
-     시안(낮)과 달라 재료색을 그대로 옮기면 합성이 어긋나므로, **합성 결과가
-     시안과 같아지는** 재료색을 렌더 대조로 풀었다 -> #9B4697.
-     결과 RGB(175,110,170) · 상대 대비 0.366 (시안 0.333). */
-  --mvh-L3-line: #865890;
-  /* [E18-0903 은퇴 · DOM 무매칭]  --mvh-L3-a: .700; */
-  /* [E18-0903 은퇴 · DOM 무매칭]  --mvh-L3-blur: calc(var(--mvh-L3-w) * 0.28); */
-
-  /* ==== 자리·크기 — 종전 그대로 ==== */
-  position: relative;
-  z-index: 3;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 0 0 auto;
-  align-self: center;
-  width: var(--mvh-w);
-  min-width: 0;
-  max-width: 100%;
-  height: var(--mvh-h);
-  margin: 0 auto calc(var(--f2-w) * .012);
-  padding: 0 calc(var(--f2-w) * .04);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-
-  /* ==== 글자 — 한 글자도 안 고쳤다 (사용자 승인본) ==== */
-  font-family: var(--font-display);
-  /* [E14-0902 · 지휘자 판정 2 「긴 제목만 자동 맞춤」]
-     크기를 **변수로** 뺐다. 기본은 승인값 .128 그대로이고, 캡슐 안폭을 넘치는
-     제목만 아래 fitHead() 가 이 변수를 낮춘다(하한 .079). 캡슐 폭은 정본 비율
-     (.62 f2-w)이라 고정이고 문구도 안 건드린다.
-     착수 전 실측 — 실제 쓰이는 제목 18개 중 **6개가 넘쳐 말줄임**이었다:
-       스테이지 1 클리어! 6.65em(여유 -2.43) · Stage 1 clear! 5.83 ·
-       Out of moves 5.49 · How to play / Arcade Duel 5.01 · 아케이드 대결 4.96
-       (h2 안폭 4.219em 기준) */
-  --mvh-fs: .128;   /* [v1.1-user0901] .058 -> .128 — 시안 글자/캡슐 채움비(높이 0.592 · 폭 0.739) 대조 실측 */
-  --mvh-fs-min: .079;
-  font-size: calc(var(--f2-w) * var(--mvh-fs));
-  font-weight: 400;
-  line-height: 1;
-  letter-spacing: -.01em;
-  color: #FFFFFF;
-  -webkit-text-fill-color: #FFFFFF;
-  -webkit-text-stroke: 0;
-  text-shadow: 0 calc(var(--f2-w) * .004) 0 rgba(120, 60, 80, .55);
-
-  /* ==== 틀 — 여기부터 젤리판 v1.0 캡슐 ==== */
-  border: 0;
-  border-radius: calc(var(--mvh-h) * .5);   /* shape() 못 읽는 브라우저용 알약 */
-  background-color: transparent;
-  background-image:
-    /* [L2-2] 광택 2점 (흰 알파만) */
-    radial-gradient(closest-side,
-      rgba(255,255,255, calc(var(--mvh-gl-a) * 1.00)) 0%,
-      rgba(255,255,255, calc(var(--mvh-gl-a) *  .72)) 52%,
-      rgba(255,255,255, 0) 100%),
-    radial-gradient(closest-side,
-      rgba(255,255,255, calc(var(--mvh-gl-a) * 1.00)) 0%,
-      rgba(255,255,255, calc(var(--mvh-gl-a) *  .72)) 52%,
-      rgba(255,255,255, 0) 100%),
-    /* [L2-0] 유백 워시 — 가운데에서 색기만 빠진다.
-       [P0-0901] 바닥값 .75 로 잡아 141%(끝자락)까지 편다 — 모달 판과 같은 사유. */
-    radial-gradient(farthest-side at 50% 50%,
-      rgba(255,255,255, calc(var(--mvh-milk-a) * 1.00)) 0%,
-      rgba(255,255,255, calc(var(--mvh-milk-a) *  .85)) 55%,
-      rgba(255,255,255, calc(var(--mvh-milk-a) *  .78)) 88%,
-      rgba(255,255,255, calc(var(--mvh-milk-a) *  .75)) 100%,
-      rgba(255,255,255, calc(var(--mvh-milk-a) *  .75)) 141%),
-    /* [L1.5-3] 윗빛 — 위에서 내려오는 덧빛 */
-    linear-gradient(to bottom,
-      color-mix(in srgb, var(--mvh-face) calc(var(--mvh-haze) * 100%), transparent) 0%,
-      color-mix(in srgb, var(--mvh-face) 0%, transparent) var(--mvh-haze-y)),
-    /* [L1.5-2] 테두리 색 띠 — **층이 배경에서 box-shadow 로 옮겨졌다**
-       ([P0-0901]. 아래 box-shadow 참조. 알파 (a-rim - a-in) 무변동) */
-    /* [L1.5-1] 속 — 정본 캡슐의 빈 유리(.010) */
-    linear-gradient(to bottom,
-      color-mix(in srgb, var(--mvh-face-top) calc(var(--mvh-a-in) * 100%), transparent) 0%,
-      color-mix(in srgb, var(--mvh-face) calc(var(--mvh-a-in) * 100%), transparent) var(--mvh-face-y),
-      color-mix(in srgb, var(--mvh-face) calc(var(--mvh-a-in) * 100%), transparent) 100%),
-    /* [L1] 색 바탕 — 종전 헤더 알약색. 흰 글자 대비를 지키는 층 */
-    linear-gradient(180deg,
-      color-mix(in srgb, var(--f2-pill-a-1) calc(var(--mvh-a-fill) * 100%), transparent)   0%,
-      color-mix(in srgb, var(--f2-pill-a-1) calc(var(--mvh-a-fill) * 100%), transparent)  16%,
-      color-mix(in srgb, var(--f2-pill-a-2) calc(var(--mvh-a-fill) * 100%), transparent)  70%,
-      color-mix(in srgb, var(--f2-pill-a-2) calc(var(--mvh-a-fill) * 100%), transparent) 100%);
-  background-position:
-    var(--mvh-gl1-px) var(--mvh-gl1-py),
-    var(--mvh-gl2-px) var(--mvh-gl2-py),
-    0 0, 0 0, 0 0, 0 0;
-  background-size:
-    var(--mvh-gl1-w) var(--mvh-gl1-h),
-    var(--mvh-gl2-w) var(--mvh-gl2-h),
-    100% 100%, 100% 100%, 100% 100%, 100% 100%;
-  background-repeat: no-repeat;
-  background-clip: border-box;
-  -webkit-background-clip: border-box;
-  /* 폴백 링 둘 — shape() 가 있으면 아래 @supports 가 이 줄을 걷고
-     고리 두 장으로 다시 그린다(코너를 그대로 돈다). */
-  box-shadow:
-    inset 0 0 0 var(--mvh-L3-w) color-mix(in srgb, var(--mvh-L3-line)
-      calc(var(--mvh-L3-a) * 100%), transparent),
-    inset 0 0 0 calc(var(--mvh-rim-in) + var(--mvh-rim-w))
-      rgba(255,255,255, var(--mvh-rim-a)),
-    /* [L1.5-2] 색 띠 — 알약 반지름(h/2)을 그대로 도는 안쪽 번짐 */
-    inset 0 0 var(--mvh-band-w) var(--mvh-band-s) color-mix(in srgb, var(--mvh-face)
-      calc((var(--mvh-a-rim) - var(--mvh-a-in)) * 100%), transparent);
-}
 /* 영문 제목은 같은 크기로 두면 캡슐을 넘친다(말줄임 발동). 한국어 시안 채움비를
    유지하면서 en 만 낮춘다 — 판정 시안이 한국어다. */
 html[lang="en"] .modal-v2 .mv2-sheet > h2,
@@ -51085,96 +50453,12 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
   /* [L0] 실루엣 — 접선 사각형 + 코너 4(초타원 n=3) + 옆변 볼록 4.
      코너가 .550h 라 위아래 코너가 1.10h 서로 겹친다 — 그 겹침이
      정본이 승인받은 「살짝 뚱뚱한 젤리」 옆변 볼록이다. */
-  .modal-v2 .mv2-sheet > h2,
-  .modal-v2 .mv2-head > h2 {
-    /* [P0-0901] 알약 반지름(border-radius: h/2)은 위 규칙에서 살아 있다 —
-       띠(inset 그림자)가 두 끝 반원을 그대로 돈다. 클립이 바깥을 다시 자른다. */
-    box-shadow: inset 0 0 var(--mvh-band-w) var(--mvh-band-s) color-mix(in srgb, var(--mvh-face)
-      calc((var(--mvh-a-rim) - var(--mvh-a-in)) * 100%), transparent);
-    clip-path: shape(from calc(var(--mvh-X0) + 0px + var(--mvh-R)) calc(var(--mvh-Y0) + 0px),
-      curve to calc(var(--mvh-X1) - 0px - var(--mvh-R)) calc(var(--mvh-Y0) + 0px) with calc(var(--mvh-X0) + 0px + var(--mvh-R) + var(--mvh-KH)) calc(var(--mvh-Y0) + 0px - var(--mvh-OX)) / calc(var(--mvh-X1) - 0px - var(--mvh-R) - var(--mvh-KH)) calc(var(--mvh-Y0) + 0px - var(--mvh-OX)),
-      curve to calc(var(--mvh-X1) - 0px) calc(var(--mvh-Y0) + 0px + var(--mvh-R)) with calc(var(--mvh-X1) - 0px - var(--mvh-C1X)) calc(var(--mvh-Y0) + 0px + var(--mvh-C1Y)) / calc(var(--mvh-X1) - 0px - var(--mvh-C2X)) calc(var(--mvh-Y0) + 0px + var(--mvh-C2Y)),
-      curve to calc(var(--mvh-X1) - 0px) calc(var(--mvh-Y1) - 0px - var(--mvh-R)) with calc(var(--mvh-X1) - 0px + var(--mvh-OY)) calc(var(--mvh-Y0) + 0px + var(--mvh-R) + var(--mvh-KV)) / calc(var(--mvh-X1) - 0px + var(--mvh-OY)) calc(var(--mvh-Y1) - 0px - var(--mvh-R) - var(--mvh-KV)),
-      curve to calc(var(--mvh-X1) - 0px - var(--mvh-R)) calc(var(--mvh-Y1) - 0px) with calc(var(--mvh-X1) - 0px - var(--mvh-C2X)) calc(var(--mvh-Y1) - 0px - var(--mvh-C2Y)) / calc(var(--mvh-X1) - 0px - var(--mvh-C1X)) calc(var(--mvh-Y1) - 0px - var(--mvh-C1Y)),
-      curve to calc(var(--mvh-X0) + 0px + var(--mvh-R)) calc(var(--mvh-Y1) - 0px) with calc(var(--mvh-X1) - 0px - var(--mvh-R) - var(--mvh-KH)) calc(var(--mvh-Y1) - 0px + var(--mvh-OX)) / calc(var(--mvh-X0) + 0px + var(--mvh-R) + var(--mvh-KH)) calc(var(--mvh-Y1) - 0px + var(--mvh-OX)),
-      curve to calc(var(--mvh-X0) + 0px) calc(var(--mvh-Y1) - 0px - var(--mvh-R)) with calc(var(--mvh-X0) + 0px + var(--mvh-C1X)) calc(var(--mvh-Y1) - 0px - var(--mvh-C1Y)) / calc(var(--mvh-X0) + 0px + var(--mvh-C2X)) calc(var(--mvh-Y1) - 0px - var(--mvh-C2Y)),
-      curve to calc(var(--mvh-X0) + 0px) calc(var(--mvh-Y0) + 0px + var(--mvh-R)) with calc(var(--mvh-X0) + 0px - var(--mvh-OY)) calc(var(--mvh-Y1) - 0px - var(--mvh-R) - var(--mvh-KV)) / calc(var(--mvh-X0) + 0px - var(--mvh-OY)) calc(var(--mvh-Y0) + 0px + var(--mvh-R) + var(--mvh-KV)),
-      curve to calc(var(--mvh-X0) + 0px + var(--mvh-R)) calc(var(--mvh-Y0) + 0px) with calc(var(--mvh-X0) + 0px + var(--mvh-C2X)) calc(var(--mvh-Y0) + 0px + var(--mvh-C2Y)) / calc(var(--mvh-X0) + 0px + var(--mvh-C1X)) calc(var(--mvh-Y0) + 0px + var(--mvh-C1Y)),
-      close);
-  }
-  /* [L2-1] 측면 림 — 외곽선 바로 안쪽의 거의 흰 띠. 고리(evenodd)라
+    /* [L2-1] 측면 림 — 외곽선 바로 안쪽의 거의 흰 띠. 고리(evenodd)라
      코너를 그대로 돈다(box-shadow inset 으로는 못 하는 일). */
-  .modal-v2 .mv2-sheet > h2::before,
-  .modal-v2 .mv2-head > h2::before {
-    content: "";
-    position: absolute; inset: 0;
-    z-index: 1;
-    pointer-events: none;
-    width: auto; height: auto; margin: 0; padding: 0;
-    border: 0; border-radius: 0;
-    box-shadow: none;
-    background: color-mix(in srgb, var(--mvh-rim-c) calc(var(--mvh-rim-a) * 100%), transparent);
-    clip-path: shape(evenodd from calc(var(--mvh-X0) + var(--mvh-rim-in) + var(--mvh-Ra)) calc(var(--mvh-Y0) + var(--mvh-rim-in)),
-      curve to calc(var(--mvh-X1) - var(--mvh-rim-in) - var(--mvh-Ra)) calc(var(--mvh-Y0) + var(--mvh-rim-in)) with calc(var(--mvh-X0) + var(--mvh-rim-in) + var(--mvh-Ra) + var(--mvh-KH)) calc(var(--mvh-Y0) + var(--mvh-rim-in) - var(--mvh-OX)) / calc(var(--mvh-X1) - var(--mvh-rim-in) - var(--mvh-Ra) - var(--mvh-KH)) calc(var(--mvh-Y0) + var(--mvh-rim-in) - var(--mvh-OX)),
-      curve to calc(var(--mvh-X1) - var(--mvh-rim-in)) calc(var(--mvh-Y0) + var(--mvh-rim-in) + var(--mvh-Ra)) with calc(var(--mvh-X1) - var(--mvh-rim-in) - var(--mvh-C1Xa)) calc(var(--mvh-Y0) + var(--mvh-rim-in) + var(--mvh-C1Ya)) / calc(var(--mvh-X1) - var(--mvh-rim-in) - var(--mvh-C2Xa)) calc(var(--mvh-Y0) + var(--mvh-rim-in) + var(--mvh-C2Ya)),
-      curve to calc(var(--mvh-X1) - var(--mvh-rim-in)) calc(var(--mvh-Y1) - var(--mvh-rim-in) - var(--mvh-Ra)) with calc(var(--mvh-X1) - var(--mvh-rim-in) + var(--mvh-OY)) calc(var(--mvh-Y0) + var(--mvh-rim-in) + var(--mvh-Ra) + var(--mvh-KV)) / calc(var(--mvh-X1) - var(--mvh-rim-in) + var(--mvh-OY)) calc(var(--mvh-Y1) - var(--mvh-rim-in) - var(--mvh-Ra) - var(--mvh-KV)),
-      curve to calc(var(--mvh-X1) - var(--mvh-rim-in) - var(--mvh-Ra)) calc(var(--mvh-Y1) - var(--mvh-rim-in)) with calc(var(--mvh-X1) - var(--mvh-rim-in) - var(--mvh-C2Xa)) calc(var(--mvh-Y1) - var(--mvh-rim-in) - var(--mvh-C2Ya)) / calc(var(--mvh-X1) - var(--mvh-rim-in) - var(--mvh-C1Xa)) calc(var(--mvh-Y1) - var(--mvh-rim-in) - var(--mvh-C1Ya)),
-      curve to calc(var(--mvh-X0) + var(--mvh-rim-in) + var(--mvh-Ra)) calc(var(--mvh-Y1) - var(--mvh-rim-in)) with calc(var(--mvh-X1) - var(--mvh-rim-in) - var(--mvh-Ra) - var(--mvh-KH)) calc(var(--mvh-Y1) - var(--mvh-rim-in) + var(--mvh-OX)) / calc(var(--mvh-X0) + var(--mvh-rim-in) + var(--mvh-Ra) + var(--mvh-KH)) calc(var(--mvh-Y1) - var(--mvh-rim-in) + var(--mvh-OX)),
-      curve to calc(var(--mvh-X0) + var(--mvh-rim-in)) calc(var(--mvh-Y1) - var(--mvh-rim-in) - var(--mvh-Ra)) with calc(var(--mvh-X0) + var(--mvh-rim-in) + var(--mvh-C1Xa)) calc(var(--mvh-Y1) - var(--mvh-rim-in) - var(--mvh-C1Ya)) / calc(var(--mvh-X0) + var(--mvh-rim-in) + var(--mvh-C2Xa)) calc(var(--mvh-Y1) - var(--mvh-rim-in) - var(--mvh-C2Ya)),
-      curve to calc(var(--mvh-X0) + var(--mvh-rim-in)) calc(var(--mvh-Y0) + var(--mvh-rim-in) + var(--mvh-Ra)) with calc(var(--mvh-X0) + var(--mvh-rim-in) - var(--mvh-OY)) calc(var(--mvh-Y1) - var(--mvh-rim-in) - var(--mvh-Ra) - var(--mvh-KV)) / calc(var(--mvh-X0) + var(--mvh-rim-in) - var(--mvh-OY)) calc(var(--mvh-Y0) + var(--mvh-rim-in) + var(--mvh-Ra) + var(--mvh-KV)),
-      curve to calc(var(--mvh-X0) + var(--mvh-rim-in) + var(--mvh-Ra)) calc(var(--mvh-Y0) + var(--mvh-rim-in)) with calc(var(--mvh-X0) + var(--mvh-rim-in) + var(--mvh-C2Xa)) calc(var(--mvh-Y0) + var(--mvh-rim-in) + var(--mvh-C2Ya)) / calc(var(--mvh-X0) + var(--mvh-rim-in) + var(--mvh-C1Xa)) calc(var(--mvh-Y0) + var(--mvh-rim-in) + var(--mvh-C1Ya)),
-      close,
-      move to calc(var(--mvh-X0) + calc(var(--mvh-rim-in) + var(--mvh-rim-w)) + var(--mvh-Rb)) calc(var(--mvh-Y0) + calc(var(--mvh-rim-in) + var(--mvh-rim-w))),
-      curve to calc(var(--mvh-X1) - calc(var(--mvh-rim-in) + var(--mvh-rim-w)) - var(--mvh-Rb)) calc(var(--mvh-Y0) + calc(var(--mvh-rim-in) + var(--mvh-rim-w))) with calc(var(--mvh-X0) + calc(var(--mvh-rim-in) + var(--mvh-rim-w)) + var(--mvh-Rb) + var(--mvh-KH)) calc(var(--mvh-Y0) + calc(var(--mvh-rim-in) + var(--mvh-rim-w)) - var(--mvh-OX)) / calc(var(--mvh-X1) - calc(var(--mvh-rim-in) + var(--mvh-rim-w)) - var(--mvh-Rb) - var(--mvh-KH)) calc(var(--mvh-Y0) + calc(var(--mvh-rim-in) + var(--mvh-rim-w)) - var(--mvh-OX)),
-      curve to calc(var(--mvh-X1) - calc(var(--mvh-rim-in) + var(--mvh-rim-w))) calc(var(--mvh-Y0) + calc(var(--mvh-rim-in) + var(--mvh-rim-w)) + var(--mvh-Rb)) with calc(var(--mvh-X1) - calc(var(--mvh-rim-in) + var(--mvh-rim-w)) - var(--mvh-C1Xb)) calc(var(--mvh-Y0) + calc(var(--mvh-rim-in) + var(--mvh-rim-w)) + var(--mvh-C1Yb)) / calc(var(--mvh-X1) - calc(var(--mvh-rim-in) + var(--mvh-rim-w)) - var(--mvh-C2Xb)) calc(var(--mvh-Y0) + calc(var(--mvh-rim-in) + var(--mvh-rim-w)) + var(--mvh-C2Yb)),
-      curve to calc(var(--mvh-X1) - calc(var(--mvh-rim-in) + var(--mvh-rim-w))) calc(var(--mvh-Y1) - calc(var(--mvh-rim-in) + var(--mvh-rim-w)) - var(--mvh-Rb)) with calc(var(--mvh-X1) - calc(var(--mvh-rim-in) + var(--mvh-rim-w)) + var(--mvh-OY)) calc(var(--mvh-Y0) + calc(var(--mvh-rim-in) + var(--mvh-rim-w)) + var(--mvh-Rb) + var(--mvh-KV)) / calc(var(--mvh-X1) - calc(var(--mvh-rim-in) + var(--mvh-rim-w)) + var(--mvh-OY)) calc(var(--mvh-Y1) - calc(var(--mvh-rim-in) + var(--mvh-rim-w)) - var(--mvh-Rb) - var(--mvh-KV)),
-      curve to calc(var(--mvh-X1) - calc(var(--mvh-rim-in) + var(--mvh-rim-w)) - var(--mvh-Rb)) calc(var(--mvh-Y1) - calc(var(--mvh-rim-in) + var(--mvh-rim-w))) with calc(var(--mvh-X1) - calc(var(--mvh-rim-in) + var(--mvh-rim-w)) - var(--mvh-C2Xb)) calc(var(--mvh-Y1) - calc(var(--mvh-rim-in) + var(--mvh-rim-w)) - var(--mvh-C2Yb)) / calc(var(--mvh-X1) - calc(var(--mvh-rim-in) + var(--mvh-rim-w)) - var(--mvh-C1Xb)) calc(var(--mvh-Y1) - calc(var(--mvh-rim-in) + var(--mvh-rim-w)) - var(--mvh-C1Yb)),
-      curve to calc(var(--mvh-X0) + calc(var(--mvh-rim-in) + var(--mvh-rim-w)) + var(--mvh-Rb)) calc(var(--mvh-Y1) - calc(var(--mvh-rim-in) + var(--mvh-rim-w))) with calc(var(--mvh-X1) - calc(var(--mvh-rim-in) + var(--mvh-rim-w)) - var(--mvh-Rb) - var(--mvh-KH)) calc(var(--mvh-Y1) - calc(var(--mvh-rim-in) + var(--mvh-rim-w)) + var(--mvh-OX)) / calc(var(--mvh-X0) + calc(var(--mvh-rim-in) + var(--mvh-rim-w)) + var(--mvh-Rb) + var(--mvh-KH)) calc(var(--mvh-Y1) - calc(var(--mvh-rim-in) + var(--mvh-rim-w)) + var(--mvh-OX)),
-      curve to calc(var(--mvh-X0) + calc(var(--mvh-rim-in) + var(--mvh-rim-w))) calc(var(--mvh-Y1) - calc(var(--mvh-rim-in) + var(--mvh-rim-w)) - var(--mvh-Rb)) with calc(var(--mvh-X0) + calc(var(--mvh-rim-in) + var(--mvh-rim-w)) + var(--mvh-C1Xb)) calc(var(--mvh-Y1) - calc(var(--mvh-rim-in) + var(--mvh-rim-w)) - var(--mvh-C1Yb)) / calc(var(--mvh-X0) + calc(var(--mvh-rim-in) + var(--mvh-rim-w)) + var(--mvh-C2Xb)) calc(var(--mvh-Y1) - calc(var(--mvh-rim-in) + var(--mvh-rim-w)) - var(--mvh-C2Yb)),
-      curve to calc(var(--mvh-X0) + calc(var(--mvh-rim-in) + var(--mvh-rim-w))) calc(var(--mvh-Y0) + calc(var(--mvh-rim-in) + var(--mvh-rim-w)) + var(--mvh-Rb)) with calc(var(--mvh-X0) + calc(var(--mvh-rim-in) + var(--mvh-rim-w)) - var(--mvh-OY)) calc(var(--mvh-Y1) - calc(var(--mvh-rim-in) + var(--mvh-rim-w)) - var(--mvh-Rb) - var(--mvh-KV)) / calc(var(--mvh-X0) + calc(var(--mvh-rim-in) + var(--mvh-rim-w)) - var(--mvh-OY)) calc(var(--mvh-Y0) + calc(var(--mvh-rim-in) + var(--mvh-rim-w)) + var(--mvh-Rb) + var(--mvh-KV)),
-      curve to calc(var(--mvh-X0) + calc(var(--mvh-rim-in) + var(--mvh-rim-w)) + var(--mvh-Rb)) calc(var(--mvh-Y0) + calc(var(--mvh-rim-in) + var(--mvh-rim-w))) with calc(var(--mvh-X0) + calc(var(--mvh-rim-in) + var(--mvh-rim-w)) + var(--mvh-C2Xb)) calc(var(--mvh-Y0) + calc(var(--mvh-rim-in) + var(--mvh-rim-w)) + var(--mvh-C2Yb)) / calc(var(--mvh-X0) + calc(var(--mvh-rim-in) + var(--mvh-rim-w)) + var(--mvh-C1Xb)) calc(var(--mvh-Y0) + calc(var(--mvh-rim-in) + var(--mvh-rim-w)) + var(--mvh-C1Yb)),
-      close);
-    filter: blur(var(--mvh-rim-blur));
-  }
-  /* [L3] 외곽선 — 회보라 어두운 선. 밖으로 부드럽게 사라진다
+    /* [L3] 외곽선 — 회보라 어두운 선. 밖으로 부드럽게 사라진다
      (번진 바깥쪽은 h2 의 clip-path 가 잘라 준다). */
-  .modal-v2 .mv2-sheet > h2::after,
-  .modal-v2 .mv2-head > h2::after {
-    content: "";
-    position: absolute; inset: 0;
-    z-index: 2;
-    pointer-events: none;
-    width: auto; height: auto; margin: 0; padding: 0;
-    border: 0; border-radius: 0;
-    box-shadow: none;
-    background: color-mix(in srgb, var(--mvh-L3-line)
-      calc(var(--mvh-L3-a) * 100%), transparent);
-    clip-path: shape(evenodd from calc(var(--mvh-X0) + 0px + var(--mvh-R)) calc(var(--mvh-Y0) + 0px),
-      curve to calc(var(--mvh-X1) - 0px - var(--mvh-R)) calc(var(--mvh-Y0) + 0px) with calc(var(--mvh-X0) + 0px + var(--mvh-R) + var(--mvh-KH)) calc(var(--mvh-Y0) + 0px - var(--mvh-OX)) / calc(var(--mvh-X1) - 0px - var(--mvh-R) - var(--mvh-KH)) calc(var(--mvh-Y0) + 0px - var(--mvh-OX)),
-      curve to calc(var(--mvh-X1) - 0px) calc(var(--mvh-Y0) + 0px + var(--mvh-R)) with calc(var(--mvh-X1) - 0px - var(--mvh-C1X)) calc(var(--mvh-Y0) + 0px + var(--mvh-C1Y)) / calc(var(--mvh-X1) - 0px - var(--mvh-C2X)) calc(var(--mvh-Y0) + 0px + var(--mvh-C2Y)),
-      curve to calc(var(--mvh-X1) - 0px) calc(var(--mvh-Y1) - 0px - var(--mvh-R)) with calc(var(--mvh-X1) - 0px + var(--mvh-OY)) calc(var(--mvh-Y0) + 0px + var(--mvh-R) + var(--mvh-KV)) / calc(var(--mvh-X1) - 0px + var(--mvh-OY)) calc(var(--mvh-Y1) - 0px - var(--mvh-R) - var(--mvh-KV)),
-      curve to calc(var(--mvh-X1) - 0px - var(--mvh-R)) calc(var(--mvh-Y1) - 0px) with calc(var(--mvh-X1) - 0px - var(--mvh-C2X)) calc(var(--mvh-Y1) - 0px - var(--mvh-C2Y)) / calc(var(--mvh-X1) - 0px - var(--mvh-C1X)) calc(var(--mvh-Y1) - 0px - var(--mvh-C1Y)),
-      curve to calc(var(--mvh-X0) + 0px + var(--mvh-R)) calc(var(--mvh-Y1) - 0px) with calc(var(--mvh-X1) - 0px - var(--mvh-R) - var(--mvh-KH)) calc(var(--mvh-Y1) - 0px + var(--mvh-OX)) / calc(var(--mvh-X0) + 0px + var(--mvh-R) + var(--mvh-KH)) calc(var(--mvh-Y1) - 0px + var(--mvh-OX)),
-      curve to calc(var(--mvh-X0) + 0px) calc(var(--mvh-Y1) - 0px - var(--mvh-R)) with calc(var(--mvh-X0) + 0px + var(--mvh-C1X)) calc(var(--mvh-Y1) - 0px - var(--mvh-C1Y)) / calc(var(--mvh-X0) + 0px + var(--mvh-C2X)) calc(var(--mvh-Y1) - 0px - var(--mvh-C2Y)),
-      curve to calc(var(--mvh-X0) + 0px) calc(var(--mvh-Y0) + 0px + var(--mvh-R)) with calc(var(--mvh-X0) + 0px - var(--mvh-OY)) calc(var(--mvh-Y1) - 0px - var(--mvh-R) - var(--mvh-KV)) / calc(var(--mvh-X0) + 0px - var(--mvh-OY)) calc(var(--mvh-Y0) + 0px + var(--mvh-R) + var(--mvh-KV)),
-      curve to calc(var(--mvh-X0) + 0px + var(--mvh-R)) calc(var(--mvh-Y0) + 0px) with calc(var(--mvh-X0) + 0px + var(--mvh-C2X)) calc(var(--mvh-Y0) + 0px + var(--mvh-C2Y)) / calc(var(--mvh-X0) + 0px + var(--mvh-C1X)) calc(var(--mvh-Y0) + 0px + var(--mvh-C1Y)),
-      close,
-      move to calc(var(--mvh-X0) + var(--mvh-L3-w) + var(--mvh-R3)) calc(var(--mvh-Y0) + var(--mvh-L3-w)),
-      curve to calc(var(--mvh-X1) - var(--mvh-L3-w) - var(--mvh-R3)) calc(var(--mvh-Y0) + var(--mvh-L3-w)) with calc(var(--mvh-X0) + var(--mvh-L3-w) + var(--mvh-R3) + var(--mvh-KH)) calc(var(--mvh-Y0) + var(--mvh-L3-w) - var(--mvh-OX)) / calc(var(--mvh-X1) - var(--mvh-L3-w) - var(--mvh-R3) - var(--mvh-KH)) calc(var(--mvh-Y0) + var(--mvh-L3-w) - var(--mvh-OX)),
-      curve to calc(var(--mvh-X1) - var(--mvh-L3-w)) calc(var(--mvh-Y0) + var(--mvh-L3-w) + var(--mvh-R3)) with calc(var(--mvh-X1) - var(--mvh-L3-w) - var(--mvh-C1X3)) calc(var(--mvh-Y0) + var(--mvh-L3-w) + var(--mvh-C1Y3)) / calc(var(--mvh-X1) - var(--mvh-L3-w) - var(--mvh-C2X3)) calc(var(--mvh-Y0) + var(--mvh-L3-w) + var(--mvh-C2Y3)),
-      curve to calc(var(--mvh-X1) - var(--mvh-L3-w)) calc(var(--mvh-Y1) - var(--mvh-L3-w) - var(--mvh-R3)) with calc(var(--mvh-X1) - var(--mvh-L3-w) + var(--mvh-OY)) calc(var(--mvh-Y0) + var(--mvh-L3-w) + var(--mvh-R3) + var(--mvh-KV)) / calc(var(--mvh-X1) - var(--mvh-L3-w) + var(--mvh-OY)) calc(var(--mvh-Y1) - var(--mvh-L3-w) - var(--mvh-R3) - var(--mvh-KV)),
-      curve to calc(var(--mvh-X1) - var(--mvh-L3-w) - var(--mvh-R3)) calc(var(--mvh-Y1) - var(--mvh-L3-w)) with calc(var(--mvh-X1) - var(--mvh-L3-w) - var(--mvh-C2X3)) calc(var(--mvh-Y1) - var(--mvh-L3-w) - var(--mvh-C2Y3)) / calc(var(--mvh-X1) - var(--mvh-L3-w) - var(--mvh-C1X3)) calc(var(--mvh-Y1) - var(--mvh-L3-w) - var(--mvh-C1Y3)),
-      curve to calc(var(--mvh-X0) + var(--mvh-L3-w) + var(--mvh-R3)) calc(var(--mvh-Y1) - var(--mvh-L3-w)) with calc(var(--mvh-X1) - var(--mvh-L3-w) - var(--mvh-R3) - var(--mvh-KH)) calc(var(--mvh-Y1) - var(--mvh-L3-w) + var(--mvh-OX)) / calc(var(--mvh-X0) + var(--mvh-L3-w) + var(--mvh-R3) + var(--mvh-KH)) calc(var(--mvh-Y1) - var(--mvh-L3-w) + var(--mvh-OX)),
-      curve to calc(var(--mvh-X0) + var(--mvh-L3-w)) calc(var(--mvh-Y1) - var(--mvh-L3-w) - var(--mvh-R3)) with calc(var(--mvh-X0) + var(--mvh-L3-w) + var(--mvh-C1X3)) calc(var(--mvh-Y1) - var(--mvh-L3-w) - var(--mvh-C1Y3)) / calc(var(--mvh-X0) + var(--mvh-L3-w) + var(--mvh-C2X3)) calc(var(--mvh-Y1) - var(--mvh-L3-w) - var(--mvh-C2Y3)),
-      curve to calc(var(--mvh-X0) + var(--mvh-L3-w)) calc(var(--mvh-Y0) + var(--mvh-L3-w) + var(--mvh-R3)) with calc(var(--mvh-X0) + var(--mvh-L3-w) - var(--mvh-OY)) calc(var(--mvh-Y1) - var(--mvh-L3-w) - var(--mvh-R3) - var(--mvh-KV)) / calc(var(--mvh-X0) + var(--mvh-L3-w) - var(--mvh-OY)) calc(var(--mvh-Y0) + var(--mvh-L3-w) + var(--mvh-R3) + var(--mvh-KV)),
-      curve to calc(var(--mvh-X0) + var(--mvh-L3-w) + var(--mvh-R3)) calc(var(--mvh-Y0) + var(--mvh-L3-w)) with calc(var(--mvh-X0) + var(--mvh-L3-w) + var(--mvh-C2X3)) calc(var(--mvh-Y0) + var(--mvh-L3-w) + var(--mvh-C2Y3)) / calc(var(--mvh-X0) + var(--mvh-L3-w) + var(--mvh-C1X3)) calc(var(--mvh-Y0) + var(--mvh-L3-w) + var(--mvh-C1Y3)),
-      close);
-    filter: blur(var(--mvh-L3-blur));
   }
-}
 /* i18n 이 h2 안에 span 을 심는 창(결과 시트)에서도 글자가 캡슐 위에 선다. */
-.modal-v2 .mv2-sheet > h2 > *,
-.modal-v2 .mv2-head > h2 > * { position: relative; z-index: 3; }
 
 /* ---- 2b. 헤더 레터링 — 시안 「게임 방법」 글자 한 벌 (2026-08-31) ----------
    출처: tentwin/ref-v2/work-lettering.css (작업판 「레터링」 절이 근거).
@@ -51306,183 +50590,18 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
 /* ---- 3. 닫기 X — 정본 한 벌(.x-btn = catalog/sian3-close.webp)의 자리만 --
    그림은 사용자 3차 확정본이라 한 픽셀도 안 바꾼다. 여기서 주는 것은 좌표뿐이고,
    좌표도 캡슐 높이 비율이라 판 폭이 바뀌어도 캡슐 우측 어깨에 붙어 있는다. */
-.modal-v2 .x-btn {
-  position: absolute;
-  top: calc(var(--f2-w) * .052);
-  right: calc(var(--f2-w) * .028);
-  left: auto;
-  bottom: auto;
-  z-index: 8;
-  width:  calc(var(--f2-w) * .115) !important;
-  height: calc(var(--f2-w) * .115) !important;
-  min-width:  calc(var(--f2-w) * .115) !important;
-  min-height: calc(var(--f2-w) * .115) !important;
-  margin: 0;
-}
 
 /* ---- 4. 줄 = kit-slot-v2 (홈) -------------------------------------------
    플레이 시트의 다섯 종목이 **같은 슬롯 하나**가 되는 자리다. 종전에는 행마다
    분홍·초록·노랑·보라·주황 색띠였고, 그것이 사용자가 "다른 게임"이라 부른 것이다.
    변주는 색이 아니라 **내용**이 갖는다: 아이콘 · 이름 · 설명 · 기록 값. */
-.modal-v2 .mode-list,
-.modal-v2 .set-list,
-.modal-v2 .sk-list,
-.modal-v2 #rank-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--mv2-gap);
-  width: 100%;
-  margin: 0;
-  background: none;
-}
-.modal-v2 .mode-list .mode-row,
-.modal-v2 .arc-entry,
-.modal-v2 .set-row,
-.modal-v2 .rank-row,
-.modal-v2 .nmate,
-.modal-v2 .nrow,
-.modal-v2 .sk-item {
-  --f2-sd: calc(var(--f2-w) * .0054);
-  position: relative;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  gap: calc(var(--f2-w) * .030);
-  width: 100%;
-  min-height: calc(var(--f2-w) * .148);
-  margin: 0;
-  padding: calc(var(--f2-w) * .022) calc(var(--f2-w) * .038);
-  border: 0;
-  border-radius: calc(var(--f2-w) * .0327);
-  background-color: var(--f2-slot);
-  background-image: none;
-  color: var(--f2-ink);
-  text-align: left;
-  text-shadow: none;
-  box-shadow: 0 calc(var(--f2-w) * .0027) 0 rgba(255,255,255,.95);
-  cursor: pointer;
-}
-.modal-v2 .set-row,
-.modal-v2 .nrow { cursor: default; }
 /* 노드 카드의 줄도 같은 홈이다. 아이콘은 #modal-node .nchip 이 이미 '자립 소품'
    (칩 없는 글리프)으로 정해 놨고 그 판정은 안 뒤집는다 — 바뀌는 것은 받침뿐. */
-.modal-v2 .mode-list .mode-row::after,
-.modal-v2 .arc-entry::after,
-.modal-v2 .set-row::after,
-.modal-v2 .rank-row::after,
-.modal-v2 .nmate::after,
-.modal-v2 .nrow::after,
-.modal-v2 .sk-item::after {        /* 킷 질감층 (색 변수 0개) */
-  content: "";
-  position: absolute; inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  display: block;
-  border: 0;
-  background: none;
-  box-shadow:
-    inset 0 var(--f2-sd) calc(var(--f2-sd) * 1.5) rgba(0,0,0,.15),
-    inset var(--f2-sd) 0 calc(var(--f2-sd) * 1.5) rgba(0,0,0,.08),
-    inset 0 calc(var(--f2-sd) * -.8) 0 rgba(255,255,255,.30);
-}
-.modal-v2 .mode-list .mode-row::before,
-.modal-v2 .arc-entry::before { content: none; }
-.modal-v2 .mode-list .mode-row:active,
-.modal-v2 .arc-entry:active,
-.modal-v2 .nmate:active,
-.modal-v2 .sk-item:active { transform: translateY(calc(var(--f2-w) * .005)); filter: brightness(.97); }
-.modal-v2 .mode-list .mode-row[hidden],
-.modal-v2 .arc-entry[hidden] { display: none; }
 
 /* 아이콘 — 킷의 초상 홈(kit-slot-v2--portrait) 축소판. 글리프는 종전 자산 그대로. */
-.modal-v2 .nchip {
-  position: relative;
-  box-sizing: border-box;
-  flex: 0 0 auto;
-  display: block;
-  width:  calc(var(--f2-w) * .105);
-  height: calc(var(--f2-w) * .105);
-  margin: 0;
-  padding: 0;
-  border: 0;
-  /* ⚠ .hchip,.nchip 이 border-image 단축으로 ui-chip.9 조각을 깔고 있고, .nchip
-     이 border-image-width 로 캡을 준다 — 둘 다 여기서 내려야 조각이 안 남는다. */
-  border-image: none;
-  border-image-width: 0;
-  border-radius: calc(var(--f2-w) * .026);
-  background-color: var(--f2-pill);
-  background-image: none;
-  overflow: visible;
-  box-shadow:
-    inset 0 0 0 calc(var(--f2-w) * .0027) rgba(255,255,255,.85),
-    0 calc(var(--f2-w) * .0027) 0 rgba(255,255,255,.9),
-    inset 0 calc(var(--f2-w) * -.006) 0 rgba(120, 95, 125, .14);
-}
-.modal-v2 .nchip::before {
-  content: "";
-  position: absolute;
-  /* ⚠ 전역 .nchip::before 가 22px 정사각 + translate(-50%,-50%) 다. inset 만 주면
-     width/height 가 살아남아 상자가 좌상단으로 밀린다(실측 첫 캡처의 그 결함).
-     그래서 셋을 함께 되돌린다. */
-  inset: 15%;
-  width: auto;
-  height: auto;
-  transform: none;
-  display: block;
-  border: 0;
-  background-color: transparent;
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: contain;
-}
 
 /* 글자 — 이름 · 설명. 색은 킷 잉크 하나. */
-.modal-v2 .mode-t {
-  flex: 1 1 auto;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: calc(var(--f2-w) * .004);
-  text-align: left;
-}
-.modal-v2 .mode-t > b,
-.modal-v2 .arc-entry b {
-  font-family: var(--font-display);
-  font-size: calc(var(--f2-w) * .046);
-  font-weight: 400;
-  line-height: 1.16;
-  color: var(--f2-ink);
-  text-shadow: 0 1px 0 rgba(255,255,255,.55);
-}
-.modal-v2 .mode-t > i,
-.modal-v2 .arc-entry i {
-  font-style: normal;
-  font-size: calc(var(--f2-w) * .0305);
-  line-height: 1.3;
-  color: rgba(91, 79, 98, .78);
-  text-shadow: none;
-}
 /* 기록 값 = kit-pill-v2[data-variant="soft"] 의 단면 (추천 알약과 같은 물건) */
-.modal-v2 .mode-b {
-  flex: 0 0 auto;
-  box-sizing: border-box;
-  display: inline-flex;
-  align-items: center;
-  height: calc(var(--f2-w) * .0475);
-  padding: 0 calc(var(--f2-w) * .026);
-  border: 0;
-  border-radius: 999em;
-  background-color: var(--f2-pill-soft);
-  background-image: none;
-  box-shadow: 0 0 0 calc(var(--f2-w) * .0034) var(--f2-pill-soft-e);
-  font-family: var(--font-display);
-  font-size: calc(var(--f2-w) * .0315);
-  font-weight: 400;
-  color: #8A5A06;
-  text-shadow: none;
-  white-space: nowrap;
-}
-.modal-v2 .mode-b:empty { display: none; }
 
 /* ---- 4-b. 모드 행 = **젤리 바** ------------------------------------------
    사용자: “잘 만들어진 버튼들이 사라졌어. 살릴 건 살리고, 기본 에셋 +
@@ -51512,160 +50631,41 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
      gold   위 #F3DE5A / 아래 #EBB83E / 겉선 #B4802A / 잉크 #6D3F03   [시안 4행 타임러시]
      sky    위 #A8D8F2 / 아래 #79ABE6 / 겉선 #436B8E / 잉크 #16395B   [사양 — 시안에 5색째가 없다. 이미 게임에 있는 승인색 --f2-btn-1/-2/-line 에서 같은 관계로 뽑았다]
    ------------------------------------------------------------------------ */
-.modal-v2 .mode-list .mode-row,
-.modal-v2 .arc-entry {
-  /* 자(尺)를 행 높이로 바꾼다. 값은 위 「4. 줄」이 이미 쓰던 min-height 그대로라
-     세로 예산이 1px 도 안 움직인다 — 바뀌는 것은 껍데기뿐이다. */
-  --f2-bh: calc(var(--f2-w) * .148);
-  --f2-c1: var(--f2-bar-1, var(--f2-btn-1));
-  --f2-c2: var(--f2-bar-2, var(--f2-btn-2));
-  --f2-cl: var(--f2-bar-l, var(--f2-btn-line));
-  border-radius: var(--f2-br);
-  background-color: transparent;
-  /* 몸통 세로 그라데 — 시안 단면이 위 16% 까지 c1, 70% 부터 c2 로 평평해진다 */
-  /* 정지 자리는 시안 세로 단면 실측이다(y 10px 간격, 모험 행 y446..566):
-       3%H #F6A8BC · 12% #EE8FA6 · 20% #EC809C · 28% #E97290 · 37% #E7708F
-       45% #E46D8E · 62% #E0688B · 78% #E1688B  → **45%H 부터 평평하다**.
-     그래서 킷 알약의 기본값(16% -> 70%)을 그대로 쓰면 안 된다 — 짧은 알약
-     기준이라 옅은 윗동이 바 절반을 먹는다(200% 대조에서 눈에 보였다).
-     아래 밝아지는 몫은 질감층의 --f2-bglow 가 이미 갖고 있다. */
-  background-image: linear-gradient(180deg, var(--f2-c1) 0%, var(--f2-c1) 4%,
-                                            var(--f2-c2) 45%, var(--f2-c2) 100%);
-  isolation: isolate;
-  box-shadow:
-    inset 0 0 0 var(--f2-bbd) var(--f2-cl),
-    0 0 var(--f2-sb) var(--f2-ss) color-mix(in srgb, var(--f2-cl) 66%, transparent),
-    0 0 var(--f2-st) 0            color-mix(in srgb, var(--f2-cl) 20%, transparent),
-    0 calc(var(--f2-bh) * .045) calc(var(--f2-bh) * .11) rgba(120,95,125,.30);
-}
 /* 질감층 — .kit-btn-v2::after 와 **같은 네 줄**이다(색 변수 0개, 흰/검 알파만).
    위 「4. 줄」의 홈 질감(inset 그림자 3줄)을 여기서 덮는다. */
-.modal-v2 .mode-list .mode-row::after,
-.modal-v2 .arc-entry::after {
-  content: "";
-  position: absolute;
-  inset: var(--f2-bbd);
-  border-radius: var(--f2-bri);
-  pointer-events: none;
-  z-index: 2;
-  border: 0;
-  background: none;
-  box-shadow:
-    inset 0 calc(var(--f2-bband) * -1) 0 rgba(0,0,0,.33),
-    inset 0 0 0 var(--f2-brim) rgba(255,255,255,.56),
-    inset 0 calc(var(--f2-bglow) * -1) 0 rgba(255,255,255,.45),
-    inset 0 calc(var(--f2-bvig) * -.30) var(--f2-bvig) rgba(60,44,66,.055);
-}
 /* 스페큘러 — 좌상 두 점. 위 「4. 줄」은 여기서 `content:none` 이었다.
    긴 바라서 킷 기본값(짧은 알약 기준)보다 왼쪽으로 더 붙인다 —
    자리만 변수로 덮고 알파·모양은 킷 그대로다. */
-.modal-v2 .mode-list .mode-row::before,
-.modal-v2 .arc-entry::before {
-  content: "";
-  position: absolute;
-  inset: var(--f2-bbd);
-  border-radius: var(--f2-bri);
-  pointer-events: none;
-  z-index: 3;
-  background:
-    radial-gradient(closest-side, rgba(255,255,255,.72) 0 62%, rgba(255,255,255,0) 100%)
-      2.5% 18% / 3.2% 26% no-repeat,
-    radial-gradient(closest-side, rgba(255,255,255,.60) 0 58%, rgba(255,255,255,0) 100%)
-      6.0% 13% / 1.6% 14% no-repeat;
-}
 /* 글자 — 잉크는 그 바의 **가장 어두운 같은 색**이다(시안 실측).
    흰 그림자를 걷는다: 진한 바 위에서는 글자를 흐리게만 만든다. */
-.modal-v2 .mode-list .mode-row .mode-t > b,
-.modal-v2 .arc-entry b {
-  color: var(--f2-bar-ink, var(--f2-ink));
-  text-shadow: 0 calc(var(--f2-w) * .0022) 0 rgba(255,255,255,.34);
-}
-.modal-v2 .mode-list .mode-row .mode-t > i,
-.modal-v2 .arc-entry i {
-  color: color-mix(in srgb, var(--f2-bar-ink, var(--f2-ink)) 82%, transparent);
-}
 /* 아이콘 칩 — 흰 라운드 칩은 그대로 두고 겉선만 그 바의 색으로 맞춘다
    (시안 칩 바탕 실측 #FDE8E4 ≈ 현행 --f2-pill #F9F9F8, 안 바꾼다). */
-.modal-v2 .mode-list .mode-row .nchip,
-.modal-v2 .arc-entry .nchip {
-  box-shadow: 0 0 0 calc(var(--f2-w) * .0030)
-                color-mix(in srgb, var(--f2-cl) 46%, transparent),
-              0 calc(var(--f2-w) * .0034) calc(var(--f2-w) * .008)
-                rgba(60,40,70,.22);
-}
 /* 기록 값 / NEW 뱃지 — 흰 알약 + 그 바 색 링. 위 .mode-b 의 크림색을 덮는다. */
-.modal-v2 .mode-list .mode-row .mode-b,
-.modal-v2 .arc-entry .mode-b {
-  position: relative;
-  z-index: 4;
-  background-color: #FFFFFF;
-  box-shadow: 0 0 0 calc(var(--f2-w) * .0034)
-                color-mix(in srgb, var(--f2-cl) 62%, transparent);
-  color: var(--f2-bar-ink, #8A5A06);
-}
 /* 눌림 — 위 「4. 줄」의 값 그대로다(따로 안 만든다). */
 
 /* ---- 4-c. 색 변주 — 행마다 세 변수뿐 ------------------------------------- */
 /* rose — 모험
    [시안 1행 모험] */
-.modal-v2 #mode-adv {
-  --f2-bar-1: #ED9AAC; --f2-bar-2: #DF658A; --f2-bar-l: #A54C60; --f2-bar-ink: #661E29;
-}
 /* lilac — 서바이벌 · 아케이드 (숨김 행 — 되살아나도 색이 있다) · 클래식 허브 · 아케이드
    [시안 2행 아케이드] */
-.modal-v2 #arcrow-surv,
-.modal-v2 #mode-arcade,
-.modal-v2 #classic-arcade {
-  --f2-bar-1: #CB99F2; --f2-bar-2: #9664D3; --f2-bar-l: #6F4084; --f2-bar-ink: #3B1452;
-}
 /* mint — 데일리 · 클래식 허브 · 데일리
    [시안 3행 데일리] */
-.modal-v2 #mode-daily,
-.modal-v2 #classic-daily {
-  --f2-bar-1: #A7E7D6; --f2-bar-2: #74C9B4; --f2-bar-l: #498A82; --f2-bar-ink: #174D42;
-}
 /* gold — 타임어택 · 타임 러시 (숨김 행) · 클래식 허브 · 타임 러시
    [시안 4행 타임러시] */
-.modal-v2 #arcrow-time,
-.modal-v2 #mode-rush,
-.modal-v2 #classic-rush {
-  --f2-bar-1: #F4E272; --f2-bar-2: #EBBB3B; --f2-bar-l: #B07926; --f2-bar-ink: #6D3F03;
-}
 /* sky — 90초 누적
    [사양 — 시안에 5색째가 없다. 이미 게임에 있는 승인색 --f2-btn-1/-2/-line 에서 같은 관계로 뽑았다] */
-.modal-v2 #arcrow-dmg {
-  --f2-bar-1: #A8D8F2; --f2-bar-2: #79ABE6; --f2-bar-l: #436B8E; --f2-bar-ink: #16395B;
-}
 
 /* ---- 5. 설정 · 기록 줄의 나머지 ------------------------------------------ */
-.modal-v2 .set-row { justify-content: space-between; }
-.modal-v2 .set-k { color: var(--f2-ink); font-family: var(--font-display); text-shadow: none; }
-.modal-v2 .rank-row .rank-main,
-.modal-v2 .rank-row .rank-pos,
-.modal-v2 .rank-row .rank-meta,
-.modal-v2 #rank-hint { color: var(--f2-ink); text-shadow: none; }
-.modal-v2 .rank-row .rank-meta,
-.modal-v2 #rank-hint { color: rgba(91, 79, 98, .78); }
-.modal-v2 .rank-row.rank-empty { background-color: rgba(207, 192, 220, .55); }
-.modal-v2 #rank-tabs { gap: var(--mv2-gap); margin: 0 0 calc(var(--f2-w) * .012); }
 
 /* 본문 글자 — 판 잉크 하나. (종전: 창마다 --j-ink / --tx-dim / 크림 잉크 세 갈래) */
-.modal-v2 .mv2-sheet p,
-.modal-v2 .mv2-sheet li,
-.modal-v2 .mv2-sheet h3 { color: var(--f2-ink); text-shadow: none; }
 
 /* ---- 6. 노드 카드 — 판·헤더만 갈고 내용(nmate/nthumb/ncta)은 그대로 ----- */
-.modal-v2 .nmate { gap: calc(var(--f2-w) * .022); }
-.modal-v2 .nrow-k { flex: 0 0 auto; color: var(--f2-ink); font-family: var(--font-display); text-shadow: none; }
-.modal-v2 .nrow-t > b { color: var(--f2-ink); }
-.modal-v2 .nrow-t > i { color: rgba(91, 79, 98, .78); }
 
 /* ---- 7. 옛 판 잔재 차단 -------------------------------------------------
    마크업에서 jbox / jbox--modal / r10-panel 을 뺐으므로 그 규칙들은 이미 안
    닿는다. 남은 것은 `.sheet` 기본값(SECTION 초입의 어두운 그라디언트 판)뿐인데
    위 .mv2-sheet 가 (0,2,0) 으로 덮는다. 여기서는 **판 밖으로 걸쳐 나가던**
    옛 리본의 음수 margin 만 확실히 지운다(선택자가 id 라 특정도가 높았다). */
-.modal-v2 .mv2-sheet > h2 { margin-top: 0; margin-bottom: calc(var(--f2-w) * .012); }
 
 
 /* ============================================================================
@@ -52302,74 +51302,11 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
    ########################################################################### */
 
 /* ---- 1. 시트 버튼 — 획을 킷 획으로. 색표(--btn-*)는 그대로 쓴다 ------------ */
-.modal-v2 .sheet .btn,
-.modal-v2 .sheet .btn-ghost,
-.modal-v2 .sheet .btn-secondary,
-.modal-v2 .sheet .cta-jelly{
-  /* kit-btn-v2 의 성분 넷을 자기 높이 H 에서 파생한다(H = min-height 52). */
-  --f2-bh: 52px;
-  box-shadow:
-    /* 외곽선 — inset ring. 크로뮴 border 정수 내림이 없다(킷 §1 근거). */
-    inset 0 0 0 calc(var(--f2-bh) * .0349) var(--btn-outline),
-    /* 측면 림 */
-    inset 0 0 0 calc(var(--f2-bh) * .0355 + var(--f2-bh) * .0349) rgba(255,255,255,.50),
-    /* 하단 내부 발광 -> 접지 밴드 2단 */
-    inset 0 calc(var(--f2-bh) * -.1320) 0 rgba(255,255,255,.34),
-    inset 0 calc(var(--f2-bh) * -.0680) 0 var(--btn-contact),
-    /* 가장자리 어두워짐 (아주 약하게) */
-    inset 0 calc(var(--f2-bh) * -.138) calc(var(--f2-bh) * .46) rgba(60,44,66,.06),
-    /* 바깥 어깨 + 드리운 그림자 */
-    0 0 var(--f2-soft-blur) var(--f2-soft-spread)
-      color-mix(in srgb, var(--btn-outline) 66%, transparent),
-    0 calc(var(--f2-bh) * .045) calc(var(--f2-bh) * .11) rgba(120,95,125,.28) !important;
-  text-shadow: 0 1.5px 0 rgba(70,52,80,.42) !important;
-}
 /* 3순위 줄버튼(기록·갤러리·방법·제작진) — 킷 보조버튼 보라. 옛 라일락은
    판(#EFE6F6)과 명도차가 8 L 밖에 안 돼 "버튼인지 줄인지"가 안 읽혔다. */
-.modal-v2 .sheet .btn-ghost,
-.modal-v2 .sheet .btn-secondary{
-  --btn-face-a:var(--role-violet-face-a); --btn-face-b:var(--role-violet-face-b); --btn-outline:var(--role-violet-outline); --btn-contact:var(--role-violet-contact);
-}
 /* 닫기 = 킷 주버튼 파랑 그대로 */
-.modal-v2 .sheet #st-close,
-.modal-v2 .sheet #howto-close,
-.modal-v2 .sheet #sk-close,
-.modal-v2 .sheet #rank-close,
-.modal-v2 .sheet #pz-resume{
-  --btn-face-a:var(--role-sky-face-a); --btn-face-b:var(--role-sky-face-b); --btn-outline:var(--role-sky-outline); --btn-contact:var(--role-sky-contact);
-}
 
 /* ---- 2. 토글 .set-tg — 민트 폐기, 킷 파랑/라일락 두 상태 ------------------ */
-.modal-v2 .set-tg{
-  --f2-bh: 34px;
-  border: 0 !important;
-  border-image: none !important;
-  border-radius: 999em !important;
-  background-color: transparent !important;
-  background-image: linear-gradient(180deg,#93CFEE 0%,#93CFEE 16%,
-                                          #79ABE6 70%,#79ABE6 100%) !important;
-  color: #FFFFFF !important;
-  text-shadow: 0 1px 0 rgba(50,72,96,.45) !important;
-  box-shadow:
-    inset 0 0 0 calc(var(--f2-bh) * .0349) #436B8E,
-    inset 0 0 0 calc(var(--f2-bh) * .0704) rgba(255,255,255,.52),
-    inset 0 calc(var(--f2-bh) * -.1320) 0 rgba(255,255,255,.34),
-    inset 0 calc(var(--f2-bh) * -.0680) 0 #5E90C6,
-    0 calc(var(--f2-bh) * .045) calc(var(--f2-bh) * .11) rgba(120,95,125,.26) !important;
-}
-.modal-v2 .set-tg[aria-pressed="false"]{
-  background-image: linear-gradient(180deg,#CFC2DA 0%,#CFC2DA 16%,
-                                          #B5A5C4 70%,#B5A5C4 100%) !important;
-  color: #5B4F62 !important;
-  text-shadow: 0 1px 0 rgba(255,255,255,.55) !important;
-  box-shadow:
-    inset 0 0 0 calc(var(--f2-bh) * .0349) #8F7E9C,
-    inset 0 0 0 calc(var(--f2-bh) * .0704) rgba(255,255,255,.46),
-    inset 0 calc(var(--f2-bh) * -.1320) 0 rgba(255,255,255,.28),
-    inset 0 calc(var(--f2-bh) * -.0680) 0 #A08FB0,
-    0 calc(var(--f2-bh) * .045) calc(var(--f2-bh) * .11) rgba(120,95,125,.22) !important;
-}
-.modal-v2 .set-tg:active{ transform: translateY(1.5px); }
 
 /* ---- 3. 시트 버튼 몸통 — **하드에지 2단 -> 젤리 세로 그라데** ###KITV2-SHEETBTN-GRAD###
    사용자(설정 캡처): “이 버튼들 구성이 매우 좋아. **디자인만 우리가 만들어둔
@@ -52382,46 +51319,11 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
         (0~4% c1 · 45~100% c2, 시안 띠 세로 단면)으로 옮긴다.
      ② 좌상 스페큘러가 없었다. 킷 .kit-btn-v2::before 와 **같은 두 점**을 준다.
    질감층(외곽선·측면 림·접지 밴드·발광)은 위 1번이 이미 킷 값이라 안 건드린다. */
-.modal-v2 .sheet .btn,
-.modal-v2 .sheet .btn-ghost,
-.modal-v2 .sheet .btn-secondary,
-.modal-v2 .sheet .cta-jelly{
-  position: relative;
-  isolation: isolate;
-  background-image: linear-gradient(180deg, var(--btn-face-a) 0%, var(--btn-face-a) 4%,
-                                            var(--btn-face-b) 45%, var(--btn-face-b) 100%) !important;
-}
-.modal-v2 .sheet .btn::before,
-.modal-v2 .sheet .btn-ghost::before,
-.modal-v2 .sheet .btn-secondary::before,
-.modal-v2 .sheet .cta-jelly::before{
-  content: "";
-  position: absolute;
-  inset: calc(var(--f2-bh) * .0349);
-  border-radius: inherit;
-  pointer-events: none;
-  z-index: 1;
-  background:
-    /* 킷 .kit-btn-v2 기본값(5.5%x17% · 2.6%x9%)을 이 버튼의 가로비(약 6:1,
-       킷 주버튼 5.68:1)에 맞춰 자리만 옮긴 값이다. 처음 넣은 6%x26% 는
-       1배율 캡처에서 **물방울**로 읽혀 반려 — 킷 값으로 되돌린다. */
-    radial-gradient(closest-side, rgba(255,255,255,.72) 0 62%, rgba(255,255,255,0) 100%)
-      6% 18% / 3.4% 19% no-repeat,
-    radial-gradient(closest-side, rgba(255,255,255,.56) 0 58%, rgba(255,255,255,0) 100%)
-      11% 13% / 1.7% 10% no-repeat;
-}
 /* 글자가 스페큘러 아래로 가지 않게 — 버튼은 글자 노드를 따로 안 두므로
    자식 전부를 한 겹 올린다(텍스트 노드는 이미 배경 위다). */
-.modal-v2 .sheet .btn > *,
-.modal-v2 .sheet .btn-ghost > *,
-.modal-v2 .sheet .btn-secondary > *,
-.modal-v2 .sheet .cta-jelly > *{ position: relative; z-index: 2; }
 /* 행 알약이 토글을 담는 홈이다 — 킷 홈 문법으로 파 준다(대장 #18 의 "초록
    캡슐이 흰 행 알약 오른쪽 림 **밖으로** 넘침"이 여기서 닫힌다: 넘치던 것은
    토글이 아니라 행의 오른쪽 안여백이었다). */
-.modal-v2 .sheet .set-row{
-  padding-right: 10px;
-}
 /* ###KITV2-APPEND-SCREENS### */
 
 /* ###########################################################################
@@ -54953,7 +53855,6 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
       제목 캡슐(.mvh)은 자두 #9B4697 그대로다 - 그 시안(81f987cb)이 자두다.
    --------------------------------------------------------------------------- */
 #charpanel .cp-fx > .cp-jelly{ --cpj-L3-line: var(--mode-a-outline); }   /* [E32-0903] 실측 · 복구 #955579 */
-.modal-v2 .mv2-sheet{ --mv2j-L3-line: #966B92; }
 
 
 #classic-hud .ch-fx > .ch-jelly,
@@ -55362,11 +54263,6 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
      림 .250 처럼 실화면에서 따로 잰 값이 있어, 근거 없이 정본 값으로 밀면
      그 실측이 깨진다. 이 파도가 통일한 것은 **색**이다.
    --------------------------------------------------------------------------- */
-.modal-v2 .mv2-sheet{
-  /* [E18-0903 은퇴 · DOM 무매칭]  --mv2j-L3-w: calc(var(--f2-ref-w) * 0.00400); */
-  /* [E18-0903 은퇴 · DOM 무매칭]  --mv2j-L3-a: .700; */
-  /* [E18-0903 은퇴 · DOM 무매칭]  --mv2j-L3-blur: calc(var(--mv2j-L3-w) * 0.28); */
-}
 
 /* ---------------------------------------------------------------------------
    ⑤ 우측 레일 젬 슬롯 — **네 코너 크리스탈 + 판 위 관(冠)** (지휘자 지시 7)
@@ -55536,22 +54432,16 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
    이 블록이 한 줄도 안 건드린다. */
 @media (min-width: 700px) and (orientation: portrait) {
   :root      { --h2-w: min(95.7vw, 593px); }   /* 620 x .957 */
-  .modal-v2  { --f2-w: min(95.7vw, 593px); }
-  #charpanel { --f2-w: 95.7vw; }               /* 패널은 뷰포트 전폭이다 */
+    #charpanel { --f2-w: 95.7vw; }               /* 패널은 뷰포트 전폭이다 */
 }
 @media (min-width: 1000px) and (min-height: 720px) and (orientation: portrait) {
   :root      { --h2-w: min(95.7vw, 727px); }   /* 760 x .957 */
-  .modal-v2  { --f2-w: min(95.7vw, 727px); }
-}
+  }
 
 /* ---- CV-2. 모달 닫기 X — 두 시안이 같은 자리를 말한다 ------------
    81f987cb: X x636..711 · 판 x61..707 → 판 오른변보다 4px 밖(=.0062판폭)
    32f6be9b: X x898..998 · 판 x85..993 → 5px 밖(=.0055판폭)
    위 여백 .0417 / .0462 판폭. 착수 전은 안쪽(-.0306판폭)에 들어와 있었다. */
-.modal-v2 .x-btn {
-  top:   calc(var(--f2-w) *  .0390);
-  right: calc(var(--f2-w) * -.0105);
-}
 
 /* ---- CV-3. 튜토리얼 모달 — 속 슬롯이 아직 고정 px 였다 ------------
    81f987cb 판 x61..707(w647) · y295..1089(h795) 기준 실측:
@@ -55616,9 +54506,6 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
 #modal-tutorial #tut-stage { width: auto; }
 #modal-mode .mv2-scroll { gap: calc(var(--f2-w) * .0120); }
 
-.modal-v2 { --mv2-head: calc(var(--f2-w) * .1839); }
-.modal-v2 .mv2-sheet > h2,
-.modal-v2 .mv2-head  > h2 { --mvh-w: calc(var(--f2-w) * .5623); }
 
 #charpanel { --cs-head: calc(var(--f2-w) * .1796); }
 #charpanel .cp-head h2 {
