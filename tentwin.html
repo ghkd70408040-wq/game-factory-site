@@ -20432,6 +20432,11 @@ window.TT_SFX = {
    * 콤보 티어 연출(8/12/16/20)·보이스·COMBO_MAX 99 는 이 상수와 무관하다. */
   var COMBO_MULT_CAP_ADV = 40;
   var LS_KEY = 'tentwin.v1';
+  /* 저장 스키마 버전(출시 체크리스트 권고 R-15, 0908). 값이 없는 옛 저장은 v0 로
+   * 읽는다. 올릴 때는 SCHEMA_MIGRATIONS 에 함수를 **끝에 하나** 붙이고 이 수를 +1.
+   * 다운그레이드(미래 버전 저장을 옛 빌드가 읽음)는 읽기 전용 + 백업 키 보존. */
+  var SCHEMA_VERSION = 1;
+  var LS_BAK_PREFIX = LS_KEY + '.bak-';
   var ROWGO_STAGGER = 35;   // ms per column, left -> right
   var DEAL_STAGGER = 30;    // ms per new tile...
   /* ...but only while there are few of them. Add(+) clones every LIVING cell,
@@ -22665,6 +22670,7 @@ window.TT_SFX = {
    * ========================================================================= */
 
   var store = {
+    schemaVersion: SCHEMA_VERSION,
     best: 0, bestStage: 1, sound: true, vibrate: true,
     streak: 0, lastDailyDate: '', dailyBest: null, save: null,
     lang: '',  // '' = follow navigator; 'en' / 'ko' = explicit user choice
@@ -22879,11 +22885,45 @@ window.TT_SFX = {
     ensureArcadeBest();     // 아케이드 대전 기록판 — 위 reconcile 과 같은 이유로 무조건
   }
 
+  /* --- 저장 스키마 이전기 ---------------------------------------------------
+   * SCHEMA_MIGRATIONS[i] 는 v(i) 저장 객체를 v(i+1) 모양으로 고쳐 돌려준다.
+   * 사슬은 readStore 의 필드별 채택 **앞**에서 돈다 — 채택 코드는 언제나 현재
+   * 모양만 알면 된다. v0→v1 은 구조가 같아 스탬프만 찍는다(필드별 이사는 이미
+   * 채택 코드 안에 있다: charId→mateId 등). */
+  var SCHEMA_MIGRATIONS = [
+    function v0to1(o) { return o; }
+  ];
+  var persistReadOnly = false;   // 미래 버전 저장을 만나면 true — 덮어쓰지 않는다
+  function backupRaw(tag, raw) {
+    try { window.localStorage.setItem(LS_BAK_PREFIX + tag, raw); } catch (e) { /* quota/private: ignore */ }
+  }
+  function migrateStore(o, raw) {
+    var from = (typeof o.schemaVersion === 'number' && isFinite(o.schemaVersion)) ? (o.schemaVersion | 0) : 0;
+    if (from > SCHEMA_VERSION) {
+      /* 이 빌드보다 새 저장 — 모르는 필드를 지우거나 덮어쓰면 그쪽 진행이 날아간다.
+       * 읽을 수 있는 만큼만 읽고, 원본은 백업 키에 보존, 이 세션은 저장하지 않는다. */
+      backupRaw(String(from), raw);
+      persistReadOnly = true;
+      try { console.warn('[tentwin] save schema v' + from + ' > v' + SCHEMA_VERSION + ': read-only, backup ' + LS_BAK_PREFIX + from); } catch (e) {}
+      return o;
+    }
+    for (var v = from; v < SCHEMA_VERSION; v++) {
+      try { o = SCHEMA_MIGRATIONS[v](o) || o; } catch (e) { break; }
+    }
+    return o;
+  }
   function readStore() {
     try {
       var raw = window.localStorage.getItem(LS_KEY);
       if (!raw) return;
-      var o = JSON.parse(raw);
+      var o;
+      try { o = JSON.parse(raw); }
+      catch (pe) {
+        /* 손상 JSON — 기본값으로 시작하되 원문은 백업 키에 남긴다(복구 여지). */
+        backupRaw('corrupt', raw);
+        return;
+      }
+      if (o && typeof o === 'object') o = migrateStore(o, raw);
       if (o && typeof o === 'object') {
         if (typeof o.best === 'number') store.best = o.best;
         if (typeof o.bestStage === 'number') store.bestStage = o.bestStage;
@@ -23257,6 +23297,8 @@ window.TT_SFX = {
   }
 
   function persist() {
+    if (persistReadOnly) return;   // 미래 버전 저장 보호 (migrateStore)
+    store.schemaVersion = SCHEMA_VERSION;
     try {
       window.localStorage.setItem(LS_KEY, JSON.stringify(store));
     } catch (e) { /* quota or private mode: ignore */ }
