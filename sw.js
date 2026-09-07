@@ -12,7 +12,7 @@
  *     페이지가 postMessage('SKIP_WAITING')을 보내면 즉시 교체(향후 "새 버전" 토스트용, 지금은 미사용)
  * 우회: 페이지 URL에 ?nosw=1 이 있으면 등록 자체를 건너뛰고 기존 등록을 해제한다(개발용, tentwin.html 등록 코드 참조)
  */
-const BUILD = '94827c4-20260908-0346';
+const BUILD = 'c78f2d7-20260908-0347';
 const CACHE = 'tentwin-' + BUILD;
 const SHELL = [
   './tentwin.html',
