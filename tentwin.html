@@ -3325,11 +3325,11 @@ li.roll-in { animation: rollin 380ms var(--spring) backwards; }
      on a page that is otherwise pinned to dark. */
   /* v3: 색은 --ms-shell / --ms-line 두 변수로만 말한다. 밝은 판 위에서는 몸이 더
      밝고 외곽선이 더 진해야 실루엣이 서므로, 캐릭터별로 어두운 테마와 다른 짝을 쓴다. */
-  :where(:root:not([data-theme="dark"])) #mascot { --ms-shell: #FFFFFF; --ms-line: #8C7BC0; }
-  :where(:root:not([data-theme="dark"])) #mascot.ch-ten     { --ms-shell: #EAF3FF; --ms-line: #1F6FD8; }
-  :where(:root:not([data-theme="dark"])) #mascot.ch-twin    { --ms-shell: #FFEDE4; --ms-line: #D2451A; }
-  :where(:root:not([data-theme="dark"])) #mascot.ch-ppyak   { --ms-shell: #FFF6D0; --ms-line: #B07C00; }
-  :where(:root:not([data-theme="dark"])) #mascot.ch-mungchi { --ms-shell: #FFEAF4; --ms-line: #D42A80; }
+  :where(:root:not([data-theme="dark"])) #mascot { --ms-shell: var(--role-ms-base-shell-light); --ms-line: var(--role-ms-base-line-light); }
+  :where(:root:not([data-theme="dark"])) #mascot.ch-ten     { --ms-shell: var(--role-ms-ten-shell-light); --ms-line: var(--role-ms-ten-line-light); }
+  :where(:root:not([data-theme="dark"])) #mascot.ch-twin    { --ms-shell: var(--role-ms-twin-shell-light); --ms-line: var(--role-ms-twin-line-light); }
+  :where(:root:not([data-theme="dark"])) #mascot.ch-ppyak   { --ms-shell: var(--role-ms-ppyak-shell-light); --ms-line: var(--role-ms-ppyak-line-light); }
+  :where(:root:not([data-theme="dark"])) #mascot.ch-mungchi { --ms-shell: var(--role-ms-mungchi-shell-light); --ms-line: var(--role-ms-mungchi-line-light); }
   /* 13차-a 반려 ①: 여기 있던 젤리공주 줄(민트 #DDFBF0/#06806A)은 **지웠다**.
      두 가지가 동시에 사실이었다 — 색이 5차의 폐기된 민트였고, 그 줄은 애초에
      한 번도 적용된 적이 없다. `:where()` 는 특이도 0 이라 이 선택자의 특이도는
@@ -4231,18 +4231,18 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
 /* v3: 실제 색값은 --ms-shell / --ms-line 두 변수로 빠졌다. 캐릭터(.ch-*)도 테마도
    이제 이 두 변수만 갈아 끼우면 되고, 아래의 모양·애니메이션 규칙은 하나도 건드리지
    않는다 — 캐릭터가 늘어도 늘어나는 CSS 는 변수 두 줄이다. */
-#mascot { --ms-shell: #EDE6FA; --ms-line: #B9A8E8; }
-#mascot.ch-ten     { --ms-shell: #CFE4FF; --ms-line: #3E8BF0; }
+#mascot { --ms-shell: var(--role-ms-base-shell); --ms-line: var(--role-ms-base-line); }
+#mascot.ch-ten     { --ms-shell: var(--role-ch-ten-body); --ms-line: var(--role-ch-ten-key); }
 /* 트윈 왕자 — 형의 파랑에 대한 주황. 명도·채도를 같은 급으로 맞춘 것이 요점이다:
    한쪽이 더 진하면 형제가 아니라 주연과 조연이 되고, 교대 표시의 두 점도 한쪽만
    눈에 띄어 "번갈아"가 안 읽힌다. */
-#mascot.ch-twin    { --ms-shell: #FFD9C8; --ms-line: #FF6B3D; }
-#mascot.ch-ppyak   { --ms-shell: #FFF0B0; --ms-line: #E8A600; }
-#mascot.ch-mungchi { --ms-shell: #FFD9EC; --ms-line: #F5479E; }
+#mascot.ch-twin    { --ms-shell: var(--role-ch-twin-body); --ms-line: var(--role-ch-twin-key); }
+#mascot.ch-ppyak   { --ms-shell: var(--role-ch-ppyak-body); --ms-line: var(--role-ch-ppyak-key); }
+#mascot.ch-mungchi { --ms-shell: var(--role-ch-mungchi-body); --ms-line: var(--role-ch-mungchi-key); }
 /* 13차-a: 젤리공주는 피치다 (확정 시트 · §23-5). 민트는 5차의 임시색이고,
    §23-5 가 이미 --ch-* 삼색을 피치로 덮고 있었다 — 두 값이 공존하면 언젠가
    한쪽만 읽는 자리가 생긴다. 그 "언젠가"가 이 마스코트였다. */
-#mascot.ch-jelly   { --ms-shell: #FBB9A0; --ms-line: #D9714B; }
+#mascot.ch-jelly   { --ms-shell: var(--role-ms-jelly-shell); --ms-line: var(--role-ch-jelly-key); }
 #mascot .ms-shadow { fill: rgba(0, 0, 0, .38); }
 #mascot .ms-shell  { fill: var(--ms-shell); stroke: var(--ms-line); stroke-width: 2; }
 #mascot .ms-gloss  { fill: rgba(255, 255, 255, .6); }
@@ -4523,11 +4523,11 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
    공유 빌드 번들러가 지우는 블록이 그것 하나뿐이라서, 여기에 두면 강제 다크로 고정된
    공유 페이지가 보는 사람의 OS 설정만으로 마스코트 색을 바꿔 버린다.
    아래 in-game 토글(13B) 사본은 공유 빌드에도 토글이 살아 있으므로 그대로 남는다. */
-:where(:root[data-theme="light"]) #mascot { --ms-shell: #FFFFFF; --ms-line: #8C7BC0; }
-:where(:root[data-theme="light"]) #mascot.ch-ten     { --ms-shell: #EAF3FF; --ms-line: #1F6FD8; }
-:where(:root[data-theme="light"]) #mascot.ch-twin    { --ms-shell: #FFEDE4; --ms-line: #D2451A; }
-:where(:root[data-theme="light"]) #mascot.ch-ppyak   { --ms-shell: #FFF6D0; --ms-line: #B07C00; }
-:where(:root[data-theme="light"]) #mascot.ch-mungchi { --ms-shell: #FFEAF4; --ms-line: #D42A80; }
+:where(:root[data-theme="light"]) #mascot { --ms-shell: var(--role-ms-base-shell-light); --ms-line: var(--role-ms-base-line-light); }
+:where(:root[data-theme="light"]) #mascot.ch-ten     { --ms-shell: var(--role-ms-ten-shell-light); --ms-line: var(--role-ms-ten-line-light); }
+:where(:root[data-theme="light"]) #mascot.ch-twin    { --ms-shell: var(--role-ms-twin-shell-light); --ms-line: var(--role-ms-twin-line-light); }
+:where(:root[data-theme="light"]) #mascot.ch-ppyak   { --ms-shell: var(--role-ms-ppyak-shell-light); --ms-line: var(--role-ms-ppyak-line-light); }
+:where(:root[data-theme="light"]) #mascot.ch-mungchi { --ms-shell: var(--role-ms-mungchi-shell-light); --ms-line: var(--role-ms-mungchi-line-light); }
 /* 13차-a 반려 ①: 민트(#DDFBF0/#06806A) → 피치. 이 한 줄이 마스코트의 **유일한**
    라이브 라이트 선언이라(위 §13A 사본은 특이도가 같고 §17 보다 앞이라 죽어 있다),
    5차의 민트가 라이트 테마에서만 살아남아 있던 자리가 바로 여기다.
@@ -4535,7 +4535,7 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
    밝히고(#FBB9A0 → #FDDCD0, 트윈의 #FFD9C8 → #FFEDE4 과 같은 비율),
    선은 밝은 판에서 실루엣이 서게 어둡게 내린다(#D9714B → #A0431C, §23-5 가
    이미 라이트 테마 젤리 글자색으로 쓰고 있는 잉크와 같은 값). */
-:where(:root[data-theme="light"]) #mascot.ch-jelly   { --ms-shell: #FDDCD0; --ms-line: #A0431C; }
+:where(:root[data-theme="light"]) #mascot.ch-jelly   { --ms-shell: var(--role-ms-jelly-shell-light); --ms-line: var(--role-ch-jelly-name-light); }
 :where(:root[data-theme="light"]) #mascot .ms-shadow { fill: rgba(34, 27, 46, .18); }
 
 /* ---- 작은 화면: 줄이고, 더 작으면 아예 물러난다 --------------------------
@@ -12708,6 +12708,8 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
   --role-ch-ten-body-2:#F3F9FF;  /* 스킬/컷인 아바타·마스코트 몸색(밝은 판) */
   --role-ch-ten-name-light:#1156C8; --role-ch-twin-name-light:#C23B12; --role-ch-none-name-light:#5E566C; --role-ch-ppyak-name-light:#8A6000; --role-ch-mungchi-name-light:#C01A6E; --role-ch-jelly-name-light:#A0431C; --role-ch-none-key-light:#6E667C;
   --role-chap-1-a:#9CE061; --role-chap-1-b:#4BD99A; --role-chap-2-a:#6FD4F2; --role-chap-2-b:#8C9BF5; --role-chap-3-a:#FF9E96; --role-chap-3-b:#FA8BB8;
+  --role-ms-base-shell:#EDE6FA; --role-ms-base-line:#B9A8E8; --role-ms-jelly-shell:#FBB9A0;
+  --role-ms-base-shell-light:#FFFFFF; --role-ms-base-line-light:#8C7BC0; --role-ms-ten-shell-light:#EAF3FF; --role-ms-ten-line-light:#1F6FD8; --role-ms-twin-shell-light:#FFEDE4; --role-ms-twin-line-light:#D2451A; --role-ms-ppyak-shell-light:#FFF6D0; --role-ms-ppyak-line-light:#B07C00; --role-ms-mungchi-shell-light:#FFEAF4; --role-ms-mungchi-line-light:#D42A80; --role-ms-jelly-shell-light:#FDDCD0;
 }
 </style>
 <!-- 최우선 2장만 preload — 젤리판(세 인터페이스 공용)과 플레이 팝업 레터링이다.
