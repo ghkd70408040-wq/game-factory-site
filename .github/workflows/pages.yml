@@ -1,0 +1,57 @@
+# GitHub Pages 배포 = Actions 빌드(소스 불변, 배포본만 경량화)
+# 소스 tentwin.html 은 그대로 두고, 배포 시점에 tools/build/build-dist.py 가
+#   dist/tentwin.html = strip-deploy.py(주석·들여쓰기 제거) + stamp.py(build 메타·sw.js 키 = HEAD)
+#   나머지(catalog/ board/ sw.js tentwin.webmanifest index.html …)는 그대로 복사(*.bak.html · evidence-*/ 제외)
+# 를 만들어 Pages 아티팩트로 올린다. 저장소 Pages 설정 build_type 이 "workflow" 여야 이 배포가 적용된다.
+# 롤백: Pages build_type 을 legacy(main 브랜치 /) 로 되돌리면 소스 그대로 다시 서빙된다.
+name: pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: build dist (strip + stamp)
+        run: python tools/build/build-dist.py --site . --out dist
+      - name: verify dist
+        run: |
+          test -s dist/tentwin.html
+          test -s dist/sw.js
+          grep -q '<meta name="build" content="' dist/tentwin.html
+          grep -q "const BUILD = '" dist/sw.js
+          python - <<'EOF'
+          import re
+          h=open('dist/tentwin.html',encoding='utf-8').read(); s=open('dist/sw.js',encoding='utf-8').read()
+          a=re.search(r'<meta name="build" content="([^"]*)"',h).group(1); b=re.search(r"const BUILD = '([^']*)'",s).group(1)
+          assert a==b, (a,b); print('build stamp', a)
+          EOF
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
