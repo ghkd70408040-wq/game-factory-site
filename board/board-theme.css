@@ -1,0 +1,374 @@
+/* ==========================================================================
+   board-theme.css — 관제탑 5방 시각 층 v1 (2026-09-08)
+   적용: 각 HTML 의 <link href="board.css"> 뒤에 아래 두 줄.
+     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+     <link rel="stylesheet" href="board-theme.css">
+   규칙: board.css 의 모든 선택자보다 특이도 +1 (body 접두) 로 이긴다. !important 없음.
+         work-frame.css (.work-frame / .wf-*) 와 .lettering-sample / .text-sample-* / .scrim-sample 은 무접촉(자산 샘플).
+   어휘: board.css 구역 주석과 같은 순서 — 뼈대 → 초점 → 상태·판정·계층·꼬리표 → 표 → 방 → 화면 → 기획실 → 공장 → 시험판 → 창고 → 폰.
+   --------------------------------------------------------------------------
+   디자인 계획
+   · 바탕: 재질 Mode B(sky 150·167·246) 쪽으로 기운 서늘한 종이색. 관제탑은 도구 — 중립 바탕, 재질색은 액센트 한 곳
+     (현재 방 레일 · 링크 · 초점 라벨). Mode A(#E6DCE2) 는 모달 관련 칩에서만.
+   · 상태는 형태로 읽힌다: 확정 = 채운 알약 / 값만 맞춤 = 테두리 알약 / 미확정·없음 = 점선 알약. 색은 보조.
+   · 계층 T1~T5 = 왼쪽 굵은 선 색 + 모노 글자. 판정 code/asset/ambiguous/variant = 모노 소문자 태그.
+   · 서체: Do Hyeon (방 이름·큰 제목만) / IBM Plex Sans KR (본문) / IBM Plex Mono (수치·파일명·hook, tabular-nums).
+   · 레이아웃: 상단 방 레일(3묶음) → 방 이름 + 초점 한 줄 → 본문. 화면 페이지 = [조립 | 시안] 양면 + 부품 선반 + 갭 표.
+   ========================================================================== */
+
+/* ===== 1. 토큰 — 라이트가 기본, :root 에 전부 선언 ===== */
+:root{
+  --bg:#F3F3F9;  --bg2:#EBEBF4;  --panel:#FFFFFF;  --panel2:#F6F6FB;
+  --line:#DCDCEA;  --line2:#C9C9DC;
+  --ink:#1F2033;  --sub:#4F5170;  --dim:#8385A3;  --mono-ink:#3A3C5C;
+  /* 액센트 = 재질 Mode B */
+  --acc:#5E6FD9;  --acc-soft:#96A7F6;  --acc-wash:#E9ECFD;  --link:var(--acc);
+  --modeA:#E6DCE2;  --modeA-ink:#8A6F84;
+  /* 의미색 (액센트와 별개) */
+  --ok:#1E8A5A;       --ok-wash:#DDF3E8;      --ok-line:#8FD0B0;
+  --partial:#A56A00;  --partial-wash:#FFF1D6; --partial-line:#E6B75C;
+  --none:#C23B4E;     --none-wash:#FBE1E5;    --none-line:#EE9BA8;
+  /* 계층 (§1) */
+  --t1:#3A7BD5; --t2:#1E8A5A; --t3:#C77A00; --t4:#8B4BC7; --t5:#C23B4E; --tx:#8385A3;
+  /* 자산 타일은 양 테마 모두 흰 바탕 (킷 시트 규칙) */
+  --stage-bg:#FFFFFF;  --stage-checker:#ECECF2;  --ink-on-light:#1F2033;  --sub-on-light:#6A6C88;  --line-on-light:#DCDCEA;
+  /* 공장 렌더 판 바닥 */
+  --stage:#DFE3F5;
+  /* 서체 */
+  --f-display:"Do Hyeon","Malgun Gothic","Apple SD Gothic Neo",sans-serif;
+  --f-body:"IBM Plex Sans KR","Pretendard","Malgun Gothic","Apple SD Gothic Neo","Segoe UI",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono","Cascadia Mono",Consolas,"D2Coding",monospace;
+  --r-sm:6px; --r-md:10px; --r-lg:14px;
+  --shadow-sheet:0 1px 0 rgba(31,32,51,.04), 0 6px 18px -12px rgba(31,32,51,.18);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#15162A; --bg2:#1B1C33; --panel:#20223A; --panel2:#272A45; --line:#32355A; --line2:#41456E;
+    --ink:#EDEEF8; --sub:#B4B7D6; --dim:#7F82A6; --mono-ink:#C8CBEA;
+    --acc:#9FAEFF; --acc-wash:#2A3060; --modeA:#4E4250; --modeA-ink:#EBDDE6;
+    --ok:#5FD79B; --ok-wash:#173627; --ok-line:#2E6E4F;
+    --partial:#F0C060; --partial-wash:#3A2E12; --partial-line:#7A5E1E;
+    --none:#FF8A9A; --none-wash:#3F1E26; --none-line:#7E3644;
+    --t1:#7FB0FF; --t2:#5FD79B; --t3:#F0B860; --t4:#CFA0FF; --t5:#FF8A9A;
+    --stage:#2C3050;
+    --shadow-sheet:0 1px 0 rgba(0,0,0,.25), 0 8px 22px -14px rgba(0,0,0,.6);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#15162A; --bg2:#1B1C33; --panel:#20223A; --panel2:#272A45; --line:#32355A; --line2:#41456E;
+  --ink:#EDEEF8; --sub:#B4B7D6; --dim:#7F82A6; --mono-ink:#C8CBEA;
+  --acc:#9FAEFF; --acc-wash:#2A3060; --modeA:#4E4250; --modeA-ink:#EBDDE6;
+  --ok:#5FD79B; --ok-wash:#173627; --ok-line:#2E6E4F;
+  --partial:#F0C060; --partial-wash:#3A2E12; --partial-line:#7A5E1E;
+  --none:#FF8A9A; --none-wash:#3F1E26; --none-line:#7E3644;
+  --t1:#7FB0FF; --t2:#5FD79B; --t3:#F0B860; --t4:#CFA0FF; --t5:#FF8A9A;
+  --stage:#2C3050;
+  --shadow-sheet:0 1px 0 rgba(0,0,0,.25), 0 8px 22px -14px rgba(0,0,0,.6);
+  color-scheme:dark;
+}
+
+/* ===== 2. 바탕 · 글 ===== */
+html{background:var(--bg);}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:var(--f-body); font-size:14px; line-height:1.55;
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+}
+body a{color:var(--link);}
+body a:hover{text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:2px;}
+body code, body .mono{font-family:var(--f-mono); color:var(--mono-ink); font-size:.84em; font-variant-numeric:tabular-nums;}
+body .value-missing{color:var(--dim);}
+body :focus-visible{outline:2px solid var(--acc); outline-offset:2px; border-radius:4px;}
+@media (prefers-reduced-motion: reduce){ body *{transition:none; animation:none;} }
+
+/* ===== 3. 뼈대 — 방 레일 · 본문 틀 · 제목 ===== */
+body .site-nav{
+  position:sticky; top:0; z-index:20;
+  background:var(--panel); border-bottom:1px solid var(--line);
+  display:flex; flex-wrap:wrap; align-items:stretch; gap:0 2px;
+  padding:0 14px; min-height:46px; box-shadow:var(--shadow-sheet);
+}
+body .nav-brand{
+  font-family:var(--f-display); font-weight:400; font-size:17px; letter-spacing:.01em;
+  color:var(--ink); display:flex; align-items:center; margin-right:14px; padding:0 2px;
+}
+body .site-nav a{
+  display:flex; align-items:center; padding:0 11px; border-radius:0;
+  color:var(--sub); font-weight:500; font-size:13px; position:relative; min-height:46px;
+}
+body .site-nav a:hover{background:var(--panel2); color:var(--ink); text-decoration:none;}
+body .site-nav a.is-current{background:transparent; color:var(--ink); font-weight:700;}
+body .site-nav a.is-current::after{
+  content:""; position:absolute; left:8px; right:8px; bottom:-1px; height:3px;
+  background:var(--acc-soft); border-radius:3px 3px 0 0;
+}
+body .nav-sep{width:1px; height:auto; background:var(--line); margin:12px 8px; display:block; align-self:stretch;}
+
+body .page{max-width:1240px; margin:0 auto; padding:26px 20px 72px;}
+body .page-title{
+  font-family:var(--f-display); font-weight:400; font-size:30px; line-height:1.15;
+  letter-spacing:.005em; margin:4px 0 6px; color:var(--ink); text-wrap:balance;
+}
+body .page-meta{font-size:12.5px; color:var(--dim); margin-bottom:14px; line-height:1.6; max-width:80ch;}
+body .page-meta b{color:var(--sub); font-weight:600;}
+body .section-title{
+  font-family:var(--f-body); font-size:15px; font-weight:700; letter-spacing:-.005em;
+  margin:34px 0 12px; padding-bottom:8px; border-bottom:1px solid var(--line2);
+  display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;
+}
+body .sub-title{
+  font-size:11.5px; font-weight:700; color:var(--dim); margin:18px 0 9px;
+  text-transform:uppercase; letter-spacing:.08em;
+}
+body .source-note{font-size:11px; color:var(--dim); font-family:var(--f-mono); margin:4px 0 16px; line-height:1.6; word-break:break-all;}
+body .scroll-x{overflow-x:auto; -webkit-overflow-scrolling:touch;}
+
+/* 초점 한 줄 — 색 카드가 아니라 왼쪽 라벨 블록 + 한 줄 */
+body .focus-line{
+  background:var(--panel); border:1px solid var(--line); border-radius:var(--r-md);
+  padding:0 14px 0 0; margin:0 0 20px; font-size:13px; line-height:1.5; color:var(--ink);
+  display:flex; flex-wrap:wrap; align-items:center; overflow:hidden; box-shadow:var(--shadow-sheet);
+}
+body .focus-line b{
+  color:var(--ink); background:var(--acc-wash); border-right:1px solid var(--line);
+  font-family:var(--f-display); font-weight:400; font-size:14px; letter-spacing:.02em;
+  padding:10px 14px; margin:0 14px 0 0; display:flex; align-items:center; align-self:stretch; white-space:nowrap; flex:0 0 auto;
+}
+body .focus-line b::before{content:""; width:8px; height:8px; border-radius:50%; background:var(--acc-soft); margin-right:8px; flex:0 0 auto;}
+body .focus-line .src{color:var(--dim); font-size:11px; font-family:var(--f-mono); margin-left:auto; padding:8px 0 8px 14px; flex:0 0 auto;}
+
+/* ===== 4. 상태 · 판정 · 계층 · 꼬리표 ===== */
+body .state{
+  display:inline-flex; align-items:center; gap:5px;
+  font-size:11px; font-weight:700; line-height:1; border-radius:20px; padding:4px 9px 4px 8px;
+  border:1px solid; letter-spacing:.01em; vertical-align:middle;
+}
+body .state-ok{color:var(--ok); border-color:var(--ok); background:var(--ok-wash);}                          /* 확정 = 채움 */
+body .state-partial{color:var(--partial); border-color:var(--partial-line); background:transparent;}       /* 값만 맞춤 = 테두리 */
+body .state-none, body .state-fail{color:var(--none); border-color:var(--none); border-style:dashed; background:transparent;} /* 미확정 = 점선 */
+
+body .verdict{
+  display:inline-block; font-family:var(--f-mono); font-size:10.5px; font-weight:600;
+  border-radius:3px; padding:1px 6px; border:1px solid var(--line2); background:transparent; color:var(--sub);
+}
+body .verdict-code{color:var(--t1); border-color:var(--t1);}
+body .verdict-asset{color:var(--t3); border-color:var(--t3);}
+body .verdict-ambiguous{color:var(--t4); border-color:var(--t4); border-style:dashed;}
+body .verdict-variant{color:var(--t2); border-color:var(--t2);}
+
+body .tier{
+  display:inline-block; font-family:var(--f-mono); font-size:10px; font-weight:600;
+  border-radius:3px; padding:1px 5px 1px 6px; margin-right:6px; border:1px solid var(--line2);
+  border-left-width:3px; background:var(--panel); color:var(--sub); vertical-align:1px; letter-spacing:.02em;
+}
+body .tier-t1{border-left-color:var(--t1); color:var(--t1);}
+body .tier-t2{border-left-color:var(--t2); color:var(--t2);}
+body .tier-t3{border-left-color:var(--t3); color:var(--t3);}
+body .tier-t4{border-left-color:var(--t4); color:var(--t4);}
+body .tier-t5{border-left-color:var(--t5); color:var(--t5);}
+body .tier-none{border-left-color:var(--tx); color:var(--tx);}
+
+body .tag{
+  display:inline-block; font-size:10.5px; font-weight:600; color:var(--sub);
+  background:var(--panel2); border:1px solid var(--line); border-radius:var(--r-sm); padding:2px 6px;
+  font-family:var(--f-mono);
+}
+body .tally{display:flex; gap:6px 12px; flex-wrap:wrap; font-size:12.5px; color:var(--sub); margin:8px 0 0; align-items:center; font-variant-numeric:tabular-nums;}
+body .tally b{color:var(--ink); font-family:var(--f-mono); font-weight:600;}
+body .pending-stamp{
+  display:inline-flex; align-items:center; font-size:11px; font-weight:700; color:var(--partial);
+  border:1px dashed var(--partial-line); background:var(--partial-wash); border-radius:20px; padding:3px 9px; margin-left:10px;
+  font-family:var(--f-body); letter-spacing:0;
+}
+
+/* ===== 5. 표 — 가로선만, 머리 소문자 라벨, 수치 모노 ===== */
+body .data-table, body .recipe-table{
+  border-collapse:collapse; width:100%; font-size:12.5px; margin:8px 0 6px;
+  background:var(--panel); border:1px solid var(--line); border-radius:var(--r-md); overflow:hidden;
+}
+body .data-table th, body .data-table td, body .recipe-table th, body .recipe-table td{
+  border:0; border-bottom:1px solid var(--line); padding:8px 12px; text-align:left; vertical-align:top;
+}
+body .data-table thead th, body .recipe-table thead th{
+  background:var(--bg2); color:var(--dim); font-weight:700; font-size:11px;
+  text-transform:uppercase; letter-spacing:.06em; white-space:nowrap; border-bottom:1px solid var(--line2);
+}
+body .recipe-table tbody th{
+  background:var(--panel2); color:var(--sub); font-weight:600; font-family:var(--f-mono); font-size:11.5px;
+  white-space:nowrap; border-right:1px solid var(--line);
+}
+body .data-table tbody tr:nth-child(even){background:transparent;}
+body .data-table tbody tr:hover td{background:var(--panel2);}
+body .data-table tbody tr:last-child td, body .recipe-table tbody tr:last-child td, body .recipe-table tbody tr:last-child th{border-bottom:0;}
+body .data-table td.num{text-align:right; font-family:var(--f-mono); color:var(--mono-ink); white-space:nowrap; font-variant-numeric:tabular-nums;}
+body .data-table caption{caption-side:top; text-align:left; font-size:12px; font-weight:700; color:var(--sub); padding:0 0 8px; letter-spacing:.01em;}
+body .recipe-table td.layer-what{white-space:normal; color:var(--sub); font-family:var(--f-body); font-size:12px; min-width:11em;}
+body .raw-output{
+  background:var(--ink); color:var(--bg); border:0; border-top:3px solid var(--ok);
+  border-radius:var(--r-md); padding:12px 14px; font-family:var(--f-mono); font-size:11.5px; line-height:1.6;
+  overflow-x:auto; white-space:pre; margin:6px 0 16px; max-height:420px; overflow-y:auto;
+}
+body .raw-output.is-fail, body .raw-output.fail{border-top-color:var(--none); color:#FFD9DE;}
+body .bar{height:8px; background:var(--line); border-radius:5px; overflow:hidden; min-width:90px;}
+body .bar i{display:block; height:100%; background:var(--acc-soft);}
+body .bar i.over{background:var(--none);}
+
+/* ===== 6. 방 (홈 허브) ===== */
+body .room-list{display:grid; gap:12px; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); margin-top:10px;}
+body .room{
+  background:var(--panel); border:1px solid var(--line); border-radius:var(--r-lg); padding:16px 18px 14px;
+  display:block; color:inherit; box-shadow:var(--shadow-sheet); transition:border-color .15s, transform .15s;
+}
+body .room:hover{border-color:var(--acc-soft); text-decoration:none; transform:translateY(-1px);}
+body .room-name{font-family:var(--f-display); font-weight:400; font-size:21px; letter-spacing:.005em; line-height:1.2;}
+body .room-desc{font-size:12.5px; color:var(--sub); margin-top:5px;}
+body .room-source{font-size:10.5px; color:var(--dim); margin-top:10px; font-family:var(--f-mono); line-height:1.5; word-break:break-all;}
+body .room .tally{margin-top:10px; padding-top:10px; border-top:1px solid var(--line);}
+
+/* ===== 7. 화면 페이지 — [조립 | 시안] 양면 + 부품 선반 + 갭 표 ===== */
+body .screen-card, body .gap-block, body .frame-card, body .bench{
+  background:var(--panel); border:1px solid var(--line); border-radius:var(--r-lg);
+  padding:18px 20px 20px; margin:16px 0 26px; box-shadow:var(--shadow-sheet);
+}
+body .shot-pair{display:grid; gap:14px; grid-template-columns:1fr;}
+@media(min-width:760px){ body .shot-pair{grid-template-columns:1fr 1fr;} }
+body .shot-box{
+  background:var(--bg2); border:1px solid var(--line); border-radius:var(--r-md); padding:0; overflow:hidden;
+  display:flex; flex-direction:column;
+}
+body .shot-caption{
+  font-size:12px; font-weight:700; margin:0; padding:8px 12px; color:var(--ink);
+  border-bottom:1px solid var(--line); background:var(--panel); display:flex; flex-wrap:wrap; gap:4px 8px; align-items:center;
+}
+body .shot-caption i{font-style:normal; font-weight:400; color:var(--dim); font-size:11px; font-family:var(--f-mono);}
+body .shot-box img{display:block; width:100%; border-radius:0; background:#fff; margin:0; padding:10px;}
+body .shot-box.is-empty, body .shot-box.is-placeholder{
+  align-items:center; justify-content:center; min-height:180px; color:var(--dim); font-size:13px; padding:16px;
+  border-style:dashed; border-color:var(--line2); background:var(--bg2);
+}
+
+body .part-list{display:grid; gap:12px; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); margin-top:6px;}
+body .part-link{color:inherit; display:block;}
+body .part-link:hover{text-decoration:none;}
+body .part-link:hover .part{border-color:var(--acc-soft); transform:translateY(-1px); box-shadow:0 10px 20px -14px rgba(94,111,217,.55);}
+body .part-link:hover .part-goto{color:var(--acc);}
+body .part{
+  background:var(--stage-bg); border:1px solid var(--line-on-light); border-radius:var(--r-md); overflow:hidden;
+  display:flex; flex-direction:column; transition:border-color .15s, transform .15s, box-shadow .15s;
+}
+body .part-stage{
+  background:
+    linear-gradient(45deg,var(--stage-checker) 25%,transparent 25%),
+    linear-gradient(-45deg,var(--stage-checker) 25%,transparent 25%),
+    linear-gradient(45deg,transparent 75%,var(--stage-checker) 75%),
+    linear-gradient(-45deg,transparent 75%,var(--stage-checker) 75%);
+  background-size:14px 14px; background-position:0 0,0 7px,7px -7px,-7px 0; background-color:var(--stage-bg);
+  display:flex; align-items:center; justify-content:center; padding:12px; min-height:84px;
+}
+body .part-stage img{display:block; max-width:100%; max-height:120px; object-fit:contain;}
+body .part-label{padding:8px 10px 10px; border-top:1px solid var(--line-on-light); background:#FFFFFF;}
+body .part-name{font-size:12.5px; font-weight:700; color:var(--ink-on-light); line-height:1.3;}
+body .part-file{font-size:10px; color:var(--sub-on-light); font-family:var(--f-mono); word-break:break-all; margin-top:3px; line-height:1.45;}
+body .part-tags{display:flex; flex-wrap:wrap; gap:4px; align-items:center; margin-top:7px;}
+body .part-label .tag{color:var(--sub-on-light); background:#F3F3F8; border-color:#DCDCEA;}
+body .part-goto{font-size:10px; color:#9698B3; margin-top:6px; font-family:var(--f-mono);}
+/* 흰 타일 위의 상태 알약은 라이트 값 고정 (다크 테마에서도 타일은 흰색) */
+body .part-label .state{font-size:10px; padding:3px 7px 3px 6px;}
+body .part-label .state-ok{color:#1E8A5A; border-color:#1E8A5A; background:#DDF3E8;}
+body .part-label .state-partial{color:#A56A00; border-color:#E6B75C; background:transparent;}
+body .part-label .state-none, body .part-label .state-fail{color:#C23B4E; border-color:#C23B4E; background:transparent;}
+body .part-label .tier{background:#FFFFFF; border-color:#DCDCEA;}
+body .part-label .verdict{border-color:#C9C9DC;}
+
+body .gap-block h3, body .frame-card h3{
+  font-family:var(--f-display); font-weight:400; font-size:20px; margin:0 0 4px; letter-spacing:.005em;
+}
+body .gap-block .sub-title, body .frame-card .sub-title{font-family:var(--f-body); font-size:11.5px; margin:16px 0 8px;}
+
+/* ===== 8. 기획실 — 흐름도 · 시안 썸네일 ===== */
+body .flow-diagram{background:var(--panel); border:1px solid var(--line); border-radius:var(--r-md); padding:14px; overflow-x:auto;}
+body .flow-diagram svg{display:block; min-width:720px; height:auto;}
+body .flow-diagram text{font-family:var(--f-body);}
+/* 흐름도 SVG 는 어두운 판용 인라인 색 — 토큰으로 되돌린다 */
+body .flow-diagram svg rect[fill="#242a36"]{fill:var(--panel2); stroke:var(--line2);}
+body .flow-diagram svg rect[fill="#1f2a22"]{fill:var(--ok-wash); stroke:var(--ok-line);}
+body .flow-diagram svg text[fill="#e9e9f0"]{fill:var(--ink);}
+body .flow-diagram svg text[fill="#8f8fa4"], body .flow-diagram svg text[fill="#8a8aa0"], body .flow-diagram svg text[fill="#a6a6b6"]{fill:var(--sub);}
+body .flow-diagram svg [stroke="#7fb2ff"]{stroke:var(--acc);}
+body .flow-diagram svg [fill="#7fb2ff"]{fill:var(--acc);}
+body .flow-diagram svg [stroke="#4a5570"]{stroke:var(--line2);}
+body .flow-diagram svg [stroke="#3d5c48"]{stroke:var(--ok-line);}
+body .thumb-list{display:grid; gap:12px; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); margin:8px 0 6px;}
+body .thumb{background:var(--panel); border:1px solid var(--line); border-radius:var(--r-md); padding:8px; box-shadow:var(--shadow-sheet);}
+body .thumb img{display:block; width:100%; border-radius:6px; background:#fff;}
+body .thumb-name{font-size:12px; font-weight:700; margin-top:8px; color:var(--ink);}
+body .thumb-file{font-size:10px; color:var(--dim); font-family:var(--f-mono); word-break:break-all; margin-top:2px;}
+
+/* ===== 9. 공장 — 레시피 시트 · 렌더 판 ===== */
+body .frame-card{scroll-margin-top:110px;}
+body .frame-meta{font-size:12.5px; color:var(--sub); margin-bottom:12px;}
+body .render-list{display:grid; gap:14px; grid-template-columns:1fr; margin-top:14px;}
+@media(min-width:620px){ body .render-list{grid-template-columns:1fr 1fr;} }
+body .render-pane{
+  background:var(--stage); border:1px solid var(--line2); border-radius:var(--r-md); padding:22px 16px 18px;
+  display:flex; flex-direction:column; align-items:center; gap:12px; min-height:150px; justify-content:center;
+  background-image:radial-gradient(circle at 50% 120%, rgba(255,255,255,.35), transparent 60%);
+}
+body .render-label{
+  font-size:11px; font-weight:600; color:var(--sub); align-self:flex-start; font-family:var(--f-mono);
+  background:var(--panel); border:1px solid var(--line); border-radius:var(--r-sm); padding:2px 7px;
+}
+
+/* 재질 시험판 */
+body .bench .section-title{margin-top:0;}
+body .bench-pane-list{display:grid; gap:14px; grid-template-columns:1fr;}
+@media(min-width:760px){ body .bench-pane-list{grid-template-columns:1fr 1fr;} }
+body .bench-pane{background:var(--stage); border:1px solid var(--line2); border-radius:var(--r-md); padding:16px 14px;}
+body .bench-label{font-size:11px; font-weight:600; color:var(--sub); margin-bottom:10px; font-family:var(--f-mono);}
+body .bench-pane-title{font-size:13px; font-weight:700; color:var(--ink); margin-bottom:12px;}
+body .bench-note{font-weight:400; color:var(--sub); opacity:1;}
+body .bench-group{margin:0 0 18px;}
+body .bench-row{display:flex; flex-wrap:wrap; gap:16px; align-items:flex-end;}
+body .bench-cell{display:flex; flex-direction:column; align-items:center; gap:6px;}
+body .bench-size-label{font-size:10px; color:var(--sub); font-family:var(--f-mono);}
+
+/* ===== 10. 창고 — 선반 · 필터 ===== */
+body .shelf-grid{display:grid; gap:12px; grid-template-columns:repeat(auto-fill,minmax(156px,1fr));}
+body .shelf-tier{
+  grid-column:1/-1; display:flex; align-items:center; gap:10px; margin:28px 0 4px;
+  padding-bottom:7px; border-bottom:2px solid var(--line2);
+}
+body .shelf-name{font-family:var(--f-display); font-weight:400; font-size:19px; letter-spacing:.005em;}
+body .shelf-desc{font-size:11.5px; color:var(--dim);}
+body .shelf-tally{margin-left:auto; font-size:11px; color:var(--sub); font-family:var(--f-mono); display:flex; gap:6px; flex-wrap:wrap;}
+body .shelf-role{grid-column:1/-1; font-size:13px; font-weight:700; color:var(--ink); margin:18px 0 2px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+body .shelf-role .count{font-size:11px; color:var(--dim); font-weight:600; font-family:var(--f-mono);}
+body .filter-bar{display:flex; flex-wrap:wrap; gap:6px; margin:12px 0 6px; position:sticky; top:46px; z-index:10; background:var(--bg); padding:10px 0;}
+body .filter-bar button{
+  font:inherit; font-size:12px; font-weight:600; color:var(--sub); background:var(--panel);
+  border:1px solid var(--line2); border-radius:20px; padding:5px 12px; cursor:pointer; line-height:1.2;
+}
+body .filter-bar button:hover{color:var(--ink); border-color:var(--acc-soft);}
+body .filter-bar button.is-current{background:var(--ink); color:var(--bg); border-color:var(--ink);}
+body .filter-sep{width:1px; background:var(--line2); margin:3px 4px;}
+
+/* ===== 11. 폰 ===== */
+@media(max-width:600px){
+  body .page{padding:16px 12px 56px;}
+  body .page-title{font-size:25px;}
+  body .site-nav{padding:0 8px;}
+  body .site-nav a{padding:0 8px; font-size:12.5px; min-height:42px;}
+  body .nav-brand{font-size:15px; margin-right:6px;}
+  body .nav-sep{margin:10px 4px;}
+  body .room-list{grid-template-columns:1fr;}
+  body .data-table, body .recipe-table{font-size:12px;}
+  body .data-table th, body .data-table td, body .recipe-table th, body .recipe-table td{padding:7px 9px;}
+  body .screen-card, body .gap-block, body .frame-card, body .bench{padding:14px 13px 16px; border-radius:var(--r-md);}
+  body .focus-line{font-size:12.5px; padding-right:11px;}
+  body .focus-line b{padding:8px 11px; font-size:13px; margin-right:10px;}
+  body .focus-line .src{width:100%; padding:6px 0 8px; margin-left:0; border-top:1px dashed var(--line);}
+  body .bench-row{gap:10px;}
+  body .part-list, body .shelf-grid{grid-template-columns:repeat(auto-fill,minmax(136px,1fr)); gap:9px;}
+}

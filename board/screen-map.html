@@ -5,7 +5,13 @@
 <title>스테이지 지도 · 게임 공장</title>
 <link rel="icon" href="data:,">
 <link rel="stylesheet" href="board.css">
-</head><body>
+<link rel="stylesheet" href="work-frame.css">
+<link rel="stylesheet" href="game-parts.css">
+<link rel="stylesheet" href="board-factory.css">
+<link rel="stylesheet" href="board-live.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="board-theme.css">
+</head><body class="kit-page">
 <nav class="site-nav">
 <span class="nav-brand">🏭 게임 공장</span>
 <a href="index.html">홈</a>
@@ -21,136 +27,93 @@
 <a href="gate.html">관문실</a>
 </nav>
 <div class="page">
-  <h1 class="page-title">스테이지 지도 — 맵 · 노드 카드</h1>
-  <div class="page-meta">조립 완성(실캡처) | 시안 없음 · 아래 = 프레임 격리 · 지도 전체 🔴 미확정 (오늘까지 손 안 댐)</div>
-<div class="focus-line"><b>초점</b><span class="value-missing">미작성</span> — judge-state.json 에 이 화면 focus 없음<span class="src">judge-state.json rev 13 · hud-components.json · kit-2side-* · FRAME-AUDIT-0906.md</span></div>
-
-  <div class="screen-card">
+  <h1 class="page-title">스테이지 지도</h1>
+<div class="kit-legend"><span class="kit-legend-k is-live"><i></i>라이브</span><span class="kit-legend-k is-partial"><i></i>값만 맞춤</span><span class="kit-legend-k is-none"><i></i>미구현</span><a class="kit-legend-link" href="gate.html#gaps">갭 표 →</a></div>
+<div class="screen-card">
     <div class="shot-pair">
-      <div class="shot-box"><div class="shot-caption">스테이지 맵 <i>#screen-map</i></div>
-        <img loading="lazy" src="img/screen/map.jpg" alt="맵 조립"></div>
+      <div class="shot-box is-live"><div class="shot-caption">조립</div>
+        <div class="live-screen" data-screen="map" data-fallback="img/screen/map.jpg"></div></div>
       <div class="shot-box is-empty">시안 없음</div>
     </div>
 
-    <h3 class="sub-title">A · 배경 · 판</h3>
     <div class="part-list">
-      <a class="part-link" href="factory.html#f-art"><div class="part"><div class="part-stage"><img loading="lazy" src="img/cat/art-map-bg.jpg"></div>
-        <div class="part-label"><div class="part-name">배경 맵 아트</div><div class="part-file">#map-layer · art-map-bg.webp</div>
-        <div class="part-tags"><span class="state state-none">🔴 미확정</span><span class="tag">기존 자산</span></div><div class="part-goto">→ f-art</div></div></div></a>
-      <a class="part-link" href="factory.html#f-bar"><div class="part"><div class="part-stage"><img loading="lazy" src="img/part/map-maptop.jpg"></div>
-        <div class="part-label"><div class="part-name">상단 HUD 바 (칩 4)</div><div class="part-file">#map-top .hudbar</div>
-        <div class="part-tags"><span class="state state-none">🔴 미확정</span><span class="tag">코드</span></div><div class="part-goto">→ f-bar</div></div></div></a>
-      <a class="part-link" href="factory.html#f-modal"><div class="part"><div class="part-stage"><img loading="lazy" src="img/cat/jelly-box.jpg"></div>
-        <div class="part-label"><div class="part-name">하단 젤리 판</div><div class="part-file">#map-bot .jbox--strip · jelly-box.webp</div>
-        <div class="part-tags"><span class="state state-none">🔴 미확정</span><span class="tag">코드(굽기)</span></div><div class="part-goto">→ f-modal</div></div></div></a>
+      <a class="part-link" href="factory.html#f-art"><div class="part is-live" data-live-sel="#map-layer"><div class="part-stage"><img class="frame-file" loading="lazy" src="../catalog/art-map-bg.webp" alt="art-map-bg"></div>
+        <div class="part-label"><div class="part-name">배경 맵 아트</div></div></div></a>
+      <a class="part-link" href="factory.html#f-bar"><div class="part is-live" data-live-sel="#map-top"><div class="part-stage part-stage--live" data-live="snip:map-top" data-live-size="s"></div>
+        <div class="part-label"><div class="part-name">상단 HUD 바</div></div></div></a>
+      <a class="part-link" href="factory.html#f-modal"><div class="part is-live" data-live-sel=".modal:not([hidden]) .sheet" data-frame-id="t2-plate-modal-pink"><div class="part-stage part-stage--live" data-live="part:modal:pink" data-live-size="s"></div>
+        <div class="part-label"><div class="part-name"><span class="tier tier-t2">T2</span>하단 젤리 판</div></div></div></a>
     </div>
 
-    <h3 class="sub-title">B · 노드</h3>
     <div class="part-list">
-      <a class="part-link" href="factory.html#f-art"><div class="part"><div class="part-stage"><img loading="lazy" src="img/cat/stage-jelly-1.jpg"></div>
-        <div class="part-label"><div class="part-name">노드 젤리 (5색 순환)</div><div class="part-file">.map-node · stage-jelly-1~5.webp</div>
-        <div class="part-tags"><span class="state state-none">🔴 미확정</span><span class="tag">기존 자산</span></div><div class="part-goto">→ f-art</div></div></div></a>
-      <a class="part-link" href="factory.html#f-icon"><div class="part"><div class="part-stage"><img loading="lazy" src="img/cat/stage-icon_lock.jpg"></div>
-        <div class="part-label"><div class="part-name">잠금</div><div class="part-file">.st-lock · stage-icon_lock.webp</div>
-        <div class="part-tags"><span class="state state-none">🔴 미확정</span><span class="tag">자산(발주)</span></div><div class="part-goto">→ f-icon</div></div></div></a>
-      <a class="part-link" href="factory.html#f-art"><div class="part"><div class="part-stage"><img loading="lazy" src="img/cat/stage-char_flag.jpg"></div>
-        <div class="part-label"><div class="part-name">곰 깃발 (현재 노드)</div><div class="part-file">.mn-flag · stage-char_flag.webp</div>
-        <div class="part-tags"><span class="state state-none">🔴 미확정</span><span class="tag">기존 자산</span></div><div class="part-goto">→ f-art</div></div></div></a>
-      <a class="part-link" href="factory.html#f-text"><div class="part"><div class="part-stage"><img loading="lazy" src="img/cat/stage-star-on.jpg"></div>
-        <div class="part-label"><div class="part-name">별 트리오 · 노드 숫자</div><div class="part-file">.mn-stars stage-star-on/off · .mn-num 코드</div>
-        <div class="part-tags"><span class="state state-none">🔴 미확정</span><span class="tag">자산+코드</span></div><div class="part-goto">→ f-text</div></div></div></a>
+      <a class="part-link" href="factory.html#f-art"><div class="part is-live" data-live-sel="#map-path"><div class="part-stage"><img class="frame-file" loading="lazy" src="../catalog/stage-jelly-1.webp" alt="stage-jelly-1"></div>
+        <div class="part-label"><div class="part-name">노드 젤리</div></div></div></a>
+      <a class="part-link" href="factory.html#f-icon"><div class="part is-live" data-live-sel="#map-path"><div class="part-stage"><img class="frame-file" loading="lazy" src="../catalog/stage-icon_lock.webp" alt="stage-icon_lock"></div>
+        <div class="part-label"><div class="part-name">잠금</div></div></div></a>
+      <a class="part-link" href="factory.html#f-art"><div class="part is-live" data-live-sel="#map-char" data-frame-id="t3-flag-current"><div class="part-stage"><img class="frame-file" loading="lazy" src="../catalog/stage-char_flag.webp" alt="stage-char_flag"></div>
+        <div class="part-label"><div class="part-name"><span class="tier tier-t3">T3</span>곰 깃발</div></div></div></a>
+      <a class="part-link" href="factory.html#f-text"><div class="part is-live" data-live-sel="#map-stars"><div class="part-stage"><img class="frame-file" loading="lazy" src="../catalog/stage-star-on.webp" alt="stage-star-on"></div>
+        <div class="part-label"><div class="part-name">별 트리오</div></div></div></a>
     </div>
 
-    <h3 class="sub-title">C · 상단 칩</h3>
     <div class="part-list">
-      <a class="part-link" href="factory.html#f-spritebtn"><div class="part"><div class="part-stage"><img loading="lazy" src="img/cat/stage-btn_back.jpg"></div>
-        <div class="part-label"><div class="part-name">뒤로</div><div class="part-file">#map-back · stage-btn_back.webp</div>
-        <div class="part-tags"><span class="state state-none">🔴 미확정</span><span class="state state-none">위반</span><span class="tag">자산</span></div><div class="part-goto">→ f-spritebtn</div></div></div></a>
-      <a class="part-link" href="factory.html#f-bar"><div class="part"><div class="part-stage"><img loading="lazy" src="img/cat/stage-pill_life.jpg"></div>
-        <div class="part-label"><div class="part-name">하트 칩</div><div class="part-file">#map-hearts · stage-pill_life.webp</div>
-        <div class="part-tags"><span class="state state-none">🔴 미확정</span><span class="state state-none">위반</span><span class="tag">코드+아이콘</span></div><div class="part-goto">→ f-bar</div></div></div></a>
-      <a class="part-link" href="factory.html#f-bar"><div class="part"><div class="part-stage"><img loading="lazy" src="img/cat/stage-pill_coin.jpg"></div>
-        <div class="part-label"><div class="part-name">코인 칩</div><div class="part-file">#map-stars · stage-pill_coin.webp</div>
-        <div class="part-tags"><span class="state state-none">🔴 미확정</span><span class="state state-none">위반</span><span class="tag">코드+아이콘</span></div><div class="part-goto">→ f-bar</div></div></div></a>
-      <a class="part-link" href="factory.html#f-spritebtn"><div class="part"><div class="part-stage"><img loading="lazy" src="img/cat/stage-btn_settings.jpg"></div>
-        <div class="part-label"><div class="part-name">설정</div><div class="part-file">#map-gear · stage-btn_settings.webp</div>
-        <div class="part-tags"><span class="state state-none">🔴 미확정</span><span class="state state-none">위반</span><span class="tag">자산</span></div><div class="part-goto">→ f-spritebtn</div></div></div></a>
+      <a class="part-link" href="factory.html#f-spritebtn"><div class="part is-live" data-live-sel="#map-back" data-frame-id="t3-btn-round-back"><div class="part-stage"><img class="frame-file" loading="lazy" src="../catalog/stage-btn_back.webp" alt="stage-btn_back"></div>
+        <div class="part-label"><div class="part-name"><span class="tier tier-t3">T3</span>뒤로</div></div></div></a>
+      <a class="part-link" href="factory.html#f-bar"><div class="part is-live" data-live-sel="#map-hearts" data-frame-id="t3-pill-stat-life"><div class="part-stage"><img class="frame-file" loading="lazy" src="../catalog/stage-pill_life.webp" alt="stage-pill_life"></div>
+        <div class="part-label"><div class="part-name"><span class="tier tier-t3">T3</span>하트 칩</div></div></div></a>
+      <a class="part-link" href="factory.html#f-bar"><div class="part is-live" data-live-sel="#map-b1" data-frame-id="t3-pill-stat-coin"><div class="part-stage"><img class="frame-file" loading="lazy" src="../catalog/stage-pill_coin.webp" alt="stage-pill_coin"></div>
+        <div class="part-label"><div class="part-name"><span class="tier tier-t3">T3</span>코인 칩</div></div></div></a>
+      <a class="part-link" href="factory.html#f-spritebtn"><div class="part is-live" data-live-sel="#map-gear" data-frame-id="t3-btn-round-settings"><div class="part-stage"><img class="frame-file" loading="lazy" src="../catalog/stage-btn_settings.webp" alt="stage-btn_settings"></div>
+        <div class="part-label"><div class="part-name"><span class="tier tier-t3">T3</span>설정</div></div></div></a>
     </div>
 
-    <h3 class="sub-title">D · 하단 칩 · 명패</h3>
     <div class="part-list">
-      <a class="part-link" href="factory.html#f-bar"><div class="part"><div class="part-stage"><img loading="lazy" src="img/cat/stage-pill_star.jpg"></div>
-        <div class="part-label"><div class="part-name">별 칩</div><div class="part-file">#map-b1 · stage-pill_star.webp</div>
-        <div class="part-tags"><span class="state state-none">🔴 미확정</span><span class="state state-none">위반</span><span class="tag">코드+아이콘</span></div><div class="part-goto">→ f-bar</div></div></div></a>
-      <a class="part-link" href="factory.html#f-modal"><div class="part"><div class="part-stage"><img loading="lazy" src="img/cat/stage-pill_chapter.jpg"></div>
-        <div class="part-label"><div class="part-name">챕터 명패</div><div class="part-file">#map-plate · stage-pill_chapter.webp</div>
-        <div class="part-tags"><span class="state state-none">🔴 미확정</span><span class="tag">코드</span></div><div class="part-goto">→ f-modal</div></div></div></a>
-      <a class="part-link" href="factory.html#f-spritebtn"><div class="part"><div class="part-stage"><img loading="lazy" src="img/cat/stage-btn_chars.jpg"></div>
-        <div class="part-label"><div class="part-name">캐릭터 버튼</div><div class="part-file">#map-char · stage-btn_chars.webp</div>
-        <div class="part-tags"><span class="state state-none">🔴 미확정</span><span class="state state-none">위반</span><span class="tag">자산</span></div><div class="part-goto">→ f-spritebtn</div></div></div></a>
-      <a class="part-link" href="factory.html#f-spritebtn"><div class="part"><div class="part-stage"><img loading="lazy" src="img/cat/stage-btn_records.jpg"></div>
-        <div class="part-label"><div class="part-name">기록 버튼</div><div class="part-file">#map-rec · stage-btn_records.webp</div>
-        <div class="part-tags"><span class="state state-none">🔴 미확정</span><span class="state state-none">위반</span><span class="tag">자산</span></div><div class="part-goto">→ f-spritebtn</div></div></div></a>
-      <a class="part-link" href="factory.html#f-modal"><div class="part"><div class="part-stage"><img loading="lazy" src="img/cat/stage-plate_tentwin.jpg"></div>
-        <div class="part-label"><div class="part-name">Ten Twin 명패</div><div class="part-file">.mn-plate · stage-plate_tentwin.webp</div>
-        <div class="part-tags"><span class="state state-none">🔴 미확정</span><span class="state state-none">위반</span><span class="tag">코드+자산</span></div><div class="part-goto">→ f-modal</div></div></div></a>
+      <a class="part-link" href="factory.html#f-bar"><div class="part is-live" data-live-sel="#map-stars" data-frame-id="t3-pill-stat-star"><div class="part-stage"><img class="frame-file" loading="lazy" src="../catalog/stage-pill_star.webp" alt="stage-pill_star"></div>
+        <div class="part-label"><div class="part-name"><span class="tier tier-t3">T3</span>별 칩</div></div></div></a>
+      <a class="part-link" href="factory.html#f-modal"><div class="part is-live" data-live-sel="#map-b2"><div class="part-stage"><img class="frame-file" loading="lazy" src="../catalog/stage-pill_chapter.webp" alt="stage-pill_chapter"></div>
+        <div class="part-label"><div class="part-name">챕터 명패</div></div></div></a>
+      <a class="part-link" href="factory.html#f-spritebtn"><div class="part is-live" data-live-sel="#map-char" data-frame-id="t3-btn-square-chars"><div class="part-stage"><img class="frame-file" loading="lazy" src="../catalog/stage-btn_chars.webp" alt="stage-btn_chars"></div>
+        <div class="part-label"><div class="part-name"><span class="tier tier-t3">T3</span>캐릭터 버튼</div></div></div></a>
+      <a class="part-link" href="factory.html#f-spritebtn"><div class="part is-live" data-live-sel="#map-rec" data-frame-id="t3-btn-square-records"><div class="part-stage"><img class="frame-file" loading="lazy" src="../catalog/stage-btn_records.webp" alt="stage-btn_records"></div>
+        <div class="part-label"><div class="part-name"><span class="tier tier-t3">T3</span>기록 버튼</div></div></div></a>
+      <a class="part-link" href="factory.html#f-modal"><div class="part is-live" data-live-sel="#map-plate"><div class="part-stage"><img class="frame-file" loading="lazy" src="../catalog/stage-plate_tentwin.webp" alt="stage-plate_tentwin"></div>
+        <div class="part-label"><div class="part-name">Ten Twin 명</div></div></div></a>
     </div>
   </div>
 
   <div class="screen-card">
     <div class="shot-pair">
-      <div class="shot-box"><div class="shot-caption">노드 카드 (열림) <i>#modal-node</i></div>
-        <img loading="lazy" src="img/screen/map-node.jpg" alt="노드 카드 조립"></div>
+      <div class="shot-box is-live"><div class="shot-caption">조립</div>
+        <div class="live-screen" data-screen="stageinfo" data-fallback="img/screen/map-node.jpg"></div></div>
       <div class="shot-box is-empty">시안 없음</div>
     </div>
-    <h3 class="sub-title">E · 노드 카드 프레임</h3>
     <div class="part-list">
-      <a class="part-link" href="factory.html#f-modal"><div class="part"><div class="part-stage"><img loading="lazy" src="img/cat/jelly-box.jpg"></div>
-        <div class="part-label"><div class="part-name">카드 판</div><div class="part-file">.jbox--modal · jelly-box.webp</div>
-        <div class="part-tags"><span class="state state-none">🔴 미확정</span><span class="tag">코드(굽기)</span></div><div class="part-goto">→ f-modal</div></div></div></a>
-      <a class="part-link" href="factory.html#f-capsule"><div class="part"><div class="part-stage"><img loading="lazy" src="img/part/map-r10-ribbon.jpg"></div>
-        <div class="part-label"><div class="part-name">제목 캡슐</div><div class="part-file">.r10-ribbon · CSS 캡슐</div>
-        <div class="part-tags"><span class="state state-none">🔴 미확정</span><span class="tag">코드</span></div><div class="part-goto">→ f-capsule</div></div></div></a>
-      <a class="part-link" href="factory.html#f-button"><div class="part"><div class="part-stage"><img loading="lazy" src="img/part/map-nodego.jpg"></div>
-        <div class="part-label"><div class="part-name">시작(기준) 버튼</div><div class="part-file">#node-go .ncta · CSS</div>
-        <div class="part-tags"><span class="state state-none">🔴 미확정</span><span class="tag">코드</span></div><div class="part-goto">→ f-button</div></div></div></a>
-      <a class="part-link" href="factory.html#f-text"><div class="part"><div class="part-stage"><img loading="lazy" src="img/part/map-nodestars.jpg"></div>
-        <div class="part-label"><div class="part-name">별 조건 3줄</div><div class="part-file">.node-stars · CSS</div>
-        <div class="part-tags"><span class="state state-none">🔴 미확정</span><span class="tag">코드</span></div><div class="part-goto">→ f-text</div></div></div></a>
-      <a class="part-link" href="factory.html#f-text"><div class="part"><div class="part-stage"><img loading="lazy" src="img/part/map-nodeinfo.jpg"></div>
-        <div class="part-label"><div class="part-name">미션 · 악당 기술 칩</div><div class="part-file">.node-info · CSS</div>
-        <div class="part-tags"><span class="state state-none">🔴 미확정</span><span class="tag">코드</span></div><div class="part-goto">→ f-text</div></div></div></a>
+      <a class="part-link" href="factory.html#f-modal"><div class="part is-live" data-live-sel=".modal:not([hidden]) .sheet" data-frame-id="t2-plate-modal-pink"><div class="part-stage part-stage--live" data-live="part:modal:pink" data-live-size="s"></div>
+        <div class="part-label"><div class="part-name"><span class="tier tier-t2">T2</span>카드 판</div></div></div></a>
+      <a class="part-link" href="factory.html#f-capsule"><div class="part is-live" data-live-sel="#modal-node .r10-ribbon"><div class="part-stage part-stage--live" data-live="snip:node-ribbon" data-live-size="s"></div>
+        <div class="part-label"><div class="part-name">제목 캡슐</div></div></div></a>
+      <a class="part-link" href="factory.html#f-button"><div class="part is-live" data-live-sel="#node-go"><div class="part-stage part-stage--live" data-live="snip:node-go" data-live-size="s"></div>
+        <div class="part-label"><div class="part-name">시작 버튼</div></div></div></a>
+      <a class="part-link" href="factory.html#f-text"><div class="part is-live" data-live-sel="#map-stars"><div class="part-stage"><img class="frame-file" loading="lazy" src="../catalog/stage-star-on.webp" alt="stage-star-on"></div>
+        <div class="part-label"><div class="part-name">별 조건 3줄</div></div></div></a>
+      <a class="part-link" href="factory.html#f-text"><div class="part is-live" data-live-sel="#node-info"><div class="part-stage part-stage--live" data-live="snip:node-info" data-live-size="s"></div>
+        <div class="part-label"><div class="part-name">미션</div></div></div></a>
     </div>
   </div>
-<div class="gap-block">
-<h3>갭 표 — 시안 프레임 ↔ 우리 프레임</h3>
-<div class="source-note">계층 T1 화면 · T2 컨테이너 · T3 제어 · T4 내용물 · T5 효과 (정본 §1) · 판정 §4 code / asset / ambiguous / variant</div>
-<div class="tally"><b>21</b> 행 &nbsp;|&nbsp; <span class="tier tier-t1" title="화면">T1</span> 1 · <span class="tier tier-t2" title="컨테이너">T2</span> 6 · <span class="tier tier-t3" title="제어">T3</span> 9 · <span class="tier tier-t4" title="내용물">T4</span> 5 &nbsp;|&nbsp; <span class="verdict verdict-code">code</span> 11 · <span class="verdict verdict-asset">asset</span> 10 &nbsp;|&nbsp; 🟢 0 · 🟡 0 · 🔴 21</div>
-<div class="scroll-x"><table class="data-table gap-table">
-<thead><tr><th>시안 프레임</th><th>우리 프레임</th><th>판정</th><th>상태</th><th>비고</th></tr></thead><tbody>
-<tr><td><span class="tier tier-t1" title="화면">T1</span>시안 없음 · 배경 맵 아트</td><td><span class="tier tier-t1" title="화면">T1</span>배경 맵 아트 · #map-layer · art-map-bg.webp</td><td><span class="verdict verdict-asset">asset</span></td><td><span class="state state-none">🔴 미확정</span></td><td>지도 전체 오늘까지 손 안 댐. art-map-bg=1프레임 준수 배경→f-art.</td></tr>
-<tr><td><span class="tier tier-t2" title="컨테이너">T2</span>시안 없음 · 상단 HUD 바(칩 4)</td><td><span class="tier tier-t2" title="컨테이너">T2</span>상단 HUD 바 · #map-top .hudbar (판 배경 없음)</td><td><span class="verdict verdict-code">code</span></td><td><span class="state state-none">🔴 미확정</span></td><td>칩 4개 담는 바, 판 배경 없음→f-bar.</td></tr>
-<tr><td><span class="tier tier-t2" title="컨테이너">T2</span>시안 없음 · 하단 젤리 판</td><td><span class="tier tier-t2" title="컨테이너">T2</span>하단 젤리 판 · #map-bot .jbox--strip · jelly-box.webp</td><td><span class="verdict verdict-code">code</span></td><td><span class="state state-none">🔴 미확정</span></td><td>공통 9슬라이스 굽기→f-modal.</td></tr>
-<tr><td><span class="tier tier-t3" title="제어">T3</span>시안 6색 · 노드 젤리(라이브 5색 순환)</td><td><span class="tier tier-t3" title="제어">T3</span>노드 젤리 · .map-node · stage-jelly-1~5.webp</td><td><span class="verdict verdict-asset">asset</span></td><td><span class="state state-none">🔴 미확정</span></td><td>시안 6색 표기와 달리 라이브는 5색. 기존 자산→f-art.</td></tr>
-<tr><td><span class="tier tier-t4" title="내용물">T4</span>시안 없음 · 잠금</td><td><span class="tier tier-t4" title="내용물">T4</span>잠금 · .st-lock · stage-icon_lock.webp</td><td><span class="verdict verdict-asset">asset</span></td><td><span class="state state-none">🔴 미확정</span></td><td>자산(발주)→f-icon.</td></tr>
-<tr><td><span class="tier tier-t4" title="내용물">T4</span>시안 없음 · 곰 깃발(현재 노드)</td><td><span class="tier tier-t4" title="내용물">T4</span>곰 깃발 · .mn-flag · stage-char_flag.webp</td><td><span class="verdict verdict-asset">asset</span></td><td><span class="state state-none">🔴 미확정</span></td><td>1프레임 준수 art→f-art.</td></tr>
-<tr><td><span class="tier tier-t4" title="내용물">T4</span>시안 없음 · 별 트리오·노드 숫자</td><td><span class="tier tier-t4" title="내용물">T4</span>별 트리오·노드 숫자 · .mn-stars(star-on/off) · .mn-num(코드)</td><td><span class="verdict verdict-asset">asset</span></td><td><span class="state state-none">🔴 미확정</span></td><td>별=asset(stage-star-on/off), 숫자=code(art-n01~11 superseded)→f-text. 화면 페이지 결합 행.</td></tr>
-<tr><td><span class="tier tier-t3" title="제어">T3</span>시안 없음 · 뒤로</td><td><span class="tier tier-t3" title="제어">T3</span>뒤로 · #map-back · stage-btn_back.webp</td><td><span class="verdict verdict-asset">asset</span></td><td><span class="state state-none">🔴 미확정 · 위반</span></td><td>audit A-1: stage-btn_back 2프레임(버튼+아이콘) 위반. 버튼 코드+아이콘 분리 가능→f-spritebtn.</td></tr>
-<tr><td><span class="tier tier-t3" title="제어">T3</span>시안 없음 · 하트 칩</td><td><span class="tier tier-t3" title="제어">T3</span>하트 칩 · #map-hearts · stage-pill_life.webp</td><td><span class="verdict verdict-code">code</span></td><td><span class="state state-none">🔴 미확정 · 위반</span></td><td>현행 stage-pill_life=2프레임(알약+하트 구움) 위반. 코드 알약+slot-ic 분리 예정→f-bar.</td></tr>
-<tr><td><span class="tier tier-t3" title="제어">T3</span>시안 없음 · 코인 칩</td><td><span class="tier tier-t3" title="제어">T3</span>코인 칩 · #map-stars · stage-pill_coin.webp</td><td><span class="verdict verdict-code">code</span></td><td><span class="state state-none">🔴 미확정 · 위반</span></td><td>stage-pill_coin=2프레임(알약+코인) 위반. 코드 알약+slot-ic 분리 예정→f-bar.</td></tr>
-<tr><td><span class="tier tier-t3" title="제어">T3</span>시안 없음 · 설정</td><td><span class="tier tier-t3" title="제어">T3</span>설정 · #map-gear · stage-btn_settings.webp</td><td><span class="verdict verdict-asset">asset</span></td><td><span class="state state-none">🔴 미확정 · 위반</span></td><td>stage-btn_settings=2프레임(버튼+기어) 위반→f-spritebtn.</td></tr>
-<tr><td><span class="tier tier-t3" title="제어">T3</span>시안 없음 · 별 칩</td><td><span class="tier tier-t3" title="제어">T3</span>별 칩 · #map-b1 · stage-pill_star.webp</td><td><span class="verdict verdict-code">code</span></td><td><span class="state state-none">🔴 미확정 · 위반</span></td><td>stage-pill_star=2프레임(알약+별) 위반. 코드 알약+slot-ic-star 분리 예정→f-bar.</td></tr>
-<tr><td><span class="tier tier-t2" title="컨테이너">T2</span>시안 없음 · 챕터 명패</td><td><span class="tier tier-t2" title="컨테이너">T2</span>챕터 명패 · #map-plate · stage-pill_chapter.webp + .mp-txt</td><td><span class="verdict verdict-code">code</span></td><td><span class="state state-none">🔴 미확정</span></td><td>stage-pill_chapter(무지판)=1프레임 준수 + 글자 코드→f-modal.</td></tr>
-<tr><td><span class="tier tier-t3" title="제어">T3</span>시안 없음 · 캐릭터 버튼</td><td><span class="tier tier-t3" title="제어">T3</span>캐릭터 버튼 · #map-char · stage-btn_chars.webp</td><td><span class="verdict verdict-asset">asset</span></td><td><span class="state state-none">🔴 미확정 · 위반</span></td><td>stage-btn_chars=2프레임(버튼+곰얼굴) 위반→f-spritebtn.</td></tr>
-<tr><td><span class="tier tier-t3" title="제어">T3</span>시안 없음 · 기록 버튼</td><td><span class="tier tier-t3" title="제어">T3</span>기록 버튼 · #map-rec · stage-btn_records.webp</td><td><span class="verdict verdict-asset">asset</span></td><td><span class="state state-none">🔴 미확정 · 위반</span></td><td>stage-btn_records=2프레임(버튼+아이콘) 위반→f-spritebtn.</td></tr>
-<tr><td><span class="tier tier-t2" title="컨테이너">T2</span>시안 없음 · Ten Twin 명패</td><td><span class="tier tier-t2" title="컨테이너">T2</span>Ten Twin 명패 · .mn-plate · stage-plate_tentwin.webp</td><td><span class="verdict verdict-asset">asset</span></td><td><span class="state state-none">🔴 미확정 · 위반</span></td><td>audit A-2: stage-plate_tentwin 2프레임(판+로고글자) 위반. 판+로고 레터링 분리. 라이브 봉인(display:none)→f-modal.</td></tr>
-<tr><td><span class="tier tier-t2" title="컨테이너">T2</span>시안 없음 · 카드 판</td><td><span class="tier tier-t2" title="컨테이너">T2</span>카드 판 · .jbox--modal · jelly-box.webp (biw 48px)</td><td><span class="verdict verdict-code">code</span></td><td><span class="state state-none">🔴 미확정</span></td><td>공통 젤리판 굽기→f-modal.</td></tr>
-<tr><td><span class="tier tier-t2" title="컨테이너">T2</span>시안 없음 · 제목 캡슐(노드)</td><td><span class="tier tier-t2" title="컨테이너">T2</span>제목 캡슐 · .r10-ribbon · CSS 캡슐</td><td><span class="verdict verdict-code">code</span></td><td><span class="state state-none">🔴 미확정</span></td><td>캡슐 제목 맨글자→제목 레터링(node focus)→f-capsule.</td></tr>
-<tr><td><span class="tier tier-t3" title="제어">T3</span>시안 없음 · 시작(기준) 버튼</td><td><span class="tier tier-t3" title="제어">T3</span>시작 버튼 · #node-go .ncta · CSS 그라디언트</td><td><span class="verdict verdict-code">code</span></td><td><span class="state state-none">🔴 미확정</span></td><td>기준 버튼(S10 틀)로 교체 예정(node focus)→f-button.</td></tr>
-<tr><td><span class="tier tier-t4" title="내용물">T4</span>시안 없음 · 별 조건 3줄</td><td><span class="tier tier-t4" title="내용물">T4</span>별 조건 3줄 · .node-stars · CSS</td><td><span class="verdict verdict-code">code</span></td><td><span class="state state-none">🔴 미확정</span></td><td>별 조건·하트 비용 배치→f-text.</td></tr>
-<tr><td><span class="tier tier-t4" title="내용물">T4</span>시안 없음 · 미션·악당 기술 칩</td><td><span class="tier tier-t4" title="내용물">T4</span>미션·악당 기술 칩 · .node-info · CSS</td><td><span class="verdict verdict-code">code</span></td><td><span class="state state-none">🔴 미확정</span></td><td>보스 카드 기술 칩 아이콘 중복 숨김(후속)→f-text.</td></tr>
-</tbody></table></div>
-<div class="source-note">FRAME-AUDIT-0906 · 총 431 · 준수 311 · 위반 120(catalog 99 + hud-shape 21) · 미사용 129</div>
+
+
+  <details class="kit-tools"><summary>교체 초안</summary><details class="kit-tools"><summary>교체 초안</summary><details class="kit-tools"><summary>교체 초안</summary><details class="kit-tools"><summary>교체 초안</summary><details class="kit-tools"><summary>교체 초안</summary><details class="kit-tools"><summary>교체 초안</summary><h2 class="section-title">교체 초안 · 프리뷰 주입 (board-factory)</h2>
+  
+  <div class="gf-prevbox"><div class="gf-prevhead"><button type="button" id="prev-load">불러오기(다시)</button> <button type="button" id="prev-apply">값 주입</button> <button type="button" id="prev-reset">초기화</button> <span id="prev-status" class="mono"></span></div></div>
+  <div id="pending"></div>
+  <div class="gf-pendhead"><button type="button" id="pend-export">내보내기</button> <button type="button" id="pend-copy">복사</button> <button type="button" id="pend-clear">초안 비우기</button></div>
+  <pre id="pend-json" class="gf-pendjson raw-output" hidden></pre>
+</details>
+</details>
+</details>
+</details>
+</details>
+</details>
 </div>
-</div>
+<script src="board-live.js"></script>
 </body></html>

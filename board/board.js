@@ -1,4 +1,4 @@
-/* board.js v2 — 창고 선반 = 계층 T1~T5 → 역할 순 · 칸마다 준수/위반/미사용 + 프레임 수 */
+/* board.js v2.1 — 타일 이미지 = site/catalog 원본 webp 그대로(jpg 사본 폐기) · 창고 선반 = 계층 T1~T5 → 역할 순 · 칸마다 준수/위반/미사용 + 프레임 수 */
 (function(){
   /* 정본 GAME-FACTORY-STANDARD.md §1 — 에셋 5계층 */
   var TIERS = [
@@ -13,19 +13,22 @@
   TIERS.forEach(function(t){ t.roles.forEach(function(r){ ROLE_TIER[r]=t; }); });
 
   var state = { role:"전체", tier:"전체", viol:false, unused:false };
+  var KIT = document.body && document.body.classList.contains('kit-page');
 
   function tierBadge(t){ return '<span class="tier tier-'+(t.id==="—"?"none":t.id.toLowerCase())+'">'+t.id+'</span>'; }
 
   function tile(c){
     var t = ROLE_TIER[c.role] || TIERS[TIERS.length-1];
-    return '<div class="part">'
-      + '<div class="part-stage"><img loading="lazy" src="'+c.img+'" alt="'+c.stem+'"></div>'
-      + '<div class="part-label"><div class="part-name">'+c.stem+'</div>'
+    return '<div class="part'+(KIT?(c.viol?' is-partial':' is-live'):'')+'" title="'+t.id+' · '+c.w+'×'+c.h+' · '+c.kb+'KB · '+(c.viol?'위반':'준수')+(c.used?'':' · 미사용')+' · '+c.verdict+'">'
+      + '<div class="part-stage"><img class="frame-file" loading="lazy" src="../catalog/'+c.stem+'.webp" alt="'+c.stem+'"></div>'
+      + (KIT
+        ? '<div class="part-label"><div class="part-name">'+tierBadge(t)+c.stem+'</div></div></div>'
+        : '<div class="part-label"><div class="part-name">'+c.stem+'</div>'
       + '<div class="part-file">'+t.id+' · '+c.w+'×'+c.h+' · '+c.kb+'KB</div>'
       + '<div class="part-tags">'
       + (c.viol ? '<span class="state state-none">위반</span>' : '<span class="state state-ok">준수</span>')
       + (c.used ? '' : '<span class="state state-partial">미사용</span>')
-      + '<span class="tag">'+c.verdict+'</span></div></div></div>';
+      + '<span class="tag">'+c.verdict+'</span></div></div></div>');
   }
 
   function counts(list){
@@ -60,16 +63,16 @@
       html += '<div class="shelf-tier">'+tierBadge(t)
             + '<span class="shelf-name">'+t.name+'</span>'
             + '<span class="shelf-desc">'+t.desc+'</span>'
-            + '<span class="shelf-tally">프레임 '+kt.n+' · 준수 '+kt.ok+' · 위반 '+kt.viol+' · 미사용 '+kt.unused+'</span></div>';
+            + (KIT ? '' : '<span class="shelf-tally">프레임 '+kt.n+' · 준수 '+kt.ok+' · 위반 '+kt.viol+' · 미사용 '+kt.unused+'</span>')+'</div>';
       t.roles.forEach(function(r){
         var g = byRole[r]; if(!g||!g.length) return;
         var k = counts(g);
-        html += '<div class="shelf-role">'+r+' <span class="count">프레임 '+k.n+'</span> '+tallyHtml(k)+'</div>';
+        html += '<div class="shelf-role">'+r+(KIT ? '' : ' <span class="count">프레임 '+k.n+'</span> '+tallyHtml(k))+'</div>';
         g.forEach(function(c){ html += tile(c); });
       });
     });
     host.innerHTML = html || '<div class="value-missing">해당 없음</div>';
-    document.getElementById('count').textContent = items.length + ' / ' + data.catalog.length;
+    var cnt = document.getElementById('count'); if (cnt) cnt.textContent = items.length + ' / ' + data.catalog.length; /* 킷 판에는 숫자 줄이 없다(0908) */
   }
 
   function buildFilters(data){

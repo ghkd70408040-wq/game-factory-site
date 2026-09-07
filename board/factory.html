@@ -4,6 +4,11 @@
 <title>공장 · 게임 공장</title>
 <link rel="icon" href="data:,">
 <link rel="stylesheet" href="board.css">
+<link rel="stylesheet" href="game-parts.css">
+<link rel="stylesheet" href="board-factory.css">
+<link rel="stylesheet" href="board-live.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="board-theme.css">
 <link rel="stylesheet" href="work-frame.css">
 <link rel="stylesheet" href="work-lettering.css">
 </head><body>
@@ -33,6 +38,7 @@
 <div class="source-note">테마 셀렉터가 실제로 덮는 토큰은 4개(face · face-top · rim-c · L3-line). alpha · gloss · contact 는 부품축/전역이라 Mode 로 갈리지 않는다 — 규격 §2 의 6슬롯과 구현의 차이.</div>
 <div class="source-note">data-part 7종: <span class="mono">modal · capsule · chip · slot · hud · wing · charsel</span> — 나머지 11 원형은 work-frame 밖(별도 코드/자산)</div>
 
+<div class="focus-line"><b>라이브</b>아래 원형의 렌더는 그림이 아니다 — 정본 engine.css+theme-tentwin.css(<span class="mono">data-part</span>)·work-lettering.css·게임 인라인 CSS 추출본(<span class="mono">game-parts.css</span>)이 이 페이지에서 직접 그린 라이브 인스턴스이고, 자산 프레임은 원본 파일 그대로다. 상태 바로 크기·Mode·State 를 실제 DOM 속성으로 바꾼다.<span class="src">board-live.js · game-parts.css(정본 아님, 추출 사본)</span></div>
 <h2 class="section-title">프레임 원형 18종</h2>
 <div class="frame-card" id="f-modal">
 <h3>판 modal</h3>
@@ -54,9 +60,10 @@
 <tr><td>HUD 위판/아래판</td><td>틀2 · 세로비↓ · 겉선 얇게</td><td><span class="state state-ok">🟢</span></td></tr>
 <tr><td>지도 하단 젤리 판</td><td>값만 맞춤 · 배선 미확정</td><td><span class="state state-none">🔴</span></td></tr>
 </tbody></table></div>
+<div data-state-bar></div>
 <div class="render-list">
-<div class="render-pane"><div class="render-label">모달 판 (pink)</div><div class="wf-wrap" data-shape="rect" data-size="l"><div class="work-frame" data-part="modal" data-theme="pink"><div class="work-frame__body"></div><i class="wf-fx wf-fx--L20"></i><i class="wf-fx wf-fx--L2a"></i><i class="wf-fx wf-fx--L2b"></i><i class="wf-fx wf-fx--L2c"></i><i class="wf-fx wf-fx--L2d"></i><i class="wf-fx wf-fx--L3"></i></div></div></div>
-<div class="render-pane"><div class="render-label">캐릭창/HUD 판 (sky)</div><div class="wf-wrap" data-shape="rect" data-size="l"><div class="work-frame" data-part="modal" data-theme="sky"><div class="work-frame__body"></div><i class="wf-fx wf-fx--L20"></i><i class="wf-fx wf-fx--L2a"></i><i class="wf-fx wf-fx--L2b"></i><i class="wf-fx wf-fx--L2c"></i><i class="wf-fx wf-fx--L2d"></i><i class="wf-fx wf-fx--L3"></i></div></div></div>
+<div class="render-pane"><div class="render-label">모달 판 (pink)</div><div class="wf-wrap live-inst" data-live-kind="part" data-shape="rect" data-size="l"><div class="work-frame" data-part="modal" data-theme="pink"><div class="work-frame__body"></div><i class="wf-fx wf-fx--L20"></i><i class="wf-fx wf-fx--L2a"></i><i class="wf-fx wf-fx--L2b"></i><i class="wf-fx wf-fx--L2c"></i><i class="wf-fx wf-fx--L2d"></i><i class="wf-fx wf-fx--L3"></i></div></div></div>
+<div class="render-pane"><div class="render-label">캐릭창/HUD 판 (sky)</div><div class="wf-wrap live-inst" data-live-kind="part" data-shape="rect" data-size="l"><div class="work-frame" data-part="modal" data-theme="sky"><div class="work-frame__body"></div><i class="wf-fx wf-fx--L20"></i><i class="wf-fx wf-fx--L2a"></i><i class="wf-fx wf-fx--L2b"></i><i class="wf-fx wf-fx--L2c"></i><i class="wf-fx wf-fx--L2d"></i><i class="wf-fx wf-fx--L3"></i></div></div></div>
 </div>
 </div>
 <div class="frame-card" id="f-capsule">
@@ -77,9 +84,10 @@
 <tr><td>캐릭창 제목 캡슐 (틀2-3)</td><td>정석 S11 값 재사용</td><td><span class="state state-ok">🟢</span></td></tr>
 <tr><td>HUD 타이머 캡슐 (sky)</td><td>면 sky · 숫자 tmr-* 얹음</td><td><span class="state state-ok">🟢</span></td></tr>
 </tbody></table></div>
+<div data-state-bar></div>
 <div class="render-list">
-<div class="render-pane"><div class="render-label">제목 캡슐 (pink)</div><div class="wf-wrap" data-shape="stadium" data-size="l"><div class="work-frame" data-part="capsule" data-theme="pink"><div class="work-frame__body"></div><i class="wf-fx wf-fx--L20"></i><i class="wf-fx wf-fx--L2a"></i><i class="wf-fx wf-fx--L2b"></i><i class="wf-fx wf-fx--L2c"></i><i class="wf-fx wf-fx--L2d"></i><i class="wf-fx wf-fx--L3"></i></div></div></div>
-<div class="render-pane"><div class="render-label">타이머 캡슐 (sky)</div><div class="wf-wrap" data-shape="stadium" data-size="l"><div class="work-frame" data-part="capsule" data-theme="sky"><div class="work-frame__body"></div><i class="wf-fx wf-fx--L20"></i><i class="wf-fx wf-fx--L2a"></i><i class="wf-fx wf-fx--L2b"></i><i class="wf-fx wf-fx--L2c"></i><i class="wf-fx wf-fx--L2d"></i><i class="wf-fx wf-fx--L3"></i></div></div></div>
+<div class="render-pane"><div class="render-label">제목 캡슐 (pink)</div><div class="wf-wrap live-inst" data-live-kind="part" data-shape="stadium" data-size="l"><div class="work-frame" data-part="capsule" data-theme="pink"><div class="work-frame__body"></div><i class="wf-fx wf-fx--L20"></i><i class="wf-fx wf-fx--L2a"></i><i class="wf-fx wf-fx--L2b"></i><i class="wf-fx wf-fx--L2c"></i><i class="wf-fx wf-fx--L2d"></i><i class="wf-fx wf-fx--L3"></i></div></div></div>
+<div class="render-pane"><div class="render-label">타이머 캡슐 (sky)</div><div class="wf-wrap live-inst" data-live-kind="part" data-shape="stadium" data-size="l"><div class="work-frame" data-part="capsule" data-theme="sky"><div class="work-frame__body"></div><i class="wf-fx wf-fx--L20"></i><i class="wf-fx wf-fx--L2a"></i><i class="wf-fx wf-fx--L2b"></i><i class="wf-fx wf-fx--L2c"></i><i class="wf-fx wf-fx--L2d"></i><i class="wf-fx wf-fx--L3"></i></div></div></div>
 </div>
 </div>
 <div class="frame-card" id="f-chip">
@@ -102,9 +110,10 @@
 <tr><td>클래식 캐릭·펫 방울</td><td>동일 부품 재사용</td><td><span class="state state-ok">🟢</span></td></tr>
 <tr><td>선택 금테</td><td>외곽 링 활성색</td><td><span class="state state-partial">🟡</span></td></tr>
 </tbody></table></div>
+<div data-state-bar></div>
 <div class="render-list">
-<div class="render-pane"><div class="render-label">빈 방울 (pink)</div><div class="wf-wrap" data-shape="circle" data-size="s"><div class="work-frame" data-part="chip" data-theme="pink"><div class="work-frame__body"></div><i class="wf-fx wf-fx--L20"></i><i class="wf-fx wf-fx--L2a"></i><i class="wf-fx wf-fx--L2b"></i><i class="wf-fx wf-fx--L2c"></i><i class="wf-fx wf-fx--L2d"></i><i class="wf-fx wf-fx--L3"></i></div></div></div>
-<div class="render-pane"><div class="render-label">펫/캐릭 방울 (sky)</div><div class="wf-wrap" data-shape="circle" data-size="s"><div class="work-frame" data-part="chip" data-theme="sky"><div class="work-frame__body"></div><i class="wf-fx wf-fx--L20"></i><i class="wf-fx wf-fx--L2a"></i><i class="wf-fx wf-fx--L2b"></i><i class="wf-fx wf-fx--L2c"></i><i class="wf-fx wf-fx--L2d"></i><i class="wf-fx wf-fx--L3"></i></div></div></div>
+<div class="render-pane"><div class="render-label">빈 방울 (pink)</div><div class="wf-wrap live-inst" data-live-kind="part" data-shape="circle" data-size="s"><div class="work-frame" data-part="chip" data-theme="pink"><div class="work-frame__body"></div><i class="wf-fx wf-fx--L20"></i><i class="wf-fx wf-fx--L2a"></i><i class="wf-fx wf-fx--L2b"></i><i class="wf-fx wf-fx--L2c"></i><i class="wf-fx wf-fx--L2d"></i><i class="wf-fx wf-fx--L3"></i></div></div></div>
+<div class="render-pane"><div class="render-label">펫/캐릭 방울 (sky)</div><div class="wf-wrap live-inst" data-live-kind="part" data-shape="circle" data-size="s"><div class="work-frame" data-part="chip" data-theme="sky"><div class="work-frame__body"></div><i class="wf-fx wf-fx--L20"></i><i class="wf-fx wf-fx--L2a"></i><i class="wf-fx wf-fx--L2b"></i><i class="wf-fx wf-fx--L2c"></i><i class="wf-fx wf-fx--L2d"></i><i class="wf-fx wf-fx--L3"></i></div></div></div>
 </div>
 </div>
 <div class="frame-card" id="f-slot">
@@ -126,9 +135,10 @@
 <tr><td>아이템 슬롯 3</td><td>코너 크리스탈 · 아이콘 대역</td><td><span class="state state-partial">🟡</span></td></tr>
 <tr><td>젬 레일</td><td>다중 슬롯 나열</td><td><span class="state state-partial">🟡</span></td></tr>
 </tbody></table></div>
+<div data-state-bar></div>
 <div class="render-list">
-<div class="render-pane"><div class="render-label">슬롯 (pink)</div><div class="wf-wrap" data-shape="square" data-size="m"><div class="work-frame" data-part="slot" data-theme="pink"><div class="work-frame__body"></div><i class="wf-fx wf-fx--L20"></i><i class="wf-fx wf-fx--L2a"></i><i class="wf-fx wf-fx--L2b"></i><i class="wf-fx wf-fx--L2c"></i><i class="wf-fx wf-fx--L2d"></i><i class="wf-fx wf-fx--L3"></i></div></div></div>
-<div class="render-pane"><div class="render-label">슬롯 (sky)</div><div class="wf-wrap" data-shape="square" data-size="m"><div class="work-frame" data-part="slot" data-theme="sky"><div class="work-frame__body"></div><i class="wf-fx wf-fx--L20"></i><i class="wf-fx wf-fx--L2a"></i><i class="wf-fx wf-fx--L2b"></i><i class="wf-fx wf-fx--L2c"></i><i class="wf-fx wf-fx--L2d"></i><i class="wf-fx wf-fx--L3"></i></div></div></div>
+<div class="render-pane"><div class="render-label">슬롯 (pink)</div><div class="wf-wrap live-inst" data-live-kind="part" data-shape="square" data-size="m"><div class="work-frame" data-part="slot" data-theme="pink"><div class="work-frame__body"></div><i class="wf-fx wf-fx--L20"></i><i class="wf-fx wf-fx--L2a"></i><i class="wf-fx wf-fx--L2b"></i><i class="wf-fx wf-fx--L2c"></i><i class="wf-fx wf-fx--L2d"></i><i class="wf-fx wf-fx--L3"></i></div></div></div>
+<div class="render-pane"><div class="render-label">슬롯 (sky)</div><div class="wf-wrap live-inst" data-live-kind="part" data-shape="square" data-size="m"><div class="work-frame" data-part="slot" data-theme="sky"><div class="work-frame__body"></div><i class="wf-fx wf-fx--L20"></i><i class="wf-fx wf-fx--L2a"></i><i class="wf-fx wf-fx--L2b"></i><i class="wf-fx wf-fx--L2c"></i><i class="wf-fx wf-fx--L2d"></i><i class="wf-fx wf-fx--L3"></i></div></div></div>
 </div>
 </div>
 <div class="frame-card" id="f-bar">
@@ -151,9 +161,10 @@
 <tr><td>지도 젤리 바</td><td>값만 맞춤</td><td><span class="state state-none">🔴</span></td></tr>
 <tr><td>스탯 트랙</td><td>가로 얇은 바</td><td><span class="state state-partial">🟡</span></td></tr>
 </tbody></table></div>
+<div data-state-bar></div>
 <div class="render-list">
-<div class="render-pane"><div class="render-label">HUD 바 (hud)</div><div class="wf-wrap" data-shape="step" data-size="l"><div class="work-frame" data-part="hud" data-theme="sky"><div class="work-frame__body"></div><i class="wf-fx wf-fx--L20"></i><i class="wf-fx wf-fx--L2a"></i><i class="wf-fx wf-fx--L2b"></i><i class="wf-fx wf-fx--L2c"></i><i class="wf-fx wf-fx--L2d"></i><i class="wf-fx wf-fx--L3"></i></div></div></div>
-<div class="render-pane"><div class="render-label">날개판 (wing)</div><div class="wf-wrap" data-shape="step" data-size="l"><div class="work-frame" data-part="wing" data-theme="sky"><div class="work-frame__body"></div><i class="wf-fx wf-fx--L20"></i><i class="wf-fx wf-fx--L2a"></i><i class="wf-fx wf-fx--L2b"></i><i class="wf-fx wf-fx--L2c"></i><i class="wf-fx wf-fx--L2d"></i><i class="wf-fx wf-fx--L3"></i></div></div></div>
+<div class="render-pane"><div class="render-label">HUD 바 (hud)</div><div class="wf-wrap live-inst" data-live-kind="part" data-shape="step" data-size="l"><div class="work-frame" data-part="hud" data-theme="sky"><div class="work-frame__body"></div><i class="wf-fx wf-fx--L20"></i><i class="wf-fx wf-fx--L2a"></i><i class="wf-fx wf-fx--L2b"></i><i class="wf-fx wf-fx--L2c"></i><i class="wf-fx wf-fx--L2d"></i><i class="wf-fx wf-fx--L3"></i></div></div></div>
+<div class="render-pane"><div class="render-label">날개판 (wing)</div><div class="wf-wrap live-inst" data-live-kind="part" data-shape="step" data-size="l"><div class="work-frame" data-part="wing" data-theme="sky"><div class="work-frame__body"></div><i class="wf-fx wf-fx--L20"></i><i class="wf-fx wf-fx--L2a"></i><i class="wf-fx wf-fx--L2b"></i><i class="wf-fx wf-fx--L2c"></i><i class="wf-fx wf-fx--L2d"></i><i class="wf-fx wf-fx--L3"></i></div></div></div>
 </div>
 </div>
 <div class="frame-card" id="f-button">
@@ -175,9 +186,10 @@
 <tr><td>ghost</td><td>면 투명 · 테두리만</td><td><span class="state state-partial">🟡</span></td></tr>
 <tr><td>pill 토글</td><td>완전 라운드 상속</td><td><span class="state state-partial">🟡</span></td></tr>
 </tbody></table></div>
+<div data-state-bar></div>
 <div class="render-list">
-<div class="render-pane"><div class="render-label">primary</div><img loading="lazy" class="preview-img" src="img/part/m-howto-btnprim.jpg"></div>
-<div class="render-pane"><div class="render-label">ghost / secondary</div><img loading="lazy" class="preview-img" src="img/part/m-settings-btnghost.jpg"> <img loading="lazy" class="preview-img" src="img/part/m-settings-btnsec.jpg"></div>
+<div class="render-pane"><div class="render-label">primary</div><div class="live-inst-host" data-live="game:btn-primary:Play" data-live-size="m"></div></div>
+<div class="render-pane"><div class="render-label">ghost / secondary</div><div class="live-inst-host" data-live="game:btn-ghost:How to play" data-live-size="m"></div> <div class="live-inst-host" data-live="game:btn-secondary:Ranking" data-live-size="m"></div></div>
 </div>
 </div>
 <div class="frame-card" id="f-spritebtn">
@@ -200,8 +212,8 @@
 <tr><td>일시정지 duel-btn-pause</td><td>버튼+글리프 구움</td><td><span class="state state-partial">🟡·위반</span></td></tr>
 </tbody></table></div>
 <div class="render-list">
-<div class="render-pane"><div class="render-label">모드 행 (구운 스프라이트)</div><img loading="lazy" class="preview-img" src="img/part/m-mode-row1.jpg"></div>
-<div class="render-pane"><div class="render-label">stage 버튼</div><img loading="lazy" class="preview-img" src="img/cat/stage-btn_back.jpg"> <img loading="lazy" class="preview-img" src="img/cat/stage-btn_settings.jpg"></div>
+<div class="render-pane"><div class="render-label">모드 행 (구운 스프라이트)</div><img class="preview-img frame-file" loading="lazy" src="../catalog/sian3-btn-adventure.webp" alt="sian3-btn-adventure"></div>
+<div class="render-pane"><div class="render-label">stage 버튼</div><img class="preview-img frame-file" loading="lazy" src="../catalog/stage-btn_back.webp" alt="stage-btn_back"> <img class="preview-img frame-file" loading="lazy" src="../catalog/stage-btn_settings.webp" alt="stage-btn_settings"></div>
 </div>
 </div>
 <div class="frame-card" id="f-gauge">
@@ -222,9 +234,10 @@
 <tr><td>스탯 게이지</td><td>단색 채움 · 4-stack</td><td><span class="state state-partial">🟡</span></td></tr>
 <tr><td>에너지 홈 채움</td><td>hud-groove 위 채움</td><td><span class="state state-partial">🟡</span></td></tr>
 </tbody></table></div>
+<div data-state-bar></div>
 <div class="render-list">
-<div class="render-pane"><div class="render-label">스탯 게이지 채움</div><img loading="lazy" class="preview-img" src="img/part/c-p-gauge-full.jpg"><br><img loading="lazy" class="preview-img" src="img/part/c-p-gauge-stack.jpg"></div>
-<div class="render-pane"><div class="render-label">HP 바(위반 합성)</div><img loading="lazy" class="preview-img" src="img/cat/duel-hpbar-bone.jpg"></div>
+<div class="render-pane"><div class="render-label">스탯 게이지 채움</div><div class="live-inst-host" data-live="snip:cs-gauge" data-live-size="m"></div><br><div class="live-inst-host" data-live="snip:cs-gauge" data-live-size="m"></div></div>
+<div class="render-pane"><div class="render-label">HP 바(위반 합성)</div><img class="preview-img frame-file" loading="lazy" src="../catalog/duel-hpbar-bone.webp" alt="duel-hpbar-bone"></div>
 </div>
 </div>
 <div class="frame-card" id="f-tab">
@@ -245,9 +258,10 @@
 <tr><td>세로 탭 3</td><td>측면 배치</td><td><span class="state state-partial">🟡</span></td></tr>
 <tr><td>이름/Lv 탭 (HUD)</td><td>어두운 판 · HP 라벨</td><td><span class="state state-partial">🟡</span></td></tr>
 </tbody></table></div>
+<div data-state-bar></div>
 <div class="render-list">
-<div class="render-pane"><div class="render-label">캐릭/펫 탭</div><img loading="lazy" class="preview-img" src="img/part/c-p-tab-char.jpg"> <img loading="lazy" class="preview-img" src="img/part/c-p-tab-pet.jpg"></div>
-<div class="render-pane"><div class="render-label">세로 탭 3</div><img loading="lazy" class="preview-img" src="img/part/c-p-vtabs.jpg"></div>
+<div class="render-pane"><div class="render-label">캐릭/펫 탭</div><div class="live-inst-host" data-live="snip:cs-tabs" data-live-size="m"></div> <div class="live-inst-host" data-live="snip:cs-tabs" data-live-size="m"></div></div>
+<div class="render-pane"><div class="render-label">세로 탭 3</div><div class="live-inst-host" data-live="snip:cs-foot" data-live-size="m"></div></div>
 </div>
 </div>
 <div class="frame-card" id="f-x">
@@ -268,8 +282,8 @@
 <tr><td>ui-x-jelly</td><td>젤리 변형</td><td><span class="state state-partial">🟡</span></td></tr>
 </tbody></table></div>
 <div class="render-list">
-<div class="render-pane"><div class="render-label">sian3-close</div><img loading="lazy" class="preview-img" src="img/cat/sian3-close.jpg"></div>
-<div class="render-pane"><div class="render-label">ui-x-jelly</div><img loading="lazy" class="preview-img" src="img/cat/ui-x-jelly.jpg"></div>
+<div class="render-pane"><div class="render-label">sian3-close</div><img class="preview-img frame-file" loading="lazy" src="../catalog/sian3-close.webp" alt="sian3-close"></div>
+<div class="render-pane"><div class="render-label">ui-x-jelly</div><img class="preview-img frame-file" loading="lazy" src="../catalog/ui-x-jelly.webp" alt="ui-x-jelly"></div>
 </div>
 </div>
 <div class="frame-card" id="f-badge">
@@ -291,9 +305,10 @@
 <tr><td>NEW / 「1단」</td><td>글자 구움</td><td><span class="state state-partial">🟡·위반</span></td></tr>
 <tr><td>추천 알약 (kit-pill-v2)</td><td>코드 알약</td><td><span class="state state-partial">🟡</span></td></tr>
 </tbody></table></div>
+<div data-state-bar></div>
 <div class="render-list">
-<div class="render-pane"><div class="render-label">메달 (구움)</div><img loading="lazy" class="preview-img" src="img/cat/medal-attack-ko.jpg"></div>
-<div class="render-pane"><div class="render-label">배지 / 추천알약</div><img loading="lazy" class="preview-img" src="img/cat/lib-badge-s.jpg"> <img loading="lazy" class="preview-img" src="img/part/c-p-rec-pill.jpg"></div>
+<div class="render-pane"><div class="render-label">메달 (구움)</div><img class="preview-img frame-file" loading="lazy" src="../catalog/medal-attack-ko.webp" alt="medal-attack-ko"></div>
+<div class="render-pane"><div class="render-label">배지 / 추천알약</div><img class="preview-img frame-file" loading="lazy" src="../catalog/lib-badge-s.webp" alt="lib-badge-s"> <div class="live-inst-host" data-live="snip:cs-rec-pill" data-live-size="m"></div></div>
 </div>
 </div>
 <div class="frame-card" id="f-icon">
@@ -316,8 +331,8 @@
 <tr><td>tmr-0~9 · tmr-colon</td><td>숫자 글자(내용물)</td><td><span class="state state-partial">🟡</span></td></tr>
 </tbody></table></div>
 <div class="render-list">
-<div class="render-pane"><div class="render-label">slot 아이콘</div><img loading="lazy" class="preview-img" src="img/cat/slot-ic-gem.jpg"> <img loading="lazy" class="preview-img" src="img/cat/slot-ic-star.jpg"></div>
-<div class="render-pane"><div class="render-label">글리프 / 숫자</div><img loading="lazy" class="preview-img" src="img/cat/lib-glyph-heart.jpg"> <img loading="lazy" class="preview-img" src="img/cat/tmr-0.jpg"></div>
+<div class="render-pane"><div class="render-label">slot 아이콘</div><img class="preview-img frame-file" loading="lazy" src="../catalog/slot-ic-gem.webp" alt="slot-ic-gem"> <img class="preview-img frame-file" loading="lazy" src="../catalog/slot-ic-star.webp" alt="slot-ic-star"></div>
+<div class="render-pane"><div class="render-label">글리프 / 숫자</div><img class="preview-img frame-file" loading="lazy" src="../catalog/lib-glyph-heart.webp" alt="lib-glyph-heart"> <img class="preview-img frame-file" loading="lazy" src="../catalog/tmr-0.webp" alt="tmr-0"></div>
 </div>
 </div>
 <div class="frame-card" id="f-title">
@@ -338,8 +353,8 @@
 <tr><td>arc/gallery/unlock 계열</td><td>미사용</td><td><span class="state state-partial">🟡</span></td></tr>
 </tbody></table></div>
 <div class="render-list">
-<div class="render-pane"><div class="render-label">제목 글자</div><img loading="lazy" class="preview-img" src="img/cat/ttl-play-ko.jpg"><br><img loading="lazy" class="preview-img" src="img/cat/ttl-howto-ko.jpg"></div>
-<div class="render-pane"><div class="render-label">설정 제목</div><img loading="lazy" class="preview-img" src="img/cat/ttl-settings-ko.jpg"></div>
+<div class="render-pane"><div class="render-label">제목 글자</div><img class="preview-img frame-file" loading="lazy" src="../catalog/ttl-play-ko.webp" alt="ttl-play-ko"><br><img class="preview-img frame-file" loading="lazy" src="../catalog/ttl-howto-ko.webp" alt="ttl-howto-ko"></div>
+<div class="render-pane"><div class="render-label">설정 제목</div><img class="preview-img frame-file" loading="lazy" src="../catalog/ttl-settings-ko.webp" alt="ttl-settings-ko"></div>
 </div>
 </div>
 <div class="frame-card" id="f-lettering">
@@ -404,8 +419,9 @@
 <div class="scroll-x"><table class="recipe-table"><thead><tr><th>변주</th><th>바꾼 것 (면·α·림·겉선·크기)</th><th>상태</th></tr></thead><tbody>
 <tr><td>설정 토글 On/Off</td><td>버튼 pill 변주</td><td><span class="state state-partial">🟡</span></td></tr>
 </tbody></table></div>
+<div data-state-bar></div>
 <div class="render-list">
-<div class="render-pane"><div class="render-label">토글</div><img loading="lazy" class="preview-img" src="img/part/m-settings-toggle.jpg"></div>
+<div class="render-pane"><div class="render-label">토글</div><div class="live-inst-host" data-live="game:toggle:ON" data-live-size="m"></div></div>
 <div class="render-pane"><div class="render-label">(버튼 pill 상속 · f-button)</div><div class="text-sample-body">f-button pill 변주</div></div>
 </div>
 </div>
@@ -451,8 +467,8 @@
 <tr><td>노드·타일</td><td>stage-jelly·lib-tile</td><td><span class="state state-partial">🟡</span></td></tr>
 </tbody></table></div>
 <div class="render-list">
-<div class="render-pane"><div class="render-label">캐릭터 초상</div><img loading="lazy" class="preview-img" src="img/cat/ch-bangul-portrait.jpg"></div>
-<div class="render-pane"><div class="render-label">배경 / 장식</div><img loading="lazy" class="preview-img" src="img/cat/art-stage.jpg"> <img loading="lazy" class="preview-img" src="img/cat/duel-orn-wing.jpg"></div>
+<div class="render-pane"><div class="render-label">캐릭터 초상</div><img class="preview-img frame-file" loading="lazy" src="../catalog/ch-bangul-portrait.webp" alt="ch-bangul-portrait"></div>
+<div class="render-pane"><div class="render-label">배경 / 장식</div><img class="preview-img frame-file" loading="lazy" src="../catalog/art-stage.webp" alt="art-stage"> <img class="preview-img frame-file" loading="lazy" src="../catalog/duel-orn-wing.webp" alt="duel-orn-wing"></div>
 </div>
 </div>
 </div><div class="bench" id="bench">
@@ -466,4 +482,5 @@
 <div class="bench-pane-list"><div class="bench-pane"><div class="bench-label bench-pane-title">Mode A · 틀 1 <span class="bench-note">· 모달 컨테이너 · data-theme="pink"</span></div><div class="bench-group"><div class="bench-label">직사각 <span class="bench-note">접선 사각형 · R 0.070·w · h 1.140·w</span></div><div class="bench-row"><div class="bench-cell"><div class="wf-wrap" data-shape="rect" data-size="s"><div class="work-frame" data-part="modal" data-theme="pink"><div class="work-frame__body"></div><i class="wf-fx wf-fx--L20"></i><i class="wf-fx wf-fx--L2a"></i><i class="wf-fx wf-fx--L2b"></i><i class="wf-fx wf-fx--L2c"></i><i class="wf-fx wf-fx--L2d"></i><i class="wf-fx wf-fx--L3"></i></div></div><div class="bench-size-label">92px</div></div><div class="bench-cell"><div class="wf-wrap" data-shape="rect" data-size="m"><div class="work-frame" data-part="modal" data-theme="pink"><div class="work-frame__body"></div><i class="wf-fx wf-fx--L20"></i><i class="wf-fx wf-fx--L2a"></i><i class="wf-fx wf-fx--L2b"></i><i class="wf-fx wf-fx--L2c"></i><i class="wf-fx wf-fx--L2d"></i><i class="wf-fx wf-fx--L3"></i></div></div><div class="bench-size-label">140px</div></div><div class="bench-cell"><div class="wf-wrap" data-shape="rect" data-size="l"><div class="work-frame" data-part="modal" data-theme="pink"><div class="work-frame__body"></div><i class="wf-fx wf-fx--L20"></i><i class="wf-fx wf-fx--L2a"></i><i class="wf-fx wf-fx--L2b"></i><i class="wf-fx wf-fx--L2c"></i><i class="wf-fx wf-fx--L2d"></i><i class="wf-fx wf-fx--L3"></i></div></div><div class="bench-size-label">200px</div></div></div></div><div class="bench-group"><div class="bench-label">스타디움 <span class="bench-note">양끝 반원 · R = h/2 · h 0.3797·w</span></div><div class="bench-row"><div class="bench-cell"><div class="wf-wrap" data-shape="stadium" data-size="s"><div class="work-frame" data-part="capsule" data-theme="pink"><div class="work-frame__body"></div><i class="wf-fx wf-fx--L20"></i><i class="wf-fx wf-fx--L2a"></i><i class="wf-fx wf-fx--L2b"></i><i class="wf-fx wf-fx--L2c"></i><i class="wf-fx wf-fx--L2d"></i><i class="wf-fx wf-fx--L3"></i></div></div><div class="bench-size-label">92px</div></div><div class="bench-cell"><div class="wf-wrap" data-shape="stadium" data-size="m"><div class="work-frame" data-part="capsule" data-theme="pink"><div class="work-frame__body"></div><i class="wf-fx wf-fx--L20"></i><i class="wf-fx wf-fx--L2a"></i><i class="wf-fx wf-fx--L2b"></i><i class="wf-fx wf-fx--L2c"></i><i class="wf-fx wf-fx--L2d"></i><i class="wf-fx wf-fx--L3"></i></div></div><div class="bench-size-label">140px</div></div><div class="bench-cell"><div class="wf-wrap" data-shape="stadium" data-size="l"><div class="work-frame" data-part="capsule" data-theme="pink"><div class="work-frame__body"></div><i class="wf-fx wf-fx--L20"></i><i class="wf-fx wf-fx--L2a"></i><i class="wf-fx wf-fx--L2b"></i><i class="wf-fx wf-fx--L2c"></i><i class="wf-fx wf-fx--L2d"></i><i class="wf-fx wf-fx--L3"></i></div></div><div class="bench-size-label">200px</div></div></div></div><div class="bench-group"><div class="bench-label">계단 <span class="bench-note">넓고 낮은 판 · h 0.1794·w · step 홈</span></div><div class="bench-row"><div class="bench-cell"><div class="wf-wrap" data-shape="step" data-size="s"><div class="work-frame" data-part="hud" data-theme="pink"><div class="work-frame__body"></div><i class="wf-fx wf-fx--L20"></i><i class="wf-fx wf-fx--L2a"></i><i class="wf-fx wf-fx--L2b"></i><i class="wf-fx wf-fx--L2c"></i><i class="wf-fx wf-fx--L2d"></i><i class="wf-fx wf-fx--L3"></i></div></div><div class="bench-size-label">92px</div></div><div class="bench-cell"><div class="wf-wrap" data-shape="step" data-size="m"><div class="work-frame" data-part="hud" data-theme="pink"><div class="work-frame__body"></div><i class="wf-fx wf-fx--L20"></i><i class="wf-fx wf-fx--L2a"></i><i class="wf-fx wf-fx--L2b"></i><i class="wf-fx wf-fx--L2c"></i><i class="wf-fx wf-fx--L2d"></i><i class="wf-fx wf-fx--L3"></i></div></div><div class="bench-size-label">140px</div></div><div class="bench-cell"><div class="wf-wrap" data-shape="step" data-size="l"><div class="work-frame" data-part="hud" data-theme="pink"><div class="work-frame__body"></div><i class="wf-fx wf-fx--L20"></i><i class="wf-fx wf-fx--L2a"></i><i class="wf-fx wf-fx--L2b"></i><i class="wf-fx wf-fx--L2c"></i><i class="wf-fx wf-fx--L2d"></i><i class="wf-fx wf-fx--L3"></i></div></div><div class="bench-size-label">200px</div></div></div></div><div class="bench-group"><div class="bench-label">원 <span class="bench-note">L0 끔 + ellipse(50% 50%) · h 1.0085·w</span></div><div class="bench-row"><div class="bench-cell"><div class="wf-wrap" data-shape="circle" data-size="s"><div class="work-frame" data-part="chip" data-theme="pink"><div class="work-frame__body"></div><i class="wf-fx wf-fx--L20"></i><i class="wf-fx wf-fx--L2a"></i><i class="wf-fx wf-fx--L2b"></i><i class="wf-fx wf-fx--L2c"></i><i class="wf-fx wf-fx--L2d"></i><i class="wf-fx wf-fx--L3"></i></div></div><div class="bench-size-label">92px</div></div><div class="bench-cell"><div class="wf-wrap" data-shape="circle" data-size="m"><div class="work-frame" data-part="chip" data-theme="pink"><div class="work-frame__body"></div><i class="wf-fx wf-fx--L20"></i><i class="wf-fx wf-fx--L2a"></i><i class="wf-fx wf-fx--L2b"></i><i class="wf-fx wf-fx--L2c"></i><i class="wf-fx wf-fx--L2d"></i><i class="wf-fx wf-fx--L3"></i></div></div><div class="bench-size-label">140px</div></div><div class="bench-cell"><div class="wf-wrap" data-shape="circle" data-size="l"><div class="work-frame" data-part="chip" data-theme="pink"><div class="work-frame__body"></div><i class="wf-fx wf-fx--L20"></i><i class="wf-fx wf-fx--L2a"></i><i class="wf-fx wf-fx--L2b"></i><i class="wf-fx wf-fx--L2c"></i><i class="wf-fx wf-fx--L2d"></i><i class="wf-fx wf-fx--L3"></i></div></div><div class="bench-size-label">200px</div></div></div></div></div><div class="bench-pane"><div class="bench-label bench-pane-title">Mode B · 틀 2 <span class="bench-note">· 모달 밖 인터페이스 · data-theme="sky"</span></div><div class="bench-group"><div class="bench-label">직사각 <span class="bench-note">접선 사각형 · R 0.070·w · h 1.140·w</span></div><div class="bench-row"><div class="bench-cell"><div class="wf-wrap" data-shape="rect" data-size="s"><div class="work-frame" data-part="modal" data-theme="sky"><div class="work-frame__body"></div><i class="wf-fx wf-fx--L20"></i><i class="wf-fx wf-fx--L2a"></i><i class="wf-fx wf-fx--L2b"></i><i class="wf-fx wf-fx--L2c"></i><i class="wf-fx wf-fx--L2d"></i><i class="wf-fx wf-fx--L3"></i></div></div><div class="bench-size-label">92px</div></div><div class="bench-cell"><div class="wf-wrap" data-shape="rect" data-size="m"><div class="work-frame" data-part="modal" data-theme="sky"><div class="work-frame__body"></div><i class="wf-fx wf-fx--L20"></i><i class="wf-fx wf-fx--L2a"></i><i class="wf-fx wf-fx--L2b"></i><i class="wf-fx wf-fx--L2c"></i><i class="wf-fx wf-fx--L2d"></i><i class="wf-fx wf-fx--L3"></i></div></div><div class="bench-size-label">140px</div></div><div class="bench-cell"><div class="wf-wrap" data-shape="rect" data-size="l"><div class="work-frame" data-part="modal" data-theme="sky"><div class="work-frame__body"></div><i class="wf-fx wf-fx--L20"></i><i class="wf-fx wf-fx--L2a"></i><i class="wf-fx wf-fx--L2b"></i><i class="wf-fx wf-fx--L2c"></i><i class="wf-fx wf-fx--L2d"></i><i class="wf-fx wf-fx--L3"></i></div></div><div class="bench-size-label">200px</div></div></div></div><div class="bench-group"><div class="bench-label">스타디움 <span class="bench-note">양끝 반원 · R = h/2 · h 0.3797·w</span></div><div class="bench-row"><div class="bench-cell"><div class="wf-wrap" data-shape="stadium" data-size="s"><div class="work-frame" data-part="capsule" data-theme="sky"><div class="work-frame__body"></div><i class="wf-fx wf-fx--L20"></i><i class="wf-fx wf-fx--L2a"></i><i class="wf-fx wf-fx--L2b"></i><i class="wf-fx wf-fx--L2c"></i><i class="wf-fx wf-fx--L2d"></i><i class="wf-fx wf-fx--L3"></i></div></div><div class="bench-size-label">92px</div></div><div class="bench-cell"><div class="wf-wrap" data-shape="stadium" data-size="m"><div class="work-frame" data-part="capsule" data-theme="sky"><div class="work-frame__body"></div><i class="wf-fx wf-fx--L20"></i><i class="wf-fx wf-fx--L2a"></i><i class="wf-fx wf-fx--L2b"></i><i class="wf-fx wf-fx--L2c"></i><i class="wf-fx wf-fx--L2d"></i><i class="wf-fx wf-fx--L3"></i></div></div><div class="bench-size-label">140px</div></div><div class="bench-cell"><div class="wf-wrap" data-shape="stadium" data-size="l"><div class="work-frame" data-part="capsule" data-theme="sky"><div class="work-frame__body"></div><i class="wf-fx wf-fx--L20"></i><i class="wf-fx wf-fx--L2a"></i><i class="wf-fx wf-fx--L2b"></i><i class="wf-fx wf-fx--L2c"></i><i class="wf-fx wf-fx--L2d"></i><i class="wf-fx wf-fx--L3"></i></div></div><div class="bench-size-label">200px</div></div></div></div><div class="bench-group"><div class="bench-label">계단 <span class="bench-note">넓고 낮은 판 · h 0.1794·w · step 홈</span></div><div class="bench-row"><div class="bench-cell"><div class="wf-wrap" data-shape="step" data-size="s"><div class="work-frame" data-part="hud" data-theme="sky"><div class="work-frame__body"></div><i class="wf-fx wf-fx--L20"></i><i class="wf-fx wf-fx--L2a"></i><i class="wf-fx wf-fx--L2b"></i><i class="wf-fx wf-fx--L2c"></i><i class="wf-fx wf-fx--L2d"></i><i class="wf-fx wf-fx--L3"></i></div></div><div class="bench-size-label">92px</div></div><div class="bench-cell"><div class="wf-wrap" data-shape="step" data-size="m"><div class="work-frame" data-part="hud" data-theme="sky"><div class="work-frame__body"></div><i class="wf-fx wf-fx--L20"></i><i class="wf-fx wf-fx--L2a"></i><i class="wf-fx wf-fx--L2b"></i><i class="wf-fx wf-fx--L2c"></i><i class="wf-fx wf-fx--L2d"></i><i class="wf-fx wf-fx--L3"></i></div></div><div class="bench-size-label">140px</div></div><div class="bench-cell"><div class="wf-wrap" data-shape="step" data-size="l"><div class="work-frame" data-part="hud" data-theme="sky"><div class="work-frame__body"></div><i class="wf-fx wf-fx--L20"></i><i class="wf-fx wf-fx--L2a"></i><i class="wf-fx wf-fx--L2b"></i><i class="wf-fx wf-fx--L2c"></i><i class="wf-fx wf-fx--L2d"></i><i class="wf-fx wf-fx--L3"></i></div></div><div class="bench-size-label">200px</div></div></div></div><div class="bench-group"><div class="bench-label">원 <span class="bench-note">L0 끔 + ellipse(50% 50%) · h 1.0085·w</span></div><div class="bench-row"><div class="bench-cell"><div class="wf-wrap" data-shape="circle" data-size="s"><div class="work-frame" data-part="chip" data-theme="sky"><div class="work-frame__body"></div><i class="wf-fx wf-fx--L20"></i><i class="wf-fx wf-fx--L2a"></i><i class="wf-fx wf-fx--L2b"></i><i class="wf-fx wf-fx--L2c"></i><i class="wf-fx wf-fx--L2d"></i><i class="wf-fx wf-fx--L3"></i></div></div><div class="bench-size-label">92px</div></div><div class="bench-cell"><div class="wf-wrap" data-shape="circle" data-size="m"><div class="work-frame" data-part="chip" data-theme="sky"><div class="work-frame__body"></div><i class="wf-fx wf-fx--L20"></i><i class="wf-fx wf-fx--L2a"></i><i class="wf-fx wf-fx--L2b"></i><i class="wf-fx wf-fx--L2c"></i><i class="wf-fx wf-fx--L2d"></i><i class="wf-fx wf-fx--L3"></i></div></div><div class="bench-size-label">140px</div></div><div class="bench-cell"><div class="wf-wrap" data-shape="circle" data-size="l"><div class="work-frame" data-part="chip" data-theme="sky"><div class="work-frame__body"></div><i class="wf-fx wf-fx--L20"></i><i class="wf-fx wf-fx--L2a"></i><i class="wf-fx wf-fx--L2b"></i><i class="wf-fx wf-fx--L2c"></i><i class="wf-fx wf-fx--L2d"></i><i class="wf-fx wf-fx--L3"></i></div></div><div class="bench-size-label">200px</div></div></div></div></div></div>
 <div class="source-note">겉선·림 두께는 --wf-ref-w(:root 고정)에 매여 크기와 무관하게 같은 px — 의도된 설계(정본 §3 「Stroke 굵기·림 = 절대 px」)</div>
 </div>
+<script src="board-live.js"></script>
 </body></html>

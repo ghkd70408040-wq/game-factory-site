@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="ko"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>관제탑 스타일 가이드</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="board.css">
+<link rel="stylesheet" href="board-live.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="board-theme.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="board-theme.css">
+<style>
+/* 가이드 전용 부품 (다른 방에는 없음) */
+body .swatch-list{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));margin:8px 0 4px;}
+body .swatch{border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;background:var(--panel);}
+body .swatch-chip{display:block;height:44px;}
+body .swatch-name{display:block;padding:6px 8px 0;font-size:11.5px;font-weight:600;color:var(--ink);}
+body .swatch-value{display:block;padding:0 8px 7px;font-family:var(--f-mono);font-size:10.5px;color:var(--sub);line-height:1.4;}
+body .type-list > div{padding:9px 0;border-bottom:1px dashed var(--line);display:flex;gap:16px;align-items:baseline;flex-wrap:wrap;}
+body .type-key{font-family:var(--f-mono);font-size:10.5px;color:var(--dim);min-width:200px;}
+body .type-display{font-family:var(--f-display);font-size:30px;line-height:1.15;}
+body .type-display-sm{font-family:var(--f-display);font-size:20px;}
+body .type-h2{font-weight:700;font-size:15px;}
+body .type-label{font-size:11.5px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;}
+body .inline-list{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0 4px;}
+body .jelly-demo{width:120px;height:60px;border-radius:14px;}
+body .jelly-demo--b{background:rgba(150,167,246,.55);border:3px solid #6F6BB4;box-shadow:inset 0 0 0 4px rgba(194,214,255,.9);}
+body .jelly-demo--a{background:rgba(230,220,226,.9);border:3px solid #9F8896;box-shadow:inset 0 0 0 4px rgba(250,245,244,.9);}
+</style>
+</head><body>
+<nav class="site-nav">
+<span class="nav-brand">🏭 게임 공장</span>
+<a href="index.html">홈</a>
+<a href="plan.html">기획실</a>
+<span class="nav-sep"></span>
+<a href="screen-hud.html">HUD</a>
+<a href="screen-modal.html">모달</a>
+<a href="screen-charsel.html">캐릭창</a>
+<a href="screen-map.html">지도</a>
+<span class="nav-sep"></span>
+<a href="warehouse.html">창고</a>
+<a href="factory.html">공장</a>
+<a href="gate.html">관문실</a>
+<a href="STYLE.html" class="is-current">스타일</a>
+</nav>
+<div class="page">
+  <h1 class="page-title">관제탑 스타일 가이드</h1>
+  <div class="page-meta">board-theme.css v1 · 2026-09-08 · 5방은 이 한 장의 부품만 쓴다. 색·서체 값은 board-theme.css 토큰에서만 바꾼다.</div>
+
+  <div class="focus-line"><b>초점</b>상태는 색이 아니라 형태로 읽힌다 — 확정은 채움, 값만 맞춤은 테두리, 미확정은 점선<span class="src">board-theme.css §4</span></div>
+
+  <h2 class="section-title">1. 색 토큰 <span class="tag">라이트 · 다크 3상태</span></h2>
+  <div class="source-note">바탕은 재질 Mode B(sky 150·167·246) 쪽으로 기운 서늘한 종이. 액센트는 그 재질값 하나. 의미색(확정·주의·실패)은 액센트와 별개.</div>
+  <div class="swatch-list">
+    <div class="swatch"><i class="swatch-chip" style="background:var(--bg)"></i><span class="swatch-name">bg 바탕</span><span class="swatch-value">#F3F3F9 / #15162A</span></div>
+    <div class="swatch"><i class="swatch-chip" style="background:var(--panel);border-bottom:1px solid var(--line)"></i><span class="swatch-name">panel 시트</span><span class="swatch-value">#FFFFFF / #20223A</span></div>
+    <div class="swatch"><i class="swatch-chip" style="background:var(--ink)"></i><span class="swatch-name">ink 본문</span><span class="swatch-value">#1F2033 / #EDEEF8</span></div>
+    <div class="swatch"><i class="swatch-chip" style="background:var(--acc-soft)"></i><span class="swatch-name">acc-soft 재질 B</span><span class="swatch-value">rgb 150 167 246</span></div>
+    <div class="swatch"><i class="swatch-chip" style="background:var(--acc)"></i><span class="swatch-name">acc 링크 · 레일</span><span class="swatch-value">#5E6FD9 / #9FAEFF</span></div>
+    <div class="swatch"><i class="swatch-chip" style="background:var(--modeA)"></i><span class="swatch-name">modeA 모달 판</span><span class="swatch-value">#E6DCE2 (S11)</span></div>
+    <div class="swatch"><i class="swatch-chip" style="background:var(--ok)"></i><span class="swatch-name">ok 확정</span><span class="swatch-value">#1E8A5A</span></div>
+    <div class="swatch"><i class="swatch-chip" style="background:var(--partial)"></i><span class="swatch-name">partial 값만 맞춤</span><span class="swatch-value">#A56A00</span></div>
+    <div class="swatch"><i class="swatch-chip" style="background:var(--none)"></i><span class="swatch-name">none 미확정 · 실패</span><span class="swatch-value">#C23B4E</span></div>
+    <div class="swatch"><i class="swatch-chip" style="background:var(--stage)"></i><span class="swatch-name">stage 렌더 바닥</span><span class="swatch-value">#DFE3F5 / #2C3050</span></div>
+  </div>
+
+  <h2 class="section-title">2. 서체</h2>
+  <div class="source-note">&lt;link&gt; 한 줄: fonts.googleapis.com/css2?family=Do+Hyeon&amp;family=IBM+Plex+Sans+KR:wght@400;500;700&amp;family=IBM+Plex+Mono:wght@400;600 · 폴백 Malgun Gothic / Cascadia Mono</div>
+  <div class="type-list">
+    <div><span class="type-key">display · Do Hyeon 30px (page-title)</span><span class="type-display">공장 — 프레임 원형 18종</span></div>
+    <div><span class="type-key">display · Do Hyeon 20px (frame-card h3)</span><span class="type-display-sm">타이머 캡슐 capsule</span></div>
+    <div><span class="type-key">body · Plex Sans KR 700 15px (section-title)</span><span class="type-h2">프레임 원형 18종</span></div>
+    <div><span class="type-key">body · Plex Sans KR 400 14px</span><span>판 폭 W · 세로비 1.140 · 큰 완만 코너. 겉선은 영역별 절대 px, 색은 Variables 에서만.</span></div>
+    <div><span class="type-key">label · 11.5px uppercase .08em (sub-title)</span><span class="type-label">판 · 캡슐 · 방울</span></div>
+    <div><span class="type-key">mono · Plex Mono 600 (수치 · hook · 파일)</span><span class="mono">--wf-face · hud-capsule-lite.png · 37,424 B · 0.544</span></div>
+  </div>
+
+  <h2 class="section-title">3. 상태 · 계층 · 판정 · 꼬리표</h2>
+  <h3 class="sub-title">상태 알약 — 형태가 먼저</h3>
+  <div class="inline-list"><span class="state state-ok">🟢 확정</span><span class="state state-partial">🟡 값만 맞춤</span><span class="state state-none">🔴 미확정</span><span class="state state-ok">PASS</span><span class="state state-partial">미실행</span><span class="state state-fail">FAIL</span><span class="pending-stamp">승인 대기</span><span class="tag">코드(굽기)</span><span class="tag">자산</span></div>
+  <h3 class="sub-title">계층 T1~T5 — 왼쪽 선 색 (§1)</h3>
+  <div class="inline-list"><span class="tier tier-t1">T1</span>화면 <span class="tier tier-t2">T2</span>컨테이너 <span class="tier tier-t3">T3</span>제어 <span class="tier tier-t4">T4</span>내용물 <span class="tier tier-t5">T5</span>효과 <span class="tier tier-none">—</span>미분류</div>
+  <h3 class="sub-title">판정 — 모노 태그 (§4)</h3>
+  <div class="inline-list"><span class="verdict verdict-code">code</span><span class="verdict verdict-asset">asset</span><span class="verdict verdict-ambiguous">ambiguous</span><span class="verdict verdict-variant">variant</span></div>
+
+  <h2 class="section-title">4. 표</h2>
+  <div class="scroll-x"><table class="data-table"><caption>관문 판정</caption>
+  <thead><tr><th>관문</th><th>대상</th><th class="num">exit</th><th>판정</th></tr></thead>
+  <tbody>
+  <tr><td>m3 죽은 선택자</td><td>site/tentwin.html</td><td class="num">0</td><td><span class="state state-ok">PASS</span></td></tr>
+  <tr><td>frames 1파일 1프레임</td><td>hud-components.json · site/catalog</td><td class="num">0</td><td><span class="state state-ok">PASS</span></td></tr>
+  <tr><td>실기기 캡처 (폴백 강제)</td><td>물리 단말</td><td class="num">—</td><td><span class="state state-none">없음</span></td></tr>
+  </tbody></table></div>
+  <div class="scroll-x"><table class="recipe-table"><thead><tr><th class="layer-col">층</th><th>담는 것</th><th>이 원형</th></tr></thead><tbody>
+  <tr><th>Shape</th><td class="layer-what">실루엣 · 코너 · 홈 · 마스크</td><td>스타디움(양끝 반원) · 높이 고정</td></tr>
+  <tr><th>Fill</th><td class="layer-what">면색 · α</td><td class="mono">$mode.B.face · $mode.B.alpha</td></tr>
+  <tr><th>Stroke</th><td class="layer-what">림 · 겉선 (절대 px)</td><td class="mono">rim 4/3px · outline 3/2px</td></tr>
+  <tr><th>Effect</th><td class="layer-what">광점 · 접지</td><td>좌 8% 상 22% · 9%W×22%H · 접지 6/4px</td></tr>
+  <tr><th>Slot</th><td class="layer-what">글자 · 숫자 자리</td><td>타이머 숫자 글리프 (별도 Frame) — 굽지 않음</td></tr>
+  </tbody></table></div>
+
+  <h2 class="section-title">5. 화면 페이지 — [조립 | 시안] 양면 + 부품 선반</h2>
+  <div class="screen-card">
+    <div class="shot-pair">
+      <div class="shot-box"><div class="shot-caption">모험 HUD (조립) <i>실캡처 · wave/hudframes 9f31f97 · <span class="state state-none">브랜치 미푸시</span></i></div>
+        <img loading="lazy" src="img/screen/hud-adv.jpg" alt="모험 HUD 조립"></div>
+      <div class="shot-box"><div class="shot-caption">시안 S6 <i>인게임 화면.png (원본)</i></div>
+        <img loading="lazy" src="img/screen/sian-s6.jpg" alt="S6 시안"></div>
+    </div>
+    <h3 class="sub-title">판 · 캡슐 · 방울 (🟢 확정 프레임)</h3>
+    <div class="part-list">
+      <a class="part-link" href="factory.html#f-bar"><div class="part"><div class="part-stage"><img loading="lazy" src="frames/hud/hud-plate-top-plain-lite.png" alt=""></div>
+        <div class="part-label"><div class="part-name">위 판 (판1)</div><div class="part-file">hud-plate-top-plain-lite.png · L+5%</div>
+        <div class="part-tags"><span class="state state-ok">🟢 틀2-1</span><span class="tag">코드(굽기)</span></div><div class="part-goto">→ f-bar</div></div></div></a>
+      <a class="part-link" href="factory.html#f-capsule"><div class="part"><div class="part-stage"><img loading="lazy" src="frames/hud/hud-capsule-lite.png" alt=""></div>
+        <div class="part-label"><div class="part-name">타이머 캡슐</div><div class="part-file">hud-capsule-lite.png · 틀2-3</div>
+        <div class="part-tags"><span class="state state-ok">🟢 틀2-3</span><span class="tag">코드</span></div><div class="part-goto">→ f-capsule</div></div></div></a>
+      <a class="part-link" href="factory.html#f-chip"><div class="part"><div class="part-stage"><img loading="lazy" src="frames/hud/hud-bubble-pet.png" alt=""></div>
+        <div class="part-label"><div class="part-name">방울 (펫 얼굴)</div><div class="part-file">hud-bubble-pet.png (미리보기 합성)</div>
+        <div class="part-tags"><span class="state state-ok">🟢 틀2-4</span><span class="state state-partial">🟡 얼굴</span><span class="tag">코드+자산</span></div><div class="part-goto">→ f-chip</div></div></div></a>
+      <a class="part-link" href="factory.html#f-gauge"><div class="part"><div class="part-stage"><img loading="lazy" src="../catalog/duel-hpbar-bone.webp" alt=""></div>
+        <div class="part-label"><div class="part-name">HP 게이지</div><div class="part-file">duel-hpbar-bone (위반 합성)</div>
+        <div class="part-tags"><span class="state state-partial">🟡 값만 맞춤</span><span class="state state-none">위반</span></div><div class="part-goto">→ f-gauge</div></div></div></a>
+    </div>
+  </div>
+
+  <h2 class="section-title">6. 창고 — 선반 머리 · 필터</h2>
+  <div class="filter-bar"><button class="is-current">전체</button><button>T2</button><button>T3</button><span class="filter-sep"></span><button>위반만</button><button>미사용만</button></div>
+  <div class="shelf-grid">
+    <div class="shelf-tier"><span class="tier tier-t2">T2</span><span class="shelf-name">컨테이너</span><span class="shelf-desc">판 · 카드 · 바 · 캡슐 · 탭 판</span><span class="shelf-tally"><span class="state state-ok">준수 41</span><span class="state state-none">위반 9</span><span class="state state-partial">미사용 12</span></span></div>
+    <div class="shelf-role">판 <span class="count">18</span></div>
+    <div class="part"><div class="part-stage"><img loading="lazy" src="frames/hud/hud-plate-bottom-lite.png" alt=""></div><div class="part-label"><div class="part-name">hud-plate-bottom</div><div class="part-file">T2 · 1170×312 · 24KB</div><div class="part-tags"><span class="state state-ok">준수</span><span class="tag">코드(굽기)</span></div></div></div>
+    <div class="part"><div class="part-stage"><img loading="lazy" src="frames/hud/hud-capsule-lite.png" alt=""></div><div class="part-label"><div class="part-name">hud-capsule-lite</div><div class="part-file">T2 · 640×200 · 18KB</div><div class="part-tags"><span class="state state-ok">준수</span><span class="tag">코드</span></div></div></div>
+  </div>
+
+  <h2 class="section-title">7. 공장 — 레시피 시트 · 렌더 판</h2>
+  <div class="frame-card" id="f-demo">
+    <h3>캡슐 capsule</h3>
+    <div class="frame-meta">역할 제목·타이머 알약 · 계열 3 → 토큰 1벌 · 판정 <span class="tag">코드</span> · <span class="state state-ok">🟢 정석 S11</span></div>
+    <h3 class="sub-title">층 레시피 — 피그마 순서 <span class="tier tier-t2">T2</span> <span class="verdict verdict-code">code</span> <span class="tag">data-part: capsule</span></h3>
+    <div class="scroll-x"><table class="recipe-table"><thead><tr><th class="layer-col">층</th><th>틀 1 (모달)</th><th>틀 2 (모달 밖)</th></tr></thead><tbody>
+    <tr><th>Shape</th><td>판 폭 W · 세로비 1.140 · 큰 완만 코너</td><td>동일 규격, 세로비 부품별</td></tr>
+    <tr><th>Fill</th><td>면 #E6DCE2 · α .544</td><td>면 150·167·246 · α .55</td></tr>
+    <tr><th>Stroke</th><td>림 #FAF5F4 · 겉선 #9F8896</td><td>림 194·214·255 · 겉선 #6F6BB4</td></tr>
+    <tr><th>Effect</th><td>광점 좌 8% 상 22% · 접지 6px</td><td>동일 규칙</td></tr>
+    </tbody></table></div>
+    <div class="render-list">
+      <div class="render-pane"><div class="render-label">Mode B · sky</div><div class="jelly-demo jelly-demo--b"></div></div>
+      <div class="render-pane"><div class="render-label">Mode A · pink</div><div class="jelly-demo jelly-demo--a"></div></div>
+    </div>
+    <div class="source-note">실제 공장 렌더 판 안은 정본 work-frame.css 가 그린다 — 테마는 판 바닥·라벨만 입힌다</div>
+  </div>
+
+  <h2 class="section-title">8. 관문실 — 원문 출력 · 막대</h2>
+  <pre class="raw-output">M3 죽은 선택자 게이트 — site/tentwin.html
+  현재 A급 100건 · 은퇴 대장 100건 · 신규 0건 · 대장서 사라짐 0건
+M3 PASS — 신규 A급 0건 (기존 A급은 은퇴 대장 소속).</pre>
+  <pre class="raw-output is-fail">frames 게이트 — 항목 23 · FAIL 2
+  hud-frame-lite.png: 프레임 2개 (판+캡슐 합성) → 분리 필요
+frames FAIL</pre>
+  <div class="scroll-x"><table class="data-table"><caption>용량 예산</caption>
+  <thead><tr><th>파일</th><th class="num">KB</th><th>비율</th></tr></thead>
+  <tbody>
+  <tr><td class="mono">tentwin.html</td><td class="num">7,812</td><td><div class="bar"><i style="width:78%"></i></div></td></tr>
+  <tr><td class="mono">catalog/*.webp</td><td class="num">11,340</td><td><div class="bar"><i class="over" style="width:100%"></i></div></td></tr>
+  </tbody></table></div>
+
+  <h2 class="section-title">9. 홈 — 방 목록</h2>
+  <div class="room-list">
+    <a class="room" href="plan.html"><div class="room-name">1 · 기획실</div><div class="room-desc">S0 기획 · S2 시안 접수</div>
+      <div class="tally">화면 <b>14</b> · 모드 <b>5</b> · 펫 <b>10</b></div><div class="room-source">MASTER-PLAN · DESIGN · SIAN-REGISTRY</div></a>
+    <a class="room" href="gate.html"><div class="room-name">5 · 관문실</div><div class="room-desc">S6 관문 · S7 승인</div>
+      <div class="tally">관문 <b>2</b> PASS · 위반 <b>120</b></div><div class="room-source">components-gate.py · 판정판</div></a>
+  </div>
+  <div class="source-note">숫자는 예시 — 실데이터는 각 방이 board-data.json 에서 읽는다</div>
+</div>
+</body></html>

@@ -5,7 +5,13 @@
 <title>캐릭터 선택창 · 게임 공장</title>
 <link rel="icon" href="data:,">
 <link rel="stylesheet" href="board.css">
-</head><body>
+<link rel="stylesheet" href="work-frame.css">
+<link rel="stylesheet" href="game-parts.css">
+<link rel="stylesheet" href="board-factory.css">
+<link rel="stylesheet" href="board-live.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="board-theme.css">
+</head><body class="kit-page">
 <nav class="site-nav">
 <span class="nav-brand">🏭 게임 공장</span>
 <a href="index.html">홈</a>
@@ -22,15 +28,13 @@
 </nav>
 <div class="page">
   <h1 class="page-title">캐릭터 선택창</h1>
-  <div class="page-meta">조립 완성(실캡처) | 시안 · 아래 = 프레임 격리 · 🟢 = 방울·캡슐·판(정석 S11·틀2-3/2-4 확정) · 나머지 🟡</div>
-<div class="focus-line"><b>초점</b>실기기 반려 17건(⑨ 클래식·⑩ 내 기록·⑪ 스테이지 모달) — ①이름↔초상 간격0 ②초상 크롭 불일치 ③이름 들쭉 ④캡슐 글자 찌부 ⑤정보판 젤리 질감 없음 ⑥탭 내용 전환 안 됨 ⑦전신 다리 잘림<span class="src">judge-state.json rev 13 · hud-components.json · kit-2side-* · FRAME-AUDIT-0906.md</span></div>
-
-  <div class="screen-card">
+<div class="kit-legend"><span class="kit-legend-k is-live"><i></i>라이브</span><span class="kit-legend-k is-partial"><i></i>값만 맞춤</span><span class="kit-legend-k is-none"><i></i>미구현</span><a class="kit-legend-link" href="gate.html#gaps">갭 표 →</a></div>
+<div class="screen-card">
     <div class="shot-pair">
-      <div class="shot-box"><div class="shot-caption">캐릭터 탭 <i>#screen-charsel [char]</i></div>
-        <img loading="lazy" src="img/screen/charsel-char.jpg" alt="캐릭터 선택 조립"></div>
-      <div class="shot-box"><div class="shot-caption">펫 탭 <i>#screen-charsel [pet]</i></div>
-        <img loading="lazy" src="img/screen/charsel-pet.jpg" alt="펫 선택 조립"></div>
+      <div class="shot-box is-live"><div class="shot-caption">조립</div>
+        <div class="live-screen" data-screen="character" data-fallback="img/screen/charsel-char.jpg"></div></div>
+      <div class="shot-box is-live"><div class="shot-caption">조립</div>
+        <div class="live-screen" data-screen="character" data-fallback="img/screen/charsel-pet.jpg"></div></div>
     </div>
     <div class="shot-pair">
       <div class="shot-box is-empty">시안 없음 (S5 uploads 미등재 · 로컬 원본 없음)</div>
@@ -38,114 +42,72 @@
         <span>정석 출처: S11 하단 정보판 · 틀2-3 캡슐 · 틀2-4 방울</span></div>
     </div>
 
-    <h3 class="sub-title">판 · 캡슐 · 방울 (🟢 확정 프레임)</h3>
     <div class="part-list">
-      <a class="part-link" href="factory.html#f-modal"><div class="part"><div class="part-stage"><img loading="lazy" src="img/part/c-p-plate-body.jpg"></div>
-        <div class="part-label"><div class="part-name">하단 정보판</div><div class="part-file">.cp-body · 정석 S11 (--cpj-*)</div>
-        <div class="part-tags"><span class="state state-ok">🟢 정석 S11</span><span class="tag">코드</span></div><div class="part-goto">→ f-modal</div></div></div></a>
-      <a class="part-link" href="factory.html#f-capsule"><div class="part"><div class="part-stage"><img loading="lazy" src="img/part/c-p-capsule-empty.jpg"></div>
-        <div class="part-label"><div class="part-name">제목 캡슐 (빈 것)</div><div class="part-file">#cp-h · .wf-cap</div>
-        <div class="part-tags"><span class="state state-ok">🟢 틀2-3</span><span class="tag">코드</span></div><div class="part-goto">→ f-capsule</div></div></div></a>
-      <a class="part-link" href="factory.html#f-capsule"><div class="part"><div class="part-stage"><img loading="lazy" src="img/part/c-p-capsule-full.jpg"></div>
-        <div class="part-label"><div class="part-name">제목 캡슐 (글자 얹음)</div><div class="part-file">#cp-h · work-lettering</div>
-        <div class="part-tags"><span class="state state-ok">🟢 틀2-3</span><span class="state state-partial">🟡 글자</span><span class="tag">코드+레터링</span></div><div class="part-goto">→ f-capsule</div></div></div></a>
-      <a class="part-link" href="factory.html#f-chip"><div class="part"><div class="part-stage"><img loading="lazy" src="img/part/c-p-bubble-empty.jpg"></div>
-        <div class="part-label"><div class="part-name">초상 방울 (빈 유리)</div><div class="part-file">.cp-th (.ct-art off)</div>
-        <div class="part-tags"><span class="state state-ok">🟢 틀2-4</span><span class="tag">코드</span></div><div class="part-goto">→ f-chip</div></div></div></a>
-      <a class="part-link" href="factory.html#f-chip"><div class="part"><div class="part-stage"><img loading="lazy" src="img/part/c-p-bubble-face.jpg"></div>
-        <div class="part-label"><div class="part-name">초상 방울 (얼굴 얹음)</div><div class="part-file">.cp-th .ct-art</div>
-        <div class="part-tags"><span class="state state-ok">🟢 틀2-4</span><span class="state state-partial">🟡 얼굴</span><span class="tag">코드+자산</span></div><div class="part-goto">→ f-chip</div></div></div></a>
-      <a class="part-link" href="factory.html#f-chip"><div class="part"><div class="part-stage"><img loading="lazy" src="img/part/c-p-bubble-gold.jpg"></div>
-        <div class="part-label"><div class="part-name">초상 방울 (금테 선택)</div><div class="part-file">#cp-ring + .cp-th.cp-center</div>
-        <div class="part-tags"><span class="state state-ok">🟢 틀2-4 금테</span><span class="tag">코드</span></div><div class="part-goto">→ f-chip</div></div></div></a>
+      <a class="part-link" href="factory.html#f-modal"><div class="part is-live" data-live-sel="#charpanel .cp-card" data-frame-id="t2-plate-charsel-info"><div class="part-stage part-stage--live" data-live="part:charsel:pink" data-live-size="s"></div>
+        <div class="part-label"><div class="part-name"><span class="tier tier-t2">T2</span>하단 정보판</div></div></div></a>
+      <a class="part-link" href="factory.html#f-capsule"><div class="part is-live" data-live-sel="#howto-h" data-frame-id="t3-title-capsule-modal"><div class="part-stage part-stage--live" data-live="part:capsule:pink" data-live-size="s"></div>
+        <div class="part-label"><div class="part-name"><span class="tier tier-t3">T3</span>제목 캡슐</div></div></div></a>
+      <a class="part-link" href="factory.html#f-capsule"><div class="part is-live" data-live-sel="#cp-h" data-frame-id="t3-capsule-charsel-full"><div class="part-stage part-stage--live" data-live="snip:cs-head" data-live-size="s"></div>
+        <div class="part-label"><div class="part-name"><span class="tier tier-t3">T3</span>제목 캡슐</div></div></div></a>
+      <a class="part-link" href="factory.html#f-chip"><div class="part is-live" data-live-sel="#charpanel .cp-th" data-frame-id="t3-bubble-charsel-empty"><div class="part-stage part-stage--live" data-live="part:chip:pink" data-live-size="s"></div>
+        <div class="part-label"><div class="part-name"><span class="tier tier-t3">T3</span>초상 방울</div></div></div></a>
+      <a class="part-link" href="factory.html#f-chip"><div class="part is-live" data-live-sel="#duel-me-av" data-frame-id="t4-bubble-hud-char"><div class="part-stage"><img class="frame-file" loading="lazy" src="../catalog/ch-ten-face.webp" alt="ch-ten-face"></div>
+        <div class="part-label"><div class="part-name"><span class="tier tier-t4">T4</span>초상 방울</div></div></div></a>
+      <a class="part-link" href="factory.html#f-chip"><div class="part is-live" data-live-sel="#charpanel .char-card.ch-ten" data-frame-id="t3-bubble-charsel-gold"><div class="part-stage part-stage--live" data-live="snip:cs-thumb" data-live-size="s"></div>
+        <div class="part-label"><div class="part-name"><span class="tier tier-t3">T3</span>초상 방울</div></div></div></a>
     </div>
 
-    <h3 class="sub-title">슬롯 · 알약 · 게이지 · 탭 · 버튼 (🟡)</h3>
     <div class="part-list">
-      <a class="part-link" href="factory.html#f-slot"><div class="part"><div class="part-stage"><img loading="lazy" src="img/part/c-p-portrait-chip.jpg"></div>
-        <div class="part-label"><div class="part-name">초상 칩</div><div class="part-file">.ci-chip.kit-slot-v2--portrait</div>
-        <div class="part-tags"><span class="state state-partial">🟡 값만 맞춤</span><span class="tag">코드(액자)</span></div><div class="part-goto">→ f-slot</div></div></div></a>
-      <a class="part-link" href="factory.html#f-slot"><div class="part"><div class="part-stage"><img loading="lazy" src="img/part/c-p-name-pill.jpg"></div>
-        <div class="part-label"><div class="part-name">이름 알약</div><div class="part-file">.ci-plate.kit-slot-v2--name</div>
-        <div class="part-tags"><span class="state state-partial">🟡 값만 맞춤</span><span class="tag">코드</span></div><div class="part-goto">→ f-slot</div></div></div></a>
-      <a class="part-link" href="factory.html#f-badge"><div class="part"><div class="part-stage"><img loading="lazy" src="img/part/c-p-rec-pill.jpg"></div>
-        <div class="part-label"><div class="part-name">추천 알약</div><div class="part-file">.ci-tag-v.kit-pill-v2</div>
-        <div class="part-tags"><span class="state state-partial">🟡 값만 맞춤</span><span class="tag">코드</span></div><div class="part-goto">→ f-badge</div></div></div></a>
-      <a class="part-link" href="factory.html#f-gauge"><div class="part"><div class="part-stage"><img loading="lazy" src="img/part/c-p-gauge-empty.jpg"></div>
-        <div class="part-label"><div class="part-name">스탯 게이지 (빈 틀)</div><div class="part-file">.cs-bar.kit-gauge-v2 (--v:0)</div>
-        <div class="part-tags"><span class="state state-partial">🟡 값만 맞춤</span><span class="tag">코드</span></div><div class="part-goto">→ f-gauge</div></div></div></a>
-      <a class="part-link" href="factory.html#f-gauge"><div class="part"><div class="part-stage"><img loading="lazy" src="img/part/c-p-gauge-full.jpg"></div>
-        <div class="part-label"><div class="part-name">스탯 게이지 (채움)</div><div class="part-file">.cs-bar.kit-gauge-v2</div>
-        <div class="part-tags"><span class="state state-partial">🟡 값만 맞춤</span><span class="tag">코드</span></div><div class="part-goto">→ f-gauge</div></div></div></a>
-      <a class="part-link" href="factory.html#f-gauge"><div class="part"><div class="part-stage"><img loading="lazy" src="img/part/c-p-gauge-stack.jpg"></div>
-        <div class="part-label"><div class="part-name">스탯 게이지 4-stack</div><div class="part-file">.cc-stats (게이지 ×4)</div>
-        <div class="part-tags"><span class="state state-partial">🟡 값만 맞춤</span><span class="tag">코드</span></div><div class="part-goto">→ f-gauge</div></div></div></a>
-      <a class="part-link" href="factory.html#f-tab"><div class="part"><div class="part-stage"><img loading="lazy" src="img/part/c-p-tab-char.jpg"></div>
-        <div class="part-label"><div class="part-name">캐릭터 탭</div><div class="part-file">.cp-tab.kit-tab-v2[char]</div>
-        <div class="part-tags"><span class="state state-partial">🟡 값만 맞춤</span><span class="tag">코드</span></div><div class="part-goto">→ f-tab</div></div></div></a>
-      <a class="part-link" href="factory.html#f-tab"><div class="part"><div class="part-stage"><img loading="lazy" src="img/part/c-p-tab-pet.jpg"></div>
-        <div class="part-label"><div class="part-name">펫 탭</div><div class="part-file">.cp-tab.kit-tab-v2[pet]</div>
-        <div class="part-tags"><span class="state state-partial">🟡 값만 맞춤</span><span class="tag">코드</span></div><div class="part-goto">→ f-tab</div></div></div></a>
-      <a class="part-link" href="factory.html#f-tab"><div class="part"><div class="part-stage"><img loading="lazy" src="img/part/c-p-vtabs.jpg"></div>
-        <div class="part-label"><div class="part-name">세로 탭 3</div><div class="part-file">.cp-side-tabs .cp-vtab</div>
-        <div class="part-tags"><span class="state state-partial">🟡 값만 맞춤</span><span class="tag">코드</span></div><div class="part-goto">→ f-tab</div></div></div></a>
-      <a class="part-link" href="factory.html#f-slot"><div class="part"><div class="part-stage"><img loading="lazy" src="img/part/c-p-item-slots.jpg"></div>
-        <div class="part-label"><div class="part-name">아이템 슬롯 3</div><div class="part-file">#cp-item-list .cp-item</div>
-        <div class="part-tags"><span class="state state-partial">🟡 아이콘 대역</span><span class="tag">코드+아이콘</span></div><div class="part-goto">→ f-slot</div></div></div></a>
-      <a class="part-link" href="factory.html#f-modal"><div class="part"><div class="part-stage"><img loading="lazy" src="img/part/c-p-side.jpg"></div>
-        <div class="part-label"><div class="part-name">사이드 판</div><div class="part-file">#cp-side.cp-side (크리스탈)</div>
-        <div class="part-tags"><span class="state state-partial">🟡 값만 맞춤</span><span class="tag">코드</span></div><div class="part-goto">→ f-modal</div></div></div></a>
-      <a class="part-link" href="factory.html#f-modal"><div class="part"><div class="part-stage"><img loading="lazy" src="img/part/c-p-passive-card.jpg"></div>
-        <div class="part-label"><div class="part-name">패시브 카드</div><div class="part-file">.ci-desc.kit-box-v2</div>
-        <div class="part-tags"><span class="state state-partial">🟡 값만 맞춤</span><span class="tag">코드</span></div><div class="part-goto">→ f-modal</div></div></div></a>
-      <a class="part-link" href="factory.html#f-button"><div class="part"><div class="part-stage"><img loading="lazy" src="img/part/c-p-btn-skin.jpg"></div>
-        <div class="part-label"><div class="part-name">스킨 버튼</div><div class="part-file">#cp-skin.kit-btn-v2 (secondary)</div>
-        <div class="part-tags"><span class="state state-partial">🟡 값만 맞춤</span><span class="tag">코드</span></div><div class="part-goto">→ f-button</div></div></div></a>
-      <a class="part-link" href="factory.html#f-button"><div class="part"><div class="part-stage"><img loading="lazy" src="img/part/c-p-btn-go.jpg"></div>
-        <div class="part-label"><div class="part-name">선택 완료 버튼 (기준)</div><div class="part-file">#cp-go.kit-btn-v2 (primary)</div>
-        <div class="part-tags"><span class="state state-partial">🟡 기준 버튼 미승인</span><span class="tag">코드</span></div><div class="part-goto">→ f-button</div></div></div></a>
-      <a class="part-link" href="factory.html#f-x"><div class="part"><div class="part-stage"><img loading="lazy" src="img/part/c-p-close-x.jpg"></div>
-        <div class="part-label"><div class="part-name">X 닫기</div><div class="part-file">#cp-close.x-btn</div>
-        <div class="part-tags"><span class="state state-partial">🟡 값만 맞춤</span><span class="tag">사용자 자산</span></div><div class="part-goto">→ f-x</div></div></div></a>
-      <a class="part-link" href="factory.html#f-icon"><div class="part"><div class="part-stage"><img loading="lazy" src="img/part/c-p-arrow-l.jpg"></div>
-        <div class="part-label"><div class="part-name">양끝 화살표 (좌)</div><div class="part-file">#cp-prev.cp-arrow</div>
-        <div class="part-tags"><span class="state state-partial">🟡 값만 맞춤</span><span class="tag">코드</span></div><div class="part-goto">→ f-icon</div></div></div></a>
-      <a class="part-link" href="factory.html#f-icon"><div class="part"><div class="part-stage"><img loading="lazy" src="img/part/c-p-arrow-r.jpg"></div>
-        <div class="part-label"><div class="part-name">양끝 화살표 (우)</div><div class="part-file">#cp-next.cp-arrow</div>
-        <div class="part-tags"><span class="state state-partial">🟡 값만 맞춤</span><span class="tag">코드</span></div><div class="part-goto">→ f-icon</div></div></div></a>
+      <a class="part-link" href="factory.html#f-slot"><div class="part is-partial" data-live-sel="#charpanel .ci-chip" data-frame-id="t3-chip-charsel"><div class="part-stage part-stage--live" data-live="snip:cs-chip" data-live-size="s"></div>
+        <div class="part-label"><div class="part-name"><span class="tier tier-t3">T3</span>초상 칩</div></div></div></a>
+      <a class="part-link" href="factory.html#f-slot"><div class="part is-partial" data-live-sel="#charpanel .ci-plate" data-frame-id="t3-pill-charsel-name"><div class="part-stage part-stage--live" data-live="snip:cs-name-pill" data-live-size="s"></div>
+        <div class="part-label"><div class="part-name"><span class="tier tier-t3">T3</span>이름 알약</div></div></div></a>
+      <a class="part-link" href="factory.html#f-badge"><div class="part is-partial" data-live-sel="#charpanel .ci-tag" data-frame-id="t3-pill-charsel-rec"><div class="part-stage part-stage--live" data-live="snip:cs-rec-pill" data-live-size="s"></div>
+        <div class="part-label"><div class="part-name"><span class="tier tier-t3">T3</span>추천 알약</div></div></div></a>
+      <a class="part-link" href="factory.html#f-gauge"><div class="part is-partial" data-live-sel="#charpanel .cc-stats" data-frame-id="t3-gauge-charsel-empty"><div class="part-stage part-stage--live" data-live="snip:cs-gauge" data-live-size="s"></div>
+        <div class="part-label"><div class="part-name"><span class="tier tier-t3">T3</span>스탯 게이지</div></div></div></a>
+      <a class="part-link" href="factory.html#f-gauge"><div class="part is-partial" data-live-sel="#charpanel .cc-stats" data-frame-id="t3-gauge-charsel-empty"><div class="part-stage part-stage--live" data-live="snip:cs-gauge" data-live-size="s"></div>
+        <div class="part-label"><div class="part-name"><span class="tier tier-t3">T3</span>스탯 게이지</div></div></div></a>
+      <a class="part-link" href="factory.html#f-gauge"><div class="part is-none" data-live-sel="#charpanel .cc-stats" data-frame-id="preview-charsel-gauge-stack"><div class="part-stage part-stage--live"><div class="live-none"><span class="state state-none">미구현</span> 합성 미리보기(preview) — 표시 금지 · 라이브에서 확인</div></div>
+        <div class="part-label"><div class="part-name">스탯 게이지 4-s</div></div></div></a>
+      <a class="part-link" href="factory.html#f-tab"><div class="part is-partial" data-live-sel="#charpanel .cp-tabs" data-frame-id="t3-tab-charsel-char"><div class="part-stage part-stage--live" data-live="snip:cs-tabs" data-live-size="s"></div>
+        <div class="part-label"><div class="part-name"><span class="tier tier-t3">T3</span>캐릭터 탭</div></div></div></a>
+      <a class="part-link" href="factory.html#f-tab"><div class="part is-partial" data-live-sel="#charpanel .cp-tabs" data-frame-id="t3-tab-charsel-char"><div class="part-stage part-stage--live" data-live="snip:cs-tabs" data-live-size="s"></div>
+        <div class="part-label"><div class="part-name"><span class="tier tier-t3">T3</span>펫 탭</div></div></div></a>
+      <a class="part-link" href="factory.html#f-tab"><div class="part is-partial" data-live-sel="#charpanel .cp-foot" data-frame-id="t3-vtabs-charsel"><div class="part-stage part-stage--live" data-live="snip:cs-foot" data-live-size="s"></div>
+        <div class="part-label"><div class="part-name"><span class="tier tier-t3">T3</span>세로 탭 3</div></div></div></a>
+      <a class="part-link" href="factory.html#f-slot"><div class="part is-partial" data-live-sel="#cp-item-list" data-frame-id="t3-slots-charsel-item"><div class="part-stage part-stage--live" data-live="snip:cs-items" data-live-size="s"></div>
+        <div class="part-label"><div class="part-name"><span class="tier tier-t3">T3</span>아이템 슬롯 3</div></div></div></a>
+      <a class="part-link" href="factory.html#f-modal"><div class="part is-partial" data-live-sel="#charpanel .cp-card" data-frame-id="t2-side-charsel"><div class="part-stage part-stage--live" data-live="snip:cs-card" data-live-size="s"></div>
+        <div class="part-label"><div class="part-name"><span class="tier tier-t2">T2</span>사이드 판</div></div></div></a>
+      <a class="part-link" href="factory.html#f-modal"><div class="part is-partial" data-live-sel="#charpanel .cc-pass" data-frame-id="t3-card-charsel-passive"><div class="part-stage part-stage--live" data-live="snip:cs-passive" data-live-size="s"></div>
+        <div class="part-label"><div class="part-name"><span class="tier tier-t3">T3</span>패시브 카드</div></div></div></a>
+      <a class="part-link" href="factory.html#f-button"><div class="part is-partial" data-live-sel="#charpanel .cp-foot" data-frame-id="t3-vtabs-charsel"><div class="part-stage part-stage--live" data-live="snip:cs-foot" data-live-size="s"></div>
+        <div class="part-label"><div class="part-name"><span class="tier tier-t3">T3</span>스킨 버튼</div></div></div></a>
+      <a class="part-link" href="factory.html#f-button"><div class="part is-partial" data-live-sel="#charpanel .cp-foot" data-frame-id="t3-vtabs-charsel"><div class="part-stage part-stage--live" data-live="snip:cs-foot" data-live-size="s"></div>
+        <div class="part-label"><div class="part-name"><span class="tier tier-t3">T3</span>선택 완료 버튼</div></div></div></a>
+      <a class="part-link" href="factory.html#f-x"><div class="part is-partial" data-live-sel="#cp-close" data-frame-id="t3-close-charsel-x"><div class="part-stage part-stage--live" data-live="snip:cs-close" data-live-size="s"></div>
+        <div class="part-label"><div class="part-name"><span class="tier tier-t3">T3</span>X 닫기</div></div></div></a>
+      <a class="part-link" href="factory.html#f-icon"><div class="part is-partial" data-live-sel="#charpanel .cp-arrow-l" data-frame-id="t3-arrow-charsel-l"><div class="part-stage part-stage--live" data-live="snip:cs-arrow-l" data-live-size="s"></div>
+        <div class="part-label"><div class="part-name"><span class="tier tier-t3">T3</span>양끝 화살표</div></div></div></a>
+      <a class="part-link" href="factory.html#f-icon"><div class="part is-partial" data-live-sel="#charpanel .cp-arrow-r" data-frame-id="t3-arrow-charsel-r"><div class="part-stage part-stage--live" data-live="snip:cs-arrow-r" data-live-size="s"></div>
+        <div class="part-label"><div class="part-name"><span class="tier tier-t3">T3</span>양끝 화살표</div></div></div></a>
     </div>
   </div>
-<div class="gap-block">
-<h3>갭 표 — 시안 프레임 ↔ 우리 프레임</h3>
-<div class="source-note">계층 T1 화면 · T2 컨테이너 · T3 제어 · T4 내용물 · T5 효과 (정본 §1) · 판정 §4 code / asset / ambiguous / variant</div>
-<div class="tally"><b>23</b> 행 &nbsp;|&nbsp; <span class="tier tier-t2" title="컨테이너">T2</span> 5 · <span class="tier tier-t3" title="제어">T3</span> 17 · <span class="tier tier-t4" title="내용물">T4</span> 1 &nbsp;|&nbsp; <span class="verdict verdict-code">code</span> 20 · <span class="verdict verdict-ambiguous">ambiguous</span> 2 · <span class="verdict verdict-asset">asset</span> 1 &nbsp;|&nbsp; 🟢 6 · 🟡 15 · 🔴 2</div>
-<div class="scroll-x"><table class="data-table gap-table">
-<thead><tr><th>시안 프레임</th><th>우리 프레임</th><th>판정</th><th>상태</th><th>비고</th></tr></thead><tbody>
-<tr><td><span class="tier tier-t2" title="컨테이너">T2</span>S5 하단 정보판 (미등재)</td><td><span class="tier tier-t2" title="컨테이너">T2</span>하단 정보판 · .cp-body · 정석 S11 (--cpj-*)</td><td><span class="verdict verdict-code">code</span></td><td><span class="state state-ok">🟢 정석 S11</span></td><td>시안 S5 uploads 미등재·로컬 원본 없음. 정석 출처=S11 정보판. kit-frame-v2 정본→f-modal.</td></tr>
-<tr><td><span class="tier tier-t2" title="컨테이너">T2</span>S5 제목 캡슐(빈 것)</td><td><span class="tier tier-t2" title="컨테이너">T2</span>제목 캡슐(빈 것) · #cp-h · .wf-cap</td><td><span class="verdict verdict-code">code</span></td><td><span class="state state-ok">🟢 틀2-3</span></td><td>정석 S11 캡슐→f-capsule.</td></tr>
-<tr><td><span class="tier tier-t2" title="컨테이너">T2</span>S5 제목 캡슐(글자 얹음)</td><td><span class="tier tier-t2" title="컨테이너">T2</span>제목 캡슐(글자) · #cp-h · work-lettering</td><td><span class="verdict verdict-code">code</span></td><td><span class="state state-ok">🟢 캡슐 / 🟡 글자</span></td><td>캡슐 code + 레터링 code→f-capsule.</td></tr>
-<tr><td><span class="tier tier-t3" title="제어">T3</span>S5 초상 방울(빈 유리)</td><td><span class="tier tier-t3" title="제어">T3</span>초상 방울(빈 유리) · .cp-th (.ct-art off)</td><td><span class="verdict verdict-code">code</span></td><td><span class="state state-ok">🟢 틀2-4</span></td><td>정본 부품4. kit-chip-v2→f-chip.</td></tr>
-<tr><td><span class="tier tier-t3" title="제어">T3</span>S5 초상 방울(얼굴 얹음)</td><td><span class="tier tier-t3" title="제어">T3</span>초상 방울(얼굴) · .cp-th .ct-art</td><td><span class="verdict verdict-code">code</span></td><td><span class="state state-ok">🟢 틀 / 🟡 얼굴</span></td><td>방울=code, 얼굴 slot=asset(ch 초상)→f-chip.</td></tr>
-<tr><td><span class="tier tier-t3" title="제어">T3</span>S5 초상 방울(금테 선택)</td><td><span class="tier tier-t3" title="제어">T3</span>초상 방울(금테) · #cp-ring + .cp-th.cp-center</td><td><span class="verdict verdict-code">code</span></td><td><span class="state state-ok">🟢 틀2-4 금테</span></td><td>Selected 상태(중앙 픽 캐러셀 금테 고정)→f-chip.</td></tr>
-<tr><td><span class="tier tier-t3" title="제어">T3</span>S5 초상 칩</td><td><span class="tier tier-t3" title="제어">T3</span>초상 칩 · .ci-chip.kit-slot-v2--portrait</td><td><span class="verdict verdict-code">code</span></td><td><span class="state state-partial">🟡 값만 맞춤</span></td><td>코드 액자(kit-slot-v2)→f-slot.</td></tr>
-<tr><td><span class="tier tier-t3" title="제어">T3</span>S5 이름 알약</td><td><span class="tier tier-t3" title="제어">T3</span>이름 알약 · .ci-plate.kit-slot-v2--name</td><td><span class="verdict verdict-code">code</span></td><td><span class="state state-partial">🟡 값만 맞춤</span></td><td>kit-slot-v2→f-slot.</td></tr>
-<tr><td><span class="tier tier-t3" title="제어">T3</span>S5 추천 알약</td><td><span class="tier tier-t3" title="제어">T3</span>추천 알약 · .ci-tag-v.kit-pill-v2</td><td><span class="verdict verdict-code">code</span></td><td><span class="state state-partial">🟡 값만 맞춤</span></td><td>kit-pill-v2→f-badge.</td></tr>
-<tr><td><span class="tier tier-t3" title="제어">T3</span>S5 스탯 게이지(빈 틀)</td><td><span class="tier tier-t3" title="제어">T3</span>스탯 게이지(빈 틀) · .cs-bar.kit-gauge-v2 (--v:0)</td><td><span class="verdict verdict-code">code</span></td><td><span class="state state-partial">🟡 값만 맞춤</span></td><td>kit-gauge-v2 틀→f-gauge.</td></tr>
-<tr><td><span class="tier tier-t4" title="내용물">T4</span>S5 스탯 게이지(채움)</td><td><span class="tier tier-t4" title="내용물">T4</span>스탯 게이지(채움) · .cs-bar.kit-gauge-v2</td><td><span class="verdict verdict-code">code</span></td><td><span class="state state-partial">🟡 값만 맞춤</span></td><td>코드 채움→f-gauge.</td></tr>
-<tr><td><span class="tier tier-t3" title="제어">T3</span>S5 스탯 게이지 4-stack</td><td><span class="tier tier-t3" title="제어">T3</span>스탯 게이지 4-stack · .cc-stats</td><td><span class="verdict verdict-code">code</span></td><td><span class="state state-partial">🟡 값만 맞춤</span></td><td>게이지 ×4 묶음→f-gauge.</td></tr>
-<tr><td><span class="tier tier-t3" title="제어">T3</span>S5 캐릭터 탭</td><td><span class="tier tier-t3" title="제어">T3</span>캐릭터 탭 · .cp-tab.kit-tab-v2[char]</td><td><span class="verdict verdict-code">code</span></td><td><span class="state state-partial">🟡 값만 맞춤</span></td><td>kit-tab-v2→f-tab.</td></tr>
-<tr><td><span class="tier tier-t3" title="제어">T3</span>S5 펫 탭</td><td><span class="tier tier-t3" title="제어">T3</span>펫 탭 · .cp-tab.kit-tab-v2[pet]</td><td><span class="verdict verdict-code">code</span></td><td><span class="state state-partial">🟡 값만 맞춤</span></td><td>kit-tab-v2→f-tab.</td></tr>
-<tr><td><span class="tier tier-t3" title="제어">T3</span>S5 세로 탭 3</td><td><span class="tier tier-t3" title="제어">T3</span>세로 탭 3 · .cp-side-tabs .cp-vtab</td><td><span class="verdict verdict-code">code</span></td><td><span class="state state-partial">🟡 값만 맞춤</span></td><td>아이템·스킨·필살기 세로 탭→f-tab.</td></tr>
-<tr><td><span class="tier tier-t3" title="제어">T3</span>S5 아이템 슬롯 3</td><td><span class="tier tier-t3" title="제어">T3</span>아이템 슬롯 3 · #cp-item-list .cp-item</td><td><span class="verdict verdict-code">code</span></td><td><span class="state state-partial">🟡 아이콘 대역</span></td><td>슬롯 code + 아이콘 slot(대역)=asset→f-slot.</td></tr>
-<tr><td><span class="tier tier-t2" title="컨테이너">T2</span>S5 사이드 판</td><td><span class="tier tier-t2" title="컨테이너">T2</span>사이드 판 · #cp-side.cp-side (크리스탈)</td><td><span class="verdict verdict-code">code</span></td><td><span class="state state-partial">🟡 값만 맞춤</span></td><td>wxtal 크리스탈, 정본 프레임 미확정→f-modal.</td></tr>
-<tr><td><span class="tier tier-t2" title="컨테이너">T2</span>S5 패시브 카드</td><td><span class="tier tier-t2" title="컨테이너">T2</span>패시브 카드 · .ci-desc.kit-box-v2</td><td><span class="verdict verdict-code">code</span></td><td><span class="state state-partial">🟡 값만 맞춤</span></td><td>kit-box-v2 정본(⑬ 연보라 반투명 젤리)→f-modal.</td></tr>
-<tr><td><span class="tier tier-t3" title="제어">T3</span>S5 스킨 버튼</td><td><span class="tier tier-t3" title="제어">T3</span>스킨 버튼 · #cp-skin.kit-btn-v2 (secondary)</td><td><span class="verdict verdict-code">code</span></td><td><span class="state state-partial">🟡 값만 맞춤</span></td><td>kit-btn-v2→f-button.</td></tr>
-<tr><td><span class="tier tier-t3" title="제어">T3</span>S5 선택 완료 버튼(기준)</td><td><span class="tier tier-t3" title="제어">T3</span>선택 완료 버튼 · #cp-go.kit-btn-v2 (primary)</td><td><span class="verdict verdict-code">code</span></td><td><span class="state state-partial">🟡 기준 버튼 미승인</span></td><td>기준 버튼 후보(S10 틀), 사용자 승인 대기→f-button.</td></tr>
-<tr><td><span class="tier tier-t3" title="제어">T3</span>S5 X 닫기</td><td><span class="tier tier-t3" title="제어">T3</span>X 닫기 · #cp-close.x-btn</td><td><span class="verdict verdict-asset">asset</span></td><td><span class="state state-partial">🟡 값만 맞춤</span></td><td>사용자 자산(sian3-close 계열)→f-x.</td></tr>
-<tr><td><span class="tier tier-t3" title="제어">T3</span>S5 양끝 화살표(좌)</td><td><span class="tier tier-t3" title="제어">T3</span>양끝 화살표(좌) · #cp-prev.cp-arrow</td><td><span class="verdict verdict-ambiguous">ambiguous</span></td><td><span class="state state-none">🔴 미확정</span></td><td>14차 제거 검토(존치·형태 미확정)→f-icon.</td></tr>
-<tr><td><span class="tier tier-t3" title="제어">T3</span>S5 양끝 화살표(우)</td><td><span class="tier tier-t3" title="제어">T3</span>양끝 화살표(우) · #cp-next.cp-arrow</td><td><span class="verdict verdict-ambiguous">ambiguous</span></td><td><span class="state state-none">🔴 미확정</span></td><td>14차 제거 검토→f-icon.</td></tr>
-</tbody></table></div>
-<div class="source-note">FRAME-AUDIT-0906 · 총 431 · 준수 311 · 위반 120(catalog 99 + hud-shape 21) · 미사용 129</div>
+
+
+  <details class="kit-tools"><summary>교체 초안</summary><details class="kit-tools"><summary>교체 초안</summary><details class="kit-tools"><summary>교체 초안</summary><details class="kit-tools"><summary>교체 초안</summary><details class="kit-tools"><summary>교체 초안</summary><details class="kit-tools"><summary>교체 초안</summary><h2 class="section-title">교체 초안 · 프리뷰 주입 (board-factory)</h2>
+  
+  <div class="gf-prevbox"><div class="gf-prevhead"><button type="button" id="prev-load">불러오기(다시)</button> <button type="button" id="prev-apply">값 주입</button> <button type="button" id="prev-reset">초기화</button> <span id="prev-status" class="mono"></span></div></div>
+  <div id="pending"></div>
+  <div class="gf-pendhead"><button type="button" id="pend-export">내보내기</button> <button type="button" id="pend-copy">복사</button> <button type="button" id="pend-clear">초안 비우기</button></div>
+  <pre id="pend-json" class="gf-pendjson raw-output" hidden></pre>
+</details>
+</details>
+</details>
+</details>
+</details>
+</details>
 </div>
-</div>
+<script src="board-live.js"></script>
 </body></html>

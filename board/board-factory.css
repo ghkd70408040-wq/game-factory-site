@@ -1,0 +1,81 @@
+/* board-factory.css — 관제탑 "공장 기능" 전용 스타일.
+ *
+ * 손으로 만든 board.css / board-theme.css 는 한 줄도 건드리지 않는다. 이 파일만 뒤에 얹는다.
+ * 색·서체·반경은 전부 board-theme.css 의 토큰(var(--…))에서 받는다 — 그래야 저쪽이
+ * 라이트/다크·팔레트를 바꿔도 공장 UI 가 따라간다. 하드코딩 색 금지.
+ * 토큰이 없는 환경(board.css 단독)에서도 읽히도록 var() 마다 폴백을 준다.
+ * 클래스는 전부 gf- 접두어 — 관제탑 어휘와 절대 충돌하지 않는다.
+ * build-board.py 가 out 디렉터리로 복사한다.
+ */
+
+/* ── 프레임 칸의 교체 UI ─────────────────────────────────────────── */
+[data-frame-id] .gf-swap{display:flex;gap:4px;align-items:center;margin-top:6px;}
+[data-frame-id] .gf-swap select.gf-swapsel{
+  flex:1;min-width:0;font:inherit;font-size:11px;padding:3px 4px;
+  border-radius:var(--r-sm,6px);
+  background:var(--panel,#fff);color:var(--ink,#1f2033);
+  border:1px solid var(--line2,#c9c9dc);}
+[data-frame-id] .gf-swap button.gf-swapclr{
+  font:inherit;font-size:11px;line-height:1;padding:4px 7px;border-radius:var(--r-sm,6px);
+  cursor:pointer;background:var(--panel2,#f6f6fb);color:var(--sub,#4f5170);
+  border:1px solid var(--line2,#c9c9dc);}
+[data-frame-id] .gf-swap button.gf-swapclr:hover{color:var(--ink,#1f2033);}
+
+/* 교체점 없음 = 계약상 차단(🔴). 점선 = "미확정" 형태 어휘를 따른다. */
+.gf-swaplock{flex:1;font-size:10.5px;font-weight:700;cursor:not-allowed;
+  color:var(--none,#c23b4e);background:var(--none-wash,#fbe1e5);
+  border:1px dashed var(--none-line,#ee9ba8);border-radius:var(--r-sm,6px);padding:3px 6px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+/* 교체점은 있으나 창고에 후보가 0 = 전혀 다른 상태(🟡). */
+.gf-swapempty{flex:1;font-size:10.5px;font-weight:700;
+  color:var(--partial,#a56a00);background:var(--partial-wash,#fff1d6);
+  border:1px solid var(--partial-line,#e6b75c);border-radius:var(--r-sm,6px);padding:3px 6px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+.gf-nohook{outline:1px dashed var(--none-line,#ee9ba8);outline-offset:-1px;}
+.gf-swapped{outline:2px solid var(--partial-line,#e6b75c);outline-offset:-2px;}
+.gf-hookline{font-family:var(--f-mono,Consolas,monospace);font-size:10px;
+  color:var(--dim,#8385a3);font-variant-numeric:tabular-nums;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;}
+
+/* ── pending-swaps 패널 ─────────────────────────────────────────── */
+#pending{background:var(--panel,#fff);border:1px solid var(--line,#dcdcea);
+  border-radius:var(--r-md,10px);padding:10px 12px;margin:14px 0;
+  box-shadow:var(--shadow-sheet,none);}
+.gf-pendhead{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
+.gf-pendhead .gf-n{font-size:11px;font-weight:700;
+  color:var(--partial,#a56a00);background:var(--partial-wash,#fff1d6);
+  border:1px solid var(--partial-line,#e6b75c);border-radius:20px;padding:1px 8px;
+  font-variant-numeric:tabular-nums;}
+.gf-pendhead button,.gf-prevhead button{
+  font:inherit;font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:var(--r-sm,6px);
+  cursor:pointer;background:var(--panel2,#f6f6fb);color:var(--ink,#1f2033);
+  border:1px solid var(--line2,#c9c9dc);}
+.gf-pendhead button:hover,.gf-prevhead button:hover{
+  background:var(--acc-wash,#e9ecfd);border-color:var(--acc-soft,#96a7f6);}
+.gf-pendrow{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;
+  font-size:12px;padding:4px 0;border-top:1px solid var(--line,#dcdcea);}
+.gf-pendrow.gf-empty{color:var(--dim,#8385a3);border-top:0;}
+.gf-pendrow code,.gf-pendrow .gf-hk{font-family:var(--f-mono,Consolas,monospace);font-size:11px;}
+.gf-pendrow .gf-hk{color:var(--acc,#5e6fd9);}
+.gf-pendrow .gf-fromto{color:var(--sub,#4f5170);}
+.gf-pendjson{background:var(--bg2,#ebebf4);border:1px solid var(--line,#dcdcea);
+  border-radius:var(--r-sm,6px);padding:10px;margin-top:8px;max-height:280px;overflow:auto;
+  font-family:var(--f-mono,Consolas,monospace);font-size:11.5px;
+  color:var(--mono-ink,#3a3c5c);white-space:pre;}
+
+/* ── iframe 프리뷰 ──────────────────────────────────────────────── */
+.gf-prevbox{background:var(--panel,#fff);border:1px solid var(--line,#dcdcea);
+  border-radius:var(--r-md,10px);padding:10px 12px;margin:14px 0;
+  box-shadow:var(--shadow-sheet,none);}
+.gf-prevhead{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
+.gf-prevhead .gf-stat{font-size:11.5px;color:var(--sub,#4f5170);}
+.gf-prevstage{background:var(--stage,#dfe3f5);border:1px solid var(--line,#dcdcea);
+  border-radius:var(--r-sm,6px);padding:8px;display:flex;justify-content:center;}
+.gf-prevstage iframe{width:390px;height:720px;max-width:100%;border:0;
+  border-radius:var(--r-sm,6px);background:#16131f;}
+@media (max-width:520px){.gf-prevstage iframe{width:100%;height:600px;}}
+
+/* ── 생성기 꼬리표 ──────────────────────────────────────────────── */
+.gf-genmark{font-size:11px;color:var(--dim,#8385a3);margin:22px 0 0;
+  border-top:1px solid var(--line,#dcdcea);padding-top:8px;}

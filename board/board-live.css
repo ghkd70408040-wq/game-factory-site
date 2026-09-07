@@ -1,0 +1,145 @@
+/* board-live.css — 라이브화 구조 (board.css 뒤, board-theme.css 앞에 링크)
+   값은 board.css 토큰(--panel/--line/--ok …)만 쓴다. 인라인 style 0.
+   새 어휘: live-screen · live-frame · live-iframe · live-status · live-src · live-fallback · is-live · is-fallback ·
+           part-live-sel · is-spot · live-inst · live-none · is-undefined-state · state-bar · state-btn · state-bar-k · state-bar-note ·
+           gp-scope · gp-stage-btn · gp-size-s/m/l · gp-hcard-host · gp-hcard · gp-chip-host · gp-letter ·
+           part-stage--live · frame-tile · part-hook · shelf-frames · part-list--frames · frame-file
+   .bench / .render-pane 안의 정본 렌더(.work-frame 등)는 손대지 않는다. */
+
+/* ---- 1. 라이브 화면 (게임 iframe 390×844 → 칸 폭에 맞춰 축소) ---- */
+.live-screen{position:relative;--live-scale:1;}
+.live-frame{position:relative;width:calc(390px * var(--live-scale));max-width:100%;height:calc(844px * var(--live-scale));overflow:hidden;border-radius:8px;background:#fff;}
+.live-iframe{position:absolute;left:0;top:0;width:390px;height:844px;border:0;transform:scale(var(--live-scale));transform-origin:0 0;display:block;background:#000;}
+.live-status{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin-top:7px;font-size:11px;color:var(--dim);}
+.live-src{font-size:10.5px;word-break:break-all;}
+.live-fallback{display:block;width:100%;border-radius:8px;background:#fff;}
+.shot-box.is-live .shot-caption{color:var(--ok);}
+
+/* ---- 2. 부품 타일 → 스포트라이트 ---- */
+.part[data-live-sel]{cursor:pointer;}
+.part-live-sel{font-size:9.5px;color:#5a5a68;margin-top:3px;word-break:break-all;}
+.part.is-spot{outline:2px solid var(--ok);outline-offset:2px;}
+.part.is-spot .part-live-sel{color:var(--ok);}
+
+/* ---- 3. 라이브 인스턴스 무대 ---- */
+.part-stage--live{min-height:120px;display:flex;align-items:center;justify-content:center;padding:10px;}
+.part-stage--live .wf-wrap{--wf-w:var(--frame-size-s);}
+.part-stage--live .frame-file{display:block;max-width:100%;max-height:120px;object-fit:contain;}
+.live-inst{display:flex;align-items:center;justify-content:center;max-width:100%;}
+.live-inst[data-state]{position:relative;}
+.live-inst.is-undefined-state::after{content:"정의 없음";position:absolute;right:-4px;top:-4px;font-size:10px;font-weight:800;
+  color:var(--none);border:1px solid #6b3130;background:#281717;border-radius:20px;padding:1px 7px;}
+.live-none{display:flex;gap:6px;align-items:center;font-size:11px;color:var(--sub-on-light);}
+.render-pane[data-live]{gap:10px;}
+.render-pane[data-live] .render-label{margin-bottom:6px;}
+
+/* 게임 추출 CSS(.gp-scope) 인스턴스 크기 — 게임 기준 폭 390 을 S/M/L 로 */
+.gp-size-s .gp-scope{--gp-w:260px;}
+.gp-size-m .gp-scope{--gp-w:390px;}
+.gp-size-l .gp-scope{--gp-w:520px;}
+.gp-scope{display:inline-block;}
+.gp-scope .gp-stage-btn{width:calc(var(--gp-w) * .56);}
+.gp-scope .set-tg{font-size:calc(var(--gp-w) * .0333);min-height:calc(var(--gp-w) * .0923);min-width:calc(var(--gp-w) * .22);}
+.gp-hcard-host{position:static;background:none;}
+.gp-hcard{width:calc(var(--gp-w) * .7);height:calc(var(--gp-w) * .32);position:relative;}
+.gp-chip-host{position:static;}
+.gp-chip-host .ci{display:block;}
+/* 0908 — game-parts.css 가 온전히 파싱되자(1048 규칙) 조상 껍데기(#charpanel·.cp-info·.ci …)에 게임의
+   position:absolute·inset:0 이 그대로 붙어 스니펫 상자가 0×0 으로 접혔다. 껍데기는 변수 상속만 하고
+   레이아웃은 버리게 강제하고, 잎(스니펫 대상 = 마지막 .gp-wrap 의 비-껍데기 자식)은 relative 로 세운다. */
+.gp-scope .gp-snip .gp-wrap, .gp-scope .gp-chip-host, .gp-scope .gp-chip-host .cp-info, .gp-scope .gp-chip-host .ci{
+  position:static !important; inset:auto !important; width:auto !important; height:auto !important;
+  min-width:0 !important; min-height:0 !important; max-width:none !important; max-height:none !important;
+  margin:0 !important; padding:0 !important; transform:none !important; display:block !important;
+  overflow:visible !important; background:none !important; border:0 !important; box-shadow:none !important;
+  opacity:1 !important; visibility:visible !important; filter:none !important; clip-path:none !important;
+  grid-template-columns:none !important; grid-template-rows:none !important; container-type:normal !important;
+}
+.gp-scope .gp-snip .gp-wrap > :not(.gp-wrap), .gp-scope .gp-chip-host .ci-chip{
+  position:relative !important; left:auto !important; top:auto !important; right:auto !important; bottom:auto !important;
+  transform:none !important; margin:0 !important; visibility:visible !important; opacity:1 !important;
+  flex:0 0 auto !important;
+}
+/* 교체 UI 알약의 글은 지운다 — 구현 여부는 점 하나로(🔴 교체점 없음 · 🟡 후보 없음), 설명은 title 로만 */
+.gf-swaplock, .gf-swapempty{font-size:0 !important; line-height:0; padding:0 !important; background:none !important; border:0 !important; box-shadow:none !important;}
+.gf-swaplock::before{content:"🔴"; font-size:11px; line-height:1;}
+.gf-swapempty::before{content:"🟡"; font-size:11px; line-height:1;}
+/* 표 감싸개가 격자/플렉스 부모의 min-width:auto 때문에 폰 폭을 넘던 것(factory 390 넘침 146px) — 부모를 0으로 */
+.page, .frame-card, .render-list, .render-pane, .bench-pane, .screen-card, .gap-block{min-width:0;}
+body .scroll-x{max-width:100%;}
+/* 게임에서 격자 열 폭을 받던 잎(캐릭 카드 등)은 스니펫 무대에서 부모 폭이 없다 → 무대 폭을 준다(값은 --gp-w 비율) */
+.gp-scope .gp-snip{min-width:calc(var(--gp-w) * .28);}
+.gp-scope .gp-snip .gp-wrap > .char-card{width:100% !important; aspect-ratio:44/50; height:auto !important;}
+.gp-letter{--f2-w:var(--gp-w);display:inline-block;}
+.gp-letter .mvh-title{font-size:calc(var(--f2-w) * .128);margin:0;line-height:1.2;}
+
+/* ---- 4. 상태 바 ---- */
+.state-bar{display:flex;flex-wrap:wrap;gap:4px 6px;align-items:center;margin:8px 0 10px;font-size:11px;}
+.state-bar-k{font-weight:800;color:var(--sub);margin-left:8px;}
+.state-bar-k:first-child{margin-left:0;}
+.state-btn{font:inherit;font-size:11px;font-weight:700;padding:3px 9px;border-radius:7px;border:1px solid var(--line2);
+  background:var(--panel2);color:var(--sub);cursor:pointer;}
+.state-btn.is-current{background:var(--link);color:#0d1420;border-color:var(--link);}
+.state-bar-note{flex-basis:100%;color:var(--dim);font-size:10.5px;}
+
+/* ---- 5. 창고 프레임 선반 ---- */
+.shelf-frames{margin:0 0 14px;}
+.part-list--frames{grid-template-columns:repeat(auto-fill,minmax(210px,1fr));}
+.frame-tile .part-name{display:flex;gap:6px;align-items:center;font-family:Consolas,"Cascadia Mono",monospace;font-size:11.5px;word-break:break-all;}
+.part-hook{font-size:9.5px;color:#5a5a68;margin-top:3px;word-break:break-all;}
+
+/* ---- 6. 게임 스니펫 무대 (game-markup.json 의 살아 있는 outerHTML 을 game-parts.css 로 그린다) ---- */
+.gp-scope{--dhW:var(--gp-w);--dh-w:var(--gp-w);--cs-card:calc(var(--gp-w) * .96);--cs-desc-box:calc(var(--gp-w) * .9);}
+.gp-wrap{position:relative;display:block;}          /* 조상 껍데기: 변수만 상속, 레이아웃 규칙은 추출에서 뺐다 */
+.gp-snip{position:relative;display:inline-block;max-width:100%;}
+.gp-snip > [hidden]{display:block;}
+.gp-scope .ch-ten{--char-face:url("../catalog/ch-ten-face.webp");--char-thumb:url("../catalog/ch-ten-face.webp");--char-portrait:url("../catalog/ch-ten-portrait.webp");}
+.part-stage--live .gp-scope{--gp-w:300px;}
+.render-pane .gp-scope{--gp-w:390px;}
+
+/* ---- 7. 킷 시트 형식 (body.kit-page) — 흰 바탕 · 부품 격자 · 글자는 이름+배지만 · 구현 여부는 시각 ---- */
+body.kit-page{background:#fff;color:#22222b;}
+body.kit-page .page{max-width:1400px;}
+body.kit-page .page-title{font-size:20px;margin:6px 0 8px;color:#22222b;}
+body.kit-page .screen-card{background:#fff;border:1px solid #e3e3ea;border-radius:12px;padding:14px;margin-bottom:18px;}
+body.kit-page .shot-pair{grid-template-columns:1fr 1fr;gap:14px;}
+body.kit-page .shot-box{background:#fafafc;border:1px solid #e3e3ea;padding:8px;}
+body.kit-page .shot-caption{font-size:11px;color:#6a6a78;margin-bottom:6px;}
+body.kit-page .part-list{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;}
+body.kit-page .part{background:#fff;border:1px solid #e3e3ea;box-shadow:none;}
+body.kit-page .part-stage,body.kit-page .part-stage--live{background:#fff;background-image:
+  linear-gradient(45deg,#f1f1f5 25%,transparent 25%,transparent 75%,#f1f1f5 75%),linear-gradient(45deg,#f1f1f5 25%,transparent 25%,transparent 75%,#f1f1f5 75%);
+  background-size:16px 16px;background-position:0 0,8px 8px;min-height:110px;}
+body.kit-page .part-label{background:#fff;border-top:1px solid #eeeef3;padding:6px 8px;}
+body.kit-page .part-name{font-size:11.5px;font-weight:700;display:flex;gap:6px;align-items:center;}
+body.kit-page .part.is-none .part-stage{background:#f7f7fa;border:2px dashed #c9c9d4;position:relative;}
+body.kit-page .part.is-none .part-stage::after{content:"";position:absolute;right:8px;top:8px;width:10px;height:10px;border-radius:50%;background:#e5615e;box-shadow:0 0 0 2px #fff;}
+body.kit-page .part.is-none .live-none{color:transparent;font-size:0;}
+body.kit-page .part.is-partial{border:2px solid #e5b23c;}
+body.kit-page .part.is-live{border-color:#e3e3ea;}
+.kit-legend{display:flex;gap:16px;align-items:center;font-size:11.5px;color:#6a6a78;margin:0 0 14px;}
+.kit-legend-k{display:inline-flex;gap:6px;align-items:center;}
+.kit-legend-k i{display:inline-block;width:18px;height:12px;border:1px solid #e3e3ea;background:#fff;border-radius:3px;}
+.kit-legend-k.is-partial i{border:2px solid #e5b23c;}
+.kit-legend-k.is-none i{border:2px dashed #c9c9d4;background:#f7f7fa;position:relative;}
+.kit-legend-k.is-none i::after{content:"";position:absolute;right:-3px;top:-3px;width:6px;height:6px;border-radius:50%;background:#e5615e;}
+.kit-legend-link{margin-left:auto;font-size:11.5px;}
+body.kit-page .shelf-tier{background:#f5f5f8;border:1px solid #e3e3ea;border-radius:8px;padding:6px 10px;margin:14px 0 8px;color:#22222b;}
+body.kit-page .shelf-role{color:#6a6a78;font-size:12px;margin:8px 0 6px;}
+body.kit-page .filter-bar{gap:4px;flex-wrap:wrap;display:flex;margin-bottom:8px;}
+body.kit-page .filter-bar button{font:inherit;font-size:11px;padding:3px 8px;border:1px solid #e3e3ea;background:#fff;border-radius:6px;color:#22222b;}
+body.kit-page .filter-bar button.is-current{background:#22222b;color:#fff;}
+body.kit-page .kit-tools{margin-top:20px;font-size:12px;color:#6a6a78;}
+body.kit-page .kit-tools summary{cursor:pointer;}
+body.kit-page .live-status{color:#6a6a78;}
+body.kit-page .site-nav{background:#fff;border-bottom:1px solid #e3e3ea;}
+body.kit-page .site-nav a{color:#6a6a78;}
+body.kit-page .site-nav a.is-current{background:#22222b;color:#fff;}
+body.kit-page .nav-brand{color:#22222b;}
+
+/* 스니펫 루트 정규화: 게임에서 absolute/fixed 로 놓인 부품을 무대 흐름 안으로 (위치만, 모양 규칙은 그대로) */
+.gp-scope .gp-root{position:relative !important;left:auto !important;right:auto !important;top:auto !important;bottom:auto !important;transform:none !important;margin:0 !important;}
+.gp-scope .gp-root[hidden]{display:block;}
+.gp-scope .dot{display:inline-block;}
+.gp-scope #howto-dots{display:flex;}
+.gp-scope .kit-slot-v2{display:inline-block;}
