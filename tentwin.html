@@ -105,13 +105,13 @@
    rgba() from a variable without color-mix(). .tile[data-v] forwards it as --cr. */
 :root {
   --t1: var(--prim-c1); /* 소다     h191  dark 6.82:1  light 8.69:1 */
-  --t2: var(--prim-c2); /* 블루베리  h231  dark 5.44:1  light 7.07:1 */
-  --t3: var(--prim-c3); /* 포도     h279  dark 5.09:1  light 6.59:1 */
-  --t4: var(--prim-c4); /* 복숭아    h336  dark 6.25:1  light 8.04:1 */
-  --t5: var(--prim-c5); /* 귤       h031  dark 6.90:1  light 8.79:1 */
-  --t6: var(--prim-c6); /* 라임     h153  dark 7.62:1  light 9.67:1 */
-  --t7: var(--prim-c7); /* 청포도    h092  dark 8.67:1  light 10.86:1 */
-  --t8: var(--prim-c8); /* 레몬     h050  dark 9.59:1  light 12.02:1 */
+   /* 블루베리  h231  dark 5.44:1  light 7.07:1 */
+   /* 포도     h279  dark 5.09:1  light 6.59:1 */
+   /* 복숭아    h336  dark 6.25:1  light 8.04:1 */
+   /* 귤       h031  dark 6.90:1  light 8.79:1 */
+   /* 라임     h153  dark 7.62:1  light 9.67:1 */
+   /* 청포도    h092  dark 8.67:1  light 10.86:1 */
+   /* 레몬     h050  dark 9.59:1  light 12.02:1 */
   --t9: var(--prim-c9); /* 딸기     h006  dark 5.48:1  light 7.07:1 */
 
   --t1r:  52, 198, 232;
@@ -143,9 +143,8 @@
   --c8: var(--prim-c8); /* 레몬     h050 */
   --c9: var(--prim-c9); /* 딸기     h006 */
 
-  --ink: var(--prim-ink);              /* dark plum ink used on every tile face */
+                /* dark plum ink used on every tile face */
   --bg: var(--prim-bg);               /* deep warm navy-charcoal */
-  --bg-2: var(--prim-bg-2);
   --bg-3: var(--prim-bg-3);
   --panel: var(--prim-panel);
   --panel-2: var(--prim-panel-2);
@@ -156,8 +155,8 @@
      Menu, buttons and HUD read their colour through these two variables only, so
      this pair is the whole "메뉴·버튼·HUD 도 젤리 톤" change (§5-4): no structure
      moves, and both themes inherit it because section 13 never overrode them. */
-  --accent: var(--prim-c8);    /* 레몬 */
-  --accent-2: var(--prim-c4);  /* 복숭아 */
+      /* 레몬 */
+    /* 복숭아 */
 
   --r-sm: 10px;
   --r-md: 16px;
@@ -263,7 +262,7 @@ button {
   -webkit-user-select: none;
 }
 
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+:focus-visible { outline: 2px solid var(--prim-c8); outline-offset: 2px; }
 
 /* ============================================================
    3. APP SHELL
@@ -752,7 +751,7 @@ button {
    버튼에는 너무 각지다(0.18xH = 23px 가 이 계열의 정본). 전역 --r-md 는 손대지
    않고 두 버튼에만 22px 를 박는다 — 변수를 바꾸면 카드까지 딸려 둥글어진다. */
 .btn-primary {
-  color: var(--ink);
+  color: var(--prim-ink);
   border-radius: 9px;
   background: linear-gradient(180deg, #FFF0A0 0%, var(--c8) 100%);
   box-shadow: 0 3px 0 #B7A93B, 0 8px 20px rgba(240, 228, 102, .28);
@@ -761,13 +760,13 @@ button {
    아웃라인이 아예 없었다. 47% 하드에지 + inset 아웃라인 + 바닥 밴드로 재작성.
    3레이어: 배경/테두리 = CSS 캔디, 내용물(글자) = 그대로. 크롭 판때기 없음. */
 .btn-secondary {
-  color: var(--ink);
+  color: var(--prim-ink);
   border-radius: 9px;
-  background: linear-gradient(180deg, var(--j-pink) 0%, var(--j-pink) 47%, var(--j-pink-2) 47%, var(--j-pink-2) 100%);
+  background: linear-gradient(180deg, var(--prim-art-pink) 0%, var(--prim-art-pink) 47%, var(--prim-art-pink-2) 47%, var(--prim-art-pink-2) 100%);
   box-shadow:
     0 3px 0 #AE4470,
     0 8px 18px rgba(83, 28, 40, .26),
-    inset 0 0 0 2.5px var(--j-outline),
+    inset 0 0 0 2.5px var(--mL-outline),
     inset 0 -7px 0 #C9527D;
 }
 /* v6: the orange #btn-rush skin and its clip-path bolt glyph are DELETED. Both
@@ -1097,7 +1096,7 @@ button {
    It is a SAFETY readout, so it is tinted mint while healthy and flips to red when
    the board is nearly locked — colour only, never size or padding, so the four/five
    stats keep a single baseline. */
-#stat-moves .stat-v { color: var(--t6); }
+#stat-moves .stat-v { color: var(--prim-c6); }
 
 /* <= 3 matches left. Urgent, not alarming: a tinted well plus a 1px ring — both
    drawn INSIDE the existing box (background + inset shadow), so the topbar rhythm
@@ -1477,13 +1476,13 @@ button {
    --c is still the per-tile handle every ring/glow below reads, so .sel, .hint and
    the fever glow automatically pick up the vivid face colour. */
 .tile[data-v="1"] { --c: var(--t1); --cr: var(--t1r); }
-.tile[data-v="2"] { --c: var(--t2); --cr: var(--t2r); }
-.tile[data-v="3"] { --c: var(--t3); --cr: var(--t3r); }
-.tile[data-v="4"] { --c: var(--t4); --cr: var(--t4r); }
-.tile[data-v="5"] { --c: var(--t5); --cr: var(--t5r); }
-.tile[data-v="6"] { --c: var(--t6); --cr: var(--t6r); }
-.tile[data-v="7"] { --c: var(--t7); --cr: var(--t7r); }
-.tile[data-v="8"] { --c: var(--t8); --cr: var(--t8r); }
+.tile[data-v="2"] { --c: var(--prim-c2); --cr: var(--t2r); }
+.tile[data-v="3"] { --c: var(--prim-c3); --cr: var(--t3r); }
+.tile[data-v="4"] { --c: var(--prim-c4); --cr: var(--t4r); }
+.tile[data-v="5"] { --c: var(--prim-c5); --cr: var(--t5r); }
+.tile[data-v="6"] { --c: var(--prim-c6); --cr: var(--t6r); }
+.tile[data-v="7"] { --c: var(--prim-c7); --cr: var(--t7r); }
+.tile[data-v="8"] { --c: var(--prim-c8); --cr: var(--t8r); }
 .tile[data-v="9"] { --c: var(--t9); --cr: var(--t9r); }
 
 /* ---- candy face: glossy dome + chunky pickup-able wall -----------------------
@@ -1625,7 +1624,7 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--ink);
+  color: var(--prim-ink);
   /* 8차 판단: 타일 숫자는 **주아체로 바꾸지 않는다**(--font-display 를 쓰지 않는
      유일한 큰 숫자다). 15px 기준으로 비교한 근거 셋:
        ① 주아체는 정적 400 한 벌이다. 서브셋 @font-face 가 `font-weight: 400 900`
@@ -1660,7 +1659,7 @@ button {
   height: 9%;
   min-height: 2px;
   border-radius: 2px;
-  background: var(--ink);
+  background: var(--prim-ink);
   opacity: 0;
   transform: rotate(-38deg);
   transform-origin: center;
@@ -1695,7 +1694,7 @@ button {
     inset 0 0 0 1.5px rgba(255, 255, 255, .42);
 }
 /* the pale core is near-white in BOTH themes, so the digit is forced back to ink */
-.tile[data-sp="wild"] > span { color: var(--ink); text-shadow: none; }
+.tile[data-sp="wild"] > span { color: var(--prim-ink); text-shadow: none; }
 
 /* --- bomb: dark casing, lit fuse at the top, hot digit --- */
 .tile[data-sp="bomb"]::before {
@@ -1751,7 +1750,7 @@ button {
     inset 0 2px 0 rgba(255, 255, 255, .85),
     inset 0 -6px 0 rgba(84, 52, 2, .3);
 }
-.tile[data-sp="gold"] > span { color: var(--ink); text-shadow: none; }
+.tile[data-sp="gold"] > span { color: var(--prim-ink); text-shadow: none; }
 /* four-point star built from two crossed elliptical gradients; scale+rotate+fade
    only, and it is anchored inside the face so it can never bleed onto a neighbour */
 .tile[data-sp="gold"]:not(.dead)::after {
@@ -1843,60 +1842,10 @@ button {
   filter: brightness(1.05) saturate(1.04);
 }
 
-/* --- .cand-ok : "이 짝은 실제로 지워진다" 은은한 발광 (14차 #32-3) -----------
-   .cand 는 **기하**만 말한다 — "여기까진 이어진다". 그런데 친구 실플레이에서
-   드러난 진짜 막막함은 기하가 아니라 "그래서 지금 뭘 누르라는 건데?" 였다.
-   그래서 .cand 중에서 **값까지 맞아 실제로 터지는** 칸만 한 겹 더 밝힌다.
-
-   힌트와 절대 헷갈리면 안 되므로 축을 셋 다 어긋내 뒀다:
-     .hint    = 정답 **한 쌍**,  두 번 **펄스**, 넓은 링 + 색 블룸, 1.8초 뒤 소멸
-     .cand-ok = 가능 **전부**,  한 번 **피어나고 정지**, 얇은 민트 블룸, 선택 중에만
-   즉 "하나가 두근거린다 = 정답" / "여럿이 잔잔히 빛난다 = 후보" 로 갈린다.
-   힌트가 켜져 있을 땐 .hint 가 뒤에서 더 센 규칙으로 덮으므로 층위도 안 뒤집힌다.
-
-   ART §8.4 생동감 예산: 이 집합은 connectCandidates 의 **부분집합**이라 상한이
-   **8칸**으로 기하학적으로 못박혀 있다 — 명목상 읽는 순서 1 + 8방향 8 이지만
-   읽는 순서 이웃은 거의 항상 동쪽 레이의 첫 타일과 같아 dedupe 되고, 증거
-   캡처의 DOM 실측도 .cand 8 / .cand-ok 5 였다. 실제로는 보통 0~3칸이며,
-   **타일을 선택한 동안에만** 켜진다. 게다가 애니는 260ms 단발이고 끝나면
-   완전히 멎는다. "보드 전 타일 상시 애니 ❌" 와 충돌하지 않는 근거가 이 셋이다.
-
-   가독성(§8 — 가독성이 왕이다): 발광은 타일 **바깥**으로만 번지는 drop-shadow
-   이고, `> span`(숫자)에는 이 절이 어떤 규칙도 걸지 않는다. 숫자를 덮지도,
-   흐리지도, 색을 섞지도 않는다.
-   **실측**(evidence-14/32-highlight-demo.png, 같은 값 6 타일끼리 비교):
-   발광 켜진 칸 **9.02:1** · 안 켜진 칸 **10.22:1**. 둘 다 4.5:1 계약의 두 배다.
-   1.2 의 차는 표본 창을 글자 쪽으로 좁힐수록 줄어들었으므로(60% 창 8.62 →
-   34% 창 9.02) 잉크가 변한 것이 아니라 **타일 테두리의 번짐이 표본에 섞인 것**
-   으로 읽는다. 어느 쪽으로 읽든 계약은 큰 여유로 지켜진다.
-   그리고 이 발광은 .cand 의 링을 **대체하지 않고 뒤에 깔린다** —
-   초록 계열 타일(#00FF80·#6AFF00) 위에서는 민트 번짐만으로 분리가 안 되므로,
-   바탕과의 분리는 어디까지나 .cand 의 흰 링 + 어두운 외곽선 2겹이 책임지고
-   이 절은 "의미"만 얹는다.
-
-   reduced-motion: 애니는 "피어나는 과정"일 뿐이고 **끝 상태가 곧 완성형**이라,
-   §15 의 전역 `animation-duration: .01ms` 가 걸리면 발광이 사라지는 게 아니라
-   즉시 완성된 채로 멈춘다 — §15 가 이미 쓰고 있는 그 계약이다
-   ("nothing disappears — it stops"). 별도 대응 규칙이 필요 없는 이유다.
-
-   구현이 `::before` 의 box-shadow 가 **아닌** 이유(중요): 후보 링은 테마마다
-   다른 규칙이 이긴다 — 크림 테마는 `:where(...) .tile.cand:not(.sel):not(.hint)
-   ::before` 가 (0,4,1) 로, 열매 스킨은 `html[data-fruit="1"] .tile.cand...` 가
-   더 높은 명시도로 box-shadow 를 통째로 갈아끼운다. 거기에 발광을 끼워 넣으려면
-   같은 블록을 세 군데에 복제해야 하고, 그중 하나는 번들러가 통째로 지우는
-   라이트 블록이다. 그래서 발광은 **아무도 안 쓰는 축**인 타일 엘리먼트 자신의
-   `filter: drop-shadow` 로 낸다. 결과적으로 ① 세 스킨 전부에서 한 규칙으로
-   살아남고 ② .cand 의 테마별 링을 하나도 건드리지 않으며 ③ 열매 스킨에서는
-   사각형이 아니라 **열매 실루엣을 따라** 번져 오히려 더 맞다.
-   (알려진 한계: `[data-sp="wild"]` 는 엘리먼트 filter 를 wildhue 애니가 이미
-   쓰고 있어 와일드 타일에서는 발광이 안 난다. 와일드는 그 자체로 이미 가장
-   눈에 띄는 타일이라 잃는 것이 없다고 보고 그대로 둔다.) */
-:root { --candok-glow: var(--role-candok-glow); }
-
 .tile.cand-ok {
   filter:
-    drop-shadow(0 0 5px var(--candok-glow))
-    drop-shadow(0 0 11px var(--candok-glow));
+    drop-shadow(0 0 5px var(--role-candok-glow))
+    drop-shadow(0 0 11px var(--role-candok-glow));
   animation: candokin 260ms var(--ease);
 }
 /* 스케일도 이동도 없다 — 보드가 들썩이면 그 자체가 §8.4 가 막으려던 것이다.
@@ -1916,8 +1865,8 @@ button {
    실측(9.02:1)은 그대로 유효하다 — 커지는 것은 번짐 반경과 겹수뿐이다. */
 .tile.cand-ok.cand-far {
   filter:
-    drop-shadow(0 0 6px var(--candok-glow))
-    drop-shadow(0 0 13px var(--candok-glow))
+    drop-shadow(0 0 6px var(--role-candok-glow))
+    drop-shadow(0 0 13px var(--role-candok-glow))
     drop-shadow(0 0 22px rgba(64, 226, 160, .42));
 }
 
@@ -2029,24 +1978,6 @@ button {
     inset 0 0 0 1.5px rgba(255, 255, 255, .38);
 }
 
-/* --- .shake : gentle wrong-pair shake (220ms) --- */
-/* --- .blocker : the tile standing in the way ---------------------------------
-   game.js adds this for 700ms when the picked pair has the right values but a
-   living cell blocks the path (canMatchEx true, isConnected false). It answers
-   "why didn't that work?" by pointing at the culprit.
-
-   Deliberately the OPPOSITE reading of .cand: candidates come forward (bright,
-   ringed), a blocker is pushed back (dimmed, recessed, cool ring). One is an
-   invitation, the other an obstacle — they must never be confused, and both can
-   be on screen at once. Never red: this is information, not punishment.
-
-   Only ::before and > span are transformed; the tile's own transform belongs to
-   game.js's inline translate3d. Same discipline as .shake above. */
-/* A mid-tone slate, chosen so one value carries both themes: it is lighter than
-   the dark ground (#16131F) and darker than the cream one (#FBF7EF), so no
-   per-theme override is needed and the two light blocks stay untouched. */
-:root { --blocker-ring: var(--role-blocker-ring); }
-
 .tile.blocker { z-index: 3; }
 /* The ring rides on ::before, restating the full chunky stack the way .cand
    does. ::after is NOT usable here: gold's glint and ice's frost own it at
@@ -2056,7 +1987,7 @@ button {
   box-shadow:
     0 3px 0 rgba(0, 0, 0, .36),
     0 6px 11px rgba(0, 0, 0, .42),
-    0 0 0 2.5px var(--blocker-ring),
+    0 0 0 2.5px var(--role-blocker-ring),
     inset 0 2px 0 rgba(255, 255, 255, .55),
     inset 0 -6px 0 rgba(0, 0, 0, .30);
   animation: blockerpush 700ms var(--ease);
@@ -2097,35 +2028,11 @@ button {
 .tile.shake-num { z-index: 3; }
 .tile.shake-num > span { animation: shake 220ms var(--ease); }
 
-/* --- 14차 #32: .blocker 를 "빨간 펄스"로 승격 ---------------------------------
-   위 .blocker 블록은 **한 줄도 지우지 않고 그대로 뒀다.** 되돌리려면 이 블록만
-   통째로 삭제하면 원래 슬레이트 링 연출로 정확히 복귀한다.
-
-   왜 뒤집는가. 위 주석의 "Never red: this is information, not punishment" 는
-   .blocker 가 **모든 거부**에 붙던 시절에 옳았던 판단이다. 값이 틀려서 거부된
-   탭에도, 비정렬이라 거부된 탭에도 같은 표시가 붙는데 그걸 빨갛게 칠하면
-   그건 정말로 처벌이 된다. 14차부터 .blocker 는 **진짜로 경로가 막힌 경우
-   에만** 붙는다 (합 불일치는 .shake-num 으로, 비정렬은 흔들림 + 8방향 가이드로
-   각각 떨어져 나갔다). 신호가 가리키는 대상이 하나로 좁혀졌으므로 신호도
-   그만큼 단호해도 된다 — "바로 이 칸이 길을 막았다" 는 **지목**은 강할수록
-   빨리 읽히고, 플레이어가 있지도 않은 막힌 경로를 눈으로 찾아 헤매던 것이
-   애초에 #32 의 증상이었다.
-
-   가독성: 링과 발광은 전부 얼굴 바깥 box-shadow 다. 그리고 위 블록의
-   `blockerdim`(숫자를 opacity .5 로 죽이던 것)을 여기서 **되돌린다** — 막은
-   칸이라도 그 숫자는 계속 읽혀야 한다. 숫자를 흐리는 순간 4.5:1 계약이 그
-   700ms 동안 깨지는데, 그건 지목을 위해 치를 값이 아니다. 지목은 링이 한다.
-
-   빨강 한 값으로 두 테마를 다 쓴다: 어두운 바닥(#16131F)보다 밝고 크림
-   바닥(#FBF7EF)보다 어두워서 --blocker-ring 과 같은 이유로 테마별 분기가
-   필요 없다. 두 라이트 블록을 건드리지 않아도 되는 이유다. */
-:root { --blocker-hot: var(--role-blocker-hot); }
-
 .tile.blocker::before {
   box-shadow:
     0 3px 0 rgba(0, 0, 0, .36),
     0 6px 11px rgba(0, 0, 0, .42),
-    0 0 0 3px var(--blocker-hot),
+    0 0 0 3px var(--role-blocker-hot),
     0 0 14px 3px rgba(255, 77, 94, .45),
     inset 0 2px 0 rgba(255, 255, 255, .55),
     inset 0 -6px 0 rgba(0, 0, 0, .22);
@@ -2271,7 +2178,7 @@ button {
 #app.fever .tile:not([data-sp]):not(.sel):not(.hint):not(.cand):not(.dead):not(.blocker)::before {
   box-shadow:
     0 3px 0 rgba(0, 0, 0, .40),
-    0 0 12px 1px var(--c, var(--t5)),
+    0 0 12px 1px var(--c, var(--prim-c5)),
     inset 0 2px 0 rgba(255, 255, 255, .85),
     inset 0 -6px 0 rgba(0, 0, 0, .22),
     inset 0 0 0 1.5px rgba(255, 255, 255, .30);
@@ -2324,7 +2231,7 @@ button {
   font-size: 11px;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
-  color: var(--ink);
+  color: var(--prim-ink);
   background: var(--c1);
   box-shadow: 0 2px 6px rgba(0, 0, 0, .4);
 }
@@ -2344,7 +2251,7 @@ button {
    Four .act at 390px: 390 - 28 (padding) - 30 (3 gaps x 10px) = 332 / 4 = 83px
    each, against a 56px min-height — the row still has plenty of slack, so nothing
    in section 8 needs to change to make room. */
-#shuffle-badge { background: var(--t3); }
+#shuffle-badge { background: var(--prim-c3); }
 /* the icon is two crossing arrows drawn as text by index.html; keep it optically
    equal to the +, ? and undo glyphs, which sit slightly larger by default */
 #btn-shuffle .act-ico { font-size: 18px; }
@@ -2492,7 +2399,7 @@ button {
   line-height: .94;
   letter-spacing: -.045em;
   font-variant-numeric: tabular-nums;
-  background: linear-gradient(100deg, var(--t8) 0%, var(--t5) 48%, var(--t4) 100%);
+  background: linear-gradient(100deg, var(--prim-c8) 0%, var(--prim-c5) 48%, var(--prim-c4) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -2870,11 +2777,11 @@ li.roll-in { animation: rollin 380ms var(--spring) backwards; }
   padding: 0;
   text-align: center;
   font-weight: 600;
-  color: var(--ink);
+  color: var(--prim-ink);
   min-height: 0;
   text-shadow: 0 1px 0 rgba(255,255,255,.92), 0 0 7px rgba(255,255,255,.78), 0 0 2px rgba(255,255,255,.95);
 }
-#modal-howto .howto-panel > p b{ color: var(--ink); }
+#modal-howto .howto-panel > p b{ color: var(--prim-ink); }
 
 /* ── ⑲ 결과 모달 안쪽 젤리 카드 ─────────────────────────────────────────────
    반려(사용자 실기기 acd0360d): #modal-adv(모험 「N탄 클리어!」) 의 별·점수·안내
@@ -2892,13 +2799,13 @@ li.roll-in { animation: rollin 380ms var(--spring) backwards; }
   border-radius: var(--hcard-r);
   background: linear-gradient(180deg, var(--hcard-fill), var(--hcard-fill-2));
   box-shadow: inset 0 0 0 1.5px var(--hcard-rim), inset 0 -2px 0 var(--hcard-lo);
-  color: var(--ink);
+  color: var(--prim-ink);
 }
 /* 판 위 대비 — `#modal-X .sheet p`(1,1,1)·`#clear-rollup li b`(1,0,2) 를 이겨야
    해서 모달 id 를 함께 건다(1,3,1). 전역 토큰·전역 .big-score/.sub-score 무접촉. */
 #modal-clear .sheet .result-card p, #modal-adv .sheet .result-card p, #modal-over .sheet .result-card p,
 #modal-clear .result-card .rollup-total, #modal-clear .result-card #clear-rollup li span,
-#modal-clear .result-card .rollup-total b, #modal-clear .result-card #clear-rollup li b{ color: var(--ink); }
+#modal-clear .result-card .rollup-total b, #modal-clear .result-card #clear-rollup li b{ color: var(--prim-ink); }
 /* 카드 안에선 옅은 인셋 알약 배경이 카드면과 겹쳐 지저분하니 정리 */
 #modal-clear .result-card #clear-next-preview{ background: rgba(255,255,255,.28); box-shadow: inset 0 0 0 1px var(--hcard-line); }
 
@@ -3006,7 +2913,7 @@ li.roll-in { animation: rollin 380ms var(--spring) backwards; }
   font-weight: 800;
   line-height: 1.35;
   text-align: center;
-  color: var(--ink);
+  color: var(--prim-ink);
 }
 
 .rules-list {
@@ -3023,11 +2930,11 @@ li.roll-in { animation: rollin 380ms var(--spring) backwards; }
   gap: 9px;
   font-size: 13px;
   line-height: 1.45;
-  color: var(--ink);            /* 51: --tx-dim -> --ink (위 절) */
+  color: var(--prim-ink);            /* 51: --tx-dim -> --ink (위 절) */
 }
 /* 강조도 같은 잉크다. 굵기만 다르다 — 강조만 다른 색으로 남기면 그 자리가
    새 «최악» 이 된다(착수 전에는 b 만 --tx 라 비강조 획이 안 잡혔다). */
-.rules-list b { color: var(--ink); font-weight: 700; }
+.rules-list b { color: var(--prim-ink); font-weight: 700; }
 
 /* 번호 원판은 셋을 "목록"으로 읽히게 하는 최소 장치다. 일부러 .tile 을 닮게
    만들지 않는다 — 카드 위에서 타일처럼 생긴 것은 눌러야 하는 것으로 읽힌다. */
@@ -3042,7 +2949,7 @@ li.roll-in { animation: rollin 380ms var(--spring) backwards; }
   font-weight: 700;
   line-height: 18px;
   text-align: center;
-  color: var(--ink);            /* 51: --tx -> --ink (위 절) */
+  color: var(--prim-ink);            /* 51: --tx -> --ink (위 절) */
 }
 
 /* `.howto-panel p` 가 min-height 60px · 13.5px 를 걸어 두었고(그리고 ko 는 한 줄 더
@@ -3055,7 +2962,7 @@ li.roll-in { animation: rollin 380ms var(--spring) backwards; }
   min-height: 0;
   font-size: 12px;
   line-height: 1.45;
-  color: var(--ink);            /* 51: --tx-dim -> --ink (위 절) */
+  color: var(--prim-ink);            /* 51: --tx-dim -> --ink (위 절) */
   /* ⑤b 의 흰 헤일로는 그대로 둔다. 착수 전 부제가 1.89:1 로 잡힌 것은 색이
      밝아 헤일로가 «잉크» 보다 세게 잡혔기 때문이고, 잉크를 --ink 로 내리면
      글리프 속이 다시 최대 차분이 된다(실측으로 확인 — 아래 관문 표). */
@@ -3075,7 +2982,7 @@ li.roll-in { animation: rollin 380ms var(--spring) backwards; }
   font-size: 30px;
   font-weight: 800;
   text-anchor: middle;
-  fill: var(--ink);
+  fill: var(--prim-ink);
 }
 .art-op { font-family: var(--font); font-size: 26px; font-weight: 800; text-anchor: middle; fill: var(--tx-dim); }
 .art-sum { font-family: var(--font); font-size: 20px; font-weight: 800; text-anchor: middle; fill: var(--c8); }
@@ -3165,7 +3072,7 @@ li.roll-in { animation: rollin 380ms var(--spring) backwards; }
   font-size: 14px;
   font-weight: 700;
   white-space: nowrap;
-  color: var(--ink);
+  color: var(--prim-ink);
   background: var(--c5);
   box-shadow: 0 10px 30px rgba(0, 0, 0, .5);
   pointer-events: none;
@@ -3271,9 +3178,9 @@ li.roll-in { animation: rollin 380ms var(--spring) backwards; }
      ink, unconditionally, and both exceptions are gone: there is nothing left to
      except. The `> span` selector is (0,1,1) so `[data-sp="bomb"] > span` (0,2,1)
      keeps its own hot digit on the dark casing. */
-  :where(:root:not([data-theme="dark"])) .tile > span { color: var(--ink); text-shadow: none; }
+  :where(:root:not([data-theme="dark"])) .tile > span { color: var(--prim-ink); text-shadow: none; }
   /* the dead-cell cancel stroke follows the digit back to ink */
-  :where(:root:not([data-theme="dark"])) .tile::after { background: var(--ink); }
+  :where(:root:not([data-theme="dark"])) .tile::after { background: var(--prim-ink); }
   /* Same gloss grammar, three changes for cream: the outer shadows go warm-dark
      (matching the rgba(60,45,30,…) family already used in this block) instead of
      pure black, which reads as dirt on a warm ground; the inner bottom shade eases
@@ -3518,8 +3425,8 @@ li.roll-in { animation: rollin 380ms var(--spring) backwards; }
    both themes; white digits measure 1.32:1..3.33:1 on them, ink measures >= 4.99:1,
    so the digit and the cancel stroke both go back to ink and the pale-5 / pale-8
    exceptions are deleted along with the reason they existed. */
-:where(:root[data-theme="light"]) .tile > span { color: var(--ink); text-shadow: none; }
-:where(:root[data-theme="light"]) .tile::after { background: var(--ink); }
+:where(:root[data-theme="light"]) .tile > span { color: var(--prim-ink); text-shadow: none; }
+:where(:root[data-theme="light"]) .tile::after { background: var(--prim-ink); }
 :where(:root[data-theme="light"]) .tile::before {
   box-shadow:
     0 0 0 1.25px rgba(58, 44, 28, .28),
@@ -3703,7 +3610,7 @@ li.roll-in { animation: rollin 380ms var(--spring) backwards; }
      아무도 안 쓰는 축이라 얼굴·링·열매 실루엣 어느 것과도 충돌하지 않고,
      box-shadow 와 달리 열매 스킨의 clip-path 에 잘리지도 않기 때문이다. */
   .tile.shake-num > span {
-    outline: 2px solid var(--blocker-hot);
+    outline: 2px solid var(--role-blocker-hot);
     outline-offset: 1px;
     border-radius: 4px;
   }
@@ -3905,7 +3812,7 @@ html[lang="ko"] .btn-sub { font-family: var(--font); }
    has to be right for a screen reader anyway, so styling from it means the two
    can never disagree. game.js also toggles .on for anything that wants it. */
 .rank-tab[aria-selected="true"] {
-  color: var(--ink);
+  color: var(--prim-ink);
   background: linear-gradient(180deg, #FFF0A0 0%, var(--c8) 100%);
   box-shadow: 0 2px 0 #B7A93B;
 }
@@ -4274,7 +4181,7 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
 #mascot.ch-twin .ms-num-o { display: none; }
 #mascot.ch-twin .ms-eq    { display: block; }
 #mascot .ms-eq path {
-  fill: none; stroke: var(--ink); stroke-width: 2.1; stroke-linecap: round;
+  fill: none; stroke: var(--prim-ink); stroke-width: 2.1; stroke-linecap: round;
 }
 /* 망토는 몸보다 한 단계 진하다 — 같은 색이면 몸이 커진 것으로 보이고, 옷으로
    안 읽힌다. 안감(ms-cape-l)만 밝게 두어 어깨에서 접힌 면을 만든다. */
@@ -4327,9 +4234,9 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
 #mascot .ms-crown-g { fill: #FFF3C4; stroke: #A66A00; stroke-width: .9; }
 #mascot .ms-eye    { fill: #2A2338; }
 #mascot .ms-glint  { fill: #FFFFFF; }
-#mascot .ms-badge  { fill: var(--accent); }
-#mascot .ms-num    { fill: none; stroke: var(--ink); stroke-width: 2.1; stroke-linecap: round; stroke-linejoin: round; }
-#mascot .ms-num-o  { fill: none; stroke: var(--ink); stroke-width: 2.1; }
+#mascot .ms-badge  { fill: var(--prim-c8); }
+#mascot .ms-num    { fill: none; stroke: var(--prim-ink); stroke-width: 2.1; stroke-linecap: round; stroke-linejoin: round; }
+#mascot .ms-num-o  { fill: none; stroke: var(--prim-ink); stroke-width: 2.1; }
 #mascot .ms-dot-a  { fill: var(--c1); }   /* 짝꿍 1 — 시안 */
 #mascot .ms-dot-b  { fill: var(--c4); }   /* 짝꿍 2 — 마젠타 */
 #mascot .ms-ant,
@@ -4574,7 +4481,7 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
 .char-card.ch-twin,    #mate.ch-twin    { --ch-key: var(--role-ch-twin-key); --ch-body: var(--role-ch-twin-body); --ch-name: var(--role-ch-twin-name); }
 .char-card.ch-ppyak,   #mate.ch-ppyak   { --ch-key: var(--role-ch-ppyak-key); --ch-body: var(--role-ch-ppyak-body); --ch-name: var(--role-ch-ppyak-name); }
 .char-card.ch-mungchi, #mate.ch-mungchi { --ch-key: var(--role-ch-mungchi-key); --ch-body: var(--role-ch-mungchi-body); --ch-name: var(--role-ch-mungchi-name); }
-.char-card.ch-jelly,   #mate.ch-jelly   { --ch-key: var(--role-ch-jelly-key); --ch-body: var(--j-peach); --ch-name: var(--role-ch-jelly-name); }
+.char-card.ch-jelly,   #mate.ch-jelly   { --ch-key: var(--role-ch-jelly-key); --ch-body: var(--prim-art-peach); --ch-name: var(--role-ch-jelly-name); }
 /* "없음" 카드는 캐릭터가 아니라서 몸색이 없다. 회색 한 벌로 두어 나머지 둘
    옆에서 스스로 "비어 있음"을 말하게 한다. */
 .char-card.ch-none    { --ch-key: var(--role-ch-none-key); --ch-body: transparent; --ch-name: var(--role-ch-none-name); }
@@ -4721,9 +4628,9 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   display: inline-flex; align-items: center; gap: 4px;
   padding: 2px 9px;
   border-radius: 999px;
-  border: 1.5px solid var(--pv-key, var(--accent));
+  border: 1.5px solid var(--pv-key, var(--prim-c8));
   background: rgba(0, 0, 0, .28);
-  color: var(--pv-key, var(--accent));
+  color: var(--pv-key, var(--prim-c8));
   font-size: 12px; font-weight: 900;
   font-variant-numeric: tabular-nums;   /* x1.4 -> x1.5 에서 폭이 흔들리지 않게 */
   line-height: 1.5;
@@ -4739,7 +4646,7 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
 /* 삐약의 장전 완료 — 다음 매치가 x2 라는 사실은 "떠 있다"만으로는 약하다. */
 #pv-chip.pv-armed {
   animation: pv-armed 1.1s ease-in-out infinite;
-  box-shadow: 0 0 10px 1px var(--pv-key, var(--accent));
+  box-shadow: 0 0 10px 1px var(--pv-key, var(--prim-c8));
 }
 @keyframes pv-armed {
   0%, 100% { opacity: 1; }
@@ -4759,8 +4666,8 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
 #score-val.punch-big { animation: score-punch-big .46s var(--spring) 1; }
 @keyframes score-punch-big {
   0%   { transform: scale(1); }
-  26%  { transform: scale(1.62); color: var(--accent); }
-  60%  { transform: scale(1.10); color: var(--accent); }
+  26%  { transform: scale(1.62); color: var(--prim-c8); }
+  60%  { transform: scale(1.10); color: var(--prim-c8); }
   100% { transform: scale(1); }
 }
 
@@ -4777,7 +4684,7 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   pointer-events: none;
   opacity: 0;
   text-align: center;
-  --cb-key: var(--accent);
+  --cb-key: var(--prim-c8);
 }
 #combo-banner.show { animation: cb-burst 1.05s cubic-bezier(.16, 1.02, .3, 1) 1; }
 #cb-num {
@@ -5583,7 +5490,7 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   background: rgba(255, 255, 255, .07);
   box-shadow: inset 0 0 0 1px var(--line);
 }
-#map-stars .ms-ico { color: var(--t8); font-size: 14px; }
+#map-stars .ms-ico { color: var(--prim-c8); font-size: 14px; }
 #map-heart-t {
   font-size: 10.5px;
   font-weight: 700;
@@ -5775,7 +5682,7 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   line-height: 1;
   letter-spacing: -1px;
   white-space: nowrap;
-  color: var(--t8);
+  color: var(--prim-c8);
   -webkit-text-stroke: 2px rgba(24, 16, 34, .9);
   paint-order: stroke fill;
 }
@@ -5848,7 +5755,7 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   gap: 8px;
 }
 .node-head h2 { font-size: 22px; font-weight: 900; letter-spacing: -.02em; }
-.node-got { font-size: 14px; letter-spacing: -1px; color: var(--t8); }
+.node-got { font-size: 14px; letter-spacing: -1px; color: var(--prim-c8); }
 
 .node-list {
   display: grid;
@@ -5922,7 +5829,7 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   font-size: 40px;
   line-height: 1;
   letter-spacing: 2px;
-  color: var(--t8);
+  color: var(--prim-c8);
   text-shadow: 0 3px 0 rgba(0, 0, 0, .35), 0 0 26px rgba(245, 216, 74, .5);
   animation: adv-star-in 520ms var(--spring);
 }
@@ -6006,10 +5913,10 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
 .rw-ico[data-disc="shard-power"]   { --rw-disc: radial-gradient(circle at 38% 32%, var(--role-rw-shard-power-1) 0 30%, var(--role-rw-shard-power-2) 62%, var(--role-rw-shard-power-3) 100%); }
 .rw-ico[data-disc="shard-steady"]  { --rw-disc: radial-gradient(circle at 38% 32%, var(--role-rw-shard-steady-1) 0 30%, var(--role-rw-shard-steady-2) 62%, var(--role-rw-shard-steady-3) 100%); }
 .rw-ico[data-disc="shard-agility"] { --rw-disc: radial-gradient(circle at 38% 32%, var(--role-rw-shard-agility-1) 0 30%, var(--role-rw-shard-agility-2) 62%, var(--role-rw-shard-agility-3) 100%); }
-.rw-ico[data-disc="shard-luck"]    { --rw-disc: radial-gradient(circle at 38% 32%, var(--role-rw-shard-luck-1) 0 30%, var(--role-rw-shard-luck-2) 62%, var(--role-rw-shard-luck-3) 100%); }
+.rw-ico[data-disc="shard-luck"]    { --rw-disc: radial-gradient(circle at 38% 32%, var(--role-rw-star-1) 0 30%, var(--role-rw-shard-luck-2) 62%, var(--role-rw-shard-luck-3) 100%); }
 .rw-ico[data-disc="gift"] {
   --rw-disc: radial-gradient(circle at 38% 32%,
-    var(--role-rw-gift-1) 0 20%, var(--role-rw-gift-2) 42%, var(--role-rw-gift-3) 62%, var(--role-rw-gift-4) 80%, var(--role-rw-gift-5) 100%);
+    var(--role-rw-star-1) 0 20%, var(--role-rw-pet-2) 42%, var(--role-rw-gift-3) 62%, var(--role-rw-shard-agility-2) 80%, var(--role-rw-shard-steady-2) 100%);
 }
 .rw-ico[data-disc="item"]   { --rw-disc: radial-gradient(circle at 38% 32%, var(--role-rw-item-1) 0 30%, var(--role-rw-item-2) 62%, var(--role-rw-item-3) 100%); }
 .rw-ico[data-disc="petnew"] { --rw-disc: radial-gradient(circle at 38% 32%, var(--role-rw-pet-1) 0 30%, var(--role-rw-pet-2) 62%, var(--role-rw-pet-3) 100%); }
@@ -6017,7 +5924,7 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
 .rw-val {
   flex: 0 0 auto;
   font-variant-numeric: tabular-nums;
-  color: var(--t8);
+  color: var(--prim-c8);
 }
 /* 획득이라는 사실은 부호가 말한다. countUp 이 쓰는 것은 숫자뿐이라(그 함수를
    한 줄도 고치지 않으려고) 부호는 CSS 가 붙인다. */
@@ -6089,7 +5996,7 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   width: 9px;
   height: 9px;
   border-radius: 2px;
-  background: var(--accent);
+  background: var(--prim-c8);
   transform: rotate(45deg);
 }
 #adv-goal.done .ag-ico { background: #2A1F14; }
@@ -7126,7 +7033,7 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
    전신은 tools/boss-recolor.py 가 소다 변주에서 몸통 색상만 돌린 것이라
    실루엣·부속색(갈색 가방·회색 숟가락)이 형제 셋과 같다. 얼굴 h 152.4 ·
    전신 h 152.1 로 소다 쌍(191.9/192.0)과 같은 규약을 지킨다. */
-.bs-mint  { --bs-body: var(--role-bs-mint-body); --bs-horn: var(--role-bs-mint-horn); --bs-face: var(--ch-boss-face-mint);
+.bs-mint  { --bs-body: var(--role-mint-face-a); --bs-horn: var(--role-bs-mint-horn); --bs-face: var(--ch-boss-face-mint);
             --bs-full: url("catalog/duel-demon-full-mint.webp"); }
 .bs-cocoa { --bs-body: var(--role-bs-cocoa-body); --bs-horn: var(--role-bs-cocoa-horn); --bs-face: var(--ch-boss-face);
             --bs-full: url("catalog/duel-demon-full-grape.webp"); }
@@ -7545,7 +7452,7 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   line-height: 1.5;
   letter-spacing: .06em;
   text-transform: uppercase;
-  color: var(--t6);
+  color: var(--prim-c6);
   word-break: keep-all;
 }
 .cc-k-u { color: var(--ch-key); }
@@ -7563,7 +7470,7 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   font-size: 11px;
   font-weight: 700;
   line-height: 1.3;
-  color: var(--t6);
+  color: var(--prim-c6);
   word-break: keep-all;
 }
 
@@ -7683,7 +7590,7 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   background: rgba(255, 255, 255, .09);
   font-size: 11px;
   font-weight: 800;
-  color: var(--t6);
+  color: var(--prim-c6);
   white-space: nowrap;
 }
 
@@ -7714,7 +7621,7 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
 .co-av.ch-twin    { --ch-key: var(--role-ch-twin-key); --ch-body: var(--role-ch-twin-body); --ch-name: var(--role-ch-twin-name); }
 .co-av.ch-ppyak   { --ch-key: var(--role-ch-ppyak-key); --ch-body: var(--role-ch-ppyak-body); --ch-name: var(--role-ch-ppyak-name); }
 .co-av.ch-mungchi { --ch-key: var(--role-ch-mungchi-key); --ch-body: var(--role-ch-mungchi-body); --ch-name: var(--role-ch-mungchi-name); }
-.co-av.ch-jelly   { --ch-key: var(--role-ch-jelly-key); --ch-body: var(--j-peach); --ch-name: var(--role-ch-jelly-name); }
+.co-av.ch-jelly   { --ch-key: var(--role-ch-jelly-key); --ch-body: var(--prim-art-peach); --ch-name: var(--role-ch-jelly-name); }
 
 /* ============================================================================
    SECTION 23 — v4 7차: 기준 일러스트로의 수렴 (레퍼런스 문법 이식)
@@ -7757,37 +7664,35 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
      연보라핑크 #E6DCE2)·Mode B(HUD 파랑)와 값이 달라 별도 Mode L로 둔다 — 지휘자가
      A/B 통합·은퇴를 결정할 때까지 --j-* 이름은 아래 브릿지로 유지(소비처 무변). */
 
-  --j-cream:    var(--mL-face-a);   /* 패널 바탕 위   (ART §3) */
-  --j-cream-2:  var(--mL-face-b);   /* 패널 바탕 아래 (ART §3) */
-  --j-rim:      var(--mL-rim);   /* 내부 1px 밝은 크림 보더 (ART §4) */
-  --j-salmon:   var(--prim-art-salmon);   /* 프레임 살몬   (ART §3) */
-  --j-salmon-2: var(--prim-art-salmon-2);   /* 살몬 어두운 에지 */
-  --j-outline:  var(--mL-outline);   /* 딥 아웃라인 — 이 게임의 "검정" (ART §3·§7-1) */
-  --j-ink:      var(--prim-art-ink);   /* 크림 위 본문 (8.51:1) — 순검정 금지 */
-  --j-ink-2:    var(--prim-art-ink-2);   /* 크림 위 보조 (4.68:1) */
-  --j-ribbon:   var(--prim-art-ribbon);   /* 헤더 리본 위 */
-  --j-ribbon-2: var(--prim-art-ribbon-2);   /* 헤더 리본 아래 */
-  --j-ribbon-sh:var(--prim-art-ribbon-sh);   /* 리본 글자 그림자 */
-  --j-plate:    var(--prim-art-plate);   /* 이름판 */
-  --j-gold:     var(--prim-art-gold);   /* 별·왕관·활성 프레임 */
-  --j-gold-e:   var(--prim-art-gold-e);
-  --j-peach:    var(--prim-art-peach);   /* 젤리공주 몸 */
-  --j-plum:     var(--mL-contact);   /* 유채색 드롭섀도 — 무채색 금지(ART §1·§7-3) */
+     /* 패널 바탕 위   (ART §3) */
+     /* 패널 바탕 아래 (ART §3) */
+     /* 내부 1px 밝은 크림 보더 (ART §4) */
+     /* 프레임 살몬   (ART §3) */
+     /* 살몬 어두운 에지 */
+     /* 딥 아웃라인 — 이 게임의 "검정" (ART §3·§7-1) */
+     /* 크림 위 본문 (8.51:1) — 순검정 금지 */
+     /* 크림 위 보조 (4.68:1) */
+     /* 헤더 리본 위 */
+     /* 헤더 리본 아래 */
+     /* 리본 글자 그림자 */
+     /* 이름판 */
+     /* 별·왕관·활성 프레임 */
+     /* 젤리공주 몸 */
+     /* 유채색 드롭섀도 — 무채색 금지(ART §1·§7-3) */
 
   /* 젤리 버튼 3종 1벌: 광택(위) / 본색(아래) / 3D 밴드. ART §3 확정값. */
-  --j-pink:     var(--prim-art-pink);  --j-pink-2:   var(--prim-art-pink-2);  --j-pink-e:   var(--prim-art-pink-e);
-  --j-sky:      var(--prim-art-sky);  --j-sky-2:    var(--prim-art-sky-2);  --j-sky-e:    var(--prim-art-sky-e);
-  --j-yel:      var(--prim-art-gold);  --j-yel-2:    var(--prim-art-yel-2);  --j-yel-e:    var(--prim-art-yel-e);
-  --j-org:      var(--prim-art-org);  --j-org-2:    var(--prim-art-org-2);  --j-org-e:    var(--prim-art-org-e);
-  --j-mint:     var(--role-mint-face-a);  --j-mint-2:   var(--role-mint-face-b);  --j-mint-e:   var(--prim-art-mint-e);
+      
+      
+      
+      
+      
   /* 캐릭터 줄의 보라는 ART §3 표에 없다 — 표의 다섯 색과 같은 문법(위 밝은 톤 /
      아래 본색 / 30~40% 어두운 에지)으로 파생한 여섯 번째다. */
-  --j-purple:   var(--prim-art-purple);  --j-purple-2: var(--prim-art-purple-2);  --j-purple-e: var(--prim-art-purple-e);
+      
 
 
   /* 그림 위에 글자를 놓아야 할 때의 유일한 판. 알파 .80 이라 어떤 밝은 그림
      위에서도 합성 결과가 #584853 보다 밝아지지 않는다 → 흰 글자 8.51:1 보장. */
-  --j-scrim:    var(--mL-scrim);
 
   /* 디스플레이 페이스 (ART §5). 8차에 주아체(Jua, OFL 1.1) 서브셋이 도착해서
      7차가 예고한 대로 **이 한 줄만** 바뀌었다 — 로고·리본·명패·버튼·큰 숫자가
@@ -7921,13 +7826,13 @@ html.no-art-logo .logo-img  { display: none; }
   filter: drop-shadow(0 4px 8px rgba(24, 10, 30, .45));
 }
 .logo-castle svg { display: block; width: 100%; height: 100%; overflow: visible; }
-.logo-castle .lc-body { fill: var(--j-cream); }
-.logo-castle .lc-roof { fill: var(--j-ribbon); }
-.logo-castle .lc-gate { fill: var(--j-salmon-2); }
-.logo-castle .lc-flag { fill: var(--j-gold); }
+.logo-castle .lc-body { fill: var(--mL-face-a); }
+.logo-castle .lc-roof { fill: var(--prim-art-ribbon); }
+.logo-castle .lc-gate { fill: var(--prim-art-salmon-2); }
+.logo-castle .lc-flag { fill: var(--prim-art-gold); }
 .logo-castle .lc-pole { fill: none; }
 .logo-castle path,
-.logo-castle rect { stroke: var(--j-outline); stroke-width: 2.4; stroke-linejoin: round; stroke-linecap: round; }
+.logo-castle rect { stroke: var(--mL-outline); stroke-width: 2.4; stroke-linejoin: round; stroke-linecap: round; }
 
 /* ART-DIRECTION §5 의 디스플레이 공식 네 겹을 그대로 옮긴 것:
      ① 흰 외곽 스트로크 — 3.4px @ 60px 은 대문자 높이(약 43px)의 7.9%
@@ -7947,11 +7852,11 @@ html.no-art-logo .logo-img  { display: none; }
   font-weight: 900;
   letter-spacing: -.02em;
   line-height: 1.06;
-  color: var(--j-gold);
+  color: var(--prim-art-gold);
   -webkit-text-stroke: 3.4px #FFFFFF;
   paint-order: stroke fill;
   filter:
-    drop-shadow(0 0 1.6px var(--j-outline))
+    drop-shadow(0 0 1.6px var(--mL-outline))
     drop-shadow(0 4px 0 rgba(90, 48, 74, .62))
     drop-shadow(0 12px 16px rgba(46, 22, 54, .45));
 }
@@ -7959,7 +7864,7 @@ html.no-art-logo .logo-img  { display: none; }
   display: inline-block;
   margin: 0 -1px;
   font-weight: 900;
-  color: var(--j-gold);
+  color: var(--prim-art-gold);
   transform: rotate(var(--r, 0deg)) translateY(var(--y, 0));
 }
 @supports ((-webkit-background-clip: text) or (background-clip: text)) {
@@ -7968,8 +7873,8 @@ html.no-art-logo .logo-img  { display: none; }
     background-clip: text;
     -webkit-text-fill-color: transparent;
   }
-  .logo .lg-a { background-image: linear-gradient(180deg, #FFC7DE 0%, var(--j-pink) 52%, #E04E86 100%); }
-  .logo .lg-b { background-image: linear-gradient(180deg, #BFD9FF 0%, var(--j-sky) 52%, #3D6ED0 100%); }
+  .logo .lg-a { background-image: linear-gradient(180deg, #FFC7DE 0%, var(--prim-art-pink) 52%, #E04E86 100%); }
+  .logo .lg-b { background-image: linear-gradient(180deg, #BFD9FF 0%, var(--prim-art-sky) 52%, #3D6ED0 100%); }
 }
 /* 부제 명패 — 레퍼런스의 "젤리 팡 월드" 자리 */
 .logo-sub {
@@ -7978,12 +7883,12 @@ html.no-art-logo .logo-img  { display: none; }
   padding: 3px 15px;
   border-radius: 999px;
   font-family: var(--font-display);
-  background: linear-gradient(180deg, var(--j-cream) 0%, var(--j-cream-2) 100%);
-  box-shadow: 0 0 0 2.5px var(--j-outline), 0 3px 0 rgba(110, 70, 58, .38);
+  background: linear-gradient(180deg, var(--mL-face-a) 0%, var(--mL-face-b) 100%);
+  box-shadow: 0 0 0 2.5px var(--mL-outline), 0 3px 0 rgba(110, 70, 58, .38);
   font-size: 13px;
   font-weight: 900;
   letter-spacing: .02em;
-  color: var(--j-ink);
+  color: var(--prim-art-ink);
   word-break: keep-all;
 }
 /* 그림 위의 두 줄은 판 위에 앉는다 — 낮/밤 어느 쪽에서도 8.5:1 이상 */
@@ -7993,7 +7898,7 @@ html.no-art-logo .logo-img  { display: none; }
   max-width: 300px;
   padding: 5px 13px;
   border-radius: 12px;
-  background: var(--j-scrim);
+  background: var(--mL-scrim);
   color: #FFFFFF;
   font-weight: 700;
 }
@@ -8008,11 +7913,11 @@ html.no-art-logo .logo-img  { display: none; }
   align-self: center;
   padding: 6px 16px;
   border-radius: 999px;
-  background: linear-gradient(180deg, var(--j-cream) 0%, var(--j-cream-2) 100%);
-  box-shadow: 0 0 0 2.5px var(--j-outline), 0 4px 0 rgba(110, 70, 58, .32);
+  background: linear-gradient(180deg, var(--mL-face-a) 0%, var(--mL-face-b) 100%);
+  box-shadow: 0 0 0 2.5px var(--mL-outline), 0 4px 0 rgba(110, 70, 58, .32);
 }
-.hero-k { color: var(--j-ink-2); }
-.hero-v { color: var(--j-ink); }
+.hero-k { color: var(--prim-art-ink-2); }
+.hero-v { color: var(--prim-art-ink); }
 
 /* --- 젤리 버튼 스택 ---------------------------------------------------------
    한 벌의 레시피를 --jb-* 세 칸으로 색만 갈아 끼운다. box-shadow 순서가 곧
@@ -8031,7 +7936,7 @@ html.no-art-logo .logo-img  { display: none; }
      paint-order 를 모르는 엔진에서는 스트로크가 안쪽으로 먹어 글자가 진해질 뿐
      읽히지 않는 상태가 되지 않는다. */
   color: #FFFFFF;
-  -webkit-text-stroke: 2.6px var(--j-outline);
+  -webkit-text-stroke: 2.6px var(--mL-outline);
   paint-order: stroke fill;
   text-shadow: 0 2px 0 rgba(110, 70, 58, .55);
   /* 광택 밴드는 하드 에지다(ART §4·§7-6): 46% 에서 두 톤이 딱 갈라진다. */
@@ -8045,19 +7950,19 @@ html.no-art-logo .logo-img  { display: none; }
        가리지 않으므로 2px 그대로가 규격 두께다. 타일·노드와 같은 광원. */
     inset -2px 0 0 rgba(255, 255, 255, .34),
     inset 0 -4px 0 var(--jb-e),           /* 하단 3D 밴드 ~7% (ART §4) */
-    0 0 0 2.5px var(--j-cream),           /* 안쪽 크림 림 */
-    0 0 0 5px var(--j-outline),           /* 딥 아웃라인 */
+    0 0 0 2.5px var(--mL-face-a),           /* 안쪽 크림 림 */
+    0 0 0 5px var(--mL-outline),           /* 딥 아웃라인 */
     0 5px 0 var(--jb-e),
-    0 10px 16px var(--j-plum);            /* 플럼 소프트 섀도 — 무채색 금지 */
+    0 10px 16px var(--mL-contact);            /* 플럼 소프트 섀도 — 무채색 금지 */
 }
 #screen-menu .btn:not(#btn-howto):active,
 #screen-menu .char-open:active { transform: translateY(2px) scale(.99); filter: brightness(.97); }
 
-#btn-adv   { --jb-1: var(--j-pink);   --jb-2: var(--j-pink-2);   --jb-e: var(--j-pink-e); }
-#btn-play  { --jb-1: var(--j-yel);    --jb-2: var(--j-yel-2);    --jb-e: var(--j-yel-e); }
-#btn-daily { --jb-1: var(--j-sky);    --jb-2: var(--j-sky-2);    --jb-e: var(--j-sky-e); }
-#btn-rush  { --jb-1: var(--j-org);    --jb-2: var(--j-org-2);    --jb-e: var(--j-org-e); }
-.char-open { --jb-1: var(--j-purple); --jb-2: var(--j-purple-2); --jb-e: var(--j-purple-e); }
+#btn-adv   { --jb-1: var(--prim-art-pink);   --jb-2: var(--prim-art-pink-2);   --jb-e: var(--prim-art-pink-e); }
+#btn-play  { --jb-1: var(--prim-art-gold);    --jb-2: var(--prim-art-yel-2);    --jb-e: var(--prim-art-yel-e); }
+#btn-daily { --jb-1: var(--prim-art-sky);    --jb-2: var(--prim-art-sky-2);    --jb-e: var(--prim-art-sky-e); }
+#btn-rush  { --jb-1: var(--prim-art-org);    --jb-2: var(--prim-art-org-2);    --jb-e: var(--prim-art-org-e); }
+.char-open { --jb-1: var(--prim-art-purple); --jb-2: var(--prim-art-purple-2); --jb-e: var(--prim-art-purple-e); }
 
 /* 좌측 아이콘 칩. 글리프는 인라인 SVG data URI 라 폰트에도 스프라이트에도
    의존하지 않는다(그리고 외부 요청 0 규칙 안에 있다). */
@@ -8074,11 +7979,11 @@ html.no-art-logo .logo-img  { display: none; }
   margin-top: -17px;
   border-radius: 11px;                     /* 라운드 32% — ART §4 */
   /* 칩도 플랫 금지(§7-2): 글리프 위 / 2톤 크림 아래, 두 겹이다. */
-  background-image: var(--chip-glyph), linear-gradient(180deg, var(--j-rim) 0%, #F0DCB8 100%);
+  background-image: var(--chip-glyph), linear-gradient(180deg, var(--mL-rim) 0%, #F0DCB8 100%);
   background-repeat: no-repeat, no-repeat;
   background-position: center, center;
   background-size: 21px 21px, cover;
-  box-shadow: inset 0 0 0 2.5px var(--j-outline), 0 2px 0 rgba(110, 70, 58, .34);
+  box-shadow: inset 0 0 0 2.5px var(--mL-outline), 0 2px 0 rgba(110, 70, 58, .34);
 }
 #btn-adv::before {
   --chip-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2.6l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.5 6.1 20.6l1.2-6.5L2.5 9.5l6.6-.9z' fill='%23FFD34A' stroke='%236E463A' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E");
@@ -8102,20 +8007,20 @@ html.no-art-logo .logo-img  { display: none; }
    그 두께가 글자 속을 메운다. 크기에 비례해 다시 잡거나(부제) 아예 끈다(칩/배지). */
 #screen-menu #btn-adv .btn-sub {
   color: #FFFFFF;
-  -webkit-text-stroke: 1.5px var(--j-outline);
+  -webkit-text-stroke: 1.5px var(--mL-outline);
   text-shadow: 0 1px 0 rgba(110, 70, 58, .5);
   opacity: 1;
 }
 #screen-menu .badge-fire {
   color: #FFFFFF;
-  -webkit-text-stroke: 1.4px var(--j-outline);
+  -webkit-text-stroke: 1.4px var(--mL-outline);
 }
 #screen-menu .badge-new {
-  color: var(--j-ink);
+  color: var(--prim-art-ink);
   -webkit-text-stroke: 0;
   text-shadow: none;
-  background-image: linear-gradient(180deg, var(--j-rim) 0%, #F0DCB8 100%);
-  box-shadow: inset 0 0 0 1.5px var(--j-outline);
+  background-image: linear-gradient(180deg, var(--mL-rim) 0%, #F0DCB8 100%);
+  box-shadow: inset 0 0 0 1.5px var(--mL-outline);
 }
 
 /* 캐릭터 진입 줄: 아바타 둘이 이 버튼의 아이콘 칩이다 — ::before 를 안 붙인다. */
@@ -8123,8 +8028,8 @@ html.no-art-logo .logo-img  { display: none; }
 .co-avs {
   padding: 3px;
   border-radius: 12px;
-  background-image: linear-gradient(180deg, var(--j-rim) 0%, #F0DCB8 100%);
-  box-shadow: inset 0 0 0 2.5px var(--j-outline);
+  background-image: linear-gradient(180deg, var(--mL-rim) 0%, #F0DCB8 100%);
+  box-shadow: inset 0 0 0 2.5px var(--mL-outline);
   width: 56px;
   height: 46px;
 }
@@ -8135,13 +8040,13 @@ html.no-art-logo .logo-img  { display: none; }
   -webkit-text-stroke: 0;
   text-shadow: 0 1px 2px rgba(90, 48, 74, .8);
 }
-.co-name { color: #FFFFFF; -webkit-text-stroke: 1.8px var(--j-outline); }
+.co-name { color: #FFFFFF; -webkit-text-stroke: 1.8px var(--mL-outline); }
 .co-go {
-  color: var(--j-ink);
+  color: var(--prim-art-ink);
   -webkit-text-stroke: 0;
   text-shadow: none;
-  background-image: linear-gradient(180deg, var(--j-rim) 0%, #F0DCB8 100%);
-  box-shadow: inset 0 0 0 2px var(--j-outline);
+  background-image: linear-gradient(180deg, var(--mL-rim) 0%, #F0DCB8 100%);
+  box-shadow: inset 0 0 0 2px var(--mL-outline);
 }
 
 /* "게임 방법"만은 젤리 바가 아니다 — 이 화면에 젤리 바가 여섯 개면 위계가 없다.
@@ -8150,7 +8055,7 @@ html.no-art-logo .logo-img  { display: none; }
    같은 요소를 잡기 때문이다 — 이 줄이 그보다 낮으면 잉크색 글자만 남는다. */
 #screen-menu #btn-howto {
   color: #FFFFFF;
-  background: var(--j-scrim);
+  background: var(--mL-scrim);
   box-shadow: none;
   font-weight: 800;
 }
@@ -8159,11 +8064,11 @@ html.no-art-logo .logo-img  { display: none; }
 #screen-menu .icon-btn {
   width: 42px;
   height: 42px;
-  color: var(--j-ink);
-  background: linear-gradient(180deg, var(--j-cream) 0%, var(--j-cream-2) 100%);
+  color: var(--prim-art-ink);
+  background: linear-gradient(180deg, var(--mL-face-a) 0%, var(--mL-face-b) 100%);
   box-shadow:
     inset 0 2px 0 rgba(255, 255, 255, .7),
-    0 0 0 2.5px var(--j-outline),
+    0 0 0 2.5px var(--mL-outline),
     0 4px 0 rgba(110, 70, 58, .34);
 }
 #screen-menu .icon-btn:active { transform: translateY(2px) scale(.96); }
@@ -8183,12 +8088,12 @@ html.no-art-logo .logo-img  { display: none; }
   max-height: 100%;
   padding: 14px 16px 16px;
   border-radius: 26px;
-  color: var(--j-ink);
-  background: linear-gradient(180deg, var(--j-cream) 0%, var(--j-cream-2) 100%);
+  color: var(--prim-art-ink);
+  background: linear-gradient(180deg, var(--mL-face-a) 0%, var(--mL-face-b) 100%);
   box-shadow:
-    inset 0 0 0 4px var(--j-salmon),
-    inset 0 0 0 7px var(--j-rim),
-    0 0 0 3px var(--j-outline),
+    inset 0 0 0 4px var(--prim-art-salmon),
+    inset 0 0 0 7px var(--mL-rim),
+    0 0 0 3px var(--mL-outline),
     0 18px 42px rgba(90, 48, 74, .55);
 }
 
@@ -8202,11 +8107,11 @@ html.no-art-logo .logo-img  { display: none; }
   font-family: var(--font-display);
   font-size: 20px;
   text-align: center;
-  text-shadow: 0 2px 0 var(--j-ribbon-sh);
-  background: linear-gradient(180deg, var(--j-ribbon) 0%, var(--j-ribbon-2) 100%);
+  text-shadow: 0 2px 0 var(--prim-art-ribbon-sh);
+  background: linear-gradient(180deg, var(--prim-art-ribbon) 0%, var(--prim-art-ribbon-2) 100%);
   box-shadow:
     inset 0 2px 0 rgba(255, 255, 255, .34),
-    0 0 0 3px var(--j-outline),
+    0 0 0 3px var(--mL-outline),
     0 4px 0 rgba(110, 70, 58, .42);
 }
 /* 리본 좌우 장식 노치 (ART §4). 본체 **밖**에 완전히 나가 있다 — z-index 로
@@ -8219,8 +8124,8 @@ html.no-art-logo .logo-img  { display: none; }
   width: 13px;
   height: 22px;
   margin-top: -11px;
-  background-image: linear-gradient(180deg, var(--j-ribbon) 0%, var(--j-ribbon-2) 100%);
-  box-shadow: 0 0 0 3px var(--j-outline);
+  background-image: linear-gradient(180deg, var(--prim-art-ribbon) 0%, var(--prim-art-ribbon-2) 100%);
+  box-shadow: 0 0 0 3px var(--mL-outline);
 }
 .cp-head h2::before { left: -13px; border-radius: 7px 0 0 7px; }
 .cp-head h2::after { right: -13px; border-radius: 0 7px 7px 0; }
@@ -8231,9 +8136,9 @@ html.no-art-logo .logo-img  { display: none; }
   margin-top: -19px;
   width: 38px;
   height: 38px;
-  color: var(--j-ink);
-  background: linear-gradient(180deg, var(--j-rim) 0%, #F0DCB8 100%);
-  box-shadow: inset 0 0 0 2.5px var(--j-outline);
+  color: var(--prim-art-ink);
+  background: linear-gradient(180deg, var(--mL-rim) 0%, #F0DCB8 100%);
+  box-shadow: inset 0 0 0 2.5px var(--mL-outline);
 }
 /* 14차 #판정 — .cp-arrow 제거(3/4: 젤리 스킨 크림 껍데기). 근거는 1/4 블록 참조.
 .cp-arrow {
@@ -8250,7 +8155,7 @@ html.no-art-logo .logo-img  { display: none; }
   border: 0;
   border-radius: 18px;
   background: none;
-  color: var(--j-ink);
+  color: var(--prim-art-ink);
 }
 #char-pick .char-card[aria-checked="true"] { box-shadow: none; }
 
@@ -8269,24 +8174,24 @@ html.no-art-logo .logo-img  { display: none; }
   z-index: 0;
   border-radius: 20px;
   /* 그림 위 / 2톤 크림 아래 — 그림이 없는 캐릭터에서도 플랫 면이 남지 않는다. */
-  background-image: var(--char-img, none), linear-gradient(180deg, var(--j-plate) 0%, #E3BFA2 100%);
+  background-image: var(--char-img, none), linear-gradient(180deg, var(--prim-art-plate) 0%, #E3BFA2 100%);
   background-size: contain, cover;
   background-position: center bottom, center;
   background-repeat: no-repeat, no-repeat;
   /* 골드 / 살몬 이중 보더 (ART §4 썸네일·초상 프레임) */
   box-shadow:
-    inset 0 0 0 3px var(--j-salmon),
-    0 0 0 3px var(--j-gold),
-    0 0 0 6px var(--j-outline),
+    inset 0 0 0 3px var(--prim-art-salmon),
+    0 0 0 3px var(--prim-art-gold),
+    0 0 0 6px var(--mL-outline),
     0 5px 0 rgba(110, 70, 58, .3);
 }
 /* 활성(선택된) 카드의 초상은 골드 글로우를 얻는다 — aria-checked 가 근거인 것은
    6차까지의 규약 그대로다. */
 #char-pick .char-card[aria-checked="true"] .cc-art {
   box-shadow:
-    inset 0 0 0 3px var(--j-salmon),
-    0 0 0 3px var(--j-gold),
-    0 0 0 6px var(--j-outline),
+    inset 0 0 0 3px var(--prim-art-salmon),
+    0 0 0 3px var(--prim-art-gold),
+    0 0 0 6px var(--mL-outline),
     0 5px 0 rgba(110, 70, 58, .3),
     0 0 22px 4px rgba(255, 211, 74, .55);
 }
@@ -8317,11 +8222,11 @@ html.no-art-logo .logo-img  { display: none; }
   border-radius: 12px;
   font-family: var(--font-display);
   font-size: 20px;
-  color: var(--j-ink);
-  background: linear-gradient(180deg, #FBE6D2 0%, var(--j-plate) 100%);
-  box-shadow: inset 0 0 0 2.5px var(--ch-key, var(--j-salmon-2)), 0 3px 0 rgba(110, 70, 58, .28);
+  color: var(--prim-art-ink);
+  background: linear-gradient(180deg, #FBE6D2 0%, var(--prim-art-plate) 100%);
+  box-shadow: inset 0 0 0 2.5px var(--ch-key, var(--prim-art-salmon-2)), 0 3px 0 rgba(110, 70, 58, .28);
 }
-#char-pick .cc-title { margin-top: 6px; font-size: 11.5px; color: var(--j-ink-2); }
+#char-pick .cc-title { margin-top: 6px; font-size: 11.5px; color: var(--prim-art-ink-2); }
 
 
 /* 설명 박스 — 패시브/필살기/한 줄 팁이 한 액자 안에 모인다 */
@@ -8329,27 +8234,27 @@ html.no-art-logo .logo-img  { display: none; }
   margin-top: 7px;
   padding: 7px 10px;
   border-radius: 12px;
-  background: var(--j-rim);
-  box-shadow: inset 0 0 0 2px var(--j-salmon);
+  background: var(--mL-rim);
+  box-shadow: inset 0 0 0 2px var(--prim-art-salmon);
 }
-#char-pick .cc-k { color: var(--j-ink-2); }
-#char-pick .cc-k-u { color: var(--j-salmon-2); }
+#char-pick .cc-k { color: var(--prim-art-ink-2); }
+#char-pick .cc-k-u { color: var(--prim-art-salmon-2); }
 #char-pick .cc-pass,
-#char-pick .cc-ult { color: var(--j-ink); }
+#char-pick .cc-ult { color: var(--prim-art-ink); }
 #char-pick .cc-tip {
   width: 100%;
   margin-top: 7px;
   padding: 6px 10px;
   border-radius: 12px;
-  color: var(--j-ink-2);
-  background: var(--j-rim);
-  box-shadow: inset 0 0 0 2px var(--j-salmon);
+  color: var(--prim-art-ink-2);
+  background: var(--mL-rim);
+  box-shadow: inset 0 0 0 2px var(--prim-art-salmon);
 }
 #char-pick .char-card.locked .cc-stats { opacity: 0; visibility: hidden; }
-#char-pick .char-card.locked .cc-lock { background: rgba(255, 243, 220, .88); color: var(--j-ink-2); }
+#char-pick .char-card.locked .cc-lock { background: rgba(255, 243, 220, .88); color: var(--prim-art-ink-2); }
 
 .cp-dots i { background: rgba(110, 70, 58, .26); }
-.cp-dots i.on { background: var(--j-outline); }
+.cp-dots i.on { background: var(--mL-outline); }
 
 
 /* 세로가 짧은 기기: 스탯 넷이 들어온 만큼 한 줄을 돌려준다. 포트레이트와
@@ -8392,7 +8297,7 @@ html.no-art-logo .logo-img  { display: none; }
 .map-node.st-lock .mn-num {
   font-family: var(--font-display);
   color: #FFFFFF;
-  -webkit-text-stroke: 2.6px var(--j-outline);
+  -webkit-text-stroke: 2.6px var(--mL-outline);
   paint-order: stroke fill;
 }
 /* 별은 원반 **위쪽 모서리에 걸친다** (ART §4). 보스는 그 자리를 왕관이 이미
@@ -8408,20 +8313,20 @@ html.no-art-logo .logo-img  { display: none; }
    접지 그림자는 검정이 아니라 플럼이다(ART §1·§7-3). */
 .mn-body {
   box-shadow:
-    inset 0 0 0 2.5px var(--j-outline),
+    inset 0 0 0 2.5px var(--mL-outline),
     /* 8차: 우측 림 라이트 (ART §1). 4px 중 바깥 2.5px 는 외곽선이 덮으므로
        실제로 보이는 것은 1.5px — 규격의 1~2px 다. 타일·버튼과 같은 처리라
        보드·지도·UI 가 같은 광원 아래 있는 것으로 읽힌다. */
     inset -4px 0 0 rgba(255, 255, 255, .30),
     inset 0 -3px 0 rgba(110, 70, 58, .18),
     0 4px 0 rgba(110, 70, 58, .42),
-    0 8px 16px var(--j-plum);
+    0 8px 16px var(--mL-contact);
 }
 .map-chap-name {
-  color: var(--j-ink);
+  color: var(--prim-art-ink);
   font-family: var(--font-display);
-  background: linear-gradient(180deg, var(--j-cream) 0%, var(--j-cream-2) 100%);
-  box-shadow: inset 0 0 0 2.5px var(--j-outline), 0 3px 0 rgba(110, 70, 58, .42);
+  background: linear-gradient(180deg, var(--mL-face-a) 0%, var(--mL-face-b) 100%);
+  box-shadow: inset 0 0 0 2.5px var(--mL-outline), 0 3px 0 rgba(110, 70, 58, .42);
   text-shadow: none;
 }
 
@@ -8443,7 +8348,7 @@ html.no-art-logo .logo-img  { display: none; }
 .char-card.ch-jelly,
 #mate.ch-jelly,
 .co-av.ch-jelly,
-.mn-hero.ch-jelly { --ch-key: var(--role-ch-jelly-key); --ch-body: var(--j-peach); --ch-name: var(--role-ch-jelly-name); }
+.mn-hero.ch-jelly { --ch-key: var(--role-ch-jelly-key); --ch-body: var(--prim-art-peach); --ch-name: var(--role-ch-jelly-name); }
 :where(:root[data-theme="light"]) .char-card.ch-jelly { --ch-name: var(--role-ch-jelly-name-light); }
 
 .ch-jelly .cav .cav-cape { display: block; }
@@ -8498,17 +8403,17 @@ html.no-art-logo .logo-img  { display: none; }
   margin-top: -17px;
   background-size: 21px 21px, cover;
 }
-#btn-settings { --jb-1: var(--j-purple); --jb-2: var(--j-purple-2); --jb-e: var(--j-purple-e); }
+#btn-settings { --jb-1: var(--prim-art-purple); --jb-2: var(--prim-art-purple-2); --jb-e: var(--prim-art-purple-e); }
 #btn-settings::before {
   content: '';
   position: absolute;
   left: 9px;
   top: 50%;
   border-radius: 11px;
-  background-image: var(--chip-glyph), linear-gradient(180deg, var(--j-rim) 0%, #F0DCB8 100%);
+  background-image: var(--chip-glyph), linear-gradient(180deg, var(--mL-rim) 0%, #F0DCB8 100%);
   background-repeat: no-repeat, no-repeat;
   background-position: center, center;
-  box-shadow: inset 0 0 0 2.5px var(--j-outline), 0 2px 0 rgba(110, 70, 58, .34);
+  box-shadow: inset 0 0 0 2.5px var(--mL-outline), 0 2px 0 rgba(110, 70, 58, .34);
   --chip-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 8.4a3.6 3.6 0 1 0 0 7.2 3.6 3.6 0 0 0 0-7.2zm9 4.5v-1.8l-2.4-.5a6.9 6.9 0 0 0-.8-1.9l1.3-2-1.3-1.3-2 1.3a6.9 6.9 0 0 0-1.9-.8L13.4 3h-1.8l-.5 2.4a6.9 6.9 0 0 0-1.9.8l-2-1.3-1.3 1.3 1.3 2a6.9 6.9 0 0 0-.8 1.9L3 11.1v1.8l2.4.5c.2.7.5 1.3.8 1.9l-1.3 2 1.3 1.3 2-1.3c.6.3 1.2.6 1.9.8l.5 2.4h1.8l.5-2.4c.7-.2 1.3-.5 1.9-.8l2 1.3 1.3-1.3-1.3-2c.3-.6.6-1.2.8-1.9z' fill='%235C4033'/%3E%3C/svg%3E");
 }
 /* 이 버튼들의 라벨은 원래 가운데 정렬이었다(반칸 시절). 1열에서는 칩 옆에서
@@ -8534,10 +8439,10 @@ html.no-art-logo .logo-img  { display: none; }
   gap: 10px;
   padding: 8px 10px 8px 14px;
   border-radius: 14px;
-  background: var(--j-rim);
-  box-shadow: inset 0 0 0 2.5px var(--j-salmon);
+  background: var(--mL-rim);
+  box-shadow: inset 0 0 0 2.5px var(--prim-art-salmon);
 }
-.set-k { flex: 1 1 auto; font-family: var(--font-display); font-size: 15px; color: var(--j-ink); }
+.set-k { flex: 1 1 auto; font-family: var(--font-display); font-size: 15px; color: var(--prim-art-ink); }
 .set-tg {
   flex: 0 0 auto;
   min-width: 86px;
@@ -8566,7 +8471,7 @@ html.no-art-logo .logo-img  { display: none; }
   box-shadow:
     0 3px 0 #8E7355,
     0 8px 18px rgba(83, 28, 40, .26),
-    inset 0 0 0 2.5px var(--j-outline),
+    inset 0 0 0 2.5px var(--mL-outline),
     inset 0 -5px 0 #A8906F;
 }
 .set-tg:active { transform: translateY(2px); }
@@ -8615,7 +8520,7 @@ html.no-art-logo .logo-img  { display: none; }
   inset: 0;
   border-radius: 20px;
   background: var(--art-stage) center / cover no-repeat;
-  box-shadow: inset 0 0 0 3px var(--j-outline), inset 0 -30px 46px rgba(58, 30, 48, .42);
+  box-shadow: inset 0 0 0 3px var(--mL-outline), inset 0 -30px 46px rgba(58, 30, 48, .42);
 }
 /* ⭐ W-B ③ (백로그 B1) — 펫 무대 --------------------------------------------
    반려 이전 상태: 펫 탭에서 동료를 골라도 무대에는 **히어로가 그대로** 서
@@ -8722,7 +8627,7 @@ html.no-art-logo .logo-img  { display: none; }
   font-size: 19px;
   line-height: 1;
   white-space: nowrap;
-  text-shadow: 0 2px 0 var(--j-ribbon-sh);
+  text-shadow: 0 2px 0 var(--prim-art-ribbon-sh);
 }
 .cp-head h2::before, .cp-head h2::after { content: none; }
 #charpanel #cp-close {
@@ -8897,8 +8802,8 @@ html.no-art-logo .logo-img  { display: none; }
   padding: 0;
   border: 0;
   border-radius: 14px;
-  background: var(--j-rim);
-  box-shadow: inset 0 0 0 2.5px var(--j-salmon);
+  background: var(--mL-rim);
+  box-shadow: inset 0 0 0 2.5px var(--prim-art-salmon);
   /* 그림이 상자 전체를 쓰므로 모서리는 여기서 한 번만 자른다 — .ct-art 가
      자기 radius 를 또 들 이유가 없어진다(보정의 보정을 없앤 자리다). */
   overflow: hidden;
@@ -8906,8 +8811,8 @@ html.no-art-logo .logo-img  { display: none; }
   -webkit-tap-highlight-color: transparent;
 }
 .cp-th[aria-current="true"] {
-  background: var(--j-plate);
-  box-shadow: inset 0 0 0 2.5px var(--j-outline);
+  background: var(--prim-art-plate);
+  box-shadow: inset 0 0 0 2.5px var(--mL-outline);
   filter: drop-shadow(0 0 8px rgba(255, 211, 74, .75));
 }
 .cp-th:active { transform: scale(.94); }
@@ -9010,19 +8915,19 @@ html.no-art-logo .logo-img  { display: none; }
   font-family: var(--font-display);
   font-size: 17px;
   line-height: 1;
-  color: var(--j-ink);
+  color: var(--prim-art-ink);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .ci-desc::-webkit-scrollbar { width: 0; height: 0; }
 .ci-desc p { margin: 0; }
-.ci-desc .cc-tip { display: none; color: var(--j-ink-2); font-weight: 700; }
+.ci-desc .cc-tip { display: none; color: var(--prim-art-ink-2); font-weight: 700; }
 .ci-desc .cc-line { display: flex; gap: 6px; margin-top: 0; }        /* 14차 — 원래 3px */
 .ci-desc .cc-line + .cc-line { margin-top: 1px; }
-.ci-desc .cc-k { flex: 0 0 auto; min-width: 0; font-size: 8.5px; color: var(--j-ink-2); }
-.ci-desc .cc-k-u { color: var(--j-salmon-2); }
-.ci-desc .cc-pass, .ci-desc .cc-ult { flex: 1 1 auto; min-width: 0; font-size: 9.8px; font-weight: 700; color: var(--j-ink); }
+.ci-desc .cc-k { flex: 0 0 auto; min-width: 0; font-size: 8.5px; color: var(--prim-art-ink-2); }
+.ci-desc .cc-k-u { color: var(--prim-art-salmon-2); }
+.ci-desc .cc-pass, .ci-desc .cc-ult { flex: 1 1 auto; min-width: 0; font-size: 9.8px; font-weight: 700; color: var(--prim-art-ink); }
 
 
 .cp-foot { flex: 0 0 auto; display: flex; align-items: stretch; gap: 8px; }
@@ -9154,8 +9059,8 @@ html.no-art-logo .logo-img  { display: none; }
 }
 
 /* ---- 24-4. 스킨 시트 (§9) -------------------------------------------------- */
-.sk-bal { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 0 0 10px; font-size: 12px; font-weight: 800; color: var(--j-ink-2); }
-.sk-bal-v { display: flex; align-items: center; gap: 4px; font-size: 15px; color: var(--j-ink); }
+.sk-bal { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 0 0 10px; font-size: 12px; font-weight: 800; color: var(--prim-art-ink-2); }
+.sk-bal-v { display: flex; align-items: center; gap: 4px; font-size: 15px; color: var(--prim-art-ink); }
 .sk-list { display: flex; flex-direction: column; gap: 8px; width: 100%; max-height: 46vh; overflow-y: auto; }
 .sk-item {
   display: flex;
@@ -9163,11 +9068,11 @@ html.no-art-logo .logo-img  { display: none; }
   gap: 10px;
   padding: 8px 10px;
   border-radius: 14px;
-  background: var(--j-rim);
-  box-shadow: inset 0 0 0 2.5px var(--j-salmon);
+  background: var(--mL-rim);
+  box-shadow: inset 0 0 0 2.5px var(--prim-art-salmon);
   text-align: left;
 }
-.sk-item.on { box-shadow: inset 0 0 0 3px var(--j-gold), 0 0 12px rgba(255, 211, 74, .45); }
+.sk-item.on { box-shadow: inset 0 0 0 3px var(--prim-art-gold), 0 0 12px rgba(255, 211, 74, .45); }
 .sk-th {
   flex: 0 0 auto;
   width: 46px;
@@ -9176,12 +9081,12 @@ html.no-art-logo .logo-img  { display: none; }
   border-image: var(--ui-chip) 40 stretch;
   border-radius: 14px;
   background: var(--sk-img, none) center 14% / auto 250% no-repeat,
-              linear-gradient(180deg, #FBE6D2 0%, var(--j-plate) 100%);
+              linear-gradient(180deg, #FBE6D2 0%, var(--prim-art-plate) 100%);
   background-clip: padding-box;
 }
 .sk-b { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-.sk-n { font-family: var(--font-display); font-size: 14px; color: var(--j-ink); }
-.sk-d { font-size: 10px; font-weight: 700; color: var(--j-ink-2); }
+.sk-n { font-family: var(--font-display); font-size: 14px; color: var(--prim-art-ink); }
+.sk-d { font-size: 10px; font-weight: 700; color: var(--prim-art-ink-2); }
 .sk-act {
   flex: 0 0 auto;
   min-width: 78px;
@@ -9192,11 +9097,11 @@ html.no-art-logo .logo-img  { display: none; }
   color: #FFFFFF;
   font: 800 12px/1 var(--font-latin);
   cursor: pointer;
-  background: linear-gradient(180deg, var(--j-mint) 0%, var(--j-mint) 46%, var(--j-mint-2) 46%, var(--j-mint-2) 100%);
-  box-shadow: inset 0 2px 0 rgba(255, 255, 255, .34), 0 0 0 2.5px var(--j-outline), 0 3px 0 #2E937A;
+  background: linear-gradient(180deg, var(--role-mint-face-a) 0%, var(--role-mint-face-a) 46%, var(--role-mint-face-b) 46%, var(--role-mint-face-b) 100%);
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, .34), 0 0 0 2.5px var(--mL-outline), 0 3px 0 #2E937A;
 }
 .sk-act[disabled] { opacity: .5; cursor: not-allowed; }
-.sk-act.buy { background: linear-gradient(180deg, var(--j-yel) 0%, var(--j-yel) 46%, var(--j-yel-2) 46%, var(--j-yel-2) 100%); box-shadow: inset 0 2px 0 rgba(255,255,255,.34), 0 0 0 2.5px var(--j-outline), 0 3px 0 #C98A1E; color: var(--j-ink); }
+.sk-act.buy { background: linear-gradient(180deg, var(--prim-art-gold) 0%, var(--prim-art-gold) 46%, var(--prim-art-yel-2) 46%, var(--prim-art-yel-2) 100%); box-shadow: inset 0 2px 0 rgba(255,255,255,.34), 0 0 0 2.5px var(--mL-outline), 0 3px 0 #C98A1E; color: var(--prim-art-ink); }
 .sk-item.soon { opacity: .72; }
 .sk-item.soon .sk-th { background: linear-gradient(180deg, #E7D3BA 0%, #D3B995 100%); }
 /* 14차 — 이미 프레이밍돼 구워진 그림(곰돌이 5색)은 여기서 다시 당기지 않는다.
@@ -9475,7 +9380,7 @@ html.no-art-logo .logo-img  { display: none; }
   border: 0;
   border-radius: 22px;
   background: none;
-  color: var(--j-ink);
+  color: var(--prim-art-ink);
   font: 800 26px/1 var(--font-latin);
   cursor: pointer;
 }
@@ -10174,7 +10079,7 @@ html.no-art-logo .logo-img  { display: none; }
   font-size: 14.5px;
   font-weight: 700;
   line-height: 1.25;
-  color: var(--j-ink);
+  color: var(--prim-art-ink);
 }
 .nrow-k {
   flex: 0 0 auto;
@@ -10200,7 +10105,7 @@ html.no-art-logo .logo-img  { display: none; }
 }
 .nthumb .node-hero-av { width: 26px; height: 26px; }
 .nthumb .node-hero-av svg { width: 100%; height: 100%; display: block; }
-.nthumb-n { font-size: 9px; font-weight: 800; color: var(--j-ink); white-space: nowrap; }
+.nthumb-n { font-size: 9px; font-weight: 800; color: var(--prim-art-ink); white-space: nowrap; }
 
 /* 보스 줄 */
 .node-boss { display: flex; align-items: center; gap: 10px; min-height: 44px; }
@@ -10227,8 +10132,8 @@ html.no-art-logo .logo-img  { display: none; }
 }
 .node-boss-av > svg { display: none; }   /* 표준 에셋이 옛 인라인 SVG 를 대신한다 */
 .node-boss-t { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.node-boss-t > b { font-family: var(--font-display); font-size: 15px; color: var(--j-ribbon-2); }
-.node-boss-t > i { font-style: normal; font-size: 12.5px; line-height: 1.3; color: var(--j-ink); }
+.node-boss-t > b { font-family: var(--font-display); font-size: 15px; color: var(--prim-art-ribbon-2); }
+.node-boss-t > i { font-style: normal; font-size: 12.5px; line-height: 1.3; color: var(--prim-art-ink); }
 
 /* 방해 요소 칩 줄 */
 .node-chips { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -10237,14 +10142,14 @@ html.no-art-logo .logo-img  { display: none; }
   border-radius: 10px;
   font-size: 11.5px;
   font-weight: 700;
-  color: var(--j-ink);
-  background: var(--j-rim);
-  box-shadow: inset 0 0 0 2px var(--j-salmon);
+  color: var(--prim-art-ink);
+  background: var(--mL-rim);
+  box-shadow: inset 0 0 0 2px var(--prim-art-salmon);
 }
 
 /* 별 3슬롯 */
 .node-stars { display: flex; flex-direction: column; gap: 4px; margin: 0; padding: 0; list-style: none; }
-.node-stars .nstar { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--j-ink); }
+.node-stars .nstar { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--prim-art-ink); }
 /* 13차-b: 빈 별은 회색 필터 위조가 아니라 **전용 조각**이다. grayscale(1) 은
    ART §7-3(무채색 그림자 금지) 위반이었다 — 빈 칸도 유채색이어야 한다. */
 .nst-ic {
@@ -10307,10 +10212,10 @@ html.no-art-logo .logo-img  { display: none; }
   opacity: .95;
 }
 .ncta-cost .hc-heart { display: block; width: 15px; height: 15px; background: var(--lib-glyph-heart) center/contain no-repeat; }
-.node-hearts { display: flex; align-items: center; gap: 6px; margin: 0; font-size: 12px; color: var(--j-ink); }
+.node-hearts { display: flex; align-items: center; gap: 6px; margin: 0; font-size: 12px; color: var(--prim-art-ink); }
 .node-hearts .hc-heart { width: 15px; height: 15px; background: var(--lib-glyph-heart) center/contain no-repeat; }
-.node-got { position: absolute; top: 6px; left: 10px; font-size: 13px; color: var(--j-gold-e); }
-.node-wait { margin: 0; font-size: 12.5px; color: var(--j-ribbon-2); }
+.node-got { position: absolute; top: 6px; left: 10px; font-size: 13px; color: var(--prim-art-gold-e); }
+.node-wait { margin: 0; font-size: 12.5px; color: var(--prim-art-ribbon-2); }
 
 /* 모드 시트의 줄 */
 .mode-list { display: flex; flex-direction: column; gap: 8px; }
@@ -10325,14 +10230,14 @@ html.no-art-logo .logo-img  { display: none; }
   border-radius: 14px;
   text-align: left;
   cursor: pointer;
-  background: var(--j-rim);
-  box-shadow: inset 0 0 0 2.5px var(--j-salmon);
+  background: var(--mL-rim);
+  box-shadow: inset 0 0 0 2.5px var(--prim-art-salmon);
 }
 .mode-row:active { transform: translateY(2px); }
 .mode-t { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-.mode-t > b { font-family: var(--font-display); font-size: 16px; color: var(--j-ink); }
+.mode-t > b { font-family: var(--font-display); font-size: 16px; color: var(--prim-art-ink); }
 .mode-t > i { font-style: normal; font-size: 11.5px; line-height: 1.3; color: #8A6B52; }
-.mode-b { flex: 0 0 auto; font-size: 12px; font-weight: 800; color: var(--j-ribbon-2); white-space: nowrap; }
+.mode-b { flex: 0 0 auto; font-size: 12px; font-weight: 800; color: var(--prim-art-ribbon-2); white-space: nowrap; }
 .mode-b:empty { display: none; }
 
 /* ==========================================================================
@@ -10600,7 +10505,7 @@ html.no-art-logo .logo-img  { display: none; }
   padding: 0 4px;
   font-family: var(--font-display);
   font-size: 14px;
-  color: var(--j-ink);
+  color: var(--prim-art-ink);
 }
 .hchip b { font-weight: 400; }
 .hchip i { font-style: normal; font-size: 10.5px; opacity: .82; }
@@ -10808,7 +10713,7 @@ html[lang="en"] .mfbtn { font-size: 8px; letter-spacing: -.15px; }
   margin: 0 0 2px;
   font-family: var(--font-display);
   font-size: 12.5px;
-  color: var(--j-ribbon-2);
+  color: var(--prim-art-ribbon-2);
 }
 .cut-who:empty { display: none; }
 .cut-line {
@@ -10816,7 +10721,7 @@ html[lang="en"] .mfbtn { font-size: 8px; letter-spacing: -.15px; }
   font-size: 15px;
   font-weight: 700;
   line-height: 1.35;
-  color: var(--j-ink);
+  color: var(--prim-art-ink);
 }
 .cut-more {
   position: absolute;
@@ -10846,7 +10751,7 @@ html[lang="en"] .mfbtn { font-size: 8px; letter-spacing: -.15px; }
   border-radius: 3px;
   background: rgba(255, 241, 216, .32);
 }
-#cut-dots i.on { background: var(--j-gold); }
+#cut-dots i.on { background: var(--prim-art-gold); }
 @media (prefers-reduced-motion: reduce) {
   .cut-more { animation: none; opacity: .8; }
 }
@@ -10863,9 +10768,9 @@ html[lang="en"] .mfbtn { font-size: 8px; letter-spacing: -.15px; }
 /* 시트 안의 본문 색은 크림 위 잉크로 (순검정 금지 — ART §7-1) */
 #modal-pause .sheet, #modal-over .sheet, #modal-tutorial .sheet,
 #modal-settings .sheet, #modal-howto .sheet, #modal-skin .sheet,
-#modal-adv .sheet, #modal-daily .sheet, #modal-clear .sheet, #modal-rank .sheet { color: var(--j-ink); }
+#modal-adv .sheet, #modal-daily .sheet, #modal-clear .sheet, #modal-rank .sheet { color: var(--prim-art-ink); }
 #modal-clear .sheet p, #modal-over .sheet p, #modal-adv .sheet p,
-#modal-daily .sheet p, #modal-rank .sheet p, #modal-tutorial .sheet p { color: var(--j-ink); }
+#modal-daily .sheet p, #modal-rank .sheet p, #modal-tutorial .sheet p { color: var(--prim-art-ink); }
 
 /* 주버튼 — 창마다 도서관 버튼 조각 (ROUND10-SPEC §C 표) */
 .lbtn {
@@ -10919,11 +10824,11 @@ html[lang="en"] .mfbtn { font-size: 8px; letter-spacing: -.15px; }
   border: 0;
   padding: 31px 38px 34px 38px;
   border-radius: 15px;
-  background: linear-gradient(180deg, var(--j-mint) 0%, var(--j-mint) 47%, var(--j-mint-2) 47%, var(--j-mint-2) 100%);
+  background: linear-gradient(180deg, var(--role-mint-face-a) 0%, var(--role-mint-face-a) 47%, var(--role-mint-face-b) 47%, var(--role-mint-face-b) 100%);
   box-shadow:
     0 3px 0 #35866F,
     0 8px 18px rgba(83, 28, 40, .26),
-    inset 0 0 0 2.5px var(--j-outline),
+    inset 0 0 0 2.5px var(--mL-outline),
     inset 0 -12px 0 #3E9C82;
   font-family: var(--font-display);
   min-height: 52px;
@@ -10940,7 +10845,7 @@ html[lang="en"] .mfbtn { font-size: 8px; letter-spacing: -.15px; }
   box-shadow:
     0 3px 0 #A85420,
     0 8px 18px rgba(83, 28, 40, .26),
-    inset 0 0 0 2.5px var(--j-outline),
+    inset 0 0 0 2.5px var(--mL-outline),
     inset 0 -12px 0 #C96426;
   font-family: var(--font-display);
   min-height: 52px;
@@ -11054,9 +10959,9 @@ html[lang="en"] .mfbtn { font-size: 8px; letter-spacing: -.15px; }
   border-radius: 10px;
   font-size: 11.5px;
   font-weight: 800;
-  color: var(--j-ink);
-  background: var(--j-rim);
-  box-shadow: inset 0 0 0 2px var(--j-gold);
+  color: var(--prim-art-ink);
+  background: var(--mL-rim);
+  box-shadow: inset 0 0 0 2px var(--prim-art-gold);
 }
 
 /* ==========================================================================
@@ -11207,7 +11112,7 @@ html[data-fruit="1"] .tile.cand:not([data-sp]):not(.dead) {
   box-shadow: var(--fr-cast), 0 0 0 2.5px rgba(255, 255, 255, .95), 0 0 0 4px rgba(14, 10, 24, .55);
 }
 html[data-fruit="1"] .tile.blocker:not([data-sp]):not(.dead) {
-  box-shadow: var(--fr-cast), 0 0 0 2.5px var(--blocker-ring);
+  box-shadow: var(--fr-cast), 0 0 0 2.5px var(--role-blocker-ring);
 }
 html[data-fruit="1"] .tile.hint:not([data-sp]):not(.dead) {
   box-shadow: 0 0 0 3px rgba(255, 255, 255, .95), 0 0 0 4.5px rgba(14, 10, 24, .5), 0 0 22px 5px var(--c);
@@ -11218,7 +11123,7 @@ html[data-fruit="1"] .tile.sel:not([data-sp]):not(.dead) {
 }
 /* 피버 — #app 특이도(1,x,x)를 이기려면 게이트가 그 앞에 서야 한다 */
 html[data-fruit="1"] #app.fever .tile:not([data-sp]):not(.sel):not(.hint):not(.cand):not(.dead):not(.blocker) {
-  box-shadow: var(--fr-cast), 0 0 12px 1px var(--c, var(--t5));
+  box-shadow: var(--fr-cast), 0 0 12px 1px var(--c, var(--prim-c5));
 }
 html[data-fruit="1"] #app.fever .tile:not([data-sp]):not(.sel):not(.hint):not(.cand):not(.dead):not(.blocker)::before {
   box-shadow: none;
@@ -11298,7 +11203,7 @@ html[data-fruit="1"] .tile[data-v="9"] {
 html[data-fruit="1"] .tile.blocker:not([data-sp]):not(.dead) {
   box-shadow:
     var(--fr-cast),
-    0 0 0 3px var(--blocker-hot),
+    0 0 0 3px var(--role-blocker-hot),
     0 0 14px 3px rgba(255, 77, 94, .45);
 }
 
@@ -11330,7 +11235,7 @@ html[data-fruit="1"] .tile.blocker:not([data-sp]):not(.dead) {
 .skill-av.ch-twin,    .cutin-av.ch-twin    { --ch-key: var(--role-ch-twin-key); --ch-body: var(--role-ch-twin-body); --ch-name: var(--role-ch-twin-name); }
 .skill-av.ch-ppyak,   .cutin-av.ch-ppyak   { --ch-key: var(--role-ch-ppyak-key); --ch-body: var(--role-ch-ppyak-body); --ch-name: var(--role-ch-ppyak-name); }
 .skill-av.ch-mungchi, .cutin-av.ch-mungchi { --ch-key: var(--role-ch-mungchi-key); --ch-body: var(--role-ch-mungchi-body); --ch-name: var(--role-ch-mungchi-name); }
-.skill-av.ch-jelly,   .cutin-av.ch-jelly   { --ch-key: var(--role-ch-jelly-key); --ch-body: var(--j-peach); --ch-name: var(--role-ch-jelly-name); }
+.skill-av.ch-jelly,   .cutin-av.ch-jelly   { --ch-key: var(--role-ch-jelly-key); --ch-body: var(--prim-art-peach); --ch-name: var(--role-ch-jelly-name); }
 
 /* ---- 26-2. 인게임 캐릭터 슬롯 = 선택 캐릭터의 face.png (§5.9-2) -------------
    CHARACTER-PIPELINE §4 는 "인게임 소형 마스코트는 SVG 유지"라 하고 §5.9-2 는
@@ -11496,12 +11401,12 @@ html[data-fruit="1"] .tile.blocker:not([data-sp]):not(.dead) {
   background: none;
   box-shadow: none;
   font-family: var(--font-display);
-  color: var(--j-ink);
+  color: var(--prim-art-ink);
 }
 /* 칩 안의 글자는 크림 조각 위에 앉으므로 어두운 잉크다(--j-ink 8.51:1).
    6차의 --tx-dim 은 어두운 유리 위의 색이라 여기서는 읽히지 않는다. */
 #mission-badge #mission-text,
-#adv-goal #adv-goal-t { color: var(--j-ink); }
+#adv-goal #adv-goal-t { color: var(--prim-art-ink); }
 #mission-badge #mission-prog,
 #mission-badge #mission-time { color: #A8410F; font-family: var(--font-display); }
 #mission-badge .mb-ico { stroke: #A8410F; }
@@ -11511,7 +11416,7 @@ html[data-fruit="1"] .tile.blocker:not([data-sp]):not(.dead) {
   box-shadow: none;
   filter: drop-shadow(0 0 10px rgba(102, 240, 159, .55));
 }
-#mission-badge.done #mission-text { color: var(--j-ink); }
+#mission-badge.done #mission-text { color: var(--prim-art-ink); }
 #tw-chip {
   border-style: solid;
   border-width: 8px 19px;
@@ -11520,7 +11425,7 @@ html[data-fruit="1"] .tile.blocker:not([data-sp]):not(.dead) {
   background: none;
   box-shadow: none;
   font-family: var(--font-display);
-  color: var(--j-ink);
+  color: var(--prim-art-ink);
 }
 
 /* 하단 액션 바: 띠는 상단과 같은 --lib-hud-bar, 캡 넷은 메뉴가 쓰는 젤리 버튼
@@ -11560,21 +11465,21 @@ html[data-fruit="1"] .tile.blocker:not([data-sp]):not(.dead) {
 .act .act-t {
   padding: 1px 7px 2px;
   border-radius: 999px;
-  background: var(--j-cream);
+  background: var(--mL-face-a);
   box-shadow: 0 1px 0 rgba(110, 70, 58, .45);
   font-family: var(--font-display);
   font-size: 11px;
   font-weight: 400;
   letter-spacing: 0;
-  color: var(--j-ink);
+  color: var(--prim-art-ink);
   text-shadow: none;
   white-space: nowrap;
 }
 .act .act-ico { color: #FFFFFF; }
 .act .act-ico .ic {
   filter:
-    drop-shadow(0 0 1.6px var(--j-outline))
-    drop-shadow(0 0 1.6px var(--j-outline))
+    drop-shadow(0 0 1.6px var(--mL-outline))
+    drop-shadow(0 0 1.6px var(--mL-outline))
     drop-shadow(0 1px 0 rgba(110, 70, 58, .85));
 }
 /* 배지는 캡 위에 떠야 하므로 크림 바탕 + 어두운 잉크로 뒤집는다 — 색 배지를
@@ -11582,11 +11487,11 @@ html[data-fruit="1"] .tile.blocker:not([data-sp]):not(.dead) {
 .act .act-badge {
   top: -2px;
   right: 2px;
-  color: var(--j-ink);
-  background: var(--j-cream);
+  color: var(--prim-art-ink);
+  background: var(--mL-face-a);
   box-shadow: 0 0 0 2px rgba(110, 70, 58, .55);
 }
-#hint-badge, #undo-badge { background: var(--j-cream); }
+#hint-badge, #undo-badge { background: var(--mL-face-a); }
 .act.off .act-badge { background: rgba(253, 243, 220, .5); color: rgba(92, 64, 51, .6); }
 
 /* 390px 기기: 네 캡이 한 줄에 들어가야 하므로 캡 두께를 한 단 줄인다. */
@@ -11827,7 +11732,7 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
   margin: 30px 0 0;
   padding: 9px 22px;
   border-radius: 999px;
-  background: var(--j-scrim);
+  background: var(--mL-scrim);
   /* 🚨 판은 **맥동하지 않는다**. 처음엔 판까지 같이 숨 쉬게 했는데, 실캡처에서
      골(trough) 프레임을 잡아 보니 판이 함께 옅어지면서 대비를 받쳐 줄 것이
      사라졌다 — 스크림을 깐 이유 자체가 무너진다. 사용자는 이 화면을 계속
@@ -11848,7 +11753,7 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
   -webkit-text-stroke: 1.6px #FFFFFF;
   paint-order: stroke fill;
   filter:
-    drop-shadow(0 0 1.6px var(--j-outline))
+    drop-shadow(0 0 1.6px var(--mL-outline))
     drop-shadow(0 2px 0 rgba(90, 48, 74, .62));
   /* 1.7s = 사용자 지정 1.6~1.8s 의 한가운데. 느린 쪽(1.9s)은 왕복이 길어져
      "정지해 있다"에 가깝게 읽힌다 — 진폭을 키운 만큼 주기도 당긴다. */
@@ -11858,7 +11763,7 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
   .splash-tap-t {
     /* 어두운 판 위에 앉으므로 채움은 §5 의 「위 밝음 → 아래 진함」을 유지하되
        전체를 밝은 쪽으로 옮긴다 — 판이 대비를 책임지고 글자는 밝게 뜬다. */
-    background-image: linear-gradient(180deg, #FFFFFF 0%, #FFD9E8 48%, var(--j-pink) 100%);
+    background-image: linear-gradient(180deg, #FFFFFF 0%, #FFD9E8 48%, var(--prim-art-pink) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -11898,7 +11803,7 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
     opacity: 1;
     transform: scale(1.03);
     filter:
-      drop-shadow(0 0 1.6px var(--j-outline))
+      drop-shadow(0 0 1.6px var(--mL-outline))
       drop-shadow(0 2px 0 rgba(90, 48, 74, .62))
       drop-shadow(0 0 6px rgba(255, 143, 184, .80))
       drop-shadow(0 0 15px rgba(255, 143, 184, .55));
@@ -11907,7 +11812,7 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
     opacity: .5;
     transform: scale(1);
     filter:
-      drop-shadow(0 0 1.6px var(--j-outline))
+      drop-shadow(0 0 1.6px var(--mL-outline))
       drop-shadow(0 2px 0 rgba(90, 48, 74, .62))
       drop-shadow(0 0 2px rgba(255, 143, 184, .18))
       drop-shadow(0 0 5px rgba(255, 143, 184, .06));
@@ -11972,7 +11877,7 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
 #modal-arc .sheet,
 #modal-arc .sheet p,
 #modal-arc .sheet .sub-score,
-#modal-arc .sheet .sub-score b { color: var(--j-ink); }
+#modal-arc .sheet .sub-score b { color: var(--prim-art-ink); }
 /* ③ 기록 숫자 — 이 판에서 **가장 대비가 높은 요소**. 그라디언트·투명 채움을
    전부 걷어내고 불투명 잉크로 덮는다(--j-ink 보다 더 진하게: 다른 줄과 층이
    갈려야 "이것이 기록"이라고 읽힌다). 순검정은 ART §7-1 이 금지하므로 쓰지
@@ -12234,7 +12139,7 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
   border-width: 0;
   padding: 8px 23px;
   border-radius: 6.1px;
-  color: var(--j-ink);
+  color: var(--prim-art-ink);
   background:
     radial-gradient(ellipse 26% 32% at 15% 24%, rgba(255, 255, 255, .55), rgba(255, 255, 255, 0) 70%),
     linear-gradient(180deg, #FFF3DC 0%, #FFF3DC 47%, #FFE0B0 47%, #FFE0B0 100%);
@@ -12266,7 +12171,7 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
 /* ⑤ 면과 한 몸인 아이콘 — 글리프에 칩 배경을 따로 깔지 않고, 면과 같은 광원의
    1px 굽만 붙여 면에 눌러 앉힌다. 별의 근백색 잔재도 이 따뜻한 굽에 물든다. */
 #screen-map .hc-ico { filter: drop-shadow(0 1px 0 rgba(138, 90, 51, .45)); }
-#screen-map .hchip b { color: var(--j-ink); }
+#screen-map .hchip b { color: var(--prim-art-ink); }
 #screen-map .hchip i { color: #7A5744; opacity: 1; }
 
 /* ② 하단 띠 좌측 두 칩 — 굶주림 결함 동시 수리 -------------------------------
@@ -12492,7 +12397,7 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
   font-size: 13px;
   font-weight: 700;
   line-height: 1.32;
-  color: var(--j-ink);
+  color: var(--prim-art-ink);
 }
 
 /* ---- ③ 인게임 상단 목표 판때기 — 갈색 9-slice → 캔디 -----------------------
@@ -12519,7 +12424,7 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
   margin-bottom: 0;
   padding: 5px 10px;
   border-radius: 7.35px;
-  color: var(--j-ink);
+  color: var(--prim-art-ink);
   background:
     radial-gradient(ellipse 30% 34% at 16% 22%, rgba(255, 255, 255, .55), rgba(255, 255, 255, 0) 72%),
     linear-gradient(180deg,
@@ -12536,7 +12441,7 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
 }
 /* 크림 면 위 글자·글리프 — 26-4 가 정한 잉크(#5C4033)와 진행색(#A8410F)을 잇는다. */
 #screen-game #hud-row #mission-badge #mission-text,
-#screen-game #hud-row #adv-goal #adv-goal-t { color: var(--j-ink); }
+#screen-game #hud-row #adv-goal #adv-goal-t { color: var(--prim-art-ink); }
 #screen-game #hud-row #mission-badge #mission-prog,
 #screen-game #hud-row #mission-badge #mission-time { color: #A8410F; }
 #screen-game #hud-row #adv-goal .ag-ico { background: #A8410F; }
@@ -12694,7 +12599,7 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
   --role-ch-pudding-key:#E8B84B; --role-ch-pudding-body:#FFF0C8; --role-ch-pudding-name:#F0C65E;
   --role-ch-sodawitch-key:#7FD4F0; --role-ch-sodawitch-body:#D6F3FD; --role-ch-sodawitch-name:#5FC4E8;
   --role-ch-mongle-key:#A8C8F0; --role-ch-mongle-body:#E4EEFC; --role-ch-mongle-name:#8FB6E8;
-  --role-ch-churup-key:var(--role-mint-face-a); --role-ch-churup-body:#DCF6EF; --role-ch-churup-name:#5FC7AB;
+   --role-ch-churup-body:#DCF6EF; --role-ch-churup-name:#5FC7AB;
   --role-ch-mukmul-key:#5B4B9E; --role-ch-mukmul-body:#DCD6F2; --role-ch-mukmul-name:#7B69C4;
   --role-ch-tiktok-key:#F3E3C0; --role-ch-tiktok-body:#FFF8E8; --role-ch-tiktok-name:#D9BE86;
   --role-ch-kkultteok-key:#F2B822; --role-ch-kkultteok-body:#FFEFC4; --role-ch-kkultteok-name:#D99A0E;
@@ -12730,10 +12635,10 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
   --role-rw-shard-power-1:#FFE2D8; --role-rw-shard-power-2:#FFA083; --role-rw-shard-power-3:#FF7A59;
   --role-rw-shard-steady-1:#DFF6E7; --role-rw-shard-steady-2:#8FE0B0; --role-rw-shard-steady-3:#5FD08A;
   --role-rw-shard-agility-1:#DCEEFF; --role-rw-shard-agility-2:#8FCEFF; --role-rw-shard-agility-3:#59B7FF;
-  --role-rw-shard-luck-1:var(--role-rw-star-1); --role-rw-shard-luck-2:#FFE58F; --role-rw-shard-luck-3:#FFD34D;
-  --role-rw-gift-1:var(--role-rw-star-1); --role-rw-gift-2:var(--role-rw-pet-2); --role-rw-gift-3:#C4B0F5; --role-rw-gift-4:var(--role-rw-shard-agility-2); --role-rw-gift-5:var(--role-rw-shard-steady-2);
+   --role-rw-shard-luck-2:#FFE58F; --role-rw-shard-luck-3:#FFD34D;
+    --role-rw-gift-3:#C4B0F5;  
   --role-rw-item-1:#F3E7FF; --role-rw-item-2:#C9AEF5; --role-rw-item-3:#A882E8;
-  --role-bs-grape-body:#C77CF0; --role-bs-grape-horn:#7E3FAE; --role-bs-soda-body:#34C6E8; --role-bs-soda-horn:#1B7E9B; --role-bs-berry-body:#FF7A6B; --role-bs-berry-horn:#B8362A; --role-bs-mint-body:var(--role-mint-face-a); --role-bs-mint-horn:#2E8F79; --role-bs-cocoa-body:#8C5A3C; --role-bs-cocoa-horn:#4A2A18;
+  --role-bs-grape-body:#C77CF0; --role-bs-grape-horn:#7E3FAE; --role-bs-soda-body:#34C6E8; --role-bs-soda-horn:#1B7E9B; --role-bs-berry-body:#FF7A6B; --role-bs-berry-horn:#B8362A;  --role-bs-mint-horn:#2E8F79; --role-bs-cocoa-body:#8C5A3C; --role-bs-cocoa-horn:#4A2A18;
 
 
   /* [E76-0908 norm-rest · 그룹 D] 남은 접두의 원시색을 이름만 이관 — 값 신설 0, 값 동일은 기존 토큰 붕괴.
@@ -44302,7 +44207,7 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
   background-color:rgba(255,255,255,.38);
   background-image:none;
   box-shadow:inset 0 0 0 2px rgba(255,255,255,.62), 0 1px 0 rgba(110,70,58,.10);
-  color:var(--j-ink);
+  color:var(--prim-art-ink);
 }
 /* .btn-secondary(기록·스토리 갤러리)까지 여기 들어오는 이유 — 설정 창에서
    그 둘만 분홍 캔디로 남으면 "게임 방법 / 제작진"과 같은 3순위인데 혼자 소리를
@@ -44319,11 +44224,11 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
 .w6m .sheet .btn-secondary:active{ transform:translateY(2px); background-color:rgba(255,255,255,.52); }
 /* 빈 기록 줄은 "있는데 아직 안 찬 칸"이라 지우지 않고 묽게만 한다(원 규칙의 뜻 그대로) */
 .w6m .rank-row.rank-empty{ background-color:rgba(255,255,255,.20); }
-.w6m .rank-row .rank-main{ color:var(--j-ink); }
+.w6m .rank-row .rank-main{ color:var(--prim-art-ink); }
 .w6m .rank-row .rank-pos,
 .w6m .rank-row .rank-meta,
 .w6m #rank-hint{ color:#7A5C4A; }
-.w6m .set-k{ color:var(--j-ink); }
+.w6m .set-k{ color:var(--prim-art-ink); }
 
 /* --- ⑦ 젤리 알약 (조각 ②) --------------------------------------------------
    설정의 파랑 사각 토글(반려)과 기록의 탭 알약이 **같은 물건**이 된다.
@@ -44350,11 +44255,11 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
   white-space:nowrap;
   cursor:pointer;
   background-color:transparent;
-  background-image:linear-gradient(180deg, var(--j-mint) 0%, var(--j-mint) 47%, var(--j-mint-2) 47%, var(--j-mint-2) 100%);
+  background-image:linear-gradient(180deg, var(--role-mint-face-a) 0%, var(--role-mint-face-a) 47%, var(--role-mint-face-b) 47%, var(--role-mint-face-b) 100%);
   box-shadow:
     0 3px 0 #35866F,
     0 6px 14px rgba(83,28,40,.22),
-    inset 0 0 0 2.5px var(--j-outline),
+    inset 0 0 0 2.5px var(--mL-outline),
     inset 0 -5px 0 #43A184;
   text-shadow:0 1.5px 0 rgba(110,70,58,.55);
 }
@@ -44384,7 +44289,7 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
   box-shadow:
     0 3px 0 #8B7E95,
     0 6px 14px rgba(83,28,40,.18),
-    inset 0 0 0 2.5px var(--j-outline),
+    inset 0 0 0 2.5px var(--mL-outline),
     inset 0 -5px 0 #A296AC;
 }
 .w6m .set-tg:active,
@@ -45099,7 +45004,7 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
 /* 장착 = 켜진 것. 티어 색을 테두리로만 쓰는 이유는 대비다 — 칩 열두 개가
    전부 다른 바탕색을 갖는 순간 어느 것이 켜져 있는지가 안 읽힌다. */
 .cp-item.on{
-  color:var(--j-ink-2, #FFF6E2);
+  color:var(--prim-art-ink-2, #FFF6E2);
   background-color:rgba(255,255,255,.20);
   box-shadow:inset 0 0 0 2px rgba(245,216,74,.72);
 }
@@ -45245,7 +45150,7 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
 }
 .char-card.ch-churup,#mate.ch-churup,.co-av.ch-churup,
 .mn-hero.ch-churup,.skill-av.ch-churup,.cutin-av.ch-churup{
-  --ch-key:var(--role-ch-churup-key); --ch-body:var(--role-ch-churup-body); --ch-name:var(--role-ch-churup-name);
+  --ch-key:var(--role-mint-face-a); --ch-body:var(--role-ch-churup-body); --ch-name:var(--role-ch-churup-name);
 }
 
 /* ---- W7 정보 카드 슬라이드 4·5번째 ---------------------------------------
@@ -45815,7 +45720,7 @@ html[lang="en"] .splash-logo{
      롤백: 이 주석을 지우고 아래 스프레드를 2.5px 로 되돌린다. */
   box-shadow:0 3px 0 var(--btn-outline),
              0 7px 16px rgba(83,28,40,.22),
-             inset 0 0 0 calc(var(--f2-ref-w) * 0.00350) var(--j-outline),
+             inset 0 0 0 calc(var(--f2-ref-w) * 0.00350) var(--mL-outline),
              inset 0 -6px 0 var(--btn-contact) !important;
   color:#FFFFFF !important;
   font-family:var(--font-display) !important;
@@ -46240,21 +46145,21 @@ html[lang="en"] .splash-logo{
   font-family:var(--font-display);
   font-size:26px;
   line-height:1;
-  color:var(--j-ink);
+  color:var(--prim-art-ink);
   text-shadow:0 1px 0 rgba(255,255,255,.9), 0 2px 4px rgba(120,110,150,.35);
 }
 #app.classic #stat-moves .stat-k,
 #app.classic #tb-stats > .stat:nth-child(2) .stat-k{
   font-size:10px;
   opacity:.82;
-  color:var(--j-ink);
+  color:var(--prim-art-ink);
 }
 #app.classic #stat-moves .stat-v,
 #app.classic #tb-stats > .stat:nth-child(2) .stat-v{
   font-family:var(--font-display);
   font-size:15px;
   line-height:1;
-  color:var(--j-ink);
+  color:var(--prim-art-ink);
   text-shadow:0 1px 0 rgba(255,255,255,.85);
 }
 
@@ -46360,7 +46265,7 @@ html[lang="en"] .splash-logo{
   font-size:9.2cqw;
   line-height:1;
   letter-spacing:.02em;
-  color:var(--j-ink);
+  color:var(--prim-art-ink);
   text-shadow:0 1px 0 rgba(255,255,255,.92), 0 2px 5px rgba(120,110,150,.38);
 }
 /* 좌우 게이지 알약 — 같은 캡슐 그림의 작은 판이다(새 색·새 조각 0).
@@ -46406,7 +46311,7 @@ html[lang="en"] .splash-logo{
   font-size:12px;
   font-size:4.0cqw;
   line-height:1;
-  color:var(--j-ink);
+  color:var(--prim-art-ink);
   text-shadow:0 1px 0 rgba(255,255,255,.88);
   white-space:nowrap;
   overflow:hidden;
@@ -47337,12 +47242,12 @@ html[lang="en"] .splash-logo{
   min-height: var(--chip-h);
   height: auto;
   padding: 5px 13px;
-  color: var(--j-ink);
+  color: var(--prim-art-ink);
   text-shadow: 0 1px 0 rgba(255, 255, 255, .92), 0 0 4px rgba(255, 255, 255, .75);
 }
 /* 안쪽 글자·글리프 — 색은 앞 절의 잉크/진행색을 잇고 후광만 물려받는다. */
 #screen-game #hud-row #mission-badge #mission-text,
-#screen-game #hud-row #adv-goal #adv-goal-t{ color: var(--j-ink); }
+#screen-game #hud-row #adv-goal #adv-goal-t{ color: var(--prim-art-ink); }
 #screen-game #hud-row #mission-badge #mission-prog,
 #screen-game #hud-row #mission-badge #mission-time,
 #screen-game #hud-row #tw-chip #tw-next,
@@ -47361,7 +47266,7 @@ html[lang="en"] .splash-logo{
 #screen-game #hud-row #adv-goal.done .ag-ico{ color: #1F4A2E; }
 /* 삐약의 장전 완료 글로우는 신호라 살린다 — 위 `box-shadow:none` 의 예외 한 줄. */
 #screen-game #hud-row #pv-chip.pv-armed{
-  box-shadow: 0 0 10px 1px var(--pv-key, var(--accent));
+  box-shadow: 0 0 10px 1px var(--pv-key, var(--prim-c8));
 }
 </style>
 
@@ -47410,7 +47315,7 @@ html[lang="en"] .splash-logo{
 .kit-cap{
   --cap-r: 999px;  --cap-h: 52px;
   --cap-a:var(--role-mint-face-a); --cap-b:var(--role-mint-face-b); --cap-drop:var(--role-mint-outline); --cap-band:var(--role-mint-contact);
-  --cap-edge:var(--j-outline);
+  --cap-edge:var(--mL-outline);
   --cap-s:.706;
   position:relative; box-sizing:border-box;
   display:flex; align-items:center; justify-content:center; gap:6px;
@@ -47574,7 +47479,7 @@ html[lang="en"] .splash-logo{
    `.ch-g` 는 이 처방을 그대로 쓴다 — 그것은 캡슐이 아니라 다른 부품이다. */
 #app.classic #classic-hud .ch-g{
   --cap-a:var(--role-glass-face-a); --cap-b:var(--role-glass-face-b); --cap-drop:var(--role-glass-outline); --cap-band:var(--role-glass-contact);
-  --cap-edge:var(--j-outline);
+  --cap-edge:var(--mL-outline);
   --jelly-s:.874;
   border:0 !important;
   border-image:none !important;
@@ -47666,7 +47571,7 @@ html[lang="en"] .splash-logo{
   background-repeat:no-repeat !important;
   box-shadow:0 3px 0 #9A89A6,
              0 7px 16px rgba(83,28,40,.22),
-             inset 0 0 0 2.5px var(--j-outline),
+             inset 0 0 0 2.5px var(--mL-outline),
              inset 0 -6px 0 #BAAAC6,
              inset 0 0 3px 5px rgba(255,255,255,.62),
              inset 0 -14px 5px -12px rgba(255,255,255,.36) !important;
@@ -47702,7 +47607,7 @@ html[lang="en"] .splash-logo{
                                           var(--cap-b) 47%,var(--cap-b) 100%);
   box-shadow:0 2px 0 var(--cap-drop),
              0 4px 9px rgba(83,28,40,.24),
-             inset 0 0 0 2px var(--j-outline),
+             inset 0 0 0 2px var(--mL-outline),
              inset 0 -4px 0 var(--cap-band),
              inset 0 0 1px 1.5px rgba(255,255,255,.42);
   color:#FFFFFF;
@@ -47791,7 +47696,7 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   --f2-box-2:    var(--role-f2-box-2);  /* 패시브 박스 하 (7b)  */
   --f2-pill:     var(--role-f2-pill);  /* 알약 바탕 (8)        */
   --f2-pill-line:var(--role-f2-pill-line);  /* 알약 외곽선 (8b)     */
-  --f2-cast:     var(--role-f2-cast); /* 카드 밖 드리운 그림자 */
+   /* 카드 밖 드리운 그림자 */
   --f2-ink:      var(--role-f2-ink);
 
   /* ---- 투명도 (B 인게임 = .43, C 흰바탕 = 1) ---------------- */
@@ -47853,7 +47758,7 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
       color-mix(in srgb, var(--f2-line) 66%, transparent),
     0 0 var(--f2-soft-tail) 0 color-mix(in srgb, var(--f2-line) 20%, transparent),
     /* 카드 밖 드리운 그림자: 아래로 치우침 (실측 하단 -41L / 측면 -8L) */
-    0 calc(var(--f2-w) * .0068) calc(var(--f2-w) * .0190) var(--f2-cast);
+    0 calc(var(--f2-w) * .0068) calc(var(--f2-w) * .0190) var(--role-f2-cast);
   isolation: isolate;
 }
 
@@ -48105,7 +48010,7 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
     0 0 var(--f2-soft-blur) var(--f2-soft-spread)
       color-mix(in srgb, var(--f2-pill-line) 66%, transparent),
     0 0 var(--f2-soft-tail) 0 color-mix(in srgb, var(--f2-pill-line) 20%, transparent),
-    0 calc(var(--f2-ph) * .05) calc(var(--f2-ph) * .12) var(--f2-cast);
+    0 calc(var(--f2-ph) * .05) calc(var(--f2-ph) * .12) var(--role-f2-cast);
 }
 .kit-pill-v2::after{                          /* 질감층 (색 변수 없음) */
   content:""; position:absolute; inset:0;
@@ -48167,29 +48072,29 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
 
 :root{
   /* ---- 주버튼 색 (참고값. 클론 시 여기만 바꾼다) ------------------ */
-  --f2-btn-1:      var(--role-f2-btn-1);  /* 1  본체 위   (글자 없는 세로줄 x=300, y=T+.22H) */
-  --f2-btn-2:      var(--role-sky-face-b);  /* 2  본체 아래 (같은 줄, y=B-.30H)  */
-  --f2-btn-line:   var(--role-sky-outline);  /* 3  외곽선 최심 화소 (L 106, 본체 대비 -98) */
-  --f2-btn-ink:    var(--prim-white);  /* 4  글자                          */
-  --f2-btn-off:    var(--role-f2-btn-off);  /* 5  비활성 바탕                   */
-  --f2-btn-off-2:  var(--role-f2-btn-off-2);  /* 5b 비활성 바탕 아래              */
-  --f2-btn-off-ln: var(--role-f2-btn-off-ln);  /* 5c 비활성 외곽선                 */
+    /* 1  본체 위   (글자 없는 세로줄 x=300, y=T+.22H) */
+    /* 2  본체 아래 (같은 줄, y=B-.30H)  */
+    /* 3  외곽선 최심 화소 (L 106, 본체 대비 -98) */
+    /* 4  글자                          */
+    /* 5  비활성 바탕                   */
+    /* 5b 비활성 바탕 아래              */
+    /* 5c 비활성 외곽선                 */
 
   /* ---- 보조버튼 색 (B 「스킨」 실측) ----------------------------- */
-  --f2-btn2-1:     var(--role-f2-btn2-1);  /* 1b 보조 본체 위 (x=70)  */
-  --f2-btn2-2:     var(--role-f2-btn2-2);  /* 2b 보조 본체 아래       */
-  --f2-btn2-line:  var(--role-f2-btn2-line);  /* 3b 보조 외곽선 최심 (L 99, -90) */
+    /* 1b 보조 본체 위 (x=70)  */
+    /* 2b 보조 본체 아래       */
+    /* 3b 보조 외곽선 최심 (L 99, -90) */
 
   /* ---- 강조 림 (선택 칩의 노란 림에서 실측한 값을 그대로 쓴다) --- */
   --f2-hi:      var(--role-f2-hi);                /* 6  강조 림   */
-  --f2-hi-halo: var(--role-f2-hi-halo);  /* 6b 강조 후광 */
+    /* 6b 강조 후광 */
 
   /* ---- 알약 ------------------------------------------------------ */
   --f2-pill-a-1:   var(--role-f2-pill-a-1);  /* 7  A 헤더 알약 위 (글자·광택 없는 x=240, 림 바로 아래) */
-  --f2-pill-a-2:   var(--role-f2-pill-a-2);  /* 7b A 헤더 알약 아래 (x=240, y=B-.30H) */
-  --f2-pill-a-ln:  var(--role-f2-pill-a-ln);  /* 7c A 헤더 알약 외곽선 최심 (L 123, -96) */
+    /* 7b A 헤더 알약 아래 (x=240, y=B-.30H) */
+    /* 7c A 헤더 알약 외곽선 최심 (L 123, -96) */
   --f2-pill-soft:  var(--role-f2-pill-soft);  /* 8  추천 알약 바탕     */
-  --f2-pill-soft-e:var(--role-f2-pill-soft-e);  /* 8b 추천 알약 소프트 링 */
+    /* 8b 추천 알약 소프트 링 */
 
   /* ---- 원형 칩 --------------------------------------------------- */
   --f2-chip-fill:  var(--prim-white-a10); /* 9 칩 바탕 — 반투명 유리.
@@ -48252,9 +48157,9 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
    ============================================================ */
 .kit-btn-v2{
   --f2-bh: calc(var(--f2-w) * .1230);
-  --f2-c1: var(--f2-btn-1);
-  --f2-c2: var(--f2-btn-2);
-  --f2-cl: var(--f2-btn-line);
+  --f2-c1: var(--role-f2-btn-1);
+  --f2-c2: var(--role-sky-face-b);
+  --f2-cl: var(--role-sky-outline);
 
   position: relative;
   box-sizing: border-box;
@@ -48268,7 +48173,7 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   /* 본체 세로 그라디언트: 실측 ΔL -17 (위 191 -> 아래 175), 52 % 에서 평평해진다 */
   background: linear-gradient(180deg, var(--f2-c1) 0%, var(--f2-c1) var(--f2-g1, 16%),
                                      var(--f2-c2) var(--f2-g2, 70%), var(--f2-c2) 100%);
-  color: var(--f2-btn-ink);
+  color: var(--prim-white);
   font-weight: 800;
   font-size: calc(var(--f2-bh) * .30);
   line-height: 1.15;
@@ -48287,7 +48192,7 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
     0 0 var(--f2-st) 0            color-mix(in srgb, var(--f2-cl) 20%, transparent),
     /* 버튼 밖 드리운 그림자 — 실측 하단 치우침 */
     0 calc(var(--f2-bh) * .045) calc(var(--f2-bh) * .11)
-      var(--f2-cast, rgba(120,95,125,.30));
+      var(--role-f2-cast, rgba(120,95,125,.30));
 }
 
 /* ---- 질감층: 색 변수 0개. 흰/검 알파만. ------------------------- */
@@ -48337,17 +48242,17 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
 
 /* ---- 종류 --------------------------------------------------------- */
 .kit-btn-v2[data-kind="primary"]{
-  --f2-c1: var(--f2-btn-1);
-  --f2-c2: var(--f2-btn-2);
-  --f2-cl: var(--f2-btn-line);
+  --f2-c1: var(--role-f2-btn-1);
+  --f2-c2: var(--role-sky-face-b);
+  --f2-cl: var(--role-sky-outline);
   /* 실측 513.22 x 90.37 -> 폭은 높이의 5.68 배 (내용이 정하면 이 줄만 뺀다) */
   min-width: calc(var(--f2-bh) * 5.68);
 }
 .kit-btn-v2[data-kind="secondary"]{
   --f2-bh: calc(var(--f2-w) * .1329);        /* 97.65 / 735 */
-  --f2-c1: var(--f2-btn2-1);
-  --f2-c2: var(--f2-btn2-2);
-  --f2-cl: var(--f2-btn2-line);
+  --f2-c1: var(--role-f2-btn2-1);
+  --f2-c2: var(--role-f2-btn2-2);
+  --f2-cl: var(--role-f2-btn2-line);
   /* 실측 156.57 x 97.65 -> 폭은 높이의 1.60 배 */
   min-width: calc(var(--f2-bh) * 1.60);
   padding: 0 calc(var(--f2-bh) * .12);
@@ -48377,7 +48282,7 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
     0 0 var(--f2-sb) var(--f2-ss) color-mix(in srgb, var(--f2-cl) 66%, transparent),
     0 0 var(--f2-st) 0            color-mix(in srgb, var(--f2-cl) 20%, transparent),
     0 calc(var(--f2-bh) * .010) calc(var(--f2-bh) * .04)
-      var(--f2-cast, rgba(120,95,125,.30));
+      var(--role-f2-cast, rgba(120,95,125,.30));
 }
 .kit-btn-v2:active:not([disabled])::after,
 .kit-btn-v2[data-press]:not([disabled])::after,
@@ -48397,10 +48302,10 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
 /* --- 비활성 ------------------------------------------------------- */
 .kit-btn-v2[disabled],
 .kit-btn-v2[aria-disabled="true"]{
-  --f2-c1: var(--f2-btn-off);
-  --f2-c2: var(--f2-btn-off-2);
-  --f2-cl: var(--f2-btn-off-ln);
-  color: color-mix(in srgb, var(--f2-btn-ink) 62%, var(--f2-btn-off-ln));
+  --f2-c1: var(--role-f2-btn-off);
+  --f2-c2: var(--role-f2-btn-off-2);
+  --f2-cl: var(--role-f2-btn-off-ln);
+  color: color-mix(in srgb, var(--prim-white) 62%, var(--role-f2-btn-off-ln));
   cursor: default;
   pointer-events: none;
   opacity: .78;
@@ -48424,9 +48329,9 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
     0 0 var(--f2-sb) var(--f2-ss) color-mix(in srgb, var(--f2-cl) 66%, transparent),
     0 0 var(--f2-st) 0            color-mix(in srgb, var(--f2-cl) 20%, transparent),
     0 0 0 calc(var(--f2-bh) * .030) var(--f2-hi),
-    0 0 calc(var(--f2-bh) * .20) calc(var(--f2-bh) * .03) var(--f2-hi-halo),
+    0 0 calc(var(--f2-bh) * .20) calc(var(--f2-bh) * .03) var(--role-f2-hi-halo),
     0 calc(var(--f2-bh) * .045) calc(var(--f2-bh) * .11)
-      var(--f2-cast, rgba(120,95,125,.30));
+      var(--role-f2-cast, rgba(120,95,125,.30));
 }
 .kit-btn-v2[data-active]::after{
   box-shadow:
@@ -48445,8 +48350,8 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   /* A 131.33 px(832폭 캔버스) = 768폭 환산 121.23 -> .1649 --f2-w */
   --f2-bh: calc(var(--f2-w) * .1649);
   --f2-c1: var(--f2-pill-a-1);
-  --f2-c2: var(--f2-pill-a-2);
-  --f2-cl: var(--f2-pill-a-ln);
+  --f2-c2: var(--role-f2-pill-a-2);
+  --f2-cl: var(--role-f2-pill-a-ln);
   /* 헤더는 코너가 조금 더 얕다 — A .2796 / B .2755, 채택 .278 */
   --f2-br:  calc(var(--f2-bh) * .278);
   --f2-bri: calc(var(--f2-br) - var(--f2-bbd));
@@ -48462,7 +48367,7 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   --f2-g2: 30%;
   background: linear-gradient(180deg, var(--f2-c1) 0%, var(--f2-c1) var(--f2-g1),
                                      var(--f2-c2) var(--f2-g2), var(--f2-c2) 100%);
-  color: var(--f2-btn-ink);
+  color: var(--prim-white);
   font-weight: 800;
   font-size: calc(var(--f2-bh) * .32);
   isolation: isolate;
@@ -48471,16 +48376,16 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
     0 0 var(--f2-sb) var(--f2-ss) color-mix(in srgb, var(--f2-cl) 66%, transparent),
     0 0 var(--f2-st) 0            color-mix(in srgb, var(--f2-cl) 20%, transparent),
     0 calc(var(--f2-bh) * .042) calc(var(--f2-bh) * .10)
-      var(--f2-cast, rgba(120,95,125,.30));
+      var(--role-f2-cast, rgba(120,95,125,.30));
   /* 실측 스페큘러: 좌상 1점(큼, cx .071 cy .156) + 그 위 작은 1점 */
   --f2-sp1-x: 7%;  --f2-sp1-y: 16%; --f2-sp1-w: 6%;   --f2-sp1-h: 16%;
   --f2-sp2-x: 12%; --f2-sp2-y: 11%; --f2-sp2-w: 2.4%; --f2-sp2-h: 8%;
   --f2-sp3-x: 4%;  --f2-sp3-y: 33%; --f2-sp3-w: 1.6%; --f2-sp3-h: 5%;
 }
 .kit-pill-v2[data-variant="header"][disabled]{
-  --f2-c1: var(--f2-btn-off);
-  --f2-c2: var(--f2-btn-off-2);
-  --f2-cl: var(--f2-btn-off-ln);
+  --f2-c1: var(--role-f2-btn-off);
+  --f2-c2: var(--role-f2-btn-off-2);
+  --f2-cl: var(--role-f2-btn-off-ln);
   opacity:.78;
 }
 
@@ -48508,7 +48413,7 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   /* 바깥 꼬리 = 실측 5 px = .144 H */
   box-shadow:
     0 0 calc(var(--f2-bh) * .144) calc(var(--f2-bh) * .02)
-      color-mix(in srgb, var(--f2-pill-soft-e) 74%, transparent);
+      color-mix(in srgb, var(--role-f2-pill-soft-e) 74%, transparent);
 }
 .kit-pill-v2[data-variant="soft"]::after{     /* 질감층: 색 변수 0개 */
   content:""; position:absolute; inset:0;
@@ -48522,8 +48427,8 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
 .kit-pill-v2[data-variant="soft"][data-active]{
   box-shadow:
     0 0 calc(var(--f2-bh) * .144) calc(var(--f2-bh) * .02)
-      color-mix(in srgb, var(--f2-pill-soft-e) 74%, transparent),
-    0 0 calc(var(--f2-bh) * .50) calc(var(--f2-bh) * .06) var(--f2-hi-halo);
+      color-mix(in srgb, var(--role-f2-pill-soft-e) 74%, transparent),
+    0 0 calc(var(--f2-bh) * .50) calc(var(--f2-bh) * .06) var(--role-f2-hi-halo);
 }
 .kit-pill-v2[data-variant="soft"]:active,
 .kit-pill-v2[data-variant="soft"][data-press]{
@@ -48568,7 +48473,7 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
     0 0 var(--f2-sb, calc(var(--f2-w) * .0005)) var(--f2-ss, calc(var(--f2-w) * .0013))
       color-mix(in srgb, var(--f2-chip-line) 60%, transparent),
     0 calc(var(--f2-cd) * .025) calc(var(--f2-cd) * .06)
-      var(--f2-cast, rgba(120,95,125,.30));
+      var(--role-f2-cast, rgba(120,95,125,.30));
 }
 .kit-chip-v2::after{                          /* 질감층: 색 변수 0개 */
   content:""; position:absolute;
@@ -48600,9 +48505,9 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
     /* 노란 림 : 링 바깥 (실측 중심 R+0.8 px = .006 D) */
     0 0 0 calc(var(--f2-cd) * .020) var(--f2-hi),
     /* 후광 : 반값폭 .103 D, 바깥끝 +.081 D */
-    0 0 calc(var(--f2-cd) * .103) calc(var(--f2-cd) * .022) var(--f2-hi-halo),
+    0 0 calc(var(--f2-cd) * .103) calc(var(--f2-cd) * .022) var(--role-f2-hi-halo),
     0 calc(var(--f2-cd) * .025) calc(var(--f2-cd) * .06)
-      var(--f2-cast, rgba(120,95,125,.30));
+      var(--role-f2-cast, rgba(120,95,125,.30));
 }
 .kit-chip-v2:active:not([disabled]),
 .kit-chip-v2[data-press]:not([disabled]){ transform: translateY(calc(var(--f2-cd) * .02)); }
@@ -48610,8 +48515,8 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
 .kit-chip-v2[data-press]:not([disabled])::before{ opacity:.5; }
 .kit-chip-v2[disabled],
 .kit-chip-v2[aria-disabled="true"]{
-  background: var(--f2-btn-off);
-  box-shadow: inset 0 0 0 var(--f2-cring) var(--f2-btn-off-ln);
+  background: var(--role-f2-btn-off);
+  box-shadow: inset 0 0 0 var(--f2-cring) var(--role-f2-btn-off-ln);
   opacity:.62; cursor:default; pointer-events:none;
 }
 .kit-chip-v2[disabled]::before{ opacity:.25; }
@@ -48731,18 +48636,18 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
 .kit-gauge-v2[data-active] .kit-gauge-v2__cap{
   box-shadow:
     inset 0 0 0 var(--f2-gbd) var(--f2-gauge-line),
-    0 0 calc(var(--f2-fh) * .30) calc(var(--f2-fh) * .04) var(--f2-hi-halo);
+    0 0 calc(var(--f2-fh) * .30) calc(var(--f2-fh) * .04) var(--role-f2-hi-halo);
 }
 .kit-gauge-v2:active .kit-gauge-v2__fill,
 .kit-gauge-v2[data-press] .kit-gauge-v2__fill{ opacity:.90; }
 .kit-gauge-v2[disabled],
 .kit-gauge-v2[aria-disabled="true"]{ opacity:.55; }
 .kit-gauge-v2[disabled] .kit-gauge-v2__fill{
-  background: linear-gradient(90deg, var(--f2-btn-off), var(--f2-btn-off-2));
-  box-shadow: inset 0 0 0 var(--f2-gbd) var(--f2-btn-off-ln);
+  background: linear-gradient(90deg, var(--role-f2-btn-off), var(--role-f2-btn-off-2));
+  box-shadow: inset 0 0 0 var(--f2-gbd) var(--role-f2-btn-off-ln);
 }
 .kit-gauge-v2[disabled] .kit-gauge-v2__cap{
-  box-shadow: inset 0 0 0 var(--f2-gbd) var(--f2-btn-off-ln);
+  box-shadow: inset 0 0 0 var(--f2-gbd) var(--role-f2-btn-off-ln);
 }
 
 /* ---- 모션을 줄이라고 한 사용자 ------------------------------------ */
@@ -48891,12 +48796,12 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   text-shadow: 0 calc(var(--f2-w) * .004) 0 rgba(120, 60, 80, .55);
   filter: none;
   -webkit-text-stroke: 0;
-  border: calc(var(--cs-head) * .027) solid var(--f2-pill-a-ln);
+  border: calc(var(--cs-head) * .027) solid var(--role-f2-pill-a-ln);
   border-radius: calc(var(--cs-head) * .232);
   background: linear-gradient(180deg, var(--f2-pill-a-1) 0%, var(--f2-pill-a-1) 16%,
-                                      var(--f2-pill-a-2) 70%, var(--f2-pill-a-2) 100%);
+                                      var(--role-f2-pill-a-2) 70%, var(--role-f2-pill-a-2) 100%);
   background-clip: border-box;
-  box-shadow: 0 calc(var(--cs-head) * .05) calc(var(--cs-head) * .12) var(--f2-cast);
+  box-shadow: 0 calc(var(--cs-head) * .05) calc(var(--cs-head) * .12) var(--role-f2-cast);
 }
 #charpanel .cp-head h2::before {
   content: "";
@@ -49178,7 +49083,7 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   box-shadow:
     inset 0 0 0 calc(var(--f2-w) * .0040) var(--f2-chip-line),
     0 0 0 calc(var(--f2-w) * .1307 * .022) var(--f2-hi),
-    0 0 calc(var(--f2-w) * .1307 * .120) calc(var(--f2-w) * .1307 * .030) var(--f2-hi-halo);
+    0 0 calc(var(--f2-w) * .1307 * .120) calc(var(--f2-w) * .1307 * .030) var(--role-f2-hi-halo);
 }
 /* 정중앙 방울만 살짝 크게 — scale 은 레이아웃을 안 바꿔 offsetLeft 측정이 안정적. */
 #charpanel #cp-track .cp-th.cp-center {
@@ -49334,7 +49239,7 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   box-shadow:
     inset 0 0 0 calc(var(--f2-w) * .0041) rgba(255,255,255,.85),
     inset 0 0 0 calc(var(--f2-w) * .007) rgba(150,124,168,.55),
-    0 calc(var(--f2-w) * .004) calc(var(--f2-w) * .010) var(--f2-cast);
+    0 calc(var(--f2-w) * .004) calc(var(--f2-w) * .010) var(--role-f2-cast);
   color: var(--f2-ink);
   font-size: calc(var(--f2-w) * .055);
   cursor: pointer;
@@ -49384,7 +49289,7 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   background: var(--f2-item-on);
   box-shadow:
     inset 0 0 0 calc(var(--f2-w) * .0041) var(--f2-hi),
-    0 0 calc(var(--f2-w) * .014) var(--f2-hi-halo);
+    0 0 calc(var(--f2-w) * .014) var(--role-f2-hi-halo);
 }
 #charpanel .cp-side .cp-item .ci-chip {
   width: auto; height: auto;
@@ -49416,7 +49321,7 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   text-align: center;
   word-break: keep-all;
 }
-#charpanel .cp-side-txt b { display: block; color: var(--f2-btn2-line); }
+#charpanel .cp-side-txt b { display: block; color: var(--role-f2-btn2-line); }
 
 /* ============================================================================
    하단 젤리 판 — kit-frame-v2 그대로. 자리만 여기서 잡는다.
@@ -50389,7 +50294,7 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   font-weight: 900;
   text-align: center;
   letter-spacing: -.02em;
-  color: var(--f2-btn2-line);
+  color: var(--role-f2-btn2-line);
 }
 /* ---- 0901 ④-b 패시브 고유명 줄 (시안 요소 11) --------------------------------
    정본 ref-v2/work-charsel-content.css 의 두 부품을 옮겼다:
@@ -50456,7 +50361,7 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   flex: none;
   font-size: calc(var(--f2-w) * .0275);
   font-weight: 900;
-  color: var(--f2-btn2-line);
+  color: var(--role-f2-btn2-line);
   background: none;
   border: 0;
   padding: 0;
@@ -50534,7 +50439,7 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   background-image: linear-gradient(180deg, var(--f2-c1) 0%, var(--f2-c1) 16%,
                                             var(--f2-c2) 70%, var(--f2-c2) 100%);
   font-family: inherit;
-  color: var(--f2-btn-ink);
+  color: var(--prim-white);
 }
 #charpanel .cp-skinbtn .cs-lab { position: relative; z-index: 4; font-weight: 900; }
 #charpanel .cp-skinbtn .cs-gem {
@@ -50562,7 +50467,7 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   background-image: linear-gradient(180deg, var(--f2-c1) 0%, var(--f2-c1) 16%,
                                             var(--f2-c2) 70%, var(--f2-c2) 100%);
   font-family: var(--font-display);
-  color: var(--f2-btn-ink);
+  color: var(--prim-white);
   text-shadow: none;
   filter: none;
   box-sizing: border-box;
@@ -50631,8 +50536,8 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   box-shadow:
     inset 0 0 0 var(--f2-cring) var(--f2-chip-line),
     0 0 0 calc(var(--f2-cd) * .020) var(--f2-hi),
-    0 0 calc(var(--f2-cd) * .103) calc(var(--f2-cd) * .022) var(--f2-hi-halo),
-    0 calc(var(--f2-cd) * .025) calc(var(--f2-cd) * .06) var(--f2-cast);
+    0 0 calc(var(--f2-cd) * .103) calc(var(--f2-cd) * .022) var(--role-f2-hi-halo),
+    0 calc(var(--f2-cd) * .025) calc(var(--f2-cd) * .06) var(--role-f2-cast);
 }
 #charpanel #mate-pick .char-card[aria-checked="true"] {
   --f2-cd: calc(var(--f2-w) * .1150 * 1.334);
@@ -51156,23 +51061,11 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
   --h2-w: min(95.7vw, 860px);
   --h2-alpha: .425;               /* 시안 B 실측. 블러 없음 */
 
-  --hv2-hp-c1:      var(--role-hv2-hp-c1);
-  --hv2-hp-c2:      var(--role-hv2-hp-c2);
-  --hv2-hp-foe-c1:  var(--role-hv2-hp-foe-c1);
-  --hv2-hp-foe-c2:  var(--role-hv2-hp-foe-c2);
-  --hv2-hp-lo-c1:   var(--role-hv2-hp-lo-c1);   /* 위험(HP<25%) */
-  --hv2-hp-lo-c2:   var(--role-hv2-hp-lo-c2);
-  --hv2-hp-drain:   var(--prim-white);   /* 감소 잔상 */
-  --hv2-hp-gain:    var(--role-hv2-hp-gain);   /* 증가 잔상 */
+     /* 위험(HP<25%) */
+     /* 감소 잔상 */
+     /* 증가 잔상 */
   --hv2-hp-track:   var(--f2-slot);
 
-  --h2-ink:     var(--role-h2-ink);
-  --h2-ink-3:   var(--role-h2-ink-3);
-  --h2-aw:      var(--role-h2-aw);
-  --h2-atk-1:   var(--role-me-atk-b);
-  --h2-atk-2:   var(--role-me-atk-a);
-  --h2-atk-foe-1:var(--role-foe-atk-a);
-  --h2-atk-foe-2:var(--role-foe-atk-b);
 }
 
 /* ============================================================
@@ -51195,7 +51088,7 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
   column-gap: calc(var(--h2-w) * .026);
   row-gap: calc(var(--h2-w) * .010);
   align-items: start;
-  color: var(--h2-ink);
+  color: var(--role-h2-ink);
   font-family: "Malgun Gothic","Pretendard",sans-serif;
   isolation: isolate;
 }
@@ -51208,8 +51101,8 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
   border-radius: var(--h2-r);
   pointer-events:none; opacity:0;
   box-shadow:
-    0 0 calc(var(--h2-w) * .048) calc(var(--h2-w) * .008) var(--h2-aw),
-    inset 0 0 calc(var(--h2-w) * .040) var(--h2-aw);
+    0 0 calc(var(--h2-w) * .048) calc(var(--h2-w) * .008) var(--role-h2-aw),
+    inset 0 0 calc(var(--h2-w) * .040) var(--role-h2-aw);
 }
 
 /* ---- 판 본체: kit-frame-v2 의 틀·질감을 그대로 쓴다 -------- */
@@ -51298,13 +51191,13 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
 .kit-hud-v2__name{
   font-size: calc(var(--h2-w) * .035);
   font-weight:800; line-height:1.1;
-  color: color-mix(in srgb, var(--h2-ink) 86%, transparent);
+  color: color-mix(in srgb, var(--role-h2-ink) 86%, transparent);
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0;
 }
 .kit-hud-v2__lv{
   font-size: calc(var(--h2-w) * .030);
   font-weight:700; line-height:1.1; flex:0 0 auto;
-  color: var(--h2-ink-3);
+  color: var(--role-h2-ink-3);
 }
 
 /* ---- 중앙: 타이머(1순위) + 성 + DMG(3순위) ------------------------
@@ -51332,7 +51225,7 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
   display:flex; align-items:center; justify-content:center;
   height: calc(var(--h2-w) * .100);
   line-height:1;
-  color: var(--h2-ink);
+  color: var(--role-h2-ink);
   font-variant-numeric: tabular-nums;
   transform-origin:center;
   transition: transform .18s cubic-bezier(.2,.9,.25,1);
@@ -51359,7 +51252,7 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
   position:relative; z-index:2;
   font-size: calc(var(--h2-w) * .030);
   font-weight:800; line-height:1.1;
-  color: var(--h2-ink-3);
+  color: var(--role-h2-ink-3);
   font-variant-numeric: tabular-nums;
   white-space:nowrap;
 }
@@ -51417,8 +51310,8 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
   --hv2-hp-bd:    calc(var(--hv2-hp-h) * .068);
   --hv2-hp-gloss: calc(var(--hv2-hp-h) * .107);
   --hv2-hp-sd:    calc(var(--hv2-hp-h) * .121);
-  --hv2-hp-1: var(--hv2-hp-c1);
-  --hv2-hp-2: var(--hv2-hp-c2);
+  --hv2-hp-1: var(--role-hv2-hp-c1);
+  --hv2-hp-2: var(--role-hv2-hp-c2);
   position:relative;
   box-sizing:border-box;
   container-type: inline-size;               /* __cap 이 100cqw 로 끝을 잡는다 */
@@ -51449,13 +51342,13 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
   position:absolute; left:0; top:0; bottom:0; z-index:1;
   right: calc(var(--hv2-hp-h) * .5);
   border-radius: 0 999em 999em 0;
-  background: var(--hv2-hp-drain);
+  background: var(--prim-white);
   opacity:.55;
   transform-origin:left center;
   transform: scaleX(var(--hv2-hp-prev));
   transition: transform .42s cubic-bezier(.33,0,.2,1) .10s;
 }
-.kit-hpbar-v2[data-dir="up"] .kit-hpbar-v2__ghost{ background: var(--hv2-hp-gain); }
+.kit-hpbar-v2[data-dir="up"] .kit-hpbar-v2__ghost{ background: var(--role-hv2-hp-gain); }
 
 /* ---- 필: transform: scaleX 만. width 애니 금지. --------------------- */
 .kit-hpbar-v2__fill{
@@ -51530,8 +51423,8 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
 /* ---- 위계: 1순위 내 HP = 시안 규격 / 2순위 악당 = x.78 -------------- */
 .kit-hpbar-v2--foe{
   --hv2-hp-h: calc(var(--f2-w) * .0350);
-  --hv2-hp-1: var(--hv2-hp-foe-c1);
-  --hv2-hp-2: var(--hv2-hp-foe-c2);
+  --hv2-hp-1: var(--role-hv2-hp-foe-c1);
+  --hv2-hp-2: var(--role-hv2-hp-foe-c2);
 }
 
 /* ---- 공격 게이지 (시안 밖 · 전투 정보) ----------------------------- */
@@ -51547,10 +51440,10 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
   transform-origin:left center;
   transform: scaleX(var(--atk, 0));
   transition: transform 200ms linear;
-  background: linear-gradient(90deg, var(--h2-atk-1), var(--h2-atk-2));
+  background: linear-gradient(90deg, var(--role-me-atk-b), var(--role-me-atk-a));
 }
 .kit-hud-v2__side--foe .hv2-atk__fill{
-  background: linear-gradient(90deg, var(--h2-atk-foe-1), var(--h2-atk-foe-2));
+  background: linear-gradient(90deg, var(--role-foe-atk-a), var(--role-foe-atk-b));
 }
 
 /* ============================================================
@@ -51570,9 +51463,9 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
 @keyframes h2-awaken{ 0%,100%{opacity:.42} 50%{opacity:.95} }
 
 /* 위험 (HP < 25%) — dhBar 가 단다 */
-.kit-hpbar-v2[data-low]{ --hv2-hp-1: var(--hv2-hp-lo-c1); --hv2-hp-2: var(--hv2-hp-lo-c2); }
+.kit-hpbar-v2[data-low]{ --hv2-hp-1: var(--role-hv2-hp-lo-c1); --hv2-hp-2: var(--role-hv2-hp-lo-c2); }
 .kit-hpbar-v2[data-low]::after{
-  background: var(--hv2-hp-lo-c2);
+  background: var(--role-hv2-hp-lo-c2);
   animation: h2-lowpulse 1.1s ease-in-out infinite;
 }
 /* 피격 — 맞은 쪽 진영만 튄다(§18.4b 의 그 규율 그대로). 위험보다 뒤라 이긴다. */
@@ -51586,7 +51479,7 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
 #duel-hud.fhit.big .kit-hud-v2__side--foe{ animation: h2-shake .30s ease-out 2; }
 /* 예고(1.8초) — 악당 바가 경고색으로 맥동한다. 화면을 덮지 않는다. */
 #duel-hud.tell .kit-hud-v2__side--foe .kit-hpbar-v2::after{
-  background: var(--hv2-hp-lo-c1);
+  background: var(--role-hv2-hp-lo-c1);
   animation: h2-tellpulse .6s ease-in-out infinite;
 }
 /* 격파 — 보스바와 같은 keyframes(bossdown). 바는 dhBar 의 [data-empty] 가 비운다. */
@@ -51657,7 +51550,7 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
   box-shadow:
     0 0 var(--f2-soft-blur) var(--f2-soft-spread) rgba(143,126,156,.66),
     0 0 var(--f2-soft-tail) 0 rgba(143,126,156,.20),
-    0 calc(var(--f2-w) * .0068) calc(var(--f2-w) * .0190) var(--f2-cast),
+    0 calc(var(--f2-w) * .0068) calc(var(--f2-w) * .0190) var(--role-f2-cast),
     inset 0 0 0 calc(var(--f2-w) * .0041) rgba(255,255,255,.82),
     inset 0 calc(var(--f2-w) * -.0204) 0 rgba(255,255,255,.62),
     inset 0 calc(var(--f2-w) * -.0150) 0 rgba(0,0,0,.13),
@@ -54066,8 +53959,8 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
     inset 0 0 0 calc(var(--wchip-rim-in) + var(--wchip-rim-w))
       rgba(255,255,255, var(--wchip-rim-a)),
     0 0 0 calc(var(--f2-cd) * .020) var(--f2-hi),
-    0 0 calc(var(--f2-cd) * .103) calc(var(--f2-cd) * .022) var(--f2-hi-halo),
-    0 calc(var(--f2-cd) * .025) calc(var(--f2-cd) * .06) var(--f2-cast);
+    0 0 calc(var(--f2-cd) * .103) calc(var(--f2-cd) * .022) var(--role-f2-hi-halo),
+    0 calc(var(--f2-cd) * .025) calc(var(--f2-cd) * .06) var(--role-f2-cast);
 }
 
 /* ---------------------------------------------------------------------------
@@ -55258,7 +55151,7 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
   text-align:center;
   /* 유리는 밝다 — 리본의 흰 글씨 + 플럼 그림자를 그대로 두면 글자가 판 위에서
      증발한다. 잉크색 + 흰 후광으로 갈아 대비를 뒤집는다(ART §7-1 순검정 금지). */
-  color:var(--j-ink);
+  color:var(--prim-art-ink);
   text-shadow:0 1px 0 rgba(255,255,255,.9), 0 2px 4px rgba(120,110,150,.35);
 }
 
@@ -55763,7 +55656,7 @@ html[lang="en"] #modal-arc.is-arcdmg .sheet > h2{ --ttl:url("catalog/ttl-arcdmg-
   box-shadow:
     0 3px 0 #D9A96F,
     0 8px 18px rgba(83, 28, 40, .26),
-    inset 0 0 0 2.5px var(--j-outline),
+    inset 0 0 0 2.5px var(--mL-outline),
     inset 0 2.5px 0 rgba(255, 255, 255, .45),
     inset 0 -10px 0 #F2D2A4;
 }
@@ -56000,7 +55893,7 @@ html[lang="en"] #modal-arc.is-arcdmg .sheet > h2{ --ttl:url("catalog/ttl-arcdmg-
   box-shadow:
     0 3px 0 #D9A96F,
     0 8px 18px rgba(83, 28, 40, .26),
-    inset 0 0 0 2.5px var(--j-outline),
+    inset 0 0 0 2.5px var(--mL-outline),
     inset 0 2.5px 0 rgba(255, 255, 255, .45),
     inset 0 -10px 0 #F2D2A4;
 }
@@ -57157,7 +57050,7 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
   --hud-groove-r:url("catalog/hud-groove-right.webp");     /* 우 체력바 홈(트랙) */
   --hud-orn-foe:url("catalog/duel-orn-bone.webp");         /* 좌 진영 뼈 장식 */
   --hud-orn-me:url("catalog/duel-orn-wing.webp");          /* 우 진영 날개 장식 */
-  --hud-tick-c:var(--prim-white-a55);                      /* 눈금 색(코드 층) */
+                        /* 눈금 색(코드 층) */
   --hud-tick-w:0.42cqw;                                    /* 눈금 선 폭 */
 }
 #app.battle #duel-hud .dh-plate,
@@ -57239,7 +57132,7 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
   z-index:6; top:26.98cqw; height:2.47cqw;
   background-image:repeating-linear-gradient(90deg,
     transparent 0, transparent calc(100%/7 - var(--hud-tick-w)),
-    var(--hud-tick-c) calc(100%/7 - var(--hud-tick-w)), var(--hud-tick-c) calc(100%/7));
+    var(--prim-white-a55) calc(100%/7 - var(--hud-tick-w)), var(--prim-white-a55) calc(100%/7));
 }
 #app.battle #duel-hud .dh-tick--l{ left:7.04cqw;  width:37.5cqw; }
 #app.battle #duel-hud .dh-tick--r{ left:61.72cqw; width:31.14cqw; }
