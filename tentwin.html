@@ -12640,12 +12640,15 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
   --mode-a-outline: #9F8896;
   --mode-a-gloss:   0.770;
   --mode-a-contact: 0.324;
-  --mode-b-face:    #ACB8F8;
+  /* [E71-0908 norm-hud] Mode B 값 = 게임 HUD 실측·첫 소비처 = --hudj-*(#classic-hud .ch-fx 젤리 엔진):
+     face #92A5DF · rim #BFCBFA · contact 0.324 (매니페스트 mode.B.face.parts.hud / rim.color.hud 와 같다).
+     theme-tentwin.css 의 #ACB8F8 / #E4EAFF / 0.000 과 다르다 — 정본↔게임 값 분열, 지휘자 보고. face_top = face(HUD 는 윗띠 없음). */
+  --mode-b-face:    #92A5DF;
   --mode-b-alpha:   0.550;
-  --mode-b-rim:     #E4EAFF;
+  --mode-b-rim:     #BFCBFA;
   --mode-b-outline: #6F6BB4;
   --mode-b-gloss:   0.770;
-  --mode-b-contact: 0.000;
+  --mode-b-contact: 0.324;
 }
 </style>
 <!-- 최우선 2장만 preload — 젤리판(세 인터페이스 공용)과 플레이 팝업 레터링이다.
@@ -51660,297 +51663,20 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
      가 살아 있으려면 외곽선이 그 변수를 읽어야 한다 — --dhj-L3-line 이
      var(--f2-line) 이다(정본의 고정색 #6B5A69 을 쓰지 않는 유일한 부품).
    ------------------------------------------------------------------------- */
-.kit-hud-v2__plate{
-  position:absolute;
-  /* ②-A — 위쪽만 --h2-w*.14 만큼 상자를 늘린다. 색 띠(inset 그림자)의 위
-     몫까지 화면 밖으로 내보내려는 것이고, #screen-game 의 overflow:hidden
-     이 실제로 자른다. 좌·우·아래는 0 이라 판 크기는 안 바뀐다. */
-  inset: calc(var(--h2-w) * -.14) 0 0 0; z-index:0;
-  pointer-events:none;
-  box-sizing:border-box;
-  border: 0;
-  background: none;
-  box-shadow: none;
-  /* 수리 0831 — 판 전체 opacity(--h2-alpha .425) 를 걷었다.
-     반투명은 정본처럼 **윌리 층이 자기 알파로** 갖는다(속 .010). */
-  container-type: size;
-}
-.kit-hud-v2__plate > .dh-gnd,
-.kit-hud-v2__plate > .dh-jelly {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
+/* [E71-0908 norm-hud] 은퇴 — .kit-hud-v2__plate > .dh-gnd/.dh-jelly(--dhj-) · #duel-hud > .dh-low > .dl-jelly(--dlj-) 젤리 엔진 사본 17규칙 삭제. 근거: 마크업·JS 0건, 런타임 querySelectorAll 0(메뉴·모험·클래식·모달 13 상태 전수). 모험 HUD 판은 단계 B(0905) 이후 .dh-plate 자산 2장이 그린다. 복구 = git(wave/norm-hud 이전 커밋). */
 
-  --dhj-w: 100cqw;
-  --dhj-h: 100cqh;
-  --dhj-L0-R:  calc(var(--dhj-w) * .178180);
-  --dhj-L0-bx: calc(var(--dhj-w) * .025000);
-  --dhj-L0-by: calc(var(--dhj-h) * .015000);
-  /* ---- ②-A (0901) 정본 hud 「위 변이 없는 판」 이식 ----------------------
-     출처(정본, 읽기만 함): ref-v2/work-frame.css :765~793 · :826 · :835 · :851
-     빈 틀 크로마 a13c656f 가 확정: 이 판은 화면 맨 위에 붙어 **위로 이어진다**.
-     실측 — y=10 줄에서 좌·우 벽만 잡히고 윗변이 없다(위 두 코너 0).
-     그래서 위 두 코너를 없애고 림·외곽선을 좌·우·아래 3변만 돌린다.
-     clip-path 는 **자르기만** 한다 — 위 변을 상자 밖(Y0 - ext)으로 내보내면
-     그 변에서 «안 자른다»가 되어 코너·림·겉선이 함께 사라진다.
-     판 상자 자체는 아래 inset 으로 화면 위까지 늘려 색 띠의 위쪽 몫도
-     화면 밖으로 보낸다(#screen-game 의 overflow:hidden 이 자른다). */
-  --dhj-ext: calc(var(--dhj-h) * 0.40);
-  --dhj-R:   min(var(--dhj-L0-R), calc(100cqh * .28));
-  --dhj-C1X: calc(var(--dhj-R) * .209445);
-  --dhj-C1Y: calc(var(--dhj-R) * .127039);
-  --dhj-C2X: calc(var(--dhj-R) * .110601);
-  --dhj-C2Y: calc(var(--dhj-R) * .209445);
-  /* [E14-0902] 들여쓴 판본의 반지름 — 볼록 코너 R-t · 오목 필렛 r+t.
-     --dhj-R 이 100cqh 상한을 쓰므로 **이 규칙 안에서** 파생해야 한다. */
-  --dhj-c1x: .209445;  --dhj-c1y: .127039;
-  --dhj-c2x: .110601;  --dhj-c2y: .209445;  --dhj-cq: .4477;
-  --dhj-R3: max(0px, calc(var(--dhj-R) - var(--dhj-L3-w)));
-  --dhj-C1X3: calc(var(--dhj-R3) * var(--dhj-c1x));
-  --dhj-C1Y3: calc(var(--dhj-R3) * var(--dhj-c1y));
-  --dhj-C2X3: calc(var(--dhj-R3) * var(--dhj-c2x));
-  --dhj-C2Y3: calc(var(--dhj-R3) * var(--dhj-c2y));
-  --dhj-Ra: max(0px, calc(var(--dhj-R) - var(--dhj-rim-in)));
-  --dhj-C1Xa: calc(var(--dhj-Ra) * var(--dhj-c1x));
-  --dhj-C1Ya: calc(var(--dhj-Ra) * var(--dhj-c1y));
-  --dhj-C2Xa: calc(var(--dhj-Ra) * var(--dhj-c2x));
-  --dhj-C2Ya: calc(var(--dhj-Ra) * var(--dhj-c2y));
-  --dhj-Rb: max(0px, calc(var(--dhj-R) - calc(var(--dhj-rim-in) + var(--dhj-rim-w))));
-  --dhj-C1Xb: calc(var(--dhj-Rb) * var(--dhj-c1x));
-  --dhj-C1Yb: calc(var(--dhj-Rb) * var(--dhj-c1y));
-  --dhj-C2Xb: calc(var(--dhj-Rb) * var(--dhj-c2x));
-  --dhj-C2Yb: calc(var(--dhj-Rb) * var(--dhj-c2y));
-  --dhj-KH:  calc(var(--dhj-L0-bx) * 8.29727);
-  --dhj-KV:  calc(var(--dhj-L0-by) * 9.53043);
-  --dhj-OX:  calc(var(--dhj-L0-bx) * 1.333333);
-  --dhj-OY:  calc(var(--dhj-L0-by) * 1.333333);
-  --dhj-X0:  var(--dhj-L0-by);
-  --dhj-X1:  calc(100% - var(--dhj-L0-by));
-  --dhj-Y0:  var(--dhj-L0-bx);
-  --dhj-Y1:  calc(100% - var(--dhj-L0-bx));
 
-  --dhj-face: #8DA6E6; --dhj-face-top: #B0C7FE; --dhj-face-y: 100%; --dhj-rim-c: #B0C7FE;
-  /* 수리 0831 — 정본 `[data-part="hud"]` 원값: 속 .010 · 림 시작 .536%W ·
-     접지 그림자 없음(--wf-L2d 0). 색 바탕(a-fill)은 정본에 없다. */
-  --dhj-a-fill: 0;
-  /* [E17-0903 · 재질층 §3] 판 α .010 -> **.657** (zoneb_hud `a13c656f` 빈 틀
-     합성 역산 · 흩어짐 .006 · 평탄창 d 6~12). 사용자 반려
-     「어째서 젤리판이 투명하지 않은 거야?」의 두 자리 중 하나다 —
-     α .010 은 «투명»이 아니라 **판이 아예 없는 것**이었다. */
-  /* [E38-0903] 면 제거 (위 chj 와 같은 부품·같은 근거). 봉인: --dhj-a-in: .657; */
-  --dhj-a-in: 0.000;
-  --dhj-a-rim: 1.000;
-  /* [P0-0901 · 확장] --dhj-band 는 **은퇴**했다. radial-gradient(farthest-side)
-     의 정지점은 **타원** 자다 — 네 변 한가운데에서만 s=100% 이고 코너는 s=141% 다.
-     그래서 띠가 코너 쪽에서 판 안쪽까지 납작한 고원이 됐고, 그 고원과 속이 갈리는
-     호가 판 안을 도는 **두 번째 테두리**로 읽혔다. 이제 띠는 실루엣을 그대로 도는
-     **inset 그림자**다 (아래 box-shadow). 되돌리려면 이 값과 [L1.5-2] 한 줄만
-     옛 것으로 바꾸면 된다. 알파 (a-rim - a-in) 는 한 자리도 안 바꿨다. */
-  --dhj-band:   93.0%;   /* [은퇴] 옛 타원 정지점 — 되돌림 근거로만 남긴다 */
-  /* 시안 hud-I-frame-chroma 넓은판 아래·좌 변 단면 (속 .002):
-       1.00 .398 · 1.50 .262 · 2.00 .168 · 2.50 .095 · 3.00 .053 · 4.00 .000 */
-  /* [E38-0903 · 면 제거 + 안쪽 글로] 시안에는 **면(균일 채움)이 없다**.
-     빈 틀 시안 a13c656f 는 순크로마그린인데 이 부품 기하 속면이 키와 dE 3.3~4.9
-     (HUD 는 속면 화소의 93.3%, 141,567 px 가 키와 같다) -> alpha_face <= .022~.033.
-     있는 것은 겉선(불투명) + 림 + **가장자리에서 안으로 사그라지는 글로** 뿐이다.
-     자료: scratchpad/matting-0903/{matting.json,CSS-VALUES.txt}
-     [!] 글로 도달 D 는 **캔버스 상수**다 — raw px CV 19% (26.2/>=28/34.1) 대
-       부품 폭 대비 CV 60%. 그래서 --f2-ref-w(캔버스 자)에 매단다.
-       띠 두 값은 alpha(d)=0.90*(1-d/D)^1.7 에 최소자승으로 맞춘 것이다
-       (spread=0.307246 D · blur=0.624734 D · rmse 0.0144). */
-  --dhj-glow-c:  #A3BBD9;   /* 글로 면색 — 시안 HUD 넓은 판 (163,187,217) */
-  --dhj-band-w:  calc(var(--f2-ref-w) * 0.021313);   /* 글로 번짐 (도달 D 26.2 시안px) */
-  --dhj-band-s:  calc(var(--f2-ref-w) * 0.010482);   /* 글로 퍼짐 */
-  --dhj-band-dy: 0px;   /* 위 변 면제 자리 — 시안 대조 결과 **0 유지**.
-     정본 hud 시안(hud-I)의 넓은판은 위 변이 화면 밖이라 잴 것이 없고(위 α .000),
-     0 이 아닌 값은 아래 변의 띠를 그만큼 깊게 만들어 시안 아래 변 단면과 어긋난다. */
-  --dhj-haze: 0;
-  --dhj-haze-y: 14.0%;
-  /* [E38-0903] 유백 워시 제거(균일 채움). 봉인: --dhj-milk-a: .050; */
-  --dhj-milk-a: 0.000;
-  --dhj-rim-in: calc(var(--f2-ref-w) * 0.00315);
-  --dhj-rim-w: calc(var(--f2-ref-w) * 0.00350);
-  --dhj-rim-a: 0.4500;
-  --dhj-rim-blur: calc(var(--f2-ref-w) * 0.00160);
-  --dhj-rim-w2: calc(var(--f2-ref-w) * 0.01094);
-  --dhj-rim-w3: calc(var(--f2-ref-w) * 0.01290);
-  --dhj-rim-k2: 0.424;
-  --dhj-rim-k3: 0.093;
-  --dhj-rim-tc: calc(var(--dhj-rim-in) + var(--dhj-rim-w) + var(--dhj-rim-w2));
-  --dhj-rim-td: calc(var(--dhj-rim-tc) + var(--dhj-rim-w3));
-  --dhj-rim-p3: calc(var(--dhj-rim-a) * var(--dhj-rim-k3));
-  --dhj-rim-p2: calc(1 - (1 - var(--dhj-rim-a) * var(--dhj-rim-k2)) / (1 - var(--dhj-rim-a) * var(--dhj-rim-k3)));
-  --dhj-rim-p1: calc(1 - (1 - var(--dhj-rim-a)) / (1 - var(--dhj-rim-a) * var(--dhj-rim-k2)));
-  --dhj-gl-a: .770;
-  --dhj-gl1-w: 12.7%;  --dhj-gl1-h: 6.6%;
-  --dhj-gl1-px: 2.95%;  --dhj-gl1-py: 1.3%;
-  --dhj-gl2-w: 5.1%;  --dhj-gl2-h: 2.0%;
-  --dhj-gl2-px: 19.45%; --dhj-gl2-py: 1.7%;
-  --dhj-gnd-a: .324;
-  --dhj-gnd-y: calc(var(--dhj-w) * .01125);
-  --dhj-gnd-b: calc(var(--dhj-w) * .01125);
-  --dhj-L3-w: calc(var(--f2-ref-w) * 0.00400);
-  --dhj-L3-line: #6F6BB4;
-  --dhj-L3-a: .700;
-  --dhj-L3-blur: calc(var(--dhj-L3-w) * 0.28);
-  --dhj-fill-c: var(--f2-base);
-  --dhj-L3-line: #6F6BB4;   /* 각성이 --h2-aw 로 갈아 끼우는 자리 */
-}
 /* 정본 `[data-part="hud"]` 은 --wf-L2d: 0 — 접지 그림자가 **없다**(실측). */
-.kit-hud-v2__plate > .dh-gnd { display: none; }
-.kit-hud-v2__plate > .dh-gnd {
-  background: rgba(24, 12, 28, var(--dhj-gnd-a));
-  border-radius: var(--h2-r);            /* shape() 폴백 */
-  transform: translateY(var(--dhj-gnd-y));
-  filter: blur(var(--dhj-gnd-b));
-}
-.kit-hud-v2__plate > .dh-jelly { border-radius: var(--h2-r); }   /* shape() 폴백 */
-.kit-hud-v2__plate > .dh-jelly {
-  /* 수리 0831 — backdrop-filter 는 정본에 없다. */
-  background-color: transparent;
-  background-image:
-    radial-gradient(closest-side,
-      rgba(255,255,255, calc(var(--dhj-gl-a) * 1.00)) 0%,
-      rgba(255,255,255, calc(var(--dhj-gl-a) *  .72)) 52%,
-      rgba(255,255,255, 0) 100%),
-    radial-gradient(closest-side,
-      rgba(255,255,255, calc(var(--dhj-gl-a) * 1.00)) 0%,
-      rgba(255,255,255, calc(var(--dhj-gl-a) *  .72)) 52%,
-      rgba(255,255,255, 0) 100%),
-    radial-gradient(farthest-side at 50% 50%,
-      rgba(255,255,255, calc(var(--dhj-milk-a) * 1.00)) 0%,
-      rgba(255,255,255, calc(var(--dhj-milk-a) *  .85)) 55%,
-      rgba(255,255,255, calc(var(--dhj-milk-a) *  .25)) 88%,
-      rgba(255,255,255, calc(var(--dhj-milk-a) *  .25)) 100%,
-      rgba(255,255,255, calc(var(--dhj-milk-a) *  .25)) 141%),
-    linear-gradient(to bottom,
-      color-mix(in srgb, var(--dhj-face) calc(var(--dhj-haze) * 100%), transparent) 0%,
-      color-mix(in srgb, var(--dhj-face) 0%, transparent) var(--dhj-haze-y)),
-    /* [L1.5-2] 테두리 색 띠 — **층이 배경에서 box-shadow 로 옮겨졌다**
-       ([P0-0901 · 확장]. 아래 box-shadow 참조. 알파 (a-rim - a-in) 는 무변동) */
-    linear-gradient(to bottom,
-      color-mix(in srgb, var(--dhj-face-top) calc(var(--dhj-a-in) * 100%), transparent) 0%,
-      color-mix(in srgb, var(--dhj-face) calc(var(--dhj-a-in) * 100%), transparent) var(--dhj-face-y),
-      color-mix(in srgb, var(--dhj-face) calc(var(--dhj-a-in) * 100%), transparent) 100%),
-    linear-gradient(color-mix(in srgb, var(--dhj-fill-c)
-      calc(var(--dhj-a-fill) * 100%), transparent) 0 0);
-  background-position:
-    var(--dhj-gl1-px) var(--dhj-gl1-py),
-    var(--dhj-gl2-px) var(--dhj-gl2-py),
-    0 0, 0 0, 0 0, 0 0;
-  background-size:
-    var(--dhj-gl1-w) var(--dhj-gl1-h),
-    var(--dhj-gl2-w) var(--dhj-gl2-h),
-    100% 100%, 100% 100%, 100% 100%, 100% 100%;
-  background-repeat: no-repeat;
-  box-shadow:
-    inset 0 0 0 var(--dhj-L3-w) color-mix(in srgb, var(--dhj-L3-line)
-      calc(var(--dhj-L3-a) * 100%), transparent),
-    inset 0 0 0 calc(var(--dhj-rim-in) + var(--dhj-rim-w))
-      rgba(255,255,255, var(--dhj-rim-a)),
-    /* [L1.5-2] 색 띠 — 폴백(shape() 없음)에서는 border-radius 를 그대로 돈다 */
-    inset 0 var(--dhj-band-dy) var(--dhj-band-w) var(--dhj-band-s) color-mix(in srgb, var(--dhj-glow-c)
-      calc((var(--dhj-a-rim) - var(--dhj-a-in)) * 100%), transparent);
-}
 
-@supports (clip-path: shape(from 0px 0px, close)) {
-  .kit-hud-v2__plate > .dh-gnd {
-    border-radius: 0;
-    clip-path: shape(from calc(var(--dhj-X0) + 0px + var(--dhj-R)) calc(var(--dhj-Y0) + 0px),
-      curve to calc(var(--dhj-X1) - 0px - var(--dhj-R)) calc(var(--dhj-Y0) + 0px) with calc(var(--dhj-X0) + 0px + var(--dhj-R) + var(--dhj-KH)) calc(var(--dhj-Y0) + 0px - var(--dhj-OX)) / calc(var(--dhj-X1) - 0px - var(--dhj-R) - var(--dhj-KH)) calc(var(--dhj-Y0) + 0px - var(--dhj-OX)),
-      curve to calc(var(--dhj-X1) - 0px) calc(var(--dhj-Y0) + 0px + var(--dhj-R)) with calc(var(--dhj-X1) - 0px - var(--dhj-C1X)) calc(var(--dhj-Y0) + 0px + var(--dhj-C1Y)) / calc(var(--dhj-X1) - 0px - var(--dhj-C2X)) calc(var(--dhj-Y0) + 0px + var(--dhj-C2Y)),
-      curve to calc(var(--dhj-X1) - 0px) calc(var(--dhj-Y1) - 0px - var(--dhj-R)) with calc(var(--dhj-X1) - 0px + var(--dhj-OY)) calc(var(--dhj-Y0) + 0px + var(--dhj-R) + var(--dhj-KV)) / calc(var(--dhj-X1) - 0px + var(--dhj-OY)) calc(var(--dhj-Y1) - 0px - var(--dhj-R) - var(--dhj-KV)),
-      curve to calc(var(--dhj-X1) - 0px - var(--dhj-R)) calc(var(--dhj-Y1) - 0px) with calc(var(--dhj-X1) - 0px - var(--dhj-C2X)) calc(var(--dhj-Y1) - 0px - var(--dhj-C2Y)) / calc(var(--dhj-X1) - 0px - var(--dhj-C1X)) calc(var(--dhj-Y1) - 0px - var(--dhj-C1Y)),
-      curve to calc(var(--dhj-X0) + 0px + var(--dhj-R)) calc(var(--dhj-Y1) - 0px) with calc(var(--dhj-X1) - 0px - var(--dhj-R) - var(--dhj-KH)) calc(var(--dhj-Y1) - 0px + var(--dhj-OX)) / calc(var(--dhj-X0) + 0px + var(--dhj-R) + var(--dhj-KH)) calc(var(--dhj-Y1) - 0px + var(--dhj-OX)),
-      curve to calc(var(--dhj-X0) + 0px) calc(var(--dhj-Y1) - 0px - var(--dhj-R)) with calc(var(--dhj-X0) + 0px + var(--dhj-C1X)) calc(var(--dhj-Y1) - 0px - var(--dhj-C1Y)) / calc(var(--dhj-X0) + 0px + var(--dhj-C2X)) calc(var(--dhj-Y1) - 0px - var(--dhj-C2Y)),
-      curve to calc(var(--dhj-X0) + 0px) calc(var(--dhj-Y0) + 0px + var(--dhj-R)) with calc(var(--dhj-X0) + 0px - var(--dhj-OY)) calc(var(--dhj-Y1) - 0px - var(--dhj-R) - var(--dhj-KV)) / calc(var(--dhj-X0) + 0px - var(--dhj-OY)) calc(var(--dhj-Y0) + 0px + var(--dhj-R) + var(--dhj-KV)),
-      curve to calc(var(--dhj-X0) + 0px + var(--dhj-R)) calc(var(--dhj-Y0) + 0px) with calc(var(--dhj-X0) + 0px + var(--dhj-C2X)) calc(var(--dhj-Y0) + 0px + var(--dhj-C2Y)) / calc(var(--dhj-X0) + 0px + var(--dhj-C1X)) calc(var(--dhj-Y0) + 0px + var(--dhj-C1Y)),
-      close);
-  }
-  .kit-hud-v2__plate > .dh-jelly {
-    /* [P0-0901 · 확장] 반지름을 0 으로 안 죽인다 — [L1.5-2] 띠(inset 그림자)가
-       코너를 돌아야 하기 때문이다. 클립(shape)이 바깥 경계를 정확히 다시 자르므로
-       겉모양(실루엣) 변화는 0 이다. */
-    border-radius: var(--dhj-R);
-    box-shadow:
-      inset 0 0 0 var(--dhj-rim-tc) color-mix(in srgb, var(--dhj-rim-c)
-        calc(var(--dhj-rim-p2) * 100%), transparent),
-      inset 0 0 0 var(--dhj-rim-td) color-mix(in srgb, var(--dhj-rim-c)
-        calc(var(--dhj-rim-p3) * 100%), transparent),
-      inset 0 var(--dhj-band-dy) var(--dhj-band-w) var(--dhj-band-s)
-      color-mix(in srgb, var(--dhj-glow-c)
-        calc((var(--dhj-a-rim) - var(--dhj-a-in)) * 100%), transparent);
-    clip-path: shape(from calc(var(--dhj-X0) + 0px) calc(var(--dhj-Y0) - var(--dhj-ext)),
-      line to calc(var(--dhj-X1) - 0px) calc(var(--dhj-Y0) - var(--dhj-ext)),
-      curve to calc(var(--dhj-X1) - 0px) calc(calc(var(--dhj-Y1) - 0px) - var(--dhj-R)) with calc(calc(var(--dhj-X1) - 0px) + var(--dhj-OY)) calc(calc(var(--dhj-Y0) - var(--dhj-ext)) + var(--dhj-KV)) / calc(calc(var(--dhj-X1) - 0px) + var(--dhj-OY)) calc(calc(var(--dhj-Y1) - 0px) - var(--dhj-R) - var(--dhj-KV)),
-      curve to calc(calc(var(--dhj-X1) - 0px) - var(--dhj-R)) calc(var(--dhj-Y1) - 0px) with calc(calc(var(--dhj-X1) - 0px) - var(--dhj-C2X)) calc(calc(var(--dhj-Y1) - 0px) - var(--dhj-C2Y)) / calc(calc(var(--dhj-X1) - 0px) - var(--dhj-C1X)) calc(calc(var(--dhj-Y1) - 0px) - var(--dhj-C1Y)),
-      curve to calc(calc(var(--dhj-X0) + 0px) + var(--dhj-R)) calc(var(--dhj-Y1) - 0px) with calc(calc(var(--dhj-X1) - 0px) - var(--dhj-R) - var(--dhj-KH)) calc(calc(var(--dhj-Y1) - 0px) + var(--dhj-OX)) / calc(calc(var(--dhj-X0) + 0px) + var(--dhj-R) + var(--dhj-KH)) calc(calc(var(--dhj-Y1) - 0px) + var(--dhj-OX)),
-      curve to calc(var(--dhj-X0) + 0px) calc(calc(var(--dhj-Y1) - 0px) - var(--dhj-R)) with calc(calc(var(--dhj-X0) + 0px) + var(--dhj-C1X)) calc(calc(var(--dhj-Y1) - 0px) - var(--dhj-C1Y)) / calc(calc(var(--dhj-X0) + 0px) + var(--dhj-C2X)) calc(calc(var(--dhj-Y1) - 0px) - var(--dhj-C2Y)),
-      curve to calc(var(--dhj-X0) + 0px) calc(var(--dhj-Y0) - var(--dhj-ext)) with calc(calc(var(--dhj-X0) + 0px) - var(--dhj-OY)) calc(calc(var(--dhj-Y1) - 0px) - var(--dhj-R) - var(--dhj-KV)) / calc(calc(var(--dhj-X0) + 0px) - var(--dhj-OY)) calc(calc(var(--dhj-Y0) - var(--dhj-ext)) + var(--dhj-KV)),
-      close);
-  }
-  .kit-hud-v2__plate > .dh-jelly::before {
-    content: "";
-    position: absolute; inset: 0;
-    z-index: 1;
-    pointer-events: none;
-    background: color-mix(in srgb, var(--dhj-rim-c) calc(var(--dhj-rim-p1) * 100%), transparent);
-    filter: blur(var(--dhj-rim-blur));
-    clip-path: shape(evenodd from calc(var(--dhj-X0) + var(--dhj-rim-in)) calc(calc(var(--dhj-Y0) - var(--dhj-ext))),
-      line to calc(var(--dhj-X1) - var(--dhj-rim-in)) calc(calc(var(--dhj-Y0) - var(--dhj-ext))),
-      curve to calc(var(--dhj-X1) - var(--dhj-rim-in)) calc(var(--dhj-Y1) - var(--dhj-rim-in) - var(--dhj-Ra)) with calc(var(--dhj-X1) - var(--dhj-rim-in) + var(--dhj-OY)) calc(calc(var(--dhj-Y0) - var(--dhj-ext)) + var(--dhj-KV)) / calc(var(--dhj-X1) - var(--dhj-rim-in) + var(--dhj-OY)) calc(var(--dhj-Y1) - var(--dhj-rim-in) - var(--dhj-Ra) - var(--dhj-KV)),
-      curve to calc(var(--dhj-X1) - var(--dhj-rim-in) - var(--dhj-Ra)) calc(var(--dhj-Y1) - var(--dhj-rim-in)) with calc(var(--dhj-X1) - var(--dhj-rim-in) - var(--dhj-C2Xa)) calc(var(--dhj-Y1) - var(--dhj-rim-in) - var(--dhj-C2Ya)) / calc(var(--dhj-X1) - var(--dhj-rim-in) - var(--dhj-C1Xa)) calc(var(--dhj-Y1) - var(--dhj-rim-in) - var(--dhj-C1Ya)),
-      curve to calc(var(--dhj-X0) + var(--dhj-rim-in) + var(--dhj-Ra)) calc(var(--dhj-Y1) - var(--dhj-rim-in)) with calc(var(--dhj-X1) - var(--dhj-rim-in) - var(--dhj-Ra) - var(--dhj-KH)) calc(var(--dhj-Y1) - var(--dhj-rim-in) + var(--dhj-OX)) / calc(var(--dhj-X0) + var(--dhj-rim-in) + var(--dhj-Ra) + var(--dhj-KH)) calc(var(--dhj-Y1) - var(--dhj-rim-in) + var(--dhj-OX)),
-      curve to calc(var(--dhj-X0) + var(--dhj-rim-in)) calc(var(--dhj-Y1) - var(--dhj-rim-in) - var(--dhj-Ra)) with calc(var(--dhj-X0) + var(--dhj-rim-in) + var(--dhj-C1Xa)) calc(var(--dhj-Y1) - var(--dhj-rim-in) - var(--dhj-C1Ya)) / calc(var(--dhj-X0) + var(--dhj-rim-in) + var(--dhj-C2Xa)) calc(var(--dhj-Y1) - var(--dhj-rim-in) - var(--dhj-C2Ya)),
-      curve to calc(var(--dhj-X0) + var(--dhj-rim-in)) calc(calc(var(--dhj-Y0) - var(--dhj-ext))) with calc(var(--dhj-X0) + var(--dhj-rim-in) - var(--dhj-OY)) calc(var(--dhj-Y1) - var(--dhj-rim-in) - var(--dhj-Ra) - var(--dhj-KV)) / calc(var(--dhj-X0) + var(--dhj-rim-in) - var(--dhj-OY)) calc(calc(var(--dhj-Y0) - var(--dhj-ext)) + var(--dhj-KV)),
-      close,
-      move to calc(var(--dhj-X0) + calc(var(--dhj-rim-in) + var(--dhj-rim-w))) calc(calc(var(--dhj-Y0) - var(--dhj-ext))),
-      line to calc(var(--dhj-X1) - calc(var(--dhj-rim-in) + var(--dhj-rim-w))) calc(calc(var(--dhj-Y0) - var(--dhj-ext))),
-      curve to calc(var(--dhj-X1) - calc(var(--dhj-rim-in) + var(--dhj-rim-w))) calc(var(--dhj-Y1) - calc(var(--dhj-rim-in) + var(--dhj-rim-w)) - var(--dhj-Rb)) with calc(var(--dhj-X1) - calc(var(--dhj-rim-in) + var(--dhj-rim-w)) + var(--dhj-OY)) calc(calc(var(--dhj-Y0) - var(--dhj-ext)) + var(--dhj-KV)) / calc(var(--dhj-X1) - calc(var(--dhj-rim-in) + var(--dhj-rim-w)) + var(--dhj-OY)) calc(var(--dhj-Y1) - calc(var(--dhj-rim-in) + var(--dhj-rim-w)) - var(--dhj-Rb) - var(--dhj-KV)),
-      curve to calc(var(--dhj-X1) - calc(var(--dhj-rim-in) + var(--dhj-rim-w)) - var(--dhj-Rb)) calc(var(--dhj-Y1) - calc(var(--dhj-rim-in) + var(--dhj-rim-w))) with calc(var(--dhj-X1) - calc(var(--dhj-rim-in) + var(--dhj-rim-w)) - var(--dhj-C2Xb)) calc(var(--dhj-Y1) - calc(var(--dhj-rim-in) + var(--dhj-rim-w)) - var(--dhj-C2Yb)) / calc(var(--dhj-X1) - calc(var(--dhj-rim-in) + var(--dhj-rim-w)) - var(--dhj-C1Xb)) calc(var(--dhj-Y1) - calc(var(--dhj-rim-in) + var(--dhj-rim-w)) - var(--dhj-C1Yb)),
-      curve to calc(var(--dhj-X0) + calc(var(--dhj-rim-in) + var(--dhj-rim-w)) + var(--dhj-Rb)) calc(var(--dhj-Y1) - calc(var(--dhj-rim-in) + var(--dhj-rim-w))) with calc(var(--dhj-X1) - calc(var(--dhj-rim-in) + var(--dhj-rim-w)) - var(--dhj-Rb) - var(--dhj-KH)) calc(var(--dhj-Y1) - calc(var(--dhj-rim-in) + var(--dhj-rim-w)) + var(--dhj-OX)) / calc(var(--dhj-X0) + calc(var(--dhj-rim-in) + var(--dhj-rim-w)) + var(--dhj-Rb) + var(--dhj-KH)) calc(var(--dhj-Y1) - calc(var(--dhj-rim-in) + var(--dhj-rim-w)) + var(--dhj-OX)),
-      curve to calc(var(--dhj-X0) + calc(var(--dhj-rim-in) + var(--dhj-rim-w))) calc(var(--dhj-Y1) - calc(var(--dhj-rim-in) + var(--dhj-rim-w)) - var(--dhj-Rb)) with calc(var(--dhj-X0) + calc(var(--dhj-rim-in) + var(--dhj-rim-w)) + var(--dhj-C1Xb)) calc(var(--dhj-Y1) - calc(var(--dhj-rim-in) + var(--dhj-rim-w)) - var(--dhj-C1Yb)) / calc(var(--dhj-X0) + calc(var(--dhj-rim-in) + var(--dhj-rim-w)) + var(--dhj-C2Xb)) calc(var(--dhj-Y1) - calc(var(--dhj-rim-in) + var(--dhj-rim-w)) - var(--dhj-C2Yb)),
-      curve to calc(var(--dhj-X0) + calc(var(--dhj-rim-in) + var(--dhj-rim-w))) calc(calc(var(--dhj-Y0) - var(--dhj-ext))) with calc(var(--dhj-X0) + calc(var(--dhj-rim-in) + var(--dhj-rim-w)) - var(--dhj-OY)) calc(var(--dhj-Y1) - calc(var(--dhj-rim-in) + var(--dhj-rim-w)) - var(--dhj-Rb) - var(--dhj-KV)) / calc(var(--dhj-X0) + calc(var(--dhj-rim-in) + var(--dhj-rim-w)) - var(--dhj-OY)) calc(calc(var(--dhj-Y0) - var(--dhj-ext)) + var(--dhj-KV)),
-      close);
-  }
-  .kit-hud-v2__plate > .dh-jelly::after {
-    content: "";
-    position: absolute; inset: 0;
-    z-index: 2;
-    pointer-events: none;
-    background: color-mix(in srgb, var(--dhj-L3-line)
-      calc(var(--dhj-L3-a) * 100%), transparent);
-    clip-path: shape(evenodd from calc(var(--dhj-X0) + 0px) calc(calc(var(--dhj-Y0) - var(--dhj-ext))),
-      line to calc(var(--dhj-X1) - 0px) calc(calc(var(--dhj-Y0) - var(--dhj-ext))),
-      curve to calc(var(--dhj-X1) - 0px) calc(var(--dhj-Y1) - 0px - var(--dhj-R)) with calc(var(--dhj-X1) - 0px + var(--dhj-OY)) calc(calc(var(--dhj-Y0) - var(--dhj-ext)) + var(--dhj-KV)) / calc(var(--dhj-X1) - 0px + var(--dhj-OY)) calc(var(--dhj-Y1) - 0px - var(--dhj-R) - var(--dhj-KV)),
-      curve to calc(var(--dhj-X1) - 0px - var(--dhj-R)) calc(var(--dhj-Y1) - 0px) with calc(var(--dhj-X1) - 0px - var(--dhj-C2X)) calc(var(--dhj-Y1) - 0px - var(--dhj-C2Y)) / calc(var(--dhj-X1) - 0px - var(--dhj-C1X)) calc(var(--dhj-Y1) - 0px - var(--dhj-C1Y)),
-      curve to calc(var(--dhj-X0) + 0px + var(--dhj-R)) calc(var(--dhj-Y1) - 0px) with calc(var(--dhj-X1) - 0px - var(--dhj-R) - var(--dhj-KH)) calc(var(--dhj-Y1) - 0px + var(--dhj-OX)) / calc(var(--dhj-X0) + 0px + var(--dhj-R) + var(--dhj-KH)) calc(var(--dhj-Y1) - 0px + var(--dhj-OX)),
-      curve to calc(var(--dhj-X0) + 0px) calc(var(--dhj-Y1) - 0px - var(--dhj-R)) with calc(var(--dhj-X0) + 0px + var(--dhj-C1X)) calc(var(--dhj-Y1) - 0px - var(--dhj-C1Y)) / calc(var(--dhj-X0) + 0px + var(--dhj-C2X)) calc(var(--dhj-Y1) - 0px - var(--dhj-C2Y)),
-      curve to calc(var(--dhj-X0) + 0px) calc(calc(var(--dhj-Y0) - var(--dhj-ext))) with calc(var(--dhj-X0) + 0px - var(--dhj-OY)) calc(var(--dhj-Y1) - 0px - var(--dhj-R) - var(--dhj-KV)) / calc(var(--dhj-X0) + 0px - var(--dhj-OY)) calc(calc(var(--dhj-Y0) - var(--dhj-ext)) + var(--dhj-KV)),
-      close,
-      move to calc(var(--dhj-X0) + var(--dhj-L3-w)) calc(calc(var(--dhj-Y0) - var(--dhj-ext))),
-      line to calc(var(--dhj-X1) - var(--dhj-L3-w)) calc(calc(var(--dhj-Y0) - var(--dhj-ext))),
-      curve to calc(var(--dhj-X1) - var(--dhj-L3-w)) calc(var(--dhj-Y1) - var(--dhj-L3-w) - var(--dhj-R3)) with calc(var(--dhj-X1) - var(--dhj-L3-w) + var(--dhj-OY)) calc(calc(var(--dhj-Y0) - var(--dhj-ext)) + var(--dhj-KV)) / calc(var(--dhj-X1) - var(--dhj-L3-w) + var(--dhj-OY)) calc(var(--dhj-Y1) - var(--dhj-L3-w) - var(--dhj-R3) - var(--dhj-KV)),
-      curve to calc(var(--dhj-X1) - var(--dhj-L3-w) - var(--dhj-R3)) calc(var(--dhj-Y1) - var(--dhj-L3-w)) with calc(var(--dhj-X1) - var(--dhj-L3-w) - var(--dhj-C2X3)) calc(var(--dhj-Y1) - var(--dhj-L3-w) - var(--dhj-C2Y3)) / calc(var(--dhj-X1) - var(--dhj-L3-w) - var(--dhj-C1X3)) calc(var(--dhj-Y1) - var(--dhj-L3-w) - var(--dhj-C1Y3)),
-      curve to calc(var(--dhj-X0) + var(--dhj-L3-w) + var(--dhj-R3)) calc(var(--dhj-Y1) - var(--dhj-L3-w)) with calc(var(--dhj-X1) - var(--dhj-L3-w) - var(--dhj-R3) - var(--dhj-KH)) calc(var(--dhj-Y1) - var(--dhj-L3-w) + var(--dhj-OX)) / calc(var(--dhj-X0) + var(--dhj-L3-w) + var(--dhj-R3) + var(--dhj-KH)) calc(var(--dhj-Y1) - var(--dhj-L3-w) + var(--dhj-OX)),
-      curve to calc(var(--dhj-X0) + var(--dhj-L3-w)) calc(var(--dhj-Y1) - var(--dhj-L3-w) - var(--dhj-R3)) with calc(var(--dhj-X0) + var(--dhj-L3-w) + var(--dhj-C1X3)) calc(var(--dhj-Y1) - var(--dhj-L3-w) - var(--dhj-C1Y3)) / calc(var(--dhj-X0) + var(--dhj-L3-w) + var(--dhj-C2X3)) calc(var(--dhj-Y1) - var(--dhj-L3-w) - var(--dhj-C2Y3)),
-      curve to calc(var(--dhj-X0) + var(--dhj-L3-w)) calc(calc(var(--dhj-Y0) - var(--dhj-ext))) with calc(var(--dhj-X0) + var(--dhj-L3-w) - var(--dhj-OY)) calc(var(--dhj-Y1) - var(--dhj-L3-w) - var(--dhj-R3) - var(--dhj-KV)) / calc(var(--dhj-X0) + var(--dhj-L3-w) - var(--dhj-OY)) calc(calc(var(--dhj-Y0) - var(--dhj-ext)) + var(--dhj-KV)),
-      close);
-    filter: blur(var(--dhj-L3-blur));
-  }
-}
+
+   /* shape() 폴백 */
+
+
+
 /* 작업C ③ — 킷 질감(접지밴드·흰 림·하단발광·비네트)은 젤리층이 대신 그린다.
    두 벌이 겹치면 테두리가 두 줄이 되고 접지가 두 번 앉는다. */
-.kit-hud-v2__plate::after{ content: none; }
-.kit-hud-v2__plate--legacy::after{
-  content:""; position:absolute; inset:0;
-  border-radius: inherit; pointer-events:none;
-  box-shadow:
-    inset 0 calc(var(--f2-band) * -1) 0 rgba(0,0,0,.17),
-    inset 0 0 0 var(--f2-rim) rgba(255,255,255,.90),
-    inset 0 calc(var(--f2-glow) * -1) 0 rgba(255,255,255,.80),
-    inset 0 calc(var(--f2-vig) * -.42) var(--f2-vig) rgba(74,52,80,.17);
-}
+
+
 
 /* ---- 좌/우 진영 --------------------------------------------------
    정본과 다른 곳이 한 군데다: 행이 셋이다(이름줄 / HP 바 / 공격 게이지).
@@ -52288,7 +52014,7 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
 
 /* 각성 — applySkill 이 켜는 #app.skill 하나가 출처다(JS 추가 0줄) */
 #app.skill #duel-hud::before{ animation: h2-awaken 1.4s ease-in-out infinite; }
-#app.skill #duel-hud .kit-hud-v2__plate{ --f2-line: var(--h2-aw); }
+
 #app.skill #duel-hud .kit-hud-v2__timer{ transform: scale(1.06); }
 
 @media (prefers-reduced-motion: reduce){
@@ -52926,66 +52652,66 @@ html.menu-v2 #screen-menu .tagline{
   inset: 0;
   pointer-events: none;
 
-  --chj-w: 100cqw;
-  --chj-h: 100cqh;
-  --chj-L0-R:  calc(var(--chj-w) * .178180);
-  --chj-L0-bx: calc(var(--chj-w) * .025000);
-  --chj-L0-by: calc(var(--chj-h) * .015000);
+  --hudj-w: 100cqw;
+  --hudj-h: 100cqh;
+  --hudj-L0-R:  calc(var(--hudj-w) * .178180);
+  --hudj-L0-bx: calc(var(--hudj-w) * .025000);
+  --hudj-L0-by: calc(var(--hudj-h) * .015000);
   /* ②-A — 위 주석(전투 HUD 쪽)과 같은 근거. 두 판은 같은 부품이다. */
-  --chj-ext: calc(var(--chj-h) * 0.40);
-  --chj-R:   min(var(--chj-L0-R), calc(100cqh * .23122));
-  --chj-C1X: calc(var(--chj-R) * .209445);
-  --chj-C1Y: calc(var(--chj-R) * .127039);
-  --chj-C2X: calc(var(--chj-R) * .110601);
-  --chj-C2Y: calc(var(--chj-R) * .209445);
+  --hudj-ext: calc(var(--hudj-h) * 0.40);
+  --hudj-R:   min(var(--hudj-L0-R), calc(100cqh * .23122));
+  --hudj-C1X: calc(var(--hudj-R) * .209445);
+  --hudj-C1Y: calc(var(--hudj-R) * .127039);
+  --hudj-C2X: calc(var(--hudj-R) * .110601);
+  --hudj-C2Y: calc(var(--hudj-R) * .209445);
   /* [E14-0902] 들여쓴 판본의 반지름 — 볼록 코너 R-t · 오목 필렛 r+t.
-     --chj-R 이 100cqh 상한을 쓰므로 **이 규칙 안에서** 파생해야 한다. */
-  --chj-c1x: .209445;  --chj-c1y: .127039;
-  --chj-c2x: .110601;  --chj-c2y: .209445;  --chj-cq: .4477;
-  --chj-R3: max(0px, calc(var(--chj-R) - var(--chj-L3-w)));
-  --chj-C1X3: calc(var(--chj-R3) * var(--chj-c1x));
-  --chj-C1Y3: calc(var(--chj-R3) * var(--chj-c1y));
-  --chj-C2X3: calc(var(--chj-R3) * var(--chj-c2x));
-  --chj-C2Y3: calc(var(--chj-R3) * var(--chj-c2y));
-  --chj-Ra: max(0px, calc(var(--chj-R) - var(--chj-rim-in)));
-  --chj-C1Xa: calc(var(--chj-Ra) * var(--chj-c1x));
-  --chj-C1Ya: calc(var(--chj-Ra) * var(--chj-c1y));
-  --chj-C2Xa: calc(var(--chj-Ra) * var(--chj-c2x));
-  --chj-C2Ya: calc(var(--chj-Ra) * var(--chj-c2y));
-  --chj-Rb: max(0px, calc(var(--chj-R) - calc(var(--chj-rim-in) + var(--chj-rim-w))));
-  --chj-C1Xb: calc(var(--chj-Rb) * var(--chj-c1x));
-  --chj-C1Yb: calc(var(--chj-Rb) * var(--chj-c1y));
-  --chj-C2Xb: calc(var(--chj-Rb) * var(--chj-c2x));
-  --chj-C2Yb: calc(var(--chj-Rb) * var(--chj-c2y));
-  --chj-KH:  calc(var(--chj-L0-bx) * 8.29727);
-  --chj-KV:  calc(var(--chj-L0-by) * 9.53043);
-  --chj-OX:  calc(var(--chj-L0-bx) * 1.333333);
-  --chj-OY:  calc(var(--chj-L0-by) * 1.333333);
-  --chj-X0:  var(--chj-L0-by);
-  --chj-X1:  calc(100% - var(--chj-L0-by));
-  --chj-Y0:  var(--chj-L0-bx);
-  --chj-Y1:  calc(100% - var(--chj-L0-bx));
+     --hudj-R 이 100cqh 상한을 쓰므로 **이 규칙 안에서** 파생해야 한다. */
+  --hudj-c1x: .209445;  --hudj-c1y: .127039;
+  --hudj-c2x: .110601;  --hudj-c2y: .209445;  --hudj-cq: .4477;
+  --hudj-R3: max(0px, calc(var(--hudj-R) - var(--hudj-L3-w)));
+  --hudj-C1X3: calc(var(--hudj-R3) * var(--hudj-c1x));
+  --hudj-C1Y3: calc(var(--hudj-R3) * var(--hudj-c1y));
+  --hudj-C2X3: calc(var(--hudj-R3) * var(--hudj-c2x));
+  --hudj-C2Y3: calc(var(--hudj-R3) * var(--hudj-c2y));
+  --hudj-Ra: max(0px, calc(var(--hudj-R) - var(--hudj-rim-in)));
+  --hudj-C1Xa: calc(var(--hudj-Ra) * var(--hudj-c1x));
+  --hudj-C1Ya: calc(var(--hudj-Ra) * var(--hudj-c1y));
+  --hudj-C2Xa: calc(var(--hudj-Ra) * var(--hudj-c2x));
+  --hudj-C2Ya: calc(var(--hudj-Ra) * var(--hudj-c2y));
+  --hudj-Rb: max(0px, calc(var(--hudj-R) - calc(var(--hudj-rim-in) + var(--hudj-rim-w))));
+  --hudj-C1Xb: calc(var(--hudj-Rb) * var(--hudj-c1x));
+  --hudj-C1Yb: calc(var(--hudj-Rb) * var(--hudj-c1y));
+  --hudj-C2Xb: calc(var(--hudj-Rb) * var(--hudj-c2x));
+  --hudj-C2Yb: calc(var(--hudj-Rb) * var(--hudj-c2y));
+  --hudj-KH:  calc(var(--hudj-L0-bx) * 8.29727);
+  --hudj-KV:  calc(var(--hudj-L0-by) * 9.53043);
+  --hudj-OX:  calc(var(--hudj-L0-bx) * 1.333333);
+  --hudj-OY:  calc(var(--hudj-L0-by) * 1.333333);
+  --hudj-X0:  var(--hudj-L0-by);
+  --hudj-X1:  calc(100% - var(--hudj-L0-by));
+  --hudj-Y0:  var(--hudj-L0-bx);
+  --hudj-Y1:  calc(100% - var(--hudj-L0-bx));
 
-  --chj-face: #92A5DF; --chj-face-top: #92A5DF; --chj-face-y: 100%; --chj-rim-c: #BFCBFA;
+  --hudj-face: var(--mode-b-face); --hudj-face-top: var(--mode-b-face); --hudj-face-y: 100%; --hudj-rim-c: var(--mode-b-rim);
   /* 수리 0831 — 정본 `[data-part="hud"]` 원값. 종전 .262/.300 은 재해석이다. */
-  --chj-a-fill: 0;
+  --hudj-a-fill: 0;
   /* [E30-0903 · 판 α 재판정] .657 -> .881. 최소자승 해(표본 255,532 화소,
      타이머 캡슐 상자 6px 팽창 제외). S시안(HUD 판)=(139.3,189.4,228.6).
      ⚠ 개선폭이 작다: ΔRGB 39.1 -> 37.8. 시안 HUD 는 **하늘이 그대로 비치는
        유리**(시안 쪽 표본 SD 29/18/29)이고 우리 HUD 뒤는 옅은 하늘이라
        두 화면의 B 가 다르다. α 로는 안 닫힌다 — 잔차 rms 24.7.
-     봉인: --chj-a-in: .657; */
+     봉인: --hudj-a-in: .657; */
   /* [E38-0903] 면 제거 — 위 30 의 .881 은 「면이 있다」는 모형 위의 최적값이고,
-     시안에는 그 면이 없다(alpha_face <= .025). 봉인: --chj-a-in: .881; */
-  --chj-a-in: 0.000;
-  --chj-a-rim: 1.000;
-  /* [P0-0901 · 확장] --chj-band 는 **은퇴**했다. radial-gradient(farthest-side)
+     시안에는 그 면이 없다(alpha_face <= .025). 봉인: --hudj-a-in: .881; */
+  --hudj-a-in: 0.000;
+  --hudj-a-rim: 1.000;
+  /* [P0-0901 · 확장] --hudj-band 는 **은퇴**했다. radial-gradient(farthest-side)
      의 정지점은 **타원** 자다 — 네 변 한가운데에서만 s=100% 이고 코너는 s=141% 다.
      그래서 띠가 코너 쪽에서 판 안쪽까지 납작한 고원이 됐고, 그 고원과 속이 갈리는
      호가 판 안을 도는 **두 번째 테두리**로 읽혔다. 이제 띠는 실루엣을 그대로 도는
      **inset 그림자**다 (아래 box-shadow). 되돌리려면 이 값과 [L1.5-2] 한 줄만
      옛 것으로 바꾸면 된다. 알파 (a-rim - a-in) 는 한 자리도 안 바꿨다. */
-  --chj-band:   93.0%;   /* [은퇴] 옛 타원 정지점 — 되돌림 근거로만 남긴다 */
+  --hudj-band:   93.0%;   /* [은퇴] 옛 타원 정지점 — 되돌림 근거로만 남긴다 */
   /* 시안 hud-I-frame-chroma 넓은판 아래·좌 변 단면 (속 .002):
        1.00 .398 · 1.50 .262 · 2.00 .168 · 2.50 .095 · 3.00 .053 · 4.00 .000 */
   /* [E38-0903 · 면 제거 + 안쪽 글로] 시안에는 **면(균일 채움)이 없다**.
@@ -52997,51 +52723,51 @@ html.menu-v2 #screen-menu .tagline{
        부품 폭 대비 CV 60%. 그래서 --f2-ref-w(캔버스 자)에 매단다.
        띠 두 값은 alpha(d)=0.90*(1-d/D)^1.7 에 최소자승으로 맞춘 것이다
        (spread=0.307246 D · blur=0.624734 D · rmse 0.0144). */
-  --chj-glow-c:  #A3BBD9;   /* 글로 면색 — 시안 HUD 넓은 판 d6..13 실측 (163,187,217) */
-  --chj-band-w:  calc(var(--f2-ref-w) * 0.021313);   /* 글로 번짐 (도달 D 26.2 시안px) */
-  --chj-band-s:  calc(var(--f2-ref-w) * 0.010482);   /* 글로 퍼짐 — 겉선에 붙는 진한 몫 */
-  --chj-band-dy: 0px;   /* 위 변 면제 자리 — 시안 대조 결과 **0 유지**.
+  --hudj-glow-c:  #A3BBD9;   /* 글로 면색 — 시안 HUD 넓은 판 d6..13 실측 (163,187,217) */
+  --hudj-band-w:  calc(var(--f2-ref-w) * 0.021313);   /* 글로 번짐 (도달 D 26.2 시안px) */
+  --hudj-band-s:  calc(var(--f2-ref-w) * 0.010482);   /* 글로 퍼짐 — 겉선에 붙는 진한 몫 */
+  --hudj-band-dy: 0px;   /* 위 변 면제 자리 — 시안 대조 결과 **0 유지**.
      정본 hud 시안(hud-I)의 넓은판은 위 변이 화면 밖이라 잴 것이 없고(위 α .000),
      0 이 아닌 값은 아래 변의 띠를 그만큼 깊게 만들어 시안 아래 변 단면과 어긋난다. */
-  --chj-haze: 0;
-  --chj-haze-y: 14.0%;
+  --hudj-haze: 0;
+  --hudj-haze-y: 14.0%;
   /* [E38-0903] 유백 워시 = **균일 채움**이다. 시안 속면이 키와 같으니 이 겹도 없다.
-     봉인: --chj-milk-a: .050; */
-  --chj-milk-a: 0.000;
-  --chj-rim-in: calc(var(--f2-ref-w) * 0.00315);
-  --chj-rim-w: calc(var(--f2-ref-w) * 0.00350);
-  --chj-rim-a: 0.4000;
-  --chj-rim-blur: calc(var(--f2-ref-w) * 0.00160);
-  --chj-rim-w2: calc(var(--f2-ref-w) * 0.01094);
-  --chj-rim-w3: calc(var(--f2-ref-w) * 0.01290);
-  --chj-rim-k2: 0.424;
-  --chj-rim-k3: 0.093;
-  --chj-rim-tc: calc(var(--chj-rim-in) + var(--chj-rim-w) + var(--chj-rim-w2));
-  --chj-rim-td: calc(var(--chj-rim-tc) + var(--chj-rim-w3));
-  --chj-rim-p3: calc(var(--chj-rim-a) * var(--chj-rim-k3));
-  --chj-rim-p2: calc(1 - (1 - var(--chj-rim-a) * var(--chj-rim-k2)) / (1 - var(--chj-rim-a) * var(--chj-rim-k3)));
-  --chj-rim-p1: calc(1 - (1 - var(--chj-rim-a)) / (1 - var(--chj-rim-a) * var(--chj-rim-k2)));
-  --chj-gl-a: .770;
-  --chj-gl1-w: 12.7%;  --chj-gl1-h: 6.6%;
-  --chj-gl1-px: 2.95%;  --chj-gl1-py: 1.3%;
-  --chj-gl2-w: 5.1%;  --chj-gl2-h: 2.0%;
-  --chj-gl2-px: 19.45%; --chj-gl2-py: 1.7%;
-  --chj-gnd-a: .324;
-  --chj-gnd-y: calc(var(--chj-w) * .01125);
-  --chj-gnd-b: calc(var(--chj-w) * .01125);
-  --chj-L3-w: calc(var(--f2-ref-w) * 0.00400);
-  --chj-L3-line: #6F6BB4;
-  --chj-L3-a: .700;
-  --chj-fill-c: #EFE6F6;
-  --chj-rim-a: 0.4000;   /* 기준 .250 x (82/90) — 클래식만 림이 옅다 */
-  --chj-gnd-a: .324;   /* 기준 .324 x (13/17) — 클래식만 접지가 옅다 */
+     봉인: --hudj-milk-a: .050; */
+  --hudj-milk-a: 0.000;
+  --hudj-rim-in: calc(var(--f2-ref-w) * 0.00315);
+  --hudj-rim-w: calc(var(--f2-ref-w) * 0.00350);
+  --hudj-rim-a: 0.4000;
+  --hudj-rim-blur: calc(var(--f2-ref-w) * 0.00160);
+  --hudj-rim-w2: calc(var(--f2-ref-w) * 0.01094);
+  --hudj-rim-w3: calc(var(--f2-ref-w) * 0.01290);
+  --hudj-rim-k2: 0.424;
+  --hudj-rim-k3: 0.093;
+  --hudj-rim-tc: calc(var(--hudj-rim-in) + var(--hudj-rim-w) + var(--hudj-rim-w2));
+  --hudj-rim-td: calc(var(--hudj-rim-tc) + var(--hudj-rim-w3));
+  --hudj-rim-p3: calc(var(--hudj-rim-a) * var(--hudj-rim-k3));
+  --hudj-rim-p2: calc(1 - (1 - var(--hudj-rim-a) * var(--hudj-rim-k2)) / (1 - var(--hudj-rim-a) * var(--hudj-rim-k3)));
+  --hudj-rim-p1: calc(1 - (1 - var(--hudj-rim-a)) / (1 - var(--hudj-rim-a) * var(--hudj-rim-k2)));
+  --hudj-gl-a: var(--mode-b-gloss);
+  --hudj-gl1-w: 12.7%;  --hudj-gl1-h: 6.6%;
+  --hudj-gl1-px: 2.95%;  --hudj-gl1-py: 1.3%;
+  --hudj-gl2-w: 5.1%;  --hudj-gl2-h: 2.0%;
+  --hudj-gl2-px: 19.45%; --hudj-gl2-py: 1.7%;
+  --hudj-gnd-a: var(--mode-b-contact);
+  --hudj-gnd-y: calc(var(--hudj-w) * .01125);
+  --hudj-gnd-b: calc(var(--hudj-w) * .01125);
+  --hudj-L3-w: calc(var(--f2-ref-w) * 0.00400);
+  --hudj-L3-line: var(--mode-b-outline);
+  --hudj-L3-a: .700;
+  --hudj-fill-c: #EFE6F6;
+  --hudj-rim-a: 0.4000;   /* 기준 .250 x (82/90) — 클래식만 림이 옅다 */
+  --hudj-gnd-a: var(--mode-b-contact);   /* 기준 .324 x (13/17) — 클래식만 접지가 옅다 */
 }
 #classic-hud .ch-fx > .ch-gnd { display: none; }   /* 정본 hud — 접지 없음 */
 #classic-hud .ch-fx > .ch-gnd {
-  background: rgba(24, 12, 28, var(--chj-gnd-a));
+  background: rgba(24, 12, 28, var(--hudj-gnd-a));
   border-radius: var(--f2-r);            /* shape() 폴백 */
-  transform: translateY(var(--chj-gnd-y));
-  filter: blur(var(--chj-gnd-b));
+  transform: translateY(var(--hudj-gnd-y));
+  filter: blur(var(--hudj-gnd-b));
 }
 #classic-hud .ch-fx > .ch-jelly { border-radius: var(--f2-r); }   /* shape() 폴백 */
 #classic-hud .ch-fx > .ch-jelly {
@@ -53049,83 +52775,83 @@ html.menu-v2 #screen-menu .tagline{
   background-color: transparent;
   background-image:
     radial-gradient(closest-side,
-      rgba(255,255,255, calc(var(--chj-gl-a) * 1.00)) 0%,
-      rgba(255,255,255, calc(var(--chj-gl-a) *  .72)) 52%,
+      rgba(255,255,255, calc(var(--hudj-gl-a) * 1.00)) 0%,
+      rgba(255,255,255, calc(var(--hudj-gl-a) *  .72)) 52%,
       rgba(255,255,255, 0) 100%),
     radial-gradient(closest-side,
-      rgba(255,255,255, calc(var(--chj-gl-a) * 1.00)) 0%,
-      rgba(255,255,255, calc(var(--chj-gl-a) *  .72)) 52%,
+      rgba(255,255,255, calc(var(--hudj-gl-a) * 1.00)) 0%,
+      rgba(255,255,255, calc(var(--hudj-gl-a) *  .72)) 52%,
       rgba(255,255,255, 0) 100%),
     radial-gradient(farthest-side at 50% 50%,
-      rgba(255,255,255, calc(var(--chj-milk-a) * 1.00)) 0%,
-      rgba(255,255,255, calc(var(--chj-milk-a) *  .85)) 55%,
-      rgba(255,255,255, calc(var(--chj-milk-a) *  .25)) 88%,
-      rgba(255,255,255, calc(var(--chj-milk-a) *  .25)) 100%,
-      rgba(255,255,255, calc(var(--chj-milk-a) *  .25)) 141%),
+      rgba(255,255,255, calc(var(--hudj-milk-a) * 1.00)) 0%,
+      rgba(255,255,255, calc(var(--hudj-milk-a) *  .85)) 55%,
+      rgba(255,255,255, calc(var(--hudj-milk-a) *  .25)) 88%,
+      rgba(255,255,255, calc(var(--hudj-milk-a) *  .25)) 100%,
+      rgba(255,255,255, calc(var(--hudj-milk-a) *  .25)) 141%),
     linear-gradient(to bottom,
-      color-mix(in srgb, var(--chj-face) calc(var(--chj-haze) * 100%), transparent) 0%,
-      color-mix(in srgb, var(--chj-face) 0%, transparent) var(--chj-haze-y)),
+      color-mix(in srgb, var(--hudj-face) calc(var(--hudj-haze) * 100%), transparent) 0%,
+      color-mix(in srgb, var(--hudj-face) 0%, transparent) var(--hudj-haze-y)),
     /* [L1.5-2] 테두리 색 띠 — **층이 배경에서 box-shadow 로 옮겨졌다**
        ([P0-0901 · 확장]. 아래 box-shadow 참조. 알파 (a-rim - a-in) 는 무변동) */
     linear-gradient(to bottom,
-      color-mix(in srgb, var(--chj-face-top) calc(var(--chj-a-in) * 100%), transparent) 0%,
-      color-mix(in srgb, var(--chj-face) calc(var(--chj-a-in) * 100%), transparent) var(--chj-face-y),
-      color-mix(in srgb, var(--chj-face) calc(var(--chj-a-in) * 100%), transparent) 100%),
-    linear-gradient(color-mix(in srgb, var(--chj-fill-c)
-      calc(var(--chj-a-fill) * 100%), transparent) 0 0);
+      color-mix(in srgb, var(--hudj-face-top) calc(var(--hudj-a-in) * 100%), transparent) 0%,
+      color-mix(in srgb, var(--hudj-face) calc(var(--hudj-a-in) * 100%), transparent) var(--hudj-face-y),
+      color-mix(in srgb, var(--hudj-face) calc(var(--hudj-a-in) * 100%), transparent) 100%),
+    linear-gradient(color-mix(in srgb, var(--hudj-fill-c)
+      calc(var(--hudj-a-fill) * 100%), transparent) 0 0);
   background-position:
-    var(--chj-gl1-px) var(--chj-gl1-py),
-    var(--chj-gl2-px) var(--chj-gl2-py),
+    var(--hudj-gl1-px) var(--hudj-gl1-py),
+    var(--hudj-gl2-px) var(--hudj-gl2-py),
     0 0, 0 0, 0 0, 0 0;
   background-size:
-    var(--chj-gl1-w) var(--chj-gl1-h),
-    var(--chj-gl2-w) var(--chj-gl2-h),
+    var(--hudj-gl1-w) var(--hudj-gl1-h),
+    var(--hudj-gl2-w) var(--hudj-gl2-h),
     100% 100%, 100% 100%, 100% 100%, 100% 100%;
   background-repeat: no-repeat;
   box-shadow:
-    inset 0 0 0 var(--chj-L3-w) color-mix(in srgb, var(--chj-L3-line)
-      calc(var(--chj-L3-a) * 100%), transparent),
-    inset 0 0 0 calc(var(--chj-rim-in) + var(--chj-rim-w))
-      rgba(255,255,255, var(--chj-rim-a)),
+    inset 0 0 0 var(--hudj-L3-w) color-mix(in srgb, var(--hudj-L3-line)
+      calc(var(--hudj-L3-a) * 100%), transparent),
+    inset 0 0 0 calc(var(--hudj-rim-in) + var(--hudj-rim-w))
+      rgba(255,255,255, var(--hudj-rim-a)),
     /* [L1.5-2] 색 띠 — 폴백(shape() 없음)에서는 border-radius 를 그대로 돈다 */
-    inset 0 var(--chj-band-dy) var(--chj-band-w) var(--chj-band-s) color-mix(in srgb, var(--chj-glow-c)
-      calc((var(--chj-a-rim) - var(--chj-a-in)) * 100%), transparent);
+    inset 0 var(--hudj-band-dy) var(--hudj-band-w) var(--hudj-band-s) color-mix(in srgb, var(--hudj-glow-c)
+      calc((var(--hudj-a-rim) - var(--hudj-a-in)) * 100%), transparent);
 }
 
 @supports (clip-path: shape(from 0px 0px, close)) {
   #classic-hud .ch-fx > .ch-gnd {
     border-radius: 0;
-    clip-path: shape(from calc(var(--chj-X0) + 0px + var(--chj-R)) calc(var(--chj-Y0) + 0px),
-      curve to calc(var(--chj-X1) - 0px - var(--chj-R)) calc(var(--chj-Y0) + 0px) with calc(var(--chj-X0) + 0px + var(--chj-R) + var(--chj-KH)) calc(var(--chj-Y0) + 0px - var(--chj-OX)) / calc(var(--chj-X1) - 0px - var(--chj-R) - var(--chj-KH)) calc(var(--chj-Y0) + 0px - var(--chj-OX)),
-      curve to calc(var(--chj-X1) - 0px) calc(var(--chj-Y0) + 0px + var(--chj-R)) with calc(var(--chj-X1) - 0px - var(--chj-C1X)) calc(var(--chj-Y0) + 0px + var(--chj-C1Y)) / calc(var(--chj-X1) - 0px - var(--chj-C2X)) calc(var(--chj-Y0) + 0px + var(--chj-C2Y)),
-      curve to calc(var(--chj-X1) - 0px) calc(var(--chj-Y1) - 0px - var(--chj-R)) with calc(var(--chj-X1) - 0px + var(--chj-OY)) calc(var(--chj-Y0) + 0px + var(--chj-R) + var(--chj-KV)) / calc(var(--chj-X1) - 0px + var(--chj-OY)) calc(var(--chj-Y1) - 0px - var(--chj-R) - var(--chj-KV)),
-      curve to calc(var(--chj-X1) - 0px - var(--chj-R)) calc(var(--chj-Y1) - 0px) with calc(var(--chj-X1) - 0px - var(--chj-C2X)) calc(var(--chj-Y1) - 0px - var(--chj-C2Y)) / calc(var(--chj-X1) - 0px - var(--chj-C1X)) calc(var(--chj-Y1) - 0px - var(--chj-C1Y)),
-      curve to calc(var(--chj-X0) + 0px + var(--chj-R)) calc(var(--chj-Y1) - 0px) with calc(var(--chj-X1) - 0px - var(--chj-R) - var(--chj-KH)) calc(var(--chj-Y1) - 0px + var(--chj-OX)) / calc(var(--chj-X0) + 0px + var(--chj-R) + var(--chj-KH)) calc(var(--chj-Y1) - 0px + var(--chj-OX)),
-      curve to calc(var(--chj-X0) + 0px) calc(var(--chj-Y1) - 0px - var(--chj-R)) with calc(var(--chj-X0) + 0px + var(--chj-C1X)) calc(var(--chj-Y1) - 0px - var(--chj-C1Y)) / calc(var(--chj-X0) + 0px + var(--chj-C2X)) calc(var(--chj-Y1) - 0px - var(--chj-C2Y)),
-      curve to calc(var(--chj-X0) + 0px) calc(var(--chj-Y0) + 0px + var(--chj-R)) with calc(var(--chj-X0) + 0px - var(--chj-OY)) calc(var(--chj-Y1) - 0px - var(--chj-R) - var(--chj-KV)) / calc(var(--chj-X0) + 0px - var(--chj-OY)) calc(var(--chj-Y0) + 0px + var(--chj-R) + var(--chj-KV)),
-      curve to calc(var(--chj-X0) + 0px + var(--chj-R)) calc(var(--chj-Y0) + 0px) with calc(var(--chj-X0) + 0px + var(--chj-C2X)) calc(var(--chj-Y0) + 0px + var(--chj-C2Y)) / calc(var(--chj-X0) + 0px + var(--chj-C1X)) calc(var(--chj-Y0) + 0px + var(--chj-C1Y)),
+    clip-path: shape(from calc(var(--hudj-X0) + 0px + var(--hudj-R)) calc(var(--hudj-Y0) + 0px),
+      curve to calc(var(--hudj-X1) - 0px - var(--hudj-R)) calc(var(--hudj-Y0) + 0px) with calc(var(--hudj-X0) + 0px + var(--hudj-R) + var(--hudj-KH)) calc(var(--hudj-Y0) + 0px - var(--hudj-OX)) / calc(var(--hudj-X1) - 0px - var(--hudj-R) - var(--hudj-KH)) calc(var(--hudj-Y0) + 0px - var(--hudj-OX)),
+      curve to calc(var(--hudj-X1) - 0px) calc(var(--hudj-Y0) + 0px + var(--hudj-R)) with calc(var(--hudj-X1) - 0px - var(--hudj-C1X)) calc(var(--hudj-Y0) + 0px + var(--hudj-C1Y)) / calc(var(--hudj-X1) - 0px - var(--hudj-C2X)) calc(var(--hudj-Y0) + 0px + var(--hudj-C2Y)),
+      curve to calc(var(--hudj-X1) - 0px) calc(var(--hudj-Y1) - 0px - var(--hudj-R)) with calc(var(--hudj-X1) - 0px + var(--hudj-OY)) calc(var(--hudj-Y0) + 0px + var(--hudj-R) + var(--hudj-KV)) / calc(var(--hudj-X1) - 0px + var(--hudj-OY)) calc(var(--hudj-Y1) - 0px - var(--hudj-R) - var(--hudj-KV)),
+      curve to calc(var(--hudj-X1) - 0px - var(--hudj-R)) calc(var(--hudj-Y1) - 0px) with calc(var(--hudj-X1) - 0px - var(--hudj-C2X)) calc(var(--hudj-Y1) - 0px - var(--hudj-C2Y)) / calc(var(--hudj-X1) - 0px - var(--hudj-C1X)) calc(var(--hudj-Y1) - 0px - var(--hudj-C1Y)),
+      curve to calc(var(--hudj-X0) + 0px + var(--hudj-R)) calc(var(--hudj-Y1) - 0px) with calc(var(--hudj-X1) - 0px - var(--hudj-R) - var(--hudj-KH)) calc(var(--hudj-Y1) - 0px + var(--hudj-OX)) / calc(var(--hudj-X0) + 0px + var(--hudj-R) + var(--hudj-KH)) calc(var(--hudj-Y1) - 0px + var(--hudj-OX)),
+      curve to calc(var(--hudj-X0) + 0px) calc(var(--hudj-Y1) - 0px - var(--hudj-R)) with calc(var(--hudj-X0) + 0px + var(--hudj-C1X)) calc(var(--hudj-Y1) - 0px - var(--hudj-C1Y)) / calc(var(--hudj-X0) + 0px + var(--hudj-C2X)) calc(var(--hudj-Y1) - 0px - var(--hudj-C2Y)),
+      curve to calc(var(--hudj-X0) + 0px) calc(var(--hudj-Y0) + 0px + var(--hudj-R)) with calc(var(--hudj-X0) + 0px - var(--hudj-OY)) calc(var(--hudj-Y1) - 0px - var(--hudj-R) - var(--hudj-KV)) / calc(var(--hudj-X0) + 0px - var(--hudj-OY)) calc(var(--hudj-Y0) + 0px + var(--hudj-R) + var(--hudj-KV)),
+      curve to calc(var(--hudj-X0) + 0px + var(--hudj-R)) calc(var(--hudj-Y0) + 0px) with calc(var(--hudj-X0) + 0px + var(--hudj-C2X)) calc(var(--hudj-Y0) + 0px + var(--hudj-C2Y)) / calc(var(--hudj-X0) + 0px + var(--hudj-C1X)) calc(var(--hudj-Y0) + 0px + var(--hudj-C1Y)),
       close);
   }
   #classic-hud .ch-fx > .ch-jelly {
     /* [P0-0901 · 확장] 반지름을 0 으로 안 죽인다 — [L1.5-2] 띠(inset 그림자)가
        코너를 돌아야 하기 때문이다. 클립(shape)이 바깥 경계를 정확히 다시 자르므로
        겉모양(실루엣) 변화는 0 이다. */
-    border-radius: var(--chj-R);
+    border-radius: var(--hudj-R);
     box-shadow:
-      inset 0 0 0 var(--chj-rim-tc) color-mix(in srgb, var(--chj-rim-c)
-        calc(var(--chj-rim-p2) * 100%), transparent),
-      inset 0 0 0 var(--chj-rim-td) color-mix(in srgb, var(--chj-rim-c)
-        calc(var(--chj-rim-p3) * 100%), transparent),
-      inset 0 var(--chj-band-dy) var(--chj-band-w) var(--chj-band-s)
-      color-mix(in srgb, var(--chj-glow-c)
-        calc((var(--chj-a-rim) - var(--chj-a-in)) * 100%), transparent);
-    clip-path: shape(from calc(var(--chj-X0) + 0px) calc(var(--chj-Y0) - var(--chj-ext)),
-      line to calc(var(--chj-X1) - 0px) calc(var(--chj-Y0) - var(--chj-ext)),
-      curve to calc(var(--chj-X1) - 0px) calc(calc(var(--chj-Y1) - 0px) - var(--chj-R)) with calc(calc(var(--chj-X1) - 0px) + var(--chj-OY)) calc(calc(var(--chj-Y0) - var(--chj-ext)) + var(--chj-KV)) / calc(calc(var(--chj-X1) - 0px) + var(--chj-OY)) calc(calc(var(--chj-Y1) - 0px) - var(--chj-R) - var(--chj-KV)),
-      curve to calc(calc(var(--chj-X1) - 0px) - var(--chj-R)) calc(var(--chj-Y1) - 0px) with calc(calc(var(--chj-X1) - 0px) - var(--chj-C2X)) calc(calc(var(--chj-Y1) - 0px) - var(--chj-C2Y)) / calc(calc(var(--chj-X1) - 0px) - var(--chj-C1X)) calc(calc(var(--chj-Y1) - 0px) - var(--chj-C1Y)),
-      curve to calc(calc(var(--chj-X0) + 0px) + var(--chj-R)) calc(var(--chj-Y1) - 0px) with calc(calc(var(--chj-X1) - 0px) - var(--chj-R) - var(--chj-KH)) calc(calc(var(--chj-Y1) - 0px) + var(--chj-OX)) / calc(calc(var(--chj-X0) + 0px) + var(--chj-R) + var(--chj-KH)) calc(calc(var(--chj-Y1) - 0px) + var(--chj-OX)),
-      curve to calc(var(--chj-X0) + 0px) calc(calc(var(--chj-Y1) - 0px) - var(--chj-R)) with calc(calc(var(--chj-X0) + 0px) + var(--chj-C1X)) calc(calc(var(--chj-Y1) - 0px) - var(--chj-C1Y)) / calc(calc(var(--chj-X0) + 0px) + var(--chj-C2X)) calc(calc(var(--chj-Y1) - 0px) - var(--chj-C2Y)),
-      curve to calc(var(--chj-X0) + 0px) calc(var(--chj-Y0) - var(--chj-ext)) with calc(calc(var(--chj-X0) + 0px) - var(--chj-OY)) calc(calc(var(--chj-Y1) - 0px) - var(--chj-R) - var(--chj-KV)) / calc(calc(var(--chj-X0) + 0px) - var(--chj-OY)) calc(calc(var(--chj-Y0) - var(--chj-ext)) + var(--chj-KV)),
+      inset 0 0 0 var(--hudj-rim-tc) color-mix(in srgb, var(--hudj-rim-c)
+        calc(var(--hudj-rim-p2) * 100%), transparent),
+      inset 0 0 0 var(--hudj-rim-td) color-mix(in srgb, var(--hudj-rim-c)
+        calc(var(--hudj-rim-p3) * 100%), transparent),
+      inset 0 var(--hudj-band-dy) var(--hudj-band-w) var(--hudj-band-s)
+      color-mix(in srgb, var(--hudj-glow-c)
+        calc((var(--hudj-a-rim) - var(--hudj-a-in)) * 100%), transparent);
+    clip-path: shape(from calc(var(--hudj-X0) + 0px) calc(var(--hudj-Y0) - var(--hudj-ext)),
+      line to calc(var(--hudj-X1) - 0px) calc(var(--hudj-Y0) - var(--hudj-ext)),
+      curve to calc(var(--hudj-X1) - 0px) calc(calc(var(--hudj-Y1) - 0px) - var(--hudj-R)) with calc(calc(var(--hudj-X1) - 0px) + var(--hudj-OY)) calc(calc(var(--hudj-Y0) - var(--hudj-ext)) + var(--hudj-KV)) / calc(calc(var(--hudj-X1) - 0px) + var(--hudj-OY)) calc(calc(var(--hudj-Y1) - 0px) - var(--hudj-R) - var(--hudj-KV)),
+      curve to calc(calc(var(--hudj-X1) - 0px) - var(--hudj-R)) calc(var(--hudj-Y1) - 0px) with calc(calc(var(--hudj-X1) - 0px) - var(--hudj-C2X)) calc(calc(var(--hudj-Y1) - 0px) - var(--hudj-C2Y)) / calc(calc(var(--hudj-X1) - 0px) - var(--hudj-C1X)) calc(calc(var(--hudj-Y1) - 0px) - var(--hudj-C1Y)),
+      curve to calc(calc(var(--hudj-X0) + 0px) + var(--hudj-R)) calc(var(--hudj-Y1) - 0px) with calc(calc(var(--hudj-X1) - 0px) - var(--hudj-R) - var(--hudj-KH)) calc(calc(var(--hudj-Y1) - 0px) + var(--hudj-OX)) / calc(calc(var(--hudj-X0) + 0px) + var(--hudj-R) + var(--hudj-KH)) calc(calc(var(--hudj-Y1) - 0px) + var(--hudj-OX)),
+      curve to calc(var(--hudj-X0) + 0px) calc(calc(var(--hudj-Y1) - 0px) - var(--hudj-R)) with calc(calc(var(--hudj-X0) + 0px) + var(--hudj-C1X)) calc(calc(var(--hudj-Y1) - 0px) - var(--hudj-C1Y)) / calc(calc(var(--hudj-X0) + 0px) + var(--hudj-C2X)) calc(calc(var(--hudj-Y1) - 0px) - var(--hudj-C2Y)),
+      curve to calc(var(--hudj-X0) + 0px) calc(var(--hudj-Y0) - var(--hudj-ext)) with calc(calc(var(--hudj-X0) + 0px) - var(--hudj-OY)) calc(calc(var(--hudj-Y1) - 0px) - var(--hudj-R) - var(--hudj-KV)) / calc(calc(var(--hudj-X0) + 0px) - var(--hudj-OY)) calc(calc(var(--hudj-Y0) - var(--hudj-ext)) + var(--hudj-KV)),
       close);
   }
   #classic-hud .ch-fx > .ch-jelly::before {
@@ -53133,23 +52859,23 @@ html.menu-v2 #screen-menu .tagline{
     position: absolute; inset: 0;
     z-index: 1;
     pointer-events: none;
-    background: color-mix(in srgb, var(--chj-rim-c) calc(var(--chj-rim-p1) * 100%), transparent);
-    filter: blur(var(--chj-rim-blur));
-    clip-path: shape(evenodd from calc(var(--chj-X0) + var(--chj-rim-in)) calc(calc(var(--chj-Y0) - var(--chj-ext))),
-      line to calc(var(--chj-X1) - var(--chj-rim-in)) calc(calc(var(--chj-Y0) - var(--chj-ext))),
-      curve to calc(var(--chj-X1) - var(--chj-rim-in)) calc(var(--chj-Y1) - var(--chj-rim-in) - var(--chj-Ra)) with calc(var(--chj-X1) - var(--chj-rim-in) + var(--chj-OY)) calc(calc(var(--chj-Y0) - var(--chj-ext)) + var(--chj-KV)) / calc(var(--chj-X1) - var(--chj-rim-in) + var(--chj-OY)) calc(var(--chj-Y1) - var(--chj-rim-in) - var(--chj-Ra) - var(--chj-KV)),
-      curve to calc(var(--chj-X1) - var(--chj-rim-in) - var(--chj-Ra)) calc(var(--chj-Y1) - var(--chj-rim-in)) with calc(var(--chj-X1) - var(--chj-rim-in) - var(--chj-C2Xa)) calc(var(--chj-Y1) - var(--chj-rim-in) - var(--chj-C2Ya)) / calc(var(--chj-X1) - var(--chj-rim-in) - var(--chj-C1Xa)) calc(var(--chj-Y1) - var(--chj-rim-in) - var(--chj-C1Ya)),
-      curve to calc(var(--chj-X0) + var(--chj-rim-in) + var(--chj-Ra)) calc(var(--chj-Y1) - var(--chj-rim-in)) with calc(var(--chj-X1) - var(--chj-rim-in) - var(--chj-Ra) - var(--chj-KH)) calc(var(--chj-Y1) - var(--chj-rim-in) + var(--chj-OX)) / calc(var(--chj-X0) + var(--chj-rim-in) + var(--chj-Ra) + var(--chj-KH)) calc(var(--chj-Y1) - var(--chj-rim-in) + var(--chj-OX)),
-      curve to calc(var(--chj-X0) + var(--chj-rim-in)) calc(var(--chj-Y1) - var(--chj-rim-in) - var(--chj-Ra)) with calc(var(--chj-X0) + var(--chj-rim-in) + var(--chj-C1Xa)) calc(var(--chj-Y1) - var(--chj-rim-in) - var(--chj-C1Ya)) / calc(var(--chj-X0) + var(--chj-rim-in) + var(--chj-C2Xa)) calc(var(--chj-Y1) - var(--chj-rim-in) - var(--chj-C2Ya)),
-      curve to calc(var(--chj-X0) + var(--chj-rim-in)) calc(calc(var(--chj-Y0) - var(--chj-ext))) with calc(var(--chj-X0) + var(--chj-rim-in) - var(--chj-OY)) calc(var(--chj-Y1) - var(--chj-rim-in) - var(--chj-Ra) - var(--chj-KV)) / calc(var(--chj-X0) + var(--chj-rim-in) - var(--chj-OY)) calc(calc(var(--chj-Y0) - var(--chj-ext)) + var(--chj-KV)),
+    background: color-mix(in srgb, var(--hudj-rim-c) calc(var(--hudj-rim-p1) * 100%), transparent);
+    filter: blur(var(--hudj-rim-blur));
+    clip-path: shape(evenodd from calc(var(--hudj-X0) + var(--hudj-rim-in)) calc(calc(var(--hudj-Y0) - var(--hudj-ext))),
+      line to calc(var(--hudj-X1) - var(--hudj-rim-in)) calc(calc(var(--hudj-Y0) - var(--hudj-ext))),
+      curve to calc(var(--hudj-X1) - var(--hudj-rim-in)) calc(var(--hudj-Y1) - var(--hudj-rim-in) - var(--hudj-Ra)) with calc(var(--hudj-X1) - var(--hudj-rim-in) + var(--hudj-OY)) calc(calc(var(--hudj-Y0) - var(--hudj-ext)) + var(--hudj-KV)) / calc(var(--hudj-X1) - var(--hudj-rim-in) + var(--hudj-OY)) calc(var(--hudj-Y1) - var(--hudj-rim-in) - var(--hudj-Ra) - var(--hudj-KV)),
+      curve to calc(var(--hudj-X1) - var(--hudj-rim-in) - var(--hudj-Ra)) calc(var(--hudj-Y1) - var(--hudj-rim-in)) with calc(var(--hudj-X1) - var(--hudj-rim-in) - var(--hudj-C2Xa)) calc(var(--hudj-Y1) - var(--hudj-rim-in) - var(--hudj-C2Ya)) / calc(var(--hudj-X1) - var(--hudj-rim-in) - var(--hudj-C1Xa)) calc(var(--hudj-Y1) - var(--hudj-rim-in) - var(--hudj-C1Ya)),
+      curve to calc(var(--hudj-X0) + var(--hudj-rim-in) + var(--hudj-Ra)) calc(var(--hudj-Y1) - var(--hudj-rim-in)) with calc(var(--hudj-X1) - var(--hudj-rim-in) - var(--hudj-Ra) - var(--hudj-KH)) calc(var(--hudj-Y1) - var(--hudj-rim-in) + var(--hudj-OX)) / calc(var(--hudj-X0) + var(--hudj-rim-in) + var(--hudj-Ra) + var(--hudj-KH)) calc(var(--hudj-Y1) - var(--hudj-rim-in) + var(--hudj-OX)),
+      curve to calc(var(--hudj-X0) + var(--hudj-rim-in)) calc(var(--hudj-Y1) - var(--hudj-rim-in) - var(--hudj-Ra)) with calc(var(--hudj-X0) + var(--hudj-rim-in) + var(--hudj-C1Xa)) calc(var(--hudj-Y1) - var(--hudj-rim-in) - var(--hudj-C1Ya)) / calc(var(--hudj-X0) + var(--hudj-rim-in) + var(--hudj-C2Xa)) calc(var(--hudj-Y1) - var(--hudj-rim-in) - var(--hudj-C2Ya)),
+      curve to calc(var(--hudj-X0) + var(--hudj-rim-in)) calc(calc(var(--hudj-Y0) - var(--hudj-ext))) with calc(var(--hudj-X0) + var(--hudj-rim-in) - var(--hudj-OY)) calc(var(--hudj-Y1) - var(--hudj-rim-in) - var(--hudj-Ra) - var(--hudj-KV)) / calc(var(--hudj-X0) + var(--hudj-rim-in) - var(--hudj-OY)) calc(calc(var(--hudj-Y0) - var(--hudj-ext)) + var(--hudj-KV)),
       close,
-      move to calc(var(--chj-X0) + calc(var(--chj-rim-in) + var(--chj-rim-w))) calc(calc(var(--chj-Y0) - var(--chj-ext))),
-      line to calc(var(--chj-X1) - calc(var(--chj-rim-in) + var(--chj-rim-w))) calc(calc(var(--chj-Y0) - var(--chj-ext))),
-      curve to calc(var(--chj-X1) - calc(var(--chj-rim-in) + var(--chj-rim-w))) calc(var(--chj-Y1) - calc(var(--chj-rim-in) + var(--chj-rim-w)) - var(--chj-Rb)) with calc(var(--chj-X1) - calc(var(--chj-rim-in) + var(--chj-rim-w)) + var(--chj-OY)) calc(calc(var(--chj-Y0) - var(--chj-ext)) + var(--chj-KV)) / calc(var(--chj-X1) - calc(var(--chj-rim-in) + var(--chj-rim-w)) + var(--chj-OY)) calc(var(--chj-Y1) - calc(var(--chj-rim-in) + var(--chj-rim-w)) - var(--chj-Rb) - var(--chj-KV)),
-      curve to calc(var(--chj-X1) - calc(var(--chj-rim-in) + var(--chj-rim-w)) - var(--chj-Rb)) calc(var(--chj-Y1) - calc(var(--chj-rim-in) + var(--chj-rim-w))) with calc(var(--chj-X1) - calc(var(--chj-rim-in) + var(--chj-rim-w)) - var(--chj-C2Xb)) calc(var(--chj-Y1) - calc(var(--chj-rim-in) + var(--chj-rim-w)) - var(--chj-C2Yb)) / calc(var(--chj-X1) - calc(var(--chj-rim-in) + var(--chj-rim-w)) - var(--chj-C1Xb)) calc(var(--chj-Y1) - calc(var(--chj-rim-in) + var(--chj-rim-w)) - var(--chj-C1Yb)),
-      curve to calc(var(--chj-X0) + calc(var(--chj-rim-in) + var(--chj-rim-w)) + var(--chj-Rb)) calc(var(--chj-Y1) - calc(var(--chj-rim-in) + var(--chj-rim-w))) with calc(var(--chj-X1) - calc(var(--chj-rim-in) + var(--chj-rim-w)) - var(--chj-Rb) - var(--chj-KH)) calc(var(--chj-Y1) - calc(var(--chj-rim-in) + var(--chj-rim-w)) + var(--chj-OX)) / calc(var(--chj-X0) + calc(var(--chj-rim-in) + var(--chj-rim-w)) + var(--chj-Rb) + var(--chj-KH)) calc(var(--chj-Y1) - calc(var(--chj-rim-in) + var(--chj-rim-w)) + var(--chj-OX)),
-      curve to calc(var(--chj-X0) + calc(var(--chj-rim-in) + var(--chj-rim-w))) calc(var(--chj-Y1) - calc(var(--chj-rim-in) + var(--chj-rim-w)) - var(--chj-Rb)) with calc(var(--chj-X0) + calc(var(--chj-rim-in) + var(--chj-rim-w)) + var(--chj-C1Xb)) calc(var(--chj-Y1) - calc(var(--chj-rim-in) + var(--chj-rim-w)) - var(--chj-C1Yb)) / calc(var(--chj-X0) + calc(var(--chj-rim-in) + var(--chj-rim-w)) + var(--chj-C2Xb)) calc(var(--chj-Y1) - calc(var(--chj-rim-in) + var(--chj-rim-w)) - var(--chj-C2Yb)),
-      curve to calc(var(--chj-X0) + calc(var(--chj-rim-in) + var(--chj-rim-w))) calc(calc(var(--chj-Y0) - var(--chj-ext))) with calc(var(--chj-X0) + calc(var(--chj-rim-in) + var(--chj-rim-w)) - var(--chj-OY)) calc(var(--chj-Y1) - calc(var(--chj-rim-in) + var(--chj-rim-w)) - var(--chj-Rb) - var(--chj-KV)) / calc(var(--chj-X0) + calc(var(--chj-rim-in) + var(--chj-rim-w)) - var(--chj-OY)) calc(calc(var(--chj-Y0) - var(--chj-ext)) + var(--chj-KV)),
+      move to calc(var(--hudj-X0) + calc(var(--hudj-rim-in) + var(--hudj-rim-w))) calc(calc(var(--hudj-Y0) - var(--hudj-ext))),
+      line to calc(var(--hudj-X1) - calc(var(--hudj-rim-in) + var(--hudj-rim-w))) calc(calc(var(--hudj-Y0) - var(--hudj-ext))),
+      curve to calc(var(--hudj-X1) - calc(var(--hudj-rim-in) + var(--hudj-rim-w))) calc(var(--hudj-Y1) - calc(var(--hudj-rim-in) + var(--hudj-rim-w)) - var(--hudj-Rb)) with calc(var(--hudj-X1) - calc(var(--hudj-rim-in) + var(--hudj-rim-w)) + var(--hudj-OY)) calc(calc(var(--hudj-Y0) - var(--hudj-ext)) + var(--hudj-KV)) / calc(var(--hudj-X1) - calc(var(--hudj-rim-in) + var(--hudj-rim-w)) + var(--hudj-OY)) calc(var(--hudj-Y1) - calc(var(--hudj-rim-in) + var(--hudj-rim-w)) - var(--hudj-Rb) - var(--hudj-KV)),
+      curve to calc(var(--hudj-X1) - calc(var(--hudj-rim-in) + var(--hudj-rim-w)) - var(--hudj-Rb)) calc(var(--hudj-Y1) - calc(var(--hudj-rim-in) + var(--hudj-rim-w))) with calc(var(--hudj-X1) - calc(var(--hudj-rim-in) + var(--hudj-rim-w)) - var(--hudj-C2Xb)) calc(var(--hudj-Y1) - calc(var(--hudj-rim-in) + var(--hudj-rim-w)) - var(--hudj-C2Yb)) / calc(var(--hudj-X1) - calc(var(--hudj-rim-in) + var(--hudj-rim-w)) - var(--hudj-C1Xb)) calc(var(--hudj-Y1) - calc(var(--hudj-rim-in) + var(--hudj-rim-w)) - var(--hudj-C1Yb)),
+      curve to calc(var(--hudj-X0) + calc(var(--hudj-rim-in) + var(--hudj-rim-w)) + var(--hudj-Rb)) calc(var(--hudj-Y1) - calc(var(--hudj-rim-in) + var(--hudj-rim-w))) with calc(var(--hudj-X1) - calc(var(--hudj-rim-in) + var(--hudj-rim-w)) - var(--hudj-Rb) - var(--hudj-KH)) calc(var(--hudj-Y1) - calc(var(--hudj-rim-in) + var(--hudj-rim-w)) + var(--hudj-OX)) / calc(var(--hudj-X0) + calc(var(--hudj-rim-in) + var(--hudj-rim-w)) + var(--hudj-Rb) + var(--hudj-KH)) calc(var(--hudj-Y1) - calc(var(--hudj-rim-in) + var(--hudj-rim-w)) + var(--hudj-OX)),
+      curve to calc(var(--hudj-X0) + calc(var(--hudj-rim-in) + var(--hudj-rim-w))) calc(var(--hudj-Y1) - calc(var(--hudj-rim-in) + var(--hudj-rim-w)) - var(--hudj-Rb)) with calc(var(--hudj-X0) + calc(var(--hudj-rim-in) + var(--hudj-rim-w)) + var(--hudj-C1Xb)) calc(var(--hudj-Y1) - calc(var(--hudj-rim-in) + var(--hudj-rim-w)) - var(--hudj-C1Yb)) / calc(var(--hudj-X0) + calc(var(--hudj-rim-in) + var(--hudj-rim-w)) + var(--hudj-C2Xb)) calc(var(--hudj-Y1) - calc(var(--hudj-rim-in) + var(--hudj-rim-w)) - var(--hudj-C2Yb)),
+      curve to calc(var(--hudj-X0) + calc(var(--hudj-rim-in) + var(--hudj-rim-w))) calc(calc(var(--hudj-Y0) - var(--hudj-ext))) with calc(var(--hudj-X0) + calc(var(--hudj-rim-in) + var(--hudj-rim-w)) - var(--hudj-OY)) calc(var(--hudj-Y1) - calc(var(--hudj-rim-in) + var(--hudj-rim-w)) - var(--hudj-Rb) - var(--hudj-KV)) / calc(var(--hudj-X0) + calc(var(--hudj-rim-in) + var(--hudj-rim-w)) - var(--hudj-OY)) calc(calc(var(--hudj-Y0) - var(--hudj-ext)) + var(--hudj-KV)),
       close);
   }
   #classic-hud .ch-fx > .ch-jelly::after {
@@ -53157,23 +52883,23 @@ html.menu-v2 #screen-menu .tagline{
     position: absolute; inset: 0;
     z-index: 2;
     pointer-events: none;
-    background: color-mix(in srgb, var(--chj-L3-line)
-      calc(var(--chj-L3-a) * 100%), transparent);
-    clip-path: shape(evenodd from calc(var(--chj-X0) + 0px) calc(calc(var(--chj-Y0) - var(--chj-ext))),
-      line to calc(var(--chj-X1) - 0px) calc(calc(var(--chj-Y0) - var(--chj-ext))),
-      curve to calc(var(--chj-X1) - 0px) calc(var(--chj-Y1) - 0px - var(--chj-R)) with calc(var(--chj-X1) - 0px + var(--chj-OY)) calc(calc(var(--chj-Y0) - var(--chj-ext)) + var(--chj-KV)) / calc(var(--chj-X1) - 0px + var(--chj-OY)) calc(var(--chj-Y1) - 0px - var(--chj-R) - var(--chj-KV)),
-      curve to calc(var(--chj-X1) - 0px - var(--chj-R)) calc(var(--chj-Y1) - 0px) with calc(var(--chj-X1) - 0px - var(--chj-C2X)) calc(var(--chj-Y1) - 0px - var(--chj-C2Y)) / calc(var(--chj-X1) - 0px - var(--chj-C1X)) calc(var(--chj-Y1) - 0px - var(--chj-C1Y)),
-      curve to calc(var(--chj-X0) + 0px + var(--chj-R)) calc(var(--chj-Y1) - 0px) with calc(var(--chj-X1) - 0px - var(--chj-R) - var(--chj-KH)) calc(var(--chj-Y1) - 0px + var(--chj-OX)) / calc(var(--chj-X0) + 0px + var(--chj-R) + var(--chj-KH)) calc(var(--chj-Y1) - 0px + var(--chj-OX)),
-      curve to calc(var(--chj-X0) + 0px) calc(var(--chj-Y1) - 0px - var(--chj-R)) with calc(var(--chj-X0) + 0px + var(--chj-C1X)) calc(var(--chj-Y1) - 0px - var(--chj-C1Y)) / calc(var(--chj-X0) + 0px + var(--chj-C2X)) calc(var(--chj-Y1) - 0px - var(--chj-C2Y)),
-      curve to calc(var(--chj-X0) + 0px) calc(calc(var(--chj-Y0) - var(--chj-ext))) with calc(var(--chj-X0) + 0px - var(--chj-OY)) calc(var(--chj-Y1) - 0px - var(--chj-R) - var(--chj-KV)) / calc(var(--chj-X0) + 0px - var(--chj-OY)) calc(calc(var(--chj-Y0) - var(--chj-ext)) + var(--chj-KV)),
+    background: color-mix(in srgb, var(--hudj-L3-line)
+      calc(var(--hudj-L3-a) * 100%), transparent);
+    clip-path: shape(evenodd from calc(var(--hudj-X0) + 0px) calc(calc(var(--hudj-Y0) - var(--hudj-ext))),
+      line to calc(var(--hudj-X1) - 0px) calc(calc(var(--hudj-Y0) - var(--hudj-ext))),
+      curve to calc(var(--hudj-X1) - 0px) calc(var(--hudj-Y1) - 0px - var(--hudj-R)) with calc(var(--hudj-X1) - 0px + var(--hudj-OY)) calc(calc(var(--hudj-Y0) - var(--hudj-ext)) + var(--hudj-KV)) / calc(var(--hudj-X1) - 0px + var(--hudj-OY)) calc(var(--hudj-Y1) - 0px - var(--hudj-R) - var(--hudj-KV)),
+      curve to calc(var(--hudj-X1) - 0px - var(--hudj-R)) calc(var(--hudj-Y1) - 0px) with calc(var(--hudj-X1) - 0px - var(--hudj-C2X)) calc(var(--hudj-Y1) - 0px - var(--hudj-C2Y)) / calc(var(--hudj-X1) - 0px - var(--hudj-C1X)) calc(var(--hudj-Y1) - 0px - var(--hudj-C1Y)),
+      curve to calc(var(--hudj-X0) + 0px + var(--hudj-R)) calc(var(--hudj-Y1) - 0px) with calc(var(--hudj-X1) - 0px - var(--hudj-R) - var(--hudj-KH)) calc(var(--hudj-Y1) - 0px + var(--hudj-OX)) / calc(var(--hudj-X0) + 0px + var(--hudj-R) + var(--hudj-KH)) calc(var(--hudj-Y1) - 0px + var(--hudj-OX)),
+      curve to calc(var(--hudj-X0) + 0px) calc(var(--hudj-Y1) - 0px - var(--hudj-R)) with calc(var(--hudj-X0) + 0px + var(--hudj-C1X)) calc(var(--hudj-Y1) - 0px - var(--hudj-C1Y)) / calc(var(--hudj-X0) + 0px + var(--hudj-C2X)) calc(var(--hudj-Y1) - 0px - var(--hudj-C2Y)),
+      curve to calc(var(--hudj-X0) + 0px) calc(calc(var(--hudj-Y0) - var(--hudj-ext))) with calc(var(--hudj-X0) + 0px - var(--hudj-OY)) calc(var(--hudj-Y1) - 0px - var(--hudj-R) - var(--hudj-KV)) / calc(var(--hudj-X0) + 0px - var(--hudj-OY)) calc(calc(var(--hudj-Y0) - var(--hudj-ext)) + var(--hudj-KV)),
       close,
-      move to calc(var(--chj-X0) + var(--chj-L3-w)) calc(calc(var(--chj-Y0) - var(--chj-ext))),
-      line to calc(var(--chj-X1) - var(--chj-L3-w)) calc(calc(var(--chj-Y0) - var(--chj-ext))),
-      curve to calc(var(--chj-X1) - var(--chj-L3-w)) calc(var(--chj-Y1) - var(--chj-L3-w) - var(--chj-R3)) with calc(var(--chj-X1) - var(--chj-L3-w) + var(--chj-OY)) calc(calc(var(--chj-Y0) - var(--chj-ext)) + var(--chj-KV)) / calc(var(--chj-X1) - var(--chj-L3-w) + var(--chj-OY)) calc(var(--chj-Y1) - var(--chj-L3-w) - var(--chj-R3) - var(--chj-KV)),
-      curve to calc(var(--chj-X1) - var(--chj-L3-w) - var(--chj-R3)) calc(var(--chj-Y1) - var(--chj-L3-w)) with calc(var(--chj-X1) - var(--chj-L3-w) - var(--chj-C2X3)) calc(var(--chj-Y1) - var(--chj-L3-w) - var(--chj-C2Y3)) / calc(var(--chj-X1) - var(--chj-L3-w) - var(--chj-C1X3)) calc(var(--chj-Y1) - var(--chj-L3-w) - var(--chj-C1Y3)),
-      curve to calc(var(--chj-X0) + var(--chj-L3-w) + var(--chj-R3)) calc(var(--chj-Y1) - var(--chj-L3-w)) with calc(var(--chj-X1) - var(--chj-L3-w) - var(--chj-R3) - var(--chj-KH)) calc(var(--chj-Y1) - var(--chj-L3-w) + var(--chj-OX)) / calc(var(--chj-X0) + var(--chj-L3-w) + var(--chj-R3) + var(--chj-KH)) calc(var(--chj-Y1) - var(--chj-L3-w) + var(--chj-OX)),
-      curve to calc(var(--chj-X0) + var(--chj-L3-w)) calc(var(--chj-Y1) - var(--chj-L3-w) - var(--chj-R3)) with calc(var(--chj-X0) + var(--chj-L3-w) + var(--chj-C1X3)) calc(var(--chj-Y1) - var(--chj-L3-w) - var(--chj-C1Y3)) / calc(var(--chj-X0) + var(--chj-L3-w) + var(--chj-C2X3)) calc(var(--chj-Y1) - var(--chj-L3-w) - var(--chj-C2Y3)),
-      curve to calc(var(--chj-X0) + var(--chj-L3-w)) calc(calc(var(--chj-Y0) - var(--chj-ext))) with calc(var(--chj-X0) + var(--chj-L3-w) - var(--chj-OY)) calc(var(--chj-Y1) - var(--chj-L3-w) - var(--chj-R3) - var(--chj-KV)) / calc(var(--chj-X0) + var(--chj-L3-w) - var(--chj-OY)) calc(calc(var(--chj-Y0) - var(--chj-ext)) + var(--chj-KV)),
+      move to calc(var(--hudj-X0) + var(--hudj-L3-w)) calc(calc(var(--hudj-Y0) - var(--hudj-ext))),
+      line to calc(var(--hudj-X1) - var(--hudj-L3-w)) calc(calc(var(--hudj-Y0) - var(--hudj-ext))),
+      curve to calc(var(--hudj-X1) - var(--hudj-L3-w)) calc(var(--hudj-Y1) - var(--hudj-L3-w) - var(--hudj-R3)) with calc(var(--hudj-X1) - var(--hudj-L3-w) + var(--hudj-OY)) calc(calc(var(--hudj-Y0) - var(--hudj-ext)) + var(--hudj-KV)) / calc(var(--hudj-X1) - var(--hudj-L3-w) + var(--hudj-OY)) calc(var(--hudj-Y1) - var(--hudj-L3-w) - var(--hudj-R3) - var(--hudj-KV)),
+      curve to calc(var(--hudj-X1) - var(--hudj-L3-w) - var(--hudj-R3)) calc(var(--hudj-Y1) - var(--hudj-L3-w)) with calc(var(--hudj-X1) - var(--hudj-L3-w) - var(--hudj-C2X3)) calc(var(--hudj-Y1) - var(--hudj-L3-w) - var(--hudj-C2Y3)) / calc(var(--hudj-X1) - var(--hudj-L3-w) - var(--hudj-C1X3)) calc(var(--hudj-Y1) - var(--hudj-L3-w) - var(--hudj-C1Y3)),
+      curve to calc(var(--hudj-X0) + var(--hudj-L3-w) + var(--hudj-R3)) calc(var(--hudj-Y1) - var(--hudj-L3-w)) with calc(var(--hudj-X1) - var(--hudj-L3-w) - var(--hudj-R3) - var(--hudj-KH)) calc(var(--hudj-Y1) - var(--hudj-L3-w) + var(--hudj-OX)) / calc(var(--hudj-X0) + var(--hudj-L3-w) + var(--hudj-R3) + var(--hudj-KH)) calc(var(--hudj-Y1) - var(--hudj-L3-w) + var(--hudj-OX)),
+      curve to calc(var(--hudj-X0) + var(--hudj-L3-w)) calc(var(--hudj-Y1) - var(--hudj-L3-w) - var(--hudj-R3)) with calc(var(--hudj-X0) + var(--hudj-L3-w) + var(--hudj-C1X3)) calc(var(--hudj-Y1) - var(--hudj-L3-w) - var(--hudj-C1Y3)) / calc(var(--hudj-X0) + var(--hudj-L3-w) + var(--hudj-C2X3)) calc(var(--hudj-Y1) - var(--hudj-L3-w) - var(--hudj-C2Y3)),
+      curve to calc(var(--hudj-X0) + var(--hudj-L3-w)) calc(calc(var(--hudj-Y0) - var(--hudj-ext))) with calc(var(--hudj-X0) + var(--hudj-L3-w) - var(--hudj-OY)) calc(var(--hudj-Y1) - var(--hudj-L3-w) - var(--hudj-R3) - var(--hudj-KV)) / calc(var(--hudj-X0) + var(--hudj-L3-w) - var(--hudj-OY)) calc(calc(var(--hudj-Y0) - var(--hudj-ext)) + var(--hudj-KV)),
       close);
   }
 }
@@ -54093,10 +53819,7 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
 }
 /* 위 직사각 바 — 아래변을 시안 자리(.17504W)에 못 박는다. 위쪽으로 내보내는
    몫(--h2-w * -.14)은 ②-A 가 정한 그대로다(위 변 없는 판). */
-#duel-hud .kit-hud-v2__plate{
-  inset: calc(var(--h2-w) * -.14) 0 auto 0;
-  height: calc(var(--h2-w) * .14 + var(--dhT) + var(--dhW) * .17504);
-}
+
 /* [지휘자 판정 4] 아래 두 코너 반지름 — **아래 굴곡판을 세운 뒤 재측**.
    착수 전: --dhj-L0-R = min(w*.178180, 100cqh*.28) 였고, 판이 낮아 늘 높이 상한
    쪽이 이겨 실제 33.2px 로 섰다(판 폭 373.22 의 8.90%). 시안 a13c656f 의 위
@@ -54107,12 +53830,9 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
    ⚠ 정본 hud 절이 못 박은 v1.0 값(w*.178180)을 덮는 자리다. 그 값은 «판 높이가
      폭의 17.94%» 인 정본 hud 상자를 전제로 하고, 우리 위 바는 그 상자가 아니다
      (위 변이 화면 밖으로 나가 실제 높이가 31.8%W 다). 시안이 자다. */
-#duel-hud .kit-hud-v2__plate > .dh-gnd,
-#duel-hud .kit-hud-v2__plate > .dh-jelly,
 #app.classic #classic-hud .ch-fx > .ch-gnd,
 #app.classic #classic-hud .ch-fx > .ch-jelly{
-  --dhj-L0-R: calc(var(--dhj-w) * .03723);
-  --chj-L0-R: calc(var(--chj-w) * .03723);
+  --hudj-L0-R: calc(var(--hudj-w) * .03723);
   /* [같은 재측] **가로변 볼록을 0 으로.** 시안 a13c656f 의 위 직사각 바 아래변은
      x120~1600 전 구간에서 y=302(잉크 끝)로 **완전히 평평하다**(열별 실측 8곳
      전부 302). 우리 판은 --?hj-L0-bx = 폭의 2.5% 라 아래변 한가운데가 상자
@@ -54123,211 +53843,15 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
      ⚠ 세로변 볼록(--?hj-L0-by)은 그대로 둔다 — 그 몫은 2px 대라 시안 좌변
        실측(y10~140 에서 x12 고정)과 어긋나지 않는다.
      ⚠ ②-A 가 정한 「위 변 없음」(--?hj-ext · 1직선+5커브)은 한 글자도 안 건드렸다. */
-  --dhj-L0-bx: 0px;
-  --chj-L0-bx: 0px;
+  --hudj-L0-bx: 0px;
 }
 
 /* ---------------------------------------------------------------------------
    아래 굴곡 단일판 (D) — 재질은 `[data-part="hud"]` 거울, 실루엣만 새것
    --------------------------------------------------------------------------- */
-#duel-hud > .dh-low{
-  position: absolute;
-  left:  calc(var(--dhW) * .00354);
-  width: calc(var(--dhW) * .97638);
-  top:   calc(var(--dhT) + var(--dhW) * .19274);
-  height: calc(var(--dhW) * .14286);
-  z-index: 0;
-  pointer-events: none;
-  container-type: size;
-}
-#duel-hud > .dh-low > .dl-jelly{
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
 
-  --dlj-w: 100cqw;
-  /* 재질 — 게임의 hud 거울(--dhj-)과 **문자 그대로 같은 값**이다. */
-  --dlj-face: #8DA6E6; --dlj-face-top: #B0C7FE; --dlj-face-y: 100%; --dlj-rim-c: #B0C7FE;
-  --dlj-a-fill: 0;
-  /* [E38-0903] 면 제거. 시안 날개 속면 #0BF408 (키와 dE 4.4) -> alpha <= .029.
-     봉인: --dlj-a-in: .657; */
-  --dlj-a-in: 0.000;
-  --dlj-a-rim: 1.000;
-  /* [E38-0903 · 면 제거 + 안쪽 글로] 시안에는 **면(균일 채움)이 없다**.
-     빈 틀 시안 a13c656f 는 순크로마그린인데 이 부품 기하 속면이 키와 dE 3.3~4.9
-     (HUD 는 속면 화소의 93.3%, 141,567 px 가 키와 같다) -> alpha_face <= .022~.033.
-     있는 것은 겉선(불투명) + 림 + **가장자리에서 안으로 사그라지는 글로** 뿐이다.
-     자료: scratchpad/matting-0903/{matting.json,CSS-VALUES.txt}
-     [!] 글로 도달 D 는 **캔버스 상수**다 — raw px CV 19% (26.2/>=28/34.1) 대
-       부품 폭 대비 CV 60%. 그래서 --f2-ref-w(캔버스 자)에 매단다.
-       띠 두 값은 alpha(d)=0.90*(1-d/D)^1.7 에 최소자승으로 맞춘 것이다
-       (spread=0.307246 D · blur=0.624734 D · rmse 0.0144). */
-  --dlj-glow-c: #95C7BF;   /* 글로 면색 — 시안 날개 d6..17 실측 (149,199,191) */
-  --dlj-band-w: calc(var(--f2-ref-w) * 0.022777);   /* 글로 번짐 (도달 D >=28 시안px · 하한) */
-  --dlj-band-s: calc(var(--f2-ref-w) * 0.011202);   /* 글로 퍼짐 */
-  --dlj-haze: 0;
-  --dlj-haze-y: 14.0%;
-  /* [E38-0903] 유백 워시 제거(균일 채움). 봉인: --dlj-milk-a: .050; */
-  --dlj-milk-a: 0.000;
-  --dlj-rim-in: calc(var(--f2-ref-w) * 0.00315);
-  --dlj-rim-w: calc(var(--f2-ref-w) * 0.00350);
-  --dlj-rim-a: 0.4500;
-  --dlj-rim-blur: calc(var(--f2-ref-w) * 0.00160);
-  --dlj-rim-w2: calc(var(--f2-ref-w) * 0.01094);
-  --dlj-rim-w3: calc(var(--f2-ref-w) * 0.01290);
-  --dlj-rim-k2: 0.424;
-  --dlj-rim-k3: 0.093;
-  --dlj-rim-tc: calc(var(--dlj-rim-in) + var(--dlj-rim-w) + var(--dlj-rim-w2));
-  --dlj-rim-td: calc(var(--dlj-rim-tc) + var(--dlj-rim-w3));
-  --dlj-rim-p3: calc(var(--dlj-rim-a) * var(--dlj-rim-k3));
-  --dlj-rim-p2: calc(1 - (1 - var(--dlj-rim-a) * var(--dlj-rim-k2)) / (1 - var(--dlj-rim-a) * var(--dlj-rim-k3)));
-  --dlj-rim-p1: calc(1 - (1 - var(--dlj-rim-a)) / (1 - var(--dlj-rim-a) * var(--dlj-rim-k2)));
-  --dlj-gl-a: .770;
-  --dlj-gl1-w: 12.7%;  --dlj-gl1-h: 6.6%;
-  --dlj-gl1-px: 2.95%;  --dlj-gl1-py: 1.3%;
-  --dlj-gl2-w: 5.1%;  --dlj-gl2-h: 2.0%;
-  --dlj-gl2-px: 19.45%; --dlj-gl2-py: 1.7%;
-  --dlj-L3-w: calc(var(--f2-ref-w) * 0.00400);
-  --dlj-L3-line: #7276B8;
-  --dlj-L3-a: .700;
-  --dlj-L3-blur: calc(var(--dlj-L3-w) * 0.28);
 
-  border-radius: calc(var(--dlj-w) * .036);   /* shape() 폴백 */
-  background-color: transparent;
-  background-image:
-    radial-gradient(closest-side,
-      rgba(255,255,255, calc(var(--dlj-gl-a) * 1.00)) 0%,
-      rgba(255,255,255, calc(var(--dlj-gl-a) *  .72)) 52%,
-      rgba(255,255,255, 0) 100%),
-    radial-gradient(closest-side,
-      rgba(255,255,255, calc(var(--dlj-gl-a) * 1.00)) 0%,
-      rgba(255,255,255, calc(var(--dlj-gl-a) *  .72)) 52%,
-      rgba(255,255,255, 0) 100%),
-    /* [L2-0] 유백 — 코너까지 고원(P0-0901 확장, hud 와 같은 .25 바닥) */
-    radial-gradient(farthest-side at 50% 50%,
-      rgba(255,255,255, calc(var(--dlj-milk-a) * 1.00)) 0%,
-      rgba(255,255,255, calc(var(--dlj-milk-a) *  .85)) 55%,
-      rgba(255,255,255, calc(var(--dlj-milk-a) *  .25)) 88%,
-      rgba(255,255,255, calc(var(--dlj-milk-a) *  .25)) 100%,
-      rgba(255,255,255, calc(var(--dlj-milk-a) *  .25)) 141%),
-    linear-gradient(to bottom,
-      color-mix(in srgb, var(--dlj-face) calc(var(--dlj-haze) * 100%), transparent) 0%,
-      color-mix(in srgb, var(--dlj-face) 0%, transparent) var(--dlj-haze-y)),
-    linear-gradient(to bottom,
-      color-mix(in srgb, var(--dlj-face-top) calc(var(--dlj-a-in) * 100%), transparent) 0%,
-      color-mix(in srgb, var(--dlj-face) calc(var(--dlj-a-in) * 100%), transparent) var(--dlj-face-y),
-      color-mix(in srgb, var(--dlj-face) calc(var(--dlj-a-in) * 100%), transparent) 100%);
-  background-position:
-    var(--dlj-gl1-px) var(--dlj-gl1-py),
-    var(--dlj-gl2-px) var(--dlj-gl2-py),
-    0 0, 0 0, 0 0;
-  background-size:
-    var(--dlj-gl1-w) var(--dlj-gl1-h),
-    var(--dlj-gl2-w) var(--dlj-gl2-h),
-    100% 100%, 100% 100%, 100% 100%;
-  background-repeat: no-repeat;
-  box-shadow:
-    inset 0 0 0 var(--dlj-L3-w) color-mix(in srgb, var(--dlj-L3-line)
-      calc(var(--dlj-L3-a) * 100%), transparent),
-    inset 0 0 0 calc(var(--dlj-rim-in) + var(--dlj-rim-w))
-      rgba(255,255,255, var(--dlj-rim-a)),
-    inset 0 0 var(--dlj-band-w) var(--dlj-band-s) color-mix(in srgb, var(--dlj-glow-c)
-      calc((var(--dlj-a-rim) - var(--dlj-a-in)) * 100%), transparent);
-}
-@supports (clip-path: shape(from 0px 0px, close)) {
-  #duel-hud > .dh-low > .dl-jelly{
-    box-shadow:
-      inset 0 0 0 var(--dlj-rim-tc) color-mix(in srgb, var(--dlj-rim-c)
-        calc(var(--dlj-rim-p2) * 100%), transparent),
-      inset 0 0 0 var(--dlj-rim-td) color-mix(in srgb, var(--dlj-rim-c)
-        calc(var(--dlj-rim-p3) * 100%), transparent),
-      inset 0 0 var(--dlj-band-w) var(--dlj-band-s) color-mix(in srgb, var(--dlj-glow-c)
-      calc((var(--dlj-a-rim) - var(--dlj-a-in)) * 100%), transparent);
-    clip-path: shape(from 3.6276% 0.0000%,
-      line to 25.2721% 0.0000%,
-      curve to 35.5502% 45.0413% with 30.4111% 0.0000% / 30.4111% 45.0413%,
-      line to 65.1753% 45.0413%,
-      curve to 75.4534% 0.0000% with 70.3144% 45.0413% / 70.3144% 0.0000%,
-      line to 96.3724% 0.0000%,
-      curve to 100.0000% 24.7934% with 99.2402% 3.1497% / 99.5988% 5.1929%,
-      line to 100.0000% 75.2066%,
-      curve to 96.3724% 100.0000% with 99.5988% 94.8071% / 99.2402% 96.8503%,
-      line to 3.6276% 100.0000%,
-      curve to 0.0000% 75.2066% with 0.7598% 96.8503% / 0.4012% 94.8071%,
-      line to 0.0000% 24.7934%,
-      curve to 3.6276% 0.0000% with 0.4012% 5.1929% / 0.7598% 3.1497%,
-      close);
-  }
-  /* [L2-1] 측면 림 고리 */
-  #duel-hud > .dh-low > .dl-jelly::before{
-    content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
-    background: color-mix(in srgb, var(--dlj-rim-c) calc(var(--dlj-rim-p1) * 100%), transparent);
-    filter: blur(var(--dlj-rim-blur));
-    clip-path: shape(evenodd from calc(3.6276% + var(--dlj-rim-in)) calc(0.0000% + var(--dlj-rim-in)),
-      line to calc(25.2721% + var(--dlj-rim-in)) calc(0.0000% + var(--dlj-rim-in)),
-      curve to calc(35.5502% + var(--dlj-rim-in)) calc(45.0413% + var(--dlj-rim-in)) with calc(30.4111% + var(--dlj-rim-in)) calc(0.0000% + var(--dlj-rim-in)) / calc(30.4111% + var(--dlj-rim-in)) calc(45.0413% + var(--dlj-rim-in)),
-      line to calc(65.1753% + var(--dlj-rim-in)) calc(45.0413% + var(--dlj-rim-in)),
-      curve to calc(75.4534% + var(--dlj-rim-in)) calc(0.0000% + var(--dlj-rim-in)) with calc(70.3144% + var(--dlj-rim-in)) calc(45.0413% + var(--dlj-rim-in)) / calc(70.3144% + var(--dlj-rim-in)) calc(0.0000% + var(--dlj-rim-in)),
-      line to calc(96.3724% - var(--dlj-rim-in)) calc(0.0000% + var(--dlj-rim-in)),
-      curve to calc(100.0000% - var(--dlj-rim-in)) calc(24.7934% + var(--dlj-rim-in)) with calc(99.2402% - var(--dlj-rim-in)) calc(3.1497% + var(--dlj-rim-in)) / calc(99.5988% - var(--dlj-rim-in)) calc(5.1929% + var(--dlj-rim-in)),
-      line to calc(100.0000% - var(--dlj-rim-in)) calc(75.2066% - var(--dlj-rim-in)),
-      curve to calc(96.3724% - var(--dlj-rim-in)) calc(100.0000% - var(--dlj-rim-in)) with calc(99.5988% - var(--dlj-rim-in)) calc(94.8071% - var(--dlj-rim-in)) / calc(99.2402% - var(--dlj-rim-in)) calc(96.8503% - var(--dlj-rim-in)),
-      line to calc(3.6276% + var(--dlj-rim-in)) calc(100.0000% - var(--dlj-rim-in)),
-      curve to calc(0.0000% + var(--dlj-rim-in)) calc(75.2066% - var(--dlj-rim-in)) with calc(0.7598% + var(--dlj-rim-in)) calc(96.8503% - var(--dlj-rim-in)) / calc(0.4012% + var(--dlj-rim-in)) calc(94.8071% - var(--dlj-rim-in)),
-      line to calc(0.0000% + var(--dlj-rim-in)) calc(24.7934% + var(--dlj-rim-in)),
-      curve to calc(3.6276% + var(--dlj-rim-in)) calc(0.0000% + var(--dlj-rim-in)) with calc(0.4012% + var(--dlj-rim-in)) calc(5.1929% + var(--dlj-rim-in)) / calc(0.7598% + var(--dlj-rim-in)) calc(3.1497% + var(--dlj-rim-in)),
-      close,
-      move to calc(3.6276% + calc(var(--dlj-rim-in) + var(--dlj-rim-w))) calc(0.0000% + calc(var(--dlj-rim-in) + var(--dlj-rim-w))),
-      line to calc(25.2721% + calc(var(--dlj-rim-in) + var(--dlj-rim-w))) calc(0.0000% + calc(var(--dlj-rim-in) + var(--dlj-rim-w))),
-      curve to calc(35.5502% + calc(var(--dlj-rim-in) + var(--dlj-rim-w))) calc(45.0413% + calc(var(--dlj-rim-in) + var(--dlj-rim-w))) with calc(30.4111% + calc(var(--dlj-rim-in) + var(--dlj-rim-w))) calc(0.0000% + calc(var(--dlj-rim-in) + var(--dlj-rim-w))) / calc(30.4111% + calc(var(--dlj-rim-in) + var(--dlj-rim-w))) calc(45.0413% + calc(var(--dlj-rim-in) + var(--dlj-rim-w))),
-      line to calc(65.1753% + calc(var(--dlj-rim-in) + var(--dlj-rim-w))) calc(45.0413% + calc(var(--dlj-rim-in) + var(--dlj-rim-w))),
-      curve to calc(75.4534% + calc(var(--dlj-rim-in) + var(--dlj-rim-w))) calc(0.0000% + calc(var(--dlj-rim-in) + var(--dlj-rim-w))) with calc(70.3144% + calc(var(--dlj-rim-in) + var(--dlj-rim-w))) calc(45.0413% + calc(var(--dlj-rim-in) + var(--dlj-rim-w))) / calc(70.3144% + calc(var(--dlj-rim-in) + var(--dlj-rim-w))) calc(0.0000% + calc(var(--dlj-rim-in) + var(--dlj-rim-w))),
-      line to calc(96.3724% - calc(var(--dlj-rim-in) + var(--dlj-rim-w))) calc(0.0000% + calc(var(--dlj-rim-in) + var(--dlj-rim-w))),
-      curve to calc(100.0000% - calc(var(--dlj-rim-in) + var(--dlj-rim-w))) calc(24.7934% + calc(var(--dlj-rim-in) + var(--dlj-rim-w))) with calc(99.2402% - calc(var(--dlj-rim-in) + var(--dlj-rim-w))) calc(3.1497% + calc(var(--dlj-rim-in) + var(--dlj-rim-w))) / calc(99.5988% - calc(var(--dlj-rim-in) + var(--dlj-rim-w))) calc(5.1929% + calc(var(--dlj-rim-in) + var(--dlj-rim-w))),
-      line to calc(100.0000% - calc(var(--dlj-rim-in) + var(--dlj-rim-w))) calc(75.2066% - calc(var(--dlj-rim-in) + var(--dlj-rim-w))),
-      curve to calc(96.3724% - calc(var(--dlj-rim-in) + var(--dlj-rim-w))) calc(100.0000% - calc(var(--dlj-rim-in) + var(--dlj-rim-w))) with calc(99.5988% - calc(var(--dlj-rim-in) + var(--dlj-rim-w))) calc(94.8071% - calc(var(--dlj-rim-in) + var(--dlj-rim-w))) / calc(99.2402% - calc(var(--dlj-rim-in) + var(--dlj-rim-w))) calc(96.8503% - calc(var(--dlj-rim-in) + var(--dlj-rim-w))),
-      line to calc(3.6276% + calc(var(--dlj-rim-in) + var(--dlj-rim-w))) calc(100.0000% - calc(var(--dlj-rim-in) + var(--dlj-rim-w))),
-      curve to calc(0.0000% + calc(var(--dlj-rim-in) + var(--dlj-rim-w))) calc(75.2066% - calc(var(--dlj-rim-in) + var(--dlj-rim-w))) with calc(0.7598% + calc(var(--dlj-rim-in) + var(--dlj-rim-w))) calc(96.8503% - calc(var(--dlj-rim-in) + var(--dlj-rim-w))) / calc(0.4012% + calc(var(--dlj-rim-in) + var(--dlj-rim-w))) calc(94.8071% - calc(var(--dlj-rim-in) + var(--dlj-rim-w))),
-      line to calc(0.0000% + calc(var(--dlj-rim-in) + var(--dlj-rim-w))) calc(24.7934% + calc(var(--dlj-rim-in) + var(--dlj-rim-w))),
-      curve to calc(3.6276% + calc(var(--dlj-rim-in) + var(--dlj-rim-w))) calc(0.0000% + calc(var(--dlj-rim-in) + var(--dlj-rim-w))) with calc(0.4012% + calc(var(--dlj-rim-in) + var(--dlj-rim-w))) calc(5.1929% + calc(var(--dlj-rim-in) + var(--dlj-rim-w))) / calc(0.7598% + calc(var(--dlj-rim-in) + var(--dlj-rim-w))) calc(3.1497% + calc(var(--dlj-rim-in) + var(--dlj-rim-w))),
-      close);
-  }
-  /* [L3] 외곽선 고리 */
-  #duel-hud > .dh-low > .dl-jelly::after{
-    content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none;
-    background: color-mix(in srgb, var(--dlj-L3-line)
-      calc(var(--dlj-L3-a) * 100%), transparent);
-    filter: blur(var(--dlj-L3-blur));
-    clip-path: shape(evenodd from 3.6276% 0.0000%,
-      line to 25.2721% 0.0000%,
-      curve to 35.5502% 45.0413% with 30.4111% 0.0000% / 30.4111% 45.0413%,
-      line to 65.1753% 45.0413%,
-      curve to 75.4534% 0.0000% with 70.3144% 45.0413% / 70.3144% 0.0000%,
-      line to 96.3724% 0.0000%,
-      curve to 100.0000% 24.7934% with 99.2402% 3.1497% / 99.5988% 5.1929%,
-      line to 100.0000% 75.2066%,
-      curve to 96.3724% 100.0000% with 99.5988% 94.8071% / 99.2402% 96.8503%,
-      line to 3.6276% 100.0000%,
-      curve to 0.0000% 75.2066% with 0.7598% 96.8503% / 0.4012% 94.8071%,
-      line to 0.0000% 24.7934%,
-      curve to 3.6276% 0.0000% with 0.4012% 5.1929% / 0.7598% 3.1497%,
-      close,
-      move to calc(3.6276% + var(--dlj-L3-w)) calc(0.0000% + var(--dlj-L3-w)),
-      line to calc(25.2721% + var(--dlj-L3-w)) calc(0.0000% + var(--dlj-L3-w)),
-      curve to calc(35.5502% + var(--dlj-L3-w)) calc(45.0413% + var(--dlj-L3-w)) with calc(30.4111% + var(--dlj-L3-w)) calc(0.0000% + var(--dlj-L3-w)) / calc(30.4111% + var(--dlj-L3-w)) calc(45.0413% + var(--dlj-L3-w)),
-      line to calc(65.1753% + var(--dlj-L3-w)) calc(45.0413% + var(--dlj-L3-w)),
-      curve to calc(75.4534% + var(--dlj-L3-w)) calc(0.0000% + var(--dlj-L3-w)) with calc(70.3144% + var(--dlj-L3-w)) calc(45.0413% + var(--dlj-L3-w)) / calc(70.3144% + var(--dlj-L3-w)) calc(0.0000% + var(--dlj-L3-w)),
-      line to calc(96.3724% - var(--dlj-L3-w)) calc(0.0000% + var(--dlj-L3-w)),
-      curve to calc(100.0000% - var(--dlj-L3-w)) calc(24.7934% + var(--dlj-L3-w)) with calc(99.2402% - var(--dlj-L3-w)) calc(3.1497% + var(--dlj-L3-w)) / calc(99.5988% - var(--dlj-L3-w)) calc(5.1929% + var(--dlj-L3-w)),
-      line to calc(100.0000% - var(--dlj-L3-w)) calc(75.2066% - var(--dlj-L3-w)),
-      curve to calc(96.3724% - var(--dlj-L3-w)) calc(100.0000% - var(--dlj-L3-w)) with calc(99.5988% - var(--dlj-L3-w)) calc(94.8071% - var(--dlj-L3-w)) / calc(99.2402% - var(--dlj-L3-w)) calc(96.8503% - var(--dlj-L3-w)),
-      line to calc(3.6276% + var(--dlj-L3-w)) calc(100.0000% - var(--dlj-L3-w)),
-      curve to calc(0.0000% + var(--dlj-L3-w)) calc(75.2066% - var(--dlj-L3-w)) with calc(0.7598% + var(--dlj-L3-w)) calc(96.8503% - var(--dlj-L3-w)) / calc(0.4012% + var(--dlj-L3-w)) calc(94.8071% - var(--dlj-L3-w)),
-      line to calc(0.0000% + var(--dlj-L3-w)) calc(24.7934% + var(--dlj-L3-w)),
-      curve to calc(3.6276% + var(--dlj-L3-w)) calc(0.0000% + var(--dlj-L3-w)) with calc(0.4012% + var(--dlj-L3-w)) calc(5.1929% + var(--dlj-L3-w)) / calc(0.7598% + var(--dlj-L3-w)) calc(3.1497% + var(--dlj-L3-w)),
-      close);
-  }
-}
+
 
 /* ---------------------------------------------------------------------------
    홈 2개 (E) + 계단 탭 (E') — 판 안에 «파인» 인셋 서브판
@@ -54822,20 +54346,7 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
      **실루엣(위 변 없음)이 아니라 선의 두께·진하기**뿐이다. clip-path 경로·
      --?hj-ext · 판 상자는 한 글자도 안 건드렸다.
    --------------------------------------------------------------------------- */
-#duel-hud .kit-hud-v2__plate > .dh-gnd,
-#duel-hud .kit-hud-v2__plate > .dh-jelly,
-#duel-hud > .dh-low > .dl-jelly{
-  --dhj-L3-w: calc(var(--f2-ref-w) * 0.00400);
-  --dhj-L3-a: .700;
-  --dhj-L3-blur: calc(var(--dhj-L3-w) * 0.28);
-  --dhj-rim-w: calc(var(--f2-ref-w) * 0.00350);
-  --dhj-rim-a: 0.4500;
-  --dlj-L3-w: calc(var(--f2-ref-w) * 0.00400);
-  --dlj-L3-a: .700;
-  --dlj-L3-blur: calc(var(--dlj-L3-w) * 0.28);
-  --dlj-rim-w: calc(var(--f2-ref-w) * 0.00350);
-  --dlj-rim-a: 0.4500;
-}
+
 /* 홈 — 시안의 홈에는 **어두운 겉선이 없다**(윗변 세로 훑기 y400~403 이 그린에서
    곧장 밝은 띠로 간다). 밝은 림 한 줄뿐이고 두께 7px(홈 높이 145.5 기준)·
    흰 알파 약 0.61 이다. 그래서 홈은 «파인 그늘 + 밝은 림» 두 겹으로 그린다.
@@ -55316,11 +54827,10 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
    --------------------------------------------------------------------------- */
 #charpanel .cp-fx > .cp-jelly{ --cpj-L3-line: var(--mode-a-outline); }   /* [E32-0903] 실측 · 복구 #955579 */
 .modal-v2 .mv2-sheet{ --mv2j-L3-line: #966B92; }
-#duel-hud .kit-hud-v2__plate,
-#duel-hud .kit-hud-v2__plate > .dh-jelly{ --f2-line: #44417A; --dhj-L3-line: #6F6BB4; --dhj-face: #8DA6E6; --dhj-face-top: #B0C7FE; --dhj-face-y: 100%; --dhj-rim-c: #B0C7FE; }
-#duel-hud > .dh-low > .dl-jelly{ --dlj-L3-line: #7276B8; --dlj-face: #8DA6E6; --dlj-face-top: #B0C7FE; --dlj-face-y: 100%; --dlj-rim-c: #B0C7FE; }
+
+
 #classic-hud .ch-fx > .ch-jelly,
-#app.classic #classic-hud .ch-fx > .ch-jelly{ --chj-L3-line: #6F6BB4; --chj-face: #92A5DF; --chj-face-top: #92A5DF; --chj-face-y: 100%; --chj-rim-c: #BFCBFA; }
+#app.classic #classic-hud .ch-fx > .ch-jelly{ --hudj-L3-line: var(--mode-b-outline); --hudj-face: var(--mode-b-face); --hudj-face-top: var(--mode-b-face); --hudj-face-y: 100%; --hudj-rim-c: var(--mode-b-rim); }
 /* [E52-0903 - S9] 이 줄은 [W7-0901] 이 「푸른 회청」계열로 세운 자리다. S9 정본이
    그 위에 오므로 같은 네 값을 S9 로 옮긴다(위 부품 기준 블록과 **같은 값**).
    되돌리기: .wf-cap{ --wcap-L3-line: #8286B4; --wcap-face: #BEBEE4; --wcap-face-top: #D4DCF7; --wcap-face-y: 100%; --wcap-rim-c: #D0DBF1; } */
@@ -58196,7 +57706,7 @@ else window.addEventListener("load",start);
            = 겉선 **바깥**에 흰 띠가 한 겹 더 있었다.
    범인은 자산도 마스크도 아니라 **단계 C 이전의 코드 덮개** `.ch-fx > .ch-jelly` 다:
    inset 이 `calc(var(--f2-bd) * -1)`(=폭의 .41%, 390에서 1.6px) 라 컨테이너 밖으로
-   나가 있고, 거기에 자기 흰 림(--chj-rim-a .4)과 L3 겉선을 그린다. 판 자산의 겉선은
+   나가 있고, 거기에 자기 흰 림(--hudj-rim-a .4)과 L3 겉선을 그린다. 판 자산의 겉선은
    컨테이너 안쪽 3.45px 부터라 그 두 겹이 통째로 겉선 바깥에 남았다.
    판 2장(--hud-plate-top/-bottom)이 이미 그 판을 그리므로 덮개는 잉여다 —
    실측 diff(#classic-hud 전체 1170×453): 바뀌는 화소가 **테두리 링에만** 있고
