@@ -76,7 +76,8 @@ self.addEventListener('fetch', (e) => {
     const cache = await caches.open(CACHE);
     try {
       const res = await fetch(req);
-      if (res && res.ok && (isHtml(req) || url.pathname.endsWith('.webmanifest') || url.pathname.endsWith('.js'))) {
+      /* perf2-0908: .css 추가 — 배포 빌드(critical-split)가 본체 뒤 CSS 를 루트 tw-late-*.css 로 내보낸다. 오프라인 재로드에 필요. */
+      if (res && res.ok && (isHtml(req) || url.pathname.endsWith('.webmanifest') || url.pathname.endsWith('.js') || url.pathname.endsWith('.css'))) {
         cache.put(req, res.clone());
       }
       return res;
