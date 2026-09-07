@@ -58179,6 +58179,24 @@ else window.addEventListener("load",start);
   left:0.53cqw; top:18.71cqw; width:99.35cqw; height:16.47cqw;
   background-image:var(--hud-plate-bottom);
 }
+/* ── [0908 ①] 클래식 판 왼쪽 겉선 **바깥**의 흰 림 제거 — 코드 젤리 덮개 은퇴 ──
+   사용자 반려: "HUD 왼쪽 흰색 입체 효과(광점/림)가 외곽선을 넘어간다".
+   300% 실측(390×844 dpr3, 판 좌변 y=20/40/110):
+     모험  x0..3 배경 → x4 겉선(114,111,180=#6F6BB4) → x5..7 림(176,191,227) → 면
+           = 림이 겉선 **안쪽**. 프레임 자산도 깨끗하다(hud-plate-top-plain-lite.png
+             좌변 38행 전부 첫 불투명 픽셀이 겉선색, 밝은 픽셀 0행).
+     클래식 x0..2 어두운 선 → x3..12 **흰 띠** → x13..16 겉선 → x17..21 림 → 면
+           = 겉선 **바깥**에 흰 띠가 한 겹 더 있었다.
+   범인은 자산도 마스크도 아니라 **단계 C 이전의 코드 덮개** `.ch-fx > .ch-jelly` 다:
+   inset 이 `calc(var(--f2-bd) * -1)`(=폭의 .41%, 390에서 1.6px) 라 컨테이너 밖으로
+   나가 있고, 거기에 자기 흰 림(--chj-rim-a .4)과 L3 겉선을 그린다. 판 자산의 겉선은
+   컨테이너 안쪽 3.45px 부터라 그 두 겹이 통째로 겉선 바깥에 남았다.
+   판 2장(--hud-plate-top/-bottom)이 이미 그 판을 그리므로 덮개는 잉여다 —
+   실측 diff(#classic-hud 전체 1170×453): 바뀌는 화소가 **테두리 링에만** 있고
+   안쪽은 0 이다(면·글자·게이지 무변). 그래서 형태·색·투명도를 하나도 안 바꾸고
+   «겉선 바깥의 흰 띠»만 사라진다.
+   ⚠ 되돌리기: 이 한 줄을 지우면 덮개가 그대로 돌아온다(.ch-fx CSS 는 손대지 않았다). */
+#app.classic #classic-hud .ch-fx{ display:none !important; }
 /* 캡슐 프레임 — 위 판 위(z), 타이머/성 글리프는 그 위. bbox = 캡슐 그대로. */
 #app.battle #duel-hud .dh-cap,
 #app.classic #classic-hud .dh-cap{
