@@ -763,11 +763,11 @@ button {
 .btn-secondary {
   color: var(--ink);
   border-radius: 9px;
-  background: linear-gradient(180deg, #FF8FB8 0%, #FF8FB8 47%, #F26D9E 47%, #F26D9E 100%);
+  background: linear-gradient(180deg, var(--j-pink) 0%, var(--j-pink) 47%, var(--j-pink-2) 47%, var(--j-pink-2) 100%);
   box-shadow:
     0 3px 0 #AE4470,
     0 8px 18px rgba(83, 28, 40, .26),
-    inset 0 0 0 2.5px #6E463A,
+    inset 0 0 0 2.5px var(--j-outline),
     inset 0 -7px 0 #C9527D;
 }
 /* v6: the orange #btn-rush skin and its clip-path bolt glyph are DELETED. Both
@@ -7751,23 +7751,34 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
    본문 4.5:1, 큰 글자 3:1 을 실측으로 넘긴다.
    ------------------------------------------------------------------------- */
 :root {
-  --j-cream:    #FDF3DC;   /* 패널 바탕 위   (ART §3) */
-  --j-cream-2:  #F5E5C4;   /* 패널 바탕 아래 (ART §3) */
-  --j-rim:      #FFFBEE;   /* 내부 1px 밝은 크림 보더 (ART §4) */
+  /* ===== Mode L — 크림 계보 재질 슬롯 (0908 · wave/norm-j) =====================
+     GAME-FACTORY-STANDARD §2 슬롯 어휘(face / rim / outline / contact)로 --j- 재질
+     여섯을 붕괴. 값은 한 자리도 새로 짓지 않았다(옛 --j-* 정의 그대로). Mode A(모달
+     연보라핑크 #E6DCE2)·Mode B(HUD 파랑)와 값이 달라 별도 Mode L로 둔다 — 지휘자가
+     A/B 통합·은퇴를 결정할 때까지 --j-* 이름은 아래 브릿지로 유지(소비처 무변). */
+  --mL-face-a:  #FDF3DC;   /* 면 그라데 위   (옛 --j-cream) */
+  --mL-face-b:  #F5E5C4;   /* 면 그라데 아래 (옛 --j-cream-2) */
+  --mL-rim:     #FFFBEE;   /* 안쪽 1px 밝은 림 (옛 --j-rim) */
+  --mL-outline: #6E463A;   /* 겉선 (옛 --j-outline) */
+  --mL-contact: rgba(90, 48, 74, .5);   /* 접지 드롭섀도 (옛 --j-plum) */
+  --mL-scrim:   rgba(46, 26, 40, .80);  /* 글자 판 스크림 (옛 --j-scrim) — 슬롯 어휘 밖 */
+
+  --j-cream:    var(--mL-face-a);   /* 패널 바탕 위   (ART §3) */
+  --j-cream-2:  var(--mL-face-b);   /* 패널 바탕 아래 (ART §3) */
+  --j-rim:      var(--mL-rim);   /* 내부 1px 밝은 크림 보더 (ART §4) */
   --j-salmon:   #E8836F;   /* 프레임 살몬   (ART §3) */
   --j-salmon-2: #C9614E;   /* 살몬 어두운 에지 */
-  --j-outline:  #6E463A;   /* 딥 아웃라인 — 이 게임의 "검정" (ART §3·§7-1) */
+  --j-outline:  var(--mL-outline);   /* 딥 아웃라인 — 이 게임의 "검정" (ART §3·§7-1) */
   --j-ink:      #5C4033;   /* 크림 위 본문 (8.51:1) — 순검정 금지 */
   --j-ink-2:    #8A6553;   /* 크림 위 보조 (4.68:1) */
   --j-ribbon:   #E25B4A;   /* 헤더 리본 위 */
   --j-ribbon-2: #C94436;   /* 헤더 리본 아래 */
   --j-ribbon-sh:#8E2F24;   /* 리본 글자 그림자 */
   --j-plate:    #F2D6BC;   /* 이름판 */
-  --j-track:    #E8D2B0;   /* 스탯 트랙 (ART §4) */
   --j-gold:     #FFD34A;   /* 별·왕관·활성 프레임 */
   --j-gold-e:   #C98A1E;
   --j-peach:    #FCC7AD;   /* 젤리공주 몸 */
-  --j-plum:     rgba(90, 48, 74, .5);   /* 유채색 드롭섀도 — 무채색 금지(ART §1·§7-3) */
+  --j-plum:     var(--mL-contact);   /* 유채색 드롭섀도 — 무채색 금지(ART §1·§7-3) */
 
   /* 젤리 버튼 3종 1벌: 광택(위) / 본색(아래) / 3D 밴드. ART §3 확정값. */
   --j-pink:     #FF8FB8;  --j-pink-2:   #F26D9E;  --j-pink-e:   #C24A78;
@@ -7779,13 +7790,10 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
      아래 본색 / 30~40% 어두운 에지)으로 파생한 여섯 번째다. */
   --j-purple:   #C79BE8;  --j-purple-2: #A874D6;  --j-purple-e: #7346A0;
 
-  /* 스탯 막대 무지개 필 */
-  --j-stat-1:   #EC67B8;  --j-stat-2:   #F56B8A;  --j-stat-3:   #FFD34A;
-  --j-stat-b:   #6FA8F5;
 
   /* 그림 위에 글자를 놓아야 할 때의 유일한 판. 알파 .80 이라 어떤 밝은 그림
      위에서도 합성 결과가 #584853 보다 밝아지지 않는다 → 흰 글자 8.51:1 보장. */
-  --j-scrim:    rgba(46, 26, 40, .80);
+  --j-scrim:    var(--mL-scrim);
 
   /* 디스플레이 페이스 (ART §5). 8차에 주아체(Jua, OFL 1.1) 서브셋이 도착해서
      7차가 예고한 대로 **이 한 줄만** 바뀌었다 — 로고·리본·명패·버튼·큰 숫자가
@@ -7966,8 +7974,8 @@ html.no-art-logo .logo-img  { display: none; }
     background-clip: text;
     -webkit-text-fill-color: transparent;
   }
-  .logo .lg-a { background-image: linear-gradient(180deg, #FFC7DE 0%, #FF8FB8 52%, #E04E86 100%); }
-  .logo .lg-b { background-image: linear-gradient(180deg, #BFD9FF 0%, #6FA8F5 52%, #3D6ED0 100%); }
+  .logo .lg-a { background-image: linear-gradient(180deg, #FFC7DE 0%, var(--j-pink) 52%, #E04E86 100%); }
+  .logo .lg-b { background-image: linear-gradient(180deg, #BFD9FF 0%, var(--j-sky) 52%, #3D6ED0 100%); }
 }
 /* 부제 명패 — 레퍼런스의 "젤리 팡 월드" 자리 */
 .logo-sub {
@@ -9190,11 +9198,11 @@ html.no-art-logo .logo-img  { display: none; }
   color: #FFFFFF;
   font: 800 12px/1 var(--font-latin);
   cursor: pointer;
-  background: linear-gradient(180deg, #7ED9C0 0%, #7ED9C0 46%, #54BFA2 46%, #54BFA2 100%);
+  background: linear-gradient(180deg, var(--j-mint) 0%, var(--j-mint) 46%, var(--j-mint-2) 46%, var(--j-mint-2) 100%);
   box-shadow: inset 0 2px 0 rgba(255, 255, 255, .34), 0 0 0 2.5px var(--j-outline), 0 3px 0 #2E937A;
 }
 .sk-act[disabled] { opacity: .5; cursor: not-allowed; }
-.sk-act.buy { background: linear-gradient(180deg, #FFD34A 0%, #FFD34A 46%, #F5B92E 46%, #F5B92E 100%); box-shadow: inset 0 2px 0 rgba(255,255,255,.34), 0 0 0 2.5px var(--j-outline), 0 3px 0 #C98A1E; color: var(--j-ink); }
+.sk-act.buy { background: linear-gradient(180deg, var(--j-yel) 0%, var(--j-yel) 46%, var(--j-yel-2) 46%, var(--j-yel-2) 100%); box-shadow: inset 0 2px 0 rgba(255,255,255,.34), 0 0 0 2.5px var(--j-outline), 0 3px 0 #C98A1E; color: var(--j-ink); }
 .sk-item.soon { opacity: .72; }
 .sk-item.soon .sk-th { background: linear-gradient(180deg, #E7D3BA 0%, #D3B995 100%); }
 /* 14차 — 이미 프레이밍돼 구워진 그림(곰돌이 5색)은 여기서 다시 당기지 않는다.
@@ -10225,7 +10233,7 @@ html.no-art-logo .logo-img  { display: none; }
 }
 .node-boss-av > svg { display: none; }   /* 표준 에셋이 옛 인라인 SVG 를 대신한다 */
 .node-boss-t { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.node-boss-t > b { font-family: var(--font-display); font-size: 15px; color: #C94436; }
+.node-boss-t > b { font-family: var(--font-display); font-size: 15px; color: var(--j-ribbon-2); }
 .node-boss-t > i { font-style: normal; font-size: 12.5px; line-height: 1.3; color: var(--j-ink); }
 
 /* 방해 요소 칩 줄 */
@@ -10307,8 +10315,8 @@ html.no-art-logo .logo-img  { display: none; }
 .ncta-cost .hc-heart { display: block; width: 15px; height: 15px; background: var(--lib-glyph-heart) center/contain no-repeat; }
 .node-hearts { display: flex; align-items: center; gap: 6px; margin: 0; font-size: 12px; color: var(--j-ink); }
 .node-hearts .hc-heart { width: 15px; height: 15px; background: var(--lib-glyph-heart) center/contain no-repeat; }
-.node-got { position: absolute; top: 6px; left: 10px; font-size: 13px; color: #C98A1E; }
-.node-wait { margin: 0; font-size: 12.5px; color: #C94436; }
+.node-got { position: absolute; top: 6px; left: 10px; font-size: 13px; color: var(--j-gold-e); }
+.node-wait { margin: 0; font-size: 12.5px; color: var(--j-ribbon-2); }
 
 /* 모드 시트의 줄 */
 .mode-list { display: flex; flex-direction: column; gap: 8px; }
@@ -10330,7 +10338,7 @@ html.no-art-logo .logo-img  { display: none; }
 .mode-t { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .mode-t > b { font-family: var(--font-display); font-size: 16px; color: var(--j-ink); }
 .mode-t > i { font-style: normal; font-size: 11.5px; line-height: 1.3; color: #8A6B52; }
-.mode-b { flex: 0 0 auto; font-size: 12px; font-weight: 800; color: #C94436; white-space: nowrap; }
+.mode-b { flex: 0 0 auto; font-size: 12px; font-weight: 800; color: var(--j-ribbon-2); white-space: nowrap; }
 .mode-b:empty { display: none; }
 
 /* ==========================================================================
@@ -10806,7 +10814,7 @@ html[lang="en"] .mfbtn { font-size: 8px; letter-spacing: -.15px; }
   margin: 0 0 2px;
   font-family: var(--font-display);
   font-size: 12.5px;
-  color: #C94436;
+  color: var(--j-ribbon-2);
 }
 .cut-who:empty { display: none; }
 .cut-line {
@@ -10844,7 +10852,7 @@ html[lang="en"] .mfbtn { font-size: 8px; letter-spacing: -.15px; }
   border-radius: 3px;
   background: rgba(255, 241, 216, .32);
 }
-#cut-dots i.on { background: #FFD34A; }
+#cut-dots i.on { background: var(--j-gold); }
 @media (prefers-reduced-motion: reduce) {
   .cut-more { animation: none; opacity: .8; }
 }
@@ -10917,11 +10925,11 @@ html[lang="en"] .mfbtn { font-size: 8px; letter-spacing: -.15px; }
   border: 0;
   padding: 31px 38px 34px 38px;
   border-radius: 15px;
-  background: linear-gradient(180deg, #7ED9C0 0%, #7ED9C0 47%, #54BFA2 47%, #54BFA2 100%);
+  background: linear-gradient(180deg, var(--j-mint) 0%, var(--j-mint) 47%, var(--j-mint-2) 47%, var(--j-mint-2) 100%);
   box-shadow:
     0 3px 0 #35866F,
     0 8px 18px rgba(83, 28, 40, .26),
-    inset 0 0 0 2.5px #6E463A,
+    inset 0 0 0 2.5px var(--j-outline),
     inset 0 -12px 0 #3E9C82;
   font-family: var(--font-display);
   min-height: 52px;
@@ -10938,7 +10946,7 @@ html[lang="en"] .mfbtn { font-size: 8px; letter-spacing: -.15px; }
   box-shadow:
     0 3px 0 #A85420,
     0 8px 18px rgba(83, 28, 40, .26),
-    inset 0 0 0 2.5px #6E463A,
+    inset 0 0 0 2.5px var(--j-outline),
     inset 0 -12px 0 #C96426;
   font-family: var(--font-display);
   min-height: 52px;
@@ -11054,7 +11062,7 @@ html[lang="en"] .mfbtn { font-size: 8px; letter-spacing: -.15px; }
   font-weight: 800;
   color: var(--j-ink);
   background: var(--j-rim);
-  box-shadow: inset 0 0 0 2px var(--j-gold, #FFD34A);
+  box-shadow: inset 0 0 0 2px var(--j-gold);
 }
 
 /* ==========================================================================
@@ -11856,7 +11864,7 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
   .splash-tap-t {
     /* 어두운 판 위에 앉으므로 채움은 §5 의 「위 밝음 → 아래 진함」을 유지하되
        전체를 밝은 쪽으로 옮긴다 — 판이 대비를 책임지고 글자는 밝게 뜬다. */
-    background-image: linear-gradient(180deg, #FFFFFF 0%, #FFD9E8 48%, #FF8FB8 100%);
+    background-image: linear-gradient(180deg, #FFFFFF 0%, #FFD9E8 48%, var(--j-pink) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -12232,7 +12240,7 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
   border-width: 0;
   padding: 8px 23px;
   border-radius: 6.1px;
-  color: #5C4033;
+  color: var(--j-ink);
   background:
     radial-gradient(ellipse 26% 32% at 15% 24%, rgba(255, 255, 255, .55), rgba(255, 255, 255, 0) 70%),
     linear-gradient(180deg, #FFF3DC 0%, #FFF3DC 47%, #FFE0B0 47%, #FFE0B0 100%);
@@ -12264,7 +12272,7 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
 /* ⑤ 면과 한 몸인 아이콘 — 글리프에 칩 배경을 따로 깔지 않고, 면과 같은 광원의
    1px 굽만 붙여 면에 눌러 앉힌다. 별의 근백색 잔재도 이 따뜻한 굽에 물든다. */
 #screen-map .hc-ico { filter: drop-shadow(0 1px 0 rgba(138, 90, 51, .45)); }
-#screen-map .hchip b { color: #5C4033; }
+#screen-map .hchip b { color: var(--j-ink); }
 #screen-map .hchip i { color: #7A5744; opacity: 1; }
 
 /* ② 하단 띠 좌측 두 칩 — 굶주림 결함 동시 수리 -------------------------------
@@ -12517,7 +12525,7 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
   margin-bottom: 0;
   padding: 5px 10px;
   border-radius: 7.35px;
-  color: #5C4033;
+  color: var(--j-ink);
   background:
     radial-gradient(ellipse 30% 34% at 16% 22%, rgba(255, 255, 255, .55), rgba(255, 255, 255, 0) 72%),
     linear-gradient(180deg,
@@ -12534,7 +12542,7 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
 }
 /* 크림 면 위 글자·글리프 — 26-4 가 정한 잉크(#5C4033)와 진행색(#A8410F)을 잇는다. */
 #screen-game #hud-row #mission-badge #mission-text,
-#screen-game #hud-row #adv-goal #adv-goal-t { color: #5C4033; }
+#screen-game #hud-row #adv-goal #adv-goal-t { color: var(--j-ink); }
 #screen-game #hud-row #mission-badge #mission-prog,
 #screen-game #hud-row #mission-badge #mission-time { color: #A8410F; }
 #screen-game #hud-row #adv-goal .ag-ico { background: #A8410F; }
@@ -43744,11 +43752,11 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
   white-space:nowrap;
   cursor:pointer;
   background-color:transparent;
-  background-image:linear-gradient(180deg, #7ED9C0 0%, #7ED9C0 47%, #54BFA2 47%, #54BFA2 100%);
+  background-image:linear-gradient(180deg, var(--j-mint) 0%, var(--j-mint) 47%, var(--j-mint-2) 47%, var(--j-mint-2) 100%);
   box-shadow:
     0 3px 0 #35866F,
     0 6px 14px rgba(83,28,40,.22),
-    inset 0 0 0 2.5px #6E463A,
+    inset 0 0 0 2.5px var(--j-outline),
     inset 0 -5px 0 #43A184;
   text-shadow:0 1.5px 0 rgba(110,70,58,.55);
 }
@@ -46800,7 +46808,7 @@ html[lang="en"] .splash-logo{
 .kit-cap{
   --cap-r: 999px;  --cap-h: 52px;
   --cap-a:#7ED9C0; --cap-b:#54BFA2; --cap-drop:#35866F; --cap-band:#43A184;
-  --cap-edge:var(--j-outline,#6E463A);
+  --cap-edge:var(--j-outline);
   --cap-s:.706;
   position:relative; box-sizing:border-box;
   display:flex; align-items:center; justify-content:center; gap:6px;
@@ -46964,7 +46972,7 @@ html[lang="en"] .splash-logo{
    `.ch-g` 는 이 처방을 그대로 쓴다 — 그것은 캡슐이 아니라 다른 부품이다. */
 #app.classic #classic-hud .ch-g{
   --cap-a:#F2EAF2; --cap-b:#DCCFE0; --cap-drop:#A896AE; --cap-band:#CBBAD1;
-  --cap-edge:var(--j-outline,#6E463A);
+  --cap-edge:var(--j-outline);
   --jelly-s:.874;
   border:0 !important;
   border-image:none !important;
@@ -47056,7 +47064,7 @@ html[lang="en"] .splash-logo{
   background-repeat:no-repeat !important;
   box-shadow:0 3px 0 #9A89A6,
              0 7px 16px rgba(83,28,40,.22),
-             inset 0 0 0 2.5px var(--j-outline,#6E463A),
+             inset 0 0 0 2.5px var(--j-outline),
              inset 0 -6px 0 #BAAAC6,
              inset 0 0 3px 5px rgba(255,255,255,.62),
              inset 0 -14px 5px -12px rgba(255,255,255,.36) !important;
@@ -47092,7 +47100,7 @@ html[lang="en"] .splash-logo{
                                           var(--cap-b) 47%,var(--cap-b) 100%);
   box-shadow:0 2px 0 var(--cap-drop),
              0 4px 9px rgba(83,28,40,.24),
-             inset 0 0 0 2px var(--j-outline,#6E463A),
+             inset 0 0 0 2px var(--j-outline),
              inset 0 -4px 0 var(--cap-band),
              inset 0 0 1px 1.5px rgba(255,255,255,.42);
   color:#FFFFFF;
@@ -56305,7 +56313,7 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
      y26 #F4A8CF -> y136 #DABAE3 단조). 착수 전 갈색 겉선(--j-outline #6E463A)과
      푸른 회백 속은 여기서 폐기된다. --cap-drop 은 실측이 없어 그대로 둔다.
      롤백: 아래 세 줄을 rgba(201,213,237,.34) / rgba(187,204,234,.22) /
-           rgba(172,190,227,.44) / var(--j-outline,#6E463A) 로 되돌린다. *)
+           rgba(172,190,227,.44) / var(--j-outline) 로 되돌린다. *)
   (* [E30-0903 · 판 α 재판정] 제목 캡슐 속 α .69 -> .010 (맑은 유리).
      최소자승 해가 raw -0.208 로 음수 -> [0,1] 상한에서 0 이고, 0 대신 이
      계열이 쓰는 「맑은 유리」 값 .010 을 쓴다(타이머 알약과 같은 처방).
@@ -56759,7 +56767,7 @@ html[lang="en"] #modal-arc.is-arcdmg .sheet > h2{ --ttl:url("catalog/ttl-arcdmg-
   box-shadow:
     0 3px 0 #D9A96F,
     0 8px 18px rgba(83, 28, 40, .26),
-    inset 0 0 0 2.5px #6E463A,
+    inset 0 0 0 2.5px var(--j-outline),
     inset 0 2.5px 0 rgba(255, 255, 255, .45),
     inset 0 -10px 0 #F2D2A4;
 }
@@ -56996,7 +57004,7 @@ html[lang="en"] #modal-arc.is-arcdmg .sheet > h2{ --ttl:url("catalog/ttl-arcdmg-
   box-shadow:
     0 3px 0 #D9A96F,
     0 8px 18px rgba(83, 28, 40, .26),
-    inset 0 0 0 2.5px #6E463A,
+    inset 0 0 0 2.5px var(--j-outline),
     inset 0 2.5px 0 rgba(255, 255, 255, .45),
     inset 0 -10px 0 #F2D2A4;
 }
