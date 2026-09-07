@@ -12654,6 +12654,15 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
   --mode-b-rim:     #C2D6FF;
   --mode-b-outline: #6F6BB4;
   --mode-b-gloss:   0.770;
+  /* [E73-0908 norm-cw] --cap- 계열 붕괴 — 캡슐 역할색 8슬롯. mint/pink/yellow/orange/purple/lilac 은
+     위 --role-* 와 값이 같아 그리로 붕괴. 아래 넷은 그 표에 없던 값을 이름만 붙여 옮긴 것(값 신설 0):
+       blue  킷 캡슐 파랑          glass 킷 유리 캡슐(불투명 두 톤) · 클래식 HUD 게이지 캡슐(.ch-g)
+       tray  킷 쟁반 캡슐          title 모달·캐릭창 제목 캡슐(E29/E30-0903 실측: 맑은 유리 α.010, 림 .44, 겉선 #865890) */
+  --role-blue-face-a:#8ACDF0;  --role-blue-face-b:#57A6DC;  --role-blue-outline:#2E6F9C;  --role-blue-contact:#4290C8;
+  --role-glass-face-a:#F2EAF2; --role-glass-face-b:#DCCFE0; --role-glass-outline:#A896AE; --role-glass-contact:#CBBAD1;
+  --role-tray-face-a:#E4DAE8;  --role-tray-face-b:#CBBED4;  --role-tray-outline:#9A89A6;  --role-tray-contact:#BAAAC6;
+  --role-title-face-a:rgba(238,207,243,.010); --role-title-face-b:rgba(219,196,232,.010);
+  --role-title-contact:rgba(242,211,253,.44); --role-title-outline:#865890;
   --mode-b-contact: 0.200;
 }
 </style>
@@ -47019,7 +47028,7 @@ html[lang="en"] .splash-logo{
 /* ═══ A. 부품 .kit-cap — 캡슐 **하나**. 변주는 곡률과 색뿐 ════════════════ */
 .kit-cap{
   --cap-r: 999px;  --cap-h: 52px;
-  --cap-a:#7ED9C0; --cap-b:#54BFA2; --cap-drop:#35866F; --cap-band:#43A184;
+  --cap-a:var(--role-mint-face-a); --cap-b:var(--role-mint-face-b); --cap-drop:var(--role-mint-outline); --cap-band:var(--role-mint-contact);
   --cap-edge:var(--j-outline);
   --cap-s:.706;
   position:relative; box-sizing:border-box;
@@ -47099,17 +47108,17 @@ html[lang="en"] .splash-logo{
 .kit-jelly{ z-index:1; }
 
 /* 색 변주 — catalog 표 그대로. --cap-s 는 면 두 단의 47/53 가중 sRGB 루마. */
-.kit-cap--mint  { --cap-a:#7ED9C0; --cap-b:#54BFA2; --cap-drop:#35866F; --cap-band:#43A184; --cap-s:.706; }
-.kit-cap--blue  { --cap-a:#8ACDF0; --cap-b:#57A6DC; --cap-drop:#2E6F9C; --cap-band:#4290C8; --cap-s:.674; }
-.kit-cap--pink  { --cap-a:#F8A2C4; --cap-b:#E8749F; --cap-drop:#A63C6A; --cap-band:#D25E8D; --cap-s:.636; }
-.kit-cap--yellow{ --cap-a:#FFDC84; --cap-b:#F0BC55; --cap-drop:#B07C1C; --cap-band:#DFA63E; --cap-s:.806; }
-.kit-cap--orange{ --cap-a:#FFB874; --cap-b:#F08E45; --cap-drop:#B15A16; --cap-band:#DF7A2E; --cap-s:.685; }
-.kit-cap--purple{ --cap-a:#C6A2F5; --cap-b:#A97FE4; --cap-drop:#6B47A8; --cap-band:#9468D2; --cap-s:.621; }
-.kit-cap--lilac { --cap-a:#CDC2D4; --cap-b:#B3A6BC; --cap-drop:#8B7E95; --cap-band:#A296AC; --cap-s:.718; }
+.kit-cap--mint  { --cap-a:var(--role-mint-face-a); --cap-b:var(--role-mint-face-b); --cap-drop:var(--role-mint-outline); --cap-band:var(--role-mint-contact); --cap-s:.706; }
+.kit-cap--blue  { --cap-a:var(--role-blue-face-a); --cap-b:var(--role-blue-face-b); --cap-drop:var(--role-blue-outline); --cap-band:var(--role-blue-contact); --cap-s:.674; }
+.kit-cap--pink  { --cap-a:var(--role-pink-face-a); --cap-b:var(--role-pink-face-b); --cap-drop:var(--role-pink-outline); --cap-band:var(--role-pink-contact); --cap-s:.636; }
+.kit-cap--yellow{ --cap-a:var(--role-yellow-face-a); --cap-b:var(--role-yellow-face-b); --cap-drop:var(--role-yellow-outline); --cap-band:var(--role-yellow-contact); --cap-s:.806; }
+.kit-cap--orange{ --cap-a:var(--role-orange-face-a); --cap-b:var(--role-orange-face-b); --cap-drop:var(--role-orange-outline); --cap-band:var(--role-orange-contact); --cap-s:.685; }
+.kit-cap--purple{ --cap-a:var(--role-purple-face-a); --cap-b:var(--role-purple-face-b); --cap-drop:var(--role-purple-outline); --cap-band:var(--role-purple-contact); --cap-s:.621; }
+.kit-cap--lilac { --cap-a:var(--role-lilac-face-a); --cap-b:var(--role-lilac-face-b); --cap-drop:var(--role-lilac-outline); --cap-band:var(--role-lilac-contact); --cap-s:.718; }
 /* 진주 유리 — 옛 비트맵 캡슐이 서던 자리(모달 헤더·클래식 상단)를 잇는 색.
    «유리» 정체성은 유지하고 기하만 젤리 문법으로 바꾼다.                    */
-.kit-cap--glass { --cap-a:#F2EAF2; --cap-b:#DCCFE0; --cap-drop:#A896AE; --cap-band:#CBBAD1; --cap-s:.874; }
-.kit-cap--tray  { --cap-a:#E4DAE8; --cap-b:#CBBED4; --cap-drop:#9A89A6; --cap-band:#BAAAC6; --cap-s:.812; }
+.kit-cap--glass { --cap-a:var(--role-glass-face-a); --cap-b:var(--role-glass-face-b); --cap-drop:var(--role-glass-outline); --cap-band:var(--role-glass-contact); --cap-s:.874; }
+.kit-cap--tray  { --cap-a:var(--role-tray-face-a); --cap-b:var(--role-tray-face-b); --cap-drop:var(--role-tray-outline); --cap-band:var(--role-tray-contact); --cap-s:.812; }
 
 /* ═══ C. 구획선 — 사용자 요구 «에너지 바에 라인을 쳐야 한다» ══════════════
    ⚠ **트랙에 얹는다. 채움에 얹지 않는다** — 채움은 scaleX 로 늘어나므로 거기
@@ -47183,7 +47192,7 @@ html[lang="en"] .splash-logo{
    안 바꿨다). 캡슐은 이제 `.wf-cap` 정본 변주가 그린다. 좌우 게이지 알약
    `.ch-g` 는 이 처방을 그대로 쓴다 — 그것은 캡슐이 아니라 다른 부품이다. */
 #app.classic #classic-hud .ch-g{
-  --cap-a:#F2EAF2; --cap-b:#DCCFE0; --cap-drop:#A896AE; --cap-band:#CBBAD1;
+  --cap-a:var(--role-glass-face-a); --cap-b:var(--role-glass-face-b); --cap-drop:var(--role-glass-outline); --cap-band:var(--role-glass-contact);
   --cap-edge:var(--j-outline);
   --jelly-s:.874;
   border:0 !important;
@@ -47324,10 +47333,10 @@ html[lang="en"] .splash-logo{
   text-shadow:0 1.5px 0 rgba(110,70,58,.62);
   z-index:2;
 }
-#app.battle #btn-add.act     .act-t{ --cap-a:#F8A2C4; --cap-b:#E8749F; --cap-drop:#A63C6A; --cap-band:#D25E8D; }
-#app.battle #btn-hint.act    .act-t{ --cap-a:#FFDC84; --cap-b:#F0BC55; --cap-drop:#B07C1C; --cap-band:#DFA63E; }
-#app.battle #btn-undo.act    .act-t{ --cap-a:#C6A2F5; --cap-b:#A97FE4; --cap-drop:#6B47A8; --cap-band:#9468D2; }
-#app.battle #btn-shuffle.act .act-t{ --cap-a:#7ED9C0; --cap-b:#54BFA2; --cap-drop:#35866F; --cap-band:#43A184; }
+#app.battle #btn-add.act     .act-t{ --cap-a:var(--role-pink-face-a); --cap-b:var(--role-pink-face-b); --cap-drop:var(--role-pink-outline); --cap-band:var(--role-pink-contact); }
+#app.battle #btn-hint.act    .act-t{ --cap-a:var(--role-yellow-face-a); --cap-b:var(--role-yellow-face-b); --cap-drop:var(--role-yellow-outline); --cap-band:var(--role-yellow-contact); }
+#app.battle #btn-undo.act    .act-t{ --cap-a:var(--role-purple-face-a); --cap-b:var(--role-purple-face-b); --cap-drop:var(--role-purple-outline); --cap-band:var(--role-purple-contact); }
+#app.battle #btn-shuffle.act .act-t{ --cap-a:var(--role-mint-face-a); --cap-b:var(--role-mint-face-b); --cap-drop:var(--role-mint-outline); --cap-band:var(--role-mint-contact); }
 html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -54924,9 +54933,9 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
        (238,207,243)·(219,196,232) 과 그 밑 판이 둘 다 G 가 높다 — 면색 몫이다.
      림(--cap-band) · 겉선(--cap-edge) · 드롭은 그대로라 알약 모양은 남는다.
      봉인: --cap-a:rgba(238,207,243,.69); --cap-b:rgba(219,196,232,.69); *)
-  --cap-a:rgba(238,207,243,.010); --cap-b:rgba(219,196,232,.010);
-  --cap-drop:#A896AE; --cap-band:rgba(242,211,253,.44);
-  --cap-edge:#865890;
+  --cap-a:var(--role-title-face-a); --cap-b:var(--role-title-face-b);
+  --cap-drop:var(--role-glass-outline); --cap-band:var(--role-title-contact);
+  --cap-edge:var(--role-title-outline);
   --cap-s:.874;
   --jelly-h:80px; --jelly-s:.874; --jelly-spec:0;
   position:relative;
