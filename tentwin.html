@@ -12666,6 +12666,13 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
   /* [E73-0908 norm-cw] --gauge- 계열 — 눈금 잉크 원시값(46,20,58 자두 잉크)을 Primitive 로 옮김(값 신설 0).
      tick-c 두 변주(.34 킷 / .30 클래식 HUD)는 α 축만 다르므로 rgb 삼중항 하나를 공유한다. seg/tick-w 는 Layout(§0 ⑥) 무접촉. */
   --prim-ink-plum-rgb:46,20,58;
+  /* [E73-0908 norm-cw] --wchip- 계열 색 리프 — 방울·칩 재질. 기하·α·광점 % 는 부품값(§0 ⑥, norm-hud 와 같은 처리) 무접촉.
+     Mode B(HUD 방울 #ch-baby/#duel-baby): 겉선 = --mode-b-outline(값 동일 붕괴), 글로 #B4CBF5 는 부품 리프.
+     Mode A(캐릭창 칩 .wf-chip / .char-card): 겉선 #685568(.wf-chip 실효, E60 이후) · #6B5A69(정본 chip 기준값, .char-card 실효) · 글로 #9AC0CB(E38 캔버스 평균). 값 신설 0. */
+  --mode-b-glow-bubble:#B4CBF5;
+  --mode-a-outline-chip:#685568;
+  --mode-a-outline-chip-base:#6B5A69;
+  --mode-a-glow-chip:#9AC0CB;
   --mode-b-contact: 0.200;
 }
 </style>
@@ -45957,8 +45964,8 @@ html[lang="en"] .splash-logo{
   width:7.8cqw; aspect-ratio:1; height:auto;
   --f2-ref-w: min(100vw, 480px);
   z-index:3;
-  --wchip-L3-line:#6F6BB4;
-  --wchip-glow-c:#B4CBF5;
+  --wchip-L3-line:var(--mode-b-outline);
+  --wchip-glow-c:var(--mode-b-glow-bubble);
   box-shadow:
     inset 0 0 0 var(--wchip-L3-w) color-mix(in srgb, var(--wchip-L3-line)
       calc(var(--wchip-L3-a) * 100%), transparent),
@@ -53037,7 +53044,7 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
        (26.2+28.0+34.1)/3 = 29.43 시안px 를 쓴다. */
   --wchip-a-in:  0.000;
   --wchip-a-rim: 1.000;
-  --wchip-glow-c: #9AC0CB;   /* 글로 면색 = 다른 셋의 캔버스 평균 (154,192,203) */
+  --wchip-glow-c: var(--mode-a-glow-chip);   /* 글로 면색 = 다른 셋의 캔버스 평균 (154,192,203) */
   --wchip-glow-D: calc(var(--f2-ref-w) * 0.038325);
   --wchip-haze:   .100;
   --wchip-haze-y: 14.0%;
@@ -53062,7 +53069,7 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
   --wchip-rim-p2: calc(1 - (1 - var(--wchip-rim-a) * var(--wchip-rim-k2)) / (1 - var(--wchip-rim-a) * var(--wchip-rim-k3)));
   --wchip-rim-p1: calc(1 - (1 - var(--wchip-rim-a)) / (1 - var(--wchip-rim-a) * var(--wchip-rim-k2)));
   --wchip-L3-w:    calc(var(--f2-ref-w) * 0.00400);
-  --wchip-L3-line: #6B5A69;
+  --wchip-L3-line: var(--mode-a-outline-chip-base);
   --wchip-L3-a:    .400;
   /* [E20-0903 · §5] 칩 광택 **한 벌** — 원장 scratchpad/zoneb-small-0903/
      zoneb_small.json -> chip_highlight.HUD_big_crown (시안 4c1274ac, 지름 102.4px):
@@ -53564,7 +53571,7 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
        (26.2+28.0+34.1)/3 = 29.43 시안px 를 쓴다. */
   --wchip-a-in:  0.000;
   --wchip-a-rim: 1.000;
-  --wchip-glow-c: #9AC0CB;   /* 글로 면색 = 다른 셋의 캔버스 평균 (154,192,203) */
+  --wchip-glow-c: var(--mode-a-glow-chip);   /* 글로 면색 = 다른 셋의 캔버스 평균 (154,192,203) */
   --wchip-glow-D: calc(var(--f2-ref-w) * 0.038325);
   --wchip-haze:   .100;
   --wchip-haze-y: 14.0%;
@@ -53589,7 +53596,7 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
   --wchip-rim-p2: calc(1 - (1 - var(--wchip-rim-a) * var(--wchip-rim-k2)) / (1 - var(--wchip-rim-a) * var(--wchip-rim-k3)));
   --wchip-rim-p1: calc(1 - (1 - var(--wchip-rim-a)) / (1 - var(--wchip-rim-a) * var(--wchip-rim-k2)));
   --wchip-L3-w:    calc(var(--f2-ref-w) * 0.00400);
-  --wchip-L3-line: #6B5A69;
+  --wchip-L3-line: var(--mode-a-outline-chip-base);
   --wchip-L3-a:    .400;
   /* [E20-0903 · §5] 칩 광택 **한 벌** — 원장 scratchpad/zoneb-small-0903/
      zoneb_small.json -> chip_highlight.HUD_big_crown (시안 4c1274ac, 지름 102.4px):
@@ -53931,7 +53938,7 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
 /* [E60-0904] 캡슐 재료색 = 캐릭창 정보판 정석(라벤더핑크). 크림/회청 S9 폐기.
    기하(area B 폭·크기)는 불변 — 재료색만 바꾼다. face #E6DCE2 · rim #FAF5F4 · 겉선 #9F8896. */
 .wf-cap{ --wcap-L3-line: var(--mode-a-outline); --wcap-face: var(--mode-a-face); --wcap-face-top: #ECE2E6; --wcap-face-y: 100%; --wcap-rim-c: var(--mode-a-rim); }
-.wf-chip{ --wchip-L3-line: #685568; }
+.wf-chip{ --wchip-L3-line: var(--mode-a-outline-chip); }
 #charpanel .cp-crystal{ --wslot-L3-line: #6C4A72; }
 
 /* ---------------------------------------------------------------------------
@@ -57051,8 +57058,8 @@ else window.addEventListener("load",start);
    HUD 안에서만 덮으므로(3 id) 캐릭창 랙 방울은 무변. box-shadow 는 wf-chip 원식
    그대로에 림 색만 흰→(194,214,255)로 바꾼 것이다. */
 #app.battle #duel-hud #duel-baby{
-  --wchip-L3-line:#6F6BB4;
-  --wchip-glow-c:#B4CBF5;
+  --wchip-L3-line:var(--mode-b-outline);
+  --wchip-glow-c:var(--mode-b-glow-bubble);
   box-shadow:
     inset 0 0 0 var(--wchip-L3-w) color-mix(in srgb, var(--wchip-L3-line)
       calc(var(--wchip-L3-a) * 100%), transparent),
