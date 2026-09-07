@@ -104,15 +104,15 @@
    --tNr is the same colour as an "R,G,B" triplet, which is the only way to build
    rgba() from a variable without color-mix(). .tile[data-v] forwards it as --cr. */
 :root {
-  --t1: #34C6E8; /* 소다     h191  dark 6.82:1  light 8.69:1 */
-  --t2: #8C9BF5; /* 블루베리  h231  dark 5.44:1  light 7.07:1 */
-  --t3: #C77CF0; /* 포도     h279  dark 5.09:1  light 6.59:1 */
-  --t4: #FA8BB8; /* 복숭아    h336  dark 6.25:1  light 8.04:1 */
-  --t5: #FFA23C; /* 귤       h031  dark 6.90:1  light 8.79:1 */
-  --t6: #4BD99A; /* 라임     h153  dark 7.62:1  light 9.67:1 */
-  --t7: #9CE061; /* 청포도    h092  dark 8.67:1  light 10.86:1 */
-  --t8: #F5D84A; /* 레몬     h050  dark 9.59:1  light 12.02:1 */
-  --t9: #FF7A6B; /* 딸기     h006  dark 5.48:1  light 7.07:1 */
+  --t1: var(--prim-c1); /* 소다     h191  dark 6.82:1  light 8.69:1 */
+  --t2: var(--prim-c2); /* 블루베리  h231  dark 5.44:1  light 7.07:1 */
+  --t3: var(--prim-c3); /* 포도     h279  dark 5.09:1  light 6.59:1 */
+  --t4: var(--prim-c4); /* 복숭아    h336  dark 6.25:1  light 8.04:1 */
+  --t5: var(--prim-c5); /* 귤       h031  dark 6.90:1  light 8.79:1 */
+  --t6: var(--prim-c6); /* 라임     h153  dark 7.62:1  light 9.67:1 */
+  --t7: var(--prim-c7); /* 청포도    h092  dark 8.67:1  light 10.86:1 */
+  --t8: var(--prim-c8); /* 레몬     h050  dark 9.59:1  light 12.02:1 */
+  --t9: var(--prim-c9); /* 딸기     h006  dark 5.48:1  light 7.07:1 */
 
   --t1r:  52, 198, 232;
   --t2r: 140, 155, 245;
@@ -129,35 +129,35 @@
      references var(--c1)…var(--c9) inline) all pop with the same voice.
      Section 13 REPLACES these with deepened values for the cream ground — that is
      a UI-legibility concern only, and it no longer touches the board. */
-  --c1: #34C6E8; /* 소다     h191 */
-  --c2: #8C9BF5; /* 블루베리  h231 */
-  --c3: #C77CF0; /* 포도     h279 */
-  --c4: #FA8BB8; /* 복숭아    h336 */
+  --c1: var(--prim-c1); /* 소다     h191 */
+  --c2: var(--prim-c2); /* 블루베리  h231 */
+  --c3: var(--prim-c3); /* 포도     h279 */
+  --c4: var(--prim-c4); /* 복숭아    h336 */
   /* 5 pairs with itself, so it has no complement to sit opposite — it takes the one
      slot the 8 paired hues leave perceptually wide open, between 딸기 (h006) and
      레몬 (h050), and carries the highest chroma of the nine so it can never be
      mistaken for a dead tile (review D). */
-  --c5: #FFA23C; /* 귤       h031 */
-  --c6: #4BD99A; /* 라임     h153 */
-  --c7: #9CE061; /* 청포도    h092 */
-  --c8: #F5D84A; /* 레몬     h050 */
-  --c9: #FF7A6B; /* 딸기     h006 */
+  --c5: var(--prim-c5); /* 귤       h031 */
+  --c6: var(--prim-c6); /* 라임     h153 */
+  --c7: var(--prim-c7); /* 청포도    h092 */
+  --c8: var(--prim-c8); /* 레몬     h050 */
+  --c9: var(--prim-c9); /* 딸기     h006 */
 
-  --ink: #221B2E;              /* dark plum ink used on every tile face */
-  --bg: #16131F;               /* deep warm navy-charcoal */
-  --bg-2: #221C30;
-  --bg-3: #0E0C15;
-  --panel: #1E1929;
-  --panel-2: #2A2338;
-  --line: rgba(255, 255, 255, .09);
-  --tx: #F1ECF6;
-  --tx-dim: #A79FB8;
+  --ink: var(--prim-ink);              /* dark plum ink used on every tile face */
+  --bg: var(--prim-bg);               /* deep warm navy-charcoal */
+  --bg-2: var(--prim-bg-2);
+  --bg-3: var(--prim-bg-3);
+  --panel: var(--prim-panel);
+  --panel-2: var(--prim-panel-2);
+  --line: var(--prim-white-a09);
+  --tx: var(--prim-tx);
+  --tx-dim: var(--prim-tx-dim);
   /* v4: the UI accents follow the board into the jelly tin — 레몬 and 복숭아.
      Menu, buttons and HUD read their colour through these two variables only, so
      this pair is the whole "메뉴·버튼·HUD 도 젤리 톤" change (§5-4): no structure
      moves, and both themes inherit it because section 13 never overrode them. */
-  --accent: #F5D84A;    /* 레몬 */
-  --accent-2: #FA8BB8;  /* 복숭아 */
+  --accent: var(--prim-c8);    /* 레몬 */
+  --accent-2: var(--prim-c4);  /* 복숭아 */
 
   --r-sm: 10px;
   --r-md: 16px;
@@ -3229,26 +3229,26 @@ li.roll-in { animation: rollin 380ms var(--spring) backwards; }
 /* ---- 13A: OS preference (unless the player has explicitly chosen dark) ---- */
 @media (prefers-color-scheme: light) {
   :root:not([data-theme="dark"]) {
-    --bg: #F6F1E8;
-    --bg-3: #EDE6DA;
-    --panel: #FFFBF4;
-    --panel-2: #FFFFFF;
-    --line: rgba(34, 27, 46, .1);
-    --tx: #2A2338;
-    --tx-dim: #736A85;
+    --bg: var(--prim-bg-light);
+    --bg-3: var(--prim-bg-3-light);
+    --panel: var(--prim-panel-light);
+    --panel-2: var(--prim-white);
+    --line: var(--prim-line-light);
+    --tx: var(--prim-tx-light);
+    --tx-dim: var(--prim-tx-dim-light);
     /* v4: the same nine jelly flavours, deepened for the cream ground. These are
        UI ACCENTS ONLY (badges, bars, tutorial SVG) — the board reads --t*, which
        this block still deliberately does not override, so the tiles are the same
        jelly in both themes. */
-    --c1: #1FA6C8; /* 소다 */
-    --c2: #6A78E0; /* 블루베리 */
-    --c3: #A85BD6; /* 포도 */
-    --c4: #E0699B; /* 복숭아 */
-    --c5: #D9821F; /* 귤 */
-    --c6: #23B478; /* 라임 */
-    --c7: #6FB232; /* 청포도 */
-    --c8: #C4A716; /* 레몬 */
-    --c9: #E8574A; /* 딸기 */
+    --c1: var(--prim-c1-light); /* 소다 */
+    --c2: var(--prim-c2-light); /* 블루베리 */
+    --c3: var(--prim-c3-light); /* 포도 */
+    --c4: var(--prim-c4-light); /* 복숭아 */
+    --c5: var(--prim-c5-light); /* 귤 */
+    --c6: var(--prim-c6-light); /* 라임 */
+    --c7: var(--prim-c7-light); /* 청포도 */
+    --c8: var(--prim-c8-light); /* 레몬 */
+    --c9: var(--prim-c9-light); /* 딸기 */
   }
   :where(:root:not([data-theme="dark"])) body {
     color: var(--tx);
@@ -3485,23 +3485,23 @@ li.roll-in { animation: rollin 380ms var(--spring) backwards; }
 
 /* ---- 13B: explicit in-game choice. Same payload, unconditional selector. ---- */
 :root[data-theme="light"] {
-  --bg: #F6F1E8;
-  --bg-3: #EDE6DA;
-  --panel: #FFFBF4;
-  --panel-2: #FFFFFF;
-  --line: rgba(34, 27, 46, .1);
-  --tx: #2A2338;
-  --tx-dim: #736A85;
+  --bg: var(--prim-bg-light);
+  --bg-3: var(--prim-bg-3-light);
+  --panel: var(--prim-panel-light);
+  --panel-2: var(--prim-white);
+  --line: var(--prim-line-light);
+  --tx: var(--prim-tx-light);
+  --tx-dim: var(--prim-tx-dim-light);
   /* v4 jelly accents, deepened for cream — must stay identical to the 13A copy. */
-  --c1: #1FA6C8; /* 소다 */
-  --c2: #6A78E0; /* 블루베리 */
-  --c3: #A85BD6; /* 포도 */
-  --c4: #E0699B; /* 복숭아 */
-  --c5: #D9821F; /* 귤 */
-  --c6: #23B478; /* 라임 */
-  --c7: #6FB232; /* 청포도 */
-  --c8: #C4A716; /* 레몬 */
-  --c9: #E8574A; /* 딸기 */
+  --c1: var(--prim-c1-light); /* 소다 */
+  --c2: var(--prim-c2-light); /* 블루베리 */
+  --c3: var(--prim-c3-light); /* 포도 */
+  --c4: var(--prim-c4-light); /* 복숭아 */
+  --c5: var(--prim-c5-light); /* 귤 */
+  --c6: var(--prim-c6-light); /* 라임 */
+  --c7: var(--prim-c7-light); /* 청포도 */
+  --c8: var(--prim-c8-light); /* 레몬 */
+  --c9: var(--prim-c9-light); /* 딸기 */
 }
 :where(:root[data-theme="light"]) body {
   color: var(--tx);
@@ -12740,6 +12740,47 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
   --role-rw-gift-1:var(--role-rw-star-1); --role-rw-gift-2:var(--role-rw-pet-2); --role-rw-gift-3:#C4B0F5; --role-rw-gift-4:var(--role-rw-shard-agility-2); --role-rw-gift-5:var(--role-rw-shard-steady-2);
   --role-rw-item-1:#F3E7FF; --role-rw-item-2:#C9AEF5; --role-rw-item-3:#A882E8;
   --role-bs-grape-body:#C77CF0; --role-bs-grape-horn:#7E3FAE; --role-bs-soda-body:#34C6E8; --role-bs-soda-horn:#1B7E9B; --role-bs-berry-body:#FF7A6B; --role-bs-berry-horn:#B8362A; --role-bs-mint-body:var(--role-mint-face-a); --role-bs-mint-horn:#2E8F79; --role-bs-cocoa-body:#8C5A3C; --role-bs-cocoa-horn:#4A2A18;
+
+
+  /* [E76-0908 norm-rest · 그룹 D] 남은 접두의 원시색을 이름만 이관 — 값 신설 0, 값 동일은 기존 토큰 붕괴.
+     그룹 A 보상 원판(--mk-)·과일 광택/접지(--fr-)·보석 면(--gem-) · B 잔여 접두(hv2/h2/hd/hu/bg-/map/lt/wslot/jbox/blocker/nk/candok/키/hcard/wcap/cpj/hudj)
+     C 캐릭창 --f2- 정본 E값 + 메뉴 버튼 역할색(menu1 옛 코드 젤리 / menu2 그림 버튼 폴백) · D 팔레트 Primitive(--prim-cN/-light, tN=cN 다크)
+     E ART 팔레트(--prim-art-*) + Mode L 슬롯 6(:root@7759 에서 이동). 옛 이름은 전부 var() 브릿지로 유지(소비처 무변). */
+  /* -- prim -- */
+  --prim-c1: #34C6E8;
+  --prim-c2: #8C9BF5;
+  --prim-c3: #C77CF0;
+  --prim-c4: #FA8BB8;
+  --prim-c5: #FFA23C;
+  --prim-c6: #4BD99A;
+  --prim-c7: #9CE061;
+  --prim-c8: #F5D84A;
+  --prim-c9: #FF7A6B;
+  --prim-ink: #221B2E;
+  --prim-bg: #16131F;
+  --prim-bg-2: #221C30;
+  --prim-bg-3: #0E0C15;
+  --prim-panel: #1E1929;
+  --prim-panel-2: #2A2338;
+  --prim-white-a09: rgba(255, 255, 255, .09);
+  --prim-tx: #F1ECF6;
+  --prim-tx-dim: #A79FB8;
+  --prim-bg-light: #F6F1E8;
+  --prim-bg-3-light: #EDE6DA;
+  --prim-panel-light: #FFFBF4;
+  --prim-white: #FFFFFF;
+  --prim-line-light: rgba(34, 27, 46, .1);
+  --prim-tx-light: #2A2338;
+  --prim-tx-dim-light: #736A85;
+  --prim-c1-light: #1FA6C8;
+  --prim-c2-light: #6A78E0;
+  --prim-c3-light: #A85BD6;
+  --prim-c4-light: #E0699B;
+  --prim-c5-light: #D9821F;
+  --prim-c6-light: #23B478;
+  --prim-c7-light: #6FB232;
+  --prim-c8-light: #C4A716;
+  --prim-c9-light: #E8574A;
 }
 </style>
 <!-- 최우선 2장만 preload — 젤리판(세 인터페이스 공용)과 플레이 팝업 레터링이다.
