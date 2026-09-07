@@ -12640,6 +12640,11 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
   --mode-a-outline: #9F8896;
   --mode-a-gloss:   0.770;
   --mode-a-contact: 0.324;
+  /* [E72-0908 norm-cs] Mode A 부품 리프 — 캐릭창 [패시브 스킬] 설명판(.ci-desc) 면색·α.
+     값 = ⑬(0904) 확정 S9 림 실측 #E3D8DF · α.58 (종전 --cs-desc-box/--cs-desc-a 원시값, 신설 0).
+     매니페스트 modes.A face.parts.charsel_desc / alpha.parts.charsel_desc 로 등재 대상. */
+  --mode-a-face-desc:  #E3D8DF;
+  --mode-a-alpha-desc: .58;
   /* [E71-0908 norm-hud] Mode B 첫 소비처 = --hudj-*(#classic-hud .ch-fx 젤리 엔진, 72ae216부터 display:none → 렌더 0).
      [E72-0908 norm-cs] 값을 정본 theme-tentwin.css(a27e2c5, 사용자 확정 HUD lite 자산값)와 한 자도 같게 맞춘다:
      face #96A7F6(150,167,246) · rim #C2D6FF(194,214,255) · contact .200(HUD 판 drop-shadow α).
@@ -48360,9 +48365,15 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
        α    = .58 (면 58% · 투과 42%). ⑤ 레일 .425 보다 높다 — 이 카드는 이미 반투명한
               .cp-card 젤리 **위**에 얹혀 두 겹을 통과하므로, 같은 「비침」을 내는 데
               면 α 가 더 필요하다. 세로 램프는 S5 에 사실상 없어 두 정지점을 같은 값으로 둔다. */
-  --cs-desc-box:   #E3D8DF;
-  --cs-desc-box-2: #E3D8DF;
-  --cs-desc-a:     .58;
+  /* [E72-0908 norm-cs] --cs- 계열 정규화 — 재질 3값은 캐릭창 재질 계열 --f2- 부품 토큰으로 옮기고
+     (--f2-desc-box/--f2-desc-a → Mode A 부품 리프 --mode-a-face-desc/--mode-a-alpha-desc, tokens-semantic),
+     옛 이름은 브릿지로 남긴다. --cs-desc-box-2 는 값이 같아 --cs-desc-box 로 붕괴. 값 신설 0.
+     나머지 --cs-(head/carh/body/tabs/card/side)는 Layout 층(§0 ⑥, --f2-w 비율 기하)이라 재질 계열이 아니다. */
+  --f2-desc-box:   var(--mode-a-face-desc);
+  --f2-desc-a:     var(--mode-a-alpha-desc);
+  --cs-desc-box:   var(--f2-desc-box);
+  --cs-desc-box-2: var(--cs-desc-box);
+  --cs-desc-a:     var(--f2-desc-a);
   /* 수리 0831 — 정본 캡슐의 속(--wf-a-in .010) */
   /* [색감 S5 0904] 추천/성향 알약(전략가·두근두근파 = .ci-tag-v·.cp-side-rec =
      kit-pill-v2) 면색·겉선색. 색 정본 = S5. 종전 면 #F8E3EF 1%(사실상 맑은 유리)·
