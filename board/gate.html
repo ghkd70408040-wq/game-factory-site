@@ -27,33 +27,193 @@
   <h1 class="page-title">관문실 — S6 관문 · S7 승인</h1>
   <div class="page-meta">정본 §5 S6(관문 스크립트) · S7(승인·출시) · 측정 2026-09-08 · 상태는 계산값만</div>
 
-  <div class="focus-line"><b>초점</b>관문 2종 PASS · 실기기 캡처 없음 · main 미푸시 1 · 미푸시 브랜치 4<span class="src">tools/measure/components-gate.py · FRAME-AUDIT-0906.md</span></div>
+  <div class="focus-line"><b>초점</b>관문 4종 실행 — m3·frames·pixel PASS · done FAIL 1/46 · 실기기 캡처 없음 · main 미푸시 0 · 미푸시 브랜치 3<span class="src">tools/measure/components-gate.py · RELEASE-CHECKLIST.md · FRAME-AUDIT-0906.md</span></div>
 
   <h2 class="section-title">1. 관문 스크립트 실행 결과 (원문)</h2>
 
   <h3 class="sub-title">m3 — 죽은 선택자</h3>
-  <div class="source-note">python tools\measure\components-gate.py m3 &nbsp;·&nbsp; cwd C:\workspace\game-factory &nbsp;·&nbsp; exit 0</div>
+  <div class="source-note">python tools\measure\components-gate.py m3 --file site\tentwin.html --baseline tools\measure\m3-baseline.json &nbsp;·&nbsp; cwd C:\workspace\game-factory &nbsp;·&nbsp; exit 0</div>
   <pre class="raw-output">M3 죽은 선택자 게이트 — site/tentwin.html
-  현재 A급 100건 · 은퇴 대장 100건 · 신규 0건 · 대장서 사라짐 0건
+  현재 A급 10건 · 은퇴 대장 10건 · 신규 0건 · 대장서 사라짐 0건
 M3 PASS — 신규 A급 0건 (기존 A급은 은퇴 대장 소속).</pre>
 
   <h3 class="sub-title">frames — 1파일 1프레임</h3>
-  <div class="source-note">python tools\measure\components-gate.py frames &nbsp;·&nbsp; cwd C:\workspace\game-factory &nbsp;·&nbsp; exit 0</div>
+  <div class="source-note">python tools\measure\components-gate.py frames --manifest tentwin\ref-v2\hud-shape\hud-components.json --catalog site\catalog &nbsp;·&nbsp; cwd C:\workspace\game-factory &nbsp;·&nbsp; exit 0</div>
   <pre class="raw-output">frames 게이트 — COMPONENTS.md §1.3 「한 파일 = 한 프레임」
   매니페스트: tentwin/ref-v2/hud-shape/hud-components.json (스키마 frames[])
   카탈로그  : site/catalog
-  항목 23 · FAIL 0 · WARN(미기재) 0 · 미등록 webp 0
+  항목 26 · FAIL 0 · WARN(미기재) 0 · 미등록 webp 0
 
 frames PASS — 전 항목 한 파일 한 프레임, 미등록 0.</pre>
+
+  <h3 class="sub-title">done — 창고 완료 (a)(b)(c)(d)</h3>
+  <div class="source-note">python tools\measure\components-gate.py done --file site\tentwin.html --prefixes="--bj-,--wf-,--j-,--dlj-,--chj-,--dhj-,--mvh-,--mv2j-,--f2-,--cpj-,--hudj-,--mode-a-,--mode-b-,--role-,--mL-,--btn-,--btnf-,--wcap-,--hcard-,--hd-,--wchip-,--cap-,--gauge-,--duel-" --layout-prefixes="--cs-" --theme tentwin\ref-v2\work-frame.css --theme tentwin\ref-v2\work-btn.css --theme tentwin\ref-v2\kit-hud-v2.css --theme tentwin\ref-v2\kit-frame-v2.css --stopwords "t2,t3,t4" &nbsp;·&nbsp; COMPONENTS.md §6.2 (1) 정본 명령 &nbsp;·&nbsp; exit 1</div>
+  <pre class="raw-output">done-gate — COMPONENTS.md §6 (a)계열==1 (b)교체점 1 (c)소비처≥1 (d)정본↔게임 값 동일
+  매니페스트: tentwin/ref-v2/manifest/frames.tentwin.json (스키마 frames[])
+  게임      : site/tentwin.html (변수 정의 1077 · 규칙 3350)
+  정본      : tentwin/ref-v2/work-frame.css, tentwin/ref-v2/work-btn.css, tentwin/ref-v2/kit-hud-v2.css, tentwin/ref-v2/kit-frame-v2.css
+  접두 계열 : --bj-, --wf-, --j-, --dlj-, --chj-, --dhj-, --mvh-, --mv2j-, --f2-, --cpj-, --hudj-, --mode-a-, --mode-b-, --role-, --mL-, --btn-, --btnf-, --wcap-, --hcard-, --hd-, --wchip-, --cap-, --gauge-, --duel-, --cs-
+  layout 접두(계열 수 제외·근거만): --cs-
+  잡음 제거 : 죽은 규칙(m3 대장 retired/orphan·.modal-v2 스킨) 전용 토큰 10개 제외 · 불용어 37개 · kw-min 2
+  배포 근거 : catalog=site/catalog · deploy 매핑 3건
+  건너뜀    : kind ∈ {preview, source} 20건(정본 교체점이 없는 미리보기/출처 — 게이트 대상 아님)
+  항목 46 · PASS 45 · FAIL 1
+
+| 부품(id) | kind | (a)계열 | 계열 내역 | 매칭 낱말 | (b)교체점 | (c)소비처 | 소비처 근거 | (d)값 | 판정 | 사유 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| t2-plate-hud-top-plain-lite | frame | 1 | [hook(배포본)] file:hud-plate-top.webp | - | 1 (실재) | 1 | 매니페스트 | 비교0 | PASS | - |
+| t3-capsule-hud-timer-lite | frame | 1 | [hook(배포본)] file:hud-capsule.webp | - | 1 (실재 · 배포본 hud-capsule.webp) | 1 | 매니페스트 | 비교0 | PASS | - |
+| t2-mask-hud-capsule | frame | 1 | [hook(배포본)] file:hud-capsule-mask.webp | - | 1 (실재 · 배포본 hud-capsule-mask.webp) | 1 | grep(셀렉터 0·파일참조 1) | 비교0 | PASS | - |
+| t2-plate-hud-bottom-lite | frame | 1 | [hook(배포본)] file:hud-plate-bottom.webp | - | 1 (실재 · 배포본 hud-plate-bottom.webp) | 1 | 매니페스트 | 비교0 | PASS | - |
+| t3-groove-hud-energy-left | frame | 1 | [hook(배포본)] file:hud-groove-left.webp | - | 1 (실재 · 배포본 hud-groove-left.webp) | 1 | 매니페스트 | 비교0 | PASS | - |
+| t3-groove-hud-energy-right | frame | 1 | [hook(배포본)] file:hud-groove-right.webp | - | 1 (실재 · 배포본 hud-groove-right.webp) | 1 | 매니페스트 | 비교0 | PASS | - |
+| t3-bubble-hud-empty | frame | 1 | [hook+scope] --wchip- | - | 1 (실재) | 1 | 매니페스트 | 비교0 | PASS | - |
+| t2-plate-modal-pink | frame | 1 | [hook(배포본)] file:jelly-box.webp | - | 1 (실재) | 11 | 매니페스트 | 비교0 | PASS | - |
+| t2-plate-charsel-info | frame | 1 | [hook+scope] --cpj- | - | 1 (실재) | 5 | 매니페스트 | 비교0 | PASS | - |
+| t3-title-capsule-modal | frame | 1 | [hook+scope] --wcap- | - | 1 (실재) | 10 | 매니페스트 | 비교0 | PASS | - |
+| t2-card-modal-rules | frame | 1 | [hook+scope] --hcard- | - | 1 (실재) | 3 | 매니페스트 | 비교0 | PASS | - |
+| t4-dots-modal-page | frame | 1 | [hook+scope] --hd- | - | 1 (실재) | 3 | 매니페스트 | 비교0 | PASS | - |
+| t3-btn-modal-ghost | frame | 1 | [hook+scope] --btn- | - | 1 (실재) | 4 | 매니페스트 | 비교0 | PASS | - |
+| t3-btn-modal-primary | frame | 1 | [hook+scope] --btn- ｜보조(낱말): --role- | a,primary | 1 (실재) | 3 | 매니페스트 | 비교0 | PASS | - |
+| t3-btn-modal-secondary | frame | 1 | [hook+scope] --btn- | - | 1 (실재) | 3 | 매니페스트 | 비교0 | PASS | - |
+| t3-toggle-modal | frame | 0 | [낱말] (없음) | - | 미기재(실측 0) | 5 | 매니페스트 | 비교0 | FAIL | 계열 0(≠1), 교체점 미기재(실측 0) |
+| t4-title-modal-howto | frame | 1 | [hook(배포본)] file:ttl-howto-ko.webp | - | 1 (실재) | 4 | 매니페스트 | 비교0 | PASS | - |
+| t4-title-modal-settings | frame | 1 | [hook(배포본)] file:ttl-settings-ko.webp | - | 1 (실재) | 3 | 매니페스트 | 비교0 | PASS | - |
+| t4-title-modal-play | frame | 1 | [hook(배포본)] file:ttl-play-ko.webp | - | 1 (실재) | 4 | 매니페스트 | 비교0 | PASS | - |
+| t3-close-modal-x | frame | 1 | [hook(배포본)] file:sian3-close.webp | - | 1 (실재) | 7 | 매니페스트 | 비교0 | PASS | - |
+| t3-moderow-modal-adv | frame | 1 | [hook(배포본)] file:sian3-btn-adventure.webp | - | 1 (실재) | 4 | 매니페스트 | 비교0 | PASS | - |
+| t3-moderow-modal-arcade | frame | 1 | [hook(배포본)] file:sian3-btn-arcade.webp | - | 1 (실재) | 4 | 매니페스트 | 비교0 | PASS | - |
+| t3-moderow-modal-daily | frame | 1 | [hook(배포본)] file:sian3-btn-daily.webp | - | 1 (실재) | 4 | 매니페스트 | 비교0 | PASS | - |
+| t3-moderow-modal-rush | frame | 1 | [hook(배포본)] file:sian3-btn-timerush.webp | - | 1 (실재) | 4 | 매니페스트 | 비교0 | PASS | - |
+| t2-side-charsel | frame | 1 | [hook+scope] --f2- ｜layout 제외: --cs-(9) | - | 1 (실재) | 2 | 매니페스트 | 2/2 동일 | PASS | - |
+| t4-lettering-charsel-title | frame | 1 | [hook(배포본)] file:ttl-chars-ko.webp | - | 1 (실재) | 3 | 매니페스트 | 비교0 | PASS | - |
+| t3-capsule-charsel-empty | frame | 1 | [hook+scope] --f2- ｜보조(낱말): --f2- | 1,a,pill | 1 (실재) | 2 | 매니페스트 | 2/2 동일 | PASS | - |
+| t3-bubble-charsel-empty | frame | 1 | [hook+scope] --wchip- | - | 1 (실재) | 2 | 매니페스트 | 비교0 | PASS | - |
+| t4-bubble-charsel-face | frame | 1 | [hook(배포본)] file:ch-ten-face.webp | - | 1 (실재) | 2 | 매니페스트 | 비교0 | PASS | - |
+| t3-bubble-charsel-gold | frame | 1 | [hook+scope] --f2- | - | 1 (실재) | 2 | 매니페스트 | 비교0 | PASS | - |
+| t3-arrow-charsel-l | frame | 1 | [hook+scope] --f2- ｜layout 제외: --cs-(9) | - | 1 (실재) | 2 | 매니페스트 | 비교0 | PASS | - |
+| t3-arrow-charsel-r | frame | 1 | [hook+scope] --f2- ｜layout 제외: --cs-(9) | - | 1 (실재) | 2 | 매니페스트 | 비교0 | PASS | - |
+| t3-tab-charsel-char | frame | 1 | [hook+scope] --f2- ｜layout 제외: --cs-(9) | - | 1 (실재) | 2 | 매니페스트 | 2/2 동일 | PASS | - |
+| t3-tab-charsel-pet | frame | 1 | [hook+scope] --f2- ｜layout 제외: --cs-(9) | - | 1 (실재) | 2 | 매니페스트 | 2/2 동일 | PASS | - |
+| t3-pill-charsel-name | frame | 1 | [hook+scope] --f2- ｜layout 제외: --cs-(9) | - | 1 (실재) | 2 | 매니페스트 | 3/3 동일 | PASS | - |
+| t4-portrait-charsel-chip | frame | 1 | [hook(배포본)] file:ch-ten-face.webp | - | 1 (실재) | 2 | 매니페스트 | 비교0 | PASS | - |
+| t3-chip-charsel | frame | 1 | [hook+scope] --f2- ｜layout 제외: --cs-(9) | - | 1 (실재) | 3 | 매니페스트 | 3/3 동일 | PASS | - |
+| t3-pill-charsel-rec | frame | 1 | [hook+scope] --f2- ｜보조(낱말): --f2- | pill,soft | 1 (실재) | 2 | 매니페스트 | 5/5 동일 | PASS | - |
+| t4-gauge-charsel-full | frame | 1 | [hook+scope] --f2- ｜보조(낱말): --f2- | a,gauge | 1 (실재) | 2 | 매니페스트 | 비교0 | PASS | - |
+| t3-gauge-charsel-empty | frame | 1 | [hook+scope] --f2- ｜보조(낱말): --f2- | gauge,slot | 1 (실재) | 2 | 매니페스트 | 1/1 동일 | PASS | - |
+| t3-card-charsel-passive | frame | 1 | [hook+scope] --f2- ｜보조(낱말): --f2-, --cs- ｜layout 제외: --cs-(9) | box,desc | 1 (실재) | 2 | 매니페스트 | 2/2 동일 | PASS | - |
+| t3-vtabs-charsel | frame | 1 | [hook+scope] --f2- ｜layout 제외: --cs-(9) | - | 1 (실재) | 2 | 매니페스트 | 2/2 동일 | PASS | - |
+| t3-slots-charsel-item | frame | 1 | [hook+scope] --f2- ｜layout 제외: --cs-(9) | - | 1 (실재) | 2 | 매니페스트 | 비교0 | PASS | - |
+| t3-btn-charsel-skin | frame | 1 | [hook+scope] --f2- | - | 1 (실재) | 2 | 매니페스트 | 비교0 | PASS | - |
+| t3-btn-charsel-go | frame | 1 | [hook+scope] --f2- | - | 1 (실재) | 2 | 매니페스트 | 비교0 | PASS | - |
+| t3-close-charsel-x | frame | 1 | [hook(배포본)] file:sian3-close.webp | - | 1 (실재) | 2 | 매니페스트 | 비교0 | PASS | - |
+
+done FAIL — 1/46 부품 미충족. §6 (a)~(d) 전부 통과해야 창고 완료.</pre>
+
+  <h3 class="sub-title">pixel — 부품 스냅샷 베이스라인</h3>
+  <div class="source-note">python tools\measure\components-gate.py pixel --shots scratchpad\s6shots-0908 --consumers game --basis-selector "#duel-hud" --uniform-scale &nbsp;·&nbsp; COMPONENTS.md §6.2 (2) &nbsp;·&nbsp; exit 0</div>
+  <pre class="raw-output">pixel 게이트 — 부품 스냅샷 베이스라인 대조 (consumers 전량)
+  매니페스트: tentwin/ref-v2/manifest/frames.tentwin.json
+  캡처      : scratchpad/s6shots-0908 (화면 6 · 대상 18장)
+  베이스라인: tools/measure/pixel-baseline
+  기준틀    : #duel-hud · 등비 배율
+  임계      : mean|Δ| ≤ 2.000 · max ≤ 32
+  행 80 · 기록 0 · PASS 21 · FAIL 0 · WARN 59
+
+| 부품(id) | 소비처 화면 | 프로필 | 크롭 | mean\|Δ\| | max | 판정 | 비고 |
+|---|---|---|---|---|---|---|---|
+| t2-plate-hud-top-plain-lite | game | android-390x844-dpr3 | 1170x226 | 0.000 | 0 | PASS | - |
+| t2-plate-hud-top-plain-lite | game | iphone-390x844-dpr3 | 1170x226 | 0.000 | 0 | PASS | - |
+| t2-plate-hud-top-plain-lite | game | pc-1280 | 1104x213 | 0.000 | 0 | PASS | - |
+| t3-capsule-hud-timer-lite | game | android-390x844-dpr3 | 516x206 | 0.000 | 0 | PASS | - |
+| t3-capsule-hud-timer-lite | game | iphone-390x844-dpr3 | 516x206 | 0.000 | 0 | PASS | - |
+| t3-capsule-hud-timer-lite | game | pc-1280 | 487x195 | 0.000 | 0 | PASS | - |
+| t2-mask-hud-capsule | game | android-390x844-dpr3 | 516x206 | 0.000 | 0 | PASS | - |
+| t2-mask-hud-capsule | game | iphone-390x844-dpr3 | 516x206 | 0.000 | 0 | PASS | - |
+| t2-mask-hud-capsule | game | pc-1280 | 487x195 | 0.000 | 0 | PASS | - |
+| t2-plate-hud-bottom-lite | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| t3-groove-hud-energy-left | game | android-390x844-dpr3 | 499x103 | 0.000 | 0 | PASS | - |
+| t3-groove-hud-energy-left | game | iphone-390x844-dpr3 | 499x103 | 0.000 | 0 | PASS | - |
+| t3-groove-hud-energy-left | game | pc-1280 | 470x96 | 0.000 | 0 | PASS | - |
+| t3-groove-hud-energy-right | game | android-390x844-dpr3 | 447x94 | 0.000 | 0 | PASS | - |
+| t3-groove-hud-energy-right | game | iphone-390x844-dpr3 | 447x94 | 0.000 | 0 | PASS | - |
+| t3-groove-hud-energy-right | game | pc-1280 | 422x88 | 0.000 | 0 | PASS | - |
+| t3-bubble-hud-empty | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| t2-plate-modal-pink | game | android-390x844-dpr3 | 1170x1338 | 0.000 | 0 | PASS | - |
+| t2-plate-modal-pink | game | iphone-390x844-dpr3 | 1170x1338 | 0.000 | 0 | PASS | - |
+| t2-plate-modal-pink | game | pc-1280 | 1104x742* | 0.000 | 0 | PASS | - |
+| t2-plate-charsel-info | game | android-390x844-dpr3 | 1164x786 | 0.000 | 0 | PASS | - |
+| t2-plate-charsel-info | game | iphone-390x844-dpr3 | 1164x786 | 0.000 | 0 | PASS | - |
+| t2-plate-charsel-info | game | pc-1280 | 1098x742 | 0.000 | 0 | PASS | - |
+| t4-hpbar-hud-left | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| t4-hpbar-hud-right | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| t4-bubble-hud-pet | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| t4-bubble-hud-char | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| src-glass-hud-capsule-st | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| src-glass-hud-capsule | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| src-glass-hud-full | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| src-glass-hud-plate-st | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| src-glass-hud-plate | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| src-glass-hud-slab-st | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| src-glass-hud-slab | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| src-glass-hud-v2 | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| legacy-hud-plate-bottom | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| legacy-hud-plate-top-cap | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| legacy-hud-plate-top | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| legacy-lib-hud-bar | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| t3-title-capsule-modal | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| t2-card-modal-rules | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| t4-dots-modal-page | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| t3-btn-modal-ghost | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| t3-btn-modal-primary | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| t3-btn-modal-secondary | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| t3-toggle-modal | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| t4-title-modal-howto | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| t4-title-modal-settings | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| t4-title-modal-play | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| t3-close-modal-x | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| t3-moderow-modal-adv | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| t3-moderow-modal-arcade | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| t3-moderow-modal-daily | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| t3-moderow-modal-rush | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| t2-side-charsel | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| t3-capsule-charsel-full | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| t4-lettering-charsel-title | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| t3-capsule-charsel-empty | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| t3-bubble-charsel-empty | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| t4-bubble-charsel-face | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| t3-bubble-charsel-gold | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| t3-arrow-charsel-l | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| t3-arrow-charsel-r | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| t3-tab-charsel-char | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| t3-tab-charsel-pet | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| t3-pill-charsel-name | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| t4-portrait-charsel-chip | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| t3-chip-charsel | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| t3-pill-charsel-rec | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| t4-gauge-charsel-full | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| t3-gauge-charsel-empty | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| t3-card-charsel-passive | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| t3-vtabs-charsel | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| t3-slots-charsel-item | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| t3-btn-charsel-skin | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| t3-btn-charsel-go | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| t3-close-charsel-x | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| preview-charsel-char | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| preview-charsel-pet | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+| preview-charsel-gauge-stack | - | - | - | - | - | WARN | bbox 미기재 — 크롭 불가 |
+
+pixel PASS — 대조 21행 전부 임계 이내 (WARN 59).</pre>
 
   <div class="scroll-x"><table class="data-table"><caption>관문 판정</caption>
   <thead><tr><th>관문</th><th>대상</th><th class="num">exit</th><th>판정</th></tr></thead>
   <tbody>
-  <tr><td>m3 죽은 선택자</td><td>site/tentwin.html</td><td class="num">0</td><td><span class="state state-ok">PASS</span></td></tr>
-  <tr><td>frames 1파일 1프레임</td><td>hud-components.json · site/catalog</td><td class="num">0</td><td><span class="state state-ok">PASS</span></td></tr>
-  <tr><td>합성 픽셀 (부품 스냅샷)</td><td>consumers 전량</td><td class="num">—</td><td><span class="state state-partial">미실행</span></td></tr>
+  <tr><td>m3 죽은 선택자</td><td>site/tentwin.html · m3-baseline.json</td><td class="num">0</td><td><span class="state state-ok">PASS</span></td></tr>
+  <tr><td>frames 1파일 1프레임</td><td>hud-components.json · site/catalog · 26항목</td><td class="num">0</td><td><span class="state state-ok">PASS</span></td></tr>
+  <tr><td>done 창고 완료</td><td>frames.tentwin.json · 46항목(20 건너뜀)</td><td class="num">1</td><td><span class="state state-none">FAIL 1/46</span></td></tr>
+  <tr><td>pixel 부품 스냅샷</td><td>s6shots-0908 · consumers game · 80행</td><td class="num">0</td><td><span class="state state-ok">PASS 21 · WARN 59</span></td></tr>
   <tr><td>실기기 캡처 (폴백 강제)</td><td>물리 단말</td><td class="num">—</td><td><span class="state state-none">없음</span></td></tr>
-  <tr><td>콘솔 · 회귀</td><td>site/tentwin.html</td><td class="num">—</td><td><span class="state state-partial">미실행</span></td></tr>
+  <tr><td>콘솔 · 회귀</td><td>s6shots-0908 console.json</td><td class="num">0</td><td><span class="state state-ok">error 0</span></td></tr>
   </tbody></table></div>
 
   <h2 class="section-title">2. 프레임 감사 요약 숫자</h2>
@@ -72,58 +232,63 @@ frames PASS — 전 항목 한 파일 한 프레임, 미등록 0.</pre>
   <div class="source-note">재발주 필요: 무엠블럼 메달 프레임 · lib-badge · lib-medal · duel-medal</div>
 
   <h2 class="section-title">3. 용량 예산표</h2>
-  <div class="source-note">예산 16MB = 16,777,216 B · 측정 PowerShell Get-ChildItem -Recurse -File | Measure-Object -Sum Length</div>
+  <div class="source-note">예산 16MB = 16,777,216 B · 측정 PowerShell Get-ChildItem -Recurse -File | Measure-Object -Sum Length · 배포본은 tools\build\build-dist.py 산출</div>
   <div class="scroll-x"><table class="data-table">
   <thead><tr><th>대상</th><th class="num">바이트</th><th class="num">파일</th><th class="num">예산 대비</th></tr></thead>
   <tbody>
-  <tr><td>site\tentwin.html <span class="tag">배포 페이로드</span></td><td class="num">7,922,497</td><td class="num">1</td><td class="num">47.22%</td></tr>
-  <tr><td>site\catalog\ <span class="tag">소스 자산 저장소</span></td><td class="num">34,161,046</td><td class="num">532</td><td class="num">203.62%</td></tr>
-  <tr><td>site\board\ <span class="tag">관제탑 v2</span></td><td class="num">5,422,150</td><td class="num">471</td><td class="num">32.32%</td></tr>
-    <tr><td><b>예산 16MB</b></td><td class="num">16,777,216</td><td class="num">—</td><td class="num">100%</td></tr>
-  <tr><td>관제탑 자체 상한 14MB</td><td class="num">14,680,064</td><td class="num">—</td><td class="num">board 36.93%</td></tr>
+  <tr><th scope="row">예산 16MB</th><td class="num">16,777,216</td><td class="num">—</td><td class="num">100%</td></tr>
+  <tr><th scope="row">관제탑 자체 상한 14MB</th><td class="num">14,680,064</td><td class="num">—</td><td class="num">board 24.41%</td></tr>
+  <tr><td>site\tentwin.html <span class="tag">소스</span></td><td class="num">4,903,253</td><td class="num">1</td><td class="num">29.23%</td></tr>
+  <tr><td>dist\tentwin.html <span class="tag">배포 페이로드</span></td><td class="num">2,983,482</td><td class="num">1</td><td class="num">17.78%</td></tr>
+  <tr><td>site\catalog\ <span class="tag">소스 자산 저장소</span></td><td class="num">34,757,199</td><td class="num">541</td><td class="num">207.17%</td></tr>
+  <tr><td>site\board\ <span class="tag">관제탑 v2</span></td><td class="num">3,582,705</td><td class="num">75</td><td class="num">21.35%</td></tr>
   </tbody></table></div>
-  <div class="source-note">catalog 는 배포에 통째로 실리는 묶음이 아니라 소스 자산 저장소 전체 합계 — 예산 판정 대상은 tentwin.html(47.22%)</div>
+  <div class="source-note">catalog 는 배포에 통째로 실리는 묶음이 아니라 소스 자산 저장소 전체 합계 — 예산 판정 대상은 배포본 dist\tentwin.html(17.78%)</div>
 
-  <h2 class="section-title">4. 버전</h2>
+  <h2 class="section-title">4. 버전 · 배포</h2>
   <div class="scroll-x"><table class="data-table"><caption>site 저장소</caption>
   <tbody>
   <tr><th>저장소</th><td class="mono">C:\workspace\game-factory\site</td></tr>
-  <tr><th>main HEAD</th><td class="mono">fb7ead8f94c32273a0ba30da16e50bc663352eb3</td></tr>
-  <tr><th>짧은 해시</th><td class="mono">fb7ead8</td></tr>
+  <tr><th>main HEAD</th><td class="mono">88b71f29d37bc8e8fdfe220b7f721ba44690b024</td></tr>
+  <tr><th>짧은 해시</th><td class="mono">88b71f2</td></tr>
   <tr><th>원격</th><td class="mono">https://github.com/ghkd70408040-wq/game-factory-site.git</td></tr>
-  <tr><th>배포 URL</th><td class="mono">https://ghkd70408040-wq.github.io/game-factory-site/ <span class="value-missing">(Pages 추정)</span></td></tr>
+  <tr><th>배포 URL</th><td class="mono">https://ghkd70408040-wq.github.io/game-factory-site/tentwin.html</td></tr>
+  <tr><th>배포 방식</th><td class="mono">GitHub Actions Pages 빌드 — site\.github\workflows\pages.yml · push(main) → tools\build\build-dist.py (strip-deploy 주석·들여쓰기 제거 + stamp HEAD) → dist\ 아티팩트</td></tr>
+  <tr><th>배포본 크기</th><td class="mono">4,903,253 B → 2,983,482 B (−1,919,771 · −39.2%)</td></tr>
+  <tr><th>배포 스탬프</th><td class="mono">로컬 HEAD 88b71f2-20260908-0416 = 원격 88b71f2-20260908-0416 <span class="state state-ok">PASS</span></td></tr>
   <tr><th>작업 트리</th><td class="mono">?? scratchpad/ (미추적) 만</td></tr>
   </tbody></table></div>
+  <div class="source-note">python tools\build\stamp.py site --check https://ghkd70408040-wq.github.io/game-factory-site/tentwin.html &nbsp;·&nbsp; 배포 확인 PASS: 원격 = 로컬 HEAD 스탬프(Actions 빌드)</div>
 
   <h3 class="sub-title">최근 커밋 10</h3>
-  <pre class="raw-output">fb7ead8 board: 관리 페이지 v1 — 화면 4·창고·공장(DEV-STEPS §0)
-40e6ba1 feat(hud): 위 판+캡슐 cap2(홈 없음·캡슐 위) + 판 투명·연하게 한 단계(α.55, L+5%)
-5d591a6 fix(hud): 위 판+캡슐 한 장 자산(시안 접합 그대로), 타이머는 글리프만
-ca59219 fix(hud): 컨테이너 시안 폭 + 클래식 중앙 게이지
-427e90e fix(hud): 기기 폴백 — shape()/cqw 미지원 시 캡슐·판 동일 렌더
-ce1a72f board: HUD 자산 킷 추가 — 틀 2 부품 4개 확정
-97dbbc0 fix(hud): 클래식 우상단 방울 2개(캐릭 큰·펫 작은) S6b 배치
-2e1fa09 feat(hud): 클래식 = 같은 베이스 4부품 (WIP: 방울 초상 겹침 조사중)
-b816b51 feat(hud): 판 1·2 조립 — 시안 실루엣 판 2장(모험)
-b96b941 feat(hud): 3·4 = 판 1 기준 재질(sky 변주)</pre>
+  <pre class="raw-output">88b71f2 refactor(tokens): rgb(46,20,58) 자두 잉크 삼중항 10곳 → var(--prim-ink-plum-rgb) 참조 통합(값 동일, 선언·폴백 블록 무접촉)
+4d9092c refactor(tokens): --duel- 계열 정규화 — 진영 재질 --mode-b-face-duel-*·역할색 --role-foe-*/--role-me-* 리프로 이름만 이관(값 신설 0), 도달 0 임시 파스텔·소비처 0 --duel-cap-* 은퇴, 19장 픽셀 diff 0
+b150771 ci(pages): Actions 빌드 배포 — strip-deploy 적용, 소스 불변
+172fd31 chore(build): 빌드 스탬프 갱신
+0d71b8b refactor(charsel): 화살표·아이템 슬롯 리터럴 → #charpanel 토큰 8개(값 무변) — 캐릭창 프레임 교체점 1/프레임, 픽셀 8장 diff 0
+1d4d773 chore(build): 빌드 스탬프 갱신
+c78f2d7 refactor(tokens): --wchip- 색 리프 → Mode B outline 붕괴 + 부품 리프(glow-bubble·outline-chip·glow-chip), 기하·α 무접촉
+c7f13a5 refactor(tokens): --gauge- 눈금 잉크 원시값 → --prim-ink-plum-rgb Primitive(α 변주 2, 값 신설 0)
+3d64bdd refactor(tokens): --cap- 계열 → --role-* 슬롯 붕괴(캡슐 역할색 8슬롯, blue/glass/tray/title 리프 이름만 이관, 값 신설 0, 브릿지 유지)
+0c7909c chore(build): 빌드 스탬프 갱신</pre>
 
   <h3 class="sub-title">미푸시 브랜치</h3>
   <div class="scroll-x"><table class="data-table">
   <thead><tr><th>브랜치</th><th>HEAD</th><th>upstream</th><th>상태</th><th>워크트리</th></tr></thead>
   <tbody>
-  <tr><td class="mono">main</td><td class="mono">fb7ead8</td><td class="mono">origin/main</td><td><span class="state state-partial">ahead 1</span></td><td class="mono">site\</td></tr>
-  <tr><td class="mono">wave/hudframes</td><td class="mono">9f31f97</td><td class="value-missing">없음</td><td><span class="state state-none">전혀 미푸시</span></td><td class="mono">wt\hudframes\</td></tr>
+  <tr><td class="mono">main</td><td class="mono">88b71f2</td><td class="mono">origin/main</td><td><span class="state state-ok">동기 (ahead 0)</span></td><td class="mono">site\</td></tr>
+  <tr><td class="mono">wave/btn-split</td><td class="mono">18b1e53</td><td class="value-missing">없음</td><td><span class="state state-none">전혀 미푸시</span></td><td class="mono">wt\btn-split\</td></tr>
   <tr><td class="mono">wave/hudgloss</td><td class="mono">bba3297</td><td class="value-missing">없음</td><td><span class="state state-none">전혀 미푸시</span></td><td class="mono">wt\hudgloss\</td></tr>
   <tr><td class="mono">worktree-agent-a3091d6d01a93614d</td><td class="mono">abac098</td><td class="value-missing">없음</td><td><span class="state state-none">전혀 미푸시</span></td><td class="mono">site\.claude\worktrees\</td></tr>
   </tbody></table></div>
-  <div class="source-note">HUD 화면 페이지의 조립 실캡처는 wave/hudframes(9f31f97, 프레임 재배선) 서빙본에서 찍음 — 배포본과 다름</div>
+  <div class="source-note">git -C site branch --no-merged main — 미병합 3 · 나머지 파도(wave/hudframes·wave/norm-*)는 main 병합 완료</div>
 
   <h2 class="section-title">5. 실기기 캡처 상태</h2>
   <div class="scroll-x"><table class="data-table">
   <thead><tr><th>항목</th><th>상태</th><th>근거</th></tr></thead>
   <tbody>
   <tr><td>물리 단말 캡처</td><td><span class="state state-none">없음</span></td><td>galaxy/iphone/adb/screencap 캡처 파일 0</td></tr>
-  <tr><td>헤드리스 뷰포트 렌더</td><td><span class="state state-partial">있음</span></td><td>.cap-ledger.json — 390×844 dpr3, entry /index.html, freeze false</td></tr>
+  <tr><td>헤드리스 뷰포트 렌더</td><td><span class="state state-partial">있음</span></td><td>scratchpad\s6shots-0908 — 프로필 3(android·iphone 390×844 dpr3 · pc-1280) × 화면 6 + 폴백, console error 0</td></tr>
   <tr><td>최신 evidence 수정일</td><td class="mono">2026-09-06</td><td>wt\hudframes\evidence-14 · wt\hudgloss\evidence-14</td></tr>
   </tbody></table></div>
   <div class="scroll-x"><table class="data-table"><caption>evidence 폴더 목록 (전부 헤드리스 렌더)</caption>
@@ -139,7 +304,31 @@ b96b941 feat(hud): 3·4 = 판 1 기준 재질(sky 변주)</pre>
   </tbody></table></div>
   <div class="source-note">정본 §5 S6 는 실기기 캡처를 관문 항목으로 요구한다 — 현재 미충족(🔴)</div>
 
-  <h2 class="section-title">6. 판정판 · 산출 링크</h2>
+  <h2 class="section-title">6. 출시 상태 (Lighthouse · 체크리스트)</h2>
+  <div class="source-note">scratchpad\release-0908\lighthouse.live2.json · Lighthouse 13.4.1 · form-factor mobile · throttling simulate · 대상 = 배포본 https://ghkd70408040-wq.github.io/game-factory-site/tentwin.html · 2026-09-08 04:17</div>
+  <div class="scroll-x"><table class="data-table"><caption>Lighthouse mobile — 배포본</caption>
+  <thead><tr><th>지표</th><th class="num">값</th><th>판정</th></tr></thead>
+  <tbody>
+  <tr><td>performance</td><td class="num">36</td><td><span class="state state-none">FAIL</span></td></tr>
+  <tr><td>FCP</td><td class="num">8.2 s</td><td><span class="state state-none">score 0</span></td></tr>
+  <tr><td>LCP</td><td class="num">9.5 s</td><td><span class="state state-none">score 0</span></td></tr>
+  <tr><td>TBT</td><td class="num">870 ms</td><td><span class="state state-partial">score 0.33</span></td></tr>
+  <tr><td>CLS</td><td class="num">0.056</td><td><span class="state state-ok">score 0.98</span></td></tr>
+  </tbody></table></div>
+  <div class="source-note">로컬 무압축 소스 기준 perf 30(RELEASE-CHECKLIST 14행) → Actions 빌드 배포본 perf 36</div>
+
+  <div class="scroll-x"><table class="data-table"><caption>출시 체크리스트 집계 (17항목)</caption>
+  <thead><tr><th>구분</th><th class="num">수</th><th>내역</th></tr></thead>
+  <tbody>
+  <tr><td>PASS</td><td class="num">14</td><td>저장 마이그레이션 wave/storage 병합 대기 포함</td></tr>
+  <tr><td>FAIL</td><td class="num">1</td><td>성능(14행) — wave/perf 별 파도</td></tr>
+  <tr><td>권고</td><td class="num">0</td><td>—</td></tr>
+  <tr><td>미도장</td><td class="num">1</td><td>사용자 최종 도장(17행)</td></tr>
+  <tr><td>판정 대기 부속</td><td class="num">2</td><td>아이콘 · OG 조립본</td></tr>
+  </tbody></table></div>
+  <div class="source-note">RELEASE-CHECKLIST.md 집계 행 · 도장은 사용자만</div>
+
+  <h2 class="section-title">7. 판정판 · 산출 링크</h2>
   <div class="scroll-x"><table class="data-table">
   <thead><tr><th>산출</th><th>경로</th><th class="num">크기</th><th>수정</th></tr></thead>
   <tbody>
@@ -151,12 +340,12 @@ b96b941 feat(hud): 3·4 = 판 1 기준 재질(sky 변주)</pre>
   </tbody></table></div>
   <div class="source-note">판정판 링크는 로컬 경로 기준 — 배포본에는 포함되지 않음</div>
 
-  <h2 class="section-title">7. S7 승인 대기</h2>
+  <h2 class="section-title">8. S7 승인 대기</h2>
   <div class="scroll-x"><table class="data-table">
   <thead><tr><th>대상</th><th>상태</th><th>다음</th></tr></thead>
   <tbody>
   <tr><td>재질 시험판 (Shape 4 × 크기 3 × Mode A·B)</td><td><span class="state state-partial">승인 대기</span></td><td><a href="factory.html#bench">공장 → 재질 시험판</a></td></tr>
-  <tr><td>HUD 프레임 재배선 (wave/hudframes)</td><td><span class="state state-partial">미푸시</span></td><td>main 병합 승인</td></tr>
+  <tr><td>그림 버튼 분해 (wave/btn-split)</td><td><span class="state state-partial">미푸시</span></td><td>main 병합 승인</td></tr>
   <tr><td>실기기 캡처</td><td><span class="state state-none">없음</span></td><td>S6 관문 미충족</td></tr>
   <tr><td>위반 프레임 120</td><td><span class="state state-none">미해결</span></td><td>배율 중복 28 정리 + 재발주 4종</td></tr>
   </tbody></table></div>
