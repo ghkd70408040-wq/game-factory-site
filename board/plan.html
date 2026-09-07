@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="ko"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>기획실 · 게임 공장</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="board.css">
+</head><body>
+<nav class="site-nav">
+<span class="nav-brand">🏭 게임 공장</span>
+<a href="index.html">홈</a>
+<a href="plan.html" class="is-current">기획실</a>
+<span class="nav-sep"></span>
+<a href="screen-hud.html">HUD</a>
+<a href="screen-modal.html">모달</a>
+<a href="screen-charsel.html">캐릭창</a>
+<a href="screen-map.html">지도</a>
+<span class="nav-sep"></span>
+<a href="warehouse.html">창고</a>
+<a href="factory.html">공장</a>
+<a href="gate.html">관문실</a>
+</nav>
+<div class="page">
+<h1 class="page-title">기획실 — S0 기획 · S2 시안 접수</h1>
+<div class="page-meta">정본 §5 S0 산출 4종(기획서 · 화면 흐름도 · 시스템/능력치 표 · 화면별 요구 요소 표) + S2 시안 등록부 · 기존 문서 전사</div>
+<div class="focus-line"><b>초점</b>기획 산출 4종이 한 장에 표로 서 있는가 · 시안 등재는 사용자가 "시안"이라 선언한 것만<span class="src">MASTER-PLAN.md · tentwin/DESIGN.md · GAME-CONTENT.md · SIAN-REGISTRY.md</span></div>
+<h2 class="section-title">1. 기획서 요약</h2>
+<div class="scroll-x"><table class="data-table">
+<caption>장르 · 세계관</caption>
+<thead><tr><th>라벨</th><th>값</th><th>출처</th></tr></thead><tbody>
+<tr><td>1호 장르</td><td>숫자 짝 맞추기 퍼즐 (Number Match 벤치마크)</td><td><span class="mono">DESIGN.md</span></td></tr>
+<tr><td>세계관</td><td>젤리팡 세계 「젤리공주 구출 대작전」 — 텐텐/트윈 왕자(규칙 의인화)·보스전</td><td><span class="mono">MASTER-PLAN.md 개정이력(v4)</span></td></tr>
+</tbody></table></div>
+<div class="scroll-x"><table class="data-table">
+<caption>코어 루프</caption>
+<thead><tr><th>단계</th><th>내용</th><th>출처</th></tr></thead><tbody>
+<tr><td class="num"><b>1</b></td><td>9열 보드에 숫자 1~9가 행 우선으로 채워짐</td><td><span class="mono">DESIGN.md §1</span></td></tr>
+<tr><td class="num"><b>2</b></td><td>두 셀이 같은 숫자이거나 합이 10이면 매치 조건 성립</td><td><span class="mono">DESIGN.md §1</span></td></tr>
+<tr><td class="num"><b>3</b></td><td>가로/세로/대각선 일직선 또는 읽기순서 연속(사이에 살아있는 셀 없음)이면 연결</td><td><span class="mono">DESIGN.md §1</span></td></tr>
+<tr><td class="num"><b>4</b></td><td>매치 성공 → 두 셀 소거(crossed), 한 행 전체 소거 시 행 붕괴</td><td><span class="mono">DESIGN.md §1</span></td></tr>
+<tr><td class="num"><b>5</b></td><td>Add(+) 버튼으로 남은 숫자를 보드 꼬리에 복제 추가(횟수 제한)</td><td><span class="mono">DESIGN.md §1</span></td></tr>
+<tr><td class="num"><b>6</b></td><td>보드 전부 소거 → 다음 스테이지(시드 난이도 상승). 막힘+Add 소진 → 게임오버</td><td><span class="mono">DESIGN.md §1</span></td></tr>
+<tr><td class="num"><b>콤보</b></td><td>5초 내 연속 매치 시 배수 x2~x8, 콤보 x4 도달 시 10초 피버(점수 2배)</td><td><span class="mono">DESIGN.md §2·§9-FUN B</span></td></tr>
+</tbody></table></div>
+<div class="scroll-x"><table class="data-table">
+<caption>게임 모드</caption>
+<thead><tr><th>모드명</th><th>규칙</th><th>출처</th></tr></thead><tbody>
+<tr><td><b>Endless</b></td><td>스테이지 무한 진행, 시드 난이도 상승</td><td><span class="mono">DESIGN.md §5</span></td></tr>
+<tr><td><b>Daily</b></td><td>하루 1퍼즐, 고정 시드(YYYYMMDD), Add 3회 고정, 특수타일 없음(전세계 동일)</td><td><span class="mono">DESIGN.md §5·§9-FUN F</span></td></tr>
+<tr><td><b>타임 러시(Time Rush)</b></td><td>90초 카운트다운, 매치마다 +2초, 특수타일 확률 2배, Add 무제한(쿨다운 8초)</td><td><span class="mono">DESIGN.md §9-FUN D</span></td></tr>
+<tr><td><b>어드벤처(Adventure)</b></td><td>100탄/10챕터 스토리 전투 — 캐릭터·펫·보스·각성 게이지가 붙는 전용 모드</td><td><span class="mono">GAME-CONTENT.md §5 · PET-SYSTEM.md</span></td></tr>
+<tr><td><b>클래식(Classic)</b></td><td>순수 규칙 판(캐릭터 패시브 오프) — classic-daily는 완전 순수</td><td><span class="mono">DESIGN-ITEMS.md · PET-SYSTEM.md §6.3</span></td></tr>
+</tbody></table></div>
+<div class="scroll-x"><table class="data-table">
+<caption>수익 모델</caption>
+<thead><tr><th>단계</th><th>값</th><th>출처</th></tr></thead><tbody>
+<tr><td>1단계(현행)</td><td>itch.io·GitHub Pages 무료 배포 — 과금 0·광고 0. 목적은 노출·검증·피드백</td><td><span class="mono">MASTER-PLAN.md §3-B</span></td></tr>
+<tr><td>2단계</td><td>앱(구글 플레이→앱스토어) 애니팡류 보편 모델 — 보석·게임 토큰·별 모으기, 하트 리필·스킨·광고 제거 IAP + AdMob</td><td><span class="mono">MASTER-PLAN.md §3-B</span></td></tr>
+<tr><td>포털 광고 분배</td><td>CrazyGames 광고 60%·IAP 70% / Poki (포털 제출 시 상업적 이용 = 법무 분기 재통과 필요)</td><td><span class="mono">MASTER-PLAN.md §3·부록</span></td></tr>
+<tr><td>추가 축</td><td>사용권(라이선스) 반복 판매 / 코스메틱(스킨·아이템) — 웹은 별(★) 무료화폐, 앱은 실화폐 전환</td><td><span class="mono">MASTER-PLAN.md §3·개정이력 2026-08-11</span></td></tr>
+</tbody></table></div>
+<div class="scroll-x"><table class="data-table">
+<caption>타깃</caption>
+<thead><tr><th>라벨</th><th>값</th><th>출처</th></tr></thead><tbody>
+<tr><td>제출 경로</td><td>CrazyGames 셀프 제출 → Poki Playtest</td><td><span class="mono">DESIGN.md 상단</span></td></tr>
+<tr><td>UI 언어</td><td>영어 UI(i18n ko/en 대칭)</td><td><span class="mono">DESIGN.md 상단</span></td></tr>
+<tr><td>기기</td><td>모바일 세로 우선 + 데스크톱 대응</td><td><span class="mono">DESIGN.md 상단</span></td></tr>
+<tr><td>유저상</td><td>한국 캐주얼 기준 — 쨍한 색감·시간 압박·N탄 진행감·하트/랭킹 경쟁</td><td><span class="mono">MASTER-PLAN.md 부록</span></td></tr>
+</tbody></table></div>
+<div class="scroll-x"><table class="data-table">
+<caption>플랫폼 · 기술 스택</caption>
+<thead><tr><th>라벨</th><th>값</th><th>출처</th></tr></thead><tbody>
+<tr><td>구조</td><td>순수 HTML/CSS/JS 단일 페이지</td><td><span class="mono">DESIGN.md 상단</span></td></tr>
+<tr><td>외부 리소스</td><td>0 — 폰트·이미지·오디오 전부 인라인/생성</td><td><span class="mono">DESIGN.md 상단</span></td></tr>
+<tr><td>사운드</td><td>WebAudio 오실레이터/노이즈 신스로 전량 생성(외부 파일 0)</td><td><span class="mono">DESIGN.md §3</span></td></tr>
+<tr><td>저장</td><td>localStorage(이어하기·별·스킨·하트) — try/catch + 인메모리 폴백(private-mode safe)</td><td><span class="mono">DESIGN.md 상단 · MASTER-PLAN.md 저장 로드맵</span></td></tr>
+<tr><td>렌더링</td><td>60fps 필수 — 파티클 단일 canvas 오버레이 + 오브젝트 풀링, CSS transform/opacity만, rAF 단일 루프</td><td><span class="mono">DESIGN.md §3</span></td></tr>
+</tbody></table></div>
+<h2 class="section-title">2. 화면 흐름도</h2>
+<div class="source-note">화면 목록·화면간 이동의 실제 정본은 site/tentwin.html 의 ?screen= 훅(SEQ 객체, L57142~)이다. UI-INVENTORY.md 는 화면 흐름도가 아니라 UI 에셋 재고 목록이라 화면 흐름 표가 없음.</div>
+<div class="flow-diagram"><svg viewBox="0 0 900 480" role="img" aria-label="화면 흐름도"><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#7fb2ff"/></marker><marker id="ahb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8a8aa0"/></marker></defs><path d="M164.0,187.0 C194.0,187.0 150.0,57.0 180.0,57.0" fill="none" stroke="#7fb2ff" stroke-width="1.4"  marker-end="url(#ah)"/><path d="M164.0,187.0 C194.0,187.0 150.0,127.0 180.0,127.0" fill="none" stroke="#7fb2ff" stroke-width="1.4"  marker-end="url(#ah)"/><path d="M164.0,187.0 C194.0,187.0 150.0,197.0 180.0,197.0" fill="none" stroke="#7fb2ff" stroke-width="1.4"  marker-end="url(#ah)"/><path d="M164.0,187.0 C194.0,187.0 150.0,317.0 180.0,317.0" fill="none" stroke="#7fb2ff" stroke-width="1.4"  marker-end="url(#ah)"/><path d="M330.0,127.0 C360.0,127.0 316.0,117.0 346.0,117.0" fill="none" stroke="#7fb2ff" stroke-width="1.4"  marker-end="url(#ah)"/><path d="M330.0,197.0 C360.0,197.0 316.0,169.0 346.0,169.0" fill="none" stroke="#7fb2ff" stroke-width="1.4"  marker-end="url(#ah)"/><path d="M330.0,197.0 C360.0,197.0 316.0,221.0 346.0,221.0" fill="none" stroke="#7fb2ff" stroke-width="1.4"  marker-end="url(#ah)"/><path d="M330.0,317.0 C360.0,317.0 316.0,317.0 346.0,317.0" fill="none" stroke="#7fb2ff" stroke-width="1.4"  marker-end="url(#ah)"/><path d="M496.0,317.0 C526.0,317.0 482.0,317.0 512.0,317.0" fill="none" stroke="#7fb2ff" stroke-width="1.4"  marker-end="url(#ah)"/><path d="M662.0,317.0 C692.0,317.0 648.0,255.0 678.0,255.0" fill="none" stroke="#7fb2ff" stroke-width="1.4"  marker-end="url(#ah)"/><path d="M662.0,317.0 C692.0,317.0 648.0,317.0 678.0,317.0" fill="none" stroke="#7fb2ff" stroke-width="1.4"  marker-end="url(#ah)"/><path d="M662.0,317.0 C692.0,317.0 648.0,379.0 678.0,379.0" fill="none" stroke="#7fb2ff" stroke-width="1.4"  marker-end="url(#ah)"/><path d="M164.0,417.0 C194.0,417.0 150.0,317.0 180.0,317.0" fill="none" stroke="#7fb2ff" stroke-width="1.4"  marker-end="url(#ah)"/><path d="M180,57 C150,57 150,317 180,317" fill="none" stroke="#7fb2ff" stroke-width="1.4" marker-end="url(#ah)"/><path d="M753,334 L753,448 L255,448 L255,334" fill="none" stroke="#8a8aa0" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#ahb)"/><path d="M753,396 L800,396 L800,466 L235,466 L235,334" fill="none" stroke="#8a8aa0" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#ahb)"/><text x="452" y="443" fill="#8a8aa0" font-size="10">clear → map</text><text x="452" y="478" fill="#8a8aa0" font-size="10">over → map</text><rect x="14" y="170" width="150" height="34" rx="8" fill="#1f2a22" stroke="#3d5c48"/><text x="23" y="185" fill="#e9e9f0" font-size="11.5" font-weight="700">메인 메뉴</text><text x="23" y="197" fill="#8f8fa4" font-size="9.5" font-family="Consolas,monospace">?screen=menu</text><rect x="14" y="400" width="150" height="34" rx="8" fill="#1f2a22" stroke="#3d5c48"/><text x="23" y="415" fill="#e9e9f0" font-size="11.5" font-weight="700">스토리 컷 뷰어</text><text x="23" y="427" fill="#8f8fa4" font-size="9.5" font-family="Consolas,monospace">?screen=story</text><rect x="180" y="40" width="150" height="34" rx="8" fill="#242a36" stroke="#4a5570"/><text x="189" y="55" fill="#e9e9f0" font-size="11.5" font-weight="700">플레이(모드 선택) 모달</text><text x="189" y="67" fill="#8f8fa4" font-size="9.5" font-family="Consolas,monospace">?screen=play</text><rect x="180" y="110" width="150" height="34" rx="8" fill="#1f2a22" stroke="#3d5c48"/><text x="189" y="125" fill="#e9e9f0" font-size="11.5" font-weight="700">캐릭터 선택창</text><text x="189" y="137" fill="#8f8fa4" font-size="9.5" font-family="Consolas,monospace">?screen=character</text><rect x="180" y="180" width="150" height="34" rx="8" fill="#242a36" stroke="#4a5570"/><text x="189" y="195" fill="#e9e9f0" font-size="11.5" font-weight="700">설정 모달</text><text x="189" y="207" fill="#8f8fa4" font-size="9.5" font-family="Consolas,monospace">?screen=settings</text><rect x="180" y="300" width="150" height="34" rx="8" fill="#1f2a22" stroke="#3d5c48"/><text x="189" y="315" fill="#e9e9f0" font-size="11.5" font-weight="700">스테이지 맵</text><text x="189" y="327" fill="#8f8fa4" font-size="9.5" font-family="Consolas,monospace">?screen=map</text><rect x="346" y="100" width="150" height="34" rx="8" fill="#242a36" stroke="#4a5570"/><text x="355" y="115" fill="#e9e9f0" font-size="11.5" font-weight="700">스킨 모달</text><text x="355" y="127" fill="#8f8fa4" font-size="9.5" font-family="Consolas,monospace">?screen=skin</text><rect x="346" y="152" width="150" height="34" rx="8" fill="#242a36" stroke="#4a5570"/><text x="355" y="167" fill="#e9e9f0" font-size="11.5" font-weight="700">기록·랭킹 모달</text><text x="355" y="179" fill="#8f8fa4" font-size="9.5" font-family="Consolas,monospace">?screen=records</text><rect x="346" y="204" width="150" height="34" rx="8" fill="#242a36" stroke="#4a5570"/><text x="355" y="219" fill="#e9e9f0" font-size="11.5" font-weight="700">게임 방법 모달</text><text x="355" y="231" fill="#8f8fa4" font-size="9.5" font-family="Consolas,monospace">?screen=howto</text><rect x="346" y="300" width="150" height="34" rx="8" fill="#242a36" stroke="#4a5570"/><text x="355" y="315" fill="#e9e9f0" font-size="11.5" font-weight="700">노드(스테이지 정보) 카드</text><text x="355" y="327" fill="#8f8fa4" font-size="9.5" font-family="Consolas,monospace">?screen=stageinfo</text><rect x="512" y="300" width="150" height="34" rx="8" fill="#1f2a22" stroke="#3d5c48"/><text x="521" y="315" fill="#e9e9f0" font-size="11.5" font-weight="700">인게임(전투·보드)</text><text x="521" y="327" fill="#8f8fa4" font-size="9.5" font-family="Consolas,monospace">?screen=game</text><rect x="678" y="238" width="150" height="34" rx="8" fill="#242a36" stroke="#4a5570"/><text x="687" y="253" fill="#e9e9f0" font-size="11.5" font-weight="700">일시정지 모달</text><text x="687" y="265" fill="#8f8fa4" font-size="9.5" font-family="Consolas,monospace">?screen=pause</text><rect x="678" y="300" width="150" height="34" rx="8" fill="#242a36" stroke="#4a5570"/><text x="687" y="315" fill="#e9e9f0" font-size="11.5" font-weight="700">스테이지 클리어 모달</text><text x="687" y="327" fill="#8f8fa4" font-size="9.5" font-family="Consolas,monospace">?screen=clear</text><rect x="678" y="362" width="150" height="34" rx="8" fill="#242a36" stroke="#4a5570"/><text x="687" y="377" fill="#e9e9f0" font-size="11.5" font-weight="700">게임 오버 모달</text><text x="687" y="389" fill="#8f8fa4" font-size="9.5" font-family="Consolas,monospace">?screen=over</text><rect x="14" y="20" width="12" height="12" rx="3" fill="#1f2a22" stroke="#3d5c48"/><text x="32" y="30" fill="#a6a6b6" font-size="10">화면</text><rect x="70" y="20" width="12" height="12" rx="3" fill="#242a36" stroke="#4a5570"/><text x="88" y="30" fill="#a6a6b6" font-size="10">모달</text></svg></div>
+<div class="scroll-x"><table class="data-table">
+<caption>화면 목록 (?screen= 훅 14)</caption>
+<thead><tr><th>훅</th><th>화면명</th><th>종류</th><th>타깃 요소</th><th>진입</th><th>나감</th></tr></thead><tbody>
+<tr><td><span class="mono">menu</span></td><td><b>메인 메뉴</b></td><td>화면</td><td><span class="mono">#screen-menu</span></td><td>앱 시작(스플래시 통과·튜토리얼 종료 후)</td><td>play / character / settings / map(openMap)</td></tr>
+<tr><td><span class="mono">play</span></td><td><b>플레이(모드 선택) 모달</b></td><td>모달</td><td><span class="mono">#modal-mode (btn-play)</span></td><td>menu 의 #btn-play</td><td>map / game (모드 선택)</td></tr>
+<tr><td><span class="mono">character</span></td><td><b>캐릭터 선택창</b></td><td>화면/패널</td><td><span class="mono">#charpanel (char-open)</span></td><td>menu 의 #char-open</td><td>skin (cp-skin)</td></tr>
+<tr><td><span class="mono">skin</span></td><td><b>스킨 모달</b></td><td>모달</td><td><span class="mono">#modal-skin (cp-skin)</span></td><td>charpanel 의 #cp-skin</td><td>charpanel</td></tr>
+<tr><td><span class="mono">settings</span></td><td><b>설정 모달</b></td><td>모달</td><td><span class="mono">#modal-settings (btn-settings)</span></td><td>menu 의 #btn-settings</td><td>records / howto</td></tr>
+<tr><td><span class="mono">records</span></td><td><b>기록·랭킹 모달</b></td><td>모달</td><td><span class="mono">#modal-rank (st-rank)</span></td><td>settings 의 #st-rank</td><td>settings</td></tr>
+<tr><td><span class="mono">howto</span></td><td><b>게임 방법 모달</b></td><td>모달</td><td><span class="mono">#modal-howto (st-howto)</span></td><td>settings 의 #st-howto</td><td>settings</td></tr>
+<tr><td><span class="mono">story</span></td><td><b>스토리 컷 뷰어</b></td><td>화면</td><td><span class="mono">#screen-story (playCuts)</span></td><td>playCuts(CUTS_OPEN) 재생</td><td>map</td></tr>
+<tr><td><span class="mono">map</span></td><td><b>스테이지 맵</b></td><td>화면</td><td><span class="mono">#screen-map (openMap)</span></td><td>menu/play → openMap</td><td>stageinfo (map-cur)</td></tr>
+<tr><td><span class="mono">stageinfo</span></td><td><b>노드(스테이지 정보) 카드</b></td><td>모달</td><td><span class="mono">#modal-node (map-cur / openNodeCard)</span></td><td>map 의 #map-cur</td><td>game (node-go)</td></tr>
+<tr><td><span class="mono">game</span></td><td><b>인게임(전투·보드)</b></td><td>화면</td><td><span class="mono">#screen-game (node-go)</span></td><td>stageinfo 의 #node-go</td><td>pause / clear / over</td></tr>
+<tr><td><span class="mono">pause</span></td><td><b>일시정지 모달</b></td><td>모달</td><td><span class="mono">#modal-pause (btn-pause)</span></td><td>game 의 #btn-pause</td><td>game (재개)</td></tr>
+<tr><td><span class="mono">clear</span></td><td><b>스테이지 클리어 모달</b></td><td>모달</td><td><span class="mono">#modal-adv (onStageClear)</span></td><td>game 의 onStageClear</td><td>map (다음 노드)</td></tr>
+<tr><td><span class="mono">over</span></td><td><b>게임 오버 모달</b></td><td>모달</td><td><span class="mono">#modal-adv (onGameOver)</span></td><td>game 의 onGameOver</td><td>map / game(리트라이·이어하기)</td></tr>
+</tbody></table></div>
+<div class="scroll-x"><table class="data-table">
+<caption>화면 간 이동</caption>
+<thead><tr><th>from</th><th>→</th><th>to</th><th>경유</th></tr></thead><tbody>
+<tr><td><span class="mono">menu</span></td><td>→</td><td><span class="mono">play</span></td><td><span class="mono">#btn-play → modal-mode</span></td></tr>
+<tr><td><span class="mono">menu</span></td><td>→</td><td><span class="mono">character</span></td><td><span class="mono">#char-open → charpanel</span></td></tr>
+<tr><td><span class="mono">menu</span></td><td>→</td><td><span class="mono">settings</span></td><td><span class="mono">#btn-settings → modal-settings</span></td></tr>
+<tr><td><span class="mono">menu</span></td><td>→</td><td><span class="mono">map</span></td><td><span class="mono">openMap()</span></td></tr>
+<tr><td><span class="mono">play</span></td><td>→</td><td><span class="mono">map</span></td><td><span class="mono">모드 선택 후</span></td></tr>
+<tr><td><span class="mono">character</span></td><td>→</td><td><span class="mono">skin</span></td><td><span class="mono">#cp-skin → modal-skin</span></td></tr>
+<tr><td><span class="mono">settings</span></td><td>→</td><td><span class="mono">records</span></td><td><span class="mono">#st-rank → modal-rank</span></td></tr>
+<tr><td><span class="mono">settings</span></td><td>→</td><td><span class="mono">howto</span></td><td><span class="mono">#st-howto → modal-howto</span></td></tr>
+<tr><td><span class="mono">story</span></td><td>→</td><td><span class="mono">map</span></td><td><span class="mono">컷 재생 종료</span></td></tr>
+<tr><td><span class="mono">map</span></td><td>→</td><td><span class="mono">stageinfo</span></td><td><span class="mono">#map-cur → modal-node</span></td></tr>
+<tr><td><span class="mono">stageinfo</span></td><td>→</td><td><span class="mono">game</span></td><td><span class="mono">#node-go → screen-game</span></td></tr>
+<tr><td><span class="mono">game</span></td><td>→</td><td><span class="mono">pause</span></td><td><span class="mono">#btn-pause → modal-pause</span></td></tr>
+<tr><td><span class="mono">game</span></td><td>→</td><td><span class="mono">clear</span></td><td><span class="mono">onStageClear() → modal-adv</span></td></tr>
+<tr><td><span class="mono">game</span></td><td>→</td><td><span class="mono">over</span></td><td><span class="mono">onGameOver() → modal-adv</span></td></tr>
+<tr><td><span class="mono">clear</span></td><td>→</td><td><span class="mono">map</span></td><td><span class="mono">다음 노드로 복귀</span></td></tr>
+<tr><td><span class="mono">over</span></td><td>→</td><td><span class="mono">map</span></td><td><span class="mono">메뉴/맵 복귀</span></td></tr>
+</tbody></table></div>
+<h2 class="section-title">3. 시스템 · 능력치</h2>
+<div class="source-note">PET-SYSTEM.md §16-B(9역할 9펫 + 10번째 예약). 성장 수치는 DESIGN-PET-GROWTH.md.</div>
+<div class="scroll-x"><table class="data-table">
+<caption>능력치 축</caption>
+<thead><tr><th>스탯</th><th>영향</th><th>체감</th></tr></thead><tbody>
+<tr><td><b>폭발력(Power)</b></td><td>한 방 점수·데미지 배율(콤보 티어 점수 보너스)</td><td>큰 거 한 방</td></tr>
+<tr><td><b>꾸준함(Steady)</b></td><td>시간당 안정 획득·피해 감소</td><td>안 죽는다</td></tr>
+<tr><td><b>순발력(Agility)</b></td><td>게이지 적립 속도·쿨다운</td><td>기관총 상태 진입이 빠름</td></tr>
+<tr><td><b>행운(Luck)</b></td><td>특수 타일·좋은 배치 확률</td><td>판이 잘 풀린다</td></tr>
+</tbody></table></div>
+<div class="scroll-x"><table class="data-table">
+<caption>펫 로스터</caption>
+<thead><tr><th>id</th><th>이름</th><th>역할</th><th>편중</th><th>액티브</th><th>파워 등급</th><th>실장</th></tr></thead><tbody>
+<tr><td><span class="mono">ppyak</span></td><td><b>뽀약/삐약(병아리)</b></td><td>시간</td><td>꾸준함</td><td>타임스톱</td><td>강(충전 2×)</td><td>17차 1차</td></tr>
+<tr><td><span class="mono">mungchi</span></td><td><b>뭉치(구름)</b></td><td>확정</td><td>폭발력</td><td>확정 터트리기 5(유효쌍 확정팝)</td><td>강(충전 2×)</td><td>17차 1차</td></tr>
+<tr><td><span class="mono">mukmul</span></td><td><b>먹물 문어</b></td><td>변환</td><td>폭발력</td><td>리페인트(숫자값 변경)</td><td>강(충전 2×)</td><td>17차 1차</td></tr>
+<tr><td><span class="mono">ttorok</span></td><td><b>또록이(가칭)</b></td><td>기억/복원</td><td>순발력</td><td>쾅셔플·바꿔치기 직후 3초 복원(평시 힌트 1회)</td><td>중</td><td>18차 2차</td></tr>
+<tr><td><span class="mono">bangul</span></td><td><b>방울이(가칭)</b></td><td>정화/시야</td><td>순발력</td><td>거품 파도(끈끈이·먹구름 정화)</td><td>중</td><td>18차 2차</td></tr>
+<tr><td><span class="mono">kkultteok</span></td><td><b>꿀떡벌(가칭)</b></td><td>행운/경제</td><td>행운</td><td>황금 열매 1개 소환(점수+게이지+별 조각)</td><td>소~중</td><td>17차 1차</td></tr>
+<tr><td><span class="mono">ttakji</span></td><td><b>딱지(가칭)</b></td><td>방어</td><td>꾸준함</td><td>5초 방어막(기믹·대전공격 1회 무효)</td><td>중(대전축)</td><td>18차 2차</td></tr>
+<tr><td><span class="mono">mukmul-b</span></td><td><b>자매펫(파랑 먹물)</b></td><td>합10 변환</td><td>폭발력</td><td>합10 리페인트(텐텐 대칭)</td><td>강(충전 2×)</td><td>균형 예약</td></tr>
+<tr><td><span class="mono">banjjak</span></td><td><b>반짝이(가칭)</b></td><td>점화/승격</td><td>폭발력(또는 행운)</td><td>빛 점화(일반 열매 → 빛나는 열매 등급 승격)</td><td>강(충전 2×)</td><td>17차 검토/기본 18차</td></tr>
+<tr><td><span class="mono">(미배정)</span></td><td><b>자유 연결 트리거 펫(10번째 예약)</b></td><td>길 트기/기하 완화</td><td>순발력 또는 행운(권고)</td><td>자유 연결(connFree 창 즉발)</td><td>강(충전 2×)</td><td>엔진 14차 / 펫 트리거 UI 17차</td></tr>
+</tbody></table></div>
+<div class="scroll-x"><table class="data-table">
+<caption>펫 핵심 수치</caption>
+<thead><tr><th>라벨</th><th>값</th><th>출처</th></tr></thead><tbody>
+<tr><td>파워 예산</td><td>액티브 1회 기대가치 ≤ 판 평균 점수의 8~12% (강계열은 충전 비용 2배)</td><td><span class="mono">PET-SYSTEM.md §16-B</span></td></tr>
+<tr><td>판당 사용</td><td>DUEL_PET_MAX=2 (펫과일로 MK_PET_CAP=4까지)</td><td><span class="mono">DESIGN-PET-GROWTH.md §0</span></td></tr>
+<tr><td>파편 통화</td><td>store.shards{power,steady,agility,luck} 4색</td><td><span class="mono">DESIGN-PET-GROWTH.md §0</span></td></tr>
+<tr><td>펫 해금</td><td>PET_SHARD_NEED=300 누적 획득 자동해금(차감 없음)</td><td><span class="mono">DESIGN-PET-GROWTH.md §0</span></td></tr>
+<tr><td>적용 범위</td><td>펫 스킬 = 배틀(어드벤처) 전용 — 데일리·클래식엔 lv 성장 미도달</td><td><span class="mono">DESIGN-PET-GROWTH.md §0</span></td></tr>
+</tbody></table></div>
+<div class="source-note">DESIGN-PET-GROWTH.md (경로 A 채택 — 무너프·헤드룸만)</div>
+<div class="scroll-x"><table class="data-table">
+<caption>성장 클램프 · 저장 스키마</caption>
+<thead><tr><th>라벨</th><th>값</th></tr></thead><tbody>
+<tr><td>PET_LV_MAX</td><td><span class="mono">20</span></td></tr>
+<tr><td>PET_EVO_MAX</td><td><span class="mono">3 (evo 0→1만 설계, evo 2·3은 스키마 예약)</span></td></tr>
+<tr><td>store.pets=[{id,lv,evo}]</td><td><span class="mono">petsVer=2 (makePetEntry 기본 lv1)</span></td></tr>
+</tbody></table></div>
+<div class="scroll-x"><table class="data-table">
+<caption>레벨 곡선 (lv1 → lv20)</caption>
+<thead><tr><th>펫</th><th>lv1</th><th>lv20</th><th>곡선</th><th>상태</th></tr></thead><tbody>
+<tr><td><b>몽글</b></td><td class="num"><span class="mono">4000ms</span></td><td class="num"><span class="mono">6000ms</span></td><td>+≈105ms/lv</td><td>★성장(승인)</td></tr>
+<tr><td><b>반짝</b></td><td class="num"><span class="mono">40%p</span></td><td class="num"><span class="mono">48%p</span></td><td>+≈0.42pp/lv</td><td>★성장(승인)</td></tr>
+<tr><td><b>먹물</b></td><td class="num"><span class="mono">5칸</span></td><td class="num"><span class="mono">6칸(lv14→6)</span></td><td>1스텝</td><td>○판정 보류(심 결함 재스윕)</td></tr>
+<tr><td><b>추릅</b></td><td class="num"><span class="mono">1행</span></td><td class="num"><span class="mono">2행(lv20→2)</span></td><td>1스텝</td><td>○판정 보류</td></tr>
+<tr><td><b>꿀떡</b></td><td class="num"><span class="mono">2개</span></td><td class="num"><span class="mono">2개(3개 철회)</span></td><td>평탄(완성★)</td><td>base 압도 1위 → 곡선 평탄</td></tr>
+<tr><td><b>방울</b></td><td class="num"><span class="mono">2개</span></td><td class="num"><span class="mono">3개(lv16→3)</span></td><td>1스텝</td><td>측정 미성립·보류</td></tr>
+<tr><td><b>삐약</b></td><td class="num"><span class="mono">8000ms</span></td><td class="num"><span class="mono">9000ms(추정)</span></td><td>+≈53ms/lv</td><td>△준평탄·보류</td></tr>
+<tr><td><b>뭉치·째깍·썩싹</b></td><td class="num"><span class="mono">천장</span></td><td class="num"><span class="mono">천장</span></td><td>평탄</td><td>✕완성★ 표기</td></tr>
+</tbody></table></div>
+<div class="scroll-x"><table class="data-table">
+<caption>경험치 · 파편 경제</caption>
+<thead><tr><th>라벨</th><th>값</th><th>출처</th></tr></thead><tbody>
+<tr><td>만렙 목표</td><td>1펫 만렙 ≈ 60~80판 (권고안 B: 색 잠금 해제·만렙 총비용 240~320)</td><td><span class="mono">DESIGN-PET-GROWTH.md 3차판정</span></td></tr>
+<tr><td>파편 획득</td><td>보드 스폰→수확, SHARD_RATE=0.10, MK_SHARD_MAX=2</td><td><span class="mono">DESIGN-PET-GROWTH.md §0</span></td></tr>
+<tr><td>spend 경로</td><td>강화 소비(차감) 코드 미구현 — 신규 배관 필요</td><td><span class="mono">DESIGN-PET-GROWTH.md §0</span></td></tr>
+</tbody></table></div>
+<div class="scroll-x"><table class="data-table">
+<caption>진화(evo)</caption>
+<thead><tr><th>도약</th><th>대상 펫</th><th>조건</th></tr></thead><tbody>
+<tr><td>+1 use (2→3회)</td><td>뭉치·째깍·삐약·몽글·방울</td><td>lv==20 &amp;&amp; 우세색 파편 150(추정)</td></tr>
+<tr><td>축 점프</td><td>추릅 1→2행 · 꿀떡 2→3 · 먹물 5→6칸 · 반짝 +5%p</td><td><span class="value-missing">미작성</span></td></tr>
+</tbody></table></div>
+<div class="source-note">GAME-CONTENT.md §5 (100탄/10챕터). 50탄 강제패배·피니시는 DESIGN-MG-FINISH.md.</div>
+<div class="scroll-x"><table class="data-table">
+<caption>100탄 표 — 10챕터 구간</caption>
+<thead><tr><th>챕터</th><th>탄</th><th>무대</th><th>기믹</th><th>보스</th><th>난이도 축</th></tr></thead><tbody>
+<tr><td class="num"><b>1</b></td><td class="num"><span class="mono">1–10</span></td><td>젤리 숲</td><td>기본(텐·트윈 배우기·튜토리얼 미션)</td><td>포도 먹깨비(10탄)</td><td>입문</td></tr>
+<tr><td class="num"><b>2</b></td><td class="num"><span class="mono">11–20</span></td><td>거품 강</td><td>얼음 타일</td><td>소다 먹깨비(20탄)</td><td>기믹 소개</td></tr>
+<tr><td class="num"><b>3</b></td><td class="num"><span class="mono">21–30</span></td><td>사탕 폐허</td><td>블로커 증가</td><td>딸기 먹깨비(30탄)</td><td>응용</td></tr>
+<tr><td class="num"><b>4</b></td><td class="num"><span class="mono">31–40</span></td><td>박하 언덕</td><td>판 흔들림</td><td>박하 먹깨비(40탄)</td><td>속도 압박</td></tr>
+<tr><td class="num"><b>5</b></td><td class="num"><span class="mono">41–50</span></td><td>초코 관문</td><td>잠금 타일</td><td>초코 대왕(50탄) — 강제 패배 각본</td><td>1차전 후퇴</td></tr>
+<tr><td class="num"><b>6</b></td><td class="num"><span class="mono">51–60</span></td><td>크림 회랑</td><td>폭탄 타일</td><td>포도 먹깨비(강화·60탄)</td><td>재상승</td></tr>
+<tr><td class="num"><b>7</b></td><td class="num"><span class="mono">61–70</span></td><td>시럽 미로</td><td>와일드 등장</td><td>소다 먹깨비(강화·70탄)</td><td>변화</td></tr>
+<tr><td class="num"><b>8</b></td><td class="num"><span class="mono">71–80</span></td><td>설탕 감옥</td><td>시간 단축</td><td>딸기 먹깨비(강화·80탄)</td><td>시간 압박</td></tr>
+<tr><td class="num"><b>9</b></td><td class="num"><span class="mono">81–90</span></td><td>심장의 방</td><td>복합 기믹</td><td>박하 먹깨비(강화·90탄)</td><td>고비</td></tr>
+<tr><td class="num"><b>10</b></td><td class="num"><span class="mono">91–100</span></td><td>왕좌</td><td>전부</td><td>초코 대왕(진·100탄) 최종 재대결</td><td>종합</td></tr>
+</tbody></table></div>
+<div class="scroll-x"><table class="data-table">
+<caption>100탄 규칙</caption>
+<thead><tr><th>라벨</th><th>값</th></tr></thead><tbody>
+<tr><td>챕터 내 리듬</td><td>1~2탄 새 기믹 소개(튜토리얼) / 3~5탄 익히기(완만) / 6~7탄 응용(기믹 2개 조합) / 8~9탄 고비(최고 난도) / 10탄 보스+피니시 미션</td></tr>
+<tr><td>보스 순환</td><td>10·60 포도 / 20·70 소다 / 30·80 딸기 / 40·90 박하 / 50·100 초코 대왕 (5종 순환 = 50탄까지 같은 보스 없음)</td></tr>
+<tr><td>보스 HP 곡선</td><td><span class="mono">기본치 × (1 + 0.08 × 챕터번호)² — 플레이어 선형 성장보다 빠르게 상승</span></td></tr>
+</tbody></table></div>
+<div class="scroll-x"><table class="data-table">
+<caption>특수 구간</caption>
+<thead><tr><th>탄</th><th>장치</th><th>출처</th></tr></thead><tbody>
+<tr><td class="num"><b>50</b></td><td>강제 패배 각본 — 초코대왕 첫 대면, DUEL_SCRIPT_HP=0.30 도달 시 무적 역전·컷인·강제 KO. 하트 미소모·advMax→51(각본 패배가 곧 진행)</td><td><span class="mono">DESIGN-MG-FINISH.md §2</span></td></tr>
+<tr><td class="num"><b>보스 처치</b></td><td>피니시 시스템 — HP 0 → 시간정지 → 10초 타이머(DUEL_FINISH_MS=10000) → 피니시 미션(못 하면 클리어 실패)</td><td><span class="mono">DESIGN-MG-FINISH.md §3 · GAME-CONTENT.md §5-3</span></td></tr>
+</tbody></table></div>
+<div class="scroll-x"><table class="data-table">
+<caption>피니시 미션</caption>
+<thead><tr><th>보스</th><th>미션</th></tr></thead><tbody>
+<tr><td><b>포도</b></td><td>텐 3번</td></tr>
+<tr><td><b>소다</b></td><td>텐↔트윈 교차 3번</td></tr>
+<tr><td><b>딸기</b></td><td>콤보 5 만들기</td></tr>
+<tr><td><b>박하</b></td><td>10초 안에 5매치</td></tr>
+<tr><td><b>초코 대왕</b></td><td>텐 5번 + 콤보 5</td></tr>
+</tbody></table></div>
+<div class="scroll-x"><table class="data-table">
+<caption>별 조건</caption>
+<thead><tr><th>★</th><th>조건</th></tr></thead><tbody>
+<tr><td class="num"><b>1</b></td><td>스테이지 클리어</td></tr>
+<tr><td class="num"><b>2</b></td><td>점수 1.2배 또는 피니시 미션 무실패</td></tr>
+<tr><td class="num"><b>3</b></td><td>보스 취약 속성으로 마무리(포도를 텐으로 끝내기 등)</td></tr>
+</tbody></table></div>
+<div class="source-note">고유명 = STORY-SCRIPT-0831.md §6 (char.&lt;id&gt;.passname, 5캐릭터+10펫). 효과 한 줄 = GAME-CONTENT.md §1·§2.</div>
+<div class="scroll-x"><table class="data-table">
+<caption>패시브 15종</caption>
+<thead><tr><th>#</th><th>id</th><th>이름 (ko)</th><th>이름 (en)</th><th>효과</th><th>분류</th></tr></thead><tbody>
+<tr><td class="num">1</td><td><span class="mono">ten</span></td><td><b>왕자의 축복</b></td><td>Prince&#x27;s Blessing</td><td>텐 매치(합 10) 점수 +40%</td><td>캐릭터</td></tr>
+<tr><td class="num">2</td><td><span class="mono">twin</span></td><td><b>쌍둥이 맹세</b></td><td>Twin Vow</td><td>같은 숫자 매치 +60%</td><td>캐릭터</td></tr>
+<tr><td class="num">3</td><td><span class="mono">jelly</span></td><td><b>공주의 온기</b></td><td>Princess&#x27;s Warmth</td><td>10% 확률로 그 매치 ×2</td><td>캐릭터</td></tr>
+<tr><td class="num">4</td><td><span class="mono">pudding</span></td><td><b>푸딩 방패</b></td><td>Pudding Guard</td><td>적 공격 피해 −35%, 콤보 끊겨도 게이지 손실 없음</td><td>캐릭터</td></tr>
+<tr><td class="num">5</td><td><span class="mono">sodawitch</span></td><td><b>탄산 주문</b></td><td>Fizzy Spell</td><td>콤보가 끊겨도 1회 유지(2초 유예)</td><td>캐릭터</td></tr>
+<tr><td class="num">6</td><td><span class="mono">ppyak</span></td><td><b>자유 연결</b></td><td>Free Link</td><td>떨어진 두 칸을 한 번 이어준다(거리 무시 1회)</td><td>펫</td></tr>
+<tr><td class="num">7</td><td><span class="mono">mungchi</span></td><td><b>말랑 방패</b></td><td>Squishy Shield</td><td>방패 1회 — 다음 적 공격 무효화</td><td>펫</td></tr>
+<tr><td class="num">8</td><td><span class="mono">mongle</span></td><td><b>시간 웅덩이</b></td><td>Time Puddle</td><td>8초간 모든 점수 ×1.5</td><td>펫</td></tr>
+<tr><td class="num">9</td><td><span class="mono">churup</span></td><td><b>크게 한 입</b></td><td>Big Bite</td><td>체력 30 회복 + 3초간 피해 무효</td><td>펫</td></tr>
+<tr><td class="num">10</td><td><span class="mono">mukmul</span></td><td><b>잉크 물들이기</b></td><td>Ink Splash</td><td>화면의 블로커·잠금을 3개 지운다(리페인트 계열)</td><td>펫</td></tr>
+<tr><td class="num">11</td><td><span class="mono">tiktok</span></td><td><b>타임 스톱</b></td><td>Time Stop</td><td>3초 정지 — 그동안 자유롭게 고른다</td><td>펫</td></tr>
+<tr><td class="num">12</td><td><span class="mono">kkultteok</span></td><td><b>황금 소환</b></td><td>Golden Call</td><td>임의 타일 4개를 숫자 5로 바꾼다</td><td>펫</td></tr>
+<tr><td class="num">13</td><td><span class="mono">bangul</span></td><td><b>거품 파도</b></td><td>Bubble Wave</td><td>최적 수 3개를 5초간 표시(정화/시야)</td><td>펫</td></tr>
+<tr><td class="num">14</td><td><span class="mono">sseokssak</span></td><td><b>싹쓸이</b></td><td>Clean Sweep</td><td>한 열을 통째로 지운다(아래로 채워짐)</td><td>펫</td></tr>
+<tr><td class="num">15</td><td><span class="mono">banjjak</span></td><td><b>번쩍 충전</b></td><td>Spark Charge</td><td>각성 게이지 +40%p 즉시</td><td>펫</td></tr>
+</tbody></table></div>
+<h2 class="section-title">4. 화면별 요구 요소</h2>
+<div class="source-note">요소 목록 = DESIGN.md §6(화면 구성) + UI-INVENTORY.md 라이브 배선(★). UI-INVENTORY.md 는 화면별 요구요소 표가 아니라 에셋 재고라 화면별 요구요소는 두 출처를 합성함.</div>
+<div class="scroll-x"><table class="data-table">
+<thead><tr><th>화면</th><th>요구 요소</th><th>개수</th></tr></thead><tbody>
+<tr><td><b>메인 메뉴(menu)</b></td><td><span class="tag">로고/타이틀 판</span> · <span class="tag">Play(Endless) 버튼(#btn-play)</span> · <span class="tag">이어하기 버튼(#btn-cont)</span> · <span class="tag">캐릭터 버튼(#char-open)</span> · <span class="tag">설정 버튼(#btn-settings)</span> · <span class="tag">Daily 🔥스트릭 배지</span> · <span class="tag">규칙 말풍선 리본(.tagline)</span> · <span class="tag">사운드 토글</span> · <span class="tag">하단 배너 광고 플레이스홀더</span></td><td class="num">9</td></tr>
+<tr><td><b>게임 화면(game)</b></td><td><span class="tag">상단바(스테이지·점수·베스트)</span> · <span class="tag">콤보 인디케이터</span> · <span class="tag">9열 보드(뷰포트 맞춤)</span> · <span class="tag">하단 액션바 Add(+배지)·Hint(배지)·Undo</span> · <span class="tag">일시정지 버튼(#btn-pause)</span> · <span class="tag">전투 HUD(타이머 캡슐·체력바·초상 방울·각성 게이지)</span></td><td class="num">6</td></tr>
+<tr><td><b>스테이지 맵(map)</b></td><td><span class="tag">뒤로 버튼(#map-back)</span> · <span class="tag">설정 버튼(#map-gear)</span> · <span class="tag">캐릭터 버튼(#map-char)</span> · <span class="tag">기록 버튼(#map-rec)</span> · <span class="tag">하트 필(#map-hearts)</span> · <span class="tag">별/코인 필(#map-stars)</span> · <span class="tag">챕터 판(#map-plate)</span> · <span class="tag">노드 경로·별 표시(#map-path)</span> · <span class="tag">현재 노드(#map-cur)</span></td><td class="num">9</td></tr>
+<tr><td><b>노드 카드(stageinfo)</b></td><td><span class="tag">스테이지 번호·챕터</span> · <span class="tag">미션/목표 표시</span> · <span class="tag">별 획득 상태</span> · <span class="tag">시작 버튼(#node-go)</span> · <span class="tag">젤리판 모달 배경</span></td><td class="num">5</td></tr>
+<tr><td><b>캐릭터 선택창(character)</b></td><td><span class="tag">캐릭터 레일·방울 줄</span> · <span class="tag">4스탯 게이지 바(base+펫 오버필)</span> · <span class="tag">펫 슬롯</span> · <span class="tag">패시브 카드([패시브 스킬] 머리·아이콘칸·제목·본문·바닥줄)</span> · <span class="tag">스킨 버튼(#cp-skin)</span> · <span class="tag">젤리 정보판(하단)</span></td><td class="num">6</td></tr>
+<tr><td><b>스테이지 클리어(clear)</b></td><td><span class="tag">점수 집계 롤업</span> · <span class="tag">클리어 등급 S/A/B/C 배지</span> · <span class="tag">획득 별</span> · <span class="tag">Next 버튼</span> · <span class="tag">3스테이지마다 전면 광고 플레이스홀더</span></td><td class="num">5</td></tr>
+<tr><td><b>게임 오버(over)</b></td><td><span class="tag">점수·베스트</span> · <span class="tag">이어하기(보상형 광고 PH)</span> · <span class="tag">리트라이</span> · <span class="tag">메뉴</span></td><td class="num">4</td></tr>
+<tr><td><b>일시정지/설정(pause/settings)</b></td><td><span class="tag">사운드 토글</span> · <span class="tag">진동 토글(navigator.vibrate)</span> · <span class="tag">재시작</span> · <span class="tag">How to</span> · <span class="tag">기록(st-rank)·게임방법(st-howto) 진입</span></td><td class="num">5</td></tr>
+<tr><td><b>스토리 컷 뷰어(story)</b></td><td><span class="tag">컷툰 이미지</span> · <span class="tag">자막/보이스</span> · <span class="tag">재생·건너뛰기</span></td><td class="num">3</td></tr>
+</tbody></table></div>
+<h2 class="section-title">5. 시안 등록부</h2>
+<div class="source-note">SIAN-REGISTRY.md (2026-09-03). §0 최상위 = 원본 3장. uploads 계열(S1~S9)은 부품 보조. &nbsp;·&nbsp; 원본 폴더 C:\Users\ghkd7\OneDrive\바탕 화면\시안 (3장 확인) → 저장소 사본 tentwin/assets/sian-src/</div>
+<h3 class="sub-title">§0 원본 3장</h3>
+<div class="thumb-list">
+<div class="thumb"><img loading="lazy" src="img/sian/s10.jpg" alt="메인화면·버튼"><div class="thumb-name">S10 · 메인화면·버튼</div><div class="thumb-file">tentwin/assets/sian-src/메인화면, 버튼.png (784×1373 RGBA, 2.5MB)</div></div>
+<div class="thumb"><img loading="lazy" src="img/sian/s4.jpg" alt="플레이 모달(스토리·게임 모드)"><div class="thumb-name">S4 · 플레이 모달(스토리·게임 모드)</div><div class="thumb-file">tentwin/assets/sian-src/모달창_스토리게임 모드.png (768×1376 RGBA, 3.1MB)</div></div>
+<div class="thumb"><img loading="lazy" src="img/sian/s6.jpg" alt="인게임 화면"><div class="thumb-name">S6 · 인게임 화면</div><div class="thumb-file">tentwin/assets/sian-src/인게임 화면.png (768×1376 RGBA, 3.6MB)</div></div>
+</div>
+<div class="scroll-x"><table class="data-table">
+<caption>원본 3장 — 정본 범위</caption>
+<thead><tr><th>S#</th><th>이름</th><th>대응 화면</th><th>정본 범위</th><th>ASCII 사본</th><th>존재 확인</th></tr></thead><tbody>
+<tr><td><b>S10</b></td><td>메인화면·버튼</td><td>메인 메뉴 + 버튼</td><td>기준 버튼 틀 실측 소스·타이틀 로고·리본 안내문</td><td><span class="mono">tentwin/assets/sian-src/S10-main-buttons.png</span></td><td><span class="state state-ok">확인됨(디스크·OneDrive 양쪽)</span></td></tr>
+<tr><td><b>S4</b></td><td>플레이 모달(스토리·게임 모드)</td><td>플레이 모드 선택 모달</td><td>그림 버튼 4줄·배지·배치</td><td><span class="mono">tentwin/assets/sian-src/S4-modal.png</span></td><td><span class="state state-ok">확인됨(디스크·OneDrive 양쪽)</span></td></tr>
+<tr><td><b>S6</b></td><td>인게임 화면</td><td>전투 인게임(HUD·보드·스킬 메달)</td><td>상단 HUD 조립·타이머 캡슐·체력바 뼈/날개·이름/Lv 탭·하단 스킬 메달 4</td><td><span class="mono">tentwin/assets/sian-src/S6-ingame.png</span></td><td><span class="state state-ok">확인됨(디스크·OneDrive 양쪽)</span></td></tr>
+</tbody></table></div>
+<h3 class="sub-title">S# 등록부</h3>
+<div class="scroll-x"><table class="data-table">
+<thead><tr><th>S#</th><th>이름</th><th>원본 파일</th><th>대응 화면</th><th>상태</th></tr></thead><tbody>
+<tr><td><b>S1</b></td><td>게임 방법 조립본</td><td><span class="mono">uploads/90127e38-image.png</span></td><td>게임 방법 모달</td><td>보조(모달 판·제목 캡슐·버튼)</td></tr>
+<tr><td><b>S2</b></td><td>제목 캡슐+글자 확대</td><td><span class="mono">uploads/150b30d1-image.jpg</span></td><td>제목 캡슐(공통)</td><td>보조(글자·캡슐 색)</td></tr>
+<tr><td><b>S3</b></td><td>판 코너+캡슐 왼끝 확대</td><td><span class="mono">uploads/4c656724-image.jpg</span></td><td>판/캡슐(공통)</td><td>보조(겉선·림·광택)</td></tr>
+<tr><td><b>S4</b></td><td>플레이 모달 완성본</td><td><span class="mono">uploads/54aa2c15-image.png (고해상 1079×1949; 구 32f6be9b)</span></td><td>플레이 모달</td><td>원본(sian-src) 우선·uploads 대체됨</td></tr>
+<tr><td><b>S5</b></td><td>캐릭터 선택창</td><td><span class="mono">uploads/fffae90b-image.png</span></td><td>캐릭터 선택창</td><td>보조(레일·방울 줄·게이지·정보판)</td></tr>
+<tr><td><b>S6</b></td><td>상단 HUD 조립본(원본 승격)</td><td><span class="mono">uploads/4c1274ac-image.png / 원본 인게임 화면.png(768×1376)</span></td><td>전투 HUD</td><td>전투 HUD 조립 정본(2026-09-03 승격)</td></tr>
+<tr><td><b>S7</b></td><td>상단 HUD 빈 틀 크로마</td><td><span class="mono">uploads/a13c656f-image.png (+b1a9bfcd) / HUD-shape-chroma.png</span></td><td>전투 HUD 실루엣</td><td>보조(판 2장·캡슐·방울 분해)</td></tr>
+<tr><td><b>S8</b></td><td>전투 HUD 배포본 사진</td><td><span class="mono">uploads/9920e80b-image.jpg</span></td><td>전투 HUD</td><td>위치 보조로 강등(색 기준 아님, 2026-09-03)</td></tr>
+<tr><td><b>S9</b></td><td>젤리판 빈 판(정본)</td><td><span class="mono">uploads/faecc400-image.jpg</span></td><td>모든 모달 판(재질·투명)</td><td>정본(판 재질·색감 기준)</td></tr>
+<tr><td><b>S11</b></td><td>젤리판 색·투명 정석</td><td><span class="mono">실기기 스크린샷 uploads/aa0a7479 + 코드 --cpj-* +S5 색</span></td><td>모달 판·캡슐 색/α/림/광</td><td>정석(2026-09-04 사용자 완벽한 색상·투명도)</td></tr>
+</tbody></table></div>
+</div></body></html>

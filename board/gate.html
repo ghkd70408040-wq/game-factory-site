@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="ko"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>관문실 · 게임 공장</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="board.css">
+</head><body>
+<nav class="site-nav">
+<span class="nav-brand">🏭 게임 공장</span>
+<a href="index.html">홈</a>
+<a href="plan.html">기획실</a>
+<span class="nav-sep"></span>
+<a href="screen-hud.html">HUD</a>
+<a href="screen-modal.html">모달</a>
+<a href="screen-charsel.html">캐릭창</a>
+<a href="screen-map.html">지도</a>
+<span class="nav-sep"></span>
+<a href="warehouse.html">창고</a>
+<a href="factory.html">공장</a>
+<a href="gate.html" class="is-current">관문실</a>
+</nav>
+<div class="page">
+  <h1 class="page-title">관문실 — S6 관문 · S7 승인</h1>
+  <div class="page-meta">정본 §5 S6(관문 스크립트) · S7(승인·출시) · 측정 2026-09-08 · 상태는 계산값만</div>
+
+  <div class="focus-line"><b>초점</b>관문 2종 PASS · 실기기 캡처 없음 · main 미푸시 1 · 미푸시 브랜치 4<span class="src">tools/measure/components-gate.py · FRAME-AUDIT-0906.md</span></div>
+
+  <h2 class="section-title">1. 관문 스크립트 실행 결과 (원문)</h2>
+
+  <h3 class="sub-title">m3 — 죽은 선택자</h3>
+  <div class="source-note">python tools\measure\components-gate.py m3 &nbsp;·&nbsp; cwd C:\workspace\game-factory &nbsp;·&nbsp; exit 0</div>
+  <pre class="raw-output">M3 죽은 선택자 게이트 — site/tentwin.html
+  현재 A급 100건 · 은퇴 대장 100건 · 신규 0건 · 대장서 사라짐 0건
+M3 PASS — 신규 A급 0건 (기존 A급은 은퇴 대장 소속).</pre>
+
+  <h3 class="sub-title">frames — 1파일 1프레임</h3>
+  <div class="source-note">python tools\measure\components-gate.py frames &nbsp;·&nbsp; cwd C:\workspace\game-factory &nbsp;·&nbsp; exit 0</div>
+  <pre class="raw-output">frames 게이트 — COMPONENTS.md §1.3 「한 파일 = 한 프레임」
+  매니페스트: tentwin/ref-v2/hud-shape/hud-components.json (스키마 frames[])
+  카탈로그  : site/catalog
+  항목 23 · FAIL 0 · WARN(미기재) 0 · 미등록 webp 0
+
+frames PASS — 전 항목 한 파일 한 프레임, 미등록 0.</pre>
+
+  <div class="scroll-x"><table class="data-table"><caption>관문 판정</caption>
+  <thead><tr><th>관문</th><th>대상</th><th class="num">exit</th><th>판정</th></tr></thead>
+  <tbody>
+  <tr><td>m3 죽은 선택자</td><td>site/tentwin.html</td><td class="num">0</td><td><span class="state state-ok">PASS</span></td></tr>
+  <tr><td>frames 1파일 1프레임</td><td>hud-components.json · site/catalog</td><td class="num">0</td><td><span class="state state-ok">PASS</span></td></tr>
+  <tr><td>합성 픽셀 (부품 스냅샷)</td><td>consumers 전량</td><td class="num">—</td><td><span class="state state-partial">미실행</span></td></tr>
+  <tr><td>실기기 캡처 (폴백 강제)</td><td>물리 단말</td><td class="num">—</td><td><span class="state state-none">없음</span></td></tr>
+  <tr><td>콘솔 · 회귀</td><td>site/tentwin.html</td><td class="num">—</td><td><span class="state state-partial">미실행</span></td></tr>
+  </tbody></table></div>
+
+  <h2 class="section-title">2. 프레임 감사 요약 숫자</h2>
+  <div class="source-note">tentwin\FRAME-AUDIT-0906.md · 2026-09-06 · 규칙 COMPONENTS.md §1.3</div>
+  <div class="scroll-x"><table class="data-table">
+  <thead><tr><th>항목</th><th class="num">값</th><th>내역</th></tr></thead>
+  <tbody>
+  <tr><td>총 파일</td><td class="num">431</td><td>catalog webp 390 + hud-shape png 41</td></tr>
+  <tr><td>인라인 base64 이미지</td><td class="num">49</td><td>lib 47 + duel-orn 2</td></tr>
+  <tr><td><b>위반</b> (2프레임 이상 또는 내용물 구움)</td><td class="num">120</td><td>catalog 99 · hud-shape 21</td></tr>
+  <tr><td>└ 위반 중 순수 배율 중복 (3x·3xp)</td><td class="num">28</td><td>catalog</td></tr>
+  <tr><td>└ 위반 대표 (배율 중복 접은 값 · 썸네일 격자)</td><td class="num">92</td><td>FRAME-AUDIT-0906.send.jpg 92칸</td></tr>
+  <tr><td><b>준수</b> (1프레임)</td><td class="num">311</td><td>—</td></tr>
+  <tr><td><b>미사용</b> (라이브 stem 참조 0)</td><td class="num">129</td><td>—</td></tr>
+  </tbody></table></div>
+  <div class="source-note">재발주 필요: 무엠블럼 메달 프레임 · lib-badge · lib-medal · duel-medal</div>
+
+  <h2 class="section-title">3. 용량 예산표</h2>
+  <div class="source-note">예산 16MB = 16,777,216 B · 측정 PowerShell Get-ChildItem -Recurse -File | Measure-Object -Sum Length</div>
+  <div class="scroll-x"><table class="data-table">
+  <thead><tr><th>대상</th><th class="num">바이트</th><th class="num">파일</th><th class="num">예산 대비</th></tr></thead>
+  <tbody>
+  <tr><td>site\tentwin.html <span class="tag">배포 페이로드</span></td><td class="num">7,922,497</td><td class="num">1</td><td class="num">47.22%</td></tr>
+  <tr><td>site\catalog\ <span class="tag">소스 자산 저장소</span></td><td class="num">34,161,046</td><td class="num">532</td><td class="num">203.62%</td></tr>
+  <tr><td>site\board\ <span class="tag">관제탑 v2</span></td><td class="num">5,422,150</td><td class="num">471</td><td class="num">32.32%</td></tr>
+    <tr><td><b>예산 16MB</b></td><td class="num">16,777,216</td><td class="num">—</td><td class="num">100%</td><td>—</td></tr>
+  <tr><td>관제탑 자체 상한 14MB</td><td class="num">14,680,064</td><td class="num">—</td><td class="num">board 36.93%</td></tr>
+  </tbody></table></div>
+  <div class="source-note">catalog 는 배포에 통째로 실리는 묶음이 아니라 소스 자산 저장소 전체 합계 — 예산 판정 대상은 tentwin.html(47.22%)</div>
+
+  <h2 class="section-title">4. 버전</h2>
+  <div class="scroll-x"><table class="data-table"><caption>site 저장소</caption>
+  <tbody>
+  <tr><th>저장소</th><td class="mono">C:\workspace\game-factory\site</td></tr>
+  <tr><th>main HEAD</th><td class="mono">fb7ead8f94c32273a0ba30da16e50bc663352eb3</td></tr>
+  <tr><th>짧은 해시</th><td class="mono">fb7ead8</td></tr>
+  <tr><th>원격</th><td class="mono">https://github.com/ghkd70408040-wq/game-factory-site.git</td></tr>
+  <tr><th>배포 URL</th><td class="mono">https://ghkd70408040-wq.github.io/game-factory-site/ <span class="value-missing">(Pages 추정)</span></td></tr>
+  <tr><th>작업 트리</th><td class="mono">?? scratchpad/ (미추적) 만</td></tr>
+  </tbody></table></div>
+
+  <h3 class="sub-title">최근 커밋 10</h3>
+  <pre class="raw-output">fb7ead8 board: 관리 페이지 v1 — 화면 4·창고·공장(DEV-STEPS §0)
+40e6ba1 feat(hud): 위 판+캡슐 cap2(홈 없음·캡슐 위) + 판 투명·연하게 한 단계(α.55, L+5%)
+5d591a6 fix(hud): 위 판+캡슐 한 장 자산(시안 접합 그대로), 타이머는 글리프만
+ca59219 fix(hud): 컨테이너 시안 폭 + 클래식 중앙 게이지
+427e90e fix(hud): 기기 폴백 — shape()/cqw 미지원 시 캡슐·판 동일 렌더
+ce1a72f board: HUD 자산 킷 추가 — 틀 2 부품 4개 확정
+97dbbc0 fix(hud): 클래식 우상단 방울 2개(캐릭 큰·펫 작은) S6b 배치
+2e1fa09 feat(hud): 클래식 = 같은 베이스 4부품 (WIP: 방울 초상 겹침 조사중)
+b816b51 feat(hud): 판 1·2 조립 — 시안 실루엣 판 2장(모험)
+b96b941 feat(hud): 3·4 = 판 1 기준 재질(sky 변주)</pre>
+
+  <h3 class="sub-title">미푸시 브랜치</h3>
+  <div class="scroll-x"><table class="data-table">
+  <thead><tr><th>브랜치</th><th>HEAD</th><th>upstream</th><th>상태</th><th>워크트리</th></tr></thead>
+  <tbody>
+  <tr><td class="mono">main</td><td class="mono">fb7ead8</td><td class="mono">origin/main</td><td><span class="state state-partial">ahead 1</span></td><td class="mono">site\</td></tr>
+  <tr><td class="mono">wave/hudframes</td><td class="mono">9f31f97</td><td class="value-missing">없음</td><td><span class="state state-none">전혀 미푸시</span></td><td class="mono">wt\hudframes\</td></tr>
+  <tr><td class="mono">wave/hudgloss</td><td class="mono">bba3297</td><td class="value-missing">없음</td><td><span class="state state-none">전혀 미푸시</span></td><td class="mono">wt\hudgloss\</td></tr>
+  <tr><td class="mono">worktree-agent-a3091d6d01a93614d</td><td class="mono">abac098</td><td class="value-missing">없음</td><td><span class="state state-none">전혀 미푸시</span></td><td class="mono">site\.claude\worktrees\</td></tr>
+  </tbody></table></div>
+  <div class="source-note">HUD 화면 페이지의 조립 실캡처는 wave/hudframes(9f31f97, 프레임 재배선) 서빙본에서 찍음 — 배포본과 다름</div>
+
+  <h2 class="section-title">5. 실기기 캡처 상태</h2>
+  <div class="scroll-x"><table class="data-table">
+  <thead><tr><th>항목</th><th>상태</th><th>근거</th></tr></thead>
+  <tbody>
+  <tr><td>물리 단말 캡처</td><td><span class="state state-none">없음</span></td><td>galaxy/iphone/adb/screencap 캡처 파일 0</td></tr>
+  <tr><td>헤드리스 뷰포트 렌더</td><td><span class="state state-partial">있음</span></td><td>.cap-ledger.json — 390×844 dpr3, entry /index.html, freeze false</td></tr>
+  <tr><td>최신 evidence 수정일</td><td class="mono">2026-09-06</td><td>wt\hudframes\evidence-14 · wt\hudgloss\evidence-14</td></tr>
+  </tbody></table></div>
+  <div class="scroll-x"><table class="data-table"><caption>evidence 폴더 목록 (전부 헤드리스 렌더)</caption>
+  <thead><tr><th>경로</th><th>종류</th><th>최신</th></tr></thead>
+  <tbody>
+  <tr><td class="mono">site\evidence-14</td><td>COMPARE/LIVE/REG/ALPHA</td><td class="mono">08-19</td></tr>
+  <tr><td class="mono">tentwin\evidence-14</td><td>렌더 + cap-ledger 390×844 dpr3</td><td class="mono">08-31</td></tr>
+  <tr><td class="mono">tentwin\evidence-classic-0831</td><td>classic / rush</td><td class="mono">08-31</td></tr>
+  <tr><td class="mono">tentwin\evidence-finish-0831</td><td>finish / modal AB</td><td class="mono">08-31</td></tr>
+  <tr><td class="mono">tentwin\evidence-hud-0901</td><td>SBS / DECOMP HUD</td><td class="mono">09-01</td></tr>
+  <tr><td class="mono">tentwin\assets\art\evidence-13a · 13b</td><td>1080/390 뷰포트 렌더</td><td class="mono">08-13</td></tr>
+  <tr><td class="mono">wt\hudframes\evidence-14 · wt\hudgloss\evidence-14</td><td>워크트리 내 사본</td><td class="mono">09-06</td></tr>
+  </tbody></table></div>
+  <div class="source-note">정본 §5 S6 는 실기기 캡처를 관문 항목으로 요구한다 — 현재 미충족(🔴)</div>
+
+  <h2 class="section-title">6. 판정판 · 산출 링크</h2>
+  <div class="scroll-x"><table class="data-table">
+  <thead><tr><th>산출</th><th>경로</th><th class="num">크기</th><th>수정</th></tr></thead>
+  <tbody>
+  <tr><td>판정판 (화면별 [시안|부품|지금|초점])</td><td class="mono"><a href="../../scratchpad/judge-0903/JUDGE.html">scratchpad\judge-0903\JUDGE.html</a></td><td class="num">9,493,136</td><td class="mono">09-06 02:51</td></tr>
+  <tr><td>판정 상태 (초점·체크리스트 원본)</td><td class="mono">scratchpad\judge-0903\judge-state.json</td><td class="num">14,556</td><td class="mono">rev 13</td></tr>
+  <tr><td>판정판 빌드</td><td class="mono">scratchpad\judge-0903\build.py</td><td class="num">93,006</td><td class="mono">—</td></tr>
+  <tr><td>판정판 자가 캡처</td><td class="mono">judge-check.png · judge-check-1280.png</td><td class="num">5,020,311 · 24,119,673</td><td class="mono">—</td></tr>
+  <tr><td>위반 썸네일 격자</td><td class="mono">scratchpad\FRAME-AUDIT-0906.send.jpg</td><td class="num">764,609</td><td class="mono">폭 1200 · 92칸</td></tr>
+  </tbody></table></div>
+  <div class="source-note">판정판 링크는 로컬 경로 기준 — 배포본에는 포함되지 않음</div>
+
+  <h2 class="section-title">7. S7 승인 대기</h2>
+  <div class="scroll-x"><table class="data-table">
+  <thead><tr><th>대상</th><th>상태</th><th>다음</th></tr></thead>
+  <tbody>
+  <tr><td>재질 시험판 (Shape 4 × 크기 3 × Mode A·B)</td><td><span class="state state-partial">승인 대기</span></td><td><a href="factory.html#bench">공장 → 재질 시험판</a></td></tr>
+  <tr><td>HUD 프레임 재배선 (wave/hudframes)</td><td><span class="state state-partial">미푸시</span></td><td>main 병합 승인</td></tr>
+  <tr><td>실기기 캡처</td><td><span class="state state-none">없음</span></td><td>S6 관문 미충족</td></tr>
+  <tr><td>위반 프레임 120</td><td><span class="state state-none">미해결</span></td><td>배율 중복 28 정리 + 재발주 4종</td></tr>
+  </tbody></table></div>
+  <div class="source-note">도장은 사용자만 (정본 §7)</div>
+</div>
+</body></html>

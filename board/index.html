@@ -2,63 +2,96 @@
 <html lang="ko"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>게임 공장 · 관리 페이지 v1</title>
+<title>관제탑 v2 · 게임 공장</title>
 <link rel="icon" href="data:,">
 <link rel="stylesheet" href="board.css">
 </head><body>
-<nav class="nav">
-  <span class="brand">🏭 게임 공장</span>
-  <a href="index.html" class="on">홈</a>
-  <a href="screen-hud.html">HUD</a>
-  <a href="screen-modal.html">모달</a>
-  <a href="screen-charsel.html">캐릭창</a>
-  <a href="screen-map.html">지도</a>
-  <a href="warehouse.html">창고</a>
-  <a href="factory.html">공장</a>
+<nav class="site-nav">
+<span class="nav-brand">🏭 게임 공장</span>
+<a href="index.html" class="is-current">홈</a>
+<a href="plan.html">기획실</a>
+<span class="nav-sep"></span>
+<a href="screen-hud.html">HUD</a>
+<a href="screen-modal.html">모달</a>
+<a href="screen-charsel.html">캐릭창</a>
+<a href="screen-map.html">지도</a>
+<span class="nav-sep"></span>
+<a href="warehouse.html">창고</a>
+<a href="factory.html">공장</a>
+<a href="gate.html">관문실</a>
 </nav>
-<div class="wrap">
-  <h1 class="title">게임 공장 — 관리 페이지 v1</h1>
-  <div class="crumb">텐트윈 · DEV-STEPS §0 그릇 · 화면 4 · 창고 · 공장 · 2026-09-06</div>
+<div class="page">
+  <h1 class="page-title">관제탑 v2 — 텐트윈</h1>
+  <div class="page-meta">정본 GAME-FACTORY-STANDARD.md §7 5방 · 게임 하나 = 관제탑 하나 · 2026-09-08</div>
 
-  <h2 class="sec">화면 페이지</h2>
-  <div class="hub">
-    <a class="hubcard" href="screen-hud.html"><div class="hn">전투 HUD</div>
-      <div class="hd">상단 조립 + 프레임 격리</div>
-      <div class="hk">S6 원본 · S6b 클래식 · 매니페스트 hud-components.json</div></a>
-    <a class="hubcard" href="screen-modal.html"><div class="hn">모달 (게임 방법·설정·플레이)</div>
-      <div class="hd">3화면 조립 + 프레임 격리</div>
-      <div class="hk">S9 판 · S11 캡슐 정석 · S4 플레이</div></a>
-    <a class="hubcard" href="screen-charsel.html"><div class="hn">캐릭터 선택창</div>
-      <div class="hd">캐릭/펫 조립 + 프레임 격리</div>
-      <div class="hk">S5 · S11 정석 · 틀2-3/2-4 확정</div></a>
-    <a class="hubcard" href="screen-map.html"><div class="hn">스테이지 지도</div>
-      <div class="hd">맵·노드카드 조립 + 프레임 격리</div>
-      <div class="hk">🔴 미확정 (오늘까지 손 안 댐)</div></a>
+  <div class="focus-line"><b>초점</b>5방(기획실 · 화면 · 창고 · 공장 · 관문실)이 매니페스트 하나 위에 서 있는가 · 도장은 사용자만<span class="src">§7 관제탑</span></div>
+
+  <h2 class="section-title">5방</h2>
+  <div class="room-list">
+    <a class="room" href="plan.html"><div class="room-name">1 · 기획실</div>
+      <div class="room-desc">S0 기획 · S2 시안 접수</div>
+      <div class="tally">화면 <b>14</b> · 모드 <b>5</b> · 100탄 <b>10</b>챕터 · 펫 <b>10</b> · 패시브 <b>15</b> · 시안 원본 <b>3</b> + S# <b>10</b></div>
+      <div class="room-source">MASTER-PLAN · DESIGN · GAME-CONTENT · SIAN-REGISTRY</div></a>
+
+    <a class="room" href="screen-hud.html"><div class="room-name">2 · 화면 (4장)</div>
+      <div class="room-desc">S1~ [조립 | 시안 | 프레임 | 초점] + 갭 표</div>
+      <div class="tally">갭 행 <b>85</b> — HUD <b>19</b> · 모달 <b>22</b> · 캐릭창 <b>23</b> · 지도 <b>21</b></div>
+      <div class="room-source">judge-state rev13 · hud-components.json · kit-2side-*</div></a>
+
+    <a class="room" href="warehouse.html"><div class="room-name">3 · 창고</div>
+      <div class="room-desc">Library · 선반 = 계층 T1~T5 → 역할</div>
+      <div class="tally" id="tally">읽는 중…</div>
+      <div class="room-source">site/catalog · FRAME-AUDIT-0906</div></a>
+
+    <a class="room" href="factory.html"><div class="room-name">4 · 공장</div>
+      <div class="room-desc">Component 원형 · 층 레시피 · Variant · 재질 시험판</div>
+      <div class="tally">원형 <b>18</b> · 층 <b>5</b>(Shape→Fill→Stroke→Effect→Slot) · Mode <b>A/B</b> · 시험판 <b>4</b>×<b>3</b>×<b>2</b></div>
+      <div class="room-source">정본 work-frame.css · data-part 7종</div></a>
+
+    <a class="room" href="gate.html"><div class="room-name">5 · 관문실</div>
+      <div class="room-desc">S6 관문 · S7 승인</div>
+      <div class="tally">관문 <b>2</b> PASS · 위반 <b>120</b> · 미푸시 브랜치 <b>4</b> · 실기기 캡처 <b>0</b></div>
+      <div class="room-source">components-gate.py · 용량 예산 · 버전 · 판정판</div></a>
   </div>
 
-  <h2 class="sec">창고 · 공장</h2>
-  <div class="hub">
-    <a class="hubcard" href="warehouse.html"><div class="hn">창고</div>
-      <div class="hd">등록 완성 에셋 전부 · 역할별 격자</div>
-      <div class="tallyrow" id="tally"></div></a>
-    <a class="hubcard" href="factory.html"><div class="hn">공장</div>
-      <div class="hd">프레임 원형 18종 · 층 6개 레시피 + 변주</div>
-      <div class="hk">정본 work-frame.css 렌더 · 앵커 = 프레임 id</div></a>
+  <h2 class="section-title">화면 페이지</h2>
+  <div class="room-list">
+    <a class="room" href="screen-hud.html"><div class="room-name">전투 HUD</div>
+      <div class="room-desc">모험 · 클래식</div>
+      <div class="room-source">갭 19 · 실캡처 = wave/hudframes 9f31f97 (미푸시)</div></a>
+    <a class="room" href="screen-modal.html"><div class="room-name">모달</div>
+      <div class="room-desc">게임 방법 · 설정 · 플레이</div>
+      <div class="room-source">갭 22 · S9·S11 정석 판</div></a>
+    <a class="room" href="screen-charsel.html"><div class="room-name">캐릭터 선택창</div>
+      <div class="room-desc">캐릭 · 펫 · 정보판</div>
+      <div class="room-source">갭 23 · 정석 S11 · 틀2-3/2-4</div></a>
+    <a class="room" href="screen-map.html"><div class="room-name">스테이지 지도</div>
+      <div class="room-desc">맵 · 노드 카드</div>
+      <div class="room-source">갭 21 · 🔴 시안 없음 · 전체 미확정</div></a>
   </div>
 
-  <h2 class="sec">상태 도장 규칙</h2>
-  <div class="tallyrow" style="gap:16px">
-    <span><span class="st g">🟢 확정</span> 등록부·매니페스트 확정 행만</span>
-    <span><span class="st y">🟡 값만 맞춤 / 배포 자산</span> 나머지</span>
-    <span><span class="st r">🔴 미확정</span> 지도 전체</span>
-  </div>
-  <div class="crumb" style="margin-top:10px">데이터 출처: COMPONENTS.md(18종·§1.1·§1.3) · SIAN-REGISTRY.md(S#) · hud-components.json · FRAME-AUDIT-0906.md. 상태는 등록부·매니페스트에서만.</div>
+  <h2 class="section-title">규격 · 도장</h2>
+  <div class="scroll-x"><table class="data-table">
+  <thead><tr><th>축</th><th>값</th></tr></thead>
+  <tbody>
+  <tr><td>층 순서 (§0)</td><td>Shape → Fill → Stroke → Effect → Slot → Auto layout → Component <span class="tag">Slot 은 절대 굽지 않음</span></td></tr>
+  <tr><td>계층 (§1)</td><td><span class="tier tier-t1">T1</span>화면 <span class="tier tier-t2">T2</span>컨테이너 <span class="tier tier-t3">T3</span>제어 <span class="tier tier-t4">T4</span>내용물 <span class="tier tier-t5">T5</span>효과</td></tr>
+  <tr><td>Modes (§2)</td><td>Mode A = 틀 1 (모달 컨테이너 · pink) / Mode B = 틀 2 (모달 밖 인터페이스 · sky) · 슬롯 face · alpha · rim · outline · gloss · contact</td></tr>
+  <tr><td>판정 (§4)</td><td><span class="verdict verdict-code">code</span> 규칙 기하 · <span class="verdict verdict-asset">asset</span> 조각·손그림 · <span class="verdict verdict-ambiguous">ambiguous</span> 둘 다 준비 · <span class="verdict verdict-variant">variant</span> Fill·Effect·State만 다름</td></tr>
+  <tr><td>단계 (§5)</td><td>S0 기획 → S1 구조 → S2 시안 → S3 매핑·판정 → S4 제작 → S5 배선 → S6 관문 → S7 승인</td></tr>
+  <tr><td>상태 도장</td><td><span class="state state-ok">🟢 확정</span> 등록부·매니페스트 확정 행만 · <span class="state state-partial">🟡 값만 맞춤 / 배포 자산</span> · <span class="state state-none">🔴 미확정</span></td></tr>
+  </tbody></table></div>
+  <div class="source-note">데이터는 매니페스트 하나 — board-data.json · hud-components.json · judge-state.json · SIAN-REGISTRY.md. 도장은 사용자만 (§7)</div>
 </div>
 <script>
 fetch('board-data.json').then(function(r){return r.json();}).then(function(d){
+  var n=d.catalog.length;
   var v=d.catalog.filter(function(c){return c.viol;}).length;
   var u=d.catalog.filter(function(c){return !c.used;}).length;
-  document.getElementById('tally').innerHTML='총 <b>'+d.catalog.length+'</b> · 위반 <b>'+v+'</b> · 미사용 <b>'+u+'</b>';
-}).catch(function(){});
+  document.getElementById('tally').innerHTML =
+    '프레임 <b>'+n+'</b> · 준수 <b>'+(n-v)+'</b> · 위반 <b>'+v+'</b> · 미사용 <b>'+u+'</b>';
+}).catch(function(){
+  document.getElementById('tally').textContent='board-data.json 로드 실패';
+});
 </script>
 </body></html>
