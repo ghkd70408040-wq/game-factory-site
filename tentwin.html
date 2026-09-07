@@ -46319,10 +46319,14 @@ html[lang="en"] .splash-logo{
      쓰는데 유리판은 max-width:860px 로 **가운데 고정**이라 둘의 폭이 다르고,
      1200px 화면에서 9.63% 는 115px 짜리 버튼이 된다. 가로에서는 W9 까지의
      흐름 배치를 그대로 쓴다 — 세로 수리 전과 픽셀이 같다. */
-  #app.battle #screen-game.active #topbar {
+  /* [0908 ②] 클래식이 같은 정지 버튼 규칙을 쓰게 됐으므로 이 가로 예외도 함께
+     받는다 — 안 그러면 클래식 가로에서 --dh-w 셈이 그대로 살아 버튼이 커진다. */
+  #app.battle #screen-game.active #topbar,
+  #app.classic #screen-game.active #topbar {
     padding: calc(var(--safe-t) + 6px) calc(var(--safe-r) + 16px) 2px calc(var(--safe-l) + 12px);
   }
-  #app.battle #screen-game.active #btn-pause {
+  #app.battle #screen-game.active #btn-pause,
+  #app.classic #screen-game.active #btn-pause {
     position: relative;
     left: auto; top: auto;
     width: 40px !important; height: 40px !important;
@@ -52812,28 +52816,13 @@ html.menu-v2 #screen-menu .tagline{
   background-image:none !important;
   overflow:visible !important;
 }
-/* 일시정지 — 판 안 좌상단에 앉는다. 전투가 #app.battle #btn-pause 를 같은
-   문법으로 이미 절대배치하고 있다(:40024). 기준 상자는 #screen-game 이고
-   그것은 #hero-slot 이 이미 쓰는 그 기준이다(새 position 을 안 만든다). */
-#app.classic #btn-pause{
-  position:absolute;
-  left:calc(var(--safe-l) + 20px);
-  top:calc(var(--safe-t) + 14px);
-  width:40px !important;
-  height:40px !important;
-  z-index:6;
-  border-radius:50%;
-  border:0;
-  background:linear-gradient(180deg,#F9F1F6 0%,#F9F1F6 47%,#E4D9E6 47%,#E4D9E6 100%);
-  color:#5B4F62;
-  box-shadow:
-    inset 0 0 0 1.6px #A38FA5,
-    inset 0 0 0 3.2px rgba(255,255,255,.62),
-    0 2px 0 rgba(154,139,154,.55),
-    0 4px 10px rgba(120,95,125,.26);
-}
-#app.classic #btn-pause:active{ transform:translateY(1.5px); }
-#app.classic #btn-pause .ic{ width:16px; height:16px; }
+/* 일시정지 — [0908 ②] **은퇴**. 클래식 고유 정지 버튼(흰 원 + 보라 링 40x40 +
+   inset 그림자 넉 겹 · :active translateY · .ic 16px)은 사용자 반려
+   「아케이드/스토리와 같은 버튼으로」에 따라 여기서 지웠다. 클래식은 이제
+   전투와 **같은 규칙 한 벌**을 쓴다 — `#app.battle #btn-pause, #app.classic
+   #btn-pause`(<style id="hud-restore-0904"> 절). 죽은 선택자를 남기지 않으려고
+   주석 봉인이 아니라 삭제를 골랐다(되돌리기는 이 커밋 revert).
+   ⚠ #hero-slot 기준 상자 문장은 아래 절이 그대로 잇는다. */
 /* 캐릭터 슬롯도 판 안으로 — 좌우가 판 안쪽에서 대칭이 되도록 12 -> 16px. */
 #app.classic #hero-slot{
   top:calc(var(--safe-t) + 12px);
@@ -57672,7 +57661,14 @@ else window.addEventListener("load",start);
    position:absolute 로 시안 자리에 박는다) 상단바를 **높이 0** 으로 접는다.
    남기는 것은 safe-area 뿐이다 — "최상단"이 노치 밑을 뜻하지는 않는다.
    ⚠ overflow 를 visible 로 두는 것이 필수다: 접힌 상단바 밖으로 버튼이 나간다. */
-#app.battle #screen-game #topbar {
+/* [0908 ②] 클래식도 같은 상단바 계약을 쓴다 — 정지 버튼이 같은 자(--dh-w)로
+   같은 자리에 앉으려면 기준 상자가 같아야 한다. 클래식 상단바는 이미 실측
+   390x0 이고 #tb-stats 는 display:none 이라, 여기서 실제로 더해지는 것은
+   position:relative + container-type:inline-size + --dh-w 뿐이다(#hero-slot 은
+   right/top 앵커라 기준이 #screen-game(0,0,390) 에서 #topbar(0,0,390) 로
+   바뀜도 실측 rect 가 같다 — 수리 후 재측으로 확인). */
+#app.battle #screen-game #topbar,
+#app.classic #screen-game #topbar {
   border-width: 0;
   border-image: none;
   background: none;
@@ -57735,7 +57731,14 @@ else window.addEventListener("load",start);
    z-index 6 은 W6.5b 의 근거를 그대로 잇는다: #duel-hud 가 DOM 에서 #topbar
    **다음**이라 나중에 칠해지므로, 버튼 하나만 유리 위로 올린다(상단바를 올리면
    그 배경까지 함께 올라간다). */
-#app.battle #btn-pause{
+/* [0908 ②] 클래식도 **같은 버튼**이다 — 사용자 반려「클래식 정지 버튼을
+   아케이드/스토리 것과 같은 버튼으로」. 클래식 고유 정지 CSS 세 줄
+   (#app.classic #btn-pause / :active / .ic — 흰 원 + 보라 링 + inset 그림자)은
+   이 커밋에서 **제거**했다(죽은 선택자로 남기지 않는다). 마크업은 원래부터
+   같은 #btn-pause 하나이고 배선(on($('btn-pause'),'click',pause))도 공용이라
+   바뀐 것은 이 선택자 목록 한 줄뿐이다. 자산·자리 규칙·눌림까지 모두 공용. */
+#app.battle #btn-pause,
+#app.classic #btn-pause{
   background:url("catalog/duel-btn-pause.webp") center/contain no-repeat !important;
   box-shadow:none !important;border-radius:0 !important;
   position:absolute;
@@ -57746,6 +57749,10 @@ else window.addEventListener("load",start);
   aspect-ratio:152/151;
   z-index:6;
 }
+#app.battle #btn-pause .ic,
+#app.classic #btn-pause .ic{display:none !important;}   /* 그림이 ‖ 를 이미 갖고 있다 */
+#app.battle #btn-pause:active,
+#app.classic #btn-pause:active{transform:scale(.92);}
 #app.battle #duel-hud{
   /* 14차 재조립(시안 6호)으로 성 그림은 --duel-castle-img 를 떠나 .dh-castle 의
      직접 배경(duel-castle-hd, 202×188 고해상)이 됐다. 구판 duel-icon-castle.webp
