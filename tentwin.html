@@ -18210,7 +18210,8 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
     var once = function (ab) { if (fired) return; fired = true; try { cb(ab); } catch (e0) {} };
     try {
       if (typeof fetch === 'function') {
-        fetch(u, { credentials: 'omit' }).then(function (r) {
+        /* perf2-0908: 선디코드(bgmWarm)에서 온 요청은 priority:'low' — 첫 화면 문서·이미지에 양보(힌트, 미지원 브라우저 무시). 첫 탭의 온디맨드 로드는 종전대로. */
+        fetch(u, { credentials: 'omit', priority: (global.__twWarmLow ? 'low' : 'auto') }).then(function (r) {
           if (!r || !r.ok) { once(null); return null; }
           return r.arrayBuffer();
         }).then(function (ab) { if (ab) once(ab); }, function () { once(null); });
@@ -18541,7 +18542,10 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
     if (!T || T.state !== 'idle') { warmDone = true; return; }
     if (!trkUri(T)) return;                // bgm.js 가 아직 안 실렸다 — 다음 기회에
     warmDone = true;
+    /* perf2-0908: 선디코드 요청만 낮은 우선순위로(mainSrcBytes 가 이 플래그를 읽어 fetch priority:'low'). 동기 구간이라 finally 에서 바로 내린다. */
+    global.__twWarmLow = true;
     try { trkLoad(T); } catch (e) { /* 조용히 실패 — 첫 탭 때 예전처럼 로드된다 */ }
+    finally { global.__twWarmLow = false; }
   }
 
   /** 'load' 이후 → idle 에 한 번. 어느 단계가 없어도 그 아래로 내려간다. */
@@ -18560,9 +18564,13 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
         }
       } catch (e) { try { global.setTimeout(bgmWarm, 200); } catch (e2) {} }
     };
+    /* perf2-0908: load 직후가 아니라 load+1.2s 뒤에 예약한다. 실측(Lighthouse 관측 트레이스)에서 이 1.5MB 요청이
+       스플래시 최대 요소 페인트(load 후 ~0.5s) **앞**에 시작해 LCP 의존 그래프에 들어갔고, 느린 회선에서는 첫 화면
+       이미지·JS 와 대역폭을 다퉜다. 1.2s 는 관측 LCP(≤1.0s)보다 늦고, 첫 탭(보통 load 후 2~3s)보다는 이르다. */
+    var after = function () { try { global.setTimeout(idle, 1200); } catch (e) { idle(); } };
     try {
-      if (global.document.readyState === 'complete') idle();
-      else global.addEventListener('load', idle, { once: true });
+      if (global.document.readyState === 'complete') after();
+      else global.addEventListener('load', after, { once: true });
     } catch (e) { /* 조용히 무시 */ }
   }
 
@@ -42956,18 +42964,26 @@ window.TT_SFX = {
   function splashAudioBoot() {
     if (splashAutoTried) return;
     splashAutoTried = true;
+    /* perf2-0908: 여기서 시작되는 로비 곡 로드(1.5MB)는 선디코드와 같은 성격이라 fetch priority:'low' 로(플래그는
+       juice 의 mainSrcBytes 가 읽는다). 정책이 막으면 첫 제스처의 unlock 이 종전대로 이어받는다. */
+    try { window.__twWarmLow = true; } catch (e0) {}
     try {
       J.resumeAudio();
       if (J.bgm.scene !== noop) J.bgm.scene('menu');
       else J.bgm.start();
     } catch (e) { /* 조용히 대기 — 첫 제스처가 이어받는다 */ }
+    finally { try { window.__twWarmLow = false; } catch (e1) {} }
   }
 
   function splashAudioBootSchedule() {
     if (typeof document === 'undefined') return;
+    /* perf2-0908: load 직후 → load+1.2s. Lighthouse 관측에서 이 1.5MB 요청이 load 시점(스플래시 최대 요소 페인트 앞)에
+       나가 LCP 의존 그래프에 들어갔고(sim LCP 9.5s→19s), 실기기에선 첫 화면 이미지·JS 와 대역폭을 다퉜다.
+       자동재생은 대개 정책에 막혀 첫 탭이 이어받으므로 체감 차이는 없고, 허용되는 환경에서만 1.2s 늦게 흐른다. */
+    var boot = function () { try { window.setTimeout(splashAudioBoot, 1200); } catch (e) { splashAudioBoot(); } };
     try {
-      if (document.readyState === 'complete') splashAudioBoot();
-      else window.addEventListener('load', splashAudioBoot, { once: true });
+      if (document.readyState === 'complete') boot();
+      else window.addEventListener('load', boot, { once: true });
     } catch (e) { /* 조용히 무시 */ }
   }
 
@@ -56359,7 +56375,7 @@ function warm(){ for(var k=0;k<4;k++) next(); }    /* 동시 4장 유지 */
 function warmBgm(){
   var M=window.TT_AUDIO; if(!M||typeof fetch!=="function") return;
   /* perf-0908: 데이터 절약 모드·2g 에서는 7MB 프리페치를 하지 않는다(재생 직전 로드). */
-  try{ var c=navigator.connection; if(c&&(c.saveData||/(^|-)2g$/.test(c.effectiveType||''))) return; }catch(e){}
+  try{ var c=navigator.connection; if(c&&(c.saveData||/(^|-)2g$|^3g$/.test(c.effectiveType||''))) return; }catch(e){}   /* perf2-0908: 3g 도 제외(7.4MB 는 재생 직전 로드) */
   if(location.protocol==="file:") return;           /* file:// 은 CORS 로 막힌다 — 소음만 난다 */
   var K=["main","mainNight","ingame1","ingame2"],j=0;
   (function step(){
@@ -56373,11 +56389,20 @@ function warmBgm(){
     }catch(e){ step(); }
   })();
 }
+/* perf2-0908: 'load' **그리고** 첫 제스처(터치·클릭·키) 뒤에만 시작한다. 실측: 프리로드 183장(4MB)+BGM 4곡(7.4MB)이
+   load 직후 한꺼번에 나가 첫 화면 문서·로비 곡 선디코드와 대역폭을 다퉜다(Lighthouse 요청 195건이 전부 FCP 앞).
+   스플래시는 어차피 제스처로 넘어가므로 그 뒤에 데워도 팝업 첫 채움은 같다. 제스처 없이 30초가 지나면 그때 시작(안전핀). */
+var armed=0,loaded=(document.readyState==="complete"),gest=0;
 function start(){
+  if(armed) return; armed=1;
   (window.requestIdleCallback||function(f){setTimeout(f,600);})(warm,{timeout:1500});
 }
-if(document.readyState==="complete") start();
-else window.addEventListener("load",start);
+function maybe(){ if(loaded&&gest) start(); }
+function onGest(){ gest=1; maybe(); }
+["pointerdown","touchstart","keydown"].forEach(function(t){ window.addEventListener(t,onGest,{once:true,passive:true,capture:true}); });
+function armSafety(){ setTimeout(function(){ gest=1; maybe(); },30000); }
+if(loaded){ maybe(); armSafety(); }
+else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); });
 })();
 </script>
 <style id="hud-restore-0904">
