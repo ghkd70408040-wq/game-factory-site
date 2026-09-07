@@ -1891,7 +1891,7 @@ button {
    (알려진 한계: `[data-sp="wild"]` 는 엘리먼트 filter 를 wildhue 애니가 이미
    쓰고 있어 와일드 타일에서는 발광이 안 난다. 와일드는 그 자체로 이미 가장
    눈에 띄는 타일이라 잃는 것이 없다고 보고 그대로 둔다.) */
-:root { --candok-glow: rgba(64, 226, 160, .62); }
+:root { --candok-glow: var(--role-candok-glow); }
 
 .tile.cand-ok {
   filter:
@@ -2045,7 +2045,7 @@ button {
 /* A mid-tone slate, chosen so one value carries both themes: it is lighter than
    the dark ground (#16131F) and darker than the cream one (#FBF7EF), so no
    per-theme override is needed and the two light blocks stay untouched. */
-:root { --blocker-ring: rgba(110, 134, 184, .95); }
+:root { --blocker-ring: var(--role-blocker-ring); }
 
 .tile.blocker { z-index: 3; }
 /* The ring rides on ::before, restating the full chunky stack the way .cand
@@ -2119,7 +2119,7 @@ button {
    빨강 한 값으로 두 테마를 다 쓴다: 어두운 바닥(#16131F)보다 밝고 크림
    바닥(#FBF7EF)보다 어두워서 --blocker-ring 과 같은 이유로 테마별 분기가
    필요 없다. 두 라이트 블록을 건드리지 않아도 되는 이유다. */
-:root { --blocker-hot: rgba(255, 77, 94, .95); }
+:root { --blocker-hot: var(--role-blocker-hot); }
 
 .tile.blocker::before {
   box-shadow:
@@ -2838,11 +2838,11 @@ li.roll-in { animation: rollin 380ms var(--spring) backwards; }
    보드 타일이 비쳐 안 읽힘. **같은 CSS 변수**를 그 세 창까지 넓혀 `.result-card`
    가 물려 쓴다(하나의 봉인값 출처). ------------------------------------------- */
 #modal-howto, #modal-clear, #modal-adv, #modal-over{
-  --hcard-fill:   #E2D7D7;                /* = --cs-desc-box   (설명상자 면색) */
-  --hcard-fill-2: #E2D7D7;                /* = --cs-desc-box-2 */
-  --hcard-line:   rgba(140,116,146,.60);  /* = .kit-box-v2 겉선 */
-  --hcard-rim:    rgba(255,255,255,.55);  /* = .kit-box-v2::after 안쪽 흰 림 */
-  --hcard-lo:     rgba(0,0,0,.07);         /* = .kit-box-v2::after 밑동 그림자 */
+  --hcard-fill:   var(--role-hcard-fill-result);                /* = --cs-desc-box   (설명상자 면색) */
+  --hcard-fill-2: var(--role-hcard-fill-result);                /* = --cs-desc-box-2 */
+  --hcard-line:   var(--role-hcard-line-result);  /* = .kit-box-v2 겉선 */
+  --hcard-rim:    var(--prim-white-a55);  /* = .kit-box-v2::after 안쪽 흰 림 */
+  --hcard-lo:     var(--prim-black-a07);         /* = .kit-box-v2::after 밑동 그림자 */
   --hcard-r:      18px;                     /* 코너 (.kit-box-v2 = .0354×판폭) */
 }
 #modal-howto .howto-art{
@@ -2911,11 +2911,11 @@ li.roll-in { animation: rollin 380ms var(--spring) backwards; }
    렌더 면색은 반투명이라 뒤 판/블러 메뉴에 따라 변한다 — 관문(Δ채도≤3·α≤.05)은
    캡처 실측으로 확인. */
 #modal-howto{
-  --hcard-fill:   rgba(172,180,191,.82);   /* S1 회보라 · 뒤 은은히 비침 */
-  --hcard-fill-2: rgba(159,167,181,.82);
-  --hcard-line:   rgba(120,126,144,.55);   /* S1 얇은 옅은 겉선 */
-  --hcard-rim:    rgba(255,255,255,.34);   /* S1 안쪽 옅은 광 (크림보다 약) */
-  --hcard-lo:     rgba(40,40,60,.10);
+  --hcard-fill:   var(--role-hcard-fill-howto);   /* S1 회보라 · 뒤 은은히 비침 */
+  --hcard-fill-2: var(--role-hcard-fill-2-howto);
+  --hcard-line:   var(--role-hcard-line-howto);   /* S1 얇은 옅은 겉선 */
+  --hcard-rim:    var(--prim-white-a34);   /* S1 안쪽 옅은 광 (크림보다 약) */
+  --hcard-lo:     var(--role-hcard-lo-howto);
   --hcard-r:      22px;                     /* S1 큰 코너 */
 }
 /* S1 색 점 — 빨·연두·민트·보라·핑크(+주황·파랑으로 7까지). `.dot` 은 튜토리얼
@@ -2928,13 +2928,13 @@ li.roll-in { animation: rollin 380ms var(--spring) backwards; }
     var(--hd-c, #C9BFD6);
   box-shadow: inset 0 -1px 1px rgba(0,0,0,.18), 0 1px 1px rgba(0,0,0,.16);
 }
-#howto-dots .dot:nth-child(1){ --hd-c:#D6402A; }   /* 빨 */
-#howto-dots .dot:nth-child(2){ --hd-c:#AEC21C; }   /* 연두 */
-#howto-dots .dot:nth-child(3){ --hd-c:#33D4AD; }   /* 민트 */
-#howto-dots .dot:nth-child(4){ --hd-c:#7B5FD1; }   /* 보라 */
-#howto-dots .dot:nth-child(5){ --hd-c:#E85B9B; }   /* 핑크 */
-#howto-dots .dot:nth-child(6){ --hd-c:#F09A2E; }   /* 주황 */
-#howto-dots .dot:nth-child(7){ --hd-c:#3AA6DE; }   /* 파랑 */
+#howto-dots .dot:nth-child(1){ --hd-c:var(--role-hd-c-1); }   /* 빨 */
+#howto-dots .dot:nth-child(2){ --hd-c:var(--role-hd-c-2); }   /* 연두 */
+#howto-dots .dot:nth-child(3){ --hd-c:var(--role-hd-c-3); }   /* 민트 */
+#howto-dots .dot:nth-child(4){ --hd-c:var(--role-hd-c-4); }   /* 보라 */
+#howto-dots .dot:nth-child(5){ --hd-c:var(--role-hd-c-5); }   /* 핑크 */
+#howto-dots .dot:nth-child(6){ --hd-c:var(--role-hd-c-6); }   /* 주황 */
+#howto-dots .dot:nth-child(7){ --hd-c:var(--role-hd-c-7); }   /* 파랑 */
 #howto-dots .dot.on{
   background:
     radial-gradient(circle at 34% 30%, rgba(255,255,255,.82), rgba(255,255,255,0) 48%),
@@ -4155,7 +4155,7 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   width: 44px;
   height: 44px;
   pointer-events: none;    /* 터치는 언제나 보드/버튼의 것 */
-  --hs-key: #3E8BF0;       /* game.js applyCharSkin() 이 캐릭터 키색으로 갈아 끼운다 */
+  --hs-key: var(--role-ch-ten-key);       /* game.js applyCharSkin() 이 캐릭터 키색으로 갈아 끼운다 */
 }
 /* 젤리 프레임: 반투명 셸 + 상단 광택 + 키색 링. 타일과 같은 문법이라 새 아트가
    0 이고, 링만 캐릭터 색이라 "지금 누구로 놀고 있는가"가 색 하나로 읽힌다. */
@@ -4868,7 +4868,7 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   gap: 4px;
   text-align: center;
   white-space: nowrap;
-  --iw-key: #FFD34D;
+  --iw-key: var(--role-rw-shard-luck-3);
 }
 .iw-main {
   font-size: var(--iw-size, 56px);
@@ -5154,7 +5154,7 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   white-space: nowrap;
   background: rgba(255, 255, 255, .06);
   box-shadow: inset 0 0 0 1px var(--tw-key, var(--line));
-  --tw-key: #3E8BF0;
+  --tw-key: var(--role-ch-ten-key);
 }
 #tw-chip[hidden] { display: none; }
 .tw-dots { display: inline-flex; gap: 3px; }
@@ -5198,7 +5198,7 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   pointer-events: none;
   opacity: 0;
   text-align: center;
-  --cb-key: #FF6B3D;
+  --cb-key: var(--role-ch-twin-key);
 }
 #tw-banner.show { animation: cb-burst 1.05s cubic-bezier(.16, 1.02, .3, 1) 1; }
 #tw-num {
@@ -5386,8 +5386,8 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
 
 /* 응원하는 왕자 형제 — 카드 아바타와 같은 파츠 문법을 축약한 것.
    색은 그룹별 변수 두 개(--hu-k 선 / --hu-b 몸)로만 갈린다. */
-.hu-av .hu-pr-a { --hu-k: #3E8BF0; --hu-b: #CFE4FF; }
-.hu-av .hu-pr-b { --hu-k: #FF6B3D; --hu-b: #FFD9C8; }
+.hu-av .hu-pr-a { --hu-k: var(--role-ch-ten-key); --hu-b: var(--role-ch-ten-body); }
+.hu-av .hu-pr-b { --hu-k: var(--role-ch-twin-key); --hu-b: var(--role-ch-twin-body); }
 .hu-av .hu-pb  { fill: var(--hu-b); stroke: var(--hu-k); stroke-width: 2; }
 .hu-av .hu-pg  { fill: rgba(255, 255, 255, .62); }
 .hu-av .hu-ant { fill: none; stroke: var(--hu-k); stroke-width: 2.4; stroke-linecap: round; }
@@ -5629,7 +5629,7 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   --map-gap: 108px;
   --map-len: 128px;
   --map-rot: 57.8deg;
-  --map-rope: rgba(255, 255, 255, .38);
+  --map-rope: var(--prim-white-a38);
   padding-bottom: 40px;
 }
 
@@ -5820,7 +5820,7 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   box-shadow: inset 0 -3px 0 rgba(0, 0, 0, .22), 0 3px 0 rgba(0, 0, 0, .3);
 }
 .map-node.st-lock .mn-num { color: rgba(255, 255, 255, .45); }
-.map-node.st-lock::before { --map-rope: rgba(255, 255, 255, .18); }
+.map-node.st-lock::before { --map-rope: var(--prim-white-a18); }
 /* 13차-b: 옛 CSS 도형 자물쇠(.mn-lock)를 지웠다 — game.js 어디에서도 그
    클래스를 만들지 않는 죽은 규칙이었고, 살아 있는 자물쇠는 아래쪽
    .map-node.st-lock::before 배지(도서관 sp-glyph-lock)다. */
@@ -6346,7 +6346,7 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
     box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .10);
     text-shadow: none;
   }
-  :where(:root:not([data-theme="dark"])) #map-path { --map-rope: rgba(60, 40, 80, .34); }
+  :where(:root:not([data-theme="dark"])) #map-path { --map-rope: var(--role-map-rope-path-light); }
   :where(:root:not([data-theme="dark"])) .map-stat { background: rgba(0, 0, 0, .05); }
   :where(:root:not([data-theme="dark"])) .mn-stars { -webkit-text-stroke-color: rgba(70, 48, 20, .85); }
   :where(:root:not([data-theme="dark"])) .node-stars,
@@ -6366,7 +6366,7 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .10);
   text-shadow: none;
 }
-:where(:root[data-theme="light"]) #map-path { --map-rope: rgba(60, 40, 80, .34); }
+:where(:root[data-theme="light"]) #map-path { --map-rope: var(--role-map-rope-path-light); }
 :where(:root[data-theme="light"]) .map-stat { background: rgba(0, 0, 0, .05); }
 :where(:root[data-theme="light"]) .mn-stars { -webkit-text-stroke-color: rgba(70, 48, 20, .85); }
 :where(:root[data-theme="light"]) .node-stars,
@@ -6443,7 +6443,7 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   -webkit-tap-highlight-color: transparent;
   /* 게이지 0~1. game.js syncSkill() 이 단독 소유자. */
   --sk: 0;
-  --sk-key: #3E8BF0;
+  --sk-key: var(--role-ch-ten-key);
 }
 #skill-btn[hidden] { display: none; }
 
@@ -6550,7 +6550,7 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   display: block;
   overflow: hidden;
   cursor: pointer;
-  --cut-key: #3E8BF0;
+  --cut-key: var(--role-ch-ten-key);
 }
 #cutin[hidden] { display: none; }
 
@@ -12464,8 +12464,8 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
      더하지 않는 것이 규율이다 — 한 화면의 강조색이 전역 토큰이 되면 다음 화면이
      그것을 상속받고, 그때부터 색은 아무 뜻도 없어진다. */
 #modal-node .node-info {
-  --nk-pink: #E4568C;
-  --nk-pink-soft: rgba(228, 86, 140, .11);
+  --nk-pink: var(--role-nk-pink-node);
+  --nk-pink-soft: var(--role-nk-pink-soft-node);
   list-style: none;
   margin: 8px 0 2px;
   padding: 9px 11px;
@@ -12846,6 +12846,66 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
   /* -- prim -- */
   --prim-white-a10: rgba(255,255,255,.10);
   --prim-white-a34: rgba(255,255,255,.34);
+
+
+  /* [E76-0908 norm-rest · 그룹 B] 남은 접두의 원시색을 이름만 이관 — 값 신설 0, 값 동일은 기존 토큰 붕괴.
+     그룹 A 보상 원판(--mk-)·과일 광택/접지(--fr-)·보석 면(--gem-) · B 잔여 접두(hv2/h2/hd/hu/bg-/map/lt/wslot/jbox/blocker/nk/candok/키/hcard/wcap/cpj/hudj)
+     C 캐릭창 --f2- 정본 E값 + 메뉴 버튼 역할색(menu1 옛 코드 젤리 / menu2 그림 버튼 폴백) · D 팔레트 Primitive(--prim-cN/-light, tN=cN 다크)
+     E ART 팔레트(--prim-art-*) + Mode L 슬롯 6(:root@7759 에서 이동). 옛 이름은 전부 var() 브릿지로 유지(소비처 무변). */
+  /* -- role -- */
+  --role-candok-glow: rgba(64, 226, 160, .62);
+  --role-blocker-ring: rgba(110, 134, 184, .95);
+  --role-blocker-hot: rgba(255, 77, 94, .95);
+  --role-hcard-fill-result: #E2D7D7;
+  --role-hcard-line-result: rgba(140,116,146,.60);
+  /* -- prim -- */
+  --prim-white-a55: rgba(255,255,255,.55);
+  --prim-black-a07: rgba(0,0,0,.07);
+  /* -- role -- */
+  --role-hcard-fill-howto: rgba(172,180,191,.82);
+  --role-hcard-fill-2-howto: rgba(159,167,181,.82);
+  --role-hcard-line-howto: rgba(120,126,144,.55);
+  --role-hcard-lo-howto: rgba(40,40,60,.10);
+  --role-hd-c-1: #D6402A;
+  --role-hd-c-2: #AEC21C;
+  --role-hd-c-3: #33D4AD;
+  --role-hd-c-4: #7B5FD1;
+  --role-hd-c-5: #E85B9B;
+  --role-hd-c-6: #F09A2E;
+  --role-hd-c-7: #3AA6DE;
+  /* -- prim -- */
+  --prim-white-a38: rgba(255, 255, 255, .38);
+  /* -- role -- */
+  --role-map-rope-path-light: rgba(60, 40, 80, .34);
+  --role-nk-pink-node: #E4568C;
+  --role-nk-pink-soft-node: rgba(228, 86, 140, .11);
+  --role-jbox-shadow-modal: rgba(83,28,40,.213);
+  --role-jbox-tint-actionbar: rgba(170, 218, 255, .30);
+  --role-jbox-tint-map-bot: rgba(170, 218, 255, .39);
+  --role-wcap-face-top-classic-cap: #A2B2F8;
+  --role-cpj-face-top-charsel: #E7DDE2;
+  --role-cpj-fill-c-charsel: #EFE6F6;
+  --role-lt-ink-node-mv2: #8F4A84;
+  --role-lt-white-node-mv2: #FBF2FB;
+  --role-lt-glow-node-mv2: #FFE2F2;
+  --role-lt-drop-node-mv2: rgba(90, 44, 84, .42);
+  --role-hv2-hp-c1: #EFA2C4;
+  --role-hv2-hp-c2: #F4C0B3;
+  --role-hv2-hp-foe-c1: #C895F4;
+  --role-hv2-hp-foe-c2: #D8A8F2;
+  --role-hv2-hp-lo-c1: #F0778F;
+  --role-hv2-hp-lo-c2: #F4A76B;
+  --role-hv2-hp-gain: #BDEB91;
+  --role-h2-ink: #4B3F52;
+  --role-h2-ink-3: rgba(75,63,82,.62);
+  --role-h2-aw: #FFC98A;
+  --role-hudj-glow-c-classic-hud: #A3BBD9;
+  --role-wcap-face-top-modal-title-node: #ECE2E6;
+  --role-wcap-glow-c-modal-title-node: #C2BCC3;
+  --role-wcap-L3-line-modal-title-node: #76547A;
+  --role-wslot-face-crystal: #D8C0D4;
+  --role-wslot-L3-line-crystal: #6C4A72;
+  --role-modal-tint: rgba(255,242,255,.17);
 }
 </style>
 <!-- 최우선 2장만 preload — 젤리판(세 인터페이스 공용)과 플레이 팝업 레터링이다.
@@ -43833,7 +43893,7 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
        남는다(색역 밖 해). 그래서 **색상은 한 자리도 안 바꾼다** - 바꾼 것은
        offset-y . blur . alpha 셋뿐이다.
      되돌리기: 아래 한 줄을 --jbox-shadow:0 14px 34px rgba(83,28,40,.26); 로 바꾼다. */
-  --jbox-shadow:0 15.3px 5.1px rgba(83,28,40,.213);
+  --jbox-shadow:0 15.3px 5.1px var(--role-jbox-shadow-modal);
   /* W2.5 ⑤ — 값의 유래와 실측은 위 :root 의 --modal-tint/--modal-glass 주석.
      옛 값: --jbox-blur:blur(5px) saturate(1.18); (틴트는 등급에 없었다 —
      `.w6m` 소비처가 크림 .50 을 따로 들고 있었고 견본 둘은 무틴트였다). */
@@ -44324,7 +44384,7 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
      더 비친다. 밝기 +6% 는 색이 아니라 backdrop-filter 의 brightness(1.06) 로
      얹는다 — 틴트 α 를 더 올리면 다시 판이 덮여 뒤가 죽기 때문이다.
      원본: --jbox-tint: rgba(215, 236, 253, .40); */
-  --jbox-tint: rgba(170, 218, 255, .30);
+  --jbox-tint: var(--role-jbox-tint-actionbar);
   --jbox-blur: var(--jbox-frost) brightness(1.06);
   padding:8px calc(var(--safe-r) + 10px) calc(var(--safe-b) + 9px) calc(var(--safe-l) + 10px) !important;
 }
@@ -44558,7 +44618,7 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
      더 비친다. 밝기 +6% 는 색이 아니라 backdrop-filter 의 brightness(1.06) 로
      얹는다 — 틴트 α 를 더 올리면 다시 판이 덮여 뒤가 죽기 때문이다.
      원본: --jbox-tint: rgba(215, 236, 253, .52); */
-  --jbox-tint: rgba(170, 218, 255, .39);
+  --jbox-tint: var(--role-jbox-tint-map-bot);
   --jbox-blur: var(--jbox-frost) brightness(1.06);
   height: calc(25.61cqw + var(--safe-b));
   padding: 0 0 var(--safe-b);
@@ -46119,8 +46179,8 @@ html[lang="en"] .splash-logo{
   left:29.0cqw; top:8.4cqw;
   width:42.3cqw; height:15.7cqw;
   --wcap-w:42.3cqw; --wcap-h:15.7cqw;
-  --wcap-face:#96A7F6; --wcap-face-top:#A2B2F8; --wcap-a-in:.657;
-  --wcap-L3-line:#6F6BB4; --wcap-rim-c:#C2D6FF; --wcap-glow-c:#B4CBF5;
+  --wcap-face:var(--mode-b-face); --wcap-face-top:var(--role-wcap-face-top-classic-cap); --wcap-a-in:.657;
+  --wcap-L3-line:var(--mode-b-outline); --wcap-rim-c:var(--mode-b-rim); --wcap-glow-c:var(--mode-b-glow-bubble);
   display:flex;
   align-items:center;
   justify-content:center;
@@ -49403,7 +49463,7 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   /* [E60-0904 · 면색 복구] 크림 #EFEBE8(⑤ 0904 반려) -> 캐논 라벤더핑크 #E6DCE2.
      모달 판(catalog/jelly-box.webp 재굽기)·캡슐과 **한 색**으로 통일한다
      (사용자 gold standard aa0a7479 = 라벤더핑크 see-through). face-y 램프 없음 유지. */
-  --cpj-face: var(--mode-a-face); --cpj-face-top: #E7DDE2; --cpj-face-y: 100%; --cpj-rim-c: var(--mode-a-rim);
+  --cpj-face: var(--mode-a-face); --cpj-face-top: var(--role-cpj-face-top-charsel); --cpj-face-y: 100%; --cpj-rim-c: var(--mode-a-rim);
   /* [L1] 색 바탕 = **판 뒤 평탄층**. 배경 층 목록의 맨 밑이고 .cp-jelly 의
      clip-path(실루엣)가 바깥을 자르므로 판 밖 무대 아트에는 한 화소도 안 닿는다.
      [E36-0903] 시안 실측 #E3E7D7 (227,231,215 · L* 90.9 · backdrop-0903/CSS-VALUES §1)
@@ -49474,7 +49534,7 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   --cpj-L3-w: calc(var(--f2-ref-w) * 0.00400);
   --cpj-L3-line: var(--mode-a-outline);   /* [E32-0903] 실측 (159,136,150) L3-a .70 역산 · 복구 #955579 */
   --cpj-L3-a: .700;
-  --cpj-fill-c: #EFE6F6;   /* ⑤ a-fill 0 이라 무효지만 봉인값으로 되돌림 */
+  --cpj-fill-c: var(--role-cpj-fill-c-charsel);   /* ⑤ a-fill 0 이라 무효지만 봉인값으로 되돌림 */
 }
 /* 탭과 본체는 언제나 덮개 위. 오늘의 겹침 순서 그대로다. */
 #charpanel .cp-card > .cp-tabs,
@@ -50769,13 +50829,13 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
      즉 **시안 테는 더 얇고, 굵어 보인 것은 흰 테가 없었기 때문**이다. */
   --lt-plum-w:  .0429em;   /* 자두 테 = 2.99%Hc */
   --lt-white-w: .0269em;   /* 흰 테   = 1.87%Hc  (착수 전 0 — 아예 없었다) */
-  --lt-ink:    #8F4A84;    /* 시안 두 이미지에서 침식한 심의 평균 */
-  --lt-white:  #FBF2FB;
-  --lt-glow:   #FFE2F2;
+  --lt-ink:    var(--role-lt-ink-node-mv2);    /* 시안 두 이미지에서 침식한 심의 평균 */
+  --lt-white:  var(--role-lt-white-node-mv2);
+  --lt-glow:   var(--role-lt-glow-node-mv2);
   --lt-glow-a: .42;
   --lt-glow-r: .086em;     /* 옛 .30em(= 캡슐높이 21%)은 h2 상하 여백 18% 보다
                               커서 **광이 캡슐 위에서 잘려 나갔다**. 시안은 6%. */
-  --lt-drop:   rgba(90, 44, 84, .42);
+  --lt-drop:   var(--role-lt-drop-node-mv2);
 
   display: inline-block;
   position: relative;
@@ -50957,23 +51017,23 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
   --h2-w: min(95.7vw, 860px);
   --h2-alpha: .425;               /* 시안 B 실측. 블러 없음 */
 
-  --hv2-hp-c1:      #EFA2C4;
-  --hv2-hp-c2:      #F4C0B3;
-  --hv2-hp-foe-c1:  #C895F4;
-  --hv2-hp-foe-c2:  #D8A8F2;
-  --hv2-hp-lo-c1:   #F0778F;   /* 위험(HP<25%) */
-  --hv2-hp-lo-c2:   #F4A76B;
-  --hv2-hp-drain:   #FFFFFF;   /* 감소 잔상 */
-  --hv2-hp-gain:    #BDEB91;   /* 증가 잔상 */
+  --hv2-hp-c1:      var(--role-hv2-hp-c1);
+  --hv2-hp-c2:      var(--role-hv2-hp-c2);
+  --hv2-hp-foe-c1:  var(--role-hv2-hp-foe-c1);
+  --hv2-hp-foe-c2:  var(--role-hv2-hp-foe-c2);
+  --hv2-hp-lo-c1:   var(--role-hv2-hp-lo-c1);   /* 위험(HP<25%) */
+  --hv2-hp-lo-c2:   var(--role-hv2-hp-lo-c2);
+  --hv2-hp-drain:   var(--prim-white);   /* 감소 잔상 */
+  --hv2-hp-gain:    var(--role-hv2-hp-gain);   /* 증가 잔상 */
   --hv2-hp-track:   var(--f2-slot);
 
-  --h2-ink:     #4B3F52;
-  --h2-ink-3:   rgba(75,63,82,.62);
-  --h2-aw:      #FFC98A;
-  --h2-atk-1:   #FF8A3D;
-  --h2-atk-2:   #FFD24D;
-  --h2-atk-foe-1:#FF5A3D;
-  --h2-atk-foe-2:#FFB03D;
+  --h2-ink:     var(--role-h2-ink);
+  --h2-ink-3:   var(--role-h2-ink-3);
+  --h2-aw:      var(--role-h2-aw);
+  --h2-atk-1:   var(--role-me-atk-b);
+  --h2-atk-2:   var(--role-me-atk-a);
+  --h2-atk-foe-1:var(--role-foe-atk-a);
+  --h2-atk-foe-2:var(--role-foe-atk-b);
 }
 
 /* ============================================================
@@ -52006,7 +52066,7 @@ html.menu-v2 #screen-menu .tagline{
        부품 폭 대비 CV 60%. 그래서 --f2-ref-w(캔버스 자)에 매단다.
        띠 두 값은 alpha(d)=0.90*(1-d/D)^1.7 에 최소자승으로 맞춘 것이다
        (spread=0.307246 D · blur=0.624734 D · rmse 0.0144). */
-  --hudj-glow-c:  #A3BBD9;   /* 글로 면색 — 시안 HUD 넓은 판 d6..13 실측 (163,187,217) */
+  --hudj-glow-c:  var(--role-hudj-glow-c-classic-hud);   /* 글로 면색 — 시안 HUD 넓은 판 d6..13 실측 (163,187,217) */
   --hudj-band-w:  calc(var(--f2-ref-w) * 0.021313);   /* 글로 번짐 (도달 D 26.2 시안px) */
   --hudj-band-s:  calc(var(--f2-ref-w) * 0.010482);   /* 글로 퍼짐 — 겉선에 붙는 진한 몫 */
   --hudj-band-dy: 0px;   /* 위 변 면제 자리 — 시안 대조 결과 **0 유지**.
@@ -52041,7 +52101,7 @@ html.menu-v2 #screen-menu .tagline{
   --hudj-L3-w: calc(var(--f2-ref-w) * 0.00400);
   --hudj-L3-line: var(--mode-b-outline);
   --hudj-L3-a: .700;
-  --hudj-fill-c: #EFE6F6;
+  --hudj-fill-c: var(--role-cpj-fill-c-charsel);
   --hudj-rim-a: 0.4000;   /* 기준 .250 x (82/90) — 클래식만 림이 옅다 */
   --hudj-gnd-a: var(--mode-b-contact);   /* 기준 .324 x (13/17) — 클래식만 접지가 옅다 */
 }
@@ -52709,7 +52769,7 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
      **화소를 0개 칠한다**. 그래도 S9 값으로 옮긴다 - 훗날 면을 켜면 계열이 갈리기 때문이다.
      이 두 줄의 실화면 dRGB 는 0 이다(그렇게 보고한다). */
   /* [E60-0904] 부품 기준 = 캐릭창 정보판 정석(라벤더핑크). 아래 .wf-cap 오버라이드와 같은 값. */
-  --wcap-face: var(--mode-a-face); --wcap-face-top: #ECE2E6; --wcap-face-y: 100%; --wcap-rim-c: var(--mode-a-rim);
+  --wcap-face: var(--mode-a-face); --wcap-face-top: var(--role-wcap-face-top-modal-title-node); --wcap-face-y: 100%; --wcap-rim-c: var(--mode-a-rim);
   --wcap-a-fill: 0;        /* 색 바탕 없음 = 맑은 유리 (시안) */
   /* [E17-0903 · 재질층 §3] 캡슐 판 α .010 -> **.622** (zoneb_hud · 흩어짐 .03).
      hud 판 위에 얹힌 자기 층의 α 이고 맨 장면 대비 실효는 .87 이다. */
@@ -52741,7 +52801,7 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
   /* [E52-0903 - S9] 글로 면색. 옛 값 #96BDC9 (시안 캡슐 d6..19 실측 150,190,201 - 청록).
      S9 의 같은 자리(림 바로 안쪽 띠)는 #C2BCC3 (193.9, 188.2, 195.3) 로 **거의 무채**다.
      되돌리기: 아래 한 줄을 #96BDC9 로 바꾼다. */
-  --wcap-glow-c: #C2BCC3;
+  --wcap-glow-c: var(--role-wcap-glow-c-modal-title-node);
   --wcap-band-w: calc(var(--f2-ref-w) * 0.027739);   /* 글로 번짐 (도달 D 34.1 시안px) */
   --wcap-band-s: calc(var(--f2-ref-w) * 0.013642);   /* 글로 퍼짐 */
   --wcap-haze: 0;
@@ -52796,7 +52856,7 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
      (우리 --wcap-L3-w 1.00%W). 림은 x11~18 = 1.09%W (우리 시작 1.00 + 폭 0.83). */
   /* [E52-0903 - S9] 겉선 재료색 #8286B4 (푸른 회청) -> **#76547A** (S9 실측 117.6,83.8,121.6).
      되돌리기: #8286B4 */
-  --wcap-L3-line: #76547A;
+  --wcap-L3-line: var(--role-wcap-L3-line-modal-title-node);
   --wcap-L3-blur: calc(var(--wcap-L3-w) * 0.28);
 
   position: relative;
@@ -53890,7 +53950,7 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
      시안 실측 gemslot stroke FWHM 은 3.0px 다 — **같은 값**이다.
      즉 옛 값이 틀린 게 아니라 **분모가 자기 상자**였던 것이 문제였다. */
   --wslot-L3-w:    calc(var(--f2-ref-w) * 0.00400);
-  --wslot-L3-line: #6B5A69;
+  --wslot-L3-line: var(--mode-a-outline-chip-base);
   --wslot-L3-a:    .363;
   /* [E30-0903 · 판 α 재판정] .010 -> .929. 4행 슬롯 속.
      뒤판 a=1.000 을 고정한 뒤 젬 상자 안쪽 4px 표본 40,862 화소에서 풀었다.
@@ -53898,7 +53958,7 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
        화면 합성 ΔRGB 67.2 -> **2.7** (관문 8 통과) · 잔차 rms 1.8
      봉인: --wslot-a-in:    .010; */
   --wslot-a-in:    .929;
-  --wslot-face:    #D8C0D4;
+  --wslot-face:    var(--role-wslot-face-crystal);
   border-radius: 21%;                            /* 정본 --wf-L0-R 0.2100 */
   background-color: transparent;
   background-image: linear-gradient(color-mix(in srgb, var(--wslot-face)
@@ -54040,7 +54100,7 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
 #charpanel[data-cpside="item"]  .cp-gem[data-cpside="item"],
 #charpanel[data-cpside="skin"]  .cp-gem[data-cpside="skin"],
 #charpanel[data-cpside="skill"] .cp-gem[data-cpside="skill"]{
-  --wslot-face: #D8C0D4;
+  --wslot-face: var(--role-wslot-face-crystal);
   /* [E30-0903] 활성 젬도 같은 α 로 맞춘다(.78 -> .929). 시안은 세 단이 모두
      같은 속색이고, 활성 강조는 겉선 알파(--wslot-L3-a .560)가 그대로 낸다.
      봉인: --wslot-a-in: .78; */
@@ -54118,9 +54178,9 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
    되돌리기: .wf-cap{ --wcap-L3-line: #8286B4; --wcap-face: #BEBEE4; --wcap-face-top: #D4DCF7; --wcap-face-y: 100%; --wcap-rim-c: #D0DBF1; } */
 /* [E60-0904] 캡슐 재료색 = 캐릭창 정보판 정석(라벤더핑크). 크림/회청 S9 폐기.
    기하(area B 폭·크기)는 불변 — 재료색만 바꾼다. face #E6DCE2 · rim #FAF5F4 · 겉선 #9F8896. */
-.wf-cap{ --wcap-L3-line: var(--mode-a-outline); --wcap-face: var(--mode-a-face); --wcap-face-top: #ECE2E6; --wcap-face-y: 100%; --wcap-rim-c: var(--mode-a-rim); }
+.wf-cap{ --wcap-L3-line: var(--mode-a-outline); --wcap-face: var(--mode-a-face); --wcap-face-top: var(--role-wcap-face-top-modal-title-node); --wcap-face-y: 100%; --wcap-rim-c: var(--mode-a-rim); }
 .wf-chip{ --wchip-L3-line: var(--mode-a-outline-chip); }
-#charpanel .cp-crystal{ --wslot-L3-line: #6C4A72; }
+#charpanel .cp-crystal{ --wslot-L3-line: var(--role-wslot-L3-line-crystal); }
 
 /* ---------------------------------------------------------------------------
    ② 캐릭터판 탭 = **실제 분할** (사용자 반려 3 「곡선대로 판을 실제로 나눠라」)
@@ -55267,9 +55327,9 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
        --wcap-L3-line: #AA6FA2;   시안 제목 겉선 (170,111,162)
        --wcap-rim-c:   #EDC6EF;   시안 제목 속 림 (237,198,239)
        --wcap-glow-c:  #D9ACD8; */
-  --wcap-L3-line: #76547A;
-  --wcap-rim-c:   #E3D8DF;
-  --wcap-glow-c:  #C2BCC3;
+  --wcap-L3-line: var(--role-wcap-L3-line-modal-title-node);
+  --wcap-rim-c:   var(--mode-a-face-desc);
+  --wcap-glow-c:  var(--role-wcap-glow-c-modal-title-node);
   /* [A5] 그림층 좌우 자 — 같은 13.18 % 를 «캡슐 폭» 기준으로 준다 */
   --ttl-pad: 13.18%;
   /* ④ (0904) 제목 그림을 나머지 14창과 같은 규칙(아래 generic ::after = contain
@@ -56832,7 +56892,7 @@ else window.addEventListener("load",start);
      글자 가독은 판을 희생해 지키지 않는다 — 텍스트 헤일로(흰 그림자)가 이미
      모든 제목·본문에 붙어 있고, 그것이 이 파도에서 판을 밀 수 있는 이유다.
      옛 값: rgba(255,242,255,.40) · blur(0px) saturate(1.04) brightness(1.03) */
-  --modal-tint:rgba(255,242,255,.17);
+  --modal-tint:var(--role-modal-tint);
   --modal-glass:blur(0px) saturate(1.06);
 }
 .jbox--slab{            /* 전투 상단 슬래브 — 그림자는 그림 알파를 따라야 해서 filter */
@@ -56949,7 +57009,7 @@ else window.addEventListener("load",start);
   --hud-groove-r:url("catalog/hud-groove-right.webp");     /* 우 체력바 홈(트랙) */
   --hud-orn-foe:url("catalog/duel-orn-bone.webp");         /* 좌 진영 뼈 장식 */
   --hud-orn-me:url("catalog/duel-orn-wing.webp");          /* 우 진영 날개 장식 */
-  --hud-tick-c:rgba(255,255,255,.55);                      /* 눈금 색(코드 층) */
+  --hud-tick-c:var(--prim-white-a55);                      /* 눈금 색(코드 층) */
   --hud-tick-w:0.42cqw;                                    /* 눈금 선 폭 */
 }
 #app.battle #duel-hud .dh-plate,
@@ -57301,12 +57361,12 @@ else window.addEventListener("load",start);
      HUD 안에서만 덮는다(캐릭창 캡슐 무변). 종전 #cp-h 연보라는 이 sky 로 대체. */
   --wcap-w:42.3cqw;
   --wcap-h:15.7cqw;
-  --wcap-face:#96A7F6;
-  --wcap-face-top:#A2B2F8;
+  --wcap-face:var(--mode-b-face);
+  --wcap-face-top:var(--role-wcap-face-top-classic-cap);
   --wcap-a-in:.657;
-  --wcap-L3-line:#6F6BB4;
-  --wcap-rim-c:#C2D6FF;
-  --wcap-glow-c:#B4CBF5;
+  --wcap-L3-line:var(--mode-b-outline);
+  --wcap-rim-c:var(--mode-b-rim);
+  --wcap-glow-c:var(--mode-b-glow-bubble);
   font-size:44px !important;               /* @container 미지원 폴백 */
   font-size:14.3cqw !important;
   letter-spacing:.02em;
