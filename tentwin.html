@@ -58835,5 +58835,58 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
   #app.classic #classic-hud .ch-t{ --f2-gh:3.6vw; top:28.5vw; }
 }
 </style>
+<style id="compat-p1">
+/* [E60-0908 기기 폴백 P1] 컨테이너 단위(cqw)·color-mix()·shape() 를 모르는 기기(iOS 15.x / Chrome 104 급) 폴백.
+   규격 GAME-FACTORY-STANDARD §5 S5 "새 CSS 기능은 @supports 폴백". 값은 정본 규칙의 숫자 그대로이고 단위만
+   컨테이너 폭 환산(--cqw = 앱 폭의 1%, 앱 폭 = min(100vw, --app-max)). 폴백 강제 검증: scratchpad/fallback-0908. */
+@supports not (width: 1cqw) {
+  /* 맵 화면 — 상단 바(뒤로·하트·별·설정)·하단 바가 컨테이너 단위만 써서 통째로 사라지던 것 */
+  #screen-map { --cqw: min(1vw, calc(var(--app-max) / 100)); }
+  #screen-map #map-top { height: calc(20 * var(--cqw)); }
+  #screen-map #map-back { left: calc(3.76 * var(--cqw)); top: calc(3.83 * var(--cqw)); width: calc(14.99 * var(--cqw)); height: calc(15.46 * var(--cqw)); }
+  #screen-map #map-hearts { left: calc(21.91 * var(--cqw)); top: calc(5.51 * var(--cqw)); width: calc(33.32 * var(--cqw)); height: calc(12.60 * var(--cqw)); }
+  #screen-map #map-stars { left: calc(56.31 * var(--cqw)); top: calc(5.87 * var(--cqw)); width: calc(21.75 * var(--cqw)); height: calc(11.71 * var(--cqw)); }
+  #screen-map #map-gear { left: calc(81.40 * var(--cqw)); top: calc(3.85 * var(--cqw)); width: calc(14.92 * var(--cqw)); height: calc(15.43 * var(--cqw)); }
+  #screen-map #map-hearts-v { font-size: calc(5.40 * var(--cqw)); text-shadow: 0 calc(.3 * var(--cqw)) 0 rgba(176, 82, 112, .7); }
+  #screen-map #map-heart-t { font-size: calc(4.40 * var(--cqw)); text-shadow: 0 calc(.3 * var(--cqw)) 0 rgba(150, 66, 92, .8); }
+  #screen-map #map-stars-v { font-size: calc(5.00 * var(--cqw)); text-shadow: 0 calc(.3 * var(--cqw)) 0 rgba(196, 140, 40, .85); }
+  #screen-map #map-bot { height: calc(25.61 * var(--cqw) + var(--safe-b)); }
+  #screen-map #map-bot > * { top: calc(14.0 * var(--cqw)); }
+  #screen-map #map-b1 { height: calc(12.47 * var(--cqw)); }
+  #screen-map #map-plate { height: calc(18.97 * var(--cqw)); }
+  #screen-map #map-char { height: calc(18.62 * var(--cqw)); }
+  #screen-map #map-rec { height: calc(18.78 * var(--cqw)); }
+  #screen-map #map-b1-v { font-size: calc(5.60 * var(--cqw)); text-shadow: 0 calc(.3 * var(--cqw)) 0 rgba(196, 140, 40, .85); }
+  #screen-map #map-ch-k, #screen-map #map-ch-n { text-shadow: 0 calc(.3 * var(--cqw)) 0 rgba(96, 40, 72, .7); }
+  #screen-map #map-ch-k { font-size: calc(4.40 * var(--cqw)); }
+  #screen-map #map-ch-n { margin-top: calc(.55 * var(--cqw)); font-size: calc(2.90 * var(--cqw)); }
+  #screen-map #map-plate .mp-arrow { width: calc(4.6 * var(--cqw)); font-size: calc(5 * var(--cqw)); text-shadow: 0 calc(.3 * var(--cqw)) 0 rgba(96, 40, 72, .7); }
+  #screen-map #map-ch-prev { left: calc(-1 * var(--cqw)); }
+  #screen-map #map-ch-next { right: calc(-1 * var(--cqw)); }
+  #screen-map #map-char > span, #screen-map #map-rec > span { font-size: calc(3.5 * var(--cqw)); text-shadow: 0 calc(.28 * var(--cqw)) 0 rgba(92, 58, 78, .7); }
+  /* 클래식 HUD — 기존 폴백(vw)이 #ch-cap.wf-cap 의 cqw 커스텀 속성에 밀려 캡슐이 0px 로 접히고, HUD 높이가 aspect-ratio 로 떨어져 목표 줄이 위로 붙던 것 */
+  #app.classic #classic-hud { --cqw: min(1vw, calc(var(--app-max) / 100)); height: calc(38.5 * var(--cqw)); }
+  #app.classic #ch-cap.wf-cap { --wcap-w: calc(42.3 * var(--cqw)); --wcap-h: calc(15.7 * var(--cqw)); left: calc(29.0 * var(--cqw)); top: calc(8.4 * var(--cqw)); }
+  #app.classic #classic-hud .ch-g { --f2-ph: calc(6.9 * var(--cqw)); --jh: calc(8.09 * var(--cqw)); gap: calc(1.0 * var(--cqw)); padding: 0 calc(1.8 * var(--cqw)); border-image-width: 0 calc(5.37 * var(--cqw)); }
+  #app.classic #classic-hud .ch-g::after { font-size: calc(2.85 * var(--cqw)); }
+  #app.classic #classic-hud .ch-g b { font-size: calc(4.2 * var(--cqw)); }
+  #app.classic #classic-hud .ch-i { width: calc(4.4 * var(--cqw)); height: calc(4.4 * var(--cqw)); }
+  #app.classic .ch-i-goal { box-shadow: inset 0 0 0 calc(.9 * var(--cqw)) #E86A9E, 0 1px 0 rgba(255,255,255,.75); }
+  /* 상단바 폭 변수(--dh-w) — 일시정지 버튼(모험·클래식 공용) 위치·크기가 여기서 나온다. cqw 무효 시 기본 아이콘 버튼으로 퇴행하던 것 */
+  #app.battle #screen-game #topbar, #app.classic #screen-game #topbar { --cqw: min(1vw, calc(var(--app-max) / 100)); --dh-w: calc(100 * var(--cqw) - var(--safe-l) - var(--safe-r) - 8px); }
+}
+@supports not (color: color-mix(in srgb, red 10%, blue)) {
+  /* 캐릭창 판 3종 — 채움이 color-mix 로만 정의돼 판이 투명해지고 글자가 배경 위에 맨몸으로 놓이던 것.
+     젤리 판: ::before 로 face 색 + a-in 투명도(정본 토큰). 겉선은 L3 선색(투명도 없이). */
+  #charpanel .cp-fx > .cp-jelly { background-image: none; box-shadow: inset 0 0 0 var(--cpj-L3-w) var(--cpj-L3-line); }
+  #charpanel .cp-fx > .cp-jelly::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background: var(--cpj-face); opacity: var(--cpj-a-in); pointer-events: none; }
+  #charpanel .cp-side-body { background: var(--f2-box); }
+  #charpanel .ci-desc { background: var(--cs-desc-box); }
+  #charpanel .cp-card > .cp-tabs > .cp-tab::after { background: #AC98AA; }
+  #charpanel .cp-side-rack .cp-gem-n { background: var(--f2-tab-on); box-shadow: inset 0 0 0 calc(var(--f2-w) * .0022) #6B5A69; }
+  /* 클래식 시간·점수 캡슐 — 채움(color-mix) 이 통째로 무효가 되던 것. face 토큰 단색. */
+  #app.classic #ch-cap.wf-cap { background-image: none; background-color: var(--wcap-face); box-shadow: inset 0 0 0 var(--wcap-L3-w) var(--wcap-L3-line); border-radius: calc(var(--wcap-h) * .5); }
+}
+</style>
 </body>
 </html>
