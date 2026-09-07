@@ -12628,6 +12628,24 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
   --role-magenta-outline:#5B4E9B; --role-magenta-contact:#7E8FC6;
   /* 고리 굵기 — Mode 무관. (19)항의 자 그대로: --f2-ref-w * 0.00350 = 1.505px @430 */
   --role-outline-w:calc(var(--f2-ref-w) * 0.00350);
+
+  /* [E70-0908 norm-wf] §2 Semantic(Mode) — 재질 Mode 두 벌(위 역할색 열과 같은 슬롯 어휘·같은 파일) — 값의 유일 출처. 슬롯 이름은 정본
+     theme-tentwin.css 와 같다(face·alpha·rim·outline·gloss·contact). Mode A =
+     모달 안(정석 S11, 사용자 승인 0904) → --cpj-(캐릭창 판)·--wcap-(제목 캡슐)이
+     참조한다. Mode B = 모달 밖(HUD) — 선언만 두고 소비처 0 (HUD 계열은 wave/hudframes
+     가 실측값으로 덮는 중이라 이 파도에서 안 건드린다). 값은 정본과 한 자도 같다. */
+  --mode-a-face:    #E6DCE2;
+  --mode-a-alpha:   0.544;
+  --mode-a-rim:     #FAF5F4;
+  --mode-a-outline: #9F8896;
+  --mode-a-gloss:   0.770;
+  --mode-a-contact: 0.324;
+  --mode-b-face:    #ACB8F8;
+  --mode-b-alpha:   0.550;
+  --mode-b-rim:     #E4EAFF;
+  --mode-b-outline: #6F6BB4;
+  --mode-b-gloss:   0.770;
+  --mode-b-contact: 0.000;
 }
 </style>
 <!-- 최우선 2장만 preload — 젤리판(세 인터페이스 공용)과 플레이 팝업 레터링이다.
@@ -48985,7 +49003,7 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   /* [E60-0904 · 면색 복구] 크림 #EFEBE8(⑤ 0904 반려) -> 캐논 라벤더핑크 #E6DCE2.
      모달 판(catalog/jelly-box.webp 재굽기)·캡슐과 **한 색**으로 통일한다
      (사용자 gold standard aa0a7479 = 라벤더핑크 see-through). face-y 램프 없음 유지. */
-  --cpj-face: #E6DCE2; --cpj-face-top: #E7DDE2; --cpj-face-y: 100%; --cpj-rim-c: #FAF5F4;
+  --cpj-face: var(--mode-a-face); --cpj-face-top: #E7DDE2; --cpj-face-y: 100%; --cpj-rim-c: var(--mode-a-rim);
   /* [L1] 색 바탕 = **판 뒤 평탄층**. 배경 층 목록의 맨 밑이고 .cp-jelly 의
      clip-path(실루엣)가 바깥을 자르므로 판 밖 무대 아트에는 한 화소도 안 닿는다.
      [E36-0903] 시안 실측 #E3E7D7 (227,231,215 · L* 90.9 · backdrop-0903/CSS-VALUES §1)
@@ -49044,17 +49062,17 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   --cpj-rim-p3: calc(var(--cpj-rim-a) * var(--cpj-rim-k3));
   --cpj-rim-p2: calc(1 - (1 - var(--cpj-rim-a) * var(--cpj-rim-k2)) / (1 - var(--cpj-rim-a) * var(--cpj-rim-k3)));
   --cpj-rim-p1: calc(1 - (1 - var(--cpj-rim-a)) / (1 - var(--cpj-rim-a) * var(--cpj-rim-k2)));
-  --cpj-gl-a: .770;
+  --cpj-gl-a: var(--mode-a-gloss);
   --cpj-gl1-w: 12.7%;  --cpj-gl1-h: 6.6%;
   --cpj-gl1-px: 2.95%;  --cpj-gl1-py: 1.3%;
   --cpj-gl2-w: 5.1%;  --cpj-gl2-h: 2.0%;
   --cpj-gl2-px: 19.45%; --cpj-gl2-py: 1.7%;
-  --cpj-gnd-a: .324;
+  --cpj-gnd-a: var(--mode-a-contact);
   --cpj-gnd-y: calc(var(--cpj-w) * .01125);
   --cpj-gnd-b: calc(var(--cpj-w) * .01125);
   /* [L3] 외곽선 — 정본 charsel 3차 실측값(순수색 L*63.4 · 번짐 0) */
   --cpj-L3-w: calc(var(--f2-ref-w) * 0.00400);
-  --cpj-L3-line: #9F8896;   /* [E32-0903] 실측 (159,136,150) L3-a .70 역산 · 복구 #955579 */
+  --cpj-L3-line: var(--mode-a-outline);   /* [E32-0903] 실측 (159,136,150) L3-a .70 역산 · 복구 #955579 */
   --cpj-L3-a: .700;
   --cpj-fill-c: #EFE6F6;   /* ⑤ a-fill 0 이라 무효지만 봉인값으로 되돌림 */
 }
@@ -53681,7 +53699,7 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
      **화소를 0개 칠한다**. 그래도 S9 값으로 옮긴다 - 훗날 면을 켜면 계열이 갈리기 때문이다.
      이 두 줄의 실화면 dRGB 는 0 이다(그렇게 보고한다). */
   /* [E60-0904] 부품 기준 = 캐릭창 정보판 정석(라벤더핑크). 아래 .wf-cap 오버라이드와 같은 값. */
-  --wcap-face: #E6DCE2; --wcap-face-top: #ECE2E6; --wcap-face-y: 100%; --wcap-rim-c: #FAF5F4;
+  --wcap-face: var(--mode-a-face); --wcap-face-top: #ECE2E6; --wcap-face-y: 100%; --wcap-rim-c: var(--mode-a-rim);
   --wcap-a-fill: 0;        /* 색 바탕 없음 = 맑은 유리 (시안) */
   /* [E17-0903 · 재질층 §3] 캡슐 판 α .010 -> **.622** (zoneb_hud · 흩어짐 .03).
      hud 판 위에 얹힌 자기 층의 α 이고 맨 장면 대비 실효는 .87 이다. */
@@ -53699,7 +53717,7 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
      봉인: --wcap-a-in: .010; */
   /* [E60-0904] 맑은 유리 0 -> 캐논 라벤더핑크 면 켬. 캐릭창 정보판 --cpj-a-in 과 같은 .544
      로 두어 캡슐 면색이 정보판과 같은 see-through 로 합성되게 한다(gate 알파차 <= .03). */
-  --wcap-a-in: .544;
+  --wcap-a-in: var(--mode-a-alpha);
   --wcap-a-rim: 1.000;
   /* [E38-0903 · 면 제거 + 안쪽 글로] 시안에는 **면(균일 채움)이 없다**.
      빈 틀 시안 a13c656f 는 순크로마그린인데 이 부품 기하 속면이 키와 dE 3.3~4.9
@@ -53742,7 +53760,7 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
   /* ---- [L2-2] 광택 2점. 정본은 «중심» 으로 적고 여기는 배경 자리라
          px = (cx - w/2) / (100 - w) * 100 으로 옮겼다(같은 점이다). ---- */
   /* [E60-0904] 광택 .930 -> .770 (캐논 soft gloss · 정보판 --cpj-gl-a 와 같은 값). */
-  --wcap-gl-a: .770;
+  --wcap-gl-a: var(--mode-a-gloss);
   --wcap-gl1-w: 15.7%;  --wcap-gl1-h: 27.3%;
   --wcap-gl1-px: 6.45%;  --wcap-gl1-py: 2.95%;
   --wcap-gl2-w: 1.95%;   --wcap-gl2-h: 8.90%;
@@ -55295,7 +55313,7 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
         푸른 회청     : 전투/클래식 HUD · 날개판 · 타이머 캡슐  (사용자 반려 2)
       제목 캡슐(.mvh)은 자두 #9B4697 그대로다 - 그 시안(81f987cb)이 자두다.
    --------------------------------------------------------------------------- */
-#charpanel .cp-fx > .cp-jelly{ --cpj-L3-line: #9F8896; }   /* [E32-0903] 실측 · 복구 #955579 */
+#charpanel .cp-fx > .cp-jelly{ --cpj-L3-line: var(--mode-a-outline); }   /* [E32-0903] 실측 · 복구 #955579 */
 .modal-v2 .mv2-sheet{ --mv2j-L3-line: #966B92; }
 #duel-hud .kit-hud-v2__plate,
 #duel-hud .kit-hud-v2__plate > .dh-jelly{ --f2-line: #44417A; --dhj-L3-line: #6F6BB4; --dhj-face: #8DA6E6; --dhj-face-top: #B0C7FE; --dhj-face-y: 100%; --dhj-rim-c: #B0C7FE; }
@@ -55307,7 +55325,7 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
    되돌리기: .wf-cap{ --wcap-L3-line: #8286B4; --wcap-face: #BEBEE4; --wcap-face-top: #D4DCF7; --wcap-face-y: 100%; --wcap-rim-c: #D0DBF1; } */
 /* [E60-0904] 캡슐 재료색 = 캐릭창 정보판 정석(라벤더핑크). 크림/회청 S9 폐기.
    기하(area B 폭·크기)는 불변 — 재료색만 바꾼다. face #E6DCE2 · rim #FAF5F4 · 겉선 #9F8896. */
-.wf-cap{ --wcap-L3-line: #9F8896; --wcap-face: #E6DCE2; --wcap-face-top: #ECE2E6; --wcap-face-y: 100%; --wcap-rim-c: #FAF5F4; }
+.wf-cap{ --wcap-L3-line: var(--mode-a-outline); --wcap-face: var(--mode-a-face); --wcap-face-top: #ECE2E6; --wcap-face-y: 100%; --wcap-rim-c: var(--mode-a-rim); }
 .wf-chip{ --wchip-L3-line: #685568; }
 #charpanel .cp-crystal{ --wslot-L3-line: #6C4A72; }
 
@@ -55672,7 +55690,7 @@ html[lang="en"] #modal-mode .mode-list #mode-adv{--advb-fs:.0645;}
      실현가능 상한 위반 화소 0%). 1.000 은 「불투명으로 도망가는 해법」이었고
      사용자 반려 「어째서 젤리판이 투명하지 않은 거야?」가 정확히 이 자리다.
      봉인(되돌리기): --cpj-a-in: 1.000; */
-  --cpj-a-in: .5440;
+  --cpj-a-in: var(--mode-a-alpha);
   --cpj-rim-w: calc(var(--f2-ref-w) * 0.00350);
   --cpj-rim-a: 0.9800;
   --cpj-L3-w: calc(var(--f2-ref-w) * 0.00400);
