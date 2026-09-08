@@ -13316,13 +13316,13 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
            내용물(미션·점수·게이지)만 클래식 것. -->
       <i class="dh-plate dh-plate--top" data-part="hud-plate" data-variant="top" aria-hidden="true"></i>
       <i class="dh-plate dh-plate--bot" data-part="hud-plate" data-variant="bottom" aria-hidden="true"></i>
-      <span id="ch-baby" class="dh-baby cp-th kit-chip-v2" aria-hidden="true"><i class="ct-art" aria-hidden="true"></i></span>
+      <span id="ch-baby" class="dh-baby cp-th kit-chip-v2" data-slot="pet-bubble" aria-hidden="true"><i class="ct-art" aria-hidden="true"></i></span>
       <div class="ch-fx" aria-hidden="true"><i class="ch-gnd"></i><i class="ch-jelly"></i></div>
       <i class="dh-cap" data-part="hud-capsule" aria-hidden="true"></i>
-      <i id="ch-castle" aria-hidden="true"></i>
-      <div id="ch-cap" class="wf-cap"><span id="ch-cap-v">0</span></div>
-      <div id="ch-l" class="ch-g"><i class="ch-i ch-i-goal" aria-hidden="true"></i><b id="ch-l-v">0</b></div>
-      <div id="ch-r" class="ch-g"><i class="ch-i ch-i-score" aria-hidden="true"></i><b id="ch-r-v">0</b></div>
+      <i id="ch-castle" data-slot="castle" data-overhang="y" aria-hidden="true"></i>
+      <div id="ch-cap" class="wf-cap" data-slot="timer-capsule" data-overhang="y"><span id="ch-cap-v">0</span></div>
+      <div id="ch-l" class="ch-g" data-slot="goal"><i class="ch-i ch-i-goal" aria-hidden="true"></i><b id="ch-l-v">0</b></div>
+      <div id="ch-r" class="ch-g" data-slot="score"><i class="ch-i ch-i-score" aria-hidden="true"></i><b id="ch-r-v">0</b></div>
       <div id="ch-tl" class="ch-t" aria-hidden="true"><span></span></div>
       <div id="ch-tc" class="ch-t" aria-hidden="true"><span></span></div>
       <div id="ch-tr" class="ch-t" aria-hidden="true"><span></span></div>
@@ -13373,29 +13373,29 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
       <i class="dh-orn dh-orn--mr" aria-hidden="true"></i>
       <i class="dh-tick dh-tick--l" aria-hidden="true"></i>
       <i class="dh-tick dh-tick--r" aria-hidden="true"></i>
-      <span id="duel-foe-av" class="dh-av boss-av bs-grape" aria-hidden="true"></span>
-      <span id="duel-me-av" class="dh-av dh-av-me" aria-hidden="true"></span>
+      <span id="duel-foe-av" class="dh-av boss-av bs-grape" data-slot="av-foe" data-overhang="art" aria-hidden="true"></span>
+      <span id="duel-me-av" class="dh-av dh-av-me" data-slot="av-me" data-overhang="art" aria-hidden="true"></span>
       <!-- 펫 방울 = 캐릭창 랙 방울 부품 재사용(원형 젤리 kit-chip-v2 + .ct-art 얼굴).
            8/19 남색 임시 스킨은 은퇴했다(아래 §펫방울 주석). -->
-      <span id="duel-baby" class="dh-baby cp-th kit-chip-v2" aria-hidden="true"><i class="ct-art" aria-hidden="true"></i></span>
+      <span id="duel-baby" class="dh-baby cp-th kit-chip-v2" data-slot="pet-bubble" aria-hidden="true"><i class="ct-art" aria-hidden="true"></i></span>
       <!-- .dh-mid 는 자리를 차지하지 않는 **쌓임 상자**다(inset:0 · z-index:1):
            #duel-timer 의 유리겹이 z-index:-1 이라 그 -1 을 여기 가둬 둔다. -->
-      <div class="dh-mid">
+      <div class="dh-mid" data-slot="timer-capsule" data-overhang="y">
         <i class="dh-cap" data-part="hud-capsule" aria-hidden="true"></i>
         <span class="dh-castle" aria-hidden="true">&#127984;</span>
         <div id="duel-timer" class="wf-cap" role="timer">0:00</div>
       </div>
-      <div class="dh-side dh-foe">
+      <div class="dh-side dh-foe" data-slot="side-foe">
         <b id="duel-foe-name" class="dh-name"></b><span id="duel-foe-lv" class="dh-lv">Lv.1</span>
         <div class="dh-bar"><i id="duel-foe-fill" class="dh-fill"></i><span id="duel-foe-n" class="dh-num">0 / 0</span></div>
         <div class="dh-sub"><i id="duel-foe-atk" class="dh-subfill"></i></div>
       </div>
-      <div class="dh-side dh-me">
+      <div class="dh-side dh-me" data-slot="side-me">
         <b id="duel-me-name" class="dh-name"></b><span id="duel-me-lv" class="dh-lv">Lv.1</span>
         <div class="dh-bar"><i id="duel-me-fill" class="dh-fill"></i><span id="duel-me-n" class="dh-num">0 / 0</span></div>
         <div class="dh-sub"><i id="duel-me-atk" class="dh-subfill"></i></div>
       </div>
-      <span id="duel-dmg" class="dh-dmg"></span>
+      <span id="duel-dmg" class="dh-dmg" data-slot="dmg"></span>
     </div>
     <!-- v2 HUD strip. Collapses to 0px when both children are [hidden] (no vertical
          padding of its own), so classic Endless / Daily keep the v1 board height. -->
@@ -56960,6 +56960,19 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
   filter:drop-shadow(0 .5cqw .5cqw rgba(var(--prim-ink-plum-rgb),.14));
 }
 #app.classic #classic-hud [data-part="hud-capsule"]{ z-index:1; }  /* 클래식: 판 위, #ch-cap 글리프 아래 */
+/* [0908 원칙 0] 슬롯 안전 상자(engine §hud-slots 사본) — 값 = 매니페스트 slot_safe(부모 상자 기준 %,
+   DOM 실측 0908). 기본은 **선언만**(렌더 무접촉). [data-guard] 를 컨테이너에 켜면 overhang 이 아닌
+   슬롯을 overflow:clip 으로 상자 안에 가둔다(음성 테스트·관제탑 검사용). [data-overhang="y"] =
+   설계상 판 밖으로 걸치는 슬롯(성·타이머 캡슐). */
+#app.battle #duel-hud [data-slot], #app.classic #classic-hud [data-slot]{ --safe-x:initial; --safe-y:initial; --safe-w:initial; --safe-h:initial; }
+#app.battle #duel-hud [data-slot="pet-bubble"], #app.classic #classic-hud [data-slot="pet-bubble"]{ --safe-x:84.80%; --safe-y:8.28%; --safe-w:13.00%; --safe-h:67.34%; }
+#app.battle #duel-hud [data-slot="timer-capsule"], #app.classic #classic-hud [data-slot="timer-capsule"]{ --safe-x:29.00%; --safe-y:43.51%; --safe-w:42.30%; --safe-h:81.33%; }
+#app.battle #duel-hud [data-slot="dmg"]{ --safe-x:55.00%; --safe-y:2.54%; --safe-w:17.00%; --safe-h:20.26%; }
+#app.classic #classic-hud [data-slot="castle"]{ --safe-x:45.93%; --safe-y:3.96%; --safe-w:8.90%; --safe-h:42.22%; }
+#app.battle #duel-hud [data-slot="side-foe"]{ --safe-x:6.32%; --safe-y:28.64%; --safe-w:37.98%; --safe-h:36.51%; }
+#app.battle #duel-hud [data-slot="side-me"]{ --safe-x:61.58%; --safe-y:27.08%; --safe-w:31.34%; --safe-h:38.07%; }
+#app.battle #duel-hud[data-guard] [data-slot]:not([data-overhang]),
+#app.classic #classic-hud[data-guard] [data-slot]:not([data-overhang]){ overflow:clip !important; clip-path:inset(0) !important; }
 
 /* ── 체력바 4층: 홈(트랙)·채움(코드)·눈금(코드)·장식(뼈/날개) — 각 별도 요소·별도 교체점 ──
    좌표는 코드 채움(.dh-bar, 무접촉)의 실렌더 박스에 앵커한다: S6 bbox 캔버스(1694×608)는
