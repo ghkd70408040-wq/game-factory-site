@@ -56970,7 +56970,7 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
 #app.battle #duel-hud [data-slot], #app.classic #classic-hud [data-slot]{ --safe-x:initial; --safe-y:initial; --safe-w:initial; --safe-h:initial; }
 #app.battle #duel-hud [data-slot="pet-bubble"], #app.classic #classic-hud [data-slot="pet-bubble"]{ --safe-x:84.80%; --safe-y:8.28%; --safe-w:13.00%; --safe-h:67.34%; }
 #app.battle #duel-hud [data-slot="timer-capsule"], #app.classic #classic-hud [data-slot="timer-capsule"]{ --safe-x:29.00%; --safe-y:43.51%; --safe-w:42.30%; --safe-h:81.33%; }
-#app.battle #duel-hud [data-slot="dmg"]{ --safe-x:55.00%; --safe-y:2.54%; --safe-w:17.00%; --safe-h:20.26%; }
+#app.battle #duel-hud [data-slot="dmg"]{ --safe-x:46.40%; --safe-y:0%; --safe-w:26.37%; --safe-h:25.31%; }  /* [lineage-0908] 글리프 최대 상자 재실측(그림자 3px 포함) */
 #app.classic #classic-hud [data-slot="castle"]{ --safe-x:45.93%; --safe-y:3.96%; --safe-w:8.90%; --safe-h:42.22%; }
 #app.battle #duel-hud [data-slot="side-foe"]{ --safe-x:6.32%; --safe-y:28.64%; --safe-w:37.98%; --safe-h:36.51%; }
 #app.battle #duel-hud [data-slot="side-me"]{ --safe-x:61.58%; --safe-y:27.08%; --safe-w:31.34%; --safe-h:38.07%; }
@@ -57478,7 +57478,10 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
 /* 누적 데미지 — 시안에 자리가 없어 성과 큰구름 사이의 빈 하늘에 눕힌다. */
 #app.battle #duel-dmg{
   position:absolute;
-  left:55%;top:1.5%;width:17%;height:12%;
+  /* [lineage-0908] 슬롯 상자 = 글리프 최대 상자(DMG 99999 ◆ 99/99 + 그림자 3px) 실측: 우끝 72%·세로 중심 9.525px 은
+     그대로 두고(글자 자리 불변, 픽셀 0) 왼쪽·위아래로만 넓혔다 — 옛 55%/1.5%/17%/12% 는 글리프보다 작아 guard 시 자기 글자를 잘랐다. */
+  left:46.4%;top:0;width:calc(25.6% + 3px);height:15%;
+  box-sizing:border-box;padding-right:3px;  /* 그림자 3px 를 상자 안에 — 글자 우끝(280.8px)은 padding 으로 고정 */
   display:flex;align-items:center;justify-content:flex-end;
   margin:0;
   font-size:10px;font-size:2.44cqw;
