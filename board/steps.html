@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="robots" content="noindex">
+<title>스텝 — 에셋 하나가 지나가는 길</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="board.css">
+<link rel="stylesheet" href="work-frame.css">
+<link rel="stylesheet" href="board-factory.css">
+<link rel="stylesheet" href="board-live.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="board-theme.css">
+</head>
+<body>
+<nav class="site-nav">
+<span class="nav-brand">🏭 게임 공장</span>
+<a href="index.html">홈</a>
+<a href="plan.html">기획실</a>
+<span class="nav-sep"></span>
+<a href="screen-hud.html">HUD</a>
+<a href="screen-modal.html">모달</a>
+<a href="screen-charsel.html">캐릭창</a>
+<a href="screen-map.html">지도</a>
+<span class="nav-sep"></span>
+<a href="warehouse.html">창고</a>
+<a href="factory.html">공장</a>
+<a href="gate.html">관문실</a>
+<a href="steps.html" class="is-current">스텝</a>
+</nav>
+<div class="page">
+  <h1 class="page-title">스텝 — 에셋 하나가 지나가는 길</h1>
+  <div class="page-meta">규격 S0~S7(<b>GAME-FACTORY-STANDARD §5</b>) · 스킬 A0~A12(<b>skills/asset-frame</b>) · 여기 그림은 전부 실제 산출물 — 그림마다 출처 파일명 한 줄</div>
+
+  <div class="focus-line"><b>초점</b>주어진 시안 한 장이 접수 → 분해 → 판정 → 재질 → 제작 → 배선 → 관문 → 승인·푸시로 어떻게 넘어가는가 · 두 번째 예시는 같은 길에서 어디가 무너졌고 기준이 어떻게 생겼는가<span class="src">S2~S7 · A0~A12</span></div>
+
+  <div class="steps-legend">
+    <span><span class="state state-ok">🟢</span> 통과·푸시됨</span>
+    <span><span class="state state-none">🔴</span> 반려·실패</span>
+    <span><span class="state state-partial">🟡</span> 진행 중·판정 대기</span>
+    <span class="mono">S# = 규격 단계 · A# = 스킬 단계</span>
+    <span>칸 = <b>입력</b> · <b>한 일</b> · <b>산출</b> · <b>관문</b> · <b>도구</b></span>
+  </div>
+
+  <!-- ================= 예시 1 ================= -->
+  <h2 class="section-title">예시 1 · HUD 위 판 <span class="tier tier-t2">T2</span> <span class="tag mono">t2-plate-hud-top-plain-lite</span> <span class="state state-ok">🟢 푸시됨</span></h2>
+
+  <div class="steps-rail steps-rail--ok">
+
+    <section class="step is-ok">
+      <div class="step-head"><span class="step-no">1</span><span class="step-code">S2 · A0 접수</span><span class="step-title">시안 두 장을 등재하고 크로마를 뜯는다</span></div>
+      <div class="step-cols">
+        <div class="step-col"><div class="step-col-k">입력</div>
+          <div class="step-fig"><img src="img/steps/s7-chroma.jpg" alt="S7 크로마 시트" loading="lazy"></div>
+          <div class="step-src">tentwin/assets/sian-src/HUD-shape-chroma.png (S7-shape, 1694×608)</div>
+          <div class="step-fig is-tall"><img src="img/steps/s6-ingame.jpg" alt="S6 인게임 시안" loading="lazy"></div>
+          <div class="step-src">tentwin/assets/sian-src/S6-ingame.png (S6, 768×1376)</div></div>
+        <div class="step-col"><div class="step-col-k">한 일</div>
+          <div class="step-line">사용자가 <b>"시안"</b>이라 부른 것만 S# 등재. ASCII 사본을 만들고, 이미 뜯은 적이 있는지(md5·pHash) 먼저 검사한 뒤 초록 배경을 키로 잡아 도형을 분리한다.</div></div>
+        <div class="step-col"><div class="step-col-k">산출</div>
+          <div class="step-fig"><img src="img/steps/intake-s7.jpg" alt="접수 시트 — 프레임 후보 7" loading="lazy"></div>
+          <div class="step-src">tentwin/ref-v2/intake/S7-shape/SHEET.png · frames.json (프레임 후보 7 · T2 3 · T3 3 · T5 1)</div></div>
+        <div class="step-col"><div class="step-col-k">관문</div>
+          <pre class="step-raw">재추적 검사: 동일 1건 · 유사 10건 → S7-shape 재사용
+f01 T2 x15 y0 1670×308  ← 위 판
+Δ%W 최대 0.45 (기준 2%) PASS</pre></div>
+        <div class="step-col"><div class="step-col-k">도구</div>
+          <pre class="step-cmd">python tools/intake/sian-intake.py tentwin/assets/sian-src/HUD-shape-chroma.png --kind chroma --screen hud</pre></div>
+      </div>
+    </section>
+
+    <section class="step is-ok">
+      <div class="step-head"><span class="step-no">2</span><span class="step-code">S3 · A1~A3 형태·레이아웃·판정</span><span class="step-title">계층을 정하고 코드인지 자산인지 가른다</span></div>
+      <div class="step-cols">
+        <div class="step-col"><div class="step-col-k">입력</div>
+          <div class="step-fig"><img src="img/steps/intake-s7-sheet.jpg" alt="분해 시트" loading="lazy"></div>
+          <div class="step-src">tentwin/ref-v2/intake/S7-shape/SHEET.png</div></div>
+        <div class="step-col"><div class="step-col-k">한 일</div>
+          <div class="step-line">위 판은 <b>T2 컨테이너</b>. 겉선·림·광점이 손질감으로 구워져 있어 <b>asset</b>(구운 층 1~4). 값이 들어갈 자리는 슬롯 3개로 비워 둔다.</div></div>
+        <div class="step-col"><div class="step-col-k">산출 · 매니페스트 원문</div>
+          <dl class="step-kv">
+            <dt>id</dt><dd>t2-plate-hud-top-plain-lite</dd>
+            <dt>tier</dt><dd>T2 · kind frame · frames 1</dd>
+            <dt>impl</dt><dd>asset · baked_layers [1,2,3,4]</dd>
+            <dt>shape</dt><dd>plate-wide</dd>
+            <dt>slots</dt><dd>hp-fill · hp-ticks · name-tab</dd>
+            <dt>bbox</dt><dd>1694×608 → x0 y0 w1694 h327 (100% × 19.3%)</dd>
+            <dt>fill</dt><dd>$mode.B.face.hud · $mode.B.alpha.hud</dd>
+            <dt>source</dt><dd>S7 glass-hud-plate-st.webp 크로마 분해</dd>
+          </dl>
+          <div class="step-src">tentwin/ref-v2/manifest/frames.tentwin.json</div></div>
+        <div class="step-col"><div class="step-col-k">관문</div>
+          <pre class="step-raw">jsonschema: 통과 (0 오류)
+원시값 직접 참조 위반 0 · dangling 0
+프레임 66 · EXIT=0</pre></div>
+        <div class="step-col"><div class="step-col-k">도구</div>
+          <pre class="step-cmd">python tools/measure/manifest-validate.py</pre></div>
+      </div>
+    </section>
+
+    <section class="step is-ok">
+      <div class="step-head"><span class="step-no">3</span><span class="step-code">S4 · A4~A5 값·효과</span><span class="step-title">재질은 틀 B 한 벌에서만 온다</span></div>
+      <div class="step-cols">
+        <div class="step-col"><div class="step-col-k">입력 · Mode B 슬롯 6</div>
+          <dl class="step-kv">
+            <dt>face</dt><dd><i class="step-swatch" data-sw="mode-b-face"></i>#96A7F6 (150,167,246)</dd>
+            <dt>alpha</dt><dd>.550</dd>
+            <dt>rim</dt><dd><i class="step-swatch" data-sw="mode-b-rim"></i>#C2D6FF (194,214,255)</dd>
+            <dt>outline</dt><dd><i class="step-swatch" data-sw="mode-b-outline"></i>#6F6BB4</dd>
+            <dt>gloss</dt><dd>.770</dd>
+            <dt>contact</dt><dd>.200</dd>
+          </dl>
+          <div class="step-src">tentwin/ref-v2/manifest/modes.tentwin.json · theme-tentwin.css --mode-b-*</div></div>
+        <div class="step-col"><div class="step-col-k">한 일</div>
+          <div class="step-line">부품이 값을 직접 갖지 않는다. 사용자가 확정한 HUD 값을 <b>틀 B</b>로 올리고, 모든 하늘색 부품은 그 여섯 슬롯을 참조한다.</div></div>
+        <div class="step-col"><div class="step-col-k">산출 · 라이브 인스턴스</div>
+          <div class="step-live"><div class="wf-wrap live-inst" data-live-kind="part" data-shape="step" data-size="l"><div class="work-frame" data-part="hud" data-theme="sky"><div class="work-frame__body"></div><i class="wf-fx wf-fx--L20"></i><i class="wf-fx wf-fx--L2a"></i><i class="wf-fx wf-fx--L2b"></i><i class="wf-fx wf-fx--L2c"></i><i class="wf-fx wf-fx--L2d"></i><i class="wf-fx wf-fx--L3"></i></div></div></div>
+          <div class="step-src">engine.css + theme-tentwin.css · [data-part=hud][data-theme=sky] (그림 아님)</div>
+          <div class="step-fig"><img src="img/steps/material-test-top.jpg" alt="재질 시험판 v2 윗부분" loading="lazy"></div>
+          <div class="step-src">tentwin/ref-v2/material-test.html → MATERIAL-TEST.png (v2, 48칸 전부 인스턴스)</div></div>
+        <div class="step-col"><div class="step-col-k">관문</div>
+          <pre class="step-raw">engine.css 원시값 0 PASS (hex 0 · color-fn 0 · opacity 0)
+재질 시험판 v2: 겉선 전역 상수 16/16 PASS
+Mode A 픽셀 변화 0 · 사용자 승인 대기</pre></div>
+        <div class="step-col"><div class="step-col-k">도구</div>
+          <pre class="step-cmd">python tools/measure/css-primitives.py tentwin/ref-v2/engine.css tentwin/ref-v2/theme-tentwin.css</pre></div>
+      </div>
+    </section>
+
+    <section class="step is-ok">
+      <div class="step-head"><span class="step-no">4</span><span class="step-code">S4 · A6~A9 제작·파일화·등록</span><span class="step-title">한 파일에 프레임 하나</span></div>
+      <div class="step-cols">
+        <div class="step-col"><div class="step-col-k">입력</div>
+          <div class="step-fig"><img src="img/steps/kit-hud-material-b.jpg" alt="HUD 판 재질 B 킷" loading="lazy"></div>
+          <div class="step-src">tentwin/ref-v2/hud-shape/KIT-HUD-plates-material-B.png</div></div>
+        <div class="step-col"><div class="step-col-k">한 일</div>
+          <div class="step-line">크로마 7조각을 <b>1파일 1Frame</b>으로 나눈다 — 위 판 · 캡슐 · 캡슐 마스크 · 아래 판 · 홈 좌·우. 판에는 글자·게이지를 굽지 않는다. 배포본은 같은 stem의 webp.</div></div>
+        <div class="step-col"><div class="step-col-k">산출 · 프레임 파일 원본</div>
+          <div class="step-fig is-stage"><img src="frames/hud/hud-plate-top-plain-lite.png" alt="hud-plate-top-plain-lite" loading="lazy"></div>
+          <div class="step-src">tentwin/ref-v2/hud-shape/hud-plate-top-plain-lite.png (28KB) → site/catalog/hud-plate-top.webp (16KB)</div></div>
+        <div class="step-col"><div class="step-col-k">관문</div>
+          <pre class="step-raw">frames 게이트 — 한 파일 = 한 프레임
+항목 26 · FAIL 0 · WARN 0 · 미등록 webp 0
+frames PASS</pre></div>
+        <div class="step-col"><div class="step-col-k">도구</div>
+          <pre class="step-cmd">python tools/measure/components-gate.py frames --manifest tentwin/ref-v2/hud-shape/hud-components.json --catalog site/catalog</pre></div>
+      </div>
+    </section>
+
+    <section class="step is-ok">
+      <div class="step-head"><span class="step-no">5</span><span class="step-code">S5 · A10 배선</span><span class="step-title">교체점은 정확히 하나</span></div>
+      <div class="step-cols">
+        <div class="step-col"><div class="step-col-k">입력 · 교체점</div>
+          <dl class="step-kv">
+            <dt>hook</dt><dd>tentwin/ref-v2/hud-shape/hud-plate-top-plain-lite.png</dd>
+            <dt>배포 대응물</dt><dd>site/catalog/hud-plate-top.webp</dd>
+            <dt>consumers</dt><dd>site/tentwin.html (#topbar) · board/screen-hud.html</dd>
+          </dl></div>
+        <div class="step-col"><div class="step-col-k">한 일</div>
+          <div class="step-line">옛 합성 자산(top-cap)을 은퇴시키고 판·캡슐·마스크를 각자 교체점에 꽂는다. 관제탑에서 후보를 고르면 이 한 줄만 바뀐다.</div></div>
+        <div class="step-col"><div class="step-col-k">산출 · 적용 블록 한 줄</div>
+          <pre class="step-raw">+  --asset-t2-plate-hud-top-plain-lite: url&#40;"tentwin/ref-v2/hud-shape/hud-plate-top-plain-lite.png"&#41;; /* T2 · url */</pre>
+          <div class="step-src">apply-manifest.py --dry-run → &lt;style id="factory-overrides"&gt;</div></div>
+        <div class="step-col"><div class="step-col-k">관문</div>
+          <pre class="step-raw">총 66 · 훅 적용 45 · 형식 불가 0
+scope 일치 8/8 · 중의성 0
+재적용 +0 bytes (멱등)</pre></div>
+        <div class="step-col"><div class="step-col-k">도구</div>
+          <pre class="step-cmd">python tools/board/apply-manifest.py --dry-run --game site/tentwin.html</pre></div>
+      </div>
+    </section>
+
+    <section class="step is-ok">
+      <div class="step-head"><span class="step-no">6</span><span class="step-code">S6 · A11 관문</span><span class="step-title">스크립트가 먼저 거른다 — 상태는 계산값만</span></div>
+      <div class="step-cols">
+        <div class="step-col"><div class="step-col-k">입력</div>
+          <div class="step-line">배선된 게임 파일 + 매니페스트 + 카탈로그. 사람은 아직 안 본다.</div></div>
+        <div class="step-col"><div class="step-col-k">한 일</div>
+          <div class="step-line">죽은 선택자 · 프레임 규칙 · 완료(계열 1 · 교체점 실재 · 값 동일) · 합성 픽셀 · 실기기 캡처 19컷을 차례로 돌린다.</div></div>
+        <div class="step-col"><div class="step-col-k">산출 · 원문</div>
+          <pre class="step-raw">m3     현재 A급 10 · 은퇴 대장 10 · 신규 0 · 사라짐 0 → PASS
+frames 항목 26 · FAIL 0 · 미등록 0 → PASS
+done   | t2-plate-hud-top-plain-lite | [hook(배포본)] file:hud-plate-top.webp · 1 (실재) | PASS |
+pixel  대조 21행 전부 임계 이내 → PASS
+shot   19컷 vs be8056d: maxD 0 / diffpx 0 (04 HUD 모험 · 05 클래식 · 05b 보스전)</pre></div>
+        <div class="step-col"><div class="step-col-k">관문</div>
+          <div class="step-line"><span class="state state-ok">🟢</span> 5종 전부 PASS일 때만 다음 단계. 하나라도 FAIL이면 사람 눈에 가기 전에 되돌아간다.</div></div>
+        <div class="step-col"><div class="step-col-k">도구</div>
+          <pre class="step-cmd">python tools/measure/components-gate.py m3 · frames · done · pixel
+python tools/measure/shot-harness.py --game site/tentwin.html --out … --serve --shots all --baseline … --max-d 2</pre></div>
+      </div>
+    </section>
+
+    <section class="step is-ok">
+      <div class="step-head"><span class="step-no">7</span><span class="step-code">S7 · A12 판정·푸시</span><span class="step-title">도장은 사용자만 — "됐다" 뒤에만 푸시</span></div>
+      <div class="step-cols">
+        <div class="step-col"><div class="step-col-k">입력 · 반려 3건 → 수정</div>
+          <div class="step-fig is-tall"><img src="img/steps/compare-hudfix.jpg" alt="HUD 반려 3건 전·후·시안" loading="lazy"></div>
+          <div class="step-src">scratchpad/hudfix-0908/COMPARE.jpg — 왼쪽 흰 림 · 정지 버튼 · 펫 방울</div></div>
+        <div class="step-col"><div class="step-col-k">한 일</div>
+          <div class="step-line">판정판 한 장에 [시안 | 부품 | 지금 | 초점 한 줄]. 사용자가 반려한 3건을 고치고 같은 자리에 다시 올렸다. "됐다" → 병합 → 스탬프 → 푸시 → 배포 확인.</div></div>
+        <div class="step-col"><div class="step-col-k">산출 · 판정판 「지금」</div>
+          <div class="step-fig is-tall"><img src="img/steps/judge-hud-adv.jpg" alt="판정판 rev16 모험 HUD" loading="lazy"></div>
+          <div class="step-src">scratchpad/judge-0903/shots/now-06.png (rev16 · 배포본 촬영)</div></div>
+        <div class="step-col"><div class="step-col-k">관문 · 배포</div>
+          <pre class="step-raw">05da1fc fix(hud) 3건 → 푸시
+원격 build 13fca00-20260908-0511 = 로컬 HEAD
+배포 확인 PASS (Actions 빌드)</pre></div>
+        <div class="step-col"><div class="step-col-k">지금 게임에서</div>
+          <div class="live-screen" data-screen="game" data-fallback="img/steps/live-adv-pause.jpg"></div>
+          <div class="step-src">라이브 iframe · 실패 시 scratchpad/live-smoke-0908/05-adventure-pause.png</div></div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ================= 예시 2 ================= -->
+  <h2 class="section-title">예시 2 · 그림 버튼 타임 러시 <span class="tier tier-t3">T3</span> <span class="tag mono">이미지판</span> <span class="state state-none">🔴 반려 → 기준 신설</span> <span class="state state-partial">🟡 재작업 중</span></h2>
+
+  <div class="steps-rail steps-rail--fail">
+
+    <section class="step">
+      <div class="step-head"><span class="step-no">1</span><span class="step-code">S2 입력</span><span class="step-title">구운 판 한 장에 글자·배지까지 들어 있다</span></div>
+      <div class="step-cols">
+        <div class="step-col"><div class="step-col-k">입력</div>
+          <div class="step-fig is-stage"><img src="../catalog/sian3-btn-timerush.webp" alt="구운 원본 타임 러시" loading="lazy"></div>
+          <div class="step-src">site/catalog/sian3-btn-timerush.webp (760×167 · 판 + 아이콘 + 글자 + NEW 배지)</div></div>
+        <div class="step-col"><div class="step-col-k">한 일</div>
+          <div class="step-line">현행 게임은 이 그림을 통째로 쓴다. 글자가 구워져 있어 영어 전환·문구 수정이 안 되고, 배지도 못 뗀다.</div></div>
+        <div class="step-col"><div class="step-col-k">판정</div>
+          <div class="step-line"><b>Slot 굽기 금지</b>(§0-5) 위반 상태 → 판(프레임)과 슬롯(글자·아이콘·배지)으로 나눠야 한다.</div></div>
+        <div class="step-col"><div class="step-col-k">관문</div>
+          <pre class="step-raw is-fail">FRAME-AUDIT-0906 위반군
+「판에 글자·아이콘 구움」 — 그림 버튼 11건</pre></div>
+        <div class="step-col"><div class="step-col-k">도구</div>
+          <pre class="step-cmd">python tools/measure/components-gate.py frames --manifest … --catalog site/catalog</pre></div>
+      </div>
+    </section>
+
+    <section class="step">
+      <div class="step-head"><span class="step-no">2</span><span class="step-code">S4~S5 분리 시도</span><span class="step-title">무글자판 + 코드 글자 + 추출 배지</span></div>
+      <div class="step-cols">
+        <div class="step-col"><div class="step-col-k">입력 → 산출</div>
+          <div class="step-fig"><img src="img/steps/btn-early2-row.jpg" alt="현행 구운 버튼 | 분리 후" loading="lazy"></div>
+          <div class="step-src">scratchpad/btn-split-0908/EARLY2.jpg (좌 구운 · 우 분리 후, 1배율)</div></div>
+        <div class="step-col"><div class="step-col-k">한 일</div>
+          <div class="step-line">판 이미지에서 글자 구역을 지운 무글자판을 만들고, 글자는 내장 폰트로 다시 치고, NEW 배지는 색 분리로 뽑아 얹었다.</div></div>
+        <div class="step-col"><div class="step-col-k">"실측"이라 부른 것</div>
+          <div class="step-line">글자 잉크 상자의 <b>가로·세로 px</b>만 원본과 맞췄다. 위치 · 겉선 굵기 · 광택 · 모서리는 안 쟀다.</div></div>
+        <div class="step-col"><div class="step-col-k">관문</div>
+          <pre class="step-raw">자체 관문: m3 PASS · frames PASS
+버튼 밖 픽셀 0 (19컷)
+시안 겹침 관문: 없음  ← 구멍</pre></div>
+        <div class="step-col"><div class="step-col-k">도구</div>
+          <pre class="step-cmd">(잉크 상자 실측 스크립트 meas5/meas7.py — 크기만)</pre></div>
+      </div>
+    </section>
+
+    <section class="step is-fail">
+      <div class="step-head"><span class="step-no">3</span><span class="step-code">S7 판정</span><span class="step-title">사용자 반려 — 300% 크롭 두 장으로</span></div>
+      <div class="step-cols">
+        <div class="step-col"><div class="step-col-k">입력 · 사용자가 보낸 크롭</div>
+          <div class="step-fig"><img src="img/steps/btn-user-crop.jpg" alt="사용자 반려 크롭 — NEW 배지·N탄" loading="lazy"></div>
+          <div class="step-src">uploads/38834aee-image.jpg (위 구운 · 아래 분리 후)</div></div>
+        <div class="step-col"><div class="step-col-k">지적 7건</div>
+          <ol class="step-rules">
+            <li>면·광택 띠가 모서리 곡선을 무시하고 끝까지 뻗음</li>
+            <li>NEW 배지가 오른쪽으로 밀려 판 가장자리에 걸림</li>
+            <li>NEW 글자가 원본보다 큼, 겉선은 얇음</li>
+            <li>배지 판 위쪽 광택 소실 — 입체감 죽음</li>
+            <li>분홍 판 우측 위 모서리 채움이 겉선을 끊음</li>
+            <li>「N탄」 글자 과대·굵음·우상 치우침</li>
+            <li>서체 자체가 다름 — 원본 획이 더 가늘고 둥긂</li>
+          </ol></div>
+        <div class="step-col"><div class="step-col-k">같은 자리 300%</div>
+          <div class="step-fig"><img src="img/steps/btn-early2-new300.jpg" alt="NEW 배지 300% — 구운 vs 분리 후" loading="lazy"></div>
+          <div class="step-src">scratchpad/btn-split-0908/EARLY2.jpg (NEW 300% 크롭)</div></div>
+        <div class="step-col"><div class="step-col-k">관문</div>
+          <pre class="step-raw is-fail">사용자: 아니다
+지휘자 관문도 실패 — 시트를 축소본으로만 보고 통과시킴</pre></div>
+        <div class="step-col"><div class="step-col-k">도구</div>
+          <div class="step-line">없었다. 이 단계에 스크립트가 없어 사람 눈이 마지막 관문이었다.</div></div>
+      </div>
+    </section>
+
+    <section class="step is-fail">
+      <div class="step-head"><span class="step-no">4</span><span class="step-code">원인</span><span class="step-title">왜 무너졌나 — 넷</span></div>
+      <div class="step-cols">
+        <div class="step-col"><div class="step-col-k">1 프레임 없이 조립</div>
+          <div class="step-line">구운 판 위에 채움·광택·배지를 <b>컨테이너 폭 %</b>로 얹었다. 층들이 판의 둥근 모서리 경로를 모른다. 규격 "Shape 먼저"를 이미지판에는 안 걸었다.</div></div>
+        <div class="step-col"><div class="step-col-k">2 잉크 상자만</div>
+          <div class="step-line">크기만 맞추고 위치·겉선 굵기·광택은 안 쟀다. 원본 위에 겹쳐 보지 않았다.</div></div>
+        <div class="step-col"><div class="step-col-k">3 다른 재료로 재작성</div>
+          <div class="step-line">구운 레터링을 내장 폰트로 다시 쳤고, 배지 색 분리에서 밝은 광택층이 글자와 함께 걷혔다.</div></div>
+        <div class="step-col"><div class="step-col-k">4 관문이 시안을 안 봄</div>
+          <div class="step-line">픽셀 검증은 "버튼 밖이 안 변했나"만 증명했다. 시안 대조는 사람에게 넘어갔고 축소본으로 통과됐다.</div></div>
+        <div class="step-col"><div class="step-col-k">결론</div>
+          <div class="step-line"><b>이미지판에도 code Frame과 같은 규칙</b>이 필요하고, 시안 겹침을 <b>스크립트 관문</b>으로 만들어야 한다.</div></div>
+      </div>
+    </section>
+
+    <section class="step is-ok">
+      <div class="step-head"><span class="step-no">5</span><span class="step-code">기준 신설 · §4.1</span><span class="step-title">이미지판(자산 프레임) 작업 기준 8</span></div>
+      <div class="step-cols">
+        <div class="step-col"><div class="step-col-k">규칙</div>
+          <ol class="step-rules">
+            <li><b>이미지판도 실루엣부터</b> — 알파 마스크(또는 실측 경로) 등재, 코드 층은 마스크 안에서만</li>
+            <li><b>모서리는 늘리지 않음</b> — 늘림은 중앙 직선부만, 캡 폭 실측 px 등재</li>
+            <li><b>슬롯 안전 영역 실측</b> — 글자·배지·아이콘 상자와 모서리 여백을 슬롯 좌표로, 판 overflow 잘림 금지</li>
+            <li><b>원본 겹침 관문</b> — 300% 겹쳐 차분 픽셀로: 모서리 4곳·겉선 굵기·광택·슬롯 위치·크기·겉선·서체. 잉크 상자만 = 실측 불인정</li>
+          </ol></div>
+        <div class="step-col"><div class="step-col-k">규칙 (계속)</div>
+          <ol class="step-rules" start="5">
+            <li><b>구운 것에서 층별로</b> — 판·광택·글자 따로, 잃은 층 기록. 광택 걷히면 실패</li>
+            <li><b>글자는 폰트를 원본에 겹쳐</b> 고른다 — 크기는 높이+폭, 겉선·그림자 300% 실측, 없으면 레터링 발주</li>
+            <li><b>판 결함은 수리보다 재추출</b> — 수리했으면 원본 캡과 차분 0 증명</li>
+            <li><b>지휘자 관문</b> — 사용자에게 보내기 전 300% 크롭(모서리·슬롯·글자)을 직접 본다</li>
+          </ol></div>
+        <div class="step-col"><div class="step-col-k">매니페스트에 생긴 칸</div>
+          <dl class="step-kv">
+            <dt>mask</dt><dd>알파 마스크 / 실측 경로 (없으면 코드 층 🔴 차단)</dd>
+            <dt>slots[].safe</dt><dd>슬롯 안전 영역 상자</dd>
+            <dt>lost_layers</dt><dd>추출 때 잃은 층 (광택이면 FAIL)</dd>
+          </dl></div>
+        <div class="step-col"><div class="step-col-k">문서</div>
+          <div class="step-line">GAME-FACTORY-STANDARD §0 메타 · §4.1 · §6 규칙 11 · S4/S5/S6 표 — DEV-STEPS §4·§5·§7 — skills/asset-frame A6·A7·A11 — COMPONENTS §1.3·§6.2</div></div>
+        <div class="step-col"><div class="step-col-k">상태</div>
+          <div class="step-line"><span class="state state-ok">🟢</span> 정본 4곳 반영 · 메모리 고정 (2026-09-08)</div></div>
+      </div>
+    </section>
+
+    <section class="step is-ok">
+      <div class="step-head"><span class="step-no">6</span><span class="step-code">관문 도구 신설</span><span class="step-title">원본 겹침 관문이 같은 결함을 수치로 잡는다</span></div>
+      <div class="step-cols">
+        <div class="step-col"><div class="step-col-k">입력</div>
+          <div class="step-line">ref = 구운 원본 · got = 분리판 렌더 캡처(타임 러시 행). 폭 기준 등축 정렬 후 300%.</div></div>
+        <div class="step-col"><div class="step-col-k">산출 · 겹침판</div>
+          <div class="step-fig"><img src="img/steps/overlay-timerush.jpg" alt="overlay-check — ref | got | 겹침 | 히트맵" loading="lazy"></div>
+          <div class="step-src">scratchpad/overlay-0908/demo/OVERLAY.jpg (ref | got | 겹침 | 차분 히트맵)</div></div>
+        <div class="step-col"><div class="step-col-k">관문 원문 (발췌)</div>
+          <pre class="step-raw is-fail">corner-TR    FAIL 넘침 22px · 결손 77px
+corner-BR    FAIL 넘침 23px · 결손 83px
+slot-slot1-font FAIL 잉크 IoU 0.37 (하한 0.6)
+slot-slot3-pos  FAIL 중심 Δ(-23.0,-0.5)px 허용 3.0
+slot-slot3-size FAIL 폭 194→146 (-24.7%)
+판정 FAIL — 12/25</pre></div>
+        <div class="step-col"><div class="step-col-k">뜻</div>
+          <div class="step-line">사용자가 눈으로 잡은 7건이 <b>모서리 4 · 서체 4 · 슬롯 위치·크기 4</b>로 그대로 수치화됐다. 음성 시험(원본 vs 원본)은 전 항목 PASS.</div></div>
+        <div class="step-col"><div class="step-col-k">도구</div>
+          <pre class="step-cmd">python tools/measure/overlay-check.py --ref site/catalog/sian3-btn-timerush.webp --got &lt;렌더 캡처&gt; --scale 3 --out …</pre></div>
+      </div>
+    </section>
+
+    <section class="step is-pending">
+      <div class="step-head"><span class="step-no">7</span><span class="step-code">S4 재작업 → S7</span><span class="step-title">지금 — 프레임부터 다시</span></div>
+      <div class="step-cols">
+        <div class="step-col"><div class="step-col-k">하는 일</div>
+          <div class="step-line">실루엣 마스크를 세우고 채움·광택을 그 안에 가둔다. 배지·글자는 원본 안전 영역 좌표로. 폰트 4종을 원본에 겹쳐 고른다.</div></div>
+        <div class="step-col"><div class="step-col-k">관문</div>
+          <div class="step-line">overlay-check <b>25/25 PASS</b> + 정본 하네스 버튼 밖 픽셀 0 + 지휘자 300% 확인 → 판정판.</div></div>
+        <div class="step-col"><div class="step-col-k">상태</div>
+          <pre class="step-raw is-pending">wave/btn-split · 재작업 중
+승인 전 병합·푸시 금지</pre></div>
+        <div class="step-col"><div class="step-col-k">판정</div>
+          <div class="step-line"><span class="state state-partial">🟡</span> 판정판 ① 「됐다 ☐ / 아니다 ☐」</div></div>
+        <div class="step-col"><div class="step-col-k">도구</div>
+          <pre class="step-cmd">overlay-check.py → shot-harness.py → 판정판 → stamp.py site --check</pre></div>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="source-note">출처: GAME-FACTORY-STANDARD.md §0·§4.1·§5·§6 · DEV-STEPS.md · skills/asset-frame/SKILL.md · tentwin/notes/{HUD-REGRESS,PERF2,NORM-*}-0908.md · scratchpad/{intake,hudfix,btn-split,overlay,judge-0903,live-smoke}-0908 · 그림은 img/steps/ 사본(원본 경로는 각 그림 아래)</div>
+</div>
+<script src="board-live.js"></script>
+</body>
+</html>
