@@ -56301,12 +56301,59 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
   }
 
   function vis(el) { return !!(el && !el.hidden && el.offsetParent !== null); }
+  function isOpen(id) { var e = d.getElementById(id); return !!(e && !e.hidden); }
+
+  /** 이미 있는 버튼을 그대로 누른다. 안 보이면 아무 일도 안 하고 false. */
+  function tap(id) {
+    var b = d.getElementById(id);
+    if (!vis(b) || !b.click) return false;
+    try { b.click(); } catch (e) { return false; }
+    return true;
+  }
+
+  /* ---- 버튼 자기가 유일한 출구인 시트들 (0909 전량 점검) --------------------
+     아래 여섯은 **Esc 사슬에 자리가 없다**. 종전의 openSheet() 는 이들을
+     띄운 채로 esc() 를 썯고 true 를 돌려줘서, 뒤로가기를 눌러도 시트가 그대로
+     있었다(앞에서 막힌 느낌). 각 줄의 동작은 새 규칙이 아니라 **그 시트가 이미
+     가진 버튼**이다 — 사람이 손가락으로 누를 때와 같은 경로를 탄다.
+     순서는 겹이 쌓인 순서(위 = 더 나중에 뜨는 것)다.
+       modal-skin      → sk-close        (캐릭터 패널 위에 뜨므로 패널보다 먼저)
+       modal-settings  → st-close
+       modal-over / modal-arc / modal-daily → 각자의 「메인 메뉴」 버튼
+       modal-clear     → 메뉴 버튼이 없는 유일한 결과 시트라 Game.menu()
+     결과 시트 넷이 「닫기」가 아니라 「메뉴로」인 이유: 닫기만 하면 판이 끝난
+     화면에 갇힌다 — #modal-adv 가 Esc 사슬에서 이미 같은 이유로 openMap 을 부른다. */
+  var SELF_BACK = [
+    ['modal-skin',     'sk-close'],
+    ['modal-settings', 'st-close'],
+    ['modal-over',     'btn-menu'],
+    ['modal-arc',      'arc-menu'],
+    ['modal-daily',    'btn-daily-menu'],
+    ['modal-clear',    '']
+  ];
+
+  function selfBackId(id) {
+    for (var i = 0; i < SELF_BACK.length; i++) { if (SELF_BACK[i][0] === id) return true; }
+    return false;
+  }
+
+  function selfBack() {
+    for (var i = 0; i < SELF_BACK.length; i++) {
+      if (!isOpen(SELF_BACK[i][0])) continue;
+      if (SELF_BACK[i][1] && tap(SELF_BACK[i][1])) return true;
+      var G = window.Game;
+      if (G && G.menu) { G.menu(); return true; }
+      return true;   /* 손잡이를 못 찾아도 앱을 닫지는 않는다 */
+    }
+    return false;
+  }
 
   function openSheet() {
     try {
       var ms = d.querySelectorAll('.modal');
       for (var i = 0; i < ms.length; i++) {
         if (ms[i].id === 'modal-pause') continue;   /* 일시정지는 아래에서 따로 */
+        if (selfBackId(ms[i].id)) continue;         /* 위 SELF_BACK 이 가져간다 */
         if (!ms[i].hidden) return ms[i];
       }
     } catch (e) {}
@@ -56321,37 +56368,79 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
     }
   }
 
+  /* ==========================================================================
+     화면별 뒤로가기 분기표 — 화면키 19 (화면 4 + 시트 15) 전량
+
+       screen-story    컷 건너뛰기 (cutFinish(true))    ← 0909 추가. 없어서 앱이 죽었다
+       modal-rank      닫기 (Esc → closeRank)           z71 = 항상 맨 위
+       modal-skin      sk-close → 캐릭터 패널로         ← 0909 추가 (Esc 사슬에 없던 겹)
+       modal-settings  st-close → 메뉴로                 ← 0909 추가
+       modal-over      btn-menu → 메인 메뉴              ← 0909 추가
+       modal-arc       arc-menu → 메인 메뉴              ← 0909 추가
+       modal-daily     btn-daily-menu → 메인 메뉴        ← 0909 추가
+       modal-clear     Game.menu() → 메인 메뉴           ← 0909 추가
+       modal-mode      모드 시트 닫기 (Esc)
+       modal-classic   클래식 허브 닫기 (Esc)
+       modal-arcade    아케이드 허브 닫기 (Esc)
+       modal-node      미션 카드 닫기 (Esc)
+       modal-adv       닫고 지도로 (Esc)
+       modal-tutorial  튜토리얼 건너뛰기 (Esc → finishTutorial) — 첫 실행 오프닝
+       modal-howto     게임 방법 닫기 (Esc)
+       charpanel       cp-close
+       modal-pause     Game.menu()   (Esc 는 resume — 일부러 다른 자리. 위 주석 ①)
+       screen-map      leaveMap (Esc)
+       screen-game     판이 돌면 일시정지 (Esc)
+       screen-menu     루트 = 흘려보낸다 → TWA 종료
+       (#splash)       루트와 같다 — 부팅 화면의 뒤로가기는 종료가 맞다
+     ========================================================================== */
+
   /** 한 걸음 뒤로. 갈 데가 있었으면 true, 여기가 루트면 false. */
   function step() {
     var G = window.Game, S = G && G.state;
 
-    /* 1) 캐릭터 패널 — Esc 사슬에 없는 유일한 겹이라 먼저 닫는다 */
-    var cp = d.getElementById('charpanel');
-    if (vis(cp)) {
-      var x = d.getElementById('cp-close');
-      if (x && x.click) { x.click(); return true; }
+    /* 0) 스토리·챕터 컷툰이 돌고 있으면 뒤로가기 = 건너뛰기.
+       ★ 이 분기가 없어서 생긴 결함이 이 파도의 이유다: 컷은 모달이 아니고
+       (playCuts 가 closeAllModals 를 먼저 부른다) 지도도 아니고 S.running 도 아니라,
+       종전에는 어느 분기에도 안 걸려 step() 이 false 를 돌렸다 → TWA 가 앱을
+       닫았다. 첫 실행 오프닝과 챕터 컷 열두줌이 전부 그 자리였다.
+       되돌리는 실체는 **기존 건너뛰기 그대로**다 — #cut-skip 의 클릭과 keydown
+       핸들러의 Esc 가 둘 다 cutFinish(true) 하나로 간다(본 표시도 그대로 선다). */
+    var story = d.getElementById('screen-story');
+    if (story && story.classList && story.classList.contains('active')) {
+      if (!tap('cut-skip')) esc();
+      return true;
     }
 
-    /* 2) 일시정지 말고 떠 있는 시트가 있으면 Esc 사슬이 가장 위 한 겹을 닫는다 */
+    /* 1) 랭킹판은 다른 시트 위에 쌓이는 유일한 겹(z71)이라 먼저다 */
+    if (isOpen('modal-rank')) { esc(); return true; }
+
+    /* 2) 자기 닫기 버튼만 아는 시트 여섯 (위 SELF_BACK) */
+    if (selfBack()) return true;
+
+    /* 3) Esc 사슬이 아는 시트가 떠 있으면 가장 위 한 겹을 닫는다 */
     if (openSheet()) { esc(); return true; }
 
-    /* 3) 일시정지 중 = 메뉴로 나가기 (Esc 와 다른 자리, 위 주석 ①) */
+    /* 4) 캐릭터 패널 — Esc 사슬에 없는 겹이라 자기 X 를 누른다.
+       스킨 시트(2)보다 뒤인 이유: 스킨은 이 패널 **위에** 뜰다. */
+    var cp = d.getElementById('charpanel');
+    if (vis(cp)) { tap('cp-close'); return true; }
+
+    /* 5) 일시정지 중 = 메뉴로 나가기 (Esc 와 다른 자리, 위 주석 ①) */
     if (S && S.paused) {
       if (G.menu) { G.menu(); return true; }
       return true;
     }
 
-    /* 4) 지도 화면 → Esc 사슬의 leaveMap */
+    /* 6) 지도 화면 → Esc 사슬의 leaveMap */
     var map = d.getElementById('screen-map');
     if (map && map.classList && map.classList.contains('active')) { esc(); return true; }
 
-    /* 5) 판이 돌고 있으면 일시정지 (아직 종료가 아니다 — 한 번 더 눌러야 메뉴) */
+    /* 7) 판이 돌고 있으면 일시정지 (아직 종료가 아니다 — 한 번 더 눌러야 메뉴) */
     if (S && S.running) { esc(); return true; }
 
-    /* 6) 메뉴 = 루트. 흘려보낸다 → TWA 는 여기서 앱을 닫는다. */
+    /* 8) 메뉴 = 루트. 흘려보낸다 → TWA 는 여기서 앱을 닫는다. */
     return false;
   }
-
   window.addEventListener('popstate', function () {
     if (!step()) return;   /* 루트: 파수꾼을 다시 쌓지 않는다 = 종료 허용 */
     guard();
