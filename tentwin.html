@@ -56300,7 +56300,11 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
     } catch (e) { /* 사파리 사생활 모드 등: 뒤로가기는 원래대로 동작한다 */ }
   }
 
-  function vis(el) { return !!(el && !el.hidden && el.offsetParent !== null); }
+  /* 종전엔 offsetParent 로 봤다 — 그런데 #charpanel 과 .modal 은 둘 다
+     `position: fixed` 이라 offsetParent 가 **항상 null** 이다. 그래서 캐릭터 패널
+     분기가 한 번도 안 돌았고(실클릭 smoke 실측: 선택창에서 뒤로가기 = 앱 종료),
+     getClientRects().length 로 바꾸면 fixed 도 같은 질문에 바르게 답한다. */
+  function vis(el) { return !!(el && !el.hidden && el.getClientRects().length); }
   function isOpen(id) { var e = d.getElementById(id); return !!(e && !e.hidden); }
 
   /** 이미 있는 버튼을 그대로 누른다. 안 보이면 아무 일도 안 하고 false. */
@@ -56371,7 +56375,6 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
   /* ==========================================================================
      화면별 뒤로가기 분기표 — 화면키 19 (화면 4 + 시트 15) 전량
 
-       screen-story    컷 건너뛰기 (cutFinish(true))    ← 0909 추가. 없어서 앱이 죽었다
        modal-rank      닫기 (Esc → closeRank)           z71 = 항상 맨 위
        modal-skin      sk-close → 캐릭터 패널로         ← 0909 추가 (Esc 사슬에 없던 겹)
        modal-settings  st-close → 메뉴로                 ← 0909 추가
@@ -56387,6 +56390,7 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
        modal-tutorial  튜토리얼 건너뛰기 (Esc → finishTutorial) — 첫 실행 오프닝
        modal-howto     게임 방법 닫기 (Esc)
        charpanel       cp-close
+       screen-story    컷 건너뛰기 (cutFinish(true))    ← 0909 추가. 없어서 앱이 죽었다
        modal-pause     Game.menu()   (Esc 는 resume — 일부러 다른 자리. 위 주석 ①)
        screen-map      leaveMap (Esc)
        screen-game     판이 돌면 일시정지 (Esc)
@@ -56397,19 +56401,6 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
   /** 한 걸음 뒤로. 갈 데가 있었으면 true, 여기가 루트면 false. */
   function step() {
     var G = window.Game, S = G && G.state;
-
-    /* 0) 스토리·챕터 컷툰이 돌고 있으면 뒤로가기 = 건너뛰기.
-       ★ 이 분기가 없어서 생긴 결함이 이 파도의 이유다: 컷은 모달이 아니고
-       (playCuts 가 closeAllModals 를 먼저 부른다) 지도도 아니고 S.running 도 아니라,
-       종전에는 어느 분기에도 안 걸려 step() 이 false 를 돌렸다 → TWA 가 앱을
-       닫았다. 첫 실행 오프닝과 챕터 컷 열두줌이 전부 그 자리였다.
-       되돌리는 실체는 **기존 건너뛰기 그대로**다 — #cut-skip 의 클릭과 keydown
-       핸들러의 Esc 가 둘 다 cutFinish(true) 하나로 간다(본 표시도 그대로 선다). */
-    var story = d.getElementById('screen-story');
-    if (story && story.classList && story.classList.contains('active')) {
-      if (!tap('cut-skip')) esc();
-      return true;
-    }
 
     /* 1) 랭킹판은 다른 시트 위에 쌓이는 유일한 겹(z71)이라 먼저다 */
     if (isOpen('modal-rank')) { esc(); return true; }
@@ -56425,20 +56416,42 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
     var cp = d.getElementById('charpanel');
     if (vis(cp)) { tap('cp-close'); return true; }
 
-    /* 5) 일시정지 중 = 메뉴로 나가기 (Esc 와 다른 자리, 위 주석 ①) */
+    /* 5) 스토리·챕터 컷툰이 돌고 있으면 뒤로가기 = 건너뛰기.
+       ★ 이 분기가 없어서 생긴 결함이 이 파도의 이유다: 컷은 모달이 아니고
+       (playCuts 가 closeAllModals 를 먼저 부른다) 지도도 아니고 S.running 도 아니라,
+       종전에는 어느 분기에도 안 걸려 step() 이 false 를 돌렸다 → TWA 가 앱을
+       닫았다. 첫 실행 오프닝과 챕터 컷 열두줌이 전부 그 자리였다.
+       되돌리는 실체는 **기존 건너뛰기 그대로**다 — #cut-skip 의 클릭과 keydown
+       핸들러의 Esc 가 둘 다 cutFinish(true) 하나로 간다(본 표시도 그대로 선다).
+       캐릭터 패널(4)보다 뒤인 이유는 오프닝 컷의 마지막이 **선택창을 띄우기**
+       때문이다(cutDone → openCharPanel). 그때 screen-story 는 여전히 active 라,
+       컷을 먼저 보면 이미 끝난 컷을 또 건드려 죽은 누름이 된다(실클릭 smoke 실측). */
+    var story = d.getElementById('screen-story');
+    if (story && story.classList && story.classList.contains('active')) {
+      if (!tap('cut-skip')) esc();
+      /* 컷 없이 스토리 화면만 남는 자리가 하나 있다: 위 선택창을 X 로 닫은
+         뒤다(closeCharPanel 은 패널만 숨긴다 — 앱 자체의 자리고 이 파도가 만든
+         것이 아니다). 거기서 뒤로가기까지 아무 일도 못 하면 영영 못 나오므로
+         메뉴로 낸다. 컷이 정상으로 끝난 뒤면 이 줄은 도달하지 않는다. */
+      if (story.classList.contains('active') && !vis(d.getElementById('charpanel'))
+          && G && G.menu) { G.menu(); }
+      return true;
+    }
+
+    /* 6) 일시정지 중 = 메뉴로 나가기 (Esc 와 다른 자리, 위 주석 ①) */
     if (S && S.paused) {
       if (G.menu) { G.menu(); return true; }
       return true;
     }
 
-    /* 6) 지도 화면 → Esc 사슬의 leaveMap */
+    /* 7) 지도 화면 → Esc 사슬의 leaveMap */
     var map = d.getElementById('screen-map');
     if (map && map.classList && map.classList.contains('active')) { esc(); return true; }
 
-    /* 7) 판이 돌고 있으면 일시정지 (아직 종료가 아니다 — 한 번 더 눌러야 메뉴) */
+    /* 8) 판이 돌고 있으면 일시정지 (아직 종료가 아니다 — 한 번 더 눌러야 메뉴) */
     if (S && S.running) { esc(); return true; }
 
-    /* 8) 메뉴 = 루트. 흘려보낸다 → TWA 는 여기서 앱을 닫는다. */
+    /* 9) 메뉴 = 루트. 흘려보낸다 → TWA 는 여기서 앱을 닫는다. */
     return false;
   }
   window.addEventListener('popstate', function () {
