@@ -22012,6 +22012,7 @@ window.TT_SFX = {
    *   EB_ROWS0 = 10  (70칸) — 폭 항 53px 을 한 픽셀도 잃지 않는 가장 큰 판이고
    *                           여백 48px 이라 "덜 그려진 화면"과도 무관하다.
    *   EB_ROWS_MAX = 12 (84칸) — 3스테이지마다 한 줄, 스테이지 7에서 도달한다.
+   *                           (0908: 13(91칸)·스테이지 10 으로 상향 — 아래 선언 주석의 실측)
    *                           12행은 타일이 53 -> 47 로 6px 내려가지만, 그래도
    *                           현행 9열의 40px 보다 18% 크고 절단은 없다(byH 가
    *                           타일을 먼저 줄이므로 보드가 박스를 넘지 않는다 —
@@ -22028,7 +22029,13 @@ window.TT_SFX = {
    * keep generating one identical board.
    * ---------------------------------------------------------------------- */
   var EB_ROWS0 = 10;         // rows on stage 1 -> 70 cells (7열)
-  var EB_ROWS_MAX = 12;      // cap -> 84 cells, reached at stage 7
+  /* 0908 수리 ③ — BALANCE-PLAN 6-A-3 「12→14+」 요구를 실측으로 판정했다(probe.py, 실기 경로
+     엔들리스 #board-scroll 유효 높이): 390×844 609px → 13행 44px·14행 40px 둘 다 들어감 /
+     412×915 675px → 13행 49px·14행 45px 들어감 / **360×740 505px → 13행 36px(504px) 들어감,
+     14행은 TILE_MIN 34 로 눌러도 515px 라 10px 절단**. 타일 크기가 사용자 반려 1순위라
+     TILE_MIN 을 내리지 않고, 좁은 기기에서도 절단 0 인 **13** 을 상한으로 한다(스테이지 10 도달).
+     14 는 360 폭 기기를 버리거나 TILE_MIN 을 깎아야 하므로 채택하지 않았다. */
+  var EB_ROWS_MAX = 13;      // cap -> 91 cells, reached at stage 10 (was 12 / stage 7)
   var EB_STAGE_STEP = 3;     // stages per extra row
   var EB_RETRIES = 40;       // genBoardExt's own re-seed budget (PURE's number)
 
