@@ -33431,6 +33431,10 @@ window.TT_SFX = {
     S.score += bonus;
     if (S.feverOn) S.feverScore += bonus;
     missionBump('rows', rows.length);
+    /* 0908 수리 ② 판단 — ARCADE-VERIFY C-2 "도달 불가"는 **아케이드 대전 기준**만 맞다:
+       대전 3종은 battleBoard() 가 popSettle 에서 먼저 빠져 여기 못 온다. 비전투
+       rush / classic-rush 는 한 행이 통째로 dead 일 때 정상 도달하는 경로라 **유지**한다.
+       (RUSH_ROW_MS 의 유일한 소비처. 지우면 러시의 행 소거 보상이 사라진다.) */
     if (isRush()) addRushTime(RUSH_ROW_MS * rows.length);
     syncHud();
 
