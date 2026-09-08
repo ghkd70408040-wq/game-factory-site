@@ -13318,9 +13318,9 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
       <i class="dh-plate dh-plate--bot" data-part="hud-plate" data-variant="bottom" aria-hidden="true"></i>
       <span id="ch-baby" class="dh-baby cp-th kit-chip-v2" data-slot="pet-bubble" aria-hidden="true"><i class="ct-art" aria-hidden="true"></i></span>
       <div class="ch-fx" aria-hidden="true"><i class="ch-gnd"></i><i class="ch-jelly"></i></div>
-      <i class="dh-cap" data-part="hud-capsule" aria-hidden="true"></i>
+      <i class="dh-cap" data-part="capsule" data-variant="image" aria-hidden="true"></i>
       <i id="ch-castle" data-slot="castle" data-overhang="y" aria-hidden="true"></i>
-      <div id="ch-cap" class="wf-cap" data-slot="timer-capsule" data-overhang="y"><span id="ch-cap-v">0</span></div>
+      <div id="ch-cap" class="wf-cap" data-part="capsule" data-variant="code" data-slot="timer-capsule" data-overhang="y"><span id="ch-cap-v">0</span></div>
       <div id="ch-l" class="ch-g" data-slot="goal"><i class="ch-i ch-i-goal" aria-hidden="true"></i><b id="ch-l-v">0</b></div>
       <div id="ch-r" class="ch-g" data-slot="score"><i class="ch-i ch-i-score" aria-hidden="true"></i><b id="ch-r-v">0</b></div>
       <div id="ch-tl" class="ch-t" aria-hidden="true"><span></span></div>
@@ -13381,9 +13381,9 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
       <!-- .dh-mid 는 자리를 차지하지 않는 **쌓임 상자**다(inset:0 · z-index:1):
            #duel-timer 의 유리겹이 z-index:-1 이라 그 -1 을 여기 가둬 둔다. -->
       <div class="dh-mid" data-slot="timer-capsule" data-overhang="y">
-        <i class="dh-cap" data-part="hud-capsule" aria-hidden="true"></i>
+        <i class="dh-cap" data-part="capsule" data-variant="image" aria-hidden="true"></i>
         <span class="dh-castle" aria-hidden="true">&#127984;</span>
-        <div id="duel-timer" class="wf-cap" role="timer">0:00</div>
+        <div id="duel-timer" class="wf-cap" data-part="capsule" data-variant="code" role="timer">0:00</div>
       </div>
       <div class="dh-side dh-foe" data-slot="side-foe">
         <b id="duel-foe-name" class="dh-name"></b><span id="duel-foe-lv" class="dh-lv">Lv.1</span>
@@ -56893,7 +56893,9 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
   --hud-tick-w:0.42cqw;                                    /* 눈금 선 폭 */
 }
 /* [0908 원칙 0] 부품 = 정본 engine.css §hud 의 사본. 판(Frame)은 [data-part="hud-plate"] +
-   변주 [data-variant="top|bottom"], 캡슐은 [data-part="hud-capsule"], 컨테이너는 [data-part="hud"].
+   변주 [data-variant="top|bottom"], 캡슐은 [data-part="capsule"][data-variant="image"](0908 계보 통합:
+   HUD 이미지 캡슐과 코드 캡슐 .wf-cap 은 같은 Shape(스타디움, h/w .374 vs .371)·같은 Stroke 규칙(0.70%W vs 0.95%W)
+   = 하나의 capsule Component, Variant image/code — 두 변주가 같은 자리에 겹쳐 서는 구조는 그대로), 컨테이너는 [data-part="hud"].
    이미지판은 Shape(알파 마스크·cap_px) 안의 Fill 층이고, 슬롯 안전 상자는 [data-slot] 요소가
    든다(값 = 매니페스트 slot_safe, engine §hud-slots). 옛 클래스는 마크업에 남기고 규칙은 부품
    속성으로만 건다 — 특이도 동일(클래스 1 = 속성 1)이라 캐스케이드·픽셀 불변. */
@@ -56952,15 +56954,15 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
    ⚠ 되돌리기: 이 한 줄을 지우면 덮개가 그대로 돌아온다(.ch-fx CSS 는 손대지 않았다). */
 #app.classic #classic-hud .ch-fx{ display:none !important; }
 /* 캡슐 프레임 — 위 판 위(z), 타이머/성 글리프는 그 위. bbox = 캡슐 그대로. */
-#app.battle #duel-hud [data-part="hud-capsule"],
-#app.classic #classic-hud [data-part="hud-capsule"]{
+#app.battle #duel-hud [data-part="capsule"][data-variant="image"],
+#app.classic #classic-hud [data-part="capsule"][data-variant="image"]{
   position:absolute; pointer-events:none;
   left:28.10cqw; top:8.09cqw; width:44.10cqw; height:17.65cqw;
   z-index:0;                        /* 모험: .dh-mid 안에서 타이머(1)·성(3) 아래 */
   background:var(--hud-capsule) center/100% 100% no-repeat;
   filter:drop-shadow(0 .5cqw .5cqw rgba(var(--prim-ink-plum-rgb),.14));
 }
-#app.classic #classic-hud [data-part="hud-capsule"]{ z-index:1; }  /* 클래식: 판 위, #ch-cap 글리프 아래 */
+#app.classic #classic-hud [data-part="capsule"][data-variant="image"]{ z-index:1; }  /* 클래식: 판 위, #ch-cap 글리프 아래 */
 /* [0908 원칙 0] 슬롯 안전 상자(engine §hud-slots 사본) — 값 = 매니페스트 slot_safe(부모 상자 기준 %,
    DOM 실측 0908). 기본은 **선언만**(렌더 무접촉). [data-guard] 를 컨테이너에 켜면 overhang 이 아닌
    슬롯을 overflow:clip 으로 상자 안에 가둔다(음성 테스트·관제탑 검사용). [data-overhang="y"] =
