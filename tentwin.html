@@ -244,6 +244,11 @@ body {
   touch-action: manipulation;
   user-select: none;
   -webkit-user-select: none;
+  /* 출시 점검 0909 ⑦ — iOS Safari 는 user-select:none 만으로 **롱프레스 콜아웃**을
+     막지 못한다. 길게 누르면 "이미지 저장 / 복사 / 공유" 시트가 뜨고, 그동안 보드
+     입력이 통째로 죽는다(안드로이드에는 없는 결함이라 헤드리스로는 안 잡힌다).
+     그리는 것을 하나도 바꾸지 않는 속성이라 픽셀 diff 0 이다. */
+  -webkit-touch-callout: none;
 }
 
 h1, h2, p, ul, pre { margin: 0; }
@@ -260,6 +265,7 @@ button {
   -webkit-tap-highlight-color: transparent;
   user-select: none;
   -webkit-user-select: none;
+  -webkit-touch-callout: none;   /* 0909 ⑦ — body 와 같은 이유(iOS 롱프레스 시트) */
 }
 
 :focus-visible { outline: 2px solid var(--prim-c8); outline-offset: 2px; }
@@ -51434,6 +51440,28 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
 #app:not(.classic):not(.battle) #screen-game #topbar .icon-btn:active{
   transform: translateY(1.5px);
 }
+/* 출시 점검 0909 ⑨ — 터치 타깃 최소 44px.
+   실측: 무한·타임러시·데일리 세 모드 모두 `#btn-pause` 가 **34.0 × 34.0** 이다
+   (probe.json touch_endless/rush/daily). 접근성 최소선(44px)에 10px 모자란다.
+
+   **보이는 크기는 손대지 않는다** — 34px 은 시안이 정한 값이고, 키우면 상단바
+   전체가 다시 짜여야 한다(승인 필요). 대신 **그리지 않는 ::after** 로 눌리는
+   넓이만 44px 로 넓힌다:
+     · ::after 는 버튼의 자식이라 여기를 눌러도 이벤트를 받는 것은 버튼이다.
+     · background·border·box-shadow 를 하나도 주지 않으므로 페인트가 0 이다
+       (19컷 회귀 diff 0 으로 증명한다).
+     · `#topbar` 안의 아이콘 버튼은 `#btn-pause` **하나뿐**이라(마크업 :13262)
+       넓힌 원이 다른 버튼의 타깃을 먹을 일이 없다. 옆의 `#tb-stats` 칸들은
+       누를 수 있는 물건이 아니다. */
+#app:not(.classic):not(.battle) #screen-game #topbar .icon-btn{ position: relative; }
+#app:not(.classic):not(.battle) #screen-game #topbar .icon-btn::after{
+  content: "";
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 44px; height: 44px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+}
 /* 칸 = 킷 홈. 22px 행 안에서 홈으로 읽히도록 상단 인셋 + 아랫변 흰 선 두 줄만. */
 #app:not(.classic):not(.battle) #screen-game .stat{
   background: rgba(207,192,220,.55) !important;
@@ -56226,6 +56254,111 @@ function onGest(){ gest=1; maybe(); }
 function armSafety(){ setTimeout(function(){ gest=1; maybe(); },30000); }
 if(loaded){ maybe(); armSafety(); }
 else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); });
+})();
+</script>
+<script>
+/* ============================================================================
+   출시 점검 0909 ③ — 안드로이드 뒤로가기 / 브라우저 뒤로 (TWA 필수)
+
+   결함(실측): 이 문서에는 `popstate`·`pushState` 가 **한 곳도 없었다**
+   (`grep -c "popstate\|pushState" tentwin.html` = 0). 웹에서는 별일이 아니지만
+   TWA(플레이스토어 배포판)에서는 뒤로가기가 곧 **앱 종료**다. 판 도중에도,
+   모달이 떠 있어도, 지도에서도 한 번 누르면 그냥 닫힌다 — 스토어 심사에서
+   가장 흔하게 걸리는 항목이고, 실제로 진행 중인 판이 통째로 날아간다.
+
+   고치는 방법(최소 침습):
+     · 부팅 때 **파수꾼 항목** 하나를 history 에 쌓아 둔다. 뒤로가기는 이것을 먼저
+       먹으므로 popstate 가 우리에게 온다.
+     · popstate 가 오면 "앱 안에서 한 걸음 뒤로 갈 데가 있나"를 묻는다.
+       있으면 파수꾼을 다시 쌓고 한 걸음만 되돌린다. 없으면(=메뉴 루트) 그냥
+       흘려보낸다 → TWA 는 여기서 정상적으로 앱을 닫는다.
+     · 되돌리는 실체는 **이미 있는 Esc 사슬**이다(§SECTION keydown Escape:
+       랭킹 → 모드 시트 → 클래식/아케이드 허브 → 노드/결과 시트 → 지도 →
+       튜토리얼 → 하우투 → 일시정지/재개). 새 규칙을 만들지 않고 합성 keydown
+       하나로 그 사슬을 그대로 태운다. 화면 순서의 정본이 두 벌로 갈라지지
+       않게 하려는 것이다.
+
+   Esc 와 **일부러 다른** 두 가지:
+     ① 일시정지 중의 뒤로 = `Game.menu()`(메뉴로 나가기). Esc 는 resume() 이라
+        그대로 재사용하면 정지↔재개만 오가며 앱을 영영 못 나간다(무한 루프).
+     ② 캐릭터 패널(#charpanel)은 Esc 사슬에 없다 — 여기서는 #cp-close 를 눌러
+        닫는다. Esc 사슬 자체는 건드리지 않는다(이 파도의 범위 밖).
+
+   그리는 것은 하나도 바꾸지 않는다(픽셀 diff 0). 키보드·마우스 동작도 그대로다
+   — 이 코드가 도는 유일한 계기는 사용자가 뒤로가기를 눌렀을 때뿐이다.
+   ========================================================================== */
+(function () {
+  if (typeof window === 'undefined' || !window.history || !window.history.pushState) return;
+  var d = window.document;
+  var SENTINEL = 'tw-back';
+
+  function guard() {
+    try {
+      if (!history.state || history.state.tw !== SENTINEL) {
+        history.pushState({ tw: SENTINEL }, '');
+      }
+    } catch (e) { /* 사파리 사생활 모드 등: 뒤로가기는 원래대로 동작한다 */ }
+  }
+
+  function vis(el) { return !!(el && !el.hidden && el.offsetParent !== null); }
+
+  function openSheet() {
+    try {
+      var ms = d.querySelectorAll('.modal');
+      for (var i = 0; i < ms.length; i++) {
+        if (ms[i].id === 'modal-pause') continue;   /* 일시정지는 아래에서 따로 */
+        if (!ms[i].hidden) return ms[i];
+      }
+    } catch (e) {}
+    return null;
+  }
+
+  function esc() {
+    try {
+      d.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    } catch (e) {
+      /* 아주 옛 브라우저: 생성자가 없으면 되돌릴 방법이 없으니 그냥 둔다 */
+    }
+  }
+
+  /** 한 걸음 뒤로. 갈 데가 있었으면 true, 여기가 루트면 false. */
+  function step() {
+    var G = window.Game, S = G && G.state;
+
+    /* 1) 캐릭터 패널 — Esc 사슬에 없는 유일한 겹이라 먼저 닫는다 */
+    var cp = d.getElementById('charpanel');
+    if (vis(cp)) {
+      var x = d.getElementById('cp-close');
+      if (x && x.click) { x.click(); return true; }
+    }
+
+    /* 2) 일시정지 말고 떠 있는 시트가 있으면 Esc 사슬이 가장 위 한 겹을 닫는다 */
+    if (openSheet()) { esc(); return true; }
+
+    /* 3) 일시정지 중 = 메뉴로 나가기 (Esc 와 다른 자리, 위 주석 ①) */
+    if (S && S.paused) {
+      if (G.menu) { G.menu(); return true; }
+      return true;
+    }
+
+    /* 4) 지도 화면 → Esc 사슬의 leaveMap */
+    var map = d.getElementById('screen-map');
+    if (map && map.classList && map.classList.contains('active')) { esc(); return true; }
+
+    /* 5) 판이 돌고 있으면 일시정지 (아직 종료가 아니다 — 한 번 더 눌러야 메뉴) */
+    if (S && S.running) { esc(); return true; }
+
+    /* 6) 메뉴 = 루트. 흘려보낸다 → TWA 는 여기서 앱을 닫는다. */
+    return false;
+  }
+
+  window.addEventListener('popstate', function () {
+    if (!step()) return;   /* 루트: 파수꾼을 다시 쌓지 않는다 = 종료 허용 */
+    guard();
+  });
+
+  if (d.readyState === 'complete' || d.readyState === 'interactive') guard();
+  else window.addEventListener('DOMContentLoaded', guard);
 })();
 </script>
 <style id="hud-restore-0904">
