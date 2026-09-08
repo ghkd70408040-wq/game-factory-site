@@ -13311,11 +13311,11 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
          ③ .ch-t 세 줄 — 시안 하단의 게이지 트랙 셋(좌 미션·중앙 진행·우 점수).
             `.ch-g` 알약이 "값", `.ch-t` 가 "채움"이다. 시안이 그 둘을 위·아래로
             나눠 놓았고, 알약 안에 막대를 넣으면 4.0cqw 글자가 설 자리가 없다. -->
-    <div id="classic-hud" hidden aria-hidden="true">
+    <div id="classic-hud" data-part="hud" data-variant="classic" hidden aria-hidden="true">
       <!-- 단계 C(0905) — 클래식도 모험과 같은 베이스: 판 2장 + sky 캡슐 + sky 방울.
            내용물(미션·점수·게이지)만 클래식 것. -->
-      <i class="dh-plate dh-plate--top" aria-hidden="true"></i>
-      <i class="dh-plate dh-plate--bot" aria-hidden="true"></i>
+      <i class="dh-plate dh-plate--top" data-part="hud-plate" data-variant="top" aria-hidden="true"></i>
+      <i class="dh-plate dh-plate--bot" data-part="hud-plate" data-variant="bottom" aria-hidden="true"></i>
       <span id="ch-baby" class="dh-baby cp-th kit-chip-v2" aria-hidden="true"><i class="ct-art" aria-hidden="true"></i></span>
       <div class="ch-fx" aria-hidden="true"><i class="ch-gnd"></i><i class="ch-jelly"></i></div>
       <i class="dh-cap" aria-hidden="true"></i>
@@ -13358,11 +13358,11 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
          --hv2-* 네임스페이스 근거: kit-hud-v2.css 정본의 --hp* 를 그대로 :root 에
          올리면 #boss-bar/#boss-hp-fill 의 --hp 와 이름이 겹친다(전투 밖이 바뀐다).
          구판 마크업 봉인은 _backup/0826/tentwin.phase3-hud-pre.html 이다. -->
-    <div id="duel-hud" class="jbox jbox--slab" hidden>
+    <div id="duel-hud" class="jbox jbox--slab" data-part="hud" data-variant="duel" hidden>
       <!-- 단계 B(0905) — 시안 실루엣 판 2장(위/아래). 슬래브 한 장 대신 이 둘이
            바탕이 되고, 나머지 조각은 이전 배포 위치 그대로 이 위에 얹힌다. -->
-      <i class="dh-plate dh-plate--top" aria-hidden="true"></i>
-      <i class="dh-plate dh-plate--bot" aria-hidden="true"></i>
+      <i class="dh-plate dh-plate--top" data-part="hud-plate" data-variant="top" aria-hidden="true"></i>
+      <i class="dh-plate dh-plate--bot" data-part="hud-plate" data-variant="bottom" aria-hidden="true"></i>
       <!-- 프레임 재배선(0906): 체력바 4층 — 홈(트랙)·눈금(코드)·장식(뼈/날개) 각 별도 요소.
            채움/이름탭 코드는 무접촉. 장식은 좌/우 캡 각각 한 요소(늘이지 않음). -->
       <i class="dh-track dh-track--l" aria-hidden="true"></i>
@@ -56891,8 +56891,13 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
                         /* 눈금 색(코드 층) */
   --hud-tick-w:0.42cqw;                                    /* 눈금 선 폭 */
 }
-#app.battle #duel-hud .dh-plate,
-#app.classic #classic-hud .dh-plate{
+/* [0908 원칙 0] 부품 = 정본 engine.css §hud 의 사본. 판(Frame)은 [data-part="hud-plate"] +
+   변주 [data-variant="top|bottom"], 캡슐은 [data-part="hud-capsule"], 컨테이너는 [data-part="hud"].
+   이미지판은 Shape(알파 마스크·cap_px) 안의 Fill 층이고, 슬롯 안전 상자는 [data-slot] 요소가
+   든다(값 = 매니페스트 slot_safe, engine §hud-slots). 옛 클래스는 마크업에 남기고 규칙은 부품
+   속성으로만 건다 — 특이도 동일(클래스 1 = 속성 1)이라 캐스케이드·픽셀 불변. */
+#app.battle #duel-hud [data-part="hud-plate"],
+#app.classic #classic-hud [data-part="hud-plate"]{
   position:absolute;
   z-index:0;                     /* 조각(대개 z-index:1~3 또는 DOM 뒤)보다 아래 */
   pointer-events:none;
@@ -56903,8 +56908,8 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
 /* 위 판 — 민무늬(홈·캡슐 없음). bbox x0 y0 w1694 h327 → L0 T0 W100 H19.30cqw.
    캡슐은 별도 프레임(.dh-cap)이 그리고, 그 발자국은 capsule-mask 로 판에서
    빼(subtract) 판 선·면 중복을 없앤다 — 접합부 300%에서 판 선 0, 캡슐 겉선 1줄. */
-#app.battle #duel-hud .dh-plate--top,
-#app.classic #classic-hud .dh-plate--top{
+#app.battle #duel-hud [data-part="hud-plate"][data-variant="top"],
+#app.classic #classic-hud [data-part="hud-plate"][data-variant="top"]{
   left:0cqw; top:0; width:100cqw; height:19.30cqw;
   z-index:1;
   background-image:var(--hud-plate-top);
@@ -56922,8 +56927,8 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
           mask-composite:subtract;   /* 표준: 판(아래층) − 캡슐(위층) */
 }
 /* 아래 판 — bbox x9 y317 w1683 h279 → L0.53 T18.71 W99.35 H16.47cqw. */
-#app.battle #duel-hud .dh-plate--bot,
-#app.classic #classic-hud .dh-plate--bot{
+#app.battle #duel-hud [data-part="hud-plate"][data-variant="bottom"],
+#app.classic #classic-hud [data-part="hud-plate"][data-variant="bottom"]{
   left:0.53cqw; top:18.71cqw; width:99.35cqw; height:16.47cqw;
   background-image:var(--hud-plate-bottom);
 }
@@ -56955,6 +56960,7 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
   filter:drop-shadow(0 .5cqw .5cqw rgba(var(--prim-ink-plum-rgb),.14));
 }
 #app.classic #classic-hud .dh-cap{ z-index:1; }  /* 클래식: 판 위, #ch-cap 글리프 아래 */
+
 /* ── 체력바 4층: 홈(트랙)·채움(코드)·눈금(코드)·장식(뼈/날개) — 각 별도 요소·별도 교체점 ──
    좌표는 코드 채움(.dh-bar, 무접촉)의 실렌더 박스에 앵커한다: S6 bbox 캔버스(1694×608)는
    HUD(1536/500)와 세로비가 달라 세로값을 그대로 못 쓴다(홈 높이 = 렌더 트랙 높이 기준). */
