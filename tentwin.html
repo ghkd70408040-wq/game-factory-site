@@ -13318,7 +13318,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
       <i class="dh-plate dh-plate--bot" data-part="hud-plate" data-variant="bottom" aria-hidden="true"></i>
       <span id="ch-baby" class="dh-baby cp-th kit-chip-v2" aria-hidden="true"><i class="ct-art" aria-hidden="true"></i></span>
       <div class="ch-fx" aria-hidden="true"><i class="ch-gnd"></i><i class="ch-jelly"></i></div>
-      <i class="dh-cap" aria-hidden="true"></i>
+      <i class="dh-cap" data-part="hud-capsule" aria-hidden="true"></i>
       <i id="ch-castle" aria-hidden="true"></i>
       <div id="ch-cap" class="wf-cap"><span id="ch-cap-v">0</span></div>
       <div id="ch-l" class="ch-g"><i class="ch-i ch-i-goal" aria-hidden="true"></i><b id="ch-l-v">0</b></div>
@@ -13381,7 +13381,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
       <!-- .dh-mid 는 자리를 차지하지 않는 **쌓임 상자**다(inset:0 · z-index:1):
            #duel-timer 의 유리겹이 z-index:-1 이라 그 -1 을 여기 가둬 둔다. -->
       <div class="dh-mid">
-        <i class="dh-cap" aria-hidden="true"></i>
+        <i class="dh-cap" data-part="hud-capsule" aria-hidden="true"></i>
         <span class="dh-castle" aria-hidden="true">&#127984;</span>
         <div id="duel-timer" class="wf-cap" role="timer">0:00</div>
       </div>
@@ -56951,15 +56951,15 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
    ⚠ 되돌리기: 이 한 줄을 지우면 덮개가 그대로 돌아온다(.ch-fx CSS 는 손대지 않았다). */
 #app.classic #classic-hud .ch-fx{ display:none !important; }
 /* 캡슐 프레임 — 위 판 위(z), 타이머/성 글리프는 그 위. bbox = 캡슐 그대로. */
-#app.battle #duel-hud .dh-cap,
-#app.classic #classic-hud .dh-cap{
+#app.battle #duel-hud [data-part="hud-capsule"],
+#app.classic #classic-hud [data-part="hud-capsule"]{
   position:absolute; pointer-events:none;
   left:28.10cqw; top:8.09cqw; width:44.10cqw; height:17.65cqw;
   z-index:0;                        /* 모험: .dh-mid 안에서 타이머(1)·성(3) 아래 */
   background:var(--hud-capsule) center/100% 100% no-repeat;
   filter:drop-shadow(0 .5cqw .5cqw rgba(var(--prim-ink-plum-rgb),.14));
 }
-#app.classic #classic-hud .dh-cap{ z-index:1; }  /* 클래식: 판 위, #ch-cap 글리프 아래 */
+#app.classic #classic-hud [data-part="hud-capsule"]{ z-index:1; }  /* 클래식: 판 위, #ch-cap 글리프 아래 */
 
 /* ── 체력바 4층: 홈(트랙)·채움(코드)·눈금(코드)·장식(뼈/날개) — 각 별도 요소·별도 교체점 ──
    좌표는 코드 채움(.dh-bar, 무접촉)의 실렌더 박스에 앵커한다: S6 bbox 캔버스(1694×608)는
