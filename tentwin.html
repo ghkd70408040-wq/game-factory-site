@@ -2814,6 +2814,28 @@ li.roll-in { animation: rollin 380ms var(--spring) backwards; }
 #modal-clear .result-card .rollup-total b, #modal-clear .result-card #clear-rollup li b{ color: var(--prim-ink); }
 /* 카드 안에선 옅은 인셋 알약 배경이 카드면과 겹쳐 지저분하니 정리 */
 #modal-clear .result-card #clear-next-preview{ background: rgba(255,255,255,.28); box-shadow: inset 0 0 0 1px var(--hcard-line); }
+/* [E-0909 modal-legibility] 결과 카드 «큰 점수» 글자 Fill — 값의 유래는 위
+   tokens-semantic 의 --role-score-* 주석(층 진단 표가 거기 있다).
+   전역 `.big-score` 는 그대로 두고 **카드 안에서만** 덮는다: #modal-arc 는 자기
+   스코프에서 이미 같은 결함을 불투명 잉크로 고쳤고(11866 경고 그대로 무접촉),
+   여기 걸리는 소비처는 #modal-adv·#modal-over 둘뿐이다.
+   겉선은 paint-order 로 채움 아래에 깔아 획을 먹지 않게 한다(§0 층 순서). */
+#modal-adv .result-card .big-score b,
+#modal-over .result-card .big-score b{
+  background-image: linear-gradient(100deg,
+      var(--role-score-fill-a), var(--role-score-fill-b) 62%, var(--role-score-fill-c));
+  -webkit-text-stroke: .022em var(--role-score-rim);
+          text-stroke: .022em var(--role-score-rim);
+  paint-order: stroke fill;
+  /* ⚠ text-shadow: none 이 필수다 — .mvh-title(:50888)이 적어 둔 그 이유가 여기도
+     그대로 적용된다: background-clip:text 의 그라데는 요소 «배경»이라 글자보다
+     먼저 그려지고, 상속된 흰 헤일로(0 1px 0 흰.62 · 0 0 3px 흰.45)가 그 위를
+     통째로 덮어 채움이 날아간다. 이것이 사용자가 말한 «뿌옇음»의 글자 쪽 몫이다
+     (실측: 헤일로만 꺼도 1.96 → 2.32). 밝은 아랫입술은 알파 밖으로만 번지는
+     drop-shadow 로 준다 — 글자 속을 덮지 않는다. */
+  text-shadow: none;
+  filter: drop-shadow(0 .022em 0 var(--role-score-lip));
+}
 
 /* ── ⑱-b 게임 방법 카드 = S1 시안 실측 ──────────────────────────────────────
    지휘자 판정: 크림 불투명 → S1 의 **회보라 반투명**(뒤가 은은히 비침).
@@ -5881,7 +5903,10 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   transform: scale(.4);
   /* ⚠ 롱핸드 둘로 나눈다(단축 금지 규율). 나누는 것이 기능상으로도 옳다:
      희귀 등급이 아래에서 background-image 만 갈아 끼우기 때문이다. */
-  background-color: rgba(255, 255, 255, .07);
+  /* [E-0909 modal-legibility] .07 은 라벤더 판 위에서 «행이 없는 것과 같은» 값
+     이었다(반려: 뿌옇음). .55 로 올려 행이 슬롯으로 읽히게 한다 — 이름 잉크는
+     6.32 → 7.64, 값 잉크는 아래 --role-rw-val-ink 와 합쳐 1.01 → 6.29. */
+  background-color: var(--role-rw-slot-face);
   background-image: none;
   box-shadow: inset 0 0 0 1px var(--line);
 }
@@ -5930,7 +5955,10 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
 .rw-val {
   flex: 0 0 auto;
   font-variant-numeric: tabular-nums;
-  color: var(--prim-c8);
+  /* [E-0909 modal-legibility] 레몬(--prim-c8) 은 판 위 1.01:1 — 「+1」이 사실상
+     안 보였다. 같은 계열의 진한 호박으로 내린다(금색이라는 뜻은 행 겉선
+     [data-rar=normal] 의 레몬 림이 그대로 말한다). */
+  color: var(--role-rw-val-ink);
 }
 /* 획득이라는 사실은 부호가 말한다. countUp 이 쓰는 것은 숫자뿐이라(그 함수를
    한 줄도 고치지 않으려고) 부호는 CSS 가 붙인다. */
@@ -12769,6 +12797,27 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
   --role-blocker-hot: rgba(255, 77, 94, .95);
   --role-hcard-fill-result: #E2D7D7;
   --role-hcard-line-result: rgba(140,116,146,.60);
+  /* [E-0909 modal-legibility] 결과 모달 «글자 Fill» 층 — 사용자 반려 2026-09-09
+     「너무 뿌옇고 잘 안 보여, 글자 디자인·글자 색상 문제」의 실측 대상.
+     층 진단(scratchpad/modal-legibility/diag.before.*.json, 390×844 dpr3):
+       판 흐림 끔      점수 1.96 → 1.96 · 보상값 1.01 → 1.08   (원인 아님)
+       판 알파 끔      점수 1.96 → 1.96 · 보상값 1.01 → 1.11   (원인 아님)
+       카드 알파 끔    점수 1.96 → 2.05 · 보상값 1.01 → 1.01   (원인 아님)
+       글자 채움 갈기  점수 1.96 → 11.76 · 보상값 1.01 → 7.35  (여기가 층이다)
+     그래서 판(§51 계약 「판은 무접촉, 대비는 글자 쪽으로만」)은 한 값도 안 바꾼다.
+     ▣ 점수 숫자 — 옛 레몬→딸기→복숭아 그라데는 크림 카드 위 1.96:1(큰 글자 3:1
+       미달). 같은 세 색의 «진한» 자리로 내리고 밝은 겉선을 얹어 젤리 스티커
+       질감을 지킨다(#modal-arc 가 D2 #35 반려에서 이미 간 길과 같은 진단).
+     ▣ 보상 행 — 값 «+1» 이 레몬(#F5D84A) 이라 판과 1.01:1(사실상 안 보임).
+       진한 호박으로 내리고, .07 흰 배경(거의 안 보이는 행)을 .55 로 올려 행이
+       슬롯으로 읽히게 한다. 이름 잉크(--j-ink)는 무접촉. */
+  --role-score-fill-a: #8A4210;
+  --role-score-fill-b: #A3213F;
+  --role-score-fill-c: #7C2A6B;
+  --role-score-rim: #FFF1DE;
+  --role-score-lip: rgba(255, 255, 255, .72);
+  --role-rw-val-ink: #7A4A12;
+  --role-rw-slot-face: rgba(255, 255, 255, .55);
   /* -- prim -- */
   --prim-white-a55: rgba(255,255,255,.55);
   --prim-black-a07: rgba(0,0,0,.07);
