@@ -22,7 +22,7 @@
     return '<div class="part'+(KIT?(c.viol?' is-partial':' is-live'):'')+'" title="'+t.id+' · '+c.w+'×'+c.h+' · '+c.kb+'KB · '+(c.viol?'위반':'준수')+(c.used?'':' · 미사용')+' · '+c.verdict+'">'
       + '<div class="part-stage"><img class="frame-file" loading="lazy" src="../catalog/'+c.stem+'.webp" alt="'+c.stem+'"></div>'
       + (KIT
-        ? '<div class="part-label"><div class="part-name">'+tierBadge(t)+c.stem+'</div></div></div>'
+        ? '<div class="part-label"><div class="part-name">'+c.role+'</div></div></div>'
         : '<div class="part-label"><div class="part-name">'+c.stem+'</div>'
       + '<div class="part-file">'+t.id+' · '+c.w+'×'+c.h+' · '+c.kb+'KB</div>'
       + '<div class="part-tags">'
@@ -72,6 +72,10 @@
       });
     });
     host.innerHTML = html || '<div class="value-missing">해당 없음</div>';
+    /* 계층 토글 한 줄이 프레임 선반도 함께 거른다(창고 = 킷 격자 하나) */
+    document.querySelectorAll('.shelf-group').forEach(function(g){
+      g.hidden = (state.tier!=="전체" && g.getAttribute('data-tier')!==state.tier);
+    });
     var cnt = document.getElementById('count'); if (cnt) cnt.textContent = items.length + ' / ' + data.catalog.length; /* 킷 판에는 숫자 줄이 없다(0908) */
   }
 
@@ -84,17 +88,19 @@
       if(!n) return;
       html += '<button data-tier="'+t.id+'">'+t.id+' '+t.name+' <span class="count">'+n+'</span></button>';
     });
-    html += '<span class="filter-sep"></span>';
-    html += '<button data-role="전체" class="is-current">역할 전체</button>';
-    TIERS.forEach(function(t){
-      t.roles.forEach(function(r){
-        var n = data.catalog.filter(function(c){return c.role===r;}).length;
-        if(!n) return;
-        html += '<button data-role="'+r+'">'+r+' <span class="count">'+n+'</span></button>';
+    if(!KIT){                       /* 킷 페이지 = 계층 토글 한 줄만 (역할·위반·미사용 줄은 공장/문서 쪽) */
+      html += '<span class="filter-sep"></span>';
+      html += '<button data-role="전체" class="is-current">역할 전체</button>';
+      TIERS.forEach(function(t){
+        t.roles.forEach(function(r){
+          var n = data.catalog.filter(function(c){return c.role===r;}).length;
+          if(!n) return;
+          html += '<button data-role="'+r+'">'+r+' <span class="count">'+n+'</span></button>';
+        });
       });
-    });
-    html += '<span class="filter-sep"></span>';
-    html += '<button id="f-viol">위반만</button><button id="f-unused">미사용만</button>';
+      html += '<span class="filter-sep"></span>';
+      html += '<button id="f-viol">위반만</button><button id="f-unused">미사용만</button>';
+    }
     f.innerHTML = html;
 
     function wire(attr, key){
@@ -108,10 +114,11 @@
     }
     wire('data-tier','tier');
     wire('data-role','role');
-    document.getElementById('f-viol').onclick=function(){
+    var fv = document.getElementById('f-viol'), fu = document.getElementById('f-unused');
+    if(fv) fv.onclick=function(){
       state.viol=!state.viol; this.classList.toggle('is-current',state.viol); render(data);
     };
-    document.getElementById('f-unused').onclick=function(){
+    if(fu) fu.onclick=function(){
       state.unused=!state.unused; this.classList.toggle('is-current',state.unused); render(data);
     };
   }

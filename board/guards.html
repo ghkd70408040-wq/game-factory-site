@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="ko"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>문지기 · 게임 공장</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="board.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="board-theme.css">
+</head><body>
+<nav class="site-nav">
+<span class="nav-brand">🏭 게임 공장</span>
+<a href="index.html">홈</a>
+<a href="plan.html">기획실</a>
+<span class="nav-sep"></span>
+<a href="screen-hud.html">HUD</a>
+<a href="screen-modal.html">모달</a>
+<a href="screen-charsel.html">캐릭창</a>
+<a href="screen-map.html">지도</a>
+<span class="nav-sep"></span>
+<a href="warehouse.html">창고</a>
+<a href="factory.html">공장</a>
+<a href="gate.html">관문실</a>
+<a href="steps.html">스텝</a>
+<span class="nav-sep"></span>
+<a href="spec.html">규격</a>
+<a href="procedure.html">절차</a>
+<a href="guards.html" class="is-current">문지기</a>
+<a href="records.html">기록</a>
+<a href="tools.html">도구</a>
+</nav>
+<div class="page">
+  <h1 class="page-title">문지기 — 지침·훅·스킬·관문·평가</h1>
+  <div class="page-meta">정본 README 5층 표 · .claude/settings.json · gate.py · 실행 원문은 <code class="mono">--run-gates</code> 로 갱신</div>
+  <div class="focus-line"><b>초점</b>문서만 있는 규칙은 세 번째 세션에서 잊힌다 — 위층이 새면 아래층이 잡는가<span class="src">LOOP-AUDIT-0908 · 규격 §6.1</span></div>
+  <div class="doc-sheet">
+<h2 class="section-title" id="sec-layers">1 · 규칙이 지켜지게 하는 5층</h2><p class="doc-p">문서만 있는 규칙은 세 번째 세션에서 잊힌다(<code class="mono">tentwin/LOOP-AUDIT-0908.md</code> — 미차단 유형 5개가 전부 &quot;규칙은 있는데 지켜지지 않음&quot;). 그래서 같은 규칙을 <b>다섯 층</b>에 박는다. 위층이 새면 아래층이 잡는다.</p>
+<div class="scroll-x"><table class="data-table">
+<thead><tr><th>층</th><th>무엇</th><th>어디</th><th>언제 작동</th><th>새면</th></tr></thead>
+<tbody><tr><td>1 <b>지침</b></td><td>항상 켜져 있는 행동 규칙</td><td><code class="mono">CLAUDE.md</code> · <code class="mono">GAME-FACTORY-STANDARD.md</code> §6 절대 규칙 12</td><td>세션 내내</td><td>사람이 잊는다 → 2층</td></tr><tr><td>2 <b>훅</b>(강제)</td><td>규칙을 <b>차단</b>으로 바꾼 것</td><td><code class="mono">.claude/settings.json</code> + <code class="mono">tools/hooks/</code></td><td>도구 호출·프롬프트·푸시 <b>직전</b></td><td>우회는 되지만 잊어서 어기는 건 막힌다 → 3층</td></tr><tr><td>3 <b>스킬</b></td><td>접수·제작 절차를 순서로 편 것</td><td><code class="mono">skills/game-factory/SKILL.md</code>(요청 접수 0~8) · <code class="mono">skills/asset-frame/SKILL.md</code>(에셋 A0~A12)</td><td>요청을 받은 순간 · 에셋 하나를 만들 때</td><td>절차를 건너뛰면 → 4층</td></tr><tr><td>4 <b>관문</b>(검증)</td><td>산출물이 규격을 지켰는지 재는 스크립트</td><td><code class="mono">tools/measure/gate.py quick|full|merge</code> · <code class="mono">components-gate.py</code> · <code class="mono">overlay-check.py</code> · <code class="mono">judge-precheck.py</code> · <code class="mono">hooks/pre-push-approval.py</code></td><td>파도 마감 · 사용자 전송 전 · 푸시</td><td>관문이 무엇을 안 보는지 모르면 → 5층</td></tr><tr><td>5 <b>평가</b>(회귀)</td><td>다음 세션의 실행자가 <b>같은 답</b>을 내는지</td><td><code class="mono">tools/eval/scenarios.json</code>(실제 요청 8건) + <code class="mono">tools/eval/run.py</code></td><td>규격·스킬을 고친 뒤</td><td>시나리오를 늘려 다시 잰다</td></tr></tbody></table></div>
+<p class="doc-p"><b>2층 훅 3개</b>(프로젝트 범위 <code class="mono">.claude/settings.json</code>, 사용자 홈 설정 무접촉):</p>
+<div class="scroll-x"><table class="data-table">
+<thead><tr><th>훅</th><th>대상</th><th>하는 일</th></tr></thead>
+<tbody><tr><td><code class="mono">tools/hooks/guard-locked-paths.py</code></td><td>PreToolUse <code class="mono">Edit|Write|MultiEdit</code></td><td>정본 경로(<code class="mono">site/tentwin.html</code> · <code class="mono">site/catalog/**</code> · <code class="mono">site/board/**</code> · <code class="mono">ref-v2/engine.css</code> · <code class="mono">theme-tentwin.css</code> · <code class="mono">manifest/*.json</code>)를 <b>잠금 없이</b> 고치면 exit 2 로 차단하고 <code class="mono">tools/lock.py claim</code> 을 안내(LOOP-AUDIT #7)</td></tr><tr><td><code class="mono">tools/hooks/inject-factory-context.py</code></td><td>UserPromptSubmit</td><td>프롬프트에 게임·에셋·화면·버튼·HUD·시안·관제탑·푸시 가 있으면 &quot;<code class="mono">/game-factory</code> 스킬로 접수 표부터&quot; 한 줄을 컨텍스트에 주입(CLAUDE.md 1·2)</td></tr><tr><td><code class="mono">tools/hooks/pre-push-notice.py</code></td><td>PreToolUse <code class="mono">Bash</code></td><td><code class="mono">git push</code> 가 보이면 <code class="mono">pre-push-approval.py --dry-run</code> 판정을 <b>먼저 띄운다</b>(차단은 <code class="mono">site/.git/hooks/pre-push</code> 가 한다, LOOP-AUDIT #1)</td></tr></tbody></table></div>
+<p class="doc-p">훅 확인: <code class="mono">echo '&lt;훅 입력 json&gt;' | python tools/hooks/&lt;script&gt;.py</code> (각 스크립트 <code class="mono">--help</code>·<code class="mono">--self-test</code>·<code class="mono">--test</code>). 평가 실행: <code class="mono">python tools/eval/run.py --list</code> · <code class="mono">--template --out &lt;답안&gt;</code> · <code class="mono">--answers &lt;답안&gt;</code> · <code class="mono">--doc-check</code>(절 번호가 규격·스킬에 실제 있는지) · <code class="mono">--self-test</code>(채점기 음성 테스트).</p>
+<p class="doc-p">용어: <b>절대 규칙</b> = 규격 §6(12줄). <b>개발 헌법</b> = 0904 초안(<code class="mono">CONSTITUTION-DRAFT-0904.md</code>), 미적용·규격에 흡수됨 → 보관, 이 용어는 쓰지 않는다.</p>
+<p class="doc-p">관문 도구(전부 <code class="mono">tools/</code>): <code class="mono">measure/components-gate.py</code>(m3·frames·done·pixel·shoot) · <code class="mono">measure/shot-harness.py</code>(19컷) · <code class="mono">measure/overlay-cap.py</code> + <code class="mono">overlay-check.py</code>(원본 겹침) · <code class="mono">measure/manifest-validate.py</code>(원칙 0 포함) · <code class="mono">measure/judge-precheck.py</code>(전송 전 600%) · <code class="mono">build/stamp.py</code>·<code class="mono">build/strip-deploy.py</code>(배포) · <code class="mono">hooks/pre-push-approval.py</code>(승인 트레일러) · <code class="mono">board/*</code>(관제탑 기능).</p>
+<p class="doc-p">절차 요약: <b>요청 접수(§10 R0~R5, <code class="mono">/game-factory</code>)</b> → 시안 접수(S2, <code class="mono">tools/intake</code>) → 매핑·판정(S3) → 제작(S4, 스킬 A0~A12) → 배선(S5, <code class="mono">tools/board/apply-manifest.py</code>) → 관문(S6) → 판정판에서 사용자 &quot;됐다&quot; → 푸시(S7, 트레일러 <code class="mono">Approval:</code>). 문제가 나면 §9(원인 실측 → 전문가 방식 조사 → 우리 번역 → 같은 날 규격·도구 반영 → 반복 루프 검사).</p><h2 class="section-title" id="sec-hooks">2 · 훅 (강제 · .claude/settings.json 실재분)</h2><div class="scroll-x"><table class="data-table">
+<thead><tr><th>이벤트</th><th>대상(matcher)</th><th>스크립트</th><th>제한</th><th>실재</th></tr></thead>
+<tbody><tr><td>PreToolUse</td><td><code class="mono">Edit|Write|MultiEdit</code></td><td><code class="mono">tools/hooks/guard-locked-paths.py</code></td><td><span class="mono">20s</span></td><td><span class="state state-ok">있음</span></td></tr><tr><td>PreToolUse</td><td><code class="mono">Bash</code></td><td><code class="mono">tools/hooks/pre-push-notice.py</code></td><td><span class="mono">30s</span></td><td><span class="state state-ok">있음</span></td></tr><tr><td>PreToolUse</td><td><code class="mono">Bash</code></td><td><code class="mono">tools/hooks/guard-bash-writes.py</code></td><td><span class="mono">20s</span></td><td><span class="state state-ok">있음</span></td></tr><tr><td>PreToolUse</td><td><code class="mono">SendUserFile</code></td><td><code class="mono">tools/hooks/guard-send.py</code></td><td><span class="mono">20s</span></td><td><span class="state state-ok">있음</span></td></tr><tr><td>UserPromptSubmit</td><td><code class="mono">(전체)</code></td><td><code class="mono">tools/hooks/inject-factory-context.py</code></td><td><span class="mono">10s</span></td><td><span class="state state-ok">있음</span></td></tr></tbody></table></div><div class="source-note">확인: echo '&lt;훅 입력 json&gt;' | python tools/hooks/&lt;script&gt;.py — 각 스크립트 --help · --self-test · --test</div><h2 class="section-title" id="sec-grade">3 · 관문 등급</h2><div class="scroll-x"><table class="data-table">
+<thead><tr><th>등급</th><th>도는 것</th><th>브라우저</th><th>쓰는 때</th></tr></thead>
+<tbody><tr><td>quick</td><td>m3 · css-primitives(정본 CSS 있을 때) · manifest-validate · <b>docsync</b> · 계산값 프로브(정적)</td><td>0</td><td>토큰 정규화·구조 수리·문서</td></tr><tr><td>full</td><td>quick + shot-harness 19컷(기준 <b>캐시</b> 대비) + done-gate + <b>overlay(자산 변경 시)</b> + <b>guard</b></td><td>1회</td><td>시각이 바뀔 수 있는 파도</td></tr><tr><td>merge</td><td>full + frames + 실클릭 smoke(<code class="mono">components-gate.py shoot</code>)</td><td>2회</td><td>지휘자 병합 직전</td></tr></tbody></table></div><h3 class="sub-title">게임 종속 인자 (gate.tentwin.json)</h3><div class="scroll-x"><table class="data-table">
+<thead><tr><th>인자</th><th>값 (게임 종속 — 규격 §8)</th></tr></thead>
+<tbody><tr><td><code class="mono">done_args</code></td><td><code class="mono">--prefixes=--bj-,--wf-,--j-,--dlj-,--chj-,--dhj-,--mvh-,--mv2j-,--f2-,--cpj-,--hudj-,--mode-a-,--mode-b-,--role-,--mL-,--btn-,--btnf-,--wcap-,--hcard-,--hd-,--wchip-,--cap-,--gauge-,--duel-,--ch-,--ms-,--m-,--mn-,--rw-,- …</code></td></tr><tr><td><code class="mono">engine_css</code></td><td><code class="mono">tentwin/ref-v2/engine.css</code></td></tr><tr><td><code class="mono">frames_args</code></td><td><code class="mono">--manifest tentwin/ref-v2/manifest/frames.tentwin.json --catalog site/catalog</code></td></tr><tr><td><code class="mono">m3_baseline</code></td><td><code class="mono">tools/measure/m3-baseline.json</code></td></tr><tr><td><code class="mono">manifest_args</code></td><td><span class="value-missing">(빈 값)</span></td></tr><tr><td><code class="mono">manifest_frames</code></td><td><code class="mono">tentwin/ref-v2/manifest/frames.tentwin.json</code></td></tr><tr><td><code class="mono">probe</code></td><td><code class="mono">tools/measure/gate.probe.tentwin.json</code></td></tr><tr><td><code class="mono">shot_args</code></td><td><span class="value-missing">(빈 값)</span></td></tr><tr><td><code class="mono">smoke_args</code></td><td><code class="mono">--url http://127.0.0.1:8931/tentwin.html --serve site --port 8931 --screens menu,map,game --out scratchpad/gate-smoke --profiles android-390x844-dpr3 --pre-click #cut-skip --wait 6000 --init-script try{var K='tentwin.v1' …</code></td></tr><tr><td><code class="mono">theme_css</code></td><td><code class="mono">tentwin/ref-v2/theme-tentwin.css</code></td></tr></tbody></table></div><h2 class="section-title" id="sec-runs">4 · 최신 실행 원문</h2><div class="scroll-x"><table class="data-table">
+<thead><tr><th>관문</th><th>명령</th><th>판정</th><th>요약 마지막 줄</th></tr></thead>
+<tbody><tr><td>관문 quick</td><td><code class="mono">python tools/measure/gate.py quick --file site/tentwin.html</code></td><td><span class="state state-ok">PASS rc 0</span></td><td>==========================================================================</td></tr><tr><td>매니페스트 검증</td><td><code class="mono">python tools/measure/manifest-validate.py</code></td><td><span class="state state-ok">PASS rc 0</span></td><td>======================================================================</td></tr><tr><td>프레임 커버리지 (frames --game)</td><td><code class="mono">python tools/measure/components-gate.py frames --manifest tentwin/ref-v2/manifest/frames.tentwin.json --catalog site/catalog --game site/tentwin.html</code></td><td><span class="state state-none">FAIL rc 1</span></td><td>frames FAIL — §1.3 위반 0건 + 카탈로그 미등록 3건 + 커버리지 미등록 242건. 되돌리거나 등록할 것(등록 없는 손편집 = §7 역류 금지 위반).</td></tr><tr><td>평가 §번호 실재 검사 (eval --doc-check)</td><td><code class="mono">python tools/eval/run.py --doc-check</code></td><td><span class="state state-ok">PASS rc 0</span></td><td>  절 20개 중 20개 확인 · 미확인 0</td></tr></tbody></table></div><h3 class="sub-title" id="run-score">최근 회귀 채점 <span class="tag">scratchpad/eval-0909/score.txt</span></h3><div class="scroll-x"><table class="data-table">
+<thead><tr><th>시나리오</th><th>PASS</th><th>FAIL</th><th>칸 합계</th></tr></thead>
+<tbody><tr><td><span class="mono">8</span></td><td><span class="state state-ok">0</span></td><td><span class="state state-none">8</span></td><td><span class="mono">53 / 112</span></td></tr></tbody></table></div><pre class="raw-output">회귀 평가 — game-factory 접수 회귀 평가  (답안 scratchpad\eval-0909\answers.json)
+====================================================================================================
+
+[E1] FAIL  —  클래식 인게임 HUD 판 왼쪽에 흰 광이 겉선 바깥으로 넘쳐 나와. 고쳐서 푸시해줘.  (8/14)
+  판정   칸                          근거
+  FAIL 대상 화면(화면키)                 기대 05-hud-classic / 답 hud
+  FAIL 부품 id(매니페스트 검색 결과)         빠짐: t2-plate-hud-bottom-lite
+  PASS 매니페스트에 등재됨                 기대 true / 답 true
+  PASS 계층 T1~T5                   기대 t2 / 답 t2
+  PASS 바뀌는 것                      기대 변주 | 인스턴스 / 답 인스턴스
+  PASS 바뀌는 층                      기대 effect | stroke / 답 effect
+  PASS 판정                         기대 code / 답 code
+  FAIL 시각 변화                      기대 true / 답 있음
+  PASS 관문 등급                      기대 full / 답 full
+  PASS 승인 트레일러                    기대 user-yyyy-mm-dd / 답 user-yyyy-mm-dd
+  PASS 착수 전 사용자 확인 필요             기대 false / 답 false
+  FAIL 필수 절(§번호)                  빠짐: 4, 4.1-1, 4.1-4, 6.2, 9-1
+  FAIL 금지                         낱말 묶음 3/4 · 빠짐: 자산 수리/픽셀/자산 픽셀/덮
+  FAIL 첫 5분 행동                    낱말 묶음 3/5 · 빠짐: 자산/코드/범인/원인 ; lock.py/claim/잠금
+
+[E2] FAIL  —  클래식 일시정지 버튼이 모험·아케이드랑 다르게 생겼어. 같은 버튼으로 통일해줘.  (7/14)
+  판정   칸                          근거
+  FAIL 대상 화면(화면키)                 기대 05-hud-classic / 답 hud
+  PASS 부품 id(매니페스트 검색 결과)         기대 (빈 목록) / 답 (빈 목록)
+  PASS 매니페스트에 등재됨                 기대 false / 답 false
+  PASS 계층 T1~T5                   기대 t3 / 답 t3
+  PASS 바뀌는 것                      기대 변주 | 인스턴스 / 답 인스턴스
+  FAIL 바뀌는 층                      기대 fill | fill stroke | stroke / 답 shape+fill
+  FAIL 판정                         기대 code / 답 variant
+  FAIL 시각 변화                      기대 true / 답 있음
+  PASS 관문 등급                      기대 full / 답 full
+  PASS 승인 트레일러                    기대 user-yyyy-mm-dd / 답 user-yyyy-mm-dd
+  PASS 착수 전 사용자 확인 필요             기대 false / 답 false
+  FAIL 필수 절(§번호)                  빠짐: 1, 4, 6-4, 6.2
+  FAIL 금지                         낱말 묶음 1/4 · 빠짐: 신설/새 부품/부르지 않은 ; consumers/소비처/전량 ; 원시값/토큰
+  FAIL 첫 5분 행동                    낱말 묶음 2/5 · 빠짐: 계산값/프로브/대조/나란히 ; 차이/목록/은퇴 ; lock.py/claim/잠금
+
+[E3] FAIL  —  펫 방울 안에 남색 덩어리가 남아 있어. 없애줘.  (6/14)
+  판정   칸                          근거
+  FAIL 대상 화면(화면키)                 기대 04-hud-adv / 답 hud
+  FAIL 부품 id(매니페스트 검색 결과)         빠짐: t4-bubble-hud-pet
+  FAIL 매니페스트에 등재됨                 기대 true / 답 false
+  PASS 계층 T1~T5                   기대 t4 / 답 t4
+  FAIL 바뀌는 것                      기대 변주 | 인스턴스 / 답 슬롯
+  PASS 바뀌는 층                      기대 effect | fill / 답 fill
+  PASS 판정                         기대 ambiguous | asset | 발주 / 답 asset
+  FAIL 시각 변화                      기대 true / 답 있음
+  PASS 관문 등급                      기대 full / 답 full
+  PASS 승인 트레일러                    기대 user-yyyy-mm-dd / 답 user-yyyy-mm-dd
+  PASS 착수 전 사용자 확인 필요             기대 false / 답 false
+  FAIL 필수 절(§번호)                  빠짐: 4, 4.1-4, 4.1-5, 4.1-7, 6-10
+  FAIL 금지                         낱말 묶음 1/4 · 빠짐: 코드 층/덮/가리 ; consumers/소비처/전량 ; lost_layers/잃은 층/기록
+  FAIL 첫 5분 행동                    낱말 묶음 3/5 · 빠짐: 코드 층/계산값/중복 ; 재추출/lock.py/claim
+
+[E4] FAIL  —  그림 버튼 글자 분리 또 안 됐어. 우측 모서리 채움 넘침·배지 찢김·NEW 겉선 잘림·「7탄  (9/14)
+  판정   칸                          근거
+  FAIL 대상 화면(화면키)                 기대 16-modal-mode / 답 modal
+  FAIL 부품 id(매니페스트 검색 결과)         빠짐: t3-btn-picture-adventure, t3-btn-picture-arcade, t3-btn-picture-daily, t3-btn-picture-timerush
+  PASS 매니페스트에 등재됨                 기대 true / 답 true
+  PASS 계층 T1~T5                   기대 t3 / 답 t3
+… (142줄 더 — 원문 파일 참조)</pre><h3 class="sub-title" id="run-gate-quick">관문 quick <span class="tag">2026-09-09 00:42</span></h3><pre class="raw-output">==========================================================================
+관문 등급 QUICK   파일 site/tentwin.html
+설정 C:\workspace\game-factory\tools\measure\gate.tentwin.json
+규칙(COMPONENTS §6.2): 토큰·구조 파도 = quick · 시각 파도 = full · 병합 = merge
+==========================================================================
+
+==========================================================================
+[gate] m3 — M3 죽은 선택자 게이트
+  $ C:\Users\ghkd7\AppData\Local\Programs\Python\Python312\python.exe tools\measure\components-gate.py m3 --file site/tentwin.html --baseline tools/measure/m3-baseline.json
+M3 죽은 선택자 게이트 — site/tentwin.html
+
+  현재 A급 10건 · 은퇴 대장 10건 · 신규 0건 · 대장서 사라짐 0건
+
+M3 PASS — 신규 A급 0건 (기존 A급은 은퇴 대장 소속).
+
+==========================================================================
+[gate] css-primitives — engine 원시값 0 (정본 CSS 있을 때만)
+  $ C:\Users\ghkd7\AppData\Local\Programs\Python\Python312\python.exe tools\measure\css-primitives.py tentwin/ref-v2/engine.css tentwin/ref-v2/theme-tentwin.css
+====================================================================
+
+engine.css   [engine (위반 0 이어야 함)]
+
+  줄 3656 · 337008 bytes · var() 참조 8929 · 주석 제외 코드 262450자
+
+    hex                    0
+
+    color-fn               0
+
+    color-mix 리터럴 %        0
+
+    opacity 리터럴            0
+
+====================================================================
+
+theme-tentwin.css   [theme  (값 파일 — 참고 계수)]
+
+  줄 1579 · 96468 bytes · var() 참조 64 · 주석 제외 코드 17710자
+
+    hex                    100
+
+    color-fn               1
+
+    color-mix 리터럴 %        0
+
+    opacity 리터럴            0
+
+         47  hex                #FFFFFF      | --wf-white:      #FFFFFF;
+
+         50  hex                #180C1C      | --wf-gnd-c:      #180C1C;           /* L2-4 접지 잉크 (원본 rgb 24,12,28) */
+
+         64  hex                #4A304A      | --wf-L4-line:    #4A304A;   --wf-L4-line-a: .62;
+
+         66  hex                #3A243A      | --wf-L4-ink:     #3A243A;   --wf-L4-ink-a:  .80;
+
+         70  hex                #E6DCE2      | --mode-a-face:    #E6DCE2;
+
+         72  hex                #FAF5F4      | --mode-a-rim:     #FAF5F4;
+
+         73  hex                #9F8896      | --mode-a-outline: #9F8896;
+
+         78  hex                #96A7F6      | --mode-b-face:    #96A7F6;   /* [B-0908] 사용자 확정 HUD lite (150,167,246) = manifest lite_peak */
+
+         80  hex                #C2D6FF      | --mode-b-rim:     #C2D6FF;   /* [B-0908] 사용자 확정 rim (194,214,255) */
+
+         81  hex                #6F6BB4      | --mode-b-outline: #6F6BB4;
+
+         97  hex                #221C2A      | --wf-L0-ink: #221C2A;
+
+        127  hex                #FFE7FF      | --wf-face-top: #FFE7FF;
+
+        128  hex                #F5A3BB      | --wf-face: #F5A3BB;
+
+        129  hex                #FBD1DB      | --wf-rim-c: #FBD1DB;
+
+        130  hex                #955579      | --wf-L3-line: #955579;
+
+        134  hex                #DCE2FF      | --wf-face-top: #DCE2FF;
+
+        298  hex                #6B5A69      | --wf-L3-line: #6B5A69;
+
+        387  hex                #9B4697      | --wf-L3-line: #9B4697;
+
+        418  hex                #AB93A5      | --wf-L3-line: #AB93A5;   /* 실측 순수색 L* 63.4 */
+
+        431  hex                #6C4A72      | --wf-L3-line: #6C4A72;   /* [W7] 시안 fffae90b 젬틀 합성 (186,166,184) */
+
+        460  hex                #8E7E8B      | --wf-L3-line:  #8E7E8B;   /* [W7] 따뜻한 회보라 — 시안 modal-H 합성 (172,158,167) */
+
+        478  hex                #A3BBD9      | --wf-glow-c:   #A3BBD9;   /* 글로 면색 — HUD 넓은 판 D 26.2 시안px */
+
+… (402줄 더 — 원문 파일 참조)</pre><h3 class="sub-title" id="run-manifest-validate">매니페스트 검증 <span class="tag">2026-09-09 00:42</span></h3><pre class="raw-output">======================================================================
+manifest-validate.py  v2
+  frames: C:\workspace\game-factory\tentwin\ref-v2\manifest\frames.tentwin.json
+  schema: C:\workspace\game-factory\tentwin\ref-v2\manifest\schema.v2.json
+  modes : C:\workspace\game-factory\tentwin\ref-v2\manifest\modes.tentwin.json
+======================================================================
+
+[1] 구조 검증
+  jsonschema: 통과 (0 오류)
+
+[2] 원시값 직접 참조(위반) 검출
+  위반 0 (모든 재질 값 필드가 토큰 참조 또는 null)
+
+[3] dangling ref (참조가 modes 에서 안 풀림)
+  0 (모든 토큰 참조가 modes 에서 풀림)
+
+[4] hook 없는(null) 프레임 = 미정규화(교체점 미정)
+  20 / 71:
+   - t4-hpbar-hud-left
+   - t4-hpbar-hud-right
+   - t4-bubble-hud-pet
+   - t4-bubble-hud-char
+   - src-glass-hud-capsule-st
+   - src-glass-hud-capsule
+   - src-glass-hud-full
+   - src-glass-hud-plate-st
+   - src-glass-hud-plate
+   - src-glass-hud-slab-st
+   - src-glass-hud-slab
+   - src-glass-hud-v2
+   - legacy-hud-plate-bottom
+   - legacy-hud-plate-top-cap
+   - legacy-hud-plate-top
+   - legacy-lib-hud-bar
+   - t3-toggle-modal
+   - preview-charsel-char
+   - preview-charsel-pet
+   - preview-charsel-gauge-stack
+
+[5] consumers 0 프레임 = 미배선
+  3 / 71:
+   - t2-mask-hud-capsule
+   - t4-hpbar-hud-left
+   - t4-hpbar-hud-right
+
+[6] todo(미완 필드 사유) 보유 프레임
+  71 / 71
+
+[7] 원칙 0 — impl=asset · tier T2/T3 · kind=frame 은 shape.mask 필수 (slots 있으면 slot_safe 필수)
+  대상 13 | PASS 13 | 예외 0 | FAIL 0
+   모든 자산 프레임이 형태·슬롯 안전 상자를 먼저 갖고 있다
+
+[8] §9 방법 의심 — rejections 2회 이상 (경고 · 종료 코드 무영향)
+  기록된 반려 16건 / 의심 프레임 4
+   ! [t3-btn-picture-adventure] 반려 4회 (마지막 2026-09-08 · 4차 — 서체 상이·글씨 그림자 조잡(§4.1-6 원본에 겹쳐 선택))
+      - 2026-09-08 user   1차 — 바 오른쪽 끝 테두리 밖으로 채움이 샘(§4.1-4 넘침)
+      - 2026-09-08 user   2차 — NEW 배지 찢김·겉선 잘림(§4.1-5 층별 추출 실패, lost_layers 후보)
+      - 2026-09-08 user   3차 — 「7탄」 글자가 붙음(슬롯 자간·폭, §4.1-6)
+      - 2026-09-08 user   4차 — 서체 상이·글씨 그림자 조잡(§4.1-6 원본에 겹쳐 선택)
+   ! [t3-btn-picture-arcade] 반려 4회 (마지막 2026-09-08 · 4차 — 서체 상이·글씨 그림자 조잡(§4.1-6 원본에 겹쳐 선택))
+      - 2026-09-08 user   1차 — 바 오른쪽 끝 테두리 밖으로 채움이 샘(§4.1-4 넘침)
+      - 2026-09-08 user   2차 — NEW 배지 찢김·겉선 잘림(§4.1-5 층별 추출 실패, lost_layers 후보)
+      - 2026-09-08 user   3차 — 「7탄」 글자가 붙음(슬롯 자간·폭, §4.1-6)
+      - 2026-09-08 user   4차 — 서체 상이·글씨 그림자 조잡(§4.1-6 원본에 겹쳐 선택)
+   ! [t3-btn-picture-daily] 반려 4회 (마지막 2026-09-08 · 4차 — 서체 상이·글씨 그림자 조잡(§4.1-6 원본에 겹쳐 선택))
+      - 2026-09-08 user   1차 — 바 오른쪽 끝 테두리 밖으로 채움이 샘(§4.1-4 넘침)
+      - 2026-09-08 user   2차 — NEW 배지 찢김·겉선 잘림(§4.1-5 층별 추출 실패, lost_layers 후보)
+      - 2026-09-08 user   3차 — 「7탄」 글자가 붙음(슬롯 자간·폭, §4.1-6)
+      - 2026-09-08 user   4차 — 서체 상이·글씨 그림자 조잡(§4.1-6 원본에 겹쳐 선택)
+   ! [t3-btn-picture-timerush] 반려 4회 (마지막 2026-09-08 · 4차 — 서체 상이·글씨 그림자 조잡(§4.1-6 원본에 겹쳐 선택))
+      - 2026-09-08 user   1차 — 바 오른쪽 끝 테두리 밖으로 채움이 샘(§4.1-4 넘침)
+      - 2026-09-08 user   2차 — NEW 배지 찢김·겉선 잘림(§4.1-5 층별 추출 실패, lost_layers 후보)
+      - 2026-09-08 user   3차 — 「7탄」 글자가 붙음(슬롯 자간·폭, §4.1-6)
+      - 2026-09-08 user   4차 — 서체 상이·글씨 그림자 조잡(§4.1-6 원본에 겹쳐 선택)
+  → 규격 §9: 같은 자리를 2회 이상 반려했으면 **방법을 의심**한다. 증상 땜질 말고 §9 5단계(재현·근본원인 실측·방법 교체·관문 추가·기록) 산출물을 낼 것.
+
+[9] baked_layers — impl=asset 프레임은 구워진 층이 1~4 값의 배열이어야 함 (code 프레임은 null/[] 이 정상 · 검사 안 함) (경고 · 종료 코드 무영향 · --strict-new 로 승격)
+  대상 42 | PASS 11 | 예외 0 | FAIL 31
+   ✗ [FAIL] t4-hpbar-hud-left                (T4) 없음(null)
+   ✗ [FAIL] t4-hpbar-hud-right               (T4) 없음(null)
+   ✗ [FAIL] t4-bubble-hud-pet                (T4) 없음(null)
+   ✗ [FAIL] t4-bubble-hud-char               (T4) 없음(null)
+   ✗ [FAIL] src-glass-hud-capsule-st         (T2) 없음(null)
+   ✗ [FAIL] src-glass-hud-capsule            (T2) 없음(null)
+   ✗ [FAIL] src-glass-hud-full               (T2) 없음(null)
+   ✗ [FAIL] src-glass-hud-plate-st           (T2) 없음(null)
+   ✗ [FAIL] src-glass-hud-plate              (T2) 없음(null)
+   ✗ [FAIL] src-glass-hud-slab-st            (T2) 없음(null)
+   ✗ [FAIL] src-glass-hud-slab               (T2) 없음(null)
+   ✗ [FAIL] src-glass-hud-v2                 (T2) 없음(null)
+… (51줄 더 — 원문 파일 참조)</pre><h3 class="sub-title" id="run-frames-game">프레임 커버리지 (frames --game) <span class="tag">2026-09-09 00:42</span></h3><pre class="raw-output">frames 게이트 — COMPONENTS.md §1.3 「한 파일 = 한 프레임」
+  매니페스트: tentwin/ref-v2/manifest/frames.tentwin.json (스키마 frames[])
+  카탈로그  : site/catalog
+  항목 71 · FAIL 0 · WARN(미기재) 0 · 미등록 webp 3
+
+미등록 — 카탈로그 HUD webp 중 매니페스트에 없는 파일 (3건):
+  - hud-capsule-mask.webp
+  - hud-groove-left.webp
+  - hud-groove-right.webp
+
+커버리지 — 게임이 참조하는데 매니페스트 프레임에 없는 것 (검증3 H2)
+  게임 site/tentwin.html · 예외(--allow-unregistered) 0패턴
+  미등록 자산 239 · 미등록 data-part 3
+
+  미등록 자산 파일 (catalog/*):
+    - catalog/apple-touch-icon.png   (tentwin.html)
+    - catalog/art-corridor.webp   (tentwin.html)
+    - catalog/art-cut-kick.webp   (tentwin.html)
+    - catalog/art-cut-smirk.webp   (tentwin.html)
+    - catalog/art-heart-room.webp   (tentwin.html)
+    - catalog/art-jelly-royal-portrait.webp   (tentwin.html)
+    - catalog/art-jelly-royal.webp   (tentwin.html)
+    - catalog/art-jelly.webp   (tentwin.html)
+    - catalog/art-logo-en.webp   (tentwin.html)
+    - catalog/art-map-bg.webp   (tentwin.html)
+    - catalog/art-menu-day-w.webp   (tentwin.html)
+    - catalog/art-menu-night-w.webp   (tentwin.html)
+    - catalog/art-n01.webp   (tentwin.html)
+    - catalog/art-n02.webp   (tentwin.html)
+    - catalog/art-n03.webp   (tentwin.html)
+    - catalog/art-n04.webp   (tentwin.html)
+    - catalog/art-n05.webp   (tentwin.html)
+    - catalog/art-n06.webp   (tentwin.html)
+    - catalog/art-n07.webp   (tentwin.html)
+    - catalog/art-n08.webp   (tentwin.html)
+    - catalog/art-n09.webp   (tentwin.html)
+    - catalog/art-n10.webp   (tentwin.html)
+    - catalog/art-n11.webp   (tentwin.html)
+    - catalog/art-prison.webp   (tentwin.html)
+    - catalog/art-stage.webp   (tentwin.html)
+    - catalog/art-tenten.webp   (tentwin.html)
+    - catalog/art-throne.webp   (tentwin.html)
+    - catalog/art-twin-bear-blue-portrait.webp   (tentwin.html)
+    - catalog/art-twin-bear-blue.webp   (tentwin.html)
+    - catalog/art-twin-bear-coral-portrait.webp   (tentwin.html)
+    - catalog/art-twin-bear-coral.webp   (tentwin.html)
+    - catalog/art-twin-bear-lavender-portrait.webp   (tentwin.html)
+    - catalog/art-twin-bear-lavender.webp   (tentwin.html)
+    - catalog/art-twin-bear-mint-portrait.webp   (tentwin.html)
+    - catalog/art-twin-bear-mint.webp   (tentwin.html)
+    - catalog/art-twin-bear-rose-portrait.webp   (tentwin.html)
+    - catalog/art-twin-bear-rose.webp   (tentwin.html)
+    - catalog/art-twin.webp   (tentwin.html)
+    - catalog/ch-bangul-face.webp   (tentwin.html)
+    - catalog/ch-bangul-full.webp   (tentwin.html)
+    - catalog/ch-bangul-portrait.webp   (tentwin.html)
+    - catalog/ch-bangul-thumb.webp   (tentwin.html)
+    - catalog/ch-boss-face-berry.webp   (tentwin.html)
+    - catalog/ch-boss-face-mint.webp   (tentwin.html)
+    - catalog/ch-boss-face-soda.webp   (tentwin.html)
+    - catalog/ch-boss-face.webp   (tentwin.html)
+    - catalog/ch-boss-full.webp   (tentwin.html)
+    - catalog/ch-boss-portrait.webp   (tentwin.html)
+    - catalog/ch-boss-thumb.webp   (tentwin.html)
+    - catalog/ch-churup-face.webp   (tentwin.html)
+    - catalog/ch-churup-full.webp   (tentwin.html)
+    - catalog/ch-churup-portrait.webp   (tentwin.html)
+    - catalog/ch-churup-thumb.webp   (tentwin.html)
+    - catalog/ch-jelly-face.webp   (tentwin.html)
+    - catalog/ch-jelly-full.webp   (tentwin.html)
+    - catalog/ch-jelly-portrait.webp   (tentwin.html)
+    - catalog/ch-jelly-thumb.webp   (tentwin.html)
+    - catalog/ch-kkultteok-face.webp   (tentwin.html)
+    - catalog/ch-kkultteok-full.webp   (tentwin.html)
+    - catalog/ch-kkultteok-portrait.webp   (tentwin.html)
+    - catalog/ch-kkultteok-thumb.webp   (tentwin.html)
+    - catalog/ch-mongle-face.webp   (tentwin.html)
+    - catalog/ch-mongle-full.webp   (tentwin.html)
+    - catalog/ch-mongle-portrait.webp   (tentwin.html)
+    - catalog/ch-mongle-thumb.webp   (tentwin.html)
+    - catalog/ch-mukmul-face.webp   (tentwin.html)
+    - catalog/ch-mukmul-full.webp   (tentwin.html)
+    - catalog/ch-mukmul-portrait.webp   (tentwin.html)
+    - catalog/ch-mukmul-thumb.webp   (tentwin.html)
+    - catalog/ch-mungchi-face.webp   (tentwin.html)
+    - catalog/ch-mungchi-full.webp   (tentwin.html)
+    - catalog/ch-mungchi-portrait.webp   (tentwin.html)
+    - catalog/ch-mungchi-thumb.webp   (tentwin.html)
+    - catalog/ch-ppyak-face.webp   (tentwin.html)
+    - catalog/ch-ppyak-full.webp   (tentwin.html)
+… (172줄 더 — 원문 파일 참조)</pre><h3 class="sub-title" id="run-eval-doccheck">평가 §번호 실재 검사 (eval --doc-check) <span class="tag">2026-09-09 00:42</span></h3><pre class="raw-output">절 존재 검사 — expected.sections 의 §번호가 문서에 실제로 있는가
+  규격 : GAME-FACTORY-STANDARD.md  
+  스킬 : skills\game-factory\SKILL.md  
+
+  판정   절         규격 헤딩      항목         스킬 인용      쓰는 시나리오
+  PASS §4        ## 4.      -          있음         E1, E2, E3
+  PASS §4.1-1    ## 4.1     있음         있음         E1
+  PASS §4.1-4    ## 4.1     있음         있음         E1, E3, E4
+  PASS §6.2      본문만        -          있음         E1, E2, E4, E5, E6, E7, E8
+  PASS §9-1      ## 9.      있음         있음         E1, E5, E7
+  PASS §1        ## 1.      -          있음         E2
+  PASS §6-4      ## 6.      있음         있음         E2
+  PASS §4.1-5    ## 4.1     있음         있음         E3
+  PASS §4.1-7    ## 4.1     있음         있음         E3
+  PASS §6-10     ## 6.      있음         있음         E3
+  PASS §4.1      ## 4.1     -          있음         E4, E8
+  PASS §4.1-3    ## 4.1     있음         있음         E4
+  PASS §4.1-9    ## 4.1     있음         있음         E4
+  PASS §9        ## 9.      -          있음         E4
+  PASS §9-2      ## 9.      있음         있음         E4, E5
+  PASS §6-8      ## 6.      있음         있음         E5, E7
+  PASS §0        ## 0.      -          있음         E6, E8
+  PASS §2        ## 2.      -          있음         E6
+  PASS §6-6      ## 6.      있음         있음         E6, E8
+  PASS §5        ## 5.      -          있음         E7
+
+  절 20개 중 20개 확인 · 미확인 0
+rc=0</pre>
+  </div>
+</div>
+</body></html>

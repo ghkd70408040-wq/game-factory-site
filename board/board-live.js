@@ -244,6 +244,26 @@
     document.querySelectorAll('[data-state-bar]').forEach(function (h) { if (!h.querySelector('.state-bar')) h.insertAdjacentHTML('afterbegin', stateBar()); });
   }
 
+
+  /* ------------------------------------------------------------ 3.5 킷 판 배율
+     킷 시트 규칙 ④ "같은 줄 = 같은 크기 기준선". 게임 DOM 조각은 제 크기대로 나오므로
+     타일 안에 꽉 차도록 배율(--kit-fit) 을 재서 준다. 값은 CSS 변수 하나 — 레이아웃은 안 건드린다. */
+  function fitKit() {
+    if (!KIT) return;
+    document.querySelectorAll('.kit-panel .part-stage--live').forEach(function (st) {
+      var c = st.firstElementChild; if (!c || c.classList.contains('live-none')) return;
+      c.style.setProperty('--kit-fit', '1');
+      var r = c.getBoundingClientRect(), W = st.clientWidth, H = st.clientHeight;
+      if (!r.width || !r.height || !W || !H) return;
+      var s = Math.min(W / r.width, H / r.height);
+      /* 글이 든 조각을 키우면 글씨만 커져 제 틀 밖으로 샌다 — 줄이기만 한다.
+         그림뿐인 조각(화살표·방울·아이콘)은 타일에 꽉 차게 키운다. */
+      var cap = (c.textContent || '').trim() ? 1 : 2.2;
+      s = Math.max(0.12, Math.min(cap, s));
+      c.style.setProperty('--kit-fit', s.toFixed(3));
+    });
+  }
+
   /* ------------------------------------------------------------ 4. 프레임 선반 · board-factory 연결 */
   var TIER_NAME = { T1: '화면', T2: '컨테이너', T3: '제어', T4: '내용물', T5: '효과' };
   function tierBadge(t) { return '<span class="tier tier-' + (t ? t.toLowerCase() : 'none') + '">' + esc(t || '—') + '</span>'; }
@@ -262,53 +282,15 @@
     return chip('state-none', '미구현');
   }
   var KIT = document.body && document.body.classList.contains('kit-page');
-  var KIT = document.body && document.body.classList.contains('kit-page');
-  var KIT = document.body && document.body.classList.contains('kit-page');
-  var KIT = document.body && document.body.classList.contains('kit-page');
-  var KIT = document.body && document.body.classList.contains('kit-page');
   function frameTile(f) {
     var body = renderLive(f.live, { id: f.id, file: f.file, size: 'm', theme: f.live && f.live.theme });
     if (KIT) {
+      /* 킷 격자: 그림 + 이름 한 낱말(역할)만. 자세한 것은 title 로만 — 눈에 보이는 글 0 */
       var st = !f.live ? 'is-none' : 'is-live';
       var tip = f.id + ' · ' + (f.impl || '') + '/' + (f.kind || '') + ' · hook ' + (f.hook || 'null') + ' · 소비처 ' + (f.consumers ? f.consumers.length : 0) + (f.file && !f.file.missing ? ' · ' + f.file.src : '');
-      return '<div class="part frame-tile ' + st + '" data-frame-id="' + esc(f.id) + '" data-hook="' + esc(f.hook_obj ? f.hook_obj.name : '') + '" title="' + esc(tip) + '">'
+      return '<div class="part frame-tile ' + st + '" data-frame-id="' + esc(f.id) + '" data-tier="' + esc(f.tier) + '" title="' + esc(tip) + '">'
         + '<div class="part-stage part-stage--live">' + (body || '<div class="live-none"></div>') + '</div>'
-        + '<div class="part-label"><div class="part-name">' + tierBadge(f.tier) + esc(f.id.replace(/^t\d-/, '').split('-').slice(0, 2).join(' ')) + '</div><div class="gf-swap"></div></div></div>';
-    }
-    if (KIT) {
-      var st = !f.live ? 'is-none' : 'is-live';
-      var tip = f.id + ' · ' + (f.impl || '') + '/' + (f.kind || '') + ' · hook ' + (f.hook || 'null') + ' · 소비처 ' + (f.consumers ? f.consumers.length : 0) + (f.file && !f.file.missing ? ' · ' + f.file.src : '');
-      return '<div class="part frame-tile ' + st + '" data-frame-id="' + esc(f.id) + '" data-hook="' + esc(f.hook_obj ? f.hook_obj.name : '') + '" title="' + esc(tip) + '">'
-        + '<div class="part-stage part-stage--live">' + (body || '<div class="live-none"></div>') + '</div>'
-        + '<div class="part-label"><div class="part-name">' + tierBadge(f.tier) + esc(f.id.replace(/^t\d-/, '').split('-').slice(0, 2).join(' ')) + '</div><div class="gf-swap"></div></div></div>';
-    }
-    if (KIT) {
-      var st = !f.live ? 'is-none' : 'is-live';
-      var tip = f.id + ' · ' + (f.impl || '') + '/' + (f.kind || '') + ' · hook ' + (f.hook || 'null') + ' · 소비처 ' + (f.consumers ? f.consumers.length : 0) + (f.file && !f.file.missing ? ' · ' + f.file.src : '');
-      return '<div class="part frame-tile ' + st + '" data-frame-id="' + esc(f.id) + '" data-hook="' + esc(f.hook_obj ? f.hook_obj.name : '') + '" title="' + esc(tip) + '">'
-        + '<div class="part-stage part-stage--live">' + (body || '<div class="live-none"></div>') + '</div>'
-        + '<div class="part-label"><div class="part-name">' + tierBadge(f.tier) + esc(f.id.replace(/^t\d-/, '').split('-').slice(0, 2).join(' ')) + '</div><div class="gf-swap"></div></div></div>';
-    }
-    if (KIT) {
-      var st = !f.live ? 'is-none' : 'is-live';
-      var tip = f.id + ' · ' + (f.impl || '') + '/' + (f.kind || '') + ' · hook ' + (f.hook || 'null') + ' · 소비처 ' + (f.consumers ? f.consumers.length : 0) + (f.file && !f.file.missing ? ' · ' + f.file.src : '');
-      return '<div class="part frame-tile ' + st + '" data-frame-id="' + esc(f.id) + '" data-hook="' + esc(f.hook_obj ? f.hook_obj.name : '') + '" title="' + esc(tip) + '">'
-        + '<div class="part-stage part-stage--live">' + (body || '<div class="live-none"></div>') + '</div>'
-        + '<div class="part-label"><div class="part-name">' + tierBadge(f.tier) + esc(f.id.replace(/^t\d-/, '').split('-').slice(0, 2).join(' ')) + '</div><div class="gf-swap"></div></div></div>';
-    }
-    if (KIT) {
-      var st = !f.live ? 'is-none' : 'is-live';
-      var tip = f.id + ' · ' + (f.impl || '') + '/' + (f.kind || '') + ' · hook ' + (f.hook || 'null') + ' · 소비처 ' + (f.consumers ? f.consumers.length : 0) + (f.file && !f.file.missing ? ' · ' + f.file.src : '');
-      return '<div class="part frame-tile ' + st + '" data-frame-id="' + esc(f.id) + '" data-hook="' + esc(f.hook_obj ? f.hook_obj.name : '') + '" title="' + esc(tip) + '">'
-        + '<div class="part-stage part-stage--live">' + (body || '<div class="live-none"></div>') + '</div>'
-        + '<div class="part-label"><div class="part-name">' + tierBadge(f.tier) + esc(f.id.replace(/^t\d-/, '').split('-').slice(0, 2).join(' ')) + '</div><div class="gf-swap"></div></div></div>';
-    }
-    if (KIT) {
-      var st = !f.live ? 'is-none' : 'is-live';
-      var tip = f.id + ' · ' + (f.impl || '') + '/' + (f.kind || '') + ' · hook ' + (f.hook || 'null') + ' · 소비처 ' + (f.consumers ? f.consumers.length : 0) + (f.file && !f.file.missing ? ' · ' + f.file.src : '');
-      return '<div class="part frame-tile ' + st + '" data-frame-id="' + esc(f.id) + '" data-hook="' + esc(f.hook_obj ? f.hook_obj.name : '') + '" title="' + esc(tip) + '">'
-        + '<div class="part-stage part-stage--live">' + (body || '<div class="live-none"></div>') + '</div>'
-        + '<div class="part-label"><div class="part-name">' + tierBadge(f.tier) + esc(f.id.replace(/^t\d-/, '').split('-').slice(0, 2).join(' ')) + '</div><div class="gf-swap"></div></div></div>';
+        + (st === 'is-none' ? '' : '<div class="part-label"><div class="part-name">' + esc(f.role || '부품') + '</div></div>') + '</div>';
     }
     var fm = f.file && !f.file.missing ? f.file : null;
     var fileLine = fm ? esc(fm.src.replace(/^.*\//, '')) + (fm.w ? ' · ' + fm.w + '×' + fm.h : '') + (fm.kb ? ' · ' + fm.kb + 'KB' : '') : '파일 없음(코드 프레임)';
@@ -330,9 +312,11 @@
       var g = by[t]; if (!g || !g.length) return;
       var n = { live: 0, file: 0, none: 0 };
       g.forEach(function (f) { var k = !f.live ? 'none' : (f.live.type === 'file' ? 'file' : 'live'); n[k]++; tot[k]++; });
+      html += '<div class="shelf-group" data-tier="' + esc(t) + '">';
       html += '<div class="shelf-tier">' + tierBadge(t) + '<span class="shelf-name">' + esc(TIER_NAME[t] || '미분류') + '</span>'
         + (KIT ? '' : '<span class="shelf-tally">프레임 ' + g.length + ' · 라이브 ' + n.live + ' · 원본 파일 ' + n.file + ' · 미구현 ' + n.none + '</span>') + '</div>';
       html += '<div class="shelf-frames"><div class="part-list part-list--frames">' + g.map(frameTile).join('') + '</div></div>';
+      html += '</div>';
     });
     host.innerHTML = html; return tot;
   }
@@ -347,7 +331,12 @@
     });
   }
   function loadFactory() {
+    if (KIT) return;               /* 교체 UI(select) 는 공장·관문실 전용 — 킷 페이지에는 그림만 */
     if (!document.querySelector('[data-frame-id]')) return;
+    /* 페이지가 이미 GF_SCREEN 을 들고 있으면(공장 페이지 = 생성기가 매니페스트에서 직접 심는다)
+       덮어쓰지 않는다. 덮어쓰면 진실원이 board-frames.json 과 매니페스트 둘로 갈려
+       훅 수가 달라진다(교체점 50 ↔ 40) — CONTRACT.md §1 「매니페스트 = 유일 진실원」. */
+    if (window.GF_SCREEN) return;
     var page = (location.pathname.match(/screen-([a-z]+)\.html/) || [])[1] || 'warehouse';
     var GAME_KEY = { hud: 'game', modal: 'howto', charsel: 'character', map: 'map' }[page] || '';
     window.GF_SCREEN = { id: page, frames: (page === 'warehouse' ? (FRAMES || []).map(function (f) { return { id: f.id, tier: f.tier, role: f.role, hook: f.hook_obj ? { type: f.hook_obj.type, name: f.hook_obj.name, scope: f.hook_obj.scope, value: f.hook_obj.value || '' } : null }; }) : screenFrames(page)), game_key: GAME_KEY };
@@ -366,9 +355,10 @@
     if (!FRAMES) return;
     document.querySelectorAll('.part[data-frame-id]').forEach(function (p) {
       var f = FRAMES.filter(function (x) { return x.id === p.getAttribute('data-frame-id'); })[0]; if (!f) return;
-      var lab = p.querySelector('.part-label'); if (!lab || lab.querySelector('.part-hook')) return;
+      var lab = p.querySelector('.part-label'); if (lab && lab.querySelector('.part-hook')) return;
+      if (!lab && !KIT) return;
       p.setAttribute('data-hook', f.hook_obj ? f.hook_obj.name : '');
-      if (KIT) { p.title = f.id + ' · hook ' + (f.hook || 'null') + (f.hook && !f.hook_obj ? ' (형식 불가)' : '') + (p.title ? ' · ' + p.title : ''); lab.insertAdjacentHTML('beforeend', '<div class="gf-swap"></div>'); if (!f.live && !f.file) p.classList.add('is-none'); return; }
+      if (KIT) { p.title = f.id + ' · hook ' + (f.hook || 'null') + (f.hook && !f.hook_obj ? ' (형식 불가)' : '') + (p.title ? ' · ' + p.title : ''); if (!f.live && !f.file && !p.querySelector('.part-stage img, .part-stage [data-live], .part-stage .live-inst')) p.classList.add('is-none'); return; }
       lab.insertAdjacentHTML('beforeend', '<div class="part-hook mono">' + esc(f.id) + ' · hook ' + (f.hook ? esc(f.hook) : '<span class="value-missing">null</span>') + (f.hook && !f.hook_obj ? ' <span class="state state-none">🔴 형식 불가</span>' : '') + '</div><div class="gf-swap"></div>');
     });
   }
@@ -382,6 +372,8 @@
     ]).then(function (r) {
       MARKUP = r[0]; FRAMES = r[1] && r[1].frames; CATALOG = r[2] && r[2].catalog;
       initPanes(); initStateBars(); initScreens(); initSpot(); initFrameShelf(); decorateTiles(); loadFactory();
+      fitKit(); setTimeout(fitKit, 400); setTimeout(fitKit, 1400);
+      window.addEventListener('resize', fitKit);
     });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();

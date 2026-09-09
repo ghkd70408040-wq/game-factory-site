@@ -122,7 +122,7 @@
     swaps.sort(function (a, b) { return a.frame_id < b.frame_id ? -1 : 1; });
     return {
       schema: 'pending-swaps/v1',
-      generated_by: 'site/board/screen-' + SCREEN.id + '.html',
+      generated_by: SCREEN.page || ('site/board/screen-' + SCREEN.id + '.html'),
       generated_at: new Date().toISOString(),
       screen: SCREEN.id,
       swaps: swaps

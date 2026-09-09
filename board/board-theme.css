@@ -430,6 +430,77 @@ body .step-live .wf-wrap{width:min(100%,360px);}
 body .steps-rail .live-screen{min-height:260px;}
 body .step-outcome{display:flex; flex-wrap:wrap; gap:6px 10px; align-items:center; font-size:12.5px; color:var(--sub); margin:10px 0 0; padding-top:10px; border-top:1px dashed var(--line);}
 
+/* ===== 10.6 설비 (문서 페이지 spec·procedure·guards·records·tools) =====
+   생성기 tools/board/build-docs.py 가 md/json/도구 출력을 이 어휘로만 굽는다.
+   기존 어휘(page·page-title·section-title·data-table·raw-output·mono·tag·state)를 그대로 쓰고,
+   문서 전용으로 새로 필요한 것만 doc- 접두로 여기 둔다. 인라인 style 은 생성 HTML에 0개다. */
+body .doc-layout{display:grid; grid-template-columns:206px minmax(0,1fr); gap:22px; align-items:start;}
+body .doc-body{min-width:0;}
+body .doc-toc{position:sticky; top:60px; max-height:calc(100vh - 80px); overflow-y:auto;
+  background:var(--panel); border:1px solid var(--line); border-radius:var(--r-md);
+  padding:11px 4px 12px; display:flex; flex-direction:column; gap:1px;}
+body .doc-toc-title{font-family:var(--f-display); font-size:13px; color:var(--sub);
+  padding:0 10px 7px; margin-bottom:4px; border-bottom:1px solid var(--line); letter-spacing:.02em;}
+body .doc-toc a{display:block; padding:4px 10px; border-radius:var(--r-sm); font-size:12px;
+  line-height:1.35; color:var(--sub); border-left:2px solid transparent;}
+body .doc-toc a:hover{background:var(--acc-wash); color:var(--acc); text-decoration:none;}
+body .doc-toc-top{font-weight:700; color:var(--ink);}
+body .doc-toc-sub{padding-left:20px; font-size:11.5px;}
+
+body .doc-p{font-size:13px; line-height:1.7; color:var(--ink); margin:8px 0 12px;}
+body .doc-h4{font-size:12.5px; font-weight:700; color:var(--sub); margin:14px 0 6px;
+  letter-spacing:.02em;}
+body .doc-list{margin:6px 0 12px; padding-left:1.35em; font-size:13px; line-height:1.7;
+  color:var(--ink); display:grid; gap:3px;}
+body .doc-list .doc-list{margin:3px 0 2px;}
+body .doc-list li::marker{color:var(--acc-soft); font-weight:700;}
+body .doc-quote{margin:8px 0 14px; padding:9px 13px; font-size:12.5px; line-height:1.65;
+  color:var(--sub); background:var(--bg2); border-left:3px solid var(--acc-soft);
+  border-radius:0 var(--r-sm) var(--r-sm) 0;}
+body .doc-rule{border:0; border-top:1px solid var(--line); margin:20px 0;}
+body .doc-anchor{margin-left:8px; font-family:var(--f-mono); font-size:.72em; color:var(--line2);
+  vertical-align:2px; opacity:0;}
+body .section-title:hover .doc-anchor,
+body .sub-title:hover .doc-anchor,
+body .doc-h4:hover .doc-anchor{opacity:1;}
+body .doc-anchor:hover{color:var(--acc); text-decoration:none;}
+
+/* 탭 3 — 라디오 + 형제 선택자, 스크립트 0 */
+body .doc-tabs{margin:14px 0 0;}
+body .doc-tab-input{position:absolute; width:1px; height:1px; opacity:0; pointer-events:none;}
+body .doc-tab-bar{display:flex; flex-wrap:wrap; gap:6px; border-bottom:1px solid var(--line);
+  padding-bottom:0; margin-bottom:16px;}
+body .doc-tab{display:flex; flex-direction:column; gap:2px; cursor:pointer; user-select:none;
+  padding:9px 14px 8px; border:1px solid transparent; border-bottom:0;
+  border-radius:var(--r-md) var(--r-md) 0 0; font-size:13.5px; font-weight:700; color:var(--sub);
+  margin-bottom:-1px;}
+body .doc-tab:hover{color:var(--ink); background:var(--panel2);}
+body .doc-tab-file{font-family:var(--f-mono); font-size:10px; font-weight:400; color:var(--dim);}
+body .doc-tab-panel{display:none;}
+body #doctab-1:checked ~ .doc-tab-bar .doc-tab[for="doctab-1"],
+body #doctab-2:checked ~ .doc-tab-bar .doc-tab[for="doctab-2"],
+body #doctab-3:checked ~ .doc-tab-bar .doc-tab[for="doctab-3"]{
+  background:var(--panel); border-color:var(--line); color:var(--ink);}
+body #doctab-1:checked ~ .doc-tab-panel[data-tab="1"],
+body #doctab-2:checked ~ .doc-tab-panel[data-tab="2"],
+body #doctab-3:checked ~ .doc-tab-panel[data-tab="3"]{display:block;}
+body .doc-tab-input:focus-visible ~ .doc-tab-bar .doc-tab{outline:2px solid var(--acc);
+  outline-offset:-2px;}
+
+/* 접힘 — 문서 본문 전문은 표 아래 접어 둔다(글 최소, 표 위주) */
+body .doc-fold{background:var(--panel); border:1px solid var(--line); border-radius:var(--r-md);
+  margin:10px 0; box-shadow:var(--shadow-sheet);}
+body .doc-fold > summary{cursor:pointer; padding:11px 14px; font-size:12.5px; color:var(--sub);
+  list-style:none; display:flex; flex-wrap:wrap; gap:4px 8px; align-items:baseline;
+  border-radius:var(--r-md);}
+body .doc-fold > summary::-webkit-details-marker{display:none;}
+body .doc-fold > summary::before{content:"▸"; color:var(--acc-soft); font-size:11px;}
+body .doc-fold[open] > summary::before{content:"▾";}
+body .doc-fold > summary b{color:var(--ink); font-weight:700;}
+body .doc-fold > summary:hover{background:var(--panel2);}
+body .doc-fold-body{padding:2px 15px 14px; border-top:1px solid var(--line);}
+body .doc-fold-body .section-title{margin-top:16px;}
+
 /* ===== 11. 폰 ===== */
 @media(max-width:600px){
   body .page{padding:16px 12px 56px;}
@@ -447,4 +518,168 @@ body .step-outcome{display:flex; flex-wrap:wrap; gap:6px 10px; align-items:cente
   body .focus-line .src{width:100%; padding:6px 0 8px; margin-left:0; border-top:1px dashed var(--line);}
   body .bench-row{gap:10px;}
   body .part-list, body .shelf-grid{grid-template-columns:repeat(auto-fill,minmax(136px,1fr)); gap:9px;}
+  /* 설비 문서 페이지 — 목차는 위로 접어 눕히고 본문 한 칸 */
+  body .doc-layout{grid-template-columns:minmax(0,1fr); gap:14px;}
+  body .doc-toc{position:static; max-height:none; flex-direction:row; flex-wrap:wrap;
+    gap:4px; padding:9px 10px 10px;}
+  body .doc-toc-title{width:100%; border-bottom:0; padding:0 0 4px; margin-bottom:0;}
+  body .doc-toc a{border-left:0; padding:4px 9px; border:1px solid var(--line); font-size:11.5px;}
+  body .doc-toc-sub{padding-left:9px;}
+  body .doc-p, body .doc-list{font-size:12.5px;}
+  body .doc-tab{padding:8px 10px 7px; font-size:12.5px;}
+  body .doc-fold-body{padding:2px 11px 12px;}
+  /* 폰에서 여러 칸 표를 세로로 짜부라뜨리지 않는다 — 칸 최소폭을 주어 .scroll-x 안에서 가로로 민다.
+     칸이 2~3개인 표는 최소폭 합이 화면보다 좁아 그대로 100% 로 남는다(스크롤 없음). */
+  body .doc-sheet .data-table th, body .doc-sheet .data-table td{min-width:94px; word-break:keep-all;}
+  body .doc-sheet .data-table td .mono, body .doc-sheet .data-table td code{word-break:break-all;}
 }
+
+/* ===== 킷 시트 두 칸 (시안 tentwin/assets/ref-kits/R3-casual-jelly.jpg) ===== */
+/* 시안에서 따온 것: ① 한 장 = 두 칸(게임 화면 | 부품 킷)  ② 킷 바탕 = 단색 짙은 회색, 타일 상자 0
+   ③ 종류별 가로 줄  ④ 같은 줄 = 같은 크기 기준선·같은 최소 폭  ⑤ 글자는 이름 한 낱말뿐.
+   값은 여기 안에서만 쓰는 킷 토큰(--kit-*)으로 둔다. 인라인 style 0. */
+body.kit-page{
+  --kit-ground:#3a3a3e; --kit-ground-2:#333338; --kit-name:#cfcfd6; --kit-ghost:#6d6d78;
+  --kit-gap:18px; --kit-pad:26px; --kit-r:14px;
+  --kit-h-plate:116px; --kit-h-button:86px; --kit-h-chip:86px; --kit-h-icon:86px; --kit-h-gauge:68px;
+}
+body.kit-page .page{max-width:1360px;}
+body.kit-page .page-title{font-size:19px; font-weight:800; margin:8px 0 12px;}
+
+/* ---- ① 두 칸 ---- */
+body.kit-page .kit-two{display:grid; grid-template-columns:390px minmax(0,1fr); gap:20px; align-items:start;}
+body.kit-page .kit-screens{display:flex; flex-direction:column; gap:14px;}
+body.kit-page .kit-screens .live-screen{width:390px; max-width:100%;}
+body.kit-page .kit-screens .live-frame{border-radius:12px;}
+body.kit-page .kit-screens .live-fallback{border-radius:12px;}
+body.kit-page .live-status{display:none;}          /* 메타 줄 — DOM 은 남기고 눈에서만 뺀다 */
+
+/* ---- ② 단색 킷 판 ---- */
+body.kit-page .kit-panel{
+  background:var(--kit-ground); border:0; border-radius:var(--kit-r);
+  padding:var(--kit-pad) 22px calc(var(--kit-pad) + 4px);
+  display:flex; flex-direction:column; gap:26px; min-width:0;
+}
+/* ---- ③ 종류별 줄 · ④ 같은 크기 기준선 ---- */
+body.kit-page .kit-row{display:grid; gap:var(--kit-gap) 16px; align-items:end;}
+body.kit-page .kit-row--plate {grid-template-columns:repeat(auto-fill,minmax(200px,1fr));}
+body.kit-page .kit-row--button{grid-template-columns:repeat(auto-fill,minmax(148px,1fr));}
+body.kit-page .kit-row--chip  {grid-template-columns:repeat(auto-fill,minmax(112px,1fr));}
+body.kit-page .kit-row--icon  {grid-template-columns:repeat(auto-fill,minmax(140px,1fr));}
+body.kit-page .kit-row--gauge {grid-template-columns:repeat(auto-fill,minmax(200px,1fr));}
+
+body.kit-page .kit-panel .part{
+  background:none; border:0; border-radius:0; box-shadow:none; overflow:visible;
+  display:flex; flex-direction:column; justify-content:flex-end; padding:0; transform:none;
+}
+body.kit-page .kit-panel .part-stage,
+body.kit-page .kit-panel .part-stage--live{
+  background:none; background-image:none; border:0; border-radius:0;
+  display:flex; align-items:center; justify-content:center; padding:0; overflow:hidden;
+}
+body.kit-page .kit-panel .part-stage img,
+body.kit-page .kit-panel .part-stage .frame-file{max-width:100%; max-height:100%; object-fit:contain;}
+body.kit-page .kit-row--plate  .part-stage{height:var(--kit-h-plate);  min-height:var(--kit-h-plate);}
+body.kit-page .kit-row--button .part-stage{height:var(--kit-h-button); min-height:var(--kit-h-button);}
+body.kit-page .kit-row--chip   .part-stage{height:var(--kit-h-chip);   min-height:var(--kit-h-chip);}
+body.kit-page .kit-row--icon   .part-stage{height:var(--kit-h-icon);   min-height:var(--kit-h-icon);}
+body.kit-page .kit-row--gauge  .part-stage{height:var(--kit-h-gauge);  min-height:var(--kit-h-gauge);}
+/* 라이브 인스턴스는 줄 높이에 맞춰 작게 굴린다 (게임 CSS 는 무접촉 — 폭 토큰만 준다) */
+body.kit-page .kit-panel .part-stage--live .gp-scope{--gp-w:220px;}
+body.kit-page .kit-panel .part-stage--live .wf-wrap{--wf-w:var(--frame-size-m);}
+body.kit-page .kit-panel .part-stage--live .live-inst{max-width:100%; max-height:100%;}
+body.kit-page .kit-panel .part-stage--live > *{max-width:100%;}
+body.kit-page .kit-panel .part-stage--live > *{transform:scale(var(--kit-fit,1)); transform-origin:center center;}
+
+
+/* ---- ⑤ 이름 한 낱말 ---- */
+body.kit-page .kit-panel .part-label{
+  background:none; border:0; border-top:0; padding:8px 2px 0; text-align:center;
+}
+body.kit-page .kit-panel .part-name{
+  display:block; font-size:12px; font-weight:700; color:var(--kit-name);
+  line-height:1.25; word-break:keep-all;
+}
+/* 상태는 글이 아니라 시각으로 — 미구현만 회색 점선 실루엣 + 점 하나 */
+body.kit-page .kit-panel .part.is-partial,
+body.kit-page .kit-panel .part.is-live{border:0;}
+body.kit-page .kit-panel .part.is-none .part-stage{
+  border:2px dashed var(--kit-ghost); border-radius:12px; background:none; position:relative;
+}
+body.kit-page .kit-panel .part.is-none .part-stage::after{
+  content:""; position:absolute; right:9px; top:9px; width:9px; height:9px; border-radius:50%;
+  background:#e0605d;
+}
+body.kit-page .kit-panel .part.is-none .live-none{font-size:0; color:transparent;}
+body.kit-page .kit-panel .part.is-spot{outline:2px solid var(--ok); outline-offset:4px;}
+body.kit-page .kit-panel .part[data-live-sel]{cursor:pointer;}
+
+/* ---- 창고 — 같은 킷 격자를 계층 줄로 ---- */
+body.kit-page .kit-panel--shelf{gap:6px;}
+body.kit-page .kit-panel--shelf .shelf-group{margin:0 0 8px;}
+body.kit-page .kit-panel--shelf .shelf-tier{
+  background:none; border:0; border-radius:0; padding:14px 0 8px; margin:0;
+  color:var(--kit-name); display:flex; align-items:center; gap:8px;
+}
+body.kit-page .kit-panel--shelf .shelf-name{font-size:12px; font-weight:700; color:var(--kit-name);}
+body.kit-page .kit-panel--shelf .shelf-role{display:none;}
+body.kit-page .kit-panel--shelf .shelf-frames{margin:0;}
+body.kit-page .kit-panel--shelf .part-list,
+body.kit-page .kit-panel--shelf .shelf-grid{
+  grid-template-columns:repeat(auto-fill,minmax(128px,1fr)); gap:var(--kit-gap) 14px; margin:0;
+}
+body.kit-page .kit-panel--shelf .part{
+  background:none; border:0; border-radius:0; box-shadow:none; overflow:visible;
+  display:flex; flex-direction:column; justify-content:flex-end;
+}
+body.kit-page .kit-panel--shelf .part-stage,
+body.kit-page .kit-panel--shelf .part-stage--live{
+  background:none; background-image:none; border:0; padding:0; min-height:84px; height:84px;
+  display:flex; align-items:center; justify-content:center; overflow:hidden;
+}
+body.kit-page .kit-panel--shelf .part-stage img,
+body.kit-page .kit-panel--shelf .part-stage .frame-file{max-width:100%; max-height:100%; object-fit:contain;}
+body.kit-page .kit-panel--shelf .part-stage--live .gp-scope{--gp-w:180px;}
+body.kit-page .kit-panel--shelf .part-label{background:none; border:0; padding:8px 2px 0; text-align:center;}
+body.kit-page .kit-panel--shelf .part-name{
+  display:block; font-size:11px; font-weight:700; color:var(--kit-name); line-height:1.25;
+}
+body.kit-page .kit-panel--shelf .part-name .tier{display:none;}
+body.kit-page .kit-panel--shelf .part.is-none .part-stage{
+  border:2px dashed var(--kit-ghost); border-radius:12px; position:relative;
+}
+body.kit-page .kit-panel--shelf .part.is-none .part-stage::after{
+  content:""; position:absolute; right:9px; top:9px; width:9px; height:9px; border-radius:50%; background:#e0605d;
+}
+body.kit-page .kit-panel--shelf .part.is-none .part-label{display:none;}
+body.kit-page .filter-bar{
+  display:flex; flex-wrap:wrap; gap:6px; margin:0 0 12px; padding:0; position:static; background:none;
+}
+body.kit-page .filter-bar button{
+  font:inherit; font-size:12px; font-weight:700; padding:5px 12px; border-radius:8px;
+  border:1px solid #dcdce4; background:#fff; color:#33333d;
+}
+body.kit-page .filter-bar button.is-current{background:#26262e; color:#fff; border-color:#26262e;}
+body.kit-page .filter-bar .count{display:none;}
+
+/* ---- 좁은 화면 ---- */
+@media(max-width:1060px){
+  body.kit-page .kit-two{grid-template-columns:minmax(0,1fr);}
+  body.kit-page .kit-screens{align-items:center;}
+}
+@media(max-width:520px){
+  body.kit-page{--kit-pad:16px; --kit-gap:14px;
+    --kit-h-plate:92px; --kit-h-button:68px; --kit-h-chip:68px; --kit-h-icon:68px; --kit-h-gauge:54px;}
+  body.kit-page .kit-panel{padding:var(--kit-pad) 14px calc(var(--kit-pad) + 2px); gap:20px;}
+  body.kit-page .kit-row--plate {grid-template-columns:repeat(auto-fill,minmax(148px,1fr));}
+  body.kit-page .kit-row--button{grid-template-columns:repeat(auto-fill,minmax(104px,1fr));}
+  body.kit-page .kit-row--chip  {grid-template-columns:repeat(auto-fill,minmax(88px,1fr));}
+  body.kit-page .kit-row--icon  {grid-template-columns:repeat(auto-fill,minmax(104px,1fr));}
+  body.kit-page .kit-row--gauge {grid-template-columns:repeat(auto-fill,minmax(148px,1fr));}
+  body.kit-page .kit-panel--shelf .part-list,
+  body.kit-page .kit-panel--shelf .shelf-grid{grid-template-columns:repeat(auto-fill,minmax(92px,1fr));}
+  body.kit-page .kit-panel--shelf .part-stage,
+  body.kit-page .kit-panel--shelf .part-stage--live{height:64px; min-height:64px;}
+  body.kit-page .kit-panel .part-stage--live .gp-scope{--gp-w:118px;}
+}
+/* ===== 킷 시트 두 칸 끝 ===== */
