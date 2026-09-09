@@ -56879,6 +56879,202 @@ html[lang="en"] #modal-arc.is-arcdmg .sheet > h2{ --ttl:url("catalog/ttl-arcdmg-
 }
 </style>
 
+<style id="node-modal-slot">
+/* ===== node-modal-slot (0909 · wave/node-modal) =============================
+   접수: 「스테이지 모달 하트 겹침 · 얼굴 캡슐 구버전 · 이미지 잘림 · 폰트/간격/위치」
+   화면키 10-modal-node · 판정 code(§4 규칙 기하) · 관문 full
+
+   층 진단(§10 R2 — 실측 scratchpad/node-modal/live/live-report.json, 390x844 dpr3)
+   ① Layout — `.r10m .sheet{row-gap: calc(var(--pw)*.04)}` 의 `--pw: min(360px,100%)`.
+      row-gap 의 백분율은 세로 맥락에서 0 으로 풀리므로 `min(360px,0)` = **실효 간격 0**.
+      남은 세로 간격은 `#modal-node .node-info{margin:8px 0 2px}` 하나뿐이라 실측이
+      6 / 8 / 2 / 8 / 2 / **0** 으로 들쭉했다. 그 마지막 0 이 사용자가 본 「겹침」이다:
+        #node-go  bottom 409.83  ↔  .node-hearts top 409.83  (간격 0)
+      버튼의 접지 `0 3px 0` + 드롭 `0 7px 16px` 가 하트 줄 위 3~16px 를 덮는다.
+      또 빈 `#node-hand.node-chips` 가 높이 0 인 채로 격자 한 칸을 계속 먹었다.
+   ② Slot — `#node-hero-av` 실측 26w x **34h**. `.node-hero-av{flex:0 0 34px}` 가
+      `.nthumb .node-hero-av{height:26px}` 를 이겨 세로만 34 로 어긋났고, 같은 52px
+      상자 안에 이름 띠(.nthumb-n)를 세로로 더 쌓아 얼굴 아래를 덮었다.
+      깔린 그림도 `--slot-std = ch-<id>-face.webp`(224², 알파가 캔버스 좌·하단에
+      붙은 이미 잘린 자산)를 contain 으로 깐 것이라 캐릭마다 크기가 달랐다.
+   ③ Fill/Effect — `.nthumb`·`.ni-pet-av` 는 14차 갈색 캔디(#FFF1DA/#F3DCB8 +
+      inset 2.5px #8A5F3C)다. **현행 정본 얼굴 캡슐은 `kit-slot-v2--portrait`**
+      (= `#charpanel .ci-chip`, :49941) — 홈 바닥 `--f2-slot` + 볼록 4겹 + 좌상 광점.
+
+   고친 방식: 새 색·새 자산 0. 정본 캡슐의 레시피와 ⑭ 얼굴 메타(:50329)를 그대로
+   상속하고, 세로는 8배수 격자 하나로 다시 깐다. 판(젤리 박스)·리본·X·시작 버튼은
+   한 값도 안 건드린다.
+   ========================================================================== */
+
+/* ---- 1. 세로 리듬 = 8배수 격자 (Layout) ---------------------------------- */
+#modal-node .sheet          { row-gap: 8px; }
+#modal-node .r10-ribbon     { margin-bottom: 0; }
+#modal-node .node-chips:empty { display: none; }   /* 빈 칩 줄이 먹던 한 칸 */
+#modal-node .node-info      { margin: 0; }
+#modal-node .node-stars     { margin: 0; }
+#modal-node .nrow           { min-height: 48px; }
+/* 하트 줄 — 시작 버튼의 접지(3px)·드롭(7/16px) 밖으로. 격자 8 + 8 = 16 */
+#modal-node .node-hearts    { margin-top: 8px; }
+/* 별 배지 — 종전 left 10 / top 6 은 젤리판 림 위였다. 판 안쪽 안전 영역으로. */
+#modal-node #node-got       { top: 16px; left: 40px; }
+
+/* ---- 2. 주인공 줄 = [캡슐][이름] (정본 캐릭창 .ci-id 와 같은 배치) --------- */
+#modal-node .nrow-hero .nthumb {
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  width: auto;
+  height: 48px;
+  min-width: 0;
+  min-height: 48px;
+  padding: 0;
+  border: 0;
+  border-image: none;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+#modal-node .nrow-hero .nthumb-n {
+  flex: 0 1 auto;
+  min-width: 0;
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--prim-art-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---- 3. 얼굴 캡슐 = 정본 kit-slot-v2--portrait 인스턴스 -------------------
+   Shape  48x48 · r12 (정본 .0327W = 12.2px)
+   Fill   그림 슬롯(--cap-art) + 홈 바닥 --f2-slot
+   Effect 볼록 4겹(#charpanel .ci-chip 의 --f2-w 373.3 환산값 그대로) + 좌상 광점
+   Slot   그림은 --face-s/x/y 메타로만 자리한다(§4.1-3 안전 영역). */
+#modal-node .nrow-hero .nthumb .node-hero-av,
+#modal-node .node-info > li > .ni-pet-av {
+  position: relative;
+  flex: 0 0 48px;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  overflow: hidden;
+  background:
+    var(--cap-art, none) var(--face-x, 50%) var(--face-y, 50%) / var(--face-s, cover) no-repeat,
+    var(--f2-slot);
+  box-shadow:
+    0 3.36px 4.11px rgba(92, 64, 106, .34),
+    0 .6px 0 rgba(255, 255, 255, .55),
+    inset 0 2.24px 2.24px rgba(255, 255, 255, .72),
+    inset 0 -4.11px 3.92px rgba(118, 90, 138, .40);
+}
+/* 좌상단 스페큘러 1점 — 정본 .kit-slot-v2--portrait::before 와 같은 값 */
+#modal-node .nrow-hero .nthumb .node-hero-av::before,
+#modal-node .node-info > li > .ni-pet-av::before {
+  content: "";
+  position: absolute;
+  left: 10%; top: 9%; width: 18%; height: 15%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 255, 255, .9), rgba(255, 255, 255, 0));
+  pointer-events: none;
+  z-index: 2;
+}
+/* 그림은 이제 판의 Fill 층이 깐다 — 옛 ::after(contain) 층은 끈다(중복 방지). */
+#modal-node .nrow-hero .nthumb .node-hero-av[data-art="std"]::after,
+#modal-node .node-info > li > .ni-pet-av[data-art="std"]::after { content: none; }
+
+/* 그림 슬롯. 주인공은 정본 초상 칩과 **같은 파생본**(얼굴중심 정사각 thumb =
+   t4-thumb-char-*, applySkins ② 규약)을 쓴다. 다만 ⑭ 메타(:50329)의 값은 지름
+   48.8 **원형 방울**과 54.8x50.3 칩에 맞춰 잰 것이라(--face-s 121.6% 등) 여기
+   48x48 정사각 홈에 그대로 넣으면 왕관이 윗변에서 잘린다. 그래서 같은 방법으로
+   **이 슬롯에서 다시 쟀다** — 자산 알파 bbox(α≥128)를 48 홈의 안전 여백 3px 안에
+   꼭 맞추고 중앙에 놓는 배율·위치다(계산 scratchpad/node-modal/slot-fit.json):
+     ten   thumb ink 150x156 @(0,12)   → s 94.2%  x 137.5%  y  -8.3%
+     twin  thumb ink 122x157 @(16,11)  → s 93.6%  x 111.2%  y   1.9%
+     jelly thumb ink 155x155 @(13,13)  → s 94.8%  x -21.1%  y -21.1%
+   노드 카드의 주인공은 advRecommend 가 돌려주는 ten·twin·jelly 셋뿐이다(:36036). */
+#modal-node .nrow-hero .nthumb .node-hero-av        { --cap-art: var(--slot-std, none); }
+#modal-node .nrow-hero .nthumb .node-hero-av.ch-ten {
+  --cap-art: var(--ch-ten-thumb);   --face-s: 94.2%; --face-x: 137.5%; --face-y:  -8.3%;
+}
+#modal-node .nrow-hero .nthumb .node-hero-av.ch-twin {
+  --cap-art: var(--ch-twin-thumb);  --face-s: 93.6%; --face-x: 111.2%; --face-y:   1.9%;
+}
+#modal-node .nrow-hero .nthumb .node-hero-av.ch-jelly {
+  --cap-art: var(--ch-jelly-thumb); --face-s: 94.8%; --face-x: -21.1%; --face-y: -21.1%;
+}
+/* 펫은 정본 #cp-pet-face 와 같은 계약 — 얼굴 자산 + center/cover 폴백(메타 없음). */
+#modal-node .node-info > li > .ni-pet-av { --cap-art: var(--slot-std, none); }
+/* 48px 캡슐이 선 줄은 글자 밑줄이 아니라 가운데로 맞춘다. */
+#modal-node .node-info > li#node-i-pet { align-items: center; gap: 8px; }
+
+/* ---- 4. 글자 — 본문 한 크기(13px) · 이름·라벨은 표시 서체 ------------------ */
+#modal-node .node-stars  { font-size: 13px; }
+#modal-node .node-hearts { font-size: 13px; }
+</style>
+<style id="node-title-fit">
+/* ===== node-title-fit (0909 · wave/node-modal) ==============================
+   접수: 「캡슐 안 글씨 레이아웃 제대로 안 잡힌 것 같은데」(사용자 폰 캡처 — 2탄)
+   부품: t3-title-capsule-modal (제목 캡슐 — 모달 전량 공유) · 슬롯 title-lettering
+
+   실측(390x844 dpr3 · 캡슐을 제목층 켜고/끄고 두 번 찍어 차분 → 제목만의 ink bbox.
+   여백 40px 을 둔 전체컷으로 재서 **잘림 0**. 오프셋 = 캡슐 기하중심 대비, css px):
+     컷                제목 층      Δx      Δy    잉크H/캡슐H  h2 display
+     10-modal-node     CSS 레터링  +0.00   -7.71    0.757     block / normal  ← 혼자 다르다
+     16-modal-mode     webp 그림층 +0.33   -0.43    0.661     (::after contain)
+     17-modal-classic  webp 그림층 +0.67   +0.11    0.656     (::after contain)
+     14-modal-clear    CSS 레터링  -0.83   -2.42    0.501     flex / center
+     18-modal-adv      CSS 레터링  -0.49   -0.60    0.469     flex / center
+
+   ▣ 원인 층 = **Layout**(§0 층 6). 가로가 아니라 **세로**다 — Δx 는 다섯 컷 모두
+     ±0.67px 안이라 이미 ≤1px 이고, 노드만 Δy 가 -7.71px 다. 후보를 하나씩 지웠다:
+       · 자간(letter-spacing -.030em)의 음수 트레일링은 가로 값(+0.75px 추정)인데
+         노드 Δx 실측이 +0.00 이다 — 다른 베어링과 상쇄돼 보이지 않는다.
+       · 자두 테는 drop-shadow 4방향 대칭(±x·±y)이라 중심을 안 옮긴다.
+       · 캡슐 슬롯 padding 은 좌우 대칭(--ttl-pad 18px)이다.
+     남는 것은 상자다: `#modal-node .r10-ribbon > h2` 만 **display:block** 이라
+     `.mvh-title`(inline-block)이 줄상자 **밑선**에 앉고 그 아래로 strut 디센더
+     공간이 남는다 → 글자 상자 중심이 캡슐 중심보다 **-5.02px**(실측). 같은 레터링을
+     쓰는 클리어·모험은 h2 가 flex/center 라 이 값이 0.00 이다.
+   ▣ 크기 — 규칙 ④(2026-09-03 사용자)의 「글자높이/캡슐높이 = 정본 채움비」에서
+     노드가 이탈해 있었다. 같은 자로 잰 webp 제목 정본(플레이 0.661 · 클래식 0.656)
+     대비 노드는 **0.757 = 1.15배**다. 배율 0.658/0.757 = .869 → --mvh-fs .80 -> .695.
+   ▣ 남는 잉크 비대칭(한글 잉크 띠가 em 상자 중앙보다 위 + 아래 방향 drop-shadow)은
+     세 레터링 소비처가 함께 갖는 **서체 성질**이라 한 값으로 잡는다. 세 컷이 동시에
+     실측 1회차(.0531em)에서 노드 -0.88 · 클리어 -1.42 가 나와 한글 두 문자열이
+     동시에 드는 구간 .0665~.0968em 의 중앙 **.0781em** 으로 다시 잡았다.
+   판정: code(§4 규칙 기하) · 새 색·새 자산 0 · 캡슐 판·webp 제목층 무접촉.
+   ========================================================================== */
+
+/* ① 노드 제목만 다르던 정렬 문법을 정본(클리어·모험 h2)과 같게 — 상자 중심차 0 */
+#modal-node .r10-ribbon > h2 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ② 채움비 복귀 — 규칙 ④. 레터링 세 소비처의 기준값 하나(긴 제목은 fitHead 가
+   이 값에서 폭 우선으로 더 줄이므로 클리어·모험의 현행 렌더는 안 바뀐다). */
+#modal-node .r10-ribbon > h2,
+#modal-clear .sheet > h2,
+#modal-adv:not(.is-advscript):not(.is-advfinish) .sheet > h2 {
+  --mvh-fs: .695;
+}
+
+/* ③ 잉크 광학 보정 — 살아 있는 레터링 소비처 셋만. .mvh-title 은 이미
+   position:relative 라 top 한 줄이면 되고, 상자·폭(fitHead 가 재는 값)은 한 화소도
+   안 바뀐다. ⚠ 정본 규칙(:50943)이 데리고 있는 `.modal-v2 .mv2-sheet|.mv2-head`
+   두 선택자는 **베끼지 않았다** — .modal-v2 는 은퇴해 인스턴스 0 이라(:55474)
+   그대로 옮기면 새 죽은 선택자를 만든다(components-gate m3 A급). */
+#modal-node .r10-ribbon > h2 > .mvh-title,
+#modal-clear .sheet > h2 > .mvh-title,
+#modal-adv:not(.is-advscript):not(.is-advfinish) .sheet > h2 > .mvh-title {
+  --lt-optical-y: .0781em;
+  top: var(--lt-optical-y);
+}
+</style>
 <script id="bg-preview-hook">
 /* 관제탑 배경 미리보기 훅 — ?bg=<카탈로그키>, 파라미터 없으면 무동작 */
 (function(){var k=new URLSearchParams(location.search).get('bg');if(!k)return;
