@@ -25021,6 +25021,24 @@ window.TT_SFX = {
       'stat.k2': 'Steady',
       'stat.k3': 'Agility',
       'stat.k4': 'Luck',
+      /* [SI-0909] 능력치 한 줄 설명. 사용자 지적 "능력치가 뭔지 설명이 없다".
+         네 문장은 **statMult() 의 네 분기를 그대로 옮긴 것**이지 분위기 글이
+         아니다(§WD-1 §12.2 실측):
+           d1 power    skillOn('summon') && awkStreak>0 -> x(1 + p/100 x min(awk,3)/3)
+           d2 steady   stdyRun >= 3                     -> x(1 + s/100)
+           d3 agility  statAgil (popLive>0 인 매치)      -> x(1 + a/100)
+           d4 luck     random() < l/100                 -> x2
+         {n} 은 statEff(id) 의 **지금 실효값**이라 강화·아이템까지 반영된다 —
+         막대(--v)와 같은 수를 말하므로 둘이 어긋날 수 없다.
+         d1x 는 각성이 'jellytime' 인 캐릭터(SKILL_KIND: jelly·sodawitch)용이다.
+         그 둘은 'summon' 을 영영 못 켜므로 d1 의 조건이 성립하지 않는다 —
+         같은 문장을 보이면 거짓말이 된다(추정 금지). */
+      'stat.d1':  'Match score +{n}% while Prince Summon is up',
+      'stat.d1x': 'This hero awakens into Jelly Time — Power stays idle',
+      'stat.d2':  '+{n}% for 3 matches in a row, no pause',
+      'stat.d3':  '+{n}% when you match while tiles still pop',
+      'stat.d4':  '{n}% chance a match scores double',
+      'aria.statinfo': 'What this stat does',
       'menu.settings': 'Settings',
       'settings.title': 'Settings',
       'settings.sound': 'Sound',
@@ -26043,6 +26061,14 @@ window.TT_SFX = {
       'stat.k2': '꾸준함',
       'stat.k3': '순발력',
       'stat.k4': '행운',
+      /* [SI-0909] 위 en 블록의 짝. 문장 길이를 15자 안팎으로 묶은 것은 말풍선
+         폭(--f2-w x .43 = 160px)에서 두 줄을 안 넘기기 위해서다. */
+      'stat.d1':  '왕자 소환 각성 중 매치 점수 +{n}%',
+      'stat.d1x': '이 캐릭터 각성은 젤리타임 — 폭발력은 쉬어요',
+      'stat.d2':  '쉬지 않고 3연속 매치하면 +{n}%',
+      'stat.d3':  '터지는 중에 이어 치면 +{n}%',
+      'stat.d4':  '매치마다 {n}% 확률로 점수 2배!',
+      'aria.statinfo': '이 능력치가 하는 일',
       'menu.settings': '설정',
       'settings.title': '설정',
       'settings.sound': '소리',
@@ -28700,6 +28726,7 @@ window.TT_SFX = {
   /** 논리 인덱스 i 로 고른다(외부·화살표·키·스와이프의 진입점). 지금 중앙에서
       가장 가까운 벌로 최단 순환 거리만큼 이동한다. 패널이 닫혀 있으면 순간 배치. */
   function cpShow(i) {
+    closeStatTip();          /* [SI-0909] 카드가 바뀌면 앞 카드의 설명은 끝난 말이다 */
     var n = HERO_IDS.length;
     var target = ((i % n) + n) % n;
     var rack = $('cp-rack'), panel = $('charpanel'), track = $('cp-track');
@@ -28714,6 +28741,7 @@ window.TT_SFX = {
 
   /** 순간 배치(열기·부팅). 가운데 벌에 정본을 세운다 — 애니메이션 없이. */
   function cpSeed(i) {
+    closeStatTip();          /* [SI-0909] 위 cpShow 와 같은 이유 */
     var n = HERO_IDS.length;
     var target = ((i % n) + n) % n;
     cpBuild();
@@ -28866,6 +28894,7 @@ window.TT_SFX = {
   /** 카테고리 탭 전환. 화면 상태의 근거는 #charpanel 의 data-cptab 하나뿐이고,
    *  보이고 숨는 일은 전부 CSS 가 한다(JS 가 display 를 만지지 않는다). */
   function cpTab(k) {
+    closeStatTip();          /* [SI-0909] 탭이 바뀌면 카드가 통째로 바뀐다 */
     var root = $('charpanel');
     cpTabCur = (k === 'pet') ? 'pet' : 'char';
     if (!root || !root.setAttribute) return;
@@ -29090,6 +29119,7 @@ window.TT_SFX = {
   }
 
   function closeCharPanel() {
+    closeStatTip();          /* [SI-0909] 닫힌 패널에 열린 말풍선을 남기지 않는다 */
     var el = $('charpanel');
     if (el) el.hidden = true;
     syncCharSummary();
@@ -42161,6 +42191,135 @@ window.TT_SFX = {
         }
       }
     }
+    buildStatInfo();   /* [SI-0909] ⓘ 칩도 같은 틱에 자리를 다시 잡는다 */
+  }
+
+  /* =========================================================================
+   * [SI-0909] 능력치 설명 — ⓘ 칩 + 한 줄 말풍선
+   *
+   * 사용자 지적: "캐릭터 능력치 창을 보면 능력치가 뭔지 설명이 없다."
+   * 네 막대는 §12 부터 **진짜 곱항**인데(statMult) 화면에는 이름 넉 자뿐이라,
+   * 플레이어가 "폭발력이 뭘 폭발시키는가"를 알 방법이 없었다.
+   *
+   * ▣ 문구의 출처는 statMult() 하나뿐이다 — 분위기 글이 아니다.
+   *     폭발력  skillOn('summon') && awkStreak>0 -> x(1 + p/100 x min(awk,3)/3)
+   *     꾸준함  stdyRun >= 3                     -> x(1 + s/100)
+   *     순발력  statAgil (popLive>0 인 매치)      -> x(1 + a/100)
+   *     행운    Math.random() < l/100            -> x LUCK_MULT(2)
+   *   숫자는 statEff(id) 의 **지금 실효값**이라 강화(statLv)·아이템까지 탄다.
+   *   막대(--v)가 읽는 값과 같은 함수이므로 말과 그림이 어긋날 수 없다.
+   *
+   * ▣ 각성이 젤리타임인 캐릭터(SKILL_KIND: jelly·sodawitch)는 'summon' 을
+   *   영영 못 켠다 -> 폭발력 분기의 조건이 성립하지 않는다. 그 둘에게 d1 을
+   *   그대로 보이면 **일어나지 않는 일**을 약속하는 것이라 d1x 로 갈아 끼운다.
+   *
+   * ▣ 펫 탭(#cp-petinfo)의 막대 넷에는 붙이지 않는다. PET_STATS 는 오늘 표시
+   *   전용이고(소비처 = syncPetInfo 의 --v 하나) 대응하는 레버가 코드에 없다.
+   *   없는 효과를 문장으로 지어내지 않는다.
+   *
+   * ▣ 만드는 자리는 `.ci` 의 절대배치 자식이다. .cc-stats 안에 넣으면 그 상자의
+   *   고정 폭(.46389) 안에서 막대가 밀려 [E37-0903] 의 트랙 폭이 깨진다.
+   * ======================================================================= */
+  var STAT_DESC_KEY = ['stat.d1', 'stat.d2', 'stat.d3', 'stat.d4'];
+  var statTipOpen = null;          /* 열려 있는 말풍선은 언제나 하나뿐이다 */
+
+  /** 한 캐릭터·한 스탯의 설명 한 줄. i 는 막대 순서(= STAT_KEYS 순서). */
+  function statTipText(id, i) {
+    var k = STAT_KEYS[i];
+    if (!k) return '';
+    if (i === 0 && (SKILL_KIND[id] || 'summon') !== 'summon') return t('stat.d1x');
+    return t(STAT_DESC_KEY[i], { n: (statEff(id) || {})[k] | 0 });
+  }
+
+  function closeStatTip() {
+    var tip = statTipOpen;
+    if (!tip) return;
+    statTipOpen = null;
+    if (tip.classList) tip.classList.remove('show');
+    tip.hidden = true;
+    var btn = tip.__csBtn;
+    if (btn && btn.setAttribute) btn.setAttribute('aria-expanded', 'false');
+    tip.__csBtn = null;
+  }
+
+  /** 줄의 세로 자리(.ci 기준). .cc-stats·.cs 둘 다 offsetParent 가 .ci 다. */
+  function statRowTop(ci, row) {
+    var stats = ci.querySelector ? ci.querySelector('.cc-stats') : null;
+    return (stats && row) ? (stats.offsetTop + row.offsetTop) : 0;
+  }
+
+  /**
+   * 카드마다 투명 버튼 넷 + 말풍선 하나를 **한 번만** 심고, 부를 때마다 자리를
+   * 다시 잰다. applyHeroStats 와 같은 규율이다(멱등 · 값이 같으면 무해).
+   */
+  function buildStatInfo() {
+    if (typeof document === 'undefined' || !document.querySelector) return;
+    for (var h = 0; h < HERO_IDS.length; h++) {
+      var id = HERO_IDS[h];
+      var ci = document.querySelector('#cp-info .ci[data-char="' + id + '"]');
+      if (!ci || ci.id === 'cp-petinfo' || !ci.querySelectorAll) continue;
+      var rows = ci.querySelectorAll('.cc-stats .cs');
+      if (!rows || rows.length < 2) continue;
+      /* 줄 사이 고랑 — CSS 의 .0157 을 여기 다시 적지 않고 실측한다. */
+      var pitch = rows[1].offsetTop - rows[0].offsetTop;
+      var half = Math.max(0, (pitch - rows[0].offsetHeight) / 2);
+      var tip = ci.querySelector('.cs-tip');
+      if (!tip) {
+        tip = document.createElement('p');
+        tip.className = 'cs-tip kit-box-v2';
+        tip.hidden = true;
+        tip.setAttribute('role', 'status');
+        ci.appendChild(tip);
+      }
+      for (var i = 0; i < rows.length && i < 4; i++) {
+        var btn = ci.querySelector('.cs-hit[data-cs="' + i + '"]');
+        if (!btn) {
+          btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'cs-hit';
+          btn.setAttribute('data-cs', String(i));
+          btn.setAttribute('aria-expanded', 'false');
+          /* 라벨은 data-i18n-aria 로 건다 — 언어를 바꾸면 applyI18n 이 같이 간다. */
+          btn.setAttribute('data-i18n-aria', 'aria.statinfo');
+          btn.setAttribute('aria-label', t('aria.statinfo'));
+          var ic = document.createElement('i');
+          ic.className = 'cs-ic';
+          ic.setAttribute('aria-hidden', 'true');
+          ic.textContent = 'i';
+          btn.appendChild(ic);
+          ci.appendChild(btn);
+          on(btn, 'click', statTipClick);
+        }
+        btn.style.setProperty('--cs-hit-y',
+          (statRowTop(ci, rows[i]) - half).toFixed(1) + 'px');
+      }
+    }
+  }
+
+  /** 같은 줄을 다시 누르면 닫힌다(토글). 다른 줄이면 문구만 갈아 끼운다. */
+  function statTipClick(ev) {
+    if (ev && ev.stopPropagation) ev.stopPropagation();
+    var btn = this, ci = btn.parentNode;
+    if (!ci || !ci.querySelector) return;
+    var i = btn.getAttribute('data-cs') | 0;
+    var tip = ci.querySelector('.cs-tip');
+    var rows = ci.querySelectorAll('.cc-stats .cs');
+    var row = rows && rows[i];
+    var again = (statTipOpen === tip && tip.__csBtn === btn);
+    closeStatTip();
+    if (again || !tip || !row) { J.sfx.ui(); return; }
+    tip.textContent = statTipText(ci.getAttribute('data-char'), i);
+    tip.style.setProperty('--cs-tip-y',
+      (statRowTop(ci, row) + row.offsetHeight / 2).toFixed(1) + 'px');
+    tip.hidden = false;
+    tip.__csBtn = btn;
+    statTipOpen = tip;
+    btn.setAttribute('aria-expanded', 'true');
+    /* 다음 프레임에 .show — hidden 을 막 벗은 요소는 transition 을 안 탄다. */
+    if (typeof requestAnimationFrame === 'function') {
+      requestAnimationFrame(function () { if (statTipOpen === tip) tip.classList.add('show'); });
+    } else { tip.classList.add('show'); }
+    J.sfx.ui();
   }
 
   /* ---- §G 선택창 무대 생동감 ---------------------------------------------
@@ -42490,6 +42649,9 @@ window.TT_SFX = {
     });
     /* 바깥(어둠) 탭으로 닫기 — 시트 안의 탭은 .cp-frame 에서 멈춘다. */
     on($('charpanel'), 'click', function (ev) {
+      /* [SI-0909] 패널 어디를 눌러도 열린 설명은 닫힌다. .cs-hit 의 클릭은
+         statTipClick 이 stopPropagation 으로 여기까지 못 오게 막는다. */
+      closeStatTip();
       if (ev && ev.target === this) closeCharPanel();
     });
     /* 좌우 스와이프. passive 리스너라 스크롤을 막지 않는다 — 이 패널에는 세로
@@ -50233,6 +50395,127 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
 #charpanel .cs-bar[style*="--v0:0%"] > .cs-b0,
 #charpanel .cs-bar[style*="--v0: 0%"] > .cs-b0,
 #charpanel .cs-bar.is-b0same > .cs-b0 { display: none; }
+
+/* ---- [SI-0909] 능력치 설명 — ⓘ 칩 + 한 줄 말풍선 ---------------------------
+   사용자 지적: "캐릭터 능력치 창을 보면 능력치가 뭔지 설명이 없다."
+
+   ▣ 왜 ⓑ(상시 부제)가 아니라 ⓐ(탭 -> 말풍선)인가 — **실측이 정했다**
+     (390x844 dpr3 · scratchpad/stat-info/measure.py 산출):
+       가로  막대 오른끝 200.8px  <->  .ci-desc 왼끝 231.1px  =  여백 30.3px
+             8~10자 한글은 10px 글자로도 ~80px 이 필요하다 -> 안 들어간다.
+       세로  .cc-stats 바닥 740.7px <-> 버튼 줄(.cp-foot) 위 761.2px = 여백 20.5px
+             부제 4줄(줄당 ~12px + 고랑)은 최소 ~56px -> 안 들어간다.
+       라벨  .cs-k 폭 52.3px · 글자 11.2px. 두 줄로 쪼개면 부제가 ~7px 이어야
+             8자가 들어가는데, 그것은 폰 가독 하한(10px) 밑이다.
+     즉 "공간이 없으면 ⓐ" 조건이 세 방향에서 다 성립한다. 억지로 ⓑ 를 넣으려면
+     막대 기하([G-0901]/[G2-0901] 가 시안 실측으로 못박은 그것)를 다시 흔들어야
+     하는데, 그것은 이 요청의 값어치보다 훨씬 비싼 회귀다.
+
+   ▣ 자리 — 새 층을 안 만든다
+     .cs-hit(투명 버튼)·.cs-ic(ⓘ 칩)·.cs-tip(말풍선) 셋 다 `.ci` 의 절대배치
+     자식이다. .ci 는 이미 `position:absolute; overflow:visible` 이고 그 안의
+     모든 조각(.ci-id·.cc-stats·.ci-desc)이 --f2-w 비율로 앉아 있으므로,
+     같은 비율 어휘를 그대로 쓴다. **.cc-stats 안에는 아무것도 안 넣는다** —
+     그 상자는 폭이 .46389 로 고정이라 자식을 하나 더하면 막대의 오른끝이
+     밀려 [E37-0903] 이 시안에서 뜬 트랙 폭이 깨진다.
+
+   ▣ 손가락 — 보이는 것은 ⓘ 칩이지만 **눌리는 것은 줄 전체**다
+     칩만 누르게 하면 목표가 14px 짜리 점이 된다(폰에서 실패한다). .cs-hit 이
+     라벨 왼끝부터 칩 오른끝까지(폭 .5085 x --f2-w = 190px) · 높이는 줄 피치
+     통째(.0532 x --f2-w = 19.9px)를 먹는다. 세로가 짧은 것은 줄 사이가 5.9px
+     뿐이라 더 늘리면 옆줄을 훔치기 때문이다 — 목록 행과 같은 규약으로 가로를
+     길게 잡아 그것을 벌충한다.
+
+   ▣ 값 — 원시값 0. 색은 전부 이 패널이 이미 쓰고 있는 --f2-* 토큰이고,
+     말풍선 판은 `.kit-box-v2`(패시브 박스와 같은 부품)를 그대로 입는다.
+     되돌리기: 이 [SI-0909] 블록 + JS 의 같은 표식 블록을 지우면 착수 전이다.
+   --------------------------------------------------------------------------- */
+#charpanel .cs-hit {
+  position: absolute;
+  left:   calc(var(--f2-w) * .050);            /* = .cc-stats 왼끝 */
+  width:  calc(var(--f2-w) * .5085);           /* 라벨 왼끝 ~ ⓘ 칩 오른끝 */
+  top:    var(--cs-hit-y, 0px);                /* JS 가 줄마다 실측해서 넣는다 */
+  height: calc(var(--f2-w) * .0532);           /* 줄 피치(상자 .0375 + 고랑 .0157) */
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  display: block;
+  z-index: 7;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+#charpanel .cs-hit:focus-visible { outline: none; }
+/* ⓘ 칩 — 30.3px 짜리 빈 골에 정확히 들어가는 크기(.0375 = 막대 높이와 같다). */
+#charpanel .cs-ic {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  width:  calc(var(--f2-w) * .0375);
+  height: calc(var(--f2-w) * .0375);
+  transform: translateY(-50%);
+  border-radius: 999px;
+  background: var(--f2-pill-soft);
+  box-shadow: inset 0 0 0 calc(var(--f2-w) * .0027) var(--f2-pill-line);
+  color: var(--f2-ink);
+  font-family: var(--font-display);
+  font-size: calc(var(--f2-w) * .0250);
+  font-style: normal;
+  font-weight: 900;
+  line-height: calc(var(--f2-w) * .0375);
+  text-align: center;
+  pointer-events: none;                        /* 눌리는 것은 .cs-hit 이다 */
+}
+#charpanel .cs-hit[aria-expanded="true"] .cs-ic {
+  background: var(--f2-pill);
+  box-shadow: inset 0 0 0 calc(var(--f2-w) * .0041) var(--f2-pill-line);
+}
+/* 말풍선 — 판은 .kit-box-v2 가 주고, 여기서는 자리·글자·꼬리만 얹는다. */
+#charpanel .cs-tip {
+  position: absolute;
+  /* 왼끝은 ⓘ 칩 **오른쪽**이다(.5085 가 칩 오른변) — 처음 잡았던 .5320 은
+     칩(203.4~217.4px)을 덮어 눌린 줄의 표식이 사라졌다(실측 후 교정).
+     오른끝은 .ci-desc 오른변에 맞춘다 — 판이 둘 다 같은 세로선에서 끝난다. */
+  left:  calc(var(--f2-w) * .5650);
+  right: calc(var(--f2-w) * .0287);
+  top: var(--cs-tip-y, 0px);
+  transform: translateY(-50%);
+  z-index: 9;
+  box-sizing: border-box;
+  padding: calc(var(--f2-w) * .0150) calc(var(--f2-w) * .0180);
+  color: var(--prim-art-ink);
+  font-size: calc(var(--f2-w) * .0270);
+  font-weight: 800;
+  line-height: 1.34;
+  text-align: left;
+  opacity: 0;
+  transition: opacity 130ms ease;
+  pointer-events: none;
+}
+#charpanel .cs-tip[hidden] { display: none; }
+#charpanel .cs-tip.show { opacity: 1; }
+/* 꼬리 — 눌린 줄을 가리킨다. 회전한 정사각형 하나면 충분하다(#hero-bubble 문법). */
+#charpanel .cs-tip::before {
+  content: "";
+  position: absolute;
+  left: calc(var(--f2-w) * -.0100);
+  top: 50%;
+  width:  calc(var(--f2-w) * .0200);
+  height: calc(var(--f2-w) * .0200);
+  border-radius: calc(var(--f2-w) * .0040);
+  background: var(--f2-box);
+  box-shadow: inset calc(var(--f2-w) * .0027) calc(var(--f2-w) * .0027) 0 0
+              var(--f2-pill-line);
+  transform: translateY(-50%) rotate(45deg);
+  z-index: -1;
+}
+@media (prefers-reduced-motion: reduce) {
+  #charpanel .cs-tip { transition: none; }
+}
+/* 잠긴 캐릭터 카드는 이름·막대·설명을 통째로 감춘다(위 .ci.locked 규칙과 같은
+   목표). 두 조각은 .cc-stats 밖에 사는 형제라 그 규칙이 안 닿는다. */
+#charpanel .cp-info .ci.locked .cs-hit,
+#charpanel .cp-info .ci.locked .cs-tip { visibility: hidden; }
 /* 보석 아이콘 자리 — 시안 A 는 게이지 왼쪽 끝에 보석이 하나씩 박힌다.
    그림 부품이 아직 없으므로 킷의 __gem 자리에 CSS 보석을 놓는다. */
 #charpanel .cs-bar > .kit-gauge-v2__gem {
