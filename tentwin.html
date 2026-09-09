@@ -14218,6 +14218,43 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
       <path class="wxtal-krim" fill="none" stroke="#FFFFFF" stroke-width=".9" stroke-linejoin="round" opacity=".5"
             d="M15.5 3.2 5.6 22.9 3.9 29.2 15.5 42.6 27.1 29.2 25.4 22.9Z"/>
     </g>
+
+    <!-- ============================================================
+         ④ (0909 · 파도 charsel-layout) 캐릭창 좌우 화살표 — 시안 S5 실측 도형.
+         종전은 `border-radius: 50% 50% 50% 8%` + rotate(∓45deg) 의 **분홍 물방울**
+         이었고(사용자 반려 ④), 회전 부호가 뒤집혀 실제 꼭지가 아래를 향했으며,
+         회전한 정사각의 AABB 가 레일창을 105~130px² 먹었다(관문 A).
+         시안은 **둥근 정삼각(플렉트럼)** 이다: 꼭지 셋 ~120° · 한 꼭지가 수평
+         바깥 · 모서리 r = .22H · 회전 0deg. border-radius 로는 못 만들므로
+         여기 <defs> 에 도형을 세우고 버튼이 <use> 로 가져간다(이 파일의 wxtal-set
+         과 **같은 문법** — href + xlink:href 둘 다).
+         뒤 상자 94.7 x 100 이 곧 화살표 바깥 상자다(w:h = .947 = 시안 54:57).
+         색은 **기존 토큰 그대로** — 새 색 선언 0. CSS 의 radial 그라디언트를
+         SVG 세로 그라디언트로 옮겨 적었을 뿐이다. -->
+    <linearGradient id="cpArwFill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"   stop-color="var(--f2-arrow-1)"/>
+      <stop offset=".38" stop-color="var(--f2-arrow-2)"/>
+      <stop offset=".76" stop-color="var(--f2-arrow-face)"/>
+      <stop offset="1"   stop-color="var(--f2-arrow-4)"/>
+    </linearGradient>
+    <g id="cpArwL">
+      <path d="M11.36 30.74 L62.06 2.74 A22.00 22.00 0 0 1 94.70 22.00 L94.70 78.00 A22.00 22.00 0 0 1 62.06 97.26 L11.36 69.26 A22.00 22.00 0 0 1 11.36 30.74 Z"
+            fill="url(#cpArwFill)"/>
+      <!-- 좌상 스펙큘러. 왼쪽 글리프는 꼭지가 왼쪽이라 «30% x / 22% y» 그 자리가
+           삼각형 **밖**이다(윗변 y = 30.74 − .5523(x−11.36) 아래여야 한다).
+           빛 방향(좌상)은 지키고 자리만 안쪽으로 당겼다 — 타원이 윗변 안쪽
+           겉선에서 4.6 단위 떨어진다. -->
+      <ellipse cx="45" cy="30" rx="12" ry="6.5" fill="#FFF" opacity=".55"/>
+      <path d="M11.36 30.74 L62.06 2.74 A22.00 22.00 0 0 1 94.70 22.00 L94.70 78.00 A22.00 22.00 0 0 1 62.06 97.26 L11.36 69.26 A22.00 22.00 0 0 1 11.36 30.74 Z"
+            fill="none" stroke="var(--f2-arrow-line)" stroke-width="5.7" stroke-linejoin="round"/>
+    </g>
+    <g id="cpArwR">
+      <path d="M83.34 69.26 L32.64 97.26 A22.00 22.00 0 0 1 0.00 78.00 L0.00 22.00 A22.00 22.00 0 0 1 32.64 2.74 L83.34 30.74 A22.00 22.00 0 0 1 83.34 69.26 Z"
+            fill="url(#cpArwFill)"/>
+      <ellipse cx="28.4" cy="22" rx="15" ry="8.5" fill="#FFF" opacity=".55"/>
+      <path d="M83.34 69.26 L32.64 97.26 A22.00 22.00 0 0 1 0.00 78.00 L0.00 22.00 A22.00 22.00 0 0 1 32.64 2.74 L83.34 30.74 A22.00 22.00 0 0 1 83.34 69.26 Z"
+            fill="none" stroke="var(--f2-arrow-line)" stroke-width="5.7" stroke-linejoin="round"/>
+    </g>
   </defs>
 </svg>
     <div class="cp-frame">
@@ -14427,13 +14464,13 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
              마크업엔 컨테이너만 둔다(순환이 끊기지 않게 양옆에 같은 방울이 늘 있다).
              양끝 물방울 화살표(⑮ 시안 S5 형태)는 트랙 밖 고정 — cpShow(cpIdx∓1)로
              드래그·스와이프·탭과 같은 선택 함수(cpSelectPos)를 부른다(복제 0). -->
-        <button id="cp-prev" class="cp-arrow cp-arrow-l" type="button" data-i18n-aria="aria.prevchar" aria-label="Previous character"></button>
+        <button id="cp-prev" class="cp-arrow cp-arrow-l" type="button" data-i18n-aria="aria.prevchar" aria-label="Previous character"><svg class="cp-arw" viewBox="0 0 94.7 100" aria-hidden="true" focusable="false"><use href="#cpArwL" xlink:href="#cpArwL"/></svg></button>
         <!-- 가시 창(#cp-win) = 정확히 방울 5슬롯 폭. 트랙은 이 안에서 이동하고
              overflow:hidden 이 6번째 방울을 정지 상태에서 잘라 낸다(부분 방울 0).
              양끝 화살표는 이 창 밖(랙 양끝)에 있어 방울과 겹치지 않는다. -->
         <div id="cp-win" class="cp-win"><div id="cp-track" class="cp-track"></div></div>
         <span id="cp-ring" class="cp-ring" aria-hidden="true"></span>
-        <button id="cp-next" class="cp-arrow cp-arrow-r" type="button" data-i18n-aria="aria.nextchar" aria-label="Next character"></button>
+        <button id="cp-next" class="cp-arrow cp-arrow-r" type="button" data-i18n-aria="aria.nextchar" aria-label="Next character"><svg class="cp-arw" viewBox="0 0 94.7 100" aria-hidden="true" focusable="false"><use href="#cpArwR" xlink:href="#cpArwR"/></svg></button>
         </div>
         <!-- 14차 #판정 — 좌우 화살표(.cp-arrow) 제거. 되돌릴 근거를 남긴다.
              레퍼런스 BG-01-01 에 화살표가 없고(§0 "극한 동일"), 3뷰포트 실측에서
@@ -49511,6 +49548,49 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   --cs-card:  calc(var(--cs-body) + var(--cs-tabs) + var(--f2-w) * .0082);
   --cs-side:  calc(var(--f2-w) * .245);    /* 우측 세로 탭 레일 폭 */
 
+  /* ---- [파도 charsel-layout · 0909] 배치 틈 자 -----------------------------
+     layout-check(절대 판정)이 charpanel 묶음에서 잡아 낸 겹침·좁은 틈 7건을
+     고치며 새로 세운 자들이다. 이 화면의 **새 간격은 전부 이 토큰으로만** 준다
+     (원시 px 리터럴 0). 근거 단위: 390 폭에서 --f2-w = 373.6px (실측).
+       --cs-gap8   .0214 x 373.6 = 8.00px  = 8 x 1   ← 이 파도의 기본 틈
+     아래 나머지는 그 틈이나 시안 실측에서 파생된 자리값이다. */
+  --cs-gap8: calc(var(--f2-w) * .0214);
+
+  /* ② 사이드바 맨 윗줄 = 추천 배지 한 칸. 배지 top .0240W + 배지 높이 .0475W
+     (= kit-pill-v2[data-variant=soft] 의 --f2-bh) + 틈 8px.
+     젬랙(.cp-side-rack)은 이 자리 **아래**에서 시작한다 — 종전에는 랙 상자가
+     사이드바 맨 위(padding 안)부터라 배지가 랙 위에 719~1251px² 올라타 있었고,
+     그 겹침이 사용자가 본 「배지가 삐뚤어 보인다」의 실측 원인이었다
+     (회전·skew 는 실측 0.00deg — 기울기는 애초에 없었다). */
+  --cs-side-rec: calc(var(--f2-w) * .0715 + var(--cs-gap8));
+
+  /* ④ 좌우 화살표 = 시안 S5 둥근 정삼각(플렉트럼). 54x57 시안px · w:h = .947 ·
+     방울(.1307W) 지름의 .54 배 -> 폭 .0706W. 자리는 레일창(#cp-win)과 8px 띄운다:
+       레일창 인셋 (1 - .7817)/2 = .1092W  −  화살표 폭 .0706W  −  틈 .0214W(8px) */
+  --cs-arw-w: calc(var(--f2-w) * .0706);
+  --cs-arw-h: calc(var(--f2-w) * .0706 / .947);
+  --cs-arw-x: calc(var(--f2-w) * .0172);
+
+  /* ① 이름 글자 세로 광학 보정. .ci-plate 는 이미 align-items:center + 상하
+     padding 0 인데도 잉크 중심이 안전 상자 중심보다 1.32~3.43px **위**에 떴다
+     (20판 실측). 원인은 정렬이 아니라 --font-display 의 잉크가 em 상자 안에서
+     위로 치우친 것 — 글자 상자는 가운데인데 잉크가 아니다.
+     .ci-plate 에 padding 을 주면 안전 상자도 같이 내려가 상쇄되므로, **글자
+     상자(.ci-name)** 에만 padding-top 을 주어 잉크만 그 절반(.0060W)만큼
+     내린다. .0060 은 네 뷰포트 20판의 어긋남 중앙값을 --f2-w 로 나눈 값이다
+     (390 2.24px · 360 2.06 · 414 2.38 · PC 2.47 -> 잔차 최대 0.96px < 허용 1.5). */
+  --cs-name-dy: calc(var(--f2-w) * .0120);
+
+  /* ③ 추천 알약(.ci-tag-v · #cp-side-rec) 폭. 글자 잉크가 알약 **안전 상자**
+     (= content box)를 좌우로 최대 1.0px 넘쳤다. 안전 상자는 padding 을 뺀 값이라
+     가로 padding 을 키워도 넓어지지 않는다(알약이 글자에 딱 붙어 줄어들기 때문).
+     그래서 알약을 글자에 붙이지 않고 **시안 실측 폭**으로 세운다 —
+     kit-pill-v2[data-variant=soft] 의 원 실측이 97.45 x 34.92 (735 기준)이므로
+     97.45/735 = .1326W 가 곧 시안 폭이다. 가로 인셋은 그 안에서 .0100W.
+     결과: 안전 상자 = .1126W(390 폭 42.1px) > 최장 글자 advance 35px + 잉크 오버행. */
+  --cs-pill-w:  calc(var(--f2-w) * .1326);
+  --cs-pill-px: calc(var(--f2-w) * .0100);
+
   display: block;
   padding: 0;
   /* 시안 B — 판 뒤로 무대가 비친다. 종전 .88 스크림은 무대를 통째로 덮었다. */
@@ -49794,43 +49874,59 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
    상단 광택, 얇은 마우브 겉선, 바깥(아래-외측)으로 향한 한 꼭지. 젤리 재질은 정본
    칩(①) 층 어휘 상속 — 새 디자인 0. 글리프 없이 꼭지 방향이 곧 화살표다(좌=이전·
    우=다음). 크기 = 방울 .1307W 의 ~.58 배. 트랙 밖 고정(양끝 절대 배치). */
+/* ④ (0909 · 파도 charsel-layout) 물방울 → 시안 S5 둥근 삼각. 사용자 반려 ④ +
+   관문 A(overlap 레일창 ↔ 화살표L/R 105~130px²).
+   ▣ 무엇이 고장이었나 — 실측 둘.
+     (1) 도형: 종전은 `border-radius: 50% 50% 50% 8%` 물방울이고 회전 부호가
+         뒤집혀 실제 꼭지가 **아래**를 가리켰다. 시안 S5 는 꼭지 셋 ~120° 의
+         둥근 정삼각(플렉트럼)이고 한 꼭지가 **수평 바깥**을 본다.
+     (2) 자리: 회전한 정사각의 **AABB** 가 변 길이의 √2 배(28.4px → 40.2px)라
+         회전 없이는 2.7px 떨어져 있던 레일창을 3.15px 파고들었다.
+         도형이 방향을 가지면 회전이 필요 없다 → rotate 0deg 로 AABB 가 사라진다.
+   ▣ 되돌릴 근거로 걷어 낸 선언을 보존한다(이 파일의 관례).
+      background/box-shadow 는 SVG(<g id="cpArwL"> / <g id="cpArwR">, :14100 근처)
+      의 그라디언트·겉선으로 **같은 토큰 그대로** 옮겨 갔고, border-radius 와
+      rotate 는 도형이 대신하므로 죽었다. 색·재질 값은 한 자리도 안 바뀌었다.
+      width/height: calc(var(--f2-w) * .076) (정사각)
+      background: radial-gradient(120% 120% at 40% 28%,
+        var(--f2-arrow-1) 0%, var(--f2-arrow-2) 40%,
+        var(--f2-arrow-face) 74%, var(--f2-arrow-4) 100%);
+      box-shadow:
+        inset 0 0 0 calc(var(--f2-w) * .0026) var(--f2-arrow-line),
+        inset 0 calc(var(--f2-w) * .0062) calc(var(--f2-w) * .0060) rgba(255,255,255,.88),
+        inset 0 calc(var(--f2-w) * -.0070) calc(var(--f2-w) * .0070) rgba(160,90,125,.26),
+        0 calc(var(--f2-w) * .0050) calc(var(--f2-w) * .0080) rgba(150,70,110,.24);
+      .cp-arrow-l { left: calc(var(--f2-w) * .026);
+                    border-radius: 50% 50% 50% 8%;
+                    transform: translateY(-50%) rotate(-45deg); }
+      .cp-arrow-r { right: calc(var(--f2-w) * .026);
+                    border-radius: 50% 50% 8% 50%;
+                    transform: translateY(-50%) rotate(45deg); }
+      :active 는 각각 위 transform 에 scale(.92) 를 덧댄 것이었다. */
 #charpanel .cp-arrow {
   position: absolute;
   top: 50%;
-  width:  calc(var(--f2-w) * .076);
-  height: calc(var(--f2-w) * .076);
+  transform: translateY(-50%);
+  width:  var(--cs-arw-w);
+  height: var(--cs-arw-h);
   padding: 0;
   border: 0;
+  background: none;
+  box-shadow: none;
+  border-radius: 0;
   font-size: 0;
   line-height: 0;
   color: transparent;
   cursor: pointer;
   z-index: 6;
-  /* 반투명 유리: 상단(40%,28%) 흰 광택 → 연분홍 → 살몬. S5 처럼 맑되, 뒤 방울이
-     비쳐 지저분해지지 않게 알파를 살짝 올렸다(유리감 유지 · 3번째 이웃 가림). */
-  background: radial-gradient(120% 120% at 40% 28%,
-    var(--f2-arrow-1) 0%, var(--f2-arrow-2) 40%,
-    var(--f2-arrow-face) 74%, var(--f2-arrow-4) 100%);
-  box-shadow:
-    inset 0 0 0 calc(var(--f2-w) * .0026) var(--f2-arrow-line),                        /* 얇은 마우브 겉선 */
-    inset 0 calc(var(--f2-w) * .0062) calc(var(--f2-w) * .0060) rgba(255,255,255,.88),   /* 상단 광택 */
-    inset 0 calc(var(--f2-w) * -.0070) calc(var(--f2-w) * .0070) rgba(160,90,125,.26),   /* 아래 접지 */
-    0 calc(var(--f2-w) * .0050) calc(var(--f2-w) * .0080) rgba(150,70,110,.24);          /* 바깥 그림자 */
   -webkit-tap-highlight-color: transparent;
 }
-/* 꼭지(둥근 물방울 + 한 모서리 뾰족)를 바깥으로 돌린다: 좌=왼쪽 · 우=오른쪽 */
-#charpanel .cp-arrow-l {
-  left: calc(var(--f2-w) * .026);
-  border-radius: 50% 50% 50% 8%;                 /* 뾰족 = 좌하 */
-  transform: translateY(-50%) rotate(-45deg);    /* 좌하 꼭지를 왼쪽으로 */
-}
-#charpanel .cp-arrow-r {
-  right: calc(var(--f2-w) * .026);
-  border-radius: 50% 50% 8% 50%;                 /* 뾰족 = 우하 */
-  transform: translateY(-50%) rotate(45deg);     /* 우하 꼭지를 오른쪽으로 */
-}
-#charpanel .cp-arrow-l:active { transform: translateY(-50%) rotate(-45deg) scale(.92); }
-#charpanel .cp-arrow-r:active { transform: translateY(-50%) rotate(45deg) scale(.92); }
+#charpanel .cp-arw { display: block; width: 100%; height: 100%; overflow: visible; }
+/* 꼭지 방향은 도형이 갖는다(좌=왼쪽 · 우=오른쪽) — 회전 0deg.
+   좌우 자리는 --cs-arw-x 하나로 잡아 레일창과 8px 를 남긴다(관문 A). */
+#charpanel .cp-arrow-l { left:  var(--cs-arw-x); }
+#charpanel .cp-arrow-r { right: var(--cs-arw-x); }
+#charpanel .cp-arrow:active { transform: translateY(-50%) scale(.92); }
 #charpanel .cp-dots  { display: none; }
 
 /* ⑰ (0904) 중앙 픽 캐러셀 — 뷰포트(#cp-rack)는 고정, 트랙(#cp-track)만 이동한다.
@@ -49902,7 +49998,13 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   position: absolute;
   right: 0;
   top: calc(var(--cs-head) + var(--cs-carh) + var(--f2-w) * .06);
-  bottom: calc(var(--cs-card) + var(--f2-w) * .03);
+  /* H (0909) 사용자 「사이드바가 카드에 겹친다, 거리 조율」 — 실측 틈은
+     10.28(360) / 11.04(390) / 11.65(414) / 12.07(PC) px 로 관문(8px)은 통과하되
+     눈에는 붙어 보였다. 밑변을 --cs-gap8 만큼 더 걷어 올려 16px 이상으로 벌린다
+     (17.6 / 18.4 / 19.2 / 20.9). 레일 폭·윗변·무대·초상 레일은 불변 —
+     줄어드는 것은 레일 판 자기 높이뿐이고 젬 3단(206px)은 그대로 들어간다.
+     봉인(되돌리기): bottom calc(var(--cs-card) + var(--f2-w) * .03) */
+  bottom: calc(var(--cs-card) + var(--f2-w) * .03 + var(--cs-gap8));
   width: var(--cs-side);
   z-index: 5;
   display: flex;
@@ -50690,7 +50792,13 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
 }
 #charpanel .ci-plate {
   position: absolute;
-  left: calc(var(--f2-w) * .1455);         /* .1816 - .0361 (ci-id 기준) */
+  /* ① (0909) 관문 D — 초상칩(.ci-chip, 폭 .1469W)과 이름 판이 .0014W(390 폭
+     0.51px · PC 0.58px) 겹쳐 있었다. 판 왼변을 칩 오른변 **밖**으로 내보내고
+     그 사이를 --cs-gap8 로 벌린다(.ci-id 는 display:block + 자식 절대배치라
+     flex `gap` 이 안 먹는다 — 자리값으로 같은 틈을 준다).
+       .1469(칩 폭) + .0214(8px) = .1683W
+     봉인(되돌리기): left .1455W = .1816 - .0361 (ci-id 기준) */
+  left: calc(var(--f2-w) * .1469 + var(--cs-gap8));
   top:  calc(var(--f2-w) * .0122);         /* .0299 - .0177 */
   width: calc(var(--f2-w) * .3837);
   height: calc(var(--f2-w) * .1088);
@@ -50716,6 +50824,13 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  /* ① (0909) 관문 G — 잉크 세로 중심이 알약 안전 상자 중심보다 1.32~3.43px 위.
+     서체·크기·색은 승인값이라 **한 자리도 안 건드리고** 자리만 고친다.
+     글자 상자(이 요소)에만 padding-top 을 주면 잉크는 그 절반만큼 내려가고,
+     알약(.ci-plate)의 안전 상자는 그대로 있어 어긋남이 실제로 줄어든다
+     (.ci-plate 에 주면 안전 상자도 같이 내려가 상쇄된다 — 실측으로 갈랐다).
+     --cs-name-dy = .0120W → 잉크 이동 .0060W. 잔차 최대 0.96px (허용 ±1.5). */
+  padding-top: var(--cs-name-dy);
 }
 
 #charpanel .ci-tag {
@@ -50743,6 +50858,26 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   background: var(--f2-pill-soft);
   color: var(--f2-ink);
   text-shadow: none;
+}
+/* ③ (0909) 관문 F — 배지 글자 잉크가 알약 안전 상자를 좌·우로 최대 1.0px 넘쳤다
+   (「전략가」·「두근두근파」·「스피드러너」·「한 방파」 — 초성/종성마다 오버행이
+   다르다. 「버티기파」는 왼쪽만 통과했다).
+   ▣ 왜 padding 으로는 못 고치나 — 안전 상자는 «상자 − padding», 즉 **content box**
+     다. 알약이 글자에 딱 붙어 줄어드는 inline-flex 라 padding 을 키우면 바깥만
+     같이 커지고 content box 는 글자 advance 그대로다(실측: 바깥 35.2 · 안전 20.8
+     · 잉크 23.0 — padding 7.1 을 10 으로 키워도 안전은 20.8 그대로).
+   ▣ 그래서 알약을 글자에 붙이지 않고 **시안 실측 폭**으로 세운다. 이 부품의 원
+     실측이 97.45 x 34.92(735 기준)라 폭 = 97.45/735 = .1326W 이고, 지금 우리
+     알약은 .094~.131W 사이를 글자 길이대로 떠돌고 있었다 — 시안은 고정폭이다.
+     가로 인셋을 .0100W 로 낮춰 안전 상자를 .1126W(390 폭 42.1px)로 넓히면
+     최장 글자(advance 35px)에도 좌우 3.5px 씩 남는다.
+   ▣ 범위 — 캐릭창의 두 알약(.ci-tag-v · #cp-side-rec)만. 공용 킷
+     .kit-pill-v2[data-variant="soft"] 자체(기록 값 등 다른 화면)는 안 건드린다.
+   봉인(되돌리기): 이 블록을 지우면 종전 «글자에 붙는 알약»으로 돌아간다. */
+#charpanel .ci-tag-v,
+#charpanel #cp-side-rec {
+  min-width: var(--cs-pill-w);
+  padding-inline: var(--cs-pill-px);
 }
 
 /* ---- 스탯 게이지 넷 (보석 자리 포함) ------------------------------------ */
@@ -51184,7 +51319,13 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
      맡는다(.cp-tight / .cp-tight-2) — 상자를 더 늘리는 대신 글자를 줄인다. */
   top:    calc(var(--f2-w) * .1580);
   width:  calc(var(--f2-w) * .3728);
-  height: calc(var(--f2-w) * .3230);
+  /* E (0909) 관문 min-gap 패시브카드 ↔ 완료버튼 — 실측 5.58(360)~6.62(PC)px 로
+     최소 8px 미달이었다. 버튼 줄(.cp-foot)은 카드 밑변에 매여 있으므로 상자
+     **밑변만** --cs-gap8 만큼 걷어 올린다(윗변 top·좌우 left/width 불변 →
+     이름 알약과의 위 여유도 그대로). 넘침 방어는 종전대로 fitDesc 가 맡는다.
+       .3230 - .0214 = .3016W   (390 폭 112.7px · 종전 120.7)
+     봉인(되돌리기): height .3230W */
+  height: calc(var(--f2-w) * .3230 - var(--cs-gap8));
   display: flex;
   flex-direction: column;
   gap: calc(var(--f2-w) * .008);
@@ -54883,7 +55024,17 @@ html[lang="en"] .mode-list [data-part="btn-picture"] .bp-badge[data-badge="stage
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: calc(var(--f2-w) * .1034) 0 0;
+  /* ② (0909) 관문 B — 배지(#cp-side-rec)가 젬랙 상자 위에 719~1251px² 올라타
+     있었다. 젬은 랙의 padding-top .1034W 아래에 있어 **그림은** 안 겹쳤지만,
+     랙 상자 자체가 사이드바 맨 위에서 시작해 배지를 통째로 품었고 — 반투명
+     알약 밑으로 크리스털 액자의 대각 면이 비쳐 사용자가 「배지가 삐뚤어
+     보인다」고 읽은 것이 이것이다(실측 rotate/skew 는 0.00deg).
+     그래서 배지 한 줄(--cs-side-rec = top .0240W + 높이 .0475W + 8px)을
+     margin 으로 떼어 내고, 그만큼을 padding 에서 뺀다 — **젬은 한 화소도
+     안 움직인다**(.0929 + .0105 = .1034W, 종전과 같은 자리).
+     봉인(되돌리기): padding: calc(var(--f2-w) * .1034) 0 0; margin-top 삭제 */
+  margin-top: var(--cs-side-rec);
+  padding: calc(var(--f2-w) * .1034 - var(--cs-side-rec)) 0 0;
   gap: calc(var(--f2-w) * .0348);
   z-index: 2;
 }
@@ -55431,7 +55582,16 @@ html[lang="en"] .mode-list [data-part="btn-picture"] .bp-badge[data-badge="stage
    = 0.099%W) 만큼 내려온 자리다. 띠 높이는 정본 --wf-tab-h 7.005%W 이고,
    담는 상자(카드 내용 폭)가 판보다 2*--f2-bd 좁으므로 그만큼 키워 적는다. */
 #charpanel .cp-card > .cp-tabs{
-  margin: calc(var(--f2-bd) * -1 + .099%) calc(var(--f2-bd) * -1) 0;
+  /* C (0909) 관문 overlap 카테고리탭바 ↔ 카드본체 (390 폭 4px² · 간격 -0.01px).
+     탭 띠는 `height:0 + padding-top:%` 로 서 있어 밑변이 본체 윗변과 **정확히**
+     맞닿고, 그 자리에서 서브픽셀이 어느 쪽으로 떨어지느냐에 따라 교차가 생겼다
+     (0.01px x 375px = 4px²). 둘 사이에 --cs-gap8 을 넣어 부호를 확정한다.
+     띠의 padding-top(=탭 버튼 높이)은 안 건드리므로 탭 그림은 그대로이고,
+     본체와 그 안의 정보층이 8px 내려간다 — 카드 상자(--cs-card = 본체 + 탭줄
+     .1047W + .0082W)는 실제 탭 띠(.0705W)보다 이미 넓어서 밑변 여유 안에서
+     흡수된다(390 폭 잔여 여유 7.8px · 360 6.7px).
+     봉인(되돌리기): margin-bottom 0 */
+  margin: calc(var(--f2-bd) * -1 + .099%) calc(var(--f2-bd) * -1) var(--cs-gap8);
   padding: calc(7.005% + var(--f2-bd) * .1401) 0 0;
 }
 /* 킷의 몸통 구분선 폐기 — 정본에는 **활성 탭 밑동에 선이 없다**(시안 실측).
