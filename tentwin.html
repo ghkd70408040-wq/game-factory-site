@@ -13390,7 +13390,12 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
       <span class="hchip" id="map-b2"><span class="hc-ico hc-score" aria-hidden="true"></span><b id="map-b2-v">0</b></span>
       <div id="map-plate">
         <button id="map-ch-prev" class="mp-arrow" type="button" data-i18n-aria="aria.chprev" aria-label="Previous chapter">&lsaquo;</button>
-        <span class="mp-txt"><b id="map-ch-k">CHAPTER 1</b><i id="map-ch-n">Chapter 1</i></span>
+        <!-- 0910 판정판 23 — 명판 글자가 «챕터 미니맵» 의 열기 손잡이가 된다
+             (DESIGN §14.2). span -> button 이지만 픽셀은 안 움직인다: 전역
+             `button` 리셋(:257)이 font/color/border/background 를 이미 상속으로
+             돌려놓고, 남은 UA padding 은 `#screen-map #map-plate .mp-txt{padding:0}`
+             한 줄이 지운다. 화살표 둘은 그대로 챕터를 한 칸씩 넘긴다. -->
+        <button id="map-chapter" class="mp-txt" type="button" aria-haspopup="dialog" data-i18n-aria="aria.minimap" aria-label="See all chapters"><b id="map-ch-k">CHAPTER 1</b><i id="map-ch-n">Chapter 1</i></button>
         <button id="map-ch-next" class="mp-arrow" type="button" data-i18n-aria="aria.chnext" aria-label="Next chapter">&rsaquo;</button>
       </div>
       <button id="map-char" class="mfbtn mfbtn-l" type="button" data-i18n-aria="aria.charopen" aria-label="Choose your character"><span data-i18n="pick.title">Character</span></button>
@@ -14969,6 +14974,31 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
        구 --lib-panel-cream / --lib-panel-main 선언(SECTION 25-5)은 지우지 않았다:
        .jbox 가 !important 로 덮으므로 값만 잠들 뿐이고, 롤백은 마크업의 jbox 두
        낱말을 지우는 것으로 끝난다. -->
+  <!-- ============================================================
+       ===== 챕터 미니맵 (DESIGN §14 · 판정판 23번, 2026-09-10) =====
+
+       하단 명판(#map-chapter)을 누르면 열린다. 챕터 10개를 한 판에 놓고,
+       탭하면 그 챕터로 이동한다(맵 스크롤·현재 위치 갱신·모달 닫힘).
+
+       새 그림 발주 0 · 새 파일 0:
+         · 판   = t2-plate-modal-pink 의 **새 인스턴스**(#modal-node 와 같은
+                  .r10m/.r10-panel/.r10-ribbon/.r10-x 문법 — 아래 CSS 는 그
+                  선택자 목록에 이 창의 이름을 더하기만 한다).
+         · 칸   = 캡슐·그림 버튼 문법(면 + 겉선 + 굽 + 좌상 광점)의 **변주**.
+         · 썸네일 = MAP_CHAPTERS[i].img 가 가리키는 --art-map-ch* 를 CSS 가
+                  background-size:cover 로 축소한다. 그림 파일이 없는 챕터는
+                  지금 지도가 쓰는 --art-map-bg 로 떨어진다.
+         · 자물쇠 = 기존 --lib-glyph-lock(지도 노드가 이미 쓰는 그 조각).
+       칸은 buildMinimap() 이 만든다 — 마크업에 챕터 10줄을 박아 두면
+       MAP_CHAPTERS 가 늘 때 두 자리를 고쳐야 한다.
+       ============================================================ -->
+  <div id="modal-minimap" class="modal r10m" hidden role="dialog" aria-modal="true" aria-labelledby="mm-h"><div class="sheet r10-panel jbox jbox--modal" data-part="modal-plate">
+    <div class="r10-ribbon"><h2 id="mm-h" data-i18n="minimap.title">Chapters</h2></div>
+    <button id="mm-close" class="r10-x x-btn" type="button" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
+    <div id="mm-grid" class="mm-grid"></div>
+    <p id="mm-sum" class="mm-sum"></p>
+  </div></div>
+
   <div id="modal-howto" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="howto-h"><div class="sheet jbox jbox--modal" data-part="modal-plate">
     <h2 id="howto-h" data-i18n="howto.title">How to play</h2>
     <button class="r10-x x-btn" type="button" data-w6x="howto-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
@@ -24814,6 +24844,13 @@ window.TT_SFX = {
       'map.plate8': 'Chapter 8: Sugar Prison',
       'map.plate9': 'Chapter 9: The Heart Room',
       'map.plate10': 'Chapter 10: The Throne',
+      /* --- 0910 챕터 미니맵 (DESIGN §14.10) — 챕터 이름은 위 map.plate* 재사용 */
+      'minimap.title': 'Chapters',
+      'minimap.locked': 'Clear stage {n} to unlock',
+      'minimap.sum': '{s} stars · {c}/10 chapters open',
+      'aria.minimap': 'See all chapters',
+      'aria.mmcell': 'Chapter {c}, {s} stars, {d} stages cleared',
+      'aria.mmlock': 'Chapter {c}, locked',
       'mode.arcade': 'Arcade',
       'mode.arcade.d': 'Endless. Chase your best.',
       'mode.daily.d': 'One board a day, for all.',
@@ -25920,6 +25957,13 @@ window.TT_SFX = {
       'map.plate8': '챕터 8: 설탕 감옥',
       'map.plate9': '챕터 9: 심장의 방',
       'map.plate10': '챕터 10: 왕좌',
+      /* --- 0910 챕터 미니맵 (DESIGN §14.10) — 챕터 이름은 위 map.plate* 재사용 */
+      'minimap.title': '챕터',
+      'minimap.locked': '{n}탄을 깨면 열려요',
+      'minimap.sum': '별 {s} · 열린 챕터 {c}/10',
+      'aria.minimap': '챕터 전체 보기',
+      'aria.mmcell': '챕터 {c}, 별 {s}개, {d}탄 클리어',
+      'aria.mmlock': '챕터 {c}, 잠김',
       'mode.arcade': '아케이드',
       'mode.arcade.d': '끝없이. 최고 기록에 도전해요.',
       'mode.daily.d': '하루 한 판 — 모두가 같은 판.',
@@ -40612,6 +40656,128 @@ window.TT_SFX = {
     mapFit();
   }
 
+  /* =========================================================================
+   * 챕터 미니맵 (DESIGN §14 · 판정판 23번, 2026-09-10)
+   *
+   * 왜 필요한가(실측): 명판의 화살표는 한 칸씩만 넘긴다. 10챕터를 훑으려면
+   * 최대 9번을 눌러야 하고, 어디까지 열렸는지·어느 챕터에 별이 몇 개인지는
+   * 화면 어디에도 없었다.
+   *
+   * 새 저장 필드 0 · 새 판정 함수 0 — 아래 넷은 전부 이미 있는 것을 읽는다:
+   *   chapFirst(c) · advStatus(n) · advStarsOf(n) · chapMax()
+   * ========================================================================= */
+
+  /** 챕터 c 의 별 합 (만점 = ADV_CHAPTER × 3). */
+  function mmStars(c) {
+    var f = chapFirst(c), s = 0;
+    for (var i = 0; i < ADV_CHAPTER; i++) s += advStarsOf(f + i);
+    return s;
+  }
+
+  /** 챕터 c 의 클리어 수 (만점 = ADV_CHAPTER). */
+  function mmClears(c) {
+    var f = chapFirst(c), d = 0;
+    for (var i = 0; i < ADV_CHAPTER; i++) if (advStatus(f + i) === 'clear') d++;
+    return d;
+  }
+
+  /** 칸의 이름 줄. 「챕터 3: 캔디 케인 사막」 에서 접두를 뗀다 — 바로 윗줄이
+      이미 `CHAPTER 3` 이라 그대로 쓰면 같은 말이 두 번 서고, 133px 짜리 칸에서
+      영문이 말줄임으로 잘린다. 출처는 그대로 map.plate<c> 하나다. */
+  function mmName(c) {
+    var s = t('map.plate' + c) || '';
+    var i = s.indexOf(':');
+    return i >= 0 ? s.slice(i + 1).replace(/^\s+/, '') : s;
+  }
+
+  /** 격자를 다시 짓는다. 열릴 때마다 부르고, 부팅 배선에서 한 번 부른다
+      (관문 컷 02b-modal-minimap 은 하네스가 판을 «드러내기만» 하므로 —
+      그때 격자가 비어 있으면 컷이 빈 판을 찍는다). */
+  function buildMinimap() {
+    var g = $('mm-grid');
+    if (!g || typeof document === 'undefined') return;
+    var last = chapMax();
+    g.innerHTML = '';
+    for (var c = 1; c <= MAP_CHAPTERS.length; c++) {
+      var lock = c > last;
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'mm-cell ' + (lock ? 'is-lock' : (c === mapChap ? 'is-cur' : 'is-open'));
+      b.setAttribute('data-c', String(c));
+      /* 썸네일 — 지도가 그 챕터에서 실제로 까는 그림을 그대로 축소한다.
+         MAP_CHAPTERS[i].img 가 빈 챕터는 지도와 같이 --art-map-bg 로 떨어진다. */
+      var img = (MAP_CHAPTERS[c - 1] || {}).img;
+      b.style.setProperty('--mm-thumb', 'var(' + (img || '--art-map-bg') + ')');
+      var st = mmStars(c), dn = mmClears(c);
+      if (lock) b.setAttribute('aria-disabled', 'true');
+      if (c === mapChap) b.setAttribute('aria-current', 'true');
+      b.setAttribute('aria-label', lock ? t('aria.mmlock', { c: c })
+                                        : t('aria.mmcell', { c: c, s: st, d: dn }));
+
+      var veil = document.createElement('span');
+      veil.className = 'mm-veil';
+      veil.setAttribute('aria-hidden', 'true');
+      b.appendChild(veil);
+
+      var k = document.createElement('b');
+      k.className = 'mm-k';
+      k.textContent = 'CHAPTER ' + c;
+      b.appendChild(k);
+
+      var nm = document.createElement('i');
+      nm.className = 'mm-n';
+      nm.textContent = mmName(c);
+      b.appendChild(nm);
+
+      /* 진행도 — 잠긴 칸도 줄을 **비우지 않는다**(둘 다 0). 줄이 사라지면 칸
+         높이가 흔들려 격자가 어긋난다(DESIGN §14.5). */
+      var p = document.createElement('span');
+      p.className = 'mm-p';
+      p.textContent = '\u2605 ' + st + '/' + (ADV_CHAPTER * 3)
+                    + ' \u00B7 \u2714 ' + dn + '/' + ADV_CHAPTER;
+      b.appendChild(p);
+
+      if (lock) {
+        var lk = document.createElement('span');
+        lk.className = 'mm-lock';
+        lk.setAttribute('aria-hidden', 'true');
+        b.appendChild(lk);
+      }
+      g.appendChild(b);
+    }
+    setText('mm-sum', t('minimap.sum', { s: advStarTotal(), c: last }));
+  }
+
+  function openMinimap() {
+    buildMinimap();
+    openModal('modal-minimap');
+  }
+
+  function closeMinimap() { closeModal('modal-minimap'); }
+
+  /** 칸을 골랐다. 잠긴 칸은 **이동하지 않는다** — 흔들림 + 토스트 한 줄이다. */
+  function mmPick(c) {
+    if (!(c >= 1) || c > MAP_CHAPTERS.length) return;
+    if (c > chapMax()) {
+      var cell = document.querySelector
+        ? document.querySelector('#mm-grid .mm-cell[data-c="' + c + '"]') : null;
+      if (cell && cell.classList) {
+        cell.classList.remove('mm-shake');
+        void cell.offsetWidth;               /* 애니메이션 재시작 (badgePop 과 같은 처방) */
+        cell.classList.add('mm-shake');
+      }
+      toast(t('minimap.locked', { n: chapFirst(c) - 1 }));
+      J.sfx.fail();
+      return;
+    }
+    mapChap = c;
+    mapPage = 0;
+    J.sfx.ui();
+    closeMinimap();
+    buildMap();          /* 배경·틴트·노드 10·명판을 그 챕터 값으로 */
+    mapCenterCurrent();  /* 그 챕터의 앵커 오프셋으로 가로 스크롤 */
+  }
+
   /** 챕터를 한 칸 옮긴다. 열린 챕터 밖으로는 나가지 않는다. */
   function mapGoChapter(d) {
     if (SIAN_MAP) {
@@ -42931,6 +43097,17 @@ window.TT_SFX = {
     on($('map-rec'), 'click', function () { J.sfx.ui(); openRank('endless'); });
     on($('map-ch-prev'), 'click', function () { mapGoChapter(-1); });
     on($('map-ch-next'), 'click', function () { mapGoChapter(1); });
+    /* 0910 챕터 미니맵. 칸 10개에 각각 거는 대신 격자 하나에 위임한다 —
+       buildMinimap() 이 열릴 때마다 칸을 새로 만들기 때문이다. */
+    on($('map-chapter'), 'click', function () { openMinimap(); });
+    on($('mm-close'), 'click', function () { closeMinimap(); });
+    on($('mm-grid'), 'click', function (e) {
+      var el = e && e.target;
+      var cell = (el && el.closest) ? el.closest('.mm-cell') : null;
+      if (!cell) return;
+      mmPick(parseInt(cell.getAttribute('data-c'), 10) || 0);
+    });
+    buildMinimap();
     on($('map-path'), 'click', function (ev) {
       /* 드래그와 탭의 구분 (§A): 6px 를 넘게 움직였으면 이 클릭은 탐험의
          부산물이지 선택이 아니다. 브라우저는 둘을 구분해 주지 않으므로
@@ -43400,6 +43577,9 @@ window.TT_SFX = {
         /* 모험의 두 시트. 미션 카드는 지도 위에 떠 있으므로 먼저 닫히고, 결과
          * 시트는 닫는 것이 아니라 **지도로 돌아가는 것**이다 — 그냥 닫으면
          * 판이 끝난 화면에 갇힌다. */
+        /* 0910 — 챕터 미니맵. 지도 위의 한 겹이고 노드 카드보다 나중에 뜰 수
+           없다(미니맵을 닫아야 노드가 열린다)므로 노드 앞자리다. */
+        if ($('modal-minimap') && !$('modal-minimap').hidden) { closeMinimap(); return; }
         if ($('modal-node') && !$('modal-node').hidden) { closeModal('modal-node'); return; }
         if ($('modal-adv') && !$('modal-adv').hidden) {
           closeModal('modal-adv');
@@ -53778,6 +53958,7 @@ html[lang="en"] .mode-list [data-part="btn-picture"] .bp-badge[data-badge="stage
 #modal-daily .sheet > h2,
 #modal-clear .sheet > h2,
 #modal-rank .sheet > h2,
+#modal-minimap .r10-ribbon,
 #modal-node .r10-ribbon,
 #modal-mode .r10-ribbon,
 #modal-classic .r10-ribbon,
@@ -54012,7 +54193,8 @@ html[lang="en"] .mode-list [data-part="btn-picture"] .bp-badge[data-badge="stage
   #modal-daily .sheet > h2,
   #modal-clear .sheet > h2,
   #modal-rank .sheet > h2,
-  #modal-node .r10-ribbon,
+  #modal-minimap .r10-ribbon,
+#modal-node .r10-ribbon,
   #modal-mode .r10-ribbon,
   #modal-classic .r10-ribbon,
   #charpanel #cp-h,
@@ -54047,7 +54229,8 @@ html[lang="en"] .mode-list [data-part="btn-picture"] .bp-badge[data-badge="stage
   #modal-daily .sheet > h2::before,
   #modal-clear .sheet > h2::before,
   #modal-rank .sheet > h2::before,
-  #modal-node .r10-ribbon::before,
+  #modal-minimap .r10-ribbon::before,
+#modal-node .r10-ribbon::before,
   #modal-mode .r10-ribbon::before,
   #modal-classic .r10-ribbon::before,
   #charpanel #cp-h::before,
@@ -56141,6 +56324,7 @@ html[lang="en"] .mode-list [data-part="btn-picture"] .bp-badge[data-badge="stage
 #modal-daily .sheet > h2,
 #modal-clear .sheet > h2,
 #modal-rank .sheet > h2,
+#modal-minimap .r10-ribbon,
 #modal-node .r10-ribbon,
 #modal-mode .r10-ribbon,
 #modal-classic .r10-ribbon,
@@ -56229,6 +56413,7 @@ html[lang="en"] .mode-list [data-part="btn-picture"] .bp-badge[data-badge="stage
 #modal-daily .sheet > h2,
 #modal-clear .sheet > h2,
 #modal-rank .sheet > h2,
+#modal-minimap .r10-ribbon,
 #modal-node .r10-ribbon,
 #modal-mode .r10-ribbon,
 #modal-classic .r10-ribbon,
@@ -56329,6 +56514,7 @@ html[lang="en"] .mode-list [data-part="btn-picture"] .bp-badge[data-badge="stage
 #modal-daily .sheet > h2::before,
 #modal-clear .sheet > h2::before,
 #modal-rank .sheet > h2::before,
+#modal-minimap .r10-ribbon::before,
 #modal-node .r10-ribbon::before,
 #modal-mode .r10-ribbon::before,
 #modal-classic .r10-ribbon::before,
@@ -56401,6 +56587,7 @@ html[lang="en"] .mode-list [data-part="btn-picture"] .bp-badge[data-badge="stage
 #modal-daily .sheet > h2,
 #modal-clear .sheet > h2,
 #modal-rank .sheet > h2,
+#modal-minimap .r10-ribbon,
 #modal-node .r10-ribbon,
 #modal-mode .r10-ribbon,
 #modal-classic .r10-ribbon,
@@ -56470,6 +56657,7 @@ html[lang="en"] .mode-list [data-part="btn-picture"] .bp-badge[data-badge="stage
   --wcap-w: calc(56.84% + var(--f2-w) * .09141 + 1.1368px);
   --wcap-panT: calc(1px + var(--f2-w) * .0210);
 }
+#modal-minimap .r10-ribbon,
 #modal-node .r10-ribbon,
 #modal-mode .r10-ribbon,
 #modal-classic .r10-ribbon{
@@ -56953,6 +57141,7 @@ html[lang="en"] #modal-arc.is-arcdmg .sheet > h2{ --ttl:url("catalog/ttl-arcdmg-
 @media (max-width: 400px) {
   .r10-ribbon > h2 { font-size: 17px; }
 }
+#modal-minimap .r10-ribbon > h2,
 #modal-node .r10-ribbon > h2,
 #modal-mode .r10-ribbon > h2,
 #modal-classic .r10-ribbon > h2 {
@@ -56964,6 +57153,7 @@ html[lang="en"] #modal-arc.is-arcdmg .sheet > h2{ --ttl:url("catalog/ttl-arcdmg-
 }
 
 #modal-arcade .sheet.r10-panel { text-align: center; }
+#modal-minimap .sheet.r10-panel,
 #modal-node .sheet.r10-panel {
   border-image: none;
   border-style: none;
@@ -57712,6 +57902,7 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
        modal-mode      모드 시트 닫기 (Esc)
        modal-classic   클래식 허브 닫기 (Esc)
        modal-arcade    아케이드 허브 닫기 (Esc)
+       modal-minimap   챕터 미니맵 닫기 (Esc)            ← 0910 추가 (지도 위의 한 겹)
        modal-node      미션 카드 닫기 (Esc)
        modal-adv       닫고 지도로 (Esc)
        modal-tutorial  튜토리얼 건너뛰기 (Esc → finishTutorial) — 첫 실행 오프닝
@@ -57742,6 +57933,11 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
 
     /* 2) 자기 닫기 버튼만 아는 시트 여섯 (위 SELF_BACK) */
     if (selfBack()) return true;
+
+    /* 2.5) 챕터 미니맵 — 지도 위의 한 겹(0910). 아래 3) 의 openSheet 가
+       .modal 이라 어차피 잡지만, 화면키 표에 이름이 있는 분기가 하나도
+       없으면 다음 사람이 «여기는 누가 맡나» 를 다시 찾게 된다. */
+    if (isOpen('modal-minimap')) { esc(); return true; }
 
     /* 3) Esc 사슬이 아는 시트가 떠 있으면 가장 위 한 겹을 닫는다 */
     if (openSheet()) { esc(); return true; }
@@ -59313,6 +59509,174 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
   #charpanel .cp-side-rack .cp-gem-n { background: var(--f2-tab-on); box-shadow: inset 0 0 0 calc(var(--f2-w) * .0022) #6B5A69; }
   /* 클래식 시간·점수 캡슐 — 채움(color-mix) 이 통째로 무효가 되던 것. face 토큰 단색. */
   #app.classic #ch-cap.wf-cap { background-image: none; background-color: var(--wcap-face); box-shadow: inset 0 0 0 var(--wcap-L3-w) var(--wcap-L3-line); border-radius: calc(var(--wcap-h) * .5); }
+}
+</style>
+
+<style id="chapter-minimap-0910">
+/* ============================================================
+   챕터 미니맵 (DESIGN §14 · 판정판 23번, 2026-09-10)
+
+   이 블록이 «새로» 그리는 것은 **격자와 칸** 둘뿐이다. 판·리본·닫기 X 는
+   위에서 선택자 목록에 이름만 더했고(P3), 썸네일은 지도가 이미 물고 있는
+   --art-map-ch* 를 축소한 것이라 파일이 한 개도 안 는다.
+   칸의 문법은 하단 띠의 그림 버튼(.mfbtn)과 같다: 면 + 2.5px 겉선 +
+   3px 굽 + 좌상 광점. 새 시각 언어 0.
+   ============================================================ */
+
+/* 명판 글자가 <button> 이 됐다(P1). UA 의 padding 1px 6px 만 지운다 —
+   나머지(font·color·border·background)는 전역 button 리셋(:257)이 이미
+   상속으로 돌려놨다. 02-map 컷의 화소는 이 한 줄로 무변이 된다. */
+#screen-map #map-plate .mp-txt { padding: 0; }
+
+#modal-minimap .sheet { gap: 10px; }
+
+/* ---- 격자 -----------------------------------------------------------------
+   2열 **고정**이다(auto-fill 이 아니다). 390 과 1280 이 같은 그림이어야
+   레이아웃 관문의 판정이 하나로 남는다(DESIGN §14.8). */
+#mm-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+}
+
+/* ---- 챕터 칸 (컴포넌트 t3-cell-minimap-chapter) ----------------------------
+   높이는 cqw 가 아니라 **썸네일 종횡비**가 정한다 — 1280 에서 판이 안 늘어나므로
+   (`.r10m .sheet` 의 --pw = min(360px,100%)) 칸도 안 늘어난다. */
+.mm-cell {
+  /* 교체점(hook) — 챕터 배경 그림 한 칸. buildMinimap() 이 챕터마다
+     style.setProperty 로 덮고, 여기 선언이 그 **기본값이자 폴백**이다
+     (MAP_CHAPTERS[i].img 가 빈 챕터 = 지도와 같은 --art-map-bg).
+     JS 만으로 붙이면 이 이름이 CSS 어디에도 «선언» 되지 않아 done-gate 의
+     (a)계열·(b)교체점이 둘 다 0 이 된다 — 실측으로 잡힌 자리다. */
+  --mm-thumb: var(--art-map-bg);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 1px;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  padding: 6px 8px 7px;
+  border: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  text-align: left;
+  background-color: #6B4A2E;
+  background-image: var(--mm-thumb);
+  background-repeat: no-repeat;
+  background-position: 50% 42%;
+  background-size: cover;
+  box-shadow:
+    inset 0 0 0 2.5px #4E2809,
+    inset 0 2.5px 0 rgba(255, 255, 255, .22),
+    0 3px 0 #67380F,
+    0 6px 14px rgba(83, 28, 40, .22);
+}
+/* 글자가 앉는 자리만 어둡게. 그림 위 흰 글자의 대비를 판이 아니라 **이 층**이
+   책임진다(0909 「대비는 글자 쪽으로만」 계약과 같은 층 분리). */
+.mm-veil {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background-image: linear-gradient(180deg, rgba(30, 12, 24, 0) 30%, rgba(30, 12, 24, .74) 100%);
+  pointer-events: none;
+}
+.mm-k, .mm-n, .mm-p {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 0 rgba(40, 14, 26, .85);
+}
+.mm-k {
+  font-family: var(--font-display);
+  font-size: 9px;
+  letter-spacing: .5px;
+  font-weight: 700;
+  color: #FFE9B8;
+}
+.mm-n {
+  font-style: normal;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: -.01em;
+  color: #FFFFFF;
+}
+.mm-p {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: -.01em;
+  color: #FFE0B0;
+}
+
+/* ---- 상태 변주 셋 ---------------------------------------------------------- */
+/* 현재 챕터 — 강조 링 한 겹(겉선 안쪽). 크기·자리는 안 바뀐다. */
+.mm-cell.is-cur {
+  box-shadow:
+    inset 0 0 0 3px #FFC94A,
+    inset 0 0 0 5.5px #4E2809,
+    inset 0 5.5px 0 rgba(255, 255, 255, .22),
+    0 3px 0 #67380F,
+    0 6px 14px rgba(83, 28, 40, .28);
+}
+/* 잠김 — 회색은 filter 가 아니라 **배경 혼합**으로 만든다. filter 를 칸에 걸면
+   자식(자물쇠 조각)까지 같이 회색이 되고, 지도 노드가 saturate 를 되돌리느라
+   쓴 그 우회(1/.75)를 여기서 또 쓰게 된다. luminosity 혼합은 배경층에서만 돈다. */
+.mm-cell.is-lock {
+  background-color: #8A8590;
+  background-blend-mode: luminosity;
+}
+.mm-cell.is-lock .mm-veil {
+  background-image: linear-gradient(180deg, rgba(30, 12, 24, .40) 0%, rgba(30, 12, 24, .82) 100%);
+}
+.mm-cell.is-lock .mm-n { color: rgba(255, 255, 255, .72); }
+.mm-cell.is-lock .mm-p { color: rgba(255, 224, 176, .58); }
+/* 자물쇠는 **우상 모서리**다. 가운데(top 34%)에 두었더니 「CHAPTER 10」 의 0 위에
+   얹혔다(300% 실측): 칸 73px 에서 자물쇠 잉크 19~49% vs 글자 블록 36~90% 이라
+   첫 줄과 겹치는 구간이 생긴다. 글자는 아래 정렬(justify-content:flex-end)이라
+   위 22px 띠는 어느 챕터에서도 비어 있다 — 그 자리로 옮긴다(크기·조각·색 무변). */
+.mm-lock {
+  position: absolute;
+  right: 5px;
+  top: 4px;
+  z-index: 2;
+  width: 19px;
+  height: 19px;
+  background-image: var(--lib-glyph-lock);
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+  background-size: contain;
+  filter: drop-shadow(0 1px 0 rgba(40, 14, 26, .6));
+}
+
+/* 눌림 — 굽(3px)을 먹고 내려앉는 그 문법 그대로. */
+.mm-cell:active { transform: translateY(2px); }
+.mm-cell.is-lock:active { transform: none; }
+
+/* 잠긴 칸을 눌렀을 때. 새 소리는 안 만든다(J.sfx.fail). */
+@keyframes mm-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-4px); }
+  40% { transform: translateX(4px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(2px); }
+}
+.mm-cell.mm-shake { animation: mm-shake 200ms var(--ease); }
+@media (prefers-reduced-motion: reduce) {
+  .mm-cell.mm-shake { animation: none; }
+}
+
+/* ---- 판 아래 요약 한 줄 ----------------------------------------------------- */
+.mm-sum {
+  margin: 0;
+  text-align: center;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: -.01em;
+  color: var(--prim-art-ink);
 }
 </style>
 </body>
