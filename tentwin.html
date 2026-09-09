@@ -21,6 +21,135 @@
 <meta name="color-scheme" content="dark light">
 <title>TenTwin</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='rgb(22,19,31)'/%3E%3Crect x='7' y='13' width='25' height='25' rx='6' fill='rgb(102,217,240)'/%3E%3Crect x='32' y='26' width='25' height='25' rx='6' fill='rgb(240,125,102)'/%3E%3C/svg%3E">
+<!-- ==PLATFORM-FLAG:BEGIN== DESIGN §17 W1 · 판정판 31 — 런타임 플랫폼 플래그 (web / twa)
+     ────────────────────────────────────────────────────────────────────────────
+     왜 여기(head 맨 앞, ==RELEASE== 블록 **밖**)인가:
+       ① `scratchpad/release-0908/apply-head.py` 가 ==RELEASE:BEGIN..END== 를 통째로
+          생성·교체한다. 그 안에 넣으면 다음 릴리스에서 조용히 사라진다.
+       ② 본문 파싱 **전**에 `<html data-platform>` 이 서야 첫 페인트부터 CSS 가 맞는다.
+          (lang 선행 힌트 블록이 같은 이유로 head 에 있다 — :13101 주석)
+
+     판정 우선순위(§17 W1 ①) — 위에서 맞으면 아래는 보지 않는다:
+       ⑴ `?platform=web|twa`   — 명시가 최우선(관문·디버깅·TWA startUrl 이 쓴다)
+       ⑵ `document.referrer` 가 `android-app://com.ghkd.tentwin` 로 시작 — TWA 실행
+       ⑶ `(display-mode: standalone)` — 설치 실행. 비동기 보조 `getInstalledRelatedApps()`
+          는 **진단으로만** 남기고 판정을 뒤집지 않는다(세션 중 UI 뒤집기 금지).
+       ⑷ 그 외 전부 `web` — 안전 편향. 틀리면 앱 전용 요소가 숨을 뿐이고,
+          반대(웹에서 앱 전용 노출)가 사고다.
+
+     `store`(localStorage `tentwin.v1`)에 **저장하지 않는다**: 웹과 TWA 는 같은 오리진이라
+     localStorage 를 공유한다. 저장하면 브라우저에서 한 번 연 값이 앱에 새고, 그 반대도 된다.
+     플래그는 매 로드마다 새로 판정한다.
+     ──────────────────────────────────────────────────────────────────────────── -->
+<style id="platform-gate">
+/* 앱 전용 표식(§17 W1 ②). 정본은 JS 가 붙이는 `hidden` 이고 이 규칙은 그 위에 얹는
+   보험이다 — `.screen{display:flex}` 처럼 [hidden] 을 덮어쓰는 선언이 이 파일에 많다.
+   지금 `[data-app-only]` DOM 은 **0개**다. 규약과 관문을 먼저 세우고, 앱 전용 요소가
+   생길 때 이 표식만 붙이면 웹에서 자동으로 사라진다. */
+html[data-platform="web"] [data-app-only]{display:none !important}
+</style>
+<script>
+(function(){
+  var D = document.documentElement;
+  var TW = window.TW = window.TW || {};
+  var APP_REFERRER = 'android-app://com.ghkd.tentwin';
+
+  /* ---- 1. 판정 (⑴→⑵→⑶→⑷) ------------------------------------------------ */
+  var p = 'web', src = 'default';
+  var q = null;
+  try { q = new URLSearchParams(location.search).get('platform'); } catch (e) {}
+  if (q !== null && q !== undefined) q = String(q).toLowerCase();
+
+  if (q === 'twa' || q === 'web') {
+    p = q; src = 'query';
+  } else {
+    var ref = '';
+    try { ref = String(document.referrer || ''); } catch (e2) {}
+    if (ref.indexOf(APP_REFERRER) === 0) {
+      p = 'twa'; src = 'referrer';
+    } else {
+      var stand = false;
+      try { stand = !!(window.matchMedia && window.matchMedia('(display-mode: standalone)').matches); } catch (e3) {}
+      if (stand) { p = 'twa'; src = 'standalone'; }
+    }
+  }
+
+  TW.platform = p;                 /* 'web' | 'twa' — 이 세션의 정본 값 */
+  TW.platformSource = src;         /* 'query' | 'referrer' | 'standalone' | 'default' */
+  TW.isApp = (p === 'twa');
+  TW.relatedApps = null;           /* 비동기 보조 결과 — 판정에 쓰지 않는다 */
+  D.setAttribute('data-platform', p);
+
+  /* ---- 2. 앱 전용 표식 게이트 ---------------------------------------------- */
+  var BK = 'data-app-only-tabindex';   /* 원래 tabindex 백업 칸 */
+  var FOCUSABLE = 'a[href],button,input,select,textarea,iframe,summary,[tabindex],[contenteditable]';
+
+  function tabOut(el) {
+    if (el.hasAttribute('tabindex')) {
+      if (!el.hasAttribute(BK)) el.setAttribute(BK, el.getAttribute('tabindex'));
+    } else if (!el.hasAttribute(BK)) {
+      el.setAttribute(BK, '');
+    }
+    el.setAttribute('tabindex', '-1');
+  }
+
+  function tabBack(el) {
+    if (!el.hasAttribute(BK)) return;
+    var v = el.getAttribute(BK);
+    if (v === '') el.removeAttribute('tabindex');
+    else el.setAttribute('tabindex', v);
+    el.removeAttribute(BK);
+  }
+
+  /* 웹이면 `hidden` + 탭 순서 제외, 앱이면 원복. 여러 번 불러도 같은 상태(멱등).
+     반환 = 손댄 개수. 나중에 DOM 을 만들어 넣는 코드는 이 함수를 다시 부르면 된다. */
+  function applyPlatformGates(root) {
+    var scope = root || document, list;
+    try { list = scope.querySelectorAll('[data-app-only]'); } catch (e) { return 0; }
+    var web = (TW.platform === 'web'), n = 0;
+    for (var i = 0; i < list.length; i++) {
+      var el = list[i], j, f;
+      if (web) {
+        el.hidden = true;
+        el.setAttribute('aria-hidden', 'true');
+        try { if ('inert' in el) el.inert = true; } catch (e4) {}
+        tabOut(el);
+        f = el.querySelectorAll(FOCUSABLE);
+        for (j = 0; j < f.length; j++) tabOut(f[j]);
+      } else {
+        el.hidden = false;
+        el.removeAttribute('aria-hidden');
+        try { if ('inert' in el) el.inert = false; } catch (e5) {}
+        tabBack(el);
+        f = el.querySelectorAll('[' + BK + ']');
+        for (j = 0; j < f.length; j++) tabBack(f[j]);
+      }
+      n++;
+    }
+    return n;
+  }
+  TW.applyPlatformGates = applyPlatformGates;
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () { applyPlatformGates(); });
+  } else {
+    applyPlatformGates();
+  }
+
+  /* ---- 3. 비동기 보조 — 기록만 하고 판정을 바꾸지 않는다 --------------------- */
+  try {
+    if (navigator.getInstalledRelatedApps) {
+      navigator.getInstalledRelatedApps().then(function (apps) {
+        TW.relatedApps = (apps || []).map(function (a) { return (a && (a.id || a.url)) || ''; });
+        if (TW.relatedApps.length && TW.platform === 'web') {
+          try { console.info('[tentwin] platform: 관련 앱 설치가 보이지만 이번 세션 판정은 web 으로 고정한다(뒤집기 금지)'); } catch (e6) {}
+        }
+      })['catch'](function () {});
+    }
+  } catch (e7) {}
+})();
+</script>
+<!-- ==PLATFORM-FLAG:END== -->
 <style>
 /* ==DISPLAY-FONT:BEGIN== generated by tools/subset-display-font.js — do not edit by hand */
 /*
