@@ -42947,10 +42947,34 @@ window.TT_SFX = {
     return b;
   }
 
+  /* [CS37-0910 · 판정판 37] 칸 그리드가 따르는 캐릭터 = «구경 중»인 캐릭터.
+   * DESIGN §17.9 ① 의 열린 항목을 닫는다 — 종전엔 charId()(고른 캐릭터)만
+   * 따라서, 레일 방울을 넘겨 다른 캐릭터를 보고 있어도 칸은 그대로였다.
+   *
+   * 근거 값은 레일의 현재 인덱스 cpIdx **하나뿐**이다. 새 상태를 만들지 않는다 —
+   * 펫 판이 cpPetView 로, 스킨 시트가 skinTargetId() 로 이미 쓰는 그 문법
+   * («구경»과 «결정»을 가르는 값)을 아이템 칸도 그대로 쓴다. 실제로 위의
+   * syncSidePanes() 는 배지 문구를 이미 HERO_IDS[cpIdx] 로 그리고 있었다 —
+   * 같은 레일 안에서 배지와 칸이 서로 다른 캐릭터를 말하던 것이 결함이었다.
+   *
+   * 패널이 닫혀 있으면 charId() 로 되돌린다: cpIdx 는 지난 세션의 잔값일 수 있고,
+   * 보이지 않는 곳에서 남의 칸을 건드리면 안 된다. 그래서 Game.toggleItem 손잡이의
+   * 패널 밖 동작은 착수 전과 **한 글자도 같다**.
+   *
+   * 저장 규칙은 §17.5 그대로다 — store.items.eq 는 원래부터 **캐릭터별**
+   * ({ <charId>: [itemId,…] }) 이라 새 키도, 새 스키마도, 소독 변경도 0 이다.
+   * 「선택 완료」(cpConfirm)는 여전히 store.charId 만 옮긴다: 구경하며 끼운 것은
+   * 그 캐릭터 칸에 이미 저장돼 있으므로 옮길 것이 없다. */
+  function cpItemCharId() {
+    var el = $('charpanel');
+    if (!el || el.hidden) return charId();
+    return HERO_IDS[cpIdx] || charId();
+  }
+
   function syncItemList() {
     var wrap = $('cp-item-list');
     if (!wrap) return;
-    var cid = charId(), eq = itemsEq(cid), own = (store.items && store.items.own) || {};
+    var cid = cpItemCharId(), eq = itemsEq(cid), own = (store.items && store.items.own) || {};
     wrap.innerHTML = '';
     var n = 0, i, it, lv, val;
     for (i = 0; i < ITEM_POOL.length; i++) {
@@ -42984,7 +43008,9 @@ window.TT_SFX = {
     if (!it) return;
     var own = (store.items && store.items.own) || {};
     if (!(own[id] | 0)) return;
-    var cid = charId(), eq = itemsEq(cid).slice(), at = eq.indexOf(id), j;
+    /* [CS37-0910] 장착도 **칸이 그리고 있는 그 캐릭터**에 적용한다 — 그리는 쪽과
+       고치는 쪽이 다른 캐릭터를 보면 누른 칸과 켜지는 칸이 어긋난다. */
+    var cid = cpItemCharId(), eq = itemsEq(cid).slice(), at = eq.indexOf(id), j;
     if (at >= 0) {
       eq.splice(at, 1);
     } else {
@@ -43907,6 +43933,31 @@ window.TT_SFX = {
            뒤로가기 파수꾼도 합성 Escape 하나로 이 사슬을 태우므로, 안드로이드
            뒤로가기 역시 이 한 줄로 「확인 창만 닫힘」이 된다. */
         if ($('modal-confirm') && !$('modal-confirm').hidden) { closeConfirm(); return; }
+        /* [CS37-0910 · 판정판 37] 캐릭터 패널(z72) — 종전에는 이 사슬에 자리가
+           **없었다**(DESIGN §17.9 ②). 그래서 Esc 로는 안 닫히고 뒤로가기만
+           닫았다(step() 4번이 #cp-close 를 눌러서). 같은 창을 여는 문이 둘인데
+           나가는 문은 하나였던 것이다.
+           자리가 여기인 이유: 이 패널 위에 설 수 있는 겹은 확인 창(77)과 스킨
+           시트(73) 둘뿐이고, 확인 창은 바로 윗줄이 이미 가져갔으며 스킨은 아래
+           가지가 **직접 먼저** 닫는다. 그러므로 "가장 위의 것부터"라는 이 사슬의
+           규칙이 겹 순서 그대로 지켜진다(77 → 73 → 72 → 71 → …).
+           닫는 실체는 새 함수가 아니라 #cp-close 가 부르는 그 closeCharPanel 이다
+           — 나가는 문 둘이 같은 함수 하나를 쓴다.
+           getClientRects 를 같이 보는 이유는 뒤로가기 파수꾼의 vis() 와 같다:
+           #charpanel 은 position:fixed 라 offsetParent 가 늘 null 이고, hidden 을
+           벗었는데 아직 안 그려진 순간에 Esc 를 삼키지 않게 한다. */
+        var cpEsc = $('charpanel');
+        if (cpEsc && !cpEsc.hidden && cpEsc.getClientRects && cpEsc.getClientRects().length) {
+          /* ① 패널 위에 뜬 스킨 시트가 먼저다(z73 > z72). */
+          if ($('modal-skin') && !$('modal-skin').hidden) { closeSkins(); return; }
+          /* ② 능력치 ⓘ 말풍선은 패널 **안**의 한 겹이다 — 열려 있으면 그것만
+             닫는다. 말풍선을 남긴 채 패널을 닫으면 다음에 열 때 남의 설명이
+             떠 있게 되므로 closeCharPanel 도 closeStatTip 을 부르지만, 여기서는
+             «한 번 누르면 한 겹»이라는 이 사슬의 규칙이 먼저다. */
+          if (statTipOpen) { closeStatTip(); J.sfx.ui(); return; }
+          closeCharPanel();
+          return;
+        }
         if ($('modal-rank') && !$('modal-rank').hidden) { closeRank(); return; }
         // 10차 §C: 모드 시트는 메뉴 위에 떠 있는 한 겹이라 가장 먼저 닫힌다.
         if ($('modal-mode') && !$('modal-mode').hidden) { closeModeSheet(); return; }
@@ -58081,6 +58132,10 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
         그대로 재사용하면 정지↔재개만 오가며 앱을 영영 못 나간다(무한 루프).
      ② 캐릭터 패널(#charpanel)은 Esc 사슬에 없다 — 여기서는 #cp-close 를 눌러
         닫는다. Esc 사슬 자체는 건드리지 않는다(이 파도의 범위 밖).
+        [CS37-0910 갱신] Esc 사슬에 캐릭창 가지가 **생겼다**(확인 창 바로 다음).
+        그래도 이 줄은 tap('cp-close') 그대로 둔다 — esc() 로 바꾸면 사슬 맨
+        위의 컷툰 가지(cutList)를 먼저 타게 되어 뒤로가기의 겹 순서가 이 파일
+        두 곳으로 갈라진다. 두 문이 부르는 함수는 어차피 같다(closeCharPanel).
 
    그리는 것은 하나도 바꾸지 않는다(픽셀 diff 0). 키보드·마우스 동작도 그대로다
    — 이 코드가 도는 유일한 계기는 사용자가 뒤로가기를 눌렀을 때뿐이다.
@@ -58189,7 +58244,7 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
        modal-adv       닫고 지도로 (Esc)
        modal-tutorial  튜토리얼 건너뛰기 (Esc → finishTutorial) — 첫 실행 오프닝
        modal-howto     게임 방법 닫기 (Esc)
-       charpanel       cp-close
+       charpanel       cp-close                                z72  (Esc 도 같은 함수 ← CS37-0910)
        screen-story    컷 건너뛰기 (cutFinish(true))    ← 0909 추가. 없어서 앱이 죽었다
        modal-pause     Game.menu()   (Esc 는 resume — 일부러 다른 자리. 위 주석 ①)
        screen-map      leaveMap (Esc)
