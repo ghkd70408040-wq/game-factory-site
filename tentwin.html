@@ -13512,7 +13512,56 @@ html[data-platform="twa"] #app-intro.is-hold .api-char{
   --role-wcap-L3-line-modal-title-node: #76547A;
   --role-wslot-face-crystal: #D8C0D4;
   --role-wslot-L3-line-crystal: #6C4A72;
-  --role-modal-tint: rgba(255,242,255,.17);
+  /* [jelly-c 0910 · 모달 젤리판 재질 C + 시안 실측 투명도] ─────────────────
+     사용자 결정(판정판 4·21, 2026-09-10): 색은 후보 **C `#F7D8E6` · 겉선 `#8E5A72`**,
+     **투명도는 시안 실측값**. 시안 실측 정본 = scratchpad/jelly-c/SIAN-ALPHA.md
+       · 판 총 α = **0.52** (S4 플레이 모달 · 교차시안 회귀 N=3441 R²=.879
+                            + 두 판 겹침회귀 N=4096 R²=.715)
+       · 백드롭 블러 **0** (그래서 --modal-glass 는 손대지 않는다 — 현행이 이미 blur(0px))
+       · 겉선 골 FWHM ≈ **2.0 CSS px** (좌·우·상 평균)
+
+     ── 역산 근거 (감각이 아니라 산술이다) ──────────────────────────────
+     합성 순서는  bg → 틴트(background-color) → webp(border-image) 위  이므로
+         총 α = 1 − (1−a_w)(1−t)
+         판 색 P = [ a_w·M_webp + (1−a_w)·t·T ] / 총α
+     webp 광학상수 실측(scratchpad/jelly-material/CALIB.json · 검정/흰 배경 두 장 분리):
+         a_w = **0.5085** · M_webp = **#E8D8DE** = (232.06, 216.32, 222.22)
+     목표 총 α = 시안 0.52 →  t = 1 − (1−.52)/(1−.5085) = **0.0234**
+
+     ⚠ **한계를 숨기지 않는다.** C 목표 P=#F7D8E6 을 t=.0234 에서 만들려면
+     틴트 색 T = **(907, 190, 573)** 이 필요하다 — R·B 가 **색역 밖**이다.
+     그래서 채택값은 클램프한 `rgba(255,190,255,.0234)` 이고, 그때 실제 판 색은
+     **≈#E9D8DF** (현행 #E7D7DF 대비 ΔRGB ≈ 2) 다.
+     즉 **webp 가 총 α 의 .5085 를 이미 #E8D8DE 로 먹고 있어, 시안 α 에서는
+     틴트가 색을 1.1% 밖에 못 얹는다.** C 색과 시안 투명도를 **동시에** 가지려면
+     토큰으로는 불가능하고 **webp 재질색 자체를 갈아야 한다**(catalog/jelly-box.webp
+     재베이크 — 알파 보존 · 후속 발주. frames.tentwin.json todo 에 등재).
+
+     ── 적용 후 실측 (헤드리스 · 판 뒤 검정/흰 두 장 · scratchpad/jelly-c/APPLIED-MEASURE.json
+        · FINAL-CHECK.json · SCRIM-CHECK.json · 병렬 3화면 OPTICS.json) ─────────
+       · **총 α = 0.5203 ~ 0.5216** (표본 자리에 따라) → 시안 0.52 **적중**(±.01 안)
+       · 판 색 P = #E4D7DE ~ #E9D7DF (현행 A 는 #E8D8DE) → **ΔRGB ≈ 2 밖에 못 움직인다**.
+         위 클램프 천장 그대로다. 실패가 아니라 «토큰으로는 여기까지»라는 실측 결론이다.
+         webp 재질색을 갈면 같은 α .5085 에서 P #F6D8E4(크로마 29)까지 간다 — 그것이 후속 발주다.
+       · 판은 균일하지 않다: **열 방향 완전 균일**, 행 방향으로 판 높이 55~70% 자리에
+         한 띠만 α 0.63~0.67 로 솟는다(jelly-box.webp 가운데가 border-image `fill` 로
+         늘어난 재질층). 대표값은 그 띠를 뺀 **평탄부 중앙값**이다(판 안쪽 화소의 72%).
+       · ⚠ **판 밖의 발견**: 사용자가 보는 투과율은 판의 α 가 아니다. 모달 막
+         `#modal-*` 이 `rgba(88,64,112,.12)` + `blur(1px)` 을 한 겹 더 깔아
+         **끝에서 끝까지 α = 0.6301** 이다(판 .5216 + 막 .1085). 판을 시안에 맞춰도
+         뒤 화면은 37% 만 비친다. 막은 이 파도의 발주 범위 **밖**이라 손대지 않았다 —
+         「투명도가 전혀 안 나온다」의 남은 절반이 여기일 수 있다. 지휘자에게 올린다.
+
+     옛 값: --role-modal-tint: rgba(255,242,255,.17);  (0903 에 44701 에서 봉인된 값) */
+  --role-modal-tint: rgba(255,190,255,.0234);
+  /* [jelly-c 0910 · **링 은퇴**] box-shadow 링은 border-radius 사각을 따라 webp 스퀘어클
+     모서리와 어긋난다(지휘자 300% 실측: 모서리에서 호가 둘로 갈린다 — 판 겉선의 호 하나 +
+     링의 호 하나. scratchpad/jelly-c/COMPARE.png §5). 이미지판 작업 기준 「모서리 어긋남」이라
+     그대로 둘 수 없다. 겉선 색 #8E5A72 는 CSS 링이 아니라 **webp 겉선 재색**으로 내려야 한다 —
+     후속 발주(재질색 재베이크와 같은 건). 색 토큰은 그 자리를 잡아 두려고 **선언만 남긴다**.
+     되살리려면 -w 를 1.5px 로 되돌린다(그 한 자리뿐 — .jbox--modal 의 링 항은 지우지 않았다). */
+  --role-modal-ring: #8E5A72;
+  --role-modal-ring-w: 0;
 
 
   /* [E76-0908 norm-rest · 그룹 C] 남은 접두의 원시색을 이름만 이관 — 값 신설 0, 값 동일은 기존 토큰 붕괴.
@@ -47309,7 +47358,7 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
        구워져 있고 catalog 는 이 파도에서 무접촉이다. **미결로 올린다.**
      되돌리기: 아래 한 줄을 --modal-tint:#C6B7C8; 로 바꾼다.
      그 앞 봉인: --modal-tint:rgba(255,242,255,.17); */
-  --modal-tint:transparent;
+  --modal-tint:transparent;  /* [jelly-c 0910] 0910 부터 뒤쪽 jelly-box-core#2 의 선언이 이긴다 — 이 줄은 그대로 두되(캐스케이드에서 뒤가 이긴다) 사는 값은 저기 --modal-tint:var(--role-modal-tint) 다. */
   --modal-glass:blur(0px) saturate(1.06);
 }
 .jbox,
@@ -47355,7 +47404,19 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
        남는다(색역 밖 해). 그래서 **색상은 한 자리도 안 바꾼다** - 바꾼 것은
        offset-y . blur . alpha 셋뿐이다.
      되돌리기: 아래 한 줄을 --jbox-shadow:0 14px 34px rgba(83,28,40,.26); 로 바꾼다. */
-  --jbox-shadow:0 15.3px 5.1px var(--role-jbox-shadow-modal);
+  /* [jelly-c 0910 · 겉선 링] 사용자 선택 후보 C 의 겉선 #8E5A72 을 접지 그림자 **앞에** 얹는다.
+     굵기 근거: 시안 겉선 골 FWHM ≈ **2.0 CSS px**(좌·우·상 평균 · scratchpad/jelly-c/SIAN-ALPHA.md §6.
+     notch 는 4.9px 이지만 그건 낙하 그림자까지 포함한 홈 전체 폭이라 겉선이 아니다).
+     그중 **≈1.7px 는 webp(catalog/jelly-box.webp)가 이미 굽고 있으므로** 새 링은 그 위에
+     얇게만 얹는다 — 채택 **1.5px** = 판정판 4 의 후보 C 승인본이 쓴 그 굵기(사용자가 본 굵기).
+     접지 그림자 값은 **한 자리도 안 바꿨다** — 링만 앞에 붙였다.
+     되돌리기: 아래 한 줄을 --jbox-shadow:0 15.3px 5.1px var(--role-jbox-shadow-modal); 로 바꾼다.
+
+     [jelly-c 0910 · 링 은퇴 후] 링 항은 **지우지 않았다.** --role-modal-ring-w 가 `0` 이라
+     퍼짐 0 · 흐림 0 의 그림자는 아무것도 그리지 않으므로 **렌더 결과가 종전(접지 그림자만)과
+     같다**(실측 확인). 후속 파도가 값 한 자리(-w)만 바꾸면 링이 되살아나도록 자리를 남겨 둔 것이다.
+     은퇴 사유는 tokens-semantic 의 --role-modal-ring-w 옆에 있다. */
+  --jbox-shadow:0 0 0 var(--role-modal-ring-w) var(--role-modal-ring), 0 15.3px 5.1px var(--role-jbox-shadow-modal);
   /* W2.5 ⑤ — 값의 유래와 실측은 위 :root 의 --modal-tint/--modal-glass 주석.
      옛 값: --jbox-blur:blur(5px) saturate(1.18); (틴트는 등급에 없었다 —
      `.w6m` 소비처가 크림 .50 을 따로 들고 있었고 견본 둘은 무틴트였다). */
@@ -60863,6 +60924,14 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
     1px 0 0 rgba(43,71,99,.80),-1px 0 0 rgba(43,71,99,.80);}
 #app.battle .dh-me .dh-num {color:#16374E !important;text-shadow:0 1px 1px rgba(255,255,255,.80);}
 #app.battle .dh-me .dh-dmg {color:#255C82 !important;text-shadow:0 1px 1px rgba(255,255,255,.72);}
+/* [jelly-c 0910 · 태그 수리 (a)] 여기 있어야 할 style 닫는 태그가 빠져 있었다.
+   그래서 아래 두 개의 style 여는 줄(jelly-box-core · sian-hud-rebuild)이 HTML
+   태그가 아니라 **이 블록의 CSS 텍스트**로 흘러들었고, CSS 오류 복구가 각 쓰레기
+   토큰 뒤의 규칙 하나씩을 프렐류드째 삼켰다(실측: 정확히 2개 — 옛 58273 :root ·
+   옛 58445 #app.battle #duel-hud). 세 블록을 각자 세운다.
+   ⚠ 이 주석 안에 style 닫는 태그의 리터럴을 절대 쓰지 말 것 — HTML 파서는 raw
+     text 안에서 CSS 주석을 모르므로 거기서 블록이 끊긴다(0910 실측으로 확인). */
+</style>
 <style id="jelly-box-core">
 /* ============================================================
    공통 젤리박스 컴포넌트 `.jbox` — 다섯 자리가 **한 판**을 공유한다.
@@ -61018,6 +61087,22 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
      글자 가독은 판을 희생해 지키지 않는다 — 텍스트 헤일로(흰 그림자)가 이미
      모든 제목·본문에 붙어 있고, 그것이 이 파도에서 판을 밀 수 있는 이유다.
      옛 값: rgba(255,242,255,.40) · blur(0px) saturate(1.04) brightness(1.03) */
+  /* [은퇴 · jelly-c 0910] 은퇴 사유: 이 줄은 25d1a86b(0904)이 배포본에서 통째로
+     옮겨 온 **0903 이전 값**이고, 그 값 rgba(255,242,255,.17) 은 하루 뒤 ca872579
+     (0903)가 위 jelly-box-core#1 44701 에서 `--modal-tint:transparent` 로 바꾸며
+     주석에 "그 앞 봉인"이라 못박아 **이미 은퇴시킨 값**이다. style 닫는 태그
+     누락 덕에 지금까지 죽어 있었을 뿐이라, 태그를 고치면 문서 뒤쪽이 이겨
+     봉인이 저절로 풀린다(실측: 모달 시트 8종 background-color
+     rgba(0,0,0,0) -> rgba(255,242,255,.17)). 되살리려면 이 한 줄의 주석만 벗긴다.
+
+     [jelly-c 0910 · **은퇴 해제**] 위 은퇴 판단의 사유는 «값이 옛 봉인값이라서» 하나뿐이었다.
+     그 사유가 이 파도에서 사라졌다 — 이 자리에 들어가는 값이 옛 봉인값이 아니라
+     **시안 실측으로 새로 정한 값**이기 때문이다:
+       · --role-modal-tint 를 rgba(255,242,255,.17) -> **rgba(255,190,255,.0234)** 로 새로 정했다
+         (tokens-semantic. 시안 실측 총 α **0.52** 에서 역산 · scratchpad/jelly-c/SIAN-ALPHA.md)
+       · 색은 판정판 4 에서 **사용자가 고른 후보 C** (#F7D8E6 · 겉선 #8E5A72, 2026-09-10)
+     그래서 주석을 벗겨 이 줄을 되살린다. 은퇴 사유는 지우지 않고 위에 그대로 남긴다 —
+     이 자리에 «옛 값»이 다시 들어오면 그때는 위 판단이 다시 유효하다. */
   --modal-tint:var(--role-modal-tint);
   --modal-glass:blur(0px) saturate(1.06);
 }
@@ -61031,6 +61116,9 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
   --jbox-biw:19px; --jbox-radius:16px;
   --jbox-blur:var(--jbox-frost);
 }
+/* [jelly-c 0910 · 태그 수리 (a)] 두 번째 jelly-box-core 를 여기서 닫는다.
+   (위 hud-restore-0904 의 닫는 태그 누락이 이 블록까지 한 덩어리로 묶고 있었다.) */
+</style>
 <style id="sian-hud-rebuild">
 /* ============================================================
    시안 6호 — 전투 상단 HUD **구조 재조립** (사용자 반려: "탑부터 제대로")
