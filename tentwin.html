@@ -9356,6 +9356,11 @@ html.no-art-logo .logo-img  { display: none; }
   box-shadow: inset 0 2px 0 rgba(255, 255, 255, .34), 0 0 0 2.5px var(--mL-outline), 0 3px 0 #2E937A;
 }
 .sk-act[disabled] { opacity: .5; cursor: not-allowed; }
+/* 리텐션 래퍼(0910) ① — 이어하기 2회차. 새 색·새 그림을 만들지 않고 바로
+   위 .sk-act[disabled] 와 **같은 어휘**(투명도 하나)를 그대로 물려받는다.
+   버튼을 지우지 않는 것이 이 한 줄의 이유다 — 왜 못 누르는지 말할 자리가
+   남아야 「다음 판에 다시」가 읽힐 수 있다. */
+#btn-continue[disabled] { opacity: .45; cursor: default; pointer-events: none; }
 .sk-act.buy { background: linear-gradient(180deg, var(--prim-art-gold) 0%, var(--prim-art-gold) 46%, var(--prim-art-yel-2) 46%, var(--prim-art-yel-2) 100%); box-shadow: inset 0 2px 0 rgba(255,255,255,.34), 0 0 0 2.5px var(--mL-outline), 0 3px 0 #C98A1E; color: var(--prim-art-ink); }
 .sk-item.soon { opacity: .72; }
 .sk-item.soon .sk-th { background: linear-gradient(180deg, #E7D3BA 0%, #D3B995 100%); }
@@ -15721,7 +15726,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
     </div>
     <p id="node-wait" class="node-wait" hidden></p>
     <!-- AD SLOT: rewarded. 포털 SDK 가 붙기 전까지는 자리와 안내만 있다. -->
-    <button id="node-ad" class="btn btn-secondary" data-i18n="adv.ad" hidden>Watch an ad for a heart</button>
+    <button id="node-ad" class="btn btn-secondary" data-i18n="adv.ad" hidden>Get a heart (coming soon)</button>
     <!-- ⑤ 대형 PLAY — 파란 CTA 조각. data-i18n 을 버튼이 아니라 안쪽 라벨에 단
          이유는 applyI18n() 이 textContent 로 쓰기 때문이다: 버튼에 달면 언어를
          바꿀 때마다 하트 소모 표시가 통째로 지워진다(5차의 되돌림 함정). -->
@@ -15772,6 +15777,13 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
         <span class="mode-t bp-text"><b class="btnf-let bp-let" data-i18n="menu.rush">Time Rush</b><i class="btnf-let bp-let" data-i18n="mode.rush.d">90s. Each match adds time.</i></span>
         <span id="mode-rush-b" class="mode-b bp-badge bp-let" data-badge="new"></span>
       </button>
+      <!-- 0910 — 다섯째 줄 「대전」. 위 네 줄과 같은 부품·같은 규약이고,
+           다른 것은 data-variant(색)와 여는 곳(#modal-arcade 허브)뿐이다. -->
+      <button id="mode-arcduel" class="mode-row" data-part="btn-picture" data-variant="timeattack" type="button">
+        <span class="nchip nchip-arc bp-icon" aria-hidden="true"></span>
+        <span class="mode-t bp-text"><b class="btnf-let bp-let" data-i18n="arc.hub">Duel</b><i class="btnf-let bp-let" data-i18n="arc.hub.d">Three ways to fight a villain.</i></span>
+        <span id="mode-arcduel-b" class="mode-b bp-badge bp-let" data-badge=""></span>
+      </button>
       <!-- ===== 0903 — 아케이드 3종목은 하위 시트(#modal-arcade)에 있다 ========
            1cd0ae0 의 반쪽 원복으로 이 자리에 남아 있던 #arcrow-time, #arcrow-surv,
            #arcrow-dmg 세 줄을 원문 자리인 #modal-arcade .mode-list 로 되돌렸다.
@@ -15787,15 +15799,14 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
          기존 네 줄의 마크업·위치·크기는 한 글자도 안 바뀐다. -->
     <!-- 🚨 0823 — 위 네 줄의 [칩][제목+한 줄] 리듬을 그대로 받는다. 칩 한 개가
          더해진 것이 마크업 변경의 전부이고, 위 네 줄은 한 글자도 안 바뀐다. -->
-    <!-- 🚨 0903 — **숨김이지 삭제가 아니다. 이 hidden 은 그대로 둔다.**
-       이 줄은 2단 시트(#modal-arcade)로 가는 옛 문이다. 지금 그 시트의 문은
-       위 #mode-arcade 행 자신이므로(openArcadeHub), 이 hidden 을 풀면 같은
-       곳으로 가는 진입 버튼이 둘이 된다. 마크업·CSS(.arc-entry 주황)·클릭
-       핸들러는 전부 살아 있으니 진입점을 다시 갈아끼울 때만 되살려라. -->
-    <button id="mode-arcduel" class="arc-entry" type="button" hidden>
-      <span class="nchip nchip-arc bp-icon" aria-hidden="true"></span>
-      <span class="mode-t bp-text"><b data-i18n="arc.hub">Arcade Duel</b><i data-i18n="arc.hub.d">Three ways to fight a villain.</i></span>
-    </button>
+    <!-- 🚨 0910 — 위 주석이 말한 「진입점을 다시 갈아끼울 때」가 왔다.
+       #mode-arcade 가 끝없이로 직행하게 되면서 이 줄이 대전 허브의 **유일한**
+       문이 됐다 — 진입 버튼이 둘이 되는 상황 자체가 사라졌으므로 hidden 을
+       풀었고, 자리는 위 .mode-list 안 다섯째로 옮겼다. .arc-entry 전용 CSS 는
+       `.modal-v2` 은퇴와 함께 죽어 있어(선택자가 그 스코프뿐) 되살리면 새
+       규칙을 써야 했다. 대신 이미 살아 있는 그림버튼 부품(t3-btn-picture)의
+       인스턴스로 만들었다 — **새 그림 0**(카탈로그의 timeattack 무글자판
+       재사용), 새 CSS 0, 라벨은 코드 텍스트(.btnf-let)라 i18n 이 그대로 듣는다. -->
   </div></div>
 
   <!-- ===== 아케이드 대전 허브 ==============================================
@@ -15915,7 +15926,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
     <!-- AD SLOT: rewarded video, grants +2 Add to continue. Hidden by default;
          the portal rewarded-ad wrapper replaces this div and adds .ad-live. -->
     <div class="ad-slot ad-reward" data-ad-slot="rewarded">Ad</div>
-    <button id="btn-continue" class="btn btn-primary" data-i18n-aria="aria.continue" data-i18n="over.continue" aria-label="Watch an ad to get two more adds">Watch ad &rarr; +2 Add</button>
+    <button id="btn-continue" class="btn btn-primary" data-i18n-aria="aria.continue" data-i18n="over.continue" aria-label="Continue this board with two more adds">Continue (1 free)</button>
     <div class="sheet-row">
       <button id="btn-retry" class="btn btn-secondary" data-i18n-aria="aria.retry" data-i18n="over.retry" aria-label="Retry">Retry</button>
       <button id="btn-over-share" class="btn btn-ghost" data-i18n-aria="aria.overShare" data-i18n="over.share" aria-label="Share your score">Share</button>
@@ -15956,6 +15967,10 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
   <div id="modal-daily" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="daily-title"><div class="sheet jbox jbox--modal" data-part="modal-plate">
     <h2 id="daily-title">Daily #1</h2>
     <p id="daily-stats"></p>
+    <!-- 리텐션 래퍼(0910) ④ — 세 결과 시트가 이미 쓰던 보상 행 부품을
+         그대로 받는다(새 그림 0 · 새 CSS 0). 획득이 0 이면 rewardReveal 이
+         아무것도 열지 않으므로 평소의 데일리 결과창은 픽셀 하나 안 바뀐다. -->
+    <ul id="daily-reward" class="reward-reveal" aria-live="polite" hidden></ul>
     <!-- v5 E-1: daily's twin of #over-rank-line. showDailyResult() owns it and
          syncDynamicI18n() re-paints it, so a language toggle cannot revert it. -->
     <p id="daily-rank-line" class="rank-line" hidden></p>
@@ -21541,6 +21556,24 @@ window.TT_SFX = {
 
   // Cumulative-match milestones (DESIGN 9-FUN E)
   var MILESTONES = [100, 500, 1000, 5000];
+  /* 리텐션 래퍼(0910) ③ — 마일스톤 보상표. 값을 코드가 아니라 **표**가
+     들고 있게 한 이유는 하나다: 뒤에 종류별로 값이 갈릴 때 고칠 곳이 한
+     줄이어야 한다. 지금은 네 종류 전부 젤리별 +5 다(지휘자 확정 0910).
+     중복 지급은 새 저장 칸이 아니라 store.milestones 가 막는다 — 이미
+     축하한 값은 checkMilestone 의 지급 줄까지 도달하지 못한다. */
+  var MILESTONE_REWARD = { 100: 5, 500: 5, 1000: 5, 5000: 5 };
+
+  /* 리텐션 래퍼(0910) ④ — 연속 출석 보상표. store.streak · lastDailyDate 는
+     이미 집계만 되고 있었다(AUDIT A2) — 여기서 보상 배관만 붙인다.
+     리셋 규칙은 bumpStreak 의 실측 그대로다: 하루라도 빠지면 streak 이 1 로
+     돌아가므로 받았다는 표식(store.streakClaimed)도 같이 비운다 — 연속을
+     다시 쌓으면 다시 받는다. 그러지 않으면 3일 보상은 평생 한 번이라
+     「연속을 유지할 이유」를 만든다는 목적 자체가 사라진다. */
+  var STREAK_REWARD = [
+    { day: 3,  heart: 1 },
+    { day: 7,  jstar: 10 },
+    { day: 14, jstar: 25 }
+  ];
 
   /* Stage pressure past the board cap (REVIEW-02 task 2).
    * The board stops growing at stage 10 (extBoardSize) and the pair-density
@@ -23551,6 +23584,9 @@ window.TT_SFX = {
     schemaVersion: SCHEMA_VERSION,
     best: 0, bestStage: 1, sound: true, vibrate: true,
     streak: 0, lastDailyDate: '', dailyBest: null, save: null,
+    /* 리텐션 래퍼(0910) ④ — 이번 연속에서 이미 받은 임계일. 가법이라
+       이전기가 필요 없다 — 옛 저장본은 {} 로 시작해 다음 출석부터 쌓는다. */
+    streakClaimed: {},
     lang: '',  // '' = follow navigator; 'en' / 'ko' = explicit user choice
     /* --- W7.5 클래식 (순수 실력 모드) -------------------------------------
      * 일반 모드의 어느 칸과도 겹치지 않는 자기 칸들이다. bestKey()/bestStageKey()
@@ -23808,6 +23844,15 @@ window.TT_SFX = {
         if (typeof o.sound === 'boolean') store.sound = o.sound;
         if (typeof o.vibrate === 'boolean') store.vibrate = o.vibrate;
         if (typeof o.streak === 'number') store.streak = o.streak;
+        /* 값은 1 로만 정규화한다 — 손상된 저장본이 무엇을 넣어도 보상
+           판정이 참/거짓 말고 다른 것으로 미끄러지지 않는다. */
+        if (o.streakClaimed && typeof o.streakClaimed === 'object') {
+          store.streakClaimed = {};
+          for (var sck in o.streakClaimed) {
+            if (!Object.prototype.hasOwnProperty.call(o.streakClaimed, sck)) continue;
+            if (o.streakClaimed[sck]) store.streakClaimed[sck] = 1;
+          }
+        }
         if (typeof o.lastDailyDate === 'string') store.lastDailyDate = o.lastDailyDate;
         if (typeof o.lang === 'string') store.lang = o.lang;
         if (o.dailyBest) store.dailyBest = o.dailyBest;
@@ -24624,6 +24669,7 @@ window.TT_SFX = {
       'rw.starfruit': 'Awaken fruit',
       'rw.petfruit': 'Pet fruit',
       'rw.gem': 'Jelly stars',
+      'rw.heart': 'Hearts',
 
       /* WD-2 §11 파편 · §11.6 갓차 · §14 펫. 파편 이름은 색이 아니라 **스탯**을
          말한다 — 색은 화면의 것이고, 결과창이 알려 줄 값어치가 있는 것은
@@ -24728,10 +24774,16 @@ window.TT_SFX = {
       'over.title': 'Out of moves',
       'over.best': 'Best',
       'over.stage': 'Stage',
-      'over.continue': 'Watch ad → +2 Add',
+      /* 리텐션 래퍼(0910) ① — 광고 약속을 문구에서 지운다. 포털 SDK 가 0 인데
+         "Watch ad" 를 적어 둔 것은 없는 것을 약속하는 거짓말이었다(AUDIT B4).
+         한 자리를 세 문구가 나눠 쓴다 — 무료 · 쓴 뒤 · 앱 유료(§20.3). */
+      'over.continue': 'Continue (1 free)',
+      'over.continue.used': 'Again next board',
+      'over.continue.gem': 'Continue · 40 💎',
       'over.retry': 'Retry',
       'over.menu': 'Main menu',
-      'aria.continue': 'Watch an ad to get two more adds',
+      'aria.continue': 'Continue this board with two more adds',
+      'aria.continue.used': 'Free continue already used on this board',
       'aria.retry': 'Retry',
       'aria.overMenu': 'Back to main menu',
 
@@ -24975,6 +25027,7 @@ window.TT_SFX = {
       'grade.b.msg': 'Solid clear.',
       'grade.c.msg': 'Cleared — try it faster.',
       'milestone.title': 'Match #{n}!',
+      'milestone.title.rw': 'Match #{n}! Jelly stars +{v}',
       'milestone.sub': 'What a streak. Keep going.',
 
       /* ---- v3: tutorial / theme / share ----
@@ -25075,6 +25128,7 @@ window.TT_SFX = {
       /* ---- v4: progression visibility ---- */
       'menu.continueStage': 'Stage {stage}',
       'hero.streak': 'Streak',
+      'streak.reward': '{d}-day streak reward!',
       'hero.best': 'Best stage',
       'menu.new': 'NEW',
       'toast.rushopen': 'Time Rush unlocked!',
@@ -25094,10 +25148,10 @@ window.TT_SFX = {
          because Korean wants a unit glued to the number ("12,340점", "7단계")
          where English wants a bare figure with a word in front of it. */
       'rank.title': 'Records',
-      'rank.tab.endless': 'Endless',
+      'rank.tab.endless': 'Arcade',
       'rank.tab.rush': 'Time Rush',
       'rank.tab.daily': 'Daily',
-      'rank.hint.endless': 'Your 5 best Endless runs, by final score.',
+      'rank.hint.endless': 'Your 5 best Arcade runs, by final score.',
       'rank.hint.rush': 'Your 5 best Time Rush runs, by final score.',
       'rank.hint.daily': 'Your 5 fastest Daily clears. Every Daily is the same size, so time is the fair measure.',
       /* W7.5 — 클래식 보드 셋. 행 문구(rank.row.* / rank.meta.*)는 새로 만들지
@@ -25178,9 +25232,9 @@ window.TT_SFX = {
       'classic.daily': 'Daily',
       'classic.daily.d': "Today's board, even.",
       /* --- 아케이드 대전 (러시 기계 + 모험의 악당) ---------------------- */
-      'arc.hub': 'Arcade Duel',
+      'arc.hub': 'Duel',
       'arc.hub.d': 'Three ways to fight a villain.',
-      'arc.title': 'Arcade Duel',
+      'arc.title': 'Duel',
       'arc.lead': 'Fight a villain on the rush clock. Screenshot the result and compare.',
       'arc.time.name': 'Time Attack',
       'arc.time.d': 'Fastest wins.',
@@ -25478,7 +25532,7 @@ window.TT_SFX = {
       'adv.heartin': 'Next in {t}',
       'adv.heartfull': 'MAX',   /* 2026-08-19 한/영 공통 표기로 통일 */
       'adv.heartwait': 'Out of hearts. Next one in {t}.',
-      'adv.ad': 'Watch an ad for a heart',
+      'adv.ad': 'Get a heart (coming soon)',
       'adv.adsoon': 'Coming when the game goes live on the portal.',
       'adv.hearts': 'Hearts',
 
@@ -25783,6 +25837,7 @@ window.TT_SFX = {
       'rw.starfruit': '각성 과일',
       'rw.petfruit': '펫 과일',
       'rw.gem': '젤리별',
+      'rw.heart': '하트',
 
       /* WD-2 §11 파편 · §11.6 갓차 · §14 펫. 위 두 줄과 같은 규율이다 — 판 위
          배지와 결과창이 **같은 말**을 써야 그게 그건 줄 안다. 파편 이름이 색이
@@ -25884,10 +25939,13 @@ window.TT_SFX = {
       'over.title': '더 이상 지울 수 없어요',
       'over.best': '최고',
       'over.stage': '단계',
-      'over.continue': '광고 보고 추가 +2',
+      'over.continue': '이어하기 (1회 무료)',
+      'over.continue.used': '다음 판에 다시',
+      'over.continue.gem': '이어하기 · 40 💎',
       'over.retry': '다시하기',
       'over.menu': '메인 메뉴',
-      'aria.continue': '광고 보고 추가 2회 받기',
+      'aria.continue': '추가 2회를 받아 이어하기',
+      'aria.continue.used': '이번 판의 무료 이어하기를 이미 썼어요',
       'aria.retry': '다시하기',
       'aria.overMenu': '메인 메뉴로',
 
@@ -26104,6 +26162,7 @@ window.TT_SFX = {
       'grade.b.msg': '무난하게 클리어!',
       'grade.c.msg': '클리어! 다음엔 더 빠르게',
       'milestone.title': '{n}번째 짝!',
+      'milestone.title.rw': '{n}번째 짝! 젤리별 +{v}',
       'milestone.sub': '이 기세 그대로 가요.',
 
       /* ---- v3: 튜토리얼 / 테마 / 공유 ----
@@ -26204,6 +26263,7 @@ window.TT_SFX = {
       /* ---- v4: 진행도 가시화 ---- */
       'menu.continueStage': '{stage}단계',
       'hero.streak': '연속 출석',
+      'streak.reward': '연속 {d}일 보상!',
       'hero.best': '최고 단계',
       'menu.new': 'NEW',
       'toast.rushopen': '타임 러시 열렸어요!',
@@ -26221,10 +26281,10 @@ window.TT_SFX = {
          숫자에 단위를 붙여야 자연스러운 한국어라서 rank.row.* / rank.meta.* 를
          코드에서 조립하지 않고 전부 키로 뺐다 (영어는 "Stage 7", 한국어는 "7단계"). */
       'rank.title': '내 기록',
-      'rank.tab.endless': '엔들리스',
+      'rank.tab.endless': '아케이드',
       'rank.tab.rush': '타임 러시',
       'rank.tab.daily': '데일리',
-      'rank.hint.endless': '엔들리스 최고 점수 TOP 5',
+      'rank.hint.endless': '아케이드 최고 점수 TOP 5',
       'rank.hint.rush': '타임 러시 최고 점수 TOP 5',
       'rank.hint.daily': '데일리 최단 시간 TOP 5. 데일리는 매일 판 크기가 같아서 시간으로 겨뤄요.',
       // W7.5 — 클래식 보드 셋. 행 문구를 새로 만들지 않는 이유는 en 쪽 주석 참조.
@@ -26291,9 +26351,9 @@ window.TT_SFX = {
       'classic.daily': '데일리',
       'classic.daily.d': '오늘의 판, 같은 조건.',
       /* --- 아케이드 대전 (러시 기계 + 모험의 악당) ---------------------- */
-      'arc.hub': '아케이드 대전',
+      'arc.hub': '대전',
       'arc.hub.d': '악당과 겨루는 세 종목.',
-      'arc.title': '아케이드 대전',
+      'arc.title': '대전',
       'arc.lead': '러시 시계 위에서 악당과 겨뤄요. 결과를 찍어 친구와 비교하세요.',
       'arc.time.name': '타임어택',
       'arc.time.d': '빠를수록 승리.',
@@ -26566,7 +26626,7 @@ window.TT_SFX = {
       'adv.heartin': '다음 {t}',
       'adv.heartfull': 'MAX',   /* 2026-08-19 사용자 반려 — "가득"이 촌스럽다. 한/영 공통 MAX */
       'adv.heartwait': '하트가 없어요. 다음 하트까지 {t}.',
-      'adv.ad': '광고 보고 하트 받기',
+      'adv.ad': '하트 받기 (준비 중)',
       'adv.adsoon': '포털 출시 후 제공돼요.',
       'adv.hearts': '하트',
 
@@ -26974,6 +27034,10 @@ window.TT_SFX = {
      * 지갑(store.jstar)은 거기서 이미 늘었다 — 여기 있는 것은 시트가 읽을 숫자
      * 하나뿐이다. 모험 밖에서는 언제나 0 이다. */
     gainGem: 0,
+    /* 리텐션 래퍼(0910) — 마일스톤·출석이 준 젤리별의 사본. gainGem 과
+       칸을 가른 이유: advFinish 가 gainGem 을 **대입**으로 덮어쓰므로 같은
+       칸을 쓰면 모험 판에서 넘은 마일스톤 보상이 조용히 사라진다. */
+    gainJstar: 0,
     feverOn: false, feverUntil: 0, feverScore: 0, feverCdUntil: 0,
     rushEndAt: 0, addCdUntil: 0, rushBeatAt: 0,
     pausedAt: 0,             // wall clock at pause, used to shift deadlines
@@ -32095,8 +32159,18 @@ window.TT_SFX = {
       if (total < m) continue;
       if (store.milestones.indexOf(m) >= 0) continue;   // already celebrated
       store.milestones.push(m);
+      /* 리텐션 래퍼(0910) ③ — 「보상 없는 행동」(AUDIT B7)을 끝낸다. 지갑은
+         여기서 바로 늘고(store.jstar), S.gainJstar 는 결과 시트의 보상 행이
+         읽을 사본일 뿐이다 — gainGem(모험이 대입으로 덮어쓴다)과 칸을 갈라
+         두 수입이 서로를 지우지 않게 한다. */
+      var mrw = MILESTONE_REWARD[m] | 0;
+      if (mrw > 0) {
+        store.jstar = (store.jstar | 0) + mrw;
+        S.gainJstar = (S.gainJstar | 0) + mrw;
+      }
       persist();
-      toast(t('milestone.title', { n: m }));
+      toast(mrw > 0 ? t('milestone.title.rw', { n: m, v: mrw })
+                    : t('milestone.title', { n: m }));
       J.sfx.milestone();
       J.vibrate(35);
       if (typeof window !== 'undefined') {
@@ -32150,6 +32224,7 @@ window.TT_SFX = {
     S.gainPet = 0;
     S.gainStar = 0;
     S.gainGem = 0;
+    S.gainJstar = 0;
     /* WD-2 — 새 사본 넷도 판 단위다(위 주석의 이유 그대로). */
     S.gainShard = { power: 0, steady: 0, agility: 0, luck: 0 };
     S.gainGift = [];
@@ -34828,6 +34903,11 @@ window.TT_SFX = {
     if ((o.gem | 0) > 0) {
       out.push({ ico: '💎', disc: 'gem', key: 'rw.gem', val: o.gem | 0, rar: 'normal' });
     }
+    /* 리텐션 래퍼(0910) ④ — 하트 행. 연속 3일 보상이 유일한 소비자고,
+       다른 자리는 o.heart 를 넘기지 않으므로 기존 세 시트의 줄 수는 불변이다. */
+    if ((o.heart | 0) > 0) {
+      out.push({ ico: '❤️', disc: 'heart', key: 'rw.heart', val: o.heart | 0, rar: 'normal' });
+    }
     /* ---- WD-2 §11 · §11.6 · §14 — 예약돼 있던 4·5번 슬롯이 내용을 얻는다 ------
      * 위 각주가 약속한 그대로다: **push 몇 줄이 늘 뿐** 연출·CSS·사운드·타이밍은
      * 한 줄도 안 바뀌었다. 자리도 §10.2 의 고정 순서 그대로 — 파편/상자가 4번,
@@ -35181,7 +35261,7 @@ window.TT_SFX = {
        것이다) 이 자리는 대개 조용하지만, 배선을 여기 두는 것이 §10.3 의 "점진
        확장" 그대로다: §11 파편이 붙는 순간 이 창이 **한 줄도 안 고치고** 같은
        연출을 얻는다. 획득이 0 인 판에서는 rewardReveal 이 스스로 생략한다. */
-    rewardReveal('clear-reward', rewardItems({}), { sheetId: 'modal-clear' });
+    rewardReveal('clear-reward', rewardItems({ gem: S.gainJstar }), { sheetId: 'modal-clear' });
 
     /* Time Rush exists but nothing has ever pointed at it. The first stage clear is
      * the moment the player has proved they understand the board, which is when a
@@ -35377,9 +35457,10 @@ window.TT_SFX = {
       stuck: cause === 'stuck'
     };
     paintOverModal();
-    var cont = $('btn-continue');
-    // Time Rush has unlimited Adds, so the "+2 Add" rewarded slot is pointless.
-    if (cont) cont.hidden = S.continueUsed || rush;
+    /* 리텐션 래퍼(0910) ① — 이어하기 정책은 paintContinueBtn 한 곳에만 있다.
+       예전 한 줄(cont.hidden = S.continueUsed || rush)은 2회차에 버튼을
+       **지워** 왜 못 쓰는지 읽을 자리까지 같이 지웠다. 지금은 남기고 끈다. */
+    paintContinueBtn();
     later(function () {
       openModal('modal-over');
       // Fired with the sheet, not before it: the float text is drawn on #fx
@@ -35388,14 +35469,58 @@ window.TT_SFX = {
       /* W-C §10 — 진 판에도 리빌이 붙는다. 수확은 판 중에 확정되므로 "졌지만
          얻은 것"은 실재하고, 그걸 안 보여 주면 게임오버가 손해로만 읽힌다.
          **획득이 있을 때만** 열리는 것은 rewardReveal 이 보장한다. */
-      rewardReveal('over-reward', rewardItems({}), { sheetId: 'modal-over' });
+      rewardReveal('over-reward', rewardItems({ gem: S.gainJstar }), { sheetId: 'modal-over' });
     }, 520);
   }
 
+  /* =========================================================================
+   * 리텐션 래퍼(0910) ① — 이어하기 정책  (DESIGN 「리텐션 래퍼(0910)」)
+   * -------------------------------------------------------------------------
+   * · 판당 1회 무료. 「판」은 startStage / restoreSave 가 S.continueUsed 를
+   *   리셋하는 단위 그대로다(코드 실측) — 새 저장 칸을 만들지 않는다.
+   *   그래서 2회차 문구 「다음 판에 다시」가 거짓말이 아니다.
+   * · 웹은 2회차부터 비활성. 앱(TWA)에서는 그 자리가 40💎 유료 이어하기가
+   *   된다(§20.3). 지금은 보석 배관이 0 이라 appGemContinue() 가 언제나
+   *   false 이고, 그래서 화면은 비활성과 완전히 같다(웹 픽셀 불변).
+   * · 광고 약속 문구는 i18n 에서 전량 사라졌다. 자리표시(.ad-slot)는 유지한다.
+   * ========================================================================= */
+  function appGemContinue() {
+    /* §18 의 정본 플래그 하나만 읽는다(window.TW.platform · 판별은 부팅
+       머리에서 끝나 있다). 여기서 다시 판별하지 않는 것이 §18.2 의 계약이다.
+       두 번째 조건(store.jewel)이 §20 결제 배관의 유무다 — 지금은 그 칸이
+       없어 언제나 false 이고, 그래서 웹·앱 모두 화면은 비활성과 같다. */
+    var p = '';
+    try { p = (window.TW && window.TW.platform) || ''; } catch (e) { p = ''; }
+    return p === 'twa' && typeof store.jewel === 'number';
+  }
+
+  /** 이어하기 버튼의 **유일한** 상태 소유자. 언제나 전체 상태를 쓴다(토글 아님).
+   *  data-i18n 자체를 갈아 끼우므로 언어 토글(applyI18n)이 문구를 되돌리지 못한다. */
+  function paintContinueBtn() {
+    var cont = $('btn-continue');
+    if (!cont) return;
+    var rush = !!(S.overInfo && S.overInfo.rush);
+    // Time Rush has unlimited Adds, so the "+2 Add" slot is pointless.
+    cont.hidden = rush;
+    if (rush) return;
+    var used = !!S.continueUsed;
+    var gem  = used && appGemContinue();
+    cont.disabled = used && !gem;
+    if (gem) cont.setAttribute('data-app-only', 'gem-continue');
+    else cont.removeAttribute('data-app-only');
+    var key  = !used ? 'over.continue' : (gem ? 'over.continue.gem' : 'over.continue.used');
+    var akey = (used && !gem) ? 'aria.continue.used' : 'aria.continue';
+    cont.setAttribute('data-i18n', key);
+    cont.setAttribute('data-i18n-aria', akey);
+    headText(cont, t(key));
+    cont.setAttribute('aria-label', t(akey));
+  }
+
   function doContinue() {
+    /* 2회차는 버튼이 이미 비활성이라 여기 닿지 않는다 — 키보드·자동화
+       경로가 직접 부를 때를 위한 백스톱이다. 앱 유료 경로도 결제 배관(§20.8)이
+       붙기 전까지 같이 막는다 — 두 번째를 공짜로 주지 않는 것이 이 항목의 전부다. */
     if (S.continueUsed) { toast(t('toast.usedstage')); return; }
-    // [AD PLACEHOLDER — rewarded] the real build awaits the portal rewarded-ad
-    // callback here; only grant the reward once the ad reports completion.
     S.continueUsed = true;
     S.adds += 2;
     S.running = true;
@@ -35426,8 +35551,35 @@ window.TT_SFX = {
   function bumpStreak() {
     var today = todayKey();
     if (store.lastDailyDate === today) return;
-    store.streak = (store.lastDailyDate === yesterdayKey()) ? (store.streak + 1) : 1;
+    var goes = (store.lastDailyDate === yesterdayKey());
+    store.streak = goes ? (store.streak + 1) : 1;
     store.lastDailyDate = today;
+    /* 리텐션 래퍼(0910) ④ — 연속이 끊기면 받았다는 표식도 같이 비운다.
+       수(streak)만 리셋하고 표식을 남기면 3일 보상이 평생 한 번이 돼
+       「연속을 유지할 이유」라는 이 항목의 목적이 그대로 사라진다. */
+    if (!goes) store.streakClaimed = {};
+  }
+
+  /**
+   * 리텐션 래퍼(0910) ④ — 임계일 3·7·14 보상을 지급하고 **지급한 것만**
+   * 돌려준다(결과 시트의 보상 행이 그것을 그대로 읽는다).
+   * bumpStreak 바로 뒤에서만 불린다 — 오늘치가 올라간 뒤여야 store.streak 이
+   * 오늘의 수이기 때문이다.
+   * @return {{heart:number, jstar:number, days:number[]}}
+   */
+  function claimStreakRewards() {
+    var got = { heart: 0, jstar: 0, days: [] };
+    if (!store.streakClaimed || typeof store.streakClaimed !== 'object') store.streakClaimed = {};
+    for (var i = 0; i < STREAK_REWARD.length; i++) {
+      var r = STREAK_REWARD[i], k = String(r.day);
+      if ((store.streak | 0) < r.day) continue;
+      if (store.streakClaimed[k]) continue;
+      store.streakClaimed[k] = 1;
+      got.days.push(r.day);
+      if (r.heart) { grantHearts(r.heart); got.heart += r.heart; }
+      if (r.jstar) { store.jstar = (store.jstar | 0) + r.jstar; got.jstar += r.jstar; }
+    }
+    return got;
   }
 
   /** 5×5 emoji grid derived from the daily seed — deterministic per puzzle. */
@@ -35453,7 +35605,11 @@ window.TT_SFX = {
      * 결과 시트가 읽는 칸도 같은 이름으로 갈린다(dailyBestOf). */
     var classicRun = (S.mode === 'classic-daily');
     var bestSlot = classicRun ? 'classicDailyBest' : 'dailyBest';
-    if (!classicRun) bumpStreak();
+    /* 리텐션 래퍼(0910) ④ — 집계만 되던 연속 수에 보상 배관을 붙인다.
+       클래식 데일리는 streak 을 안 올리므로(바로 위 주석) 보상도 없다 —
+       하루에 두 번 받는 길을 만들지 않는 것이 이 분기의 전부다. */
+    var streakGot = { heart: 0, jstar: 0, days: [] };
+    if (!classicRun) { bumpStreak(); streakGot = claimStreakRewards(); }
     store[bestSlot] = {
       date: todayKey(), n: dailyNumber(), timeSec: sec,
       matches: S.matches, maxCombo: S.maxCombo, score: S.score,
@@ -35464,6 +35620,16 @@ window.TT_SFX = {
       grade: gradeFor(S.adds, S.maxCombo, sec, 3, extBoardSize(3)),
       grid: buildEmojiGrid(S.gridSeed)
     };
+    /* 리텐션 래퍼(0910) ④ — 결과 시트가 읽을 보상 행. **판이 끝난 이 경로에서만**
+       채운다 — 허브에서 몇 시간 전 결과를 다시 여는 경로는 빈 배열이라 열리지
+       않는다(dailyRank 가 쓰는 규약 그대로). */
+    dailyReward = rewardItems({
+      gem:   (S.gainJstar | 0) + (streakGot.jstar | 0),
+      heart: streakGot.heart | 0
+    });
+    if (streakGot.days.length) {
+      toast(t('streak.reward', { d: streakGot.days[streakGot.days.length - 1] }));
+    }
     dropProgress();
     persist();
     /* v5 E-1: built from the very numbers just written into store.dailyBest, so
@@ -35504,6 +35670,13 @@ window.TT_SFX = {
     showScreen('screen-game');
     openModal('modal-daily');
     celebrateRank(dailyRank);
+    /* 리텐션 래퍼(0910) ④ — 방금 끝난 판이 준 것만 연다. 여기서 비우는 것이
+       핵심이다 — 허브에서 옛 결과를 다시 열면 빈 배열이라 아무것도 안 열린다. */
+    var drw = dailyReward;
+    dailyReward = [];
+    later(function () {
+      rewardReveal('daily-reward', drw, { sheetId: 'modal-daily' });
+    }, 420);
   }
 
   /* ---- 0909 copy-flow ② — 공유 문구에 **게임 주소** ---------------------
@@ -35671,6 +35844,9 @@ window.TT_SFX = {
   /* Rank achieved by the daily result currently on screen; painted into
    * #daily-rank-line and re-read by syncDynamicI18n() after a language switch. */
   var dailyRank = 0;
+  /* 리텐션 래퍼(0910) ④ — 방금 끝난 판이 준 것. dailyRank 와 같은 규약이다:
+     허브에서 옛 결과를 다시 여는 경로는 이것이 비어 있어 다시 축하하지 않는다. */
+  var dailyReward = [];
 
   /* 13차-b §E — 이모지 메달 표(`['🥇','🥈','🥉']`)는 걷어냈다. 1~3 위 메달은 이제
      CSS 가 조각으로 그린다(`.rank-row:nth-child(n) .rank-pos` → --lib-medal-gold /
@@ -40247,7 +40423,7 @@ window.TT_SFX = {
     var txt = (sv && !sv.hidden) ? String(sv.textContent || '') : '';
     var full = 0;
     for (var i = 0; i < txt.length; i++) { if (txt.charAt(i) === '★') full++; }
-    rewardReveal('adv-reward', rewardItems({ gem: S.gainGem }), {
+    rewardReveal('adv-reward', rewardItems({ gem: (S.gainGem | 0) + (S.gainJstar | 0) }), {
       starEl: 'adv-stars',
       stars: full,
       sheetId: 'modal-adv'
@@ -43452,7 +43628,11 @@ window.TT_SFX = {
     on($('arc-menu'), 'click', goMenu);
     on($('mode-close'), 'click', function () { closeModeSheet(); J.sfx.ui(); });
     on($('mode-adv'), 'click', function () { closeModeSheet(); J.sfx.ui(); openAdventure(); });
-    on($('mode-arcade'), 'click', function () { closeModeSheet(); openArcadeHub(); });
+    /* 리텐션 래퍼(0910) ② — 카드 「아케이드 · 끝없이」가 유한한 대전 3종을
+       열던 모순을 끝낸다(AUDIT B5). 카드는 이제 자기 설명 그대로 끝없이로
+       직행하고, 대전 허브는 다섯째 줄(#mode-arcduel)이 연다.
+       startEndless(false) 인 것은 의도다 — 쓰던 판이 있으면 그 판을 잇는다. */
+    on($('mode-arcade'), 'click', function () { closeModeSheet(); J.sfx.ui(); startEndless(false); });
     on($('mode-daily'), 'click', function () {
       closeModeSheet();
       J.sfx.ui();
@@ -44619,6 +44799,10 @@ window.TT_SFX = {
     reconcileRanks: reconcileRanks, submitRank: submitRank,
     celebrateRank: celebrateRank, openRankModal: openRank, setRankTab: setRankTab,
     onGameOver: onGameOver, onStageClear: onStageClear, finishDaily: finishDaily,
+    /* 리텐션 래퍼(0910) — DEBUG HANDLE ONLY, 위 규약 그대로다. 마일스톤은
+       누적 매치 100 회를 실제로 채워야 닿는 자리라, 지급·중복방지를 관문이
+       판정하려면 이 문 하나가 필요하다(게임 코드는 이것을 거쳐 부르지 않는다). */
+    checkMilestone: checkMilestone,
     store: store,
     /* W-C §10 루트 리빌 — DEBUG HANDLES ONLY, 위 규약 그대로다(게임 코드는 이
      * 중 무엇도 window.Game 을 거쳐 부르지 않는다). 관문이 슬롯 순서·타이밍·
@@ -45508,7 +45692,7 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
    색이면 눌러야 할 쪽이 안 읽힌다). 같은 낱말은 창이 달라도 같은 색이다 —
    "메인 메뉴"는 일시정지에서도 게임오버에서도 데일리에서도 보라 하나다:
      파랑  계속하기 · 닫기(도움말·설정·스킨·기록 넷 전부)
-     핑크  다음 단계 · 모험 다음/재도전 · 광고 보고 +2
+     핑크  다음 단계 · 모험 다음/재도전 · 이어하기 +2
      노랑  단계 다시하기 · 결과 복사
      주황  재도전(게임오버)
      보라  메인 메뉴(일시정지 · 게임오버 · 데일리)
