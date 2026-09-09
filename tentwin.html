@@ -1,5 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<!-- 출시 점검 0909 ③(승인 A5) — 정적 기본을 ko 로.
+     전까지 `lang="en"` 으로 문서가 서고 부팅 뒤 applyI18n() 이 ko 로 갈아 끼웠다.
+     그 사이(첫 페인트 ~ 스크립트 실행) 문서는 영어로 선언돼 있어서
+       · `html[lang="ko"] #toast{font-weight:600}` 같은 자국어 조판 규칙이 안 걸리고
+       · 스크린리더·번역기·검색엔진이 첫 신호로 en 을 읽고
+       · 매니페스트(`"lang":"ko"`)와 문서가 서로 다른 말을 한다.
+     정본은 한국어 게임이므로 **정적 기본이 ko** 다. 런타임 전환은 그대로다 —
+     applyI18n() 의 `document.documentElement.lang = currentLang()`(§SECTION i18n)
+     이 계속 이 자리를 덮으므로 영어 사용자·설정 전환에서 en 이 정상으로 선다. -->
+<html lang="ko">
 <head>
 <!-- TenTwin — markup shell: screens, modals, ad placeholders. No external resources. -->
 <meta charset="utf-8">
@@ -9157,6 +9166,15 @@ html.no-art-logo .logo-img  { display: none; }
    나머지 모달과 랭킹판의 순서까지 같이 흔들린다. */
 #modal-skin { z-index: 73; }
 
+/* 출시 점검 0909 ①(승인 A2) — 게임 내 확인 창의 쌓임 순서.
+   이 창은 **다른 창 위에서** 열린다(지금의 유일한 호출부인 스킨 구매는
+   #modal-skin(73) 안의 버튼이고, 그 스킨 시트 자신이 #charpanel(72) 위에
+   올라와 있다). 그래서 73 보다 위여야 하고, 임팩트 층(76)보다도 위여야
+   격파 연출이 확인 창을 덮지 않는다. 토스트(80)만 위에 남긴다 —
+   "확인 창 위에 안내 알약"이 옳은 순서다.
+   새 층 규약을 만들지 않는다: 위 두 줄과 **같은 문법**(id 하나에 z-index 하나). */
+#modal-confirm { z-index: 77; }
+
 /* ---- 24-5. 텐텐 = 비숑 젤리 왕자 (인게임 SVG · DESIGN-V4 §2) ----------------
    새 지오메트리를 하나도 만들지 않았다. 기존 `.ch-* .cav` 토글 규약 안에서
    파츠를 갈아 끼운 것이 전부다:
@@ -10802,9 +10820,13 @@ html[lang="en"] .mfbtn { font-size: 8px; letter-spacing: -.15px; }
 /* 시트 안의 본문 색은 크림 위 잉크로 (순검정 금지 — ART §7-1) */
 #modal-pause .sheet, #modal-over .sheet, #modal-tutorial .sheet,
 #modal-settings .sheet, #modal-howto .sheet, #modal-skin .sheet,
-#modal-adv .sheet, #modal-daily .sheet, #modal-clear .sheet, #modal-rank .sheet { color: var(--prim-art-ink); }
+#modal-adv .sheet, #modal-daily .sheet, #modal-clear .sheet, #modal-rank .sheet,
+/* 출시 점검 0909 ① — 확인 창은 **선언을 하나도 새로 쓰지 않고** 이 두 목록에
+   합류한다. 새 값을 지어내면 같은 크림 판 위의 잉크가 두 벌이 된다. */
+#modal-confirm .sheet { color: var(--prim-art-ink); }
 #modal-clear .sheet p, #modal-over .sheet p, #modal-adv .sheet p,
-#modal-daily .sheet p, #modal-rank .sheet p, #modal-tutorial .sheet p { color: var(--prim-art-ink); }
+#modal-daily .sheet p, #modal-rank .sheet p, #modal-tutorial .sheet p,
+#modal-confirm .sheet p { color: var(--prim-art-ink); }
 
 /* 주버튼 — 창마다 도서관 버튼 조각 (ROUND10-SPEC §C 표) */
 .lbtn {
@@ -15047,6 +15069,39 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
     <p class="sk-bal"><span data-i18n="skin.balance">Jelly stars</span><b class="sk-bal-v"><i class="gem-ic" aria-hidden="true">★</i><span id="sk-gems">0</span></b></p>
     <div id="sk-list" class="sk-list"></div>
     <button id="sk-close" class="btn btn-primary" type="button" data-i18n="settings.close">Close</button>
+  </div></div>
+
+  <!-- ============================================================
+       출시 점검 0909 ①(승인 A2) — window.confirm 대체 창
+
+       왜: TWA·설치본에서 시스템 대화상자는 원본 URL 을 머리에 달고 뜬다
+       (`ghkd70408040-wq.github.io says…`). 그 한 줄이 "앱이 아니라 웹페이지"라고
+       말해 버리고, 스토어 심사에서도 그렇게 읽힌다. 게다가 confirm() 은
+       **동기 차단**이라 그 사이 RAF·타이머가 통째로 멎는다.
+
+       새로 지은 것이 무엇인가 — **부품은 0개다.**
+         · 판  = 다른 열두 창과 같은 `.modal.w6m > .sheet.jbox.jbox--modal
+                 [data-part="modal-plate"]` (모달 판 컴포넌트 그대로)
+         · X   = 같은 `.r10-x.x-btn[data-w6x]` (기존 위임 배선이 그대로 받는다)
+         · 버튼 = 같은 그림 버튼 부품 `.btn.btn-primary` / `.btn.btn-ghost`
+                 (#pz-resume · #pz-menu 가 입고 있는 그 둘)
+         · 색  = §시트 잉크 목록에 선택자만 합류(새 값 0)
+       원시값도 0이다 — 이 블록에 style 속성이 하나도 없다.
+
+       본문(#cf-msg)은 호출부가 t() 로 채운다. 마크업에 문장을 굳히지 않는
+       이유는 이 창이 "스킨 구매 전용"이 아니라 **확인이 필요한 자리 공용**이기
+       때문이다(지금 호출부는 buySkin 하나뿐이다).
+
+       버튼 순서는 이 파일의 규약을 따른다 — 주 행동(.btn-primary)이 **아래**,
+       물러서는 행동(.btn-ghost)이 그 위. #modal-pause 가 [howto][restart]
+       [menu·ghost][resume·primary] 로 같은 순서다.
+       ============================================================ -->
+  <div id="modal-confirm" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="cf-h" aria-describedby="cf-msg"><div class="sheet jbox jbox--modal" data-part="modal-plate">
+    <h2 id="cf-h" data-i18n="confirm.title">Confirm</h2>
+    <button class="r10-x x-btn" type="button" data-w6x="cf-no" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
+    <p id="cf-msg"></p>
+    <button id="cf-no" class="btn btn-ghost" type="button" data-i18n="confirm.no">Cancel</button>
+    <button id="cf-yes" class="btn btn-primary" type="button" data-i18n="confirm.yes">Buy</button>
   </div></div>
 
   <div id="modal-pause" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="pause-h"><div class="sheet jbox jbox--modal" data-part="modal-plate">
@@ -23673,12 +23728,32 @@ window.TT_SFX = {
     return out;
   }
 
+  /* 출시 점검 0909 ②(승인 A4) — 저장이 막혔을 때 **한 번** 알린다.
+   * 전까지 이 자리는 `catch (e) { /* quota or private mode: ignore *\/ }` 였다.
+   * 게임이 계속 도는 것은 옳다(저장 못 한다고 판을 세울 이유가 없다). 틀린
+   * 것은 **플레이어가 그 사실을 영영 모른다**는 쪽이었다 — 사파리 사생활
+   * 모드·저장소 가득 참에서 한 시간을 논 뒤 앱을 닫으면 전부 사라진다.
+   *
+   * 왜 한 번뿐인가: persist() 는 한 판에 수십 번 불린다(매치·설정·단계 클리어).
+   * 실패는 그때마다 나므로 그대로 알리면 토스트가 화면에 눌어붙는다. 원인은
+   * 세션 내내 같은 하나(저장소가 막혔다)라 알림도 하나면 충분하다.
+   * 되살아나는 자리를 두지 않는다 — 새로고침이 곧 새 세션이다.
+   *
+   * 🚨 alert() 가 아니라 토스트인 이유는 ① 과 같다: 시스템 대화상자는 TWA 에서
+   * 원본 URL 을 노출하고 스크립트를 동기로 세운다. */
+  var saveFailWarned = false;
   function persist() {
     if (persistReadOnly) return;   // 미래 버전 저장 보호 (migrateStore)
     store.schemaVersion = SCHEMA_VERSION;
     try {
       window.localStorage.setItem(LS_KEY, JSON.stringify(store));
-    } catch (e) { /* quota or private mode: ignore */ }
+    } catch (e) {
+      /* quota or private mode: 게임은 계속 돈다 — 알리기만 한다(세션당 1회) */
+      if (!saveFailWarned) {
+        saveFailWarned = true;
+        try { toast(t('toast.savefail')); } catch (e2) { /* 알림 때문에 저장 경로가 죽지 않는다 */ }
+      }
+    }
   }
 
   function saveProgress() {
@@ -24218,6 +24293,10 @@ window.TT_SFX = {
       'aria.share': 'Copy result to clipboard',
       'aria.dailyMenu': 'Back to main menu',
 
+      /* 출시 점검 0909 ②(승인 A4) — 저장 실패(쿼터·시크릿 모드) 알림.
+         한 줄에 들어가는 길이여야 한다: #toast 는 `white-space: nowrap` 이고
+         `max-width: 84vw` 라, 길면 알약이 화면을 가로지른다. */
+      'toast.savefail': 'Progress can’t be saved',
       'toast.noadds': 'No adds left',
       'toast.empty': 'Board is empty',
       'toast.nohints': 'No hints left',
@@ -25070,6 +25149,12 @@ window.TT_SFX = {
       'skin.confirm': 'Spend {n} jelly stars on {name}?',
       'skin.bought': '{name} unlocked!',
       'skin.poor': 'Not enough jelly stars ({n} more)',
+      /* 출시 점검 0909 ①(승인 A2) — 게임 내 확인 창. 제목·두 버튼만 새 키이고,
+         본문은 기존 skin.confirm 을 그대로 쓴다(물어보는 문장을 두 벌로 갈라
+         놓지 않는다). */
+      'confirm.title': 'Confirm',
+      'confirm.yes': 'Buy',
+      'confirm.no': 'Cancel',
       'skin.gem': '+1 jelly star!',
       'skin.base': 'Default',
       'skin.basedesc': 'The look you started with',
@@ -25327,6 +25412,8 @@ window.TT_SFX = {
       'aria.share': '결과 클립보드에 복사',
       'aria.dailyMenu': '메인 메뉴로',
 
+      /* 출시 점검 0909 ②(승인 A4) — 저장 실패 알림(en 쪽과 같은 키). */
+      'toast.savefail': '진행이 저장되지 않아요',
       'toast.noadds': '추가 횟수를 다 썼어요',
       'toast.empty': '보드가 비었어요',
       'toast.nohints': '힌트를 다 썼어요',
@@ -26097,6 +26184,10 @@ window.TT_SFX = {
       'skin.confirm': '{name}을(를) 젤리별 {n}개로 살까요?',
       'skin.bought': '{name} 해금!',
       'skin.poor': '젤리별이 {n}개 부족해요',
+      /* 출시 점검 0909 ①(승인 A2) — 게임 내 확인 창(en 쪽과 같은 세 키). */
+      'confirm.title': '확인',
+      'confirm.yes': '구매',
+      'confirm.no': '취소',
       'skin.gem': '젤리별 +1!',
       'skin.base': '기본',
       'skin.basedesc': '처음부터 함께한 모습',
@@ -27005,8 +27096,46 @@ window.TT_SFX = {
         startArcade 가 자기 안에서 closeAllModals() 를 부르므로, 그 한 번으로
         허브까지 걷히려면 목록에 있어야 한다. 결과 시트도 함께 둔다 — 시트를 열어
         둔 채 메뉴로 나가면 판이 끝난 화면이 메뉴 위에 남는다. */
-     'modal-arcade', 'modal-arc']
+     'modal-arcade', 'modal-arc',
+     /* 출시 점검 0909 ① — 확인 창도 여기서 걷힌다. 화면이 통째로 바뀌는데
+        "살까요?"만 떠 있는 상태가 남으면 안 된다. 걷힐 때 대기 중이던 응답은
+        confirmPending 가드가 무효로 만든다(아래 confirmBox 참조). */
+     'modal-confirm']
       .forEach(closeModal);
+  }
+
+  /* ---- 출시 점검 0909 ①(승인 A2) — 게임 내 확인 창 -------------------------
+   * window.confirm 을 대신한다. 차이는 셋이다:
+   *   ① 원본 URL 이 안 뜬다(TWA 에서 "웹페이지"로 읽히던 그 줄).
+   *   ② 동기 차단이 아니다 — confirm() 은 그 자리에서 스크립트를 세워
+   *      RAF·타이머·오디오를 함께 멈췄다. 여기서는 콜백으로 돌아온다.
+   *   ③ 우리 판·우리 버튼·우리 폰트다(시각 언어가 안 끊긴다).
+   *
+   * 계약: confirmBox(문장, 예를 눌렀을 때 부를 함수). 취소·X·Esc·뒤로가기는
+   * 전부 "아니오"이고, 아무것도 부르지 않는다(= confirm() 의 false 자리).
+   *
+   * confirmPending 은 **한 번만 쓰이는 응답 자리**다. yes 핸들러가 읽는 즉시
+   * 비우므로 두 번 눌러도 두 번 사지 않고, closeAllModals 가 창을 걷어 가도
+   * 남은 콜백이 나중에 되살아나지 않는다. */
+  var confirmPending = null;
+  function confirmBox(msg, onYes) {
+    var m = $('modal-confirm'), p = $('cf-msg');
+    /* 창이 없는 빌드(마크업이 잘린 사본 등)에서 조용히 아무 일도 안 일어나면
+       "눌렀는데 안 사진다"가 된다. 그때만 시스템 대화상자로 물러선다. */
+    if (!m || !p) {
+      if (typeof window !== 'undefined' && window.confirm && window.confirm(msg) && onYes) onYes();
+      return;
+    }
+    confirmPending = (typeof onYes === 'function') ? onYes : null;
+    p.textContent = htmlPlain(msg);
+    openModal('modal-confirm');
+    var y = $('cf-yes');
+    if (y && y.focus) { try { y.focus(); } catch (e) { /* 포커스는 장식이다 */ } }
+  }
+  /** 취소 경로 하나. Esc·뒤로가기·X·[취소] 넷이 전부 이 함수를 지난다. */
+  function closeConfirm() {
+    confirmPending = null;
+    closeModal('modal-confirm');
   }
 
   /** <b> 같은 서식 태그만 벗긴 평문. 토스트는 textContent 라 태그가 그대로 찍힌다. */
@@ -28874,16 +29003,28 @@ window.TT_SFX = {
       J.sfx.fail();
       return;
     }
-    if (typeof window !== 'undefined' && window.confirm &&
-        !window.confirm(t('skin.confirm', { n: sk.cost, name: t(sk.name) }))) return;
-    store.jstar = have - sk.cost;
-    if (store.skins.indexOf(sk.id) < 0) store.skins.push(sk.id);
-    store.equipped[skinTargetId()] = sk.id;
-    persist();
-    applySkins();
-    buildSkinList();
-    toast(t('skin.bought', { name: t(sk.name) }));
-    J.sfx.win();
+    /* 출시 점검 0909 ①(승인 A2) — window.confirm 이 있던 자리.
+       옛 줄(되돌릴 근거로 남긴다):
+         if (typeof window !== 'undefined' && window.confirm &&
+             !window.confirm(t('skin.confirm', …))) return;
+       확인 창이 비동기라 결제는 **콜백 안**으로 들어간다. 그래서 잔액을 다시
+       읽는다(창이 떠 있는 사이에 젤리별이 줄 수 있는 유일한 경로는 다른 구매
+       뿐이지만, 물어본 값으로 결제하는 코드는 두 번 물어보면 두 번 산다). */
+    confirmBox(t('skin.confirm', { n: sk.cost, name: t(sk.name) }), function () {
+      closeConfirm();
+      var sk2 = skinById(sid);
+      if (!sk2 || sk2.soon || skinOwned(sk2)) return;
+      var now = store.jstar | 0;
+      if (now < sk2.cost) { toast(t('skin.poor', { n: sk2.cost - now })); J.sfx.fail(); return; }
+      store.jstar = now - sk2.cost;
+      if (store.skins.indexOf(sk2.id) < 0) store.skins.push(sk2.id);
+      store.equipped[skinTargetId()] = sk2.id;
+      persist();
+      applySkins();
+      buildSkinList();
+      toast(t('skin.bought', { name: t(sk2.name) }));
+      J.sfx.win();
+    });
   }
 
   /* W4 — 탭은 **세션 로컬**이다. store 에 안 넣는 이유는, 그것이 "무엇을 골랐나"가
@@ -42761,6 +42902,18 @@ window.TT_SFX = {
       J.sfx.ui();
     });
     on($('sk-close'), 'click', closeSkins);
+    /* 출시 점검 0909 ① — 확인 창의 두 버튼. X 는 data-w6x="cf-no" 로 이 [취소]
+       버튼을 그대로 누르므로(§W6 위임) 배선이 하나 더 늘지 않는다.
+       [예]는 창이 실제로 열려 있을 때만 응답한다 — closeAllModals 가 창을
+       걷어 간 뒤 남은 콜백이 되살아나는 경로를 막는 가드다. */
+    on($('cf-yes'), 'click', function () {
+      var m = $('modal-confirm');
+      if (!m || m.hidden) return;
+      var fn = confirmPending;
+      confirmPending = null;
+      if (fn) fn(); else closeConfirm();
+    });
+    on($('cf-no'), 'click', closeConfirm);
     on($('modal-skin'), 'click', function (ev) { if (ev && ev.target === this) closeSkins(); });
     on($('sk-list'), 'click', function (ev) {
       var el = ev && ev.target;
@@ -42919,6 +43072,12 @@ window.TT_SFX = {
          * on another one (z-index 71 over 70), so it is checked before every
          * other branch — including the pause branch, which would otherwise
          * resume a paused game while its board was still covering the screen. */
+        /* 출시 점검 0909 ① — 확인 창이 가장 먼저다. z-index 77 로 랭킹판(71)·
+           스킨 시트(73)·캐릭터 패널(72) 위에 있으므로 "가장 위의 것부터"라는
+           이 사슬의 규칙상 여기가 그 자리다. Esc = 취소(= confirm() 의 false).
+           뒤로가기 파수꾼도 합성 Escape 하나로 이 사슬을 태우므로, 안드로이드
+           뒤로가기 역시 이 한 줄로 「확인 창만 닫힘」이 된다. */
+        if ($('modal-confirm') && !$('modal-confirm').hidden) { closeConfirm(); return; }
         if ($('modal-rank') && !$('modal-rank').hidden) { closeRank(); return; }
         // 10차 §C: 모드 시트는 메뉴 위에 떠 있는 한 겹이라 가장 먼저 닫힌다.
         if ($('modal-mode') && !$('modal-mode').hidden) { closeModeSheet(); return; }
@@ -56835,9 +56994,10 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
   }
 
   /* ==========================================================================
-     화면별 뒤로가기 분기표 — 화면키 19 (화면 4 + 시트 15) 전량
+     화면별 뒤로가기 분기표 — 화면키 20 (화면 4 + 시트 16) 전량
 
-       modal-rank      닫기 (Esc → closeRank)           z71 = 항상 맨 위
+       modal-confirm   취소 (Esc → closeConfirm)        z77 = 항상 맨 위 ← 0909 ① 추가
+       modal-rank      닫기 (Esc → closeRank)           z71
        modal-skin      sk-close → 캐릭터 패널로         ← 0909 추가 (Esc 사슬에 없던 겹)
        modal-settings  st-close → 메뉴로                 ← 0909 추가
        modal-over      btn-menu → 메인 메뉴              ← 0909 추가
@@ -56863,6 +57023,14 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
   /** 한 걸음 뒤로. 갈 데가 있었으면 true, 여기가 루트면 false. */
   function step() {
     var G = window.Game, S = G && G.state;
+
+    /* 0) 확인 창(z77)이 가장 위다 — 랭킹판(71)·스킨(73)·캐릭터 패널(72) 전부보다.
+       ★ 이 줄이 **selfBack() 보다 앞**이어야 하는 이유가 실제 결함이다: 확인 창은
+       지금 스킨 시트 위에서 열리는데, 스킨은 SELF_BACK 목록(2번)에 있어서 그
+       루프가 먼저 돌면 뒤로가기가 **위에 뜬 확인 창을 두고 밑의 스킨 시트를**
+       닫는다. 아래 openSheet() 도 같은 이유로 이 겹을 못 가져간다(스킨을
+       SELF_BACK 이 이미 채간 뒤다). 그래서 겹 순서 그대로 맨 앞에 둔다. */
+    if (isOpen('modal-confirm')) { esc(); return true; }
 
     /* 1) 랭킹판은 다른 시트 위에 쌓이는 유일한 겹(z71)이라 먼저다 */
     if (isOpen('modal-rank')) { esc(); return true; }
