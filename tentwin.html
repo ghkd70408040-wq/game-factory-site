@@ -8296,6 +8296,18 @@ html.no-art-logo .logo-img  { display: none; }
 #char-pick .char-card.locked .cc-stats { opacity: 0; visibility: hidden; }
 #char-pick .char-card.locked .cc-lock { background: rgba(255, 243, 220, .88); color: var(--prim-art-ink-2); }
 
+/* 0909 copy-flow ④ — 펫 미선택(「없음」)이 **고장**으로 읽혔다(감사 D8):
+   빈 초상 사각 + 빈 스탯 트랙 4개 + 잘린 「사용 -」. 채울 것이 없다는 사실은
+   그대로 두고, 그 자리를 **자리표시자**로 읽히게 한다 — 점선 슬롯이다.
+   outline 은 레이아웃을 한 픽셀도 안 움직인다(시안 A 좌표의 세로 예산 불변).
+   새 원시값 0: 테두리 색은 currentColor 이고, 그것은 이 판이 이미 쓰는 잉크다. */
+#cp-petinfo[data-char=""] #cp-pet-face,
+#cp-petinfo[data-char=""] .cs-bar {
+  outline: 1.5px dashed currentColor;
+  outline-offset: -1.5px;
+  opacity: .55;
+}
+
 .cp-dots i { background: rgba(110, 70, 58, .26); }
 .cp-dots i.on { background: var(--mL-outline); }
 
@@ -10733,11 +10745,24 @@ html[lang="en"] .mfbtn { font-size: 8px; letter-spacing: -.15px; }
   background: var(--cut-veil, transparent);
   mix-blend-mode: multiply;
 }
-.cut-skip {
+/* 0909 copy-flow ③ — 건너뛰기가 둘이 됐다(「건너뛰기」·「전부 건너뛰기」). 새
+   버튼 모양을 짓지 않는다: 알약 부품 `.cut-skip` 은 그대로 두 번 쓰고, 절대배치만
+   이 줄(`.cut-skips`)로 올린다. 종전 좌표(안전영역 + 10px 우상단)는 한 픽셀도
+   안 옮겼다 — 단추 하나짜리 화면에서는 지금까지와 똑같이 그려진다.
+   줄 자체는 pointer-events:none 이라 버튼 사이 틈을 눌러도 컷이 넘어가지 않는다
+   (#screen-story 의 위임 클릭 = 다음 컷). */
+.cut-skips {
   position: absolute;
   top: calc(var(--safe-t) + 10px);
   right: calc(var(--safe-r) + 10px);
   z-index: 4;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  pointer-events: none;
+}
+.cut-skip {
+  pointer-events: auto;
   min-width: 64px;
   min-height: 44px;
   padding: 0 14px;
@@ -13346,7 +13371,16 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
       <div id="cut-cast" aria-hidden="true"></div>
       <div id="cut-veil" aria-hidden="true"></div>
     </div>
-    <button id="cut-skip" class="cut-skip" type="button" data-i18n="story.skip" data-i18n-aria="aria.cutskip" aria-label="Skip the story">Skip</button>
+    <!-- 0909 copy-flow ③ — 감사 D7: 첫 타일까지 필수 탭 20+ 이고, #cut-skip 은
+         오프닝(A)만 넘긴다. 캐릭터 선택 뒤의 출정 컷(B)이 통째로 남아 있어서
+         「건너뛰기」를 눌러도 이야기가 끝나지 않았다. 그래서 버튼이 둘이다:
+           · 건너뛰기      = 지금 컷 사슬 한 벌         (뒤로가기와 같은 뜻)
+           · 전부 건너뛰기 = 온보딩 사슬 전부(A + 출정)
+         「전부 건너뛰기」는 사슬 위에서만 뜬다(hidden 토글, cutSyncSkipAll). -->
+    <div class="cut-skips">
+      <button id="cut-skipall" class="cut-skip" type="button" hidden data-i18n="story.skipall" data-i18n-aria="aria.cutskipall" aria-label="Skip the whole story">Skip all</button>
+      <button id="cut-skip" class="cut-skip" type="button" data-i18n="story.skip" data-i18n-aria="aria.cutskip" aria-label="Skip the story">Skip</button>
+    </div>
     <div id="cut-bar" role="status" aria-live="polite">
       <p id="cut-who" class="cut-who"></p>
       <p id="cut-line" class="cut-line"></p>
@@ -14832,7 +14866,12 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
                    (같은 줄의 cp-pet-pass 규약 그대로). 펫 미선택이면 비어 접힌다. -->
               <p class="cc-name" id="cp-pet-nameline"><i class="cc-ic" aria-hidden="true"><svg viewBox="0 0 40 40" aria-hidden="true" focusable="false"><path d="M20.6 30.6 17.4 37" stroke="#B9A8D6" stroke-width="2.6" stroke-linecap="round"/><path d="M13 12.5a6.4 6.4 0 0 1 6.4-5.6 6.4 6.4 0 0 1 6.2 4.8 5.6 5.6 0 0 1 5 5.5 5.6 5.6 0 0 1-3.4 5.2 5.9 5.9 0 0 1-5.4 4.6 6.2 6.2 0 0 1-5.3-2.4 5.8 5.8 0 0 1-6.2-3.2 5.6 5.6 0 0 1 2.7-8.9Z" fill="#FDF8FC" stroke="#C9B7DE" stroke-width="1.5" stroke-linejoin="round"/><ellipse cx="20.2" cy="17.6" rx="3.1" ry="2.7" fill="#E39D9A"/><ellipse cx="15.6" cy="13.4" rx="1.5" ry="1.9" fill="#E39D9A"/><ellipse cx="19.6" cy="11.6" rx="1.5" ry="1.9" fill="#E39D9A"/><ellipse cx="23.6" cy="12.9" rx="1.5" ry="1.9" fill="#E39D9A"/><path d="M8 8.5 8.9 11l2.5.9-2.5.9L8 15.3l-.9-2.5L4.6 12l2.5-.9Z" fill="#FCE69F"/><path d="M33 22.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8Z" fill="#FCE69F"/><path d="M31.5 8.6l.6 1.6 1.6.6-1.6.6-.6 1.6-.6-1.6-1.6-.6 1.6-.6Z" fill="#FCE69F"/></svg></i><b id="cp-pet-passname"></b></p>
               <p class="cc-line"><b class="cc-k" id="cp-pet-passk" data-i18n="cp.sk.skill">Skill</b><span class="cc-pass" id="cp-pet-pass">&nbsp;</span></p>
-              <p class="cc-line"><b class="cc-k cc-k-u" data-i18n="cp.sk.use">Uses</b><span class="cc-ult" id="cp-pet-use">&nbsp;</span></p>
+              <p class="cc-line" id="cp-pet-useline"><b class="cc-k cc-k-u" data-i18n="cp.sk.use">Uses</b><span class="cc-ult" id="cp-pet-use">&nbsp;</span></p>
+              <!-- 0909 copy-flow ④ — 펫 미선택일 때 「사용 -」 대신 서는 한 줄.
+                   내용은 JS 가 PET_FREE 에서 뽑아 채운다(syncPetInfo) — 무료 동료
+                   표가 바뀌면 말도 같이 바뀐다. 값이 동적이라 data-i18n 이 아니라
+                   id 로 채우는 것은 같은 판의 cp-pet-pass 규약 그대로다. -->
+              <p class="cc-line cc-empty" id="cp-pet-empty" hidden></p>
             </div>
           </div>
         </div>
@@ -24218,6 +24257,10 @@ window.TT_SFX = {
       'cp.sk.usev': '{n} per match',
       'cp.sk.perm': 'Always on',
       'cp.sk.none': 'Going solo. No buddy skill this run.',
+      /* 0909 copy-flow ④ — 펫 탭 빈 상태 한 줄. `{free}` 는 PET_FREE 에서 나온다
+         (petFreeNames) — 무료 동료가 바뀌면 이 문장도 같이 바뀐다. */
+      'cp.pet.empty': 'Pick a buddy and their skill shows up here. {free} are with you from the very first round.',
+      'cp.pet.sep': ' and ',
       'cp.sk.lock': 'Locked',
       'aria.loadout': 'Loadout',
       'pet.axis.link': 'Link',
@@ -24374,20 +24417,20 @@ window.TT_SFX = {
       'cut.c10a': 'King Cocoa, once more. This time, the Heart beats on our side.',
       'cut.c10b': 'Harmony returns. Sames are sweet because they match \u2014 differents add up to Ten.',
       'cut.c10b2': '\u2026That\'s how this world plays.',
-      /* --- W7 푸딩 기사 (필살기 = 소환 계열, 7초) --- */
+      /* --- W7 푸딩 기사 (필살기 = 소환 계열 · 지속은 SKILL_MS.pudding) --- */
       'char.pudding.name': 'Pudding Knight',
       'char.pudding.title': 'Shield of the Jelly Court',
       'char.pudding.tag': 'Defender',
       'char.pudding.pass': 'Pudding Guard — +60% on a 10-sum, +15% on anything else. No match is wasted.',
-      'char.pudding.ult': 'Pudding Shield — 7s where every match counts as a TenTwin combo',
+      'char.pudding.ult': 'Pudding Shield — {sec}s where every match counts as a TenTwin combo',
       'char.pudding.tip': 'Pick him to hold the line and stack the chain.',
       'skill.pudding.name': 'PUDDING SHIELD!',
-      /* --- W7 소다 마녀 (필살기 = 젤리 타임 계열, 6.5초) --- */
+      /* --- W7 소다 마녀 (필살기 = 젤리 타임 계열 · 지속은 SKILL_MS.sodawitch) --- */
       'char.sodawitch.name': 'Soda Witch',
       'char.sodawitch.title': 'Witch of the Fizzy Marsh',
       'char.sodawitch.tag': 'Big-hitter',
       'char.sodawitch.pass': 'Fizz Pop — a 20% chance of x2 on every match. Twice as often, half as big.',
-      'char.sodawitch.ult': 'Soda Burst — 6.5s at a 40% jackpot chance',
+      'char.sodawitch.ult': 'Soda Burst — {sec}s at a 40% jackpot chance',
       'char.sodawitch.tip': 'Pick her to blow the board wide open.',
       'skill.sodawitch.name': 'SODA BURST!',
       /* --- W7 신규 동료 둘. 기술명(skill.mongle.name / skill.churup.name)은
@@ -24747,6 +24790,7 @@ window.TT_SFX = {
       'aria.gallery': 'Story gallery',
       'aria.credits': 'Credits',
       'aria.cutskip': 'Skip the story',
+      'aria.cutskipall': 'Skip the whole story',
       'settings.gallery': 'Story gallery',
       'settings.credits': 'Credits',
       'credits.body': 'TenTwin: Jellypang World — art & music by the author, built with the game factory.',
@@ -24757,6 +24801,9 @@ window.TT_SFX = {
       'char.jelly.tag': 'Thrill-seeker',
       /* --- §E 컷툰 (STORY-CUTS.md) ---------------------------------------- */
       'story.skip': 'Skip',
+      /* 0909 copy-flow ③ — 두 건너뛰기가 나란히 서므로 라벨이 서로를 설명해야
+         한다: 하나는 지금 사슬, 하나는 이야기 전부다. */
+      'story.skipall': 'Skip all',
       'cut.who.ten': 'Tenten',
       'cut.who.twin': 'Twin',
       'cut.who.jelly': 'Jelly Princess',
@@ -24875,7 +24922,7 @@ window.TT_SFX = {
          htmlPlain() 이 태그만 벗겨서 넣는다. */
       'howto.ten': 'Same numbers make a <b>Twin</b>; adding to 10 makes a <b>Ten</b>. Every Ten loosens the hardened world.',
       'howto.ult': 'The Special charges by <b>alternating</b> \u2014 Ten, then Twin, then Ten. Repeat the same kind, and the chain breaks.',
-      'howto.awaken': 'Awaken fills faster with bigger combos. When it bursts: for 6 seconds, <b>every match counts as a TenTwin combo.</b>',
+      'howto.awaken': 'Awaken fills faster with bigger combos. When it bursts: for {sec} seconds, <b>every match counts as a TenTwin combo.</b>',
       'howto.overdrive': 'Chain your attacks and hit <b>OVERDRIVE</b>! It lasts as long as you do \u2014 keep matching, keep firing.',
       'howto.finish': 'When the boss falls: <b>10-second Finish</b>. Clear the final mission on screen \u2014 that\'s the real win.',
       /* 0901 ⑥-d — I16 이 한 대를 막았을 때 뜨는 한 낱말. */
@@ -25187,13 +25234,13 @@ window.TT_SFX = {
       'aria.nextchar': 'Next character',
       'aria.close': 'Close',
       'char.ten.title': 'First Prince of Tentwin',
-      'char.ten.ult': 'Summon Twin — 6s where every match counts as a TenTwin combo',
+      'char.ten.ult': 'Summon Twin — {sec}s where every match counts as a TenTwin combo',
       'char.ten.tip': 'Pick him when sum-10 pairs are everywhere.',
       'char.twin.title': 'Second Prince of Tentwin',
-      'char.twin.ult': 'Summon Tenten — 6s where every match counts as a TenTwin combo',
+      'char.twin.ult': 'Summon Tenten — {sec}s where every match counts as a TenTwin combo',
       'char.twin.tip': 'Pick him when the same numbers pile up.',
       'char.jelly.title': 'Princess of the Jellypang world',
-      'char.jelly.ult': 'Jelly Time — 8s at a 40% jackpot chance',
+      'char.jelly.ult': 'Jelly Time — {sec}s at a 40% jackpot chance',
       'char.jelly.tip': 'Pick her to gamble on one huge run.',
 
       /* --- v4 6차 §A-2: 리액션 말풍선 대사 ---------------------------------
@@ -25338,6 +25385,13 @@ window.TT_SFX = {
       'cp.sk.usev': '한 판에 {n}회',
       'cp.sk.perm': '영구',
       'cp.sk.none': '혼자 갑니다 — 이번 판에는 펫 기술이 없어요.',
+      /* 0909 copy-flow ④ — 펫 탭 빈 상태 한 줄. `{free}` 는 PET_FREE 에서 나온다
+         (petFreeNames). ⚠ 실측 정정: 이 탭은 "펫이 하나도 없는" 상태가 아니다 —
+         새 설치도 삐약·뭉치를 이미 갖고 있다(store 리터럴 pets 두 항목 · §14.1 ⓐ).
+         비어 보이던 것은 **기본 선택이 「없음」**이었기 때문이다. 그러니 문구도
+         "첫 펫을 만나요"가 아니라 "고르면 나온다"가 사실이다. */
+      'cp.pet.empty': '동료를 고르면 여기에 기술이 나와요. {free}는 처음부터 함께예요.',
+      'cp.pet.sep': '·',
       'cp.sk.lock': '잠김',
       'aria.loadout': '장비',
       'pet.axis.link': '연결',
@@ -25483,20 +25537,20 @@ window.TT_SFX = {
       'cut.c10a': '초코 대왕과의 재대결. 이번엔 심장이 우리 쪽에서 뛰어요.',
       'cut.c10b': '합이 돌아왔어요. 같은 것은 같아서 반갑고, 다른 것은 더해져 열이 돼요.',
       'cut.c10b2': '\u2026그게 이 세계의 노는 법이에요.',
-      /* --- W7 푸딩 기사 (필살기 = 소환 계열, 7초) --- */
+      /* --- W7 푸딩 기사 (필살기 = 소환 계열 · 지속은 SKILL_MS.pudding) --- */
       'char.pudding.name': '푸딩 기사',
       'char.pudding.title': '젤리 왕궁의 방패',
       'char.pudding.tag': '버티기파',
       'char.pudding.pass': '푸딩 방패 · 합10은 +60%, 나머지도 +15% — 헛치는 매치가 없어요',
-      'char.pudding.ult': '푸딩 방패 — 7초간 모든 매치가 텐트윈 콤보',
+      'char.pudding.ult': '푸딩 방패 — {sec}초간 모든 매치가 텐트윈 콤보',
       'char.pudding.tip': '길게 버티며 사슬을 쌓고 싶을 때.',
       'skill.pudding.name': '푸딩 방패!',
-      /* --- W7 소다 마녀 (필살기 = 젤리 타임 계열, 6.5초) --- */
+      /* --- W7 소다 마녀 (필살기 = 젤리 타임 계열 · 지속은 SKILL_MS.sodawitch) --- */
       'char.sodawitch.name': '소다 마녀',
       'char.sodawitch.title': '탄산 늪의 마녀',
       'char.sodawitch.tag': '한 방파',
       'char.sodawitch.pass': '탄산 팡 · 매치마다 20% 확률로 ×2 — 두 배로 자주, 절반 크기로',
-      'char.sodawitch.ult': '탄산 폭발 — 6.5초간 잭팟 확률 40%',
+      'char.sodawitch.ult': '탄산 폭발 — {sec}초간 잭팟 확률 40%',
       'char.sodawitch.tip': '한 번에 크게 터뜨리고 싶을 때.',
       'skill.sodawitch.name': '탄산 폭발!',
       /* --- W7 신규 동료 둘. 기술명은 W3 이 이미 세워 뒀다. --- */
@@ -25828,6 +25882,7 @@ window.TT_SFX = {
       'aria.gallery': '스토리 갤러리',
       'aria.credits': '제작진',
       'aria.cutskip': '스토리 건너뛰기',
+      'aria.cutskipall': '이야기 전부 건너뛰기',
       'settings.gallery': '스토리 갤러리',
       'settings.credits': '제작진',
       'credits.body': '틴트윈: 젤리팡 월드 — 그림·음악 제작자 제공, 게임 공장에서 만들었습니다.',
@@ -25838,6 +25893,7 @@ window.TT_SFX = {
       'char.jelly.tag': '두근두근파',
       /* --- §E 컷툰 (STORY-CUTS.md) ---------------------------------------- */
       'story.skip': '건너뛰기',
+      'story.skipall': '전부 건너뛰기',
       'cut.who.ten': '텐텐',
       'cut.who.twin': '트윈',
       'cut.who.jelly': '젤리공주',
@@ -25942,7 +25998,7 @@ window.TT_SFX = {
       /* ---- 0901 ⑥-c — 개념 튜토리얼 5장 (STORY-SCRIPT-0831 §3 원문) ---- */
       'howto.ten': '같은 숫자는 <b>트윈</b>, 합이 10이면 <b>텐</b>. 텐을 만들수록 굳은 세계가 풀려요.',
       'howto.ult': '필살기는 <b>번갈아</b> 채워요 \u2014 텐 다음 트윈, 트윈 다음 텐. 같은 것만 반복하면 사슬이 끊겨요.',
-      'howto.awaken': '각성 게이지는 콤보가 클수록 빨리 차요. 터지면 6초간, <b>모든 매치가 텐트윈 콤보</b>가 돼요.',
+      'howto.awaken': '각성 게이지는 콤보가 클수록 빨리 차요. 터지면 {sec}초간, <b>모든 매치가 텐트윈 콤보</b>가 돼요.',
       'howto.overdrive': '공격이 꼬리를 물면 <b>폭주</b>! 멈추지 않는 한 계속돼요 \u2014 계속 맞추면, 계속 쏴요.',
       'howto.finish': '보스가 쓰러지면 <b>피니시 10초</b>. 화면에 뜬 마지막 미션을 해내야 진짜 승리예요.',
       /* 0901 ⑥-d — I16 이 한 대를 막았을 때 뜨는 한 낱말. */
@@ -26220,13 +26276,13 @@ window.TT_SFX = {
       'aria.nextchar': '다음 캐릭터',
       'aria.close': '닫기',
       'char.ten.title': '텐트윈 왕국의 첫째 왕자',
-      'char.ten.ult': '트윈 왕자 소환 — 6초간 모든 매치가 텐트윈 콤보',
+      'char.ten.ult': '트윈 왕자 소환 — {sec}초간 모든 매치가 텐트윈 콤보',
       'char.ten.tip': '합이 10인 짝이 많은 판에서 강해요.',
       'char.twin.title': '텐트윈 왕국의 둘째 왕자',
-      'char.twin.ult': '텐텐 왕자 소환 — 6초간 모든 매치가 텐트윈 콤보',
+      'char.twin.ult': '텐텐 왕자 소환 — {sec}초간 모든 매치가 텐트윈 콤보',
       'char.twin.tip': '같은 숫자가 몰린 판에서 강해요.',
       'char.jelly.title': '젤리팡 세상의 공주',
-      'char.jelly.ult': '젤리 타임 — 8초간 잭팟 확률 40%',
+      'char.jelly.ult': '젤리 타임 — {sec}초간 잭팟 확률 40%',
       'char.jelly.tip': '운에 걸고 크게 터뜨리고 싶을 때.',
 
       /* --- v4 6차 §A-2: 리액션 말풍선 대사 --- */
@@ -26291,18 +26347,49 @@ window.TT_SFX = {
     return 'en';
   }
 
+  /* ---- 문구-값 파생 (0909 copy-flow ①) --------------------------------
+   * 감사 COMPLETION-AUDIT-0909 상위 3: 필살기 지속 문구 12건이 SKILL_MS
+   * ×1.25 상향 뒤에도 옛 값(6/6/8/7/6.5초)에 남아 있었다. 원인은 하나다 —
+   * **같은 수가 두 곳에 적혀 있었다**(상수 하나, 사전 12건). 그래서 고치는
+   * 방법도 하나다: 사전에서 숫자를 지우고 `{sec}` 자리표시자만 남긴다.
+   * 이제 다섯 캐릭터 ko/en `char.<id>.ult` 와 튜토리얼 `howto.awaken` 은
+   * t() 가 SKILL_MS 에서 **그 자리에서** 읽어 채운다. 상수를 다시 올리면
+   * 문구가 같은 프레임에서 따라 올라간다 — 어긋날 자리가 없다.
+   *   · char.<id>.ult  -> SKILL_MS[<id>]
+   *   · howto.awaken   -> SKILL_MS[charId()]   각성 버튼이 쏘는 것이 바로 그 필살기다
+   *                          (applySkill() 의 `SKILL_MS[charId()]` 와 같은 집)
+   * ▣ 표기 규칙은 **0.1초 자리에서 끊는다**(8125ms -> "8.1"). 화면에
+   *   "8.125초"를 쓸 수는 없고, 어느 반올림 규칙이든 **한 자리에만** 적혀
+   *   있으면 다시 어긋날 수 없다. 관문 tools/measure/copy-check.py 가 같은
+   *   규칙으로 사전을 다시 재고, 사전에 맨숫자가 돌아오면 FAIL 한다.
+   * ▣ 밸런스 계약 밖: 상수는 한 글자도 안 바뀐다. 바뀌는 것은 문구뿐이다. */
+  /** ms -> 초 표기. 7500 -> "7.5" · 10000 -> "10" · 8125 -> "8.1". */
+  function fmtSec(ms) { return String(Math.round((ms | 0) / 100) / 10); }
+  var ULT_KEY_RE = /^char\.([A-Za-z0-9_]+)\.ult$/;
+  /** `{name}` 하나를 상수에서 뽑아 준다. 모르는 이름이면 null(자리표시자 유지). */
+  function i18nDerived(name, key) {
+    if (name !== 'sec') return null;
+    var m = ULT_KEY_RE.exec(String(key || ''));
+    var ms = m ? SKILL_MS[m[1]]
+               : (key === 'howto.awaken' ? SKILL_MS[charId()] : 0);
+    return ms ? fmtSec(ms) : null;
+  }
+
   /** Translate `key`, substituting {placeholder} tokens from `params`. */
   function t(key, params) {
     var dict = I18N[currentLang()] || I18N.en;
     var s = dict[key];
     if (typeof s !== 'string') s = I18N.en[key];
     if (typeof s !== 'string') return String(key);
-    if (params) {
-      s = s.replace(/\{(\w+)\}/g, function (m, name) {
-        return Object.prototype.hasOwnProperty.call(params, name)
-          ? String(params[name]) : m;
-      });
-    }
+    /* 상수 파생(위 주석) 때문에 params 가 없어도 항상 돌린다. 모르는
+       이름은 종전처럼 그대로 남기므로(`return m`) 기존 문구는 무변이다. */
+    s = s.replace(/\{(\w+)\}/g, function (m, name) {
+      if (params && Object.prototype.hasOwnProperty.call(params, name)) {
+        return String(params[name]);
+      }
+      var d = i18nDerived(name, key);
+      return (d === null) ? m : d;
+    });
     return s;
   }
 
@@ -29099,6 +29186,18 @@ window.TT_SFX = {
   }
 
   /**
+   * 0909 copy-flow ④ — 무료 동료의 **이름 목록**. 빈 상태 문구가 이 함수를 통해
+   * PET_FREE 를 그대로 읽으므로, 표가 바뀌면 문장도 같은 프레임에서 바뀐다
+   * (필살기 지속 문구를 상수에서 파생시킨 ① 과 같은 규율 — 같은 사실을 두 곳에
+   * 적지 않는다). 구분자도 언어별이라 사전에 있다.
+   */
+  function petFreeNames() {
+    var out = [];
+    for (var i = 0; i < PET_FREE.length; i++) out.push(t('char.' + PET_FREE[i] + '.name'));
+    return out.join(t('cp.pet.sep'));
+  }
+
+  /**
    * 펫 탭의 정보 판. **사용자가 지적한 그 자리**다 — 시안 A 의 [패시브 스킬]
    * 박스에 고른(또는 구경 중인) 펫의 기술이 통째로 들어간다.
    *   이름  char.<id>.name        기술·효과·수치·지속  char.<id>.pass  (2c 문구 그대로)
@@ -29145,6 +29244,16 @@ window.TT_SFX = {
     /* 0901 ④-b — 펫의 고유명(STORY-SCRIPT §6). 미선택이면 빈 문자열이라
        `.cc-name:has(> b:empty)` 가 줄을 통째로 접는다(요소를 지우지 않는다). */
     cpTxt($('cp-pet-passname'), null, id ? (t('char.' + id + '.passname') || '') : '');
+    /* 0909 copy-flow ④ — 빈 상태(감사 D8). 「사용 -」은 값이 없는데 라벨만 남은
+       줄이라 잘린 꼬리로 읽혔다. 펫이 안 골렸을 때는 그 줄을 접고, 대신 무엇을
+       하면 되는지 한 줄로 말한다. 요소를 지우지 않고 hidden 만 토글하는 것은
+       같은 판의 `.cc-name:has(> b:empty)` 접기와 같은 문법이다. */
+    var emp = $('cp-pet-empty'), useln = $('cp-pet-useline');
+    if (useln) useln.hidden = !id;
+    if (emp) {
+      if (id) emp.hidden = true;
+      else { emp.textContent = t('cp.pet.empty', { free: petFreeNames() }); emp.hidden = false; }
+    }
     if (!id) {
       cpTxt($('cp-pet-pass'), 'cp.sk.none');
       cpTxt($('cp-pet-use'), null, '-');
@@ -34939,12 +35048,30 @@ window.TT_SFX = {
     celebrateRank(dailyRank);
   }
 
+  /* ---- 0909 copy-flow ② — 공유 문구에 **게임 주소** ---------------------
+   * 감사 COMPLETION-AUDIT-0909 상위 6: 자랑을 받은 친구가 게임에 도달할 경로가
+   * 0 이었다 — 세 공유 문구(데일리·아케이드·게임오버) 어느 것에도 URL 이 없어
+   * 바이럴 루프가 그 자리에서 끊겼다.
+   * ▣ 주소는 배포본 하나다 — <link rel="canonical"> · og:url 과 **같은 글자**다.
+   *   그 URL 에 og:title / og:description / og:image 가 이미 서 있어(헤더 메타
+   *   묶음, og:image = catalog/og-card.jpg 1200×630 실재) 카카오톡·슬랙에
+   *   붙이면 카드 미리보기가 그대로 뜬다.
+   * ▣ `?ref=share` 는 캐시를 비껴가지 않는다: sw.js 가 네비게이션·정적 둘 다
+   *   `cache.match(req, { ignoreSearch: true })` 로 맞춘다(sw.js :61 · :85).
+   *   게임 코드는 이 키를 읽지 않는다 — URLSearchParams 사용처는 ?bg= · ?screen=
+   *   프리뷰 훅 둘뿐이라 모르는 쿼리는 조용히 무시된다.
+   * ▣ 점수·모드 쿼리는 붙이지 않는다: 진입 쿼리를 읽는 코드가 아직 없어
+   *   (씨드 링크 = 2차) 지금 붙이면 아무것도 안 하는 글자만 길어진다. */
+  var SHARE_URL = 'https://ghkd70408040-wq.github.io/game-factory-site/tentwin.html?ref=share';
+  /** 공유 글 끝에 주소 한 줄. 빈 글에는 붙이지 않는다(빈 공유는 아예 안 나간다). */
+  function withShareLink(txt) { return txt ? (txt + '\n' + SHARE_URL) : txt; }
+
   function shareText() {
     var d = dailyBestNow();   // W7.5 — 방금 끝낸 판의 칸
     if (!d) return '';
     // Language-independent by design (contract §8).
-    return 'TenTwin #' + d.n + ' ✅ ' + fmtTime(d.timeSec) + ' 🔥' + d.maxCombo + 'x' +
-           (d.grade ? ' ' + d.grade : '') + '\n' + (d.grid || '');
+    return withShareLink('TenTwin #' + d.n + ' ✅ ' + fmtTime(d.timeSec) + ' 🔥' + d.maxCombo + 'x' +
+           (d.grade ? ' ' + d.grade : '') + '\n' + (d.grid || ''));
   }
 
   /**
@@ -35034,11 +35161,11 @@ window.TT_SFX = {
       : Math.max(0, (S.arcLastValue | 0));
     ensureArcadeBest();
     var b = store.arcadeBest[mode];
-    return 'TenTwin ⚔ ' + arcModeName(mode) + '\n' +
+    return withShareLink('TenTwin ⚔ ' + arcModeName(mode) + '\n' +
            arcValueText(mode, value) + ' · ' + arcDirText(mode) +
            (b && typeof b.value === 'number'
               ? '\n👑 ' + arcValueText(mode, b.value) : '') +
-           '\n' + t('share.beat');
+           '\n' + t('share.beat'));
   }
 
   /**
@@ -35057,12 +35184,16 @@ window.TT_SFX = {
    * person a player sends their score to is a friend who shares their language.
    * So the numbers travel, and one localized sentence rides along.
    */
-  function shareScore() {
+  /* 0909 copy-flow ② — 글자를 만드는 일과 보내는 일을 나눠 둔다. 형제 둘
+     (shareText · arcShareText)이 이미 그 모양이고, 관문 하네스가 공유 글을
+     클립보드 없이 재려면 돌려주는 함수가 있어야 한다. */
+  function scoreShareText() {
     var o = S.overInfo;
-    if (!o) return;
-    copyToClipboard('TenTwin ' + (o.rush ? '⚡ Time Rush ' : '') + o.score +
+    if (!o) return '';
+    return withShareLink('TenTwin ' + (o.rush ? '⚡ Time Rush ' : '') + o.score +
                     (o.rush ? '' : ' · Stage ' + o.stage) + ' 🍬\n' + t('share.beat'));
   }
+  function shareScore() { copyToClipboard(scoreShareText()); }
 
   /* =========================================================================
    * SECTION 13B — RANKING BOARD SCREEN (v5 E-1)
@@ -41130,6 +41261,11 @@ window.TT_SFX = {
   ];
 
   var cutList = null, cutIdx = 0, cutId = '', cutDone = null, cutPend = '';
+  /* 0909 copy-flow ③ — 지금 컷이 **온보딩 사슬**(오프닝 A → 캐릭터 선택 → 출정 B)의
+     일부인가. 「전부 건너뛰기」는 이 사슬 위에서만 뜬다: 챕터·해방·엔딩 컷까지
+     영구히 끄는 스위치가 아니라, 감사 D7 의 "첫 타일까지 필수 탭 20+"를 줄이는
+     버튼이다. 30분 뒤 엔딩 컷이 조용히 사라지면 그것은 건너뛰기가 아니라 손실이다. */
+  var cutChain = false;
 
   function cutSeen(id) { return !!(store.seenCuts && store.seenCuts[id]); }
   function cutMark(id) {
@@ -41156,8 +41292,15 @@ window.TT_SFX = {
     cutDone = after || null;
     closeAllModals();
     showScreen('screen-story');
+    cutSyncSkipAll();
     cutBuildDots();
     cutPaint();
+  }
+
+  /** 「전부 건너뛰기」는 온보딩 사슬 위에서만 보인다. 그 밖에서는 존재하지 않는다. */
+  function cutSyncSkipAll() {
+    var b = $('cut-skipall');
+    if (b) b.hidden = !cutChain;
   }
 
   function cutBuildDots() {
@@ -41225,11 +41368,45 @@ window.TT_SFX = {
   }
 
   /**
+   * 0909 copy-flow ③ — 「이야기 전부 건너뛰기」(감사 D7).
+   *
+   * #cut-skip 이 **지금 사슬 한 벌**을 넘기는 것과 달리, 이쪽은 온보딩 사슬
+   * 전부 — 오프닝 `open` 과 다섯 주인공의 출정 `sortie-<id>` — 를 본 것으로
+   * 표시하고 곧장 다음 화면으로 낸다. 캐릭터 선택은 이야기가 아니라 **선택**
+   * 이므로 그대로 남는다(선택 없이는 어느 출정 컷인지도 정해지지 않는다).
+   *
+   * ▣ 뒤로가기는 종전 그대로다. 파수꾼 step() 의 컷 분기는 계속 #cut-skip 을
+   *   누른다 — 뒤로가기의 뜻은 "한 컷 사슬 건너뛰기"이고, 하드웨어 뒤로가기가
+   *   이야기를 통째로 지워 버리면 그것은 되돌릴 수 없는 실수가 된다.
+   * ▣ 본 표시를 남기는 이유는 cutFinish 주석과 같다: 두 번째 진입에서 또 열리면
+   *   그것은 건너뛰기가 아니라 미룬 것이 되고 버튼이 거짓말이 된다. 표시된 컷은
+   *   설정 → 갤러리에서 언제든 다시 볼 수 있다(openGallery).
+   */
+  function cutFinishAll() {
+    if (!cutList) return;
+    cutMark('open');
+    for (var k in CUTS_SORTIE) {
+      if (Object.prototype.hasOwnProperty.call(CUTS_SORTIE, k)) cutMark('sortie-' + k);
+    }
+    /* 실측(flow-smoke, 신규 프로필): 첫 타일까지의 사슬은 두 벌이 아니라 **셋**이다 —
+       seenCuts 가 {open, sortie-ten, chap1} 로 남는다. 지도에 들어서는 순간
+       openMap() 이 maybeChapCut(chapMax()) 을 한 번 더 돌리기 때문이다.
+       그래서 **지금 들어갈 챕터 하나**도 같이 표시한다. 열 챕터를 전부 표시하지는
+       않는다: 그것은 이 버튼이 약속한 "이야기 전부"(= 지금 이 온보딩)가 아니라
+       앞으로 나올 이야기까지 미리 지우는 일이고, 되돌릴 수 없다. */
+    cutMark('chap' + chapMax());
+    cutChain = false;
+    cutFinish(true);
+  }
+
+  /**
    * 모험 진입. 최초 1회만 오프닝 → 캐릭터 선택 → 출정 컷 → 지도이고,
    * 그 다음부터는 곧장 지도다 (§E).
    */
   function openAdventure() {
     if (cutSeen('open')) { openMap(); return; }
+    /* 0909 copy-flow ③ — 여기서부터 지도에 닿을 때까지가 온보딩 사슬이다. */
+    cutChain = true;
     playCuts(CUTS_OPEN, 'open', function () {
       /* 캐릭터 선택이 이야기의 일부가 되는 지점이다: 누구로 갈지 고르고 나면
          그 캐릭터의 출정 컷이 이어진다. cpConfirm() 이 이 깃발을 본다. */
@@ -41243,8 +41420,12 @@ window.TT_SFX = {
     if (cutPend !== 'sortie') return false;
     cutPend = '';
     var id = charId();
+    /* 0909 copy-flow ③ — 이미 본(또는 「전부 건너뛰기」로 넘긴) 출정 컷은 다시
+       열지 않는다. cutSeen 검사가 없던 자리라, 표시만 서고 컷은 그대로 재생됐다.
+       playCuts 의 완료 콜백과 같은 곳으로 나간다(지도). */
+    if (cutSeen('sortie-' + id)) { cutChain = false; openMap(); return true; }
     var list = CUTS_SORTIE[id] || CUTS_SORTIE.ten;
-    playCuts(list, 'sortie-' + id, function () { openMap(); });
+    playCuts(list, 'sortie-' + id, function () { cutChain = false; openMap(); });
     return true;
   }
 
@@ -42873,12 +43054,19 @@ window.TT_SFX = {
     on($('st-credits'), 'click', function () { J.sfx.ui(); toast(t('credits.body')); });
     /* --- 스토리 컷툰 뷰어 (§E) — 탭/클릭/스페이스 = 다음, 우상단 건너뛰기 --- */
     on($('screen-story'), 'click', function (ev) {
-      if (ev && ev.target && ev.target.id === 'cut-skip') return;
+      var tid = ev && ev.target && ev.target.id;
+      /* 0909 copy-flow ③ — 건너뛰기가 둘이라 둘 다 위임에서 뺀다(둘 다 자기
+         핸들러에서 stopPropagation 하지만, 계약은 여기 한 줄에 적혀 있어야 한다). */
+      if (tid === 'cut-skip' || tid === 'cut-skipall') return;
       cutNext();
     });
     on($('cut-skip'), 'click', function (ev) {
       if (ev && ev.stopPropagation) ev.stopPropagation();
       cutFinish(true);
+    });
+    on($('cut-skipall'), 'click', function (ev) {
+      if (ev && ev.stopPropagation) ev.stopPropagation();
+      cutFinishAll();
     });
     on($('cp-skin'), 'click', openSkins);
     on($('cp-side-skin'), 'click', openSkins);
@@ -43866,6 +44054,18 @@ window.TT_SFX = {
     readStore: readStore, runHurry: runHurry, endHurry: endHurry,
     runBang: runBang, endBang: endBang, maybeHurry: maybeHurry,
     shiftDeadlines: shiftDeadlines,
+    /* 0909 copy-flow ② — DEBUG HANDLES ONLY(위 규약 그대로: 게임 코드는 이
+       중 무엇도 window.Game 을 거쳐 부르지 않는다). 공유 글에 주소가 정말
+       붙는가를 관문이 재려면 클립보드를 가로채는 대신 글을 돌려받는 자리가
+       필요하다(tools/measure/copy-check.py · flow-smoke). */
+    shareText: shareText, arcShareText: arcShareText, scoreShareText: scoreShareText,
+    SHARE_URL: SHARE_URL,
+    /* 0909 copy-flow ① — 문구-값 파생의 두 끝. 관문이 사전과 상수를 나란히
+       재려면 둘 다 밖에서 보여야 한다. */
+    SKILL_MS: SKILL_MS, fmtSec: fmtSec,
+    /* 0909 copy-flow ③ — 탭 수 실측 하네스가 「전부 건너뛰기」와 저장 키를
+       바깥에서 확인하는 자리(위 debug handles 규약 그대로). */
+    cutFinishAll: cutFinishAll, cutSeen: cutSeen,
     // i18n
     setLang: setLang, t: t, lang: currentLang, dict: I18N
   };
@@ -49492,6 +49692,30 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
 #charpanel .cp-th.locked .ct-art { opacity: .6; filter: grayscale(1) contrast(0) brightness(1.15); }
 #charpanel #mate-pick .char-card.locked .cav,
 #charpanel .cp-th.locked .cav { filter: grayscale(1) brightness(0) opacity(.32); }
+/* ---- 0909 copy-flow ④ — 펫 탭 잠금 실루엣 (감사 D8) ------------------------
+   실측한 결함: 펫 탭을 열면 **똑같은 검은 원 6개**가 앉는다. 원인은 마크업도
+   자산도 아니고 바로 윗줄들의 필터 레시피다 — `grayscale(1) brightness(0)` 는
+   모든 화소를 **검정**으로 뭉갠다. 여섯 마리가 서로 구별될 수 없고, 같은 판이
+   `.cc-lock{display:none}`(:45626)으로 「???」 뱃지도 걷어 뒀으므로, 화면에
+   남는 신호는 "검은 원"뿐이다. 그래서 고장으로 읽힌다.
+   새 표현을 짓지 않는다. **같은 파일이 이미 더 나은 레시피를 갖고 있다**:
+   주인공 방울의 잠금 실루엣(바로 위 `.cp-th.locked .ct-art`)이 그것이고, 그
+   주석이 이유까지 적어 뒀다 — "brightness(0) 만 쓰면 유리색이 배어 남색으로
+   어두워졌다 — 사용자 시안은 옅은 회색 실루엣". 펫 줄만 옛 레시피에 남아
+   있었을 뿐이다. 값 신설 0 · 규칙 신설 0 — 같은 레시피를 펫 줄에도 적는다.
+   여기에 점선 링 한 줄을 더해 그 자리가 "아직 빈 자리"라고 말하게 한다
+   (자리표시자 문법 · outline 이라 레이아웃은 한 픽셀도 안 움직인다 ·
+   색은 currentColor 라 새 원시값이 없다). */
+#charpanel #mate-pick .char-card.locked .cav,
+#charpanel[data-cptab="pet"] #mate-pick .char-card.locked::after {
+  opacity: .6;
+  filter: grayscale(1) contrast(0) brightness(1.15);
+}
+#charpanel[data-cptab="pet"] #mate-pick .char-card.locked::after {
+  outline: 1.5px dashed currentColor;
+  outline-offset: -1.5px;
+}
+
 #charpanel #mate-pick .char-card .cc-lock {
   position: absolute; inset: 0;
   display: flex; align-items: center; justify-content: center;
