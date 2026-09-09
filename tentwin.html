@@ -13099,6 +13099,49 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
 <meta name="twitter:description" content="TenTwin Jellypang World — pick number jellies that equal or sum to 10. Free, no install, works offline.">
 <meta name="twitter:image" content="https://ghkd70408040-wq.github.io/game-factory-site/catalog/og-card.jpg">
 <script>
+/* ---------------------------------------------------------------------------
+   perf3-0909 — **부팅 즉시 `lang` 확정**. 그리는 것은 하나도 바꾸지 않는다.
+
+   실측(scratchpad/perf3-0909/langprobe.py, 배포본 동등 dist):
+     · locale ko-KR → 로고 요청 **2건** `art-logo-en.webp`(62KB) + `art-logo.webp`(42KB)
+     · locale en-US → 로고 요청 **1건** `art-logo-en.webp`
+   원인: `<html lang="en">` 이 정적 기본값이고 ko 는 `applyI18n()`(본체 JS, defer)
+   이 돌 때 비로소 선다. 그 전까지 `html[lang="en"] .logo-img/.splash-logo`
+   (지연 CSS `tw-late-*.css`)가 맞아 **영문 로고를 High 우선순위로 먼저 받고**,
+   lang 이 ko 로 바뀌면 한글 로고를 한 번 더 받는다. 한국어 사용자에게는
+   첫 화면 대역폭 62KB 가 통째로 헛돈이고, 스플래시 로고가 EN→KO 로 한 번
+   갈린다(실측 요청 시각 106ms → 202ms).
+
+   고치는 방법: 이 head 스크립트에서 `documentElement.lang` 을 **본문 파싱 전에**
+   세운다. 값은 `currentLang()`(:26119) 이 나중에 계산할 값과 **같다** —
+   ① 저장된 선택(`tentwin.v1`.lang) ② navigator ③ GAME_DEFAULT_LANG ④ 'en'.
+   정본은 여전히 `currentLang()`/`applyI18n()` 이고 이 블록은 **선행 힌트**다.
+   틀려도 applyI18n 이 같은 자리에 같은 값을 다시 쓴다(멱등).
+
+   왜 `<html lang>` 정적 기본값을 ko 로 바꾸지 않는가: 그러면 영어 사용자에게
+   대칭으로 같은 낭비가 생기고, 정적 기본값 변경은 RELEASE-CHECKLIST 「텐트윈
+   특기」가 별 판단으로 남겨 둔 항목이다. 여기서는 **모든 사용자에게 처음부터
+   맞는 값**을 준다.
+   --------------------------------------------------------------------------- */
+(function(){
+  try{
+    var l='';
+    try{
+      var raw=window.localStorage.getItem('tentwin.v1');
+      if(raw){var s=JSON.parse(raw); if(s&&(s.lang==='ko'||s.lang==='en')) l=s.lang;}
+    }catch(e){}
+    if(!l){
+      var n='';
+      try{ n=(navigator.language||(navigator.languages&&navigator.languages[0])||''); }catch(e2){}
+      n=String(n).toLowerCase();
+      if(n.indexOf('ko')===0) l='ko';
+      else if(n) l='en';
+      else if(window.GAME_DEFAULT_LANG==='ko'||window.GAME_DEFAULT_LANG==='en') l=window.GAME_DEFAULT_LANG;
+      else l='en';
+    }
+    document.documentElement.lang=l;
+  }catch(e){}
+})();
 /* 진단 훅: 콘솔에만 남긴다. 외부 전송 없음. */
 window.addEventListener('error',function(e){try{console.error('[tentwin] error',e.message,e.filename+':'+e.lineno)}catch(_){}});
 window.addEventListener('unhandledrejection',function(e){try{console.error('[tentwin] rejection',e.reason&&(e.reason.message||e.reason))}catch(_){}});
