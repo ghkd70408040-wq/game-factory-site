@@ -21882,8 +21882,65 @@ window.TT_SFX = {
    * duelFoeHpMax · duelAtkMax 도 같은 par 에서 나오므로 악당 체력·공격력이 함께
    * 내려가 상대 난이도는 유지된다 — 실측 전/후 비교는 W1 검증 보고 참조. */
   var ADV_PAR_SEC = 2.0;
-  var ADV_STAR2 = 1.2;               // ★★ = 기준점수의 120%
-  var ADV_STAR3 = 1.5;               // ★★★ = 150% (또는 노셔플 — advStars 주석 참조)
+  /* ⛔ 0910 밸런스 재보정(판정판 44) — **전역 상수 1.2 / 1.5 를 은퇴시켰다.**
+   *   근거는 100탄 × 봇 3정책 × 5판 = 1,500판 실측(`scratchpad/balance-0910/raw/adv.jsonl`)
+   *   이다. 그 원자료를 옛 계수로 **재판정하면 기록된 별과 1,425/1,425 로 일치**
+   *   하고(즉 아래 계산은 게임이 실제로 하는 계산 그대로다), 결과는:
+   *     · ★★★ 획득률 = **전 챕터 0.3%** (탐욕봇 기준 **0.0%**, 100탄 전부)
+   *     · ★★ 이상   = 3.6% (챕터2 이후 0~7%)
+   *   문턱이 판정을 하지 못하고 **전부 떨어뜨리고 있었다**. 원인은 자의 눈금이
+   *   실제 분포와 무관한 데 있다 — 봇 점수의 중앙값은 par×D(ch) 의 **0.59 배**
+   *   인데 ★★ 문턱이 1.2 배였다. 즉 문턱이 실측 중앙값의 두 배였다.
+   *
+   * ✅ 후: 문턱을 **그 탄의 실제 점수 분포에서** 뽑는다(탄별 계수 표).
+   *     ★★  = 탐욕봇 점수 **중앙값**      → 정석 플레이의 절반이 받는다
+   *     ★★★ = 탐욕봇 점수 **상위 25%**    → 정석 플레이의 넷 중 하나가 받는다
+   *   계수는 `점수 ÷ (par × D(ch))` 로 정규화해 저장한다 — par 식이나 D(ch) 가
+   *   바뀌어도 「분포의 어디」라는 뜻이 안 흔들린다. 자릿수는 소수 2자리다
+   *   (5판 표본의 유효자릿수를 넘는 정밀도는 거짓 정밀도다).
+   *
+   * ⚠ 왜 **탐욕봇**인가 — 3정책 중 점수가 가장 낮다(중앙 0.595 vs 무작위 0.990 ·
+   *   힌트추종 0.913). 콤보를 극대화하느라 매치 수가 적어서다. 별은 스킨 화폐이므로
+   *   **가장 박한 자동 주행이 절반은 받는 높이**를 바닥으로 잡는 것이 안전하다 —
+   *   사람은 그보다 잘한다. 반대로 무작위봇에 맞추면 문턱이 다시 봇 상한이 된다.
+   *
+   * ⚠ 표본 없는 탄(79 · 84~88 — 심 로그가 그 탄에서 탐욕 레코드를 빠뜨렸다)은
+   *   **같은 챕터의 중앙값**으로 채웠다. 추정이 아니라 이웃의 실측이다.
+   *
+   * ⚠ 1~3탄(온보딩)은 계수에 **0.85** 를 곱해 완화했다. 완화 없이는 그 셋의
+   *   ★★★ 율이 20~40% 라 「첫 세 판에서 ★★★ 를 한 번은 본다」가 성립하지 않는다
+   *   (0.85 에서 80%). 4탄부터는 완화가 없다 — 온보딩은 셋으로 끝난다. */
+  var ADV_STAR_EARLY = 3;            // 온보딩 완화가 걸리는 마지막 탄
+  /* ★★ 계수 — 탄별. 값 = 탐욕봇 점수 중앙값 ÷ (par × D(ch)). */
+  var ADV_STAR2_K = [
+    0.75, 0.70, 0.80, 0.65, 0.63, 0.67, 0.62, 0.58, 0.67, 0.91,   /* 1~10탄 */
+    0.57, 0.59, 0.59, 0.58, 0.51, 0.57, 0.52, 0.55, 0.55, 0.66,   /* 11~20탄 */
+    0.57, 0.49, 0.54, 0.58, 0.61, 0.53, 0.52, 0.55, 0.53, 0.62,   /* 21~30탄 */
+    0.61, 0.65, 0.66, 0.60, 0.69, 0.71, 0.62, 0.71, 0.62, 0.79,   /* 31~40탄 */
+    0.67, 0.66, 0.66, 0.66, 0.70, 0.72, 0.81, 0.72, 0.67, 0.35,   /* 41~50탄 */
+    0.57, 0.58, 0.68, 0.69, 0.65, 0.64, 0.63, 0.61, 0.62, 0.49,   /* 51~60탄 */
+    0.60, 0.59, 0.58, 0.59, 0.63, 0.59, 0.54, 0.60, 0.57, 0.67,   /* 61~70탄 */
+    0.61, 0.56, 0.58, 0.59, 0.55, 0.69, 0.52, 0.59, 0.59, 0.60,   /* 71~80탄 */
+    0.51, 0.49, 0.55, 0.52, 0.52, 0.52, 0.52, 0.52, 0.52, 0.59,   /* 81~90탄 */
+    0.51, 0.63, 0.48, 0.52, 0.48, 0.55, 0.49, 0.52, 0.54, 0.57    /* 91~100탄 */
+  ];
+  /* ★★★ 계수 — 탄별. 값 = 탐욕봇 점수 상위 25% ÷ (par × D(ch)). 항상 ★★ 이상. */
+  var ADV_STAR3_K = [
+    0.80, 0.74, 0.86, 0.69, 0.72, 0.68, 0.64, 0.71, 0.74, 0.94,   /* 1~10탄 */
+    0.59, 0.60, 0.60, 0.62, 0.53, 0.58, 0.53, 0.55, 0.66, 0.75,   /* 11~20탄 */
+    0.59, 0.51, 0.56, 0.59, 0.62, 0.56, 0.55, 0.59, 0.55, 0.64,   /* 21~30탄 */
+    0.69, 0.65, 0.66, 0.60, 0.70, 0.76, 0.62, 0.72, 0.70, 0.81,   /* 31~40탄 */
+    0.68, 0.72, 0.67, 0.68, 0.78, 0.73, 0.87, 0.83, 0.71, 0.40,   /* 41~50탄 */
+    0.60, 0.61, 0.69, 0.69, 0.66, 0.67, 0.64, 0.68, 0.63, 0.53,   /* 51~60탄 */
+    0.60, 0.61, 0.60, 0.59, 0.66, 0.59, 0.58, 0.72, 0.59, 0.70,   /* 61~70탄 */
+    0.63, 0.57, 0.58, 0.62, 0.55, 0.69, 0.53, 0.61, 0.61, 0.62,   /* 71~80탄 */
+    0.55, 0.57, 0.58, 0.57, 0.57, 0.57, 0.57, 0.57, 0.54, 0.60,   /* 81~90탄 */
+    0.52, 0.63, 0.52, 0.54, 0.50, 0.56, 0.55, 0.52, 0.56, 0.60    /* 91~100탄 */
+  ];
+  /* 표 밖의 탄(100 초과 · 모드 밖 호출)이 오면 마지막 챕터의 중앙값으로 받는다 —
+     빈 칸을 undefined 로 넘기면 문턱이 NaN 이 되어 별이 **전부 세 개**가 된다. */
+  var ADV_STAR2_FALLBACK = 0.52;
+  var ADV_STAR3_FALLBACK = 0.56;
   /* ★ 0826 6단계 — ★★★ 의 셋째 항(숙련). 요구 텐 수 = ceil(칸수 × 이 값). */
   var ADV_STAR3_TEN = 0.10;
   var ADV_MISSION_MS = 45000;        // 스테이지 미션의 제한시간
@@ -40220,11 +40277,30 @@ window.TT_SFX = {
    * ⚠ **tenCount 를 안 넘기면(undefined) 옛 판정 그대로**다 — ease 와 같은 계약.
    *   밸런스 심이 이 함수를 이름으로 잘라 자기 샌드박스에서 부르고, 거기에는
    *   S 도 판 기록도 없다. 그 계약을 깨면 심이 죽는다. */
+  /* 0910 — 탄별 별 계수. 표 밖이면 마지막 챕터 중앙값(FALLBACK). 온보딩(1~3탄)
+     완화는 **표 안에 이미 들어 있다**(값 자체가 0.85 를 곱해 저장된 값이다) —
+     여기서 다시 곱하면 두 번 완화된다. */
+  function advStarK(arr, n, fb) {
+    var i = (n | 0) - 1;
+    var v = (i >= 0 && i < arr.length) ? arr[i] : fb;
+    return (v > 0) ? v : fb;
+  }
+  /** ★★ 가 요구하는 점수. 카드·결과 시트·판정이 **모두 이 한 함수**를 읽는다. */
+  function advStar2Need(plan) {
+    var n = plan ? plan.n : 1;
+    return Math.round((plan && plan.par > 0 ? plan.par : 1) * advDiffK(n) *
+                      advStarK(ADV_STAR2_K, n, ADV_STAR2_FALLBACK));
+  }
+  /** ★★★ 가 요구하는 점수(세 항 중 첫째). */
+  function advStar3Need(plan) {
+    var n = plan ? plan.n : 1;
+    return Math.round((plan && plan.par > 0 ? plan.par : 1) * advDiffK(n) *
+                      advStarK(ADV_STAR3_K, n, ADV_STAR3_FALLBACK));
+  }
   function advStarsFor(plan, score, shuffled, ease, tenCount) {
-    var par = (plan.par > 0 ? plan.par : 1) * advDiffK(plan ? plan.n : 1);
     var s = 1;
-    if (score >= par * ADV_STAR2 && (ease === undefined || ease)) s = 2;
-    if (s === 2 && score >= par * ADV_STAR3 && !shuffled &&
+    if (score >= advStar2Need(plan) && (ease === undefined || ease)) s = 2;
+    if (s === 2 && score >= advStar3Need(plan) && !shuffled &&
         (tenCount === undefined || (tenCount | 0) >= advTenNeed(plan ? plan.n : 1))) s = 3;
     return s;
   }
@@ -40745,9 +40821,9 @@ window.TT_SFX = {
    * ------------------------------------------------------------------------ */
   function advStarNote(stars, p) {
     if (stars >= 3) return t('adv.note3');
-    var d = advDiffK(p.n), miss = [];
+    var miss = [];
     if (stars >= 2) {
-      var need3 = Math.round(p.par * ADV_STAR3 * d);
+      var need3 = advStar3Need(p);   /* 0910 — 판정이 쓰는 그 함수 그대로 */
       if ((S.score | 0) < need3) miss.push(t('adv.miss.score', { n: fmtNum(need3) }));
       if (S.advShuf) miss.push(t('adv.miss.shuffle'));
       var tn = advTenNeed(p.n), have = S.tenCount | 0;
@@ -40757,7 +40833,7 @@ window.TT_SFX = {
       if (!miss.length) miss.push(t('adv.miss.score', { n: fmtNum(need3) }));
       return t('adv.note.miss3', { m: miss.join(' \u00B7 ') });
     }
-    var need2 = Math.round(p.par * ADV_STAR2 * d);
+    var need2 = advStar2Need(p);     /* 0910 — 〃 */
     var lowScore = (S.score | 0) < need2;
     if (lowScore) miss.push(t('adv.miss.score', { n: fmtNum(need2) }));
     if (!S.starEase) miss.push(t('adv.miss.ease'));
@@ -41852,7 +41928,7 @@ window.TT_SFX = {
          ③ 달성률     store.advBest[n] 대 ★★ 점수선
          ④ 이유       advRecommend/보스가 준 hero id 의 rec.why.<id>
          ⑤ 추천 펫    advPetRecommend */
-    var star2Need = Math.round(p.par * ADV_STAR2 * advDiffK(p.n));
+    var star2Need = advStar2Need(p);          /* 0910 탄별 계수 — 판정과 같은 함수 */
     var liHp = $('node-i-hp'), liAtk = $('node-i-atk');
     /* B4 — 숨기지 않는다. 승리선(악당 체력)은 **모든 탄**의 첫 사실이고,
        전투가 켜져 있으면 duelFoeHpMax 가 그 실제 값이다. 보스탄에서만
@@ -41911,7 +41987,7 @@ window.TT_SFX = {
     /* 0826 6단계 — ★★★ 는 이제 세 항의 AND 다. {t} 가 그 셋째(텐 요구 수)이고,
        값은 advStarsFor 가 실제로 묻는 그 함수(advTenNeed)에서 온다. */
     setText('node-star3', t('adv.star3', {
-      n: fmtNum(Math.round(p.par * ADV_STAR3 * advDiffK(p.n))), t: advTenNeed(p.n)
+      n: fmtNum(advStar3Need(p)), t: advTenNeed(p.n)
     }));
     /* 별 3슬롯 — 획득한 칸만 색이 산다(§B). 같은 사실을 두 번 말하지 않으려고
        9차의 "★★☆" 문자열은 좌상단 요약 하나로 줄였다. */
@@ -45408,6 +45484,7 @@ window.TT_SFX = {
     advPar: advPar, advStarsFor: advStarsFor, advStatus: advStatus,
     advZig: advZig, advChapter: advChapter, advIsBoss: advIsBoss,
     advDiffK: advDiffK,                       /* 0826 챕터 난이도 계수 D(ch) */
+    advStar2Need: advStar2Need, advStar3Need: advStar3Need,  /* 0910 탄별 별 문턱 */
     heartsTick: heartsTick, heartNextMs: heartNextMs,
     spendHeart: spendHeart, grantHearts: grantHearts,
     applyHandicaps: applyHandicaps, isBlocker: isBlocker,
