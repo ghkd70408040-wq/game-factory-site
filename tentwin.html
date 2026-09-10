@@ -11903,7 +11903,7 @@ html[data-fruit="1"] .tile.blocker:not([data-sp]):not(.dead) {
    (.cutin-av)은 그 넷 중 어디에도 속하지 않는 **복제본**이라, 텐텐을 뺀 네
    캐릭터에서 --ch-body 가 initial(검정)로 떨어져 얼굴이 검은 덩어리가 됐다.
    .mn-hero 가 5차에 겪은 것과 같은 버그이고, 처방도 같다 — 같은 규약으로 한 벌 더.
-   텐텐의 몸색만 다른 값(#F3F9FF)인 것은 §24-5 가 비숑을 흰 털로 바꿨기 때문이다.
+   텐텐의 몸색만 다른 값(#F3F9FF)인 것은 §26-5 가 비숑을 흰 털로 바꿨기 때문이다.
    ------------------------------------------------------------------------- */
 .skill-av.ch-ten,     .cutin-av.ch-ten     { --ch-key: var(--role-ch-ten-key); --ch-body: var(--role-ch-ten-body-2); --ch-name: var(--role-ch-ten-name); }
 .skill-av.ch-twin,    .cutin-av.ch-twin    { --ch-key: var(--role-ch-twin-key); --ch-body: var(--role-ch-twin-body); --ch-name: var(--role-ch-twin-name); }
@@ -12060,7 +12060,7 @@ html[data-fruit="1"] .tile.blocker:not([data-sp]):not(.dead) {
    과 화면 맨 아래 액션 바는 6차의 반투명 유리(rgba(255,255,255,.06) + 1px 선)
    그대로였다. 한 화면에 두 문법이 공존하는 것이 실기기에서 "조잡"으로 읽힌 것의
    실체다. 조각은 맵 HUD 가 이미 쓰는 것과 **같은 것**을 쓴다 — 새 추출 0 건.
-   slice 값은 art-embed 가 찍은 숫자 그대로다(§24 규약).
+   slice 값은 art-embed 가 찍은 숫자 그대로다(§26 규약).
    ------------------------------------------------------------------------- */
 #mission-badge,
 #adv-goal,
@@ -14072,6 +14072,31 @@ html[data-platform="twa"] #app-intro.is-hold .api-char{
   --mo-get-out: 240ms;     /* 사라짐 */
   --mo-get-life: 1700ms;   /* = 위 셋의 합. JS getLifeMs() 가 읽는 그 값 */
   /* ==[INV-0911]:TOKENS:END== */
+  /* [KD57-0911] 젤리팡 왕국 — DESIGN §26(판정판 57). game-motion 규약 그대로:
+     지속시간을 규칙 안에 리터럴로 박지 않는다. 왕국 화면의 시간·값은 **여기가
+     유일한 출처**이고, 아래 `<style id="kingdom-0911">` 과 JS(kdWalkMs)가 같은
+     이름을 읽는다. 위 --mo-* 일곱과 같은 규약이라 같은 :root 에 산다.
+       --mo-kd-walk    거주자 한 방향 산책 1회(왕복 = ×2). 8명이 같은 값을 쓰고
+                       개체차는 --kd-k 배수로만 준다 — 값을 개체마다 박으면
+                       "느리게 하자"가 여덟 곳을 고치는 일이 된다.
+       --mo-kd-bounce  걸음 바운스 주기. 산책과 약수 관계가 아니어야 여덟이
+                       한 박자로 굳지 않는다.
+       --mo-kd-idle    유휴(앉기·숨) 주기. 노드는 안 늘고 키프레임만 바뀐다.
+       --mo-kd-pop     건물 탭 바운스 1회.
+       --mo-kd-heart   탭 하트 말풍선 한 장의 수명. JS `kdHeartMs()` 가 같은
+                       토큰을 읽어 풀 노드를 되돌린다(--mo-mult-life 와 같은 규약).
+     --kd-pan 은 시간이 아니라 **레이어 폭 배수**다(1 = 팬 없음). 1화면 + 소폭
+     좌우 팬이라는 §26.2 의 「스크롤 강제 없음」이 이 한 값으로 조절된다. */
+  --mo-kd-walk: 9000ms;
+  --mo-kd-bounce: 620ms;
+  --mo-kd-idle: 2600ms;
+  --mo-kd-pop: 260ms;
+  --mo-kd-heart: 900ms;
+  --kd-pan: 1.34;
+  /* 하늘 = #map-view 가 쓰는 그 값이다(이미지가 아직 없는 빌드의 바닥색).
+     같은 사실을 두 곳에 적지 않으려고 이름을 붙였다 — 왕국 배경이 도착하면
+     (W2) 이 한 줄만 그 그림의 하늘로 바뀐다. */
+  --kd-sky: #7FC3E8;
 }
 </style>
 <!-- 최우선 2장만 preload — 젤리판(세 인터페이스 공용)과 플레이 팝업 레터링이다.
@@ -14373,6 +14398,66 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
          display:none) so the unfilled dotted box never reads as unfinished UI.
          The portal SDK wrapper replaces this div and adds .ad-live to reveal it. -->
     <div class="ad-slot ad-banner" data-ad-slot="banner">Ad</div>
+  </section>
+
+  <!-- ============================================================
+       [KD57-0911] ===== 젤리팡 왕국 (DESIGN §26 · 판정판 57 · W1 뼈대) =====
+
+       사용자 지시(2026-09-11): 「메인 화면 하나 만들고 건물을 누르면 그 기능이
+       뜬다 — 왕국(성)을 누르면 캐릭터 선택 모달, 모험은 밖으로 나가는 문을
+       누르면 맵으로」.
+
+       이 화면은 **내비게이션 허브**다: 건물 아홉이 전부 «이미 있던 진입점»을
+       부른다(§26.4 표). W1 에서 새로 생긴 모드·모달·그림은 **0** 이고, 새로
+       생긴 것은 이 화면 하나와 그것이 여는 손잡이뿐이다.
+
+       구조는 지도(#screen-map)와 **같은 문법**이다 — 새 화면 문법을 만들지
+       않았다: 뷰포트(#kd-view, overflow:hidden) + 변환 레이어(#kd-layer,
+       translate3d 하나만 움직인다) + 절대좌표 자식들. 좌표는 전부 레이어에
+       대한 %(KD_BUILDINGS / KD_WALKS)라, 배경이 어떤 크기로 깔리든 건물과
+       거주자가 같은 자리에 앉는다(MAP_ANCHORS 규약 그대로).
+
+       배경은 **W1 에서 기존 챕터 원화**(--art-map-bg)다. 왕국 전용 배경은
+       §26.9 발주 #1(W2)이고, 도착하면 `#kd-layer` 의 background-image 한 줄만
+       바뀐다 — 이 화면의 코드는 손대지 않는다.
+
+       ⚠ 레거시 메뉴(#screen-menu)는 **지우지 않았다**(§26.4 「공존기」). 진입만
+         왕국으로 옮겼고, 안전망으로 그 네 버튼의 축소판을 아래 띠에 뒀다.
+         되돌리기 = homeScreen() 이 'screen-menu' 를 돌려주게 하는 한 줄.
+       ============================================================ -->
+  <section id="screen-kingdom" class="screen">
+    <div id="kd-view">
+      <div id="kd-layer">
+        <div id="kd-tint" aria-hidden="true"></div>
+        <!-- 셋 다 JS 가 채운다(buildKingdom). 마크업에 손으로 적지 않은 이유는
+             건물 아홉의 해금 상태와 거주자 목록이 **저장에서 나오는 값**이기
+             때문이다 — 마크업에 굽으면 그 값이 두 곳에 살게 된다. -->
+        <div id="kd-bldgs"></div>
+        <div id="kd-res"></div>
+        <div id="kd-fx" aria-hidden="true"></div>
+      </div>
+    </div>
+    <!-- 상단 띠 — 지도와 같은 부품(.hudbar + .hchip + .jbox--strip).
+         ⚠ 칩이 **하나**인 이유는 자산 부채다: 별(`lib-star-gold.webp`)과
+         톱니(`lib-glyph-gear.webp`)는 알파 경계가 캔버스 변에 닿아 있어
+         canon 이 CLIPPED 로 잡는다(선행 부채 — 지도 상단 띠에서도 같다).
+         새 화면이 그 조각을 데려오면 이 파도가 남의 부채를 «신규»로 짊어진다.
+         하트(`lib-glyph-heart.webp`)만 통과하므로 그것만 세우고, 젤리별 칩은
+         조각이 재제작되는 파도에서 되살린다(설정은 아래 안전망 줄에 이미 있다). -->
+    <header id="kd-top" class="hudbar jbox jbox--strip">
+      <span class="hchip" id="kd-hearts"><span class="hc-ico hc-heart" aria-hidden="true"></span><b id="kd-hearts-v">5</b></span>
+    </header>
+    <!-- 방문 보상 줄 (§26.6 「어제의 나」). toast 가 아니라 **이 화면 안의 줄**인
+         것이 의도다: toast 는 body 전역이라 다른 화면의 컷에 새어 들어간다. -->
+    <p id="kd-visit" hidden></p>
+    <!-- 안전망 — 레거시 메뉴 네 버튼의 축소판. 부품은 지도 하단 띠가 쓰는
+         .mfbtn(9-slice 도서관 조각) 그대로이고 **새 그림 0**이다. -->
+    <footer id="kd-bot" class="hudbar jbox jbox--strip">
+      <button id="kd-legacy-play" class="mfbtn mfbtn-l" type="button" data-i18n-aria="aria.play" aria-label="Play"><span data-i18n="menu.play">Play</span></button>
+      <button id="kd-legacy-classic" class="mfbtn mfbtn-r" type="button" data-i18n-aria="aria.cont" aria-label="Continue"><span data-i18n="menu.continue">Classic</span></button>
+      <button id="kd-legacy-char" class="mfbtn mfbtn-l" type="button" data-i18n-aria="aria.charopen" aria-label="Choose your character"><span data-i18n="pick.title">Character</span></button>
+      <button id="kd-legacy-set" class="mfbtn mfbtn-r" type="button" data-i18n-aria="aria.settings" aria-label="Settings"><span data-i18n="menu.settings">Settings</span></button>
+    </footer>
   </section>
 
   <!-- ============================================================
@@ -24893,6 +24978,26 @@ window.TT_SFX = {
        존재 이유는 오직 하나, 아케이드 판의 점수가 store.bestRush 로 새어 들어가는
        경로를 문법적으로 없애는 것이다(bestKey 주석 참조). */
     bestArcade: 0,
+    /* --- [KD57-0911] 젤리팡 왕국 — DESIGN §26.7 저장 스키마 --------------
+     * 칸 하나가 통째로 **신규**이고 **가법(加法)**이다. 기존 화폐 세 칸
+     * (`hearts` 생명 · `jstar` 젤리별 · `shards` 파편)은 이름도 뜻도 한 글자
+     * 안 바뀌었다 — 그래서 저장 버전을 올리지 않는다. 이 한 줄을 지우면
+     * 세이브가 착수 전 모양으로 정확히 돌아간다.
+     *
+     * ⚠ **새 화폐를 만들지 않았다**(§20.2 「4번째 화폐 금지」). 설계 초안의
+     *   「애정 하트」는 기각됐고, 거주자 탭 보상은 젤리별 +1(일일 상한
+     *   KD_TAP_CAP)로 흐른다 — 장식(꾸밈) 구매로만 쓰이므로 젤리별이
+     *   「스킨·꾸밈 전용」이라는 §20.2 의 뜻과 어긋나지 않는다.
+     *
+     *   unlocked  해금이 «확정»된 건물 id. W1 의 해금 판정은 챕터 진도에서
+     *             파생되므로(kdUnlocked) 이 배열은 아직 비어 있는 것이 정상이다.
+     *             W2 의 모험 별 소비 해금이 여기에 적는다 — 그때 파생 규칙과
+     *             적힌 사실이 OR 로 합쳐진다(진도가 뒤로 갈 수 없으므로 충돌 없음).
+     *   zones     완성된 구역 id (§26.5 · KD_ZONES). W1 미사용 — 자리만 판다.
+     *   deco      { 슬롯번호: 장식id } 고정 12슬롯 (§26.5). W1 미사용.
+     *   lastVisit 마지막 방문 시각(ms). 날짜가 바뀌면 방문 보상 1회 + tapToday 0.
+     *   tapToday  오늘 거주자 탭으로 받은 젤리별 수. 상한 KD_TAP_CAP. */
+    kingdom: { unlocked: [], zones: [], deco: {}, lastVisit: 0, tapToday: 0 },
     /* --- [SHOP-0910] 앱 상점 — DESIGN §20.11 저장 스키마 4칸 --------------
      * 네 칸 전부 **신규**이고 **가법(加法)**이다. 기존 칸(`jstar` · `shards`
      * · `hearts`)은 이름도 뜻도 한 글자 안 바뀌었고, 그래서 **저장 버전을
@@ -25268,6 +25373,49 @@ window.TT_SFX = {
               dst[sk] = sv;
             }
             if (dst) store.statLv[hid] = dst;
+          }
+        }
+        /* ---- [KD57-0911] 젤리팡 왕국 (§26.7) -------------------------------
+         * 소독 규율은 바로 위 statLv 블록의 **복제**다(§26.7 「새 소독 규율 안
+         * 만듦»): 아는 키 · 아는 형 · 범위 안의 정수만 살리고, 어긋난 항목은
+         * **그 항목만** 버린다. 없는 필드 = 기본값이 곧 마이그레이션이다.
+         * `unlocked`/`zones` 가 «아는 id 만» 통과하는 것은 스킨·아이템 블록과
+         * 같은 이유다 — 표에서 한 종을 빼도 세이브가 게임을 막지 않아야 한다. */
+        if (o.kingdom && typeof o.kingdom === 'object') {
+          var kdo = o.kingdom;
+          if (Array.isArray(kdo.unlocked)) {
+            for (var kui = 0; kui < kdo.unlocked.length; kui++) {
+              var kuid = kdo.unlocked[kui];
+              if (typeof kuid !== 'string' || !kdBuilding(kuid)) continue;
+              if (store.kingdom.unlocked.indexOf(kuid) < 0) store.kingdom.unlocked.push(kuid);
+            }
+          }
+          if (Array.isArray(kdo.zones)) {
+            for (var kzi = 0; kzi < kdo.zones.length; kzi++) {
+              var kzid = kdo.zones[kzi];
+              if (typeof kzid !== 'string' || !kdZone(kzid)) continue;
+              if (store.kingdom.zones.indexOf(kzid) < 0) store.kingdom.zones.push(kzid);
+            }
+          }
+          if (kdo.deco && typeof kdo.deco === 'object') {
+            for (var kdk in kdo.deco) {
+              if (!Object.prototype.hasOwnProperty.call(kdo.deco, kdk)) continue;
+              var kslot = parseInt(kdk, 10);
+              if (!isFinite(kslot) || kslot < 0 || kslot >= KD_DECO_SLOTS) continue;
+              var kdid = kdo.deco[kdk];
+              if (typeof kdid !== 'string' || !kdDeco(kdid)) continue;
+              store.kingdom.deco[String(kslot)] = kdid;
+            }
+          }
+          /* 미래로 조작된 방문 시각은 버린다(= 0 = 「방문한 적 없음」). 남겨 두면
+             날짜 비교가 영영 «오늘»이 되어 방문 보상이 다시 안 열린다 —
+             dailyFreeAt 이 같은 이유로 같은 처방을 쓴다. */
+          if (typeof kdo.lastVisit === 'number' && isFinite(kdo.lastVisit)) {
+            var kdlv = Math.max(0, Math.floor(kdo.lastVisit));
+            if (kdlv <= Date.now() + 86400000) store.kingdom.lastVisit = kdlv;
+          }
+          if (typeof kdo.tapToday === 'number' && isFinite(kdo.tapToday)) {
+            store.kingdom.tapToday = clamp(kdo.tapToday | 0, 0, KD_TAP_CAP);
           }
         }
         /* ---- [SHOP-0910] 앱 상점 4칸 (§20.11) ------------------------------
@@ -27204,7 +27352,24 @@ window.TT_SFX = {
       'say.boss.jelly': 'Take this!',
       'say.star.ten': 'A star for us!',
       'say.star.twin': 'Got a star!',
-      'say.star.jelly': 'Sparkle!'
+      'say.star.jelly': 'Sparkle!',
+      /* [KD57-0911] 젤리팡 왕국 (DESIGN §26). 건물 이름 아홉 + 안내 셋.
+         잠금 안내는 새 키를 안 만들었다 — 미니맵(§14.10)의 `minimap.locked`
+         「N탄을 깨면 열려요」가 **같은 사실**을 이미 말하고 있고, 같은 사실에
+         두 번째 문구를 만들면 둘이 갈라진다. */
+      'kd.castle': 'Jelly Castle',
+      'kd.gate': 'Town Gate',
+      'kd.playground': 'Playground',
+      'kd.arena': 'Arena',
+      'kd.shop': 'Shop',
+      'kd.mailbox': 'Mailbox',
+      'kd.pethouse': 'Pet House',
+      'kd.hall': 'Hall of Records',
+      'kd.gazebo': 'Invite Gazebo',
+      'kd.soon': 'Opening soon!',
+      'kd.visit': 'Yesterday-you saved up {n} Jelly Stars.',
+      'kd.visit.first': 'Welcome to Jellypang Kingdom!',
+      'kd.res.aria': 'Say hello'
     },
 
     ko: {
@@ -28441,7 +28606,22 @@ window.TT_SFX = {
       'say.boss.jelly': '받아라!',
       'say.star.ten': '별을 얻었다!',
       'say.star.twin': '별 챙겼다!',
-      'say.star.jelly': '반짝!'
+      'say.star.jelly': '반짝!',
+      /* [KD57-0911] 젤리팡 왕국 (DESIGN §26). en 쪽 주석 참조 —
+         잠금 문구는 `minimap.locked` 를 그대로 빌린다(새 키 0). */
+      'kd.castle': '젤리 성',
+      'kd.gate': '성문',
+      'kd.playground': '놀이터',
+      'kd.arena': '훈련장',
+      'kd.shop': '상점',
+      'kd.mailbox': '우편함',
+      'kd.pethouse': '펫 하우스',
+      'kd.hall': '기록관',
+      'kd.gazebo': '초대 정자',
+      'kd.soon': '곧 열려요!',
+      'kd.visit': '어제의 내가 젤리별 {n}개를 모아 뒀어요.',
+      'kd.visit.first': '젤리팡 왕국에 온 걸 환영해요!',
+      'kd.res.aria': '인사하기'
     }
   };
 
@@ -29293,6 +29473,11 @@ window.TT_SFX = {
        이 밤에 낮 곡을 켜지 않는다. setNight 은 값이 그대로면 아무 일도 하지 않는다. */
     syncLobbyBgmNight(isNightHour(new Date().getHours()));
     if (audioUnlocked) J.bgm.scene(id === 'screen-game' ? 'game' : 'menu');
+    /* [KD57-0911] 왕국의 유휴 타이머는 **왕국이 서 있는 동안만** 돈다. 화면
+       전환이 여기 한 곳뿐이라(위 주석의 그 근거) 「지금 무슨 화면인가」와
+       「무슨 타이머가 도는가」가 갈라질 여지가 원리적으로 없다 — 깔개 곡이
+       같은 이유로 같은 자리에 있다. */
+    if (id !== 'screen-kingdom') kdIdleStop();
   }
 
   function openModal(id) { var m = $(id); if (m) { m.hidden = false; healHeads(m); } }
@@ -39758,8 +39943,12 @@ window.TT_SFX = {
     clearTimers();
     J.clear();
     closeAllModals();
-    showScreen('screen-menu');
+    /* [KD57-0911] 「홈으로 나간다」의 착지가 타이틀에서 **왕국**으로 바뀌었다
+       (§26.1 홈 승격). syncMenu() 를 남긴 것은 의도다 — 레거시 메뉴 화면은
+       은퇴가 아니라 **공존**이고(§26.4), 그 화면의 값(최고기록·연속·주인공
+       얼굴)은 계속 맞아 있어야 되돌리기가 한 줄로 끝난다. */
     syncMenu();
+    enterKingdom();
   }
 
   function restartStage() {
@@ -45588,9 +45777,445 @@ window.TT_SFX = {
   function leaveMap() {
     stopMapTicker();
     closeModal('modal-node');
-    showScreen('screen-menu');
+    /* [KD57-0911] 지도에서 나가는 곳이 «타이틀»에서 «왕국»으로 바뀌었다.
+       왕국이 홈이므로 지도의 뒤로(←)가 곧 왕국 귀환이다 — 하단 띠에 버튼을
+       하나 더 세우지 않은 이유는 그 띠의 다섯 칸이 이미 실측 비율표로 꽉
+       차 있어(§14 표) 칸을 더하면 기존 컷의 화소가 움직이기 때문이다. */
     syncMenu();
+    enterKingdom();
   }
+
+  /* =========================================================================
+   * [KD57-0911] 젤리팡 왕국 — DESIGN §26 (판정판 57 · W1 뼈대)
+   *
+   * 이 블록 하나가 왕국의 전부다(마크업 `#screen-kingdom` + `<style
+   * id="kingdom-0911">` 과 짝). 통째로 지우고 homeScreen() 을 'screen-menu' 로
+   * 되돌리면 착수 전이다.
+   *
+   * W1 이 만들지 **않은** 것: 새 모드 0 · 새 모달 0 · 새 그림 0 · 새 화폐 0 ·
+   * 새 소리 0. 건물 아홉은 전부 이미 있던 진입 함수를 부르고(§26.4 표),
+   * 거주자는 이미 구워져 있는 `--ch-<id>-full` 을 그대로 세운다.
+   * ========================================================================= */
+
+  /** 홈 화면. 「탭하여 시작」·게임 종료·지도 뒤로가 전부 여기로 온다(§26.1). */
+  function homeScreen() { return 'screen-kingdom'; }
+
+  var KD_TAP_CAP = 10;        // §26.6 — 거주자 탭으로 하루에 받을 수 있는 젤리별
+  var KD_TAP_JSTAR = 1;       // 한 번 탭의 보상. «캡 건 소액 반복»(패턴 ⑥)
+  var KD_VISIT_JSTAR = 3;     // §26.6 방문 보상 — 하루 1회 고정 소액
+  var KD_RES_MAX = 8;         // §26.3 동시 화면 거주자 상한
+  var KD_DECO_SLOTS = 12;     // §26.5 고정 12슬롯
+
+  /* --- 구역·장식 표 (§26.5) -------------------------------------------------
+   * W1 은 **읽기만** 한다(소독이 아는 id 를 물어보는 곳). 값을 코드가 아니라
+   * 표로 뺀 것은 §26.5 의 지시다: 2주 케이던스로 구역·장식을 더할 자리를 미리
+   * 파 둔다 — 그때 더하는 것이 «표의 한 줄»이어야 하고 «함수 수정»이면 안 된다.
+   * 별 가격(cost)은 §26.11 ③ 밸런스 심의 대상이라 아직 아무도 안 읽는다. */
+  var KD_ZONES = [
+    { id: 'z-plaza',  bldgs: ['castle', 'gate', 'playground'], cost: 0 },
+    { id: 'z-field',  bldgs: ['arena', 'pethouse'],            cost: 30 },
+    { id: 'z-market', bldgs: ['shop', 'mailbox'],              cost: 60 },
+    { id: 'z-garden', bldgs: ['hall', 'gazebo'],               cost: 90 }
+  ];
+  var KD_DECO = [
+    { id: 'd-lamp',   zone: 'z-plaza',  cost: 5 },
+    { id: 'd-bench',  zone: 'z-plaza',  cost: 5 },
+    { id: 'd-fence',  zone: 'z-field',  cost: 8 },
+    { id: 'd-tree',   zone: 'z-field',  cost: 8 },
+    { id: 'd-stall',  zone: 'z-market', cost: 12 },
+    { id: 'd-banner', zone: 'z-market', cost: 12 },
+    { id: 'd-flower', zone: 'z-garden', cost: 16 },
+    { id: 'd-pond',   zone: 'z-garden', cost: 16 }
+  ];
+
+  /* --- 건물 아홉 (§26.4 표) -------------------------------------------------
+   * 한 줄이 한 건물이고, 칸은 다섯이다.
+   *   좌표는 **3줄 격자**(뒷줄·가운뎃줄·앞줄)이고 아홉 상자는 서로 **한 px 도
+   *   안 겹친다**(layout 묶음 `kingdom` 이 그 사실을 잰다). 겹친 투명 상자는
+   *   «어느 건물을 눌렀나»가 그리기 순서로 정해지는 자리라, 실측 없이는 옳고
+   *   그름을 말할 수 없는 결함이 된다.
+   *   l/t/w/h  레이어에 대한 % (MAP_ANCHORS 와 같은 규약 — 배경이 바뀌어도
+   *            좌표가 안 흔들린다). W1 배경은 챕터 원화라 이 자리는 «뼈대»이고,
+   *            §26.9 발주 #1 배경이 도착하는 W2 에 그 그림의 자리로 맞춘다.
+   *   chap     열리는 챕터. 1 = 항상 열림. kdUnlocked 가 chapMax() 와 비교한다.
+   *   go       누르면 부르는 **이미 있던 함수**. 새 진입점을 만들지 않았다.
+   *   app      true 면 앱 전용(§18.7 규약 함수가 감춘다).
+   * ⚠ 이 표의 세 줄(우편함·초대 정자·훈련장)은 한때 kdSoon 토스트로
+   *   막혀 있었다 — 그 화면들이 origin/main 에 없었기 때문이다. 판정판 50(퀀스트·
+   *   출석)·54(초대)·49(플레이 시트)가 들어오면서 세 줄 모두 실제 화면으로
+   *   이어졌고, 새 진입점은 하나도 안 만들었다 — 세 줄 전부 main 에 이미
+   *   살아 있는 여는 함수를 그대로 부른다. 이 표 밖은 한 글자도 안 바뀐다. */
+  /* ⚠ 가로 좌표는 **15~85%** 안이다(실측). 레이어가 화면보다 --kd-pan 배
+   *   넓고 처음에는 가운데를 보므로, 그 밖에 앉힌 칸은 «팬을 해야만 닿는 건물»이
+   *   된다 — 아홉 중 하나가 첫 화면에서 안 보이면 그것은 허브가 아니다. */
+  var KD_BUILDINGS = [
+    /* 뒷줄 (y 18~38) */
+    /* 판정판 54(char-invite)가 세운 초대 창을 그대로 부른다(:31617 openInvite).
+       openInvite 는 **id 당 문**이라 정자에는 부를 상대가 필요하다 — 54 가 쓴
+       그 판정(invitable :31577)을 그대로 써서 처음 하나를 부른다. 새 판정은 안
+       만든다: 카드 탭·cpConfirm(:32189·:32241·:32265)과 같은 문이어야 두 입구가
+       잠금을 다르게 다루지 않는다. 초대할 상대가 없으면 종전 토스트로 떨어진다. */
+    { id: 'gazebo',     l: 23.5, t: 28, w: 15, h: 16, chap: 5, key: 'kd.gazebo',
+      go: function () {
+        var ids = INVITE_ORDER, i;
+        for (i = 0; i < ids.length; i++) { if (openInvite(ids[i])) return; }
+        kdSoon();
+      } },
+    { id: 'hall',       l: 50,   t: 28, w: 16, h: 18, chap: 4, key: 'kd.hall',
+      go: function () { openRank('endless'); } },
+    /* 판정판 49(mode-dedupe)가 openArcadeHub()/#modal-arcade 를 **은퇴**시켰다
+       (:35717). 아케이드 세 줄은 이제 플레이 시트 안에 산다 — 49 가 쓰는
+       관용구를 그대로 부른다(:46499 openModeSheet → openModal('modal-mode')). */
+    { id: 'arena',      l: 76,   t: 28, w: 18, h: 20, chap: 2, key: 'kd.arena',
+      go: function () { openModeSheet(); } },
+    /* 가운뎃줄 (y 40~64) */
+    { id: 'castle',     l: 30,   t: 52, w: 20, h: 24, chap: 1, key: 'kd.castle',
+      go: function () { openCharPanel(); } },
+    { id: 'gate',       l: 60,   t: 52, w: 18, h: 20, chap: 1, key: 'kd.gate',
+      go: function () { openAdventure(); } },
+    { id: 'shop',       l: 80,   t: 52, w: 15, h: 18, chap: 1, key: 'kd.shop', app: true,
+      go: function () { openShop(); } },
+    /* 앞줄 (y 65~83) */
+    { id: 'playground', l: 22,   t: 74, w: 17, h: 18, chap: 1, key: 'kd.playground',
+      go: function () { openClassicHub(); } },
+    /* 판정판 50(missions)이 세운 퀀스트·출석 판을 그대로 연다(:39706 openQuest).
+       인자는 설정 줄의 진입과 같은 'daily' 다(:49135) — 우편함을 누른 사람이
+       보는 첫 탭이 설정에서 들어간 사람과 다르면 그것이 두 번째 체계가 된다. */
+    { id: 'mailbox',    l: 46,   t: 74, w: 13, h: 14, chap: 3, key: 'kd.mailbox',
+      go: function () { openQuest('daily'); } },
+    { id: 'pethouse',   l: 70,   t: 74, w: 16, h: 17, chap: 1, key: 'kd.pethouse',
+      go: function () { openCharPanel(); cpTab('pet'); } }
+  ];
+
+  /* --- 거주자 산책 경로 (§26.3) ---------------------------------------------
+   * 여덟 자리는 **고정**이다(무작위 아님). 이유가 둘 있다: ① 관문 컷이 매번
+   * 같은 그림이어야 판정이 성립한다(비결정 수리와 같은 규율). ② 무작위 자리는
+   * W2 에 건물 그림이 도착하면 그 위를 걸어 다니게 된다 — 자리는 배경이 정할
+   * 몫이지 난수가 정할 몫이 아니다.
+   *   l/t/w/h  레이어 % · x0/x1 자기 폭 대비 산책 구간 · k 속도 배수(개체차) */
+  var KD_WALKS = [
+    { l: 20, t: 74, w: 11, h: 20, x0: '-40%', x1: '150%', k: 1 },
+    { l: 44, t: 70, w: 10, h: 18, x0: '120%', x1: '-60%', k: 1.18 },
+    { l: 66, t: 76, w: 11, h: 19, x0: '-70%', x1: '110%', k: .88 },
+    { l: 32, t: 56, w: 9,  h: 16, x0: '90%',  x1: '-90%', k: 1.32 },
+    { l: 78, t: 60, w: 9,  h: 16, x0: '-80%', x1: '80%',  k: 1.05 },
+    { l: 54, t: 50, w: 8,  h: 14, x0: '110%', x1: '-50%', k: .78 },
+    { l: 18, t: 58, w: 8,  h: 14, x0: '-30%', x1: '130%', k: 1.45 },
+    { l: 82, t: 80, w: 9,  h: 16, x0: '60%',  x1: '-70%', k: .95 }
+  ];
+
+  function kdBuilding(id) {
+    for (var i = 0; i < KD_BUILDINGS.length; i++) if (KD_BUILDINGS[i].id === id) return KD_BUILDINGS[i];
+    return null;
+  }
+  function kdZone(id) {
+    for (var i = 0; i < KD_ZONES.length; i++) if (KD_ZONES[i].id === id) return KD_ZONES[i];
+    return null;
+  }
+  function kdDeco(id) {
+    for (var i = 0; i < KD_DECO.length; i++) if (KD_DECO[i].id === id) return KD_DECO[i];
+    return null;
+  }
+
+  /** 저장 칸. 손상된 세이브·저장 못 쓰는 환경에서도 언제나 같은 모양을 준다. */
+  function kdStore() {
+    if (!store.kingdom || typeof store.kingdom !== 'object') {
+      store.kingdom = { unlocked: [], zones: [], deco: {}, lastVisit: 0, tapToday: 0 };
+    }
+    var k = store.kingdom;
+    if (!Array.isArray(k.unlocked)) k.unlocked = [];
+    if (!Array.isArray(k.zones)) k.zones = [];
+    if (!k.deco || typeof k.deco !== 'object') k.deco = {};
+    return k;
+  }
+
+  /**
+   * 이 건물이 열렸는가 (§26.4 해금표).
+   * 근거는 **이미 있는 함수 하나**(chapMax)다 — 새 진도 개념을 만들지 않았다.
+   * `store.kingdom.unlocked` 에 적힌 사실은 OR 로 합쳐진다: W2 의 «모험 별로
+   * 연다»가 여기에 적을 것이고, 진도는 뒤로 가지 않으므로 둘이 충돌하지 않는다.
+   */
+  function kdUnlocked(b) {
+    if (!b) return false;
+    if (kdStore().unlocked.indexOf(b.id) >= 0) return true;
+    return chapMax() >= (b.chap | 0 || 1);
+  }
+
+  /** 잠긴 건물이 요구하는 탄 번호. 미니맵(§14.4)이 쓰는 그 식 그대로다. */
+  function kdNeedStage(b) { return chapFirst(b.chap | 0 || 1) - 1; }
+
+  /** 아직 모달이 없는 건물(우편함·초대 정자). 판정판 50/54 병합 전의 임시 배선. */
+  function kdSoon() { toast(t('kd.soon')); J.sfx.ui(); }
+
+  /* --- 거주자 풀 (§26.3) ----------------------------------------------------
+   * 해금 캐릭터 + 보유 펫 중 **전신 자산이 이미 구워져 있는 것**만 선다.
+   * `--ch-<id>-full` 이 없는 id 를 세우면 빈 상자가 걸어 다닌다 — 그래서
+   * 존재 확인이 필터의 전부다(setStdArt 가 쓰는 그 판단과 같은 근거). */
+  function kdArtVar(id) {
+    var v = '';
+    try { v = getComputedStyle(document.documentElement).getPropertyValue('--ch-' + id + '-full'); } catch (e) { v = ''; }
+    return (v && v.replace(/\s/g, '')) ? 'var(--ch-' + id + '-full)' : '';
+  }
+  function kdResidents() {
+    var out = [], i;
+    for (i = 0; i < HERO_IDS.length; i++) {
+      if (!heroUnlocked(HERO_IDS[i])) continue;
+      var ha = kdArtVar(HERO_IDS[i]);
+      if (ha) out.push({ id: HERO_IDS[i], art: ha });
+    }
+    var pl = petIds();
+    for (i = 0; i < pl.length && out.length < KD_RES_MAX; i++) {
+      var pa = kdArtVar(pl[i]);
+      if (pa) out.push({ id: pl[i], art: pa });
+    }
+    return out.slice(0, KD_RES_MAX);
+  }
+
+  /* --- 화면 짓기 ------------------------------------------------------------
+   * 들어올 때마다 다시 짓는다. 해금·보유가 판을 하나 깨는 사이에 바뀌므로,
+   * 「한 번 짓고 상태만 갱신」은 그 사실을 놓치는 자리를 매번 새로 만든다
+   * (buildMap 이 챕터를 다시 그리는 것과 같은 판단). 노드 수는 9 + 8×3 = 33 이라
+   * 다시 짓는 비용이 상태 동기화 코드를 유지하는 비용보다 싸다. */
+  function buildKingdom() {
+    var wrap = $('kd-bldgs'), i, b, el;
+    if (wrap) {
+      wrap.innerHTML = '';
+      for (i = 0; i < KD_BUILDINGS.length; i++) {
+        b = KD_BUILDINGS[i];
+        el = document.createElement('button');
+        el.type = 'button';
+        el.className = 'kd-bldg';
+        el.id = 'kd-b-' + b.id;
+        el.setAttribute('data-kd', b.id);
+        el.style.setProperty('--l', b.l);
+        el.style.setProperty('--t', b.t);
+        el.style.setProperty('--w', b.w);
+        el.style.setProperty('--h', b.h);
+        if (b.app) el.setAttribute('data-app-only', '');
+        var open = kdUnlocked(b);
+        if (!open) el.classList.add('is-lock');
+        el.setAttribute('aria-disabled', open ? 'false' : 'true');
+        var lab = document.createElement('span');
+        lab.className = 'kd-lab';
+        lab.setAttribute('data-i18n', b.key);
+        lab.textContent = t(b.key);
+        el.appendChild(lab);
+        wrap.appendChild(el);
+      }
+      /* §18.7 규약 함수 — 웹에서 상점 건물을 감추는 일은 이것이 한다.
+         새 숨김 방식을 만들지 않았다(메뉴의 #shop-entry 와 같은 경로). */
+      try { if (window.TW && window.TW.applyPlatformGates) window.TW.applyPlatformGates(wrap); } catch (e) {}
+    }
+    var rw = $('kd-res');
+    if (rw) {
+      rw.innerHTML = '';
+      var list = kdResidents();
+      for (i = 0; i < list.length; i++) {
+        var w = KD_WALKS[i % KD_WALKS.length];
+        var res = document.createElement('button');
+        res.type = 'button';
+        res.className = 'kd-res';
+        res.setAttribute('data-kd-res', list[i].id);
+        res.setAttribute('aria-label', t('kd.res.aria'));
+        res.style.setProperty('--l', w.l);
+        res.style.setProperty('--t', w.t);
+        res.style.setProperty('--w', w.w);
+        res.style.setProperty('--h', w.h);
+        res.style.setProperty('--x0', w.x0);
+        res.style.setProperty('--x1', w.x1);
+        res.style.setProperty('--kd-k', w.k);
+        /* 개체차는 **지연**으로만 준다. 지속시간을 개체마다 다르게 쓰면
+           §22.1 이 세운 「시간의 유일 출처」가 깨진다(--mo-kd-walk × k 는
+           그 토큰을 읽는 식이라 출처가 여전히 하나다). */
+        res.style.setProperty('--kd-delay', (-i * 700) + 'ms');
+        var walker = document.createElement('span');
+        walker.className = 'kd-walker';
+        var sp = document.createElement('span');
+        sp.className = 'kd-sprite';
+        sp.style.setProperty('--kd-art', list[i].art);
+        walker.appendChild(sp);
+        res.appendChild(walker);
+        rw.appendChild(res);
+      }
+    }
+    kdSync();
+  }
+
+  /** 상단 띠. 값은 기존 칸에서 읽는다(새 저장 0). 젤리별 칩은 자산 부채로
+   *  이번 파도에 안 세운다 — 마크업 주석의 근거 참조. */
+  function kdSync() {
+    setText('kd-hearts-v', store.hearts | 0);
+  }
+
+  /* --- 방문 보상 (§26.6 「어제의 나」) ---------------------------------------
+   * toast 가 아니라 이 화면 안의 줄인 것이 의도다: toast(#toast)는 body 전역이라
+   * 다른 화면을 찍는 컷에 새어 들어간다(관문 비결정의 고전적 원인).
+   * 새 하트를 찍지 않는다 — 주는 것은 젤리별뿐이다(§26.6 불가침 목록). */
+  function kdVisit() {
+    var k = kdStore(), line = $('kd-visit');
+    var today = todayKey();
+    /* 날짜 키는 **기존 함수 하나**에서만 나온다 — todayKey(d) 는 Date 를 받으므로
+       「오늘」과 「마지막 방문일」이 같은 식으로 계산된다(새 날짜 규약 0). */
+    var last = k.lastVisit ? todayKey(new Date(k.lastVisit)) : '';
+    if (last === today) { if (line) line.hidden = true; return; }
+    /* ⚠ **첫 방문에는 주지 않는다.** 이 보상의 이름이 「어제의 나」이고, 처음
+       온 사람에게는 어제가 없다 — 없는 사실을 근거로 지갑을 늘리면 그 문장이
+       거짓말이 된다. 기록만 세우고 다음 날부터 준다.
+       (부수 효과 하나가 이 판단을 실측으로 확인해 줬다: 첫 방문에 지급하면
+        새 설치의 젤리별 잔액이 3 늘어, 그 값을 그리는 캐릭창·스킨 시트 컷의
+        화소가 왕국과 무관하게 움직인다 — 관문 델타 03-charpanel·13-modal-skin.) */
+    var first = !k.lastVisit;
+    k.lastVisit = Date.now();
+    k.tapToday = 0;
+    if (!first) store.jstar = (store.jstar | 0) + KD_VISIT_JSTAR;
+    persist();
+    syncGems();
+    kdSync();
+    if (line) {
+      line.textContent = t(first ? 'kd.visit.first' : 'kd.visit', { n: KD_VISIT_JSTAR });
+      line.hidden = false;
+    }
+    if (!first) J.sfx.starGet(0);
+  }
+
+  /** 홈으로 들어간다. 「탭하여 시작」·게임 종료·지도 뒤로가 전부 이 문을 지난다. */
+  function enterKingdom() {
+    buildKingdom();
+    showScreen(homeScreen());
+    kdPanClamp();
+    kdVisit();
+    kdIdleSchedule();
+  }
+
+  /* --- 건물 탭 -------------------------------------------------------------- */
+  function kdBldgTap(id) {
+    var b = kdBuilding(id), el = $('kd-b-' + id);
+    if (!b) return;
+    if (el) { el.classList.remove('is-pop'); void el.offsetWidth; el.classList.add('is-pop'); }
+    if (!kdUnlocked(b)) {
+      /* 잠금 안내는 미니맵(§14.4)이 이미 쓰는 그 문장을 그대로 읽는다 —
+         같은 사실에 두 번째 문구를 만들지 않는다. */
+      toast(t('minimap.locked', { n: kdNeedStage(b) }));
+      J.sfx.fail();
+      return;
+    }
+    J.sfx.ui();
+    b.go();
+  }
+
+  /* --- 거주자 탭 (§26.3 · §26.6) -------------------------------------------- */
+  var kdHeartPool = [];
+  function kdHeartMs() {
+    var v = 0;
+    try {
+      v = parseFloat(getComputedStyle(document.documentElement)
+        .getPropertyValue('--mo-kd-heart')) || 0;
+    } catch (e) { v = 0; }
+    return v > 0 ? v : 900;      /* 토큰을 못 읽는 환경의 안전값(multLifeMs 규약) */
+  }
+  function kdHeartAt(el) {
+    var fx = $('kd-fx');
+    if (!fx || !el) return;
+    var node = null, i;
+    for (i = 0; i < kdHeartPool.length; i++) {
+      if (!kdHeartPool[i].classList.contains('is-on')) { node = kdHeartPool[i]; break; }
+    }
+    if (!node) {
+      if (kdHeartPool.length >= 6) return;      /* 풀 상한 — 연타로 노드가 안 는다 */
+      node = document.createElement('span');
+      node.className = 'kd-heart';
+      fx.appendChild(node);
+      kdHeartPool.push(node);
+    }
+    var r = el.getBoundingClientRect(), p = fx.getBoundingClientRect();
+    node.style.left = (r.left - p.left + r.width / 2) + 'px';
+    node.style.top = (r.top - p.top - 8) + 'px';
+    node.classList.remove('is-on');
+    void node.offsetWidth;
+    node.classList.add('is-on');
+    var n = node;
+    setTimeout(function () { n.classList.remove('is-on'); }, kdHeartMs() + 60);
+  }
+  function kdResTap(el) {
+    if (!el) return;
+    var id = el.getAttribute('data-kd-res') || '';
+    var k = kdStore();
+    kdHeartAt(el);
+    /* 대사 한 줄 — 기존 대사 자산(say.*)을 그대로 읽는다. 캐릭터가 아닌
+       동료에게는 표가 없으므로 t() 가 키를 돌려주기 전에 걸러 낸다. */
+    var say = t('say.clear.' + id);
+    if (say && say !== 'say.clear.' + id) toast(say);
+    if ((k.tapToday | 0) >= KD_TAP_CAP) { J.sfx.ui(); return; }
+    k.tapToday = (k.tapToday | 0) + 1;
+    store.jstar = (store.jstar | 0) + KD_TAP_JSTAR;
+    persist();
+    syncGems();
+    kdSync();
+    J.sfx.petBell();
+  }
+
+  /* --- 유휴 (§26.3) ---------------------------------------------------------
+   * 노드를 안 늘리고 키프레임만 바꾼다. 타이머는 **왕국이 서 있는 동안만**
+   * 돈다 — 다른 화면에서 도는 타이머는 그 화면의 예산을 조용히 먹는다. */
+  var kdIdleT = 0, kdIdleN = 0;
+  function kdIdleSchedule() {
+    if (kdIdleT) { clearTimeout(kdIdleT); kdIdleT = 0; }
+    var s = $('screen-kingdom');
+    if (!s || !s.classList.contains('active')) return;
+    kdIdleT = setTimeout(function () {
+      kdIdleT = 0;
+      var list = $('kd-res') ? $('kd-res').querySelectorAll('.kd-res') : null;
+      if (list && list.length) {
+        /* 무작위가 아니라 **순번**이다 — 관문 컷이 매번 같은 그림이어야 한다.
+           보는 눈에는 «가끔 한 명이 쉰다»로 똑같이 읽힌다. */
+        for (var i = 0; i < list.length; i++) list[i].classList.remove('is-idle');
+        list[kdIdleN % list.length].classList.add('is-idle');
+        kdIdleN++;
+      }
+      kdIdleSchedule();
+    }, 4200);
+  }
+  function kdIdleStop() { if (kdIdleT) { clearTimeout(kdIdleT); kdIdleT = 0; } }
+
+  /* --- 좌우 팬 (§26.2 「소폭 좌우 드래그 팬 · 스크롤 강제 없음」) -------------
+   * 지도의 드래그와 **같은 규약**이다: 움직이는 것은 --kx(translate3d) 하나이고
+   * scrollLeft 를 쓰지 않는다. 세로 제스처는 브라우저에 그대로 돌려준다. */
+  var kdDrag = null, kdX = 0;
+  function kdPanMin() {
+    var v = $('kd-view'), l = $('kd-layer');
+    if (!v || !l) return 0;
+    var d = l.offsetWidth - v.offsetWidth;
+    return d > 0 ? -d : 0;
+  }
+  function kdPanSet(x) {
+    var l = $('kd-layer');
+    var lo = kdPanMin();
+    kdX = clamp(x, lo, 0);
+    if (l) l.style.setProperty('--kx', kdX + 'px');
+  }
+  function kdPanClamp() { kdPanSet(kdX || kdPanMin() / 2); }
+  function kdPanDown(e) {
+    var v = $('kd-view');
+    if (!v) return;
+    kdDrag = { x: e.clientX, x0: kdX, moved: 0 };
+    v.classList.add('dragging');
+  }
+  function kdPanMove(e) {
+    if (!kdDrag) return;
+    var dx = e.clientX - kdDrag.x;
+    if (Math.abs(dx) > kdDrag.moved) kdDrag.moved = Math.abs(dx);
+    kdPanSet(kdDrag.x0 + dx);
+  }
+  var kdWasDrag = false;
+  function kdPanUp() {
+    var v = $('kd-view');
+    if (v) v.classList.remove('dragging');
+    /* 드래그였으면 탭으로 치지 않는다 — 12px 은 지도 드래그가 쓰는 그 문턱이다. */
+    kdWasDrag = !!(kdDrag && kdDrag.moved > 12);
+    kdDrag = null;
+  }
+  /** 방금 것이 드래그였나. 읽으면 사라진다(한 번의 click 에만 듣는다). */
+  function kdAteTap() { var w = kdWasDrag; kdWasDrag = false; return w; }
 
   /* ---- 10. 미션 카드 (V3 §4·§5) ------------------------------------------- */
 
@@ -46348,7 +46973,7 @@ window.TT_SFX = {
     cutDone = null;
     if (skipped) J.sfx.ui();
     if (f) f();
-    else { showScreen('screen-menu'); syncMenu(); }
+    else { syncMenu(); enterKingdom(); }   /* [KD57-0911] 컷이 끝나면 홈 = 왕국 */
   }
 
   /**
@@ -46416,7 +47041,7 @@ window.TT_SFX = {
   /** 설정창 "갤러리" — 오프닝을 다시 본다. 끝나면 있던 자리(메뉴)로 돌아간다. */
   function openGallery() {
     closeSettings();
-    playCuts(CUTS_OPEN, 'open', function () { showScreen('screen-menu'); syncMenu(); });
+    playCuts(CUTS_OPEN, 'open', function () { syncMenu(); enterKingdom(); });   /* [KD57-0911] */
   }
 
   /* ---- §H 캐릭터 스탯 4종 -------------------------------------------------
@@ -47999,6 +48624,41 @@ window.TT_SFX = {
     on($('map-gear'), 'click', openSettings);
     on($('map-char'), 'click', openCharPanel);
     on($('map-rec'), 'click', function () { J.sfx.ui(); openRank('endless'); });
+
+    /* ---- [KD57-0911] 젤리팡 왕국 (§26.4) ---------------------------------
+       건물 아홉과 거주자 여덟은 **JS 가 짓는 노드**다. 그래서 배선은 개별
+       버튼이 아니라 **부모 위임 둘**이다 — buildKingdom() 이 몇 번을 다시
+       지어도 배선이 새지 않고, 리스너 수가 화면 다시 짓기와 무관해진다
+       (#cp-side 의 [data-cpside] 위임이 쓰던 그 규약). */
+    on($('kd-bldgs'), 'click', function (e) {
+      var b = e.target && e.target.closest ? e.target.closest('.kd-bldg') : null;
+      if (!b || kdAteTap()) return;
+      kdBldgTap(b.getAttribute('data-kd') || '');
+    });
+    on($('kd-res'), 'click', function (e) {
+      var r = e.target && e.target.closest ? e.target.closest('.kd-res') : null;
+      if (!r || kdAteTap()) return;
+      kdResTap(r);
+    });
+    /* 안전망 줄 — 부르는 함수가 메뉴 화면의 그것과 **같다**(§26.4 공존기).
+       레거시 메뉴를 제거할 때(W2 사용자 판정) 이 네 줄과 아래 <footer> 가
+       함께 사라진다. */
+    on($('kd-legacy-play'), 'click', openModeSheet);
+    on($('kd-legacy-classic'), 'click', openClassicHub);
+    on($('kd-legacy-char'), 'click', openCharPanel);
+    on($('kd-legacy-set'), 'click', openSettings);
+    /* 좌우 팬 — 포인터 이벤트 하나로 마우스·터치를 함께 받는다. 세로 제스처는
+       CSS `touch-action: pan-y` 가 브라우저에 그대로 돌려준다(§26.2).
+       ⚠ `setPointerCapture` 를 **쓰지 않는다**(실측). 포인터를 붙잡으면 그
+          뒤의 pointer 이벤트가 붙잡은 요소로 재조준되고, click 의 대상도 함께
+          #kd-view 로 옮겨 간다 — 건물·거주자 탭이 통째로 삼켜진다. 대신 놓는
+          것은 창(window)에서 받는다: 손가락이 화면 밖으로 나가도 드래그가
+          안 걸려 남는다. */
+    var kdv = $('kd-view');
+    on(kdv, 'pointerdown', kdPanDown);
+    on(kdv, 'pointermove', kdPanMove);
+    on(window, 'pointerup', kdPanUp);
+    on(window, 'pointercancel', kdPanUp);
     on($('map-ch-prev'), 'click', function () { mapGoChapter(-1); });
     on($('map-ch-next'), 'click', function () { mapGoChapter(1); });
     /* 0910 챕터 미니맵. 칸 10개에 각각 거는 대신 격자 하나에 위임한다 —
@@ -49427,7 +50087,10 @@ window.TT_SFX = {
         syncHud();
       },
       // Daily already finished today? The menu button routes to the result screen.
-      function () { showScreen('screen-menu'); },
+      /* [KD57-0911] 인트로(§19)「탭하여 시작」의 착지 = **왕국**(§26.1).
+         웹·앱 공통이고 플랫폼 플래그와 무관하다 — 상점 «건물»만 data-app-only.
+         되돌리기 = 이 한 줄을 showScreen('screen-menu') 로. */
+      function () { enterKingdom(); },
       // review #2: the connection rule was never taught, so the tutorial is forced on
       // first run. store.tutorialDone is set by BOTH completing and skipping it.
       /* PERF ⑥: tutBuildBoard 26ms. 스플래시/로딩 뒤 청크로. */
@@ -49718,6 +50381,14 @@ window.TT_SFX = {
     harvestSpec: { perTile: HARVEST_PER_TILE, lead: HV_LEAD_MS, span: HV_SPAN_MS,
                    stepMin: HV_STEP_MIN, stepMax: HV_STEP_MAX,
                    hold: HV_HOLD_MS, tail: HV_TAIL_MS },
+    /* [KD57-0911] 젤리팡 왕국 — 스모크가 DOM 없이 화면을 세우고 건물·거주자
+       탭을 몰아 볼 수 있도록 낸 손잡이. 게임 코드는 이 중 무엇도
+       window.Game 을 거쳐 부르지 않는다(위 아케이드 손잡이와 같은 규약). */
+    enterKingdom: enterKingdom, buildKingdom: buildKingdom, kdBldgTap: kdBldgTap,
+    kdResTap: kdResTap, kdUnlocked: kdUnlocked, kdBuilding: kdBuilding,
+    kdResidents: kdResidents, kdStore: kdStore, homeScreen: homeScreen,
+    KD_BUILDINGS: KD_BUILDINGS, KD_ZONES: KD_ZONES, KD_DECO: KD_DECO,
+    KD_TAP_CAP: KD_TAP_CAP,
     mateId: mateId, setMate: setMate, cpTab: cpTab, openCharPanel: openCharPanel,
     duelFoeFull: duelFoeFull, PET_SKILL: PET_SKILL,
     openModeSheet: openModeSheet, openAdventure: openAdventure,
@@ -66043,6 +66714,297 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
 /* ---- 설정 줄의 진입 배지 — 부품(.badge-new)의 자리만 잡는다 -------------- */
 #modal-settings #st-quest{ position:relative; }
 #modal-settings #quest-badge{ margin-left:calc(var(--f2-w) * .0180); }
+</style>
+
+<style id="kingdom-0911">
+/* ============================================================================
+   [KD57-0911] 젤리팡 왕국 W1 — DESIGN §26 · 판정판 57
+
+   규율 셋을 지킨다.
+     ① 애니메이트하는 속성은 `transform` · `opacity` 뿐이다(§26.3 성능 예산).
+        `left`/`top`/`width` 는 **정지 좌표**로만 쓰고 한 번도 애니메이트하지
+        않는다 — 그 셋은 합성 밖이라 8개가 동시에 움직이면 저사양에서 레이아웃이
+        프레임마다 다시 선다.
+     ② 지속시간 리터럴 0. 전부 `<style id="tokens-semantic">` 의 `--mo-kd-*`
+        에서 온다(§22.1 이 세운 규약을 그대로 물려받는다).
+     ③ 새 그림 0. 배경은 --art-map-bg, 자물쇠는 --lib-glyph-lock, 하트는
+        --lib-glyph-heart, 명판은 --lib-chapter-plate, 버튼은 --lib-btn-* —
+        전부 이미 구워져 있는 도서관 조각이다.
+
+   되돌리기 = 이 <style> 블록 하나 + `#screen-kingdom` 섹션 + JS 의 `[KD57-0911]`
+   표식 블록. 셋을 지우면 착수 전이다.
+   ========================================================================= */
+
+/* .screen.active 는 flex 이고, 하네스의 __SHOT.screen() 은 인라인 display:block
+   을 준다. 둘 중 무엇이 와도 그림이 같아야 하므로 자식은 **전부 절대배치**다
+   (#screen-map 이 같은 이유로 같은 모양이다). */
+#screen-kingdom{
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 0;
+  overflow: hidden;
+}
+#kd-view{
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--kd-sky);
+  touch-action: pan-y;      /* 세로는 브라우저에, 가로는 우리 팬에 (지도와 같은 규약) */
+  cursor: grab;
+}
+#kd-view.dragging{ cursor: grabbing; }
+/* 레이어 = 1화면보다 --kd-pan 배만큼 넓은 한 장. 「스크롤 강제 없음 + 소폭 좌우
+   팬」(§26.2)이 이 배수 하나로 정해진다. 움직이는 것은 translate3d 뿐이다. */
+#kd-layer{
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: calc(var(--kd-pan) * 100%);
+  height: 100%;
+  transform: translate3d(var(--kx, 0px), 0, 0);
+  will-change: transform;
+  background-image: var(--art-map-bg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+}
+#kd-tint{
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  background: var(--ch-tint, transparent);
+  opacity: 0;
+}
+/* 세 겹은 전부 레이어를 꽉 덮는 «좌표계»다. 덮개가 탭을 먹지 않도록 겹 자체는
+   포인터를 안 받고, 실제 칸(.kd-bldg / .kd-res)만 받는다 — 이 한 줄이 없으면
+   위에 깔린 거주자 겹이 건물 아홉의 탭을 통째로 삼킨다. */
+#kd-bldgs, #kd-res, #kd-fx{ position: absolute; inset: 0; pointer-events: none; }
+/* 건물의 **탭 자리는 이름 명판**이고 상자가 아니다(실측 근거). 상자를 통째로
+   탭 대상으로 두면 아홉 개의 큰 사각형이 화면 대부분을 덮어 그 아래를 걷는
+   거주자가 영영 안 눌린다(스모크 3c·3d 가 실제로 그렇게 실패했다). 반대로
+   거주자를 위에 두면 지나가는 장식이 목적지 탭을 훔친다(2-mailbox·6-shop).
+   둘 다 «안 보이는 것이 탭을 정한다»는 같은 결함이고, 답도 하나다 —
+   **보이는 것만 누른다**. W2 에서 건물 그림이 도착하면 그 그림이 명판과 함께
+   pointer-events 를 받는다(자리가 커지는 것이지 규칙이 바뀌는 것이 아니다). */
+.kd-bldg{ pointer-events: none; }
+.kd-lab, .kd-res{ pointer-events: auto; }
+/* 겹 순서 — **건물이 거주자보다 위**다(실측 근거). 거주자는 산책하므로 어느
+   순간 건물 상자 위를 지나고, 그때 위에 있는 쪽이 탭을 가져간다: 거주자가
+   위면 «우편함을 눌렀는데 텐텐이 인사하는» 일이 무작위로 생긴다(스모크
+   2-mailbox · 6-shop 이 실제로 그렇게 실패했다). 허브에서 목적지 탭이
+   지나가는 장식에 밀리면 그것은 허브가 아니다.
+   W1 의 건물은 **투명 + 이름 명판**이라 이 순서가 그림도 옳게 만든다(명판은
+   UI 이므로 지나가는 거주자를 가려야 한다). W2 에서 건물 «그림»이 도착하면
+   그림 겹과 히트 겹을 갈라 그림만 거주자 아래로 내린다 — 그때도 이 규칙
+   (탭은 건물이 먼저)은 유지된다. */
+#kd-bldgs{ z-index: 1; }
+#kd-fx{ z-index: 2; }
+
+/* ---- 건물 = 투명 히트박스 (§26.4) ---------------------------------------
+   W1 에 건물 그림은 없다(§26.9 발주 #2~#9 는 W2). 그래서 이 칸은 **투명**이고,
+   보이는 것은 이름 명판 하나뿐이다 — 없는 그림을 CSS 로 흉내 내지 않는다.
+   그림이 도착하면 `background-image: var(--kd-art)` 한 줄이 여기 붙는다. */
+.kd-bldg{
+  position: absolute;
+  left: calc(var(--l) * 1%);
+  top: calc(var(--t) * 1%);
+  width: calc(var(--w) * 1%);
+  height: calc(var(--h) * 1%);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+/* 명판 = 챕터 명판(#map-plate)과 **한 부품**이다. 9-slice 조각도 슬라이스 값도
+   글자색도 그대로이고, 다른 것은 테두리 폭(작은 칸이라 한 단 낮춘다)뿐이다. */
+.kd-lab{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  max-width: 100%;
+  /* 탭 자리가 곧 명판이므로 최소 44pt 를 여기서 지킨다(.hchip-btn 과 같은 값). */
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 2px;
+  border-style: solid;
+  border-width: 15px 12px;
+  border-image: var(--lib-chapter-plate) 40 28 40 28 fill stretch;
+  font-family: var(--font-display);
+  font-size: 10.5px;
+  line-height: 1.05;
+  letter-spacing: -.2px;
+  color: #FFE9B8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+@keyframes kd-pop{
+  0%   { transform: translate(-50%, -50%) scale(1); }
+  45%  { transform: translate(-50%, -50%) scale(1.11); }
+  100% { transform: translate(-50%, -50%) scale(1); }
+}
+.kd-bldg.is-pop{ animation: kd-pop var(--mo-kd-pop) ease-out 1; }
+/* 잠금 = 실루엣 + 자물쇠(§26.4 · §14.3 잠금 변주 문법 그대로). 지도 노드가 이미
+   쓰는 --lib-glyph-lock 이고 새 조각 0이다. */
+.kd-bldg.is-lock .kd-lab{ filter: grayscale(1) brightness(.74); }
+.kd-bldg.is-lock::after{
+  content: '';
+  position: absolute;
+  right: 4%;
+  bottom: 46%;
+  width: 22%;
+  height: 22%;
+  min-width: 14px;
+  min-height: 14px;
+  background: var(--lib-glyph-lock) center/contain no-repeat;
+  pointer-events: none;
+}
+/* 앱 전용 건물(상점)은 §18.7 의 규약 함수가 감춘다 — 새 숨김 방식 0. */
+
+/* ---- 거주자 (§26.3) -------------------------------------------------------
+   층 셋으로 나눈 이유는 **한 요소의 transform 은 하나**이기 때문이다:
+     .kd-res     가로 산책      translate3d
+     .kd-walker  걸음 바운스    translateY
+     .kd-sprite  진행 방향 flip scaleX
+   합치려면 매 프레임 JS 가 세 값을 곱해 써야 하고, 그것은 합성 스레드 밖의
+   일이 된다. 노드 3 × 8 = 24 는 그 대가이고 전부 GPU 합성이다. */
+.kd-res{
+  position: absolute;
+  left: calc(var(--l) * 1%);
+  top: calc(var(--t) * 1%);
+  width: calc(var(--w) * 1%);
+  height: calc(var(--h) * 1%);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transform: translate3d(var(--x0), 0, 0);
+  animation: kd-walk calc(var(--mo-kd-walk) * var(--kd-k, 1)) linear infinite alternate;
+  animation-delay: var(--kd-delay, 0ms);
+}
+@keyframes kd-walk{
+  from{ transform: translate3d(var(--x0), 0, 0); }
+  to  { transform: translate3d(var(--x1), 0, 0); }
+}
+.kd-walker{
+  position: absolute;
+  inset: 0;
+  animation: kd-bounce var(--mo-kd-bounce) ease-in-out infinite;
+  animation-delay: var(--kd-delay, 0ms);
+}
+@keyframes kd-bounce{
+  0%, 100%{ transform: translateY(0); }
+  50%     { transform: translateY(-5.5%); }
+}
+.kd-sprite{
+  position: absolute;
+  inset: 0;
+  background-image: var(--kd-art);
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center bottom;
+  filter: drop-shadow(0 4px 8px rgba(58, 30, 48, .34));
+  /* 왕복 주기(= 산책 ×2) 안에서 **한 번** 뒤집는다. steps(1,end) 라 뒤집힘이
+     보간되지 않고, 지연이 산책과 같으므로 방향이 도는 순간과 정확히 맞는다. */
+  animation: kd-flip calc(var(--mo-kd-walk) * var(--kd-k, 1) * 2) steps(1, end) infinite;
+  animation-delay: var(--kd-delay, 0ms);
+}
+@keyframes kd-flip{
+  0%  { transform: scaleX(1); }
+  50% { transform: scaleX(-1); }
+}
+/* 유휴 — **노드가 늘지 않는다**(§26.3). 가로 산책만 멈추고 바운스 키프레임이
+   숨쉬기로 갈린다. 그래서 유휴 진입·해제가 DOM 을 한 번도 안 만진다. */
+.kd-res.is-idle{ animation-play-state: paused; }
+.kd-res.is-idle .kd-walker{ animation-name: kd-idle; animation-duration: var(--mo-kd-idle); }
+.kd-res.is-idle .kd-sprite{ animation-play-state: paused; }
+@keyframes kd-idle{
+  0%, 100%{ transform: translateY(0) scaleY(1); }
+  50%     { transform: translateY(1.2%) scaleY(.975); }
+}
+
+/* ---- 탭 하트 말풍선 (코드 합성 · §26.3) ----------------------------------
+   §26.9 #13(하트 말풍선 발주)을 **안 쓰기 위한** 형태다: CSS 말풍선 + 이미
+   구워져 있는 --lib-glyph-heart 한 조각. 노드는 풀(kdHeartPool)에서 돌려 쓴다. */
+.kd-heart{
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  margin-left: -15px;
+  border-radius: 50% 50% 50% 8px;
+  background: rgba(255, 255, 255, .92);
+  box-shadow: 0 2px 6px rgba(58, 30, 48, .3);
+  opacity: 0;
+  pointer-events: none;
+}
+.kd-heart::before{
+  content: '';
+  position: absolute;
+  inset: 6px;
+  background: var(--lib-glyph-heart) center/contain no-repeat;
+}
+.kd-heart.is-on{ animation: kd-heart var(--mo-kd-heart) ease-out 1 forwards; }
+@keyframes kd-heart{
+  0%  { opacity: 0; transform: translateY(0) scale(.6); }
+  22% { opacity: 1; transform: translateY(-18%) scale(1.06); }
+  100%{ opacity: 0; transform: translateY(-120%) scale(1); }
+}
+
+/* ---- 띠 · 방문 줄 --------------------------------------------------------- */
+#kd-top{ top: 0; gap: 8px; padding-top: var(--safe-t); }
+#kd-bot{ bottom: 0; gap: 6px; padding-bottom: var(--safe-b); justify-content: center; }
+/* 지도 하단 띠는 자식을 절대좌표(%)로 앉히지만 이 띠는 흐름 배치다. .mfbtn 의
+   :active 가 그 절대좌표를 전제로 translateY(-50%) 를 들고 있으므로 여기서만
+   자기 자리로 되돌린다 — 지도 쪽 규칙은 한 글자도 안 건드린다. */
+#kd-bot .mfbtn{ position: relative; flex: 1 1 0; min-width: 0; transform: none; }
+#kd-bot .mfbtn:active{ transform: translateY(2px); }
+
+#kd-visit{
+  position: absolute;
+  left: 50%;
+  top: calc(var(--safe-t) + clamp(48px, 13.1vh, 110px) + 6px);
+  z-index: 4;
+  max-width: 88%;
+  margin: 0;
+  padding: 5px 12px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .9);
+  color: var(--prim-art-ink);
+  font-family: var(--font-display);
+  font-size: 11px;
+  line-height: 1.25;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(58, 30, 48, .28);
+}
+
+/* ---- 동작 줄이기 ---------------------------------------------------------
+   §22.3 의 처분을 그대로 넓힌다: **움직임만** 끄고 «누가 살고 있는가»라는
+   정보는 안 줄인다. 거주자는 첫 프레임 자리에 서 있고 하트는 정지 표시가 된다. */
+@media (prefers-reduced-motion: reduce){
+  .kd-res, .kd-walker, .kd-sprite, .kd-bldg.is-pop{ animation: none !important; }
+  .kd-heart.is-on{ animation: none !important; opacity: 1; }
+}
+
+/* ---- 데스크톱 1280 -------------------------------------------------------
+   지도와 같은 처방(§14.8): 기하가 넓어져도 **글자 상자는 안 늘어난다**. 명판과
+   버튼 글자만 한 단 키우고 좌표표(%)는 그대로다 — 390 과 1280 이 같은 그림이다. */
+@media (min-width: 900px){
+  .kd-lab{ font-size: 12.5px; border-width: 17px 14px; }
+  #kd-bot .mfbtn{ flex: 0 1 168px; font-size: 12px; }
+  #kd-visit{ font-size: 12.5px; }
+}
 </style>
 </body>
 </html>
