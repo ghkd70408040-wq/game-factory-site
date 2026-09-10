@@ -15869,12 +15869,17 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
               <span class="ci-chip kit-slot-v2 kit-slot-v2--portrait" id="cp-pet-face" aria-hidden="true"></span>
               <span class="ci-plate kit-slot-v2 kit-slot-v2--name"><span class="ci-name" id="cp-pet-name">&nbsp;</span></span>
             </div>
-            <p class="ci-tag"><span class="ci-tag-k" data-i18n="pick.rec">Best for</span><b class="ci-tag-v kit-pill-v2" data-variant="soft" id="cp-pet-tag">&nbsp;</b></p>
-            <div class="cc-stats" id="cp-pet-stats" aria-hidden="true">
-            <span class="cs"><b class="cs-k" data-i18n="stat.k1">Power</b><i class="cs-bar kit-gauge-v2" data-pet="pwr" style="--v:25%;--f2-gv:.25"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i></span>
-            <span class="cs"><b class="cs-k" data-i18n="stat.k2">Steady</b><i class="cs-bar kit-gauge-v2" data-pet="std" style="--v:25%;--f2-gv:.25"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i></span>
-            <span class="cs"><b class="cs-k" data-i18n="stat.k3">Agility</b><i class="cs-bar kit-gauge-v2" data-pet="agi" style="--v:25%;--f2-gv:.25"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i></span>
-            <span class="cs"><b class="cs-k" data-i18n="stat.k4">Luck</b><i class="cs-bar kit-gauge-v2" data-pet="luk" style="--v:25%;--f2-gv:.25"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i></span>
+            <p class="ci-tag"><span class="ci-tag-k" data-i18n="pick.rec">Best for</span><b class="ci-tag-v kit-pill-v2" data-variant="soft" id="cp-pet-tag">&nbsp;</b><!-- [PG-0910] 파편 잔액 — 아이템 칸이 쓰는 그 크리스탈 액자(.cp-crystal.cp-gem)의 인스턴스 하나다. 새 도형 0 · 새 그림 0. 숫자는 «지금 보고 있는 레버 색»의 잔액이고, 그 색은 data-stat 이 말한다. --><b class="cp-crystal cp-gem cp-shardgem" id="cp-pet-shard" data-stat="power"><i class="cp-cr-ic" aria-hidden="true">💎</i><b class="cp-gem-n">0</b></b></p>
+            <!-- [PG-0910] W3 — 네 줄이 이제 **강화 손잡이**를 갖는다.
+                 aria-hidden 을 뗄 이유: 안에 누를 수 있는 버튼이 생겼다 —
+                 스크린리더에 안 보이는 버튼은 도달할 수 없는 버튼이다.
+                 버튼은 이 판이 이미 쓰던 알약 부품(kit-pill-v2[soft])의 인스턴스고,
+                 숫자·비활성·라벨은 전부 syncPetUp() 이 채운다. -->
+            <div class="cc-stats" id="cp-pet-stats">
+            <span class="cs"><b class="cs-k" data-i18n="stat.k1">Power</b><i class="cs-bar kit-gauge-v2" data-pet="pwr" style="--v:25%;--f2-gv:.25"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i><button class="cs-up kit-pill-v2" data-variant="soft" data-pet-up="pwr" type="button" disabled><b class="cs-up-n">-</b></button></span>
+            <span class="cs"><b class="cs-k" data-i18n="stat.k2">Steady</b><i class="cs-bar kit-gauge-v2" data-pet="std" style="--v:25%;--f2-gv:.25"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i><button class="cs-up kit-pill-v2" data-variant="soft" data-pet-up="std" type="button" disabled><b class="cs-up-n">-</b></button></span>
+            <span class="cs"><b class="cs-k" data-i18n="stat.k3">Agility</b><i class="cs-bar kit-gauge-v2" data-pet="agi" style="--v:25%;--f2-gv:.25"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i><button class="cs-up kit-pill-v2" data-variant="soft" data-pet-up="agi" type="button" disabled><b class="cs-up-n">-</b></button></span>
+            <span class="cs"><b class="cs-k" data-i18n="stat.k4">Luck</b><i class="cs-bar kit-gauge-v2" data-pet="luk" style="--v:25%;--f2-gv:.25"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i><button class="cs-up kit-pill-v2" data-variant="soft" data-pet-up="luk" type="button" disabled><b class="cs-up-n">-</b></button></span>
             </div>
             <div class="ci-desc kit-box-v2" id="cp-pet-desc">
               <p class="cc-head" data-i18n="cp.sk.head">[Passive Skill]</p>
@@ -24604,6 +24609,13 @@ window.TT_SFX = {
      *               하는 것이 되어 서사(스승이 합류한다)가 성립하지 않는다. */
     shards: { power: 0, steady: 0, agility: 0, luck: 0 },
     shardDry: { power: 0, steady: 0, agility: 0, luck: 0 },
+    /* [PG-0910] DESIGN §16.6 — 누적 **획득**(차감 안 함).
+     * 왜 잔액과 따로 두는가: 꿀떡이 천장(petShardCheck)이 지금까지 잔액 합을
+     * 읽었는데, 이번 파도가 **소비**를 만들었다. 그대로 두면 300을 모았다가
+     * 강화에 12를 쓰면 해금 조건이 **후퇴**한다 — 천장(확률에 안 걸려도 확정
+     * 획득하는 안전판)의 뜻을 정면으로 깨는 것이라 천장은 누적을 읽어야 한다.
+     * 이전기는 readStore 한 줄이다(옆에 적어 둔 시딩). */
+    shardEver: { power: 0, steady: 0, agility: 0, luck: 0 },
     items: { own: {}, eq: {} },
     giftNoItem: 0,
     /* 2c — 모양이 바뀌었다: 문자열 배열 -> **항목 배열** [{id, lv, evo}].
@@ -24612,12 +24624,20 @@ window.TT_SFX = {
      * 두 번 바꾸면 두 번째 마이그레이션이 첫 번째의 결과를 다시 만나야 한다.
      * ⚠ 옛 세이브(문자열 배열)는 readStore 가 **자동 변환**한다. 그 경로가
      *   없으면 기존 플레이어의 펫이 통째로 사라진다(= 세이브 손실). */
-    pets: [{ id: 'ppyak', lv: 1, evo: 0 }, { id: 'mungchi', lv: 1, evo: 0 }],
+    /* [PG-0910] up = 레버 넷의 강화 단수(0..PET_UP_LV_MAX). 저장이 없는 첫
+       실행은 readStore 를 통째로 건너뛰므로(`if (!raw) return;`) 이 리터럴이
+       곧 신규 유저의 모양이다 — 여기에 없으면 신규만 up 이 없는 항목을 갖는다. */
+    pets: [{ id: 'ppyak', lv: 1, evo: 0, up: { pwr: 0, std: 0, agi: 0, luk: 0 } },
+           { id: 'mungchi', lv: 1, evo: 0, up: { pwr: 0, std: 0, agi: 0, luk: 0 } }],
     /* 2c — 스키마 판. 위 pets 의 모양이 또 바뀌면 여기가 오른다. */
     petsVer: 2,
     /* 2c — 합10 매치 누적(§14 썩싹이 조건). 계정 단위 최고 기록이 아니라
      * **누적**이라 awkChainMax 셋과 갈라 뒀다. */
     tenTotal: 0,
+    /* [PG-0910] §16.3-ⓔ — 데일리 파편을 받은 날(todayKey). 하루에 한 번이라는
+       사실을 streak 과 나누지 않는다 — 연속이 끊겨도 파편은 받아야 하고,
+       그 둘은 서로 다른 약속이다. */
+    shardDailyDate: '',
     awkChainMax: 0,
     noDelayMax: 0,
     bossNoHit: 0,
@@ -25046,6 +25066,17 @@ window.TT_SFX = {
             store.shardDry[wdk] = clamp(wdv | 0, 0, SHARD_PITY);
           }
         }
+        /* [PG-0910] §16.6 — 누적 획득. 소독 규율은 위 두 블록 그대로고, 한 줄이
+           더 붙는다: **누적은 잔액보다 작을 수 없다**. 그 한 줄이 이전기를 겸한다 —
+           그 필드가 없던 옛 세이브는 잔액이 곧 «지금까지 딴 수»이므로 그것이 그대로
+           시드값이 되고, 손상된 세이브도 해금이 뒤로 가지 않는다. */
+        for (var evi = 0; evi < STAT_KEYS.length; evi++) {
+          var evk = STAT_KEYS[evi];
+          var evv = (o.shardEver && typeof o.shardEver === 'object') ? o.shardEver[evk] : null;
+          var evn = (typeof evv === 'number' && isFinite(evv))
+            ? clamp(evv | 0, 0, SHARD_HOLD_MAX) : 0;
+          store.shardEver[evk] = Math.max(evn, store.shards[evk] | 0);
+        }
         /* 아이템. 모르는 id 는 **조용히 버린다** — 나중에 풀에서 한 종을 빼거나
            이름을 바꿔도 세이브가 게임을 막지 않아야 한다(스킨 블록과 같은 규율).
            장착 목록은 슬롯 수(ITEM_SLOTS)에서 자르고, 보유하지 않은 id 가 장착
@@ -25135,6 +25166,10 @@ window.TT_SFX = {
         store.petsVer = 2;
         if (typeof o.tenTotal === 'number' && isFinite(o.tenTotal)) {
           store.tenTotal = Math.max(0, o.tenTotal | 0);
+        }
+        /* [PG-0910] 날짜 문자열 하나. 모양이 아니면 버린다(= 오늘 아직 안 받음). */
+        if (typeof o.shardDailyDate === 'string' && /^[0-9]{8}$/.test(o.shardDailyDate)) {
+          store.shardDailyDate = o.shardDailyDate;
         }
         /* 조건 카운터(§14.3). 계정 단위 최고 기록이라 단조 증가만 뜻이 있다. */
         if (typeof o.awkChainMax === 'number' && isFinite(o.awkChainMax)) {
@@ -25687,6 +25722,16 @@ window.TT_SFX = {
       'cp.pet.sep': ' and ',
       'cp.sk.lock': 'Locked',
       'aria.loadout': 'Loadout',
+      /* [PG-0910] DESIGN §16.5 — 펫 강화. 숫자는 전부 자리표시자다
+         (copy-check: 같은 사실을 사전과 코드 두 곳에 적지 않는다). */
+      'pet.up.btn': 'Upgrade',
+      'pet.up.max': 'MAX',
+      'pet.up.cost': '{n} shards',
+      'pet.up.bal': '{s}: {n}',
+      'pet.up.poor': '{s} short by {n}',
+      'pet.up.done': '{s} up! Lv.{lv}',
+      'pet.up.maxmsg': 'That lever is already at its peak.',
+      'pet.up.aria': 'Upgrade {s} to Lv.{lv} for {n} shards',
       'pet.axis.link': 'Link',
       'pet.axis.time': 'Time',
       'pet.axis.cleanse': 'Cleanse',
@@ -26978,6 +27023,15 @@ window.TT_SFX = {
       'cp.pet.sep': '·',
       'cp.sk.lock': '잠김',
       'aria.loadout': '장비',
+      /* [PG-0910] DESIGN §16.5 — 펫 강화. 숫자는 전부 자리표시자다. */
+      'pet.up.btn': '강화',
+      'pet.up.max': 'MAX',
+      'pet.up.cost': '파편 {n}개',
+      'pet.up.bal': '{s} {n}개',
+      'pet.up.poor': '{s}이 {n}개 부족해요',
+      'pet.up.done': '{s} 강화! Lv.{lv}',
+      'pet.up.maxmsg': '이 레버는 이미 만렙이에요',
+      'pet.up.aria': '{s}을 Lv.{lv}로 강화 — 파편 {n}개',
       'pet.axis.link': '연결',
       'pet.axis.time': '시간',
       'pet.axis.cleanse': '정화',
@@ -31290,16 +31344,25 @@ window.TT_SFX = {
     setStdArt(face, id, 'face', '--char-face');
     cpTxt($('cp-pet-name'), id ? ('char.' + id + '.name') : 'mate.none.name');
     cpTxt($('cp-pet-tag'), (id && st) ? ('pet.axis.' + st.axis) : 'mate.none.name');
-    /* 막대 — 없는 펫('없음')이면 넷 다 0 이다. */
-    var keys = ['pwr', 'std', 'agi', 'luk'];
+    /* 막대 — 없는 펫('없음')이면 넷 다 0 이다.
+       [PG-0910] 눈금이 바뀌었다: 종전은 «타고난 값 / 8» 이라 편중 축이 언제나
+       100% 로 꽉 차 **강화가 들어갈 자리가 화면에 없었다**. 이제 캐릭터 막대와
+       같은 규율로 «실효값 / 고정 상한(PET_STAT_CAP=12)» 을 읽는다 — 편중 8 은
+       67% 에서 시작해 만렙에서 정확히 100% 에 닿는다. --v0 에는 타고난 값을
+       실어 둔다(기준선 마커의 문법 그대로, 둘이 같으면 .is-b0same 로 접힌다). */
+    var keys = PET_UP_KEYS;
     var bars = box.querySelectorAll ? box.querySelectorAll('.cs-bar') : [];
     for (i = 0; i < bars.length && i < 4; i++) {
-      var v = st ? clamp(Math.round(100 * st[keys[i]] / 8), 0, 100) : 0;
+      var bk = keys[i];
+      var v = st ? clamp(Math.round(100 * petEff(id, bk) / PET_STAT_CAP), 0, 100) : 0;
+      var v0 = st ? clamp(Math.round(100 * st[bk] / PET_STAT_CAP), 0, 100) : 0;
       if (!bars[i].style) continue;
       bars[i].style.setProperty('--v', v + '%');
-      bars[i].style.setProperty('--v0', '0%');
+      bars[i].style.setProperty('--v0', v0 + '%');
       bars[i].style.setProperty('--f2-gv', String(v / 100));
+      if (bars[i].classList) bars[i].classList.toggle('is-b0same', v === v0);
     }
+    syncPetUp(id, lock);        /* [PG-0910] 강화 버튼 넷 + 잔액 젬 */
     /* 기술 문구. 잠긴 펫은 **왜 잠겼는지**를 같은 자리에서 말한다. */
     /* charsel v2-b — 캐릭터 판과 **같은 두 칸 줄**로 맞춘다:
          [패시브] 값 / [필살기] 값   ↔   [기술] 값 / [사용] 값
@@ -31334,7 +31397,10 @@ window.TT_SFX = {
       cpTxt($('cp-pet-pass'), null, ptx);
       if (plab) { cpTxt(pk, null, plab); } else { cpTxt(pk, 'cp.sk.skill'); }
       cpTxt($('cp-pet-use'), null,
-            lock ? petLockText(id) : t('cp.sk.usev', { n: DUEL_PET_MAX }));
+            /* [PG-0910] 순발력 레버가 실재하게 됐으므로 **그 펫의 수**를 말한다.
+               상수를 그대로 찍으면 판에서 3회 쓰는 펫이 화면에선 2회라고 적힌다. */
+            lock ? petLockText(id)
+                 : t('cp.sk.usev', { n: petUsesFrom(st ? petEff(id, 'agi') : PET_EFF_BASE) }));
     }
     var uk = $('cp-pet-use');
     if (uk && uk.parentNode && uk.parentNode.firstChild) {
@@ -31343,6 +31409,116 @@ window.TT_SFX = {
     fitDesc($('cp-pet-desc'));
     cpPetStage();             /* 구경 중인 펫이 무대에도 선다(없으면 히어로) */
     cpCenterAll();
+  }
+
+  /* =========================================================================
+   * [PG-0910] W3 — 펫 탭 강화 줄 (DESIGN §16.5)
+   *
+   * 새 그림 0 · 새 부품 0. 쓰는 것은 둘 다 이 판이 이미 갖고 있던 인스턴스다:
+   *   강화 버튼  .kit-pill-v2[data-variant="soft"]  (추천 배지가 쓰는 그 알약)
+   *   잔액 젬    .cp-crystal.cp-gem                 (아이템 칸이 쓰는 그 액자)
+   * 색은 **그 레버의 파편 색**이다(§16.3-ⓓ) — 지갑·판 위 배지·강화가 같은
+   * 색표(--role-rw-shard-*)를 읽으므로 색이 세 곳에서 같은 것을 뜻한다.
+   * ========================================================================= */
+
+  /** 잔액 젬이 지금 보여 주는 레버. «지금 보고 있는 것»이지 저장이 아니다
+   *  (cpTabCur 과 같은 급의 세션 값). 기본은 그 펫의 **편중 축**이다 —
+   *  펫 하나가 가진 유일한 개성이 그 축이라, 처음 보이는 지갑도 그 색이 맞다. */
+  var cpPetLever = 'pwr', cpPetLeverFor = '';
+
+  /** 그 펫의 편중(최대) 레버. 동률이면 표 순서(pwr→luk)가 이긴다. */
+  function petLeadLever(id) {
+    var st = PET_STATS[id], best = 'pwr', i, k;
+    if (!st) return 'pwr';
+    for (i = 0; i < PET_UP_KEYS.length; i++) {
+      k = PET_UP_KEYS[i];
+      if (st[k] > st[best]) best = k;
+    }
+    return best;
+  }
+
+  /**
+   * 강화 줄 넷 + 잔액 젬 하나를 한 번에 다시 칠한다. 값의 출처는 전부
+   * petUpLv / petUpCost / store.shards 이고, 이 함수는 **아무것도 안 바꾼다** —
+   * 화면은 저장을 읽기만 한다(syncPetInfo 가 매번 부르므로 부팅 빗장이 없다).
+   */
+  function syncPetUp(id, lock) {
+    var stats = $('cp-pet-stats');
+    if (!stats || !stats.querySelectorAll) return;
+    /* 펫이 바뀌면 지갑도 **그 펫의 편중 축**으로 돌아간다. 앞서 보던 펫에서
+       누른 색을 그대로 들고 오면, 새 펫의 화면이 남의 사정을 말하게 된다. */
+    if (id && (cpPetLeverFor !== id || PET_UP_KEYS.indexOf(cpPetLever) < 0)) {
+      cpPetLever = petLeadLever(id);
+      cpPetLeverFor = id;
+    }
+    var btns = stats.querySelectorAll('.cs-up'), i;
+    for (i = 0; i < btns.length; i++) {
+      var b = btns[i], k = b.getAttribute('data-pet-up');
+      var sk = PET_UP_STAT[k] || 'power';
+      var lv = id ? petUpLv(id, k) : 0;
+      var maxed = !!id && lv >= PET_UP_LV_MAX;
+      var cost = maxed ? 0 : petUpCost(lv + 1);
+      var have = store.shards[sk] | 0;
+      var n = b.querySelector ? b.querySelector('.cs-up-n') : null;
+      if (n) n.textContent = !id ? '-' : (maxed ? t('pet.up.max') : String(cost));
+      b.setAttribute('data-stat', sk);
+      b.setAttribute('data-max', maxed ? '1' : '0');
+      b.disabled = !id || !!lock || maxed || have < cost;
+      b.setAttribute('aria-label', !id ? t('pet.up.btn')
+        : (maxed ? t('pet.up.max')
+                 : t('pet.up.aria', { s: t('stat.k' + (i + 1)), lv: lv + 1, n: cost })));
+    }
+    var gem = $('cp-pet-shard');
+    if (gem) {
+      var gk = PET_UP_STAT[cpPetLever] || 'power';
+      var gn = gem.querySelector ? gem.querySelector('.cp-gem-n') : null;
+      gem.setAttribute('data-stat', gk);
+      if (gn) gn.textContent = String(store.shards[gk] | 0);
+      gem.setAttribute('aria-label',
+        t('pet.up.bal', { s: t('rw.shard.' + gk), n: store.shards[gk] | 0 }));
+    }
+  }
+
+  /**
+   * 강화 한 단. 실패는 **전부 같은 모양**이다 — 토스트 한 줄 + 실패음이고,
+   * 저장은 한 톨도 안 움직인다(shardSpend 의 부분 차감 금지가 그 보증이다).
+   * 성공하면 순서가 하나뿐이다: 차감 -> 단수 -> persist -> 화면 -> 연출.
+   * 화면을 먼저 칠하고 저장하면, 저장이 실패한 판에서 화면만 앞서 간다.
+   */
+  function petUpDo(k) {
+    var id = cpPetId();
+    if (!id) { toast(t('cp.pet.empty', { free: petFreeNames() })); J.sfx.fail(); return; }
+    if (!petOwned(id)) { toast(petLockText(id)); J.sfx.fail(); return; }
+    if (PET_UP_KEYS.indexOf(k) < 0) return;
+    var lv = petUpLv(id, k), sk = PET_UP_STAT[k];
+    if (lv >= PET_UP_LV_MAX) { toast(t('pet.up.maxmsg')); J.sfx.fail(); return; }
+    var cost = petUpCost(lv + 1), have = store.shards[sk] | 0;
+    if (have < cost) {
+      toast(t('pet.up.poor', { s: t('rw.shard.' + sk), n: cost - have }));
+      J.sfx.fail();
+      return;
+    }
+    var e = petEntry(id);
+    if (!e) { J.sfx.fail(); return; }
+    if (!shardSpend(sk, cost)) { J.sfx.fail(); return; }
+    if (!e.up || typeof e.up !== 'object') e.up = makePetUp(null);
+    e.up[k] = clamp(lv + 1, 0, PET_UP_LV_MAX);
+    persist();
+    syncPetInfo();
+    /* 막대 애니 — transform 하나만 애니메이트한다(game-motion §4). 지속·이징은
+       토큰(--dur-2 · --ease-out)이고 리터럴 ms 를 쓰지 않는다. 클래스를 떼었다
+       다시 붙이는 사이의 reflow 강제 한 줄이 «연속 강화에서 두 번째부터 안 뛴다»
+       를 막는다(badgePop 이 쓰는 그 문법). */
+    var bar = $('cp-pet-stats');
+    bar = bar && bar.querySelector ? bar.querySelector('.cs-bar[data-pet="' + k + '"]') : null;
+    if (bar && bar.classList) {
+      bar.classList.remove('is-up');
+      void bar.offsetWidth;
+      bar.classList.add('is-up');
+    }
+    toast(t('pet.up.done', { s: t('stat.k' + (PET_UP_KEYS.indexOf(k) + 1)), lv: lv + 1 }));
+    J.sfx.win();
+    J.vibrate(24);
   }
 
   /**
@@ -37307,6 +37483,22 @@ window.TT_SFX = {
        하루에 두 번 받는 길을 만들지 않는 것이 이 분기의 전부다. */
     var streakGot = { heart: 0, jstar: 0, days: [] };
     if (!classicRun) { bumpStreak(); streakGot = claimStreakRewards(); }
+    /* [PG-0910] §16.3-ⓔ — 데일리 1일 1회 완주 파편 5알. 색은 shardDropFor(0, …)
+       = 균등 + 기존 천장 규율이다(새 추첨표 0).
+       왜 순수성에 안 걸리는가: **판 규칙에 한 글자도 안 닿는다** — 같은 시드·같은
+       보드·같은 규칙이고, 늘어난 것은 판이 끝난 뒤의 지갑뿐이다. 클래식 데일리가
+       빠진 것도 streak 과 같은 근거다(하루에 두 번 받는 길을 만들지 않는다).
+       수 5 의 근거: GACHA_SHARD_N(3) < 5 < 판당 수확 하한 10 — 상자보다 크고
+       한 판보다 작아 데일리가 파밍을 대체하지 못한다. */
+    if (!classicRun && store.shardDailyDate !== todayKey()) {
+      store.shardDailyDate = todayKey();
+      var dsk = shardDropFor(0), dsg = {}, dsi;
+      for (dsi = 0; dsi < STAT_KEYS.length; dsi++) dsg[STAT_KEYS[dsi]] = 0;
+      dsg[dsk] = PET_DAILY_SHARD;
+      shardCredit(dsg);
+      S.gainShard[dsk] = (S.gainShard[dsk] | 0) + PET_DAILY_SHARD;   /* 결과 시트 보상 행 */
+      petShardCheck();
+    }
     store[bestSlot] = {
       date: todayKey(), n: dailyNumber(), timeSec: sec,
       matches: S.matches, maxCombo: S.maxCombo, score: S.score,
@@ -39724,7 +39916,9 @@ window.TT_SFX = {
              hit: duelFoeHit(n) },
       def: duelFoeDef(n),
       dmg: 0,
-      petLeft: DUEL_PET_MAX,
+      /* [PG-0910] §16.3-ⓒ 횟수 레버. 기본 2회, 편중 8 은 3회, 만렙 12 는 4회
+         (= MK_PET_CAP, 펫 과일이 이미 허용하던 잔여 상한). */
+      petLeft: petUses(),
       refillSeq: 0,
       foeSkillAt: 0,
       idleAt: 0,
@@ -40898,7 +41092,9 @@ window.TT_SFX = {
      것은 틀리다(리필·busy·idle 리셋이 두 벌이 된다). */
   function petPeck(nOpt, keyOpt) {
     var d = S.duel, i;
-    var want = (nOpt | 0) > 0 ? (nOpt | 0) : DUEL_PET_POP;
+    /* [PG-0910] §16.3-ⓒ 위력 레버. eff=2 에서 x1.00 이므로 오늘의 값 그대로고,
+       편중 8 은 x1.30, 만렙 12 는 x1.50(4 -> 6 = PET2_SWEEP_POP)이다. */
+    var want = petPowN((nOpt | 0) > 0 ? (nOpt | 0) : DUEL_PET_POP);
     var tkey = keyOpt || 'duel.petpeck';
     var live = [];
     for (i = 0; i < S.cells.length; i++) {
@@ -40956,7 +41152,9 @@ window.TT_SFX = {
    */
   function petShield() {
     var d = S.duel;
-    d.freezeUntil = now() + DUEL_PET_FREEZE_MS;
+    /* [PG-0910] §16.3-ⓒ 지속 레버. 6000 -> 만렙 9000ms. 문구도 같은 수를 읽는다. */
+    var fms = petDurMs(DUEL_PET_FREEZE_MS);
+    d.freezeUntil = now() + fms;
     /* 커서를 **지금**으로 찍어 둔다. 200ms 틱이 알아서 열게 두면 최대 한 틱
        (200ms)이 정지 밖으로 새어 나가, 6초 정지가 5.8초가 된다. */
     if (!(d.chillAt > 0)) d.chillAt = now();
@@ -40975,7 +41173,7 @@ window.TT_SFX = {
       J.floatText(window.innerWidth / 2, window.innerHeight * 0.50,
                   t('duel.timestop'), '#9fe8ff', 34);
     }
-    toast(t('duel.petshield', { n: Math.round(DUEL_PET_FREEZE_MS / 1000) }));
+    toast(t('duel.petshield', { n: Math.round(fms / 1000) }));
     return true;
   }
 
@@ -41001,7 +41199,8 @@ window.TT_SFX = {
   function petFreeze4s_mongle() {
     var d = S.duel;
     if (!d || d.down) return false;
-    var until = now() + DUEL_MONGLE_FREEZE_MS;
+    var mms = petDurMs(DUEL_MONGLE_FREEZE_MS);   /* [PG-0910] 지속 레버 */
+    var until = now() + mms;
     if (until > d.freezeUntil) d.freezeUntil = until;
     if (!(d.chillAt > 0)) d.chillAt = now();
     duelChillSync();
@@ -41016,7 +41215,7 @@ window.TT_SFX = {
       J.floatText(window.innerWidth / 2, window.innerHeight * 0.50,
                   t('duel.timestop'), '#9fe8ff', 32);
     }
-    toast(t('duel.petmongle', { n: Math.round(DUEL_MONGLE_FREEZE_MS / 1000) }));
+    toast(t('duel.petmongle', { n: Math.round(mms / 1000) }));
     return true;
   }
 
@@ -41122,13 +41321,14 @@ window.TT_SFX = {
   function petTimestop_tiktok() {
     var d = S.duel;
     if (!d || d.down) return false;
-    var until = now() + DUEL_TIKTOK_FREEZE_MS;
+    var tms = petDurMs(DUEL_TIKTOK_FREEZE_MS);   /* [PG-0910] 지속 레버 */
+    var until = now() + tms;
     /* 이미 더 긴 얼음이 걸려 있으면 덮어쓰지 않는다 — 몽글과 같은 규율
        (짧은 것이 긴 것을 자르지 않는다). */
     if (until > d.freezeUntil) d.freezeUntil = until;
     if (!(d.chillAt > 0)) d.chillAt = now();
     duelChillSync();
-    tsOverlayOpen(DUEL_TIKTOK_FREEZE_MS);
+    tsOverlayOpen(tms);
     J.sfx.ice();
     J.sfx.mission();
     J.screenPulse();
@@ -41136,7 +41336,7 @@ window.TT_SFX = {
     hitStop(HITSTOP_LIGHT_MS);
     shakeScreen(1);
     J.vibrate(60);                     /* §4.2-3 의 값 그대로 */
-    toast(t('duel.pettiktok', { n: Math.round(DUEL_TIKTOK_FREEZE_MS / 1000) }));
+    toast(t('duel.pettiktok', { n: Math.round(tms / 1000) }));
     return true;
   }
 
@@ -41417,7 +41617,10 @@ window.TT_SFX = {
     var dd = S.duel;
     if (!dd || dd.down) return false;
     if (store.gauge >= SKILL_MAX) { toast(t('skill.ready')); J.sfx.fail(); return false; }
-    var add = Math.round(SKILL_MAX * PET2_BANJJAK_GAUGE / 100);
+    /* [PG-0910] 위력 레버 — 40%p 가 편중 만렙에서 60%p 까지. 숫자를 한 번만
+       재고 그 수를 가산·문구·떠오르는 글자가 다 쓴다(같은 사실을 두 곳에 안 적는다). */
+    var gpct = petPowN(PET2_BANJJAK_GAUGE);
+    var add = Math.round(SKILL_MAX * gpct / 100);
     store.gauge = clamp(store.gauge + add, 0, SKILL_MAX);
     syncSkill();
     J.sfx.petBell();
@@ -41429,9 +41632,9 @@ window.TT_SFX = {
     if (typeof window !== 'undefined') {
       J.shockwave(window.innerWidth / 2, window.innerHeight * 0.55, '#B98CFF');
       J.floatText(window.innerWidth / 2, window.innerHeight * 0.50,
-                  '+' + PET2_BANJJAK_GAUGE + '%', '#D9BBFF', 30);
+                  '+' + gpct + '%', '#D9BBFF', 30);
     }
-    toast(t('duel.petbanjjak', { n: PET2_BANJJAK_GAUGE }));
+    toast(t('duel.petbanjjak', { n: gpct }));
     return true;
   }
   var PET_SKILL = {
@@ -44817,6 +45020,11 @@ window.TT_SFX = {
       n = got[k] | 0;
       if (n > 0) any = 1;
       store.shards[k] = clamp((store.shards[k] | 0) + n, 0, SHARD_HOLD_MAX);
+      /* [PG-0910] 누적 획득은 **적립의 짝**이다 — 지갑을 올리는 자리가 여기
+         하나뿐이므로 둘이 갈라질 경로가 원리적으로 없다. */
+      if (n > 0) {
+        store.shardEver[k] = clamp((store.shardEver[k] | 0) + n, 0, SHARD_HOLD_MAX);
+      }
     }
     if (!any) return;
     for (i = 0; i < STAT_KEYS.length; i++) {
@@ -44826,11 +45034,35 @@ window.TT_SFX = {
     }
   }
 
-  /** 지금까지 모은 파편의 총합. §14 ⓓ 천장이 읽는다. */
+  /** 지금 **지갑에 있는** 파편의 합(잔액). 강화로 줄어든다. */
   function shardTotal() {
     var s = 0;
     for (var i = 0; i < STAT_KEYS.length; i++) s += store.shards[STAT_KEYS[i]] | 0;
     return s;
+  }
+
+  /* [PG-0910] §16.6 — 누적 획득의 합. §14 ⓓ 천장(꿀떡이)이 이젠 이쪽을 읽는다.
+     이름을 shardTotal 그대로 두고 속만 바꾸지 않은 이유: 두 수는 이제 서로 다른
+     사실이라 한 이름을 나눠 쓰면 호출부가 무엇을 묻는지 코드에서 안 읽힌다. */
+  function shardEverTotal() {
+    var s = 0;
+    for (var i = 0; i < STAT_KEYS.length; i++) s += store.shardEver[STAT_KEYS[i]] | 0;
+    return s;
+  }
+
+  /**
+   * [PG-0910] §16.6 — shardCredit 의 짝. 그 색 잔액에서 n 을 뺀다.
+   * **부분 차감 금지**: 모자라면 한 톨도 안 쓰고 false 를 돌려준다 —
+   * «산 것도 없는데 잔액만 줄었다» 는 상태를 만들 경로 자체를 두지 않는다.
+   * 누적(shardEver)은 **안 건드린다** — 그것이 이 둘을 갈라 둔 이유다.
+   */
+  function shardSpend(k, n) {
+    n = n | 0;
+    if (n <= 0) return false;
+    if (STAT_KEYS.indexOf(k) < 0) return false;
+    if ((store.shards[k] | 0) < n) return false;
+    store.shards[k] = clamp((store.shards[k] | 0) - n, 0, SHARD_HOLD_MAX);
+    return true;
   }
 
   /* -------------------------------------------------------------------------
@@ -45102,10 +45334,14 @@ window.TT_SFX = {
        추첨을 굴린 **뒤에** 덮어쓰지 않고 앞에서 가르는 것이 요점이다(굴리고
        덮으면 위 roll 이 무슨 뜻이었는지 코드에서 안 읽힌다). */
     var forced = (store.giftNoItem | 0) >= GACHA_PITY;
+    /* [PG-0910] §16.3-ⓒ 행운 레버 — 희귀 슬롯만 넓힌다. 파편 몫(.70)은
+       한 톨도 안 움직이고 아이템이 그만큼 줄어든다. eff=2 면 rareP = .05 이라
+       경계가 .95 — 오늘의 표와 **한 화소도 다르지 않다**. */
+    var rareP = petRareP();
     var kind;
     if (forced) kind = 'item';
     else if (roll < w.shard) kind = 'shard';
-    else if (roll < w.shard + w.item) kind = 'item';
+    else if (roll < 1 - rareP) kind = 'item';
     else kind = 'rare';
 
     if (kind === 'shard') {
@@ -45197,11 +45433,117 @@ window.TT_SFX = {
    * 자기 코드에서 찾게 된다.
    */
   var PET_LV_MAX = 20, PET_EVO_MAX = 3;
+
+  /* =========================================================================
+   * [PG-0910] DESIGN §16 — 펫 성장 · 파편 경제 (W1 배관 · W2 레버)
+   *
+   * 근거 한 줄: 파편 = 그 색의 펫 레버를 한 단 올리는 값(§16.3).
+   * 색이 곧 스탯이므로 지갑(store.shards)과 강화가 같은 낱말을 쓴다.
+   * 되돌리기 = [PG-0910] 표식이 붙은 블록만 지우면 착수 전이다.
+   *
+   * ▣ 상한이 전부 **이미 있는 상수**에 착지한다 — 새 천장을 하나도 안 만들었다:
+   *   실효 상한 12 = STAT_CAP.power · STAT_LV_MAX · ITEM_LV_MAX
+   *   위력 x1.50 -> DUEL_PET_POP 4 x 1.5 = 6 = PET2_SWEEP_POP
+   *   지속 x1.50 -> DUEL_PET_FREEZE_MS 6000 -> 9000ms
+   *   횟수 4회   -> MK_PET_CAP (펫 과일이 이미 허용하던 잔여 상한)
+   *   행운 10%   -> GACHA_OPEN_WEIGHTS.rare(.05) x LUCK_MULT(2)
+   *
+   * ▣ 네 수식은 전부 **eff = 2 에서 항등**이다. 즉 비편중 축은 day-0 에 한
+   *   글자도 안 바뀌고, 무펫 기준선은 정의상 불변이다(petGrowthOn 게이트).
+   * ========================================================================= */
+  var PET_UP_LV_MAX = 10;      // 레버 한 칸의 강화 상한 (§16.3-ⓑ)
+  var PET_UP_STEP   = 0.4;     // 레벨 1당 실효 스탯 가산(pt). 10레벨 = +4.0 -> 편중 8 이 상한 12 에 정확히 닿는다
+  var PET_STAT_CAP  = 12;      // 실효 상한. 상한이 **값 쪽**에 있다(statEff 와 같은 요점)
+  var PET_EFF_BASE  = 2;       // 비편중 기본값 — 네 수식이 여기서 항등이다
+  var PET_UP_C0     = 12;      // 첫 강화 비용 — «첫 강화 <= 3판» 최악 조건에서 나온 수(§16.3-ⓓ)
+  var PET_UP_CD     = 4;       // 단당 증분 — sum(12+4(n-1)) = 300 = PET_SHARD_NEED
+  var PET_UP_KEYS   = ['pwr', 'std', 'agi', 'luk'];
+  /* 지불 색 = 그 레버의 색. 색이 뜻을 가지는 유일한 이유가 여기서 처음 실현된다. */
+  var PET_UP_STAT   = { pwr: 'power', std: 'steady', agi: 'agility', luk: 'luck' };
+  var PET_POW_K = 0.05;        // 위력 계수 (§16.3-ⓒ)
+  var PET_DUR_K = 0.05;        // 지속 계수
+  var PET_LUK_K = 0.10;        // 행운 계수 — lv5 에서 상한(§16.9 열린 항목 1)
+  var PET_DAILY_SHARD = 5;     // §16.3-ⓔ 데일리 1일 1회 완주 보상
+
+  /** n 번째 강화의 비용(그 레버 색 파편). n = 1..PET_UP_LV_MAX */
+  function petUpCost(n) { return PET_UP_C0 + PET_UP_CD * ((n | 0) - 1); }
+
+  /** 강화 칸 넷을 소독해 만든다. 소독 규율은 statLv 블록 그대로 —
+   *  아는 키만 · 유한한 숫자만 · 범위 안 정수만. */
+  function makePetUp(src) {
+    var o = (src && typeof src === 'object') ? src : null, out = {}, i, k, v;
+    for (i = 0; i < PET_UP_KEYS.length; i++) {
+      k = PET_UP_KEYS[i];
+      v = o ? o[k] : 0;
+      out[k] = (typeof v === 'number' && isFinite(v)) ? clamp(v | 0, 0, PET_UP_LV_MAX) : 0;
+    }
+    return out;
+  }
+
   function makePetEntry(id, src) {
     var o = (src && typeof src === 'object') ? src : null;
     var lv = o ? (o.lv | 0) : 1;
     var ev = o ? (o.evo | 0) : 0;
-    return { id: id, lv: clamp(lv || 1, 1, PET_LV_MAX), evo: clamp(ev, 0, PET_EVO_MAX) };
+    /* [PG-0910] §16.6 — up 은 **이전기가 필요 없다**. 없는 필드를 0 으로
+       채우면 끝이고, 그것이 정확히 오늘의 상태다. petsVer 는 2 를 유지한다 —
+       배열의 **모양**이 아니라 항목 안에 선택 필드가 하나 느는 것이다. */
+    return { id: id, lv: clamp(lv || 1, 1, PET_LV_MAX), evo: clamp(ev, 0, PET_EVO_MAX),
+             up: makePetUp(o ? o.up : null) };
+  }
+
+  /** 그 펫·그 레버의 강화 단수. 손상·부재 = 0. */
+  function petUpLv(id, k) {
+    var e = petEntry(id);
+    var m = (e && e.up && typeof e.up === 'object') ? e.up : null;
+    var v = m ? m[k] : 0;
+    return (typeof v === 'number' && isFinite(v)) ? clamp(v | 0, 0, PET_UP_LV_MAX) : 0;
+  }
+
+  /** §16.3-ⓑ 실효 스탯. statEff() 와 **같은 규율**이다 — 상한이 값 쪽에 있어
+   *  강화를 아무리 부어도 레버가 폭주할 경로가 세이브 내용과 무관하게 없다. */
+  function petEff(id, k) {
+    var st = PET_STATS[id];
+    if (!st) return PET_EFF_BASE;
+    return clamp(st[k] + petUpLv(id, k) * PET_UP_STEP, 0, PET_STAT_CAP);
+  }
+
+  /**
+   * 성장이 도는 판인가. battleOn() 의 짝이지만 **S.duel 을 안 본다** —
+   * 전투 초기화(petLeft)가 S.duel 이 서기 **전에** 이 값을 읽기 때문이다.
+   * 데일리·클래식·엔들리스·러시는 여기 못 들어온다 — statMult() 의
+   * `noBonus || isDaily()` 게이트와 같은 규율이고, 전 세계가 같은 판으로
+   * 겨루는 곳에는 성장이 안 들어간다.
+   */
+  function petGrowthOn() {
+    return TW_BATTLE && (S.mode === 'adv' || isArcadeDuel());
+  }
+
+  /** 지금 판에서 그 레버가 갖는 실효값. 성장이 안 도는 판·동료 없음 = 항등(2). */
+  function petLeverEff(k) {
+    if (!petGrowthOn()) return PET_EFF_BASE;
+    var id = mateId();
+    return id ? petEff(id, k) : PET_EFF_BASE;
+  }
+
+  /** 위력 배수 — eff=2 에서 1.00 (항등). */
+  function petPowMult() { return 1 + PET_POW_K * (petLeverEff('pwr') - PET_EFF_BASE); }
+  /** 위력 적용 — 없이 정수 칸수로 돌려준다(최소 1). */
+  function petPowN(n) { return Math.max(1, Math.round((n | 0) * petPowMult())); }
+  /** 지속 적용 — 6000 -> 최대 9000ms. eff=2 에서 입력값 그대로. */
+  function petDurMs(ms) {
+    return Math.round((ms | 0) * (1 + PET_DUR_K * (petLeverEff('std') - PET_EFF_BASE)));
+  }
+  /** 판당 사용 횟수 — 계단(floor(…/5)). 상한은 MK_PET_CAP. */
+  function petUsesFrom(eff) {
+    return clamp(DUEL_PET_MAX + Math.floor((eff - PET_EFF_BASE) / 5),
+                 DUEL_PET_MAX, MK_PET_CAP);
+  }
+  function petUses() { return petUsesFrom(petLeverEff('agi')); }
+  /** 상자 희귀 슬롯 확률 — .05 -> 최대 .10(= .05 x LUCK_MULT). */
+  function petRareP() {
+    var base = GACHA_OPEN_WEIGHTS.rare;
+    return clamp(base * (1 + PET_LUK_K * (petLeverEff('luk') - PET_EFF_BASE)),
+                 base, base * LUCK_MULT);
   }
 
   /** 그 펫의 저장 항목. 없으면 null. 손상된 세이브도 안 깨진다. */
@@ -45293,9 +45635,11 @@ window.TT_SFX = {
     if (dirty) persist();
   }
 
-  /** §14.2 ⓓ — 파편 천장. 파편이 늘어난 직후에만 볼 값이라 따로 떼어 뒀다. */
+  /** §14.2 ⓓ — 파편 천장. 파편이 늘어난 직후에만 볼 값이라 따로 떼어 뒀다.
+   *  [PG-0910] 잔액(shardTotal)이 아니라 **누적 획득**(shardEverTotal)을 읽는다 —
+   *  §16.6 의 그 한 줄. 이제 파편을 강화에 써도 해금이 뒤로 가지 않는다. */
   function petShardCheck() {
-    if (!petOwned('kkultteok') && shardTotal() >= PET_SHARD_NEED) grantPet('kkultteok');
+    if (!petOwned('kkultteok') && shardEverTotal() >= PET_SHARD_NEED) grantPet('kkultteok');
   }
 
   /**
@@ -46103,6 +46447,21 @@ window.TT_SFX = {
     on($('char-open'), 'click', openCharPanel);
     on($('cp-close'), 'click', closeCharPanel);
     on($('cp-go'), 'click', cpConfirm);
+    /* [PG-0910] 강화 줄 — 위임 하나. 줄이 넷이라 리스너를 넷 달 이유가 없고,
+       버튼이 늘어도(진화 W5) 배선이 안 는다. 눌린 줄이 곧 잔액 젬의 색이다. */
+    on($('cp-pet-stats'), 'click', function (ev) {
+      var el = ev.target;
+      while (el && el !== this && !(el.classList && el.classList.contains('cs-up'))) {
+        el = el.parentNode;
+      }
+      if (!el || el === this) return;
+      ev.stopPropagation();          /* 패널 바깥 탭(닫기)까지 안 굴러간다 */
+      var k = el.getAttribute('data-pet-up');
+      cpPetLever = k;
+      cpPetLeverFor = cpPetId();     /* 누른 줄이 곧 지갑의 색이다 */
+      petUpDo(k);
+      syncPetUp(cpPetId(), !!cpPetId() && !petOwned(cpPetId()));
+    });
     /* W4 — 카테고리 탭. 위임 한 줄이라 탭이 늘어도 배선이 안 는다. */
     on($('cp-tabs'), 'click', function (ev) {
       var el = ev.target;
@@ -47559,6 +47918,17 @@ window.TT_SFX = {
     SHARD_RATE: SHARD_RATE, SHARD_PITY: SHARD_PITY, SHARD_MK: SHARD_MK,
     MK_SHARD_MAX: MK_SHARD_MAX, GIFT_SPAWN_RATE: GIFT_SPAWN_RATE,
     shardDropFor: shardDropFor, shardCredit: shardCredit, shardTotal: shardTotal,
+    /* [PG-0910] 스모크 손잡이. 게임 코드는 이 중 무엇도 window.Game 을 거쳐
+       부르지 않는다(위 debug handles 와 같은 규약) — 관문이 «곱항이 정말 1 인가»
+       를 사람 눈이 아니라 숫자로 확인할 수 있어야 하기 때문에 있다. */
+    shardSpend: shardSpend, shardEverTotal: shardEverTotal, persist: persist,
+    petEff: petEff, petUpLv: petUpLv, petUpCost: petUpCost, petUpDo: petUpDo,
+    petPowMult: petPowMult, petPowN: petPowN, petDurMs: petDurMs,
+    petUses: petUses, petUsesFrom: petUsesFrom, petRareP: petRareP,
+    petGrowthOn: petGrowthOn, syncPetUp: syncPetUp,
+    PET_UP_LV_MAX: PET_UP_LV_MAX, PET_UP_STEP: PET_UP_STEP,
+    PET_STAT_CAP: PET_STAT_CAP, PET_UP_STAT: PET_UP_STAT,
+    PET_DAILY_SHARD: PET_DAILY_SHARD, PET_SHARD_NEED: PET_SHARD_NEED,
     openGachaRoll: openGachaRoll, isGachaStage: isGachaStage,
     itemById: itemById, itemEffOf: itemEffOf, itemStatBonus: itemStatBonus,
     /* 0901 ⑥-d — 관문 하네스가 "곱항이 정말 1 인가"를 사람 눈이 아니라 숫자로
@@ -54511,6 +54881,131 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
 #charpanel .cs-bar[style*="--v0:0%"] > .cs-b0,
 #charpanel .cs-bar[style*="--v0: 0%"] > .cs-b0,
 #charpanel .cs-bar.is-b0same > .cs-b0 { display: none; }
+
+/* ==== [PG-0910] 펫 탭 강화 줄 · 파편 잔액 젬 (DESIGN §16.5 · W3) =============
+   새 그림 0 · 새 도형 0 · 새 색 0. 쓰는 것은 셋뿐이다:
+     · 알약 부품   .kit-pill-v2[data-variant="soft"] 의 인스턴스 (강화 버튼)
+     · 크리스탈 액자 .cp-crystal.cp-gem 의 인스턴스            (잔액 젬)
+     · 파편 색표   --role-rw-shard-*                          (판 위 배지와 같은 토큰)
+
+   ▣ 왜 열의 총폭을 조금만 넓혔나 — 실측이 정했다
+     (scratchpad/pet-growth/measure.json · 390x844 · dpr1):
+       .cc-stats 오른변 200.8px  <->  패시브 카드(.ci-desc) 왼변 231.1px  = 자유 30.3px
+     버튼 하나(.080W = 29.9px)를 자유 폭에 통째로 넣으면 카드에 1px 도 안 남는다.
+     그래서 펫 탭 열만 .46389W -> .500W(오른변 여백 16.8px 남음)로 넓히고 나머지는
+     막대에서 뗀다. **캐릭터 탭의 .cc-stats 는 한 화소도 안 건드린다** — 선택자가
+     #cp-pet-stats 로 잠겨 있다.
+   ▣ 줄 높이는 안 바뀐다(버튼 높이 = 막대 높이 .0374W) — «스탯행» 상자가 그대로라
+     레이아웃 관문의 겹침·잘림 판정이 착수 전과 같은 자를 쓴다.
+   봉인(되돌리기): 이 블록 + 마크업의 .cs-up · .cp-shardgem 두 낱말을 지우면 착수 전. */
+#charpanel #cp-pet-stats { width: calc(var(--f2-w) * .500); }
+#charpanel #cp-pet-stats .cs { gap: calc(var(--f2-w) * .014); }
+#charpanel #cp-pet-stats .cs-k { flex: 0 0 calc(var(--f2-w) * .140); }
+/* [판정판 52 · 지휘자 300% 지적] 라벨 마지막 글자가 색 젬에 닿는다 — 실측하니
+   닿은 것이 아니라 **겹쳤다**(잉크 간격 390에서 -3.41px · 착수 전은 +1.81px).
+   ▣ 원인: 보석은 자기 막대 상자보다 **왼쪽으로** `-0.62 x --f2-gh` = .0232W 만큼
+     튀어나와 있다(.kit-gauge-v2__gem). 줄 고랑(.020W)이 그 돌출을 덮어 주던
+     것인데, 열을 넓히며 고랑을 .014W 로 좁히자 라벨이 돌출부 안으로 들어갔다.
+   ▣ 그래서 **막대 왼쪽에만** 여백을 준다. gap 은 두 틈에 같은 값을 주므로
+     (라벨↔막대 · 막대↔버튼) 한쪽만 벌리려면 이 자리가 유일하다.
+     라벨↔막대 실효 간격 = .014W + .021W = .035W
+     막대폭 = .500 - .140 - .035 - .014 - .080 = **.231W**
+   ▣ 무변인 것: 줄 높이 · 막대 높이 · 버튼 폭·높이 · 열 총폭(.500W) ·
+     라벨 칸(.140W) · 글꼴 · 자간. 바뀌는 것은 막대 **길이** 하나뿐이다.
+   실측 결과(잉크 간격, 1배율): 390 +4.4 · 360 +4.1 · 414 +4.7 · 1280 +4.9 px
+   봉인(되돌리기): 이 한 줄을 지우면 종전 배분으로 돌아간다. */
+#charpanel #cp-pet-stats .cs-bar { margin-left: calc(var(--f2-w) * .021); }
+#charpanel #cp-pet-stats .cs-up {
+  position: relative;
+  flex: 0 0 calc(var(--f2-w) * .080);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  height: calc(var(--f2-w) * .0374);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: var(--f2-pill-soft);
+  color: var(--f2-ink);
+  font-family: inherit;
+  font-size: calc(var(--f2-w) * .0235);
+  font-weight: 900;
+  line-height: 1;
+  text-shadow: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--dur-1) var(--ease-out), opacity var(--dur-1) var(--ease-out);
+}
+/* 색 = 그 레버의 파편 색. 판 위 배지(.tile[data-mk="shard-*"])와 **같은 토큰**을
+   읽으므로, 빨강을 모아 빨강 줄에 쓴다는 사실이 두 화면에서 같은 색으로 보인다. */
+#charpanel #cp-pet-stats .cs-up[data-stat="power"]   { box-shadow: inset 0 0 0 calc(var(--f2-w) * .0030) var(--role-rw-shard-power-2); }
+#charpanel #cp-pet-stats .cs-up[data-stat="steady"]  { box-shadow: inset 0 0 0 calc(var(--f2-w) * .0030) var(--role-rw-shard-steady-2); }
+#charpanel #cp-pet-stats .cs-up[data-stat="agility"] { box-shadow: inset 0 0 0 calc(var(--f2-w) * .0030) var(--role-rw-shard-agility-2); }
+#charpanel #cp-pet-stats .cs-up[data-stat="luck"]    { box-shadow: inset 0 0 0 calc(var(--f2-w) * .0030) var(--role-rw-shard-luck-2); }
+/* 손가락 목표를 키운다 — **자리는 그대로**다(.cs-hit 이 쓰는 그 문법). 줄 고랑
+   (.0157W)의 절반씩만 먹으므로 이웃 줄의 목표를 뺏지 않는다. */
+#charpanel #cp-pet-stats .cs-up::after {
+  content: "";
+  position: absolute;
+  inset: calc(var(--f2-w) * -.0078) calc(var(--f2-w) * -.0060);
+}
+#charpanel #cp-pet-stats .cs-up > .cs-up-n { pointer-events: none; }
+#charpanel #cp-pet-stats .cs-up:active { transform: scale(.94); }
+/* 부족·만렙·잠김 = 누를 수 없다. 지우지 않고 **흐리게** 두는 것이 요점이다 —
+   버튼이 사라지면 «얼마가 모자란가»를 볼 자리도 같이 사라진다. */
+#charpanel #cp-pet-stats .cs-up[disabled] { opacity: .42; cursor: default; }
+#charpanel #cp-pet-stats .cs-up[data-max="1"] { font-size: calc(var(--f2-w) * .0200); letter-spacing: -.02em; }
+
+/* 강화 순간의 막대 — transform 하나만 움직인다(game-motion §4). 리터럴 지속 금지. */
+@keyframes pg-bar-pop {
+  0%   { transform: scaleY(1); }
+  38%  { transform: scaleY(1.42); }
+  100% { transform: scaleY(1); }
+}
+#charpanel #cp-pet-stats .cs-bar.is-up { animation: pg-bar-pop var(--dur-2) var(--ease-out) 1; }
+
+/* 잔액 젬 — 액자는 .cp-crystal 그대로고, 정사각 랙 밖에 서므로 **가로 알약**으로
+   눕힌다(랙 안 칸의 .1094 정사각 규칙은 .cp-side-rack 안에만 있다). */
+#charpanel #cp-petinfo .ci-tag .cp-shardgem {
+  width: auto;
+  height: calc(var(--f2-w) * .046);
+  aspect-ratio: auto;
+  flex-direction: row;
+  gap: calc(var(--f2-w) * .006);
+  padding: 0 calc(var(--f2-w) * .014);
+  border-radius: 999px;
+  cursor: default;
+  font-size: calc(var(--f2-w) * .026);
+}
+#charpanel #cp-petinfo .cp-shardgem > .cp-cr-ic {
+  flex: 0 0 auto;
+  font-size: calc(var(--f2-w) * .026);
+  line-height: 1;
+}
+#charpanel #cp-petinfo .cp-shardgem > .cp-gem-n {
+  display: block;
+  min-width: calc(var(--f2-w) * .030);
+  padding: 0 calc(var(--f2-w) * .005);
+  border-radius: 999px;
+  background: var(--f2-pill-soft);
+  font-size: calc(var(--f2-w) * .022);
+  font-weight: 900;
+  line-height: 1.4;
+  text-align: center;
+  color: var(--f2-ink);
+}
+#charpanel #cp-petinfo .cp-shardgem[data-stat="power"]   > .cp-cr-ic { color: var(--role-rw-shard-power-2); }
+#charpanel #cp-petinfo .cp-shardgem[data-stat="steady"]  > .cp-cr-ic { color: var(--role-rw-shard-steady-2); }
+#charpanel #cp-petinfo .cp-shardgem[data-stat="agility"] > .cp-cr-ic { color: var(--role-rw-shard-agility-2); }
+#charpanel #cp-petinfo .cp-shardgem[data-stat="luck"]    > .cp-cr-ic { color: var(--role-rw-shard-luck-2); }
+
+@media (prefers-reduced-motion: reduce) {
+  #charpanel #cp-pet-stats .cs-bar.is-up { animation: none; }
+  #charpanel #cp-pet-stats .cs-up { transition: none; }
+}
 
 /* ---- [SI-0909] 능력치 설명 — ⓘ 칩 + 한 줄 말풍선 ---------------------------
    사용자 지적: "캐릭터 능력치 창을 보면 능력치가 뭔지 설명이 없다."
