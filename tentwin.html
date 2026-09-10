@@ -3071,6 +3071,35 @@ li.roll-in { animation: rollin 380ms var(--spring) backwards; }
   box-shadow: inset 0 0 0 1.5px var(--hcard-rim), inset 0 -2px 0 var(--hcard-lo);
   color: var(--prim-ink);
 }
+/* ── 공유 카드 미리보기 썸네일 (판정판 53) ───────────────────────────────
+   결과 시트 셋(#modal-daily · #modal-arc · #modal-over)이 공유 버튼 바로 위에
+   띄우는 1080x1350 카드의 축소판이다.
+
+   ▣ 새 시각 어휘를 만들지 않았다 — 액자는 이 파일이 이미 쓰는 썸네일 액자
+     토큰(--lib-thumb-frame, :9492) 을 .nthumb(:10372)·.nmate(:10445) 와
+     **똑같은 슬라이스 값**으로 다시 부르고, 뒷면은 결과 카드가 쓰는
+     --hcard-fill/-2 다. 그래서 새 CSS 변수 0 · 새 그림 0 이다.
+   ▣ data-part 를 안 붙였다 — canon-check.py 는 매핑 순서 (b)에서 배경/테두리
+     자산 **파일명 정확 일치**로 프레임을 찾는다. border-image-source 가
+     catalog/lib-thumb-frame.webp 라 t3-slot-thumb-frame-default 에 그대로
+     걸린다. 없는 data-part 값을 새로 지어내면 그 관문이 UNMAPPED 로 FAIL 한다.
+   ▣ box-sizing 을 content-box 로 되돌린 이유 하나: 전역 border-box 아래에서는
+     width/aspect-ratio 가 액자 테두리까지 포함한 상자를 재서 **속 그림**이
+     1080:1350 을 못 지킨다. 여기서만 안쪽 상자를 직접 재게 한다.
+   ▣ 트랜지션 없음 — prefers-reduced-motion 을 따질 움직임 자체를 안 만든다. */
+.share-thumb{
+  box-sizing: content-box;
+  display: block;
+  width: 104px;
+  aspect-ratio: 1080 / 1350;
+  height: auto;
+  margin: 2px auto 10px;
+  object-fit: contain;
+  border-style: solid;
+  border-width: 13px 15px;
+  border-image: var(--lib-thumb-frame) 32 31 32 31 fill stretch;
+  background: linear-gradient(180deg, var(--hcard-fill), var(--hcard-fill-2));
+}
 /* 판 위 대비 — `#modal-X .sheet p`(1,1,1)·`#clear-rollup li b`(1,0,2) 를 이겨야
    해서 모달 id 를 함께 건다(1,3,1). 전역 토큰·전역 .big-score/.sub-score 무접촉. */
 #modal-clear .sheet .result-card p, #modal-adv .sheet .result-card p, #modal-over .sheet .result-card p,
@@ -16708,6 +16737,12 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
     <p class="big-score"><b id="over-score">0</b></p>
     <!-- #over-best-label is swapped to the Time Rush best label by game.js -->
     <p class="sub-score"><span id="over-best-label" data-i18n="over.best">Best</span> <b id="over-best">0</b> &middot; <span data-i18n="over.stage">Stage</span> <b id="over-stage">1</b></p>
+    <!-- 판정판 53 — 공유 카드 미리보기. 결과 카드 **안**에 넣은 이유: 이 시트에서
+         카드가 말하는 것(점수·최고·스테이지)이 곧 이 상자가 말하는 것이라,
+         상자 밖에 두면 같은 사실이 두 상자로 갈린다. aria-hidden 인 것도 같은
+         이유다 — 위 두 줄이 이미 그 값을 읽어 준다. hidden 은 blob 이 생기면
+         shareCardPrep 이 벗긴다(카드가 안 구워지면 자리도 안 생긴다). -->
+    <img id="over-card-thumb" class="share-thumb" alt="" aria-hidden="true" hidden>
     </div>
     <!-- v5 E-1: the rank this run earned, as text that survives the confetti.
          No data-i18n on purpose — paintOverModal() owns it and re-paints it after
@@ -16754,6 +16789,10 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
     <p id="arc-who" class="sub-score"></p>
     <p id="arc-best" class="rank-line"></p>
     <p id="arc-when" class="sub-score"></p>
+    <!-- 판정판 53 — 공유 카드 미리보기. 이 시트에는 .result-card 가 없어(위 주석의
+         「#modal-over 의 시트 문법을 그대로 쓴다」에서 카드 상자만 빠져 있다)
+         공유 버튼 바로 위, 줄 순서의 맨 끝에 놓는다. -->
+    <img id="arc-card-thumb" class="share-thumb" alt="" aria-hidden="true" hidden>
     <div class="sheet-row">
       <button id="arc-again" class="btn btn-primary" data-i18n="arc.again">Retry</button>
       <button id="arc-share" class="btn btn-ghost" data-i18n-aria="aria.arcShare" data-i18n="arc.share" aria-label="Share your record">Share</button>
@@ -16772,6 +16811,10 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
          syncDynamicI18n() re-paints it, so a language toggle cannot revert it. -->
     <p id="daily-rank-line" class="rank-line" hidden></p>
     <pre id="daily-grid"></pre>
+    <!-- 판정판 53 — 공유 카드 미리보기. 이 시트에도 .result-card 가 없어 공유
+         버튼 바로 위에 둔다. 이모지 격자(#daily-grid) 다음인 것은 의도다:
+         카드가 그 격자를 다시 그리지 않으므로 둘은 서로 다른 것을 보여 준다. -->
+    <img id="daily-card-thumb" class="share-thumb" alt="" aria-hidden="true" hidden>
     <button id="btn-share" data-part="btn-modal" data-variant="yellow" class="btn btn-primary" data-i18n-aria="aria.share" data-i18n="daily.share" aria-label="Copy result to clipboard">Copy result</button>
     <button id="btn-daily-menu" data-part="btn-modal" data-variant="purple" class="btn btn-ghost" data-i18n-aria="aria.dailyMenu" data-i18n="daily.menu" aria-label="Back to main menu">Main menu</button>
   </div></div>
@@ -26024,7 +26067,10 @@ window.TT_SFX = {
       'daily.grade': 'Rank {grade}',
       'daily.share': 'Copy result',
       'daily.menu': 'Main menu',
-      'aria.share': 'Copy result to clipboard',
+      /* 판정판 53 — 카드 이미지가 함께 나간다는 사실을 접근성 이름이 말해야 한다.
+         보이는 라벨('Copy result')을 **앞머리에 그대로 두는** 것은 WCAG 2.5.3
+         (label in name) 때문이다 — 음성 조작이 보이는 글자로 이 버튼을 부른다. */
+      'aria.share': 'Copy result, or share the result card image',
       'aria.dailyMenu': 'Back to main menu',
 
       /* 출시 점검 0909 ②(승인 A4) — 저장 실패(쿼터·시크릿 모드) 알림.
@@ -26267,7 +26313,7 @@ window.TT_SFX = {
          innerHTML, because style.css styles `#tut-text b`. Like the howto.p*
          strings they are our own literals — no user input ever reaches them. */
       'over.share': 'Share',
-      'aria.overShare': 'Share your score',
+      'aria.overShare': 'Share your score with a result card image',
       'tut.skip': 'Skip',
       'aria.tutSkip': 'Skip the tutorial',
       'aria.theme': 'Theme',
@@ -26492,7 +26538,7 @@ window.TT_SFX = {
       'arc.again': 'Retry',
       'arc.menu': 'Main menu',
       'arc.share': 'Share',
-      'aria.arcShare': 'Share your arcade record',
+      'aria.arcShare': 'Share your arcade record with a result card image',
       'rank.arc.title': 'Arcade Duel',
       'aria.cont': 'Classic — pure skill modes',
       'aria.chprev': 'Previous chapter',
@@ -27374,7 +27420,8 @@ window.TT_SFX = {
       'daily.grade': '{grade}등급',
       'daily.share': '결과 복사',
       'daily.menu': '메인 메뉴',
-      'aria.share': '결과 클립보드에 복사',
+      /* 판정판 53 — en 쪽 주석과 같은 이유로 보이는 라벨('결과 복사')이 앞머리다. */
+      'aria.share': '결과 복사 — 결과 카드 이미지로 공유',
       'aria.dailyMenu': '메인 메뉴로',
 
       /* 출시 점검 0909 ②(승인 A4) — 저장 실패 알림(en 쪽과 같은 키). */
@@ -27590,7 +27637,7 @@ window.TT_SFX = {
          (style.css 가 `#tut-text b` 를 스타일링하기 때문). howto.p* 와 마찬가지로
          전부 우리가 쓴 리터럴이라 사용자 입력이 섞일 여지가 없다. */
       'over.share': '공유하기',
-      'aria.overShare': '점수 공유하기',
+      'aria.overShare': '점수 공유하기 — 결과 카드 이미지 포함',
       'tut.skip': '건너뛰기',
       'aria.tutSkip': '튜토리얼 건너뛰기',
       'aria.theme': '테마',
@@ -27799,7 +27846,7 @@ window.TT_SFX = {
       'arc.again': '다시하기',
       'arc.menu': '메인메뉴',
       'arc.share': '공유하기',
-      'aria.arcShare': '아케이드 기록 공유하기',
+      'aria.arcShare': '아케이드 기록 공유하기 — 결과 카드 이미지 포함',
       'rank.arc.title': '아케이드 대전',
       'aria.cont': '클래식 — 순수 실력 모드',
       'aria.chprev': '이전 챕터',
@@ -34670,13 +34717,87 @@ window.TT_SFX = {
     return '' + t.getFullYear() + (m < 10 ? '0' : '') + m + (day < 10 ? '0' : '') + day;
   }
 
-  function dailySeed() { return parseInt(todayKey(), 10) | 0; }
+  /* ---- ?daily=YYYYMMDD 딥링크 (판정판 53) --------------------------------
+   * 공유 카드를 받은 친구가 **같은 판**을 풀 수 있어야 자랑이 대결이 된다.
+   * 지금까지 이 게임에는 진입 쿼리를 읽는 게임 코드가 0 이었다(SHARE_URL 주석의
+   * 「씨드 링크 = 2차」가 그 자리다) — 그 2차가 여기다.
+   *
+   * ▣ 읽는 자리는 **한 곳**이다. 부팅 때 한 번 재고 그 뒤로는 이 모듈 변수만 본다:
+   *   URLSearchParams 를 판마다 다시 부르면 「지금 어느 판인가」의 답이 두 곳이 된다.
+   * ▣ 8자리 숫자 + **실재하는 날짜**만 받는다. 20250230 같은 값은 Date 가 3월 2일로
+   *   조용히 굴려 버려서, 그대로 두면 남이 못 여는 판이 생긴다 — 되받아 대조한다.
+   * ▣ todayKey() 는 **건드리지 않는다**. 그 함수는 기록 장부의 키다
+   *   (store.dailyBest.date · 「오늘 이미 했음」 판정 · submitRank 의 동일 날짜
+   *   중복 제거). 여기서 그것까지 갈아 끼우면 남의 판을 대신 푼 결과가 내 오늘
+   *   기록을 덮어쓴다. 갈리는 것은 **판을 만드는 씨드**뿐이다.
+   * ▣ 그 밖의 값(빈 문자열)은 조용히 무시 = 파라미터 없는 평소와 완전히 같다.
+   *   샷 하네스·관문은 ?daily= 를 절대 안 붙이므로 이 배관 전체가 거기서는 죽어 있다. */
+  var dailyParam = (function () {
+    var v = '';
+    try { v = new URLSearchParams(location.search).get('daily') || ''; }
+    catch (e) { return ''; }
+    if (!/^\d{8}$/.test(v)) return '';
+    var y = +v.slice(0, 4), m = +v.slice(4, 6), dd = +v.slice(6, 8);
+    var dt = new Date(y, m - 1, dd);
+    if (dt.getFullYear() !== y || dt.getMonth() !== m - 1 || dt.getDate() !== dd) return '';
+    return v;
+  })();
+
+  /** 지금 풀고 있는 데일리 판의 키. 평소에는 todayKey() 와 같은 글자다. */
+  function dailyKey() { return dailyParam || todayKey(); }
+
+  /** 남의 판을 대신 푸는 중인가. 이 한 줄이 「기록을 쓰지 않는다」의 유일한 조건이다. */
+  function dailyIsReplay() { return !!dailyParam && dailyParam !== todayKey(); }
+
+  function dailySeed() { return parseInt(dailyKey(), 10) | 0; }
 
   function dailyNumber() {
-    var t = new Date();
+    /* 딥링크로 열린 판은 **그 날의 회차 번호**를 달아야 한다 — 오늘 번호를 달면
+       카드에 적힌 #N 과 화면의 #N 이 갈려 같은 판인지 확인할 길이 사라진다. */
+    var t = dailyParam
+      ? new Date(+dailyParam.slice(0, 4), +dailyParam.slice(4, 6) - 1, +dailyParam.slice(6, 8))
+      : new Date();
     var base = Date.UTC(2025, 0, 1);
     var cur = Date.UTC(t.getFullYear(), t.getMonth(), t.getDate());
     return Math.max(1, Math.floor((cur - base) / 86400000) + 1);
+  }
+
+  /** 딥링크가 여는 자리. #mode-daily 버튼이 쓰는 **그 두 갈래** 그대로다 —
+   *  오늘 판이고 이미 풀었으면 결과만, 아니면 판을 연다. 다른 점 하나: fresh 를
+   *  true 로 준다. 남의 판을 열면서 내 저장(store.save)을 이어받으면 링크가
+   *  가리킨 판이 아니라 내가 쓰던 판이 뜬다. */
+  function dailyLinkEnter() {
+    if (!dailyIsReplay() && store.dailyBest && store.dailyBest.date === todayKey()) {
+      showDailyResult(0, false);
+      return;
+    }
+    startDaily(true);
+  }
+
+  /**
+   * 부팅 끝에서 한 번. ?daily= 가 없으면 **아무 일도 안 한다** — 샷 하네스·관문은
+   * 이 파라미터를 절대 안 붙이므로 그쪽에서는 이 배관 전체가 죽어 있다.
+   *
+   * ▣ 스플래시와 튜토리얼이 걷힌 뒤에 연다: 그 둘은 화면 위에 덮개라, 아래에서
+   *   판을 열어 봐야 플레이어는 못 본다(그리고 스플래시 클릭 실드가 서 있는
+   *   동안의 입력은 삼켜진다).
+   * ▣ later() 가 아니라 setTimeout 인 이유: later 가 등록하는 타이머는
+   *   clearTimers() 가 판 시작마다 전부 지운다. 이 대기는 «판이 시작되기 전»의
+   *   것이라 그 청소에 걸리면 안 된다. 대신 시도 횟수에 상한을 두어 무한
+   *   타이머를 남기지 않는다(80 x 150ms = 12초면 포기).
+   */
+  function dailyLinkBoot() {
+    if (!dailyParam) return;
+    var tries = 0;
+    var step = function () {
+      if (++tries > 80) return;
+      var sp = $('splash');
+      if (sp && !sp.hidden) { setTimeout(step, 150); return; }
+      var tu = $('modal-tutorial');
+      if (tu && !tu.hidden) { setTimeout(step, 150); return; }
+      dailyLinkEnter();
+    };
+    setTimeout(step, 150);
   }
 
   function startStage(stage, seed) {
@@ -34822,6 +34943,9 @@ window.TT_SFX = {
        않는다 — "판 넘어가도 유지"가 스펙이고, 그게 이 시스템의 존재 이유다. */
     skillReset();
     S.overInfo = null;
+    /* 판정판 53 — 결과가 무효가 되는 자리에서 그 결과로 구운 카드도 무효다.
+       안 버리면 다음 판의 공유 버튼이 «앞 판의 그림» 을 내보낸다. */
+    shareCardReset();
     S.adds = isDaily() ? 3 : addsForStage(stage);
     S.addCdUntil = 0;
     S.hints = 3;
@@ -35253,6 +35377,13 @@ window.TT_SFX = {
        판이라 축포를 달지 않는다(§25.2 표). 진 판은 꼬리를 곧장 부른다. */
     var arcTail = function () {
       paintArcSheet(mode, why, value, res);
+      /* 판정판 53 — 시트를 «칠하는» 이 자리에서 카드도 굽는다. 아래 520ms 뒤의
+         openModal 을 기다리지 않는 이유: 굽기는 비동기라 미리 걸어 둘수록 시트가
+         열릴 때 썸네일이 이미 서 있다. 값은 방금 얼려 둔 S.arcLastValue 를 읽으므로
+         그 사이에 상태가 움직여도 화면과 카드가 갈리지 않는다. 피날레 경로(격파)에서는
+         피날레가 끝난 뒤에 이 꼬리가 불리므로 굽기 시작만 늦어질 뿐, «칠하기 → 520ms →
+         열기» 순서 자체는 둘 다 같다. */
+      shareCardPrep('arc', 'arc-card-thumb');
       /* onGameOver 와 같은 리듬(520ms). 연출이 끝나기 전에 시트를 올리면 격파
          이펙트가 시트 뒤에서 혼자 돌다 끝난다. */
       later(function () { openModal('modal-arc'); }, 520);
@@ -35463,6 +35594,7 @@ window.TT_SFX = {
     if (S.mission) store.lastMissionId = S.mission.id;
     S.sprintTimes = [];
     S.overInfo = null;
+    shareCardReset();       // 판정판 53 — startStage 와 같은 이유(결과가 무효 = 카드도 무효)
     S.addCdUntil = 0;
     S.score = sv.score || 0;
     S.adds = typeof sv.adds === 'number' ? sv.adds : addsForStage(S.stage);
@@ -38171,6 +38303,9 @@ window.TT_SFX = {
       stuck: cause === 'stuck'
     };
     paintOverModal();
+    /* 판정판 53 — #modal-arc 와 같은 리듬: 시트를 칠하는 자리에서 카드를 굽고,
+       520ms 뒤 openModal 이 도착할 때쯤 썸네일이 이미 서 있게 한다. */
+    shareCardPrep('over', 'over-card-thumb');
     /* 리텐션 래퍼(0910) ① — 이어하기 정책은 paintContinueBtn 한 곳에만 있다.
        예전 한 줄(cont.hidden = S.continueUsed || rush)은 2회차에 버튼을
        **지워** 왜 못 쓰는지 읽을 자리까지 같이 지웠다. 지금은 남기고 끈다.
@@ -38256,6 +38391,7 @@ window.TT_SFX = {
     S.running = true;
     S.busy = false;
     S.overInfo = null;      // back in play: the modal is no longer meaningful
+    shareCardReset();       // 판정판 53 — 게임오버가 취소됐으므로 그 카드도 취소다
     var board = $('board');
     if (board) board.classList.remove('grayed');
     var cont = $('btn-continue');
@@ -38336,18 +38472,28 @@ window.TT_SFX = {
      * 결과 시트가 읽는 칸도 같은 이름으로 갈린다(dailyBestOf). */
     var classicRun = (S.mode === 'classic-daily');
     var bestSlot = classicRun ? 'classicDailyBest' : 'dailyBest';
+    /* 판정판 53 — 공유 카드로 받은 «남의 판»을 대신 푼 판인가(?daily= 딥링크).
+       그렇다면 이 판은 장부에 **한 줄도 안 쓴다**: 기록 칸(store.dailyBest ·
+       classicDailyBest)도, 개인 기록판 제출도, 연속 일수·보상도 전부 건너뛴다.
+       친구가 보낸 카드를 눌러 3일 전 판을 풀어 본 것이 여는 사람 «자신의» 오늘
+       기록을 덮어써 버리면, 공유 링크가 남의 장부를 망가뜨리는 도구가 된다.
+       결과 시트는 평소대로 연다 — 풀어 본 결과 자체는 보여 줘야 대결이 된다. */
+    var replay = dailyIsReplay();
     /* 리텐션 래퍼(0910) ④ — 집계만 되던 연속 수에 보상 배관을 붙인다.
        클래식 데일리는 streak 을 안 올리므로(바로 위 주석) 보상도 없다 —
        하루에 두 번 받는 길을 만들지 않는 것이 이 분기의 전부다. */
     var streakGot = { heart: 0, jstar: 0, days: [] };
-    if (!classicRun) { bumpStreak(); streakGot = claimStreakRewards(); }
+    if (!classicRun && !replay) { bumpStreak(); streakGot = claimStreakRewards(); }
     /* [PG-0910] §16.3-ⓔ — 데일리 1일 1회 완주 파편 5알. 색은 shardDropFor(0, …)
        = 균등 + 기존 천장 규율이다(새 추첨표 0).
        왜 순수성에 안 걸리는가: **판 규칙에 한 글자도 안 닿는다** — 같은 시드·같은
        보드·같은 규칙이고, 늘어난 것은 판이 끝난 뒤의 지갑뿐이다. 클래식 데일리가
        빠진 것도 streak 과 같은 근거다(하루에 두 번 받는 길을 만들지 않는다).
        수 5 의 근거: GACHA_SHARD_N(3) < 5 < 판당 수확 하한 10 — 상자보다 크고
-       한 판보다 작아 데일리가 파밍을 대체하지 못한다. */
+       한 판보다 작아 데일리가 파밍을 대체하지 못한다.
+       딥링크 재도전(replay)을 따로 걸지 않는 이유: 아래 store.shardDailyDate 가
+       이미 «오늘 한 번» 을 잠그므로, 남의 판을 풀든 내 판을 풀든 하루에 들어오는
+       파편은 토탈로 5알 하나다. */
     if (!classicRun && store.shardDailyDate !== todayKey()) {
       store.shardDailyDate = todayKey();
       var dsk = shardDropFor(0), dsg = {}, dsi;
@@ -38360,8 +38506,11 @@ window.TT_SFX = {
     /* 판정판 50 — 「오늘의 데일리」 축. 클래식은 streak 을 안 올리므로(위 주석)
        퀘스트도 같은 분기 안에 둔다 — 하루에 두 번 받는 길을 만들지 않는다. */
     if (!classicRun) { dqBump('daily', 1); achvCheck(); }
-    store[bestSlot] = {
-      date: todayKey(), n: dailyNumber(), timeSec: sec,
+    var rec = {
+      /* date 는 «푼 날»(장부 키), seed 는 «판의 날». 평소에는 같은 글자라 옛
+         기록과 뜻이 안 갈리고, 딥링크로 푼 판에서만 둘이 갈린다 — 공유 주소가
+         가리켜야 하는 것은 seed 쪽이다(dailyShareUrl). */
+      date: todayKey(), seed: dailyKey(), n: dailyNumber(), timeSec: sec,
       matches: S.matches, maxCombo: S.maxCombo, score: S.score,
       // Grade and milestones are seed-independent, so awarding them in Daily
       // costs nothing in fairness — everyone still solves the same board.
@@ -38370,9 +38519,13 @@ window.TT_SFX = {
       grade: gradeFor(S.adds, S.maxCombo, sec, 3, extBoardSize(3)),
       grid: buildEmojiGrid(S.gridSeed)
     };
+    if (!replay) store[bestSlot] = rec;
     /* 리텐션 래퍼(0910) ④ — 결과 시트가 읽을 보상 행. **판이 끝난 이 경로에서만**
        채운다 — 허브에서 몇 시간 전 결과를 다시 여는 경로는 빈 배열이라 열리지
        않는다(dailyRank 가 쓰는 규약 그대로). */
+    /* replay 여도 이 줄은 그대로다 — streakGot 이 이미 전부 0 이라 «데일리
+       보상» 은 한 톨도 안 들어가고, 남는 것은 판 중에 확정된 수확(S.gainJstar)
+       뿐이다. 그것까지 숨기면 실제로 번 것을 안 보여 주는 거짓말이 된다. */
     dailyReward = rewardItems({
       gem:   (S.gainJstar | 0) + (streakGot.jstar | 0),
       heart: streakGot.heart | 0
@@ -38387,12 +38540,16 @@ window.TT_SFX = {
      * same-date dedupe inside submitRank() is what makes a replay of today's
      * puzzle either improve the single entry for today or change nothing. */
     clearRankFresh();
-    var dRank = submitRank(rankKeyOf(), {
+    /* replay 는 기록판에도 안 올린다 — 위 장부 가지와 같은 이유이고, 여기서는
+       하나가 더 있다: submitRank 의 동일 날짜 중복 제거가 «오늘» 을 키로 쓰므로
+       3일 전 판의 기록이 오늘 칸을 밀어내 버린다. */
+    var dRank = replay ? 0 : submitRank(rankKeyOf(), {
       timeSec: sec, n: dailyNumber(), matches: S.matches,
-      maxCombo: S.maxCombo, grade: store[bestSlot].grade, date: todayKey()
+      maxCombo: S.maxCombo, grade: rec.grade, date: todayKey()
     });
     if (dRank > 0) { rankFresh.mode = rankKeyOf(); rankFresh.pos = dRank; }
-    showDailyResult(dRank, classicRun);
+    /* replay 는 store 에 칸이 없으므로 방금 만든 기록을 직접 넘겨 준다. */
+    showDailyResult(dRank, classicRun, replay ? rec : undefined);
   }
 
   /**
@@ -38406,10 +38563,18 @@ window.TT_SFX = {
    *   했음”을 눌러 결과만 다시 여는 경로는 아직 그 모드로 **들어가기 전**이라
    *   S.mode 가 딴 값이다. 그 한 자리만 명시적으로 넘긴다.
    */
-  function showDailyResult(rank, classicRun) {
-    var d = (classicRun === undefined) ? dailyBestNow()
-      : (classicRun ? store.classicDailyBest : store.dailyBest);
+  /**
+   * @param rec 판정판 53 — 그릴 기록을 **직접** 넘기는 자리. 딥링크로 남의 판을
+   *   대신 푼 판은 store 에 칸이 없어(finishDaily 의 replay 가지) 여기로 온다.
+   *   생략하면 종전대로 store 에서 읽으므로 기존 호출부 둘은 한 글자도 안 바뀐다.
+   */
+  function showDailyResult(rank, classicRun, rec) {
+    var d = rec || ((classicRun === undefined) ? dailyBestNow()
+      : (classicRun ? store.classicDailyBest : store.dailyBest));
     if (!d) { goMenu(); return; }
+    /* 공유 글·카드가 읽을 «지금 보여 주는 칸». 평소에는 바로 위에서 store 에서
+       읽은 그 객체라 기존 공유 문구는 무변이다(dailyShown 선언부 주석). */
+    dailyShown = d;
     dailyRank = rank | 0;
     setText('daily-title', t('daily.title', { n: d.n }));
     setText('daily-stats', dailyStatsLine(d));
@@ -38419,6 +38584,9 @@ window.TT_SFX = {
     closeAllModals();
     showScreen('screen-game');
     openModal('modal-daily');
+    /* 판정판 53 — 시트가 열리는 이 자리에서 카드를 굽는다. 클릭 핸들러가 아니라
+       여기인 이유는 절 머리 주석 그대로다(제스처 안에서 동기적으로 공유해야 한다). */
+    shareCardPrep('daily', 'daily-card-thumb');
     celebrateRank(dailyRank);
     /* 리텐션 래퍼(0910) ④ — 방금 끝난 판이 준 것만 연다. 여기서 비우는 것이
        핵심이다 — 허브에서 옛 결과를 다시 열면 빈 배열이라 아무것도 안 열린다. */
@@ -38444,15 +38612,37 @@ window.TT_SFX = {
    * ▣ 점수·모드 쿼리는 붙이지 않는다: 진입 쿼리를 읽는 코드가 아직 없어
    *   (씨드 링크 = 2차) 지금 붙이면 아무것도 안 하는 글자만 길어진다. */
   var SHARE_URL = 'https://ghkd70408040-wq.github.io/game-factory-site/tentwin.html?ref=share';
-  /** 공유 글 끝에 주소 한 줄. 빈 글에는 붙이지 않는다(빈 공유는 아예 안 나간다). */
-  function withShareLink(txt) { return txt ? (txt + '\n' + SHARE_URL) : txt; }
+  /** 공유 글 끝에 주소 한 줄. 빈 글에는 붙이지 않는다(빈 공유는 아예 안 나간다).
+   *  ▣ 판정판 53 에서 인자가 하나 늘었다 — 데일리만 `&daily=` 딥링크를 달고
+   *    나머지 둘은 그대로 안 넘긴다(호출부 두 곳 무변). 주소를 붙이는 «자리»는
+   *    여전히 이 함수 하나다: 두 벌이 되면 한쪽만 고쳐지는 날이 온다. */
+  function withShareLink(txt, url) { return txt ? (txt + '\n' + (url || SHARE_URL)) : txt; }
+
+  /* 판정판 53 — 지금 결과 시트가 «보여 주고 있는» 데일리 칸.
+     평소에는 store 의 그 칸과 **같은 객체**라 기존 경로의 글자가 한 글자도 안
+     바뀐다(showDailyResult 이 자기가 그린 칸을 그대로 넣는다). 남의 판을 딥링크로
+     대신 푼 판만 store 에 없는 임시 기록을 여기 둔다 — 그 기록을 store 에 쓰면
+     링크를 연 사람 «자신의» 데일리 기록이 덮인다(finishDaily 의 replay 가지 참조). */
+  var dailyShown = null;
+
+  /** 데일리 공유 주소 = SHARE_URL + 그 판의 8자리.
+   *  ▣ `?ref=share` 는 그대로 둔다 — 이미 `?` 를 쓰고 있으므로 여기서는 `&` 다.
+   *  ▣ 캐시를 비껴가지 않는다: sw.js 가 네비게이션·정적 둘 다
+   *    `cache.match(req, { ignoreSearch: true })` 로 맞춘다(sw.js :61 · :85).
+   *    쿼리가 하나 더 붙어도 오프라인 캐시가 그대로 맞는다 — SHARE_URL 주석의
+   *    그 근거가 두 번째 쿼리에도 똑같이 선다.
+   *  ▣ 옛 저장에는 `seed` 칸이 없다. 그 기록들은 «푼 날 = 판의 날» 이므로
+   *    date 로 떨어져도 같은 판을 가리킨다. */
+  function dailyShareUrl(d) {
+    return SHARE_URL + '&daily=' + ((d && (d.seed || d.date)) || dailyKey());
+  }
 
   function shareText() {
-    var d = dailyBestNow();   // W7.5 — 방금 끝낸 판의 칸
+    var d = dailyShown || dailyBestNow();   // W7.5 — 방금 끝낸 판의 칸
     if (!d) return '';
     // Language-independent by design (contract §8).
     return withShareLink('TenTwin #' + d.n + ' ✅ ' + fmtTime(d.timeSec) + ' 🔥' + d.maxCombo + 'x' +
-           (d.grade ? ' ' + d.grade : '') + '\n' + (d.grid || ''));
+           (d.grade ? ' ' + d.grade : '') + '\n' + (d.grid || ''), dailyShareUrl(d));
   }
 
   /**
@@ -38575,6 +38765,424 @@ window.TT_SFX = {
                     (o.rush ? '' : ' · Stage ' + o.stage) + ' 🍬\n' + t('share.beat'));
   }
   function shareScore() { copyToClipboard(scoreShareText()); }
+
+  /* =========================================================================
+   * SECTION 13A-2 — 결과 카드 (판정판 53)
+   *
+   * 세 공유 버튼이 지금까지 내보낸 것은 글자 + 주소뿐이었다. 글자는 피드에서
+   * 스크롤에 묻힌다 — 그림 한 장이 붙어야 남의 타임라인에서 멈춘다. 그래서
+   * **1080x1350 PNG 한 장**을 굽고 navigator.share 의 files 로 함께 보낸다.
+   *
+   * ▣ 새 그림을 굽지 않는다. 카드에 들어가는 것은 이미 이 페이지에 서 있는
+   *   자산(--art-logo · --ch-<id>-full)과 캔버스 글자뿐이다. 출시 아이콘 절차
+   *   (tools/release/make-icons.py)가 지키는 그 규율과 같다.
+   *
+   * ▣ 배치 규칙도 그 파일에서 이관했다: 알파 crop → 알파 상자 높이를 비율로
+   *   맞춤 → 바닥선 기준 앵커 → **조립 뒤 그림 층만 다시 재서** 네 변 여백을
+   *   검증. 잘림 0 은 눈이 아니라 알파 상자 수치가 증명한다(0910 수리의 결론).
+   *   그래서 캔버스가 둘이다 — 불투명 그라데 배경(bg)과 잉크만 든 투명 층(lay).
+   *   한 장에 그리면 여백을 «잴 수가 없다»: 배경이 네 변까지 불투명이라 알파
+   *   상자가 언제나 카드 전체가 된다.
+   *
+   * ▣ PERFORMANCE CONTRACT: 이 절은 프레임당 비용이 0 이다. 아래 어느 함수도
+   *   rAF · syncHud() · 보드 변형에서 불리지 않는다. 카드는 **결과 시트가 열릴
+   *   때 한 번** 구워지고, 다음 결과가 그것을 무효로 만든다.
+   *
+   * ▣ 왜 «열릴 때» 인가(클릭 때가 아니라): navigator.share 는 사용자 제스처
+   *   안에서 «동기적으로» 불려야 한다. 클릭 핸들러 안에서 캔버스를 비동기로
+   *   구우면 그 사이에 제스처가 만료돼 iOS Safari 가 공유를 거절한다. 시트가
+   *   열리는 순간 구워 두고 클릭에서는 이미 있는 blob 을 넘긴다.
+   * ========================================================================= */
+
+  /* 세로 카드 배치. release.tentwin.json `icons.card_layout`(가로 OG·피처 카드)의
+     **세로 형제**다. 그 수치를 그대로 못 옮긴 이유가 둘이다:
+       ① char_h 0.74 는 H=1350 에서 999px 짜리 캐릭터가 된다 — 카드의 3/4 를 한
+          인물이 먹어 글자가 설 자리가 없다(가로 카드에는 애초에 글자가 없다).
+       ② 가로판은 로고가 **왼쪽 지대**(logo_left·logo_gap·logo_max_h)에 서고
+          캐릭터가 오른쪽을 다 쓴다. 세로에서 그 배치를 그대로 옮기면 로고 지대
+          폭이 W 의 절반도 안 돼 560x326 레터링이 눌린다.
+     그래서 «규칙» 만 이관하고 «수치» 는 세로용으로 다시 잡았다. 전부 W·H 대비
+     비율이라 1080x1350 이 아닌 크기로 구워도 같은 그림이 나온다(가로판
+     _layout_note 와 같은 계약). safe 는 레시피의 margin_pct(0.04)와 **같은 값**
+     이어야 한다 — 관문이 그 수로 잰다. */
+  var CARD_L = {
+    safe: 0.04,
+    logo_top: 0.050, logo_box: [0.62, 0.135],
+    mode_y: 0.250, mode_f: 0.046,
+    value_y: 0.385, value_f: 0.115,
+    sub_y: 0.455, sub_f: 0.036,
+    num_y: 0.545, num_f: 0.032,
+    extra_y: 0.610, extra_f: 0.032,
+    char_h: 0.340, char_bottom: 0.885, char_right: 0.955,
+    foot_y: 0.925, foot_f: 0.026,
+    url_y: 0.950, url_f: 0.018,
+    /* 가운데 정렬 글자의 최대 폭 / W. (1-0.86)/2 = 0.07 이라 이 줄들의 좌우
+       여백은 자동으로 safe(0.04)를 넘는다. */
+    mid_box: 0.86,
+    /* 아래 두 줄(회차·별)은 **왼쪽 정렬**이다: 그 높이대는 캐릭터가 서 있는
+       띠라, 가운데 정렬로 두면 알파 상자가 캐릭터와 겹친다. left_x+left_box 가
+       캐릭터 왼쪽(char_right - 캐릭터 폭)보다 왼쪽에 있게 잡았다. */
+    left_x: 0.070, left_box: 0.58
+  };
+
+  /** 카드 굽기에 필요한 브라우저 배관이 다 있는가. 하나라도 없으면 이 파도의
+   *  모든 코드가 죽고 세 버튼은 착수 전의 글자+주소 경로 그대로 산다. */
+  function shareCardSupported() {
+    try {
+      return !!(typeof document !== 'undefined' && document.createElement &&
+        typeof Promise === 'function' &&
+        typeof HTMLCanvasElement !== 'undefined' &&
+        HTMLCanvasElement.prototype && HTMLCanvasElement.prototype.toBlob &&
+        typeof URL !== 'undefined' && URL.createObjectURL);
+    } catch (e) { return false; }
+  }
+
+  /** CSS 변수 하나를 «주소 문자열» 로 푼다. stdArt() 가 돌려주는 것은
+   *  'var(--ch-ten-full)' 라는 **글자**라 캔버스가 그것으로는 그림을 못 연다.
+   *  값은 data:image/webp;base64,... 이거나 catalog/*.webp 둘 중 하나이고 둘 다
+   *  동일 출처라 캔버스가 오염되지 않는다(toBlob 이 막히지 않는다는 뜻이다). */
+  function shareCardCssUrl(name) {
+    var v = '';
+    try { v = getComputedStyle(document.documentElement).getPropertyValue(name) || ''; }
+    catch (e) { return ''; }
+    var m = /url\(\s*(['"]?)([\s\S]*?)\1\s*\)/.exec(v);
+    return m ? m[2] : '';
+  }
+
+  /** 토큰 한 개를 계산된 값으로. 원시값을 이 파일에 새로 박지 않기 위한 자리다. */
+  function shareCardToken(name, fallback) {
+    var v = '';
+    try { v = (getComputedStyle(document.documentElement).getPropertyValue(name) || '').trim(); }
+    catch (e) { v = ''; }
+    return v || fallback;
+  }
+
+  /** 알파 상자. thr=8 은 make-icons.py 의 ALPHA_THR 과 **같은 값**이다
+   *  (overlay-check.py 와도 같다 — 세 도구가 같은 문턱을 써야 수치가 대조된다). */
+  function cardInkBox(d, w, h, thr) {
+    var l = w, t = h, r = -1, b = -1, x, y, row;
+    for (y = 0; y < h; y++) {
+      row = y * w * 4;
+      for (x = 0; x < w; x++) {
+        if (d[row + (x << 2) + 3] > thr) {
+          if (x < l) l = x;
+          if (x > r) r = x;
+          if (y < t) t = y;
+          b = y;
+        }
+      }
+    }
+    return (r < 0) ? null : { l: l, t: t, r: r + 1, b: b + 1 };
+  }
+
+  /** make-icons 의 alpha_crop 과 같은 일 — 투명 여백을 잘라낸 «그림만» 의 원본
+   *  좌표. 배치의 기준은 파일 캔버스가 아니라 이것이다(0910 수리의 새 방식 ①).
+   *  thr 0 인 것도 그 함수 그대로다(alpha>0 인 픽셀 전부를 포함). */
+  function cardAlphaBox(im) {
+    var w = im.naturalWidth || im.width || 0, h = im.naturalHeight || im.height || 0;
+    var box = { x: 0, y: 0, w: w, h: h };
+    if (!w || !h) return box;
+    try {
+      var cv = document.createElement('canvas');
+      cv.width = w; cv.height = h;
+      var cx = cv.getContext('2d');
+      cx.drawImage(im, 0, 0);
+      var bb = cardInkBox(cx.getImageData(0, 0, w, h).data, w, h, 0);
+      if (bb) { box.x = bb.l; box.y = bb.t; box.w = bb.r - bb.l; box.h = bb.b - bb.t; }
+    } catch (e) { /* 못 재면 파일 캔버스 그대로 — 카드는 그래도 나간다 */ }
+    return box;
+  }
+
+  /** 그림 한 장. **실패해도 거절하지 않는다** — 캐릭터가 안 열렸다고 카드를
+   *  통째로 버리면 공유가 글자 경로로 떨어진다. 그림 없이 굽는 편이 낫다. */
+  function shareCardLoad(url) {
+    return new Promise(function (resolve) {
+      if (!url) { resolve(null); return; }
+      var im = new Image();
+      im.onload = function () { resolve(im); };
+      im.onerror = function () { resolve(null); };
+      try { im.src = url; } catch (e) { resolve(null); }
+    });
+  }
+
+  /**
+   * 글자 한 줄. **그리기 전에 재고**, 상자를 넘치면 글꼴을 줄인다 — 카드는
+   * 스크린샷이 아니라 파일이라 넘친 글자를 나중에 발견할 자리가 없다.
+   * 그래도 min 까지 줄여 안 들어가면 overflow 에 담아 «넘쳤다는 사실» 을
+   * 호출부(관문 하네스)에 그대로 넘긴다. 조용히 자르지 않는다.
+   */
+  function cardRun(cx, out, id, str, o) {
+    if (!str) return;
+    var size = o.size, min = o.min || Math.max(10, o.size * 0.45), w;
+    cx.textAlign = o.align || 'center';
+    cx.textBaseline = 'alphabetic';
+    for (;;) {
+      cx.font = (o.weight || 800) + ' ' + Math.round(size) + 'px ' + o.fam;
+      w = cx.measureText(str).width;
+      if (w <= o.box || size <= min) break;
+      size = Math.max(min, size * (o.box / w) * 0.98);
+    }
+    if (w > o.box) out.overflow.push({ id: id, w: Math.round(w), box: Math.round(o.box) });
+    cx.globalAlpha = (typeof o.alpha === 'number') ? o.alpha : 1;
+    cx.fillStyle = o.fill;
+    cx.fillText(str, o.x, o.y);
+    cx.globalAlpha = 1;
+    out.texts.push({ id: id, str: str, x: Math.round(o.x), y: Math.round(o.y), w: Math.round(w) });
+  }
+
+  /**
+   * 카드가 적을 내용. 화면이 그리는 것과 **같은 함수**에서 뽑는다 — 시트의
+   * 숫자와 카드의 숫자가 다르면 그게 곧 거짓말이다(arcShareText 의 그 규율).
+   * 결과가 없으면 null 이고, 그러면 카드는 아예 안 구워진다.
+   */
+  function shareCardData(kind) {
+    if (kind === 'daily') {
+      var d = dailyShown || dailyBestNow();
+      if (!d) return null;
+      return {
+        mode: t('menu.daily'),
+        value: fmtTime(d.timeSec),
+        sub: '🔥' + d.maxCombo + 'x · ' + d.matches + (d.grade ? ' · ' + d.grade : ''),
+        num: '#' + d.n,
+        extra: '',
+        url: dailyShareUrl(d)
+      };
+    }
+    if (kind === 'arc') {
+      var mode = arcLast || S.mode;
+      if (!ARC_MODES[mode]) return null;
+      var du = S.duel;
+      /* arcShareText 와 **같은 값 고르기**다(누적 DMG 만 S.duel 에서, 나머지는
+         종료 시점에 얼려 둔 S.arcLastValue 에서). 두 벌로 세지 않는다. */
+      var v = (mode === 'arc-dmg') ? (du ? (du.dmg | 0) : 0) : Math.max(0, (S.arcLastValue | 0));
+      ensureArcadeBest();
+      var b = store.arcadeBest[mode];
+      return {
+        mode: arcModeName(mode),
+        value: arcValueText(mode, v),
+        sub: arcDirText(mode),
+        num: t('arc.kos', { n: du ? (du.kos | 0) : 0 }),
+        extra: (b && typeof b.value === 'number')
+          ? t('arc.best', { v: arcValueText(mode, b.value) }) : t('arc.nobest'),
+        url: SHARE_URL
+      };
+    }
+    /* ⚠ 모험(탄 번호 · ★ 줄)은 여기 오지 않는다 — 실측이다: onGameOver 의 첫
+       가지가 `S.mode === 'adv'` 를 advFinish 로 돌려보내고(:35866), 그 결과는
+       #modal-adv 로 간다. 그 시트에는 공유 버튼 자체가 없다. 그래서 S.overInfo
+       가 서는 경로에 모험은 없고, 모험용 가지를 여기 적어 두면 그것은 부를 수
+       없는 코드다. ★ 줄이 정말 필요해지면 그것은 #modal-adv 에 공유 버튼을
+       세우는 «다른 파도»다. */
+    var o = S.overInfo;
+    if (!o) return null;
+    return {
+      mode: (o.rush && !o.stuck) ? t('over.rush.title') : t('over.title'),
+      value: String(o.score),
+      // 러시에는 스테이지가 뜻이 없다 — scoreShareText 가 빼는 그 자리다.
+      sub: o.rush ? '' : (t('over.stage') + ' ' + o.stage),
+      num: (o.rush ? t('over.rush.best') : t('over.best')) + ' ' + o.best,
+      extra: '',
+      url: SHARE_URL
+    };
+  }
+
+  /**
+   * 결과 카드 한 장. 돌려주는 것은 **객체**다(blob 하나가 아니라):
+   *   { blob, url, width, height, ink, inkPct, overflow, texts }
+   * ink 는 그림 층의 알파 «상자»(px), inkPct 는 그 상자가 네 변에서 떨어진
+   * «여백» 의 비율 — make-icons.py 의 content_margins() 가 (bb, pct) 로 돌려주는
+   * 바로 그 두 모양이다. 관문은 inkPct 네 값이 전부 margin_pct(0.04) 이상인지와
+   * overflow 가 비었는지를 본다.
+   */
+  function buildShareCard(kind) {
+    return new Promise(function (resolve, reject) {
+      if (!shareCardSupported()) { reject(new Error('share-card: unsupported')); return; }
+      var data = shareCardData(kind);
+      if (!data) { reject(new Error('share-card: no result for ' + kind)); return; }
+      /* 영문 회차의 로고는 --art-logo 가 아니라 별도 파일이다(html[lang="en"]
+         .logo-img 가 background-image 만 덮는 그 규약) — 변수를 읽어서는 알 수
+         없으므로 여기서 같은 판정을 한 번 더 한다. */
+      var logoUrl = (currentLang() === 'en') ? 'catalog/art-logo-en.webp'
+                                             : shareCardCssUrl('--art-logo');
+      var charUrl = shareCardCssUrl('--ch-' + charId() + '-full');
+      Promise.all([shareCardLoad(logoUrl), shareCardLoad(charUrl)]).then(function (ims) {
+        try { cardPaint(data, ims[0], ims[1], resolve, reject); }
+        catch (e) { reject(e); }
+      }, reject);
+    });
+  }
+
+  function cardPaint(data, logo, ch, resolve, reject) {
+    var L = CARD_L, W = 1080, H = 1350;
+
+    /* ① 배경 — gradient() 와 같은 보간이다: 위 색에서 아래 색으로 선형, 마지막
+       «행» 이 정확히 아래 색(그래서 끝점이 H-1 이다). 색 두 개는 레시피의
+       icons.grad_top / grad_bottom 과 같은 값이어야 한다 — 이 카드가 OG 카드와
+       같은 판에서 나온 것으로 읽혀야 하기 때문이고, 그 값은 사용자 승인 대상이라
+       여기서 새로 고르지 않는다. */
+    var bg = document.createElement('canvas');
+    bg.width = W; bg.height = H;
+    var bx = bg.getContext('2d');
+    var g = bx.createLinearGradient(0, 0, 0, H - 1);
+    g.addColorStop(0, '#C6D0FF');
+    g.addColorStop(1, '#ACB8F8');
+    bx.fillStyle = g;
+    bx.fillRect(0, 0, W, H);
+
+    /* ② 그림 층 — 로고·캐릭터·글자 **전부**. 배경과 갈라 두는 것이 여백을 잴 수
+       있게 만드는 유일한 장치다(절 머리 주석). */
+    var lay = document.createElement('canvas');
+    lay.width = W; lay.height = H;
+    var cx = lay.getContext('2d');
+
+    /* 잉크는 토큰 하나(--prim-ink)로 통일하고 «세기» 만 알파로 가른다.
+       테마 토큰(--tx-dim 등)을 쓰지 않은 이유: 카드 배경은 테마와 무관하게 늘
+       밝은 그라데인데 그 토큰들은 다크 테마에서 밝은 색이 되어 글자가 사라진다.
+       --prim-ink 는 원시 팔레트라 테마를 타지 않는다. 새 색은 0 이다. */
+    var ink = shareCardToken('--prim-ink', '#221B2E');
+    var fam = shareCardToken('--font', '-apple-system, "Segoe UI", Roboto, sans-serif');
+    var out = { overflow: [], texts: [] };
+
+    if (logo) {
+      var lb = cardAlphaBox(logo);
+      var bw = W * L.logo_box[0], bh = H * L.logo_box[1];
+      var s = Math.min(bw / lb.w, bh / lb.h);          // fit() 와 같은 식
+      var lw = Math.max(1, Math.round(lb.w * s)), lh = Math.max(1, Math.round(lb.h * s));
+      cx.drawImage(logo, lb.x, lb.y, lb.w, lb.h,
+        Math.round((W - lw) / 2), Math.round(H * L.logo_top), lw, lh);
+    }
+    if (ch) {
+      /* scale_h() 와 같은 식: 알파 상자 «높이» 를 목표에 맞추고, 바닥선과
+         오른쪽선에 앵커한다(compose_card 의 by / fx 계산 그대로). */
+      var cb = cardAlphaBox(ch);
+      var chh = Math.max(1, Math.round(H * L.char_h));
+      var chw = Math.max(1, Math.round(cb.w * chh / cb.h));
+      cx.drawImage(ch, cb.x, cb.y, cb.w, cb.h,
+        Math.round(W * L.char_right) - chw, Math.round(H * L.char_bottom) - chh, chw, chh);
+    }
+
+    var mid = W * L.mid_box, lx = W * L.left_x, lbox = W * L.left_box;
+    cardRun(cx, out, 'mode', data.mode,
+      { x: W / 2, y: H * L.mode_y, box: mid, size: H * L.mode_f, fill: ink, fam: fam, alpha: .78 });
+    cardRun(cx, out, 'value', data.value,
+      { x: W / 2, y: H * L.value_y, box: mid, size: H * L.value_f, weight: 900, fill: ink, fam: fam });
+    cardRun(cx, out, 'sub', data.sub,
+      { x: W / 2, y: H * L.sub_y, box: mid, size: H * L.sub_f, fill: ink, fam: fam, alpha: .86 });
+    cardRun(cx, out, 'num', data.num,
+      { x: lx, y: H * L.num_y, box: lbox, size: H * L.num_f, align: 'left', fill: ink, fam: fam, alpha: .86 });
+    cardRun(cx, out, 'extra', data.extra,
+      { x: lx, y: H * L.extra_y, box: lbox, size: H * L.extra_f, align: 'left', fill: ink, fam: fam, alpha: .86 });
+    cardRun(cx, out, 'foot', 'Ten Twin',
+      { x: W / 2, y: H * L.foot_y, box: mid, size: H * L.foot_f, weight: 900, fill: ink, fam: fam, alpha: .72 });
+    /* 주소는 프로토콜을 뗀 표시형이다 — 카드에서 이 줄은 «어디로 가면 되나» 를
+       알려 주는 글자이지 누를 수 있는 링크가 아니고, https:// 여덟 자를 살리면
+       그만큼 글꼴이 작아진다. 실제로 클릭되는 전체 주소는 함께 나가는 공유
+       글(withShareLink)이 들고 있다. */
+    cardRun(cx, out, 'url', String(data.url || SHARE_URL).replace(/^https?:\/\//, ''),
+      { x: W / 2, y: H * L.url_y, box: mid, size: H * L.url_f, weight: 600, min: 14, fill: ink, fam: fam, alpha: .62 });
+
+    /* ③ 합성 — 배경 위에 그림 층. compose_card 의 im.alpha_composite(lay) 그대로. */
+    var cvo = document.createElement('canvas');
+    cvo.width = W; cvo.height = H;
+    var ox = cvo.getContext('2d');
+    ox.drawImage(bg, 0, 0);
+    ox.drawImage(lay, 0, 0);
+
+    /* ④ 검증 — «그림 층만» 다시 잰다. ImageData 는 한 번만 읽는다(1.4M 픽셀). */
+    var bb = cardInkBox(cx.getImageData(0, 0, W, H).data, W, H, 8);
+    var ink4 = bb ? { l: bb.l, t: bb.t, r: bb.r, b: bb.b } : { l: 0, t: 0, r: W, b: H };
+    var m = bb ? { l: bb.l, t: bb.t, r: W - bb.r, b: H - bb.b } : { l: 0, t: 0, r: 0, b: 0 };
+    var pct = { l: m.l / W, r: m.r / W, t: m.t / H, b: m.b / H };
+
+    cvo.toBlob(function (blob) {
+      if (!blob) { reject(new Error('share-card: toBlob failed')); return; }
+      var url = '';
+      try { url = URL.createObjectURL(blob); } catch (e) { url = ''; }
+      resolve({
+        blob: blob, url: url, width: W, height: H,
+        ink: ink4, inkPct: pct, overflow: out.overflow, texts: out.texts
+      });
+    }, 'image/png');
+  }
+
+  /* ---- 캐시 · 썸네일 ------------------------------------------------------
+   * 카드 한 장은 시트 하나에 속한다. 다음 결과가 열리면 앞 장은 그 자리에서
+   * 무효다 — 그렇지 않으면 A 판의 그림이 B 판의 결과와 함께 나간다. */
+  var shareCardCache = null;   // { kind, res }
+  var shareCardGen = 0;        // 세대 번호. 늦게 도착한 굽기를 버리는 데 쓴다.
+  var shareCardThumb = null;   // 그 blob 주소를 걸고 있는 <img> (반납 전에 떼야 한다)
+
+  /** 들고 있던 blob 주소를 **반드시** 반납한다(안 하면 판마다 몇 MB 씩 샌다).
+   *  반납보다 <img> 에서 떼는 것이 먼저다 — 순서가 뒤집히면 이미 무효인 주소를
+   *  건 채로 남은 그림이 다시 배치될 때 콘솔에 실패가 찍힌다. */
+  function shareCardReset() {
+    if (shareCardThumb) {
+      /* src 를 ''로 두지 않고 속성을 뗀다(빈 src = 현재 문서로 요청 한 번 = 새 404). */
+      shareCardThumb.hidden = true;
+      shareCardThumb.removeAttribute('src');
+      shareCardThumb = null;
+    }
+    if (shareCardCache && shareCardCache.res && shareCardCache.res.url) {
+      try { URL.revokeObjectURL(shareCardCache.res.url); } catch (e) { /* 이미 반납됨 */ }
+    }
+    shareCardCache = null;
+    shareCardGen++;
+  }
+
+  /**
+   * 결과 시트가 열릴 때 한 번. 카드를 굽고 썸네일을 칠한다.
+   * 실패는 조용하다 — 카드가 없으면 공유는 착수 전의 글자+주소 경로 그대로다.
+   */
+  function shareCardPrep(kind, thumbId) {
+    shareCardReset();
+    var img = $(thumbId);
+    /* src 를 ''로 두지 않고 **속성을 뗀다**: 빈 src 는 브라우저에 따라 현재
+       문서 주소로 요청을 한 번 날린다(= 콘솔에 새 404). */
+    if (img) { img.hidden = true; img.removeAttribute('src'); }
+    if (!shareCardSupported()) return;
+    var gen = shareCardGen;
+    buildShareCard(kind).then(function (res) {
+      if (gen !== shareCardGen) {                 // 그 사이에 다음 판이 열렸다
+        try { URL.revokeObjectURL(res.url); } catch (e) {}
+        return;
+      }
+      shareCardCache = { kind: kind, res: res };
+      if (img && res.url) { img.src = res.url; img.hidden = false; shareCardThumb = img; }
+    }, function () { /* 카드 없이도 공유는 산다 */ });
+  }
+
+  /**
+   * 공유 한 번 — 파일이 있으면 파일로, 없으면 **그 모드가 원래 쓰던 폴백** 으로.
+   *
+   * ▣ 폴백을 «모드마다 그대로» 넘겨받는 이유: 데일리는 클립보드(copyShare),
+   *   아케이드는 OS 시트(shareOut), 게임오버는 클립보드(shareScore)다. 이 파도에서
+   *   그 셋을 한 줄로 통일하면 그것은 카드와 무관한 별개의 UX 변경이 된다.
+   * ▣ catch 가 두 겹인 것도 shareOut 의 그 이유 그대로다: 호출 자체가 던지면
+   *   공유를 **못 한** 것이라 폴백으로 내려가야 하고, 돌려준 Promise 가
+   *   AbortError 로 거절되면 사용자가 **안 하기로 한** 것이라 조용히 끝나야 한다.
+   *   거기서 폴백을 부르면 취소했는데 복사가 되는, 시키지 않은 일이 된다.
+   */
+  function shareCardOut(kind, txt, fallback) {
+    var c = shareCardCache;
+    if (c && c.kind === kind && c.res && c.res.blob &&
+        typeof File === 'function' && typeof navigator !== 'undefined' &&
+        navigator.canShare && navigator.share) {
+      try {
+        var f = new File([c.res.blob], 'tentwin-' + kind + '.png', { type: 'image/png' });
+        if (navigator.canShare({ files: [f] })) {
+          var pr = navigator.share({ files: [f], text: txt });
+          if (pr && pr.then) {
+            pr.then(function () { J.sfx.ui(); }, function (e) {
+              if (e && e.name === 'AbortError') return;   // 사용자가 닫았다 — 끝
+              fallback();
+            });
+          }
+          return;
+        }
+      } catch (e) { /* 아래 글+주소 경로로 */ }
+    }
+    fallback();
+  }
 
   /* =========================================================================
    * SECTION 13B — RANKING BOARD SCREEN (v5 E-1)
@@ -47364,7 +47972,12 @@ window.TT_SFX = {
       if (bd0) bd0.classList.remove('grayed');
       startArcade(arcLast || 'arc-time');
     });
-    on($('arc-share'), 'click', function () { shareOut(arcShareText()); });
+    /* 판정판 53 — 카드가 구워져 있으면 파일로, 아니면 **이 모드가 원래 쓰던**
+       폴백(shareOut = OS 시트 → 클립보드 3단)으로. 글자는 한 번만 만든다. */
+    on($('arc-share'), 'click', function () {
+      var txt = arcShareText();
+      shareCardOut('arc', txt, function () { shareOut(txt); });
+    });
     on($('arc-menu'), 'click', goMenu);
     on($('mode-close'), 'click', function () { closeModeSheet(); J.sfx.ui(); });
     on($('mode-adv'), 'click', function () { closeModeSheet(); J.sfx.ui(); openAdventure(); });
@@ -47837,9 +48450,16 @@ window.TT_SFX = {
       if (S.mode === 'daily') { startStage(1, dailySeed()); startTimer(); }
       else startStage(1, (Math.random() * 0x7fffffff) | 0);
     });
-    on($('btn-over-share'), 'click', shareScore);
+    /* 판정판 53 — 두 버튼의 폴백은 **착수 전 그대로**다: 게임오버·데일리는
+       클립보드(shareScore / copyShare)이고, 이 파도에서 그것을 OS 시트로
+       «승격» 시키지 않는다(카드와 무관한 별개의 UX 변경이 된다). */
+    on($('btn-over-share'), 'click', function () {
+      shareCardOut('over', scoreShareText(), shareScore);
+    });
     on($('btn-menu'), 'click', goMenu);
-    on($('btn-share'), 'click', copyShare);
+    on($('btn-share'), 'click', function () {
+      shareCardOut('daily', shareText(), copyShare);
+    });
     on($('btn-daily-menu'), 'click', goMenu);
 
     /* --- ranking board (v5 E-1) -------------------------------------------
@@ -48815,7 +49435,12 @@ window.TT_SFX = {
            내려간다(splashAudioBoot 주석의 근거). 막히면 조용히 대기하고, 첫
            pointerdown 이 그 자리에서 이어받는다. */
         splashAudioBootSchedule();
-      }
+      },
+      /* 판정판 53 — ?daily= 딥링크. **마지막 청크**인 것이 조건이다: 스플래시
+         바인딩(바로 위)이 서 있어야 «걷혔는가» 를 물을 수 있고, 튜토리얼도 이미
+         열려 있어야 «닫혔는가» 를 물을 수 있다. 파라미터가 없으면 즉시 되돌아
+         나오므로 평소 부팅은 한 줄도 안 바뀐다. */
+      function () { dailyLinkBoot(); }
     ];
     if (!APP) {
       for (var i = 0; i < steps.length; i++) steps[i]();
@@ -49133,6 +49758,14 @@ window.TT_SFX = {
        필요하다(tools/measure/copy-check.py · flow-smoke). */
     shareText: shareText, arcShareText: arcShareText, scoreShareText: scoreShareText,
     SHARE_URL: SHARE_URL,
+    /* 판정판 53 — 결과 카드. 위 debug handles 규약 그대로 **게임 코드는 이 중
+       무엇도 window.Game 을 거쳐 부르지 않는다**. 카드가 1080x1350 인가 · 그림
+       층 여백이 네 변 모두 4% 이상인가 · 넘친 글자가 있는가를 관문이 재려면
+       PNG 와 함께 그 실측치를 돌려받는 자리가 필요하다(buildShareCard 의 반환
+       객체가 그것이다). dailyKey/dailyIsReplay 는 ?daily= 딥링크가 «어느 판을
+       열었나»와 «기록을 안 쓰는가»를 밖에서 확인하는 두 값이다. */
+    buildShareCard: buildShareCard, CARD_L: CARD_L,
+    dailyKey: dailyKey, dailyIsReplay: dailyIsReplay, dailyShareUrl: dailyShareUrl,
     /* 0909 copy-flow ① — 문구-값 파생의 두 끝. 관문이 사전과 상수를 나란히
        재려면 둘 다 밖에서 보여야 한다. */
     SKILL_MS: SKILL_MS, fmtSec: fmtSec,
