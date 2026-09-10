@@ -53,7 +53,12 @@ def load_allowlist(site):
     if stats.get('error'):
         sys.exit('catalog-allowlist: ' + stats['error'])
     return set(allow), set(deny), stats
-EXCLUDE_DIRS = {'.git', '.github', '.claude', 'tools', 'node_modules'}
+
+
+# 판정판 20-2(2026-09-10) — `_retired` 추가. site/catalog/_retired/ 는 «참조 0» 으로 판정돼
+# 옮겨 둔 자산이다(삭제 아님, 되돌리기는 git mv 역방향). 배포본에 실어 보낼 이유가 없다.
+# 처분 대장: tentwin/notes/CATALOG-RETIRE-0910.md
+EXCLUDE_DIRS = {'.git', '.github', '.claude', 'tools', 'node_modules', '_retired'}
 EXCLUDE_GLOB_DIRS = ['evidence-*']
 EXCLUDE_FILES = ['*.bak.html', '*.bak-*', '.gitignore']
 

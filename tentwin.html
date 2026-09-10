@@ -12841,6 +12841,11 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
   --role-ch-tiktok-key:#F3E3C0; --role-ch-tiktok-body:#FFF8E8; --role-ch-tiktok-name:#D9BE86;
   --role-ch-kkultteok-key:#F2B822; --role-ch-kkultteok-body:#FFEFC4; --role-ch-kkultteok-name:#D99A0E;
   --role-ch-bangul-key:#7EC8F0; --role-ch-bangul-body:#DCF1FD; --role-ch-bangul-name:#4FA8DA;
+  /* 2c-art(2026-09-10) — CODEX P09/P10 초상 배선. 키색은 JS CHARS[id].key 와
+     **같은 값**이어야 한다(썩싹 #A0E85B · 반짝 #B98CFF): HUD 칩·게이지 링은 JS 를,
+     아바타 실루엣은 이 토큰을 읽으므로 어긋나면 한 동료가 두 색이 된다. */
+  --role-ch-sseokssak-key:#A0E85B; --role-ch-sseokssak-body:#E6FAD0; --role-ch-sseokssak-name:#7FC93E;
+  --role-ch-banjjak-key:#B98CFF; --role-ch-banjjak-body:#EDE2FF; --role-ch-banjjak-name:#C9A6FF;
   --role-ch-ten-body-2:#F3F9FF;  /* 스킬/컷인 아바타·마스코트 몸색(밝은 판) */
   --role-ch-ten-name-light:#1156C8; --role-ch-twin-name-light:#C23B12; --role-ch-none-name-light:#5E566C; --role-ch-ppyak-name-light:#8A6000; --role-ch-mungchi-name-light:#C01A6E; --role-ch-jelly-name-light:#A0431C; --role-ch-none-key-light:#6E667C;
   --role-chap-1-a:#9CE061; --role-chap-1-b:#4BD99A; --role-chap-2-a:#6FD4F2; --role-chap-2-b:#8C9BF5; --role-chap-3-a:#FF9E96; --role-chap-3-b:#FA8BB8;
@@ -14863,12 +14868,11 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
         <!-- ============================================================
              2c - CODEX P09/P10 신규 동료 둘. 자리는 위 두 주석의 계약 그대로다:
              "없음" **앞**(그 카드는 선택지의 끝이고, 마지막 자리가 그 뜻의 일부).
-             ⚠ 이 둘만 사정이 다르다: 표준 4크롭이 **아직 없다**. 그래서 일부러
-             CHAR_STD 에 넣지 않았고, data-art="std" 가 안 붙어 아래 인라인 SVG 가
-             실제로 그려진다 — 위 넷과 달리 폴백이 아니라 **현재의 그림**이다.
-             그림이 도착하면 배선은 CHAR_STD 에 id 둘을 더하는 것이 전부다.
-             색도 같은 이유로 아직 없다(.ch-sseokssak / .ch-banjjak 규칙 0줄) —
-             CSS 는 이 단계의 소관이 아니라 카드가 기본 젤리색으로 선다.
+             ✅ 2c-art(2026-09-10) — 그림이 도착했다. 예고한 대로 배선은 CHAR_STD 에
+             id 둘을 더한 것이 전부이고, 아래 인라인 SVG 는 지우지 않고 **폴백으로**
+             내려앉는다(data-art="std" 가 찍히면 .cav 가 꺼진다 — 위 넷과 같은 길).
+             키색 한 벌(.ch-sseokssak / .ch-banjjak)도 형제 넷과 같은 여섯 자리
+             셀렉터로 함께 섰다. 새 그림 0장 — catalog 의 8파일을 배선만 했다.
              ============================================================ -->
         <button class="char-card kit-chip-v2 ch-sseokssak" data-char="sseokssak" type="button" role="radio" aria-checked="false">
           <svg class="cav" viewBox="0 0 44 46" aria-hidden="true" focusable="false">
@@ -24694,9 +24698,9 @@ window.TT_SFX = {
       'char.bangul.pass': 'Skill: bubble wave - 2 blockers cleared',
       /* W6.5a — 삐약의 소개도 갈린다(§16-B-3 이관). 이름은 그대로다. */
       'char.ppyak.pass2': 'Skill: 8s free link - far tiles connect',
-      /* 2c - CODEX P09/P10.  No portrait art has arrived yet, so these two
-         are deliberately kept OUT of CHAR_STD: the card then draws the shared
-         inline SVG fallback instead of an empty box (setArt's data-art rule). */
+      /* 2c - CODEX P09/P10.  Portrait art landed 2026-09-10; both ids are now in
+         CHAR_STD, so the card paints the standard crop and the shared inline SVG
+         drops back to being a fallback (setArt's data-art rule). */
       'char.sseokssak.name': 'Sweepy',
       'char.sseokssak.pass': 'Skill: big sweep - 6 live tiles cleared',
       'char.banjjak.name': 'Sparky',
@@ -25820,8 +25824,8 @@ window.TT_SFX = {
       'char.bangul.name': '방울이',
       'char.bangul.pass': '기술: 거품 파도 — 방해 타일 2개 정화',
       'char.ppyak.pass2': '기술: 자유 연결 8초 — 떨어진 두 칸도 이어져요',
-      /* 2c - CODEX P09/P10.  초상 에셋이 아직 없어 CHAR_STD 에 일부러 넣지
-         않았다 — 그래서 카드가 빈칸이 아니라 공용 인라인 SVG 폴백을 그린다. */
+      /* 2c - CODEX P09/P10.  초상 에셋이 2026-09-10 에 배선됐다(CHAR_STD 안) —
+         카드는 표준 4크롭을 그리고 공용 인라인 SVG 는 폴백으로 내려앉았다. */
       'char.sseokssak.name': '썩싹이',
       'char.sseokssak.pass': '기술: 큰 정리 — 산 타일 6칸 제거',
       'char.banjjak.name': '반짝이',
@@ -28530,7 +28534,12 @@ window.TT_SFX = {
      **빈칸**이 된다(data-art="std" 가 SVG 를 이미 껐기 때문이다). */
   var CHAR_STD = ['ten', 'twin', 'jelly', 'ppyak', 'mungchi', 'boss',
                   'pudding', 'sodawitch', 'mongle', 'churup',
-                  'mukmul', 'tiktok', 'kkultteok', 'bangul'];
+                  'mukmul', 'tiktok', 'kkultteok', 'bangul',
+  /* 2c-art(2026-09-10) — CODEX P09/P10 초상 도착. 위 2c 주석이 예고한 배선이
+     이 두 낱말이다: hasStdArt 가 참이 되는 순간 카드·무대·노드·컷인이
+     한꺼번에 data-art="std" 로 넘어가고 공용 인라인 blob SVG 는 폴백으로
+     내려앉는다(지우지 않는다 — setArt 계약). 새 상태·새 규칙 0. */
+                  'sseokssak', 'banjjak'];
   function hasStdArt(id) { return CHAR_STD.indexOf(id) >= 0; }
   /** 표준 에셋 변수 이름. 없는 캐릭터에는 '' 를 돌려준다(= 붙이지 않는다). */
   function stdArt(id, kind) {
@@ -46402,6 +46411,22 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
   --mate-tiktok-img:url("catalog/ch-tiktok-face.webp");
   --mate-kkultteok-img:url("catalog/ch-kkultteok-face.webp");
   --mate-bangul-img:url("catalog/ch-bangul-face.webp");
+  /* ---- 2c-art(2026-09-10) — CODEX P09/P10 표준 4크롭 × 2동료 --------------
+     **새로 그린 그림 0 장**이다. catalog 에 이미 서 있던 8 파일
+     (ch-sseokssak-* · ch-banjjak-*, 2026-08-31 수확·표준화 8e413b0/1cd0ae0)을
+     배선만 한다. 규격은 형제 넷과 같다 — portrait 760×1140 · full 900×1200 ·
+     face 224 · thumb 168, 전부 straight alpha webp. 위 블록의 규율 그대로
+     **그림 주소와 색**만 주고 레이아웃 규칙은 새로 만들지 않는다. ---- */
+  --ch-sseokssak-portrait:url("catalog/ch-sseokssak-portrait.webp");
+  --ch-sseokssak-full:url("catalog/ch-sseokssak-full.webp");
+  --ch-sseokssak-face:url("catalog/ch-sseokssak-face.webp");
+  --ch-sseokssak-thumb:url("catalog/ch-sseokssak-thumb.webp");
+  --ch-banjjak-portrait:url("catalog/ch-banjjak-portrait.webp");
+  --ch-banjjak-full:url("catalog/ch-banjjak-full.webp");
+  --ch-banjjak-face:url("catalog/ch-banjjak-face.webp");
+  --ch-banjjak-thumb:url("catalog/ch-banjjak-thumb.webp");
+  --mate-sseokssak-img:url("catalog/ch-sseokssak-face.webp");
+  --mate-banjjak-img:url("catalog/ch-banjjak-face.webp");
   /* ---- 모달 헤더 부속 ----
      ⚠ 캡슐은 **-st** 판이다(straight alpha). 도착본 glass-hud-capsule.webp 는
      프리멀티플라이드라 브라우저가 straight 로 해석하는 순간 반투명 구간의 RGB
@@ -46464,18 +46489,30 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
 .mn-hero.ch-bangul,.skill-av.ch-bangul,.cutin-av.ch-bangul{
   --ch-key:var(--role-ch-bangul-key); --ch-body:var(--role-ch-bangul-body); --ch-name:var(--role-ch-bangul-name);
 }
+.char-card.ch-sseokssak,#mate.ch-sseokssak,.co-av.ch-sseokssak,
+.mn-hero.ch-sseokssak,.skill-av.ch-sseokssak,.cutin-av.ch-sseokssak{
+  --ch-key:var(--role-ch-sseokssak-key); --ch-body:var(--role-ch-sseokssak-body); --ch-name:var(--role-ch-sseokssak-name);
+}
+.char-card.ch-banjjak,#mate.ch-banjjak,.co-av.ch-banjjak,
+.mn-hero.ch-banjjak,.skill-av.ch-banjjak,.cutin-av.ch-banjjak{
+  --ch-key:var(--role-ch-banjjak-key); --ch-body:var(--role-ch-banjjak-body); --ch-name:var(--role-ch-banjjak-name);
+}
 
 /* ---- 펫 탭 그리드의 신규 넷 칸 (W7 블록의 규칙을 그대로 연장) -------------- */
 #charpanel[data-cptab="pet"] #mate-pick .char-card.ch-mukmul .cav,
 #charpanel[data-cptab="pet"] #mate-pick .char-card.ch-tiktok .cav,
 #charpanel[data-cptab="pet"] #mate-pick .char-card.ch-kkultteok .cav,
-#charpanel[data-cptab="pet"] #mate-pick .char-card.ch-bangul .cav{
+#charpanel[data-cptab="pet"] #mate-pick .char-card.ch-bangul .cav,
+#charpanel[data-cptab="pet"] #mate-pick .char-card.ch-sseokssak .cav,
+#charpanel[data-cptab="pet"] #mate-pick .char-card.ch-banjjak .cav{
   opacity:calc(1 - var(--mate-img-on,0));
 }
 #charpanel[data-cptab="pet"] #mate-pick .char-card.ch-mukmul::after,
 #charpanel[data-cptab="pet"] #mate-pick .char-card.ch-tiktok::after,
 #charpanel[data-cptab="pet"] #mate-pick .char-card.ch-kkultteok::after,
-#charpanel[data-cptab="pet"] #mate-pick .char-card.ch-bangul::after{
+#charpanel[data-cptab="pet"] #mate-pick .char-card.ch-bangul::after,
+#charpanel[data-cptab="pet"] #mate-pick .char-card.ch-sseokssak::after,
+#charpanel[data-cptab="pet"] #mate-pick .char-card.ch-banjjak::after{
   content:"";
   position:absolute;
   left:6%;right:6%;top:5%;bottom:22%;
@@ -46489,6 +46526,8 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
 #charpanel[data-cptab="pet"] #mate-pick .char-card.ch-tiktok::after{ background-image:var(--mate-tiktok-img,none); }
 #charpanel[data-cptab="pet"] #mate-pick .char-card.ch-kkultteok::after{ background-image:var(--mate-kkultteok-img,none); }
 #charpanel[data-cptab="pet"] #mate-pick .char-card.ch-bangul::after{ background-image:var(--mate-bangul-img,none); }
+#charpanel[data-cptab="pet"] #mate-pick .char-card.ch-sseokssak::after{ background-image:var(--mate-sseokssak-img,none); }
+#charpanel[data-cptab="pet"] #mate-pick .char-card.ch-banjjak::after{ background-image:var(--mate-banjjak-img,none); }
 /* WD-2 §14 — 잠긴 펫 카드에서는 그림도 걷는다. 이 한 줄이 **여기**(아트 규칙
    전부의 뒤)에 사는 이유는 순전히 캐스케이드다: 위 여덟 줄과 특정도가 같아서
    앞에 두면 진다. `.cc-lock` 은 카드의 자식이고 이 art 는 카드의 ::after 라,
