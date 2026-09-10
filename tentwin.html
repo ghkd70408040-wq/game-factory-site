@@ -1975,7 +1975,14 @@ button {
     inset 0 2px 0 rgba(255, 255, 255, .85),
     inset 0 -6px 0 rgba(84, 52, 2, .3);
 }
-.tile[data-sp="gold"] > span { color: var(--prim-ink); text-shadow: none; }
+.tile[data-sp="gold"] > span,
+.tile.harvest > span { color: var(--prim-ink); text-shadow: none; }
+
+/* 수확 피날레의 황금 얼굴은 **여기가 아니라 래스터 블록 뒤**에 있다(§25.5).
+   이 자리에 두면 `html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp])…::before`
+   (0,5,1) 아래로 흘러 화면에 한 칸도 안 나온다 — 1차 실캡처가 그것을 잡았다.
+   금 특수타일이 그 규칙을 이기는 방식은 특이도가 아니라 `:not([data-sp])` **제외**인데,
+   `.harvest` 는 클래스라 그 제외에 안 걸린다. 찾는 사람을 위한 이정표 한 줄. */
 /* four-point star built from two crossed elliptical gradients; scale+rotate+fade
    only, and it is anchored inside the face so it can never bleed onto a neighbour */
 .tile[data-sp="gold"]:not(.dead)::after {
@@ -2372,6 +2379,44 @@ button {
 @keyframes goldsheen {
   0%, 100% { filter: brightness(1); }
   22%      { filter: brightness(1.16) saturate(1.14); }
+}
+
+/* --- .harvest : 탄 클리어 수확 피날레 (DESIGN §25.5 전이표 16행) --------------
+   변신은 **색만**이다 — 움직임이 없다. 처음에는 여기에 1회성 스케일 펄스를 두었는데,
+   격리 실측(scratchpad/harvest-0911/DIAG-ISO.json · 4x CPU)이 그 축을 지목했다:
+   `.tile` 자체에는 transform 을 못 쓰고(위치가 인라인 translate3d 다 — `.pop` 이
+   의사요소 두 자리를 쓰는 것도 같은 이유다), 그래서 펄스는 63칸 × 2자리로 곱해져
+   팝과 합쳐 한 순간 46개가 동시에 돈다. 현행 매치 연쇄의 동시 44개와 같은 자릿수이고
+   그 구간은 이미 4x 에서 무너지는 구간이다(game-motion §8).
+   두 사건 중 움직임이 꼭 필요한 것은 뒤엣것이다 — **「금으로 바뀌었다」는 색이 말하고
+   「터졌다」는 팝이 말한다.** 그래서 이 상태는 얼굴색만 바꾸고, 동시 애니메이션은
+   절반이 된다. 전이도 두지 않는다(색 트랜지션은 페인트 축이라 §4 금지).
+   ↑ 얼굴색 선언은 위 `.tile.harvest::before` 한 줄(골드 틴트 변주)이 전부다. */
+/* 전이표 17행 — 터짐은 .pop 의 곡선을 그대로 쓰되 **filter 한 줄만 뺀다**.
+   `@keyframes pop` 의 46% 에는 `filter: brightness(1.5)` 가 있는데, 그것은 페인트
+   유발이라 game-motion §4 가 전면 금지한 축이다. 평소에는 한 번에 두 칸이 터지므로
+   드러나지 않던 것이, 수확에서는 10~20칸이 동시에 돌아 프레임에 그대로 찍힌다
+   (LoAF 실측 근거는 scratchpad/harvest-0911/DIAG-LOAF.json).
+   transform·opacity 곡선은 .pop 과 **한 값도 다르지 않다** — 눈에 보이는 움직임은
+   같고, 사라진 것은 밝기 한 줄뿐이다. */
+.tile.harvest.pop::before,
+.tile.harvest.pop > span {
+  animation: harvestgo var(--dur-2) var(--ease) forwards;
+}
+@keyframes harvestgo {
+  0%   { transform: scale(1, 1);       opacity: 1; }
+  22%  { transform: scale(1.12, .90);  opacity: 1; }
+  46%  { transform: scale(1.30, 1.34); opacity: 1; }
+  100% { transform: scale(.52, .68);   opacity: .16; }
+}
+@media (prefers-reduced-motion: reduce) {
+  /* game-motion §7 — "끄기"가 아니라 "정적 대체"다. reduce 에서는 JS 가 클래스를
+     아예 안 붙이고 보너스만 정적으로 합산한다(§25.5 16행). 이 블록은 이중 안전
+     장치다: 어떤 경로로 클래스가 붙어도 남는 움직임이 없다. */
+  .tile.harvest::before,
+  .tile.harvest > span,
+  .tile.harvest.pop::before,
+  .tile.harvest.pop > span { animation: none; }
 }
 
 /* a cleared special stops idling — it is out of play, it should read as inert */
@@ -12334,6 +12379,34 @@ html[data-fruit="1"][data-tileart="1"] .tile:not([data-sp]):not(.dead)::before {
 }
 /* ==TILERASTER:END== */
 
+/* --- 수확 피날레의 황금 열매 얼굴 (DESIGN §25.5) ------------------------------
+   **위치가 곧 규칙이다.** 타일 얼굴의 실소유자는 바로 위 래스터/과일 두 규칙이고
+   특이도가 (0,5,1)·(0,4,1) 이다. 같은 조상 조건을 그대로 달아 같은 특이도에서
+   **나중에 오는 쪽**으로 이긴다(제외 `:not([data-sp])` 는 클래스인 `.harvest` 를
+   안 걸러 주므로 그 길은 못 쓴다).
+
+   금 타일 얼굴을 **통째로 공유하지는 않는다**. 그 선언은 그라디언트 3겹 + 그림자
+   7겹이고, 평소엔 판에 한두 칸뿐이라 공짜지만 수확은 1.4초에 63칸을 갈아 끼운다.
+   그래서 지시가 열어 둔 갈래인 **골드 틴트 변주**를 쓴다 — 면 그라디언트 **한 줄만**
+   금 타일 선언에서 그대로 가져오고(새 hex 0 · 새 이미지 0), 베젤·그림자·클립은
+   원래 타일의 것을 그대로 둔다(층을 안 늘린다).
+   상시 루프(goldsheen · goldglint)는 상속하지 않는다 — goldsheen 은 filter infinite
+   라 game-motion §4 전면 금지다. 움직임은 물결과 팝이 만든다. */
+html[data-fruit="1"][data-tileart="1"] .tile.harvest:not(.dead)::before,
+html[data-fruit="1"] .tile.harvest:not(.dead)::before,
+.tile.harvest:not(.dead)::before {
+  clip-path: none;
+  background-color: #E8A317;
+  background-image: linear-gradient(180deg, #FFE9A0 0%, #F3C23F 34%, #B9820D 70%, #F7D97A 100%);
+  background-size: 100% 100%;
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+}
+/* 숫자는 금면 위에서 잉크색으로 (금 타일이 쓰는 그 규약 그대로). */
+html[data-fruit="1"][data-tileart="1"] .tile.harvest:not(.dead) > span,
+html[data-fruit="1"] .tile.harvest:not(.dead) > span,
+.tile.harvest:not(.dead) > span { color: var(--prim-ink); text-shadow: none; }
+
 
 
 
@@ -16598,6 +16671,10 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
     <div class="result-card">
     <div id="adv-stars" class="adv-stars" aria-hidden="true"></div>
     <p class="big-score"><b id="adv-score">0</b></p>
+    <!-- 수확 피날레(DESIGN §25.7). 큰 숫자는 수확이 끝난 뒤의 점수이고 이 줄은
+         그중 수확분이 얼마인지를 말한다. 값이 0 이면 paintHarvestRow 가 닫으므로
+         수확이 없는 판(진 판·남은 칸 0)의 시트는 픽셀 하나 안 바뀐다. -->
+    <p id="adv-bonus" class="sub-score" hidden></p>
     <p id="adv-note" class="sub-score"></p>
     <p id="adv-hearts" class="adv-hearts"></p>
     </div>
@@ -16658,6 +16735,9 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
   <div id="modal-arc" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="arc-title"><div class="sheet jbox jbox--modal" data-part="modal-plate">
     <h2 id="arc-title">Arcade</h2>
     <p class="big-score"><b id="arc-value">0</b></p>
+    <!-- 수확 피날레(DESIGN §25.7). 아케이드의 큰 숫자는 종전대로 **기록**(시간·
+         피해)이라 보너스를 합칠 자리가 아니다 — 그래서 별도 행이다. -->
+    <p id="arc-bonus" class="sub-score" hidden></p>
     <p id="arc-dir" class="sub-score"></p>
     <p id="arc-note" class="sub-score"></p>
     <p id="arc-kos" class="sub-score"></p>
@@ -25667,6 +25747,7 @@ window.TT_SFX = {
       'clear.matches': 'Matches',
       'clear.combo': 'Best combo',
       'clear.adds': 'Adds left × 30',
+      'harvest.bonus': 'Harvest bonus +{n}',
       'clear.total': 'Total',
       'clear.next': 'Next stage',
       'aria.next': 'Go to next stage',
@@ -26968,6 +27049,7 @@ window.TT_SFX = {
       'clear.matches': '지운 짝',
       'clear.combo': '최고 콤보',
       'clear.adds': '남은 추가 × 30',
+      'harvest.bonus': '수확 보너스 +{n}',
       'clear.total': '합계',
       'clear.next': '다음 단계',
       'aria.next': '다음 단계로',
@@ -34076,6 +34158,11 @@ window.TT_SFX = {
     S.gainPet = 0;
     S.gainStar = 0;
     S.gainGem = 0;
+    /* 수확 피날레(DESIGN §25)도 같은 이유로 판 단위다: 보너스 사본을 안 지우면
+       다음 판의 결과 시트가 지난 판의 수확을 다시 말하고, 진행 중이던 rAF 루프가
+       새 판의 타일에 .harvest 를 계속 붙인다. */
+    hvReset();
+    S.harvest = 0;
     S.gainJstar = 0;
     /* WD-2 — 새 사본 넷도 판 단위다(위 주석의 이유 그대로). */
     S.gainShard = { power: 0, steady: 0, agility: 0, luck: 0 };
@@ -34626,10 +34713,16 @@ window.TT_SFX = {
       J.vibrate(60);
       mascotSad();
     }
-    paintArcSheet(mode, why, value, res);
-    /* onGameOver 와 같은 리듬(520ms). 연출이 끝나기 전에 시트를 올리면 격파
-       이펙트가 시트 뒤에서 혼자 돌다 끝난다. */
-    later(function () { openModal('modal-arc'); }, 520);
+    /* 수확 피날레(DESIGN §25) — **격파한 판에서만**. KO·시간초과는 진
+       판이라 축포를 달지 않는다(§25.2 표). 진 판은 꼬리를 곧장 부른다. */
+    var arcTail = function () {
+      paintArcSheet(mode, why, value, res);
+      /* onGameOver 와 같은 리듬(520ms). 연출이 끝나기 전에 시트를 올리면 격파
+         이펙트가 시트 뒤에서 혼자 돌다 끝난다. */
+      later(function () { openModal('modal-arc'); }, 520);
+    };
+    if (why === 'clear') { harvestFinale(arcTail); return; }
+    arcTail();
   }
 
   /**
@@ -34717,6 +34810,7 @@ window.TT_SFX = {
     /* E34-0903 — 한 자리가 종목 셋으로 갈린다. 상태 표시 한 줄. */
     var am = $('modal-arc'); if (am) { am.classList.toggle('is-arctime', mode === 'arc-time'); am.classList.toggle('is-arcsurv', mode === 'arc-surv'); am.classList.toggle('is-arcdmg', mode === 'arc-dmg'); }
     setText('arc-value', arcValueText(mode, value));
+    paintHarvestRow('arc-bonus');   /* 수확 피날레 DESIGN §25.7 */
     setText('arc-dir', arcDirText(mode));
     /* 왜 끝났는가. 타임어택에서만 승패가 갈리므로(격파=성공) 그 한 줄이 필요하고,
        무한 두 종목에서는 시간 종료가 정상 종료라 담담하게 적는다. */
@@ -36656,6 +36750,224 @@ window.TT_SFX = {
    * SECTION 12 — STAGE CLEAR / GAME OVER / DAILY RESULT
    * ========================================================================= */
 
+  /* =========================================================================
+   * SECTION 12H — 수확 피날레 (DESIGN §25 · 판정판 51 · AUDIT ★12)
+   *
+   * 결손 진단은 한 줄이었다: **"잘 끝냈다"는 종료 페이오프가 없다**(공백6).
+   * 그래서 결과 시트가 뜨기 **전에** 1.2~1.8초를 끼운다 — 판에 남아 있던 타일이
+   * 좌→우·위→아래 물결로 황금 열매가 되며 순서대로 터지고, 터질 때마다 보너스가
+   * 붙는다. 탭하면 즉시 끝 상태로 점프한다.
+   *
+   * ⚠ 대상은 **모험 승리**와 **아케이드 타임어택 격파** 둘뿐이다(§25.2 표).
+   *   엔들리스·데일리·러시는 실측상 도달 순간 남은 타일이 **0개**다
+   *   (onStageClear 은 afterMove 의 `alive === 0` 에서만 불린다) — 수확할 것이
+   *   원리적으로 없어 대상이 아니다. 이 경계를 넓히지 않는다.
+   *
+   * ⚠ 밸런스 무접촉. 별 판정(advStarsFor)은 수확 **전** 점수로 이미 끝나 있고,
+   *   수확은 그 뒤에 S.score 를 올린다(§25.3). 별 임계·par·하트 한 톨도 안 움직인다.
+   * ========================================================================= */
+
+  /** 엔들리스 클리어의 「남은 추가 × 30」. 종전 리터럴 30 을 이름으로 꺼냈을 뿐 값 무변
+   *  (i18n `clear.adds` 문구와 1:1 이므로 이 값을 고치면 문구도 같이 고쳐야 한다). */
+  var CLEAR_ADD_BONUS = 30;
+  /** 남은 타일 1개당 수확 보너스. **파생이다** — 새 계수를 발명하면 "한 칸이 몇 점
+   *  인가"가 표 두 곳으로 갈린다(§25.3). 곡선을 고칠 일이 생기면 위 한 곳만 고친다. */
+  var HARVEST_PER_TILE = CLEAR_ADD_BONUS;
+
+  var HV_LEAD_MS  = 140;    // 승리 효과음 뒤 첫 열매가 금이 되기까지
+  var HV_SPAN_MS  = 1400;   // 물결이 판 전체를 훑는 시간 (지시 범위 1.2~1.8초의 중앙)
+  var HV_STEP_MIN = 16;     // 칸 간격 하한 — 한 프레임보다 촘촘하면 물결이 아니라 동시 폭발
+  var HV_STEP_MAX = 90;     // 칸 간격 상한 — 남은 칸이 적을 때 피날레가 늘어지지 않게
+  var HV_HOLD_MS  = 180;    // 금으로 바뀐 뒤 터지기까지 (두 사건이 갈려 읽히는 최소 간격)
+  var HV_TAIL_MS  = 220;    // 마지막 팝 뒤 결과 시트까지 (파티클 착지 여유)
+  var HV_SWEEP_N  = 10;     /* 뒷정리를 한 프레임에 몇 칸씩 훑나. 63칸을 한 번에
+                               걷으면 그 프레임 하나가 50ms 를 넘는다(실측). */
+  var HV_SFX_MS   = 340;    /* 효과음 최소 간격 = 물결의 **강조 리듬**. 오디오 gate()
+                               디바운스(70ms)보다 훨씬 성근 이유는 실측이다 — 촘촘히
+                               부르면 4x CPU 에서 프레임을 먹는다(DIAG-PAIRED.json). */
+
+  var hvGen = 0;            // 세대 — 새 판·새 피날레가 옛 rAF 루프를 무효로 만든다
+  var hvRaf = 0;
+  var hvOff = null;         // 탭-스킵 리스너 해제자 (없으면 null)
+
+  /** 이 판이 거둔 수확 보너스 총액. 결과 시트 두 곳이 이것만 읽는다. */
+  function harvestGain() { return S.harvest | 0; }
+
+  /** 진행 중인 피날레를 흔적 없이 걷는다. 새 판(startStage)·새 피날레가 부른다. */
+  function hvReset() {
+    hvGen++;
+    if (hvRaf) { try { cancelAnimationFrame(hvRaf); } catch (e) {} hvRaf = 0; }
+    if (hvOff) { try { hvOff(); } catch (e) {} hvOff = null; }
+  }
+
+  /** 결과 시트의 「보너스」 행 하나. 0 이면 열지 않는다 — 0 을 축하하지 않는다. */
+  function paintHarvestRow(id) {
+    var el = $(id);
+    if (!el) return;
+    var n = harvestGain();
+    if (n > 0) { el.textContent = t('harvest.bonus', { n: n }); el.hidden = false; }
+    else { el.textContent = ''; el.hidden = true; }
+  }
+
+  /**
+   * 피날레 본체. 끝나면 done() 을 부른다 — 부르는 쪽은 결과 시트를 여는 꼬리를
+   * 통째로 넘긴다(advFinish / arcFinish).
+   *
+   * 프레임 예산 규약(game-motion §6 · DESIGN §25.6):
+   *   ① 좌표는 **시작할 때 한 번만** 전부 읽는다. 이후 한 프레임도 DOM 을 읽지
+   *      않는다 — 연쇄 구간 강제 리플로우 337회의 원인이 정확히 읽기-쓰기 교차였다.
+   *   ② 타이머는 칸당 setTimeout 이 아니라 **rAF 루프 하나**다. 경과시간으로
+   *      "지금까지 금이 됐어야 할 개수 / 터졌어야 할 개수"를 구해 델타만 쓴다.
+   *      (LoAF 긴 프레임 13건 중 9건이 setTimeout invoker 였다)
+   *   ③ void offsetWidth 신규 사용 0. 클래스를 붙일 뿐 재시작 핵을 쓰지 않는다.
+   *   ④ 파티클·효과음은 기존 J.burst / J.sfx.gold 를 HV_SFX_MS 리듬으로 솎아 쓴다.
+   *      (14차 파일 클립 이름이 말 그대로 'golden-fruit' 다 — 새 소리 0)
+   */
+  function harvestFinale(done) {
+    hvReset();
+    S.harvest = 0;
+
+    var i, live = [];
+    /* 인덱스 오름차순 = 행 우선 = **좌→우·위→아래**. 물결의 방향이 곧 배열 순서라
+       정렬이 필요 없다(S.cells 가 COLS 폭의 행 우선 배열이다). */
+    for (i = 0; i < S.cells.length; i++) {
+      var c0 = S.cells[i];
+      if (c0 && !c0.dead) live.push(i);
+    }
+    var n = live.length;
+    if (!n) { if (done) done(); return; }
+    var total = n * HARVEST_PER_TILE;
+
+    /* --- reduced-motion: 정적 합산만 (game-motion §7 · §25.5 16행) -----------
+       끄는 것이 아니다. 얻은 점수는 그대로 얻고 **움직임만** 없다. */
+    if (rwReduced()) {
+      for (i = 0; i < n; i++) {
+        var rc = S.cells[live[i]];
+        if (rc) { rc.dead = true; rc.sp = ''; rc.ice = 0; rc.blk = 0; }
+        var re = tileEls[live[i]];
+        if (re && re.classList) re.classList.add('dead');
+      }
+      S.score += total;
+      S.harvest = total;
+      syncHud();
+      if (done) done();
+      return;
+    }
+
+    /* --- ① batch read — 여기가 이 함수의 유일한 DOM 읽기다 ------------------- */
+    var pts = [];
+    for (i = 0; i < n; i++) pts.push(tileCenter(live[i]));
+
+    /* 점수 글자를 쓸 자리 둘. 여기서 한 번 잡아 두고 루프에서는 textContent 만
+       쓴다(요소 조회도 읽기이므로 루프 밖으로 뺀다). syncHud 가 쓰는 그 두 칸이다. */
+    var scoreEls = [$('score-val'), $('ch-r-v')];
+    function hvPaintScore() {
+      var s = String(S.score | 0);
+      for (var q = 0; q < scoreEls.length; q++) {
+        if (scoreEls[q]) scoreEls[q].textContent = s;
+      }
+    }
+
+    var step  = clamp(HV_SPAN_MS / Math.max(1, n - 1), HV_STEP_MIN, HV_STEP_MAX);
+    var gen   = hvGen;
+    var t0    = now();
+    var goldN = 0, popN = 0, sfxAt = 0;
+
+    function goldAt(k) {
+      var el = tileEls[live[k]];
+      if (el && el.classList) el.classList.add('harvest');
+    }
+
+    function popAt(k) {
+      var idx = live[k], el = tileEls[idx], cc = S.cells[idx];
+      var v = cc ? cc.v : 1;
+      if (cc) { cc.dead = true; cc.sp = ''; cc.ice = 0; cc.blk = 0; }
+      if (el && el.classList) el.classList.add('pop');
+      S.score += HARVEST_PER_TILE;
+      S.harvest = (S.harvest | 0) + HARVEST_PER_TILE;
+      var ms = now();
+      /* 청각 사다리가 물결의 진행을 말한다 — 강조 리듬으로 성글게. */
+      if (ms - sfxAt >= HV_SFX_MS) { sfxAt = ms; J.sfx.gold(); }
+      /* 파티클은 **마지막 한 알에만**. 호출마다 J.burst 안의 pulseForCombo 가
+         `void el.offsetWidth`(#app 전체 강제 리플로우)를 밟는데, 짝지은 반복 측정에서
+         그 8회 호출이 4x CPU 드랍 10건 **전부**였다(DIAG-PAIRED.json — 클래스·점수
+         글자는 각각 0건으로 무죄가 나왔다). 그 핵 자체는 game-motion §6.2 가 이미
+         등재한 선행 결함이고 매치 연쇄 전량이 쓰는 공유 소비처라 이 파도가 고칠
+         자리가 아니다 — 피날레가 덜 밟는 쪽을 고른다.
+         승리 순간의 대형 파티클은 advFinish/arcFinish 가 이미 부르는 J.confetti 가
+         **피날레 앞에서** 맡는다. 새 연출을 만든 것이 아니라 자리를 나눈 것이다. */
+      if (k === n - 1) J.burst(pts[k].x, pts[k].y, '#ffd76a', 14, fruitOf(v));
+    }
+
+    function finish() {
+      if (gen !== hvGen) return;
+      hvReset();
+      /* 정리를 **꼬리 뒤로 미룬다.** 마지막 몇 칸의 .pop 은 아직 도는 중이라(260ms),
+         여기서 곧장 클래스를 걷으면 물결의 끝자락이 잘려 나간다 — 게다가 63칸치
+         클래스 조작을 마지막 프레임 하나에 몰면 그 프레임이 그대로 튄다.
+         HV_TAIL_MS 는 원래 "마지막 파티클이 착지할 여유"였고, 그 여유가 곧 팝이
+         끝나는 시간이기도 하다. 끝 상태는 .dead 하나다(남는 그림은 취소선뿐). */
+      later(function () {
+        /* 63칸치 클래스 조작을 한 프레임에 몰면 그 프레임 하나가 50ms 를 넘는다
+           (실측: 그 한 건이 game-perf F3 의 유일한 위반이었다). HV_TAIL_MS 안에서
+           프레임당 HV_SWEEP_N 칸씩 훑어 같은 일을 여러 프레임에 나눈다 — 총량은
+           같고, 한 프레임에 실리는 몫만 줄어든다. 화면상 이 칸들은 이미 .pop 끝
+           상태(scale .52 · opacity .16)라 정리 순서가 눈에 보이지 않는다. */
+        var k = 0;
+        (function sweep() {
+          var end = Math.min(n, k + HV_SWEEP_N);
+          for (; k < end; k++) {
+            var e = tileEls[live[k]];
+            if (e && e.classList) {
+              e.classList.remove('harvest');
+              e.classList.remove('pop');
+              e.classList.add('dead');
+            }
+          }
+          if (k < n) { requestAnimationFrame(sweep); return; }
+          syncHud();
+          if (done) done();
+        })();
+      }, HV_TAIL_MS);
+    }
+
+    /** 탭 스킵 — 끝 상태로 점프한다. 남은 칸 전부 수확 + 남은 점수 전액 가산. */
+    function skip() {
+      if (gen !== hvGen) return;
+      while (goldN < n) { goldAt(goldN); goldN++; }
+      while (popN  < n) { popAt(popN);  popN++;  }
+      finish();
+    }
+
+    hvRaf = requestAnimationFrame(function frame() {
+      if (gen !== hvGen) return;
+      var ms = now() - t0;
+      var wantGold = clamp(Math.floor((ms - HV_LEAD_MS) / step) + 1, 0, n);
+      var wantPop  = clamp(Math.floor((ms - HV_LEAD_MS - HV_HOLD_MS) / step) + 1, 0, n);
+      var before = popN;
+      while (goldN < wantGold) { goldAt(goldN); goldN++; }
+      while (popN  < wantPop)  { popAt(popN);  popN++;  }
+      if (popN >= n) { finish(); return; }
+      /* 카운트업은 여기다. **syncHud() 를 부르지 않는다** — 그 함수는 게이지 트랙을
+         맞추며 레이아웃을 읽고, rAF 안에서 읽으면 그것이 곧 강제 리플로우다
+         (LoAF 실측: FrameRequestCallback forced 12~18ms · game-motion §6).
+         읽기 0 · 글자 두 자리만 쓴다. 나머지 HUD 는 finish() 가 루프 **밖에서**
+         한 번에 맞춘다. */
+      if (popN !== before) hvPaintScore();
+      hvRaf = requestAnimationFrame(frame);
+    });
+
+    /* 스킵 리스너. capture 로 잡아 판 위의 다른 핸들러보다 먼저 먹는다. 판은 이미
+       S.busy = true 라 탭이 매치를 만들 수는 없지만, 「탭하면 즉시」가 조건이므로
+       순서를 운에 맡기지 않는다. 해제자는 hvReset 이 쥔다(rwOff 와 같은 문법). */
+    if (typeof document !== 'undefined') {
+      var onTap = function () { skip(); };
+      document.addEventListener('pointerdown', onTap, true);
+      hvOff = function () { document.removeEventListener('pointerdown', onTap, true); };
+    }
+  }
+
+
   /** `key` is an I18N key: it is stamped on the label so applyI18n() re-translates. */
   function rollupRow(list, key, value) {
     if (!list) return null;
@@ -37062,7 +37374,7 @@ window.TT_SFX = {
     stopComboLoop();
     endFever(true);
     clearSelection();
-    var bonus = S.adds * 30;
+    var bonus = S.adds * CLEAR_ADD_BONUS;
     S.score += bonus;
 
     /* Still a high-water mark taken MID-RUN, and deliberately not a submit: a
@@ -42755,42 +43067,59 @@ window.TT_SFX = {
     /* W-C §10 — 시트가 읽을 사본 한 줄. 지갑은 위에서 이미 늘었고(store.jstar),
        여기서 하는 일은 "이번 판이 새로 딴 몫"을 결과창까지 들고 가는 것뿐이다. */
     S.gainGem = gemGain | 0;
-    paintAdvSheet(win, stars, why, p);
-    /* 해금 연출이 결과 시트보다 **먼저** 온다. 순서가 반대면 "격파했다 → 점수는
-       이만큼 → 아 그리고 공주도 풀려났다"가 되어, 챕터 하나를 통째로 건 사건이
-       정산표의 각주로 읽힌다. 시트는 해금 화면의 확인 버튼이 연다. */
-    /* E3 W5 — 해방 컷툰이 해금 연출 **앞**에 붙는다. 순서가 이 한 줄의 전부다:
-       컷툰이 "무슨 일이 있었나"를 말하고, 그 다음에 runUnlock 이 "그래서 무엇이
-       열렸나"를 말한다. 반대로 두면 결과를 먼저 보고 이유를 나중에 보게 된다.
 
-       ⚠ 완료 콜백이 **필수**다. playCuts 의 세 번째 인자를 비우면 cutFinish 가
-       screen-menu 로 튀어(그것이 갤러리 재생의 기본 동작이다) 해금도 결과 시트도
-       영영 안 열린다. 콜백이 하는 일은 둘: ① 컷 뷰어가 가져간 화면을 판으로
-       되돌리고 ② 종전의 runUnlock → (확인) → modal-adv 사슬을 **그대로** 잇는다.
-       runUnlock 을 대체하지 않고 이어 붙인 것이 요점이다 — 그 함수가 잠금 해제
-       (syncCharPick)와 결과 시트 진입의 유일한 소유자이기 때문이다. */
-    if (freed) {
-      later(function () {
-        playCuts(CUTS_FREE, 'free', function () {
-          showScreen('screen-game');
-          runUnlock();
-        });
-      }, 900);
-      return;
-    }
-    /* 0901 ⑥-b §1 — 엔딩 컷(c10b). 위 freed 블록과 **같은 문법**이다: 컷이
-       "무슨 일이 있었나"를 말한 뒤에 결과 시트가 "그래서 무엇을 얻었나"를
-       말한다. 100탄을 이긴 그 한 번뿐이고, 본 표시는 seenCuts['end'] 다. */
-    if (win && p && p.n === ADV_CHAPTER * MAP_CHAPTERS.length && !cutSeen('end')) {
-      later(function () {
-        playCuts(CUTS_END, 'end', function () {
-          showScreen('screen-game');
-          openAdvSheet();
-        });
-      }, 900);
-      return;
-    }
-    later(function () { openAdvSheet(); }, win ? 420 : 520);
+    /* ── 수확 피날레(DESIGN §25) ─────────────────────────────────────
+       결과 시트가 뜨기 **전에** 남은 타일을 거둔다. 이긴 판에서만, 그리고 별
+       판정(advStarsFor)이 이미 끝난 뒤에만 들어간다 — 그래야 별 임계가 한 톨도
+       안 움직인다(§25.3). 진 판은 꼬리를 곧장 부르므로 종전과 한 프레임도
+       다르지 않다. 꼬리를 통째로 넘긴 것이 요점이다: 해금 컷툰·엔딩 컷까지
+       포함해 시트로 가는 세 갈래가 전부 피날레 뒤에 서게 된다. */
+    var advTail = function () {
+      /* 판별 최고점은 위에서 수확 전 점수로 한 번 집었다. 화면에 뜨는 숫자와
+         저장된 숫자가 갈라지면 안 되므로 수확분까지 담아 한 번 더 본다(§25.3). */
+      if (harvestGain() > 0 && (S.score | 0) > (store.advBest[key] | 0)) {
+        store.advBest[key] = S.score | 0;
+        persist();
+      }
+      paintAdvSheet(win, stars, why, p);
+      /* 해금 연출이 결과 시트보다 **먼저** 온다. 순서가 반대면 "격파했다 → 점수는
+         이만큼 → 아 그리고 공주도 풀려났다"가 되어, 챕터 하나를 통째로 건 사건이
+         정산표의 각주로 읽힌다. 시트는 해금 화면의 확인 버튼이 연다. */
+      /* E3 W5 — 해방 컷툰이 해금 연출 **앞**에 붙는다. 순서가 이 한 줄의 전부다:
+         컷툰이 "무슨 일이 있었나"를 말하고, 그 다음에 runUnlock 이 "그래서 무엇이
+         열렸나"를 말한다. 반대로 두면 결과를 먼저 보고 이유를 나중에 보게 된다.
+
+         ⚠ 완료 콜백이 **필수**다. playCuts 의 세 번째 인자를 비우면 cutFinish 가
+         screen-menu 로 튀어(그것이 갤러리 재생의 기본 동작이다) 해금도 결과 시트도
+         영영 안 열린다. 콜백이 하는 일은 둘: ① 컷 뷰어가 가져간 화면을 판으로
+         되돌리고 ② 종전의 runUnlock → (확인) → modal-adv 사슬을 **그대로** 잇는다.
+         runUnlock 을 대체하지 않고 이어 붙인 것이 요점이다 — 그 함수가 잠금 해제
+         (syncCharPick)와 결과 시트 진입의 유일한 소유자이기 때문이다. */
+      if (freed) {
+        later(function () {
+          playCuts(CUTS_FREE, 'free', function () {
+            showScreen('screen-game');
+            runUnlock();
+          });
+        }, 900);
+        return;
+      }
+      /* 0901 ⑥-b §1 — 엔딩 컷(c10b). 위 freed 블록과 **같은 문법**이다: 컷이
+         "무슨 일이 있었나"를 말한 뒤에 결과 시트가 "그래서 무엇을 얻었나"를
+         말한다. 100탄을 이긴 그 한 번뿐이고, 본 표시는 seenCuts['end'] 다. */
+      if (win && p && p.n === ADV_CHAPTER * MAP_CHAPTERS.length && !cutSeen('end')) {
+        later(function () {
+          playCuts(CUTS_END, 'end', function () {
+            showScreen('screen-game');
+            openAdvSheet();
+          });
+        }, 900);
+        return;
+      }
+      later(function () { openAdvSheet(); }, win ? 420 : 520);
+    };
+    if (win) { harvestFinale(advTail); return; }
+    advTail();
   }
 
   /**
@@ -42914,6 +43243,7 @@ window.TT_SFX = {
     var sv = $('adv-stars');
     if (sv) sv.hidden = !win;
     setText('adv-score', S.score);
+    paintHarvestRow('adv-bonus');   /* 수확 피날레 DESIGN §25.7 */
     setText('adv-note', win
       ? advStarNote(stars, p)          /* 0901 ⑥-e — 남은 조건만 정확히 */
       /* §3 — 'finish' 는 짝이 없어서 진 것이 아니라 **10초를 못 지킨 것**이다.
@@ -47961,6 +48291,14 @@ window.TT_SFX = {
        재현해야 하고 그 사슬이 한 번만 어긋나도 조용히 다른 화면을 찍는다. */
     CUTS_FREE: CUTS_FREE, CUTS_CHAP: CUTS_CHAP, CUTS_END: CUTS_END,
     advFinish: advFinish, runUnlock: runUnlock,
+    /* 수확 피날레(DESIGN §25) — 위 debug handles 와 **같은 규약**이다: 게임 코드는
+       이 셋 중 무엇도 window.Game 을 거쳐 부르지 않는다. 손잡이가 없으면 검증이
+       보스 격파를 실제로 재현해야 하고, 그 사슬이 한 번만 어긋나면 피날레가 아니라
+       엉뚱한 화면을 재게 된다. HV_* 는 스모크가 프레임 간격을 계산하는 데 쓴다. */
+    harvestFinale: harvestFinale, harvestGain: harvestGain,
+    harvestSpec: { perTile: HARVEST_PER_TILE, lead: HV_LEAD_MS, span: HV_SPAN_MS,
+                   stepMin: HV_STEP_MIN, stepMax: HV_STEP_MAX,
+                   hold: HV_HOLD_MS, tail: HV_TAIL_MS },
     mateId: mateId, setMate: setMate, cpTab: cpTab, openCharPanel: openCharPanel,
     duelFoeFull: duelFoeFull, PET_SKILL: PET_SKILL,
     openModeSheet: openModeSheet, openAdventure: openAdventure,
