@@ -5102,6 +5102,65 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   #impact-layer.iw-flash::before { animation: none; }
 }
 
+/* ---- 판정판 47 — 배율 ×N 은 **판 밖의 띠**로 (2026-09-11 사용자 실플레이) -----
+   반려 원문: 「×876 / 28 COMBO 가 판 한가운데를 덮어 플레이 방해」.
+   15차 ① 은 "화면에서 제일 중요한 숫자가 제일 작을 이유가 없다"며 ×N 을 정중앙
+   최대 크기로 올렸는데, 그 판단이 실기기에서 뒤집혔다 — **판 위에 서는 순간
+   그것은 정보가 아니라 가림막**이다. 콤보 28 은 판을 계속 봐야 이어지는데,
+   그 절정에서 판이 가려지면 연출이 자기가 축하하는 플레이를 끊는다.
+
+   그래서 바꾸는 축은 셋뿐이다: **자리 · 크기 · 수명**.
+     ① 자리 — HUD 아래 끝과 판 위 끝 **사이의 띠**. 화면 좌표는 JS(multBandWord)가
+        실측해 `--iw-top` 에 px 로 넣는다. %(고정 비율)로는 국면마다 다른
+        HUD 높이(전투 #duel-hud 127 · 비전투 #topbar+#tb-stats · 클래식)를
+        따라갈 수 없고, 따라가지 못하면 어느 국면에서는 다시 판 위에 선다
+        — hudFloorY() 가 이미 같은 이유로 함수인 자리다.
+     ② 크기 — 종전 상한 128px 의 **40% 이하**(multBandWord 의 MULT_BAND_K),
+        그리고 띠의 세로 여유를 넘지 않게 한 번 더 깎는다. 부제(28 COMBO)는
+        아래가 아니라 **옆**에 선다 — 세로로 쌓으면 띠 높이가 두 배가 되고,
+        띠가 두꺼워지는 순간 다시 판을 침범한다.
+     ③ 수명 — 나타남 --mo-mult-in · 유지 --mo-mult-hold · 사라짐 --mo-mult-out
+        (합 --mo-mult-life). 연속 갱신은 **누적이 아니라 재트리거**다: 자리는
+        예약 슬롯 0 하나뿐이라(impactWord opts.slot) 새 값이 앞 값을 덮어쓴다.
+   ⚠ 판 위엔 아무것도 남기지 않는다 — 이 규칙 묶음이 손대는 것은 배율 오버레이
+     하나뿐이고, 각성 폭발·피니시(iw-slam)는 한 줄도 안 바뀐다.
+   ⚠ transform/opacity 만 애니메이트한다. 아래 정적 선언(줄 방향·글자 크기·
+     외곽선)은 움직이지 않는다. */
+.iw.iw-band {
+  flex-direction: row;
+  align-items: baseline;
+  gap: calc(var(--iw-size, 28px) * .22);
+}
+.iw.iw-band .iw-main { font-size: var(--iw-size, 28px); }
+/* 부제는 본문에서 파생한다 — 두 값을 따로 두면 띠 높이가 둘 중 큰 쪽을 따라간다. */
+.iw.iw-band .iw-sub { font-size: calc(var(--iw-size, 28px) * .44); }
+/* 128px 글자용 6px 스트로크는 30px 글자에서 글씨를 메운다. 띠는 글자에 비례한다. */
+.iw.iw-band.iw-plate .iw-main {
+  -webkit-text-stroke: calc(var(--iw-size, 28px) * .105) rgba(18, 10, 26, .96);
+  text-shadow:
+    0 2px 0 rgba(18, 10, 26, .55),
+    0 0 10px rgba(18, 10, 26, .92),
+    0 0 22px rgba(18, 10, 26, .78);
+}
+.iw.iw-band.iw-plate .iw-sub {
+  -webkit-text-stroke: calc(var(--iw-size, 28px) * .055) rgba(18, 10, 26, .96);
+  text-shadow: 0 1px 0 rgba(18, 10, 26, .6), 0 0 8px rgba(18, 10, 26, .85);
+}
+/* 띠는 자기 키프레임을 쓴다 — iw-pop 은 .34 에서 1.26 까지 튀는데, 그 튐 폭은
+   정중앙 큰 글자의 것이고 좁은 띠에서는 위아래로 넘쳐 판을 스친다. */
+.iw.iw-band.iw-show {
+  animation-name: iw-band-pop;
+  animation-duration: var(--mo-mult-life);
+}
+@keyframes iw-band-pop {
+  /* 0 → 15% = --mo-mult-in · 15 → 75% = --mo-mult-hold · 75 → 100% = --mo-mult-out */
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(.72); }
+  15%  { opacity: 1; transform: translate(-50%, -50%) scale(1.06); }
+  24%  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  75%  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.04); }
+}
+
 /* ---- 라이트 테마: 글자 대비 재조정 (원색 그대로는 4.5:1 을 못 넘는다) ------- */
 :where(:root[data-theme="light"]) .char-card { border-color: rgba(34, 27, 46, .12); background: rgba(34, 27, 46, .04); }
 :where(:root[data-theme="light"]) .char-card.ch-ten     { --ch-name: var(--role-ch-ten-name-light); }
@@ -13577,6 +13636,24 @@ html[data-platform="twa"] #app-intro.is-hold .api-char{
   --role-f2-pill-classic-hud: #F8E3EF;
   --role-f2-pill-line-classic-hud: #A38FA5;
   --role-f2-slot-classic-hud: #CFC0DC;
+
+  /* [MO-0911 판정판 47·48] 모션 지속시간 토큰 — DESIGN §22.
+     game-motion 규약: 지속시간을 규칙 안에 리터럴로 박지 않는다. 이 절이 만든
+     세 연출(배율 띠 · 만땅 발광 펄스 · 만땅 유도 1회)의 시간은 **여기가 유일한
+     출처**이고, CSS 도 JS 도(multLifeMs) 이 이름을 읽는다.
+       --mo-mult-*  배율 띠 한 장의 수명: 나타남 0.15 + 유지 0.6 + 사라짐 0.25
+                    = --mo-mult-life 1s. 키프레임의 15%/75% 는 그 비율이다.
+       --mo-full-pulse  만땅 발광 펄스 주기(각성·필살기 공통 리듬).
+                        종전 1.15s 에서 1.2s 로 — 사용자 피드백 2026-09-11.
+       --mo-full-cue    만땅 유도(화살) 1회의 수명.
+     --mo-full-k 는 시간이 아니라 **발광 강도 계수**다(1 = 종전, 2 = 만땅). */
+  --mo-mult-in: 150ms;
+  --mo-mult-hold: 600ms;
+  --mo-mult-out: 250ms;
+  --mo-mult-life: 1000ms;
+  --mo-full-pulse: 1200ms;
+  --mo-full-cue: 1000ms;
+  --mo-full-k: 1;
 }
 </style>
 <!-- 최우선 2장만 preload — 젤리판(세 인터페이스 공용)과 플레이 팝업 레터링이다.
@@ -24192,6 +24269,13 @@ window.TT_SFX = {
        {ten, ult, awaken, od, finish}. **마이그레이션 = 없으면 빈 객체**이고,
        그 규약은 위 seenCuts 와 한 글자도 다르지 않다. */
     seenHowto: {},
+    /* 판정판 48 — 「첫 만땅」 안내 1회성 플래그. {awaken, ult}.
+       seenHowto 와 **칸을 나눈** 이유는 성격이 다르기 때문이다: seenHowto 는
+       "규칙을 처음 만나는 순간"의 개념 설명(FTUE 다섯 장)이고, 이쪽은 "지금 이
+       버튼을 눌러도 된다"는 조작 힌트다. 한 칸에 섞으면 FTUE 를 다시 보기로
+       열어 줄 때(게임 방법 시트) 조작 힌트까지 딸려 나온다.
+       마이그레이션 규약은 위 둘과 한 글자도 다르지 않다 — 없으면 빈 객체. */
+    tipsSeen: {},
     /* --- 아케이드 대전 개인 기록판 -----------------------------------------
      * { 'arc-time': {mode,value,lowerIsBetter,date,ts,char,pet}, … } 모양의
      * **모드당 한 칸**이다. store.ranks(RANK_MODES 6종)를 건드리지 않은 이유는
@@ -24493,6 +24577,14 @@ window.TT_SFX = {
           for (var ck in o.seenCuts) {
             if (!Object.prototype.hasOwnProperty.call(o.seenCuts, ck)) continue;
             if (typeof ck === 'string' && ck.length <= 16 && o.seenCuts[ck]) store.seenCuts[ck] = 1;
+          }
+        }
+        /* 판정판 48 — 첫 만땅 안내 기록. 위 둘과 **같은 규율**이다(켜짐/꺼짐뿐인
+           짧은 문자열 키만 살린다 · 없으면 기본값 {} 이 곧 마이그레이션이다). */
+        if (o.tipsSeen && typeof o.tipsSeen === 'object') {
+          for (var tk in o.tipsSeen) {
+            if (!Object.prototype.hasOwnProperty.call(o.tipsSeen, tk)) continue;
+            if (typeof tk === 'string' && tk.length <= 16 && o.tipsSeen[tk]) store.tipsSeen[tk] = 1;
           }
         }
         /* WD-1 §12 — 스탯 강화 레벨. 통과 조건이 좁은 것은 이 값이 곧바로
@@ -25897,6 +25989,10 @@ window.TT_SFX = {
       'howto.awaken': 'Awaken fills faster with bigger combos. When it bursts: for {sec} seconds, <b>every match counts as a TenTwin combo.</b>',
       'howto.overdrive': 'Chain your attacks and hit <b>OVERDRIVE</b>! It lasts as long as you do \u2014 keep matching, keep firing.',
       'howto.finish': 'When the boss falls: <b>10-second Finish</b>. Clear the final mission on screen \u2014 that\'s the real win.',
+      /* \ud310\uc815\ud310 48 \u2014 \uccab \ub9cc\ub545 1\ud68c \uc548\ub0b4. \uc704 howto.* \uac00 \u00ab\uaddc\uce59\u00bb\uc774\ub77c\uba74 \uc774 \ub458\uc740
+         \u00ab\uc9c0\uae08 \ub20c\ub7ec\ub3c4 \ub41c\ub2e4\u00bb\ub294 \uc870\uc791 \ud78c\ud2b8\ub2e4(store.tipsSeen). \ud55c \uc904\ub85c \ub05d\ub09c\ub2e4. */
+      'tip.awakenReady': 'Awaken ready! Tap it.',
+      'tip.ultReady': 'Special ready! Tap it.',
       /* 0901 ⑥-d — I16 이 한 대를 막았을 때 뜨는 한 낱말. */
       'item.guard.block': 'Blocked!',
       'fx.overdrive': 'OVERDRIVE!!',
@@ -27062,6 +27158,9 @@ window.TT_SFX = {
       'howto.awaken': '각성 게이지는 콤보가 클수록 빨리 차요. 터지면 {sec}초간, <b>모든 매치가 텐트윈 콤보</b>가 돼요.',
       'howto.overdrive': '공격이 꼬리를 물면 <b>폭주</b>! 멈추지 않는 한 계속돼요 \u2014 계속 맞추면, 계속 쏴요.',
       'howto.finish': '보스가 쓰러지면 <b>피니시 10초</b>. 화면에 뜬 마지막 미션을 해내야 진짜 승리예요.',
+      /* 판정판 48 — 첫 만땅 1회 안내(사용자 지시 문구 그대로 + 행동 한 마디). */
+      'tip.awakenReady': '각성 준비! 눌러 보세요.',
+      'tip.ultReady': '필살기 준비! 눌러 보세요.',
       /* 0901 ⑥-d — I16 이 한 대를 막았을 때 뜨는 한 낱말. */
       'item.guard.block': '막았다!',
       'fx.overdrive': '폭주!!',
@@ -28371,6 +28470,64 @@ window.TT_SFX = {
     persist();
     toast(htmlPlain(t(key)));
     return true;
+  }
+
+  /* ---- 판정판 48 — 조작 힌트 1회 (2026-09-11 사용자 실플레이) ---------------
+   * howtoOnce 와 **배선이 같고 칸만 다르다**(store.tipsSeen). 규칙 설명이 아니라
+   * "지금 이 버튼을 눌러도 된다"는 조작 힌트라서, 다시 보기(게임 방법 시트)에
+   * 섞이면 안 된다 — store.tipsSeen 주석에 근거를 적어 뒀다.
+   * 반환값이 있는 것은 관문(smoke)이 「1회인가」를 사람 눈이 아니라 참/거짓으로
+   * 셀 수 있어야 하기 때문이다. 두 번째 호출은 반드시 false 다.
+   * ------------------------------------------------------------------------ */
+  function tipOnce(flag, key) {
+    if (!store.tipsSeen) store.tipsSeen = {};
+    if (store.tipsSeen[flag]) return false;
+    store.tipsSeen[flag] = 1;
+    persist();
+    toast(htmlPlain(t(key)));
+    return true;
+  }
+
+  /* ---- 판정판 48 — 만땅이 **된 순간**의 유도 1회 -----------------------------
+   * 상시 펄스(.urge)는 상태를 말하고, 이 한 발은 **사건**을 말한다. 무한 반복은
+   * 곧 배경이 되므로, 「방금 찼다」는 그 안에 묻힌다.
+   * ▣ 왜 later() 가 아니라 맨 setTimeout 인가
+   *   later() 로 걸면 clearTimers()(판 이탈·재시작)가 그 타이머를 버리는 순간
+   *   화살이 화면에 얼어붙는다 — impactWord 의 정지 표시 경로가 같은 이유로
+   *   같은 선택을 했다. id 를 노드에 달아 두어 같은 버튼을 다시 쓸 때 앞것이
+   *   반드시 취소된다.
+   * ▣ 되감기 한 줄(void offsetWidth)의 근거는 impactWord 주석과 같다: 사건당
+   *   1회(게이지 한 판)라 프레임 예산에서 무시할 수 있다.
+   * ------------------------------------------------------------------------ */
+  function fullCue(btnId) {
+    /* 동작 줄이기에서도 **끄지 않는다**: 움직임은 CSS 가 멈추고(§접근성 블록)
+       화살은 정지한 채 같은 수명을 산다 — 줄일 것은 움직임이지 정보가 아니다. */
+    var el = $(btnId);
+    if (!el || !el.classList) return false;
+    if (el.cueT) { clearTimeout(el.cueT); el.cueT = 0; }
+    el.classList.remove('fullcue');
+    void el.offsetWidth;
+    el.classList.add('fullcue');
+    el.cueT = setTimeout(function () {
+      el.cueT = 0;
+      el.classList.remove('fullcue');
+    }, Math.round(fullCueMs()));
+    return true;
+  }
+
+  /** 유도 1회의 수명. 유일 출처는 토큰(--mo-full-cue) — multLifeMs 와 같은 규약. */
+  var fullCueCache = 0;
+  function fullCueMs() {
+    if (fullCueCache) return fullCueCache;
+    var v = 0;
+    try {
+      var raw = window.getComputedStyle(document.documentElement)
+                      .getPropertyValue('--mo-full-cue');
+      v = parseFloat(raw);
+      if (isFinite(v) && v > 0 && String(raw).indexOf('ms') < 0) v *= 1000;
+    } catch (e) { v = 0; }
+    fullCueCache = (isFinite(v) && v > 0) ? v : 1000;   /* 토큰을 못 읽을 때의 안전값 */
+    return fullCueCache;
   }
 
   /* ⑫ 토스트의 숨김 타이머는 판(round)의 timers[] 에 넣지 않는다(later() 금지).
@@ -31158,11 +31315,17 @@ window.TT_SFX = {
        쓰지도 않으므로 이 네 줄에는 강제 리플로우가 원리적으로 없다. */
     el.style.setProperty('--iw-key', color || '#FFD34D');
     el.style.setProperty('--iw-size', Math.round(iwFit(main.textContent, size || 56)) + 'px');
-    el.style.setProperty('--iw-top', (o.top || 34) + '%');
+    /* 판정판 47 — 자리를 **px 로도** 받는다. 띠(iw-band)는 화면 비율이 아니라
+       「HUD 아래 끝과 판 위 끝 사이」라는 실측 구간에 서기 때문이다(multBandWord).
+       인자를 안 주면 종전 % 경로 그대로다 — 각성·피니시는 한 줄도 안 바뀐다. */
+    el.style.setProperty('--iw-top', o.topCss || ((o.top || 34) + '%'));
     el.style.setProperty('--iw-dur', Math.round(o.dur || 900) + 'ms');
     el.classList.remove('iw-show');
     el.classList.remove('iw-heavy');
     el.classList.remove('iw-still');
+    /* 띠 변주. 크기·줄 방향·외곽선만 갈리고 노드도 출구도 같은 하나다. */
+    if (o.band) el.classList.add('iw-band');
+    else el.classList.remove('iw-band');
     /* plate 는 애니메이션이 아니라 **잉크**라 동작 줄이기 경로에서도 그대로
        걸린다 — 정지 표시에서도 파티클 위에 서는 것은 마찬가지다. */
     if (o.plate) el.classList.add('iw-plate');
@@ -31229,6 +31392,94 @@ window.TT_SFX = {
   function multSize(m) {
     var v = 62 + (m > 20 ? 20 : m) * 3.4;
     return v > 128 ? 128 : v;
+  }
+
+  /* =========================================================================
+   * 판정판 47 — 배율 ×N 을 **판 밖의 띠**로 (2026-09-11 사용자 실플레이)
+   *
+   * 반려 원문: 「×876 / 28 COMBO 가 판 한가운데를 덮어 플레이 방해」.
+   * 15차 ① 의 판단("제일 중요한 숫자가 제일 작을 이유가 없다")은 정지 화면에서
+   * 옳았고 손이 움직이는 화면에서 틀렸다 — 판 위에 서는 순간 그것은 정보가
+   * 아니라 가림막이다. 그래서 자리·크기·수명 셋만 바꾼다. 값(무엇이 곱해졌나)도
+   * 발동 조건(정수 계단 · MULT_FX_MIN_MS)도 한 글자도 안 바뀐다.
+   *
+   * ▣ 왜 %가 아니라 실측인가
+   *   상단은 국면마다 다른 노드다(전투 #duel-hud 127px · 비전투 #topbar+
+   *   #tb-stats · 클래식 #classic-hud). 비율 하나를 박으면 그 셋 중 둘에서
+   *   틀리고, 틀린 쪽은 **다시 판 위에 선다** — hudFloorY() 가 같은 이유로
+   *   함수인 자리이고, 이 함수는 그 계보를 그대로 잇는다.
+   *
+   * ▣ 강제 리플로우
+   *   rect 읽기는 **여기서 몰아서** 끝난다. 돌려준 값은 impactWord 가 커스텀
+   *   프로퍼티로만 쓰므로 읽기-쓰기 교차가 없다(impactWord 주석의 그 규율).
+   * ========================================================================= */
+  var MULT_BAND_K = 0.4;       /* 종전 크기의 40% 상한 — 사용자 지시 그대로 */
+  var MULT_BAND_FILL = 0.68;   /* 띠 세로 여유 중 글자가 쓰는 비율(나머지는 숨통) */
+  var MULT_BAND_MIN = 14;      /* 이보다 작으면 읽을 수 없다 — 그 아래로는 안 간다 */
+
+  /** 배율 띠 한 장의 수명. **유일 출처는 토큰**(--mo-mult-life)이고 JS 는 읽기만
+   *  한다 — boardMaxPx() 가 --board-max 를 읽는 것과 같은 규약이다. */
+  var multLifeCache = 0;
+  function multLifeMs() {
+    if (multLifeCache) return multLifeCache;
+    var v = 0;
+    try {
+      var raw = window.getComputedStyle(document.documentElement)
+                      .getPropertyValue('--mo-mult-life');
+      v = parseFloat(raw);
+      if (isFinite(v) && v > 0 && String(raw).indexOf('ms') < 0) v *= 1000;
+    } catch (e) { v = 0; }
+    multLifeCache = (isFinite(v) && v > 0) ? v : 1000;   /* 토큰을 못 읽을 때의 안전값 */
+    return multLifeCache;
+  }
+
+  /** HUD 아래 끝 ~ 판 위 끝. 배율 띠가 설 수 있는 **유일한 구간**이다. */
+  function multBandGap() {
+    var vh = (typeof window !== 'undefined' ? (window.innerHeight || 844) : 844);
+    var top = 0, i, el, r;
+    var ids = ['duel-hud', 'classic-hud', 'topbar', 'tb-stats', 'hud-row', 'boss-bar'];
+    for (i = 0; i < ids.length; i++) {
+      el = $(ids[i]);
+      if (!el || el.hidden || !el.getBoundingClientRect) continue;
+      r = el.getBoundingClientRect();
+      if (r.width <= 0 || r.height <= 0) continue;
+      if (r.bottom > top) top = r.bottom;
+    }
+    var bot = 0;
+    el = $('board') || $('board-scroll');
+    if (el && el.getBoundingClientRect) {
+      r = el.getBoundingClientRect();
+      if (r.height > 0) bot = r.top;
+    }
+    /* 판이 아직 없거나(첫 프레임) 상단을 못 읽었으면 화면 위 18% 를 띠로 본다 —
+       그 자리는 어떤 국면에서도 판보다 위다. */
+    if (!(bot > 0) || !(bot > top)) { top = vh * 0.06; bot = vh * 0.18; }
+    return { top: top, bot: bot };
+  }
+
+  /**
+   * 배율 띠 한 장. 배율 오버레이의 **유일한 출구**다(호출부는 resolveMatch 하나).
+   * @param m   실제로 곱해진 정수 계단
+   * @param sub 부제(연쇄 또는 콤보). 띠에서는 아래가 아니라 **옆**에 선다.
+   */
+  function multBandWord(m, sub) {
+    var g = multBandGap();
+    var gap = g.bot - g.top;
+    /* ① 사용자 상한(40%) ② 띠 여유 ③ 읽을 수 있는 하한 — 셋의 순서가 곧 규칙이다. */
+    var size = multSize(m) * MULT_BAND_K;
+    var byGap = gap * MULT_BAND_FILL;
+    if (byGap < size) size = byGap;
+    if (size < MULT_BAND_MIN) size = MULT_BAND_MIN;
+    /* 글자 상자의 반높이 — line-height .94 + 스트로크(글자 크기의 10.5%) + 숨통 2px.
+       이 값이 「판을 안 밟는다」의 산술 근거다: 아래에서 중심 y 를 이만큼 띄운다. */
+    var half = size * 0.47 + size * 0.105 + 2;
+    var y = (g.top + g.bot) / 2;
+    if (y + half > g.bot) y = g.bot - half;      /* 판 위 끝을 넘지 않는다 */
+    if (y - half < 0) y = half;                  /* 화면 위로도 안 나간다 */
+    impactWord('×' + m, multColor(m), size,
+               { topCss: Math.round(y * 10) / 10 + 'px', dur: multLifeMs(),
+                 sub: sub, plate: true, band: true, slot: 0 });
+    return { y: y, size: size, gap: gap };       /* smoke 가 읽는다 */
   }
 
   /* ---- 배율이 떠 있는 동안의 **억제** (삭제가 아니다) ----------------------
@@ -31650,6 +31901,17 @@ window.TT_SFX = {
          "각성"은 하단 메달이 아니라 떠 있는 스킬 링이고, 급이 다르다. */
       if (battleOn() && J.sfx.awakenMax) J.sfx.awakenMax(); else J.sfx.mission();
       J.vibrate(battleOn() ? 40 : 24);
+      /* 🚨 판정판 48 (2026-09-11 사용자 실플레이) — 「각성 게이지 만땅이 안 보임」.
+         소리는 W10 ④ 가 이미 전용음(awakenMax)으로 갈라 뒀고, 이 줄이 더하는
+         것은 **눈** 쪽 둘이다: 사건 한 발(fullCue = 버튼 위 화살 1회)과 첫
+         만땅에서만 뜨는 한 줄 안내. 상시 펄스(.urge)는 syncBattleActs 가 세우던
+         그대로다 — 그쪽이 세기·주기만 바뀌었고(CSS §판정판 48) 배선은 무변이다.
+         하단 4버튼이 없는 비전투(떠 있는 스킬 링)에서는 화살을 안 띄운다 —
+         가리킬 버튼이 그 자리에 없다. */
+      if (battleOn()) {
+        fullCue('btn-shuffle');
+        tipOnce('awakenReady', 'tip.awakenReady');
+      }
     }
     syncSkill();
   }
@@ -34248,9 +34510,15 @@ window.TT_SFX = {
         var mSub = '';
         if (tw && tw.fired > 0) mSub = tw.fired + ' CHAIN';
         else if (S.combo >= 3) mSub = S.combo + ' COMBO';
-        impactWord('\u00D7' + mTier, multColor(mTier), multSize(mTier),
-                   { top: 50, dur: 900, heavy: mTier >= 5, sub: mSub, plate: true, slot: 0 });
-        multFxUntil = now() + 900;
+        /* \uD83D\uDEA8 \uD310\uC815\uD310 47 (2026-09-11) \u2014 \uC790\uB9AC\uAC00 \uC815\uC911\uC559\uC5D0\uC11C **\uD310 \uBC16\uC758 \uB760**\uB85C \uC62E\uACBC\uB2E4.
+           \uC704 15\uCC28 \u2460 \uC8FC\uC11D\uC758 "top 50 \uC778 \uAC83\uC774 \uC774 \uC904\uC758 \uC804\uBD80\uB2E4"\uB294 \uADF8 \uC790\uB9AC\uAC00 \uD310 \uC704\uB77C\uB294
+           \uAC83\uC744 \uBAB0\uB790\uB358 \uD310\uB2E8\uC774\uACE0, \uC2E4\uAE30\uAE30\uC5D0\uC11C \uADF8\uAC83\uC774 \uD50C\uB808\uC774\uB97C \uB9C9\uC558\uB2E4. \uC9C0\uAE08\uC740
+           multBandWord \uAC00 HUD \uC544\uB798 \uB05D\uACFC \uD310 \uC704 \uB05D\uC744 \uC2E4\uCE21\uD574 \uADF8 \uC0AC\uC774\uC5D0 \uC138\uC6B4\uB2E4 \u2014
+           \uD06C\uAE30\uB294 \uC885\uC804\uC758 40% \uC774\uD558, \uC218\uBA85\uC740 --mo-mult-life, \uBD80\uC81C\uB294 \uC606\uC904.
+           `heavy`(iw-slam \uB0B4\uB824\uCC0D\uAE30)\uB294 \uB5C0\uB2E4: \uC881\uC740 \uB760\uC5D0\uC11C \uADF8 \uD3ED\uC73C\uB85C \uD280\uBA74 \uB2E4\uC2DC \uD310\uC744
+           \uC2A4\uCE5C\uB2E4. \uAC12\u00B7\uC870\uAC74(mTier \u00B7 MULT_FX_MIN_MS \u00B7 \uC9C4\uB3D9)\uC740 \uD55C \uAE00\uC790\uB3C4 \uC548 \uBC14\uB010\uB2E4. */
+        multBandWord(mTier, mSub);
+        multFxUntil = now() + multLifeMs();
         J.vibrate(mTier >= 8 ? 46 : (mTier >= 4 ? 26 : 14));
       }
       /* WD-2 §14.3 — 조건 펫의 카운터. WD-1 이 이미 굴리고 있는 awkStreak/stdyRun
@@ -39314,7 +39582,26 @@ window.TT_SFX = {
          (텐↔트윈을 번갈아 맞추는 플레이의 단독 보상). 발동은 단계 3의 버튼이
          맡고, 이 단계는 적립·저장까지만 한다. */
       if (tw && (tw.chain | 0) > (twPrev | 0)) {
+        var spWas = d.me.sp >= d.me.spMax;
         d.me.sp = Math.min(d.me.spMax, d.me.sp + DUEL_SP_MULT * Math.max(0, pts));
+        /* 🚨 판정판 48 (2026-09-11 사용자 실플레이) — 「필살기 게이지 만땅이
+           안 보임」. 실측한 결함은 **알림이 아예 없었다**는 것이다: 각성은
+           gaugeBump 가 만땅의 순간에 전용음·진동을 내는데, 필살기 게이지는
+           여기서 조용히 100% 가 되고 그 사실을 말하는 자리가 한 곳도 없었다
+           (syncBattleActs 의 `.urge` 는 **상태**를 그리지 사건을 알리지 않는다).
+           그래서 각성과 **같은 문법**을 그 자리에 세운다 — 소리 1 + 화살 1 +
+           첫 1회 안내. 소리는 새로 만들지 않았다: J.sfx.milestone 은 이미 구워져
+           있는 「달성 벨」(A5·C#6·E6 + A6)이고, 각성 전용음(awakenMax = 성가풍
+           상행 스윕)과 음색이 겹치지 않아 **귀로도 둘이 갈린다** — 화면에서
+           무지개/금빛이 하는 구별을 소리에서도 지킨다(§15.3 과 같은 규율).
+           ⚠ 게이지 산술(DUEL_SP_MULT · 조건)은 한 글자도 안 바뀐다. 위 한 줄은
+             바뀐 값을 **읽기만** 한다. */
+        if (!spWas && d.me.sp >= d.me.spMax) {
+          if (J.sfx.milestone) J.sfx.milestone();
+          J.vibrate(34);
+          fullCue('btn-hint');
+          tipOnce('ultReady', 'tip.ultReady');
+        }
       }
     }
     /* 만땅은 여기서 **표시만** 한다. 발동은 duelTick 이 판이 조용해진 뒤에 —
@@ -46211,6 +46498,13 @@ window.TT_SFX = {
        그 셋을 각각 세우지 않고도 화면에 뜬 것을 재야 한다. 게임 코드는 이 중
        무엇도 window.Game 을 거쳐 부르지 않는다. */
     impactWord: impactWord, awakenBlast: awakenBlast, finishBlast: finishBlast,
+    /* 판정판 47·48 — 위 셋과 **같은 규약**의 손잡이 넷이다(게임 코드는 이 중
+       무엇도 window.Game 을 거쳐 부르지 않는다). 관문이 판정해야 하는 것은
+       ㉠ 배율 띠 상자가 판 상자와 **교차 0** 인가 ㉡ 만땅 유도가 **1회**인가
+       ㉢ 첫 안내가 **1회뿐**인가인데, 셋 다 실제 연쇄·게이지를 채워야 닿는
+       자리라 연출만 따로 세울 문이 없으면 관문이 브라우저 속도에 매달린다. */
+    multBandWord: multBandWord, multBandGap: multBandGap,
+    fullCue: fullCue, tipOnce: tipOnce, gaugeBump: gaugeBump,
     bossDefeatFx: bossDefeatFx, applySkill: applySkill,
     petFreeze4s_mongle: petFreeze4s_mongle, petRowShuffle_churup: petRowShuffle_churup,
     duelAtkPct: duelAtkPct, duelSpPct: duelSpPct, syncBattleActs: syncBattleActs,
@@ -46709,6 +47003,25 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
    ⚠ 퍼짐 반경(6/14px)·순서는 위 일반 규칙 그대로다 — 바뀌는 축은 **색 하나**다. */
 #app.battle #btn-hint.act.urge::before{
   filter:drop-shadow(0 0 6px var(--role-me-atk-a)) drop-shadow(0 0 14px var(--role-me-atk-b));
+}
+/* 🚨 판정판 48 (2026-09-11 사용자 실플레이) — 「각성·필살기 게이지 만땅이 안 보임」.
+   위 한 줄이 만든 것은 **정지한 빛**이었다(§15.3 표: 필살기 = 움직임 없음). 그
+   판단의 근거는 "움직이는 것은 각성 하나여야 눈이 고른다"였는데, 실기기에서
+   드러난 것은 그 반대다: 판을 보는 동안 하단은 **주변시**에 있고, 주변시는 정지한
+   빛을 거의 못 잡는다(W10 ④ 가 각성에 대해 이미 적어 둔 사실이다). 그래서
+   「눈이 고르게 한다」는 목적은 유지하되 수단을 색으로 옮긴다 —
+     · 움직임(펄스)은 **둘 다** 갖는다. 주기도 같다(--mo-full-pulse).
+     · 구별은 **색**이 한다. 각성 무지개 / 필살기 금빛(--role-me-atk-*).
+   퍼짐 반경은 종전의 **2배**(6/14 → 12/28px)이고 밝기 항을 하나 더 흔든다 —
+   주변시가 잡는 것은 채도가 아니라 밝기 변화다.
+   ⚠ 새 원시값 0 · 새 자산 0. 색은 위 규칙과 같은 토큰 두 개뿐이고, 움직이는 것은
+     filter 한 축이다(레이아웃 0). */
+@keyframes full-atk-pulse{
+  0%,100%{ filter:drop-shadow(0 0 6px var(--role-me-atk-a))  drop-shadow(0 0 14px var(--role-me-atk-b)) brightness(1); }
+  50%    { filter:drop-shadow(0 0 12px var(--role-me-atk-a)) drop-shadow(0 0 28px var(--role-me-atk-b)) brightness(1.18); }
+}
+#app.battle #btn-hint.act.urge::before{
+  animation:full-atk-pulse var(--mo-full-pulse) var(--ease) infinite;
 }
 /* 게이지 배지 = 메달 우상단의 작은 칩. 메달 면색이 넷 다 다르므로(적·청·보라·주황)
    칩은 어두운 잉크 알약 + 흰 글자 한 벌로 고정한다 — 어느 메달 위에서도 대비가
@@ -49661,11 +49974,15 @@ html[lang="en"] .splash-logo{
    주기(1.15s)는 안 바꾼다 — 그 값은 필살기 `.urge` 와 리듬을 나누는 값이고,
    빨라지면 "급하다"가 되지 "찼다"가 되지 않는다.
    ⚠ 여전히 `#btn-shuffle` 스코프다: 넷 중 각성만 이 급으로 빛나야 눈이 고른다. */
+/* 판정판 48 — 퍼짐 반경이 **계수 하나**(--mo-full-k)로 자란다. 값을 두 벌로
+   복사하지 않는 이유는 `.urge`(만땅 = 2배)와 `.primed`(장전 = 종전 1배)가 **같은
+   빛의 세기 차이**일 뿐이기 때문이다. 두 키프레임으로 나누면 색 하나를 고칠 때
+   둘이 갈라진다. 색·정지점·주기 축은 W10 ④ 원문 그대로다 — 바뀐 축은 반경뿐. */
 @keyframes w65-awk-glow{
-  0%,100%{ filter:drop-shadow(0 0 12px rgba(255,214,120,1)) drop-shadow(0 0 30px rgba(255,120,220,.72)) brightness(1); }
-  25%    { filter:drop-shadow(0 0 18px rgba(120,255,214,1)) drop-shadow(0 0 38px rgba(120,180,255,.76)) brightness(1.16); }
-  50%    { filter:drop-shadow(0 0 15px rgba(255,120,220,1)) drop-shadow(0 0 34px rgba(255,214,120,.76)) brightness(1.04); }
-  75%    { filter:drop-shadow(0 0 21px rgba(190,140,255,1)) drop-shadow(0 0 42px rgba(120,255,214,.72)) brightness(1.16); }
+  0%,100%{ filter:drop-shadow(0 0 calc(12px * var(--mo-full-k)) rgba(255,214,120,1)) drop-shadow(0 0 calc(30px * var(--mo-full-k)) rgba(255,120,220,.72)) brightness(1); }
+  25%    { filter:drop-shadow(0 0 calc(18px * var(--mo-full-k)) rgba(120,255,214,1)) drop-shadow(0 0 calc(38px * var(--mo-full-k)) rgba(120,180,255,.76)) brightness(1.16); }
+  50%    { filter:drop-shadow(0 0 calc(15px * var(--mo-full-k)) rgba(255,120,220,1)) drop-shadow(0 0 calc(34px * var(--mo-full-k)) rgba(255,214,120,.76)) brightness(1.04); }
+  75%    { filter:drop-shadow(0 0 calc(21px * var(--mo-full-k)) rgba(190,140,255,1)) drop-shadow(0 0 calc(42px * var(--mo-full-k)) rgba(120,255,214,.72)) brightness(1.16); }
 }
 @keyframes w65-awk-bounce{
   0%,70%,100%{ transform:translateY(0) scale(1); }
@@ -49683,13 +50000,17 @@ html[lang="en"] .splash-logo{
   66% { opacity:0; transform:scale(.55) rotate(150deg); }
   100%{ opacity:0; transform:scale(.35) rotate(150deg); }
 }
+/* 판정판 48 — 주기 1.15s → --mo-full-pulse(1.2s), 발광 계수 2배.
+   주기를 토큰으로 옮긴 것이 요점이다: 각성과 필살기가 **같은 리듬**으로 뛰어야
+   "둘 다 찼다"가 한 사건으로 읽히고, 그 값이 두 자리에 복사돼 있으면 곧 갈린다. */
 #app.battle #btn-shuffle.act.urge{
-  animation:w65-awk-bounce 1.15s var(--ease) infinite;
+  --mo-full-k: 2;
+  animation:w65-awk-bounce var(--mo-full-pulse) var(--ease) infinite;
 }
 /* 위 §1 의 `.act.urge::before` 가 노랑·분홍 두 겹 드롭섀도를 이미 걸어 둔다 —
    애니메이션은 일반 선언을 이기므로 이 한 줄이 그 값을 무지개로 돌린다. */
 #app.battle #btn-shuffle.act.urge::before{
-  animation:w65-awk-glow 1.15s linear infinite;
+  animation:w65-awk-glow var(--mo-full-pulse) linear infinite;
 }
 #app.battle #btn-shuffle.act.urge::after{
   content:"";
@@ -49708,7 +50029,7 @@ html[lang="en"] .splash-logo{
   background-repeat:no-repeat;
   background-size:100% 100%, 100% 100%;
   filter:drop-shadow(0 0 5px rgba(255,240,180,.95));
-  animation:w65-awk-spark 1.15s ease-out infinite;
+  animation:w65-awk-spark var(--mo-full-pulse) ease-out infinite;
   z-index:1;
 }
 /* ---- 장전 신호 `.primed` — 지속 중인데 **다음 것이 이미 찼다** ---------------
@@ -49716,7 +50037,7 @@ html[lang="en"] .splash-logo{
    버튼이 되므로, 같은 무지개를 **절반 세기·두 배 느리게** 돌리고 튀지는 않는다.
    흐림(.off 의 saturate .42)은 그대로 둔다 — 지금 못 쓴다는 사실이 먼저다. */
 #app.battle #btn-shuffle.act.primed::before{
-  animation:w65-awk-glow 2.3s linear infinite;
+  animation:w65-awk-glow calc(var(--mo-full-pulse) * 2) linear infinite;
   opacity:.92;
 }
 #app.battle #btn-shuffle.act.primed::after{
@@ -49733,8 +50054,43 @@ html[lang="en"] .splash-logo{
   background-repeat:no-repeat;
   background-size:100% 100%, 100% 100%;
   filter:drop-shadow(0 0 4px rgba(255,240,180,.9));
-  animation:w65-awk-spark 2.3s ease-out infinite;
+  animation:w65-awk-spark calc(var(--mo-full-pulse) * 2) ease-out infinite;
   z-index:1;
+}
+/* ---- 판정판 48 — 만땅이 **된 순간**의 유도 1회 (화살 한 번) -----------------
+   상시 펄스는 "지금 찰랑거린다"를 말하지만, 「방금 찼다」는 그 안에 묻힌다 —
+   무한 반복은 배경이 되기 때문이다. 그래서 사건 쪽에 한 발만 따로 준다:
+   버튼 **위**에서 아래로 한 번 찍는 갈매기 화살, 수명 --mo-full-cue 1회.
+   ⚠ 새 노드 0 — 자리는 `.act::after` 다. 각성은 그 자리에 상시 스파클이 있는데,
+     아래 선택자가 `.fullcue` 한 겹만큼 무겁다(2,4,1 > 2,3,1)라 **1초 동안만**
+     화살이 그 자리를 빌리고 클래스가 벗겨지면 스파클이 그대로 돌아온다.
+     필살기 쪽 `::after` 는 원래 비어 있던 자리다.
+   ⚠ 버튼 자산(메달 그림 = ::before)은 한 픽셀도 안 건드린다. 움직이는 것은
+     transform/opacity 뿐이다. */
+@keyframes full-cue{
+  0%   { opacity:0; transform:translateY(-150%) rotate(-45deg); }
+  22%  { opacity:1; transform:translateY(0)     rotate(-45deg); }
+  52%  { opacity:1; transform:translateY(-34%)  rotate(-45deg); }
+  76%  { opacity:1; transform:translateY(0)     rotate(-45deg); }
+  100% { opacity:0; transform:translateY(-46%)  rotate(-45deg); }
+}
+#app.battle #actionbar .act.urge.fullcue::after,
+#app.battle #actionbar .act.fullcue::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:-13%;
+  width:13%;
+  height:13%;
+  margin-left:-6.5%;
+  pointer-events:none;
+  background:none;
+  border-left:3px solid rgba(255,255,255,.98);
+  border-bottom:3px solid rgba(255,255,255,.98);
+  border-radius:2px;
+  filter:drop-shadow(0 0 6px rgba(255,240,180,.95));
+  animation:full-cue var(--mo-full-cue) cubic-bezier(.16,1.02,.3,1) 1 both;
+  z-index:2;
 }
 /* 접근성 — 이 파일의 다른 상시 애니메이션과 같은 처분(움직임은 끄고 빛만 남긴다:
    "지금 쓸 수 있다"는 사실 자체는 축소하면 안 되는 정보다). */
@@ -49745,9 +50101,21 @@ html[lang="en"] .splash-logo{
   #app.battle #btn-shuffle.act.primed::before,
   #app.battle #btn-shuffle.act.primed::after{ animation:none; }
   #app.battle #btn-shuffle.act.urge::before{
-    filter:drop-shadow(0 0 10px rgba(255,214,120,.95)) drop-shadow(0 0 20px rgba(255,120,220,.6));
+    filter:drop-shadow(0 0 calc(10px * var(--mo-full-k))  rgba(255,214,120,.95))
+           drop-shadow(0 0 calc(20px * var(--mo-full-k)) rgba(255,120,220,.6));
   }
   #app.battle #btn-shuffle.act.urge::after{ opacity:.9; }
+  /* 판정판 48 — 필살기도 같은 처분이다: 움직임은 끄고, **2배가 된 빛은 남긴다**
+     (만땅이라는 사실은 정보이지 장식이 아니다). 화살은 정지한 채 1초를 산다 —
+     수명은 JS 타이머가 재므로 애니메이션 없이도 정확히 한 번 나타났다 사라진다. */
+  #app.battle #btn-hint.act.urge::before{
+    animation:none;
+    filter:drop-shadow(0 0 12px var(--role-me-atk-a)) drop-shadow(0 0 28px var(--role-me-atk-b));
+  }
+  #app.battle #actionbar .act.urge.fullcue::after,
+  #app.battle #actionbar .act.fullcue::after{
+    animation:none; opacity:1; transform:rotate(-45deg);
+  }
 }
 </style>
 
