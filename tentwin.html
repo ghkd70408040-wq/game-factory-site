@@ -14818,21 +14818,30 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
         <button id="cp-next" class="cp-arrow cp-arrow-r" type="button" data-i18n-aria="aria.nextchar" aria-label="Next character">&rsaquo;</button>
         -->
         <!-- ============================================================
-             시안 A 의 **우측 세로 탭** — 아이템 · 스킨 · 스킬.
-             자리와 크리스탈 액자는 여기서 만들고, 내용은 **이미 있는 기능**을
-             그대로 끌어다 꽂는다: 아이템은 syncItemList() 가 그리던 그 목록이고
-             (#cp-items 를 통째로 옮겨 왔다 — 새 DOM 0), 스킨은 openSkins() 를
-             부르는 같은 버튼이며, "스킬" 은 기능이 아직 없는 자리라 **비워 두지
-             않고** 그 캐릭터의 궁극기 문구(char.<id>.ult)를 넣는다.
+             우측 레일 = **아이템 한 줄기** (판정판 24 · 2026-09-10)
+             착수 전에는 세로 탭 셋(아이템 · 스킨 · 필살기)이 서 있었다.
+             스킨은 하단 「스킨 ★0」(#cp-skin) 버튼과 **같은 창을 여는 두
+             번째 입구**였고, 필살기는 추가 예정이 없는 빈 자리였다.
+             탭이 하나만 남으면 탭 부품 자체가 고를 것이 없다 —
+             .cp-side-tabs / .cp-vtab 와 탭 젬 둘(#cp-side-skin · #cp-gem-skill)을
+             **은퇴**시켰다(그 둘은 세로 탭과 같은 일을 하던 둘째 복본이다).
+
+             남은 랙(.cp-side-rack)은 이제 탭이 아니라 **아이템 칸 그리드**다
+             (#cp-item-list 가 그 랙으로 옮겨 왔다 — 목록을 둘로 그리던 것이
+             하나가 됐다). 칸 = 기존 슬롯 부품 .cp-crystal(work-frame slot 변주)
+             인스턴스에 상태 변주 셋을 얹은 것뿐이다 — 새 원시값 0 · 새 그림 0:
+               data-state="empty"  빈 자리표시(슬롯 실루엣) — 누를 수 없다
+               data-state="own"    획득 — 누르면 장착
+               data-state="eq"     장착 — 누르면 해제
+             칸 수 = max(3, 보유 수). 3 은 «빈 레일이 없다»를 위한 바닥이라
+             보유 0 에서는 착수 전과 **같은 세 칸**이 선다. 빈 칸의 실루엣은
+             자리 번호대로 ITEM_SLOTS(무기 · 보조 · 장신구)를 가리키며,
+             그림 셋(slot-ic-skill / skin / item.webp = 홀 · 코트 · 왕관)은
+             종전 그대로다. 그리는 곳은 syncItemList() 하나, 장착은
+             toggleItem() 하나다(새 시스템 0 — 저장 키도 store.items 그대로).
              ============================================================ -->
         <aside id="cp-side" class="cp-side" data-i18n-aria="aria.loadout" aria-label="Loadout">
           <div class="cp-side-rec kit-pill-v2" data-variant="soft" id="cp-side-rec" aria-hidden="true">&nbsp;</div>
-          <div class="cp-side-tabs" role="tablist" data-i18n-aria="aria.loadout" aria-label="Loadout">
-            <button class="cp-vtab" type="button" role="tab" data-cpside="item"  aria-selected="true"  data-i18n="cp.items">Items</button>
-            <button class="cp-vtab" type="button" role="tab" data-cpside="skin"  aria-selected="false" data-i18n="skin.btn">Skins</button>
-            <button class="cp-vtab" type="button" role="tab" data-cpside="skill" aria-selected="false" data-i18n="pick.ult">Ultimate</button>
-          </div>
-          <div class="cp-side-body">
   <svg class="wxtal-crown" viewBox="0 0 87.5 50" aria-hidden="true" focusable="false">
     <!-- 좌 렌즈: 꼭지 (2.5,22) -> (32,44) · 장축 36.8 · +36.7° -->
     <g transform="translate(2.5 22) rotate(81.7) scale(.2842) translate(-4.2 -95.8)"><use href="#wxtalGem" xlink:href="#wxtalGem"/></g>
@@ -14843,48 +14852,9 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
     <!-- 가운데 카이트 -->
     <g transform="translate(28.25 2)"><use href="#wxtalKite" xlink:href="#wxtalKite"/></g>
   </svg>
-            <!-- ③-c ②안 (2026-09-01) — 젬 슬롯 **3단 동시 노출**.
-                 랙(.cp-side-rack)은 늘 서 있고(아이템·스킨·스킬 셋), 그 아래
-                 펼침판이 **활성 단의 내용**만 편다. 아이템 젬은 대표 표시
-                 (아이콘 + 보유 개수)뿐이고, 목록은 종전 그대로 #cp-item-list 가
-                 아래에 축소형으로 앉는다 — 장착 규칙(toggleItem)은 무접촉이고
-                 새 시스템 0. 스킨 젬은 종전 #cp-side-skin 그 버튼 그대로다
-                 (openSkins 배선 유지). 활성 강조는 #charpanel[data-cpside] 이
-                 이미 쓰는 그 근거 하나로만 갈린다 — JS 에 새 속성 없음. -->
-            <div class="cp-side-rack" role="presentation">
-              <button id="cp-gem-item" class="cp-crystal cp-gem" type="button" data-cpside="item" data-i18n-aria="cp.items" aria-label="Items"><span class="cp-cr-ic" id="cp-gem-item-ic" aria-hidden="true">&#9671;</span><b class="cp-gem-n" id="cp-gem-item-n" aria-hidden="true">0</b>  <span class="wxtal-set wxtal-set--ref" aria-hidden="true">
-    <svg class="wxtal wxtal--tl" viewBox="0 0 100 100" preserveAspectRatio="none"><use href="#wxtalGem" xlink:href="#wxtalGem"/></svg>
-    <svg class="wxtal wxtal--tr" viewBox="0 0 100 100" preserveAspectRatio="none"><use href="#wxtalGem" xlink:href="#wxtalGem"/></svg>
-    <svg class="wxtal wxtal--bl" viewBox="0 0 100 100" preserveAspectRatio="none"><use href="#wxtalGem" xlink:href="#wxtalGem"/></svg>
-    <svg class="wxtal wxtal--br" viewBox="0 0 100 100" preserveAspectRatio="none"><use href="#wxtalGem" xlink:href="#wxtalGem"/></svg>
-  </span></button>
-              <button id="cp-side-skin" class="cp-crystal cp-gem" type="button" data-cpside="skin" data-i18n-aria="aria.skins" aria-label="Skins"><span class="cp-cr-ic" aria-hidden="true">&#9733;</span>  <span class="wxtal-set wxtal-set--ref" aria-hidden="true">
-    <svg class="wxtal wxtal--tl" viewBox="0 0 100 100" preserveAspectRatio="none"><use href="#wxtalGem" xlink:href="#wxtalGem"/></svg>
-    <svg class="wxtal wxtal--tr" viewBox="0 0 100 100" preserveAspectRatio="none"><use href="#wxtalGem" xlink:href="#wxtalGem"/></svg>
-    <svg class="wxtal wxtal--bl" viewBox="0 0 100 100" preserveAspectRatio="none"><use href="#wxtalGem" xlink:href="#wxtalGem"/></svg>
-    <svg class="wxtal wxtal--br" viewBox="0 0 100 100" preserveAspectRatio="none"><use href="#wxtalGem" xlink:href="#wxtalGem"/></svg>
-  </span></button>
-              <button id="cp-gem-skill" class="cp-crystal cp-gem" type="button" data-cpside="skill" data-i18n-aria="pick.ult" aria-label="Ultimate"><span class="cp-cr-ic" aria-hidden="true">&#10022;</span>  <span class="wxtal-set wxtal-set--ref" aria-hidden="true">
-    <svg class="wxtal wxtal--tl" viewBox="0 0 100 100" preserveAspectRatio="none"><use href="#wxtalGem" xlink:href="#wxtalGem"/></svg>
-    <svg class="wxtal wxtal--tr" viewBox="0 0 100 100" preserveAspectRatio="none"><use href="#wxtalGem" xlink:href="#wxtalGem"/></svg>
-    <svg class="wxtal wxtal--bl" viewBox="0 0 100 100" preserveAspectRatio="none"><use href="#wxtalGem" xlink:href="#wxtalGem"/></svg>
-    <svg class="wxtal wxtal--br" viewBox="0 0 100 100" preserveAspectRatio="none"><use href="#wxtalGem" xlink:href="#wxtalGem"/></svg>
-  </span></button>
-            </div>
-            <div class="cp-side-panes">
-              <div class="cp-pane" data-pane="item">
-              <div id="cp-items" class="cp-items">
-                <span class="pick-lab" data-i18n="cp.items">Items</span>
-                <div id="cp-item-list" class="cp-item-list"></div>
-              </div>
-              </div>
-              <div class="cp-pane" data-pane="skin">
-                <p class="cp-side-txt"><b id="cp-side-skinv">&nbsp;</b></p>
-              </div>
-              <div class="cp-pane" data-pane="skill">
-                <p class="cp-side-txt" id="cp-side-ult">&nbsp;</p>
-              </div>
-            </div>
+          <div class="cp-side-body">
+            <div id="cp-item-list" class="cp-side-rack" role="group" data-i18n-aria="cp.items" aria-label="Items"></div>
+            <p id="cp-item-none" class="cp-item-none" data-i18n="cp.items.none">No items yet. Pop a gift box on an adventure.</p>
           </div>
         </aside>
         <div class="pick-row pick-mate">
@@ -29643,16 +29613,15 @@ window.TT_SFX = {
   /* =========================================================================
    * charsel v2 — 펫 정보 판 · 우측 세로 탭 · 캐러셀 중앙 맞춤 · 잘림 실측
    *
-   * 새로 만든 **상태**는 둘뿐이다: cpSideCur(우측 레일이 지금 무엇을 보여 주나)
-   * 와 cpPetView(펫 캐러셀에서 지금 **구경 중인** 펫). 둘 다 세션 로컬이고
-   * store 에 안 들어간다 — cpTabCur 와 같은 급의 값이다("무엇을 골랐나"가
-   * 아니라 "지금 무엇을 보고 있나").
+   * 새로 만든 **상태**는 하나뿐이다: cpPetView(펫 캐러셀에서 지금
+   * **구경 중인** 펫). 세션 로컬이고 store 에 안 들어간다 — cpTabCur 와
+   * 같은 급의 값이다("무엇을 골랐나"가 아니라 "지금 무엇을 보고 있나").
+   * (cpSideCur 은 2026-09-10 은퇴 — 우측 레일이 아이템 하나가 됐다.)
    *
    * cpPetView 가 필요한 이유는 잠금이다. setMate 는 안 가진 펫을 거절하므로,
    * 그것 하나로는 **잠긴 펫의 기술을 읽을 방법이 없다**. 주인공 쪽이 이미
    * cpIdx 로 "구경과 결정"을 갈라 놓은 그 문법을 펫에도 그대로 쓴다.
    * ======================================================================= */
-  var cpSideCur = 'item';
   var cpPetView = null;      /* null = 지금 고른 펫(mateId) 을 본다 */
 
   /** data-i18n 을 같이 갈아 준다 — 언어를 바꿔도 applyI18n 이 알아서 맞춘다. */
@@ -29806,35 +29775,16 @@ window.TT_SFX = {
     }
   }
 
-  /**
-   * 우측 세로 탭(아이템 · 스킨 · 스킬). cpTab 과 같은 문법이다: 화면 상태의
-   * 근거는 #charpanel 의 data-cpside 하나뿐이고, 보이고 숨는 일은 전부 CSS 가
-   * 한다(JS 가 display 를 안 만진다).
-   */
-  function cpSide(k) {
-    var root = $('charpanel');
-    cpSideCur = (k === 'skin' || k === 'skill') ? k : 'item';
-    if (!root || !root.setAttribute) return;
-    root.setAttribute('data-cpside', cpSideCur);
-    var tabs = root.querySelectorAll ? root.querySelectorAll('.cp-vtab') : null;
-    if (tabs) {
-      for (var i = 0; i < tabs.length; i++) {
-        tabs[i].setAttribute('aria-selected',
-          tabs[i].getAttribute('data-cpside') === cpSideCur ? 'true' : 'false');
-      }
-    }
-    syncSidePanes();
-  }
-
-  /** 레일의 내용. 아이템은 syncItemList 가, 나머지 둘은 여기서 한 줄씩 채운다. */
+  /** 레일의 내용. 배지 한 줄과 아이템 칸 그리드가 전부다.
+   *
+   *  [은퇴 2026-09-10 · 판정판 24] cpSide() / cpSideCur — 탭 셋이 하나로
+   *  줄어 «지금 어느 단인가»라는 상태 자체가 없어졌다. 같이 내린 둘:
+   *    · 스킨 문구(★ jstar) — 하단 #cp-skin 버튼이 같은 창을 열고 잔액도 거기 있다.
+   *    · 필살기 문구(char.<id>.ult) — 아래 패시브 카드가 이미 같은 문장을 적는다. */
   function syncSidePanes() {
     var id = HERO_IDS[cpIdx] || charId();
     cpTxt($('cp-side-rec'), 'char.' + id + '.tag');
-    /* "스킬" 은 아직 상세 화면이 없는 자리다. 비워 두지 않고 그 캐릭터의
-       궁극기 문구를 넣는다 — 이미 있는 사실이고, 준비 중 딱지보다 쓸모 있다. */
-    cpTxt($('cp-side-ult'), 'char.' + id + '.ult');
-    var v = $('cp-side-skinv');
-    if (v) v.textContent = '\u2605 ' + (store.jstar | 0);
+    syncItemList();
   }
 
   function openCharPanel() {
@@ -29843,7 +29793,7 @@ window.TT_SFX = {
     el.hidden = false;
     cpPetView = null;         /* 열 때마다 "구경"은 지금 고른 펫에서 시작한다 */
     cpTab(cpTabCur);          /* W4 — 세션 안에서 마지막으로 보던 탭으로 연다 */
-    cpSide(cpSideCur);
+    syncSidePanes();          /* 레일 — 배지 + 아이템 칸 그리드 */
     syncCharPick();
     var cur = HERO_IDS.indexOf(charId());
     cpSeed(cur < 0 ? 0 : cur);   /* ⑰ 열 때는 애니 없이 정중앙 seed(가운데 벌) */
@@ -42942,35 +42892,59 @@ window.TT_SFX = {
     }
   }
 
-  /**
-   * §11.6-B 아이템 **자리표**. 가진 것만 칩으로 늘어놓고, 지금 캐릭터가 낀 것에
-   * `.on` 을 붙인다. 탭하면 그 슬롯을 채우거나 비운다.
+  /* §11.6-B 아이템 **칸 그리드** (판정판 24 · 2026-09-10 · DESIGN §17).
+   * 랙(#cp-item-list = .cp-side-rack)이 곧 목록이다 — 칸 하나가 아이템
+   * 하나이고, 칸 부품은 랙이 쓰던 그 크리스탈 액자(.cp-crystal) 그대로다.
+   *   empty  빈 자리표시 — 누를 수 없다. 실루엣이 그 자리의 슬롯을 가리킨다.
+   *   own    획득 — 누르면 장착(toggleItem).
+   *   eq     장착 — 누르면 해제(toggleItem).
+   * 칸 수 = max(3, 보유 수). 그래서 보유 0 에서도 착수 전과 같은 세 칸이 선다.
    *
-   * 여기서 하지 **않는** 일을 적어 두는 편이 낫다: 강화(파편 소비)도, 슬롯별
-   * 필터도, 캐릭터별 비교도 없다. 셋 다 선택창 2.0 의 IA 가 정해야 하는
-   * 것들이라(§12.4 · §13.5 ⚠③), 지금 임의로 그려 두면 그 화면이 도착할 때
-   * 두 벌이 된다.
-   */
-  /**
-   * ③-c ②안 — 아이템 젬의 **대표 표시**. 보유 개수와, 대표 아이콘 한 개.
-   * 대표는 ① 지금 낀 것이 있으면 그 중 첫 번째, ② 없으면 보유한 것 중 첫 번째다.
-   * 여기서 장착을 바꾸지 않는다 — 읽기만 한다(장착은 toggleItem 하나뿐).
-   */
-  function syncItemGem() {
-    var ic = $('cp-gem-item-ic'), nb = $('cp-gem-item-n');
-    if (!ic && !nb) return;
-    var cid = charId(), eq = itemsEq(cid), own = (store.items && store.items.own) || {};
-    var i, it, n = 0, rep = '', first = '';
-    for (i = 0; i < ITEM_POOL.length; i++) {
-      it = ITEM_POOL[i];
-      if (it.enabled === false) continue;
-      if ((own[it.id] | 0) <= 0) continue;
-      n++;
-      if (!first) first = it.ico;
-      if (!rep && eq.indexOf(it.id) >= 0) rep = it.ico;
+   * 여기서 하지 **않는** 일: 강화(파편 소비) · 슬롯별 필터 · 캐릭터별 비교.
+   * 셋 다 선택창 2.0 의 IA 가 정해야 하는 것이라(§12.4 · §13.5 ⚠③) 지금
+   * 임의로 그려 두면 그 화면이 도착할 때 두 벌이 된다. */
+  var ITEM_CELL_MIN = 3;      /* «빈 레일» 방지 바닥 = ITEM_SLOTS 수 */
+  /* 액자 네 모서리의 크리스탈 조각. 착수 전 세 젬의 마크업에 있던 것을
+     그대로 가져왔다(새 도형 0). 칸을 JS 가 지으므로 문자열 한 벌로 둔다. */
+  var CP_XTAL_SET =
+    '<span class="wxtal-set wxtal-set--ref" aria-hidden="true">' +
+    '<svg class="wxtal wxtal--tl" viewBox="0 0 100 100" preserveAspectRatio="none"><use href="#wxtalGem" xlink:href="#wxtalGem"/></svg>' +
+    '<svg class="wxtal wxtal--tr" viewBox="0 0 100 100" preserveAspectRatio="none"><use href="#wxtalGem" xlink:href="#wxtalGem"/></svg>' +
+    '<svg class="wxtal wxtal--bl" viewBox="0 0 100 100" preserveAspectRatio="none"><use href="#wxtalGem" xlink:href="#wxtalGem"/></svg>' +
+    '<svg class="wxtal wxtal--br" viewBox="0 0 100 100" preserveAspectRatio="none"><use href="#wxtalGem" xlink:href="#wxtalGem"/></svg>' +
+    '</span>';
+
+  /** 칸 하나. 상태 · 슬롯 · 아이콘 · 값만 다르고 뼈대는 같다.
+   *  빈 칸은 <span> 이다 — 누를 수 없는 것을 버튼으로 세우지 않는다
+   *  (탭 순회에도 안 걸린다). */
+  function cpItemCell(state, slot, ico, val, id, tier, label) {
+    var b = document.createElement(state === 'empty' ? 'span' : 'button');
+    b.className = 'cp-crystal cp-gem cp-islot';
+    b.setAttribute('data-state', state);
+    b.setAttribute('data-slot', slot);
+    if (state === 'empty') {
+      b.setAttribute('aria-hidden', 'true');
+    } else {
+      b.type = 'button';
+      b.setAttribute('data-item', id);
+      if (tier) b.setAttribute('data-tier', tier);
+      b.setAttribute('aria-pressed', state === 'eq' ? 'true' : 'false');
+      b.setAttribute('aria-label', label);
     }
-    if (ic) ic.textContent = rep || first || '◇';
-    if (nb) { nb.textContent = String(n); nb.hidden = !n; }
+    var ic = document.createElement('span');
+    ic.className = 'cp-cr-ic';
+    ic.setAttribute('aria-hidden', 'true');
+    ic.textContent = ico;
+    b.appendChild(ic);
+    if (val) {
+      var vb = document.createElement('b');
+      vb.className = 'cp-gem-n';
+      vb.setAttribute('aria-hidden', 'true');
+      vb.textContent = val;
+      b.appendChild(vb);
+    }
+    b.insertAdjacentHTML('beforeend', CP_XTAL_SET);
+    return b;
   }
 
   function syncItemList() {
@@ -42978,43 +42952,28 @@ window.TT_SFX = {
     if (!wrap) return;
     var cid = charId(), eq = itemsEq(cid), own = (store.items && store.items.own) || {};
     wrap.innerHTML = '';
-    var any = 0;
-    for (var i = 0; i < ITEM_POOL.length; i++) {
-      var it = ITEM_POOL[i], lv = own[it.id] | 0;
+    var n = 0, i, it, lv, val;
+    for (i = 0; i < ITEM_POOL.length; i++) {
+      it = ITEM_POOL[i];
       if (it.enabled === false) continue;   /* 2c — 데이터만 있는 것은 안 그린다 */
+      lv = own[it.id] | 0;
       if (lv <= 0) continue;
-      any = 1;
-      var b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'cp-item' + (eq.indexOf(it.id) >= 0 ? ' on' : '');
-      b.setAttribute('data-item', it.id);
-      b.setAttribute('data-tier', it.tier);
-      var ic = document.createElement('span');
-      ic.className = 'ci-chip';
-      ic.setAttribute('aria-hidden', 'true');
-      ic.textContent = it.ico;
-      var nm = document.createElement('span');
-      nm.className = 'cc-name';
-      nm.setAttribute('data-i18n', 'item.' + it.id + '.nm');
-      nm.textContent = t('item.' + it.id + '.nm');
-      var vb = document.createElement('b');
-      vb.className = 'cp-item-v';
       /* 표시값은 레벨이 아니라 **지금 주는 %p** 다. 레벨은 내부 사정이고,
-         플레이어가 비교하고 싶은 것은 "이걸 끼면 얼마나 오르나"다. */
-      vb.textContent = '+' + itemEffOf(it.id, lv) + '%';
-      b.appendChild(ic);
-      b.appendChild(nm);
-      b.appendChild(vb);
-      wrap.appendChild(b);
+         플레이어가 비교하고 싶은 것은 "이걸 끼면 얼마나 오르나"다.
+         행동형(kind:'act')은 %p 가 아니라 규칙을 바꿔 값이 없으므로
+         값 알약을 달지 않는다 — 없는 수를 적는 것보다 안 적는 편이 맞다. */
+      val = (it.kind === 'stat') ? ('+' + itemEffOf(it.id, lv) + '%') : '';
+      wrap.appendChild(cpItemCell(eq.indexOf(it.id) >= 0 ? 'eq' : 'own',
+                                  it.slot, it.ico, val, it.id, it.tier,
+                                  t('item.' + it.id + '.nm')));
+      n++;
     }
-    if (!any) {
-      var em = document.createElement('p');
-      em.className = 'cp-item-none';
-      em.setAttribute('data-i18n', 'cp.items.none');
-      em.textContent = t('cp.items.none');
-      wrap.appendChild(em);
+    for (i = n; i < ITEM_CELL_MIN; i++) {
+      wrap.appendChild(cpItemCell('empty', ITEM_SLOTS[i % ITEM_SLOTS.length],
+                                  '', '', '', '', ''));
     }
-    syncItemGem();          /* ③-c ②안 — 젬 대표 표시도 같은 틱에 맞춘다 */
+    var em = $('cp-item-none');
+    if (em) em.hidden = !!n;
   }
 
   /** 칩 탭 = 장착 토글. 슬롯(무기/보조/장신구)당 한 개라, 같은 슬롯의 것을 새로
@@ -43766,26 +43725,11 @@ window.TT_SFX = {
       cutFinishAll();
     });
     on($('cp-skin'), 'click', openSkins);
-    on($('cp-side-skin'), 'click', openSkins);
     /* ⑧ (0904) 방울 줄 양끝 물방울 화살표 = 이전/다음 캐릭터. 전환 진입점은
        cpShow(i) 하나이고 드래그·스와이프·썸네일 탭이 모두 이 함수를 부른다 —
        화살표도 같은 함수를 부른다(새 선택 경로·복제 0). */
     on($('cp-prev'), 'click', function () { cpShow(cpIdx - 1); J.sfx.ui(); });
     on($('cp-next'), 'click', function () { cpShow(cpIdx + 1); J.sfx.ui(); });
-    /* charsel v2 — 우측 세로 탭. cp-tabs 와 같은 위임 한 줄. */
-    on($('cp-side'), 'click', function (ev) {
-      var el = ev && ev.target;
-      /* ③-c ②안 — 세로 탭과 **젬 슬롯**이 같은 근거(data-cpside)로 같은 일을
-         한다. 매처를 클래스에서 그 속성으로 옮긴 한 줄이 전부다. */
-      while (el && el !== this && !(el.getAttribute && el.getAttribute('data-cpside'))) {
-        el = el.parentNode;
-      }
-      if (!el || el === this) return;
-      var k = el.getAttribute('data-cpside');
-      if (k === cpSideCur) return;
-      cpSide(k);
-      J.sfx.ui();
-    });
     on($('sk-close'), 'click', closeSkins);
     /* 출시 점검 0909 ① — 확인 창의 두 버튼. X 는 data-w6x="cf-no" 로 이 [취소]
        버튼을 그대로 누르므로(§W6 위임) 배선이 하나 더 늘지 않는다.
@@ -46458,15 +46402,9 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
 }
 
 
-/* 장착 = 켜진 것. 티어 색을 테두리로만 쓰는 이유는 대비다 — 칩 열두 개가
-   전부 다른 바탕색을 갖는 순간 어느 것이 켜져 있는지가 안 읽힌다. */
-.cp-item.on{
-  color:var(--prim-art-ink-2, #FFF6E2);
-  background-color:rgba(255,255,255,.20);
-  box-shadow:inset 0 0 0 2px rgba(245,216,74,.72);
-}
-.cp-item[data-tier="rare"].on{ box-shadow:inset 0 0 0 2px rgba(122,200,255,.80); }
-.cp-item[data-tier="epic"].on{ box-shadow:inset 0 0 0 2px rgba(201,174,245,.86); }
+/* [은퇴 2026-09-10 · 판정판 24] .cp-item 칩 계열 — 사이드바 목록이
+   칩 줄이 아니라 **칸 그리드**(.cp-islot)가 됐다. 장착 강조는 그
+   칸의 data-state="eq" 가 받는다(#charpanel .cp-side-rack 절). */
 @media (prefers-reduced-motion: reduce){
 }
 
@@ -50716,43 +50654,10 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   top: calc(var(--f2-w) * -.075);
   z-index: 3;
 }
-#charpanel .cp-side-tabs {
-  flex: 0 0 calc(var(--f2-w) * .072);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: calc(var(--f2-w) * .012);
-}
-#charpanel .cp-vtab {
-  position: relative;
-  box-sizing: border-box;
-  flex: 1 1 0;
-  min-height: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border: calc(var(--f2-w) * .0041) solid var(--f2-line);
-  border-right: 0;
-  border-radius: calc(var(--f2-w) * .0327) 0 0 calc(var(--f2-w) * .0327);
-  background: var(--f2-tab-off);
-  color: var(--f2-ink);
-  font-family: inherit;
-  font-size: calc(var(--f2-w) * .036);
-  font-weight: 800;
-  line-height: 1.05;
-  letter-spacing: -.02em;
-  writing-mode: vertical-rl;
-  text-orientation: upright;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  box-shadow: inset 0 0 0 calc(var(--f2-w) * .0041) rgba(255,255,255,.85);
-}
-#charpanel .cp-vtab[aria-selected="true"] {
-  background: var(--f2-tab-on);
-  z-index: 2;
-  margin-right: calc(var(--f2-w) * -.0041);
-}
+/* [은퇴 2026-09-10 · 판정판 24] 우측 세로 탭(.cp-side-tabs · .cp-vtab).
+   탭이 「아이템」 하나만 남으면 탭은 고를 것이 없다 — 부품째 내렸다.
+   되살리려면 이 절 · HTML 의 .cp-side-tabs · JS 의 cpSide()/cpSideCur ·
+   [data-cpside] 규칙을 **함께** 되돌려라(하나만 되돌리면 죽은 탭이 선다). */
 #charpanel .cp-side-body {
   flex: 1 1 auto;
   min-width: 0;
@@ -50778,47 +50683,10 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
     color-mix(in srgb, var(--f2-box) calc(var(--cps-body-a) * 100%), transparent),
     color-mix(in srgb, var(--f2-box-2) calc(var(--cps-body-a) * 100%), transparent));
 }
-/* ⑥ (0904) 사용자 반려 「세로탭 눌러도 오른쪽 판 내용이 안 바뀜」 — 원인은
-   젬 슬롯 3단(.cp-side-rack = 왕관/재킷/지팡이 아이템 슬롯)이 **모든 탭에서**
-   서 있어서, 탭을 바꿔도 지배적 시각(젬 3단)이 그대로였다(바뀌는 건 아래 작은
-   판 문구뿐). 아이템 슬롯은 아이템 탭에서만 세운다 — 스킨/필살기 탭은 자기
-   카테고리 판 내용만 보인다. 데이터는 이미 있는 것만 연결(스킨=jstar 개수·
-   필살기=char.<id>.ult), 새 카테고리 발명 없음. */
-#charpanel:not([data-cpside="item"]) .cp-side-rack { display: none; }
-/* 스킨·필살기 판은 젬 슬롯이 사라진 자리를 채우도록 세로 중앙에 앉히되,
-   윗변 추천 배지(버티기파, cp-side-rec top .024W)와 겹치지 않게 그 아래에서 시작 */
-#charpanel[data-cpside="skin"]  .cp-pane[data-pane="skin"],
-#charpanel[data-cpside="skill"] .cp-pane[data-pane="skill"] {
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  padding: calc(var(--f2-w) * .14) calc(var(--f2-w) * .028) calc(var(--f2-w) * .04);
-}
-#charpanel[data-cpside="skin"]  .cp-pane[data-pane="skin"] .cp-side-txt,
-#charpanel[data-cpside="skill"] .cp-pane[data-pane="skill"] .cp-side-txt {
-  font-size: calc(var(--f2-w) * .046);
-  line-height: 1.35;
-  color: var(--f2-ink);
-}
-#charpanel .cp-side-panes {
-  position: absolute;
-  inset: calc(var(--f2-w) * .018);
-  overflow: hidden;
-}
-#charpanel .cp-pane {
-  position: absolute;
-  inset: 0;
-  display: none;
-  flex-direction: column;
-  align-items: stretch;
-  gap: calc(var(--f2-w) * .012);
-  overflow-y: auto;
-  scrollbar-width: none;
-}
-#charpanel .cp-pane::-webkit-scrollbar { width: 0; height: 0; }
-#charpanel[data-cpside="item"]  .cp-pane[data-pane="item"],
-#charpanel[data-cpside="skin"]  .cp-pane[data-pane="skin"],
-#charpanel[data-cpside="skill"] .cp-pane[data-pane="skill"] { display: flex; }
+/* [은퇴 2026-09-10 · 판정판 24] [data-cpside] 계열 규칙 · .cp-side-panes ·
+   .cp-pane(item/skin/skill) — 탭이 하나라 «지금 어느 단인가»라는 상태
+   자체가 없어졌다. 랙(.cp-side-rack)은 이제 언제나 서 있고, 그 안의
+   칸이 곧 아이템 목록이다 — 숨기고 보이는 규칙이 필요 없다. */
 
 /* 크리스탈 프레임 — 시안 A 의 보석 액자. 그림 부품이 없으므로 CSS 로만 짓는다. */
 #charpanel .cp-crystal {
@@ -50856,70 +50724,20 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
 #charpanel .cp-crystal::before { left: calc(var(--f2-w) * -.010); top: calc(var(--f2-w) * -.014); }
 #charpanel .cp-crystal::after  { right: calc(var(--f2-w) * -.010); bottom: calc(var(--f2-w) * -.014); }
 
-#charpanel .cp-side .cp-items { display: block; margin: 0; padding: 0; }
-#charpanel .cp-side .cp-item-list {
-  display: flex;
-  flex-direction: column;
-  gap: calc(var(--f2-w) * .010);
-  margin: 0;
-  padding: 0;
-  overflow: visible;
-}
-#charpanel .cp-side .cp-item {
-  position: relative;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0;
-  width: 100%;
-  min-height: 0;
-  padding: calc(var(--f2-w) * .008) 0;
-  border: 0;
-  border-radius: calc(var(--f2-w) * .022);
-  background: var(--f2-item-face);
-  box-shadow: inset 0 0 0 calc(var(--f2-w) * .0041) var(--f2-item-line);
-  color: var(--f2-ink);
-  cursor: pointer;
-}
-#charpanel .cp-side .cp-item.on {
-  background: var(--f2-item-on);
-  box-shadow:
-    inset 0 0 0 calc(var(--f2-w) * .0041) var(--f2-hi),
-    0 0 calc(var(--f2-w) * .014) var(--role-f2-hi-halo);
-}
-#charpanel .cp-side .cp-item .ci-chip {
-  width: auto; height: auto;
-  border: 0; border-image: none; border-radius: 0;
-  background: none;
-  font-size: calc(var(--f2-w) * .046);
-  line-height: 1.1;
-}
-#charpanel .cp-side .cp-item .cc-name { display: none; }
-#charpanel .cp-side .cp-item .cp-item-v {
-  font-size: calc(var(--f2-w) * .026);
-  font-weight: 900;
-  color: var(--f2-ink);
-}
+/* ---- 아이템 칸 그리드 (판정판 24 · 2026-09-10) ---------------------
+   착수 전 이 자리에는 «세로 칩 목록»(.cp-item / .cp-item-list)이 랙 아래에
+   따로 있었다 — 같은 보유 아이템을 랙(대표 젬)과 목록(칩)이 **두 벌**로
+   그리던 것이다. 랙 하나로 합치고 칩 부품은 은퇴시켰다. 칸의 크기 ·
+   간격 · 액자는 랙 규칙(.cp-side-rack .cp-gem · .cp-crystal)이 그대로 낸다. */
 #charpanel .cp-side .cp-item-none {
-  margin: 0;
+  margin: 0 calc(var(--f2-w) * .0180) calc(var(--f2-w) * .0180);
   font-size: calc(var(--f2-w) * .026);
   line-height: 1.3;
   font-weight: 700;
   color: var(--f2-ink);
   text-align: center;
 }
-#charpanel .cp-side-txt {
-  margin: 0;
-  font-size: calc(var(--f2-w) * .026);
-  line-height: 1.32;
-  font-weight: 700;
-  color: var(--f2-ink);
-  text-align: center;
-  word-break: keep-all;
-}
-#charpanel .cp-side-txt b { display: block; color: var(--role-f2-btn2-line); }
+#charpanel .cp-side .cp-item-none[hidden] { display: none; }
 
 /* ============================================================================
    하단 젤리 판 — kit-frame-v2 그대로. 자리만 여기서 잡는다.
@@ -55689,9 +55507,10 @@ html[lang="en"] .mode-list [data-part="btn-picture"] .bp-badge[data-badge="stage
      서고 왼쪽 세로 탭 셋이 그 세 단의 이름표다. 우리 레일은 탭으로 **한 단씩**
      봤다(같은 자리에 하나만 그렸다).
 
-   ▣ ②안 — 젬 셋을 랙에 늘 세우고, 랙 아래 판이 **활성 단의 내용**을 편다.
-     아이템 젬은 대표 표시(아이콘 + 보유 개수)뿐이고 목록은 그 아래 축소형이다.
-     장착 시스템은 발명하지 않았다 — #cp-item-list · toggleItem 이 종전 그대로다.
+   ▣ ②안 — 젬 셋을 랙에 늘 세운다. [0910 판정판 24 갱신] 그 랙은 이제
+     탭이 아니라 **아이템 칸 그리드**(#cp-item-list)이고, 칸 수는 max(3, 보유 수)
+     라서 보유 0 에서도 이 절의 세 칸 치수가 그대로 선다. 랙 아래 펼침판은 은퇴했다.
+     장착은 여전히 toggleItem 하나다(새 시스템 0).
 
    ▣ 치수 = DECOMP 실측 그대로 (%W of 832)
      젬 틀 93 x 91  -> .1118W x .1094W      세로 피치 120 -> .1442W
@@ -55700,9 +55519,10 @@ html[lang="en"] .mode-list [data-part="btn-picture"] .bp-badge[data-badge="stage
      배지 94 x 40 · 판 윗변에서 20 아래 -> 가로중앙 · top .0240W
      젬 가로중앙 = 판 가로중앙(실측: 젬 중심 733.5 · 판 중심 733.5, 차 0)
 
-   ▣ 활성 강조 — **새 원리 0**. 근거는 이미 서 있는 #charpanel[data-cpside] 하나
-     이고, 색은 캐릭터/펫 탭이 쓰는 --f2-tab-on 그 토큰이다. 비활성 젬은 ③-b 에서
-     등록한 `slot` 변주 원값(맑은 속 .010 · 겉선 α.363)을 **한 자리도 안 바꿨다**.
+   ▣ 활성 강조 — **새 원리 0**. [0910 갱신] 근거는 이제 칸의 data-state
+     하나다(empty / own / eq). 값은 옛 «비활성 젬 · 활성 젬» 두 벌 그대로고
+     (겉선 α .363 ↔ .560), 빈 칸은 ③-b 에서 등록한 `slot` 변주 원값을
+     **한 자리도 안 바꿨다**.
    ------------------------------------------------------------------------- */
 #charpanel .cp-side-body{
   display: flex;
@@ -55717,6 +55537,10 @@ html[lang="en"] .mode-list [data-part="btn-picture"] .bp-badge[data-badge="stage
 }
 #charpanel .cp-side-rack{
   position: relative;
+  /* [판정판 24 · 0910] 랙이 곧 아이템 칸 그리드다. **안 눌린다**(flex 0 0 auto) —
+     1280 실측에서 flex 로 눌리자 셋째 칸이 랙 밖으로 나갔다(빈 칸 3 → 2로 보였다).
+     넘치는 몫은 레일 판(.cp-side-body)이 굴려서 받는다. 좌우 안여백은 코너
+     크리스탈(.wxtal — 칸 밖 ±5.1%)이 판 가장자리에 잘리지 않게 하는 몫이다. */
   flex: 0 0 auto;
   display: flex;
   flex-direction: column;
@@ -55733,6 +55557,8 @@ html[lang="en"] .mode-list [data-part="btn-picture"] .bp-badge[data-badge="stage
   margin-top: var(--cs-side-rec);
   padding: calc(var(--f2-w) * .1034 - var(--cs-side-rec)) 0 0;
   gap: calc(var(--f2-w) * .0348);
+  padding-left: calc(var(--f2-w) * .0090);
+  padding-right: calc(var(--f2-w) * .0090);
   z-index: 2;
 }
 #charpanel .cp-side-rack .cp-gem{
@@ -55802,73 +55628,73 @@ html[lang="en"] .mode-list [data-part="btn-picture"] .bp-badge[data-badge="stage
   color: transparent;
   text-shadow: none;
   background: center/contain no-repeat;
-}
-#charpanel .cp-side-rack #cp-gem-item .cp-cr-ic {
   width: calc(var(--f2-w) * .0995);
   height: calc(var(--f2-w) * .0995);
-  background-image: url("catalog/slot-ic-item.webp");
 }
-#charpanel .cp-side-rack #cp-side-skin .cp-cr-ic {
-  width: calc(var(--f2-w) * .0995);
-  height: calc(var(--f2-w) * .0995);
-  background-image: url("catalog/slot-ic-skin.webp");
+/* [판정판 24 · 0910] 빈 칸의 실루엣 — 그 자리에 무엇이 들어오는지를
+   그림이 말한다. 파일 셋은 종전 그대로고(새 그림 0) 상자도 같다 —
+   바뀐 것은 «무엇을 가리키는가»뿐이다: 홀=무기 · 코트=보조 · 왕관=장신구. */
+#charpanel .cp-side-rack .cp-islot[data-slot="weapon"]  > .cp-cr-ic { background-image: url("catalog/slot-ic-skill.webp"); }
+#charpanel .cp-side-rack .cp-islot[data-slot="aux"]     > .cp-cr-ic { background-image: url("catalog/slot-ic-skin.webp"); }
+#charpanel .cp-side-rack .cp-islot[data-slot="trinket"] > .cp-cr-ic { background-image: url("catalog/slot-ic-item.webp"); }
+/* 획득 · 장착 칸은 아이템 자신의 글리프를 쓴다 — 그림을 끄고 글꼴로
+   돌아간다. 크기는 칸이 이미 가진 .0500 을 그대로 상속한다(새 값 0). */
+#charpanel .cp-side-rack .cp-islot[data-state="own"] > .cp-cr-ic,
+#charpanel .cp-side-rack .cp-islot[data-state="eq"]  > .cp-cr-ic {
+  width: auto;
+  height: auto;
+  background-image: none;
+  font-size: inherit;
+  color: var(--f2-ink);
+  line-height: 1;
 }
-#charpanel .cp-side-rack #cp-gem-skill .cp-cr-ic {
-  width: calc(var(--f2-w) * .0995);
-  height: calc(var(--f2-w) * .0995);
-  background-image: url("catalog/slot-ic-skill.webp");
+/* ---- 칸 상태 변주 셋 (빈 / 획득 / 장착) -------------------------------
+   액자는 셋 다 같은 .cp-crystal(work-frame slot 변주) 인스턴스다. 바뀌는
+   것은 **면 · 겉선 두 손잡이**뿐이고, 값은 이미 서 있던 것을 그대로
+   가져온다 — 빈 = 종전 비활성 젬(.929 / .363) · 장착 = 종전 활성 젬(.560)
+   + 종전 아이템 칸 토큰(--f2-item-on 면 · --f2-item-line 겉선) + 종전
+   .cp-item.on 의 광배(--role-f2-hi-halo). 새 원시값 0. */
+#charpanel .cp-side-rack .cp-islot[data-state="empty"] {
+  cursor: default;
+  pointer-events: none;
 }
-#charpanel[data-cpside="item"]  .cp-gem[data-cpside="item"],
-#charpanel[data-cpside="skin"]  .cp-gem[data-cpside="skin"],
-#charpanel[data-cpside="skill"] .cp-gem[data-cpside="skill"]{
-  --wslot-face: var(--role-wslot-face-crystal);
-  /* [E30-0903] 활성 젬도 같은 α 로 맞춘다(.78 -> .929). 시안은 세 단이 모두
-     같은 속색이고, 활성 강조는 겉선 알파(--wslot-L3-a .560)가 그대로 낸다.
-     봉인: --wslot-a-in: .78; */
+#charpanel .cp-side-rack .cp-islot[data-state="own"] {
+  --wslot-face: var(--f2-item-face);
+}
+#charpanel .cp-side-rack .cp-islot[data-state="eq"] {
+  --wslot-face: var(--f2-item-on);
+  --wslot-L3-line: var(--f2-item-line);
   --wslot-a-in: .929;
   --wslot-L3-a: .560;
+  box-shadow:
+    inset 0 0 0 var(--wslot-L3-w) color-mix(in srgb, var(--wslot-L3-line)
+      calc(var(--wslot-L3-a) * 100%), transparent),
+    0 0 calc(var(--f2-w) * .014) var(--role-f2-hi-halo);
 }
-/* 펼침판 — 랙 아래 남는 몫 전부. 착수 전에는 몸통 전체를 덮는 absolute 였다. */
-#charpanel .cp-side-panes{
-  position: relative;
-  inset: auto;
-  flex: 1 1 auto;
-  min-height: 0;
-  margin: calc(var(--f2-w) * .0120) calc(var(--f2-w) * .0180)
-          calc(var(--f2-w) * .0180);
+/* [판정판 24 · 0910] 슬롯 안전 상자 — 규격 §4.1-3. HUD 절(#duel-hud/#classic-hud
+   [data-slot=…])과 **같은 어휘·같은 단위**(칸 상자 대비 %)다. 여기서도 기본은
+   **선언만**이다 — 이 네 값을 읽는 규칙은 `[data-guard]` 를 켠 컨테이너 안에만
+   있고(#duel-hud[data-guard] · #classic-hud[data-guard]), 캐릭창은 그 둘 어느
+   쪽의 자손도 아니다. 그래서 렌더는 한 화소도 안 움직인다(선언 전후 동일).
+   ▣ 실측(390x844 dpr1 · 칸 상자 51.531 x 50.609 · playwright DOM, 네 상태 전량):
+     빈 칸  .cp-cr-ic 상자   x 7.203 y 6.734 w 37.125 h 37.125  (그림 .0995W 정사각)
+     획득·장착 글리프+값 알약 union  x 9.141 y 6.391 w 33.234 h 34.828
+       (가장 넓은 경우 = 값 「+120%」 알약 33.234 · 글리프 잉크가 상자 위로 3.0 넘침)
+     상태 전량 union       x 7.203 y 6.391 w 37.125 h 37.469
+       -> 13.98% · 12.63% · 72.04% · 74.04% (우변 86.02% · 밑변 86.67%, 칸 안)
+   ▣ 세 칸은 크기·내용 문법이 같은 한 부품의 슬롯 변주라 값도 같다 — 다른 것은
+     빈 칸 실루엣 그림뿐이고 그 상자(.0995W 정사각)는 셋이 공유한다. */
+#charpanel .cp-side-rack .cp-islot[data-slot="weapon"],
+#charpanel .cp-side-rack .cp-islot[data-slot="aux"],
+#charpanel .cp-side-rack .cp-islot[data-slot="trinket"] {
+  --safe-x: 13.98%;
+  --safe-y: 12.63%;
+  --safe-w: 72.04%;
+  --safe-h: 74.04%;
 }
-/* 아이템 축소 목록 — 한 줄이 «아이콘 + %p» 가로 한 줄이 된다. 착수 전에는 세로
-   2줄이라 좁아진 레일에서 눌려 아이콘과 숫자가 서로 겹쳤다(착수 전 캡처 참고).
-   그리는 코드(syncItemList)와 클릭 배선(toggleItem)은 한 글자도 안 건드렸다. */
-#charpanel .cp-side .cp-item-list{ gap: calc(var(--f2-w) * .0060); }
-#charpanel .cp-side .cp-item{
-  flex-direction: row;
-  gap: calc(var(--f2-w) * .0100);
-  padding: calc(var(--f2-w) * .0040) calc(var(--f2-w) * .0050);
-  min-height: calc(var(--f2-w) * .0540);
-}
-#charpanel .cp-side .cp-item .ci-chip{ font-size: calc(var(--f2-w) * .0340); }
-#charpanel .cp-side .cp-item .cp-item-v{ font-size: calc(var(--f2-w) * .0240); }
-/* 스킨·필살기 문구는 랙 아래 판에 앉는다(젬은 랙으로 올라갔다). */
-#charpanel .cp-side .cp-pane[data-pane="skin"],
-#charpanel .cp-side .cp-pane[data-pane="skill"]{ justify-content: flex-start; }
-/* 세로 탭 줄 — 세 탭이 **자기 젬 줄에 서게** 한다. 착수 전에는 flex:1 1 0 으로
-   레일 전 높이를 셋으로 갈라(각 123.6px) 젬 줄(피치 53.8px)과 어긋나 있었다:
-   ★(스킨) 젬이 「아이템」 탭 옆에 서서 짝을 오독할 수 있었다.
-   값은 랙과 **같은 실측**이다 — 시작 .1034W · 피치 .1442W(= 높이 .1406 + 틈 .0036).
-   높이를 못 박지 않고 min-height 로 둔 이유: en 라벨(Items/Skins/Ultimate)은 세로
-   쓰기에서 그 높이에 안 들어간다. ko(시안 언어)는 정확히 맞고, en 은 잘리는 대신
-   자란다(착수 전 8자 「Ultimate」가 탭 밖으로 흘러나오던 것도 이걸로 그친다). */
-#charpanel .cp-side-tabs{
-  justify-content: flex-start;
-  padding-top: calc(var(--f2-w) * .1034);
-  gap: calc(var(--f2-w) * .0036);
-}
-#charpanel .cp-vtab{
-  flex: 0 0 auto;
-  height: auto;
-  min-height: calc(var(--f2-w) * .1406);
-}
+/* [은퇴 2026-09-10 · 판정판 24] 축소 칩 목록(.cp-item-list · .cp-item) ·
+   스킨/필살기 펼침판 · 세로 탭 줄 덮쓰기. 셋 모두 사라진 부품을
+   가리키던 규칙이다. 칸의 크기는 바로 위 .cp-side-rack .cp-gem 이 낸다. */
 
 
 /* ==== [W7-0901] 파도7 - 색 통일 · 탭 실제 분할 (여기부터) ==== */
@@ -56530,7 +56356,6 @@ html[lang="en"] .mode-list [data-part="btn-picture"] .bp-badge[data-badge="stage
    슬롯/판 비는 우리 .677 · 시안 .683 으로 이미 같다 — 레일 전체가 작았다.
    --f2-w = .957W 이므로 W분수 ÷ .957 로 환산해 적는다. */
 #charpanel { --cs-side: calc(var(--f2-w) * .2730); }
-#charpanel .cp-side-tabs { flex: 0 0 calc(var(--f2-w) * .0628); }
 #charpanel .cp-side-rack { gap: calc(var(--f2-w) * .0213); }
 #charpanel .cp-side-rack .cp-gem {
   width:  calc(var(--f2-w) * .1381);
@@ -56692,16 +56517,17 @@ html[lang="en"] .mode-list [data-part="btn-picture"] .bp-badge[data-badge="stage
 /* ---- CV-14. CV-1 부수효과 막기 — 레일 빈 안내문구 잘림 ------------
    CV-1 이 768x1389 에서 #charpanel 의 --f2-w 를 430 -> 735 로 올렸다. 글자는
    폭에 비례해 1.71배가 되는데 레일 높이는 화면 높이(1.65배)를 따라서,
-   «아직 아이템이 없어요…» 마지막 줄이 `.cp-side-panes` 의 overflow:hidden
+   «아직 아이템이 없어요…» 마지막 줄이 레일 판의 overflow:hidden
    에 잘렸다(실렌더 확인). 잘리는 일 자체를 없앱니다:
      · 문구 크기를 이 구간에서만 .026 -> .0190 (768 에서 14.0px)
-     · 펼침판을 세로 스크롤 가능하게 — 어떤 비율에서도 글이 사라지지 않는다.
+     · 레일 판(.cp-side-body)을 세로 스크롤 가능하게 — 어떤 비율에서도 글이
+       사라지지 않는다. [0910] 스크롤을 판이 지는 이유는 칸(.cp-islot)이
+       눌리면 안 되기 때문이다(랙은 flex 0 0 auto).
    시안이 재는 자리(390 풀블리드)는 이 블록 밖이라 무변화다. */
-#charpanel .cp-side-panes { overflow-y: auto; scrollbar-width: none; }
-#charpanel .cp-side-panes::-webkit-scrollbar { width: 0; height: 0; }
+#charpanel .cp-side-body { overflow-y: auto; scrollbar-width: none; }
+#charpanel .cp-side-body::-webkit-scrollbar { width: 0; height: 0; }
 @media (min-width: 700px) and (orientation: portrait) {
-  #charpanel .cp-side .cp-item-none,
-  #charpanel .cp-side-txt { font-size: calc(var(--f2-w) * .0150); }
+  #charpanel .cp-side .cp-item-none { font-size: calc(var(--f2-w) * .0150); }
 }
 /* ==== [CV-0901] (여기까지) ==== */
 
