@@ -13552,8 +13552,19 @@ html[data-platform="twa"] #app-intro.is-hold .api-char{
          뒤 화면은 37% 만 비친다. 막은 이 파도의 발주 범위 **밖**이라 손대지 않았다 —
          「투명도가 전혀 안 나온다」의 남은 절반이 여기일 수 있다. 지휘자에게 올린다.
 
-     옛 값: --role-modal-tint: rgba(255,242,255,.17);  (0903 에 44701 에서 봉인된 값) */
-  --role-modal-tint: rgba(255,190,255,.0234);
+     옛 값: --role-modal-tint: rgba(255,242,255,.17);  (0903 에 44701 에서 봉인된 값)
+
+     ── [jelly-c 0910 · 재베이크 후 재역산] ────────────────────────────────────
+     위 「클램프 천장」이 실측으로 확인돼 webp 재질색·겉선색을 다시 구웠다
+     (catalog/jelly-box-c.webp · 재질색 #F7D8E6 · 겉선 #8E5A72 · 알파 무접촉).
+     합성식은 그대로다:  총α = 1−(1−a_w)(1−t) ,  P = [a_w·M + (1−a_w)·t·T]/총α
+       · a_w = 0.5085 (알파를 한 화소도 안 건드렸으므로 **불변**)
+       · 총 α 목표 = 시안 실측 0.52  →  t = 1 − (1−.52)/(1−.5085) = **0.0234 유지**
+       · 새 M_webp ≈ 목표 P(#F7D8E6) 이므로 산술상 **T ≈ #F7D8E6** 이면 닫힌다.
+     **옛 값 rgba(255,190,255,.0234) 은 옛 webp(M #E8D8DE) 기준의 «클램프 해»였다
+     — 재베이크로 M 이 곧 목표색이 되어 클램프가 풀렸다.** 그래서 틴트는 더 이상
+     색을 억지로 끌 필요가 없고, 목표색 그대로를 얹는다(α 는 손대지 않는다). */
+  --role-modal-tint: rgba(247,216,230,.0234);
   /* [jelly-c 0910 · **링 은퇴**] box-shadow 링은 border-radius 사각을 따라 webp 스퀘어클
      모서리와 어긋난다(지휘자 300% 실측: 모서리에서 호가 둘로 갈린다 — 판 겉선의 호 하나 +
      링의 호 하나. scratchpad/jelly-c/COMPARE.png §5). 이미지판 작업 기준 「모서리 어긋남」이라
@@ -13708,7 +13719,8 @@ html[data-platform="twa"] #app-intro.is-hold .api-char{
 <!-- 최우선 2장만 preload — 젤리판(세 인터페이스 공용)과 플레이 팝업 레터링이다.
      나머지 31장은 부트 뒤 유휴 프리로더(#catalog-preload)가 데운다. 여기에 더
      얹으면 초기 로드 대역폭을 게임 코드와 다투게 되므로 늘리지 않는다. -->
-<link rel="preload" as="image" href="catalog/jelly-box.webp">
+<!-- [jelly-c 0910] 재베이크판으로 교체. 되돌리기: href="catalog/jelly-box.webp" -->
+<link rel="preload" as="image" href="catalog/jelly-box-c.webp">
 <link rel="preload" as="image" href="catalog/duel-title-play.webp">
 <!-- ==RELEASE:BEGIN== 출시 메타 (scratchpad/release-0908/apply-head.py 가 생성·교체, 본문 무접촉) -->
 <meta name="build" content="8decb36-20260908-1716">
@@ -47366,7 +47378,9 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
   border-style:solid !important;
   border-color:transparent !important;
   border-width:var(--jbox-bw,0) !important;
-  border-image-source:url("catalog/jelly-box.webp") !important;
+  /* [jelly-c 0910] 젤리판 재질 재베이크 — 재질색 #F7D8E6 · 겉선 #8E5A72 · 알파 무손실.
+     되돌리기: border-image-source:url("catalog/jelly-box.webp") !important; */
+  border-image-source:url("catalog/jelly-box-c.webp") !important;
   border-image-slice:190 fill !important;
   border-image-repeat:stretch !important;
   border-image-width:var(--jbox-biw,1) !important;
