@@ -16205,6 +16205,16 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
       <div class="set-row"><span class="set-k" data-i18n="settings.theme">Theme</span><button id="st-theme" class="set-tg" type="button" data-i18n-aria="aria.theme" aria-label="Theme">Dark</button></div>
       <div class="set-row"><span class="set-k" data-i18n="settings.lang">Language</span><button id="st-lang" class="set-tg" type="button" data-i18n-aria="aria.lang" aria-label="Language">English</button></div>
     </div>
+    <!-- 판정판 50 — 퀘스트 진입. 기존 설정 줄 부품(btn-modal/lilac)의 인스턴스
+         하나이고, 배지는 이미 살아 있는 `.badge-new`(비면 자동 숨김)다.
+         ⚠ 맵 두 띠(#map-top·#map-bot)는 자식이 전부 **절대 좌표 %**로 100% 를
+           채우고 있어(back 3.76~18.75 · hearts 21.91~55.23 · stars 56.31~78.06 ·
+           gear 81.40~96.32cqw / b1 2.14~32.53 · plate 34.22~65.88 · char 66.84~
+           82.27 · rec 82.91~98.06%) 빈 칸이 3cqw 미만이다 — 거기에 버튼을 더하려면
+           정본 버튼 넷의 좌표를 옮겨야 하고 그것은 부품 픽셀 변경이다. 메뉴 넷은
+           §6.8 이 «칩 한 칸 + 라벨 한 줄»로 잠갔다(:13827). 그래서 진입은 설정 줄
+           하나 + 메뉴 상태 한 줄(#menu-best)로 둔다. -->
+    <button id="st-quest" data-part="btn-modal" data-variant="lilac" class="btn btn-secondary" type="button" data-i18n-aria="aria.quest" aria-label="Quests"><span data-i18n="settings.quest">Quests</span><span id="quest-badge" class="badge-new" hidden></span></button>
     <button id="st-rank" data-part="btn-modal" data-variant="lilac" class="btn btn-secondary" type="button" data-i18n-aria="aria.rank" data-i18n="settings.rank" aria-label="Records">Records</button>
     <!-- 10차 §E — 본 컷툰 다시 보기. 아직 한 컷도 안 봤으면 game.js 가 숨긴다:
          열어 봐야 빈 목록인 줄은 있으나 마나가 아니라 고장으로 읽힌다. -->
@@ -16791,6 +16801,33 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
     <p id="rank-hint"></p>
     <div id="rank-list"></div>
     <button id="rank-close" data-part="btn-modal" data-variant="primary" class="btn btn-primary" data-i18n-aria="aria.rankClose" data-i18n="rank.close" aria-label="Close records">Close</button>
+  </div></div>
+
+  <!-- ===== 퀘스트 · 출석 (판정판 50 · 2026-09-11) =====================
+       판은 **정본 모달 판 인스턴스**다 — `.sheet.jbox.jbox--modal[data-part=
+       "modal-plate"]`, #modal-rank(:16192) 와 한 글자도 다르지 않은 문법이다.
+       새 판을 그리지 않았고 새 그림도 0 이다(아이콘은 전부 --lib-* 카탈로그).
+       행 = [보상 타일+수량 | 제목 + 게이지(가운데 n/N) | 받기]. 받기 버튼은
+       젤리 알약 부품(.rank-tab)의 인스턴스이고 상태는 그 부품의 자기 문법
+       aria-selected 로 낸다 — 새 상태 어휘를 만들지 않는다.
+       ⚠ 탭은 **판 위**에 선다. 참고 화면은 아래에 붙어 있지만 우리 탭 부품
+       (.kit-tab-v2)은 윗변만 둥글고 스페큘러가 좌상단인 «상단 탭»이라, 아래에
+       뒤집어 붙이면 광원이 뒤집힌다(부품 계약 위반). 자리보다 부품을 지켰다. -->
+  <div id="modal-quest" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="quest-h"><div class="sheet jbox jbox--modal" data-part="modal-plate">
+    <h2 id="quest-h" data-i18n="quest.title">Quests</h2>
+    <button class="r10-x x-btn" type="button" data-w6x="quest-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
+    <div id="quest-tabs" class="kit-frame-v2__tabs qs-tabs" role="tablist" data-i18n-aria="aria.questTab" aria-label="Quest type">
+      <button class="kit-tab-v2 qs-tab" type="button" role="tab" data-qtab="daily" data-active aria-selected="true"><span class="cpt-lab" data-i18n="quest.tab.daily">Daily</span></button>
+      <button class="kit-tab-v2 qs-tab" type="button" role="tab" data-qtab="weekly" aria-selected="false"><span class="cpt-lab" data-i18n="quest.tab.weekly">Weekly</span></button>
+      <button class="kit-tab-v2 qs-tab" type="button" role="tab" data-qtab="epic" aria-selected="false"><span class="cpt-lab" data-i18n="quest.tab.epic">Epic</span></button>
+    </div>
+    <!-- 출석 7일 — 새 저장 칸 0. store.streak · store.streakClaimed(§21④)만 읽는다. -->
+    <div id="quest-att" class="qs-att" role="list" aria-label="Attendance"></div>
+    <div id="quest-list" class="qs-list"></div>
+    <div class="qs-foot">
+      <button id="quest-all" class="rank-tab qs-all" type="button" aria-selected="false" data-i18n="quest.claimall">Claim all</button>
+    </div>
+    <button id="quest-close" data-part="btn-modal" data-variant="primary" class="btn btn-primary" data-i18n-aria="aria.close" data-i18n="rank.close" aria-label="Close">Close</button>
   </div></div>
 
   <div id="toast" role="status" aria-live="polite"></div>
@@ -22387,6 +22424,66 @@ window.TT_SFX = {
      축하한 값은 checkMilestone 의 지급 줄까지 도달하지 못한다. */
   var MILESTONE_REWARD = { 100: 5, 500: 5, 1000: 5, 5000: 5 };
 
+  /* =========================================================================
+   * 퀘스트 · 출석 (판정판 50 · 2026-09-11) — 표
+   * -------------------------------------------------------------------------
+   * ⚠ 판 안 「스테이지 미션」(MISSION_GOALS · pickMission · missionBump ·
+   *   completeMission)과 **다른 시스템**이다. 이름이 겹치지 않게 이 계열은
+   *   전부 DAILY_/WEEKLY_/ACHV_ 접두와 dqBump·wqRoll·achvCheck 이름을 쓴다.
+   * 값 정본 = scratchpad/missions/SPEC-CONDUCTOR.md 표.
+   * ========================================================================= */
+  var DAILY_QUESTS = [
+    { id: 'm10',    goal: [15, 25, 40],       ico: '--lib-glyph-target' },
+    { id: 'combo',  goal: [5, 8, 12],         ico: '--lib-glyph-flag' },
+    { id: 'pet',    goal: [1, 2, 3],          ico: '--lib-glyph-heart' },
+    { id: 'awaken', goal: [1, 2, 3],          ico: '--lib-glyph-inf' },
+    { id: 'clear',  goal: [1, 2, 3],          ico: '--lib-glyph-crown' },
+    { id: 'daily',  goal: [1, 1, 1],  fix: 1, ico: '--lib-glyph-cal' },
+    { id: 'duel',   goal: [1, 1, 1],  fix: 2, ico: '--lib-badge-a' },
+    { id: 'star2',  goal: [1, 1, 1],  fix: 2, ico: '--lib-star-gold' },
+    { id: 'rush',   goal: [1000, 2000, 3500], ico: '--lib-glyph-clock' },
+    { id: 'item',   goal: [1, 1, 1],  fix: 1, ico: '--lib-glyph-score' },
+    { id: 'match',  goal: [30, 60, 100],      ico: '--lib-glyph-target' },
+    { id: 'chain',  goal: [3, 5, 8],          ico: '--lib-glyph-flag' }
+  ];
+  /* 난이도 1/2/3 의 젤리별 보상. 0 번 칸은 자리표시(난이도는 1 부터). */
+  var DQ_REWARD = [0, 3, 5, 8];
+  var DQ_BONUS_HEART = 1;          // 셋 다 «수령»하면 하루 1회
+
+  /* 주간 — 누적형 넷 중 셋을 그 주 월요일 시드로 뽑는다. */
+  var WEEKLY_QUESTS = [
+    { id: 'wclear', goal: 15,  v: 15, ico: '--lib-glyph-crown' },
+    { id: 'wstar',  goal: 20,  v: 20, ico: '--lib-star-gold' },
+    { id: 'wmis',   goal: 10,  v: 15, ico: '--lib-glyph-cal' },
+    { id: 'wmatch', goal: 300, v: 20, ico: '--lib-glyph-target' }
+  ];
+  var WQ_PICK = 3;
+
+  /* 에픽(업적) 20종. `ax` 는 «어느 누계를 읽는가»이고, 그 누계는 전부
+     achvAxis() 한 곳에서만 읽는다 — 조건이 코드 스무 군데로 흩어지지 않게. */
+  var ACHV = [
+    { id: 'first',     ax: 'match',  goal: 1,    v: 5,  ico: '--lib-glyph-target' },
+    { id: 'match100',  ax: 'match',  goal: 100,  v: 5,  ico: '--lib-glyph-target' },
+    { id: 'match1000', ax: 'match',  goal: 1000, v: 10, ico: '--lib-medal-bronze' },
+    { id: 'match5000', ax: 'match',  goal: 5000, v: 20, ico: '--lib-medal-gold' },
+    { id: 'combo5',    ax: 'combo',  goal: 5,    v: 5,  ico: '--lib-glyph-flag' },
+    { id: 'combo10',   ax: 'combo',  goal: 10,   v: 10, ico: '--lib-glyph-flag' },
+    { id: 'combo20',   ax: 'combo',  goal: 20,   v: 20, ico: '--lib-badge-s' },
+    { id: 'pet1',      ax: 'pet',    goal: 1,    v: 5,  ico: '--lib-glyph-heart' },
+    { id: 'pet3',      ax: 'pet',    goal: 3,    v: 10, ico: '--lib-glyph-heart' },
+    { id: 'petall',    ax: 'pet',    goal: 0,    v: 20, ico: '--lib-badge-s' },
+    { id: 'chap1',     ax: 'chap',   goal: 1,    v: 5,  ico: '--lib-glyph-crown' },
+    { id: 'chap3',     ax: 'chap',   goal: 3,    v: 10, ico: '--lib-glyph-crown' },
+    { id: 'star30',    ax: 'star',   goal: 30,   v: 5,  ico: '--lib-star-gold' },
+    { id: 'star60',    ax: 'star',   goal: 60,   v: 10, ico: '--lib-star-gold' },
+    { id: 'streak3',   ax: 'streak', goal: 3,    v: 5,  ico: '--lib-glyph-cal' },
+    { id: 'streak7',   ax: 'streak', goal: 7,    v: 10, ico: '--lib-glyph-cal' },
+    { id: 'streak14',  ax: 'streak', goal: 14,   v: 20, ico: '--lib-medal-gold' },
+    { id: 'duel1',     ax: 'duel',   goal: 1,    v: 5,  ico: '--lib-badge-a' },
+    { id: 'duel10',    ax: 'duel',   goal: 10,   v: 10, ico: '--lib-medal-silver' },
+    { id: 'awaken50',  ax: 'awaken', goal: 50,   v: 10, ico: '--lib-glyph-inf' }
+  ];
+
   /* 리텐션 래퍼(0910) ④ — 연속 출석 보상표. store.streak · lastDailyDate 는
      이미 집계만 되고 있었다(AUDIT A2) — 여기서 보상 배관만 붙인다.
      리셋 규칙은 bumpStreak 의 실측 그대로다: 하루라도 빠지면 streak 이 1 로
@@ -24779,7 +24876,26 @@ window.TT_SFX = {
     jewel: 0,
     iap: {},
     dailyFreeAt: 0,
-    firstBuy: false
+    firstBuy: false,
+    /* --- 퀘스트 · 에픽 (판정판 50 · 2026-09-11) --------------------------
+     * 새 저장 키는 **둘**뿐이다(quests · achv). 나머지 셋(comboMax ·
+     * duelWins · awkTotal)은 «이미 도는 카운터가 없는 축» 세 개를 메우는
+     * 가법 칸이고, 없던 세이브는 0 에서 시작한다 = 이전기 0.
+     *
+     *   quests.daily  { date, list:[{id,lv,goal,prog,done,claimed}]×3, bonus }
+     *   quests.weekly { week, list:[{id,goal,prog,done,claimed}]×3 }
+     *   achv          { <id>: { date:'YYYYMMDD', claimed:0|1 } }
+     *
+     * ⚠ 완료(done)와 수령(claimed)이 **다른 칸**인 것이 이 파도의 계약이다:
+     *   완료는 지급하지 않는다. 받기 버튼이 켜질 뿐이고, 지급은 클릭 한 곳
+     *   (questClaim)에서만 일어난다. 한 사건에 두 지급 경로를 만들지 않는다.
+     * 출석은 새 칸을 **안 만든다** — store.streak · lastDailyDate ·
+     *   streakClaimed(§21④)를 그대로 읽는다. */
+    quests: null,
+    achv: {},
+    comboMax: 0,      // 계정 최고 콤보 (에픽 combo5/10/20)
+    duelWins: 0,      // 아케이드 대전 누적 승 (에픽 duel1/10 · 일일 duel)
+    awkTotal: 0       // 각성 누적 발동 (에픽 awaken50 · 일일 awaken)
   };
 
   /**
@@ -25043,6 +25159,25 @@ window.TT_SFX = {
              기존 플레이어에게만 안 지키면 업데이트가 손해로 읽힌다. */
           store.jstar = advStarsTotalOf(store.advStars);
         }
+        /* 판정판 50 — 퀘스트·에픽. 모양이 어긋나면 그 칸만 버린다(9차
+           sanitizeCountMap 과 같은 규율). 없으면 기본값이 곧 정답이라
+           SCHEMA_MIGRATIONS 는 한 줄도 안 늘었다. */
+        if (o.quests && typeof o.quests === 'object') store.quests = o.quests;
+        if (o.achv && typeof o.achv === 'object') {
+          store.achv = {};
+          for (var qak in o.achv) {
+            if (!Object.prototype.hasOwnProperty.call(o.achv, qak)) continue;
+            var qav = o.achv[qak];
+            if (!qav) continue;
+            if (typeof qav === 'string') { store.achv[qak] = { date: qav, claimed: 0 }; continue; }
+            if (typeof qav === 'object') {
+              store.achv[qak] = { date: String(qav.date || ''), claimed: qav.claimed ? 1 : 0 };
+            }
+          }
+        }
+        if (typeof o.comboMax === 'number' && isFinite(o.comboMax)) store.comboMax = Math.max(0, o.comboMax | 0);
+        if (typeof o.duelWins === 'number' && isFinite(o.duelWins)) store.duelWins = Math.max(0, o.duelWins | 0);
+        if (typeof o.awkTotal === 'number' && isFinite(o.awkTotal)) store.awkTotal = Math.max(0, o.awkTotal | 0);
         /* 10차 §E — 컷툰 시청 기록. 값은 켜짐/꺼짐뿐이라 문자열 키만 살려 담는다:
            남의 손을 탄 세이브가 여기에 무엇을 넣어 두었든 화면에 흘러 들어가지
            않는다(9차의 sanitizeCountMap 과 같은 규율). */
@@ -26766,6 +26901,59 @@ window.TT_SFX = {
       'settings.vibe': 'Vibration',
       'settings.theme': 'Theme',
       'settings.lang': 'Language',
+      /* 퀘스트 · 출석 (판정판 50) — 숫자는 전부 자리표시자 파생이다. */
+      'quest.title': 'Quests',
+      'quest.tab.daily': 'Daily',
+      'quest.tab.weekly': 'Weekly',
+      'quest.tab.epic': 'Epic',
+      'quest.claim': 'Claim',
+      'quest.claimed': 'Done',
+      'quest.claimall': 'Claim all',
+      'quest.none': 'Nothing to claim yet.',
+      'quest.ready': 'Ready to claim: {n}',
+      'quest.got': 'Jelly Stars +{v}',
+      'quest.bonus': 'All daily quests cleared! Heart +{n}',
+      'quest.att.d': 'Day {n}',
+      'settings.quest': 'Quests',
+      'aria.quest': 'Open quests',
+      'aria.questTab': 'Pick which quests to show',
+      'menu.quest': 'Quests {n}/{g}',
+      'dq.m10': 'Make a Ten {n} times',
+      'dq.combo': 'Reach a x{n} combo',
+      'dq.pet': 'Call your friend {n} times',
+      'dq.awaken': 'Awaken {n} times',
+      'dq.clear': 'Clear {n} stages',
+      'dq.daily': "Finish today's Daily",
+      'dq.duel': 'Win a duel',
+      'dq.star2': 'Earn 2 stars or more',
+      'dq.rush': 'Score {n} in Time Rush',
+      'dq.item': 'Equip an item',
+      'dq.match': 'Match {n} pairs',
+      'dq.chain': 'Chain {n} in a row',
+      'wq.wclear': 'Clear {n} stages this week',
+      'wq.wstar': 'Earn {n} new stars this week',
+      'wq.wmis': 'Finish {n} daily quests',
+      'wq.wmatch': 'Match {n} pairs this week',
+      'ach.first': 'First pair',
+      'ach.match100': 'Matched {n}',
+      'ach.match1000': 'Matched {n}',
+      'ach.match5000': 'Matched {n}',
+      'ach.combo5': 'Combo x{n}',
+      'ach.combo10': 'Combo x{n}',
+      'ach.combo20': 'Combo x{n}',
+      'ach.pet1': 'First friend',
+      'ach.pet3': 'Three friends',
+      'ach.petall': 'Every friend',
+      'ach.chap1': 'Chapter {n} cleared',
+      'ach.chap3': 'Chapter {n} cleared',
+      'ach.star30': 'Stars {n}',
+      'ach.star60': 'Stars {n}',
+      'ach.streak3': '{n}-day streak',
+      'ach.streak7': '{n}-day streak',
+      'ach.streak14': '{n}-day streak',
+      'ach.duel1': 'First win',
+      'ach.duel10': '{n} duel wins',
+      'ach.awaken50': 'Awakened {n} times',
       'settings.rank': 'Records',
       'settings.close': 'Close',
       'settings.on': 'On',
@@ -27965,6 +28153,59 @@ window.TT_SFX = {
       'settings.vibe': '진동',
       'settings.theme': '테마',
       'settings.lang': '언어',
+      /* 퀘스트 · 출석 (판정판 50) — 숫자는 전부 자리표시자 파생이다. */
+      'quest.title': '퀘스트',
+      'quest.tab.daily': '일일',
+      'quest.tab.weekly': '주간',
+      'quest.tab.epic': '에픽',
+      'quest.claim': '받기',
+      'quest.claimed': '완료',
+      'quest.claimall': '모두 받기',
+      'quest.none': '아직 받을 것이 없어요.',
+      'quest.ready': '받을 수 있어요: {n}',
+      'quest.got': '젤리별 +{v}',
+      'quest.bonus': '오늘 퀘스트 전부 완료! 하트 +{n}',
+      'quest.att.d': '{n}일째',
+      'settings.quest': '퀘스트',
+      'aria.quest': '퀘스트 열기',
+      'aria.questTab': '어떤 퀘스트를 볼지 고르기',
+      'menu.quest': '퀘스트 {n}/{g}',
+      'dq.m10': '합 텐 {n}번 만들기',
+      'dq.combo': '콤보 x{n} 이상 1회',
+      'dq.pet': '펫 {n}번 소환',
+      'dq.awaken': '각성 {n}번',
+      'dq.clear': '스테이지 {n}판 클리어',
+      'dq.daily': '오늘의 데일리 1판',
+      'dq.duel': '대전 1승',
+      'dq.star2': '별 두 개 이상 1회',
+      'dq.rush': '타임러시 {n}점',
+      'dq.item': '아이템 장착 1회',
+      'dq.match': '짝 {n}번 맞추기',
+      'dq.chain': '연속 매치 {n}회',
+      'wq.wclear': '이번 주 스테이지 {n}판 클리어',
+      'wq.wstar': '이번 주 새 별 {n}개',
+      'wq.wmis': '일일 퀘스트 {n}회 완료',
+      'wq.wmatch': '이번 주 짝 {n}번',
+      'ach.first': '첫 짝',
+      'ach.match100': '짝 {n}번',
+      'ach.match1000': '짝 {n}번',
+      'ach.match5000': '짝 {n}번',
+      'ach.combo5': '콤보 x{n}',
+      'ach.combo10': '콤보 x{n}',
+      'ach.combo20': '콤보 x{n}',
+      'ach.pet1': '첫 펫',
+      'ach.pet3': '펫 셋',
+      'ach.petall': '펫 전원',
+      'ach.chap1': '챕터 {n} 완주',
+      'ach.chap3': '챕터 {n} 완주',
+      'ach.star30': '별 {n}개',
+      'ach.star60': '별 {n}개',
+      'ach.streak3': '{n}일 연속',
+      'ach.streak7': '{n}일 연속',
+      'ach.streak14': '{n}일 연속',
+      'ach.duel1': '첫 승',
+      'ach.duel10': '대전 {n}승',
+      'ach.awaken50': '각성 {n}회',
       'settings.rank': '기록',
       'settings.close': '닫기',
       'settings.on': '켜짐',
@@ -29016,6 +29257,9 @@ window.TT_SFX = {
       * replacing them, so it must be listed here or a goMenu() from underneath
       * would leave the board floating over the menu. */
      'modal-rank',
+     /* 판정판 50 — 퀘스트 판도 기록판과 같은 이유로 여기 있어야 한다(맵·메뉴로
+        나갈 때 판이 남지 않게). */
+     'modal-quest',
      // v4 4차-a — 모험의 두 시트도 여기 목록에 있어야 지도/메뉴로 나갈 때 남지 않는다.
      'modal-node', 'modal-adv',
      /* W7.5 — 클래식 허브. #modal-mode 가 이 목록에 없는 것과 대칭이 아닌 데는
@@ -29519,6 +29763,13 @@ window.TT_SFX = {
        * record parts, because "the daily is waiting" is exactly the state a
        * brand-new player is in and the one worth advertising most. */
       parts.push(dailyDoneToday() ? t('menu.dailydone') : t('menu.dailytodo'));
+      /* 판정판 50 — 넷째 조각. §6.8 이 메뉴 버튼의 배지·부제를 금지했으므로
+         «오늘 받을 것이 있다»는 이 «아주 작은 상태 한 줄»이 말한다. 새 요소 0. */
+      try {
+        var qs = questsEnsure(), qd = 0, qi;
+        for (qi = 0; qi < qs.daily.list.length; qi++) { if (qs.daily.list[qi].claimed) qd++; }
+        parts.push(t('menu.quest', { n: qd, g: qs.daily.list.length }));
+      } catch (eq) { /* 부팅 전 */ }
       mb.textContent = parts.join(' · ');
     }
     // The How-to's Next button doubles as the tutorial entry on the last panel,
@@ -29827,6 +30078,11 @@ window.TT_SFX = {
     S.comboUntil = t + COMBO_MS;
     if (S.combo > S.maxCombo) S.maxCombo = S.combo;
     if (S.combo > S.stageMaxCombo) S.stageMaxCombo = S.combo;
+    /* 판정판 50 — 계정 최고 콤보(에픽 combo5/10/20 이 읽는 유일한 칸)와
+       일일 「콤보 n 이상」. 판 단위 S.maxCombo 옆에 둔 것은 같은 사건을
+       두 번 판정하지 않기 위해서다. */
+    if (S.combo > (store.comboMax | 0)) store.comboMax = S.combo;
+    dqBump('combo', S.combo, true);
     // "Reach a x5 combo" — an unbroken chain, which is exactly what S.combo is.
     if (S.combo >= MISSION_COMBO) missionBump('combo5', 1);
 
@@ -33268,6 +33524,11 @@ window.TT_SFX = {
        ⚠ 아래 twAlt/twSeen/syncTwChip 은 summon 안에 남는다: 그것은 「형제가
          소환돼 사슬을 대신 세운다」는 summon 고유 효과이지 연쇄 카운터가 아니다. */
     awkStreak++;
+    /* 판정판 50 — 「각성」 축. 수동 발동과 보스 확정 시전이 둘 다 여기로
+       모이고 게이지가 모자라 튕긴 시도는 여기까지 못 온다(위 주석 그대로). */
+    store.awkTotal = (store.awkTotal | 0) + 1;
+    dqBump('awaken', 1);
+    achvCheck();
     if (kind === 'summon') {
       /* 형제는 이미 리듬을 맞춘 채로 도착한다 — 사슬이 SKILL_TW_HEAD 에서
          출발한다. twSeen 도 같이 올려 5연쇄 배너가 "내가 한 것도 아닌데" 터지는
@@ -34114,6 +34375,277 @@ window.TT_SFX = {
       }
       break;   // at most one milestone can be crossed by a single match
     }
+  }
+
+
+  /* =========================================================================
+   * SECTION 8.5 — 퀘스트 · 출석  (판정판 50 · 2026-09-11 · DESIGN 「퀘스트·출석」)
+   * -------------------------------------------------------------------------
+   * · 일일 3 (풀 12종, 날짜 시드) · 주간 3 (풀 4종, 월요일 시드) · 에픽 20(업적).
+   * · 진행 훅은 **dqBump(id, n, atLeast) 한 함수**만 부른다(교체점 1).
+   * · 보상은 **클릭으로만** 나간다(questClaim) — 완료는 버튼을 켤 뿐이다.
+   * · 새 규칙·새 수치는 없다. 이미 도는 카운터를 읽고, 없는 축 셋만 새로 센다.
+   * ========================================================================= */
+
+  /* 결정적 PRNG (mulberry32). 같은 날짜·같은 주에는 전 세계가 같은 목록을 본다. */
+  function qRng(seed) {
+    var a = (seed | 0) >>> 0;
+    return function () {
+      a = (a + 0x6D2B79F5) >>> 0;
+      var t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  /** 그 날이 속한 주의 **월요일** 날짜키. 주 경계를 코드 한 곳에서만 정한다. */
+  function weekKey(d) {
+    var t = d ? new Date(d.getTime()) : new Date();
+    var dow = t.getDay();                    // 0=일 … 6=토
+    var back = (dow + 6) % 7;                // 월요일까지 며칠 뒤로
+    t.setHours(0, 0, 0, 0);
+    t.setDate(t.getDate() - back);
+    return todayKey(t);
+  }
+
+  function dqDefOf(id) {
+    for (var i = 0; i < DAILY_QUESTS.length; i++) {
+      if (DAILY_QUESTS[i].id === id) return DAILY_QUESTS[i];
+    }
+    return null;
+  }
+  function wqDefOf(id) {
+    for (var i = 0; i < WEEKLY_QUESTS.length; i++) {
+      if (WEEKLY_QUESTS[i].id === id) return WEEKLY_QUESTS[i];
+    }
+    return null;
+  }
+  function achvDefOf(id) {
+    for (var i = 0; i < ACHV.length; i++) {
+      if (ACHV[i].id === id) return ACHV[i];
+    }
+    return null;
+  }
+  function achvGoal(a) { return a.id === 'petall' ? MATE_IDS.length : a.goal; }
+
+  /** 일일 3택. 중복 없이 셋, 난이도는 시드로, **최소 하나는 난이도 1**. */
+  function dqRoll(dateK) {
+    var r = qRng(parseInt(dateK, 10) | 0);
+    var pool = DAILY_QUESTS.slice(), list = [], i, d, lv;
+    for (i = 0; i < 3 && pool.length; i++) {
+      d = pool.splice(Math.floor(r() * pool.length) % pool.length, 1)[0];
+      lv = d.fix ? d.fix : (1 + (Math.floor(r() * 3) % 3));
+      list.push({ id: d.id, lv: lv, goal: d.goal[lv - 1], prog: 0, done: 0, claimed: 0 });
+    }
+    var has1 = false;
+    for (i = 0; i < list.length; i++) { if (list[i].lv === 1) has1 = true; }
+    if (!has1) {
+      /* 고정 난이도가 없는 첫 칸을 1 로 내린다. 결정적이라 같은 날에는 언제나
+         같은 칸이 내려간다 — «쉬운 것 하나는 반드시 있다»가 이 줄의 전부다. */
+      for (i = 0; i < list.length; i++) {
+        d = dqDefOf(list[i].id);
+        if (d && !d.fix) { list[i].lv = 1; list[i].goal = d.goal[0]; break; }
+      }
+    }
+    return { date: dateK, list: list, bonus: 0 };
+  }
+
+  /** 주간 3택. 시드는 그 주 월요일. */
+  function wqRoll(weekK) {
+    var r = qRng((parseInt(weekK, 10) | 0) ^ 0x5745454B);
+    var pool = WEEKLY_QUESTS.slice(), list = [], i, d;
+    for (i = 0; i < WQ_PICK && pool.length; i++) {
+      d = pool.splice(Math.floor(r() * pool.length) % pool.length, 1)[0];
+      list.push({ id: d.id, goal: d.goal, prog: 0, done: 0, claimed: 0 });
+    }
+    return { week: weekK, list: list };
+  }
+
+  /**
+   * 읽는 순간 굴린다. 날짜(주)가 바뀌었으면 목록을 새로 뽑고 진행은 0 —
+   * **별도 타이머 0**. dailyDoneToday() 가 쓰는 그 관례 그대로다.
+   */
+  function questsEnsure() {
+    var dk = todayKey(), wk = weekKey(), q = store.quests, dirty = false;
+    if (!q || typeof q !== 'object') { q = {}; dirty = true; }
+    if (!q.daily || q.daily.date !== dk || !q.daily.list || q.daily.list.length !== 3) {
+      q.daily = dqRoll(dk); dirty = true;
+    }
+    if (!q.weekly || q.weekly.week !== wk || !q.weekly.list || !q.weekly.list.length) {
+      q.weekly = wqRoll(wk); dirty = true;
+    }
+    if (!store.achv || typeof store.achv !== 'object') { store.achv = {}; dirty = true; }
+    store.quests = q;
+    if (dirty) persist();
+    return q;
+  }
+
+  /**
+   * 진행 훅 **단일 진입점**. 일일·주간 두 목록을 같은 id 로 훑는다.
+   * @param atLeast 참이면 «올린다»가 아니라 «적어도 n 까지»(콤보·점수처럼 최댓값)
+   */
+  function dqBump(id, n, atLeast) {
+    var q = questsEnsure(), hit = false, i, e, want;
+    var lists = [q.daily.list, q.weekly.list];
+    for (var L = 0; L < lists.length; L++) {
+      for (i = 0; i < lists[L].length; i++) {
+        e = lists[L][i];
+        if (e.id !== id || e.done) continue;
+        want = atLeast ? Math.max(e.prog | 0, n | 0) : ((e.prog | 0) + (n | 0 || 1));
+        if (want <= (e.prog | 0)) continue;
+        e.prog = Math.min(e.goal, want);
+        hit = true;
+        if (e.prog >= e.goal) {
+          e.done = 1;
+          /* 지급하지 않는다 — 받기 버튼만 켜진다(이 파도의 계약). */
+          toast(t('quest.ready', { n: questText(e, L === 0 ? 'daily' : 'weekly') }));
+          J.sfx.milestone();
+          J.vibrate(35);
+          if (L === 0) dqBump('wmis', 1);      // 주간 「미션 10회」는 일일 완료를 센다
+        }
+      }
+    }
+    if (!hit) return;
+    persist();
+    questPaint();
+    questBadges();
+  }
+
+  /* ---- 에픽(업적) --------------------------------------------------------- */
+
+  /** 누계를 읽는 유일한 자리. **새 카운터는 세 개뿐**이고 나머지는 실측 재사용. */
+  function achvAxis(ax) {
+    switch (ax) {
+      case 'match':  return store.totalMatches | 0;
+      case 'combo':  return store.comboMax | 0;
+      case 'pet':    return Array.isArray(store.pets) ? store.pets.length : 0;
+      /* 챕터는 파생 판정이다 — advMax 는 «다음에 열린 탄»이라 11 이면 10탄까지
+         깼다는 뜻이고, ADV_CHAPTER(10) 로 나누면 그것이 곧 완주한 챕터 수다.
+         새 카운터를 만들지 않는 이유가 이 한 줄이다. */
+      case 'chap':   return Math.max(0, Math.floor((((store.advMax | 0) - 1)) / ADV_CHAPTER));
+      case 'star':   return advStarsTotalOf(store.advStars) | 0;
+      case 'streak': return store.streak | 0;
+      case 'duel':   return store.duelWins | 0;
+      case 'awaken': return store.awkTotal | 0;
+    }
+    return 0;
+  }
+
+  /**
+   * 달성 판정 한 곳(교체점 1). **지급하지 않는다** — 달성 날짜만 남기고
+   * 받기 버튼을 켠다. checkMilestone() 의 문법(조건 → 중복방지 → 기록 →
+   * persist → 축하)을 그대로 따르되 지급 줄만 questClaim 으로 옮겼다.
+   */
+  function achvCheck() {
+    if (!store.achv || typeof store.achv !== 'object') store.achv = {};
+    var got = 0, i, a;
+    for (i = 0; i < ACHV.length; i++) {
+      a = ACHV[i];
+      if (store.achv[a.id]) continue;
+      if (achvAxis(a.ax) < achvGoal(a)) continue;
+      store.achv[a.id] = { date: todayKey(), claimed: 0 };
+      if (!got) {
+        toast(t('quest.ready', { n: t('ach.' + a.id, { n: achvGoal(a) }) }));
+        J.sfx.milestone();
+        J.vibrate(35);
+        if (typeof window !== 'undefined') {
+          J.confetti(window.innerWidth / 2, window.innerHeight * 0.35);
+        }
+      }
+      got++;
+    }
+    if (!got) return;
+    persist();
+    questPaint();
+    questBadges();
+  }
+
+  /* ---- 수령 --------------------------------------------------------------- */
+
+  /** 받을 것이 있는 항목 수. 배지가 읽는 유일한 값이다. */
+  function questClaimable() {
+    var q = questsEnsure(), n = 0, i, L;
+    var lists = [q.daily.list, q.weekly.list];
+    for (L = 0; L < lists.length; L++) {
+      for (i = 0; i < lists[L].length; i++) {
+        if (lists[L][i].done && !lists[L][i].claimed) n++;
+      }
+    }
+    for (i = 0; i < ACHV.length; i++) {
+      var r = store.achv && store.achv[ACHV[i].id];
+      if (r && !r.claimed) n++;
+    }
+    return n;
+  }
+
+  /** 일일 세 칸을 **전부 수령**했으면 하루 1회 하트 +1. */
+  function dqBonus(q) {
+    if (q.daily.bonus) return 0;
+    for (var i = 0; i < q.daily.list.length; i++) {
+      if (!q.daily.list[i].claimed) return 0;
+    }
+    q.daily.bonus = 1;
+    grantHearts(DQ_BONUS_HEART);
+    toast(t('quest.bonus', { n: DQ_BONUS_HEART }));
+    return DQ_BONUS_HEART;
+  }
+
+  /** 지급하는 **유일한 함수**. tab: 'daily'|'weekly'|'epic'. */
+  function questClaim(tab, id) {
+    var q = questsEnsure(), gain = 0, e, i, a, r;
+    if (tab === 'epic') {
+      a = achvDefOf(id);
+      r = a && store.achv ? store.achv[a.id] : null;
+      if (!a || !r || r.claimed) return 0;
+      r.claimed = 1;
+      gain = a.v | 0;
+    } else {
+      var list = (tab === 'weekly' ? q.weekly.list : q.daily.list);
+      for (i = 0; i < list.length; i++) {
+        if (list[i].id !== id) continue;
+        e = list[i];
+        break;
+      }
+      if (!e || !e.done || e.claimed) return 0;
+      e.claimed = 1;
+      gain = (tab === 'weekly') ? ((wqDefOf(id) || { v: 0 }).v | 0)
+                                : (DQ_REWARD[e.lv] | 0);
+    }
+    if (gain > 0) {
+      /* 지갑은 여기서 바로 늘고, S.gainJstar 는 결과 시트의 보상 행이 읽을
+         사본이다 — §21③ 과 **같은 배관**(gainGem 과 칸을 가른 이유도 같다). */
+      store.jstar = (store.jstar | 0) + gain;
+      S.gainJstar = (S.gainJstar | 0) + gain;
+    }
+    if (tab === 'daily') dqBonus(q);
+    persist();
+    toast(t('quest.got', { v: gain }));
+    J.sfx.milestone();
+    J.vibrate(30);
+    if (typeof window !== 'undefined') {
+      J.confetti(window.innerWidth / 2, window.innerHeight * 0.42);
+    }
+    questPaint();
+    questBadges();
+    return gain;
+  }
+
+  /** 지금 탭의 받을 수 있는 것 전량. 없으면 0 을 돌려주고 아무 일도 안 한다. */
+  function questClaimAll(tab) {
+    var q = questsEnsure(), got = 0, i;
+    if (tab === 'epic') {
+      for (i = 0; i < ACHV.length; i++) {
+        var r = store.achv && store.achv[ACHV[i].id];
+        if (r && !r.claimed) got += questClaim('epic', ACHV[i].id);
+      }
+      return got;
+    }
+    var list = (tab === 'weekly' ? q.weekly.list : q.daily.list).slice();
+    for (i = 0; i < list.length; i++) {
+      if (list[i].done && !list[i].claimed) got += questClaim(tab, list[i].id);
+    }
+    return got;
   }
 
   /* =========================================================================
@@ -35588,6 +36120,11 @@ window.TT_SFX = {
       petCondBump();
       S.matches++;
       store.totalMatches = (store.totalMatches | 0) + 1;
+      /* 판정판 50 — 「짝」 축. 세는 자리는 store.totalMatches 를 세는 그 한
+         줄 옆이다(43250 주석의 규약 그대로) — 두 수가 갈리는 경로가 없다. */
+      dqBump('match', 1);
+      dqBump('wmatch', 1);
+      achvCheck();
       missionBump('noadd', 1);
       missionBump('sprint', 1);
       /* ★ 0901 ⑦ P1 — 교차 미션의 진행. **자리를 여기로 옮긴 것이 이 처방의
@@ -35598,10 +36135,13 @@ window.TT_SFX = {
          다른 모드는 무접촉이다: noBonus(클래식·데일리·얼음만)에서 tw 는
          {chain:0} 이고, 엔들리스는 chain3 미션을 애초에 못 뽑는다
          (missionPool 에 없다) — missionBump 가 id 불일치로 즉시 돌아간다. */
+      /* 판정판 50 — 「연속 매치」 축 = 텐트윈 연쇄 길이. 최댓값이라 atLeast. */
+      if (tw && tw.chain > 0) dqBump('chain', tw.chain, true);
       if (tw && tw.chain > 0 && tw.chain % 3 === 0) missionBump('chain3', 1);
       if (va === vb) missionBump('same', 1);
       else if (va + vb === 10) {
         missionBump('sum10', 1);
+        dqBump('m10', 1);           /* 판정판 50 — 「합 10」 축 */
         petTenBump();
         /* ★ 0826 6단계 — ★★★ 의 숙련 항. 자리가 여기인 것은 계약이다: 이
            else-if 는 matchKind 와 **같은 규칙**(같은 숫자가 아니고 합이 10)을
@@ -37591,6 +38131,8 @@ window.TT_SFX = {
      * 그래서 클래식 세 종목이 store.best / ranks.endless 로 새어 들어갈 문법적
      * 경로가 없다 — 이 함수 안에 'endless' 나 'best' 라는 이름이 남아 있지 않다. */
     var rush = isRush();
+    /* 판정판 50 — 「타임러시 n점」 축. 점수가 확정되는 이 한 자리에서만 센다. */
+    if (rush) dqBump('rush', S.score | 0, true);
     if (S.score > store[bestKey()]) store[bestKey()] = S.score;
     if (!rush && S.stage > store[bestStageKey()]) store[bestStageKey()] = S.stage;
     dropProgress();
@@ -37811,6 +38353,9 @@ window.TT_SFX = {
       S.gainShard[dsk] = (S.gainShard[dsk] | 0) + PET_DAILY_SHARD;   /* 결과 시트 보상 행 */
       petShardCheck();
     }
+    /* 판정판 50 — 「오늘의 데일리」 축. 클래식은 streak 을 안 올리므로(위 주석)
+       퀘스트도 같은 분기 안에 둔다 — 하루에 두 번 받는 길을 만들지 않는다. */
+    if (!classicRun) { dqBump('daily', 1); achvCheck(); }
     store[bestSlot] = {
       date: todayKey(), n: dailyNumber(), timeSec: sec,
       matches: S.matches, maxCombo: S.maxCombo, score: S.score,
@@ -38186,6 +38731,198 @@ window.TT_SFX = {
       sec.appendChild(row);
     }
     list.appendChild(sec);
+  }
+
+
+  /* ---- 퀘스트 화면 (판정판 50) --------------------------------------------
+   * JS 는 display 를 만지지 않는다 — 루트 #modal-quest 의 data-qtab 하나가
+   * «지금 어느 탭인가»의 유일한 근거이고, 보임/숨김은 CSS 가 한다(cpTab 규약).
+   * 목록만 JS 가 만든다(행 수가 데이터에서 나오므로). */
+  var questTab = 'daily';
+
+  function questText(e, tab) {
+    if (tab === 'weekly') return t('wq.' + e.id, { n: e.goal });
+    if (tab === 'epic') return t('ach.' + e.id, { n: achvGoal(e) });
+    return t('dq.' + e.id, { n: e.goal });
+  }
+
+  var QS_GAUGE =
+    '<i class="kit-gauge-v2__gem" aria-hidden="true"></i>' +
+    '<i class="kit-gauge-v2__fill">' +
+      '<i class="kit-gauge-v2__cap" data-side="l"></i>' +
+      '<i class="kit-gauge-v2__cap" data-side="r"></i>' +
+    '</i>';
+
+  /** 행 하나. 다섯 칸 전부 기존 부품 인스턴스다(새 그림 0). */
+  function questRow(tab, id, ico, label, prog, goal, v, claimed) {
+    var done = (prog | 0) >= (goal | 0);
+    var row = document.createElement('div');
+    row.className = 'qs-row';
+    row.setAttribute('data-state', claimed ? 'claimed' : (done ? 'done' : 'prog'));
+
+    var rw = document.createElement('span');
+    rw.className = 'qs-rw';
+    var ic = document.createElement('i');
+    ic.className = 'qs-rw-ic';
+    ic.setAttribute('aria-hidden', 'true');
+    ic.style.setProperty('--q-ico', 'var(' + ico + ')');
+    var rn = document.createElement('b');
+    rn.className = 'qs-rw-n';
+    rn.textContent = '+' + (v | 0);
+    rw.appendChild(ic);
+    rw.appendChild(rn);
+
+    var mid = document.createElement('div');
+    mid.className = 'qs-mid';
+    var ttl = document.createElement('p');
+    ttl.className = 'qs-t';
+    ttl.textContent = label;
+    var pct = (goal | 0) > 0 ? Math.max(0, Math.min(1, (prog | 0) / (goal | 0))) : 0;
+    var bar = document.createElement('i');
+    bar.className = 'qs-bar kit-gauge-v2';
+    /* 게이지 부품의 마크업 계약 그대로다 — 값은 --v(퍼센트)와 --f2-gv(0~1) 둘 다. */
+    bar.style.setProperty('--v', (pct * 100).toFixed(1) + '%');
+    bar.style.setProperty('--f2-gv', pct.toFixed(3));
+    bar.insertAdjacentHTML('beforeend', QS_GAUGE);
+    var num = document.createElement('b');
+    num.className = 'qs-n';
+    num.textContent = Math.min(prog | 0, goal | 0) + '/' + (goal | 0);
+    bar.appendChild(num);
+    mid.appendChild(ttl);
+    mid.appendChild(bar);
+
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'rank-tab qs-get';
+    btn.setAttribute('data-qtab', tab);
+    btn.setAttribute('data-qid', id);
+    btn.setAttribute('aria-selected', (done && !claimed) ? 'true' : 'false');
+    btn.disabled = !(done && !claimed);
+    btn.textContent = claimed ? t('quest.claimed') : t('quest.claim');
+
+    row.appendChild(rw);
+    row.appendChild(mid);
+    row.appendChild(btn);
+    return row;
+  }
+
+  /** 출석 7일 카드. 값은 전부 §21④ 의 칸에서 읽는다(새 키 0). */
+  function questAtt() {
+    var host = $('quest-att');
+    if (!host) return;
+    var st = store.streak | 0, i, j, r, cell, k;
+    host.innerHTML = '';
+    for (i = 1; i <= 7; i++) {
+      cell = document.createElement('span');
+      cell.className = 'qs-day';
+      cell.setAttribute('role', 'listitem');
+      cell.setAttribute('data-on', i <= st ? '1' : '0');
+      if (st > 0 && i === Math.min(st, 7)) cell.setAttribute('data-now', '1');
+      r = null;
+      for (j = 0; j < STREAK_REWARD.length; j++) {
+        if (STREAK_REWARD[j].day === i) { r = STREAK_REWARD[j]; break; }
+      }
+      if (r) {
+        k = String(r.day);
+        cell.setAttribute('data-rw', r.heart ? 'heart' : 'jstar');
+        cell.setAttribute('data-claimed',
+          (store.streakClaimed && store.streakClaimed[k]) ? '1' : '0');
+      }
+      cell.setAttribute('aria-label', t('quest.att.d', { n: i }));
+      var lab = document.createElement('b');
+      lab.textContent = String(i);
+      cell.appendChild(lab);
+      host.appendChild(cell);
+    }
+  }
+
+  /** 목록 전량. 탭이 바뀌어도 행을 다시 만드는 것이 유일한 경로다. */
+  function questPaint() {
+    var host = $('quest-list');
+    var root = $('modal-quest');
+    if (root && root.setAttribute) root.setAttribute('data-qtab', questTab);
+    var tabs = root && root.querySelectorAll ? root.querySelectorAll('.qs-tab') : null;
+    var i;
+    if (tabs) {
+      for (i = 0; i < tabs.length; i++) {
+        var on = tabs[i].getAttribute('data-qtab') === questTab;
+        tabs[i].setAttribute('aria-selected', on ? 'true' : 'false');
+        if (on) tabs[i].setAttribute('data-active', '');
+        else tabs[i].removeAttribute('data-active');
+      }
+    }
+    if (!host) return;
+    var q = questsEnsure(), e, d, a, r, n = 0;
+    host.innerHTML = '';
+    if (questTab === 'epic') {
+      for (i = 0; i < ACHV.length; i++) {
+        a = ACHV[i];
+        r = (store.achv && store.achv[a.id]) || null;
+        host.appendChild(questRow('epic', a.id, a.ico, t('ach.' + a.id, { n: achvGoal(a) }),
+                                  Math.min(achvAxis(a.ax), achvGoal(a)), achvGoal(a),
+                                  a.v, r && r.claimed ? 1 : 0));
+        n++;
+      }
+    } else if (questTab === 'weekly') {
+      for (i = 0; i < q.weekly.list.length; i++) {
+        e = q.weekly.list[i];
+        d = wqDefOf(e.id) || { ico: '--lib-glyph-target', v: 0 };
+        host.appendChild(questRow('weekly', e.id, d.ico, questText(e, 'weekly'),
+                                  e.prog, e.goal, d.v, e.claimed));
+        n++;
+      }
+    } else {
+      for (i = 0; i < q.daily.list.length; i++) {
+        e = q.daily.list[i];
+        d = dqDefOf(e.id) || { ico: '--lib-glyph-target' };
+        host.appendChild(questRow('daily', e.id, d.ico, questText(e, 'daily'),
+                                  e.prog, e.goal, DQ_REWARD[e.lv] | 0, e.claimed));
+        n++;
+      }
+    }
+    var all = $('quest-all');
+    if (all) {
+      var can = 0;
+      var rows = host.querySelectorAll ? host.querySelectorAll('.qs-get[aria-selected="true"]') : [];
+      can = rows.length;
+      all.setAttribute('aria-selected', can > 0 ? 'true' : 'false');
+      all.disabled = !can;
+    }
+    questAtt();
+  }
+
+  /** 배지 · 메뉴 한 줄. «받을 것이 있다»는 사실을 화면 밖에서 말하는 유일한 자리. */
+  function questBadges() {
+    var n = questClaimable();
+    var b = $('quest-badge');
+    if (b) {
+      b.textContent = n > 0 ? String(n) : '';
+      b.hidden = !(n > 0);
+    }
+    syncDynamicI18n();
+  }
+
+  function openQuest(tab) {
+    questTab = (tab === 'weekly' || tab === 'epic') ? tab : 'daily';
+    questsEnsure();
+    achvCheck();
+    questPaint();
+    openModal('modal-quest');
+    J.sfx.ui();
+  }
+
+  function closeQuest() {
+    closeModal('modal-quest');
+    J.sfx.ui();
+  }
+
+  /** 탭 전환. 같은 탭을 또 누르는 것은 공짜다(setRankTab 규약 그대로). */
+  function setQuestTab(tab) {
+    var m = (tab === 'weekly' || tab === 'epic') ? tab : 'daily';
+    if (m === questTab) return;
+    questTab = m;
+    questPaint();
+    J.sfx.ui();
   }
 
   function openRank(mode) {
@@ -41029,6 +41766,13 @@ window.TT_SFX = {
          종료**, 서바이벌·90초누적은 **다음 웨이브**다 — 뒤 둘에서 판을 끝내면
          "무한"이라는 말이 거짓이 되고, 반대로 HP 바를 0 에 세워 두면 화면이
          고장난 것으로 읽힌다. 그래서 리스폰이 그 자리를 메운다. */
+      /* 판정판 50 — 「대전 1승」 축. 모험 밖(아케이드 대전 3종)의 악당 격파가
+         곧 1승이다. 모험의 보스 격파는 「클리어」 축이 이미 센다. */
+      if (S.mode !== 'adv') {
+        store.duelWins = (store.duelWins | 0) + 1;
+        dqBump('duel', 1);
+        achvCheck();
+      }
       if (S.mode === 'adv') {
         /* §3 — 보스탄에 피니시 미션이 있으면 격파가 곧 승리가 아니다. 시간정지
            서든데스를 한 겹 끼운다. 게이트가 `p.boss && bossFinishOf(n)` 이므로
@@ -41368,6 +42112,7 @@ window.TT_SFX = {
        콜백 안이다. 컷인 앞에 두면 정지된 화면 뒤에서 타일이 사라지고,
        0.8초 뒤 플레이어는 이미 끝난 결과만 보게 된다. */
     d.petLeft = (d.petLeft | 0) - 1;
+    dqBump('pet', 1);               /* 판정판 50 — 「펫 소환」 축 */
     duelPetFx();
     badgePop('undo-badge');
     syncHud();
@@ -43007,6 +43752,12 @@ window.TT_SFX = {
       }
       store.advFails[key] = 0;
       if (p.n >= (store.advMax | 0)) store.advMax = p.n + 1;
+      /* 판정판 50 — 「클리어」·「★★ 이상」·주간 누계 둘. 별은 **새로 딴 별**
+         만큼만 센다(gemGain 과 같은 규칙 = 반복 파밍 차단). */
+      dqBump('clear', 1);
+      dqBump('wclear', 1);
+      if (stars >= 2) dqBump('star2', 1);
+      if (gemGain > 0) dqBump('wstar', gemGain);
       if (p.boss) grantHearts(ADV_BOSS_HEART);    // 보스 보상 (캡 초과 허용)
       /* --- v4 5차 §1: 젤리공주 구출 --------------------------------------
        * 10탄 보스 격파가 유일한 해금 사건이다. `p.n === ADV_CHAPTER` 로 못박은
@@ -43032,6 +43783,7 @@ window.TT_SFX = {
        * 있느냐"로 멈추지 않도록 여기 적어 둔다. */
       if (p.boss && !S.hitTaken) store.bossNoHit = (store.bossNoHit | 0) + 1;
       persist();
+      achvCheck();                  /* 판정판 50 — 별·챕터·펫 축이 여기서 움직인다 */
       J.sfx.win();
       J.vibrate(40);
       /* v4 6차 §C-1: 클리어 → (별을 땄으면) 별. 둘을 240ms 벌려 놓은 것은
@@ -45948,6 +46700,7 @@ window.TT_SFX = {
       }
     }
     syncMateLocks();
+    achvCheck();                    /* 판정판 50 — pet1/pet3/petall 축 */
     return true;
   }
 
@@ -46163,6 +46916,7 @@ window.TT_SFX = {
       }
       eq.push(id);
       if (eq.length > ITEM_SLOTS.length) eq.shift();
+      dqBump('item', 1);            /* 판정판 50 — 「아이템 장착」 축(끼울 때만) */
     }
     store.items.eq[cid] = eq;
     persist();
@@ -47105,6 +47859,29 @@ window.TT_SFX = {
       }(RANK_MODES[rti]));
     }
     on($('rank-close'), 'click', closeRank);
+    /* 판정판 50 — 퀘스트. 탭·받기는 **위임 한 줄씩**이라 행이 늘어도 배선이
+       안 는다(#cp-tabs·#mm-grid 가 쓰는 그 규약 그대로). */
+    on($('st-quest'), 'click', function () { closeSettings(); openQuest('daily'); });
+    on($('quest-close'), 'click', closeQuest);
+    on($('quest-tabs'), 'click', function (ev) {
+      var el = ev && ev.target;
+      while (el && el !== this && !(el.classList && el.classList.contains('qs-tab'))) {
+        el = el.parentNode;
+      }
+      if (!el || el === this) return;
+      setQuestTab(el.getAttribute('data-qtab'));
+    });
+    on($('quest-list'), 'click', function (ev) {
+      var el = ev && ev.target;
+      while (el && el !== this && !(el.classList && el.classList.contains('qs-get'))) {
+        el = el.parentNode;
+      }
+      if (!el || el === this || el.disabled) return;
+      questClaim(el.getAttribute('data-qtab'), el.getAttribute('data-qid'));
+    });
+    on($('quest-all'), 'click', function () {
+      if (questClaimAll(questTab) <= 0) { toast(t('quest.none')); J.sfx.fail(); }
+    });
 
     // --- global ---
     on(window, 'resize', onResize);
@@ -48165,6 +48942,15 @@ window.TT_SFX = {
        누적 매치 100 회를 실제로 채워야 닿는 자리라, 지급·중복방지를 관문이
        판정하려면 이 문 하나가 필요하다(게임 코드는 이것을 거쳐 부르지 않는다). */
     checkMilestone: checkMilestone,
+    /* 판정판 50 — DEBUG HANDLES ONLY(위 규약 그대로). 스모크가 날짜를 넘기고
+       진행을 밀어 넣고 수령을 눌러 보려면 이 문들이 필요하다. 게임 코드는
+       이 중 무엇도 window.Game 을 거쳐 부르지 않는다. */
+    openQuest: openQuest, setQuestTab: setQuestTab, questsEnsure: questsEnsure,
+    dqBump: dqBump, achvCheck: achvCheck, questClaim: questClaim,
+    questClaimAll: questClaimAll, questClaimable: questClaimable,
+    questPaint: questPaint, weekKey: weekKey, dqRoll: dqRoll, wqRoll: wqRoll,
+    ACHV: ACHV, DAILY_QUESTS: DAILY_QUESTS, WEEKLY_QUESTS: WEEKLY_QUESTS,
+    DQ_REWARD: DQ_REWARD,
     store: store,
     /* [SHOP-0910] 상점 손잡이. 게임 코드는 이 중 무엇도 window.Game 을 거쳐
        부르지 않는다 — 관문(layout-check·smoke)이 DOM 없이 값을 세우고 결제
@@ -64418,6 +65204,201 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
   #modal-shop{ --f2-w: 320px; }
   #modal-shop .shop-body{ max-height: 52vh; }
 }
+</style>
+
+<style id="quest-0911">
+/* ===========================================================================
+   퀘스트 · 출석 — 판정판 50 (2026-09-11)
+   ---------------------------------------------------------------------------
+   이 블록 하나를 지우면 통째로 원복된다(이 파일의 관례 :46706·:51027·:54781).
+   ▣ 새 부품 0 · 새 그림 0. 여기 있는 규칙은 **자리 잡기**뿐이다:
+     판   = `.sheet.jbox.jbox--modal[data-part="modal-plate"]` (정본 모달 판)
+     탭   = `.kit-tab-v2` × 3            (상태 = 부품 자기 문법 [data-active])
+     진행 = `.kit-gauge-v2`              (gem + fill[cap l, cap r] 계약 그대로)
+     받기 = `.rank-tab` 젤리 알약        (상태 = 부품 자기 문법 aria-selected)
+     배지 = `.badge-new`                 (:empty / [hidden] 로 자동 숨김)
+     아이콘 = `--lib-*` 카탈로그 토큰    (인라인 --q-ico 로 주입)
+   ▣ 특정도 — `#modal-quest` 는 `.w6m` 이라 `.w6m .rank-tab`(0,2,0) 이 이미
+     알약을 그린다. 여기서 겹치는 것은 **폭·자간뿐**이고 전부 id 스코프
+     (1,1,0) 라 색·재질은 부품이 계속 소유한다.
+   ▣ 값은 전부 --f2-w(판 폭) 비율과 기존 --f2-*/--role-*/--lib-* 토큰이다.
+     새 원시색 0.
+   =========================================================================== */
+#modal-quest .sheet{ display:flex; flex-direction:column; }
+#modal-quest .sheet > h2,
+#modal-quest #quest-tabs,
+#modal-quest #quest-att,
+#modal-quest .qs-foot,
+#modal-quest #quest-close{ flex:0 0 auto; }
+/* 목록만 안에서 구른다 — #modal-rank ⑩(0904)이 쓴 그 처방 그대로다
+   (`.w6m .sheet` 가 overflow:visible !important 라 판 자신은 스크롤 상자가
+   못 된다). */
+#modal-quest #quest-list{
+  flex:0 1 auto;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  gap:calc(var(--f2-w) * .0150);
+  margin:calc(var(--f2-w) * .0180) 0 0;
+  overflow-y:auto;
+  overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+#modal-quest #quest-list::-webkit-scrollbar{ width:0; height:0; }
+
+/* ---- 탭 줄 --------------------------------------------------------------- */
+#modal-quest .qs-tabs{ margin:calc(var(--f2-w) * .0180) 0 0; }
+#modal-quest .qs-tab{
+  font-family:var(--font-display);
+  font-size:calc(var(--f2-w) * .0330);
+  color:var(--f2-ink);
+}
+#modal-quest .qs-tab .cpt-lab{
+  min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+
+/* ---- 출석 7일 — 값은 §21④ 의 store.streak / streakClaimed 만 읽는다 ------- */
+#modal-quest .qs-att{
+  display:flex;
+  gap:calc(var(--f2-w) * .0090);
+  margin:calc(var(--f2-w) * .0180) 0 0;
+}
+#modal-quest .qs-day{
+  position:relative;
+  box-sizing:border-box;
+  flex:1 1 0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  height:calc(var(--f2-w) * .0850);
+  border-radius:calc(var(--f2-w) * .0180);
+  background:color-mix(in srgb, var(--f2-tab-off) 82%, transparent);
+  box-shadow:inset 0 0 0 calc(var(--f2-w) * .0027)
+    color-mix(in srgb, var(--f2-line) 42%, transparent);
+  font-family:var(--font-display);
+  font-size:calc(var(--f2-w) * .0280);
+  color:var(--f2-ink);
+}
+#modal-quest .qs-day[data-on="1"]{
+  background:color-mix(in srgb, var(--f2-tab-on) 92%, transparent);
+}
+#modal-quest .qs-day[data-now="1"]{
+  box-shadow:
+    inset 0 0 0 calc(var(--f2-w) * .0040) var(--role-f2-hi-halo),
+    0 0 calc(var(--f2-w) * .0120) var(--role-f2-hi-halo);
+}
+#modal-quest .qs-day[data-rw]::after{
+  content:"";
+  position:absolute;
+  right:calc(var(--f2-w) * -.0040);
+  top:calc(var(--f2-w) * -.0040);
+  width:calc(var(--f2-w) * .0320);
+  height:calc(var(--f2-w) * .0320);
+  background:center/contain no-repeat var(--lib-star-gold);
+}
+#modal-quest .qs-day[data-rw="heart"]::after{ background-image:var(--lib-glyph-heart); }
+#modal-quest .qs-day[data-claimed="1"]::after{ opacity:.38; }
+
+/* ---- 행 ------------------------------------------------------------------ */
+#modal-quest .qs-row{
+  display:flex;
+  align-items:center;
+  gap:calc(var(--f2-w) * .0180);
+  padding:calc(var(--f2-w) * .0130) calc(var(--f2-w) * .0150);
+  border-radius:calc(var(--f2-w) * .0220);
+  background:color-mix(in srgb, var(--f2-box) 55%, transparent);
+  box-shadow:inset 0 0 0 calc(var(--f2-w) * .0027)
+    color-mix(in srgb, var(--f2-line) 42%, transparent);
+}
+/* 수령한 줄은 지우지 않고 **가라앉힌다** — 오늘 무엇을 했는지가 목록에 남는다. */
+#modal-quest .qs-row[data-state="claimed"]{ opacity:.52; }
+#modal-quest .qs-rw{
+  position:relative;
+  flex:0 0 auto;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:calc(var(--f2-w) * .0995);
+  height:calc(var(--f2-w) * .0995);
+}
+#modal-quest .qs-rw-ic{
+  display:block;
+  width:100%;
+  height:100%;
+  background:center/contain no-repeat var(--q-ico);
+}
+#modal-quest .qs-rw-n{
+  position:absolute;
+  right:calc(var(--f2-w) * -.0060);
+  bottom:calc(var(--f2-w) * -.0040);
+  padding:0 calc(var(--f2-w) * .0060);
+  border-radius:999px;
+  background:color-mix(in srgb, var(--f2-tab-on) 88%, transparent);
+  box-shadow:inset 0 0 0 calc(var(--f2-w) * .0022)
+    color-mix(in srgb, var(--f2-line) 48%, transparent);
+  font-family:var(--font-display);
+  font-size:calc(var(--f2-w) * .0230);
+  font-weight:900;
+  line-height:1.5;
+  color:var(--f2-ink);
+}
+#modal-quest .qs-mid{ flex:1 1 auto; min-width:0; }
+#modal-quest .qs-t{
+  margin:0 0 calc(var(--f2-w) * .0090);
+  font-family:var(--font-display);
+  font-size:calc(var(--f2-w) * .0300);
+  line-height:1.25;
+  color:var(--f2-ink);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+#modal-quest .qs-bar{ position:relative; display:block; width:100%; }
+/* n/N 은 게이지 **가운데**에 얹는다(참고 화면과 같은 자리). 게이지 부품의
+   내부 층(gem/fill/cap)은 한 줄도 안 건드린다 — 그 위에 글자만 더한다. */
+#modal-quest .qs-n{
+  position:absolute;
+  left:50%;
+  top:50%;
+  z-index:3;
+  transform:translate(-50%, -50%);
+  font-family:var(--font-display);
+  font-size:calc(var(--f2-w) * .0230);
+  font-variant-numeric:tabular-nums;
+  /* 게이지 위 글자 — 빈 게이지(연분홍)에서 흰 글자는 읽히지 않는다(실캡처).
+     잉크 토큰 + 흰 후광으로 채운 구간·빈 구간 양쪽에서 같은 대비를 낸다. */
+  color:var(--f2-ink);
+  text-shadow:0 1px 0 rgba(255,255,255,.72);
+  pointer-events:none;
+}
+#modal-quest .qs-get{
+  flex:0 0 auto;
+  min-width:calc(var(--f2-w) * .1750);
+  min-height:calc(var(--f2-w) * .0850);
+  padding:0 calc(var(--f2-w) * .0240);
+  font-size:calc(var(--f2-w) * .0300);
+  line-height:calc(var(--f2-w) * .0850);
+}
+#modal-quest .qs-get[disabled]{ cursor:default; }
+#modal-quest .qs-foot{
+  display:flex;
+  justify-content:flex-end;
+  margin:calc(var(--f2-w) * .0180) 0 0;
+}
+#modal-quest .qs-all{
+  flex:0 0 auto;
+  min-width:calc(var(--f2-w) * .2700);
+  min-height:calc(var(--f2-w) * .0850);
+  padding:0 calc(var(--f2-w) * .0240);
+  font-size:calc(var(--f2-w) * .0300);
+  line-height:calc(var(--f2-w) * .0850);
+}
+#modal-quest .qs-all[disabled]{ cursor:default; }
+
+/* ---- 설정 줄의 진입 배지 — 부품(.badge-new)의 자리만 잡는다 -------------- */
+#modal-settings #st-quest{ position:relative; }
+#modal-settings #quest-badge{ margin-left:calc(var(--f2-w) * .0180); }
 </style>
 </body>
 </html>
