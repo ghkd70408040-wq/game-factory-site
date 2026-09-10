@@ -16170,95 +16170,38 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
         <span class="mode-t bp-text"><b class="btnf-let bp-let" data-i18n="menu.adv">Adventure</b><i class="btnf-let bp-let" data-i18n="menu.advsub">Rescue the Jelly Princess</i></span>
         <span id="mode-adv-b" class="mode-b bp-badge bp-let" data-badge="stage"></span>
       </button>
-      <!-- ===== 0903 — 이 행은 **보인다**. hidden 없음 =====================
-           14차가 다섯 줄 한 단으로 합치면서 여기에 hidden 을 걸었고, 1cd0ae0 의
-           반쪽 원복이 CSS·JS 만 4줄 구조로 되돌리면서 마크업을 안 되돌려
-           「모험·데일리」 두 줄만 보이는 회귀가 됐다. E48 이 hidden 을 지워
-           정본 4줄(모험·아케이드·데일리·타임러시)로 복원했다. 이 행의 클릭은
-           openArcadeHub() 로 하위 시트(#modal-arcade)를 연다. 기록은 그대로다 —
-           store.ranks(RANK_MODES 6종)가 endless/rush 를 계속 들고 있다. -->
-      <button id="mode-arcade" class="mode-row" data-part="btn-picture" data-variant="arcade" type="button">
-        <span class="nchip nchip-arc bp-icon" aria-hidden="true"></span>
-        <span class="mode-t bp-text"><b class="btnf-let bp-let" data-i18n="mode.arcade">Arcade</b><i class="btnf-let bp-let" data-i18n="mode.arcade.d">Endless. Chase your best.</i></span>
-        <span id="mode-arcade-b" class="mode-b bp-badge bp-let" data-badge=""></span><!-- [0908] 최상위 행 배지 슬롯 비움(시안 기준) — 규칙은 클래식과 하나, 데이터만 다름 -->
-      </button>
-      <button id="mode-daily" class="mode-row" data-part="btn-picture" data-variant="daily" type="button">
-        <span class="nchip nchip-day bp-icon" aria-hidden="true"></span>
-        <span class="mode-t bp-text"><b class="btnf-let bp-let" data-i18n="menu.daily">Daily</b><i class="btnf-let bp-let" data-i18n="mode.daily.d">One board a day, for all.</i></span>
-        <span id="mode-daily-b" class="mode-b bp-badge bp-let" data-badge=""></span><!-- [0908] 최상위 행 배지 슬롯 비움(시안 기준) -->
-      </button>
-      <!-- 0903 — 위 #mode-arcade 와 같은 이유로 hidden 을 지웠다. 정본 4줄째. -->
-      <button id="mode-rush" class="mode-row" data-part="btn-picture" data-variant="timerush" type="button">
-        <span class="nchip nchip-rush bp-icon" aria-hidden="true"></span>
-        <span class="mode-t bp-text"><b class="btnf-let bp-let" data-i18n="menu.rush">Time Rush</b><i class="btnf-let bp-let" data-i18n="mode.rush.d">90s. Each match adds time.</i></span>
-        <span id="mode-rush-b" class="mode-b bp-badge bp-let" data-badge="new"></span>
-      </button>
-      <!-- 0910 — 다섯째 줄 「대전」. 위 네 줄과 같은 부품·같은 규약이고,
-           다른 것은 data-variant(색)와 여는 곳(#modal-arcade 허브)뿐이다. -->
-      <button id="mode-arcduel" class="mode-row" data-part="btn-picture" data-variant="timeattack" type="button">
-        <span class="nchip nchip-arc bp-icon" aria-hidden="true"></span>
-        <span class="mode-t bp-text"><b class="btnf-let bp-let" data-i18n="arc.hub">Duel</b><i class="btnf-let bp-let" data-i18n="arc.hub.d">Three ways to fight a villain.</i></span>
-        <span id="mode-arcduel-b" class="mode-b bp-badge bp-let" data-badge=""></span>
-      </button>
-      <!-- ===== 0903 — 아케이드 3종목은 하위 시트(#modal-arcade)에 있다 ========
-           1cd0ae0 의 반쪽 원복으로 이 자리에 남아 있던 #arcrow-time, #arcrow-surv,
-           #arcrow-dmg 세 줄을 원문 자리인 #modal-arcade .mode-list 로 되돌렸다.
-           진입점은 위 #mode-arcade 행 자신이다(openArcadeHub). id 와 data-i18n
-           키는 한 글자도 안 바꿨고, #arcrow-dmg 의 칩만 nchip-dmg 로 유지한다. -->
-    </div>
-    <!-- ===== 아케이드 대전 진입 =====================================
-         네 줄(.mode-row)은 글자까지 통짜로 베이크된 **그림 버튼**이라 다섯째
-         줄을 그 규약으로 만들려면 발주가 필요하다(§0). 그래서 #modal-classic 이
-         쓴 것과 같은 수를 썼다: 스프라이트 규칙이 전부 `.mode-list .mode-row`
-         에만 걸려 있다는 사실을 이용해, **.mode-list 밖·다른 클래스**로 앉힌다.
-         그러면 그림 규칙이 한 줄도 닿지 않고 코드 텍스트 라벨이 그대로 산다.
-         기존 네 줄의 마크업·위치·크기는 한 글자도 안 바뀐다. -->
-    <!-- 🚨 0823 — 위 네 줄의 [칩][제목+한 줄] 리듬을 그대로 받는다. 칩 한 개가
-         더해진 것이 마크업 변경의 전부이고, 위 네 줄은 한 글자도 안 바뀐다. -->
-    <!-- 🚨 0910 — 위 주석이 말한 「진입점을 다시 갈아끼울 때」가 왔다.
-       #mode-arcade 가 끝없이로 직행하게 되면서 이 줄이 대전 허브의 **유일한**
-       문이 됐다 — 진입 버튼이 둘이 되는 상황 자체가 사라졌으므로 hidden 을
-       풀었고, 자리는 위 .mode-list 안 다섯째로 옮겼다. .arc-entry 전용 CSS 는
-       `.modal-v2` 은퇴와 함께 죽어 있어(선택자가 그 스코프뿐) 되살리면 새
-       규칙을 써야 했다. 대신 이미 살아 있는 그림버튼 부품(t3-btn-picture)의
-       인스턴스로 만들었다 — **새 그림 0**(카탈로그의 timeattack 무글자판
-       재사용), 새 CSS 0, 라벨은 코드 텍스트(.btnf-let)라 i18n 이 그대로 듣는다. -->
-  </div></div>
-
-  <!-- ===== 아케이드 대전 허브 ==============================================
-       #modal-classic 과 **같은 문법**이다(.r10m 판 + .r10-ribbon + .mode-list /
-       .mode-row 세 줄). 같은 이유로 `#modal-mode` 스코프 밖에 앉아 있어 스프라이트
-       덮어쓰기가 닿지 않고, 색만 전용 CSS 블록이 준다.
-       세 줄은 전부 러시 기계 위에서 돌고, 다른 것은 **무엇이 기록인가**뿐이다. -->
-  <div id="modal-arcade" class="modal r10m" hidden role="dialog" aria-modal="true" aria-labelledby="arcade-h"><div class="sheet r10-panel jbox jbox--modal" data-part="modal-plate">
-    <div class="r10-ribbon"><h2 id="arcade-h" data-i18n="arc.title">Arcade Duel</h2></div>
-    <button id="arcade-close" class="r10-x x-btn" type="button" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
-    <p id="arcade-lead" data-i18n="arc.lead">Fight a villain on the rush clock. Compare your record with a friend.</p>
-    <!-- 🚨 14차 — 세 줄(#arcrow-time/-surv/-dmg)은 **여기서 위 #modal-mode
-         .mode-list 로 옮겨 갔다**(복제 아님 — id 는 문서에 하나뿐이어야 한다).
-         이 시트 자체는 지우지 않았다: 판·리본·닫기·리드 문구·CSS(#modal-arcade
-         .mode-list .mode-row)·openArcadeHub()/closeArcadeHub()·ESC 처리까지 전부
-         그대로다. 입구(#mode-arcduel)가 hidden 이라 지금은 열리지 않을 뿐이고,
-         세 버튼을 이 자리로 되돌리고 hidden 을 지우면 2단 구조가 복구된다. -->
-    <div class="mode-list">
+      <!-- ===== 0911 판정판 49 (사용자 반려) — 대전 3종이 **한 단 위로** 올라왔다 ==
+           사용자 판정: 「플레이 메뉴의 아케이드·데일리·타임러시는 그냥 클래식이잖아」.
+           그래서 그 세 줄은 플레이 시트에서 **빠지고**(은퇴 아님 — 클래식 시트가
+           토글 하나로 스킬판·순수판 여섯 모드를 다 받는다), 대신 2단 허브
+           (#modal-arcade)에 숨어 있던 대전 3종이 모험 바로 아래로 올라온다.
+           세 버튼은 **복제가 아니라 이사**다 — id·data-part·data-variant·칩·배지
+           슬롯이 한 글자도 안 바뀌었고, 옮겨 온 것은 부모 .mode-list 하나뿐이다.
+           허브 리드(`arc.lead`, "러시 시계 위에서 악당과 겨뤄요")는 시트가 없어진
+           만큼 **각 줄의 설명으로 흡수**했다(§13.3 표 갱신). -->
       <button id="arcrow-time" class="mode-row" data-part="btn-picture" data-variant="timeattack" type="button">
         <span class="nchip nchip-rush bp-icon" aria-hidden="true"></span>
-        <span class="mode-t bp-text"><b class="btnf-let bp-let" data-i18n="arc.time.name">Time Attack</b><i class="btnf-let bp-let" data-i18n="arc.time.d">Fastest wins.</i></span>
+        <span class="mode-t bp-text"><b class="btnf-let bp-let" data-i18n="arc.time.name">Time Attack</b><i class="btnf-let bp-let" data-i18n="arc.time.d">Beat the villain fastest.</i></span>
         <span id="arcrow-time-b" class="mode-b bp-badge bp-let" data-badge="rank"></span>
       </button>
       <button id="arcrow-surv" class="mode-row" data-part="btn-picture" data-variant="survival" type="button">
         <span class="nchip nchip-arc bp-icon" aria-hidden="true"></span>
-        <span class="mode-t bp-text"><b class="btnf-let bp-let" data-i18n="arc.surv.name">Survival</b><i class="btnf-let bp-let" data-i18n="arc.surv.d">Longest wins.</i></span>
+        <span class="mode-t bp-text"><b class="btnf-let bp-let" data-i18n="arc.surv.name">Survival</b><i class="btnf-let bp-let" data-i18n="arc.surv.d">Last longest vs. the villain.</i></span>
         <span id="arcrow-surv-b" class="mode-b bp-badge bp-let" data-badge="rank"></span>
       </button>
       <button id="arcrow-dmg" class="mode-row" data-part="btn-picture" data-variant="accum90" type="button">
         <span class="nchip nchip-dmg bp-icon" aria-hidden="true"></span>
-        <span class="mode-t bp-text"><b class="btnf-let bp-let" data-i18n="arc.dmg.name">90s Damage</b><i class="btnf-let bp-let" data-i18n="arc.dmg.d">Most in 90s.</i></span>
+        <span class="mode-t bp-text"><b class="btnf-let bp-let" data-i18n="arc.dmg.name">90s Damage</b><i class="btnf-let bp-let" data-i18n="arc.dmg.d">Most damage in 90s.</i></span>
         <span id="arcrow-dmg-b" class="mode-b bp-badge bp-let" data-badge="rank"></span>
       </button>
     </div>
+    <!-- 🚨 0911 — 여기 있던 다섯째 줄 「대전」(#mode-arcduel)과 그것이 열던 2단
+         허브(#modal-arcade)는 **은퇴**했다. 진입점이 하나뿐인 문 하나를 위해 창을
+         한 겹 더 두는 구조 자체가 없어졌기 때문이다(대전 3종이 이 목록에 있다).
+         되살리려면: 이 목록에서 arcrow-* 세 줄을 도로 #modal-arcade .mode-list 로
+         옮기고 #mode-arcduel 행 + openArcadeHub 배선을 복원한다. 기록·시작 코드
+         (store.arcadeBest · startArcade · syncArcadeSheet)는 한 줄도 안 바뀌었다. -->
   </div></div>
-
   <!-- ===== W7.5 클래식 허브 =================================================
        메인 메뉴의 "이어하기" 자리를 물려받은 두 번째 시트다. 구조는 #modal-mode
        와 같은 문법(.jbox--modal 판 + .r10-ribbon + .mode-list/.mode-row)이지만,
@@ -16274,6 +16217,23 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
     <div class="r10-ribbon"><h2 id="classic-h" data-i18n="classic.title">Classic</h2></div>
     <button id="classic-close" class="r10-x x-btn" type="button" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
     <p id="classic-lead" data-i18n="classic.lead">No skills, no items, no passives. Clear the board for the next one — stuck ends the run, Rush ends at 90s, Daily is one board a day.</p>
+    <!-- ===== 0911 판정판 49 ② — 「스킬·펫 사용」 토글 =========================
+         사용자 판정: 플레이 시트의 아케이드·데일리·타임러시는 클래식 세 줄과
+         **같은 세 종목**이고, 갈리는 것은 「스킬·펫을 쓰나」 하나뿐이다. 그래서
+         이름을 여섯 줄로 늘리는 대신 **줄 셋 + 스위치 하나**로 여섯 모드를 받는다.
+           OFF(기본) : classic · classic-rush · classic-daily   (순수 클래식)
+           ON        : endless · rush         · daily           (스킬판)
+         새 부품 0 — 설정창·일시정지창이 쓰는 그 토글 부품(.set-list/.set-row/
+         .set-k/.set-tg, aria-pressed 가 상태의 유일한 근거)의 **세 번째 인스턴스**다.
+         모드 id·기록 키·RANK_MODES·저장 스키마는 한 글자도 안 바뀐다: 토글은
+         «어느 진입 함수를 부르고 어느 칸을 읽어 배지를 그리는가»만 고른다.
+         상태는 `store.classicSkills` 한 칸(가법 — 옛 저장본에는 없고, 없으면 false). -->
+    <div class="set-list">
+      <div class="set-row">
+        <span class="set-k" data-i18n="classic.skills">Use skills &amp; pets</span>
+        <button id="classic-skills" class="set-tg" type="button" data-i18n-aria="aria.classicSkills" aria-label="Toggle skills and pets" aria-pressed="false">Off</button>
+      </div>
+    </div>
     <div class="mode-list">
       <button id="classic-arcade" class="mode-row" data-part="btn-picture" data-variant="arcade" type="button">
         <span class="nchip nchip-arc bp-icon" aria-hidden="true"></span>
@@ -24159,6 +24119,10 @@ window.TT_SFX = {
     bestClassicRush: 0,      // 클래식 타임러시 최고 점수
     classicDailyBest: null,  // 클래식 데일리 오늘 결과 (일반 dailyBest 와 별개)
     saveClassic: null,       // 클래식 전용 진행 저장 슬롯
+    /* [0911 판정판 49 ②] 클래식 시트의 「스킬·펫 사용」 토글. **가법 키**다 — 옛
+     * 저장본에는 없고, 없으면 false = 순수 클래식(기본). 이 칸은 «어느 진입
+     * 함수를 부르나·어느 기록 칸을 읽나»만 고르고, 어떤 기록 칸도 소유하지 않는다. */
+    classicSkills: false,
     // --- v2 (contract §9). Older saves simply lack these; defaults apply. ---
     bestRush: 0,        // Time Rush high score, kept apart from `best`
     totalMatches: 0,    // lifetime matches, drives the milestone toasts
@@ -24465,6 +24429,7 @@ window.TT_SFX = {
           store.bestClassicRush = o.bestClassicRush;
         }
         if (o.classicDailyBest) store.classicDailyBest = o.classicDailyBest;
+        if (typeof o.classicSkills === 'boolean') store.classicSkills = o.classicSkills;
         // v2 fields — a pre-v2 save just leaves the defaults in place.
         if (typeof o.bestRush === 'number' && isFinite(o.bestRush)) store.bestRush = o.bestRush;
         if (typeof o.totalMatches === 'number' && isFinite(o.totalMatches)) {
@@ -25257,6 +25222,7 @@ window.TT_SFX = {
       'aria.daily': "Play today's daily puzzle",
       'aria.howto': 'How to play',
       'aria.sound': 'Sound',
+      'aria.classicSkills': 'Toggle skills and pets',
       'aria.vibe': 'Vibration',
       'aria.lang': 'Language',
       'aria.pause': 'Pause',
@@ -25881,17 +25847,20 @@ window.TT_SFX = {
       'classic.rush.d': '90s, skill only.',
       'classic.daily': 'Daily',
       'classic.daily.d': "Today's board, even.",
+      /* [0911 판정판 49 ②] 「스킬·펫 사용」 토글 + ON 회차의 리드 한 줄. */
+      'classic.skills': 'Use skills & pets',
+      'classic.lead.on': 'Skills, items, pets and passives are on. Same three modes, records kept apart from pure Classic.',
       /* --- 아케이드 대전 (러시 기계 + 모험의 악당) ---------------------- */
       'arc.hub': 'Duel',
       'arc.hub.d': 'Three ways to fight a villain.',
       'arc.title': 'Duel',
       'arc.lead': 'Fight a villain on the rush clock. Screenshot the result and compare.',
       'arc.time.name': 'Time Attack',
-      'arc.time.d': 'Fastest wins.',
+      'arc.time.d': 'Beat the villain fastest.',
       'arc.surv.name': 'Survival',
-      'arc.surv.d': 'Longest wins.',
+      'arc.surv.d': 'Last longest vs. the villain.',
       'arc.dmg.name': '90s Damage',
-      'arc.dmg.d': 'Most in 90s.',
+      'arc.dmg.d': 'Most damage in 90s.',
       'arc.dir.low': 'Shorter wins',
       'arc.dir.high': 'Longer wins',
       'arc.dir.more': 'Higher wins',
@@ -25972,6 +25941,10 @@ window.TT_SFX = {
       'aria.mapback': 'Back to the menu',
       'adv.title': 'Adventure',
       'adv.stagen': 'Stage {n}',
+      /* [0911 판정판 49 ③] 배지 전용 — 안전 상자가 라틴 6글자를 못 받는다(실측 잉크
+         'Stage 1' 61.8px ≫ 상자 32.5px). ko 는 원문 그대로, en 만 짧은 표기를 쓴다.
+         모달 제목·노드 카드가 쓰는 'adv.stagen' 은 한 글자도 안 바뀐다. */
+      'adv.stagebadge': 'S{n}',
       'adv.bossn': 'Boss {n}',
       'adv.chapn': 'Chapter {n}',
       'adv.chap1': 'Green Grape Hills',
@@ -26491,6 +26464,7 @@ window.TT_SFX = {
       'aria.daily': '오늘의 데일리 퍼즐 풀기',
       'aria.howto': '게임 방법',
       'aria.sound': '소리',
+      'aria.classicSkills': '스킬·펫 사용 켜고끄기',
       'aria.vibe': '진동',
       'aria.lang': '언어',
       'aria.pause': '일시정지',
@@ -27066,17 +27040,20 @@ window.TT_SFX = {
       'classic.rush.d': '90초, 실력만으로.',
       'classic.daily': '데일리',
       'classic.daily.d': '오늘의 판, 같은 조건.',
+      /* [0911 판정판 49 ②] 「스킬·펫 사용」 토글 + ON 회차의 리드 한 줄. */
+      'classic.skills': '스킬·펫 사용',
+      'classic.lead.on': '스킬·아이템·펫·패시브를 켜고 해요. 종목은 그대로 셋, 기록은 순수 클래식과 따로 쌓여요.',
       /* --- 아케이드 대전 (러시 기계 + 모험의 악당) ---------------------- */
       'arc.hub': '대전',
       'arc.hub.d': '악당과 겨루는 세 종목.',
       'arc.title': '대전',
       'arc.lead': '러시 시계 위에서 악당과 겨뤄요. 결과를 찍어 친구와 비교하세요.',
       'arc.time.name': '타임어택',
-      'arc.time.d': '빠를수록 승리.',
+      'arc.time.d': '악당을 가장 빠르게.',
       'arc.surv.name': '서바이벌',
-      'arc.surv.d': '오래 버틸수록 승리.',
+      'arc.surv.d': '악당 앞에서 오래 버티기.',
       'arc.dmg.name': '90초 누적',
-      'arc.dmg.d': '90초 누적 데미지 승부.',
+      'arc.dmg.d': '90초, 악당에게 누적 데미지.',
       'arc.dir.low': '짧을수록 승리',
       'arc.dir.high': '길수록 승리',
       'arc.dir.more': '많을수록 승리',
@@ -27149,6 +27126,8 @@ window.TT_SFX = {
       'aria.mapback': '메뉴로 돌아가기',
       'adv.title': '모험',
       'adv.stagen': '{n}탄',
+      /* [0911 판정판 49 ③] 배지 전용. ko 는 원문과 같은 값이다 — 키만 갈렸다. */
+      'adv.stagebadge': '{n}탄',
       'adv.bossn': '{n}탄 보스',
       'adv.chapn': '{n}챕터',
       'adv.chap1': '청포도 언덕',
@@ -28459,11 +28438,11 @@ window.TT_SFX = {
       * 한다(허브의 행 핸들러도 닫지만, 그것 하나에만 기대면 다른 경로로 진입할
       * 때 허브가 판 위에 남는다). */
      'modal-classic',
-     /* 아케이드 대전 — 허브는 클래식 허브와 **같은 이유**로 이 목록에 있다:
-        startArcade 가 자기 안에서 closeAllModals() 를 부르므로, 그 한 번으로
-        허브까지 걷히려면 목록에 있어야 한다. 결과 시트도 함께 둔다 — 시트를 열어
-        둔 채 메뉴로 나가면 판이 끝난 화면이 메뉴 위에 남는다. */
-     'modal-arcade', 'modal-arc',
+     /* 아케이드 대전 결과 시트. 허브(#modal-arcade)는 0911 에 은퇴했고(세 줄이
+        플레이 시트로 올라갔다), 결과 시트는 그대로 남는다 — 시트를 열어 둔 채
+        메뉴로 나가면 판이 끝난 화면이 메뉴 위에 남기 때문이다. 플레이 시트는
+        여기 없어도 된다: 세 줄이 startArcade 를 부르기 **전에** 자기를 닫는다. */
+     'modal-arc',
      /* 출시 점검 0909 ① — 확인 창도 여기서 걷힌다. 화면이 통째로 바뀌는데
         "살까요?"만 떠 있는 상태가 남으면 안 된다. 걷힐 때 대기 중이던 응답은
         confirmPending 가드가 무효로 만든다(아래 confirmBox 참조). */
@@ -33859,12 +33838,10 @@ window.TT_SFX = {
     }
   }
 
-  function openArcadeHub() {
-    syncArcadeSheet();
-    openModal('modal-arcade');
-    J.sfx.ui();
-  }
-  function closeArcadeHub() { closeModal('modal-arcade'); }
+  /* [0911 판정판 49 ①] openArcadeHub()/closeArcadeHub() 는 **은퇴**했다 — 세 줄이
+     플레이 시트로 올라오면서 여는 창 자체가 없어졌다(#modal-arcade 마크업도 함께
+     내렸다). syncArcadeSheet 는 그대로 산다: 배지를 그리는 것은 창이 아니라 줄이고,
+     그 줄은 이제 플레이 시트가 연다(syncModeSheet 가 부른다). */
 
   /** Board emptied in Time Rush: roll straight into the next one, no modal. */
   function rushNextBoard() {
@@ -43168,27 +43145,100 @@ window.TT_SFX = {
    * 를 그대로 부르고, 배지는 이미 store 에 있는 사실을 읽어 쓴다. 9차의 메뉴
    * 배지와 같은 값을 같은 자리에서 계산하므로 둘이 갈라질 수가 없다.
    * ----------------------------------------------------------------------- */
+  /* [0911 판정판 49 ③] 「N탄」 배지 — 자릿수가 늘면 **안전 상자가 자른다**.
+   * 사용자 반려 2026-09-11: 모험 줄 배지가 「|0탄」 으로 보였다. 실측 원인은
+   * 텍스트 커서도 구분 문자도 배지 테두리도 아니고 **「10탄」 의 왼쪽 잘림**이다:
+   * 배지 슬롯(--bp-badge-w = 행 폭의 14.737%)은 구운 그림 실측 안전 상자라 넓힐 수
+   * 없고(§4.1-3), `overflow:hidden` + `justify-content:flex-end` 라 넘치는 만큼
+   * **왼쪽부터** 잘린다. store.advMax 가 10 이 되는 순간 '1' 의 왼쪽이 잘려 나가고
+   * 세로 획만 남아 세로줄처럼 읽혔다.
+   * 상자를 넓히는 대신 **자를 줄인다** — en 로케일이 이미 쓰는 그 문법
+   * (`html[lang="en"] … --bp-stage-fs`)과 같고, 값은 CSS §btn-picture 값 블록에 있다.
+   * 여기서는 자릿수만 데이터로 넘긴다(원시값 0). */
+  var inkCtx = null;
+
+  /** 글자의 **잉크 폭**(줄상자가 아니라 실제 글리프가 칠해지는 폭). layout-check.py
+   *  ③ ink 판정이 쓰는 그 정의 그대로다 — 캔버스 actualBoundingBox* + 자간 + 겉선. */
+  function inkWidthOf(txt, cs) {
+    if (!txt) return 0;
+    if (!inkCtx) {
+      try { inkCtx = document.createElement('canvas').getContext('2d'); } catch (e) { inkCtx = null; }
+    }
+    if (!inkCtx) return 0;
+    inkCtx.font = cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
+    var m = inkCtx.measureText(txt);
+    var w = (m.actualBoundingBoxLeft || 0) + (m.actualBoundingBoxRight || 0);
+    if (!(w > 0)) w = m.width || 0;
+    var ls = parseFloat(cs.letterSpacing) || 0;
+    var sw = parseFloat(cs.webkitTextStrokeWidth || cs.getPropertyValue('-webkit-text-stroke-width')) || 0;
+    return w + ls * Math.max(0, txt.length - 1) + sw;
+  }
+
+  /**
+   * 배지 잉크가 안전 상자를 넘으면 **자만 줄인다**(상자는 구운 그림 실측이라 못 넓힌다).
+   * 비례 한 번으로 안 끝나는 이유: 힌팅·반올림 때문에 잉크가 자에 완전히 선형이 아니다.
+   * 그래서 «재고 줄이고 다시 재는» 수렴 루프를 돌린다(보통 1~2회, 최대 4회).
+   * 판이 hidden 이면 clientWidth 가 0 이라 그냥 물러난다 — 판이 선 뒤 다시 불린다.
+   */
+  function fitStageBadge(el) {
+    if (!el) return;
+    var txt = el.textContent || '';
+    if (!txt) return;
+    el.style.removeProperty('--bp-stage-fs');   // 언제나 정본 자에서 다시 시작한다
+    for (var pass = 0; pass < 4; pass++) {
+      var cs = window.getComputedStyle(el);
+      var avail = el.clientWidth
+                - (parseFloat(cs.paddingLeft) || 0)
+                - (parseFloat(cs.paddingRight) || 0);
+      if (!(avail > 0)) return;
+      var ink = inkWidthOf(txt, cs);
+      if (!(ink > avail)) return;
+      var r0 = parseFloat(cs.getPropertyValue('--bp-stage-fs')) || 0;
+      if (!r0) return;
+      /* 0.98 은 수렴 여유다 — 딱 맞게 줄이면 반올림 때문에 한 화소가 다시 넘친다. */
+      el.style.setProperty('--bp-stage-fs',
+        String(Math.floor(r0 * (avail / ink) * 0.98 * 1e5) / 1e5));
+    }
+  }
+
+  var badgeFontHooked = false;
+
+  function setStageBadge(id, n) {
+    var el = $(id);
+    if (!el) return;
+    el.setAttribute('data-digits', String(n).length);
+    setText(id, t('adv.stagebadge', { n: n }));
+    fitStageBadge(el);
+    /* 표시 서체가 아직 안 왔으면 **대체 서체 폭**으로 재게 된다(폭이 다르다).
+       서체가 도착하면 한 번 더 맞춘다 — 판이 이미 서 있으므로 그때 상자 폭도 참이다. */
+    if (!badgeFontHooked && window.document && document.fonts && document.fonts.ready) {
+      badgeFontHooked = true;
+      try {
+        document.fonts.ready.then(function () { fitStageBadge($(id)); });
+      } catch (e) { /* 서체 API 가 없으면 첫 맞춤 하나로 산다 */ }
+    }
+  }
+
   function syncModeSheet() {
-    /* 데일리: 연속 일수 + 오늘 완료 여부. 언어와 무관한 기호라 어느 언어에서도
-       줄 폭이 흔들리지 않는다(9차 #streak-badge 의 규약 그대로 옮겨 왔다). */
-    var d = store.streak > 0 ? ('🔥' + store.streak) : '';
-    if (dailyDoneToday()) d = d ? (d + ' ✅') : '✅';
-    /* [0908] 배지 슬롯은 데이터 속성이 결정한다 — data-badge 가 빈 슬롯(최상위 아케이드·데일리, 시안에
-       알약 없음)에는 값을 쓰지 않는다. 규칙(CSS)은 클래식과 하나, 내용만 행 데이터. */
-    var slotOn = function (id) { var el = document.getElementById(id); return !!(el && el.getAttribute('data-badge')); };
-    setText('mode-daily-b', slotOn('mode-daily-b') ? d : '');
-    setText('mode-rush-b', store.rushSeen ? '' : t('menu.new'));
-    setText('mode-arcade-b', slotOn('mode-arcade-b') && store.best > 0 ? String(store.best) : '');
-    setText('mode-adv-b', t('adv.stagen', { n: Math.max(1, store.advMax | 0) }));
-    /* 14차 — 아케이드 대전 세 줄이 이 시트로 올라왔으니 그 기록 라벨도 여기서
-       채운다. 함수는 그대로 재사용한다(store.arcadeBest 를 읽어 arcrow-*-b 에
-       쓰는 그 함수다). 2단 시트가 살아난다면 openArcadeHub() 쪽 호출도 그대로다. */
+    /* 0911 판정판 49 ① — 플레이 시트는 **네 줄**이다: 모험 + 대전 3종.
+       아케이드·데일리·타임러시 세 줄은 사용자 판정(「그냥 클래식이잖아」)대로 이
+       시트를 떠나 클래식 시트가 토글 하나로 받는다. 그 세 줄이 들고 있던 배지
+       (연속 🔥·✅ · NEW · 최고점)도 함께 갔다 — syncClassicSheet 가 토글 상태에
+       맞는 칸을 읽어 그린다. 여기 남은 것은 모험의 「N탄」 하나뿐이다. */
+    setStageBadge('mode-adv-b', Math.max(1, store.advMax | 0));
+    /* 대전 3종의 기록 배지. 함수는 한 글자도 안 바뀐 그대로 쓴다(store.arcadeBest
+       를 읽어 arcrow-*-b 에 쓰는 그 함수다) — 허브가 은퇴해도 배지 규약은
+       그대로이고, 바뀐 것은 세 줄이 앉아 있는 부모뿐이다. */
     syncArcadeSheet();
   }
 
   function openModeSheet() {
-    syncModeSheet();
+    /* [0911 판정판 49 ③] 순서가 계약이다 — 배지 자 맞춤(setStageBadge)이 **안전 상자의
+       실측 폭**을 읽는다. 판이 hidden 인 채로 그리면 clientWidth 가 0 이라 맞춤이
+       조용히 건너뛰고, 자릿수가 늘어난 배지가 그대로 잘린다(「|0탄」 사고). 판을 먼저
+       세우고 그린다 — 시트가 상태를 만들지 않는다는 규약은 그대로다. */
     openModal('modal-mode');
+    syncModeSheet();
     J.sfx.ui();
   }
   function closeModeSheet() { closeModal('modal-mode'); }
@@ -43214,13 +43264,42 @@ window.TT_SFX = {
    * 모드 시트와 같은 규약이다: 허브는 **상태를 만들지 않는다**. 각 줄은 진입
    * 함수를 그대로 부르고, 배지는 이미 store 에 있는 사실을 읽어 쓸 뿐이다.
    * ------------------------------------------------------------------------- */
+  /** [0911 판정판 49 ②] 「스킬·펫 사용」 토글의 현재 값. 옛 저장본에는 이 칸이
+   *  없으므로 기본은 false = **순수 클래식**이다(가법 키). */
+  function classicSkillsOn() { return !!store.classicSkills; }
+
   function syncClassicSheet() {
-    /* 아케이드 배지는 최고점, 러시 배지도 최고점, 데일리 배지는 오늘 완료 표식.
-       전부 클래식 전용 칸에서 읽는다 — 여기서 일반 store.best 를 읽으면 화면이
-       "기록 분리"를 스스로 부정한다. */
-    setText('classic-arcade-b', store.bestClassic > 0 ? String(store.bestClassic) : '');
-    setText('classic-rush-b', store.bestClassicRush > 0 ? String(store.bestClassicRush) : '');
-    setText('classic-daily-b', classicDailyDoneToday() ? '✅' : '');
+    /* [0911 판정판 49 ②] 토글이 고르는 것은 딱 둘이다 — **어느 진입 함수를 부르나**
+       (wire 참조)와 **어느 칸을 읽어 배지를 그리나**(여기). 모드 id·기록 키·
+       RANK_MODES·저장 스키마는 한 글자도 안 바뀐다.
+         OFF(기본) : bestClassic · bestClassicRush · classicDailyBest  (순수 클래식)
+         ON        : best        · bestRush        · dailyBest         (스킬판)
+       두 벌을 섞어 읽지 않는 것이 규약이다 — 섞으면 화면이 "기록 분리"를 스스로
+       부정한다(W7.5 가 이 시트를 세운 이유가 그것이었다). */
+    var on = classicSkillsOn();
+    var tg = $('classic-skills');
+    if (tg) {
+      tg.setAttribute('aria-pressed', on ? 'true' : 'false');
+      tg.textContent = t(on ? 'settings.on' : 'settings.off');
+    }
+    /* 리드 한 줄도 토글을 따라간다 — ON 인데 "스킬도 아이템도 없어요"가 서 있으면
+       그 문장이 곧 거짓말이 된다. 언어 전환 뒤에는 applyI18n 이 data-i18n 으로
+       OFF 문구를 되돌리지만, 같은 자리에서 이 함수를 다시 부르므로 갈라지지 않는다. */
+    var lead = $('classic-lead');
+    if (lead) lead.textContent = t(on ? 'classic.lead.on' : 'classic.lead');
+    var bA = on ? store.best : store.bestClassic;
+    var bR = on ? store.bestRush : store.bestClassicRush;
+    setText('classic-arcade-b', bA > 0 ? String(bA) : '');
+    setText('classic-rush-b', bR > 0 ? String(bR) : '');
+    setText('classic-daily-b', (on ? dailyDoneToday() : classicDailyDoneToday()) ? '✅' : '');
+  }
+
+  /** 토글 한 번 — 상태를 저장하고 시트를 다시 그린다(진입 함수는 클릭이 고른다). */
+  function toggleClassicSkills() {
+    store.classicSkills = !store.classicSkills;
+    persist();
+    J.sfx.ui();
+    syncClassicSheet();
   }
 
   function openClassicHub() {
@@ -45042,31 +45121,47 @@ window.TT_SFX = {
        진입점에서 자동 복원으로 처리하므로 버튼 하나가 통째로 비었다. */
     on($('btn-cont'), 'click', openClassicHub);
     on($('classic-close'), 'click', function () { closeClassicHub(); J.sfx.ui(); });
+    /* [0911 판정판 49 ②] 클래식 세 줄은 **여섯 모드의 문**이다. 토글이 OFF 면
+       순수 클래식(classic / classic-rush / classic-daily), ON 이면 스킬판
+       (endless / rush / daily) — 부르는 함수는 전부 착수 전에 이미 있던 것이고
+       새 모드는 0 이다. 각 줄이 자기 안에서 토글을 읽는 이유: 토글을 누른 뒤
+       다시 배선하는 길을 두면 «지금 켜져 있나»를 아는 자리가 둘이 된다. */
+    on($('classic-skills'), 'click', toggleClassicSkills);
     on($('classic-arcade'), 'click', function () {
-      closeClassicHub(); J.sfx.ui(); startClassic(false);
+      closeClassicHub(); J.sfx.ui();
+      if (classicSkillsOn()) startEndless(false);
+      else startClassic(false);
     });
     on($('classic-rush'), 'click', function () {
-      closeClassicHub(); J.sfx.ui(); startClassicRush();
+      closeClassicHub(); J.sfx.ui();
+      if (classicSkillsOn()) {
+        // 스킬판 러시를 처음 누르는 것이 NEW 배지를 은퇴시킨다(W7.5 규약 그대로).
+        if (!store.rushSeen) { store.rushSeen = true; persist(); }
+        startRush();
+      } else {
+        startClassicRush();
+      }
     });
     on($('classic-daily'), 'click', function () {
       closeClassicHub();
       J.sfx.ui();
-      /* 일반 데일리와 같은 규약: 오늘 이미 끝냈으면 결과를 다시 보여 주고 판을
-         새로 열지 않는다. 다만 읽는 칸이 classicDailyBest 라 두 데일리는 서로의
-         완료 여부를 모른다 — 하루에 둘 다 한 판씩 할 수 있어야 하기 때문이다. */
-      if (classicDailyDoneToday()) showDailyResult(0, true);
-      else startClassicDaily(false);
+      /* 데일리 규약: 오늘 이미 끝냈으면 결과를 다시 보여 주고 판을 새로 열지 않는다.
+         읽는 칸이 갈려 있어(dailyBest / classicDailyBest) 두 데일리는 서로의 완료
+         여부를 모른다 — 하루에 둘 다 한 판씩 할 수 있어야 하기 때문이다. */
+      if (classicSkillsOn()) {
+        if (store.dailyBest && store.dailyBest.date === todayKey()) showDailyResult(0, false);
+        else startDaily(false);
+      } else {
+        if (classicDailyDoneToday()) showDailyResult(0, true);
+        else startClassicDaily(false);
+      }
     });
-    /* 아케이드 대전 — 모드 시트의 다섯째 진입점. 기존 네 줄의 핸들러는 한 글자도
-       안 바뀌었고, 이 배선은 새 버튼 하나가 새 허브를 여는 것이 전부다. */
-    on($('mode-arcduel'), 'click', function () { closeModeSheet(); J.sfx.ui(); openArcadeHub(); });
-    on($('arcade-close'), 'click', function () { closeArcadeHub(); J.sfx.ui(); });
-    /* 14차 — 세 줄이 2단 허브에서 **플레이 시트로 올라왔다**. 닫을 창이 바뀌었을
-       뿐 시작 코드(startArcade)는 그대로다. closeArcadeHub() 를 그냥 두면 이미
-       닫혀 있는 창을 닫고 정작 열려 있는 플레이 시트가 게임 뒤에 남는다. */
-    on($('arcrow-time'), 'click', function () { closeArcadeHub(); J.sfx.ui(); startArcade('arc-time'); });
-    on($('arcrow-surv'), 'click', function () { closeArcadeHub(); J.sfx.ui(); startArcade('arc-surv'); });
-    on($('arcrow-dmg'), 'click', function () { closeArcadeHub(); J.sfx.ui(); startArcade('arc-dmg'); });
+    /* [0911 판정판 49 ①] 대전 3종이 플레이 시트의 2·3·4번째 줄이다. 닫을 창이
+       허브에서 플레이 시트로 바뀐 것이 배선 변경의 전부이고, 시작 코드
+       (startArcade)·기록(store.arcadeBest)·결과 시트는 한 글자도 안 바뀌었다. */
+    on($('arcrow-time'), 'click', function () { closeModeSheet(); J.sfx.ui(); startArcade('arc-time'); });
+    on($('arcrow-surv'), 'click', function () { closeModeSheet(); J.sfx.ui(); startArcade('arc-surv'); });
+    on($('arcrow-dmg'), 'click', function () { closeModeSheet(); J.sfx.ui(); startArcade('arc-dmg'); });
     /* 결과 시트의 두 버튼. [다시하기]가 S.mode 가 아니라 arcLast 를 읽는 것은
        의도다 — 시트가 떠 있는 동안 다른 경로가 S.mode 를 옮겨도 같은 종목으로
        다시 시작한다(종목이 바뀌면 기록의 뜻이 바뀐다). */
@@ -45081,25 +45176,10 @@ window.TT_SFX = {
     on($('arc-menu'), 'click', goMenu);
     on($('mode-close'), 'click', function () { closeModeSheet(); J.sfx.ui(); });
     on($('mode-adv'), 'click', function () { closeModeSheet(); J.sfx.ui(); openAdventure(); });
-    /* 리텐션 래퍼(0910) ② — 카드 「아케이드 · 끝없이」가 유한한 대전 3종을
-       열던 모순을 끝낸다(AUDIT B5). 카드는 이제 자기 설명 그대로 끝없이로
-       직행하고, 대전 허브는 다섯째 줄(#mode-arcduel)이 연다.
-       startEndless(false) 인 것은 의도다 — 쓰던 판이 있으면 그 판을 잇는다. */
-    on($('mode-arcade'), 'click', function () { closeModeSheet(); J.sfx.ui(); startEndless(false); });
-    on($('mode-daily'), 'click', function () {
-      closeModeSheet();
-      J.sfx.ui();
-      // 0: re-opening a result finished hours ago must not re-celebrate it.
-      if (store.dailyBest && store.dailyBest.date === todayKey()) showDailyResult(0, false);
-      else startDaily(false);
-    });
-    on($('mode-rush'), 'click', function () {
-      closeModeSheet();
-      J.sfx.ui();
-      // Pressing it is what retires the NEW badge — see syncModeSheet().
-      if (!store.rushSeen) { store.rushSeen = true; persist(); }
-      startRush();
-    });
+    /* [0911 판정판 49 ①] #mode-arcade / #mode-daily / #mode-rush 세 배선은 여기서
+       내렸다 — 그 세 줄이 클래식 시트로 갔고, 그쪽 세 줄이 토글 ON 에서 바로 이
+       세 함수(startEndless / startDaily / startRush)를 부른다. 진입 함수는 하나도
+       안 지웠고 부르는 자리만 옮겼다. */
 
     /* --- 모험 (v4 4차-a) ----------------------------------------------------
      * 지도의 노드는 스무 개가 넘을 수 있으므로 리스너는 노드마다가 아니라
@@ -45626,8 +45706,6 @@ window.TT_SFX = {
             !($('modal-skin') && !$('modal-skin').hidden)) { closeShop(); return; }
       // W7.5 — 클래식 허브도 메뉴 위의 한 겹이라 모드 시트와 같은 우선순위다.
       if ($('modal-classic') && !$('modal-classic').hidden) { closeClassicHub(); return; }
-      // 아케이드 대전 허브도 같은 겹·같은 우선순위다.
-      if ($('modal-arcade') && !$('modal-arcade').hidden) { closeArcadeHub(); return; }
         /* 모험의 두 시트. 미션 카드는 지도 위에 떠 있으므로 먼저 닫히고, 결과
          * 시트는 닫는 것이 아니라 **지도로 돌아가는 것**이다 — 그냥 닫으면
          * 판이 끝난 화면에 갇힌다. */
@@ -47701,7 +47779,11 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
    베이지 민판(--j-rim + 연어색 테두리)과 어두운 반투명 줄(rgba 255/.05) 두
    문법이 창마다 갈라져 있던 자리를 하나로 모은다. 크림 틴트 판 위이므로
    줄은 **더 밝은 유리**여야 판에서 떠 보인다(어두운 줄은 구멍처럼 읽힌다). */
+/* [0911 판정판 49] `#modal-classic` 은 `.r10m` 판이라 이 `.w6m` 스코프가 안 닿는다.
+   클래식 시트의 「스킬·펫 사용」 줄은 설정창 토글과 **같은 부품 인스턴스**이므로
+   같은 규칙을 받아야 한다 — 새 값·새 규칙 0, 선택자 목록에 스코프만 하나 더 잇는다. */
 .w6m .set-row,
+#modal-classic .set-row,
 .w6m .rank-row,
 .w6m .sheet .btn-ghost,
 .w6m .sheet .btn-secondary{
@@ -47730,7 +47812,8 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
 .w6m .rank-row .rank-pos,
 .w6m .rank-row .rank-meta,
 .w6m #rank-hint{ color:#7A5C4A; }
-.w6m .set-k{ color:var(--prim-art-ink); }
+.w6m .set-k,
+#modal-classic .set-k{ color:var(--prim-art-ink); }
 
 /* --- ⑦ 젤리 알약 (조각 ②) --------------------------------------------------
    설정의 파랑 사각 토글(반려)과 기록의 탭 알약이 **같은 물건**이 된다.
@@ -47741,6 +47824,7 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
    = 같은 캔디의 채도만 뺀 라일락. 상태가 색 하나로만 갈리므로 "켜짐/꺼짐"을
    글자와 색이 동시에 말한다. */
 .w6m .set-tg,
+#modal-classic .set-tg,
 .w6m .rank-tab{
   flex:0 0 auto;
   min-width:92px;
@@ -47785,6 +47869,7 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
 .w6m #rank-tabs{ flex-wrap:wrap; row-gap:8px; }
 /* 꺼짐 · 비선택 — 같은 캔디에서 채도만 뺀다 */
 .w6m .set-tg[aria-pressed="false"],
+#modal-classic .set-tg[aria-pressed="false"],
 .w6m .rank-tab[aria-selected="false"]{
   background-color:transparent;
   background-image:linear-gradient(180deg, #CDC2D4 0%, #CDC2D4 47%, #B3A6BC 47%, #B3A6BC 100%);
@@ -47795,6 +47880,7 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
     inset 0 -5px 0 #A296AC;
 }
 .w6m .set-tg:active,
+#modal-classic .set-tg:active,
 .w6m .rank-tab:active{ transform:translateY(2px); }
 
 /* --- ⑩ [0904] 내 기록 — 판 안 스크롤 ---------------------------------------
@@ -47854,7 +47940,8 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
    알약이 커졌으니 탭 줄도 유리 줄들과 같은 리듬(8px)으로 띄운다. */
 .w6m #rank-tabs{ gap:8px; margin:2px 0 6px; }
 .w6m #rank-list{ gap:8px; }
-.w6m .set-list{ gap:8px; }
+.w6m .set-list,
+#modal-classic .set-list{ gap:8px; }
 </style>
 
 <style id="sian-jelly-panel-v4">
@@ -49411,6 +49498,7 @@ html[lang="en"] .splash-logo{
 /* 토글·기록탭은 **이미 정본**이다(W6-b ⑦ 이 만든 그 알약) — 여기서는 상자만
    같은 규칙에 맞춘다. 색은 건드리지 않는다(켜짐 민트 · 꺼짐 라일락 유지). */
 .w6m .set-tg,
+#modal-classic .set-tg,
 .w6m .rank-tab{
   display:flex !important;
   align-items:center !important;
@@ -56209,7 +56297,7 @@ html.menu-v2 #screen-menu .tagline{
    게임의 10행은 전부 이 부품의 인스턴스 — 행별 규칙 없음, data-part·data-variant·data-badge 만 다르다.
    선택자 앞의 `.mode-list ` 는 인스턴스 스코프(옛 .mode-list .mode-row 규칙을 이기는 특이도)일 뿐 규칙 내용은 정본과 같다.
    =========================================================================== */
-#modal-mode .mode-list,#modal-arcade .mode-list,#modal-classic .mode-list{gap:2px !important;background:none !important;}
+#modal-mode .mode-list,#modal-classic .mode-list{gap:2px !important;background:none !important;}
 
 /* ===========================================================================
    §btn-picture — 그림 버튼 컴포넌트 (T3, data-part="btn-picture") · engine 층 (0908)
@@ -59599,7 +59687,7 @@ html[lang="en"] #modal-arc.is-arcdmg .sheet > h2{ --ttl:url("catalog/ttl-arcdmg-
   line-height: inherit;
 }
 
-#modal-arcade .sheet.r10-panel { text-align: center; }
+/* [0911] #modal-arcade 은퇴 — 같은 규칙은 #modal-classic 이 이미 자기 블록에서 받는다. */
 #modal-minimap .sheet.r10-panel,
 #modal-node .sheet.r10-panel {
   border-image: none;
