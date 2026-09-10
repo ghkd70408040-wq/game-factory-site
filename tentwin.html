@@ -529,8 +529,79 @@ button {
    **하나도 안 남았다**(살아 있는 마크업은 :12770 `#duel-me-av > i.hv2-face--me`).
    그래서 폭주(mg/mg2) 구간에 주인공 초상이 한 번도 달아오르지 않았다.
    바꾸는 것은 선택자뿐이다 — 값·순서·색은 그대로다. */
-#app.mg #duel-hud .hv2-face--me { box-shadow: 0 0 14px 2px rgba(255, 150, 40, .55); }
-#app.mg2 #duel-hud .hv2-face--me { box-shadow: 0 0 20px 3px rgba(255, 90, 30, .65); }
+/* 🚨 0910 판정판 14 흡수(→ 25) — 위 수리가 **또** 죽었고, 되살리려던 커밋
+   (wave/repair 636c39e)은 사용자 반려됐다. 두 사실을 실측으로 적어 둔다.
+     ① 죽은 선택자: `.hv2-face--me` 를 class 로 단 마크업이 이 문서에 0 개다
+        (`grep 'class="[^"]*hv2-face"' → 없음`). 살아 있는 초상은 :13559 의
+        `<span id="duel-me-av" class="dh-av dh-av-me">` 하나다. 그래서 0901·0908
+        두 번의 수리가 모두 «없는 것»에 색을 칠하고 있었다.
+     ② 반려 사유 「네모 상자형」의 원인: 그 초상은 **투명 PNG 를 담은 상자**다
+        (`background-image` + `background-size:contain`, :58200). box-shadow 는
+        상자의 border-box 를 따라가므로 그림이 아니라 **빈 사각형**이 빛난다.
+        캡슐도 아니고 둥글지도 않은 네모가 나오는 것이 산술적으로 당연했다.
+   그래서 기법을 바꾼다 — **모양을 따르는 빛**:
+     · 전투 초상(#duel-me-av)  `filter: drop-shadow()` — 알파(그림 실루엣)를
+       따라 번진다. 상자가 아니라 캐릭터가 빛난다.
+     · 모험 초상(#hero-slot)   `::after` 한 겹 + `border-radius:50%` — 이 슬롯은
+       진짜 원형 캡슐이다(.hs-ring `border-radius:50%`, #mascot 도 50%). 링의
+       반지름을 그대로 물려받은 원형 글로우라 «네모»가 나올 자리가 없다.
+   색은 **각성의 역할색 토큰**이다(--role-mint-*). 근거는 이미 화면에 있다:
+   전투 하단 4버튼에서 각성(#btn-shuffle)의 명판은 --role-mint-*, 필살기
+   (#btn-hint)는 --role-yellow-* 다(:48501·:48503). 초상도 같은 어휘를 쓰면
+   「초상이 민트로 달아오름 = 각성」이 화면 안에서 한 번에 읽힌다. 필살기 만땅의
+   금빛(--role-me-atk-*)과는 색상환에서 반대편이라 눈이 둘을 안 섞는다.
+   상태 두 겹은 하단 버튼의 어휘(`urge` / `primed`)를 그대로 옮긴 것이다:
+     #app.skill       각성 **지속 중**   — 밝게, 1.15s (버튼 urge 와 같은 주기)
+     #app.skill-full  각성 **만땅 대기** — 절반 세기, 2.3s (primed 와 같은 배수)
+   끄는 것은 applySkill/skillTick 의 `setAppClass('skill', false)` 하나뿐이라,
+   지속이 끝나면 클래스가 사라져 글로우도 같이 꺼진다(꺼짐 배선 추가 0줄). */
+@keyframes awk-av-ring{
+  0%,100%{ opacity:.72; transform:scale(1);     }
+  50%    { opacity:1;   transform:scale(1.045); }
+}
+@keyframes awk-av-glow{
+  0%,100%{ filter: var(--dh-av-me-drop) drop-shadow(0 0 6px  var(--role-mint-face-a)) drop-shadow(0 0 14px var(--role-mint-face-b)); }
+  50%    { filter: var(--dh-av-me-drop) drop-shadow(0 0 11px var(--role-mint-face-a)) drop-shadow(0 0 24px var(--role-mint-face-b)); }
+}
+/* 모험 HUD — 원형 캡슐. z-index 0 이라 링(2)·마스코트(1) **뒤**에 앉는다:
+   빛은 캡슐을 덮는 것이 아니라 캡슐 뒤에서 새어 나와야 테두리 키색이 산다. */
+#app.skill #hero-slot::after,
+#app.skill-full #hero-slot::after{
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  z-index: 0;
+  pointer-events: none;
+  box-shadow: 0 0 9px 2px var(--role-mint-face-a), 0 0 20px 6px var(--role-mint-face-b);
+  animation: awk-av-ring 1.15s ease-in-out infinite;
+}
+#app.skill-full #hero-slot::after{
+  box-shadow: 0 0 6px 1px var(--role-mint-face-a), 0 0 13px 3px var(--role-mint-face-b);
+  animation-duration: 2.3s;
+}
+/* 전투 HUD — 그림 실루엣을 따르는 빛. 각성이 폭주(mg/mg2)를 이기는 것은
+   의도다: 폭주는 몇십 초를 가는 상태이고 각성은 7~10초짜리 사건이라, 겹치는
+   순간에 말해야 하는 것은 방금 일어난 쪽이다. */
+#app.battle.skill #duel-hud .dh-av-me      { animation: awk-av-glow 1.15s ease-in-out infinite; }
+#app.battle.skill-full #duel-hud .dh-av-me { animation: awk-av-glow 2.3s  ease-in-out infinite; }
+/* 폭주 — 값(반경·색·α)은 0901 원문 그대로 옮기고 기법만 box-shadow → drop-shadow. */
+#app.mg  #duel-hud .dh-av-me { filter: var(--dh-av-me-drop) drop-shadow(0 0 14px rgba(255, 150, 40, .55)); }
+#app.mg2 #duel-hud .dh-av-me { filter: var(--dh-av-me-drop) drop-shadow(0 0 20px rgba(255, 90, 30, .65)); }
+/* 접근성 — 이 파일의 다른 상시 연출과 같은 처분: 움직임은 끄고 빛은 남긴다
+   ("지금 각성 중이다"는 사실 자체가 정보라 축소하면 안 된다). */
+@media (prefers-reduced-motion: reduce){
+  #app.skill #hero-slot::after,
+  #app.skill-full #hero-slot::after,
+  #app.battle.skill #duel-hud .dh-av-me,
+  #app.battle.skill-full #duel-hud .dh-av-me{ animation: none; }
+  #app.skill #hero-slot::after,
+  #app.skill-full #hero-slot::after{ opacity: .9; }
+  #app.battle.skill #duel-hud .dh-av-me,
+  #app.battle.skill-full #duel-hud .dh-av-me{
+    filter: var(--dh-av-me-drop) drop-shadow(0 0 9px var(--role-mint-face-a)) drop-shadow(0 0 19px var(--role-mint-face-b));
+  }
+}
 
 /* ---- 각본 컷인 — DESIGN-MG-FINISH §2.2 ② ----------------------------------
    50탄 초코대왕 1차전이 **스토리 컷**임을 프레이밍으로 말한다. 일반 컷인과
@@ -24659,7 +24730,7 @@ window.TT_SFX = {
       'cut.c10a': 'King Cocoa, once more. This time, the Heart beats on our side.',
       'cut.c10b': 'Harmony returns. Sames are sweet because they match \u2014 differents add up to Ten.',
       'cut.c10b2': '\u2026That\'s how this world plays.',
-      /* --- W7 푸딩 기사 (필살기 = 소환 계열 · 지속은 SKILL_MS.pudding) --- */
+      /* --- W7 푸딩 기사 (각성 = 소환 계열 · 지속은 SKILL_MS.pudding) --- */
       'char.pudding.name': 'Pudding Knight',
       'char.pudding.title': 'Shield of the Jelly Court',
       'char.pudding.tag': 'Defender',
@@ -24667,7 +24738,7 @@ window.TT_SFX = {
       'char.pudding.ult': 'Pudding Shield — {sec}s where every match counts as a TenTwin combo',
       'char.pudding.tip': 'Pick him to hold the line and stack the chain.',
       'skill.pudding.name': 'PUDDING SHIELD!',
-      /* --- W7 소다 마녀 (필살기 = 젤리 타임 계열 · 지속은 SKILL_MS.sodawitch) --- */
+      /* --- W7 소다 마녀 (각성 = 젤리 타임 계열 · 지속은 SKILL_MS.sodawitch) --- */
       'char.sodawitch.name': 'Soda Witch',
       'char.sodawitch.title': 'Witch of the Fizzy Marsh',
       'char.sodawitch.tag': 'Big-hitter',
@@ -25318,10 +25389,14 @@ window.TT_SFX = {
       'adv.hearts': 'Hearts',
 
       /* --- v4 5차 §2: 스킬 게이지 · 필살기 --- */
-      'aria.skill': 'Use your ultimate',
+      /* 0910 각성/필살기 분리(판정판 25) — 이 세 키가 붙는 곳은 전부 **각성
+         게이지**(store.gauge -> fireSkill)다: #skill-btn 뜬 링 · 미충전 토스트 ·
+         castSkill 컷인의 기본 부제. 전투 즉발 타격(doSpecial)의 부제는 아래
+         skill.sub.sp 가 따로 든다 — 두 낱말이 갈라서는 자리가 여기다. */
+      'aria.skill': 'Use your awakening',
       'skill.ready': 'GO!',
       'skill.notyet': 'Awakening {n}% — every match charges it, and a higher combo charges it faster.',
-      'skill.sub': 'ULTIMATE',
+      'skill.sub': 'AWAKENING',
       /* 단계 3 개명: "소환" → "각성". 키는 그대로다 — castSkill 의 분기가 이 키로
          갈리므로 문구만 바뀌고 코드 경로는 한 글자도 안 움직인다. */
       'skill.ten.name': 'TENTWIN AWAKENING — TWIN PRINCE!',
@@ -25340,7 +25415,7 @@ window.TT_SFX = {
       'fx.awaken.chain': '{n}-CHAIN BLAST!',
       'fx.finish': 'FINISH!!',
       'fx.finish.sub': 'PERFECT FINISH!',
-      'skill.gauge': 'Ultimate',
+      'skill.gauge': 'Awakening',
 
       /* --- v4 5차 §4: 보스전 --- */
       'boss.grape.name': 'Grape Gobbler',
@@ -25363,7 +25438,9 @@ window.TT_SFX = {
       'boss.cond.mission2': 'Clear {n} missions in a row',
       'boss.goal': 'Take down {b}',
       'boss.prog': '{c} · {n}/{goal}',
-      'boss.armed': 'Opening found — ULTIMATE INCOMING!',
+      /* 0910 — bossArmUlt 가 부르는 것은 castSkill(= 각성)이다. 「필살기」로
+         쓰면 하단 필살기 버튼(doSpecial)이 저절로 나간 줄로 읽힌다. */
+      'boss.armed': 'Opening found — AWAKENING INCOMING!',
       'boss.weak': 'OPENING!',
       'boss.tell': '{b} is winding up…',
       'boss.atk': 'Blockers dropped! (x{n})',
@@ -25385,7 +25462,12 @@ window.TT_SFX = {
       'pick.go': 'Confirm',
       'pick.locked': 'Locked',
       'pick.passive': 'Passive',
-      'pick.ult': 'Ultimate',
+      /* 0910 각성/필살기 분리(판정판 25) — 이 라벨이 붙는 값은 char.*.ult
+         (= store.gauge -> fireSkill 로 켜지는 **지속 모드**)라 「각성」이다.
+         전투 전용 즉발 타격(d.me.sp -> doSpecial)은 act.special 이 따로 든다.
+         키 이름(pick.ult)은 그대로다 — 마크업 data-i18n 6곳을 안 건드리는 것이
+         24번 파도(사이드바 탭 은퇴)와의 충돌을 0 으로 만드는 유일한 길이다. */
+      'pick.ult': 'Awakening',
 
       /* --- v4 7차 §B: 기준 일러스트 수렴 (로고 부제 · 맵 배너 · 스탯 바 4종) ---
        * 스탯 넷은 밸런스 수치가 아니라 성격 소개다. 값은 index.html 의 --v 에
@@ -25406,17 +25488,18 @@ window.TT_SFX = {
       /* [SI-0909] 능력치 한 줄 설명. 사용자 지적 "능력치가 뭔지 설명이 없다".
          네 문장은 **statMult() 의 네 분기를 그대로 옮긴 것**이지 분위기 글이
          아니다(§WD-1 §12.2 실측):
-           d1 power    skillOn('summon') && awkStreak>0 -> x(1 + p/100 x min(awk,3)/3)
+           d1 power    (skillOn('summon')||skillOn('jellytime')) && awkStreak>0
+                                                        -> x(1 + p/100 x min(awk,3)/3)
            d2 steady   stdyRun >= 3                     -> x(1 + s/100)
            d3 agility  statAgil (popLive>0 인 매치)      -> x(1 + a/100)
            d4 luck     random() < l/100                 -> x2
          {n} 은 statEff(id) 의 **지금 실효값**이라 강화·아이템까지 반영된다 —
          막대(--v)와 같은 수를 말하므로 둘이 어긋날 수 없다.
-         d1x 는 각성이 'jellytime' 인 캐릭터(SKILL_KIND: jelly·sodawitch)용이다.
-         그 둘은 'summon' 을 영영 못 켜므로 d1 의 조건이 성립하지 않는다 —
-         같은 문장을 보이면 거짓말이 된다(추정 금지). */
-      'stat.d1':  'Match score +{n}% while Prince Summon is up',
-      'stat.d1x': 'This hero awakens into Jelly Time — Power stays idle',
+         0910 각성/필살기 분리(판정판 25) — d1 의 조건이 **kind 무관**이 되면서
+         d1x(젤리타임 예외 문구)는 은퇴했다. 「각성」은 지속 모드 한 낱말이고
+         summon/jellytime 은 그 안의 갈래일 뿐이라, 화면이 갈래를 말할 이유가
+         없다. 갈래를 나누던 시절의 문구를 남겨 두면 그것이 다시 규칙이 된다. */
+      'stat.d1':  'Match score +{n}% while Awakening is up (peaks at 3 casts)',
       'stat.d2':  '+{n}% for 3 matches in a row, no pause',
       'stat.d3':  '+{n}% when you match while tiles still pop',
       'stat.d4':  '{n}% chance a match scores double',
@@ -25793,7 +25876,7 @@ window.TT_SFX = {
       'cut.c10a': '초코 대왕과의 재대결. 이번엔 심장이 우리 쪽에서 뛰어요.',
       'cut.c10b': '합이 돌아왔어요. 같은 것은 같아서 반갑고, 다른 것은 더해져 열이 돼요.',
       'cut.c10b2': '\u2026그게 이 세계의 노는 법이에요.',
-      /* --- W7 푸딩 기사 (필살기 = 소환 계열 · 지속은 SKILL_MS.pudding) --- */
+      /* --- W7 푸딩 기사 (각성 = 소환 계열 · 지속은 SKILL_MS.pudding) --- */
       'char.pudding.name': '푸딩 기사',
       'char.pudding.title': '젤리 왕궁의 방패',
       'char.pudding.tag': '버티기파',
@@ -25801,7 +25884,7 @@ window.TT_SFX = {
       'char.pudding.ult': '푸딩 방패 — {sec}초간 모든 매치가 텐트윈 콤보',
       'char.pudding.tip': '길게 버티며 사슬을 쌓고 싶을 때.',
       'skill.pudding.name': '푸딩 방패!',
-      /* --- W7 소다 마녀 (필살기 = 젤리 타임 계열 · 지속은 SKILL_MS.sodawitch) --- */
+      /* --- W7 소다 마녀 (각성 = 젤리 타임 계열 · 지속은 SKILL_MS.sodawitch) --- */
       'char.sodawitch.name': '소다 마녀',
       'char.sodawitch.title': '탄산 늪의 마녀',
       'char.sodawitch.tag': '한 방파',
@@ -26394,10 +26477,12 @@ window.TT_SFX = {
       'adv.hearts': '하트',
 
       /* --- v4 5차 §2: 스킬 게이지 · 필살기 --- */
-      'aria.skill': '필살기 쓰기',
+      /* 0910 각성/필살기 분리(판정판 25) — 위 en 블록의 짝. 이 셋은 각성
+         게이지(store.gauge)의 낱말이고, 전투 즉발 타격은 skill.sub.sp 다. */
+      'aria.skill': '각성 쓰기',
       'skill.ready': '발동!',
       'skill.notyet': '각성 {n}% — 매치마다 차고, 콤보가 높을수록 빨리 차요.',
-      'skill.sub': '필살기',
+      'skill.sub': '각성',
       /* 단계 3 개명: "소환" → "각성". 키는 그대로 (castSkill 무수정). */
       'skill.ten.name': '텐트윈 각성 — 트윈 왕자!',
       'skill.twin.name': '텐트윈 각성 — 텐텐 왕자!',
@@ -26413,7 +26498,7 @@ window.TT_SFX = {
          한국어 UI 에서는 한국어가 서는 것이 맞다. */
       'fx.finish': '격파!!',
       'fx.finish.sub': '완벽한 마무리!',
-      'skill.gauge': '필살기',
+      'skill.gauge': '각성',
 
       /* --- v4 5차 §4: 보스전 --- */
       'boss.grape.name': '포도 먹깨비',
@@ -26436,7 +26521,8 @@ window.TT_SFX = {
       'boss.cond.mission2': '미션 {n}개 연속 성공',
       'boss.goal': '{b} 격파',
       'boss.prog': '{c} · {n}/{goal}',
-      'boss.armed': '빈틈 발견 — 필살기 발동!',
+      /* 0910 — bossArmUlt -> castSkill(각성). 하단 필살기 버튼과 다른 사건이다. */
+      'boss.armed': '빈틈 발견 — 각성 발동!',
       'boss.weak': '빈틈!',
       'boss.tell': '{b}가 노려보고 있어요…',
       'boss.atk': '블로커가 떨어졌어요! ({n}개)',
@@ -26458,7 +26544,8 @@ window.TT_SFX = {
       'pick.go': '선택 완료',
       'pick.locked': '잠김',
       'pick.passive': '패시브',
-      'pick.ult': '필살기',
+      /* 0910 각성/필살기 분리(판정판 25) — 위 en 블록의 짝. 키 이름 유지. */
+      'pick.ult': '각성',
 
       /* --- v4 7차 §B: 기준 일러스트 수렴 --- */
       'menu.sub': '젤리팡 월드',
@@ -26470,9 +26557,10 @@ window.TT_SFX = {
       'stat.k3': '순발력',
       'stat.k4': '행운',
       /* [SI-0909] 위 en 블록의 짝. 문장 길이를 15자 안팎으로 묶은 것은 말풍선
-         폭(--f2-w x .43 = 160px)에서 두 줄을 안 넘기기 위해서다. */
-      'stat.d1':  '왕자 소환 각성 중 매치 점수 +{n}%',
-      'stat.d1x': '이 캐릭터 각성은 젤리타임 — 폭발력은 쉬어요',
+         폭(--f2-w x .43 = 160px)에서 두 줄을 안 넘기기 위해서다.
+         0910 — d1 은 「왕자 소환」을 빼고 「각성」 한 낱말로 말한다(각성/필살기
+         분리). 괄호 한 마디가 늘어난 만큼 두 줄째가 길어지지만 상한(2줄) 안이다. */
+      'stat.d1':  '각성 중 매치 점수 +{n}% (연쇄 3회에 최대)',
       'stat.d2':  '쉬지 않고 3연속 매치하면 +{n}%',
       'stat.d3':  '터지는 중에 이어 치면 +{n}%',
       'stat.d4':  '매치마다 {n}% 확률로 점수 2배!',
@@ -30716,12 +30804,15 @@ window.TT_SFX = {
     return SKILL_BASE + SKILL_COMBO * c;
   }
 
-  /* 주인공별 필살기의 종류. 왕자 둘은 방향만 반대인 같은 기술이다.
+  /* 주인공별 각성의 갈래(kind). 왕자 둘은 방향만 반대인 같은 기술이다.
+   * 0910 판정판 25 — summon/jellytime 은 「각성」 한 낱말 **안의 갈래**이지
+   * 서로 다른 기술이 아니다. 전투 전용 즉발 타격은 doSpecial 쪽이고 그것만
+   * 「필살기」라 부른다. 화면 문구가 이 갈래를 말하는 자리는 이제 없다.
    *
    * E3 W7 — 신규 주인공 둘이 **기존 두 효과를 나눠 갖는다**. 새 kind 를 만들지
    * 않은 것이 이 표의 요점이다: kind 가 늘면 applySkill 뿐 아니라 그것을 읽는
    * 네 곳(twinApply·passiveApply·jackpotP·syncSkill)이 전부 갈라지고, 그 순간
-   * "필살기가 무엇을 하는가"가 코드 한 곳에서 안 읽힌다.
+   * "각성이 무엇을 하는가"가 코드 한 곳에서 안 읽힌다.
    *   푸딩 방패  = summon    한 판의 사슬을 대신 세워 준다(형이 옆에 붙는 그림)
    *   탄산 폭발  = jellytime 잭팟 확률이 터진다("폭발"이 곧 그 효과다)
    * 변주는 **지속시간**으로만 낸다(SKILL_MS). 기존 셋의 값은 한 글자도 안 바뀐다. */
@@ -30802,6 +30893,13 @@ window.TT_SFX = {
 
   /** 스킬 버튼. 링(conic)은 --sk 하나로 그려지고, 만땅이면 .full 이 발광·펄스. */
   function syncSkill() {
+    /* 0910 판정판 14 — 「각성 만땅 대기」의 앱 클래스. 지속 중(#app.skill)은
+       applySkill 이 이미 켜고 끄지만, **차오른 채 아직 안 쓴** 구간에는 이름이
+       없어서 HUD 초상이 그 사실을 말할 수단이 없었다. 아래 el 검사보다 **앞**에
+       두는 이유는 #skill-btn 이 없어도(전투·다른 화면) 이 사실은 참이기 때문이고,
+       전투는 syncBattleActs 가 같은 이름을 자기 값(gFull)으로 다시 세운다. */
+    setAppClass('skill-full', S.mode === 'adv' && !!S.running && !battleOn()
+                              && gaugeFull() && !S.skillKind);
     var el = $('skill-btn');
     if (!el) return;
     /* 전투(단계 3): 각성이 하단 4버튼으로 이사했다. 같은 기능이 두 자리에 있으면
@@ -31080,13 +31178,25 @@ window.TT_SFX = {
     S.skillUntil = now() + (SKILL_MS[charId()] || 6000);
     setAppClass('skill', true);
     setAppClass('skill-jelly', kind === 'jellytime');
+    /* WD-1 §12 폭발력 — 각성 연쇄는 **여기서만** 오른다. 수동 발동
+       (fireSkill → castSkill)과 보스전 확정 시전이 결국 둘 다 applySkill 로
+       모이므로, 이 한 줄이 "실제로 성립한 시전"을 빠짐없이 그리고 두 번 세지
+       않고 센다. 게이지가 모자라 튕긴 시도는 여기까지 못 오므로 자동으로
+       제외된다 — 그 판정을 따로 복제하지 않는 것이 요점이다.
+
+       🚨 0910 각성/필살기 분리(판정판 25) — 이 줄이 `kind === 'summon'` **안**에
+       있었다. 그래서 젤리타임 계열(젤리공주·소다 마녀)은 각성을 몇 번을 켜도
+       awkStreak 이 0 이었고, 그 값을 읽는 셋이 전부 조용히 죽어 있었다:
+         · statMult 폭발력    조건이 영영 성립 안 함 → stat.d1x 라는 예외 문구가 생겼다
+         · awakenBlast 의 st  주석은 "jellytime 도 같은 급"인데 실제로는 늘 1단계
+         · PET_AWK_NEED(째깍이) 각성 3연쇄 해금이 그 둘에게만 닿을 수 없었다
+       셋 다 "각성을 켰다"를 세려던 것이지 "어느 갈래를 켰다"를 세려던 것이
+       아니다. 그래서 카운터를 갈래 밖으로 낸다 — 조건을 고치는 대신 **세는
+       자리**를 고쳐야 세 소비처가 함께 참말이 된다.
+       ⚠ 아래 twAlt/twSeen/syncTwChip 은 summon 안에 남는다: 그것은 「형제가
+         소환돼 사슬을 대신 세운다」는 summon 고유 효과이지 연쇄 카운터가 아니다. */
+    awkStreak++;
     if (kind === 'summon') {
-      /* WD-1 §12 폭발력 — 각성 연쇄는 **여기서만** 오른다. 수동 발동
-         (fireSkill → castSkill)과 보스전 확정 시전이 결국 둘 다 applySkill 로
-         모이므로, 이 한 줄이 "실제로 성립한 시전"을 빠짐없이 그리고 두 번 세지
-         않고 센다. 게이지가 모자라 튕긴 시도는 여기까지 못 오므로 자동으로
-         제외된다 — 그 판정을 따로 복제하지 않는 것이 요점이다. */
-      awkStreak++;
       /* 형제는 이미 리듬을 맞춘 채로 도착한다 — 사슬이 SKILL_TW_HEAD 에서
          출발한다. twSeen 도 같이 올려 5연쇄 배너가 "내가 한 것도 아닌데" 터지는
          것을 막는다(10연쇄 배너는 그대로 살아 있어서 목표가 남는다). */
@@ -32183,6 +32293,10 @@ window.TT_SFX = {
        모드가 시작되고, #duel-hud 가 남으면 endless 의 보드가 그만큼 낮아진다 —
        "3모드 무영향"은 값뿐 아니라 화면에도 적용된다(위 skillReset 과 같은 규약). */
     setAppClass('battle', false);
+    /* 0910 판정판 14 — 「만땅 대기」 글로우도 같이 내린다. syncBattleActs 는 판이
+       끝난 뒤 한 번도 더 안 돌 수 있어서(그 함수가 켠 클래스를 그 함수가 끄지
+       못한다), 위 두 줄과 같은 자리에서 끄는 것이 유일하게 새지 않는 자리다. */
+    setAppClass('skill-full', false);
     duelHudUnmount();
   }
 
@@ -39441,6 +39555,10 @@ window.TT_SFX = {
       setCls(bsh, 'urge', gFull);
       setCls(bsh, 'primed', gaugeFull() && !!S.skillKind);
     }
+    /* 0910 판정판 14 — 전투에서의 「만땅 대기」. 버튼의 `urge` 와 **같은 사실**을
+       HUD 초상 쪽에도 흘려 준다(gFull 을 다시 계산하지 않는다 = 두 신호가 갈릴
+       수 없다). 지속 중(#app.skill)은 applySkill 이 든다. */
+    setAppClass('skill-full', gFull);
     setActLabel(ba, 'act.attack', 'aria.attack');
     setActLabel(bh, 'act.special', 'aria.special');
     setActLabel(bu, 'act.pet', 'aria.pet');
@@ -41993,8 +42111,19 @@ window.TT_SFX = {
     var det = 1, kind = '';
     /* 폭발력 — 연쇄가 EXPL_STREAK_CAP 에 닿으면 정확히 1 + e.power/100 이 된다
        (만렙 텐텐 = +12%, §12.3 의 폭발력 상한 그대로). 그 아래는 비례 배분이라
-       "각성을 처음 켠 한 수"와 "3연쇄째"가 같은 값을 주지 않는다. */
-    if (e.power > 0 && skillOn('summon') && awkStreak > 0) {
+       "각성을 처음 켠 한 수"와 "3연쇄째"가 같은 값을 주지 않는다.
+
+       🚨 0910 각성/필살기 분리(판정판 25 · DESIGN §15) — 조건이 `skillOn('summon')`
+       하나였다. 그 한 낱말 때문에 폭발력은 「각성 중의 배수」가 아니라 「소환
+       갈래일 때만의 배수」였고, 젤리타임 계열 둘에게는 **닿을 수 없는 스탯**이
+       됐다(그 사실을 감추려고 stat.d1x 라는 예외 문구가 따로 있었다).
+       각성은 하나의 지속 모드이고 kind 는 그 안의 갈래일 뿐이므로 조건도 갈래를
+       묻지 않는다. `skillOn('summon') || skillOn('jellytime')` 로 적는 것은
+       인자 없는 `skillOn()` 과 값이 같지만 **무엇을 묻는지가 원문에 남기** 위해서다
+       (kind 가 늘면 여기도 함께 늘어야 한다는 사실이 조건식에 보인다).
+       ⚠ 배수 자체는 한 값도 안 바뀐다 — 계수(e.power)·상한(EXPL_STREAK_CAP)·
+         비례식이 전부 그대로다. 바뀐 것은 "누구에게 열려 있는가" 하나다. */
+    if (e.power > 0 && (skillOn('summon') || skillOn('jellytime')) && awkStreak > 0) {
       det *= 1 + (e.power / 100) * (Math.min(awkStreak, EXPL_STREAK_CAP) / EXPL_STREAK_CAP);
       kind = 'power';
     }
@@ -42952,16 +43081,20 @@ window.TT_SFX = {
    * 플레이어가 "폭발력이 뭘 폭발시키는가"를 알 방법이 없었다.
    *
    * ▣ 문구의 출처는 statMult() 하나뿐이다 — 분위기 글이 아니다.
-   *     폭발력  skillOn('summon') && awkStreak>0 -> x(1 + p/100 x min(awk,3)/3)
+   *     폭발력  (skillOn('summon')||skillOn('jellytime')) && awkStreak>0
+   *                                              -> x(1 + p/100 x min(awk,3)/3)
    *     꾸준함  stdyRun >= 3                     -> x(1 + s/100)
    *     순발력  statAgil (popLive>0 인 매치)      -> x(1 + a/100)
    *     행운    Math.random() < l/100            -> x LUCK_MULT(2)
    *   숫자는 statEff(id) 의 **지금 실효값**이라 강화(statLv)·아이템까지 탄다.
    *   막대(--v)가 읽는 값과 같은 함수이므로 말과 그림이 어긋날 수 없다.
    *
-   * ▣ 각성이 젤리타임인 캐릭터(SKILL_KIND: jelly·sodawitch)는 'summon' 을
-   *   영영 못 켠다 -> 폭발력 분기의 조건이 성립하지 않는다. 그 둘에게 d1 을
-   *   그대로 보이면 **일어나지 않는 일**을 약속하는 것이라 d1x 로 갈아 끼운다.
+   * ▣ 0910 각성/필살기 분리(판정판 25 · DESIGN §15) — 여기에는 「젤리타임 계열은
+   *   'summon' 을 못 켜므로 d1x 로 갈아 끼운다」는 예외가 있었다. 그 예외가
+   *   성립한 이유는 두 겹이었고 둘 다 이번에 없앴다: 조건이 갈래를 물었고
+   *   (statMult), 연쇄 카운터가 summon 안에서만 올랐다(applySkill).
+   *   이제 다섯 캐릭터가 **같은 한 문장**(d1)을 쓴다 — 캐릭터마다 다른 문장을
+   *   보이는 것 자체가 "각성이 둘"이라는 오해의 출처였다. d1x 는 은퇴.
    *
    * ▣ 펫 탭(#cp-petinfo)의 막대 넷에는 붙이지 않는다. PET_STATS 는 오늘 표시
    *   전용이고(소비처 = syncPetInfo 의 --v 하나) 대응하는 레버가 코드에 없다.
@@ -42977,7 +43110,8 @@ window.TT_SFX = {
   function statTipText(id, i) {
     var k = STAT_KEYS[i];
     if (!k) return '';
-    if (i === 0 && (SKILL_KIND[id] || 'summon') !== 'summon') return t('stat.d1x');
+    /* 0910 — 여기 있던 d1x 분기(젤리타임 계열이면 다른 문장)를 지웠다. 네 스탯
+       모두 캐릭터와 무관하게 같은 문장·같은 함수를 쓴다(위 ▣ 참조). */
     return t(STAT_DESC_KEY[i], { n: (statEff(id) || {})[k] | 0 });
   }
 
@@ -44773,6 +44907,25 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
 }
 #app.battle #actionbar .act.urge::before{
   filter:drop-shadow(0 0 6px rgba(255,214,120,.95)) drop-shadow(0 0 14px rgba(255,120,220,.55));
+}
+/* 🚨 0910 각성/필살기 분리(판정판 25 · DESIGN §15) — **발광의 갈래**.
+   실측한 결함: 만땅 신호가 넷에 하나(위 노랑+분홍 두 겹)뿐이라, 각성(#btn-shuffle)
+   과 필살기(#btn-hint)가 **같은 빛**으로 찼다. 각성은 §W6.5b 가 그 위에 무지개
+   애니메이션을 덮어 이미 갈라져 있었지만, 필살기는 그 노랑+분홍을 그대로 써서
+   「각성의 약한 판」처럼 읽혔다 — 두 시스템인데 한 어휘였다.
+   그래서 필살기만 **전투 계열 토큰**으로 옮긴다:
+     --role-me-atk-a / --role-me-atk-b = 내 진영 공격 게이지의 색 램프
+       (:root tokens-semantic · #duel-hud 의 --duel-me-atk 이 같은 두 리프를 읽는다)
+   근거는 의미다. 필살기는 `d.me.sp`(전투 전용 게이지)로 차서 `doSpecial` 로
+   나가는 **내 공격**이므로, 전투 HUD 에서 내 공격을 뜻하는 바로 그 색으로
+   빛나는 것이 화면 안에서 자기 자리를 말한다. 각성은 위 노랑+분홍 → 무지개
+   그대로 둔다(기존 어휘 = 텐트윈 연쇄).
+   ⚠ 새 원시값 0 — 위 두 이름은 이미 있는 토큰이고 여기서 만든 색은 없다.
+   ⚠ 애니메이션도 추가하지 않는다: 움직이는 것은 각성 하나여야 눈이 고른다
+     (§W10 ④ "넷 중 각성만 이 급으로 빛나야"). 필살기는 정지한 빛이다.
+   ⚠ 퍼짐 반경(6/14px)·순서는 위 일반 규칙 그대로다 — 바뀌는 축은 **색 하나**다. */
+#app.battle #btn-hint.act.urge::before{
+  filter:drop-shadow(0 0 6px var(--role-me-atk-a)) drop-shadow(0 0 14px var(--role-me-atk-b));
 }
 /* 게이지 배지 = 메달 우상단의 작은 칩. 메달 면색이 넷 다 다르므로(적·청·보라·주황)
    칩은 어두운 잉크 알약 + 흰 글자 한 벌로 고정한다 — 어느 메달 위에서도 대비가
@@ -58550,7 +58703,11 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
 }
 #app.battle #duel-me-av{
   background-size:contain;background-position:center;background-repeat:no-repeat;
-  filter:drop-shadow(0 2px 3px rgba(40,70,100,.35));
+  /* 0910 판정판 14 — 접지 그림자를 **조각으로 이름 붙인다**. 각성·폭주 글로우가
+     같은 `filter` 사슬을 다시 쓰는데(필터는 누적이 아니라 통째 교체다), 그때
+     이 값을 복사해 붙이면 같은 수가 세 곳에 살게 된다. 이름 하나로 묶는다. */
+  --dh-av-me-drop: drop-shadow(0 2px 3px rgba(40,70,100,.35));
+  filter: var(--dh-av-me-drop);
 }
 /* ---- 3. 타이머 유리 캡슐 + 젤리 숫자 --------------------------------------
    유리는 ::before 한 겹이 맡고(z-index:-1), 요소 자신의 배경은 **글자 젤리**가
