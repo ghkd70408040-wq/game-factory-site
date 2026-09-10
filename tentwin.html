@@ -47380,6 +47380,15 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
   border-width:var(--jbox-bw,0) !important;
   /* [jelly-c 0910] 젤리판 재질 재베이크 — 재질색 #F7D8E6 · 겉선 #8E5A72 · 알파 무손실.
      되돌리기: border-image-source:url("catalog/jelly-box.webp") !important; */
+  /* [jelly-c2 0911] 이 자산은 **1294x1480 그대로**다. 병합 체인이 「긴 모달 dpr3 에
+     세로 부족(LOWRES)」으로 보류했지만, 실측해 보니 자산 크기 문제가 아니었다 —
+     `tools/measure/canon.tentwin.json` 의 `nine_slice` 목록에 옛 이름 jelly-box.webp
+     만 있고 **개명한 jelly-box-c.webp 가 빠져 있었다**. 그 목록은 규격이 「9슬라이스
+     타일은 표시 크기보다 원본이 작은 것이 정상」이라고 못박아 「잘림·dpr3 미만」
+     검사에서 빼 주는 자리다(_doc_nine_slice). 즉 우리 파도가 이름을 갈면서 소비처
+     하나(관문 설정)를 안 따라간 부채였다. 등재 한 줄로 닫았고 자산은 안 부풀렸다
+     — 세로 1700/2100 으로 부풀린 판본은 실험 증거로만 scratchpad 에 남겼다
+     (scratchpad/jelly-c/jelly-box-c.EVIDENCE-1700.webp · box_verify.py). */
   border-image-source:url("catalog/jelly-box-c.webp") !important;
   border-image-slice:190 fill !important;
   border-image-repeat:stretch !important;
@@ -61000,7 +61009,15 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
   /* 프로스티드 유리 세기. 슬래브·받침 두 겹의 backdrop-filter 는 저사양 폰에서
      비싸다 — 무거우면 이 한 줄만 none 으로 바꿔 전투 화면 흐림을 통째로 끈다
      (팝업은 승인값 blur(5px) 를 따로 들고 있어 영향받지 않는다). */
-  --jbox-frost:blur(3px);
+  /* [jelly-c2 0911 은퇴] 사유 — 이 줄은 0910 태그 수리가 되살린 `:root` 규칙 안에 있다.
+     `:root` 선언은 **전역**이라, 모달 판만 손볼 권한밖에 없는 이 파도가 사용자
+     확정(GREEN) HUD 까지 사정권에 넣게 된다. 그런데 실측하면 이 값은 **중복**이다 —
+     같은 `--jbox-frost:blur(3px)` 가 위 jelly-box-core#1 :root 46015 에 이미 살아
+     있다(scratchpad/jelly-c/RULES-C2-repair.json 「선언 규칙」 실측: `:root{--jbox-frost:
+     blur(3px)}` 두 곳, 값 동일). 되살려도 화면은 한 화소도 안 바뀌고 전역 선언만
+     하나 늘 뿐이므로, 얻는 것 없이 위험만 지는 선언으로 판정해 은퇴시킨다.
+     되살리는 법: 바로 아래 한 줄에서 여는/닫는 주석 기호만 벗긴다. */
+  /* --jbox-frost:blur(3px); */
   /* ---- W2.5 ⑤ 모달 등급의 유리 (2026-08-20) --------------------------------
      사용자 반려: "모달 젤리판이 전부 무채색·혼탁 — 더 투명하게, 은은한 핑크빛
      젤리로. 모달로 쓰이는 판은 전부 같은 색." 정본 목표는
@@ -61117,8 +61134,34 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
        · 색은 판정판 4 에서 **사용자가 고른 후보 C** (#F7D8E6 · 겉선 #8E5A72, 2026-09-10)
      그래서 주석을 벗겨 이 줄을 되살린다. 은퇴 사유는 지우지 않고 위에 그대로 남긴다 —
      이 자리에 «옛 값»이 다시 들어오면 그때는 위 판단이 다시 유효하다. */
+  /* [jelly-c2 0911 스코프 축소] 이 줄은 여기(`:root`)서 **내렸다**. 사유 —
+     `:root` 에 두면 문서의 모든 요소가 `--modal-tint` 를 상속받아, 모달 판과
+     아무 상관 없는 전투 HUD·액션바·토프바까지 이 파도의 값을 물게 된다(실측:
+     REVIVED-DIFF-2.md §4 — #btn-pause·#topbar·#duel-hud·.jbox--slab·.jbox--strip
+     전부 `--modal-tint` 가 transparent -> rgba(247,216,230,.0234) 로 바뀌었다).
+     사용자가 확정(GREEN)한 HUD 를 우리 파도가 스칠 권한이 없다.
+     실측으로 확인한 소비처는 **모달 판 계열 둘뿐**이다:
+       `.jbox--modal,[data-part="modal-plate"]` 46240 { --jbox-tint:var(--modal-tint) }
+       `.w6m .sheet`                            46478 { --jbox-tint:var(--modal-tint) }
+     그래서 아래 :root 블록 **밖**에 그 둘만 받는 규칙을 새로 세우고 거기에 옮겼다.
+     결과값은 소비처에서 동일하고(같은 var 를 같은 요소가 읽는다) 전역 누출만 사라진다.
+     되살리는 법: 이 :root 블록 안에 `--modal-tint:var(--role-modal-tint);` 한 줄을
+     되돌려 넣고, 아래 [jelly-c2 0911 · 모달 판 등급 스코프] 규칙을 지운다. */
+  /* [jelly-c2 0911 은퇴] --modal-glass 도 **중복**이라 되살리지 않는다 —
+     같은 `blur(0px) saturate(1.06)` 이 jelly-box-core#1 :root 46177 에 이미 살아
+     있다(RULES-C2-repair.json 실측). 되살리는 법: 아래 한 줄의 주석만 벗긴다. */
+  /* --modal-glass:blur(0px) saturate(1.06); */
+}
+/* [jelly-c2 0911 · 모달 판 등급 스코프] 위 :root 에서 내려온 `--modal-tint` 의 새 자리.
+   선택자는 실측한 소비처 둘의 합집합이다(46240 · 46478). 마크업 실측상 `.w6m .sheet`
+   는 전부 `.sheet jbox jbox--modal ... data-part="modal-plate"` 라 이미 앞 둘에
+   포함되지만, 소비처 규칙이 따로 서 있는 한 선택자도 나란히 적어 둔다 —
+   훗날 `.w6m .sheet` 가 `.jbox--modal` 을 잃어도 판 색이 조용히 빠지지 않도록.
+   값의 유래는 위 :root 주석 전체(W2.5 → W7.5 → W6.5b → 0910 후보 C)를 그대로 따른다. */
+.jbox--modal,
+[data-part="modal-plate"],
+.w6m .sheet{
   --modal-tint:var(--role-modal-tint);
-  --modal-glass:blur(0px) saturate(1.06);
 }
 .jbox--slab{            /* 전투 상단 슬래브 — 그림자는 그림 알파를 따라야 해서 filter */
   --jbox-biw:15px; --jbox-radius:13px;
@@ -61187,15 +61230,31 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
    조각을 트랙만 투명하게 다시 따야 하므로 이번 범위 밖이다.
    ============================================================ */
 
-#app.battle #duel-hud{
-  position:relative;
-  /* 폰트가 전부 cqw(컨테이너 폭 %)라 이 한 줄이 HUD 전체의 배율기다.
-     inline-size 컨테인먼트는 절대 자식의 컨테이닝 블록도 함께 세운다. */
-  container-type:inline-size;
-  aspect-ratio:1536/500;
-  height:auto;
-  overflow:visible;
-}
+/* [jelly-c2 0911 은퇴] 사유 — 이 규칙은 0910 태그 수리(빠진 style 닫는 태그 보충)가
+   **되살린 규칙 둘 중 하나**이고, 모달 판 계열이 **아니다**. 그런데 되살아나면 사용자가
+   확정(GREEN)한 전투 HUD 를 실제로 움직인다. 실측(REVIVED-DIFF-2.md §4):
+     #app.battle #duel-hud  height 127.125px -> 126.953px  (aspect-ratio:1536/500 + height:auto)
+     .dh-foe                top 89.6719px  -> 89.5469px · height 36.9844 -> 36.9375
+     .dh-me                 top 89.6719px  -> 89.5469px · height 36.9844 -> 36.9375
+   이 0.17px 이 HUD 전체의 하위픽셀 래스터를 바꾸고, 병합 체인이 05b-hud-duel 컷에서
+   정지 버튼이 「분홍 -> 창백」해졌다고 잡은 것이 그 결과다.
+   이 파도의 범위는 「모달 젤리판 재질 C」이고, 사용자 확정 HUD 를 우리가 건드릴 권한이
+   없다 — HUD 를 되살릴지 말지는 HUD 를 소유한 파도가 판단할 몫이다. 그래서 삭제하지
+   않고 은퇴시킨다.
+   덧 — position/container-type 은 어차피 무해했다: 바로 아래 「단계 B (0905)」 규칙이
+   같은 선택자에 `position:relative !important` · `container-type:inline-size !important`
+   를 이미 걸고 있어 계산값이 같다(실측: 두 값 모두 before/after 무변). 실제로 바뀌는
+   것은 aspect-ratio 와 height 둘뿐이다.
+   되살리는 법: 아래 일곱 줄에서 줄머리의 여는 주석 기호와 줄끝의 닫는 주석 기호만 벗긴다.
+   (원래 있던 안쪽 주석: 「폰트가 전부 cqw(컨테이너 폭 %)라 이 한 줄이 HUD 전체의
+    배율기다. inline-size 컨테인먼트는 절대 자식의 컨테이닝 블록도 함께 세운다.」) */
+/* #app.battle #duel-hud{ */
+/*   position:relative; */
+/*   container-type:inline-size; */
+/*   aspect-ratio:1536/500; */
+/*   height:auto; */
+/*   overflow:visible; */
+/* } */
 /* ============================================================================
    단계 B (0905) — 판 1·2 조립. 슬래브 한 장(.jbox--slab border-image + tint)을
    시안 실루엣 판 2장(위/아래)으로 교체한다. .jbox 프레임/틴트/필터를 걷고
