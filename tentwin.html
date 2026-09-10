@@ -6897,6 +6897,247 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   word-break: keep-all;
 }
 
+/* ==[INV-0911]:CSS:BEGIN== 캐릭터 획득 연출 · 자기소개 대사 (DESIGN §23.3·§23.4)
+   ────────────────────────────────────────────────────────────────────────────
+   **새 컴포넌트 0.** 아래 둘은 위 컷인 부품(`.cut-dim` / `.cut-stage` /
+   `.cut-txt` / `.cut-sub` / `.cut-name`)과 스토리 자막 띠 부품(`.cut-who` /
+   `.cut-line` / `.cut-more` + `--lib-panel-cream` 조각)의 **새 인스턴스**다.
+   그 클래스들의 바탕 규칙은 전부 `#cutin` 밖에 홑으로 서 있고(모션만
+   `#cutin.go` 로 스코프됐다), 그래서 여기서 다시 정의하는 것은 **자리와 모션**
+   뿐이다 — 형태·색·서체를 한 값도 새로 만들지 않는다.
+
+   왜 `#cutin` 을 재사용하지 않는가: 그 기계는 판 안의 것이다(`runCutin` 이
+   `S.paused` 를 세우고 `stopComboLoop`·`shiftDeadlines` 로 타이머 회계를
+   민다). 캐릭창은 판 밖이라 그 회계가 성립하지 않는다 — 빌리면 «정지한 적
+   없는 판을 재개»하는 경로가 생긴다. 부품은 같고 기계만 다르다.
+   ────────────────────────────────────────────────────────────────────────── */
+#charget {
+  position: fixed;
+  inset: 0;
+  z-index: 78;              /* 캐릭창(72)·스킨(73)·확인창(77) 위 */
+  display: block;
+  overflow: hidden;
+  cursor: pointer;          /* 탭 = 스킵 (#cutin 과 같은 계약) */
+  --cut-key: var(--role-ch-ten-key);
+}
+#charget[hidden] { display: none; }
+
+/* 판을 더 짙게 — 사용자 지시의 낱말이 「**어두운** 판」이고, 참고 화면 ②의
+   바탕은 뒤가 안 비친다. 컷인의 .62~.88 은 판 **안**의 연출이라 뒤가 비쳐야
+   맞지만(플레이어가 판을 계속 봐야 한다), 이 연출은 판 밖이라 뒤가 비치면
+   캐릭창의 이름·능력치 라벨이 이 판의 것과 **겹쳐 두 벌로 읽힌다**(실측).
+   색은 그대로 두고 알파만 올린다 — `#cutin.cut-scripted .cut-dim` 이 같은
+   문법으로 자기 옷을 갈아입는 그 자리다(새 색 0). */
+#charget .cut-dim {
+  background: radial-gradient(circle at 50% 42%, rgba(8, 5, 16, .90) 0%, rgba(8, 5, 16, .97) 100%);
+}
+/* 무대를 가운데로 세운다 — 컷인은 옆에서 밀고 들어오지만(전투의 문법),
+   획득은 «정면에 선다»가 사양이다(참고 화면 ②). 자리만 다르고 상자는 같다. */
+#charget .cut-stage {
+  left: 50%;
+  top: 42%;
+  width: 62vw;
+  max-width: 300px;
+  height: 62vw;
+  max-height: 300px;
+  transform: translate(-50%, -50%);
+}
+#charget .cg-art {
+  position: absolute;
+  inset: 0;
+  background-image: var(--cg-img, none);
+  background-size: contain;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  filter: drop-shadow(0 12px 30px rgba(0, 0, 0, .55));
+  opacity: 0;
+  transform: scale(.82);
+}
+#charget .cut-txt {
+  right: auto;
+  left: 50%;
+  top: auto;
+  bottom: calc(var(--safe-b) + 10%);
+  align-items: center;
+  text-align: center;
+  transform: translate(-50%, 0);
+  gap: 6px;
+  width: min(86vw, 360px);
+}
+#charget .cut-txt > * { opacity: 0; }
+/* 배지·막대는 캐릭창 부품(.ci-tag-v / .cs)의 인스턴스라 자기 값이 없다 —
+   여기서는 «어디에 서는가» 만 정한다. */
+#charget .cg-badge { display: flex; justify-content: center; }
+#charget .cg-stats { width: 100%; }
+#charget .cg-stats .cs { --cs-lab: 1; }
+
+/* ---- 모션. 전부 transform/opacity 이고 시간은 --mo-get-* 에서만 온다.
+       백분율 = 비율(260/1700 ≈ 15.3% · 1460/1700 ≈ 85.9%). ---- */
+#charget.go .cut-dim { animation: cgdim var(--mo-get-life) ease-out forwards; }
+@keyframes cgdim {
+  0%   { opacity: 0; }
+  6%   { opacity: 1; }
+  85.9%{ opacity: 1; }
+  100% { opacity: 0; }
+}
+#charget.go .cg-art { animation: cgart var(--mo-get-life) cubic-bezier(.2, .9, .28, 1) forwards; }
+@keyframes cgart {
+  0%    { opacity: 0; transform: scale(.82); }
+  10%   { opacity: 1; transform: scale(1.06); }
+  15.3% { opacity: 1; transform: scale(1); }
+  85.9% { opacity: 1; transform: scale(1); }
+  100%  { opacity: 0; transform: scale(.96); }
+}
+/* 네 조각이 계단으로 선다 — 이름 → 배지 → 막대. 지연은 지속시간이 아니라
+   같은 토큰의 비율이라, 토큰을 고치면 계단 간격도 함께 따라간다. */
+#charget.go .cg-sub  { animation: cgrise var(--mo-get-life) ease-out forwards; }
+#charget.go .cg-name { animation: cgrise var(--mo-get-life) ease-out forwards; animation-delay: calc(var(--mo-get-in) * .3); }
+#charget.go .cg-badge{ animation: cgrise var(--mo-get-life) ease-out forwards; animation-delay: calc(var(--mo-get-in) * .6); }
+#charget.go .cg-stats{ animation: cgrise var(--mo-get-life) ease-out forwards; animation-delay: calc(var(--mo-get-in) * .9); }
+@keyframes cgrise {
+  0%    { opacity: 0; transform: translateY(10px); }
+  15.3% { opacity: 1; transform: translateY(0); }
+  85.9% { opacity: 1; transform: translateY(0); }
+  100%  { opacity: 0; transform: translateY(-4px); }
+}
+/* 막대가 0 → **그 캐릭터의 값**으로 찬다.
+   🚨 도착점이 `scaleX(1)` 이면 안 된다 — 부품의 정지 규칙이 이미
+   `transform: scaleX(var(--f2-gv))` 이라, 1 로 끝내는 애니메이션은 그 값을
+   **덮어써서 네 막대가 전부 만땅**이 된다(실측으로 잡은 결함). 도착점을 같은
+   변수로 쓰면 «0에서 자기 값까지»가 되고, 값의 출처는 여전히 한 곳(`--f2-gv`)이다.
+   transform-origin 도 다시 쓰지 않는다 — 부품이 이미 `0 50%` 를 갖고 있다. */
+#charget.go .cg-stats .kit-gauge-v2__fill {
+  animation: cgfill var(--mo-get-in) cubic-bezier(.2, .9, .28, 1) both;
+  animation-delay: calc(var(--mo-get-in) * .9);
+}
+@keyframes cgfill { from { transform: scaleX(0); } to { transform: scaleX(var(--f2-gv)); } }
+
+/* ---- 자기소개 대사 판 -----------------------------------------------------
+   스토리 자막 띠(#cut-bar)의 **인스턴스**다: 같은 크림 패널 조각
+   (`--lib-panel-cream` 33 fill stretch) · 같은 세 조각(.cut-who/.cut-line/
+   .cut-more). 다른 것은 «화면 안»이 아니라 «화면 위»에 뜬다는 것 하나뿐이다. */
+#charintro {
+  position: fixed;
+  inset: 0;
+  z-index: 79;
+  display: block;
+  cursor: pointer;
+}
+#charintro[hidden] { display: none; }
+#charintro .ci-scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(8, 5, 16, .46);
+}
+#charintro .cin-bar {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: calc(var(--safe-b) + 18px);
+  min-height: 84px;
+  padding: 2px 8px 2px 82px;   /* 왼쪽 여백 = 초상 자리 */
+  border-style: solid;
+  border-width: 17px;
+  border-image: var(--lib-panel-cream) 33 fill stretch;
+}
+#charintro .cin-face {
+  position: absolute;
+  left: -58px;      /* 띠의 17px 테두리를 넘어 판 밖으로 살짝 나온다(참고 화면 ⑤) */
+  bottom: -4px;
+  width: 92px;
+  height: 104px;
+  background-image: var(--cin-face, none);
+  background-size: contain;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .38));
+}
+#charintro .cut-line { min-height: 42px; }
+/* ▶ 다음 — 판 밖이 아니라 띠 안 오른쪽 아래. 부품은 그림 버튼이 아니라
+   자막 띠의 «더 있음» 조각(.cut-more)이다: 이 판에서 그것이 곧 다음이다. */
+#charintro .cin-next {
+  position: absolute;
+  right: 4px;
+  bottom: 0;
+  padding: 2px 6px;
+  border: 0;
+  background: none;
+  font: 800 12px/1.2 var(--font);
+  color: #9A7A5E;
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* 동작 줄이기 = **정적 표시로 대체**(§22 규약). 다섯 막이 한 프레임에 전부
+     선 채로 --mo-get-life 만큼 서 있다 — 숨기지 않는다. */
+  #charget.go .cut-dim { animation: none; opacity: 1; }
+  #charget.go .cg-art  { animation: none; opacity: 1; transform: scale(1); }
+  #charget.go .cut-txt > * { animation: none; opacity: 1; transform: none; }
+  #charget.go .cg-stats .kit-gauge-v2__fill { animation: none; transform: none; }
+}
+
+/* ---- 빌려 온 조각의 «자리»만 정한다 ---------------------------------------
+   `.ci-chip` · `.ci-plate` · `.ci-tag` · `.cc-stats` 의 형태·질감은 kit-v2 의
+   :root 토큰과 `.kit-*` 규칙이 이미 전부 갖고 있다. 다만 캐릭창은 그 조각들을
+   **절대 배치**로 앉히므로(`#charpanel .cc-stats{position:absolute}` 등) 여기서는
+   같은 조각을 **흐름 배치**로 다시 앉히는 규칙만 쓴다 — 색·서체·높이·질감은
+   한 줄도 다시 정의하지 않는다(`#app-loading .apl-bar` 가 `--f2-w` 하나만
+   선언하고 나머지를 킷에 맡긴 그 선례와 같은 문법).
+   ⚠ `#charpanel …` 규칙은 한 글자도 안 건드린다 — 선택자 주어가 달라 교차가 없다. */
+#modal-invite { --f2-w: min(76vw, 320px); }
+#charget      { --f2-w: min(84vw, 340px); }
+
+#modal-invite .ci-id { gap: calc(var(--f2-w) * .030); justify-content: center; }
+#modal-invite .ci-chip {
+  flex: 0 0 auto;
+  overflow: hidden;
+  /* 칩의 그림 규약은 캐릭창과 같다 — thumb(얼굴중심 정사각)가 먼저, face 는 폴백. */
+  background:
+    var(--char-thumb, var(--char-face, none)) 50% 50% / cover no-repeat,
+    var(--f2-slot);
+}
+#modal-invite .ci-plate {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 calc(var(--f2-w) * .030);
+}
+#modal-invite .ci-tag { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 8px 0 0; }
+#modal-invite .cc-stats,
+#charget .cg-stats {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--f2-w) * .0157);   /* 캐릭창과 같은 줄 피치 비율 */
+  margin: 10px 0 0;
+  padding: 0;
+}
+#modal-invite .cs,
+#charget .cg-stats .cs { display: flex; align-items: center; gap: calc(var(--f2-w) * .020); }
+#modal-invite .cs-k,
+#charget .cg-stats .cs-k {
+  flex: 0 0 calc(var(--f2-w) * .140);
+  font-size: calc(var(--f2-w) * .030);
+  font-weight: 900;
+  text-align: right;
+  color: var(--f2-ink);
+}
+/* 어두운 판 위의 라벨은 잉크색(어두움)으로 두면 사라진다. 컷인 대사가 이미 쓰는
+   그 크림색(#cutin.cut-scripted .cut-txt)과 같은 자리의 값을 쓴다 — 새 색 0. */
+#charget .cg-stats .cs-k { color: #FFE0B8; }
+#modal-invite .cs-bar,
+#modal-invite #iv-prog,
+#charget .cg-stats .cs-bar { flex: 1 1 auto; min-width: 0; border: 0; border-image: none; background-image: none; }
+#modal-invite #iv-prog { display: block; width: 100%; margin: 4px 0 0; }
+#modal-invite #iv-why { margin: 8px 0 0; text-align: center; font-size: 12.5px; }
+#modal-invite #iv-prog-row[hidden],
+#modal-invite #iv-prog[hidden] { display: none; }
+/* 부족 = 누를 수 없다. 그림 버튼 부품의 비활성 표시를 그대로 쓴다(새 상태 0). */
+#modal-invite #iv-yes[disabled] { filter: grayscale(.85) brightness(.92); opacity: .72; cursor: not-allowed; }
+#charget .cg-name { color: #fff; }
+/* ==[INV-0911]:CSS:END== */
+
 /* ============================================================================
    W3 (2026-08-20) — 스킬 연출 강화. 아래 넷은 전부 **CSS 만**이고, 새 이미지도
    새 오디오도 한 개 들어오지 않았다(효과음은 WebAudio 합성 변주다).
@@ -9451,6 +9692,10 @@ html.no-art-logo .logo-img  { display: none; }
    패널에서 태어난 이 시트 하나만 패널보다 앞으로 올린다. .modal 전체를 올리면
    나머지 모달과 랭킹판의 순서까지 같이 흔들린다. */
 #modal-skin { z-index: 73; }
+/* [INV-0911] 초대 창도 **패널에서 태어난 시트**라 같은 자리다(DESIGN §23.6).
+   새 층 규약을 만들지 않는다 — 위 줄과 같은 문법(id 하나에 z-index 하나)이고,
+   스킨 시트와 동시에 뜰 수 없으므로 같은 값이 순서를 어지럽히지 않는다. */
+#modal-invite { z-index: 73; }
 
 /* 출시 점검 0909 ①(승인 A2) — 게임 내 확인 창의 쌓임 순서.
    이 창은 **다른 창 위에서** 열린다(지금의 유일한 호출부인 스킨 구매는
@@ -13714,6 +13959,17 @@ html[data-platform="twa"] #app-intro.is-hold .api-char{
   --mo-full-pulse: 1200ms;
   --mo-full-cue: 1000ms;
   --mo-full-k: 1;
+
+  /* ==[INV-0911]:TOKENS:BEGIN== 캐릭터 획득 연출 모션 토큰 (DESIGN §23.3)
+     시간의 유일 출처. CSS 도 JS 도 이 이름만 읽는다 — 지속시간을 규칙이나
+     함수 안에 리터럴로 박지 않는다(game-motion 규율). 키프레임의 백분율은
+     지속시간이 아니라 아래 세 값의 **비율**이다(0.153 / 0.859).
+     합 = 1700ms 로 사용자가 정한 1.5~2s 구간 안에 있다. */
+  --mo-get-in: 260ms;      /* 판·전신·이름·배지·막대가 서는 구간 */
+  --mo-get-hold: 1200ms;   /* 유지 */
+  --mo-get-out: 240ms;     /* 사라짐 */
+  --mo-get-life: 1700ms;   /* = 위 셋의 합. JS getLifeMs() 가 읽는 그 값 */
+  /* ==[INV-0911]:TOKENS:END== */
 }
 </style>
 <!-- 최우선 2장만 preload — 젤리판(세 인터페이스 공용)과 플레이 팝업 레터링이다.
@@ -14728,6 +14984,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
         <span id="cutin-name" class="cut-name"></span>
       </div>
     </div>
+
     <!-- ============================================================
          v4 5차 §1 — 젤리공주 구출 해금 이벤트.
 
@@ -15893,6 +16150,75 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
     <div id="sk-list" class="sk-list"></div>
     <button id="sk-close" data-part="btn-modal" data-variant="primary" class="btn btn-primary" type="button" data-i18n="settings.close">Close</button>
   </div></div>
+
+  <!-- ==[INV-0911]:HTML:BEGIN== 초대 창 (DESIGN §23.2)
+       **부품 0개를 새로 만들지 않았다.** 판·X·버튼 둘·잔액 줄은 위 #modal-skin /
+       #modal-confirm 이 입고 있는 그것 그대로이고, 초상칩·이름판·역할배지·능력치
+       4막대는 캐릭창 정보 카드(#cp-info .ci)의 조각을 그대로 인스턴스로 세웠다.
+       원시값도 0이다 — 이 블록에 style 속성이 하나도 없다(막대의 --v 는 JS 가
+       채우는 값 슬롯이고, 캐릭창의 그 막대와 같은 규약이다).
+
+       문장은 마크업에 굳히지 않는다(#modal-confirm 규약) — 이름·배지·비용·진행은
+       전부 syncInvite() 가 t() 로 채운다. data-i18n 이 붙은 것은 **고정 문구**
+       (제목·두 버튼·「다음 초대까지」 라벨)뿐이라 언어 전환이 값을 안 지운다. -->
+  <div id="modal-invite" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="iv-h"><div class="sheet jbox jbox--modal" data-part="modal-plate">
+    <h2 id="iv-h" data-i18n="invite.title">Invite</h2>
+    <button class="r10-x x-btn" type="button" data-w6x="iv-no" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
+    <div class="ci-id">
+      <span id="iv-chip" class="ci-chip kit-slot-v2 kit-slot-v2--portrait" aria-hidden="true"></span>
+      <span class="ci-plate kit-slot-v2 kit-slot-v2--name"><span id="iv-name" class="ci-name"></span></span>
+    </div>
+    <p class="ci-tag"><span class="ci-tag-k" data-i18n="pick.rec">Best for</span><b id="iv-tag" class="ci-tag-v kit-pill-v2" data-variant="soft"></b></p>
+    <div id="iv-stats" class="cc-stats" aria-hidden="true">
+      <span class="cs"><b class="cs-k" data-i18n="stat.k1">Power</b><i class="cs-bar kit-gauge-v2"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i></span>
+      <span class="cs"><b class="cs-k" data-i18n="stat.k2">Steady</b><i class="cs-bar kit-gauge-v2"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i></span>
+      <span class="cs"><b class="cs-k" data-i18n="stat.k3">Agility</b><i class="cs-bar kit-gauge-v2"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i></span>
+      <span class="cs"><b class="cs-k" data-i18n="stat.k4">Luck</b><i class="cs-bar kit-gauge-v2"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i></span>
+    </div>
+    <p id="iv-why" class="cut-line"></p>
+    <p class="sk-bal"><span data-i18n="skin.balance">Jelly stars</span><b class="sk-bal-v"><i class="gem-ic" aria-hidden="true">&#9733;</i><span id="iv-gems">0</span></b></p>
+    <!-- 「다음 초대까지 ★ n/N」. 무료(N=0)이면 이 줄 통째로 hidden 이다 —
+         0/0 게이지는 아무것도 말하지 않는다(DESIGN §23.2 ⓑ). -->
+    <p id="iv-prog-row" class="sk-bal"><span id="iv-prog-k" data-i18n="invite.next">To the next invite</span><b class="sk-bal-v"><i class="gem-ic" aria-hidden="true">&#9733;</i><span id="iv-prog-v">0/0</span></b></p>
+    <i id="iv-prog" class="cs-bar kit-gauge-v2" aria-hidden="true"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i>
+    <button id="iv-no" data-part="btn-modal" data-variant="lilac" class="btn btn-ghost" type="button" data-i18n="confirm.no">Cancel</button>
+    <button id="iv-yes" data-part="btn-modal" data-variant="primary" class="btn btn-primary" type="button" data-i18n="invite.go">Invite</button>
+  </div></div>
+  <!-- ==[INV-0911]:HTML:END== -->
+
+  <!-- ==[INV-0911]:HTML:BEGIN== 획득 연출 · 자기소개 (DESIGN §23.3·§23.4)
+       위 #cutin 과 **같은 부품, 다른 기계**다(그 이유는 CSS 블록 머리말).
+       겹은 그대로 넷: 어두운 막 → 무대(전신) → 글자(부제·이름·배지·막대).
+       전신은 `--cg-img` 한 줄로 분리돼 있다 — `--cutin-img` 와 같은 교체 규약이라
+       자산이 바뀌어도 마크업·JS 는 안 움직인다. -->
+  <div id="charget" hidden>
+    <div class="cut-dim" aria-hidden="true"></div>
+    <div class="cut-stage" aria-hidden="true"><span id="cg-art" class="cg-art"></span></div>
+    <div class="cut-txt" aria-hidden="true">
+      <span id="cg-sub" class="cut-sub cg-sub"></span>
+      <span id="cg-name" class="cut-name cg-name"></span>
+      <span class="cg-badge"><b id="cg-tag" class="ci-tag-v kit-pill-v2" data-variant="soft"></b></span>
+      <span id="cg-stats" class="cc-stats cg-stats">
+        <span class="cs"><b class="cs-k" data-i18n="stat.k1">Power</b><i class="cs-bar kit-gauge-v2"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i></span>
+        <span class="cs"><b class="cs-k" data-i18n="stat.k2">Steady</b><i class="cs-bar kit-gauge-v2"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i></span>
+        <span class="cs"><b class="cs-k" data-i18n="stat.k3">Agility</b><i class="cs-bar kit-gauge-v2"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i></span>
+        <span class="cs"><b class="cs-k" data-i18n="stat.k4">Luck</b><i class="cs-bar kit-gauge-v2"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i></span>
+      </span>
+    </div>
+  </div>
+
+  <!-- 자기소개 대사 판 = 스토리 자막 띠(#cut-bar)의 인스턴스. 세 조각 이름이
+       같다(.cut-who 이름 · .cut-line 대사 · 「▶ 다음」). 초상은 `--cin-face`. -->
+  <div id="charintro" hidden>
+    <div class="ci-scrim" aria-hidden="true"></div>
+    <div class="cin-bar" role="status" aria-live="polite">
+      <span id="cin-face" class="cin-face" aria-hidden="true"></span>
+      <p id="cin-who" class="cut-who"></p>
+      <p id="cin-line" class="cut-line"></p>
+      <button id="cin-next" class="cin-next" type="button" data-i18n="intro.next">&#9654; Next</button>
+    </div>
+  </div>
+  <!-- ==[INV-0911]:HTML:END== -->
 
   <!-- ============================================================
        [SHOP-0910] 앱 상점 모달 — DESIGN §20 W2 · 판정판 33.
@@ -24237,6 +24563,18 @@ window.TT_SFX = {
     skins: [],
     equipped: {},
     jstar: 0,
+    /* --- [INV-0911] 초대 · 자기소개 (DESIGN §23.5) -------------------------
+     * invited    { id: 1 } 초대(젤리별)로 얻은 id. **보유의 정본이 아니다** —
+     *            보유는 여전히 jellyOn / pets 이고, 이 칸은 «어느 문으로
+     *            들어왔나»의 기록이라 통째로 지워도 한 마리도 안 사라진다.
+     * introSeen  { id: 1 } 자기소개를 **본** id. 「보여 줬다」가 아니라 「봤다」다
+     *            (중간에 끊긴 소개는 다음에 다시 뜬다).
+     * 둘 다 가법이라 이전기가 없다 — 옛 저장본은 {} 로 시작하고 그 상태가 곧
+     * 「아직 아무것도 안 했다」로 정확히 맞는 답이다(streakClaimed 와 같은 판단).
+     * 그래서 SCHEMA_VERSION 을 **올리지 않는다**: 잃어도 소개를 한 번 더 볼 뿐인
+     * 값 때문에 옛 세이브 전량을 마이그레이션 대상으로 만들 이유가 0 이다. */
+    invited: {},
+    introSeen: {},
     /* --- WD-1 §12/§13: 스탯 강화 레벨 ------------------------------------
      * { charId: { power, steady, agility, luck } }. 없는 키 = 강화 0 이고,
      * 기본표(STAT_BASE)는 코드가 들고 있으므로 여기에는 **올린 만큼만** 적는다.
@@ -24411,6 +24749,23 @@ window.TT_SFX = {
           for (var sck in o.streakClaimed) {
             if (!Object.prototype.hasOwnProperty.call(o.streakClaimed, sck)) continue;
             if (o.streakClaimed[sck]) store.streakClaimed[sck] = 1;
+          }
+        }
+        /* [INV-0911] 초대·자기소개 두 칸. 소독 문법은 바로 위 streakClaimed 와
+           한 글자도 다르지 않다 — 값은 1 로만 정규화하고, 없으면 기본 {} 가
+           그대로 남는다(= 아직 아무것도 안 했다). */
+        if (o.invited && typeof o.invited === 'object') {
+          store.invited = {};
+          for (var ivk in o.invited) {
+            if (!Object.prototype.hasOwnProperty.call(o.invited, ivk)) continue;
+            if (o.invited[ivk]) store.invited[ivk] = 1;
+          }
+        }
+        if (o.introSeen && typeof o.introSeen === 'object') {
+          store.introSeen = {};
+          for (var isk in o.introSeen) {
+            if (!Object.prototype.hasOwnProperty.call(o.introSeen, isk)) continue;
+            if (o.introSeen[isk]) store.introSeen[isk] = 1;
           }
         }
         if (typeof o.lastDailyDate === 'string') store.lastDailyDate = o.lastDailyDate;
@@ -26368,6 +26723,57 @@ window.TT_SFX = {
       'confirm.title': 'Confirm',
       'confirm.yes': 'Buy',
       'confirm.no': 'Cancel',
+      /* ==[INV-0911]== 초대 · 획득 · 자기소개 (DESIGN §23).
+         고정 문구 여덟 + 대사 31. 대사는 지어낸 것이 아니라 **이미 있는 키를
+         1인칭으로 편 것**이다(§23.4 출처 표): 성격 = char.<id>.tag ·
+         패시브 = char.<id>.passname + .pass · 각성 = char.<id>.ult.
+         펫은 두 줄이다 — 각성이 없는 시스템을 문장으로 지어내지 않는다(§15.1).
+         ⚠ `{sec}` 를 쓰지 않는다: i18nDerived 의 자동 채움은 `char.*.ult` 키에만
+         걸리므로 여기 쓰면 중괄호가 화면에 그대로 남는다. */
+      'invite.title': 'Invite',
+      'invite.next': 'To the next invite',
+      'invite.go.n': 'Invite for ★{n}',
+      'invite.free': 'Invite for free',
+      'invite.go': 'Invite',
+      'invite.got': 'NEW CHARACTER!',
+      'invite.new': '{n} joined you!',
+      'intro.next': '▶ Next',
+      'intro.done': '▶ Close',
+      'intro.ten.l1': "I am Prince Tenten. There is always one more path, you know.",
+      'intro.ten.l2': "My Prince's Blessing pays back every sum-10 match at +60%.",
+      'intro.ten.l3': 'And when I Awaken I call my brother — every match becomes a TenTwin combo.',
+      'intro.twin.l1': "Twin here! I can't stand slow — try to keep up.",
+      'intro.twin.l2': 'My Twin Vow makes every same-number match +60%.',
+      'intro.twin.l3': 'Awaken and I call Tenten over — everything counts as a TenTwin combo.',
+      'intro.jelly.l1': "I'm the Jelly Princess. I waited a long time. My turn to protect you now.",
+      'intro.jelly.l2': "The Princess's Warmth gives a 10% chance to triple that match.",
+      'intro.jelly.l3': 'My Awakening is Jelly Time — the jackpot chance climbs to 40%.',
+      'intro.pudding.l1': 'Pudding Knight, at your service. The bigger the rush, the firmer I stand.',
+      'intro.pudding.l2': 'Pudding Guard gives +60% on a 10-sum and +15% on anything else. No match is wasted.',
+      'intro.pudding.l3': 'When I Awaken the shield opens — every match counts as a TenTwin combo.',
+      'intro.sodawitch.l1': 'Soda Witch. One big bang — that is my taste.',
+      'intro.sodawitch.l2': 'Fizz Pop sets off a 20% chance of x2 on every single match.',
+      'intro.sodawitch.l3': 'My Awakening is Soda Burst — the jackpot chance becomes 40%.',
+      'intro.ppyak.l1': "Ppyak! I've been here with you from the very first round.",
+      'intro.ppyak.l2': 'My skill is Free Link — for 8 seconds even far tiles connect.',
+      'intro.mungchi.l1': 'Mungchi. Nobody is sturdier than me.',
+      'intro.mungchi.l2': 'My skill is Squishy Shield — 6 seconds where the clock and the foe gauge stop.',
+      'intro.mongle.l1': 'Mongle here. Call me when time gets tight.',
+      'intro.mongle.l2': 'My skill is Time Puddle — 4 seconds where the clock and the foe gauge stop.',
+      'intro.tiktok.l1': 'Tick-tock! I am the one who counts the seconds.',
+      'intro.tiktok.l2': 'My skill is Time Stop — 6 frozen seconds, and you can still match.',
+      'intro.churup.l1': 'Churup! One bite, one row — leave it to me.',
+      'intro.churup.l2': 'My skill is Big Bite — a whole row gets re-shuffled.',
+      'intro.kkultteok.l1': 'Honeybee here. Anything sweet belongs to me.',
+      'intro.kkultteok.l2': 'My skill is Golden Call — I summon 2 golden fruits.',
+      'intro.sseokssak.l1': 'Sweepy! A messy board is exactly my job.',
+      'intro.sseokssak.l2': 'My skill is Clean Sweep — 6 live tiles cleared at once.',
+      'intro.mukmul.l1': 'Inky. Quietly, and for certain.',
+      'intro.mukmul.l2': 'My skill is Ink Splash — 5 tiles repainted to the same number.',
+      'intro.banjjak.l1': 'Sparky! Leave anything that glitters to me.',
+      'intro.banjjak.l2': 'My skill is Spark Charge — your Awakening gauge fills +40%p.',
+      'intro.bangul.l1': 'Bubbly here. Stuck spots get loosened with bubbles.',
+      'intro.bangul.l2': 'My skill is Bubble Wave — 2 blockers cleansed.',
       'skin.gem': '+1 jelly star!',
       'skin.base': 'Default',
       'skin.basedesc': 'The look you started with',
@@ -27499,6 +27905,51 @@ window.TT_SFX = {
       'confirm.title': '확인',
       'confirm.yes': '구매',
       'confirm.no': '취소',
+      /* ==[INV-0911]== 초대 · 획득 · 자기소개 (en 쪽과 같은 39키 · DESIGN §23). */
+      'invite.title': '초대',
+      'invite.next': '다음 초대까지',
+      'invite.go.n': '★{n} 로 초대',
+      'invite.free': '무료로 초대',
+      'invite.go': '초대',
+      'invite.got': '새로운 캐릭터!',
+      'invite.new': '{n} 합류!',
+      'intro.next': '▶ 다음',
+      'intro.done': '▶ 닫기',
+      'intro.ten.l1': '나는 텐텐 왕자. 길은 언제나 하나쯤 더 있는 법이오.',
+      'intro.ten.l2': '내 「왕자의 축복」은 합이 10인 짝을 +60%로 갚아 주지.',
+      'intro.ten.l3': '각성하면 트윈을 부른다 — 그동안은 모든 매치가 텐트윈 콤보요.',
+      'intro.twin.l1': '트윈 왕자야. 느린 건 못 참아 — 따라와 봐!',
+      'intro.twin.l2': '「쌍둥이 맹세」로 같은 숫자 매치는 +60%야.',
+      'intro.twin.l3': '각성하면 형을 부른다 — 그동안은 전부 텐트윈 콤보!',
+      'intro.jelly.l1': '젤리공주예요. 오래 기다렸어요 — 이제 내가 지킬 차례예요.',
+      'intro.jelly.l2': '「공주의 온기」가 10% 확률로 그 매치를 ×3 으로 부풀려요.',
+      'intro.jelly.l3': '내 각성은 젤리 타임 — 잭팟 확률이 40%까지 올라가요.',
+      'intro.pudding.l1': '푸딩 기사입니다. 급할수록 단단하게 — 내가 앞에 서겠소.',
+      'intro.pudding.l2': '「푸딩 방패」는 합10에 +60%, 나머지에도 +15% — 헛치는 매치가 없소.',
+      'intro.pudding.l3': '각성하면 방패를 펼친다 — 그동안 모든 매치가 텐트윈 콤보요.',
+      'intro.sodawitch.l1': '소다 마녀야. 크게 한 번, 그게 내 취향이지.',
+      'intro.sodawitch.l2': '「탄산 팡」이 매치마다 20% 확률로 ×2 를 터뜨려.',
+      'intro.sodawitch.l3': '내 각성은 탄산 폭발 — 잭팟 확률이 40%가 돼.',
+      'intro.ppyak.l1': '삐약! 처음부터 너랑 같이 있었어.',
+      'intro.ppyak.l2': '내 기술은 「자유 연결」 — 8초 동안 떨어진 두 칸도 이어져.',
+      'intro.mungchi.l1': '뭉치야. 든든한 건 내가 제일이지.',
+      'intro.mungchi.l2': '내 기술은 「덩어리 방패」 — 6초간 시계와 악당 게이지가 멈춰.',
+      'intro.mongle.l1': '몽글이에요. 시간이 급할 때 불러 주세요.',
+      'intro.mongle.l2': '내 기술은 「시간 웅덩이」 — 4초간 시계와 악당 게이지가 멈춰요.',
+      'intro.tiktok.l1': '째깍! 나는 시간을 세는 동료야.',
+      'intro.tiktok.l2': '내 기술은 「타임스톱」 — 6초 멈춘 동안에도 매치할 수 있어.',
+      'intro.churup.l1': '츄릅! 한 입에 한 줄, 자신 있어요.',
+      'intro.churup.l2': '내 기술은 「한 입 재굴림」 — 한 줄을 통째로 다시 섞어요.',
+      'intro.kkultteok.l1': '꿀떡이예요. 달콤한 건 다 제 몫이죠.',
+      'intro.kkultteok.l2': '내 기술은 「황금 소환」 — 황금 열매를 2개 불러요.',
+      'intro.sseokssak.l1': '썩싹! 지저분한 판은 제가 싹 치워요.',
+      'intro.sseokssak.l2': '내 기술은 「큰 정리」 — 산 타일 6칸을 한 번에 없애요.',
+      'intro.mukmul.l1': '먹물이야. 조용히, 그리고 확실하게.',
+      'intro.mukmul.l2': '내 기술은 「먹물 발사」 — 5칸을 같은 숫자로 바꿔.',
+      'intro.banjjak.l1': '반짝! 번쩍이는 건 다 나한테 맡겨.',
+      'intro.banjjak.l2': '내 기술은 「반짝 충전」 — 각성 게이지를 +40%p 채워 줘.',
+      'intro.bangul.l1': '방울이에요. 막힌 자리는 거품으로 풀어요.',
+      'intro.bangul.l2': '내 기술은 「거품 파도」 — 방해 타일 2개를 정화해요.',
       'skin.gem': '젤리별 +1!',
       'skin.base': '기본',
       'skin.basedesc': '처음부터 함께한 모습',
@@ -30452,6 +30903,287 @@ window.TT_SFX = {
     });
   }
 
+  /* ==[INV-0911]:JS:BEGIN== 캐릭터 초대 · 획득 연출 · 자기소개 (DESIGN §23)
+   * ---------------------------------------------------------------------------
+   * 세 구멍이 한 배관이라 한 블록이다(§23.1): 잠긴 카드가 «막다른 골목»이고,
+   * 얻는 순간이 «토스트 한 줄»이며, 얻은 뒤에도 «누구인지 모른다».
+   *
+   * 🚨 **가챠가 아니다.** 이 블록에 `Math.random` 이 한 번도 없고, 추첨·중복·천장이
+   *    라는 낱말에 해당하는 코드가 0줄이다. 누를 때 결과는 이미 정해져 있다
+   *    (§20.9 「확률형 회피가 1차 확정」이 여기서도 그대로 산다).
+   * ------------------------------------------------------------------------- */
+
+  /** 초대 사다리. **순서 고정**이고 값은 이 순서를 따라 단조 증가한다.
+   *  값의 자는 `SKIN_COST_ROYAL`(25) 하나다 — 지금 게임에 있는 유일한 젤리별
+   *  가격이라 그것을 중간 계단(먹물이)에 두고 위아래로 폈다. 표를 고치면 값이
+   *  고쳐지고 코드는 표만 읽는다(§23.2 ⓐ). */
+  var INVITE_ORDER = ['mongle', 'tiktok', 'churup', 'kkultteok', 'sseokssak',
+                      'mukmul', 'banjjak', 'bangul', 'jelly'];
+  var INVITE_COST = {
+    mongle: 0,          /* 첫 초대 **무료** — 값을 배우기 전에 흐름을 먼저 배운다 */
+    tiktok: 8,
+    churup: 12,
+    kkultteok: 16,
+    sseokssak: 20,
+    mukmul: SKIN_COST_ROYAL,   /* = 25. 사다리의 중간 계단이자 값의 자 */
+    banjjak: 30,
+    bangul: 36,
+    jelly: 45           /* 10탄 보스(무료 경로)가 그대로 살아 있는 보조 경로 */
+  };
+
+  /** 표에 없는 id 는 초대 대상이 아니다 — 처음부터 가진 여섯이 그 경우다. */
+  function inviteCost(id) {
+    return Object.prototype.hasOwnProperty.call(INVITE_COST, id) ? (INVITE_COST[id] | 0) : null;
+  }
+  /** 주인공·펫을 한 낱말로 묻는다. 두 잠금 체계를 만들지 않는 것이 요점이다. */
+  function charOwned(id) {
+    if (HERO_IDS.indexOf(id) >= 0) return heroUnlocked(id);
+    if (MATE_IDS.indexOf(id) >= 0) return petOwned(id);
+    return false;
+  }
+  function invitable(id) { return inviteCost(id) !== null && !charOwned(id); }
+
+  /** 능력치 넷을 0~100 으로. 주인공은 HERO_STATS(이미 0~100), 펫은 8 만점의 환산
+   *  이다 — syncPetInfo 가 쓰는 그 식(round(100 × v / 8))을 그대로 쓴다. */
+  function charStatPct(id) {
+    var s = HERO_STATS[id];
+    if (s) return [s.pwr, s.std, s.agi, s.luk];
+    var p = PET_STATS[id];
+    if (p) {
+      return [Math.round(100 * p.pwr / 8), Math.round(100 * p.std / 8),
+              Math.round(100 * p.agi / 8), Math.round(100 * p.luk / 8)];
+    }
+    return [0, 0, 0, 0];
+  }
+  /** 막대 넷을 칠한다. 부품(kit-gauge-v2)이 읽는 두 값만 넣는다 — 새 규약 0. */
+  function paintStatBars(root, id) {
+    if (!root || !root.querySelectorAll) return;
+    var v = charStatPct(id), bars = root.querySelectorAll('.cs-bar'), i;
+    for (i = 0; i < bars.length && i < 4; i++) {
+      var n = clamp(v[i] | 0, 0, 100);
+      bars[i].style.setProperty('--v', n + '%');
+      bars[i].style.setProperty('--f2-gv', String(n / 100));
+    }
+  }
+  /** 역할 배지의 문구. 주인공은 추천 태그, 펫은 축(§14 pet.axis.*) 이다. */
+  function charTagKey(id) {
+    if (HERO_IDS.indexOf(id) >= 0) return 'char.' + id + '.tag';
+    var p = PET_STATS[id];
+    return p ? ('pet.axis.' + p.axis) : 'mate.none.name';
+  }
+  /** 1차(무료) 해금 조건 한 줄. 초대가 **보조 경로**임을 창 안에서 말한다. */
+  function inviteWhy(id) {
+    return (MATE_IDS.indexOf(id) >= 0) ? petLockText(id) : t('char.locked.hint');
+  }
+
+  /* ---- 초대 창 ------------------------------------------------------------ */
+  var ivId = '';        /* 지금 초대 창이 보고 있는 id. 창이 닫히면 '' 다. */
+
+  /** 잠긴 카드를 눌렀을 때의 새 출구. 초대할 수 없는 id 면 false 를 돌려
+   *  호출부가 종전 토스트로 떨어지게 한다 — 조용히 아무 일도 안 하지 않는다. */
+  function openInvite(id) {
+    if (!invitable(id) || !$('modal-invite')) return false;
+    ivId = id;
+    syncInvite();
+    openModal('modal-invite');
+    J.sfx.ui();
+    return true;
+  }
+  function closeInvite() {
+    ivId = '';
+    closeModal('modal-invite');
+    J.sfx.ui();
+  }
+  function syncInvite() {
+    var id = ivId;
+    if (!id) return;
+    var cost = inviteCost(id) | 0, have = store.jstar | 0, free = cost <= 0;
+    var chip = $('iv-chip');
+    if (chip) {
+      /* 폴백 SVG 의 색은 `.ch-<id>` 가 준다 — 클래스를 같이 갈지 않으면 초상
+         없는 캐릭터가 검은 덩어리로 앉는다(syncPetInfo 가 세운 그 규칙). */
+      chip.className = 'ci-chip kit-slot-v2 kit-slot-v2--portrait ch-' + id;
+      setArt(chip, '--char-thumb', stdArt(id, 'thumb'), '');
+    }
+    setText('iv-name', t('char.' + id + '.name'));
+    setText('iv-tag', t(charTagKey(id)));
+    paintStatBars($('iv-stats'), id);
+    setText('iv-why', inviteWhy(id));
+    setText('iv-gems', have);
+    var row = $('iv-prog-row'), bar = $('iv-prog');
+    if (row) row.hidden = free;
+    if (bar) {
+      bar.hidden = free;
+      var pct = free ? 100 : clamp(Math.round(100 * have / cost), 0, 100);
+      bar.style.setProperty('--v', pct + '%');
+      bar.style.setProperty('--f2-gv', String(pct / 100));
+    }
+    setText('iv-prog-v', Math.min(have, cost) + '/' + cost);
+    var yes = $('iv-yes');
+    if (yes) {
+      /* 부족하면 **누를 수 없다**(§23.2 ⓑ). 값은 버튼 위에 있다 — 누르기 전에
+         무엇을 내는지 이미 화면에 있어야 확정형이다. */
+      yes.disabled = have < cost;
+      headText(yes, free ? t('invite.free') : t('invite.go.n', { n: cost }));
+    }
+  }
+  /** 실제 초대. 값을 다시 읽는 이유는 buySkin 과 같다 — 물어본 값으로 결제하는
+   *  코드는 두 번 물어보면 두 번 산다. */
+  function inviteBuy() {
+    var id = ivId;
+    if (!id || !invitable(id)) return;
+    var cost = inviteCost(id) | 0, have = store.jstar | 0;
+    if (have < cost) { toast(t('skin.poor', { n: cost - have })); J.sfx.fail(); return; }
+    store.jstar = have - cost;
+    if (!store.invited || typeof store.invited !== 'object') store.invited = {};
+    store.invited[id] = 1;
+    /* 보유의 정본은 여전히 store.jellyOn / store.pets 다 — store.invited 는
+       «어느 문으로 들어왔나»의 기록일 뿐이라 통째로 지워도 보유가 안 사라진다. */
+    if (MATE_IDS.indexOf(id) >= 0) grantPet(id, true);   /* quiet: 연출은 아래가 맡는다 */
+    else if (id === 'jelly') store.jellyOn = true;
+    persist();
+    closeModal('modal-invite');
+    ivId = '';
+    syncCharPick();
+    charGetFx(id, function () { introPlay(id, null); });
+  }
+
+  /* ---- 획득 연출 (§23.3) --------------------------------------------------- */
+  var cgTimer = 0, cgThen = null;
+
+  /** 토큰 하나에서만 시간이 나온다. 못 읽으면 폴백 — `boardMaxPx()` 가
+   *  `--board-max` 를 읽는 것과 같은 규약이다(읽는 곳 하나, 박힌 곳 없음). */
+  function invCssMs(name, fb) {
+    try {
+      var s = getComputedStyle(document.documentElement).getPropertyValue(name);
+      var m = /(-?[\d.]+)\s*(ms|s)?/.exec(String(s || '').trim());
+      if (!m) return fb;
+      var n = parseFloat(m[1]);
+      if (!isFinite(n)) return fb;
+      return (m[2] === 's') ? Math.round(n * 1000) : Math.round(n);
+    } catch (e) { return fb; }
+  }
+  function getLifeMs() { return invCssMs('--mo-get-life', 1700); }
+
+  /**
+   * 전면 획득 연출. **판 안에서는 열지 않는다**(§23.3) — grantPet 은 매치 도중에도
+   * 나므로 1.7초 전면 판이 그 순간 화면을 덮으면 연출이 아니라 방해가 된다.
+   * 그 판단을 여기 한 곳에 둔 이유는 호출부마다 흩어지지 않게 하기 위해서다.
+   * 예약은 `later()` 가 아니라 모듈 타이머다 — 화면 전환의 clearTimers 가
+   * 연출을 중간에 끊고 `then` 을 영영 안 부르는 일이 없어야 한다(toast 와 같은 판단).
+   */
+  function charGetFx(id, then) {
+    var el = $('charget');
+    if (!el || (S && S.running)) { if (then) then(); return false; }
+    cgThen = then || null;
+    el.className = 'ch-' + id;
+    var art = $('cg-art');
+    if (art && art.style) {
+      var img = stdArt(id, 'full');
+      if (img) art.style.setProperty('--cg-img', img);
+      else if (art.style.removeProperty) art.style.removeProperty('--cg-img');
+    }
+    if (el.style) el.style.setProperty('--cut-key', (CHARS[id] || CHARS[CHAR_DEFAULT]).key);
+    setText('cg-sub', t('invite.got'));
+    setText('cg-name', t('char.' + id + '.name'));
+    setText('cg-tag', t(charTagKey(id)));
+    paintStatBars($('cg-stats'), id);
+    el.hidden = false;
+    el.classList.remove('go');
+    void el.offsetWidth;              // 진행 중인 애니메이션을 새 사건으로 다시 시작
+    el.classList.add('go');
+    toast(t('invite.new', { n: t('char.' + id + '.name') }));
+    J.sfx.win();
+    J.vibrate(70);
+    if (typeof window !== 'undefined') {
+      J.confetti(window.innerWidth / 2, window.innerHeight * 0.42);
+    }
+    if (cgTimer) clearTimeout(cgTimer);
+    cgTimer = setTimeout(function () { cgTimer = 0; charGetEnd(); }, getLifeMs());
+    return true;
+  }
+  /** 탭 스킵도 자연 종료도 여기 하나로 끝난다 — `then` 은 어느 쪽이든 반드시 돈다. */
+  function charGetEnd() {
+    if (cgTimer) { clearTimeout(cgTimer); cgTimer = 0; }
+    var el = $('charget');
+    if (el) { el.classList.remove('go'); el.hidden = true; }
+    var fn = cgThen;
+    cgThen = null;
+    if (fn) fn();
+  }
+
+  /* ---- 첫 사용 자기소개 (§23.4) -------------------------------------------- */
+  var cinId = '', cinIdx = 0, cinLines = [], cinThen = null;
+
+  function introSeenChar(id) {
+    return !!(store.introSeen && store.introSeen[id]);
+  }
+  function introMark(id) {
+    if (!id) return;
+    if (!store.introSeen || typeof store.introSeen !== 'object') store.introSeen = {};
+    if (store.introSeen[id]) return;
+    store.introSeen[id] = 1;
+    persist();
+  }
+  /** 있는 줄만 모은다 — 주인공 3줄(성격·패시브·각성) · 펫 2줄(각성이 없다). */
+  function introLines(id) {
+    var out = [], i, k, s;
+    for (i = 1; i <= 3; i++) {
+      k = 'intro.' + id + '.l' + i;
+      s = t(k);
+      if (s && s !== k) out.push(s);
+    }
+    return out;
+  }
+  /** 뜰 것이 있는가. 「처음 선택」·「첫 판 진입」 두 문이 같은 이 함수를 묻는다. */
+  function introDue(id) {
+    return !!id && !introSeenChar(id) && introLines(id).length > 0;
+  }
+  function introPlay(id, then) {
+    var lines = introLines(id), el = $('charintro');
+    if (!el || !lines.length) { introMark(id); if (then) then(); return false; }
+    cinId = id; cinIdx = 0; cinLines = lines; cinThen = then || null;
+    var face = $('cin-face');
+    if (face && face.style) {
+      var img = stdArt(id, 'portrait');
+      if (img) face.style.setProperty('--cin-face', img);
+      else if (face.style.removeProperty) face.style.removeProperty('--cin-face');
+    }
+    setText('cin-who', t('char.' + id + '.name'));
+    cinPaint();
+    el.hidden = false;
+    return true;
+  }
+  function cinPaint() {
+    setText('cin-line', cinLines[cinIdx] || '');
+    var b = $('cin-next');
+    if (b) headText(b, (cinIdx >= cinLines.length - 1) ? t('intro.done') : t('intro.next'));
+  }
+  function cinNext() {
+    if (!cinLines.length) return;
+    if (cinIdx < cinLines.length - 1) { cinIdx++; cinPaint(); J.sfx.ui(); return; }
+    cinFinish();
+  }
+  /** 마지막 줄에서 같은 버튼이 판을 닫는다. **본 것은 여기서만 적힌다** — 중간에
+   *  끊긴 소개는 다음에 다시 뜬다(1회는 «보여 줬다»가 아니라 «봤다»의 1회다). */
+  function cinFinish() {
+    var el = $('charintro');
+    if (el) el.hidden = true;
+    introMark(cinId);
+    cinLines = []; cinIdx = 0; cinId = '';
+    var fn = cinThen;
+    cinThen = null;
+    J.sfx.ui();
+    if (fn) fn();
+  }
+  /** 「첫 판 진입」 문. 뜨면 true 를 돌려 호출부가 **그 자리에서 멈추게** 하고,
+   *  대사가 끝나면 `then` 이 원래 하려던 일을 그대로 이어 한다. */
+  function introGate(id, then) {
+    if (!introDue(id)) return false;
+    return introPlay(id, then);
+  }
+  /* ==[INV-0911]:JS:END== */
+
   /* W4 — 탭은 **세션 로컬**이다. store 에 안 넣는 이유는, 그것이 "무엇을 골랐나"가
      아니라 "지금 무엇을 보고 있나"이기 때문이다(cpIdx 와 같은 급의 값). 저장하면
      다음 접속에서 캐릭터 선택창이 펫 화면으로 열리는 일이 생긴다. */
@@ -30697,7 +31429,11 @@ window.TT_SFX = {
   /** 큰 "선택!" — 지금 보고 있는 캐릭터로 결정하고 닫는다. */
   function cpConfirm() {
     var id = HERO_IDS[cpIdx];
-    if (!heroUnlocked(id)) { toast(t('char.locked.hint')); J.sfx.fail(); return; }
+    /* [INV-0911] 카드 탭과 같은 문이다 — 두 입구가 잠금을 다르게 다루면 안 된다. */
+    if (!heroUnlocked(id)) {
+      if (openInvite(id)) return;
+      toast(t('char.locked.hint')); J.sfx.fail(); return;
+    }
     setChar(id);              // 이미 그 캐릭터면 조용히 아무 일도 하지 않는다
     closeCharPanel();
     /* v4 10차 §E — 이 선택이 스토리의 일부였다면(오프닝 직후) 출정 컷이 이어진다.
@@ -30742,8 +31478,14 @@ window.TT_SFX = {
   function setChar(id) {
     if (HERO_IDS.indexOf(id) < 0 || id === store.charId) return;
     /* 잠긴 캐릭터는 고를 수 없다. 조용히 무시하지 않고 이유를 말하는 것이
-       중요하다 — 카드가 눌리는데 아무 일도 안 일어나면 고장으로 읽힌다. */
-    if (!heroUnlocked(id)) { toast(t('char.locked.hint')); J.sfx.fail(); return; }
+       중요하다 — 카드가 눌리는데 아무 일도 안 일어나면 고장으로 읽힌다.
+       [INV-0911] 이제 그 «이유»는 토스트가 아니라 **문**이다(DESIGN §23.2):
+       초대할 수 있으면 초대 창이 열리고, 초대 대상이 아닌 id 에서만 종전
+       토스트로 떨어진다 — 잠긴 카드가 막다른 골목이 아니게 되는 것이 요점이다. */
+    if (!heroUnlocked(id)) {
+      if (openInvite(id)) return;
+      toast(t('char.locked.hint')); J.sfx.fail(); return;
+    }
     store.charId = id;
     persist();
     syncCharPick();
@@ -30751,6 +31493,8 @@ window.TT_SFX = {
     J.sfx.ui();
     // 고른 순간 그 캐릭터의 목소리를 한 번 들려준다 — 선택의 근거가 하나 더 는다.
     J.sfx.voice(id, 3);
+    /* [INV-0911] 「처음 선택」 문(§23.4). 이미 본 캐릭터면 아무 일도 안 난다. */
+    introGate(id, null);
   }
 
   /** 동료 선택. ''(없음)도 정당한 값이라 CHARS 조회가 아니라 목록 검사로 거른다. */
@@ -30759,8 +31503,13 @@ window.TT_SFX = {
     /* WD-2 §14 — 안 가진 펫은 고를 수 없다. 조용히 무시하지 않고 이유를 말하는
        것이 중요한 것도 setChar 와 같다(카드가 눌리는데 아무 일도 안 일어나면
        고장으로 읽힌다). 문구·소리까지 그대로 재사용한다 — 잠금이라는 사건이
-       주인공 카드와 펫 카드에서 다른 말을 하면 그것이 두 번째 체계가 된다. */
-    if (v && !petOwned(v)) { toast(petLockText(v)); J.sfx.fail(); return; }
+       주인공 카드와 펫 카드에서 다른 말을 하면 그것이 두 번째 체계가 된다.
+       [INV-0911] 그 «같은 말»이 이제 같은 **문**이기도 하다 — 주인공 카드와
+       똑같이 초대 창이 먼저 열리고, 초대 대상이 아닌 펫에서만 토스트로 떨어진다. */
+    if (v && !petOwned(v)) {
+      if (openInvite(v)) return;
+      toast(petLockText(v)); J.sfx.fail(); return;
+    }
     if (v === mateId()) return;
     store.mateId = v;
     cpPetView = null;         /* 고른 순간 구경도 그것으로 맞춘다 */
@@ -41647,6 +42396,12 @@ window.TT_SFX = {
   function advStart(n) {
     var st = (n | 0) < 1 ? 1 : (n | 0);
     if (st > (store.advMax | 0)) { toast(t('adv.locked')); J.sfx.fail(); return; }
+    /* [INV-0911] 「첫 판 진입」 문(DESIGN §23.4). **판 상태를 하나도 바꾸기 전에**
+       묻는다 — 대사가 끝나면 이 함수를 그대로 다시 부르므로, 소개가 판 중간에
+       끼어들지 않고 «판이 시작되기 전»에만 선다. 이미 본 캐릭터면 false 라
+       한 줄도 안 도는 것과 같다. 기본 캐릭터(텐텐)는 «고른 적»이 없어서
+       setChar 의 문에 영영 안 걸린다 — 그 하나를 이 문이 받는다. */
+    if (introGate(charId(), function () { advStart(n); })) return;
     heartsTick();
     if (store.hearts <= 0) { openNodeCard(st); return; }   // 카드가 대기 안내를 맡는다
     closeModal('modal-node');
@@ -44493,7 +45248,11 @@ window.TT_SFX = {
    * 돌려준다. 호출부가 "두 번 주지 않기"를 각자 챙기지 않아도 되게 하는 것이
    * 이 함수의 존재 이유다(조건 카운터는 매 매치 검사되므로 두 번은 기본값이다).
    */
-  function grantPet(id) {
+  /* [INV-0911] `quiet` 한 칸을 더했다(기본값 = 종전 동작 그대로). 초대 경로는
+     자기 연출(charGetFx)을 이미 갖고 있어서 여기 축하가 겹치면 **한 사건이 두
+     번** 난다 — 토스트가 뜨고, 결과 시트의 획득 자리(S.gainPets)에도 판 밖에서
+     얻은 펫이 얹힌다. 지급을 복제하지 않고 축하만 끄는 것이 요점이다. */
+  function grantPet(id, quiet) {
     if (MATE_IDS.indexOf(id) < 0) return false;
     if (!Array.isArray(store.pets)) {
       store.pets = [];
@@ -44507,12 +45266,14 @@ window.TT_SFX = {
     /* 획득 연출 = §10 최희귀 자리 + 토스트 한 줄(§14.3 "신규 연출 0"). 결과
        시트의 컷인 몫은 S.gainPets 가 들고 가고, 여기서는 그 순간 화면에
        무슨 일이 났는지만 알린다. */
-    S.gainPets.push(id);
-    toast(t('pet.get', { n: t('char.' + id + '.name') }));
-    J.sfx.tierUp(4);
-    J.vibrate(70);
-    if (typeof window !== 'undefined') {
-      J.confetti(window.innerWidth / 2, window.innerHeight * 0.42);
+    if (!quiet) {
+      S.gainPets.push(id);
+      toast(t('pet.get', { n: t('char.' + id + '.name') }));
+      J.sfx.tierUp(4);
+      J.vibrate(70);
+      if (typeof window !== 'undefined') {
+        J.confetti(window.innerWidth / 2, window.innerHeight * 0.42);
+      }
     }
     syncMateLocks();
     return true;
@@ -45245,6 +46006,19 @@ window.TT_SFX = {
      * 읽힐 수 있고, 그러면 입력 차단(S.paused)과 두 곳이 같은 일을 하게 된다. */
     on($('skill-btn'), 'click', function () { fireSkill(); });
     on($('cutin'), 'click', function () { endCutin(true); });
+    /* ==[INV-0911]:WIRE:BEGIN== (DESIGN §23)
+       초대 창의 두 버튼. X 는 `data-w6x="iv-no"` 라 **이미 있는 위임**이 받는다
+       — 새 배선 0(닫으면 무슨 일이 나는가의 소유자가 창마다 하나로 유지된다). */
+    on($('iv-no'), 'click', closeInvite);
+    on($('iv-yes'), 'click', inviteBuy);
+    /* 획득 연출 = 판 아무 곳이나 탭하면 스킵(#cutin 과 같은 계약). 오버레이가
+       화면을 통째로 덮고 있으므로 리스너를 그것 자신에게 단다. */
+    on($('charget'), 'click', function () { charGetEnd(); });
+    /* 자기소개 = 「▶ 다음」 하나로 넘긴다. 판을 탭해도 같은 함수다 — 두 입구가
+       다르게 동작할 여지를 만들지 않는다(버튼의 click 은 여기까지 버블한다). */
+    on($('cin-next'), 'click', function (ev) { if (ev && ev.stopPropagation) ev.stopPropagation(); cinNext(); });
+    on($('charintro'), 'click', function () { cinNext(); });
+    /* ==[INV-0911]:WIRE:END== */
     on($('unlock-go'), 'click', closeUnlock);
     on($('node-close'), 'click', function () { closeModal('modal-node'); J.sfx.ui(); });
 
@@ -45669,6 +46443,12 @@ window.TT_SFX = {
            이 사슬의 규칙상 여기가 그 자리다. Esc = 취소(= confirm() 의 false).
            뒤로가기 파수꾼도 합성 Escape 하나로 이 사슬을 태우므로, 안드로이드
            뒤로가기 역시 이 한 줄로 「확인 창만 닫힘」이 된다. */
+        /* [INV-0911] 자기소개(z79) · 획득 연출(z78) 이 확인 창(77)보다 위다 —
+           "가장 위의 것부터"라는 이 사슬의 규칙상 여기가 그 자리다. Esc 는
+           탭과 **같은 함수**를 부른다(넘김/스킵) — 나가는 문이 둘인데 동작이
+           갈리면 그것이 두 번째 체계다. */
+        if ($('charintro') && !$('charintro').hidden) { cinNext(); return; }
+        if ($('charget') && !$('charget').hidden) { charGetEnd(); return; }
         if ($('modal-confirm') && !$('modal-confirm').hidden) { closeConfirm(); return; }
         /* [CS37-0910 · 판정판 37] 캐릭터 패널(z72) — 종전에는 이 사슬에 자리가
            **없었다**(DESIGN §17.9 ②). 그래서 Esc 로는 안 닫히고 뒤로가기만
@@ -45685,6 +46465,10 @@ window.TT_SFX = {
            벗었는데 아직 안 그려진 순간에 Esc 를 삼키지 않게 한다. */
         var cpEsc = $('charpanel');
         if (cpEsc && !cpEsc.hidden && cpEsc.getClientRects && cpEsc.getClientRects().length) {
+          /* [INV-0911] ⓪ 초대 창은 스킨 시트와 같은 겹(패널 위의 한 장)이다.
+             둘이 동시에 뜰 수 없으므로 순서는 자유이고, 스킨 앞에 둔 것은
+             이 파도가 만든 것을 먼저 읽게 하려는 편의뿐이다. */
+          if ($('modal-invite') && !$('modal-invite').hidden) { closeInvite(); return; }
           /* ① 패널 위에 뜬 스킨 시트가 먼저다(z73 > z72). */
           if ($('modal-skin') && !$('modal-skin').hidden) { closeSkins(); return; }
           /* ② 능력치 ⓘ 말풍선은 패널 **안**의 한 겹이다 — 열려 있으면 그것만
@@ -46782,6 +47566,17 @@ window.TT_SFX = {
     itemScoreMult: itemScoreMult, itemOn: itemOn, ITEM_POOL: ITEM_POOL,
     grantItem: grantItem, toggleItem: toggleItem, syncItemList: syncItemList,
     petOwned: petOwned, grantPet: grantPet, petCondBump: petCondBump,
+    /* ==[INV-0911]== 초대·연출·자기소개 손잡이 (DESIGN §23.7 smoke).
+       게임 코드는 이 중 무엇도 window.Game 을 거쳐 부르지 않는다 — 관문의
+       실클릭 사슬(잠긴 카드 → 창 → 부족 비활성 → 시드 충족 → 초대 → 연출 →
+       대사 → 재진입 0)이 «값을 심고 상태를 읽을» 자리로만 쓴다. */
+    INVITE_ORDER: INVITE_ORDER, INVITE_COST: INVITE_COST,
+    inviteCost: inviteCost, invitable: invitable, charOwned: charOwned,
+    openInvite: openInvite, closeInvite: closeInvite, inviteBuy: inviteBuy,
+    syncInvite: syncInvite, charStatPct: charStatPct,
+    charGetFx: charGetFx, charGetEnd: charGetEnd, getLifeMs: getLifeMs,
+    introDue: introDue, introPlay: introPlay, introLines: introLines,
+    cinNext: cinNext, introSeenChar: introSeenChar,
     petShardCheck: petShardCheck, petGachaPool: petGachaPool,
     syncMateLocks: syncMateLocks,
     PET_FREE: PET_FREE, PET_BOSS: PET_BOSS, MATE_IDS: MATE_IDS,
