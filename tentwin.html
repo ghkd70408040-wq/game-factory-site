@@ -29763,13 +29763,14 @@ window.TT_SFX = {
        * record parts, because "the daily is waiting" is exactly the state a
        * brand-new player is in and the one worth advertising most. */
       parts.push(dailyDoneToday() ? t('menu.dailydone') : t('menu.dailytodo'));
-      /* 판정판 50 — 넷째 조각. §6.8 이 메뉴 버튼의 배지·부제를 금지했으므로
-         «오늘 받을 것이 있다»는 이 «아주 작은 상태 한 줄»이 말한다. 새 요소 0. */
-      try {
-        var qs = questsEnsure(), qd = 0, qi;
-        for (qi = 0; qi < qs.daily.list.length; qi++) { if (qs.daily.list[qi].claimed) qd++; }
-        parts.push(t('menu.quest', { n: qd, g: qs.daily.list.length }));
-      } catch (eq) { /* 부팅 전 */ }
+      /* 판정판 50 — 여기에 「퀘스트 n/3」 조각을 더했다가 **철회했다**. 관문 실측:
+         이 줄은 모달 열여덟 컷의 흐린 배경으로 그대로 비쳐 나온다(09-modal-rank ·
+         13-modal-skin · 15-modal-daily · 17-modal-classic · 18-modal-adv 의
+         diffpx 가 76358 로 **완전히 같은 수치** = 원인이 이 요소 하나라는 증거).
+         한 줄이 얻는 것보다 「나머지 전 컷 maxD 0」이 잃는 것이 크다.
+         퀘스트의 «받을 것이 있다» 신호는 설정 줄 #st-quest 의 배지가 맡는다.
+         되살리려면: parts.push(t('menu.quest', {n: 수령수, g: 3})) 한 줄.
+         i18n 키 'menu.quest' 는 ko/en 둘 다 남겨 두었다. */
       mb.textContent = parts.join(' · ');
     }
     // The How-to's Next button doubles as the tutorial entry on the last panel,
@@ -31145,6 +31146,9 @@ window.TT_SFX = {
     if (!el) return;
     el.hidden = false;
     syncToggleLabels();
+    /* 판정판 50 — 퀘스트 배지는 «설정을 여는 그 순간»에 맞춘다. 화면 밖에서
+       매번 굴리지 않는 이유는 questClaimable() 이 저장을 읽고 굴리기 때문이다. */
+    try { questBadges(); } catch (eq) { /* 부팅 전 */ }
     J.sfx.ui();
   }
   function closeSettings() {
@@ -38899,7 +38903,6 @@ window.TT_SFX = {
       b.textContent = n > 0 ? String(n) : '';
       b.hidden = !(n > 0);
     }
-    syncDynamicI18n();
   }
 
   function openQuest(tab) {
