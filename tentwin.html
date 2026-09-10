@@ -10754,9 +10754,8 @@ html.no-art-logo .logo-img  { display: none; }
      지우는 대신 가리는 것이 §A 의 지시라, 띠가 얇아지면 글자가 삐져나온다. */
   height: clamp(48px, 13.1vh, 110px);
   padding: 0 8px;
-  border-style: solid;
-  border-width: 7px 5px;
-  border-image: var(--lib-hud-bar) 13 9 13 9 fill stretch;
+  /* [hud-unify 0910] 은퇴 — 맵 띄는 이미 코드 젬리(.jbox--strip)가 그린다.
+     이 세 줄은 그 밑에 깔려 있던 은퇴 자산(lib-hud-bar.webp) 띄였다. */
 }
 #map-top { top: 0; gap: 8px; padding-top: var(--safe-t); }
 #map-bot { bottom: 0; padding-bottom: var(--safe-b); }
@@ -11131,12 +11130,14 @@ html[lang="en"] .mfbtn { font-size: 8px; letter-spacing: -.15px; }
   min-height: 52px;
 }
 
-/* 게임 상단바 — 맵과 같은 --lib-hud-bar 띠 (§D). 안의 배치는 6차 그대로다:
-   바뀐 것은 띠의 재질 한 겹이고, 보드는 한 픽셀도 움직이지 않는다. */
+/* [hud-unify 0910 · 판정판 26+27] 은퇴 — 게임 상단바의 베이지 리본 띠였다.
+   위화감 감사(CANON-AUDIT-0910 §1-2b) 실측: 인게임 상단 6화면 중 정본 판을 입은
+   것은 클래식·전투 둘뿐이고 나머지 넷(모험·아케이드·러시·데일리)이 이 띠였다.
+   이제 여섯 화면 전부가 [data-part="hud-plate"][data-variant="top"] 한 프레임을
+   쓴다 — 이 border-image 는 그 판 밑에 깔린 은퇴 자산(legacy-lib-hud-bar)이라
+   지운다(규격 §6-4 「옛 판 CSS 은퇴 · 죽은 선택자 0」).
+   되돌리기 = 이 커밋 revert. */
 #topbar {
-  border-style: solid;
-  border-width: 7px 5px;
-  border-image: var(--lib-hud-bar) 13 9 13 9 fill stretch;
   background: none;
 }
 
@@ -11711,14 +11712,103 @@ html[data-fruit="1"] .tile.blocker:not([data-sp]):not(.dead) {
 /* 하단 액션 바: 띠는 상단과 같은 --lib-hud-bar, 캡 넷은 메뉴가 쓰는 젤리 버튼
    네 색이다. 색 순서는 메뉴(핑크→보라→노랑→주황)와 겹치지 않게 민트에서 시작해
    기능 구분이 색으로도 남게 했다: 추가=민트 · 힌트=노랑 · 되돌리기=보라 · 섞기=핑크. */
+/* [hud-unify 0910 · 판정판 26+27] 하단 행동 줄의 띄 = 은퇴 자산이었다.
+   위화감 감사(CANON-AUDIT-0910 §1-3) 실측: `lib-hud-bar.webp`(= legacy-lib-hud-bar,
+   status retire-or-replace)가 **모드를 가리지 않고 10화면 전량**에서 살아 있었다 —
+   정본 판을 입은 클래식·전투 화면에서도 하단만 옛 부품이었다.
+   띄를 걷고, 상단바와 **같은 프레임**(hud-plate/top)을 위아래 뒤집어 깔는다 —
+   위 판은 «위 변이 없는 판» 이라 뒤집으면 그대로 «아랫 변이 없는 판» 이 된다(화면 밑에 붙는 형태). */
 #actionbar {
   gap: 8px;
   padding: 6px calc(var(--safe-r) + 10px) calc(var(--safe-b) + 8px) calc(var(--safe-l) + 10px);
-  border-style: solid;
-  border-width: 7px 5px;
-  border-image: var(--lib-hud-bar) 13 9 13 9 fill stretch;
+  border: 0;
   background: none;
+  position: relative;
 }
+#actionbar > [data-part="hud-plate"][data-variant="top"] {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: var(--hud-plate-top);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  transform: scaleY(-1);
+  /* 판이 판으로 읽히려면 밑에 자기 면이 있어야 한다 — 아래 ::before 절 참조. */
+  isolation: isolate;
+}
+/* ── [hud-unify 0910 · 되돌림 1] 하단 판이 화면에서 안 읽혔다 ────────────────
+   지휘자 반려: 「후 컷에서 버튼 넷이 물 배경 위에 그냥 떠 있다(6모드 전부)」.
+
+   실측(390x844 · 05d-hud-endless.png):
+     · 판 노드는 **있다** — 상자 390x81 · display block · opacity 1 ·
+       background-image hud-plate-top.webp · size 100% 100% · z 0 · visible.
+     · 자산 실측 알파 = **140/255 = .549** = 정본 Mode B α .550 그대로다.
+     · 그런데 그 .55 유리 뒤가 «화면 맨 아래»다. #screen-game 의 스크림
+       그라데이션이 100% 지점에서 rgba(12,8,24,**.34**) 로 가장 어둡고, 그 아래
+       배경 그림도 짙은 물이다. 실캡처 화소:
+         상단 판 면 (159,180,242)  ← 밝은 하늘 위의 .55 유리 = 판으로 읽힌다
+         하단 판 면 (113,154,211)  ← 짙은 물 위의 같은 .55 유리 = 물과 섞인다
+   즉 판이 없거나 α 가 낮았던 것이 아니라, **바탕이 어두워 같은 α 가 다른 값으로
+   합성**된 것이다. 상단이 잘 읽히는 이유가 곧 하단이 안 읽히는 이유다.
+
+   처방 — 판에 **자기 면(fill)을 깔아 준다**. 매니페스트가 이 프레임에 대해 이미
+   선언해 둔 그 층이다: fill.face = $mode.B.face.hud · fill.alpha = $mode.B.alpha.hud.
+   구운 래스터라 그 면이 그림 안에 들어 있지만, 어두운 바탕 위에서는 한 겹으로는
+   모자란다. 그래서 **같은 토큰**(--mode-b-face #96A7F6 · --mode-b-alpha .55)으로
+   한 겹을 판 **밑에** 깔고, 그 겹을 **판 자신의 알파로 마스킹**한다 — 사각형이
+   아니라 판 실루엣(림·겉선 포함) 그대로다. 합성 알파 1-(1-.55)^2 = .7975 라
+   어두운 물 위에서도 상단과 같은 «파란 젤리 판»으로 읽힌다.
+   새 자산 0 · 새 색 0 · 마스크는 같은 파일 하나(--hud-plate-top).
+   ⚠ 부모가 scaleY(-1) 이므로 이 겹도 함께 뒤집혀 마스크가 정확히 겹친다.
+   되돌리기: 이 ::before 규칙 하나를 지우면 착수 전 상태(반려된 그림)로 돌아간다. */
+#actionbar > [data-part="hud-plate"][data-variant="top"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;                       /* 판 그림 **밑** */
+  pointer-events: none;
+  /* 🚨 α 를 여기서 또 곱하면 안 된다 — **마스크가 이미 그 α 다**.
+     `mask-image` 는 그림의 알파 채널을 그대로 마스크로 쓰는데, 이 판 자산의 면
+     알파가 곧 정본 값(140/255 = .549 = --mode-b-alpha)이다. 첫 판에서 면색에도
+     α .55 를 곱했더니 실효 .55 x .549 = **.30** 이 되어 실측 상승이 (113,154,211)
+     -> (124,159,221) 뿐이었다(계산과 화소가 정확히 일치했다).
+     면색은 **불투명**으로 두고 α 는 마스크 한 곳에서만 온다 — 그래야 이 겹이
+     정확히 «$mode.B.face.hud 를 $mode.B.alpha.hud 로 칠한 fill 층» 이 된다. */
+  background-color: var(--mode-b-face);
+  -webkit-mask-image: var(--hud-plate-top);
+          mask-image: var(--hud-plate-top);
+  -webkit-mask-repeat: no-repeat;
+          mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+          mask-size: 100% 100%;
+}
+/* 폴백 — mask 를 모르는 기기에서는 면이 사각형으로 삐져나온다. 그때는 면을 끄고
+   판 그림 한 겹만 남긴다(어둡게 읽히더라도 «사각형 색판»보다 낫다). */
+@supports not ((-webkit-mask-image: none) or (mask-image: none)) {
+  #actionbar > [data-part="hud-plate"][data-variant="top"]::before { content: none; }
+}
+/* ── [hud-unify 0910 · 되돌림 1] 전투 하단 줄만 **다른 판**이었다 ────────────
+   실측: 다섯 모드는 이제 파란 젤리 판인데 전투만 연라벤더 판이다. 범인은
+   `#app.battle #actionbar::after`(:48492) 의 **코드 트레이** — 곡률만 다른 판을
+   그리려고 `linear-gradient(#E4DAE8 → #CBBED4)` + 그림자 여섯 겹을 `!important`
+   로 얹어 둔 자리다(그 절이 갈아 끼운 것은 그보다 더 옛 자산 glass-hud-bar-st
+   이었고, 그 교체 자체는 옳았다 — 다만 그때는 «정본 하단 판»이 없었다).
+   지금은 있다. 그러니 트레이를 걷고 여섯 화면이 **한 판**을 쓰게 한다.
+   ::before 의 흰 오버레이(.11)도 함께 걷는다 — 그 겹은 트레이를 밝히려던 것이고,
+   판 위에 남으면 전투만 뿌옇게 뜬다.
+   ⚠ 메달·명패·배지는 무접촉이다(z-index 1 계약 그대로 판 위에 선다).
+   되돌리기: 이 두 규칙을 지우면 :48492 트레이가 그대로 돌아온다. */
+#app.battle #screen-game #actionbar::after{
+  background-image: none !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border-image: none !important;
+}
+#app.battle #screen-game #actionbar::before{
+  background-color: transparent !important;
+}
+#actionbar > .act { position: relative; z-index: 1; }
 .act {
   gap: 1px;
   min-height: 52px;
@@ -13643,7 +13733,26 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
 
   <!-- ===== Game ===== -->
   <section id="screen-game" class="screen">
-    <header id="topbar">
+    <header id="topbar" data-part="hud" data-variant="topbar">
+      <!-- ============================================================
+           [hud-unify 0910 · 판정판 26] 아케이드·타임러시·데일리 상단바 =
+           정본 HUD 판의 **인스턴스**.
+
+           사용자 지시(격노): "클래식이든 뭐든 **이 상단바**로 통일하라"
+           (파란 젤리 HUD 판 + 분홍 캔디 정지 버튼 + 젤리 캡슐 칸).
+           규격 §0-7: 같은 Shape·Stroke = 한 Component -> 세 모드는 클래식·전투가
+           쓰는 [data-part="hud-plate"][data-variant="top"] 과 **같은 규칙·같은
+           자산**을 쓰는 인스턴스이고, 다른 것은 슬롯 내용(단계·점수·최고·남은
+           짝·시간·데일리#)뿐이다.
+
+           ⚠ 판은 기본 display:none 이다 — 모험(#app.adv)·클래식·전투에서
+             이 두 노드가 **플렉스 자식으로도 존재하지 않아야** 그 세 화면의
+             화소가 한 톨도 안 움직인다(관문: 04/05/05b/05c diff 0).
+           ⚠ 아래 판(variant bottom)은 안 부른다 — 이 상단바의 슬롯은 위 판
+             하나에 다 앉고, 아래 판을 부르면 상단바가 137px 이 되어 보드가
+             75px 을 잃는다(부르지 않은 부품 금지).
+           ============================================================ -->
+      <i class="dh-plate dh-plate--top" data-part="hud-plate" data-variant="top" aria-hidden="true"></i>
       <button id="btn-pause" class="icon-btn" data-i18n-aria="aria.pause" aria-label="Pause"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-pause"/></svg></button>
       <!-- ============================================================
            v4 6차 §A-4 — 상단바 재배열.
@@ -13661,14 +13770,18 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
            세로는 22×2 = 44px 로 늘지만, 상하 패딩을 10/8 → 8/6 으로 줄여
            보드가 실제로 잃는 높이는 2px 다.
            ============================================================ -->
-      <div id="tb-stats">
-      <div class="stat" id="stat-stage"><span class="stat-k" data-i18n="hud.stage">Stage</span><span id="stage-val" class="stat-v">1</span></div>
-      <div class="stat"><span class="stat-k" data-i18n="hud.score">Score</span><span id="score-val" class="stat-v">0</span></div>
-      <div class="stat"><span class="stat-k" data-i18n="hud.best">Best</span><span id="best-val" class="stat-v">0</span></div>
+      <!-- [hud-unify 0910] 칸 = capsule Component 의 code 변주 인스턴스.
+           슬롯 수는 모드가 정한다(syncHud 의 [hidden] 그대로): 아케이드 4 ·
+           타임러시 3(단계 내림, 시계는 #rush-timer) · 데일리 5(단계=데일리# + 시간).
+           «캡슐 인스턴스 수만 다르고 칸의 부품은 하나»가 이 파도의 계약이다. -->
+      <div id="tb-stats" data-part="hud" data-variant="stats">
+      <div class="stat" id="stat-stage" data-part="capsule" data-variant="code" data-slot="stage"><span class="stat-k" data-i18n="hud.stage">Stage</span><span id="stage-val" class="stat-v">1</span></div>
+      <div class="stat" data-part="capsule" data-variant="code" data-slot="score"><span class="stat-k" data-i18n="hud.score">Score</span><span id="score-val" class="stat-v">0</span></div>
+      <div class="stat" data-part="capsule" data-variant="code" data-slot="best"><span class="stat-k" data-i18n="hud.best">Best</span><span id="best-val" class="stat-v">0</span></div>
       <!-- v4 A-1: remaining valid matches (사천성-style). game.js recomputes it only
            when the board actually changed, never per frame. -->
-      <div class="stat" id="stat-moves"><span class="stat-k" data-i18n="hud.moves">Moves</span><span id="moves-val" class="stat-v">0</span></div>
-      <div class="stat" id="stat-timer" hidden><span class="stat-k" data-i18n="hud.time">Time</span><span id="timer-val" class="stat-v">0:00</span></div>
+      <div class="stat" id="stat-moves" data-part="capsule" data-variant="code" data-slot="moves"><span class="stat-k" data-i18n="hud.moves">Moves</span><span id="moves-val" class="stat-v">0</span></div>
+      <div class="stat" id="stat-timer" data-part="capsule" data-variant="code" data-slot="time" hidden><span class="stat-k" data-i18n="hud.time">Time</span><span id="timer-val" class="stat-v">0:00</span></div>
       </div>
     </header>
     <!-- ============================================================
@@ -13790,7 +13903,12 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
     </div>
     <!-- v2 HUD strip. Collapses to 0px when both children are [hidden] (no vertical
          padding of its own), so classic Endless / Daily keep the v1 board height. -->
-    <div id="hud-row">
+    <!-- [hud-unify 0910 · 판정판 26+27] `data-part="hud"` — 이 줄은 «칠하지 않는»
+         HUD 컨테이너다(미션 배지·러시 시계·칩이 각자 자기 부품으로 앉는다).
+         속성이 없으면 canon-check 가 7화면 전부에서 UNMAPPED ★★★★ 로 세운다:
+         자산이 없다는 것과 정본 밖이라는 것은 다른 말인데 구분할 근거가 없었다.
+         #classic-hud(data-part="hud" data-variant="classic")와 **같은 어휘**다. -->
+    <div id="hud-row" data-part="hud" data-variant="hudrow">
       <div id="mission-badge" hidden>
         <svg class="mb-ico" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="6.2"/><circle cx="8" cy="8" r="3.4"/><circle cx="8" cy="8" r="1.2"/></svg>
         <span id="mission-text"></span><span id="mission-prog"></span>
@@ -14300,7 +14418,13 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
       <span id="skill-av" class="skill-av ch-ten" aria-hidden="true"></span>
       <span id="skill-pct" class="sk-pct">0%</span>
     </button>
-    <footer id="actionbar">
+    <!-- [hud-unify 0910 · 판정판 26+27] 하단 행동 줄도 상단바와 **같은 프레임**이다.
+         위화감 감사 §1-3: 이 줄은 모드를 가리지 않고 10화면 전량에서 은퇴 자산
+         lib-hud-bar.webp 를 쓰고 있었다(정본 판을 입은 클래식·전투에서도).
+         판은 위 판(variant top)을 위아래로 뒤집어 깐다 — 「위 변이 없는 판」을
+         뒤집으면 「아랫변이 없는 판」이 되어 화면 밑에 붙는 형태가 그대로 나온다. -->
+    <footer id="actionbar" data-part="hud" data-variant="actionbar">
+      <i class="dh-plate dh-plate--top" data-part="hud-plate" data-variant="top" data-flip="y" aria-hidden="true"></i>
       <button id="btn-add" class="act" data-i18n-aria="aria.add" aria-label="Add remaining numbers to the board"><span class="act-ico"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-add"/></svg></span><span class="act-t" data-i18n="act.add">Add</span><span id="add-badge" class="act-badge">5</span></button>
       <button id="btn-hint" class="act" data-i18n-aria="aria.hint" aria-label="Show a hint"><span class="act-ico"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-hint"/></svg></span><span class="act-t" data-i18n="act.hint">Hint</span><span id="hint-badge" class="act-badge">3</span></button>
       <button id="btn-undo" class="act" data-i18n-aria="aria.undo" aria-label="Undo last match"><span class="act-ico"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-undo"/></svg></span><span class="act-t" data-i18n="act.undo">Undo</span><span id="undo-badge" class="act-badge">1</span></button>
@@ -44844,7 +44968,12 @@ window.TT_SFX = {
      그만큼 보드가 줄고, 이번 파도는 "보드 공간 확보"를 함께 받았다. W10 ① 이
      상단에서 14px 을 돌려받았으므로 12px 지출은 그 안에서 소화된다(순증 +2px).
      화면 결과: 그림 74.4×94 → 83.9×106 (**+12.8%**). */
-  min-height:0 !important;height:106px !important;
+  /* [hud-unify 0910 · 판정판 26+27] `height:106px !important` **삭제**(죽은 선언).
+     실측: 이 줄은 뒤의 유리띠 절(:47986·:48029)이 `height: var(--medal-h) !important`
+     = `min(120px, --medal-pitch/0.6934)` 로 이미 덮고 있어 화면에 한 픽셀도 못 낸다.
+     「특이도 충돌」이 아니라 **뒤 파도가 갈아치우고 앞 줄을 안 지운 것**이다 —
+     규격 §6-4(죽은 선택자 0)대로 여기서 지운다. 화소 변화 0. */
+  min-height:0 !important;
 }
 #app.battle #actionbar .act::before{
   content:"";position:absolute;inset:0;
@@ -44883,7 +45012,13 @@ html[lang="en"] #app.battle #btn-add.act::before    {background-image:url("catal
 html[lang="en"] #app.battle #btn-hint.act::before   {background-image:url("catalog/medal-special-en@3x.webp");}
 html[lang="en"] #app.battle #btn-undo.act::before   {background-image:url("catalog/medal-pet-en@3x.webp");}
 html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catalog/medal-awaken-en@3x.webp");}
-#app.battle #actionbar .act .act-t,
+/* [hud-unify 0910 · 판정판 26+27] `.act-t` 를 이 목록에서 **뺀다**(죽은 선언).
+   실측: 뒤의 명패 절(:48456)이 **같은 선택자**로 `display:flex !important` 를 다시
+   선언해 이 줄을 이미 이기고 있다. 그 절이 그렇게 한 데는 근거가 있다 —
+   새 메달 자산(medal-*@3x)은 **라벨이 안 구워진 판**이라 글자를 숨기면 이름 없는
+   메달 넷이 남는다(구판 duel-medal-* 는 라벨이 구워져 있어 두 겹이 됐다).
+   그래서 「전투에서 넷이 메달」은 지금 화면에서 이미 성립한다: 메달 그림 + 젤리 명패.
+   여기서는 못 이기는 선언만 지운다 — 화소 변화 0. */
 #app.battle #actionbar .act .act-ico{display:none !important;}
 #app.battle #actionbar .act:active{transform:scale(.94);background:none !important;}
 /* 흐림은 "지금 못 쓴다"의 신호지 소멸이 아니다 — .34 는 메달 위에서 그림이
@@ -48168,8 +48303,12 @@ html[lang="en"] .splash-logo{
   #app.classic #screen-game.active #topbar {
     padding: calc(var(--safe-t) + 6px) calc(var(--safe-r) + 16px) 2px calc(var(--safe-l) + 12px);
   }
+  /* [hud-unify 0910] 아케이드·러시·데일리도 같은 버튼을 쓰게 됐으므로 이 가로
+     예외를 함께 받는다 — 안 그러면 1200px 화면에서 9.63% 가 115px 버튼이 된다
+     (바로 위 W10 ② 주석의 그 함정). */
   #app.battle #screen-game.active #btn-pause,
-  #app.classic #screen-game.active #btn-pause {
+  #app.classic #screen-game.active #btn-pause,
+  #app:not(.classic):not(.battle) #screen-game.active #topbar #btn-pause {
     position: relative;
     left: auto; top: auto;
     width: 40px !important; height: 40px !important;
@@ -52988,46 +53127,20 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
      · .classic  -> 위 §절이 #topbar 를 접는다(중복 선언 금지)
      · .battle   -> :6671 이 #tb-stats 를 내리고 :40024 가 조각 일시정지를 앉힌다
    ########################################################################### */
-#app:not(.classic):not(.battle) #screen-game #topbar{
-  --f2-w: calc(100vw - var(--safe-l) - var(--safe-r) - 16px);
-  position: relative;
-  margin: calc(var(--safe-t) + 6px) calc(var(--safe-r) + 8px) 0 calc(var(--safe-l) + 8px);
-  /* 오른쪽 92px 은 캐릭터 슬롯(+동료 코인) 자리다 — :12100 의 100px 예산을
-     판 안쪽 좌표로 옮긴 값이다(판이 좌우 8px 씩 들어와 있으므로 100-8=92).
-     이 줄이 없으면 '최고' 칸이 슬롯 밑으로 들어간다(실측 0826). */
-  padding: 6px 92px 8px 10px !important;
-  border: 0 !important;
-  border-image: none !important;
-  border-radius: calc(var(--f2-w) * .0626) !important;
-  background-color: rgba(239,230,246,.62) !important;
-  background-image: none !important;
-  box-shadow:
-    0 0 var(--f2-soft-blur) var(--f2-soft-spread) rgba(143,126,156,.66),
-    0 0 var(--f2-soft-tail) 0 rgba(143,126,156,.20),
-    0 calc(var(--f2-w) * .0068) calc(var(--f2-w) * .0190) var(--role-f2-cast),
-    inset 0 0 0 calc(var(--f2-w) * .0041) rgba(255,255,255,.82),
-    inset 0 calc(var(--f2-w) * -.0204) 0 rgba(255,255,255,.62),
-    inset 0 calc(var(--f2-w) * -.0150) 0 rgba(0,0,0,.13),
-    inset 0 calc(var(--f2-w) * -.040) calc(var(--f2-w) * .0952) rgba(74,52,80,.14) !important;
-}
+/* [hud-unify 0910 · 판정판 26] 위 `.stat` 과 **같은 판정**으로 스코프를 모험
+   하나로 좁힌다. 이 규칙은 padding·배경·그림자 일곱 겹을 전부 `!important` 로
+   못 박고 있어서(특이도로는 못 이긴다), 남겨 두면 세 모드의 정본 HUD 판이
+   이 라벤더 킷 판 **뒤에** 깔린다(실측: 판이 272px 로 잘려 보였다 — 컨테이너
+   질의가 이 규칙의 padding 92/10 을 뺀 콘텐츠 상자를 재기 때문이다).
+   모험(#app.adv) 화소는 그대로다. 되돌리기: `#app.adv` -> 옛 선택자. */
+/* [hud-unify 0910 · 판정판 26+27] 은퇴 — 상단바 라벤더 킷 판(padding·면색·그림자 일곱 겹). 정본 HUD 판이 대신한다
+   삭제를 골랏다(주석 봉인 아니라): 규격 §6-4 「옛 판 CSS 은퇴 · 죽은 선택자 0」.
+   되돌리기 = 이 커미트 revert. */
 /* 일시정지 — 클래식과 같은 원형 알약(조각 없음. 같은 처방을 두 번 적지 않도록
    선택자만 합류시킨다). */
-#app:not(.classic):not(.battle) #screen-game #topbar .icon-btn{
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  border: 0;
-  background: linear-gradient(180deg,#F9F1F6 0%,#F9F1F6 47%,#E4D9E6 47%,#E4D9E6 100%);
-  color: #5B4F62;
-  box-shadow:
-    inset 0 0 0 1.4px #A38FA5,
-    inset 0 0 0 2.8px rgba(255,255,255,.60),
-    0 1.6px 0 rgba(154,139,154,.52),
-    0 3px 8px rgba(120,95,125,.22);
-}
-#app:not(.classic):not(.battle) #screen-game #topbar .icon-btn:active{
-  transform: translateY(1.5px);
-}
+/* [hud-unify 0910 · 판정판 26+27] 은퇴 — 흰 원형 정지 버튼 스킨. 정본 duel-btn-pause 자산이 대신한다
+   삭제를 골랏다(주석 봉인 아니라): 규격 §6-4 「옛 판 CSS 은퇴 · 죽은 선택자 0」.
+   되돌리기 = 이 커미트 revert. */
 /* 출시 점검 0909 ⑨ — 터치 타깃 최소 44px.
    실측: 무한·타임러시·데일리 세 모드 모두 `#btn-pause` 가 **34.0 × 34.0** 이다
    (probe.json touch_endless/rush/daily). 접근성 최소선(44px)에 10px 모자란다.
@@ -53041,8 +53154,17 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
      · `#topbar` 안의 아이콘 버튼은 `#btn-pause` **하나뿐**이라(마크업 :13262)
        넓힌 원이 다른 버튼의 타깃을 먹을 일이 없다. 옆의 `#tb-stats` 칸들은
        누를 수 있는 물건이 아니다. */
-#app:not(.classic):not(.battle) #screen-game #topbar .icon-btn{ position: relative; }
-#app:not(.classic):not(.battle) #screen-game #topbar .icon-btn::after{
+/* [hud-unify 0910 · 판정판 26+27] 스코프를 **여섯 모드 전부**로 넓힌다.
+   0909 에 이 규칙을 세울 때 실측 대상이 「무한·타임러시·데일리 셋」뿐이었던 것은
+   그때 클래식·전투의 정지 버튼이 다른 부품이었기 때문이다. 이 파도가 여섯 화면을
+   **한 부품**으로 묶으면서 보이는 크기도 36.78px 로 같아졌으므로, 44px 히트도
+   같이 따라와야 한다(smoke 실측: 스코프를 안 넓히면 클래식·전투만 히트 상자가
+   `auto` 로 남는다). ::after 는 background·border·box-shadow 를 하나도 안 그리므로
+   화소 변화는 0 이다(7컷 maxD 0 으로 증명). `position: relative` 한 줄은 그대로
+   두되, 정본 정지 규칙(:58137 계열)의 `position:absolute` 가 특이도로 이긴다 —
+   absolute 도 ::after 의 컨테이닝 블록을 똑같이 세우므로 히트 상자는 성립한다. */
+#screen-game #topbar .icon-btn{ position: relative; }
+#screen-game #topbar .icon-btn::after{
   content: "";
   position: absolute;
   left: 50%; top: 50%;
@@ -53051,13 +53173,16 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
   border-radius: 50%;
 }
 /* 칸 = 킷 홈. 22px 행 안에서 홈으로 읽히도록 상단 인셋 + 아랫변 흰 선 두 줄만. */
-#app:not(.classic):not(.battle) #screen-game .stat{
-  background: rgba(207,192,220,.55) !important;
-  box-shadow:
-    inset 0 1.4px 2px rgba(0,0,0,.13),
-    inset 0 -.6px 0 rgba(255,255,255,.34),
-    0 .6px 0 rgba(255,255,255,.72);
-}
+/* [hud-unify 0910 · 판정판 26] 스코프를 `:not(.classic):not(.battle)`(= 모험 +
+   아케이드·러시·데일리 넷) 에서 **모험 하나**로 좁힌다. 세 모드의 칸은 이제
+   capsule 부품(젤리 캡슐)이고, 이 회색 알약 처방이 `background: … !important`
+   로 그 부품의 배경 여섯 겹을 통째로 지우고 있었다(important 는 특이도로 못 이긴다).
+   모험(#app.adv)의 화소는 이 한 줄로 **그대로**다 — 선택자가 여전히 그 상태를
+   전부 덮는다(관문 04-hud-adv diff 0 이 그 증거).
+   되돌리기: `#app.adv` -> `#app:not(.classic):not(.battle)`. */
+/* [hud-unify 0910 · 판정판 26+27] 은퇴 — 상단바 회색 알약 칸. 정본 capsule 부품(젬리 캐프슐)이 대신한다
+   삭제를 골랏다(주석 봉인 아니라): 규격 §6-4 「옛 판 CSS 은퇴 · 죽은 선택자 0」.
+   되돌리기 = 이 커미트 revert. */
 #app:not(.classic):not(.battle) #screen-game .stat-k{
   color: rgba(91,79,98,.72) !important;
   text-shadow: 0 1px 0 rgba(255,255,255,.7) !important;
@@ -54284,6 +54409,13 @@ html[lang="en"] .mode-list [data-part="btn-picture"] .bp-badge[data-badge="stage
 #modal-mode .r10-ribbon,
 #modal-classic .r10-ribbon,
 #charpanel #cp-h,
+/* [hud-unify 0910 · 판정판 26] 아케이드·타임러시·데일리 상단바의 칸(.stat) =
+   이 부품의 **인스턴스**. 새 처방을 만들지 않고 이 목록에 한 줄 얹는 것이
+   §0-7("같은 Shape·Stroke = 한 Component")을 코드로 지키는 유일한 방법이다 —
+   토큰(--wcap-*)·실루엣·림·겉선이 전부 이 한 규칙에서 온다.
+   모험(:not(.adv))은 뺀다: 그 화면은 이 파도의 대상이 아니고 화소가 0 이어야 한다.
+   클래식·전투는 #tb-stats 자체가 display:none 이라 이 줄이 닿지 않는다. */
+#app:not(.classic):not(.battle) #screen-game #tb-stats .stat,
 .wf-cap{
   --wcap-h: calc(var(--wcap-w) * .3797);   /* 정본 [data-part=capsule] 세로비 */
 
@@ -54519,6 +54651,7 @@ html[lang="en"] .mode-list [data-part="btn-picture"] .bp-badge[data-badge="stage
   #modal-mode .r10-ribbon,
   #modal-classic .r10-ribbon,
   #charpanel #cp-h,
+  #app:not(.classic):not(.battle) #screen-game #tb-stats .stat,
   .wf-cap{
     box-shadow:
       inset 0 0 0 var(--wcap-rim-tc) color-mix(in srgb, var(--wcap-rim-c)
@@ -54555,6 +54688,7 @@ html[lang="en"] .mode-list [data-part="btn-picture"] .bp-badge[data-badge="stage
   #modal-mode .r10-ribbon::before,
   #modal-classic .r10-ribbon::before,
   #charpanel #cp-h::before,
+  #app:not(.classic):not(.battle) #screen-game #tb-stats .stat::before,
   .wf-cap::before{
     content: "";
     position: absolute; inset: 0;
@@ -54587,6 +54721,7 @@ html[lang="en"] .mode-list [data-part="btn-picture"] .bp-badge[data-badge="stage
     filter: blur(var(--wcap-rim-blur));
   }
   /* [L3] 외곽선 — 밖으로 번진 몫은 .wf-cap 의 클립이 잘라 준다 */
+  #app:not(.classic):not(.battle) #screen-game #tb-stats .stat::after,
   .wf-cap::after{
     content: "";
     position: absolute; inset: 0;
@@ -58556,7 +58691,14 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
       슬롯을 접으면 #topbar 의 오른쪽 예산 100px 도 의미를 잃으므로 12px 로
       되돌린다 — 벗긴 띠 두께(7px×2)와 함께 약 20px 이 보드로 넘어간다.
    ------------------------------------------------------------------------- */
-#app.battle #screen-game {
+/* [hud-unify 0910 · 판정판 26+27] 스코프를  에서 **클래식이 아닌 전부**로
+   넓힌다. 위화감 감사 §1-2b: 「띄만 다른 게 아니라 배경 장면 자체가 다르다 —
+   정본 두 화면은 하늘·성 일러스트 위에 뜨고, 옛 네 화면은 크림 단색 바탕이다.
+   『다른 게임 같다』의 가장 큰 신호는 띄가 아니라 이 배경 층이다.」
+   새 처방을 만들지 않고 **이 한 벌을 여섯 화면이 공유**하게 한다(한 에셋 한 레시피).
+   클래식은 자기 절(:6988)이 --cls-wash 한 겹을 더 얹으므로 여기서 제외한다.
+   되돌리기: 선택자를  으로 되돌린다. */
+#app:not(.classic) #screen-game {
   background-image:
     linear-gradient(180deg,
       rgba(12, 8, 24, .30) 0%,
@@ -58656,8 +58798,16 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
    이 커밋에서 **제거**했다(죽은 선택자로 남기지 않는다). 마크업은 원래부터
    같은 #btn-pause 하나이고 배선(on($('btn-pause'),'click',pause))도 공용이라
    바뀐 것은 이 선택자 목록 한 줄뿐이다. 자산·자리 규칙·눌림까지 모두 공용. */
+/* [hud-unify 0910 · 판정판 26] 아케이드·타임러시·데일리도 **같은 버튼**이다.
+   사용자 지시(격노): "클래식이든 뭐든 이 상단바로 통일하라" — 분홍 캔디 정지
+   버튼은 그 상단바의 세 부품 중 하나다. 새 CSS 를 만들지 않고 이 목록에
+   한 줄 얹는다: 자산(duel-btn-pause.webp) · 자리 규칙(--dh-w 비율) · 눌림이
+   다섯 화면에서 한 벌이 된다. 모험(:not(.adv))만 뺀다(이 파도 대상 밖).
+   ⚠ 세로 전용이 아니다 — 가로(데스크톱)에서는 아래 pc-landscape 예외가
+     battle·classic 과 **같은 줄에서** 이 셋도 흐름 배치 40px 로 되돌린다. */
 #app.battle #btn-pause,
-#app.classic #btn-pause{
+#app.classic #btn-pause,
+#app:not(.classic):not(.battle) #screen-game #topbar #btn-pause{
   background:url("catalog/duel-btn-pause.webp") center/contain no-repeat !important;
   box-shadow:none !important;border-radius:0 !important;
   position:absolute;
@@ -58669,9 +58819,11 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
   z-index:6;
 }
 #app.battle #btn-pause .ic,
-#app.classic #btn-pause .ic{display:none !important;}   /* 그림이 ‖ 를 이미 갖고 있다 */
+#app.classic #btn-pause .ic,
+#app:not(.classic):not(.battle) #screen-game #topbar #btn-pause .ic{display:none !important;}   /* 그림이 ‖ 를 이미 갖고 있다 */
 #app.battle #btn-pause:active,
-#app.classic #btn-pause:active{transform:scale(.92);}
+#app.classic #btn-pause:active,
+#app:not(.classic):not(.battle) #screen-game #topbar #btn-pause:active{transform:scale(.92);}
 #app.battle #duel-hud{
   /* 14차 재조립(시안 6호)으로 성 그림은 --duel-castle-img 를 떠나 .dh-castle 의
      직접 배경(duel-castle-hd, 202×188 고해상)이 됐다. 구판 duel-icon-castle.webp
@@ -59781,6 +59933,271 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
   #app.classic #classic-hud .ch-g{ --f2-ph:6.9vw; top:20.5vw; gap:1.0vw; padding:0 1.8vw; }
   #app.classic #classic-hud .ch-g .ch-i{ width:3.8vw; height:3.8vw; }
   #app.classic #classic-hud .ch-t{ --f2-gh:3.6vw; top:28.5vw; }
+}
+</style>
+<style id="hud-unify-0910">
+/* ###########################################################################
+   §상단바 통일 (2026-09-10 · 판정판 26 — 10번(정지 44px)을 흡수)
+
+   사용자 지시(격노 원문): 「클래식이든 뭐든 **이 상단바**로 통일하라고 했다」
+   가리킨 상단바 = 파란 젤리 HUD 판 + 분홍 캔디 정지 버튼 + 젤리 캡슐 칸
+   (클래식·전투가 이미 쓰는 그 판. 대조 이미지 10.png).
+
+   착수 전 실측(390x844 dpr3 · 04-hud-adv 컷):
+     아케이드·타임러시·데일리 = `#topbar` 가 --lib-hud-bar **border-image 베이지
+     리본**을 두르고, 그 안에 `.stat` 회색 알약 다섯 + 밋밋한 ‖ 원형 버튼.
+     클래식·전투 = `[data-part="hud-plate"][data-variant="top"]`(catalog/
+     hud-plate-top.webp) + `duel-btn-pause.webp` + `[data-part="capsule"]`.
+     즉 **같은 자리·같은 뜻의 부품이 두 계보**로 갈라져 있었다.
+
+   ▣ 이 절이 하는 일 = 부품을 새로 만드는 것이 아니라 **인스턴스를 세 개 더
+     세우는 것**이다(규격 §0-7 「같은 Shape·Stroke = 한 Component」).
+       판   : 위 §sian-hud-rebuild 의 `[data-part="hud-plate"][data-variant="top"]`
+              규칙과 **같은 자산·같은 19.30cqw 비율**. 새 그림 0.
+       버튼 : 위 §hud-restore-0904 의 `#btn-pause` 목록에 선택자 한 줄을 얹었다.
+       칸   : `.wf-cap` 부품 목록에 선택자 한 줄을 얹었다(토큰 --wcap-* 그대로).
+     이 파일에 **새 처방은 없다**. 여기 있는 것은 자리(좌표)와 슬롯 배분뿐이다.
+
+   ▣ 슬롯만 모드가 다르다(캡슐 인스턴스 수만 다르다) — syncHud 의 [hidden] 그대로:
+       아케이드  단계 · 점수 · 최고 · 남은 짝            = 4
+       타임러시  점수 · 최고 · 남은 짝                   = 3  (시계는 #rush-timer)
+       데일리    데일리# · 점수 · 최고 · 남은 짝 · 시간  = 5
+     JS 는 한 줄도 안 바꿨다.
+
+   ▣ 왜 아래 판(variant bottom)을 안 부르는가
+     클래식은 판 2장(35.18cqw = 137px)이다. 세 모드에 그대로 물리면 상단바가
+     62 -> 137px 이 되어 보드가 75px 을 잃는다. 이 상단바의 슬롯 다섯은 위 판
+     하나(19.30cqw = 75px)에 다 앉으므로 아래 판은 «부르지 않은 부품»이다.
+     상단바 실측 62 -> 75px(+13px)이 이 파도가 보드에서 가져가는 전부다.
+
+   ▣ 모험(#app.adv)은 **대상이 아니다**
+     판정판 26 의 제목이 「아케이드·타임러시·데일리」다. 그래서 모든 선택자가
+     `:not(.adv)` 를 든다 — 04-hud-adv 컷의 화소가 0 이어야 한다는 관문 조건이
+     곧 이 세 글자다. 모험까지 통일하려면 별건으로 접수해 승인받는다.
+
+   ▣ 되돌리기: 이 <style> 블록 + 위 세 목록에 얹은 선택자 넉 줄 + `#app.adv
+     #screen-game .stat` 한 줄을 되돌리면 착수 전 화면이 그대로 선다.
+   ########################################################################### */
+
+/* ---- 0. 숨은 칸은 숨은 채로 (부품 편입의 부작용 봉쇄) ---------------------
+   `.wf-cap` 목록에 얹은 선택자는 특이도 (3,4,0) 이고 그 규칙이 display:flex 를
+   준다. `.stat[hidden]{display:none}`(0,2,0)·UA `[hidden]`(0,1,0) 은 그것을 못
+   이기므로, 그 한 줄이 없으면 **러시의 단계 칸과 비데일리의 시간 칸이 되살아난다**.
+   클래식이 :46953 에서 같은 이유로 같은 줄을 이미 갖고 있다. 세로·가로 공통이라
+   아래 미디어 밖에 둔다. */
+#app:not(.classic):not(.battle) #screen-game #tb-stats .stat[hidden]{ display:none !important; }
+/* 판은 기본이 «없음» — 모험·클래식·전투에서는 플렉스 자식으로도 존재하지 않는다. */
+#topbar > [data-part="hud-plate"]{ display:none; }
+
+/* ===== 세로(폰·태블릿) — 판 배치 =========================================
+   가로(데스크톱)는 상단바가 1104px 그리드 행이라 19.30cqw 가 213px 이 된다.
+   그 화면은 §pc-landscape 가 이미 자기 배치를 갖고 있으므로 이 절의 «판»은
+   세로에서만 선다(아래 §9 가 가로 몫을 따로 적는다). */
+@media not all and (min-aspect-ratio: 1/1) and (min-width: 900px){
+
+/* ---- 1. 상단바 = 정본 HUD 판이 앉는 상자 -------------------------------- */
+#app:not(.classic):not(.battle) #screen-game #topbar{
+  /* 베이지 리본은 background 가 아니라 **border-image 데이터 URI** 다 — 배경만
+     갈면 안 지워진다(클래식이 :46880 에서 같은 함정에 빠졌던 그 자리). */
+  border-image-source:none;
+  border-image-slice:0;
+  border-image-width:0;
+  border-style:none;
+  border-width:0;
+  background:none;
+  display:block;
+  /* 🚨 padding 은 0 이어야 한다 — `container-type:inline-size` 의 질의 상자는
+     **콘텐츠 상자**다. 옛 킷 판 규칙(:52459)의 `padding:6px 92px 8px 10px`
+     이 남아 있으면 100cqw 가 272px 로 풀려 판이 그 폭에서 잘린다(실측 0910).
+     오른쪽 예산은 사라지지 않는다 — 아래 --tbs-r 이 그 값을 그대로 든다.
+     margin 도 0 이다: 상자를 화면 폭 그대로 두어야 --dh-w 가 전투·클래식과
+     **같은 수**(382 @390)로 풀리고, 정지 버튼이 세 화면에서 같은 자리에 앉는다.
+     판이 좌우 8px 안쪽인 것은 상자가 아니라 **판 자신**이 든다(아래 §2). */
+  padding:0;
+  margin:0;
+  position:relative;
+  overflow:visible;
+  /* 🚨 cqw 이지 % 가 아니다 — 같은 길이를 width 와 top 양쪽에 쓰기 때문이다
+     (§hud-restore-0904 의 --dh-w 주석과 같은 근거). */
+  container-type:inline-size;
+  /* 판 상자 = 클래식 실측 그대로. #classic-hud 를 재면 x0 y0 w390 h150.1 이고
+     그 안의 위 판이 x1 y1 w388 h74.9 다 — 즉 정본 위 판은 **화면 맨 위에 붙는
+     full-bleed 판**이다(:47188 「위 변이 없는 판은 화면 맨 위에 붙어 있어야
+     그렇게 읽힌다」). 그래서 좌우 여백을 두지 않고 안전영역만 비운다.
+     판 높이 = 판 폭 x 19.30%(프레임 bbox 1694x327). */
+  --tb-plate-w: calc(100cqw - var(--safe-l) - var(--safe-r));
+  --tb-plate-h: calc(var(--tb-plate-w) * .1930);
+  --tb-plate-t: var(--safe-t);
+  height: calc(var(--tb-plate-t) + var(--tb-plate-h));
+  --dh-w: calc(100cqw - var(--safe-l) - var(--safe-r) - 8px);
+  /* 캡슐 림·겉선 두께의 자 — HUD 식구(클래식 방울 :47052)와 같은 값. */
+  --f2-ref-w: min(100vw, 480px);
+  /* 칸 격자의 자 하나가 나머지 수를 전부 낳는다.
+     .1550 = 정지 버튼 오른쪽 끝(.03785 + .0963 = .13415)에 8px 숨통. */
+  --tbs-l: calc(var(--safe-l) + 4px + .1550 * var(--dh-w));
+  --tbs-r: calc(var(--safe-r) + 100px);   /* :12429 동료 레인 예산 그대로 */
+  --tbs-gap: 1.30cqw;
+  --tbs-rowgap: 1.00cqw;
+  --tbs-cell: calc((100cqw - var(--tbs-l) - var(--tbs-r) - 2 * var(--tbs-gap)) / 3);
+  --tbs-caph: calc(var(--tbs-cell) * .3797);   /* 정본 capsule 세로비 */
+}
+@media (max-height: 520px){
+  /* :12431 과 같은 판정 — 슬롯이 38px 이면 오른쪽 예산도 94px 이다. */
+  #app:not(.classic):not(.battle) #screen-game #topbar{ --tbs-r: calc(var(--safe-r) + 94px); }
+}
+
+/* ---- 2. 판(Frame) — 클래식·전투와 같은 자산·같은 비율 --------------------
+   bbox x0 y0 w1694 h327 -> L0 T0 W100 H19.30cqw. 캡슐 마스크는 안 건다:
+   이 인스턴스에는 위 판을 뚫고 앉는 이미지 캡슐 슬롯이 없다(구멍만 남는다). */
+#app:not(.classic):not(.battle) #screen-game #topbar > [data-part="hud-plate"][data-variant="top"]{
+  display:block;
+  position:absolute;
+  left:var(--safe-l); top:var(--tb-plate-t);
+  width:var(--tb-plate-w); height:var(--tb-plate-h);
+  z-index:0;
+  pointer-events:none;
+  background-image:var(--hud-plate-top);
+  background-repeat:no-repeat;
+  background-size:100% 100%;
+  filter:drop-shadow(0 1.4cqw 1.0cqw rgba(var(--prim-ink-plum-rgb),.20));
+}
+
+/* ---- 3. 정지 버튼 — 자산·자리는 §hud-restore-0904 목록이 준다 ------------
+   여기서 더하는 것은 판 위로 올리는 z 뿐이다. 44px 히트(:52487 ::after)는
+   그대로 산다 — 그 규칙이 요구하는 컨테이닝 블록을 absolute 가 함께 세운다
+   (판정판 10번이 이 파도에 흡수된 지점). */
+#app:not(.classic):not(.battle) #screen-game #topbar #btn-pause{ z-index:6; }
+
+/* ---- 4. 칸 격자 — 판 안에 세로 중앙 ------------------------------------- */
+#app:not(.classic):not(.battle) #screen-game #tb-stats{
+  position:absolute;
+  left:var(--tbs-l);
+  right:var(--tbs-r);
+  top:calc(var(--tb-plate-t) + (var(--tb-plate-h) - 2 * var(--tbs-caph) - var(--tbs-rowgap)) / 2);
+  z-index:2;
+  display:grid;
+  grid-template-columns:repeat(3, var(--tbs-cell));
+  grid-template-rows:var(--tbs-caph) var(--tbs-caph);
+  column-gap:var(--tbs-gap);
+  row-gap:var(--tbs-rowgap);
+  align-content:start;
+}
+
+/* ---- 5. 칸 = capsule 부품 인스턴스. 색 계열은 판과 같은 Mode B ------------
+   값은 클래식 캡슐(#ch-cap :54116 계열)과 **한 글자도 다르지 않다** —
+   면 --mode-b-face(#96A7F6) · 림 --mode-b-rim(#C2D6FF) · 겉선 --mode-b-outline(#6F6BB4).
+   기본 .wf-cap 은 모달 계열(Mode A 라벤더핑크)이라 판 위에서 계보가 갈린다. */
+#app:not(.classic):not(.battle) #screen-game #tb-stats .stat{
+  --wcap-w: var(--tbs-cell);
+  --wcap-h: var(--tbs-caph);
+  --wcap-face: var(--mode-b-face);
+  --wcap-face-top: var(--role-wcap-face-top-classic-cap);
+  --wcap-a-in: .657;
+  --wcap-L3-line: var(--mode-b-outline);
+  --wcap-rim-c: var(--mode-b-rim);
+  --wcap-glow-c: var(--mode-b-glow-bubble);
+  width: var(--wcap-w);
+  height: var(--wcap-h);
+  align-items: center;             /* 알약 속 세로 중앙(옛 baseline 은 22px 행의 것) */
+  justify-content: space-between;
+  gap: .70cqw;
+  padding: 0 1.00cqw;
+  border-radius: calc(var(--wcap-h) * .5);
+  overflow: visible;               /* 림 blur 가 잘리지 않게 — 글자는 .stat-v 가 자른다 */
+}
+/* 글자 — 칸이 판을 따라 커지고 작아지므로 크기도 같은 자(cqw)로 잰다.
+   최악 케이스 실측 근거: 칸 72.2px · 안폭 ≈ 59px, 「점수 + 5자리」 = 55px. */
+#app:not(.classic):not(.battle) #screen-game #tb-stats .stat-k{ font-size: 2.05cqw; }
+#app:not(.classic):not(.battle) #screen-game #tb-stats .stat-v{ font-size: 2.80cqw; }
+/* 남은 짝 3개 이하 — 옛 처방은 붉은 우물 + 1px 링(background/box-shadow)이었는데
+   그 두 자리는 이제 부품이 쓴다. 같은 «위험» 신호를 부품의 겉선·림으로 옮긴다
+   (숫자 색과 두근거림 :1123 은 그대로 산다). */
+#app:not(.classic):not(.battle) #screen-game #tb-stats #stat-moves.low{
+  --wcap-L3-line: var(--t9);
+  --wcap-rim-c: var(--t9);
+}
+
+/* ---- 6. 펫·캐릭터 방울 — 클래식과 같은 자리 ------------------------------ */
+#app:not(.classic):not(.battle) #screen-game #hero-slot{
+  top: calc(var(--safe-t) + 12px);
+  right: calc(var(--safe-r) + 16px);
+}
+
+/* ---- 7. 폴백(§5 S5) — 컨테이너 단위를 모르는 기기 ------------------------
+   값은 위 규칙의 숫자 그대로이고 단위만 앱 폭 1% 환산이다(compat-p1 과 같은 문법). */
+@supports not (width: 1cqw){
+  #app:not(.classic):not(.battle) #screen-game #topbar{
+    --cqw: min(1vw, calc(var(--app-max) / 100));
+    --tb-plate-w: calc(100 * var(--cqw) - var(--safe-l) - var(--safe-r));
+    --dh-w: calc(100 * var(--cqw) - var(--safe-l) - var(--safe-r) - 8px);
+    --tbs-gap: calc(1.30 * var(--cqw));
+    --tbs-rowgap: calc(1.00 * var(--cqw));
+    --tbs-cell: calc((100 * var(--cqw) - var(--tbs-l) - var(--tbs-r) - 2 * var(--tbs-gap)) / 3);
+  }
+  #app:not(.classic):not(.battle) #screen-game #topbar > [data-part="hud-plate"][data-variant="top"]{
+    filter: drop-shadow(0 calc(1.4 * var(--cqw)) calc(1.0 * var(--cqw)) rgba(var(--prim-ink-plum-rgb),.20));
+  }
+  #app:not(.classic):not(.battle) #screen-game #tb-stats .stat{
+    gap: calc(.70 * var(--cqw));
+    padding: 0 calc(1.00 * var(--cqw));
+  }
+  #app:not(.classic):not(.battle) #screen-game #tb-stats .stat-k{ font-size: calc(2.05 * var(--cqw)); }
+  #app:not(.classic):not(.battle) #screen-game #tb-stats .stat-v{ font-size: calc(2.80 * var(--cqw)); }
+}
+
+}   /* @media 세로 끝 */
+
+/* ---- 9. 가로(데스크톱) ---------------------------------------------------
+   상단바가 1104px 그리드 행이라 판을 cqw 로 앉히면 213px 이 된다(§pc-landscape
+   의 W10 ② 가 정지 버튼에서 이미 밝힌 그 함정). 그래서 가로에서는
+     · 판  = 흐름 상자에 깔리는 **띠 한 겹**(같은 자산, 상자에 맞춰 늘어난다)
+     · 버튼 = 위 pc-landscape 예외가 battle·classic 과 같은 줄에서 40px 로 되돌린다
+     · 칸  = 같은 capsule 부품, 다만 22px 행 높이에 맞춘 알약 비율
+   세 모드가 세로와 **같은 부품·같은 색**을 쓰되 자리만 그 화면의 것이다. */
+@media (min-aspect-ratio: 1/1) and (min-width: 900px){
+  #app:not(.classic):not(.battle) #screen-game.active #topbar{
+    border-image-source: none;
+    border-style: none;
+    border-width: 0;
+    background: none;
+    position: relative;
+  }
+  /* 판은 **같은 노드·같은 자산**이다 — 세로에서는 시안 비율(19.30cqw)로 서고,
+     가로에서는 상단바 상자에 맞춰 늘어난다. 서리유리 판이라 세로로 펴져도
+     형상이 안 바뀐다(:47010 glass-band-v2 절이 같은 판정을 이미 적었다).
+     노드를 지우지 않는 것이 요점이다: 레이아웃 관문이 네 뷰포트에서 같은
+     상자를 재고, 「가로에선 판이 없다」는 구멍이 안 생긴다. */
+  #app:not(.classic):not(.battle) #screen-game.active #topbar > [data-part="hud-plate"][data-variant="top"]{
+    display: block;
+    position: absolute;
+    inset: 0;
+    left: 0; top: 0; width: auto; height: auto;
+    z-index: 0;
+    pointer-events: none;
+    background-image: var(--hud-plate-top);
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    filter: none;
+  }
+  /* 절대배치 판이 정적 형제 위에 칠해지지 않도록 알맹이를 한 층 올린다. */
+  #app:not(.classic):not(.battle) #screen-game.active #topbar > #tb-stats{ position: relative; z-index: 2; }
+  #app:not(.classic):not(.battle) #screen-game #tb-stats .stat{
+    --wcap-w: 200px;                 /* 모양비 계산에만 쓰인다 — 폭은 격자가 정한다 */
+    --wcap-h: 22px;
+    --wcap-face: var(--mode-b-face);
+    --wcap-face-top: var(--role-wcap-face-top-classic-cap);
+    --wcap-a-in: .657;
+    --wcap-L3-line: var(--mode-b-outline);
+    --wcap-rim-c: var(--mode-b-rim);
+    --wcap-glow-c: var(--mode-b-glow-bubble);
+    width: auto;
+    height: 22px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 8px;
+    border-radius: 11px;
+    overflow: visible;
+  }
 }
 </style>
 <style id="compat-p1">
