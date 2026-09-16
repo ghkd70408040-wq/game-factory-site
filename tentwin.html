@@ -14437,26 +14437,28 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
         <div id="kd-fx" aria-hidden="true"></div>
       </div>
     </div>
-    <!-- 상단 띠 — 지도와 같은 부품(.hudbar + .hchip + .jbox--strip).
-         ⚠ 칩이 **하나**인 이유는 자산 부채다: 별(`lib-star-gold.webp`)과
-         톱니(`lib-glyph-gear.webp`)는 알파 경계가 캔버스 변에 닿아 있어
-         canon 이 CLIPPED 로 잡는다(선행 부채 — 지도 상단 띠에서도 같다).
-         새 화면이 그 조각을 데려오면 이 파도가 남의 부채를 «신규»로 짊어진다.
-         하트(`lib-glyph-heart.webp`)만 통과하므로 그것만 세우고, 젤리별 칩은
-         조각이 재제작되는 파도에서 되살린다(설정은 아래 안전망 줄에 이미 있다). -->
-    <header id="kd-top" class="hudbar jbox jbox--strip">
-      <span class="hchip" id="kd-hearts"><span class="hc-ico hc-heart" aria-hidden="true"></span><b id="kd-hearts-v">5</b></span>
+    <!-- 상단 바 — 지도 상단 바(#map-top)의 **같은 부품 인스턴스**다(판정판 60,
+         사용자 2026-09-16). 조각·좌표·값은 시안 절(#screen-map #map-top…)의 것을
+         그대로 쓰고 ID만 kd-top-* 다 — 새 CSS 값 0. 뒤로 버튼은 홈이라 제외(그
+         자리는 비운다): [하트 캡슐+타이머 · 코인 캡슐 · 설정 둥근 버튼]. -->
+    <header id="kd-top" class="hudbar">
+      <span class="hchip" id="kd-top-hearts"><span class="hc-ico hc-heart" aria-hidden="true"></span><b id="kd-top-hearts-v">5</b><i id="kd-top-heart-t"></i></span>
+      <span class="hchip" id="kd-top-stars"><span class="hc-ico hc-star" aria-hidden="true"></span><b id="kd-top-stars-v">0</b></span>
+      <button id="kd-top-gear" class="hchip hchip-btn" type="button" data-i18n-aria="aria.settings" aria-label="Settings"><span class="hc-ico hc-gear" aria-hidden="true"></span></button>
     </header>
     <!-- 방문 보상 줄 (§26.6 「어제의 나」). toast 가 아니라 **이 화면 안의 줄**인
          것이 의도다: toast 는 body 전역이라 다른 화면의 컷에 새어 들어간다. -->
     <p id="kd-visit" hidden></p>
-    <!-- 안전망 — 레거시 메뉴 네 버튼의 축소판. 부품은 지도 하단 띠가 쓰는
-         .mfbtn(9-slice 도서관 조각) 그대로이고 **새 그림 0**이다. -->
+    <!-- 하단 바 — 지도 하단 바(#map-bot)의 **같은 부품 인스턴스**다(판정판 60).
+         마크업·클래스·조각·좌표는 시안 절(#screen-map #map-bot…) 그대로, ID만
+         kd-bot-* (새 CSS 값 0): [젤리별 카운트 캡슐(store.jstar) · 큰 캡슐
+         「모험」+부제 「챕터 n: 이름」→맵 열기 · 캐릭터 그림 버튼→캐릭창 ·
+         기록 그림 버튼→기록]. 옛 4버튼(시작하기·클래식·캐릭터·설정)은 삭제. -->
     <footer id="kd-bot" class="hudbar jbox jbox--strip">
-      <button id="kd-legacy-play" class="mfbtn mfbtn-l" type="button" data-i18n-aria="aria.play" aria-label="Play"><span data-i18n="menu.play">Play</span></button>
-      <button id="kd-legacy-classic" class="mfbtn mfbtn-r" type="button" data-i18n-aria="aria.cont" aria-label="Continue"><span data-i18n="menu.continue">Classic</span></button>
-      <button id="kd-legacy-char" class="mfbtn mfbtn-l" type="button" data-i18n-aria="aria.charopen" aria-label="Choose your character"><span data-i18n="pick.title">Character</span></button>
-      <button id="kd-legacy-set" class="mfbtn mfbtn-r" type="button" data-i18n-aria="aria.settings" aria-label="Settings"><span data-i18n="menu.settings">Settings</span></button>
+      <span class="hchip" id="kd-bot-b1"><span class="hc-ico hc-star" aria-hidden="true"></span><b id="kd-bot-b1-v">0</b></span>
+      <button id="kd-bot-plate" type="button" data-i18n-aria="menu.adv" aria-label="Adventure"><span class="mp-txt"><b id="kd-bot-ch-k" data-i18n="menu.adv">Adventure</b><i id="kd-bot-ch-n">Chapter 1</i></span></button>
+      <button id="kd-bot-char" class="mfbtn mfbtn-l" type="button" data-i18n-aria="aria.charopen" aria-label="Choose your character"><span data-i18n="pick.title">Character</span></button>
+      <button id="kd-bot-rec" class="mfbtn mfbtn-r" type="button" data-i18n-aria="aria.rank" aria-label="Records"><span data-i18n="settings.rank">Records</span></button>
     </footer>
   </section>
 
@@ -45855,35 +45857,35 @@ window.TT_SFX = {
        그 판정(invitable :31577)을 그대로 써서 처음 하나를 부른다. 새 판정은 안
        만든다: 카드 탭·cpConfirm(:32189·:32241·:32265)과 같은 문이어야 두 입구가
        잠금을 다르게 다루지 않는다. 초대할 상대가 없으면 종전 토스트로 떨어진다. */
-    { id: 'gazebo',     l: 35, t: 33, w: 14, h: 12, chap: 5, key: 'kd.gazebo',
+    { id: 'gazebo',     l: 16, t: 24, w: 14, h: 13, chap: 5, key: 'kd.gazebo',
       go: function () {
         var ids = INVITE_ORDER, i;
         for (i = 0; i < ids.length; i++) { if (openInvite(ids[i])) return; }
         kdSoon();
       } },
-    { id: 'hall',       l: 80, t: 47, w: 21, h: 17, chap: 4, key: 'kd.hall', art: 'url("catalog/t3-bldg-hall.webp")',
+    { id: 'hall',       l: 83, t: 52, w: 21, h: 17, chap: 4, key: 'kd.hall', art: 'url("catalog/t3-bldg-hall.webp")',
       go: function () { openRank('endless'); } },
     /* 판정판 49(mode-dedupe)가 openArcadeHub()/#modal-arcade 를 **은퇴**시켰다
        (:35717). 아케이드 세 줄은 이제 플레이 시트 안에 산다 — 49 가 쓰는
        관용구를 그대로 부른다(:46499 openModeSheet → openModal('modal-mode')). */
-    { id: 'arena',      l: 20, t: 47, w: 23, h: 17, chap: 2, key: 'kd.arena', art: 'url("catalog/t3-bldg-arena.webp")',
+    { id: 'arena',      l: 17, t: 52, w: 22, h: 17, chap: 2, key: 'kd.arena', art: 'url("catalog/t3-bldg-arena.webp")',
       go: function () { openModeSheet(); } },
     /* 가운뎃줄 (y 40~64) */
-    { id: 'castle',     l: 50, t: 20, w: 34, h: 25, chap: 1, key: 'kd.castle', art: 'url("catalog/t3-bldg-castle.webp")',
+    { id: 'castle',     l: 50, t: 25, w: 26, h: 22, chap: 1, key: 'kd.castle', art: 'url("catalog/t3-bldg-castle.webp")',
       go: function () { openCharPanel(); } },
-    { id: 'gate',       l: 50, t: 41, w: 18, h: 13, chap: 1, key: 'kd.gate', art: 'url("catalog/t3-bldg-gate.webp")',
+    { id: 'gate',       l: 50, t: 52, w: 18, h: 15, chap: 1, key: 'kd.gate', art: 'url("catalog/t3-bldg-gate.webp")',
       go: function () { openAdventure(); } },
     { id: 'shop',       l: 19, t: 63, w: 23, h: 18, chap: 1, key: 'kd.shop', app: true, art: 'url("catalog/t3-bldg-shop.webp")',
       go: function () { openShop(); } },
     /* 앞줄 (y 65~83) */
-    { id: 'playground', l: 80, t: 76, w: 24, h: 16, chap: 1, key: 'kd.playground', art: 'url("catalog/t3-bldg-playground.webp")',
+    { id: 'playground', l: 83, t: 76, w: 22, h: 16, chap: 1, key: 'kd.playground', art: 'url("catalog/t3-bldg-playground.webp")',
       go: function () { openClassicHub(); } },
     /* 판정판 50(missions)이 세운 퀀스트·출석 판을 그대로 연다(:39706 openQuest).
        인자는 설정 줄의 진입과 같은 'daily' 다(:49135) — 우편함을 누른 사람이
        보는 첫 탭이 설정에서 들어간 사람과 다르면 그것이 두 번째 체계가 된다. */
-    { id: 'mailbox',    l: 81, t: 63, w: 22, h: 17, chap: 3, key: 'kd.mailbox', art: 'url("catalog/t3-bldg-mail.webp")',
+    { id: 'mailbox',    l: 50, t: 76, w: 22, h: 16, chap: 3, key: 'kd.mailbox', art: 'url("catalog/t3-bldg-mail.webp")',
       go: function () { openQuest('daily'); } },
-    { id: 'pethouse',   l: 20, t: 76, w: 22, h: 16, chap: 1, key: 'kd.pethouse', art: 'url("catalog/t3-bldg-pethouse.webp")',
+    { id: 'pethouse',   l: 17, t: 76, w: 22, h: 16, chap: 1, key: 'kd.pethouse', art: 'url("catalog/t3-bldg-pethouse.webp")',
       go: function () { openCharPanel(); cpTab('pet'); } }
   ];
 
@@ -46045,10 +46047,18 @@ window.TT_SFX = {
     kdSync();
   }
 
-  /** 상단 띠. 값은 기존 칸에서 읽는다(새 저장 0). 젤리별 칩은 자산 부채로
-   *  이번 파도에 안 세운다 — 마크업 주석의 근거 참조. */
+  /** 상·하단 바. 값은 기존 칸에서 읽는다(새 저장 0). 부품은 지도 두 바와 같은
+   *  인스턴스라 값 갱신도 지도가 쓰는 같은 함수를 쓴다(판정판 60). */
   function kdSync() {
-    setText('kd-hearts-v', store.hearts | 0);
+    /* 상단 바 — 하트+회복 타이머(지도 paintHearts 와 같은 식) · 코인 칩. */
+    setText('kd-top-hearts-v', store.hearts | 0);
+    var ht = $('kd-top-heart-t');
+    if (ht) { var ms = heartNextMs(); ht.textContent = ms > 0 ? fmtHeartWait(ms) : t('adv.heartfull'); }
+    setText('kd-top-stars-v', advStarTotal());
+    /* 하단 바 — 젤리별 카운트 · 큰 캡슐 부제 「챕터 n: 이름」(주 라벨 「모험」은
+       #kd-bot-ch-k 의 data-i18n=menu.adv 가 채운다). */
+    setText('kd-bot-b1-v', store.jstar | 0);
+    setText('kd-bot-ch-n', t('map.plate' + chapMax()));
   }
 
   /* --- 방문 보상 (§26.6 「어제의 나」) ---------------------------------------
@@ -48644,13 +48654,13 @@ window.TT_SFX = {
       if (!r || kdAteTap()) return;
       kdResTap(r);
     });
-    /* 안전망 줄 — 부르는 함수가 메뉴 화면의 그것과 **같다**(§26.4 공존기).
-       레거시 메뉴를 제거할 때(W2 사용자 판정) 이 네 줄과 아래 <footer> 가
-       함께 사라진다. */
-    on($('kd-legacy-play'), 'click', openModeSheet);
-    on($('kd-legacy-classic'), 'click', openClassicHub);
-    on($('kd-legacy-char'), 'click', openCharPanel);
-    on($('kd-legacy-set'), 'click', openSettings);
+    /* 하단 바(판정판 60) — 지도 하단 바와 같은 진입점 함수를 부른다: 큰 캡슐은
+       지도(모험)를 열고, 캐릭터·기록 그림 버튼은 캐릭창·기록으로 간다. 상단 바
+       설정 둥근 버튼은 설정을 연다(지도 map-gear 와 같은 함수). 옛 4버튼은 삭제. */
+    on($('kd-bot-plate'), 'click', function () { J.sfx.ui(); openMap(); });
+    on($('kd-bot-char'), 'click', openCharPanel);
+    on($('kd-bot-rec'), 'click', function () { J.sfx.ui(); openRank('endless'); });
+    on($('kd-top-gear'), 'click', openSettings);
     /* 좌우 팬 — 포인터 이벤트 하나로 마우스·터치를 함께 받는다. 세로 제스처는
        CSS `touch-action: pan-y` 가 브라우저에 그대로 돌려준다(§26.2).
        ⚠ `setPointerCapture` 를 **쓰지 않는다**(실측). 포인터를 붙잡으면 그
@@ -66748,6 +66758,9 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
   min-height: 100dvh;
   padding: 0;
   overflow: hidden;
+  /* 판정판 60 — 상·하단 바가 지도(#screen-map)와 같은 cqw 좌표를 쓰므로 이
+     화면도 지도와 같은 컨테이너가 된다(같은 값·같은 식, 새 값 0). */
+  container-type: inline-size;
 }
 #kd-view{
   position: absolute;
@@ -66994,14 +67007,51 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
   100%{ opacity: 0; transform: translateY(-120%) scale(1); }
 }
 
-/* ---- 띠 · 방문 줄 --------------------------------------------------------- */
+/* ---- 상·하단 바 = 지도 두 바(#map-top·#map-bot) 부품 인스턴스 (판정판 60) ----
+   #screen-map 절은 한 글자도 안 건드린다 — 같은 값을 여기 kd-* 로 복제해 지도
+   컷의 화소가 안 움직이게 한다(새 CSS 값 0). 조각·좌표·색은 모두 시안 절
+   (#screen-map #map-top… · #map-bot…)에서 그대로 옮겼다. 방문 줄은 아래에. */
 #kd-top{ top: 0; gap: 8px; padding-top: var(--safe-t); }
-#kd-bot{ bottom: 0; gap: 6px; padding-bottom: var(--safe-b); justify-content: center; }
-/* 지도 하단 띠는 자식을 절대좌표(%)로 앉히지만 이 띠는 흐름 배치다. .mfbtn 의
-   :active 가 그 절대좌표를 전제로 translateY(-50%) 를 들고 있으므로 여기서만
-   자기 자리로 되돌린다 — 지도 쪽 규칙은 한 글자도 안 건드린다. */
-#kd-bot .mfbtn{ position: relative; flex: 1 1 0; min-width: 0; transform: none; }
-#kd-bot .mfbtn:active{ transform: translateY(2px); }
+#kd-bot{ bottom: 0; padding-bottom: var(--safe-b); }
+
+/* 상단 바 — display:block + 조각(뒤로 자리 비움) */
+#screen-kingdom #kd-top{ top: var(--safe-t); height: 20cqw; display: block; padding: 0; gap: 0; border: 0; border-image: none; background-color: transparent; background-image: none; pointer-events: none; }
+#screen-kingdom #kd-top > *{ position: absolute; padding: 0; min-width: 0; min-height: 0; border: 0; border-radius: 0; background-color: transparent; background-size: 100% 100%; background-position: center; background-repeat: no-repeat; box-shadow: none; color: #FFFFFF; font-family: var(--font-display); line-height: 1; pointer-events: auto; }
+#screen-kingdom #kd-top-hearts{ left: 21.91cqw; top: 5.51cqw; width: 33.32cqw; height: 12.60cqw; background-image: url("catalog/stage-pill_life.webp"); }
+#screen-kingdom #kd-top-stars { left: 56.31cqw; top: 5.87cqw; width: 21.75cqw; height: 11.71cqw; background-image: url("catalog/stage-pill_coin.webp?v=9"); }
+#screen-kingdom #kd-top-gear  { left: 81.40cqw; top: 3.85cqw; width: 14.92cqw; height: 15.43cqw; background-image: url("catalog/stage-btn_settings.webp?v=9"); }
+#screen-kingdom #kd-top .hc-ico{ display: none; }
+#screen-kingdom #kd-top b, #screen-kingdom #kd-top i{ position: absolute; transform: translate(-50%, -50%); font-style: normal; font-weight: 700; white-space: nowrap; opacity: 1; }
+#screen-kingdom #kd-top-hearts-v{ left: 40.7%; top: 43.3%; font-size: 5.40cqw; text-shadow: 0 .3cqw 0 rgba(176, 82, 112, .7); }
+#screen-kingdom #kd-top-heart-t { left: 70.0%; top: 42.8%; font-size: 4.40cqw; text-shadow: 0 .3cqw 0 rgba(150, 66, 92, .8); }
+#screen-kingdom #kd-top-stars-v { left: 65.7%; top: 43.6%; font-size: 5.00cqw; text-shadow: 0 .3cqw 0 rgba(196, 140, 40, .85); }
+
+/* 하단 바 — 공통 젤리박스 띠 + 조각 넷 */
+#screen-kingdom #kd-bot{ --jbox-tint: var(--role-jbox-tint-map-bot); --jbox-blur: var(--jbox-frost) brightness(1.06); height: calc(25.61cqw + var(--safe-b)); padding: 0 0 var(--safe-b); pointer-events: none; }
+#screen-kingdom #kd-bot button{ pointer-events: auto; }
+#screen-kingdom #kd-bot > *{ position: absolute; top: 14.0cqw; right: auto; transform: translateY(-50%); margin: 0; padding: 0; min-width: 0; min-height: 0; border: 0; border-radius: 0; background-color: transparent; background-size: 100% 100%; background-position: center; background-repeat: no-repeat; box-shadow: none; color: #FFFFFF; font-family: var(--font-display); line-height: 1; }
+#screen-kingdom #kd-bot-b1   { left: 2.14%;  width: 30.39%; height: 12.47cqw; background-image: url("catalog/stage-pill_star.webp?v=9"); }
+#screen-kingdom #kd-bot-plate{ left: 34.22%; width: 31.66%; height: 18.97cqw; background-image: url("catalog/stage-pill_chapter.webp"); }
+#screen-kingdom #kd-bot-char { left: 66.84%; width: 15.43%; height: 18.62cqw; background-image: url("catalog/stage-btn_chars.webp"); }
+#screen-kingdom #kd-bot-rec  { left: 82.91%; width: 15.15%; height: 18.78cqw; background-image: url("catalog/stage-btn_records.webp?v=9"); }
+#screen-kingdom #kd-bot-b1-v{ position: absolute; left: 57.7%; top: 41.7%; transform: translate(-50%, -50%); font-size: 5.60cqw; font-weight: 700; text-shadow: 0 .3cqw 0 rgba(196, 140, 40, .85); }
+#screen-kingdom #kd-bot-plate .mp-txt{ position: absolute; left: 50%; top: 50%; width: 92%; transform: translate(-50%, -50%); display: block; text-align: center; }
+#screen-kingdom #kd-bot-ch-k, #screen-kingdom #kd-bot-ch-n{ display: block; max-width: none; font-style: normal; font-weight: 700; color: #FFFFFF; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 .3cqw 0 rgba(96, 40, 72, .7); }
+#screen-kingdom #kd-bot-ch-k{ font-size: 4.40cqw; letter-spacing: -.01em; }
+#screen-kingdom #kd-bot-ch-n{ margin-top: .55cqw; font-size: 2.90cqw; letter-spacing: -.02em; }
+
+/* 데스크톱(가로·≥700) — 지도 데스크톱 절(63324~)과 같은 처방: 배율은 폰
+   (--mapui)에 못박고 바만 칸 폭을 쓴다. --mapui 숫자 그대로다(새 값 0). */
+@media (min-aspect-ratio: 1/1) and (min-width: 700px){
+  #screen-kingdom #kd-top{ height: calc(var(--mapui) * 20); }
+  #screen-kingdom #kd-top-hearts{ left: calc(var(--mapui) * 21.91); top: calc(var(--mapui) * 5.51); width: calc(var(--mapui) * 33.32); height: calc(var(--mapui) * 12.60); }
+  #screen-kingdom #kd-top-stars{ left: auto; right: calc(var(--mapui) * 21.94); top: calc(var(--mapui) * 5.87); width: calc(var(--mapui) * 21.75); height: calc(var(--mapui) * 11.71); }
+  #screen-kingdom #kd-top-gear{ left: auto; right: calc(var(--mapui) * 3.68); top: calc(var(--mapui) * 3.85); width: calc(var(--mapui) * 14.92); height: calc(var(--mapui) * 15.43); }
+  #screen-kingdom #kd-top-hearts-v{ font-size: calc(var(--mapui) * 5.40); text-shadow: 0 calc(var(--mapui) * .3) 0 rgba(176, 82, 112, .7); }
+  #screen-kingdom #kd-top-heart-t{ font-size: calc(var(--mapui) * 4.40); text-shadow: 0 calc(var(--mapui) * .3) 0 rgba(150, 66, 92, .8); }
+  #screen-kingdom #kd-top-stars-v{ font-size: calc(var(--mapui) * 5.00); text-shadow: 0 calc(var(--mapui) * .3) 0 rgba(196, 140, 40, .85); }
+  #screen-kingdom #kd-bot{ left: 50%; right: auto; width: calc(var(--mapui) * 100); margin-left: calc(var(--mapui) * -50); height: calc(var(--mapui) * 25.61 + var(--safe-b)); --f2-w: calc(var(--mapui) * 100); container-type: inline-size; }
+}
 
 #kd-visit{
   position: absolute;
@@ -67035,7 +67085,8 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
    버튼 글자만 한 단 키우고 좌표표(%)는 그대로다 — 390 과 1280 이 같은 그림이다. */
 @media (min-width: 900px){
   .kd-lab{ font-size: 12.5px; border-width: 17px 14px; }
-  #kd-bot .mfbtn{ flex: 0 1 168px; font-size: 12px; }
+  /* 하단 바 .mfbtn 은 이제 지도와 같은 절대배치 조각이라 흐름-배치 시절의
+     flex/글자 확대 줄을 걷어낸다(판정판 60) — 배율은 위 aspect 절이 못박는다. */
   #kd-visit{ font-size: 12.5px; }
 }
 </style>
