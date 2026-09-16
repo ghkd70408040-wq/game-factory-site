@@ -14092,7 +14092,7 @@ html[data-platform="twa"] #app-intro.is-hold .api-char{
   --mo-kd-idle: 2600ms;
   --mo-kd-pop: 260ms;
   --mo-kd-heart: 900ms;
-  --kd-pan: 1.34;
+  --kd-pan: 1;   /* 57 W2 — 세로 전용 배경 도착: 화면 꽉 참, 가로 팬 없음(1=팬 없음) */
   /* 하늘 = #map-view 가 쓰는 그 값이다(이미지가 아직 없는 빌드의 바닥색).
      같은 사실을 두 곳에 적지 않으려고 이름을 붙였다 — 왕국 배경이 도착하면
      (W2) 이 한 줄만 그 그림의 하늘로 바뀐다. */
@@ -45855,35 +45855,35 @@ window.TT_SFX = {
        그 판정(invitable :31577)을 그대로 써서 처음 하나를 부른다. 새 판정은 안
        만든다: 카드 탭·cpConfirm(:32189·:32241·:32265)과 같은 문이어야 두 입구가
        잠금을 다르게 다루지 않는다. 초대할 상대가 없으면 종전 토스트로 떨어진다. */
-    { id: 'gazebo',     l: 23.5, t: 28, w: 15, h: 16, chap: 5, key: 'kd.gazebo',
+    { id: 'gazebo',     l: 35, t: 33, w: 14, h: 12, chap: 5, key: 'kd.gazebo',
       go: function () {
         var ids = INVITE_ORDER, i;
         for (i = 0; i < ids.length; i++) { if (openInvite(ids[i])) return; }
         kdSoon();
       } },
-    { id: 'hall',       l: 50,   t: 28, w: 16, h: 18, chap: 4, key: 'kd.hall',
+    { id: 'hall',       l: 80, t: 47, w: 21, h: 17, chap: 4, key: 'kd.hall', art: 'url("catalog/t3-bldg-hall.webp")',
       go: function () { openRank('endless'); } },
     /* 판정판 49(mode-dedupe)가 openArcadeHub()/#modal-arcade 를 **은퇴**시켰다
        (:35717). 아케이드 세 줄은 이제 플레이 시트 안에 산다 — 49 가 쓰는
        관용구를 그대로 부른다(:46499 openModeSheet → openModal('modal-mode')). */
-    { id: 'arena',      l: 76,   t: 28, w: 18, h: 20, chap: 2, key: 'kd.arena',
+    { id: 'arena',      l: 20, t: 47, w: 23, h: 17, chap: 2, key: 'kd.arena', art: 'url("catalog/t3-bldg-arena.webp")',
       go: function () { openModeSheet(); } },
     /* 가운뎃줄 (y 40~64) */
-    { id: 'castle',     l: 30,   t: 52, w: 20, h: 24, chap: 1, key: 'kd.castle',
+    { id: 'castle',     l: 50, t: 20, w: 34, h: 25, chap: 1, key: 'kd.castle', art: 'url("catalog/t3-bldg-castle.webp")',
       go: function () { openCharPanel(); } },
-    { id: 'gate',       l: 60,   t: 52, w: 18, h: 20, chap: 1, key: 'kd.gate',
+    { id: 'gate',       l: 50, t: 41, w: 18, h: 13, chap: 1, key: 'kd.gate', art: 'url("catalog/t3-bldg-gate.webp")',
       go: function () { openAdventure(); } },
-    { id: 'shop',       l: 80,   t: 52, w: 15, h: 18, chap: 1, key: 'kd.shop', app: true,
+    { id: 'shop',       l: 19, t: 63, w: 23, h: 18, chap: 1, key: 'kd.shop', app: true, art: 'url("catalog/t3-bldg-shop.webp")',
       go: function () { openShop(); } },
     /* 앞줄 (y 65~83) */
-    { id: 'playground', l: 22,   t: 74, w: 17, h: 18, chap: 1, key: 'kd.playground',
+    { id: 'playground', l: 80, t: 76, w: 24, h: 16, chap: 1, key: 'kd.playground', art: 'url("catalog/t3-bldg-playground.webp")',
       go: function () { openClassicHub(); } },
     /* 판정판 50(missions)이 세운 퀀스트·출석 판을 그대로 연다(:39706 openQuest).
        인자는 설정 줄의 진입과 같은 'daily' 다(:49135) — 우편함을 누른 사람이
        보는 첫 탭이 설정에서 들어간 사람과 다르면 그것이 두 번째 체계가 된다. */
-    { id: 'mailbox',    l: 46,   t: 74, w: 13, h: 14, chap: 3, key: 'kd.mailbox',
+    { id: 'mailbox',    l: 81, t: 63, w: 22, h: 17, chap: 3, key: 'kd.mailbox', art: 'url("catalog/t3-bldg-mail.webp")',
       go: function () { openQuest('daily'); } },
-    { id: 'pethouse',   l: 70,   t: 74, w: 16, h: 17, chap: 1, key: 'kd.pethouse',
+    { id: 'pethouse',   l: 20, t: 76, w: 22, h: 16, chap: 1, key: 'kd.pethouse', art: 'url("catalog/t3-bldg-pethouse.webp")',
       go: function () { openCharPanel(); cpTab('pet'); } }
   ];
 
@@ -45991,6 +45991,10 @@ window.TT_SFX = {
         el.style.setProperty('--t', b.t);
         el.style.setProperty('--w', b.w);
         el.style.setProperty('--h', b.h);
+        /* 57 W2 — 건물 이미지가 도착했다. 이미지가 있는 칸은 이미지 자체가 탭
+           표적(bbox 전체)이 되고 이름표는 그 아래 작은 라벨로 내려간다(kd-has-art).
+           초대 정자(gazebo)는 아직 그림이 없어 종전 명판을 그대로 쓴다. */
+        if (b.art) { el.style.setProperty('--kd-art', b.art); el.classList.add('kd-has-art'); }
         if (b.app) el.setAttribute('data-app-only', '');
         var open = kdUnlocked(b);
         if (!open) el.classList.add('is-lock');
@@ -66764,7 +66768,10 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
   height: 100%;
   transform: translate3d(var(--kx, 0px), 0, 0);
   will-change: transform;
-  background-image: var(--art-map-bg);
+  /* 57 W2 — 왕국 전용 배경(§26.9 발주 #1). 세로 780x1688 파노라마라 cover-fit 로
+     화면을 채우고 가로 팬은 없앤다(--kd-pan:1). 성·성문·길은 이 그림에 그려져
+     있고, 좌3·우3 자리는 비워 둔 잔디/발판 — 그 위에 건물 이미지가 앉는다. */
+  background-image: url("catalog/t2-bg-kingdom.webp");
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
@@ -66800,6 +66807,10 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
    그림 겹과 히트 겹을 갈라 그림만 거주자 아래로 내린다 — 그때도 이 규칙
    (탭은 건물이 먼저)은 유지된다. */
 #kd-bldgs{ z-index: 1; }
+/* 57 W2 — 거주자는 건물 «뒤»에 둔다(z 미설정=0). 건물이 이제 불투명 그림이라,
+   거주자를 위층으로 올리면 하단 건물(놀이터·펫하우스) 위를 걷는 순간 그 탭을
+   가로챈다(스모크 2-playground·2-pethouse FAIL로 실측). 뒤에 두면 건물 아래를
+   지날 때 자연스럽게 가려지고 9개 탭이 전부 산다 — 탭 가능이 층 순서보다 우선. */
 #kd-fx{ z-index: 2; }
 
 /* ---- 건물 = 투명 히트박스 (§26.4) ---------------------------------------
@@ -66855,7 +66866,29 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
 .kd-bldg.is-pop{ animation: kd-pop var(--mo-kd-pop) ease-out 1; }
 /* 잠금 = 실루엣 + 자물쇠(§26.4 · §14.3 잠금 변주 문법 그대로). 지도 노드가 이미
    쓰는 --lib-glyph-lock 이고 새 조각 0이다. */
-.kd-bldg.is-lock .kd-lab{ filter: grayscale(1) brightness(.74); }
+/* 57 W2 — 이미지 건물: 그림이 곧 탭 표적(.kd-bldg 는 button, bbox 전체가 누름
+   면). 이름표는 그림 아래 작은 라벨로 내려가고, 명판 9-slice 테는 벗는다. */
+.kd-bldg.kd-has-art{
+  background: var(--kd-art) center bottom / contain no-repeat;
+  align-items: flex-end;
+}
+.kd-bldg.kd-has-art .kd-lab{
+  border: 0;
+  border-image: none;
+  min-height: 0;
+  min-width: 0;
+  padding: 1px 6px;
+  margin-bottom: -3%;
+  font-size: 9.5px;
+  line-height: 1.15;
+  color: #FFF3D6;
+  background: rgba(58, 30, 48, .62);
+  border-radius: 7px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .5);
+}
+/* 잠금 실루엣 — 명판 칸은 라벨에, 이미지 칸은 그림 자체에 건다(§26.4 잠금 변주). */
+.kd-bldg.is-lock:not(.kd-has-art) .kd-lab{ filter: grayscale(1) brightness(.74); }
+.kd-bldg.is-lock.kd-has-art{ filter: grayscale(1) brightness(.62); }
 .kd-bldg.is-lock::after{
   content: '';
   position: absolute;
