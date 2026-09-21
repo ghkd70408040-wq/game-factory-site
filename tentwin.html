@@ -16783,6 +16783,27 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
     </div>
   </div></div>
 
+  <!-- ===== [KD61-0922] 놀이터 선택 창 (판정판 61 · spec 5절) ================
+       왕국의 「놀이터」 건물이 여는 한 겹. 「클래식 / 아케이드」 두 줄뿐이고 두 줄은
+       **이미 있는 시트**(#modal-classic · #modal-mode[data-arcade-only])를 연다.
+       판 = 젤리 모달 판, 제목 = .w6m 의 글자 제목(퀘스트 판과 같은 문법 — 리본
+       그림 제목은 발주가 필요해 쓰지 않는다), 줄 = .mode-row(btn-picture) 의 기존
+       변주 arcade(보라)·timeattack(주황) 인스턴스. 새 그림 0 · 새 값 0. -->
+  <div id="modal-playground" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="pg-h"><div class="sheet jbox jbox--modal" data-part="modal-plate">
+    <h2 id="pg-h" data-i18n="pg.title">Playground</h2>
+    <button id="pg-close" class="r10-x x-btn" type="button" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
+    <div class="mode-list">
+      <button id="pg-classic" class="mode-row" data-part="btn-picture" data-variant="arcade" type="button">
+        <span class="nchip nchip-arc bp-icon" aria-hidden="true"></span>
+        <span class="mode-t bp-text"><b class="btnf-let bp-let" data-i18n="pg.classic">Classic</b><i class="btnf-let bp-let" data-i18n="pg.classic.d">Arcade, Time Rush, Daily.</i></span>
+      </button>
+      <button id="pg-arcade" class="mode-row" data-part="btn-picture" data-variant="timeattack" type="button">
+        <span class="nchip nchip-rush bp-icon" aria-hidden="true"></span>
+        <span class="mode-t bp-text"><b class="btnf-let bp-let" data-i18n="pg.arcade">Arcade</b><i class="btnf-let bp-let" data-i18n="pg.arcade.d">Time Attack, Survival, 90s Damage.</i></span>
+      </button>
+    </div>
+  </div></div>
+
   <!-- v4 4차-a — 모험 스테이지 결과. 성공/실패가 같은 시트를 쓰고 .lost 클래스가
        색과 별 줄의 유무를 가른다: 두 시트를 따로 두면 버튼 위치가 미묘하게
        어긋나 "다시 도전"을 누르려다 "지도로"를 누르는 사고가 난다. -->
@@ -27359,15 +27380,20 @@ window.TT_SFX = {
          잠금 안내는 새 키를 안 만들었다 — 미니맵(§14.10)의 `minimap.locked`
          「N탄을 깨면 열려요」가 **같은 사실**을 이미 말하고 있고, 같은 사실에
          두 번째 문구를 만들면 둘이 갈라진다. */
-      'kd.castle': 'Jelly Castle',
-      'kd.gate': 'Town Gate',
+      'kd.castle': 'Castle',
       'kd.playground': 'Playground',
-      'kd.arena': 'Arena',
       'kd.shop': 'Shop',
-      'kd.mailbox': 'Mailbox',
       'kd.pethouse': 'Pet House',
-      'kd.hall': 'Hall of Records',
-      'kd.gazebo': 'Invite Gazebo',
+      /* [KD61-0922] 메인 화면 v2 — 서커스·미션·우체국 + 놀이터 선택 창 */
+      'kd.circus': 'Circus',
+      'kd.mission': 'Missions',
+      'kd.post': 'Post Office',
+      'pg.title': 'Playground',
+      'pg.classic': 'Classic',
+      'pg.classic.d': 'Arcade, Time Rush, Daily.',
+      'pg.arcade': 'Arcade',
+      'pg.arcade.d': 'Time Attack, Survival, 90s Damage.',
+      'mode.title.arcade': 'Arcade Duel',
       'kd.soon': 'Opening soon!',
       'kd.visit': 'Yesterday-you saved up {n} Jelly Stars.',
       'kd.visit.first': 'Welcome to Jellypang Kingdom!',
@@ -28611,15 +28637,20 @@ window.TT_SFX = {
       'say.star.jelly': '반짝!',
       /* [KD57-0911] 젤리팡 왕국 (DESIGN §26). en 쪽 주석 참조 —
          잠금 문구는 `minimap.locked` 를 그대로 빌린다(새 키 0). */
-      'kd.castle': '젤리 성',
-      'kd.gate': '성문',
+      'kd.castle': '성',
       'kd.playground': '놀이터',
-      'kd.arena': '훈련장',
       'kd.shop': '상점',
-      'kd.mailbox': '우편함',
       'kd.pethouse': '펫 하우스',
-      'kd.hall': '기록관',
-      'kd.gazebo': '초대 정자',
+      /* [KD61-0922] 메인 화면 v2 — 서커스·미션·우체국 + 놀이터 선택 창 */
+      'kd.circus': '서커스',
+      'kd.mission': '미션',
+      'kd.post': '우체국',
+      'pg.title': '놀이터',
+      'pg.classic': '클래식',
+      'pg.classic.d': '아케이드·타임 러시·데일리',
+      'pg.arcade': '아케이드',
+      'pg.arcade.d': '타임어택·서바이벌·90초 누적',
+      'mode.title.arcade': '아케이드 대전',
       'kd.soon': '곧 열려요!',
       'kd.visit': '어제의 내가 젤리별 {n}개를 모아 뒀어요.',
       'kd.visit.first': '젤리팡 왕국에 온 걸 환영해요!',
@@ -29499,6 +29530,8 @@ window.TT_SFX = {
      /* 판정판 50 — 퀘스트 판도 기록판과 같은 이유로 여기 있어야 한다(맵·메뉴로
         나갈 때 판이 남지 않게). */
      'modal-quest',
+     /* [KD61-0922] 놀이터 선택 창 — 왕국 위의 한 겹. 맵·판으로 나갈 때 남지 않게. */
+     'modal-playground',
      // v4 4차-a — 모험의 두 시트도 여기 목록에 있어야 지도/메뉴로 나갈 때 남지 않는다.
      'modal-node', 'modal-adv',
      /* W7.5 — 클래식 허브. #modal-mode 가 이 목록에 없는 것과 대칭이 아닌 데는
@@ -45850,43 +45883,49 @@ window.TT_SFX = {
   /* ⚠ 가로 좌표는 **15~85%** 안이다(실측). 레이어가 화면보다 --kd-pan 배
    *   넓고 처음에는 가운데를 보므로, 그 밖에 앉힌 칸은 «팬을 해야만 닿는 건물»이
    *   된다 — 아홉 중 하나가 첫 화면에서 안 보이면 그것은 허브가 아니다. */
+  /* [KD61-0922] 판정판 61 — 메인 화면 v2(사용자 시안 S13). 건물 6 + 성 탭 자리 2.
+     좌표는 시안 S13(704x1507) 실측 %. 성(나무 위 성·밑동 성문)은 **배경 그림에
+     들어 있어** 자산이 없고 투명 탭 자리 둘이다(hit:true). 잠금은 전부 풀었다
+     (chap:1 — 시안에 잠금 표현이 없다. 별 소비 해금은 W3). 누르면 부르는 것은
+     전부 **이미 있던 함수**이고, 새 화면은 놀이터 선택 창 하나뿐이다.
+       tone  이름표(.kit-pill-v2 인스턴스)의 색 계열 = 기존 --role-<tone>-* 토큰
+       ic    이름표 글리프 = 기존 --lib-glyph-* */
   var KD_BUILDINGS = [
-    /* 뒷줄 (y 18~38) */
-    /* 판정판 54(char-invite)가 세운 초대 창을 그대로 부른다(:31617 openInvite).
-       openInvite 는 **id 당 문**이라 정자에는 부를 상대가 필요하다 — 54 가 쓴
-       그 판정(invitable :31577)을 그대로 써서 처음 하나를 부른다. 새 판정은 안
-       만든다: 카드 탭·cpConfirm(:32189·:32241·:32265)과 같은 문이어야 두 입구가
-       잠금을 다르게 다루지 않는다. 초대할 상대가 없으면 종전 토스트로 떨어진다. */
-    { id: 'gazebo',     l: 16, t: 24, w: 14, h: 13, chap: 5, key: 'kd.gazebo',
+    { id: 'castle-top', l: 50, t: 16.5, w: 20, h: 9,  chap: 1, key: 'kd.castle', hit: true, notag: true,
+      go: function () { openCharPanel(); } },
+    { id: 'castle',     l: 50, t: 32, w: 22, h: 18, chap: 1, key: 'kd.castle', hit: true, tone: 'purple', ic: 'crown',
+      go: function () { openCharPanel(); } },
+    { id: 'circus',     l: 19, t: 41, w: 33, h: 15, chap: 1, key: 'kd.circus', tone: 'mint', ic: 'star-empty',
+      art: 'url("catalog/t3-bldg2-circus.webp")',
+      go: function () { openGallery(); } },
+    { id: 'mission',    l: 85, t: 42, w: 26, h: 14.5, chap: 1, key: 'kd.mission', tone: 'mint', ic: 'target',
+      art: 'url("catalog/t3-bldg2-mission.webp")',
+      go: function () { openQuest('daily'); } },
+    /* 상점 — 앱은 보석 상점(§20), 웹은 스킨 상점(젤리별). 웹에서 건물을 감추지
+       않는다: 시안의 자리 하나가 비는 것보다 웹에도 쓸모 있는 문이 서는 쪽이 맞다.
+       웹에서 openShop() 을 부르지 않으므로 「웹 상점 완전 숨김」(§18.7)은 그대로다. */
+    { id: 'shop',       l: 21, t: 58.4, w: 33, h: 14, chap: 1, key: 'kd.shop', tone: 'orange', ic: 'score',
+      art: 'url("catalog/t3-bldg2-shop.webp")',
+      go: function () {
+        var twa = false;
+        try { twa = !!(window.TW && window.TW.platform === 'twa'); } catch (e) { twa = false; }
+        if (twa) openShop(); else openSkins();
+      } },
+    /* 우체국 = 초대장을 보내는 곳. 판정판 54 의 초대 창을 그대로 부른다 —
+       옛 「초대 정자」가 쓰던 그 판정(처음 초대 가능한 상대) 그대로다. */
+    { id: 'post',       l: 81.7, t: 58.4, w: 33, h: 14.6, chap: 1, key: 'kd.post', tone: 'pink', ic: 'flag',
+      art: 'url("catalog/t3-bldg2-post.webp")',
       go: function () {
         var ids = INVITE_ORDER, i;
         for (i = 0; i < ids.length; i++) { if (openInvite(ids[i])) return; }
         kdSoon();
       } },
-    { id: 'hall',       l: 83, t: 52, w: 21, h: 17, chap: 4, key: 'kd.hall', art: 'url("catalog/t3-bldg-hall.webp")',
-      go: function () { openRank('endless'); } },
-    /* 판정판 49(mode-dedupe)가 openArcadeHub()/#modal-arcade 를 **은퇴**시켰다
-       (:35717). 아케이드 세 줄은 이제 플레이 시트 안에 산다 — 49 가 쓰는
-       관용구를 그대로 부른다(:46499 openModeSheet → openModal('modal-mode')). */
-    { id: 'arena',      l: 17, t: 52, w: 22, h: 17, chap: 2, key: 'kd.arena', art: 'url("catalog/t3-bldg-arena.webp")',
-      go: function () { openModeSheet(); } },
-    /* 가운뎃줄 (y 40~64) */
-    { id: 'castle',     l: 50, t: 25, w: 26, h: 22, chap: 1, key: 'kd.castle', art: 'url("catalog/t3-bldg-castle.webp")',
-      go: function () { openCharPanel(); } },
-    { id: 'gate',       l: 50, t: 52, w: 18, h: 15, chap: 1, key: 'kd.gate', art: 'url("catalog/t3-bldg-gate.webp")',
-      go: function () { openAdventure(); } },
-    { id: 'shop',       l: 19, t: 63, w: 23, h: 18, chap: 1, key: 'kd.shop', app: true, art: 'url("catalog/t3-bldg-shop.webp")',
-      go: function () { openShop(); } },
-    /* 앞줄 (y 65~83) */
-    { id: 'playground', l: 83, t: 76, w: 22, h: 16, chap: 1, key: 'kd.playground', art: 'url("catalog/t3-bldg-playground.webp")',
-      go: function () { openClassicHub(); } },
-    /* 판정판 50(missions)이 세운 퀀스트·출석 판을 그대로 연다(:39706 openQuest).
-       인자는 설정 줄의 진입과 같은 'daily' 다(:49135) — 우편함을 누른 사람이
-       보는 첫 탭이 설정에서 들어간 사람과 다르면 그것이 두 번째 체계가 된다. */
-    { id: 'mailbox',    l: 50, t: 76, w: 22, h: 16, chap: 3, key: 'kd.mailbox', art: 'url("catalog/t3-bldg-mail.webp")',
-      go: function () { openQuest('daily'); } },
-    { id: 'pethouse',   l: 17, t: 76, w: 22, h: 16, chap: 1, key: 'kd.pethouse', art: 'url("catalog/t3-bldg-pethouse.webp")',
-      go: function () { openCharPanel(); cpTab('pet'); } }
+    { id: 'pethouse',   l: 17.4, t: 77.8, w: 29, h: 15, chap: 1, key: 'kd.pethouse', tone: 'orange', ic: 'heart',
+      art: 'url("catalog/t3-bldg2-pethouse.webp")',
+      go: function () { openCharPanel(); cpTab('pet'); } },
+    { id: 'playground', l: 82.7, t: 78.1, w: 33, h: 15, chap: 1, key: 'kd.playground', tone: 'violet', ic: 'inf',
+      art: 'url("catalog/t3-bldg2-playground.webp")',
+      go: function () { openPlayground(); } }
   ];
 
   /* --- 거주자 산책 경로 (§26.3) ---------------------------------------------
@@ -45896,14 +45935,14 @@ window.TT_SFX = {
    * 몫이지 난수가 정할 몫이 아니다.
    *   l/t/w/h  레이어 % · x0/x1 자기 폭 대비 산책 구간 · k 속도 배수(개체차) */
   var KD_WALKS = [
-    { l: 20, t: 74, w: 11, h: 20, x0: '-40%', x1: '150%', k: 1 },
-    { l: 44, t: 70, w: 10, h: 18, x0: '120%', x1: '-60%', k: 1.18 },
-    { l: 66, t: 76, w: 11, h: 19, x0: '-70%', x1: '110%', k: .88 },
-    { l: 32, t: 56, w: 9,  h: 16, x0: '90%',  x1: '-90%', k: 1.32 },
-    { l: 78, t: 60, w: 9,  h: 16, x0: '-80%', x1: '80%',  k: 1.05 },
-    { l: 54, t: 50, w: 8,  h: 14, x0: '110%', x1: '-50%', k: .78 },
-    { l: 18, t: 58, w: 8,  h: 14, x0: '-30%', x1: '130%', k: 1.45 },
-    { l: 82, t: 80, w: 9,  h: 16, x0: '60%',  x1: '-70%', k: .95 }
+    { l: 38, t: 50, w: 9,  h: 9,  x0: '-60%', x1: '160%', k: 1 },
+    { l: 60, t: 50, w: 9,  h: 9,  x0: '120%', x1: '-80%', k: 1.18 },
+    { l: 40, t: 67, w: 10, h: 10, x0: '-70%', x1: '110%', k: .88 },
+    { l: 58, t: 67, w: 10, h: 10, x0: '90%',  x1: '-90%', k: 1.32 },
+    { l: 50, t: 58, w: 9,  h: 9,  x0: '-80%', x1: '80%',  k: 1.05 },
+    { l: 50, t: 84, w: 10, h: 10, x0: '110%', x1: '-110%', k: .78 },
+    { l: 44, t: 76, w: 9,  h: 9,  x0: '-30%', x1: '130%', k: 1.45 },
+    { l: 56, t: 44, w: 8,  h: 8,  x0: '60%',  x1: '-70%', k: .95 }
   ];
 
   function kdBuilding(id) {
@@ -46001,11 +46040,27 @@ window.TT_SFX = {
         var open = kdUnlocked(b);
         if (!open) el.classList.add('is-lock');
         el.setAttribute('aria-disabled', open ? 'false' : 'true');
-        var lab = document.createElement('span');
-        lab.className = 'kd-lab';
-        lab.setAttribute('data-i18n', b.key);
-        lab.textContent = t(b.key);
-        el.appendChild(lab);
+        /* [KD61-0922] 이름표 = 기존 알약 부품(.kit-pill-v2)의 인스턴스. 색은
+           data-tone 이 고르는 기존 --role-<tone>-* 토큰, 글리프는 기존 --lib-glyph-*.
+           성의 둘째 탭 자리(나무 위 성)는 이름표가 없다(notag) — aria-label 만. */
+        if (b.hit) el.classList.add('kd-hit');
+        el.setAttribute('aria-label', t(b.key));
+        el.setAttribute('data-i18n-aria', b.key);
+        if (!b.notag) {
+          var lab = document.createElement('span');
+          lab.className = 'kd-tag kit-pill-v2';
+          lab.setAttribute('data-tone', b.tone || 'purple');
+          var ic = document.createElement('i');
+          ic.className = 'kd-tag-ic';
+          ic.setAttribute('aria-hidden', 'true');
+          ic.style.setProperty('--kd-ic', 'var(--lib-glyph-' + (b.ic || 'crown') + ')');
+          var tx = document.createElement('b');
+          tx.setAttribute('data-i18n', b.key);
+          tx.textContent = t(b.key);
+          lab.appendChild(ic);
+          lab.appendChild(tx);
+          el.appendChild(lab);
+        }
         wrap.appendChild(el);
       }
       /* §18.7 규약 함수 — 웹에서 상점 건물을 감추는 일은 이것이 한다.
@@ -46527,7 +46582,25 @@ window.TT_SFX = {
     syncArcadeSheet();
   }
 
-  function openModeSheet() {
+  /* [KD61-0922] 놀이터 선택 창(spec 5절) — 「클래식 / 아케이드」 두 줄.
+     새 시스템 0: 클래식 줄은 openClassicHub(), 아케이드 줄은 플레이 시트를
+     **모험 줄만 감춘 상태**로 연다(대전 3종은 그 시트에 이미 산다 — 판정판 49).
+     상태는 시트의 data-arcade-only 한 칸이고, 닫을 때 반드시 원상 복구한다. */
+  function openPlayground() { openModal('modal-playground'); J.sfx.ui(); }
+  function closePlayground() { closeModal('modal-playground'); }
+  function modeSheetArcadeOnly(on) {
+    var m = $('modal-mode'), adv = $('mode-adv'), h = $('mode-h');
+    if (!m) return;
+    if (on) m.setAttribute('data-arcade-only', ''); else m.removeAttribute('data-arcade-only');
+    if (adv) adv.hidden = !!on;
+    if (h) {
+      h.setAttribute('data-i18n', on ? 'mode.title.arcade' : 'mode.title');
+      h.textContent = t(on ? 'mode.title.arcade' : 'mode.title');
+    }
+  }
+
+  function openModeSheet(opt) {
+    modeSheetArcadeOnly(!!(opt && opt.arcadeOnly));
     /* [0911 판정판 49 ③] 순서가 계약이다 — 배지 자 맞춤(setStageBadge)이 **안전 상자의
        실측 폭**을 읽는다. 판이 hidden 인 채로 그리면 clientWidth 가 0 이라 맞춤이
        조용히 건너뛰고, 자릿수가 늘어난 배지가 그대로 잘린다(「|0탄」 사고). 판을 먼저
@@ -46536,7 +46609,7 @@ window.TT_SFX = {
     syncModeSheet();
     J.sfx.ui();
   }
-  function closeModeSheet() { closeModal('modal-mode'); }
+  function closeModeSheet() { closeModal('modal-mode'); modeSheetArcadeOnly(false); }
 
   /**
    * "이어하기" — 하던 것을 잇는다. 저장된 판이 있으면 그 판이고, 없으면 모험의
@@ -48657,6 +48730,10 @@ window.TT_SFX = {
     /* 하단 바(판정판 60) — 지도 하단 바와 같은 진입점 함수를 부른다: 큰 캡슐은
        지도(모험)를 열고, 캐릭터·기록 그림 버튼은 캐릭창·기록으로 간다. 상단 바
        설정 둥근 버튼은 설정을 연다(지도 map-gear 와 같은 함수). 옛 4버튼은 삭제. */
+    /* [KD61-0922] 놀이터 선택 창 — 두 줄은 자기를 닫고 기존 시트를 연다. */
+    on($('pg-close'), 'click', function () { closePlayground(); J.sfx.ui(); });
+    on($('pg-classic'), 'click', function () { closePlayground(); openClassicHub(); });
+    on($('pg-arcade'), 'click', function () { closePlayground(); openModeSheet({ arcadeOnly: true }); });
     on($('kd-bot-plate'), 'click', function () { J.sfx.ui(); openMap(); });
     on($('kd-bot-char'), 'click', openCharPanel);
     on($('kd-bot-rec'), 'click', function () { J.sfx.ui(); openRank('endless'); });
@@ -49250,6 +49327,8 @@ window.TT_SFX = {
         if ($('modal-rank') && !$('modal-rank').hidden) { closeRank(); return; }
         // 10차 §C: 모드 시트는 메뉴 위에 떠 있는 한 겹이라 가장 먼저 닫힌다.
         if ($('modal-mode') && !$('modal-mode').hidden) { closeModeSheet(); return; }
+        /* [KD61-0922] 놀이터 선택 창도 같은 우선순위의 한 겹이다. */
+        if ($('modal-playground') && !$('modal-playground').hidden) { closePlayground(); J.sfx.ui(); return; }
         /* [SHOP-0910] 상점도 메뉴 위에 떠 있는 한 겹이라 모드 시트와 같은
            우선순위다. 단 **스킨 시트가 그 위에 열려 있으면 넘긴다** — 스킨은
            이 사슬이 아니라 SELF_BACK(닫기 버튼)이 가져가는 겹이라, 여기서
@@ -60037,7 +60116,7 @@ html.menu-v2 #screen-menu .tagline{
    게임의 10행은 전부 이 부품의 인스턴스 — 행별 규칙 없음, data-part·data-variant·data-badge 만 다르다.
    선택자 앞의 `.mode-list ` 는 인스턴스 스코프(옛 .mode-list .mode-row 규칙을 이기는 특이도)일 뿐 규칙 내용은 정본과 같다.
    =========================================================================== */
-#modal-mode .mode-list,#modal-classic .mode-list{gap:2px !important;background:none !important;}
+#modal-mode .mode-list,#modal-classic .mode-list,#modal-playground .mode-list{gap:2px !important;background:none !important;}
 
 /* ===========================================================================
    §btn-picture — 그림 버튼 컴포넌트 (T3, data-part="btn-picture") · engine 층 (0908)
@@ -63046,6 +63125,10 @@ html[lang="ko"] #charpanel #cp-h{ --ttl:url("catalog/ttl-chars-ko.webp"); }
 html[lang="en"] #modal-mode .r10-ribbon{ --ttl:url("catalog/ttl-play-en.webp"); }
 html[lang="en"] #modal-classic .r10-ribbon{ --ttl:url("catalog/ttl-classic-en.webp"); }
 html[lang="en"] #charpanel #cp-h{ --ttl:url("catalog/ttl-chars-en.webp"); }
+/* [KD61-0922] 놀이터 → 아케이드: 플레이 시트가 모험 줄 없이 열릴 때의 제목 그림.
+   새 그림이 아니다 — 은퇴한 2단 허브(#modal-arcade)가 쓰던 제목 조각 그대로다(ko/en 둘 다 catalog 에 있다). */
+html[lang="ko"] #modal-mode[data-arcade-only] .r10-ribbon{ --ttl:url("catalog/ttl-arc-ko.webp"); }
+html[lang="en"] #modal-mode[data-arcade-only] .r10-ribbon{ --ttl:url("catalog/ttl-arc-en.webp"); }
 
 /* ⑲-c(0904 · wave/node) — 결과 모달 **동적 번호** 제목만 정본 레터링 + ④ 비율 =====
    #modal-clear(「N탄 클리어!」)·#modal-adv 승/패(「N탄 클리어!」/「N탄 실패」)는 값이
@@ -63378,20 +63461,23 @@ html[lang="en"] #modal-arc.is-arcdmg .sheet > h2{ --ttl:url("catalog/ttl-arcdmg-
   line-height: 1.45;
   text-align: center;
 }
-#modal-classic .mode-list .mode-row {
+#modal-classic .mode-list .mode-row,
+#modal-playground .mode-list .mode-row {
   border-image: none;
   border: 0;
   padding: 9px 12px;
   min-height: 60px;
 }
-#modal-classic .nchip {
+#modal-classic .nchip,
+#modal-playground .nchip {
   border-image: none;
   border: 0;
   width: 34px;
   height: 34px;
   overflow: visible;
 }
-#modal-classic .nchip::before {
+#modal-classic .nchip::before,
+#modal-playground .nchip::before {
   width: 32px;
   height: 32px;
 }
@@ -66784,7 +66870,9 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
   /* 57 W2 — 왕국 전용 배경(§26.9 발주 #1). 세로 780x1688 파노라마라 cover-fit 로
      화면을 채우고 가로 팬은 없앤다(--kd-pan:1). 성·성문·길은 이 그림에 그려져
      있고, 좌3·우3 자리는 비워 둔 잔디/발판 — 그 위에 건물 이미지가 앉는다. */
-  background-image: url("catalog/t2-bg-kingdom.webp");
+  /* [KD61-0922] 메인 화면 v2 배경(시안 S13) — 거목·나무 위 성·밑동 성문·무지개
+     벽돌 길·수정 산·물가가 이 그림에 있고, 건물 6 자리는 비워 둔 잔디다. */
+  background-image: url("catalog/t2-bg-kingdom-v2.webp");
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
@@ -66914,6 +67002,54 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
   background: var(--lib-glyph-lock) center/contain no-repeat;
   pointer-events: none;
 }
+/* ---- [KD61-0922] 메인 화면 v2 — 건물 그림·성 탭 자리·이름표 ------------------
+   · 탭 표적 = 건물 그림 상자 전체 + 그 안의 이름표(둘 다 같은 button 의 일부).
+     거주자는 건물 뒤(z 0)라 탭을 훔치지 못한다(57 W2 의 실측 규칙 그대로).
+   · 성은 배경에 그려져 있어 그림이 없는 투명 탭 자리다(.kd-hit).
+   · 이름표 = .kit-pill-v2 인스턴스. 치수는 부품의 자(--f2-w) 하나로만 정하고,
+     색은 data-tone 이 기존 --role-<tone>-* 토큰을 고른다(새 원시값 0). */
+.kd-bldg.kd-has-art, .kd-bldg.kd-hit{ pointer-events: auto; align-items: flex-start; }
+.kd-bldg.kd-has-art{ background-position: center bottom; }
+.kd-tag.kit-pill-v2{
+  --f2-w: 46cqw;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--f2-ph) * .16);
+  width: auto;
+  max-width: 100%;
+  padding: 0 calc(var(--f2-ph) * .42);
+  margin-top: 0;
+  font-family: var(--font-display);
+  font-size: calc(var(--f2-ph) * .50);
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--prim-white);
+  text-shadow: 0 calc(var(--f2-ph) * .04) 0 var(--kd-tag-ink);
+  --f2-pill: linear-gradient(180deg, var(--kd-tag-a), var(--kd-tag-b));
+  --f2-pill-line: var(--kd-tag-ink);
+  pointer-events: auto;
+}
+.kd-bldg.kd-hit .kd-tag{ margin-top: 0; }
+.kd-tag b{ font-weight: 700; position: relative; z-index: 1; }
+.kd-tag-ic{
+  position: relative; z-index: 1;
+  flex: 0 0 auto;
+  width: calc(var(--f2-ph) * .56);
+  height: calc(var(--f2-ph) * .56);
+  background: var(--kd-ic) center / contain no-repeat;
+}
+.kd-tag[data-tone="purple"]{ --kd-tag-a: var(--role-purple-face-a); --kd-tag-b: var(--role-purple-face-b); --kd-tag-ink: var(--role-purple-outline); }
+.kd-tag[data-tone="violet"]{ --kd-tag-a: var(--role-violet-face-a); --kd-tag-b: var(--role-violet-face-b); --kd-tag-ink: var(--role-violet-outline); }
+.kd-tag[data-tone="mint"]  { --kd-tag-a: var(--role-mint-face-a);   --kd-tag-b: var(--role-mint-face-b);   --kd-tag-ink: var(--role-mint-outline); }
+.kd-tag[data-tone="orange"]{ --kd-tag-a: var(--role-orange-face-a); --kd-tag-b: var(--role-orange-face-b); --kd-tag-ink: var(--role-orange-outline); }
+.kd-tag[data-tone="pink"]  { --kd-tag-a: var(--role-pink-face-a);   --kd-tag-b: var(--role-pink-face-b);   --kd-tag-ink: var(--role-pink-outline); }
+.kd-bldg:active .kd-tag{ transform: translateY(calc(var(--f2-ph) * .04)); }
+/* 놀이터 선택 창 — 제목은 퀘스트 판(.w6m 글자 제목)과 같은 문법, 줄은 클래식 시트의 줄. */
+#modal-playground .sheet{ display: flex; flex-direction: column; }
+/* 환영 말풍선은 안내일 뿐 누르는 것이 아니다 — 그 아래 성 탭 자리를 가로채지 않게(실측: castle-top 탭을 먹었다). */
+#kd-visit{ pointer-events: none; }
+
 /* 앱 전용 건물(상점)은 §18.7 의 규약 함수가 감춘다 — 새 숨김 방식 0. */
 
 /* ---- 거주자 (§26.3) -------------------------------------------------------
