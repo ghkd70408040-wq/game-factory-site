@@ -67011,7 +67011,12 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
 .kd-bldg.kd-has-art, .kd-bldg.kd-hit{ pointer-events: auto; align-items: flex-start; }
 .kd-bldg.kd-has-art{ background-position: center bottom; }
 .kd-tag.kit-pill-v2{
-  --f2-w: 46cqw;
+  /* [KD61-FIX 2026-09-22] 이름표 크기 = 시안 S13 비율. 실측: 성 라벨 폭/화면
+     조립 0.141 vs 시안 0.195(−28%). 부품 자(--f2-w) 하나만 올려 부품 규칙대로
+     글자·아이콘이 따라 커지게 한다(새 원시값 0). 46→55cqw(×1.20) = 7 라벨 폭을
+     시안 비율에 최소-최대 오차로 맞춘 균형값(짧은 성은 부품 기하상 −13%까지만,
+     넓은 펫하우스/놀이터는 +13%; 단일 부품 변수로 도달 가능한 최적, 보고 참조). */
+  --f2-w: 55cqw;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -67039,11 +67044,17 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
   height: calc(var(--f2-ph) * .56);
   background: var(--kd-ic) center / contain no-repeat;
 }
-.kd-tag[data-tone="purple"]{ --kd-tag-a: var(--role-purple-face-a); --kd-tag-b: var(--role-purple-face-b); --kd-tag-ink: var(--role-purple-outline); }
-.kd-tag[data-tone="violet"]{ --kd-tag-a: var(--role-violet-face-a); --kd-tag-b: var(--role-violet-face-b); --kd-tag-ink: var(--role-violet-outline); }
-.kd-tag[data-tone="mint"]  { --kd-tag-a: var(--role-mint-face-a);   --kd-tag-b: var(--role-mint-face-b);   --kd-tag-ink: var(--role-mint-outline); }
-.kd-tag[data-tone="orange"]{ --kd-tag-a: var(--role-orange-face-a); --kd-tag-b: var(--role-orange-face-b); --kd-tag-ink: var(--role-orange-outline); }
-.kd-tag[data-tone="pink"]  { --kd-tag-a: var(--role-pink-face-a);   --kd-tag-b: var(--role-pink-face-b);   --kd-tag-ink: var(--role-pink-outline); }
+/* [KD61-FIX 2026-09-22] 이름표 색 = 시안 채도 0.547 vs 현재 0.409(옅음). 같은
+   색 계열의 **더 진한 기존 역할 토큰**으로 교체(새 원시값 0): 면 그라데를
+   face-a→face-b 에서 한두 단 내려 contact→outline 로(주황만 갈변 방지로
+   face-b→contact). 겉선/잉크는 outline 유지, 부품 흰 inner-rim 이 가장자리를 살린다.
+   우체국은 시안 빨강 #DF5351 최근접 탐색 결과 **빨강 계열 역할 토큰 부재**
+   (rose/모험 줄·하트 캡슐 전부 pink 계열 참조) → pink 유지·심화(보고). */
+.kd-tag[data-tone="purple"]{ --kd-tag-a: var(--role-purple-contact); --kd-tag-b: var(--role-purple-outline); --kd-tag-ink: var(--role-purple-outline); }
+.kd-tag[data-tone="violet"]{ --kd-tag-a: var(--role-violet-contact); --kd-tag-b: var(--role-violet-outline); --kd-tag-ink: var(--role-violet-outline); }
+.kd-tag[data-tone="mint"]  { --kd-tag-a: var(--role-mint-contact);   --kd-tag-b: var(--role-mint-outline);   --kd-tag-ink: var(--role-mint-outline); }
+.kd-tag[data-tone="orange"]{ --kd-tag-a: var(--role-orange-face-b); --kd-tag-b: var(--role-orange-contact); --kd-tag-ink: var(--role-orange-outline); }
+.kd-tag[data-tone="pink"]  { --kd-tag-a: var(--role-pink-contact);   --kd-tag-b: var(--role-pink-outline);   --kd-tag-ink: var(--role-pink-outline); }
 .kd-bldg:active .kd-tag{ transform: translateY(calc(var(--f2-ph) * .04)); }
 /* 놀이터 선택 창 — 제목은 퀘스트 판(.w6m 글자 제목)과 같은 문법, 줄은 클래식 시트의 줄. */
 #modal-playground .sheet{ display: flex; flex-direction: column; }
