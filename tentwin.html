@@ -45889,22 +45889,30 @@ window.TT_SFX = {
      (chap:1 — 시안에 잠금 표현이 없다. 별 소비 해금은 W3). 누르면 부르는 것은
      전부 **이미 있던 함수**이고, 새 화면은 놀이터 선택 창 하나뿐이다.
        tone  이름표(.kit-pill-v2 인스턴스)의 색 계열 = 기존 --role-<tone>-* 토큰
-       ic    이름표 글리프 = 기존 --lib-glyph-* */
+       ic    이름표 글리프 = 기존 --lib-glyph-*
+       roof  [KD61-FIX 2026-09-22] 이름표 세로 기준 = 건물 자산의 **알파 bbox 상단**
+             (지붕선)을 상자 높이 %로 표기. 이름표 하단이 이 선에서 8px 겹치도록
+             CSS 가 bottom-앵커한다(뜬 알약 → 지붕에 안착). PIL 실측(1024² 자산,
+             렌더 390×844 · contain center bottom 레터박스 반영):
+               circus 4.5(top4.49) · shop 8.8(8.79) · post 5.8(5.76) ·
+               playground 16.3(16.31)  — 이상 상자 폭≥높이라 지붕선=알파top%
+               mission 18.1(알파1.17+상단레터박스16.9) · pethouse 11.7(1.17+10.5)
+             성(castle·notag/그림 없음)은 배경에 그려져 roof 없음 = flex-start 유지. */
   var KD_BUILDINGS = [
     { id: 'castle-top', l: 50, t: 16.5, w: 20, h: 9,  chap: 1, key: 'kd.castle', hit: true, notag: true,
       go: function () { openCharPanel(); } },
     { id: 'castle',     l: 50, t: 32, w: 22, h: 18, chap: 1, key: 'kd.castle', hit: true, tone: 'purple', ic: 'crown',
       go: function () { openCharPanel(); } },
-    { id: 'circus',     l: 19, t: 41, w: 33, h: 15, chap: 1, key: 'kd.circus', tone: 'mint', ic: 'star-empty',
+    { id: 'circus',     l: 19, t: 41, w: 33, h: 15, chap: 1, key: 'kd.circus', tone: 'mint', ic: 'star-empty', roof: 4.5,
       art: 'url("catalog/t3-bldg2-circus.webp")',
       go: function () { openGallery(); } },
-    { id: 'mission',    l: 85, t: 42, w: 26, h: 14.5, chap: 1, key: 'kd.mission', tone: 'mint', ic: 'target',
+    { id: 'mission',    l: 85, t: 42, w: 26, h: 14.5, chap: 1, key: 'kd.mission', tone: 'mint', ic: 'target', roof: 18.1,
       art: 'url("catalog/t3-bldg2-mission.webp")',
       go: function () { openQuest('daily'); } },
     /* 상점 — 앱은 보석 상점(§20), 웹은 스킨 상점(젤리별). 웹에서 건물을 감추지
        않는다: 시안의 자리 하나가 비는 것보다 웹에도 쓸모 있는 문이 서는 쪽이 맞다.
        웹에서 openShop() 을 부르지 않으므로 「웹 상점 완전 숨김」(§18.7)은 그대로다. */
-    { id: 'shop',       l: 21, t: 58.4, w: 33, h: 14, chap: 1, key: 'kd.shop', tone: 'orange', ic: 'score',
+    { id: 'shop',       l: 21, t: 58.4, w: 33, h: 14, chap: 1, key: 'kd.shop', tone: 'orange', ic: 'score', roof: 8.8,
       art: 'url("catalog/t3-bldg2-shop.webp")',
       go: function () {
         var twa = false;
@@ -45913,17 +45921,17 @@ window.TT_SFX = {
       } },
     /* 우체국 = 초대장을 보내는 곳. 판정판 54 의 초대 창을 그대로 부른다 —
        옛 「초대 정자」가 쓰던 그 판정(처음 초대 가능한 상대) 그대로다. */
-    { id: 'post',       l: 81.7, t: 58.4, w: 33, h: 14.6, chap: 1, key: 'kd.post', tone: 'pink', ic: 'flag',
+    { id: 'post',       l: 81.7, t: 58.4, w: 33, h: 14.6, chap: 1, key: 'kd.post', tone: 'pink', ic: 'flag', roof: 5.8,
       art: 'url("catalog/t3-bldg2-post.webp")',
       go: function () {
         var ids = INVITE_ORDER, i;
         for (i = 0; i < ids.length; i++) { if (openInvite(ids[i])) return; }
         kdSoon();
       } },
-    { id: 'pethouse',   l: 17.4, t: 77.8, w: 29, h: 15, chap: 1, key: 'kd.pethouse', tone: 'orange', ic: 'heart',
+    { id: 'pethouse',   l: 17.4, t: 77.8, w: 29, h: 15, chap: 1, key: 'kd.pethouse', tone: 'orange', ic: 'heart', roof: 11.7,
       art: 'url("catalog/t3-bldg2-pethouse.webp")',
       go: function () { openCharPanel(); cpTab('pet'); } },
-    { id: 'playground', l: 82.7, t: 78.1, w: 33, h: 15, chap: 1, key: 'kd.playground', tone: 'violet', ic: 'inf',
+    { id: 'playground', l: 82.7, t: 78.1, w: 33, h: 15, chap: 1, key: 'kd.playground', tone: 'violet', ic: 'inf', roof: 16.3,
       art: 'url("catalog/t3-bldg2-playground.webp")',
       go: function () { openPlayground(); } }
   ];
@@ -45940,7 +45948,7 @@ window.TT_SFX = {
     { l: 40, t: 67, w: 10, h: 10, x0: '-70%', x1: '110%', k: .88 },
     { l: 58, t: 67, w: 10, h: 10, x0: '90%',  x1: '-90%', k: 1.32 },
     { l: 50, t: 58, w: 9,  h: 9,  x0: '-80%', x1: '80%',  k: 1.05 },
-    { l: 50, t: 84, w: 10, h: 10, x0: '110%', x1: '-110%', k: .78 },
+    { l: 50, t: 77, w: 10, h: 10, x0: '110%', x1: '-110%', k: .78 }, /* [KD61-FIX] 84→77: t는 상자 상단이라 84+h10=94% 가 하단 바(약 88.2%) 아래로 내려가 하반신이 먹혔다. 77 로 올려 바 위(하단 87%)에 세운다. */
     { l: 44, t: 76, w: 9,  h: 9,  x0: '-30%', x1: '130%', k: 1.45 },
     { l: 56, t: 44, w: 8,  h: 8,  x0: '60%',  x1: '-70%', k: .95 }
   ];
@@ -46036,6 +46044,9 @@ window.TT_SFX = {
            표적(bbox 전체)이 되고 이름표는 그 아래 작은 라벨로 내려간다(kd-has-art).
            초대 정자(gazebo)는 아직 그림이 없어 종전 명판을 그대로 쓴다. */
         if (b.art) { el.style.setProperty('--kd-art', b.art); el.classList.add('kd-has-art'); }
+        /* [KD61-FIX 2026-09-22] 지붕선(알파 bbox 상단, 상자 높이 %) — 이름표가 이
+           선에 8px 걸쳐 앉는다. 그림 없는 성은 roof 없음 → CSS 가 flex-start 유지. */
+        if (b.roof != null) el.style.setProperty('--kd-roof', b.roof);
         if (b.app) el.setAttribute('data-app-only', '');
         var open = kdUnlocked(b);
         if (!open) el.classList.add('is-lock');
@@ -67044,6 +67055,24 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
   height: calc(var(--f2-ph) * .56);
   background: var(--kd-ic) center / contain no-repeat;
 }
+/* [KD61-FIX 2026-09-22] 이름표 지붕 안착 — 그림 건물(kd-has-art)의 이름표는 상자
+   안에서 **절대배치**하되 세로 기준을 «상자 상단»이 아니라 «자산 지붕선»
+   (--kd-roof = 알파 bbox 상단, 상자 높이 %)으로 잡는다. top = 지붕선% → 이름표
+   상단이 보이는 지붕 꼭대기에 얹혀 지붕 위에 걸쳐 보인다(상자 안 유지 →
+   ink_in_slot·교차 관문 그대로 통과). 종전 flex-start 는 상자 상단(=자산 상단
+   **투명 여백** 위)에 붙어, 여백만큼 지붕과 떨어진 「하늘에 뜬 알약」이었다.
+   성(kd-hit, --kd-roof 없음)은 이 규칙에 안 걸려 flex-start 유지.
+   ※ 시안처럼 이름표를 건물 «위»로 완전히 띄우는(하단만 지붕에 6~10px 걸치는)
+     연출은 상자 밖으로 나가 layout 관문의 상자-포함 모델과 충돌하므로 별도
+     파도(리뷰 I3)로 둔다 — 여기서는 상자 안에서 지붕선에 안착시켜 뜸을 없앤다. */
+.kd-bldg.kd-has-art .kd-tag.kit-pill-v2{
+  position: absolute;
+  left: 50%;
+  top: calc(var(--kd-roof, 6) * 1%);
+  transform: translateX(-50%);
+  margin: 0;
+}
+.kd-bldg.kd-has-art:active .kd-tag{ transform: translateX(-50%) translateY(calc(var(--f2-ph) * .04)); }
 /* [KD61-FIX 2026-09-22] 이름표 색 = 시안 채도 0.547 vs 현재 0.409(옅음). 같은
    색 계열의 **더 진한 기존 역할 토큰**으로 교체(새 원시값 0): 면 그라데를
    face-a→face-b 에서 한두 단 내려 contact→outline 로(주황만 갈변 방지로
@@ -67217,7 +67246,14 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
   line-height: 1.25;
   text-align: center;
   box-shadow: 0 2px 8px rgba(58, 30, 48, .28);
+  /* [KD61-FIX 2026-09-22] 환영 말풍선이 나무 위 성(castle-top, 약 17%)을 가린다.
+     성 위 여백이 좁아 옮길 자리가 없으므로 **3초 뒤 사라지게** 한다: 기존 --mo
+     토큰만 사용(hold=--mo-kd-idle 2600ms · fade=--mo-kd-heart 900ms). 페이드는
+     opacity/visibility 뿐이라(공간 이동 0) 동작 줄이기에서도 안전 → reduce 블록
+     불변. hidden=false 로 다시 보일 때 애니메이션이 재시작한다. */
+  animation: kd-visit-bye var(--mo-kd-heart) ease-in var(--mo-kd-idle) forwards;
 }
+@keyframes kd-visit-bye{ to{ opacity: 0; visibility: hidden; } }
 
 /* ---- 동작 줄이기 ---------------------------------------------------------
    §22.3 의 처분을 그대로 넓힌다: **움직임만** 끄고 «누가 살고 있는가»라는
