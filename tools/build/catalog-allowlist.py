@@ -95,7 +95,6 @@ PUBLISH_PINS = (
 BOARD_ROOT_FILES = (
     'BOARD.html', 'kit.html', 'FACTORY-DASHBOARD.html', 'SPEC-SITE.html',
     'AUDIO-AUDITION.html', 'privacy.html',
-    'tentwin-k2.html',   # 판정판 61 미리보기(승인 뒤 본 게임에 병합되면 이 줄과 파일을 함께 지운다)
     'board-data.json', 'usage-map.json', 'staging.json',
 )
 BOARD_EXTS = ('.html', '.js', '.json', '.css')
