@@ -67215,6 +67215,24 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
 #screen-kingdom #kd-bot-ch-k, #screen-kingdom #kd-bot-ch-n{ display: block; max-width: none; font-style: normal; font-weight: 700; color: #FFFFFF; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 .3cqw 0 rgba(96, 40, 72, .7); }
 #screen-kingdom #kd-bot-ch-k{ font-size: 4.40cqw; letter-spacing: -.01em; }
 #screen-kingdom #kd-bot-ch-n{ margin-top: .55cqw; font-size: 2.90cqw; letter-spacing: -.02em; }
+/* 캐릭터·기록 라벨 — 맵 하단 바(#screen-map #map-char/#map-rec > span, :52088)의
+   **같은 값을 그대로 복제**한다(새 값 0). 이 규칙이 빠져 있어 라벨이 버튼 상속 폰트
+   (9.5px/500 · 인라인 중앙)로 떨어져, 맵(3.5cqw/700 · 하단 73% 절대 배치)과 크기·
+   자간·굵기·그림자가 전부 달라 보였다. 컨테이너(#screen-kingdom·데스크톱 #kd-bot)는
+   맵과 같은 inline-size 라 cqw 가 같은 px 로 푼다. (사용자 피드백 2026-09-22) */
+#screen-kingdom #kd-bot-char > span, #screen-kingdom #kd-bot-rec > span {
+  position: absolute; left: 50%; top: 73%;
+  width: 92%;
+  transform: translate(-50%, -50%);
+  font-size: 3.5cqw;
+  font-weight: 700;
+  letter-spacing: -.03em;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 .28cqw 0 rgba(92, 58, 78, .7);
+}
 
 /* 데스크톱(가로·≥700) — 지도 데스크톱 절(63324~)과 같은 처방: 배율은 폰
    (--mapui)에 못박고 바만 칸 폭을 쓴다. --mapui 숫자 그대로다(새 값 0). */
