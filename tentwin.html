@@ -9214,6 +9214,10 @@ html.no-art-logo .logo-img  { display: none; }
 #charpanel[data-cptab="pet"] .cp-petart[data-art] { opacity: 1; }
 /* 일반 형제 선택자 — 그래서 마크업에서 .cp-petart 가 .cp-view 보다 **앞**에 선다. */
 #charpanel[data-cptab="pet"] .cp-petart[data-art] ~ .cp-view { opacity: 0; }
+/* [T10-0926] 펫 탭에서는 아이템 칸(우측 레일)을 숨긴다 — cpTab() 이 이미
+   data-cptab 을 세우므로 "JS 는 display 를 안 만진다"는 이 절의 계약 그대로
+   CSS 로만 가른다(새 상태 0). */
+#charpanel[data-cptab="pet"] #cp-side { display: none; }
 .cp-view { transition: opacity .18s ease; }
 @media (prefers-reduced-motion: reduce) {
   .cp-petart, .cp-view { transition: none; }
@@ -15935,10 +15939,10 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
             </div>
             <p class="ci-tag"><span class="ci-tag-k" data-i18n="pick.rec">Best for</span><b class="ci-tag-v kit-pill-v2" data-variant="soft" data-i18n="char.ten.tag">Strategist</b></p>
             <div class="cc-stats" aria-hidden="true">
-              <span class="cs"><b class="cs-k" data-i18n="stat.k1">Power</b><i class="cs-bar kit-gauge-v2" style="--v:82%;--f2-gv:0.82"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i></span>
-              <span class="cs"><b class="cs-k" data-i18n="stat.k2">Steady</b><i class="cs-bar kit-gauge-v2" style="--v:100%;--f2-gv:1"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i></span>
-              <span class="cs"><b class="cs-k" data-i18n="stat.k3">Agility</b><i class="cs-bar kit-gauge-v2" style="--v:88%;--f2-gv:0.88"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i></span>
-              <span class="cs"><b class="cs-k" data-i18n="stat.k4">Luck</b><i class="cs-bar kit-gauge-v2" style="--v:70%;--f2-gv:0.7"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i></span>
+              <span class="cs"><b class="cs-k" data-i18n="stat.k1">Power</b><i class="cs-bar kit-gauge-v2" style="--v:82%;--f2-gv:0.82"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i><b class="cs-up kit-pill-v2" data-variant="soft" data-stat="power" aria-hidden="true"><b class="cs-up-n">-</b></b></span>
+              <span class="cs"><b class="cs-k" data-i18n="stat.k2">Steady</b><i class="cs-bar kit-gauge-v2" style="--v:100%;--f2-gv:1"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i><b class="cs-up kit-pill-v2" data-variant="soft" data-stat="steady" aria-hidden="true"><b class="cs-up-n">-</b></b></span>
+              <span class="cs"><b class="cs-k" data-i18n="stat.k3">Agility</b><i class="cs-bar kit-gauge-v2" style="--v:88%;--f2-gv:0.88"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i><b class="cs-up kit-pill-v2" data-variant="soft" data-stat="agility" aria-hidden="true"><b class="cs-up-n">-</b></b></span>
+              <span class="cs"><b class="cs-k" data-i18n="stat.k4">Luck</b><i class="cs-bar kit-gauge-v2" style="--v:70%;--f2-gv:0.7"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i><b class="cs-up kit-pill-v2" data-variant="soft" data-stat="luck" aria-hidden="true"><b class="cs-up-n">-</b></b></span>
             </div>
             <div class="ci-desc kit-box-v2">
               <p class="cc-head" data-i18n="cp.sk.head">[Passive Skill]</p>
@@ -15949,7 +15953,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
                    효과 문장(char.*.pass / .ult)은 한 글자도 안 건드렸다. -->
               <p class="cc-name"><i class="cc-ic" aria-hidden="true"><svg viewBox="0 0 40 40" aria-hidden="true" focusable="false"><path d="M20.6 30.6 17.4 37" stroke="#B9A8D6" stroke-width="2.6" stroke-linecap="round"/><path d="M13 12.5a6.4 6.4 0 0 1 6.4-5.6 6.4 6.4 0 0 1 6.2 4.8 5.6 5.6 0 0 1 5 5.5 5.6 5.6 0 0 1-3.4 5.2 5.9 5.9 0 0 1-5.4 4.6 6.2 6.2 0 0 1-5.3-2.4 5.8 5.8 0 0 1-6.2-3.2 5.6 5.6 0 0 1 2.7-8.9Z" fill="#FDF8FC" stroke="#C9B7DE" stroke-width="1.5" stroke-linejoin="round"/><ellipse cx="20.2" cy="17.6" rx="3.1" ry="2.7" fill="#E39D9A"/><ellipse cx="15.6" cy="13.4" rx="1.5" ry="1.9" fill="#E39D9A"/><ellipse cx="19.6" cy="11.6" rx="1.5" ry="1.9" fill="#E39D9A"/><ellipse cx="23.6" cy="12.9" rx="1.5" ry="1.9" fill="#E39D9A"/><path d="M8 8.5 8.9 11l2.5.9-2.5.9L8 15.3l-.9-2.5L4.6 12l2.5-.9Z" fill="#FCE69F"/><path d="M33 22.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8Z" fill="#FCE69F"/><path d="M31.5 8.6l.6 1.6 1.6.6-1.6.6-.6 1.6-.6-1.6-1.6-.6 1.6-.6Z" fill="#FCE69F"/></svg></i><b data-i18n="char.ten.passname">Passive</b></p>
               <p class="cc-tip" data-i18n="char.ten.tip">.</p>
-              <p class="cc-line"><b class="cc-k" data-i18n="pick.passive">Passive</b><span class="cc-pass" data-i18n="char.ten.pass">.</span></p>
+              <p class="cc-line" hidden><b class="cc-k" data-i18n="pick.passive">Passive</b><span class="cc-pass" data-i18n="char.ten.pass">.</span></p>
               <p class="cc-line"><b class="cc-k cc-k-u" data-i18n="pick.ult">Ultimate</b><span class="cc-ult" data-i18n="char.ten.ult">.</span></p>
             </div>
           </div>
@@ -15960,10 +15964,10 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
             </div>
             <p class="ci-tag"><span class="ci-tag-k" data-i18n="pick.rec">Best for</span><b class="ci-tag-v kit-pill-v2" data-variant="soft" data-i18n="char.twin.tag">Strategist</b></p>
             <div class="cc-stats" aria-hidden="true">
-              <span class="cs"><b class="cs-k" data-i18n="stat.k1">Power</b><i class="cs-bar kit-gauge-v2" style="--v:76%;--f2-gv:0.76"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i></span>
-              <span class="cs"><b class="cs-k" data-i18n="stat.k2">Steady</b><i class="cs-bar kit-gauge-v2" style="--v:72%;--f2-gv:0.72"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i></span>
-              <span class="cs"><b class="cs-k" data-i18n="stat.k3">Agility</b><i class="cs-bar kit-gauge-v2" style="--v:80%;--f2-gv:0.8"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i></span>
-              <span class="cs"><b class="cs-k" data-i18n="stat.k4">Luck</b><i class="cs-bar kit-gauge-v2" style="--v:100%;--f2-gv:1"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i></span>
+              <span class="cs"><b class="cs-k" data-i18n="stat.k1">Power</b><i class="cs-bar kit-gauge-v2" style="--v:76%;--f2-gv:0.76"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i><b class="cs-up kit-pill-v2" data-variant="soft" data-stat="power" aria-hidden="true"><b class="cs-up-n">-</b></b></span>
+              <span class="cs"><b class="cs-k" data-i18n="stat.k2">Steady</b><i class="cs-bar kit-gauge-v2" style="--v:72%;--f2-gv:0.72"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i><b class="cs-up kit-pill-v2" data-variant="soft" data-stat="steady" aria-hidden="true"><b class="cs-up-n">-</b></b></span>
+              <span class="cs"><b class="cs-k" data-i18n="stat.k3">Agility</b><i class="cs-bar kit-gauge-v2" style="--v:80%;--f2-gv:0.8"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i><b class="cs-up kit-pill-v2" data-variant="soft" data-stat="agility" aria-hidden="true"><b class="cs-up-n">-</b></b></span>
+              <span class="cs"><b class="cs-k" data-i18n="stat.k4">Luck</b><i class="cs-bar kit-gauge-v2" style="--v:100%;--f2-gv:1"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i><b class="cs-up kit-pill-v2" data-variant="soft" data-stat="luck" aria-hidden="true"><b class="cs-up-n">-</b></b></span>
             </div>
             <div class="ci-desc kit-box-v2">
               <p class="cc-head" data-i18n="cp.sk.head">[Passive Skill]</p>
@@ -15974,7 +15978,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
                    효과 문장(char.*.pass / .ult)은 한 글자도 안 건드렸다. -->
               <p class="cc-name"><i class="cc-ic" aria-hidden="true"><svg viewBox="0 0 40 40" aria-hidden="true" focusable="false"><path d="M20.6 30.6 17.4 37" stroke="#B9A8D6" stroke-width="2.6" stroke-linecap="round"/><path d="M13 12.5a6.4 6.4 0 0 1 6.4-5.6 6.4 6.4 0 0 1 6.2 4.8 5.6 5.6 0 0 1 5 5.5 5.6 5.6 0 0 1-3.4 5.2 5.9 5.9 0 0 1-5.4 4.6 6.2 6.2 0 0 1-5.3-2.4 5.8 5.8 0 0 1-6.2-3.2 5.6 5.6 0 0 1 2.7-8.9Z" fill="#FDF8FC" stroke="#C9B7DE" stroke-width="1.5" stroke-linejoin="round"/><ellipse cx="20.2" cy="17.6" rx="3.1" ry="2.7" fill="#E39D9A"/><ellipse cx="15.6" cy="13.4" rx="1.5" ry="1.9" fill="#E39D9A"/><ellipse cx="19.6" cy="11.6" rx="1.5" ry="1.9" fill="#E39D9A"/><ellipse cx="23.6" cy="12.9" rx="1.5" ry="1.9" fill="#E39D9A"/><path d="M8 8.5 8.9 11l2.5.9-2.5.9L8 15.3l-.9-2.5L4.6 12l2.5-.9Z" fill="#FCE69F"/><path d="M33 22.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8Z" fill="#FCE69F"/><path d="M31.5 8.6l.6 1.6 1.6.6-1.6.6-.6 1.6-.6-1.6-1.6-.6 1.6-.6Z" fill="#FCE69F"/></svg></i><b data-i18n="char.twin.passname">Passive</b></p>
               <p class="cc-tip" data-i18n="char.twin.tip">.</p>
-              <p class="cc-line"><b class="cc-k" data-i18n="pick.passive">Passive</b><span class="cc-pass" data-i18n="char.twin.pass">.</span></p>
+              <p class="cc-line" hidden><b class="cc-k" data-i18n="pick.passive">Passive</b><span class="cc-pass" data-i18n="char.twin.pass">.</span></p>
               <p class="cc-line"><b class="cc-k cc-k-u" data-i18n="pick.ult">Ultimate</b><span class="cc-ult" data-i18n="char.twin.ult">.</span></p>
             </div>
           </div>
@@ -15985,10 +15989,10 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
             </div>
             <p class="ci-tag"><span class="ci-tag-k" data-i18n="pick.rec">Best for</span><b class="ci-tag-v kit-pill-v2" data-variant="soft" data-i18n="char.jelly.tag">Strategist</b></p>
             <div class="cc-stats" aria-hidden="true">
-              <span class="cs"><b class="cs-k" data-i18n="stat.k1">Power</b><i class="cs-bar kit-gauge-v2" style="--v:100%;--f2-gv:1"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i></span>
-              <span class="cs"><b class="cs-k" data-i18n="stat.k2">Steady</b><i class="cs-bar kit-gauge-v2" style="--v:92%;--f2-gv:0.92"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i></span>
-              <span class="cs"><b class="cs-k" data-i18n="stat.k3">Agility</b><i class="cs-bar kit-gauge-v2" style="--v:96%;--f2-gv:0.96"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i></span>
-              <span class="cs"><b class="cs-k" data-i18n="stat.k4">Luck</b><i class="cs-bar kit-gauge-v2" style="--v:66%;--f2-gv:0.66"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i></span>
+              <span class="cs"><b class="cs-k" data-i18n="stat.k1">Power</b><i class="cs-bar kit-gauge-v2" style="--v:100%;--f2-gv:1"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i><b class="cs-up kit-pill-v2" data-variant="soft" data-stat="power" aria-hidden="true"><b class="cs-up-n">-</b></b></span>
+              <span class="cs"><b class="cs-k" data-i18n="stat.k2">Steady</b><i class="cs-bar kit-gauge-v2" style="--v:92%;--f2-gv:0.92"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i><b class="cs-up kit-pill-v2" data-variant="soft" data-stat="steady" aria-hidden="true"><b class="cs-up-n">-</b></b></span>
+              <span class="cs"><b class="cs-k" data-i18n="stat.k3">Agility</b><i class="cs-bar kit-gauge-v2" style="--v:96%;--f2-gv:0.96"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i><b class="cs-up kit-pill-v2" data-variant="soft" data-stat="agility" aria-hidden="true"><b class="cs-up-n">-</b></b></span>
+              <span class="cs"><b class="cs-k" data-i18n="stat.k4">Luck</b><i class="cs-bar kit-gauge-v2" style="--v:66%;--f2-gv:0.66"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i><b class="cs-up kit-pill-v2" data-variant="soft" data-stat="luck" aria-hidden="true"><b class="cs-up-n">-</b></b></span>
             </div>
             <div class="ci-desc kit-box-v2">
               <p class="cc-head" data-i18n="cp.sk.head">[Passive Skill]</p>
@@ -15999,7 +16003,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
                    효과 문장(char.*.pass / .ult)은 한 글자도 안 건드렸다. -->
               <p class="cc-name"><i class="cc-ic" aria-hidden="true"><svg viewBox="0 0 40 40" aria-hidden="true" focusable="false"><path d="M20.6 30.6 17.4 37" stroke="#B9A8D6" stroke-width="2.6" stroke-linecap="round"/><path d="M13 12.5a6.4 6.4 0 0 1 6.4-5.6 6.4 6.4 0 0 1 6.2 4.8 5.6 5.6 0 0 1 5 5.5 5.6 5.6 0 0 1-3.4 5.2 5.9 5.9 0 0 1-5.4 4.6 6.2 6.2 0 0 1-5.3-2.4 5.8 5.8 0 0 1-6.2-3.2 5.6 5.6 0 0 1 2.7-8.9Z" fill="#FDF8FC" stroke="#C9B7DE" stroke-width="1.5" stroke-linejoin="round"/><ellipse cx="20.2" cy="17.6" rx="3.1" ry="2.7" fill="#E39D9A"/><ellipse cx="15.6" cy="13.4" rx="1.5" ry="1.9" fill="#E39D9A"/><ellipse cx="19.6" cy="11.6" rx="1.5" ry="1.9" fill="#E39D9A"/><ellipse cx="23.6" cy="12.9" rx="1.5" ry="1.9" fill="#E39D9A"/><path d="M8 8.5 8.9 11l2.5.9-2.5.9L8 15.3l-.9-2.5L4.6 12l2.5-.9Z" fill="#FCE69F"/><path d="M33 22.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8Z" fill="#FCE69F"/><path d="M31.5 8.6l.6 1.6 1.6.6-1.6.6-.6 1.6-.6-1.6-1.6-.6 1.6-.6Z" fill="#FCE69F"/></svg></i><b data-i18n="char.jelly.passname">Passive</b></p>
               <p class="cc-tip" data-i18n="char.jelly.tip">.</p>
-              <p class="cc-line"><b class="cc-k" data-i18n="pick.passive">Passive</b><span class="cc-pass" data-i18n="char.jelly.pass">.</span></p>
+              <p class="cc-line" hidden><b class="cc-k" data-i18n="pick.passive">Passive</b><span class="cc-pass" data-i18n="char.jelly.pass">.</span></p>
               <p class="cc-line"><b class="cc-k cc-k-u" data-i18n="pick.ult">Ultimate</b><span class="cc-ult" data-i18n="char.jelly.ult">.</span></p>
             </div>
           </div>
@@ -16017,10 +16021,10 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
             </div>
             <p class="ci-tag"><span class="ci-tag-k" data-i18n="pick.rec">Best for</span><b class="ci-tag-v kit-pill-v2" data-variant="soft" data-i18n="char.pudding.tag">Defender</b></p>
             <div class="cc-stats" aria-hidden="true">
-              <span class="cs"><b class="cs-k" data-i18n="stat.k1">Power</b><i class="cs-bar kit-gauge-v2" style="--v:82%;--f2-gv:0.82"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i></span>
-              <span class="cs"><b class="cs-k" data-i18n="stat.k2">Steady</b><i class="cs-bar kit-gauge-v2" style="--v:100%;--f2-gv:1"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i></span>
-              <span class="cs"><b class="cs-k" data-i18n="stat.k3">Agility</b><i class="cs-bar kit-gauge-v2" style="--v:88%;--f2-gv:0.88"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i></span>
-              <span class="cs"><b class="cs-k" data-i18n="stat.k4">Luck</b><i class="cs-bar kit-gauge-v2" style="--v:70%;--f2-gv:0.7"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i></span>
+              <span class="cs"><b class="cs-k" data-i18n="stat.k1">Power</b><i class="cs-bar kit-gauge-v2" style="--v:82%;--f2-gv:0.82"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i><b class="cs-up kit-pill-v2" data-variant="soft" data-stat="power" aria-hidden="true"><b class="cs-up-n">-</b></b></span>
+              <span class="cs"><b class="cs-k" data-i18n="stat.k2">Steady</b><i class="cs-bar kit-gauge-v2" style="--v:100%;--f2-gv:1"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i><b class="cs-up kit-pill-v2" data-variant="soft" data-stat="steady" aria-hidden="true"><b class="cs-up-n">-</b></b></span>
+              <span class="cs"><b class="cs-k" data-i18n="stat.k3">Agility</b><i class="cs-bar kit-gauge-v2" style="--v:88%;--f2-gv:0.88"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i><b class="cs-up kit-pill-v2" data-variant="soft" data-stat="agility" aria-hidden="true"><b class="cs-up-n">-</b></b></span>
+              <span class="cs"><b class="cs-k" data-i18n="stat.k4">Luck</b><i class="cs-bar kit-gauge-v2" style="--v:70%;--f2-gv:0.7"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i><b class="cs-up kit-pill-v2" data-variant="soft" data-stat="luck" aria-hidden="true"><b class="cs-up-n">-</b></b></span>
             </div>
             <div class="ci-desc kit-box-v2">
               <p class="cc-head" data-i18n="cp.sk.head">[Passive Skill]</p>
@@ -16031,7 +16035,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
                    효과 문장(char.*.pass / .ult)은 한 글자도 안 건드렸다. -->
               <p class="cc-name"><i class="cc-ic" aria-hidden="true"><svg viewBox="0 0 40 40" aria-hidden="true" focusable="false"><path d="M20.6 30.6 17.4 37" stroke="#B9A8D6" stroke-width="2.6" stroke-linecap="round"/><path d="M13 12.5a6.4 6.4 0 0 1 6.4-5.6 6.4 6.4 0 0 1 6.2 4.8 5.6 5.6 0 0 1 5 5.5 5.6 5.6 0 0 1-3.4 5.2 5.9 5.9 0 0 1-5.4 4.6 6.2 6.2 0 0 1-5.3-2.4 5.8 5.8 0 0 1-6.2-3.2 5.6 5.6 0 0 1 2.7-8.9Z" fill="#FDF8FC" stroke="#C9B7DE" stroke-width="1.5" stroke-linejoin="round"/><ellipse cx="20.2" cy="17.6" rx="3.1" ry="2.7" fill="#E39D9A"/><ellipse cx="15.6" cy="13.4" rx="1.5" ry="1.9" fill="#E39D9A"/><ellipse cx="19.6" cy="11.6" rx="1.5" ry="1.9" fill="#E39D9A"/><ellipse cx="23.6" cy="12.9" rx="1.5" ry="1.9" fill="#E39D9A"/><path d="M8 8.5 8.9 11l2.5.9-2.5.9L8 15.3l-.9-2.5L4.6 12l2.5-.9Z" fill="#FCE69F"/><path d="M33 22.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8Z" fill="#FCE69F"/><path d="M31.5 8.6l.6 1.6 1.6.6-1.6.6-.6 1.6-.6-1.6-1.6-.6 1.6-.6Z" fill="#FCE69F"/></svg></i><b data-i18n="char.pudding.passname">Passive</b></p>
               <p class="cc-tip" data-i18n="char.pudding.tip">.</p>
-              <p class="cc-line"><b class="cc-k" data-i18n="pick.passive">Passive</b><span class="cc-pass" data-i18n="char.pudding.pass">.</span></p>
+              <p class="cc-line" hidden><b class="cc-k" data-i18n="pick.passive">Passive</b><span class="cc-pass" data-i18n="char.pudding.pass">.</span></p>
               <p class="cc-line"><b class="cc-k cc-k-u" data-i18n="pick.ult">Ultimate</b><span class="cc-ult" data-i18n="char.pudding.ult">.</span></p>
             </div>
           </div>
@@ -16042,10 +16046,10 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
             </div>
             <p class="ci-tag"><span class="ci-tag-k" data-i18n="pick.rec">Best for</span><b class="ci-tag-v kit-pill-v2" data-variant="soft" data-i18n="char.sodawitch.tag">Big-hitter</b></p>
             <div class="cc-stats" aria-hidden="true">
-              <span class="cs"><b class="cs-k" data-i18n="stat.k1">Power</b><i class="cs-bar kit-gauge-v2" style="--v:100%;--f2-gv:1"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i></span>
-              <span class="cs"><b class="cs-k" data-i18n="stat.k2">Steady</b><i class="cs-bar kit-gauge-v2" style="--v:92%;--f2-gv:0.92"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i></span>
-              <span class="cs"><b class="cs-k" data-i18n="stat.k3">Agility</b><i class="cs-bar kit-gauge-v2" style="--v:96%;--f2-gv:0.96"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i></span>
-              <span class="cs"><b class="cs-k" data-i18n="stat.k4">Luck</b><i class="cs-bar kit-gauge-v2" style="--v:66%;--f2-gv:0.66"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i></span>
+              <span class="cs"><b class="cs-k" data-i18n="stat.k1">Power</b><i class="cs-bar kit-gauge-v2" style="--v:100%;--f2-gv:1"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i><b class="cs-up kit-pill-v2" data-variant="soft" data-stat="power" aria-hidden="true"><b class="cs-up-n">-</b></b></span>
+              <span class="cs"><b class="cs-k" data-i18n="stat.k2">Steady</b><i class="cs-bar kit-gauge-v2" style="--v:92%;--f2-gv:0.92"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i><b class="cs-up kit-pill-v2" data-variant="soft" data-stat="steady" aria-hidden="true"><b class="cs-up-n">-</b></b></span>
+              <span class="cs"><b class="cs-k" data-i18n="stat.k3">Agility</b><i class="cs-bar kit-gauge-v2" style="--v:96%;--f2-gv:0.96"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i><b class="cs-up kit-pill-v2" data-variant="soft" data-stat="agility" aria-hidden="true"><b class="cs-up-n">-</b></b></span>
+              <span class="cs"><b class="cs-k" data-i18n="stat.k4">Luck</b><i class="cs-bar kit-gauge-v2" style="--v:66%;--f2-gv:0.66"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i><b class="cs-up kit-pill-v2" data-variant="soft" data-stat="luck" aria-hidden="true"><b class="cs-up-n">-</b></b></span>
             </div>
             <div class="ci-desc kit-box-v2">
               <p class="cc-head" data-i18n="cp.sk.head">[Passive Skill]</p>
@@ -16056,7 +16060,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
                    효과 문장(char.*.pass / .ult)은 한 글자도 안 건드렸다. -->
               <p class="cc-name"><i class="cc-ic" aria-hidden="true"><svg viewBox="0 0 40 40" aria-hidden="true" focusable="false"><path d="M20.6 30.6 17.4 37" stroke="#B9A8D6" stroke-width="2.6" stroke-linecap="round"/><path d="M13 12.5a6.4 6.4 0 0 1 6.4-5.6 6.4 6.4 0 0 1 6.2 4.8 5.6 5.6 0 0 1 5 5.5 5.6 5.6 0 0 1-3.4 5.2 5.9 5.9 0 0 1-5.4 4.6 6.2 6.2 0 0 1-5.3-2.4 5.8 5.8 0 0 1-6.2-3.2 5.6 5.6 0 0 1 2.7-8.9Z" fill="#FDF8FC" stroke="#C9B7DE" stroke-width="1.5" stroke-linejoin="round"/><ellipse cx="20.2" cy="17.6" rx="3.1" ry="2.7" fill="#E39D9A"/><ellipse cx="15.6" cy="13.4" rx="1.5" ry="1.9" fill="#E39D9A"/><ellipse cx="19.6" cy="11.6" rx="1.5" ry="1.9" fill="#E39D9A"/><ellipse cx="23.6" cy="12.9" rx="1.5" ry="1.9" fill="#E39D9A"/><path d="M8 8.5 8.9 11l2.5.9-2.5.9L8 15.3l-.9-2.5L4.6 12l2.5-.9Z" fill="#FCE69F"/><path d="M33 22.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8Z" fill="#FCE69F"/><path d="M31.5 8.6l.6 1.6 1.6.6-1.6.6-.6 1.6-.6-1.6-1.6-.6 1.6-.6Z" fill="#FCE69F"/></svg></i><b data-i18n="char.sodawitch.passname">Passive</b></p>
               <p class="cc-tip" data-i18n="char.sodawitch.tip">.</p>
-              <p class="cc-line"><b class="cc-k" data-i18n="pick.passive">Passive</b><span class="cc-pass" data-i18n="char.sodawitch.pass">.</span></p>
+              <p class="cc-line" hidden><b class="cc-k" data-i18n="pick.passive">Passive</b><span class="cc-pass" data-i18n="char.sodawitch.pass">.</span></p>
               <p class="cc-line"><b class="cc-k cc-k-u" data-i18n="pick.ult">Ultimate</b><span class="cc-ult" data-i18n="char.sodawitch.ult">.</span></p>
             </div>
           </div>
@@ -16074,13 +16078,18 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
               <span class="ci-chip kit-slot-v2 kit-slot-v2--portrait" id="cp-pet-face" aria-hidden="true"></span>
               <span class="ci-plate kit-slot-v2 kit-slot-v2--name"><span class="ci-name" id="cp-pet-name">&nbsp;</span></span>
             </div>
-            <p class="ci-tag"><span class="ci-tag-k" data-i18n="pick.rec">Best for</span><b class="ci-tag-v kit-pill-v2" data-variant="soft" id="cp-pet-tag">&nbsp;</b><!-- [PG-0910] 파편 잔액 — 아이템 칸이 쓰는 그 크리스탈 액자(.cp-crystal.cp-gem)의 인스턴스 하나다. 새 도형 0 · 새 그림 0. 숫자는 «지금 보고 있는 레버 색»의 잔액이고, 그 색은 data-stat 이 말한다. --><b class="cp-crystal cp-gem cp-shardgem" id="cp-pet-shard" data-stat="power"><i class="cp-cr-ic" aria-hidden="true">💎</i><b class="cp-gem-n">0</b></b></p>
+            <p class="ci-tag"><span class="ci-tag-k" data-i18n="pick.rec">Best for</span><b class="ci-tag-v kit-pill-v2" data-variant="soft" id="cp-pet-tag">&nbsp;</b><!-- [PG-0910] 파편 잔액 — 아이템 칸이 쓰는 그 크리스탈 액자(.cp-crystal.cp-gem)의 인스턴스 하나다. 새 도형 0 · 새 그림 0. 숫자는 «지금 보고 있는 레버 색»의 잔액이고, 그 색은 data-stat 이 말한다. --><b class="cp-crystal cp-gem cp-shardgem" id="cp-pet-shard" data-stat="power" hidden><i class="cp-cr-ic" aria-hidden="true">💎</i><b class="cp-gem-n">0</b></b></p>
+            <!-- [T10-0926] 「추천 조합」 — 스탯 막대·강화 자리에 대신 선다(같은
+                 목록-태그 부품 .ci-tag 의 인스턴스, 새 부품 0). 값은 syncPetInfo()
+                 가 petComboNames() 로 채운다(펫의 편중 레버 petLeadLever() 와 같은
+                 스탯의 HERO_STATS 최댓값 1~2명, 새 데이터 0). -->
+            <p class="ci-tag" id="cp-pet-combo"><span class="ci-tag-k" data-i18n="pet.combo.k">Best team</span><b class="ci-tag-v kit-pill-v2" data-variant="soft" id="cp-pet-combo-v">&nbsp;</b></p>
             <!-- [PG-0910] W3 — 네 줄이 이제 **강화 손잡이**를 갖는다.
                  aria-hidden 을 뗄 이유: 안에 누를 수 있는 버튼이 생겼다 —
                  스크린리더에 안 보이는 버튼은 도달할 수 없는 버튼이다.
                  버튼은 이 판이 이미 쓰던 알약 부품(kit-pill-v2[soft])의 인스턴스고,
                  숫자·비활성·라벨은 전부 syncPetUp() 이 채운다. -->
-            <div class="cc-stats" id="cp-pet-stats">
+            <div class="cc-stats" id="cp-pet-stats" hidden>
             <span class="cs"><b class="cs-k" data-i18n="stat.k1">Power</b><i class="cs-bar kit-gauge-v2" data-pet="pwr" style="--v:25%;--f2-gv:.25"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i><button class="cs-up kit-pill-v2" data-variant="soft" data-pet-up="pwr" type="button" disabled><b class="cs-up-n">-</b></button></span>
             <span class="cs"><b class="cs-k" data-i18n="stat.k2">Steady</b><i class="cs-bar kit-gauge-v2" data-pet="std" style="--v:25%;--f2-gv:.25"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i><button class="cs-up kit-pill-v2" data-variant="soft" data-pet-up="std" type="button" disabled><b class="cs-up-n">-</b></button></span>
             <span class="cs"><b class="cs-k" data-i18n="stat.k3">Agility</b><i class="cs-bar kit-gauge-v2" data-pet="agi" style="--v:25%;--f2-gv:.25"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i><button class="cs-up kit-pill-v2" data-variant="soft" data-pet-up="agi" type="button" disabled><b class="cs-up-n">-</b></button></span>
@@ -16337,24 +16346,29 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
       <div class="set-row"><span class="set-k" data-i18n="settings.theme">Theme</span><button id="st-theme" class="set-tg" type="button" data-i18n-aria="aria.theme" aria-label="Theme">Dark</button></div>
       <div class="set-row"><span class="set-k" data-i18n="settings.lang">Language</span><button id="st-lang" class="set-tg" type="button" data-i18n-aria="aria.lang" aria-label="Language">English</button></div>
     </div>
-    <!-- 판정판 50 — 퀘스트 진입. 기존 설정 줄 부품(btn-modal/lilac)의 인스턴스
-         하나이고, 배지는 이미 살아 있는 `.badge-new`(비면 자동 숨김)다.
-         ⚠ 맵 두 띠(#map-top·#map-bot)는 자식이 전부 **절대 좌표 %**로 100% 를
-           채우고 있어(back 3.76~18.75 · hearts 21.91~55.23 · stars 56.31~78.06 ·
-           gear 81.40~96.32cqw / b1 2.14~32.53 · plate 34.22~65.88 · char 66.84~
-           82.27 · rec 82.91~98.06%) 빈 칸이 3cqw 미만이다 — 거기에 버튼을 더하려면
-           정본 버튼 넷의 좌표를 옮겨야 하고 그것은 부품 픽셀 변경이다. 메뉴 넷은
-           §6.8 이 «칩 한 칸 + 라벨 한 줄»로 잠갔다(:13827). 그래서 진입은 설정 줄
-           하나 + 메뉴 상태 한 줄(#menu-best)로 둔다. -->
-    <button id="st-quest" data-part="btn-modal" data-variant="lilac" class="btn btn-secondary" type="button" data-i18n-aria="aria.quest" aria-label="Quests"><span data-i18n="settings.quest">Quests</span><span id="quest-badge" class="badge-new" hidden></span></button>
-    <button id="st-rank" data-part="btn-modal" data-variant="lilac" class="btn btn-secondary" type="button" data-i18n-aria="aria.rank" data-i18n="settings.rank" aria-label="Records">Records</button>
-    <!-- 10차 §E — 본 컷툰 다시 보기. 아직 한 컷도 안 봤으면 game.js 가 숨긴다:
-         열어 봐야 빈 목록인 줄은 있으나 마나가 아니라 고장으로 읽힌다. -->
-    <button id="st-gallery" data-part="btn-modal" data-variant="lilac" class="btn btn-secondary" type="button" data-i18n-aria="aria.gallery" data-i18n="settings.gallery" aria-label="Story gallery" hidden>Story gallery</button>
+    <!-- [T8-0926 · 판정판 71] 퀘스트(→미션)·기록·스토리 갤러리·제작진 네 진입은
+         사용자 지시로 설정 창에서 지운다. 함수·i18n 키·모달 마크업은 그대로 둔다
+         (다른 소비처 — 미션은 왕국 「미션」 건물, 기록은 왕국 하단 바 #kd-bot-rec,
+         갤러리는 왕국 「서커스」 건물이 각자 openQuest/openRank/openGallery 를
+         그대로 부른다). 제작진(#modal-credits류) 마크업도 남기되 진입만 지운다 —
+         내용은 T4가 itch 페이지 CREDITS로 옮긴다. 남는 순서: 소리·진동·테마·언어 ·
+         게임 방법 · 닫기. -->
     <button id="st-howto" data-part="btn-modal" data-variant="lilac" class="btn btn-ghost" type="button" data-i18n-aria="aria.howto" data-i18n="menu.howto" aria-label="How to play">How to play</button>
-    <!-- 10차 §C — 제작진은 메뉴에서 설정창 안으로 들어왔다. -->
-    <button id="st-credits" data-part="btn-modal" data-variant="lilac" class="btn btn-ghost" type="button" data-i18n-aria="aria.credits" data-i18n="settings.credits" aria-label="Credits">Credits</button>
     <button id="st-close" data-part="btn-modal" data-variant="primary" class="btn btn-primary" type="button" data-i18n="settings.close">Close</button>
+  </div></div>
+
+  <!-- ============================================================
+       [T8-0926 · 판정판 70] 「준비 중」 모달 — 성·펫 하우스 전용. 기존 범용
+       안내/확인 창이 없어(#modal-confirm 은 예/아니오 확인창, 문구도 호출부가
+       매번 채우는 계약) 다른 열 창과 같은 문법으로 **새 인스턴스 1개**를
+       세운다: 판 = `.sheet.jbox.jbox--modal[data-part=modal-plate]`(다른 12창과
+       한 글자도 다르지 않다), X = 같은 `.r10-x.x-btn[data-w6x]`(기존 위임이
+       그대로 받는다), 버튼 = 같은 `.btn.btn-primary`. 새 부품 0 · 새 값 0. -->
+  <div id="modal-soon" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="soon-h"><div class="sheet jbox jbox--modal" data-part="modal-plate">
+    <h2 id="soon-h" data-i18n="soon.title">Coming Soon</h2>
+    <button class="r10-x x-btn" type="button" data-w6x="soon-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
+    <p class="cut-line" data-i18n="soon.body">Under construction &#8212; check back after the next update!</p>
+    <button id="soon-close" data-part="btn-modal" data-variant="primary" class="btn btn-primary" type="button" data-i18n="settings.close">Close</button>
   </div></div>
 
   <!-- ============================================================
@@ -16981,9 +16995,9 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
        (.kit-tab-v2)은 윗변만 둥글고 스페큘러가 좌상단인 «상단 탭»이라, 아래에
        뒤집어 붙이면 광원이 뒤집힌다(부품 계약 위반). 자리보다 부품을 지켰다. -->
   <div id="modal-quest" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="quest-h"><div class="sheet jbox jbox--modal" data-part="modal-plate">
-    <h2 id="quest-h" data-i18n="quest.title">Quests</h2>
+    <h2 id="quest-h" data-i18n="quest.title">Missions</h2>
     <button class="r10-x x-btn" type="button" data-w6x="quest-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
-    <div id="quest-tabs" class="kit-frame-v2__tabs qs-tabs" role="tablist" data-i18n-aria="aria.questTab" aria-label="Quest type">
+    <div id="quest-tabs" class="kit-frame-v2__tabs qs-tabs" role="tablist" data-i18n-aria="aria.questTab" aria-label="Mission type">
       <button class="kit-tab-v2 qs-tab" type="button" role="tab" data-qtab="daily" data-active aria-selected="true"><span class="cpt-lab" data-i18n="quest.tab.daily">Daily</span></button>
       <button class="kit-tab-v2 qs-tab" type="button" role="tab" data-qtab="weekly" aria-selected="false"><span class="cpt-lab" data-i18n="quest.tab.weekly">Weekly</span></button>
       <button class="kit-tab-v2 qs-tab" type="button" role="tab" data-qtab="epic" aria-selected="false"><span class="cpt-lab" data-i18n="quest.tab.epic">Epic</span></button>
@@ -26193,7 +26207,7 @@ window.TT_SFX = {
       'char.bangul.passname': 'Bubble Wave',
       'char.sseokssak.passname': 'Clean Sweep',
       'char.banjjak.passname': 'Spark Charge',
-      'cp.sk.head': '[Passive Skill]',
+      'cp.sk.head': '[Skill]',
       'cp.sk.eff': 'Effect',
       'cp.sk.skill': 'Skill',
       'cp.sk.use': 'Uses',
@@ -26781,6 +26795,7 @@ window.TT_SFX = {
       'credits.body': 'TenTwin: Jellypang World — art & music by the author, built with the game factory.',
       /* --- §H 캐릭터 추천 태그 -------------------------------------------- */
       'pick.rec': 'Best for',
+      'pet.combo.k': 'Best team',
       'char.ten.tag': 'Strategist',
       'char.twin.tag': 'Speedrunner',
       'char.jelly.tag': 'Thrill-seeker',
@@ -26948,11 +26963,11 @@ window.TT_SFX = {
       'act.attack': 'Attack',
       'act.special': 'Special',
       'act.pet': 'Pet',
-      'act.awaken': 'Awaken',
+      'act.awaken': 'Skill',
       'aria.attack': 'Attack gauge status',
       'aria.special': 'Fire your special attack',
       'aria.pet': 'Use your partner skill',
-      'aria.awaken': 'TenTwin Awakening',
+      'aria.awaken': 'Skill',
       /* 게이지 토스트는 "안 찼다"가 아니라 **채우는 법**을 말한다. 안 찼다는 것은
          게이지 바를 보면 이미 아는 사실이고, 정작 모르는 것은 무엇을 하면 차는가다
          — 특히 필살기는 매치마다 차는 것이 아니라 합이 10 ↔ 같은 숫자를 **번갈아**
@@ -27065,8 +27080,8 @@ window.TT_SFX = {
       'skill.sub': 'AWAKENING',
       /* 단계 3 개명: "소환" → "각성". 키는 그대로다 — castSkill 의 분기가 이 키로
          갈리므로 문구만 바뀌고 코드 경로는 한 글자도 안 움직인다. */
-      'skill.ten.name': 'TENTWIN AWAKENING — TWIN PRINCE!',
-      'skill.twin.name': 'TENTWIN AWAKENING — TENTEN PRINCE!',
+      'skill.ten.name': "Prince's Blessing!",
+      'skill.twin.name': 'Twin Vow!',
       'skill.jelly.name': 'JELLY TIME!',
       'skill.on.summon': 'TenTwin Awakening! Every match is a TenTwin chain now!',
       'skill.on.jelly': 'Jelly Time! Jackpot odds are up to 40%',
@@ -27133,7 +27148,7 @@ window.TT_SFX = {
          전투 전용 즉발 타격(d.me.sp -> doSpecial)은 act.special 이 따로 든다.
          키 이름(pick.ult)은 그대로다 — 마크업 data-i18n 6곳을 안 건드리는 것이
          24번 파도(사이드바 탭 은퇴)와의 충돌을 0 으로 만드는 유일한 길이다. */
-      'pick.ult': 'Awakening',
+      'pick.ult': 'Skill',
 
       /* --- v4 7차 §B: 기준 일러스트 수렴 (로고 부제 · 맵 배너 · 스탯 바 4종) ---
        * 스탯 넷은 밸런스 수치가 아니라 성격 소개다. 값은 index.html 의 --v 에
@@ -27177,7 +27192,7 @@ window.TT_SFX = {
       'settings.theme': 'Theme',
       'settings.lang': 'Language',
       /* 퀘스트 · 출석 (판정판 50) — 숫자는 전부 자리표시자 파생이다. */
-      'quest.title': 'Quests',
+      'quest.title': 'Missions',
       'quest.tab.daily': 'Daily',
       'quest.tab.weekly': 'Weekly',
       'quest.tab.epic': 'Epic',
@@ -27187,12 +27202,12 @@ window.TT_SFX = {
       'quest.none': 'Nothing to claim yet.',
       'quest.ready': 'Ready to claim: {n}',
       'quest.got': 'Jelly Stars +{v}',
-      'quest.bonus': 'All daily quests cleared! Heart +{n}',
+      'quest.bonus': 'All daily missions cleared! Heart +{n}',
       'quest.att.d': 'Day {n}',
-      'settings.quest': 'Quests',
-      'aria.quest': 'Open quests',
-      'aria.questTab': 'Pick which quests to show',
-      'menu.quest': 'Quests {n}/{g}',
+      'settings.quest': 'Missions',
+      'aria.quest': 'Open missions',
+      'aria.questTab': 'Pick which missions to show',
+      'menu.quest': 'Missions {n}/{g}',
       'dq.m10': 'Make a Ten {n} times',
       'dq.combo': 'Reach a x{n} combo',
       'dq.pet': 'Call your friend {n} times',
@@ -27207,7 +27222,7 @@ window.TT_SFX = {
       'dq.chain': 'Chain {n} in a row',
       'wq.wclear': 'Clear {n} stages this week',
       'wq.wstar': 'Earn {n} new stars this week',
-      'wq.wmis': 'Finish {n} daily quests',
+      'wq.wmis': 'Finish {n} daily missions',
       'wq.wmatch': 'Match {n} pairs this week',
       'ach.first': 'First pair',
       'ach.match100': 'Matched {n}',
@@ -27449,6 +27464,8 @@ window.TT_SFX = {
       'pg.arcade.d': 'Time Attack, Survival, 90s Damage.',
       'mode.title.arcade': 'Arcade Duel',
       'kd.soon': 'Opening soon!',
+      'soon.title': 'Coming Soon',
+      'soon.body': 'Under construction — check back after the next update!',
       'kd.visit': 'Yesterday-you saved up {n} Jelly Stars.',
       'kd.visit.first': 'Welcome to Jellypang Kingdom!',
       'kd.res.aria': 'Say hello'
@@ -27574,7 +27591,7 @@ window.TT_SFX = {
       'char.bangul.passname': '거품 파도',
       'char.sseokssak.passname': '싹쓸이',
       'char.banjjak.passname': '번쩍 충전',
-      'cp.sk.head': '[패시브 스킬]',
+      'cp.sk.head': '[스킬]',
       'cp.sk.eff': '효과',
       'cp.sk.skill': '기술',
       'cp.sk.use': '사용',
@@ -28112,6 +28129,7 @@ window.TT_SFX = {
       'credits.body': '틴트윈: 젤리팡 월드 — 그림·음악 제작자 제공, 게임 공장에서 만들었습니다.',
       /* --- §H 캐릭터 추천 태그 -------------------------------------------- */
       'pick.rec': '추천',
+      'pet.combo.k': '추천 조합',
       'char.ten.tag': '전략가',
       'char.twin.tag': '스피드러너',
       'char.jelly.tag': '두근두근파',
@@ -28260,11 +28278,11 @@ window.TT_SFX = {
       'act.attack': '공격',
       'act.special': '필살기',
       'act.pet': '펫소환',
-      'act.awaken': '각성',
+      'act.awaken': '스킬',
       'aria.attack': '공격 게이지 상태',
       'aria.special': '필살기 발동',
       'aria.pet': '펫 스킬 사용',
-      'aria.awaken': '텐트윈 각성',
+      'aria.awaken': '스킬',
       /* 게이지 토스트는 "안 찼다"가 아니라 **채우는 법**을 말한다. 안 찼다는 것은
          게이지 바를 보면 이미 아는 사실이고, 정작 모르는 것은 무엇을 하면 차는가다
          — 특히 필살기는 매치마다 차는 것이 아니라 합이 10 ↔ 같은 숫자를 **번갈아**
@@ -28365,8 +28383,8 @@ window.TT_SFX = {
       'skill.notyet': '각성 {n}% — 매치마다 차고, 콤보가 높을수록 빨리 차요.',
       'skill.sub': '각성',
       /* 단계 3 개명: "소환" → "각성". 키는 그대로 (castSkill 무수정). */
-      'skill.ten.name': '텐트윈 각성 — 트윈 왕자!',
-      'skill.twin.name': '텐트윈 각성 — 텐텐 왕자!',
+      'skill.ten.name': '왕자의 축복!',
+      'skill.twin.name': '쌍둥이 맹세!',
       'skill.jelly.name': '젤리 타임!',
       'skill.on.summon': '텐트윈 각성! 이제 모든 매치가 텐트윈 콤보예요',
       'skill.on.jelly': '젤리 타임! 잭팟 확률이 40%로',
@@ -28426,7 +28444,7 @@ window.TT_SFX = {
       'pick.locked': '잠김',
       'pick.passive': '패시브',
       /* 0910 각성/필살기 분리(판정판 25) — 위 en 블록의 짝. 키 이름 유지. */
-      'pick.ult': '각성',
+      'pick.ult': '스킬',
 
       /* --- v4 7차 §B: 기준 일러스트 수렴 --- */
       'menu.sub': '젤리팡 월드',
@@ -28453,7 +28471,7 @@ window.TT_SFX = {
       'settings.theme': '테마',
       'settings.lang': '언어',
       /* 퀘스트 · 출석 (판정판 50) — 숫자는 전부 자리표시자 파생이다. */
-      'quest.title': '퀘스트',
+      'quest.title': '미션',
       'quest.tab.daily': '일일',
       'quest.tab.weekly': '주간',
       'quest.tab.epic': '에픽',
@@ -28463,12 +28481,12 @@ window.TT_SFX = {
       'quest.none': '아직 받을 것이 없어요.',
       'quest.ready': '받을 수 있어요: {n}',
       'quest.got': '젤리별 +{v}',
-      'quest.bonus': '오늘 퀘스트 전부 완료! 하트 +{n}',
+      'quest.bonus': '오늘 미션 전부 완료! 하트 +{n}',
       'quest.att.d': '{n}일째',
-      'settings.quest': '퀘스트',
-      'aria.quest': '퀘스트 열기',
-      'aria.questTab': '어떤 퀘스트를 볼지 고르기',
-      'menu.quest': '퀘스트 {n}/{g}',
+      'settings.quest': '미션',
+      'aria.quest': '미션 열기',
+      'aria.questTab': '어떤 미션을 볼지 고르기',
+      'menu.quest': '미션 {n}/{g}',
       'dq.m10': '합 텐 {n}번 만들기',
       'dq.combo': '콤보 x{n} 이상 1회',
       'dq.pet': '펫 {n}번 소환',
@@ -28483,7 +28501,7 @@ window.TT_SFX = {
       'dq.chain': '연속 매치 {n}회',
       'wq.wclear': '이번 주 스테이지 {n}판 클리어',
       'wq.wstar': '이번 주 새 별 {n}개',
-      'wq.wmis': '일일 퀘스트 {n}회 완료',
+      'wq.wmis': '일일 미션 {n}회 완료',
       'wq.wmatch': '이번 주 짝 {n}번',
       'ach.first': '첫 짝',
       'ach.match100': '짝 {n}번',
@@ -28706,6 +28724,8 @@ window.TT_SFX = {
       'pg.arcade.d': '타임어택·서바이벌·90초 누적',
       'mode.title.arcade': '아케이드 대전',
       'kd.soon': '곧 열려요!',
+      'soon.title': '준비 중',
+      'soon.body': '공사 중이에요! 다음 업데이트를 기다려 주세요.',
       'kd.visit': '어제의 내가 젤리별 {n}개를 모아 뒀어요.',
       'kd.visit.first': '젤리팡 왕국에 온 걸 환영해요!',
       'kd.res.aria': '인사하기'
@@ -32049,11 +32069,15 @@ window.TT_SFX = {
        하면 되는지 한 줄로 말한다. 요소를 지우지 않고 hidden 만 토글하는 것은
        같은 판의 `.cc-name:has(> b:empty)` 접기와 같은 문법이다. */
     var emp = $('cp-pet-empty'), useln = $('cp-pet-useline');
-    if (useln) useln.hidden = !id;
+    /* [T10-0926] 「사용 한 판에 N회」 줄은 판정판 73으로 항상 접힌다(데이터·
+       petUsesFrom()·store 는 무변 — 표시만 지운다). */
+    if (useln) useln.hidden = true;
     if (emp) {
       if (id) emp.hidden = true;
       else { emp.textContent = t('cp.pet.empty', { free: petFreeNames() }); emp.hidden = false; }
     }
+    /* [T10-0926] 「추천 조합」 — 스탯 자리에 대신 선다. */
+    cpTxt($('cp-pet-combo-v'), null, id ? petComboNames(id) : '');
     if (!id) {
       cpTxt($('cp-pet-pass'), 'cp.sk.none');
       cpTxt($('cp-pet-use'), null, '-');
@@ -32103,6 +32127,20 @@ window.TT_SFX = {
       if (st[k] > st[best]) best = k;
     }
     return best;
+  }
+
+  /* [T10-0926] 「추천 조합」 — 펫의 편중 레버(petLeadLever, 위)와 같은 스탯이
+     가장 높은 주인공 1~2명. 새 데이터 0 — 기존 HERO_STATS/HERO_IDS 를
+     그대로 재는 것뿐이다(스탯 개편 74 전까지는 이 다섯 키 그대로). */
+  function petComboNames(id) {
+    var lever = petLeadLever(id), i, v;
+    var rows = [];
+    for (i = 0; i < HERO_IDS.length; i++) {
+      v = (HERO_STATS[HERO_IDS[i]] || {})[lever] || 0;
+      rows.push({ id: HERO_IDS[i], v: v });
+    }
+    rows.sort(function (a, b) { return b.v - a.v; });
+    return rows.slice(0, 2).map(function (r) { return t('char.' + r.id + '.name'); }).join(', ');
   }
 
   /**
@@ -45953,10 +45991,13 @@ window.TT_SFX = {
                mission 18.1(알파1.17+상단레터박스16.9) · pethouse 11.7(1.17+10.5)
              성(castle·notag/그림 없음)은 배경에 그려져 roof 없음 = flex-start 유지. */
   var KD_BUILDINGS = [
+    /* [T8-0926 · 판정판 70] 성(나무 위·밑동 성문 둘 다)은 출시 뒤 기획이라
+       「준비 중」 모달로 대신 연다(캐릭터 창은 하단 바 「캐릭터」 버튼이 그대로
+       맡는다). ic·tone·roof·art 는 무변 — 진입 함수만 바꾼다. */
     { id: 'castle-top', l: 50, t: 16.5, w: 20, h: 9,  chap: 1, key: 'kd.castle', hit: true, notag: true,
-      go: function () { openCharPanel(); } },
+      go: function () { kdSoonModal(); } },
     { id: 'castle',     l: 50, t: 32, w: 22, h: 18, chap: 1, key: 'kd.castle', hit: true, tone: 'purple', ic: 'crown',
-      go: function () { openCharPanel(); } },
+      go: function () { kdSoonModal(); } },
     { id: 'circus',     l: 19, t: 41, w: 33, h: 15, chap: 1, key: 'kd.circus', tone: 'mint', ic: 'star-empty', roof: 4.5,
       art: 'url("catalog/t3-bldg2-circus.webp")',
       go: function () { openGallery(); } },
@@ -45982,9 +46023,10 @@ window.TT_SFX = {
         for (i = 0; i < ids.length; i++) { if (openInvite(ids[i])) return; }
         kdSoon();
       } },
+    /* [T8-0926 · 판정판 70] 펫 하우스도 성과 같은 이유로 「준비 중」 모달. */
     { id: 'pethouse',   l: 17.4, t: 77.8, w: 29, h: 15, chap: 1, key: 'kd.pethouse', tone: 'orange', ic: 'heart', roof: 11.7,
       art: 'url("catalog/t3-bldg2-pethouse.webp")',
-      go: function () { openCharPanel(); cpTab('pet'); } },
+      go: function () { kdSoonModal(); } },
     { id: 'playground', l: 82.7, t: 78.1, w: 33, h: 15, chap: 1, key: 'kd.playground', tone: 'violet', ic: 'inf', roof: 16.3,
       art: 'url("catalog/t3-bldg2-playground.webp")',
       go: function () { openPlayground(); } }
@@ -46049,6 +46091,10 @@ window.TT_SFX = {
 
   /** 아직 모달이 없는 건물(우편함·초대 정자). 판정판 50/54 병합 전의 임시 배선. */
   function kdSoon() { toast(t('kd.soon')); J.sfx.ui(); }
+  /* [T8-0926 · 판정판 70] 성·펫 하우스 전용 — 토스트가 아니라 모달(#modal-soon)
+     이다. kdSoon() 은 우체국의 기존 계약(토스트)이라 그대로 두고 새 진입만
+     추가한다. */
+  function kdSoonModal() { openModal('modal-soon'); J.sfx.ui(); }
 
   /* --- 거주자 풀 (§26.3) ----------------------------------------------------
    * 해금 캐릭터 + 보유 펫 중 **전신 자산이 이미 구워져 있는 것**만 선다.
@@ -48456,6 +48502,10 @@ window.TT_SFX = {
            문자열이라 calc 로 무단위로 바꿀 수 없으므로, 값을 아는 유일한 자리인
            여기서 한 줄로 같이 써 준다. 옛 --v/--v0 은 그대로 남는다. */
         el.style.setProperty('--f2-gv', String(row[b].eff / 100));
+        /* [T10-0926] 판정판 73 — 캐릭터 탭 숫자 칩(펫 탭의 강화 알약과 같은
+           인스턴스, 클릭 없음). 값 = 이 스탯의 실효 %(위 --v 와 같은 수). */
+        var chip = el.parentNode && el.parentNode.querySelector ? el.parentNode.querySelector('.cs-up-n') : null;
+        if (chip) chip.textContent = String(row[b].eff);
         el.classList.toggle('is-b0same', row[b].base === row[b].eff);  /* [E31-0903] base == eff 면 기본선 마커를 숨긴다(CSS 가 받는다). `is-` 접두사인 이유: 배포본 델타표 하네스(scratchpad/boxdelta-0903/analyze.py)의 NOISE 목록이 `is-*` 를 지워 짝짓기 서명을 안 흔든다 — 처음 쓴 `cs-b0-same` 은 charpanel-char 의 짝 수를 74에서 70으로 움직였다 */
         /* 기본선 마커는 **실제 자식 노드**다. .cs-bar 의 두 의사요소는 이미 둘 다
            일하고 있고(::before = 필, ::after = 14차가 캡에 맞춰 둔 광택 노브),
@@ -49307,6 +49357,7 @@ window.TT_SFX = {
        안 는다(#cp-tabs·#mm-grid 가 쓰는 그 규약 그대로). */
     on($('st-quest'), 'click', function () { closeSettings(); openQuest('daily'); });
     on($('quest-close'), 'click', closeQuest);
+    on($('soon-close'), 'click', function () { closeModal('modal-soon'); J.sfx.ui(); });
     on($('quest-tabs'), 'click', function (ev) {
       var el = ev && ev.target;
       while (el && el !== this && !(el.classList && el.classList.contains('qs-tab'))) {
@@ -49412,6 +49463,10 @@ window.TT_SFX = {
            한다(위 스킨·초대와 반대 방향). */
         if ($('modal-quest') && !$('modal-quest').hidden) { closeQuest(); return; }
         if ($('modal-settings') && !$('modal-settings').hidden) { closeSettings(); return; }
+        /* [T8-0926 · 판정판 70] 「준비 중」 — 왕국에서 바로 여는 z70 겹, 위 둘과 같은
+           우선순위. 뒤로가기는 SELF_BACK 에 없는 평범한 .modal 이라 openSheet()
+           (아래 4번)가 이미 잡는다. */
+        if ($('modal-soon') && !$('modal-soon').hidden) { closeModal('modal-soon'); return; }
         // 10차 §C: 모드 시트는 메뉴 위에 떠 있는 한 겹이라 가장 먼저 닫힌다.
         if ($('modal-mode') && !$('modal-mode').hidden) { closeModeSheet(); return; }
         /* [KD61-0922] 놀이터 선택 창도 같은 우선순위의 한 겹이다. */
@@ -55432,6 +55487,56 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
       rgba(0,0,0,0)   var(--f2-arc-r5))
       right bottom / var(--f2-arc-r5) var(--f2-arc-r5) no-repeat;
 }
+/* [T8-0926 · 판정판 68] 탭 줄 양 끝 바깥의 곡선 조각 결함 — 부품 공통(원인: 위
+   ::before 가 매 탭마다 좌·우 어깨를 둘 다 그린다. 안쪽 탭끼리는 마주보는 두
+   어깨가 만나 시안의 이음매 홈이 되지만, 줄의 첫 탭은 왼쪽에·마지막 탭은
+   오른쪽에 짝이 없어 그 어깨가 판 위에 홀로 떠 보인다 — 다른 모달의 같은
+   탭(예: 상점 4탭)도 같은 자리에서 같은 결함이 난다). 고치는 값은 없다 — 짝이
+   없는 쪽 마스크 한 겹만 뺀다(반지름·알파·색 전부 위와 동일, 새 값 0). */
+.kit-tab-v2:first-child::before{
+  -webkit-mask:
+    radial-gradient(circle at 100% 0,
+      rgba(0,0,0,0)   var(--f2-arc-r0),
+      rgba(0,0,0,.68) var(--f2-fillet),
+      #000            var(--f2-arc-r1),
+      #000            var(--f2-arc-r2),
+      rgba(0,0,0,.68) var(--f2-arc-r3),
+      rgba(0,0,0,.36) var(--f2-arc-r4),
+      rgba(0,0,0,0)   var(--f2-arc-r5))
+      right bottom / var(--f2-arc-r5) var(--f2-arc-r5) no-repeat;
+  mask:
+    radial-gradient(circle at 100% 0,
+      rgba(0,0,0,0)   var(--f2-arc-r0),
+      rgba(0,0,0,.68) var(--f2-fillet),
+      #000            var(--f2-arc-r1),
+      #000            var(--f2-arc-r2),
+      rgba(0,0,0,.68) var(--f2-arc-r3),
+      rgba(0,0,0,.36) var(--f2-arc-r4),
+      rgba(0,0,0,0)   var(--f2-arc-r5))
+      right bottom / var(--f2-arc-r5) var(--f2-arc-r5) no-repeat;
+}
+.kit-tab-v2:last-child::before{
+  -webkit-mask:
+    radial-gradient(circle at 0 0,
+      rgba(0,0,0,0)   var(--f2-arc-r0),
+      rgba(0,0,0,.68) var(--f2-fillet),
+      #000            var(--f2-arc-r1),
+      #000            var(--f2-arc-r2),
+      rgba(0,0,0,.68) var(--f2-arc-r3),
+      rgba(0,0,0,.36) var(--f2-arc-r4),
+      rgba(0,0,0,0)   var(--f2-arc-r5))
+      left bottom / var(--f2-arc-r5) var(--f2-arc-r5) no-repeat;
+  mask:
+    radial-gradient(circle at 0 0,
+      rgba(0,0,0,0)   var(--f2-arc-r0),
+      rgba(0,0,0,.68) var(--f2-fillet),
+      #000            var(--f2-arc-r1),
+      #000            var(--f2-arc-r2),
+      rgba(0,0,0,.68) var(--f2-arc-r3),
+      rgba(0,0,0,.36) var(--f2-arc-r4),
+      rgba(0,0,0,0)   var(--f2-arc-r5))
+      left bottom / var(--f2-arc-r5) var(--f2-arc-r5) no-repeat;
+}
 .kit-tab-v2[data-active]{
   background:
     radial-gradient(closest-side, rgba(255,255,255,.24), rgba(255,255,255,0))
@@ -57576,7 +57681,8 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
    실측 결과(잉크 간격, 1배율): 390 +4.4 · 360 +4.1 · 414 +4.7 · 1280 +4.9 px
    봉인(되돌리기): 이 한 줄을 지우면 종전 배분으로 돌아간다. */
 #charpanel #cp-pet-stats .cs-bar { margin-left: calc(var(--f2-w) * .021); }
-#charpanel #cp-pet-stats .cs-up {
+#charpanel #cp-pet-stats .cs-up,
+#charpanel .cc-stats .cs-up {
   position: relative;
   flex: 0 0 calc(var(--f2-w) * .080);
   display: inline-flex;
@@ -57602,19 +57708,26 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
 }
 /* 색 = 그 레버의 파편 색. 판 위 배지(.tile[data-mk="shard-*"])와 **같은 토큰**을
    읽으므로, 빨강을 모아 빨강 줄에 쓴다는 사실이 두 화면에서 같은 색으로 보인다. */
-#charpanel #cp-pet-stats .cs-up[data-stat="power"]   { box-shadow: inset 0 0 0 calc(var(--f2-w) * .0030) var(--role-rw-shard-power-2); }
-#charpanel #cp-pet-stats .cs-up[data-stat="steady"]  { box-shadow: inset 0 0 0 calc(var(--f2-w) * .0030) var(--role-rw-shard-steady-2); }
-#charpanel #cp-pet-stats .cs-up[data-stat="agility"] { box-shadow: inset 0 0 0 calc(var(--f2-w) * .0030) var(--role-rw-shard-agility-2); }
-#charpanel #cp-pet-stats .cs-up[data-stat="luck"]    { box-shadow: inset 0 0 0 calc(var(--f2-w) * .0030) var(--role-rw-shard-luck-2); }
+#charpanel #cp-pet-stats .cs-up[data-stat="power"],
+#charpanel .cc-stats .cs-up[data-stat="power"]     { box-shadow: inset 0 0 0 calc(var(--f2-w) * .0030) var(--role-rw-shard-power-2); }
+#charpanel #cp-pet-stats .cs-up[data-stat="steady"],
+#charpanel .cc-stats .cs-up[data-stat="steady"]    { box-shadow: inset 0 0 0 calc(var(--f2-w) * .0030) var(--role-rw-shard-steady-2); }
+#charpanel #cp-pet-stats .cs-up[data-stat="agility"],
+#charpanel .cc-stats .cs-up[data-stat="agility"]   { box-shadow: inset 0 0 0 calc(var(--f2-w) * .0030) var(--role-rw-shard-agility-2); }
+#charpanel #cp-pet-stats .cs-up[data-stat="luck"],
+#charpanel .cc-stats .cs-up[data-stat="luck"]      { box-shadow: inset 0 0 0 calc(var(--f2-w) * .0030) var(--role-rw-shard-luck-2); }
 /* 손가락 목표를 키운다 — **자리는 그대로**다(.cs-hit 이 쓰는 그 문법). 줄 고랑
    (.0157W)의 절반씩만 먹으므로 이웃 줄의 목표를 뺏지 않는다. */
-#charpanel #cp-pet-stats .cs-up::after {
+#charpanel #cp-pet-stats .cs-up::after,
+#charpanel .cc-stats .cs-up::after {
   content: "";
   position: absolute;
   inset: calc(var(--f2-w) * -.0078) calc(var(--f2-w) * -.0060);
 }
-#charpanel #cp-pet-stats .cs-up > .cs-up-n { pointer-events: none; }
-#charpanel #cp-pet-stats .cs-up:active { transform: scale(.94); }
+#charpanel #cp-pet-stats .cs-up > .cs-up-n,
+#charpanel .cc-stats .cs-up > .cs-up-n { pointer-events: none; }
+#charpanel #cp-pet-stats .cs-up:active,
+#charpanel .cc-stats .cs-up:active { transform: scale(.94); }
 /* 부족·만렙·잠김 = 누를 수 없다. 지우지 않고 **흐리게** 두는 것이 요점이다 —
    버튼이 사라지면 «얼마가 모자란가»를 볼 자리도 같이 사라진다. */
 #charpanel #cp-pet-stats .cs-up[disabled] { opacity: .42; cursor: default; }
@@ -57665,7 +57778,8 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
 
 @media (prefers-reduced-motion: reduce) {
   #charpanel #cp-pet-stats .cs-bar.is-up { animation: none; }
-  #charpanel #cp-pet-stats .cs-up { transition: none; }
+  #charpanel #cp-pet-stats .cs-up,
+  #charpanel .cc-stats .cs-up { transition: none; }
 }
 
 /* ---- [SI-0909] 능력치 설명 — ⓘ 칩 + 한 줄 말풍선 ---------------------------
@@ -64091,7 +64205,10 @@ var SEQ={
   character:[CHAR],
   skin:[CHAR,till(function(){return open_('modal-skin');},function(){tap('cp-skin');})],
   settings:[SET],
-  records:[SET,till(function(){return open_('modal-rank');},function(){tap('st-rank');})],
+  /* [T8-0926] #st-rank(설정 창 진입)가 판정판 71로 지워졌다 — 왕국 하단 바의
+     같은 목적지(#kd-bot-rec, openRank('endless'))를 대신 누른다. SET(설정 열기)
+     단계는 더 필요 없다(왕국이 이미 착지 화면이라 그 버튼이 바로 보인다). */
+  records:[till(function(){return open_('modal-rank');},function(){tap('kd-bot-rec');})],
   howto:[SET,till(function(){return open_('modal-howto');},function(){tap('st-howto');})],
   /* 갤러리 줄은 본 컷툰이 있어야 나타나므로, 뷰어를 직접 재생한다. 두 번째 인자를
      빈 문자열로 주면 "봤다" 표시가 저장되지 않는다(cutFinish 의 `if (cutId)`). */
@@ -64410,6 +64527,7 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
        modal-invite    Esc → closeInvite(패널 안팎 모두) · 뒤로는 openSheet() ← 0925 추가(F4.1/F4.2)
        modal-settings  st-close(뒤로) · Esc → closeSettings            ← 0909 추가, 0925 Esc 보강(F4.1)
        modal-quest     Esc → closeQuest · 뒤로는 openSheet()            ← 0925 추가(F4.1/F4.2)
+       modal-soon      Esc → closeModal('modal-soon') · 뒤로는 openSheet() ← 0926 추가(판정판 70)
        modal-over      btn-menu(뒤로) · Esc → goMenu()                   ← 0909 추가, 0925 Esc 보강(F4.1)
        modal-arc       arc-menu(뒤로) · Esc → goMenu()                   ← 0909 추가, 0925 Esc 보강(F4.1)
        modal-daily     btn-daily-menu(뒤로) · Esc → goMenu()             ← 0909 추가, 0925 Esc 보강(F4.1)
@@ -67356,9 +67474,40 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
 #screen-kingdom #kd-top-stars-v { left: 65.7%; top: 43.6%; font-size: 5.00cqw; text-shadow: 0 .3cqw 0 rgba(196, 140, 40, .85); }
 
 /* 하단 바 — 공통 젤리박스 띠 + 조각 넷 */
-#screen-kingdom #kd-bot{ --jbox-tint: var(--role-jbox-tint-map-bot); --jbox-blur: var(--jbox-frost) brightness(1.06); height: calc(25.61cqw + var(--safe-b)); padding: 0 0 var(--safe-b); pointer-events: none; }
+#screen-kingdom #kd-bot{ height: calc(25.61cqw + var(--safe-b)); padding: 0 0 var(--safe-b); pointer-events: none; }
 #screen-kingdom #kd-bot button{ pointer-events: auto; }
 #screen-kingdom #kd-bot > *{ position: absolute; top: 14.0cqw; right: auto; transform: translateY(-50%); margin: 0; padding: 0; min-width: 0; min-height: 0; border: 0; border-radius: 0; background-color: transparent; background-size: 100% 100%; background-position: center; background-repeat: no-repeat; box-shadow: none; color: #FFFFFF; font-family: var(--font-display); line-height: 1; }
+/* [T8-0926 · 판정판 66] 왕국 하단 판 = 맵 하단 판과 같은 값. 원인(실측): 왕국 스코프는
+   --jbox-tint/--jbox-blur 만 얹었을 뿐 .jbox 의 기본 9-slice(jelly-box-c.webp, 재질색
+   #F7D8E6 분홍)를 벗기지 않아 분홍 겉판이 그대로 남았다 — 맵은 §10(위 :59351 「지도
+   하단 바 = kit-frame-v2 투명 판」)에서 border-image:none + flat background-color 로
+   그 겉판을 이미 벗겨 뒀다. 아래 넉 줄은 그 §10 블록의 값을 문자 그대로 옮긴 것이다
+   (새 값 0) — 이 규칙이 위 :67359 보다 나중이라 그 줄의 옛 --jbox-tint/--jbox-blur를
+   대신한다(그래서 그 두 선언은 위에서 지웠다). */
+#screen-kingdom #kd-bot{
+  --f2-w: calc(100vw - var(--safe-l) - var(--safe-r));
+  border: 0 !important;
+  border-image: none !important;
+  border-radius: calc(var(--f2-w) * .0626) calc(var(--f2-w) * .0626) 0 0 !important;
+  background-color: rgba(198,225,247,.40) !important;
+  background-image: none !important;
+  box-shadow:
+    0 0 var(--f2-soft-blur) var(--f2-soft-spread) rgba(143,126,156,.66),
+    0 0 var(--f2-soft-tail) 0 rgba(143,126,156,.20),
+    0 calc(var(--f2-w) * -.0068) calc(var(--f2-w) * .0190) rgba(120,95,125,.22),
+    inset 0 0 0 calc(var(--f2-w) * .0041) rgba(255,255,255,.72),
+    inset 0 calc(var(--f2-w) * .0150) 0 rgba(255,255,255,.30) !important;
+}
+#screen-kingdom #kd-bot::before{
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background-color: rgba(255,255,255,.09);
+  pointer-events: none;
+  z-index: 0;
+}
+#screen-kingdom #kd-bot > *{ z-index: 1; }
 #screen-kingdom #kd-bot-b1   { left: 2.14%;  width: 30.39%; height: 12.47cqw; background-image: url("catalog/stage-pill_star.webp?v=9"); }
 #screen-kingdom #kd-bot-plate{ left: 34.22%; width: 31.66%; height: 18.97cqw; background-image: url("catalog/stage-pill_chapter.webp"); }
 #screen-kingdom #kd-bot-char { left: 66.84%; width: 15.43%; height: 18.62cqw; background-image: url("catalog/stage-btn_chars.webp"); }
