@@ -16,6 +16,7 @@ const BUILD = '8decb36-20260908-1716';
 const CACHE = 'tentwin-' + BUILD;
 const SHELL = [
   './tentwin.html',
+  './play.html',            /* 데스크톱 껍데기(판정판 64) — 캐시에 없으면 아래 HTML 폴백이 tentwin.html 본문을 돌려줘 :24 replace 가 되풀이된다 */
   './tentwin.webmanifest',
   './catalog/pwa-icon-192.png',
   './catalog/pwa-icon-512.png',
