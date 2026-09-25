@@ -14,14 +14,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
 <script>
-/* 데스크톱 가로 창은 껍데기 play.html(세로 기둥 iframe)로 — 판정판 64. 프레임 안(itch·play)·?noshell=1·앱은 제외. */
+/* 짧은 변 ≥600(데스크톱·태블릿, 세로·가로 무관, T6)은 껍데기 play.html(세로 기둥 iframe)로
+   — 판정판 64. 프레임 안(itch·play)·?noshell=1·앱은 제외. */
 (function(){try{
   if(/\/play\.html$/i.test(location.pathname))return;
   if(window.self!==window.top)return;
   var q=location.search;
   if(/[?&](noshell=1|platform=twa)(&|$)/.test(q))return;
   var w=window.innerWidth,h=window.innerHeight;
-  // 데스크톱·태블릿(짧은 변 ≥600)은 전부 껍데기; 가로 폰(높이<600)만 본체 — 감사 A F1.1/F1.2
+  // 가로 폰(짧은 변<600)만 본체로 남는다 — 그 화면에서 왕국만 폭 캡되는 CSS는
+  // `#screen-kingdom` 절 끝의 `@media (min-aspect-ratio:1/1) and (max-height:599.98px)`
+  // (감사 A F1.1/F1.2).
   if(Math.min(w,h)<600)return;
   location.replace('play.html'+q+location.hash);
 }catch(e){}})();
@@ -67247,9 +67250,19 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
   text-shadow: 0 .28cqw 0 rgba(92, 58, 78, .7);
 }
 
-/* 데스크톱(가로·≥700) — 지도 데스크톱 절(63324~)과 같은 처방: 배율은 폰
-   (--mapui)에 못박고 바만 칸 폭을 쓴다. --mapui 숫자 그대로다(새 값 0). */
-@media (min-aspect-ratio: 1/1) and (min-width: 700px){
+/* 데스크톱(가로·≥700·≥600) — 지도 데스크톱 절(63324~)과 같은 처방: 배율은 폰
+   (--mapui)에 못박고 바만 칸 폭을 쓴다. --mapui 숫자 그대로다(새 값 0).
+   [T6 fix1 Critical 1] `and (min-height: 600px)` 를 붙였다 — 이 절은 원래 「가로·700px
+   이상」에서만 쓰려던 것인데 가로 폰(700px 이상·600px 미만, 예 844×390)에도 걸려
+   `--mapui`(=1% of 430px, 고정 px) 캡슐이 왕국 폭 캡 절(아래 `@media (min-aspect-ratio:
+   1/1) and (max-height: 599.98px)`)이 왕국을 360px 로 캡한 뒤에도 그 고정 px 로 남아
+   하트·코인 캡슐이 약 65px 겹치고(리뷰 Critical 1 실측: hearts.right 479.5 vs
+   stars.left 414.2) `#kd-bot` 높이도 폰 cqw 값(0.2561·kingdom.w=92.2px)이 아니라
+   110.1px 로 남았다. `min-height:600px` 를 붙이면 가로 폰에서 이 절 전체가 꺼지고,
+   캡슐은 이 절보다 앞서 있는 폰 cqw 규칙(`#screen-kingdom #kd-top-hearts` 등, 이 절
+   없이도 늘 켜져 있다)으로 돌아간다 — `#kd-bot` 좌표 오버라이드도 이 절 안에 있으므로
+   같이 꺼져 `.hudbar` 기본(`left/right:0;width:auto`)으로 되돌아간다(별도 규칙 불필요). */
+@media (min-aspect-ratio: 1/1) and (min-width: 700px) and (min-height: 600px){
   #screen-kingdom #kd-top{ height: calc(var(--mapui) * 20); }
   #screen-kingdom #kd-top-hearts{ left: calc(var(--mapui) * 21.91); top: calc(var(--mapui) * 5.51); width: calc(var(--mapui) * 33.32); height: calc(var(--mapui) * 12.60); }
   #screen-kingdom #kd-top-stars{ left: auto; right: calc(var(--mapui) * 21.94); top: calc(var(--mapui) * 5.87); width: calc(var(--mapui) * 21.75); height: calc(var(--mapui) * 11.71); }
@@ -67260,13 +67273,16 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
   #screen-kingdom #kd-bot{ left: 50%; right: auto; width: calc(var(--mapui) * 100); margin-left: calc(var(--mapui) * -50); height: calc(var(--mapui) * 25.61 + var(--safe-b)); --f2-w: calc(var(--mapui) * 100); container-type: inline-size; }
 }
 
-/* 가로 폰(높이<600, 껍데기 없음): 왕국만 세로 기둥 폭으로 캡 — 다른 화면은 자기 가로 규칙이 있다(감사 A F1.1) */
-@media (min-aspect-ratio: 1/1) and (max-height: 599px) {
+/* 가로 폰(짧은 변<600, 껍데기 없음): 왕국만 세로 기둥 폭으로 캡 — 다른 화면은 자기 가로
+   규칙이 있다(감사 A F1.1). 상한을 599.98px(599px 아닌)로 잡은 이유: 진입 스크립트의
+   JS 조건은 `Math.min(w,h) < 600`(정수 600 경계)인데 실제 뷰포트 높이는 소수일 수 있어
+   (예 599.4) `max-height:599px`로는 599<h<600 구간에서 「셸도 아니고 캡도 아닌」 틈이
+   생긴다 — 599.98px로 그 틈을 좁힌다(리뷰 Minor 3). `#kd-top`·`#kd-bot`은 위 데스크톱
+   절에 `min-height:600px`를 붙여(리뷰 Critical 1) 이 구간에서 통째로 꺼지므로 별도
+   되돌림 규칙이 필요 없다 — `.hudbar` 기본(`left/right:0;width:auto`)이 왕국 캡을 그대로
+   따라간다(실측 §fix1 보고 참조). */
+@media (min-aspect-ratio: 1/1) and (max-height: 599.98px) {
   #screen-kingdom { width: clamp(360px, 56.25vh, 480px); max-width: 100vw; margin-left: auto; margin-right: auto; }
-  /* #kd-bot는 위 데스크톱 절(:67251, min-width:700px)이 left:50%+음수 margin-left로 이미
-     자기 폭을 고정해 캡 전 폭(844)에 맞춰 어긋난다 — #kd-top과 같은 값(.hudbar 기본:
-     left/right:0, width:auto=부모 폭 그대로)으로 되돌려 왕국과 같이 캡한다. */
-  #screen-kingdom #kd-bot { left: 0; right: 0; width: auto; margin-left: 0; }
 }
 
 #kd-visit{
