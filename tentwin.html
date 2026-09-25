@@ -9766,6 +9766,16 @@ html.no-art-logo .logo-img  { display: none; }
    남아야 「다음 판에 다시」가 읽힐 수 있다. */
 #btn-continue[disabled] { opacity: .45; cursor: default; pointer-events: none; }
 .sk-act.buy { background: linear-gradient(180deg, var(--prim-art-gold) 0%, var(--prim-art-gold) 46%, var(--prim-art-yel-2) 46%, var(--prim-art-yel-2) 100%); box-shadow: inset 0 2px 0 rgba(255,255,255,.34), 0 0 0 2.5px var(--mL-outline), 0 3px 0 #C98A1E; color: var(--prim-art-ink); }
+/* [T8-0926 · Task10 스킨 버튼] 「장착」= kit-pill-v2[soft] 위에 .rank-tab(설정→
+   기록판 모드 탭, :51803 부근)의 켜짐 변주와 같은 민트 레시피만 얹는다(껍데기·
+   질감층은 kit-pill-v2가 그린다 — 폭도 이 인스턴스 스코프에서만 --f2-w 를
+   #modal-skin 이 이미 주는 값 그대로 물려받는다, 새 원시값 0). 「착용 중」은
+   손대지 않는다 — kit-pill-v2[soft][disabled] 의 기존 opacity .55 그대로다. */
+#modal-skin .sk-act.kit-pill-v2[data-equip]{
+  --f2-pill-soft: linear-gradient(180deg, var(--role-mint-face-a) 0%, var(--role-mint-face-a) 47%, var(--role-mint-face-b) 47%, var(--role-mint-face-b) 100%);
+  --f2-ink: var(--prim-white);
+  --role-f2-pill-soft-e: var(--role-mint-outline);
+}
 .sk-item.soon { opacity: .72; }
 .sk-item.soon .sk-th { background: linear-gradient(180deg, #E7D3BA 0%, #D3B995 100%); }
 /* 14차 — 이미 프레이밍돼 구워진 그림(곰돌이 5색)은 여기서 다시 당기지 않는다.
@@ -9910,6 +9920,11 @@ html.no-art-logo .logo-img  { display: none; }
   --lib-glyph-heart: url("catalog/lib-glyph-heart.webp");
   --lib-glyph-gear: url("catalog/lib-glyph-gear.webp");
   --lib-glyph-score: url("catalog/lib-glyph-score.webp");
+  /* [T8-0926 · 판정판 65] stage-pill_coin.webp(상단 코인 캡슐)에서 원반만 추출한
+     파생 글리프(새 생성 0, tentwin/ref-v2/manifest/frames.tentwin.json t4-glyph-coin).
+     상점 이름표·노드 데미지칩·퀘스트 아이템 아이콘 3곳 전용 — HUD 점수칩(.hc-score)은
+     사용자 GREEN이라 계속 --lib-glyph-score 를 쓴다(무접촉). */
+  --lib-glyph-coin: url("catalog/lib-glyph-coin.webp");
   --lib-glyph-flag: url("catalog/lib-glyph-flag.webp");
   --lib-glyph-target: url("catalog/lib-glyph-target.webp");
   --lib-glyph-clock: url("catalog/lib-glyph-clock.webp");
@@ -10741,7 +10756,7 @@ html.no-art-logo .logo-img  { display: none; }
 /* 14차 — 90초 누적 전용. 원래 .nchip-day(달력)를 쓰고 있었는데, 플레이 시트가
    5줄로 합쳐지면서 같은 시트 안의 「데일리」와 아이콘이 겹쳤다. 새 그림 발주 없이
    이미 있는 점수 글리프로 갈라 준다. */
-.nchip-dmg::before  { background-image: var(--lib-glyph-score); }
+.nchip-dmg::before  { background-image: var(--lib-glyph-coin); } /* [T8-0926·65] 코인 원반으로(상단 캡슐과 같은 자산) */
 
 .nrow-t { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .nrow-t > b {
@@ -22623,7 +22638,7 @@ window.TT_SFX = {
     { id: 'duel',   goal: [1, 1, 1],  fix: 2, ico: '--lib-badge-a' },
     { id: 'star2',  goal: [1, 1, 1],  fix: 2, ico: '--lib-star-gold' },
     { id: 'rush',   goal: [1000, 2000, 3500], ico: '--lib-glyph-clock' },
-    { id: 'item',   goal: [1, 1, 1],  fix: 1, ico: '--lib-glyph-score' },
+    { id: 'item',   goal: [1, 1, 1],  fix: 1, ico: '--lib-glyph-coin' }, /* [T8-0926·65] 코인 원반으로 */
     { id: 'match',  goal: [30, 60, 100],      ico: '--lib-glyph-target' },
     { id: 'chain',  goal: [3, 5, 8],          ico: '--lib-glyph-flag' }
   ];
@@ -31560,9 +31575,18 @@ window.TT_SFX = {
         act.textContent = '★' + sk.cost;
         act.setAttribute('data-buy', sk.id);
       } else if (cur && cur.id === sk.id) {
+        /* [T8-0926 · Task10 스킨 버튼] 「착용 중」= 기존 kit-pill-v2[soft][disabled]
+           변주 그대로(회색조 opacity .55, 새 값 0). */
+        act.className += ' kit-pill-v2';
+        act.setAttribute('data-variant', 'soft');
         act.textContent = t('skin.equipped');
         act.disabled = true;
       } else {
+        /* [T8-0926] 「장착」= kit-pill-v2[soft] + .rank-tab(설정→기록판 탭)의
+           켜짐 변주와 같은 민트 레시피(--role-mint-face-a/b·-outline·-contact,
+           새 원시값 0) — 아래 .sk-act[data-equip] 스코프 규칙. */
+        act.className += ' kit-pill-v2';
+        act.setAttribute('data-variant', 'soft');
         act.textContent = t('skin.equip');
         act.setAttribute('data-equip', sk.id);
       }
@@ -46007,7 +46031,7 @@ window.TT_SFX = {
     /* 상점 — 앱은 보석 상점(§20), 웹은 스킨 상점(젤리별). 웹에서 건물을 감추지
        않는다: 시안의 자리 하나가 비는 것보다 웹에도 쓸모 있는 문이 서는 쪽이 맞다.
        웹에서 openShop() 을 부르지 않으므로 「웹 상점 완전 숨김」(§18.7)은 그대로다. */
-    { id: 'shop',       l: 21, t: 58.4, w: 33, h: 14, chap: 1, key: 'kd.shop', tone: 'orange', ic: 'score', roof: 8.8,
+    { id: 'shop',       l: 21, t: 58.4, w: 33, h: 14, chap: 1, key: 'kd.shop', tone: 'orange', ic: 'coin', roof: 8.8, /* [T8-0926·65] score(톱니 테두리 오자산) -> coin(상단 캡슐 파생 원반) */
       art: 'url("catalog/t3-bldg2-shop.webp")',
       go: function () {
         var twa = false;
