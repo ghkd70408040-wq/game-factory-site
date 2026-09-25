@@ -21,7 +21,8 @@
   var q=location.search;
   if(/[?&](noshell=1|platform=twa)(&|$)/.test(q))return;
   var w=window.innerWidth,h=window.innerHeight;
-  if(!(w>=900&&h>=600&&w>h))return;
+  // 데스크톱·태블릿(짧은 변 ≥600)은 전부 껍데기; 가로 폰(높이<600)만 본체 — 감사 A F1.1/F1.2
+  if(Math.min(w,h)<600)return;
   location.replace('play.html'+q+location.hash);
 }catch(e){}})();
 </script>
@@ -67257,6 +67258,11 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
   #screen-kingdom #kd-top-heart-t{ font-size: calc(var(--mapui) * 4.40); text-shadow: 0 calc(var(--mapui) * .3) 0 rgba(150, 66, 92, .8); }
   #screen-kingdom #kd-top-stars-v{ font-size: calc(var(--mapui) * 5.00); text-shadow: 0 calc(var(--mapui) * .3) 0 rgba(196, 140, 40, .85); }
   #screen-kingdom #kd-bot{ left: 50%; right: auto; width: calc(var(--mapui) * 100); margin-left: calc(var(--mapui) * -50); height: calc(var(--mapui) * 25.61 + var(--safe-b)); --f2-w: calc(var(--mapui) * 100); container-type: inline-size; }
+}
+
+/* 가로 폰(높이<600, 껍데기 없음): 왕국만 세로 기둥 폭으로 캡 — 다른 화면은 자기 가로 규칙이 있다(감사 A F1.1) */
+@media (min-aspect-ratio: 1/1) and (max-height: 599px) {
+  #screen-kingdom { width: clamp(360px, 56.25vh, 480px); max-width: 100vw; margin-left: auto; margin-right: auto; }
 }
 
 #kd-visit{
