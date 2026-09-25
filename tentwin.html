@@ -16178,6 +16178,21 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
     <p id="mm-sum" class="mm-sum"></p>
   </div></div>
 
+  <!-- ============================================================
+       [T9-0926 · 판정판 69] 「스토리 극장」 — 옛 서커스 건물이 열던 스토리
+       갤러리(오프닝만 재생하던 openGallery, 모달 마크업 자체가 없었다)를
+       대신한다. 격자는 위 챕터 미니맵의 카드 부품(.mm-cell) **같은 인스턴스**
+       — 마크업·클래스·data-part·잠금 변주 그대로, 새 부품 0. 카드 1장 =
+       챕터 1개의 스토리(컷씬 CUTS_CHAP[c]). 열림 조건은 진행도(chapMax)가
+       아니라 그 챕터 스토리를 본 기록 cutSeen('chap'+c) — buildTheater()/
+       theaterPick() 참조(챕터 미니맵 함수들 옆). 요약 줄(#mm-sum류)은 두지
+       않는다(브리프 범위 = 카드 격자뿐). -->
+  <div id="modal-theater" class="modal r10m" hidden role="dialog" aria-modal="true" aria-labelledby="th-h"><div class="sheet r10-panel jbox jbox--modal" data-part="modal-plate">
+    <div class="r10-ribbon"><h2 id="th-h" data-i18n="theater.title">Story Theater</h2></div>
+    <button id="th-close" class="r10-x x-btn" type="button" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
+    <div id="th-grid" class="mm-grid"></div>
+  </div></div>
+
   <div id="modal-howto" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="howto-h"><div class="sheet jbox jbox--modal" data-part="modal-plate">
     <h2 id="howto-h" data-i18n="howto.title">How to play</h2>
     <button class="r10-x x-btn" type="button" data-w6x="howto-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
@@ -16377,10 +16392,10 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
     <!-- [T8-0926 · 판정판 71] 퀘스트(→미션)·기록·스토리 갤러리·제작진 네 진입은
          사용자 지시로 설정 창에서 지운다. 함수·i18n 키·모달 마크업은 그대로 둔다
          (다른 소비처 — 미션은 왕국 「미션」 건물, 기록은 왕국 하단 바 #kd-bot-rec,
-         갤러리는 왕국 「서커스」 건물이 각자 openQuest/openRank/openGallery 를
-         그대로 부른다). 제작진(#modal-credits류) 마크업도 남기되 진입만 지운다 —
-         내용은 T4가 itch 페이지 CREDITS로 옮긴다. 남는 순서: 소리·진동·테마·언어 ·
-         게임 방법 · 닫기. -->
+         갤러리는 [T9-0926 · 판정판 69] 「스토리 극장」으로 개조되어 왕국 건물이
+         openQuest/openRank/openTheater 를 각자 부른다). 제작진(#modal-credits류)
+         마크업도 남기되 진입만 지운다 — 내용은 T4가 itch 페이지 CREDITS로 옮긴다.
+         남는 순서: 소리·진동·테마·언어 · 게임 방법 · 닫기. -->
     <button id="st-howto" data-part="btn-modal" data-variant="lilac" class="btn btn-ghost" type="button" data-i18n-aria="aria.howto" data-i18n="menu.howto" aria-label="How to play">How to play</button>
     <button id="st-close" data-part="btn-modal" data-variant="primary" class="btn btn-primary" type="button" data-i18n="settings.close">Close</button>
   </div></div>
@@ -26752,6 +26767,12 @@ window.TT_SFX = {
       'aria.minimap': 'See all chapters',
       'aria.mmcell': 'Chapter {c}, {s} stars, {d} stages cleared',
       'aria.mmlock': 'Chapter {c}, locked',
+      /* [T9-0926 · 판정판 69] 스토리 극장 — 카드는 위 미니맵과 같은 부품
+         인스턴스(mm-cell 재사용, aria.mmcell/aria.mmlock 도 그대로 빌린다 —
+         챕터 n·별·클리어라는 같은 사실이라 새 aria 키를 안 만든다). 잠금
+         toast만 새 문구(챕터 도달 기준, minimap.locked의 탄 기준과 다른 사실). */
+      'theater.title': 'Story Theater',
+      'theater.locked': 'Reach Chapter {n} to unlock',
       'mode.arcade': 'Arcade',
       'mode.arcade.d': 'Endless. Chase your best.',
       'mode.daily.d': 'One board a day, for all.',
@@ -27486,7 +27507,9 @@ window.TT_SFX = {
       'kd.shop': 'Shop',
       'kd.pethouse': 'Pet House',
       /* [KD61-0922] 메인 화면 v2 — 서커스·미션·우체국 + 놀이터 선택 창 */
-      'kd.circus': 'Circus',
+      /* [T9-0926 · 판정판 69] 서커스 -> 스토리 극장(건물 이름표). 모달 제목은
+         기존 관례대로(quest.title/shop.title/pg.title처럼) 별도 키 theater.title. */
+      'kd.circus': 'Story Theater',
       'kd.mission': 'Missions',
       'kd.post': 'Post Office',
       'pg.title': 'Playground',
@@ -28102,6 +28125,10 @@ window.TT_SFX = {
       'aria.minimap': '챕터 전체 보기',
       'aria.mmcell': '챕터 {c}, 별 {s}개, {d}탄 클리어',
       'aria.mmlock': '챕터 {c}, 잠김',
+      /* [T9-0926 · 판정판 69] 스토리 극장 — 카드는 미니맵과 같은 부품
+         인스턴스라 aria 도 그대로 재사용. 잠금 toast만 새 문구(챕터 도달 기준). */
+      'theater.title': '스토리 극장',
+      'theater.locked': '{n}챕터에 도착하면 열려요',
       'mode.arcade': '아케이드',
       'mode.arcade.d': '끝없이. 최고 기록에 도전해요.',
       'mode.daily.d': '하루 한 판 — 모두가 같은 판.',
@@ -28748,7 +28775,8 @@ window.TT_SFX = {
       'kd.shop': '상점',
       'kd.pethouse': '펫 하우스',
       /* [KD61-0922] 메인 화면 v2 — 서커스·미션·우체국 + 놀이터 선택 창 */
-      'kd.circus': '서커스',
+      /* [T9-0926 · 판정판 69] 서커스 -> 스토리 극장(건물 이름표) */
+      'kd.circus': '스토리 극장',
       'kd.mission': '미션',
       'kd.post': '우체국',
       'pg.title': '놀이터',
@@ -29643,6 +29671,9 @@ window.TT_SFX = {
      'modal-soon',
      /* [KD61-0922] 놀이터 선택 창 — 왕국 위의 한 겹. 맵·판으로 나갈 때 남지 않게. */
      'modal-playground',
+     /* [T9-0926 · 판정판 69] 스토리 극장 — 놀이터 선택 창과 같은 이유(왕국
+        위의 한 겹, 맵·메뉴로 나갈 때 남으면 안 됨). */
+     'modal-theater',
      // v4 4차-a — 모험의 두 시트도 여기 목록에 있어야 지도/메뉴로 나갈 때 남지 않는다.
      'modal-node', 'modal-adv',
      /* W7.5 — 클래식 허브. #modal-mode 가 이 목록에 없는 것과 대칭이 아닌 데는
@@ -45659,6 +45690,57 @@ window.TT_SFX = {
     return i >= 0 ? s.slice(i + 1).replace(/^\s+/, '') : s;
   }
 
+  /** 챕터 카드 1장의 DOM(컴포넌트 t3-cell-minimap-chapter, CSS는 .mm-cell
+      그대로). [T9-0926 · 판정판 69] 챕터 미니맵과 스토리 극장이 이 하나를
+      같이 쓴다(중복 로직 금지) — 두 화면이 부르는 잠금 조건(미니맵은
+      진행도 chapMax, 극장은 본 기록 cutSeen)만 다르다. */
+  function buildChapCellDom(c, locked, current) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'mm-cell ' + (locked ? 'is-lock' : (current ? 'is-cur' : 'is-open'));
+    b.setAttribute('data-c', String(c));
+    /* 썸네일 — 지도가 그 챕터에서 실제로 까는 그림을 그대로 축소한다.
+       MAP_CHAPTERS[i].img 가 빈 챕터는 지도와 같이 --art-map-bg 로 떨어진다. */
+    var img = (MAP_CHAPTERS[c - 1] || {}).img;
+    b.style.setProperty('--mm-thumb', 'var(' + (img || '--art-map-bg') + ')');
+    var st = mmStars(c), dn = mmClears(c);
+    if (locked) b.setAttribute('aria-disabled', 'true');
+    if (current) b.setAttribute('aria-current', 'true');
+    b.setAttribute('aria-label', locked ? t('aria.mmlock', { c: c })
+                                        : t('aria.mmcell', { c: c, s: st, d: dn }));
+
+    var veil = document.createElement('span');
+    veil.className = 'mm-veil';
+    veil.setAttribute('aria-hidden', 'true');
+    b.appendChild(veil);
+
+    var k = document.createElement('b');
+    k.className = 'mm-k';
+    k.textContent = 'CHAPTER ' + c;
+    b.appendChild(k);
+
+    var nm = document.createElement('i');
+    nm.className = 'mm-n';
+    nm.textContent = mmName(c);
+    b.appendChild(nm);
+
+    /* 진행도 — 잠긴 칸도 줄을 **비우지 않는다**(둘 다 0). 줄이 사라지면 칸
+       높이가 흔들려 격자가 어긋난다(DESIGN §14.5). */
+    var p = document.createElement('span');
+    p.className = 'mm-p';
+    p.textContent = '\u2605 ' + st + '/' + (ADV_CHAPTER * 3)
+                  + ' \u00B7 \u2714 ' + dn + '/' + ADV_CHAPTER;
+    b.appendChild(p);
+
+    if (locked) {
+      var lk = document.createElement('span');
+      lk.className = 'mm-lock';
+      lk.setAttribute('aria-hidden', 'true');
+      b.appendChild(lk);
+    }
+    return b;
+  }
+
   /** 격자를 다시 짓는다. 열릴 때마다 부르고, 부팅 배선에서 한 번 부른다
       (관문 컷 02b-modal-minimap 은 하네스가 판을 «드러내기만» 하므로 —
       그때 격자가 비어 있으면 컷이 빈 판을 찍는다). */
@@ -45668,51 +45750,7 @@ window.TT_SFX = {
     var last = chapMax();
     g.innerHTML = '';
     for (var c = 1; c <= MAP_CHAPTERS.length; c++) {
-      var lock = c > last;
-      var b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'mm-cell ' + (lock ? 'is-lock' : (c === mapChap ? 'is-cur' : 'is-open'));
-      b.setAttribute('data-c', String(c));
-      /* 썸네일 — 지도가 그 챕터에서 실제로 까는 그림을 그대로 축소한다.
-         MAP_CHAPTERS[i].img 가 빈 챕터는 지도와 같이 --art-map-bg 로 떨어진다. */
-      var img = (MAP_CHAPTERS[c - 1] || {}).img;
-      b.style.setProperty('--mm-thumb', 'var(' + (img || '--art-map-bg') + ')');
-      var st = mmStars(c), dn = mmClears(c);
-      if (lock) b.setAttribute('aria-disabled', 'true');
-      if (c === mapChap) b.setAttribute('aria-current', 'true');
-      b.setAttribute('aria-label', lock ? t('aria.mmlock', { c: c })
-                                        : t('aria.mmcell', { c: c, s: st, d: dn }));
-
-      var veil = document.createElement('span');
-      veil.className = 'mm-veil';
-      veil.setAttribute('aria-hidden', 'true');
-      b.appendChild(veil);
-
-      var k = document.createElement('b');
-      k.className = 'mm-k';
-      k.textContent = 'CHAPTER ' + c;
-      b.appendChild(k);
-
-      var nm = document.createElement('i');
-      nm.className = 'mm-n';
-      nm.textContent = mmName(c);
-      b.appendChild(nm);
-
-      /* 진행도 — 잠긴 칸도 줄을 **비우지 않는다**(둘 다 0). 줄이 사라지면 칸
-         높이가 흔들려 격자가 어긋난다(DESIGN §14.5). */
-      var p = document.createElement('span');
-      p.className = 'mm-p';
-      p.textContent = '\u2605 ' + st + '/' + (ADV_CHAPTER * 3)
-                    + ' \u00B7 \u2714 ' + dn + '/' + ADV_CHAPTER;
-      b.appendChild(p);
-
-      if (lock) {
-        var lk = document.createElement('span');
-        lk.className = 'mm-lock';
-        lk.setAttribute('aria-hidden', 'true');
-        b.appendChild(lk);
-      }
-      g.appendChild(b);
+      g.appendChild(buildChapCellDom(c, c > last, c === mapChap));
     }
     setText('mm-sum', t('minimap.sum', { s: advStarTotal(), c: last }));
   }
@@ -45745,6 +45783,54 @@ window.TT_SFX = {
     closeMinimap();
     buildMap();          /* 배경·틴트·노드 10·명판을 그 챕터 값으로 */
     mapCenterCurrent();  /* 그 챕터의 앵커 오프셋으로 가로 스크롤 */
+  }
+
+  /* ---- [T9-0926 · 판정판 69] 스토리 극장 ---------------------------------
+   * 위 챕터 미니맵과 같은 카드 부품(buildChapCellDom)의 두 번째 소비처.
+   * 열림 조건만 다르다: 미니맵은 chapMax()(진행도), 극장은
+   * cutSeen('chap'+c)(그 챕터 스토리를 본 기록 — maybeChapCut() 이 챕터
+   * 최초 진입 때 세우는 그 플래그, 「스토리 갤러리」가 쓰려던 것과 같은
+   * 자리다 — 그 쪽은 갤러리 전용 트랙이 아예 없었다). 옛 openGallery()
+   * (오프닝만 재생, 모달 없음)를 대신한다 — KD_BUILDINGS circus.go 의
+   * 유일한 호출부였다. */
+  function theaterOpen(c) { return cutSeen('chap' + c); }
+
+  function buildTheater() {
+    var g = $('th-grid');
+    if (!g || typeof document === 'undefined') return;
+    g.innerHTML = '';
+    for (var c = 1; c <= MAP_CHAPTERS.length; c++) {
+      g.appendChild(buildChapCellDom(c, !theaterOpen(c), false));
+    }
+  }
+
+  function openTheater() {
+    buildTheater();
+    openModal('modal-theater');
+  }
+
+  function closeTheater() { closeModal('modal-theater'); }
+
+  function theaterPick(c) {
+    if (!(c >= 1) || c > MAP_CHAPTERS.length) return;
+    if (!theaterOpen(c)) {
+      var cell = document.querySelector
+        ? document.querySelector('#th-grid .mm-cell[data-c="' + c + '"]') : null;
+      if (cell && cell.classList) {
+        cell.classList.remove('mm-shake');
+        void cell.offsetWidth;               /* 애니메이션 재시작 (mmPick 과 같은 처방) */
+        cell.classList.add('mm-shake');
+      }
+      toast(t('theater.locked', { n: c }));
+      J.sfx.fail();
+      return;
+    }
+    closeTheater();
+    /* [T9-0926 fix1] playCuts() 는 showScreen('screen-story') 만 하고 화면을
+       되돌리지 않는다 — enterKingdom() 으로 왕국 화면부터 되돌린 뒤(옛
+       openGallery() 콜백·maybeChapCut() 콜백과 같은 「돌아갈 화면부터」 규약)
+       그 위에 극장 모달을 다시 띄운다. */
+    playCuts(CUTS_CHAP[c], 'chap' + c, function () { enterKingdom(); openTheater(); });
   }
 
   /** 챕터를 한 칸 옮긴다. 열린 챕터 밖으로는 나가지 않는다. */
@@ -46061,7 +46147,10 @@ window.TT_SFX = {
       go: function () { kdSoonModal(); } },
     { id: 'circus',     l: 19, t: 41, w: 33, h: 15, chap: 1, key: 'kd.circus', tone: 'mint', ic: 'star-empty', roof: 4.5,
       art: 'url("catalog/t3-bldg2-circus.webp")',
-      go: function () { openGallery(); } },
+      /* [T9-0926 · 판정판 69] 서커스 -> 스토리 극장. ic·tone·roof·art 는 무변
+         (사용자 지시 「좋은 단어로」 — 지휘자 확정 ko 스토리 극장/en Story
+         Theater) — 진입 함수만 openGallery() -> openTheater() 로. */
+      go: function () { openTheater(); } },
     { id: 'mission',    l: 85, t: 42, w: 26, h: 14.5, chap: 1, key: 'kd.mission', tone: 'mint', ic: 'target', roof: 18.1,
       art: 'url("catalog/t3-bldg2-mission.webp")',
       go: function () { openQuest('daily'); } },
@@ -47291,11 +47380,10 @@ window.TT_SFX = {
     return true;
   }
 
-  /** 설정창 "갤러리" — 오프닝을 다시 본다. 끝나면 있던 자리(메뉴)로 돌아간다. */
-  function openGallery() {
-    closeSettings();
-    playCuts(CUTS_OPEN, 'open', function () { syncMenu(); enterKingdom(); });   /* [KD57-0911] */
-  }
+  /* [T9-0926 · 판정판 69] 옛 openGallery()(오프닝만 재생, 모달 없음)는 여기
+     있었다 — KD_BUILDINGS circus 의 유일한 호출부가 openTheater() 로
+     바뀌며 호출부가 사라져 제거한다. 대체 = buildTheater()/openTheater()/
+     closeTheater()/theaterPick()(챕터 미니맵 옆, buildChapCellDom 뒤). */
 
   /* ---- §H 캐릭터 스탯 4종 -------------------------------------------------
    * 막대의 길이는 **패시브의 실제 계수에서 나온다**(§H: 하드코딩한 장식 숫자
@@ -48933,6 +49021,20 @@ window.TT_SFX = {
       mmPick(parseInt(cell.getAttribute('data-c'), 10) || 0);
     });
     buildMinimap();
+    /* [T9-0926 · 판정판 69] 스토리 극장 — 왕국 건물(kd-b-circus)의 go()가
+       연다(KD_BUILDINGS 참조). 여기서는 닫기·격자 위임만 미니맵과 같은
+       문법으로. buildTheater() 도 buildMinimap() 과 같은 이유로 부팅 때 한 번
+       무조건 부른다(관문 컷 23-modal-theater 가 판을 «드러내기만» 하므로 —
+       그때 격자가 비어 있으면 컷이 빈 판을 찍는다. 같은 이유로 openMinimap/
+       buildMinimap 도 window.Game 에 안 올라가 있다 — 여기서도 안 올린다). */
+    buildTheater();
+    on($('th-close'), 'click', function () { closeTheater(); });
+    on($('th-grid'), 'click', function (e) {
+      var el = e && e.target;
+      var cell = (el && el.closest) ? el.closest('.mm-cell') : null;
+      if (!cell) return;
+      theaterPick(parseInt(cell.getAttribute('data-c'), 10) || 0);
+    });
     on($('map-path'), 'click', function (ev) {
       /* 드래그와 탭의 구분 (§A): 6px 를 넘게 움직였으면 이 클릭은 탐험의
          부산물이지 선택이 아니다. 브라우저는 둘을 구분해 주지 않으므로
@@ -49520,6 +49622,9 @@ window.TT_SFX = {
            우선순위. 뒤로가기는 SELF_BACK 에 없는 평범한 .modal 이라 openSheet()
            (아래 4번)가 이미 잡는다. */
         if ($('modal-soon') && !$('modal-soon').hidden) { closeModal('modal-soon'); return; }
+        /* [T9-0926 · 판정판 69] 스토리 극장 — 왕국에서 바로 여는 같은 z70 겹.
+           뒤로가기도 SELF_BACK 에 없는 평범한 .modal 이라 openSheet()가 잡는다. */
+        if ($('modal-theater') && !$('modal-theater').hidden) { closeTheater(); return; }
         // 10차 §C: 모드 시트는 메뉴 위에 떠 있는 한 겹이라 가장 먼저 닫힌다.
         if ($('modal-mode') && !$('modal-mode').hidden) { closeModeSheet(); return; }
         /* [KD61-0922] 놀이터 선택 창도 같은 우선순위의 한 겹이다. */
@@ -60546,6 +60651,7 @@ html[lang="en"] .mode-list [data-part="btn-picture"] .bp-badge[data-badge="stage
 #modal-clear .sheet > h2,
 #modal-rank .sheet > h2,
 #modal-minimap .r10-ribbon,
+#modal-theater .r10-ribbon,
 #modal-node .r10-ribbon,
 #modal-shop .r10-ribbon,
 #modal-mode .r10-ribbon,
@@ -60789,6 +60895,7 @@ html[lang="en"] .mode-list [data-part="btn-picture"] .bp-badge[data-badge="stage
   #modal-clear .sheet > h2,
   #modal-rank .sheet > h2,
   #modal-minimap .r10-ribbon,
+  #modal-theater .r10-ribbon,
   #modal-node .r10-ribbon,
   #modal-shop .r10-ribbon,
   #modal-mode .r10-ribbon,
@@ -60827,6 +60934,7 @@ html[lang="en"] .mode-list [data-part="btn-picture"] .bp-badge[data-badge="stage
   #modal-clear .sheet > h2::before,
   #modal-rank .sheet > h2::before,
   #modal-minimap .r10-ribbon::before,
+  #modal-theater .r10-ribbon::before,
   #modal-node .r10-ribbon::before,
   #modal-shop .r10-ribbon::before,
   #modal-mode .r10-ribbon::before,
@@ -62933,6 +63041,7 @@ html[lang="en"] .mode-list [data-part="btn-picture"] .bp-badge[data-badge="stage
 #modal-clear .sheet > h2,
 #modal-rank .sheet > h2,
 #modal-minimap .r10-ribbon,
+#modal-theater .r10-ribbon,
 #modal-node .r10-ribbon,
 #modal-shop .r10-ribbon,
 #modal-mode .r10-ribbon,
@@ -63023,6 +63132,7 @@ html[lang="en"] .mode-list [data-part="btn-picture"] .bp-badge[data-badge="stage
 #modal-clear .sheet > h2,
 #modal-rank .sheet > h2,
 #modal-minimap .r10-ribbon,
+#modal-theater .r10-ribbon,
 #modal-node .r10-ribbon,
 #modal-shop .r10-ribbon,
 #modal-mode .r10-ribbon,
@@ -63125,6 +63235,7 @@ html[lang="en"] .mode-list [data-part="btn-picture"] .bp-badge[data-badge="stage
 #modal-clear .sheet > h2::before,
 #modal-rank .sheet > h2::before,
 #modal-minimap .r10-ribbon::before,
+#modal-theater .r10-ribbon::before,
 #modal-node .r10-ribbon::before,
 #modal-shop .r10-ribbon::before,
 #modal-mode .r10-ribbon::before,
@@ -63199,6 +63310,7 @@ html[lang="en"] .mode-list [data-part="btn-picture"] .bp-badge[data-badge="stage
 #modal-clear .sheet > h2,
 #modal-rank .sheet > h2,
 #modal-minimap .r10-ribbon,
+#modal-theater .r10-ribbon,
 #modal-node .r10-ribbon,
 #modal-shop .r10-ribbon,
 #modal-mode .r10-ribbon,
@@ -63270,6 +63382,7 @@ html[lang="en"] .mode-list [data-part="btn-picture"] .bp-badge[data-badge="stage
   --wcap-panT: calc(1px + var(--f2-w) * .0210);
 }
 #modal-minimap .r10-ribbon,
+#modal-theater .r10-ribbon,
 #modal-node .r10-ribbon,
 #modal-shop .r10-ribbon,
 #modal-mode .r10-ribbon,
@@ -63762,6 +63875,7 @@ html[lang="en"] #modal-arc.is-arcdmg .sheet > h2{ --ttl:url("catalog/ttl-arcdmg-
   .r10-ribbon > h2 { font-size: 17px; }
 }
 #modal-minimap .r10-ribbon > h2,
+#modal-theater .r10-ribbon > h2,
 #modal-node .r10-ribbon > h2,
 #modal-shop .r10-ribbon > h2,
 #modal-mode .r10-ribbon > h2,
@@ -63775,6 +63889,7 @@ html[lang="en"] #modal-arc.is-arcdmg .sheet > h2{ --ttl:url("catalog/ttl-arcdmg-
 
 /* [0911] #modal-arcade 은퇴 — 같은 규칙은 #modal-classic 이 이미 자기 블록에서 받는다. */
 #modal-minimap .sheet.r10-panel,
+#modal-theater .sheet.r10-panel,
 #modal-node .sheet.r10-panel {
   border-image: none;
   border-style: none;
@@ -64542,6 +64657,7 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
        modal-settings  st-close(뒤로) · Esc → closeSettings            ← 0909 추가, 0925 Esc 보강(F4.1)
        modal-quest     Esc → closeQuest · 뒤로는 openSheet()            ← 0925 추가(F4.1/F4.2)
        modal-soon      Esc → closeModal('modal-soon') · 뒤로는 openSheet() ← 0926 추가(판정판 70)
+       modal-theater   Esc → closeTheater() · 뒤로는 openSheet()         ← 0926 추가(판정판 69)
        modal-over      btn-menu(뒤로) · Esc → goMenu()                   ← 0909 추가, 0925 Esc 보강(F4.1)
        modal-arc       arc-menu(뒤로) · Esc → goMenu()                   ← 0909 추가, 0925 Esc 보강(F4.1)
        modal-daily     btn-daily-menu(뒤로) · Esc → goMenu()             ← 0909 추가, 0925 Esc 보강(F4.1)
@@ -66557,11 +66673,16 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
 #screen-map #map-plate .mp-txt { padding: 0; }
 
 #modal-minimap .sheet { gap: 10px; }
+#modal-theater .sheet { gap: 10px; }
 
 /* ---- 격자 -----------------------------------------------------------------
    2열 **고정**이다(auto-fill 이 아니다). 390 과 1280 이 같은 그림이어야
    레이아웃 관문의 판정이 하나로 남는다(DESIGN §14.8). */
-#mm-grid {
+/* [T9-0926 · 판정판 69] #mm-grid -> .mm-grid(선택자를 클래스로 넓힘) —
+   마크업이 이미 이 이름을 클래스로도 갖고 있었다(id="mm-grid"
+   class="mm-grid"); 스토리 극장의 #th-grid.mm-grid 도 같은 규칙을
+   그대로 받는다(새 CSS 0). */
+.mm-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
