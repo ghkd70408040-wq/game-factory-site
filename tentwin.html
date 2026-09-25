@@ -14147,8 +14147,10 @@ html[data-platform="twa"] #app-intro.is-hold .api-char{
   --kd-sky: #7FC3E8;
 }
 </style>
-<!-- 최우선 2장만 preload — 젤리판(세 인터페이스 공용)과 플레이 팝업 레터링이다.
-     나머지 31장은 부트 뒤 유휴 프리로더(#catalog-preload)가 데운다. 여기에 더
+<!-- 최우선 2장만 preload — 젤리판 9슬라이스와 플레이 팝업 레터링이다.
+     [T11-0926 · 리뷰 M-3] 젤리판 webp 의 실제 소비처는 이제 TWA 로딩 판 .apl-plate 하나다(모달 22창은 코드 젤리,
+     맵/왕국 띠·전투 슬래브는 border-image none). 웹 빌드에서는 안 쓰이는 preload 가 될 수 있다 — 둘지 말지는
+     지휘자 판정(출시 뒤 백로그). 나머지 31장은 부트 뒤 유휴 프리로더(#catalog-preload)가 데운다. 여기에 더
      얹으면 초기 로드 대역폭을 게임 코드와 다투게 되므로 늘리지 않는다. -->
 <!-- [jelly-c 0910] 재베이크판으로 교체. 되돌리기: href="catalog/jelly-box.webp" -->
 <link rel="preload" as="image" href="catalog/jelly-box-c.webp">
@@ -51511,7 +51513,7 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
        구워져 있고 catalog 는 이 파도에서 무접촉이다. **미결로 올린다.**
      되돌리기: 아래 한 줄을 --modal-tint:#C6B7C8; 로 바꾼다.
      그 앞 봉인: --modal-tint:rgba(255,242,255,.17); */
-  --modal-tint:transparent;  /* [jelly-c 0910] 0910 부터 뒤쪽 jelly-box-core#2 의 선언이 이긴다 — 이 줄은 그대로 두되(캐스케이드에서 뒤가 이긴다) 사는 값은 저기 --modal-tint:var(--role-modal-tint) 다. */
+  --modal-tint:transparent;  /* [jelly-c 0910] 0910 부터 뒤쪽 jelly-box-core#2 의 선언이 이긴다 — 이 줄은 그대로 두되(캐스케이드에서 뒤가 이긴다) 사는 값은 저기 스코프 규칙의 것이다. [T11-0926] 그 값도 이제 transparent(webp 은퇴로 보정층 소비처 0) — 둘이 같은 값이 됐다. */
   --modal-glass:blur(0px) saturate(1.06);
 }
 .jbox,
@@ -51546,8 +51548,10 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
 .jbox--modal,
 [data-part="modal-plate"]{ /* 팝업/노드카드 — [0908 원칙 0] 부품 modal-plate(정본 engine §modal-plate)의 사본.
      [lineage-0908] 계보 판정: 정본 코드 젤리 .work-frame[data-part="modal"](S11 값)과는 **다른 Component** — 실루엣 IoU .883,
-     jelly-box 모서리가 더 둥글고 상변이 볼록(Δ≈1.2%W), engine 은 --wf-L0-R .07w + 탭. 게임 15 시트는 전부 이 이미지 변주,
-     코드 젤리는 게임 소비처 0. 통합하지 않고 매니페스트 t2-plate-modal-pink.lineage 에 Shape·값 차 표를 기록했다(값 무변). */
+     jelly-box 모서리가 더 둥글고 상변이 볼록(Δ≈1.2%W), engine 은 --wf-L0-R .07w + 탭. (0908 당시) 게임 15 시트는 전부 이 이미지 변주,
+     코드 젤리는 게임 소비처 0. 통합하지 않고 매니페스트 t2-plate-modal-pink.lineage 에 Shape·값 차 표를 기록했다(값 무변).
+     [T11-0926 갱신] 이제는 반대다 — 게임 22 시트 전부가 아래 코드 젤리(::before/::after · 캐릭터 선택 판 재질)이고 이미지 변주는
+     이 등급에서 은퇴했다. 계보 분열은 닫혔다(젤리판 v1.0 층 어휘 공유 · 코너 구현만 shape() vs corner-shape). */
   --jbox-biw:48px; --jbox-radius:40px; --jbox-bw:1.5px;
   /* ===== [T11-0926 · 판정판 75] 모달 판 = 젤리판 v1.0 층 · **캐릭터 선택 판 재질** ==================
      사용자 지시(2026-09-25): 「맵 하단 바·캐릭터 선택 판은 깔끔하고 정돈돼 있는데 메인 젤리 모달판은
@@ -51560,6 +51564,7 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
      §6 done-gate 「구현 계열 1」 규칙: 이 등급 규칙 안의 토큰은 전부 --jbox- 한 계열이어야 한다. engine §modal-plate 의
      --mp- 접두는 게임 접두 표(components-gate --prefixes)에 없어 두 계열(--jbox-, --mp-?)로 세어져 FAIL 이었다).
        Shape  L0  실루엣 = 모달 자신의 반경 --jbox-radius 40px(모양 유지) + 초타원 코너(corner-shape).
+                  [T11 fix1 · 지휘자 판정 I-3②] 반경은 「모양」(모달 고유)이지 재질이 아니다 — 40px 유지(캐릭판 44.6 아님).
                   K 는 정본 engine.css L0 코너 3차 베지에(c1 .209445/.127039 · c2 .110601/.209445)를
                   |x|^n+|y|^n=1 에 최소제곱 적합한 값 — n=2.25 → K=log2(2.25)=1.17, rms .016R · 최대 .024R
                   ≈ 1px@R40 (scratchpad/release-0925/plate/cornerfit.py). 옆변 볼록은 캐릭터 선택 판의
@@ -51572,22 +51577,30 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
                   **같은 코너(corner-shape)**를 쓰는 지금은 성립하지 않는다 — 300% 비교 1장이 그 증거다.
        Fill   L1   면 --mode-a-face #E6DCE2(사용자 승인 라벤더핑크) · 속 α --mode-a-alpha .544(= --cpj-a-in)
               L1.5 테두리 색 띠 face @ (a-rim − a-in) · L2-0 유백 .0222
-       Stroke L2-1 측면 림 --mode-a-rim @ .98 (rim-in .00315w · rim-w .00350w · blur .0016w · 2·3차 감쇠 링)
-              L3   외곽선 --mode-a-outline @ .745 · 굵기 .0040w   (자 w = --f2-ref-w, 캐릭터 선택 판과 같은 자)
-       Effect L2-2 광택 2점 --mode-a-gloss .770 (12.7%×6.6% @2.95%/1.3% · 5.1%×2.0% @19.45%/1.7% —
-                  매니페스트 t2-plate-modal-pink.fx.speculars 와 같은 수)
-              L2-4 접지 = 기존 --jbox-shadow 그대로(캐릭터 선택 판 배선은 접지를 안 그리지만(.cp-gnd
-                  display:none) 모달은 떠 있는 판이라 기존 접지를 유지 — 색·겉선·광택 밖의 축, 보고에 적음)
+       Stroke L2-1 측면 림 --mode-a-rim @ .98 — 1차 고리 p1 은 [rim-in, rim-in+rim-w](rim-in .00315w · rim-w .00350w)
+                  를 **::after** 가 겉선과 함께 그린다(캐릭판 .cp-jelly::before 고리와 같은 범위 — 겉선 밑 0..rim-in
+                  에는 p1 이 없다) · 2·3차 감쇠 링(p2·p3)은 ::before 의 inset 그림자. [T11 fix1 · 리뷰 I-2]
+              L3   외곽선 --mode-a-outline @ .745 · 굵기 .0040w — ::after 의 border(0..rim-in) + inset(rim-in..L3-w)
+                  (자 w = --f2-ref-w, 캐릭터 선택 판의 림·겉선과 같은 자)
+       Effect L2-2 광택 2점 --mode-a-gloss .770 — **폭 자(--jbox-w) 기준 고정** [T11 fix1 · 지휘자 판정 I-1]:
+                  gl1 .1221w×.0490w @ .0248w/.0090w · gl2 .0490w×.0148w @ .1775w/.0124w = 캐릭판(.cp-jelly 375×289.5)
+                  의 % 값을 화면 px(47.6×19.1 @9.7/3.5 · 19.1×5.8 @69.2/4.8)로 환산해 390 으로 나눈 비율.
+                  판 높이(146~598)에 비례시키면 창마다 광택 모양이 달라져(리뷰 I-1) 캐릭판과 같지 않았다.
+              L2-4 접지 **없음**(--jbox-shadow none) — 캐릭판(.cp-gnd display:none)과 같이. [T11 fix1 · 지휘자 판정 I-3①
+                  「기존 모달판 색은 고려하지 말고 온전히 캐릭터 선택 판의 재질로」 — 옛 팔레트 접지 rgba(83,28,40,.213)·
+                  링 #8E5A72 항 은퇴]
      캐릭터 선택 판에서 값이 0 인 층(색 바탕 --cpj-a-fill 0 · 헤이즈 --cpj-haze 0)은 옮기지 않았다(0 = 층 없음).
      backdrop-filter 도 캐릭터 선택 판과 같이 없음(--jbox-blur none) — 옛 --modal-glass 는 소비처 0 이 된다.
      9슬라이스 catalog/jelly-box-c.webp 는 **이 등급에서만 은퇴** — .jbox 공용 규칙의 border-image-source 는
-     슬래브·띠(HUD GREEN)가 아직 읽으므로 그 줄은 무접촉이고, 같은 특이성(0,1,0)·같은 !important 를 뒤에
-     세워 여기서만 none 으로 덮는다. --jbox-biw 48px 는 소비처가 사라져 값만 남는다(되돌리기 근거).
+     무접촉이고, 같은 특이성(0,1,0)·같은 !important 를 뒤에 세워 여기서만 none 으로 덮는다. 그 공용 줄을 실제로
+     칠하는 소비처는 [T11 fix1 · 리뷰 M-3 실측] TWA 로딩 판 `.apl-plate.jbox.jbox--strip` 하나뿐이다 — 띠 #map-bot/
+     #kd-bot 은 border-image:none, 슬래브 #duel-hud 는 border-image-source:none, #actionbar 는 다른 webp.
+     --jbox-biw 48px 는 소비처가 사라져 값만 남는다(되돌리기 근거).
      원시값 0: 색은 전부 토큰(--mode-a-* · --prim-white · --role-cpj-face-top-charsel), 흰 알파는 color-mix.
      되돌리기: 이 블록(--jbox-* · 아래 세 줄)과 ::before 규칙을 지우고 --jbox-blur:var(--modal-glass) 로. */
   border-image-source:none !important;
   isolation:isolate;                 /* ::before z-index:-1 의 스택 문맥(backdrop-filter 가 없어져 새로 세운다) */
-  corner-shape:var(--jbox-corner);     /* 접지 그림자(--jbox-shadow)도 판과 같은 초타원 모서리를 돈다 */
+  corner-shape:var(--jbox-corner);     /* 시트 자신은 배경·접지를 안 그려 지금은 실효 0 — 시트가 무언가를 다시 그리게 되면 판과 같은 코너를 돌도록 둔다 */
   --jbox-w: var(--f2-ref-w);           /* 자(尺) — 캐릭터 선택 판의 림(--cpj-rim-in 등)·겉선(--cpj-L3-w)이 쓰는 그 자.
                                         ⚠ 주석 안에 별표+빗금 조합을 쓰지 말 것 — 주석이 조기에 닫혀 다음 선언이 죽는다(감사 F2.1 유형). */
   --jbox-L0-R: var(--jbox-radius);     /* 모달 자신의 반경(모양 유지) */
@@ -51596,9 +51609,9 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
   --jbox-rim-c: var(--mode-a-rim);
   --jbox-a-in: var(--mode-a-alpha); --jbox-a-rim: 1.000;
   --jbox-band-w: calc(var(--jbox-w) * .00991); --jbox-band-s: calc(var(--jbox-w) * .0161); --jbox-band-dy: 0px;
+  /* 띠(L1.5) 기준 폭 [리뷰 M-2]: 캐릭판은 판 실폭(100cqw = 375) · 여기는 --jbox-w(390) → 번짐·퍼짐이 4%(0.14/0.24px) 넓다. 서브픽셀이라 수용. */
   --jbox-milk-a: .0222;
   --jbox-rim-in: calc(var(--jbox-w) * 0.00315); --jbox-rim-w: calc(var(--jbox-w) * 0.00350); --jbox-rim-a: 0.9800;
-  --jbox-rim-blur: calc(var(--jbox-w) * 0.00160);
   --jbox-rim-w2: calc(var(--jbox-w) * 0.01094); --jbox-rim-w3: calc(var(--jbox-w) * 0.01290);
   --jbox-rim-k2: 0.424; --jbox-rim-k3: 0.093;
   --jbox-rim-tc: calc(var(--jbox-rim-in) + var(--jbox-rim-w) + var(--jbox-rim-w2));
@@ -51607,8 +51620,10 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
   --jbox-rim-p2: calc(1 - (1 - var(--jbox-rim-a) * var(--jbox-rim-k2)) / (1 - var(--jbox-rim-a) * var(--jbox-rim-k3)));
   --jbox-rim-p1: calc(1 - (1 - var(--jbox-rim-a)) / (1 - var(--jbox-rim-a) * var(--jbox-rim-k2)));
   --jbox-gl-a: var(--mode-a-gloss);
-  --jbox-gl1-w: 12.7%; --jbox-gl1-h: 6.6%; --jbox-gl1-px: 2.95%;  --jbox-gl1-py: 1.3%;
-  --jbox-gl2-w: 5.1%;  --jbox-gl2-h: 2.0%; --jbox-gl2-px: 19.45%; --jbox-gl2-py: 1.7%;
+  --jbox-gl1-w: calc(var(--jbox-w) * .1221); --jbox-gl1-h: calc(var(--jbox-w) * .0490);
+  --jbox-gl1-px: calc(var(--jbox-w) * .0248); --jbox-gl1-py: calc(var(--jbox-w) * .0090);
+  --jbox-gl2-w: calc(var(--jbox-w) * .0490); --jbox-gl2-h: calc(var(--jbox-w) * .0148);
+  --jbox-gl2-px: calc(var(--jbox-w) * .1775); --jbox-gl2-py: calc(var(--jbox-w) * .0124);
   --jbox-L3-w: calc(var(--jbox-w) * 0.00400); --jbox-L3-line: var(--mode-a-outline); --jbox-L3-a: .7450;
   /* [E52-0903 - S9 정본 - 접지 그림자] 이 그림자는 **모달 판 전용 층**이다
      (캡슐 . HUD 판 . 칩 . 슬롯 . 버튼에는 0 - 아래 --slab/--strip 등급에 이 토큰이
@@ -51641,7 +51656,10 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
      퍼짐 0 · 흐림 0 의 그림자는 아무것도 그리지 않으므로 **렌더 결과가 종전(접지 그림자만)과
      같다**(실측 확인). 후속 파도가 값 한 자리(-w)만 바꾸면 링이 되살아나도록 자리를 남겨 둔 것이다.
      은퇴 사유는 tokens-semantic 의 --role-modal-ring-w 옆에 있다. */
-  --jbox-shadow:0 0 0 var(--role-modal-ring-w) var(--role-modal-ring), 0 15.3px 5.1px var(--role-jbox-shadow-modal);
+  /* [T11 fix1 · 지휘자 판정 I-3①] 접지 그림자 **은퇴** — 캐릭터 선택 판은 접지를 그리지 않고(.cp-gnd display:none),
+     사용자 원문 「기존 모달판 색은 고려하지 말고 온전히 캐릭터 선택 판의 재질로」. 위 S9 실측·0910 링 주석은 이력으로 둔다.
+     옛 값: --jbox-shadow:0 0 0 var(--role-modal-ring-w) var(--role-modal-ring), 0 15.3px 5.1px var(--role-jbox-shadow-modal); */
+  --jbox-shadow:none;
   /* W2.5 ⑤ — 값의 유래와 실측은 위 :root 의 --modal-tint/--modal-glass 주석.
      옛 값: --jbox-blur:blur(5px) saturate(1.18); (틴트는 등급에 없었다 —
      `.w6m` 소비처가 크림 .50 을 따로 들고 있었고 견본 둘은 무틴트였다). */
@@ -51650,14 +51668,15 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
      옛 값: --jbox-blur:var(--modal-glass);  (= blur(0px) saturate(1.06)) */
   --jbox-blur:none;
 }
-/* [T11-0926] 모달 판 몸통 — 캐릭터 선택 판 덮개(.cp-jelly)의 층을 의사요소 한 장에 접었다.
-   배경 4층(위→아래): 광택 1 · 광택 2 · 유백(L2-0) · 면(L1, face-top→face @ a-in).
-   inset 그림자 5겹(위→아래): 외곽선(L3) · 측면 림 1차(L2-1 p1, 안쪽 가장자리 blur) · 림 2차(p2) ·
-   림 3차(p3) · 테두리 색 띠(L1.5). 링 총 α: p1∘p2∘p3 = 1−(1−p1)(1−p2)(1−p3) = rim-a .98 — .cp-jelly 와 같은 합성.
-   inset −1.5px = 투명 테두리(--jbox-bw)만큼 밖 = 판 border-box(승인된 판 크기). 절대배치 기준이 padding
-   상자라 이 보정이 없으면 판이 1.5px 작게 선다. 시트는 overflow:visible(.w6m/.r10m 실측 22창 전부)이라
-   스크롤로 흘러 올라가지 않는다. corner-shape 는 배경·inset 그림자·클립 전부에 걸린다 — 링이 코너에서
-   갈리지 않는 근거. */
+/* [T11-0926] 모달 판 몸통 — 캐릭터 선택 판 덮개(.cp-jelly)의 층을 의사요소 두 장에 나눠 담았다(캐릭판과 같은 층 순서).
+   ::before(아래) 배경 4층(위→아래): 광택 1 · 광택 2 · 유백(L2-0) · 면(L1, face-top→face @ a-in).
+                  inset 그림자 3겹(위→아래): 림 2차(p2) · 림 3차(p3) · 테두리 색 띠(L1.5).
+   ::after (위)   겉선(L3, 0..L3-w = border + inset) · 측면 림 1차 고리(p1, rim-in..rim-in+rim-w) — 아래 규칙.
+   링 총 α: p1∘p2∘p3 = 1−(1−p1)(1−p2)(1−p3) = rim-a .98 — .cp-jelly(고리 ::before + box-shadow)와 같은 합성.
+   [T11 fix1 · 리뷰 M-1] inset −1.5px = 투명 테두리 토큰(--jbox-bw 1.5px)만큼 밖. 크로뮴은 테두리 굵기를 정수 px 로
+   맞춰 계산 테두리가 1px 이라(22창 실측 borderWidth 1px) 판이 테두리 상자보다 사방 **0.5px 넓다** — 배율마다 달라
+   -1px 고정은 안 하고 0.5px 넘침을 수용한다. 시트는 overflow:visible(.w6m/.r10m 실측 22창 전부)이라 스크롤로
+   흘러 올라가지 않는다. corner-shape 는 배경·테두리·inset 그림자·클립 전부에 걸린다 — 링이 코너에서 갈리지 않는 근거. */
 .jbox--modal::before,
 [data-part="modal-plate"]::before{
   content:"";
@@ -51697,16 +51716,34 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
     100% 100%, 100% 100%;
   background-repeat:no-repeat;
   box-shadow:
-    inset 0 0 0 var(--jbox-L3-w)
-      color-mix(in srgb, var(--jbox-L3-line) calc(var(--jbox-L3-a) * 100%), transparent),
-    inset 0 0 var(--jbox-rim-blur) calc(var(--jbox-rim-in) + var(--jbox-rim-w))
-      color-mix(in srgb, var(--jbox-rim-c) calc(var(--jbox-rim-p1) * 100%), transparent),
     inset 0 0 0 var(--jbox-rim-tc)
       color-mix(in srgb, var(--jbox-rim-c) calc(var(--jbox-rim-p2) * 100%), transparent),
     inset 0 0 0 var(--jbox-rim-td)
       color-mix(in srgb, var(--jbox-rim-c) calc(var(--jbox-rim-p3) * 100%), transparent),
     inset 0 var(--jbox-band-dy) var(--jbox-band-w) var(--jbox-band-s)
       color-mix(in srgb, var(--jbox-face) calc((var(--jbox-a-rim) - var(--jbox-a-in)) * 100%), transparent);
+}
+/* [T11 fix1 · 리뷰 I-2] 겉선(L3) + 측면 림 1차 고리(p1) — 캐릭판 .cp-jelly::after(겉선 고리)·::before(림 고리) 기하 그대로.
+   테두리(border rim-in) = 겉선 바깥 0..rim-in · inset (L3-w − rim-in) = 겉선 안쪽 rim-in..L3-w (겉선이 고리 위에 온다)
+   · inset rim-w(rim-c @ p1) = 고리 rim-in..rim-in+rim-w — 겉선 밑 0..rim-in 에는 p1 이 깔리지 않는다(종전 한 장 구조는
+   p1 을 0 부터 칠해 겉선 합성색이 캐릭판보다 연했다 — 리뷰 층 모형·단면 실측으로 확인). z-order: ::before 와 같은
+   z-index -1 이지만 트리 순서가 뒤라 그 위·내용(리본·X·줄·버튼) 아래. 배경 없음·pointer-events 없음. */
+.jbox--modal::after,
+[data-part="modal-plate"]::after{
+  content:"";
+  position:absolute;
+  inset:calc(var(--jbox-bw) * -1);
+  z-index:-1;
+  pointer-events:none;
+  border-radius:var(--jbox-L0-R);
+  corner-shape:var(--jbox-corner);
+  background:none;
+  border:var(--jbox-rim-in) solid color-mix(in srgb, var(--jbox-L3-line) calc(var(--jbox-L3-a) * 100%), transparent);
+  box-shadow:
+    inset 0 0 0 calc(var(--jbox-L3-w) - var(--jbox-rim-in))
+      color-mix(in srgb, var(--jbox-L3-line) calc(var(--jbox-L3-a) * 100%), transparent),
+    inset 0 0 0 var(--jbox-rim-w)
+      color-mix(in srgb, var(--jbox-rim-c) calc(var(--jbox-rim-p1) * 100%), transparent);
 }
 .jbox--slab{            /* 전투 상단 슬래브 — 그림자는 그림 알파를 따라야 해서 filter */
   --jbox-biw:15px; --jbox-radius:13px;
