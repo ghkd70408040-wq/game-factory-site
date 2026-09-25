@@ -26767,12 +26767,14 @@ window.TT_SFX = {
       'aria.minimap': 'See all chapters',
       'aria.mmcell': 'Chapter {c}, {s} stars, {d} stages cleared',
       'aria.mmlock': 'Chapter {c}, locked',
-      /* [T9-0926 · 판정판 69] 스토리 극장 — 카드는 위 미니맵과 같은 부품
-         인스턴스(mm-cell 재사용, aria.mmcell/aria.mmlock 도 그대로 빌린다 —
-         챕터 n·별·클리어라는 같은 사실이라 새 aria 키를 안 만든다). 잠금
-         toast만 새 문구(챕터 도달 기준, minimap.locked의 탄 기준과 다른 사실). */
+      /* [T9-0926 · 판정판 69, T9-fix1 M-7] 스토리 극장 — 카드는 위 미니맵과
+         같은 부품 인스턴스(mm-cell 재사용). 잠긴 카드는 aria.mmlock을 그대로
+         빌린다(잠김이라는 사실은 화면과 무관). 열린 카드는 전용 aria.thcell
+         — 이 화면에서 탭이 하는 일(이야기 재생)이 미니맵의 「이동」과 다른
+         사실이라 aria.mmcell을 빌리면 안내가 어긋난다(리뷰 지적). */
       'theater.title': 'Story Theater',
       'theater.locked': 'Reach Chapter {n} to unlock',
+      'aria.thcell': 'Chapter {c} story replay',
       'mode.arcade': 'Arcade',
       'mode.arcade.d': 'Endless. Chase your best.',
       'mode.daily.d': 'One board a day, for all.',
@@ -28125,10 +28127,13 @@ window.TT_SFX = {
       'aria.minimap': '챕터 전체 보기',
       'aria.mmcell': '챕터 {c}, 별 {s}개, {d}탄 클리어',
       'aria.mmlock': '챕터 {c}, 잠김',
-      /* [T9-0926 · 판정판 69] 스토리 극장 — 카드는 미니맵과 같은 부품
-         인스턴스라 aria 도 그대로 재사용. 잠금 toast만 새 문구(챕터 도달 기준). */
+      /* [T9-0926 · 판정판 69, T9-fix1 M-7] 스토리 극장 — 카드는 미니맵과
+         같은 부품 인스턴스. 잠긴 카드는 aria.mmlock 재사용(잠김은 화면과
+         무관한 사실). 열린 카드는 전용 aria.thcell(이 화면의 탭 = 이야기
+         재생, 미니맵의 「이동」과 다른 사실). */
       'theater.title': '스토리 극장',
       'theater.locked': '{n}챕터에 도착하면 열려요',
+      'aria.thcell': '{c}장 이야기 다시 보기',
       'mode.arcade': '아케이드',
       'mode.arcade.d': '끝없이. 최고 기록에 도전해요.',
       'mode.daily.d': '하루 한 판 — 모두가 같은 판.',
@@ -45691,10 +45696,13 @@ window.TT_SFX = {
   }
 
   /** 챕터 카드 1장의 DOM(컴포넌트 t3-cell-minimap-chapter, CSS는 .mm-cell
-      그대로). [T9-0926 · 판정판 69] 챕터 미니맵과 스토리 극장이 이 하나를
-      같이 쓴다(중복 로직 금지) — 두 화면이 부르는 잠금 조건(미니맵은
-      진행도 chapMax, 극장은 본 기록 cutSeen)만 다르다. */
-  function buildChapCellDom(c, locked, current) {
+      그대로). [T9-0926 · 판정판 69, T9-fix1] 챕터 미니맵과 스토리 극장이
+      이 하나를 같이 쓴다(중복 로직 금지). ariaKey = 열린 카드의 aria-label
+      키(화면마다 다른 사실 — 미니맵은 이동, 극장은 재생. 잠긴 카드는 항상
+      공용 aria.mmlock, 리뷰 M-7). 잠금 자체는 두 화면이 이제 같은 판정
+      chapLocked(c)에서 나온다(아래, 리뷰 I-1) — 이 함수는 그 결과(locked)를
+      받기만 한다. */
+  function buildChapCellDom(c, locked, current, ariaKey) {
     var b = document.createElement('button');
     b.type = 'button';
     b.className = 'mm-cell ' + (locked ? 'is-lock' : (current ? 'is-cur' : 'is-open'));
@@ -45707,7 +45715,7 @@ window.TT_SFX = {
     if (locked) b.setAttribute('aria-disabled', 'true');
     if (current) b.setAttribute('aria-current', 'true');
     b.setAttribute('aria-label', locked ? t('aria.mmlock', { c: c })
-                                        : t('aria.mmcell', { c: c, s: st, d: dn }));
+                                        : t(ariaKey, { c: c, s: st, d: dn }));
 
     var veil = document.createElement('span');
     veil.className = 'mm-veil';
@@ -45741,6 +45749,28 @@ window.TT_SFX = {
     return b;
   }
 
+  /** [T9-fix1 · I-1] 챕터 c가 잠겼는가 — 챕터 모달·스토리 극장이 공유하는
+      단 하나의 판정(진행도 기준). 두 화면이 「같은 잠금 판정」을 쓰게
+      고정한다(리뷰 지적: 이전엔 극장만 cutSeen 기준이라 두 화면이 서로
+      다른 답을 낼 수 있었다). */
+  function chapLocked(c) { return c > chapMax(); }
+
+  /** [T9-fix1 · I-3] 잠긴 칸을 눌렀을 때의 흔들기+toast+실패음 — mmPick·
+      theaterPick이 공유한다. 강제 리플로우(void offsetWidth)는 이 한 곳만
+      남고 신규 0(모션 규칙 6: 신규 사용 금지). gridId = 그 격자 컨테이너
+      id, msg = 이미 번역된 문구. */
+  function chapCellDeny(gridId, c, msg) {
+    var cell = document.querySelector
+      ? document.querySelector('#' + gridId + ' .mm-cell[data-c="' + c + '"]') : null;
+    if (cell && cell.classList) {
+      cell.classList.remove('mm-shake');
+      void cell.offsetWidth;               /* 애니메이션 재시작 (badgePop 과 같은 처방) */
+      cell.classList.add('mm-shake');
+    }
+    toast(msg);
+    J.sfx.fail();
+  }
+
   /** 격자를 다시 짓는다. 열릴 때마다 부르고, 부팅 배선에서 한 번 부른다
       (관문 컷 02b-modal-minimap 은 하네스가 판을 «드러내기만» 하므로 —
       그때 격자가 비어 있으면 컷이 빈 판을 찍는다). */
@@ -45750,7 +45780,7 @@ window.TT_SFX = {
     var last = chapMax();
     g.innerHTML = '';
     for (var c = 1; c <= MAP_CHAPTERS.length; c++) {
-      g.appendChild(buildChapCellDom(c, c > last, c === mapChap));
+      g.appendChild(buildChapCellDom(c, chapLocked(c), c === mapChap, 'aria.mmcell'));
     }
     setText('mm-sum', t('minimap.sum', { s: advStarTotal(), c: last }));
   }
@@ -45765,16 +45795,8 @@ window.TT_SFX = {
   /** 칸을 골랐다. 잠긴 칸은 **이동하지 않는다** — 흔들림 + 토스트 한 줄이다. */
   function mmPick(c) {
     if (!(c >= 1) || c > MAP_CHAPTERS.length) return;
-    if (c > chapMax()) {
-      var cell = document.querySelector
-        ? document.querySelector('#mm-grid .mm-cell[data-c="' + c + '"]') : null;
-      if (cell && cell.classList) {
-        cell.classList.remove('mm-shake');
-        void cell.offsetWidth;               /* 애니메이션 재시작 (badgePop 과 같은 처방) */
-        cell.classList.add('mm-shake');
-      }
-      toast(t('minimap.locked', { n: chapFirst(c) - 1 }));
-      J.sfx.fail();
+    if (chapLocked(c)) {
+      chapCellDeny('mm-grid', c, t('minimap.locked', { n: chapFirst(c) - 1 }));
       return;
     }
     mapChap = c;
@@ -45785,22 +45807,19 @@ window.TT_SFX = {
     mapCenterCurrent();  /* 그 챕터의 앵커 오프셋으로 가로 스크롤 */
   }
 
-  /* ---- [T9-0926 · 판정판 69] 스토리 극장 ---------------------------------
-   * 위 챕터 미니맵과 같은 카드 부품(buildChapCellDom)의 두 번째 소비처.
-   * 열림 조건만 다르다: 미니맵은 chapMax()(진행도), 극장은
-   * cutSeen('chap'+c)(그 챕터 스토리를 본 기록 — maybeChapCut() 이 챕터
-   * 최초 진입 때 세우는 그 플래그, 「스토리 갤러리」가 쓰려던 것과 같은
-   * 자리다 — 그 쪽은 갤러리 전용 트랙이 아예 없었다). 옛 openGallery()
-   * (오프닝만 재생, 모달 없음)를 대신한다 — KD_BUILDINGS circus.go 의
-   * 유일한 호출부였다. */
-  function theaterOpen(c) { return cutSeen('chap' + c); }
+  /* ---- [T9-0926 · 판정판 69, T9-fix1] 스토리 극장 -------------------------
+   * 위 챕터 미니맵과 같은 카드 부품(buildChapCellDom)·같은 잠금 판정
+   * (chapLocked, 리뷰 I-1 — 「같은 잠금 판정」을 코드로 고정, 열림 여부는
+   * 본 기록과 무관)의 두 번째 소비처. 옛 openGallery()(오프닝만 재생, 모달
+   * 없음)를 대신한다 — KD_BUILDINGS circus.go 의 유일한 호출부였다. */
+  function theaterUnlocked(c) { return !chapLocked(c); }
 
   function buildTheater() {
     var g = $('th-grid');
     if (!g || typeof document === 'undefined') return;
     g.innerHTML = '';
     for (var c = 1; c <= MAP_CHAPTERS.length; c++) {
-      g.appendChild(buildChapCellDom(c, !theaterOpen(c), false));
+      g.appendChild(buildChapCellDom(c, !theaterUnlocked(c), false, 'aria.thcell'));
     }
   }
 
@@ -45811,26 +45830,30 @@ window.TT_SFX = {
 
   function closeTheater() { closeModal('modal-theater'); }
 
+  /** [T9-fix1 · I-2] 그 챕터 카드가 재생할 컷 목록. 챕터1은 **오프닝부터**
+      (CUTS_OPEN — 옛 openGallery()가 다시 보여 주던 그 컷, 조건 없음: 1은
+      항상 열려 있다). 마지막 챕터(왕좌, MAP_CHAPTERS.length — 하드코딩
+      10 금지)는 진짜 엔딩을 본 상태(cutSeen('end'))면 CUTS_END 를 이어
+      붙인다 — 결말까지 다시 볼 수 있게. */
+  function theaterCutsFor(c) {
+    var list = CUTS_CHAP[c] || [];
+    if (c === 1) list = CUTS_OPEN.concat(list);
+    if (c === MAP_CHAPTERS.length && cutSeen('end')) list = list.concat(CUTS_END);
+    return list;
+  }
+
   function theaterPick(c) {
     if (!(c >= 1) || c > MAP_CHAPTERS.length) return;
-    if (!theaterOpen(c)) {
-      var cell = document.querySelector
-        ? document.querySelector('#th-grid .mm-cell[data-c="' + c + '"]') : null;
-      if (cell && cell.classList) {
-        cell.classList.remove('mm-shake');
-        void cell.offsetWidth;               /* 애니메이션 재시작 (mmPick 과 같은 처방) */
-        cell.classList.add('mm-shake');
-      }
-      toast(t('theater.locked', { n: c }));
-      J.sfx.fail();
+    if (!theaterUnlocked(c)) {
+      chapCellDeny('th-grid', c, t('theater.locked', { n: c }));
       return;
     }
     closeTheater();
-    /* [T9-0926 fix1] playCuts() 는 showScreen('screen-story') 만 하고 화면을
-       되돌리지 않는다 — enterKingdom() 으로 왕국 화면부터 되돌린 뒤(옛
-       openGallery() 콜백·maybeChapCut() 콜백과 같은 「돌아갈 화면부터」 규약)
-       그 위에 극장 모달을 다시 띄운다. */
-    playCuts(CUTS_CHAP[c], 'chap' + c, function () { enterKingdom(); openTheater(); });
+    /* playCuts() 는 showScreen('screen-story') 만 하고 화면을 되돌리지
+       않는다 — enterKingdom() 으로 왕국 화면부터 되돌린 뒤(옛 openGallery()
+       콜백·maybeChapCut() 콜백과 같은 「돌아갈 화면부터 + syncMenu」 규약,
+       T9-fix1 M-1) 그 위에 극장 모달을 다시 띄운다. */
+    playCuts(theaterCutsFor(c), 'chap' + c, function () { syncMenu(); enterKingdom(); openTheater(); });
   }
 
   /** 챕터를 한 칸 옮긴다. 열린 챕터 밖으로는 나가지 않는다. */
@@ -47330,8 +47353,10 @@ window.TT_SFX = {
    *   누른다 — 뒤로가기의 뜻은 "한 컷 사슬 건너뛰기"이고, 하드웨어 뒤로가기가
    *   이야기를 통째로 지워 버리면 그것은 되돌릴 수 없는 실수가 된다.
    * ▣ 본 표시를 남기는 이유는 cutFinish 주석과 같다: 두 번째 진입에서 또 열리면
-   *   그것은 건너뛰기가 아니라 미룬 것이 되고 버튼이 거짓말이 된다. 표시된 컷은
-   *   설정 → 갤러리에서 언제든 다시 볼 수 있다(openGallery).
+   *   그것은 건너뛰기가 아니라 미룬 것이 되고 버튼이 거짓말이 된다. [T9-fix1 · I-2]
+   *   표시된 컷은 왕국 → 스토리 극장(openTheater)에서 다시 볼 수 있다 — 챕터1
+   *   카드가 오프닝부터 재생한다(theaterCutsFor). 출정 sortie-<id> 컷은 범위
+   *   밖이라(지휘자 판정) 다시 볼 곳이 없다 — 옛 openGallery() 도 마찬가지였다.
    */
   function cutFinishAll() {
     if (!cutList) return;
@@ -64643,10 +64668,12 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
   }
 
   /* ==========================================================================
-     화면별 뒤로가기 분기표 — 화면키 29 (화면 5 + 시트 22 + 오버레이 2) 전량
+     화면별 뒤로가기 분기표 — 화면키 31 (화면 5 + 시트 24 + 오버레이 2) 전량
      [F4.2-0925, 감사 A] 표를 다시 씀: 은퇴한 modal-arcade 를 지우고, 누락돼
      있던 charintro·charget·modal-quest·modal-invite(패널 밖)·modal-playground·
-     modal-shop 을 더하고, 루트를 실제 홈(왕국)으로 정정했다.
+     modal-shop 을 더하고, 루트를 실제 홈(왕국)으로 정정했다. [T9-fix1 M-6]
+     modal-soon(판정판 70)·modal-theater(판정판 69) 두 줄이 더해진 뒤에도
+     머리글 개수가 안 갱신돼 있었다(리뷰 지적) — 시트 22 → 24로 고친다.
 
        charintro       cinNext (Esc)                    z79 = 항상 맨 위  ← 0925 추가(F4.2)
        charget         charGetEnd (Esc)                 z78              ← 0925 추가(F4.2)
@@ -66672,17 +66699,20 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
    상속으로 돌려놨다. 02-map 컷의 화소는 이 한 줄로 무변이 된다. */
 #screen-map #map-plate .mp-txt { padding: 0; }
 
-#modal-minimap .sheet { gap: 10px; }
+#modal-minimap .sheet,
+/* [T9-0926 · 판정판 69, T9-fix1 M-2] #modal-theater 는 새 선언을 만들지
+   않고 이 인스턴스 목록에 형제 선택자로 합류한다(다른 10곳과 같은 방식,
+   px 리터럴 신규 0). */
 #modal-theater .sheet { gap: 10px; }
 
 /* ---- 격자 -----------------------------------------------------------------
    2열 **고정**이다(auto-fill 이 아니다). 390 과 1280 이 같은 그림이어야
    레이아웃 관문의 판정이 하나로 남는다(DESIGN §14.8). */
-/* [T9-0926 · 판정판 69] #mm-grid -> .mm-grid(선택자를 클래스로 넓힘) —
-   마크업이 이미 이 이름을 클래스로도 갖고 있었다(id="mm-grid"
-   class="mm-grid"); 스토리 극장의 #th-grid.mm-grid 도 같은 규칙을
-   그대로 받는다(새 CSS 0). */
-.mm-grid {
+/* [T9-fix1 · I-4] id 규칙 그대로 유지 — 부품 자체(전역 .mm-grid 규칙)를
+   만들지 않고, #th-grid 를 이 인스턴스 목록에 형제로만 더한다(다른 CSS
+   블록들과 같은 「인스턴스 스코프만」 방식). 값은 무변이라 02b 화소는
+   그대로 0. */
+#mm-grid, #th-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
