@@ -13,6 +13,17 @@
 <!-- TenTwin — markup shell: screens, modals, ad placeholders. No external resources. -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
+<script>
+/* 데스크톱 가로 창은 껍데기 play.html(세로 기둥 iframe)로 — 판정판 64. 프레임 안(itch·play)·?noshell=1·앱은 제외. */
+(function(){try{
+  if(window.self!==window.top)return;
+  var q=location.search;
+  if(/[?&](noshell=1|platform=twa)(&|$)/.test(q))return;
+  var w=window.innerWidth,h=window.innerHeight;
+  if(!(w>=900&&h>=600&&w>h))return;
+  location.replace('play.html'+q+location.hash);
+}catch(e){}})();
+</script>
 <!-- Two theme-color entries so the OS chrome follows the OS preference. The in-game
      toggle (html[data-theme]) only re-skins the page; the browser bar is cosmetic. -->
 <meta name="theme-color" content="#16131f" media="(prefers-color-scheme: dark)">
