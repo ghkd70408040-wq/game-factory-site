@@ -27195,7 +27195,7 @@ window.TT_SFX = {
       'unlock.go': 'Welcome aboard!',
 
       /* --- v4 6차 §B: 캐릭터 선택 패널 --- */
-      'pick.title': 'Character',
+      'pick.title': 'Heroes',
       'pick.change': 'Change',
       'pick.go': 'Confirm',
       'pick.locked': 'Locked',
@@ -60778,6 +60778,18 @@ html.menu-v2 #screen-menu .tagline{
 .mode-list [data-part="btn-picture"][data-variant="timeattack"],
 .mode-list [data-part="btn-picture"][data-variant="survival"],
 .mode-list [data-part="btn-picture"][data-variant="accum90"]{--bp-t-fs:.0615;--bp-t-cyb:35.60%;--bp-d-fs:.0374;--bp-d-cyb:76.31%;}
+/* 0926 T5 연장(판정판 72 연속) — 이 세 변주는 --bp-t-fs 가 기본(.0551)보다
+   커서(.0615) 위 .bp-text > b 의 line-height:1 상자에 글자 세로가 살짝
+   넘친다(실측: scrollHeight 25 vs clientHeight 23 · pseudo-element 없음,
+   진짜 글자 잘림). 부품 전역 규칙(.bp-text > b 자체의 line-height:1)은
+   무변 — 이 3변주 인스턴스에만 여유를 준다. 자리는 transform:translateY(-50%)
+   로 같은 중심축에 고정되므로 상자가 커져도 앵커는 안 움직인다(새 값은
+   line-height 숫자 하나뿐, 새 색·새 자산 0). */
+.mode-list [data-part="btn-picture"][data-variant="timeattack"] .bp-text > b,
+.mode-list [data-part="btn-picture"][data-variant="survival"] .bp-text > b,
+.mode-list [data-part="btn-picture"][data-variant="accum90"] .bp-text > b {
+  line-height: 1.1;
+}
 .mode-list [data-part="btn-picture"][data-variant="timeattack"]{--bp-fill-img:url("catalog/sian3-btn-timeattack-blank.webp");--bp-ink:#7A3A0B;--bp-core:#FFFDF8;}
 .mode-list [data-part="btn-picture"][data-variant="survival"]  {--bp-fill-img:url("catalog/sian3-btn-survival-blank.webp");  --bp-ink:#2E0B4A;--bp-core:#FFFFFF;}
 .mode-list [data-part="btn-picture"][data-variant="accum90"]   {--bp-fill-img:url("catalog/sian3-btn-accum90-blank.webp");   --bp-ink:#16395B;--bp-core:#F7FCFF;}
