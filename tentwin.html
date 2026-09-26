@@ -7419,7 +7419,11 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   right: 12px;
   bottom: calc(var(--safe-b) + 18px);
   min-height: 84px;
-  padding: 2px 8px 2px 82px;   /* 왼쪽 여백 = 초상 자리 */
+  /* [T14 I-7a] 아래 여백 = .cin-next 자기 높이(font 12px×1.2 + 상하 패딩
+     2px×2 — 값은 :7460 부근 .cin-next 선언과 동일, 새 매직넘버 아님).
+     .cin-next 는 이 판 안에서 bottom:0 절대배치라, 대사(.cut-line)가 이
+     여백만큼 먼저 멎어야 긴 en 문장 마지막 줄이 버튼 밑에 깔리지 않는다. */
+  padding: 2px 8px calc(12px * 1.2 + 4px) 82px;   /* 왼쪽 여백 = 초상 자리 */
   border-style: solid;
   border-width: 17px;
   border-image: var(--lib-panel-cream) 33 fill stretch;
@@ -7499,6 +7503,10 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
    재사용), color 를 currentColor 로 읽는 -webkit-text-stroke 도 같이 따라와
    맞는다(실측: stroke 색은 항상 color 와 같은 값이었다). */
 #modal-invite .ci-tag-v { color: var(--role-f2-ink-charsel); text-shadow: none; }
+/* T14 I-4 (2b④) — 획득 화면(#charget)의 태그 알약이 같은 결함(루트 기본
+   잉크로 낙하)을 앓았다. text-shadow 는 이미 none(그림자 성분은 재현 안 됨) —
+   잉크만 초대 창과 같은 값으로. */
+#charget .ci-tag-v { color: var(--role-f2-ink-charsel); }
 #modal-invite .cc-stats,
 #charget .cg-stats {
   display: flex;
@@ -9434,6 +9442,23 @@ html.no-art-logo .logo-img  { display: none; }
     inset 0 -5px 0 #A8906F;
 }
 .set-tg:active { transform: translateY(2px); }
+/* T14 항목13(T12 이월) — 계정 알약(#portal-acct-name)의 유저네임이 길면(실측
+   39자) 잘려도 줄 폭을 넘기고, 안의 아바타·글자는 (공용 .kit-pill-v2 가 flex를
+   안 주는) 보통 인라인 흐름이라 글자에 말줄임을 걸 상자 자체가 없었다.
+   인스턴스 스코프만 — 공용 .set-tg/.kit-pill-v2/.hc-ico 는 무변(다른 소비처
+   전부 픽셀 0). display:inline-flex 는 이 알약의 다른 인스턴스(.kd-tag.kit-pill-v2,
+   :68227 부근)가 이미 쓰는 같은 처방이다 — 아바타·글자를 진짜 flex 자식으로
+   만들어야 min-width:0 이 뜻을 갖는다(그래야 글자만 줄고 아바타는 고정폭으로
+   남는다). max-width 는 flex-shrink 값과 무관하게 알약 폭 자체를 죈다(표준 flex
+   클램프) — 그래야 유저네임이 아무리 길어도 알약이 줄 밖으로 안 번진다. */
+#portal-acct-name{
+  display: inline-flex; align-items: center;
+  min-width: 0; max-width: 50%; overflow: hidden;
+}
+#portal-acct-avatar{ flex-shrink: 0; }
+#portal-acct-uname{
+  min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+}
 
 
 /* ---- 24-3. ART §6.6 캐릭터 선택창 (배치도 복제) -----------------------------
@@ -14465,7 +14490,7 @@ html[data-platform="twa"] #app-intro.is-hold .api-char{
 <!-- ==RELEASE:BEGIN== 출시 메타 (scratchpad/release-0908/apply-head.py 가 생성·교체, 본문 무접촉) -->
 <meta name="build" content="8decb36-20260908-1716">
 <meta name="application-name" content="텐트윈 젤리팡 월드">
-<meta name="description" lang="ko" content="숫자 젤리를 골라 10을 만들어 터뜨리는 퍼즐 — 모험·아케이드·데일리·타임러시·클래식. TenTwin Jellypang World: pick number jellies that equal or sum to 10.">
+<meta name="description" lang="ko" content="숫자 젤리를 골라 10을 만들어 터뜨리는 퍼즐 — 모험·아케이드·데일리·타임러시·클래식. TenTwin Jelly Pang World: pick number jellies that equal or sum to 10.">
 <link rel="manifest" href="tentwin.webmanifest">
 <link rel="canonical" href="https://ghkd70408040-wq.github.io/game-factory-site/tentwin.html">
 <meta name="robots" content="index,follow">
@@ -14487,7 +14512,7 @@ html[data-platform="twa"] #app-intro.is-hold .api-char{
 <meta property="og:locale:alternate" content="en_US">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="텐트윈 젤리팡 월드 — 숫자 젤리 퍼즐">
-<meta name="twitter:description" content="TenTwin Jellypang World — pick number jellies that equal or sum to 10. Free, no install, works offline.">
+<meta name="twitter:description" content="TenTwin Jelly Pang World — pick number jellies that equal or sum to 10. Free, no install, works offline.">
 <meta name="twitter:image" content="https://ghkd70408040-wq.github.io/game-factory-site/catalog/og-card.jpg">
 <script>
 /* ---------------------------------------------------------------------------
@@ -14694,7 +14719,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
         ><span class="lg lg-b" style="--r:2deg;--y:-2px">i</span
         ><span class="lg lg-b" style="--r:-3deg;--y:1px">n</span
         ></div>
-        <p class="logo-sub" data-i18n="menu.sub">Jellypang World</p>
+        <p class="logo-sub" data-i18n="menu.sub">Jelly Pang World</p>
         </div>
         <p class="tagline" data-i18n="menu.tagline">Match pairs that are equal or sum to 10.</p>
       </div>
@@ -15781,7 +15806,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
              일반 형제 선택자(`~`)로 접을 수 있는 유일한 자리다. -->
         <span class="cp-petart" aria-hidden="true"></span>
         <div class="cp-head">
-          <h2 id="cp-h" data-i18n="pick.head">Character Select</h2>
+          <h2 id="cp-h" data-i18n="pick.head">Heroes</h2>
           <button id="cp-close" class="icon-btn x-btn" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
         </div>
         <div class="cp-view">
@@ -16038,8 +16063,8 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
           </div>
         </aside>
         <div class="pick-row pick-mate">
-        <span class="pick-lab" data-i18n="pick.mate">Buddy</span>
-        <div id="mate-pick" role="radiogroup" data-i18n-aria="aria.matepick" aria-label="Choose your buddy">
+        <span class="pick-lab" data-i18n="pick.mate">Pet</span>
+        <div id="mate-pick" role="radiogroup" data-i18n-aria="aria.matepick" aria-label="Choose your pet">
         <button class="char-card kit-chip-v2 ch-ppyak" data-char="ppyak" type="button" role="radio" aria-checked="false">
           <svg class="cav" viewBox="0 0 44 46" aria-hidden="true" focusable="false">
             <g class="cav-puff"><circle cx="10" cy="17" r="7"/><circle cx="34" cy="17" r="7"/><circle cx="8" cy="30" r="7.5"/><circle cx="36" cy="30" r="7.5"/><circle cx="22" cy="10" r="7.5"/></g>
@@ -16081,7 +16106,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
             <path class="cav-mouth" d="M18.4 30 C20.4 33.4 23.6 33.4 25.6 30"/>
           </svg>
           <span class="cc-name" data-i18n="char.ppyak.name">Ppyak</span>
-          <span class="cc-pass" data-i18n="char.ppyak.pass">Skill: 8s free link - far tiles connect</span>
+          <span class="cc-pass" data-i18n="char.ppyak.pass">Skill: 8s free link — far tiles connect</span>
         </button>
         <button class="char-card kit-chip-v2 ch-mungchi" data-char="mungchi" type="button" role="radio" aria-checked="false">
           <svg class="cav" viewBox="0 0 44 46" aria-hidden="true" focusable="false">
@@ -16249,7 +16274,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
             <path d="M13.9 16.9 L30.1 33.1"/>
           </svg>
           <span class="cc-name" data-i18n="mate.none.name">Solo</span>
-          <span class="cc-pass" data-i18n="mate.none.pass">No buddy</span>
+          <span class="cc-pass" data-i18n="mate.none.pass">No pet</span>
         </button>
         </div>
         </div>
@@ -16264,7 +16289,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
              34px 로 상쇄된다). 새 상태를 만들지 않는다: 저장은 여전히
              store.charId / store.mateId 이고, 탭은 세션 로컬 변수 하나다. -->
         <div id="cp-tabs" class="cp-tabs kit-frame-v2__tabs" role="tablist" aria-label="Category">
-          <button class="cp-tab kit-tab-v2" type="button" role="tab" data-cptab="char" aria-selected="true"><svg class="cpt-ic" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><path d="M7.4 9.2 6.1 3.4a1 1 0 0 1 1.5-1l5 3.2a13 13 0 0 1 6.8 0l5-3.2a1 1 0 0 1 1.5 1l-1.3 5.8a11 11 0 0 1 3 7.2c0 6.2-5.2 10.4-11.6 10.4S4.4 22.6 4.4 16.4a11 11 0 0 1 3-7.2Z" fill="#F2A899" stroke="#C97C6E" stroke-width="1.6" stroke-linejoin="round"/><circle cx="12" cy="16.4" r="1.5" fill="#5A2E28"/><circle cx="20" cy="16.4" r="1.5" fill="#5A2E28"/><ellipse cx="16" cy="20" rx="1.7" ry="1.2" fill="#5A2E28"/></svg><span class="cpt-lab" data-i18n="cp.tab.char">Characters</span></button>
+          <button class="cp-tab kit-tab-v2" type="button" role="tab" data-cptab="char" aria-selected="true"><svg class="cpt-ic" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><path d="M7.4 9.2 6.1 3.4a1 1 0 0 1 1.5-1l5 3.2a13 13 0 0 1 6.8 0l5-3.2a1 1 0 0 1 1.5 1l-1.3 5.8a11 11 0 0 1 3 7.2c0 6.2-5.2 10.4-11.6 10.4S4.4 22.6 4.4 16.4a11 11 0 0 1 3-7.2Z" fill="#F2A899" stroke="#C97C6E" stroke-width="1.6" stroke-linejoin="round"/><circle cx="12" cy="16.4" r="1.5" fill="#5A2E28"/><circle cx="20" cy="16.4" r="1.5" fill="#5A2E28"/><ellipse cx="16" cy="20" rx="1.7" ry="1.2" fill="#5A2E28"/></svg><span class="cpt-lab" data-i18n="cp.tab.char">Heroes</span></button>
           <button class="cp-tab kit-tab-v2" type="button" role="tab" data-cptab="pet" aria-selected="false"><svg class="cpt-ic" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><ellipse cx="16" cy="21.5" rx="7.4" ry="6.2" fill="#3D7989"/><ellipse cx="8.2" cy="13.4" rx="3.4" ry="4.2" fill="#3D7989"/><ellipse cx="23.8" cy="13.4" rx="3.4" ry="4.2" fill="#3D7989"/><ellipse cx="13.1" cy="7.6" rx="3.1" ry="3.9" fill="#3D7989"/><ellipse cx="19.9" cy="7.6" rx="3.1" ry="3.9" fill="#3D7989"/></svg><span class="cpt-lab" data-i18n="cp.tab.pet">Pets</span></button>
         </div>
         <div class="cp-body kit-frame-v2__body">
@@ -16608,7 +16633,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
             <path d="M183 35 H191 V56 H9 V77 H21" class="art-wrap"/>
           </svg>
         </div>
-        <p data-i18n-html="howto.p4">&hellip;or be <b>neighbours in reading order</b> &mdash; the end of a row wraps to the start of the next.</p>
+        <p data-i18n-html="howto.p4">&hellip;or be <b>neighbors in reading order</b> &mdash; the end of a row wraps to the start of the next.</p>
       </div>
 
       <!-- 5 / 5 — a fully emptied row collapses -->
@@ -16650,9 +16675,9 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
             <li><i class="rules-medal" aria-hidden="true" style="--mi:url('catalog/duel-medal-attack.webp')"></i><span data-i18n-html="skills.s1"><b>Attack</b> &mdash; fills with every point you score, and fires on its own when full.</span></li>
             <li><i class="rules-medal" aria-hidden="true" style="--mi:url('catalog/duel-medal-special.webp')"></i><span data-i18n-html="skills.s2"><b>Special</b> &mdash; fills only when you <b>alternate</b> sum-10 and same-number matches. One hit is worth two attacks.</span></li>
             <li><i class="rules-medal" aria-hidden="true" style="--mi:url('catalog/duel-medal-awaken.webp')"></i><span data-i18n-html="skills.s3"><b>Awakening</b> &mdash; every match charges it, faster the higher your combo. It turns the board your way for a few seconds.</span></li>
-            <li><i class="rules-medal" aria-hidden="true" style="--mi:url('catalog/duel-medal-pet.webp')"></i><span data-i18n-html="skills.s4"><b>Partner</b> &mdash; your chosen partner&rsquo;s skill, a few uses each round.</span></li>
+            <li><i class="rules-medal" aria-hidden="true" style="--mi:url('catalog/duel-medal-pet.webp')"></i><span data-i18n-html="skills.s4"><b>Pet</b> &mdash; your chosen pet&rsquo;s skill, a few uses each round.</span></li>
           </ol>
-          <p class="rules-note" data-i18n-html="skills.note">A <b>Skill Fruit</b> fills the skill gauge at once; a <b>pet fruit</b> gives one more Partner use.</p>
+          <p class="rules-note" data-i18n-html="skills.note">A <b>skill fruit</b> fills the skill gauge at once; a <b>pet fruit</b> gives one more Pet use.</p>
         </div>
       </div>
 
@@ -16743,7 +16768,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
   <div id="modal-skin" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="sk-h"><div class="sheet jbox jbox--modal" data-part="modal-plate">
     <h2 id="sk-h" data-i18n="skin.title">Skins</h2>
     <button class="r10-x x-btn" type="button" data-w6x="sk-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
-    <p class="sk-bal"><span data-i18n="skin.balance">Jelly stars</span><b class="sk-bal-v"><i class="gem-ic" aria-hidden="true">★</i><span id="sk-gems">0</span></b></p>
+    <p class="sk-bal"><span data-i18n="skin.balance">Jelly Stars</span><b class="sk-bal-v"><i class="gem-ic" aria-hidden="true">★</i><span id="sk-gems">0</span></b></p>
     <div id="sk-list" class="sk-list"></div>
     <button id="sk-close" data-part="btn-modal" data-variant="primary" class="btn btn-primary" type="button" data-i18n="settings.close">Close</button>
   </div></div>
@@ -16773,7 +16798,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
       <span class="cs"><b class="cs-k" data-i18n="stat.k4">Luck</b><i class="cs-bar kit-gauge-v2"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i></span>
     </div>
     <p id="iv-why" class="cut-line"></p>
-    <p class="sk-bal"><span data-i18n="skin.balance">Jelly stars</span><b class="sk-bal-v"><i class="gem-ic" aria-hidden="true">&#9733;</i><span id="iv-gems">0</span></b></p>
+    <p class="sk-bal"><span data-i18n="skin.balance">Jelly Stars</span><b class="sk-bal-v"><i class="gem-ic" aria-hidden="true">&#9733;</i><span id="iv-gems">0</span></b></p>
     <!-- 「다음 초대까지 ★ n/N」. 무료(N=0)이면 이 줄 통째로 hidden 이다 —
          0/0 게이지는 아무것도 말하지 않는다(DESIGN §23.2 ⓑ). -->
     <p id="iv-prog-row" class="sk-bal"><span id="iv-prog-k" data-i18n="invite.next">To the next invite</span><b class="sk-bal-v"><i class="gem-ic" aria-hidden="true">&#9733;</i><span id="iv-prog-v">0/0</span></b></p>
@@ -17060,8 +17085,8 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
          늘어나도 줄 하나가 더 생길 뿐이다. 목록은 game.js buildNodeMates() 가
          짓는다(동료가 늘어나면 마크업이 아니라 표가 는다). -->
     <div class="nrow nrow-mate">
-      <span class="nrow-k" data-i18n="pick.mate">Buddy</span>
-      <div id="node-mates" class="node-mates" role="radiogroup" data-i18n-aria="aria.matepick" aria-label="Choose your buddy"></div>
+      <span class="nrow-k" data-i18n="pick.mate">Pet</span>
+      <div id="node-mates" class="node-mates" role="radiogroup" data-i18n-aria="aria.matepick" aria-label="Choose your pet"></div>
     </div>
     <p id="node-wait" class="node-wait" hidden></p>
     <!-- AD SLOT: rewarded. 포털 SDK 가 붙기 전까지는 자리와 안내만 있다. -->
@@ -26504,7 +26529,7 @@ window.TT_SFX = {
          single slide (review #2: "연결 규칙을 아무도 안 알려줌"); it is now three
          slides, one idea each, matching the five .howto-panel elements. */
       'howto.p3': 'The two tiles must sit on a <b>straight line</b> — any of the 8 directions.',
-      'howto.p4': '…or be <b>neighbours in reading order</b> — the end of a row wraps to the start of the next.',
+      'howto.p4': '…or be <b>neighbors in reading order</b> — the end of a row wraps to the start of the next.',
       'howto.p5': 'Empty a whole row and it <b>collapses</b> — everything above drops down.',
       'howto.prev': 'Prev',
       'howto.next': 'Next',
@@ -26553,9 +26578,12 @@ window.TT_SFX = {
       'aria.next': 'Go to next stage',
 
       /* W-C §10 루트 리빌 — 결과 시트의 획득 슬롯 라벨. */
-      'rw.starfruit': 'Skill Fruit',
-      'rw.petfruit': 'Pet Fruit',
-      'rw.gem': 'Jelly stars',
+      /* [T14 M-6] 결과 시트 보상 이름 대소문자 규칙 하나로 — shard 4종은 이미
+         "Power shard" 류(첫 낱말만 대문자)다. Fruit 둘만 Title Case 라 그
+         규칙에 맞춘다(skills.note 의 기존 <b>pet fruit</b> 표기와도 일치). */
+      'rw.starfruit': 'Skill fruit',
+      'rw.petfruit': 'Pet fruit',
+      'rw.gem': 'Jelly Stars',
       'rw.heart': 'Hearts',
 
       /* WD-2 §11 파편 · §11.6 갓차 · §14 펫. 파편 이름은 색이 아니라 **스탯**을
@@ -26596,10 +26624,10 @@ window.TT_SFX = {
       'cp.sk.use': 'Uses',
       'cp.sk.usev': '{n} per match',
       'cp.sk.perm': 'Always on',
-      'cp.sk.none': 'Going solo. No buddy skill this run.',
+      'cp.sk.none': 'Going solo. No pet skill this run.',
       /* 0909 copy-flow ④ — 펫 탭 빈 상태 한 줄. `{free}` 는 PET_FREE 에서 나온다
          (petFreeNames) — 무료 동료가 바뀌면 이 문장도 같이 바뀐다. */
-      'cp.pet.empty': 'Pick a buddy and their skill shows up here. {free} are with you from the very first round.',
+      'cp.pet.empty': 'Pick a pet and their skill shows up here. {free} are with you from the very first round.',
       'cp.pet.sep': ' and ',
       'cp.sk.lock': 'Locked',
       'aria.loadout': 'Loadout',
@@ -26725,7 +26753,7 @@ window.TT_SFX = {
       'char.twin.name': 'Twin',
       'char.twin.pass': 'Same-number match +60%',
       'char.ppyak.name': 'Ppyak',
-      'char.ppyak.pass': 'Skill: 8s free link - far tiles connect',
+      'char.ppyak.pass': 'Skill: 8s free link — far tiles connect',
       'char.mungchi.name': 'Mungchi',
       'char.mungchi.pass': 'Skill: 6s chunky shield - clock and foe gauge stop',
       'char.jelly.name': 'Jelly',
@@ -26757,9 +26785,9 @@ window.TT_SFX = {
          안 바뀌었고**, 이어 읽으면 대본 원문 그대로다.
          c1b 는 거기에 더해 나레이션과 텐텐의 인용 대사가 한 칸에 있어 화자가
          갈리므로 세 컷이 됐다(c1b · c1b2 · c1c). */
-      'cut.c1a': 'The Harmony of Jellypang World is broken.',
-      'cut.c1a2': 'When only sames remain, the world slowly hardens.',
-      'cut.c1b': 'The Muncher swallowed the Heart of Ten.',
+      'cut.c1a': 'The harmony of Jelly Pang World is broken.',
+      'cut.c1a2': 'When only sameness remains, the world slowly hardens.',
+      'cut.c1b': 'The Gobbler swallowed the Heart of Ten.',
       'cut.c1b2': 'The Princess went after it\u2026 and got locked in the castle.',
       'cut.c1c': '"Let\'s go. Every Ten we make, the world loosens a little."',
       'cut.c2a': 'Even the river has gone sticky and stiff.',
@@ -26768,9 +26796,9 @@ window.TT_SFX = {
       'cut.c3b': 'A starlight blinked from the castle. The Princess is alive.',
       'cut.c4a': 'The wind bites. King Mint freezes what moves \u2014 keep the chain going, don\'t stop.',
       'cut.c5a': 'The castle\'s first gate. The keeper is\u2026 King Cocoa.',
-      'cut.c5a2': 'The very Muncher who swallowed the Heart.',
+      'cut.c5a2': 'The very Gobbler who swallowed the Heart.',
       'cut.c5b': 'You weren\'t too weak. Without the Heart, no Ten is ever complete. Fall back. Gather more.',
-      'cut.c6a': 'Inside the castle. The cream swallows every footstep. Muncher territory, from here on.',
+      'cut.c6a': 'Inside the castle. The cream swallows every footstep. Gobbler territory, from here on.',
       'cut.c7a': 'The paths keep sticking. What the maze wants: you, circling the same way forever.',
       'cut.c8a': 'The cell where the Princess was held.',
       'cut.c8a2': 'Scratched on the bars: "Harmony breaks \u2014 and can be matched anew."',
@@ -26818,7 +26846,7 @@ window.TT_SFX = {
       'char.bangul.name': 'Bubbly',
       'char.bangul.pass': 'Skill: bubble wave - 2 blockers cleared',
       /* W6.5a — 삐약의 소개도 갈린다(§16-B-3 이관). 이름은 그대로다. */
-      'char.ppyak.pass2': 'Skill: 8s free link - far tiles connect',
+      'char.ppyak.pass2': 'Skill: 8s free link — far tiles connect',
       /* 2c - CODEX P09/P10.  Portrait art landed 2026-09-10; both ids are now in
          CHAR_STD, so the card paints the standard crop and the shared inline SVG
          drops back to being a fallback (setArt's data-art rule). */
@@ -26846,13 +26874,13 @@ window.TT_SFX = {
 
       /* ---- v4 §2: 주인공 / 동료 2단 선택 ---- */
       'pick.hero': 'Hero',
-      'pick.mate': 'Buddy',
+      'pick.mate': 'Pet',
       /* W4 — 캐릭터 선택창의 카테고리 탭 두 장 */
-      'cp.tab.char': 'Characters',
+      'cp.tab.char': 'Heroes',
       'cp.tab.pet': 'Pets',
-      'aria.matepick': 'Choose your buddy',
+      'aria.matepick': 'Choose your pet',
       'mate.none.name': 'Solo',
-      'mate.none.pass': 'No buddy',
+      'mate.none.pass': 'No pet',
       /* ---- v4 §3: 텐트윈 콤보 ---- */
       'tw.next.ten': 'Next: Ten!',
       'tw.next.twin': 'Next: Twin!',
@@ -26890,12 +26918,20 @@ window.TT_SFX = {
       /* ---- v2: missions ---- */
       'mission.label': 'Mission',
       'mission.sum10': 'Clear {goal} pairs that add to 10',
+      'mission.sum10.one': 'Clear 1 pair that adds to 10',
       'mission.same': 'Clear {goal} matching-number pairs',
-      'mission.rows': 'Collapse {goal} rows',
+      'mission.same.one': 'Clear 1 matching-number pair',
+      /* [T14 I-6] 「Collapse 1 rows」 — 복수형만이 아니라 동사도 이 부품군의
+         다른 mission.* 과 어긋나 있었다(Collapse vs Clear). 본문도 정정. */
+      'mission.rows': 'Clear {goal} rows',
+      'mission.rows.one': 'Clear 1 row',
       'mission.noadd': 'Make {goal} matches without Add',
+      'mission.noadd.one': 'Make 1 match without Add',
       'mission.special': 'Use {goal} special tiles',
+      'mission.special.one': 'Use 1 special tile',
       'mission.fever': 'Trigger fever once',
       'mission.bomb': 'Blow up {goal} tiles with a bomb',
+      'mission.bomb.one': 'Blow up 1 tile with a bomb',
       /* ★ 0901 ⑦ P1 — 교차 미션. MISSION_GOALS 에는 아무것도 안 넣는다: 그 표는
          pickMission(엔들리스·클래식) 전용이고 모험은 advMissionGoal 을 쓴다. */
       'mission.chain3': 'Reach a TenTwin chain of 3, {goal} times',
@@ -26909,8 +26945,8 @@ window.TT_SFX = {
       'mission.col': 'Clear column {goal} completely',
       'mission.prog': '{n}/{goal}',
       /* §3 피니시 — STAGES 의 피니시 어휘. 같은 미션 id 라도 평시 문장과 다르다. */
-      'finish.mission.sum10': 'Ten x{goal}',
-      'finish.mission.chain3': 'TenTwin chain x{goal}',
+      'finish.mission.sum10': 'Ten ×{goal}',
+      'finish.mission.chain3': 'TenTwin chain ×{goal}',
       'finish.mission.sprint': '{goal} matches, right now',
       'finish.sub': 'FINISH CHANCE',
       'mission.done': 'Mission complete!',
@@ -26931,7 +26967,7 @@ window.TT_SFX = {
       'grade.b.msg': 'Solid clear.',
       'grade.c.msg': 'Cleared — try it faster.',
       'milestone.title': 'Match #{n}!',
-      'milestone.title.rw': 'Match #{n}! Jelly stars +{v}',
+      'milestone.title.rw': 'Match #{n}! Jelly Stars +{v}',
       'milestone.sub': 'What a streak. Keep going.',
 
       /* ---- v3: tutorial / theme / share ----
@@ -26962,7 +26998,7 @@ window.TT_SFX = {
       'tut.s2fail': 'See? Bent lines do not connect. Straight only — and diagonals count. <b>7</b> and <b>3</b> make <b>10</b>.',
       'tut.s3': 'End of the row, start of the next. Those two <b>6</b>s still reach each other.',
       'tut.s3fail': 'Not that one. Go from the <b>end</b> of a row to the <b>start</b> of the next.',
-      'tut.done': 'That is the whole game. Go clear a board.',
+      'tut.done': 'That\'s the basics. Now beat the villain!',
       /* 14차 #34 — 규칙 요약 카드(도움말 첫 장). 세 줄이 곧 isValidPair 의 두 조건
          이다: r1 = 값 규칙(canMatch), r2·r3 = 연결 규칙의 두 갈래(isLineConnected /
          isReadingConnected), note = 두 갈래에 공통으로 걸리는 "사이가 비어야 한다".
@@ -26990,8 +27026,8 @@ window.TT_SFX = {
       'skills.s1': '<b>Attack</b> — fills with every point you score, and fires on its own when full.',
       'skills.s2': '<b>Special</b> — fills only when you <b>alternate</b> sum-10 and same-number matches. One hit is worth two attacks.',
       'skills.s3': '<b>Skill</b> — every match charges it, faster the higher your combo. It turns the board your way for a few seconds.',
-      'skills.s4': '<b>Partner</b> — your chosen partner\'s skill, a few uses each round.',
-      'skills.note': 'A <b>Skill Fruit</b> fills the skill gauge at once; a <b>pet fruit</b> gives one more Partner use.',
+      'skills.s4': '<b>Pet</b> — your chosen pet\'s skill, a few uses each round.',
+      'skills.note': 'A <b>skill fruit</b> fills the skill gauge at once; a <b>pet fruit</b> gives one more Pet use.',
       'menu.dailydone': "Today's daily: cleared",
       'menu.dailytodo': "Today's daily is waiting",
       'hud.daily': 'Daily',
@@ -27067,7 +27103,7 @@ window.TT_SFX = {
       'rank.hint.classic': 'Your 5 best Classic runs — no skills, no items.',
       'rank.hint.classic-rush': 'Your 5 best Classic Time Rush runs — skill only.',
       'rank.hint.classic-daily': "Your 5 fastest Classic Daily clears — everyone on even ground.",
-      'rank.empty': 'Empty — go take it',
+      'rank.empty': 'No record yet',
       'rank.dateunknown': 'earlier',
       'rank.close': 'Close',
       'rank.open': 'Records',
@@ -27183,7 +27219,7 @@ window.TT_SFX = {
       'aria.cutskipall': 'Skip the whole story',
       'settings.gallery': 'Story gallery',
       'settings.credits': 'Credits',
-      'credits.body': 'TenTwin: Jellypang World — art & music by the author, built with the game factory.',
+      'credits.body': 'TenTwin: Jelly Pang World — art & music by the author, built with the game factory.',
       /* --- §H 캐릭터 추천 태그 -------------------------------------------- */
       'pick.rec': 'Best for',
       'pet.combo.k': 'Best team',
@@ -27202,7 +27238,7 @@ window.TT_SFX = {
       'cut.who.ten': 'Tenten',
       'cut.who.twin': 'Twin',
       'cut.who.jelly': 'Jelly Princess',
-      'cut.who.boss': 'Mukkaebi',
+      'cut.who.boss': 'Gobbler',
       'cut.who.bros': 'Tenten & Twin',
       'cut.who.mates': 'Ppyak & Mungchi',
       /* 13차-a: 컷 o11 의 화자가 'ppyak' 인데 이 표에 그 키가 없어, t() 가
@@ -27260,8 +27296,8 @@ window.TT_SFX = {
       'adv.hud.digit': '{d}: {n} / {goal}',
       'adv.hud.time': 'Cleared {n} / {goal}',
       'adv.goalhit': 'Goal reached — now go for stars!',
-      'adv.hand.blk': 'Blockers x{n}',
-      'adv.hand.lock': 'Locked tiles x{n}',
+      'adv.hand.blk': 'Blockers ×{n}',
+      'adv.hand.lock': 'Locked tiles ×{n}',
       'adv.hand.noshuffle': 'No shuffle',
       'adv.hand.timecut': 'Short clock',
       'adv.hand.none': 'No handicap',
@@ -27287,8 +27323,8 @@ window.TT_SFX = {
       'node.bestv': '{b} / ★★ line {g} = {p}%',
       'node.bestnone': 'No record yet — ★★ line {g}',
       'node.rec': 'Why this hero',
-      'node.recpet': 'Why this buddy',
-      'node.pet': 'Buddy pick',
+      'node.recpet': 'Why this pet',
+      'node.pet': 'Pet pick',
       'rec.why.ten': 'Sum-10 matches pay +60% for Tenten — this stage is full of them.',
       'rec.why.twin': 'Same-number matches pay +60% for Twin, and they chain fastest.',
       'rec.why.jelly': 'Jackpot variance pushes clear speed — best where the clock is the goal.',
@@ -27302,7 +27338,7 @@ window.TT_SFX = {
       'rec.why.atk.cycle': 'All four skills rotate in - holding the clock with TikTok leaves a window whichever one lands.',
       'adv.go': 'Start',
       'adv.close': 'Close',
-      'adv.missionwin': 'Mission clear! Every match x{mult} from now on',
+      'adv.missionwin': 'Mission clear! Every match ×{mult} from now on',
       'adv.missionfail': 'Mission time is up — the stage goes on.',
       'adv.crumble': 'The blockers crumbled!',
       'adv.win': 'Stage {n} clear!',
@@ -27347,7 +27383,7 @@ window.TT_SFX = {
       /* 전투 개편 단계 2 — 임시 문구. 본 HUD 는 단계 4에서 온다. */
       'duel.tell': 'The villain is winding up!',
       'duel.hit': 'Hit! -{n} HP',
-      'duel.skill': 'Blockers dropped x{n}!',
+      'duel.skill': 'Blockers dropped ×{n}!',
       'duel.skfreeze': 'A whole column froze! ({n} tiles)',
       'duel.skmask': 'Numbers blacked out! ({n} tiles)',
       'duel.skquake': 'The board lurched! ({n} rows shifted)',
@@ -27361,7 +27397,7 @@ window.TT_SFX = {
       'act.awaken': 'Skill',
       'aria.attack': 'Attack gauge status',
       'aria.special': 'Fire your special attack',
-      'aria.pet': 'Use your partner skill',
+      'aria.pet': 'Use your pet skill',
       'aria.awaken': 'Skill',
       /* 게이지 토스트는 "안 찼다"가 아니라 **채우는 법**을 말한다. 안 찼다는 것은
          게이지 바를 보면 이미 아는 사실이고, 정작 모르는 것은 무엇을 하면 차는가다
@@ -27372,8 +27408,8 @@ window.TT_SFX = {
       'duel.atkstat': 'Attack {n}% — it fills with every point you score, and fires on its own when full.',
       'duel.spstat': 'Special {n}% — it only fills when you alternate sum-10 and same-number matches.',
       'duel.spgo': 'SPECIAL! -{n}',
-      'duel.petnone': 'No partner yet — pick one and you get their skill a few times each round.',
-      'duel.petout': 'No partner skill left this round — break a pet fruit on the board for one more.',
+      'duel.petnone': 'No pet yet — pick one and you get their skill a few times each round.',
+      'duel.petout': 'No pet skill left this round — break a pet fruit on the board for one more.',
       'duel.petempty': 'Nothing left to peck.',
       'duel.petpeck': 'Peck! {n} tiles cleared',
       /* W2.5 ④ — 마크 과일의 플로트 문구. 토스트가 아니라 **보드 위 플로트**라
@@ -27394,7 +27430,7 @@ window.TT_SFX = {
       'duel.petshield': 'Chunky Shield! Clock AND villain gauge frozen for {n}s',
       /* --- W3: 컷인이 붙은 기술들의 이름 한 벌 --- */
       'skill.sub.sp': 'SPECIAL',
-      'skill.sub.pet': 'PARTNER',
+      'skill.sub.pet': 'PET',
       'skill.sub.foe': 'VILLAIN',
       'skill.sp.name': 'FULL-POWER STRIKE!',
       /* W6.5a — 삐약의 기술이 쪼아먹기 → 자유 연결로 갈렸다(§16-B-3 이관).
@@ -27519,7 +27555,7 @@ window.TT_SFX = {
       'boss.armed': 'Opening found — SKILL INCOMING!',
       'boss.weak': 'OPENING!',
       'boss.tell': '{b} is winding up…',
-      'boss.atk': 'Blockers dropped! (x{n})',
+      'boss.atk': 'Blockers dropped! (×{n})',
       'boss.down': 'DOWN!',
       'boss.label': 'Boss',
       'boss.hp': 'HP',
@@ -27549,8 +27585,8 @@ window.TT_SFX = {
        * 스탯 넷은 밸런스 수치가 아니라 성격 소개다. 값은 index.html 의 --v 에
        * 고정돼 있고 여기에는 이름만 있다 — 캐릭터별로 세 번째 칸까지 겹치지
        * 않게 골라서, 넷을 나란히 보면 "이 셋은 서로 다른 사람"이 읽히게 했다. */
-      'menu.sub': 'Jellypang World',
-      'pick.head': 'Character Select',
+      'menu.sub': 'Jelly Pang World',
+      'pick.head': 'Heroes',
       'adv.goal.k': 'Final goal',
       'adv.goal.v': 'Jelly Castle',
       /* 9차: 스탯 라벨이 캐릭터별에서 **공용 4종**으로 바뀌었다. 레퍼런스 목업
@@ -27604,10 +27640,18 @@ window.TT_SFX = {
       'aria.questTab': 'Pick which missions to show',
       'menu.quest': 'Missions {n}/{g}',
       'dq.m10': 'Make a Ten {n} times',
-      'dq.combo': 'Reach a x{n} combo',
+      'dq.m10.one': 'Make a Ten once',
+      /* [T14 I-6] 「Reach a x{n} combo」의 관사가 항상 틀렸다(x5 앞은 "a",
+         x8 앞은 "an" — 수마다 갈리는 관사를 문자열로 못 뽑는다). 관사째
+         드롭한 「Reach combo x{n}」은 어느 n 에도 맞아 .one 분기가 필요 없다. */
+      'dq.combo': 'Reach combo ×{n}',
       'dq.pet': 'Call your friend {n} times',
-      'dq.awaken': 'Skill {n} times',
+      'dq.pet.one': 'Call your friend once',
+      /* [T14 I-6] 「Skill {n} times」에는 동사가 없었다(has-no-verb — I-6). */
+      'dq.awaken': 'Use skills {n} times',
+      'dq.awaken.one': 'Use a skill once',
       'dq.clear': 'Clear {n} stages',
+      'dq.clear.one': 'Clear 1 stage',
       'dq.daily': "Finish today's Daily",
       'dq.duel': 'Win a duel',
       'dq.star2': 'Earn 2 stars or more',
@@ -27623,9 +27667,9 @@ window.TT_SFX = {
       'ach.match100': 'Matched {n}',
       'ach.match1000': 'Matched {n}',
       'ach.match5000': 'Matched {n}',
-      'ach.combo5': 'Combo x{n}',
-      'ach.combo10': 'Combo x{n}',
-      'ach.combo20': 'Combo x{n}',
+      'ach.combo5': 'Combo ×{n}',
+      'ach.combo10': 'Combo ×{n}',
+      'ach.combo20': 'Combo ×{n}',
       'ach.pet1': 'First friend',
       'ach.pet3': 'Three friends',
       'ach.petall': 'Every friend',
@@ -27638,7 +27682,8 @@ window.TT_SFX = {
       'ach.streak14': '{n}-day streak',
       'ach.duel1': 'First win',
       'ach.duel10': '{n} duel wins',
-      'ach.awaken50': 'Skill {n} times',
+      'ach.awaken50': 'Use skills {n} times',
+      'ach.awaken50.one': 'Use a skill once',
       'settings.rank': 'Records',
       'settings.close': 'Close',
       'settings.on': 'On',
@@ -27654,16 +27699,16 @@ window.TT_SFX = {
       'aria.skins': 'Open skins',
       'skin.btn': 'Skins',
       'skin.title': 'Skins',
-      'skin.balance': 'Jelly stars',
+      'skin.balance': 'Jelly Stars',
       'skin.own': 'Owned',
       'skin.equip': 'Equip',
       'skin.equipped': 'Wearing',
       'skin.buy': 'Buy',
       'skin.soon': 'Coming soon',
       'skin.soonhint': 'A hat for the bichon prince',
-      'skin.confirm': 'Spend {n} jelly stars on {name}?',
+      'skin.confirm': 'Spend {n} Jelly Stars on {name}?',
       'skin.bought': '{name} unlocked!',
-      'skin.poor': 'Not enough jelly stars ({n} more)',
+      'skin.poor': 'Not enough Jelly Stars ({n} more)',
       /* ---- [SHOP-0910] 앱 상점 (DESIGN §20). ko 쪽과 **키가 정확히 같다** —
          한쪽에만 있는 키는 그 언어에서 영문 원문이 새어 나오거나 키 자체가
          화면에 찍힌다(t() 의 마지막 줄이 String(key) 다). ---------------- */
@@ -27691,9 +27736,9 @@ window.TT_SFX = {
       'shop.pack.d': '{n} jewels',
       'shop.start': 'Starter pack',
       'shop.start.d': '{n} jewels + {h} hearts + {s} shards',
-      'shop.trade': 'Jelly stars {s}',
+      'shop.trade': 'Jelly Stars {s}',
       'shop.trade.d': 'Jewels to stars. One way only.',
-      'shop.trade.ok': 'Jelly stars +{s}',
+      'shop.trade.ok': 'Jelly Stars +{s}',
       'shop.heart5': 'Refill hearts',
       'shop.heart5.d': 'Straight back to {n}',
       'shop.heart1': 'One heart',
@@ -27735,6 +27780,7 @@ window.TT_SFX = {
       'invite.free': 'Invite for free',
       'invite.go': 'Invite',
       'invite.got': 'NEW CHARACTER!',
+      'invite.got.pet': 'NEW PET!',   /* [T14 I-9] 몽글 같은 펫 획득에도 이 화면을 쓰는데 머리는 늘 「캐릭터」였다 */
       'invite.new': '{n} joined you!',
       'intro.next': '▶ Next',
       'intro.done': '▶ Close',
@@ -27773,7 +27819,7 @@ window.TT_SFX = {
       'intro.banjjak.l2': 'My skill is Spark Charge — your skill gauge fills +40%p.',
       'intro.bangul.l1': 'Bubbly here. Stuck spots get loosened with bubbles.',
       'intro.bangul.l2': 'My skill is Bubble Wave — 2 blockers cleansed.',
-      'skin.gem': '+1 jelly star!',
+      'skin.gem': '+1 Jelly Star!',
       'skin.base': 'Default',
       'skin.basedesc': 'The look you started with',
       'skin.royal': 'Royal Gown',
@@ -27810,7 +27856,7 @@ window.TT_SFX = {
       'char.twin.title': 'Second Prince of Tentwin',
       'char.twin.ult': 'Twin Oath — {sec}s where every match counts as a TenTwin combo',
       'char.twin.tip': 'Pick him when the same numbers pile up.',
-      'char.jelly.title': 'Princess of the Jellypang world',
+      'char.jelly.title': 'Princess of the Jelly Pang world',
       'char.jelly.ult': 'Jelly Time — {sec}s at a 40% jackpot chance',
       'char.jelly.tip': 'Pick her to gamble on one huge run.',
 
@@ -27864,7 +27910,7 @@ window.TT_SFX = {
       'soon.title': 'Coming Soon',
       'soon.body': 'Under construction — check back after the next update!',
       'kd.visit': 'Yesterday-you saved up {n} Jelly Stars.',
-      'kd.visit.first': 'Welcome to Jellypang Kingdom!',
+      'kd.visit.first': 'Welcome to Jelly Pang Kingdom!',
       'kd.res.aria': 'Say hello',
 
       /* Task 12 — CrazyGames 포털 어댑터. 전부 TW_PORTAL.env==='crazygames' 일
@@ -28012,7 +28058,7 @@ window.TT_SFX = {
          새 설치도 삐약·뭉치를 이미 갖고 있다(store 리터럴 pets 두 항목 · §14.1 ⓐ).
          비어 보이던 것은 **기본 선택이 「없음」**이었기 때문이다. 그러니 문구도
          "첫 펫을 만나요"가 아니라 "고르면 나온다"가 사실이다. */
-      'cp.pet.empty': '동료를 고르면 여기에 기술이 나와요. {free}는 처음부터 함께예요.',
+      'cp.pet.empty': '펫을 고르면 여기에 기술이 나와요. {free}는 처음부터 함께예요.',
       'cp.pet.sep': '·',
       'cp.sk.lock': '잠김',
       'aria.loadout': '장비',
@@ -28229,11 +28275,11 @@ window.TT_SFX = {
 
       /* ---- v4 §2: 주인공 / 동료 2단 선택 ---- */
       'pick.hero': '주인공',
-      'pick.mate': '동료',
+      'pick.mate': '펫',
       /* W4 — 캐릭터 선택창의 카테고리 탭 두 장 */
       'cp.tab.char': '캐릭터',
       'cp.tab.pet': '펫',
-      'aria.matepick': '동료를 고르세요',
+      'aria.matepick': '펫을 고르세요',
       'mate.none.name': '없음',
       'mate.none.pass': '혼자서',
       /* ---- v4 §3: 텐트윈 콤보 ---- */
@@ -28340,7 +28386,7 @@ window.TT_SFX = {
       'tut.s2fail': '봤지? 꺾이면 안 이어져. 곧은 길만 통해 — 비스듬한 것도 곧은 길이야. <b>7</b>과 <b>3</b>, 합이 <b>10</b>.',
       'tut.s3': '줄 끝이랑 다음 줄 첫 칸. 저 <b>6</b> 둘은 아직 닿아 있어.',
       'tut.s3fail': '거기 말고. 줄 <b>끝</b>에서 다음 줄 <b>첫 칸</b>으로 이어 봐.',
-      'tut.done': '이게 전부야. 이제 판을 싹 비워 보자.',
+      'tut.done': '이게 기본이야. 이제 악당을 물리쳐 봐!',
       /* 14차 #34 — 규칙 요약 카드(도움말 첫 장). 세 줄이 곧 isValidPair 의 두 조건
          이다: r1 = 값 규칙(canMatch), r2·r3 = 연결 규칙의 두 갈래(isLineConnected /
          isReadingConnected), note = 두 갈래에 공통인 "사이가 비어 있어야 한다".
@@ -28368,7 +28414,7 @@ window.TT_SFX = {
       'skills.s1': '<b>공격</b> — 점수를 낼수록 차고, 다 차면 저절로 나가요.',
       'skills.s2': '<b>필살기</b> — <b>합이 10</b>과 <b>같은 숫자</b>를 <b>번갈아</b> 맞춰야 차요. 한 방이 공격 두 번치예요.',
       'skills.s3': '<b>스킬</b> — 매치마다 차고, 콤보가 높을수록 빨리 차요. 잠깐 동안 판이 내 편이 돼요.',
-      'skills.s4': '<b>펫소환</b> — 고른 동료의 기술이에요. 한 판에 쓸 수 있는 횟수가 정해져 있어요.',
+      'skills.s4': '<b>펫소환</b> — 고른 펫의 기술이에요. 한 판에 쓸 수 있는 횟수가 정해져 있어요.',
       'skills.note': '<b>스킬 과일</b>은 스킬을 단번에 채우고, <b>펫 과일</b>은 펫 횟수를 하나 늘려 줘요.',
       'menu.dailydone': '오늘 데일리 완료',
       'menu.dailytodo': '오늘의 데일리가 기다려요',
@@ -28711,7 +28757,7 @@ window.TT_SFX = {
       'duel.atkstat': '공격 {n}% — 점수를 낼수록 차고, 다 차면 저절로 나가요.',
       'duel.spstat': '필살기 {n}% — 합이 10과 같은 숫자를 번갈아 맞춰야 차요.',
       'duel.spgo': '필살기! -{n}',
-      'duel.petnone': '동료가 없어요 — 동료를 고르면 그 기술을 판마다 몇 번 쓸 수 있어요.',
+      'duel.petnone': '펫이 없어요 — 펫을 고르면 그 기술을 판마다 몇 번 쓸 수 있어요.',
       'duel.petout': '이번 판 펫 기술을 다 썼어요 — 판 위의 펫 과일을 깨면 한 번 더 생겨요.',
       'duel.petempty': '쪼아먹을 타일이 없어요.',
       'duel.petpeck': '쪼아먹기! {n}칸 정리',
@@ -28731,7 +28777,7 @@ window.TT_SFX = {
       'duel.petshield': '덩어리 방패! {n}초 동안 시간도 악당 게이지도 멈춰요',
       /* --- W3: 컷인이 붙은 기술들의 이름 한 벌 --- */
       'skill.sub.sp': '필살기',
-      'skill.sub.pet': '동료 기술',
+      'skill.sub.pet': '펫 기술',
       'skill.sub.foe': '악당 기술',
       'skill.sp.name': '혼신의 일격!',
       /* W6.5a — 값만 갈린다(위 en 주석 참조). 옛 값: '삐약 — 쪼아먹기 폭풍!' */
@@ -28764,8 +28810,8 @@ window.TT_SFX = {
          썼고, 그것은 일곱에게 거짓말이었다.  아래 줄들은 실제 게이트와
          **같은 사실**을 말한다: PET_FREE / PET_BOSS / PET_AWK_NEED /
          PET_NODELAY_NEED / PET_SHARD_NEED / PET_GACHA / PET_TEN_NEED. */
-      'pet.lock.ppyak': '처음부터 함께 있는 동료예요.',
-      'pet.lock.mungchi': '처음부터 함께 있는 동료예요.',
+      'pet.lock.ppyak': '처음부터 함께 있는 펫이에요.',
+      'pet.lock.mungchi': '처음부터 함께 있는 펫이에요.',
       'pet.lock.mongle': '쉬지 않고 10연속 매치하면 합류해요.',
       'pet.lock.churup': '모험 선물 상자의 희귀 자리에서 만날 수 있어요.',
       'pet.lock.mukmul': '20탄 보스를 이기면 합류해요.',
@@ -29026,6 +29072,7 @@ window.TT_SFX = {
       'invite.free': '무료로 초대',
       'invite.go': '초대',
       'invite.got': '새로운 캐릭터!',
+      'invite.got.pet': '새로운 펫!',
       'invite.new': '{n} 합류!',
       'intro.next': '▶ 다음',
       'intro.done': '▶ 닫기',
@@ -29050,7 +29097,7 @@ window.TT_SFX = {
       'intro.mungchi.l2': '내 기술은 「덩어리 방패」 — 6초간 시계와 악당 게이지가 멈춰.',
       'intro.mongle.l1': '몽글이에요. 시간이 급할 때 불러 주세요.',
       'intro.mongle.l2': '내 기술은 「시간 웅덩이」 — 4초간 시계와 악당 게이지가 멈춰요.',
-      'intro.tiktok.l1': '째깍! 나는 시간을 세는 동료야.',
+      'intro.tiktok.l1': '째깍! 나는 시간을 세는 펫이야.',
       'intro.tiktok.l2': '내 기술은 「타임스톱」 — 6초 멈춘 동안에도 매치할 수 있어.',
       'intro.churup.l1': '츄릅! 한 입에 한 줄, 자신 있어요.',
       'intro.churup.l2': '내 기술은 「한 입 재굴림」 — 한 줄을 통째로 다시 섞어요.',
@@ -29226,11 +29273,18 @@ window.TT_SFX = {
     return ms ? fmtSec(ms) : null;
   }
 
-  /** Translate `key`, substituting {placeholder} tokens from `params`. */
+  /** Translate `key`, substituting {placeholder} tokens from `params`.
+   *  [T14 I-6] 최소 단수형 규칙 — params.n 또는 params.goal 이 1이면 그
+   *  언어 사전의 `<key>.one` 을 먼저 찾는다(없으면 평소처럼 key 그대로).
+   *  ko 사전에는 `.one` 항목을 안 두므로 ko 결과는 글자 하나 안 바뀐다. */
   function t(key, params) {
     var dict = I18N[currentLang()] || I18N.en;
-    var s = dict[key];
-    if (typeof s !== 'string') s = I18N.en[key];
+    var isOne = !!params && (params.n === 1 || params.goal === 1);
+    var oneKey = isOne ? (key + '.one') : null;
+    var s = (oneKey && typeof dict[oneKey] === 'string') ? dict[oneKey] : dict[key];
+    if (typeof s !== 'string') {
+      s = (oneKey && typeof I18N.en[oneKey] === 'string') ? I18N.en[oneKey] : I18N.en[key];
+    }
     if (typeof s !== 'string') return String(key);
     /* 상수 파생(위 주석) 때문에 params 가 없어도 항상 돌린다. 모르는
        이름은 종전처럼 그대로 남기므로(`return m`) 기존 문구는 무변이다. */
@@ -29276,6 +29330,10 @@ window.TT_SFX = {
     syncMenu();
     syncHud();
     syncToggleLabels();
+    /* T14 I-2b — #kd-bot-ch-n(챕터 부제)은 data-i18n 없이 kdSync() 가 직접
+       채우는 칸이라 applyI18n() 이 못 건드린다. 왕국이 지어져 있을 때만 부른다
+       (부팅 초반 setLang 호출은 화면이 아직 없어 no-op 이 될 자리라 굳이 돈다). */
+    if ($('screen-kingdom')) kdSync();
     J.sfx.ui();
   }
 
@@ -31273,8 +31331,9 @@ window.TT_SFX = {
   var SKINS = {
     ten: [
       { id: 'ten.base', name: 'skin.base', desc: 'skin.basedesc', cost: 0, img: '--art-tenten' },
-      { id: 'ten.hat', name: 'skin.soon', desc: 'skin.soonhint', cost: 0, soon: true },
-      { id: 'ten.hat2', name: 'skin.soon', desc: 'skin.soonhint', cost: 0, soon: true }
+      /* [T14 M-3] ten.hat2 는 ten.hat 과 문구·soon 상태가 완전히 같은 줄이라
+         스킨 창에 「곧 만나요」가 똑같이 두 번 떴다 — 하나로 줄인다. */
+      { id: 'ten.hat', name: 'skin.soon', desc: 'skin.soonhint', cost: 0, soon: true }
     ],
     twin: [
       { id: 'twin.base', name: 'skin.base', desc: 'skin.basedesc', cost: 0, img: '--art-twin' },
@@ -32266,7 +32325,7 @@ window.TT_SFX = {
   }
 
   /* ---- 획득 연출 (§23.3) --------------------------------------------------- */
-  var cgTimer = 0, cgThen = null;
+  var cgTimer = 0, cgThen = null, cgToastMsg = '';   /* [T14 I-7b] 토스트는 화면이 닫힌 뒤 */
 
   /** 토큰 하나에서만 시간이 나온다. 못 읽으면 폴백 — `boardMaxPx()` 가
    *  `--board-max` 를 읽는 것과 같은 규약이다(읽는 곳 하나, 박힌 곳 없음). */
@@ -32301,7 +32360,9 @@ window.TT_SFX = {
       else if (art.style.removeProperty) art.style.removeProperty('--cg-img');
     }
     if (el.style) el.style.setProperty('--cut-key', (CHARS[id] || CHARS[CHAR_DEFAULT]).key);
-    setText('cg-sub', t('invite.got'));
+    /* [T14 I-9] 이 화면은 펫 초대(예: 몽글)에도 쓰이는데 머리는 늘 「캐릭터」
+       였다 — HERO_IDS 에 없으면 펫이다(같은 판정을 이미 곳곳에서 쓴다). */
+    setText('cg-sub', t(HERO_IDS.indexOf(id) >= 0 ? 'invite.got' : 'invite.got.pet'));
     setText('cg-name', t('char.' + id + '.name'));
     setText('cg-tag', t(charTagKey(id)));
     paintStatBars($('cg-stats'), id);
@@ -32309,7 +32370,9 @@ window.TT_SFX = {
     el.classList.remove('go');
     void el.offsetWidth;              // 진행 중인 애니메이션을 새 사건으로 다시 시작
     el.classList.add('go');
-    toast(t('invite.new', { n: t('char.' + id + '.name') }));
+    /* [T14 I-7b] 예전엔 여기서 바로 띄워 능력치 막대 두 줄을 가렸다(증거
+       crops/I9-charget-toast-*.png) — 화면이 닫힐 때(charGetEnd)로 미룬다. */
+    cgToastMsg = t('invite.new', { n: t('char.' + id + '.name') });
     J.sfx.win();
     J.vibrate(70);
     if (typeof window !== 'undefined') {
@@ -32324,6 +32387,7 @@ window.TT_SFX = {
     if (cgTimer) { clearTimeout(cgTimer); cgTimer = 0; }
     var el = $('charget');
     if (el) { el.classList.remove('go'); el.hidden = true; }
+    if (cgToastMsg) { toast(cgToastMsg); cgToastMsg = ''; }
     var fn = cgThen;
     cgThen = null;
     if (fn) fn();
@@ -35484,6 +35548,7 @@ window.TT_SFX = {
     }
     questPaint();
     questBadges();
+    kdSync();   /* T14 I-2a — 젤리별 지갑은 위에서 바로 늘지만 왕국 하단 칩은 따로 안 갱신됐다 */
     return gain;
   }
 
@@ -35800,6 +35865,14 @@ window.TT_SFX = {
     S.sel = -1;
     S.combo = 1;
     S.comboUntil = 0;
+    /* T14 I-1 — comboLoop()/bumpCombo() 만 라벨·바를 지우는데 그 둘은 만료·매치
+       시점에만 돈다. startStage() 는 상태(S.combo/comboUntil)만 되돌리고 DOM은
+       손대지 않아, 클리어→다음 탄처럼 comboLoop 가 멎은 채 새 판이 시작되면
+       옛 「x29」·꽉 찬 바가 첫 매치 전까지 그대로 남았다 — comboLoop 의 만료
+       분기와 같은 값으로 여기서도 지운다. */
+    var comboFill = $('combo-fill'), comboLabel = $('combo-label');
+    if (comboFill) comboFill.style.setProperty('--p', '0');
+    if (comboLabel) { comboLabel.textContent = ''; comboLabel.style.color = ''; }
     S.busy = false;
     S.continueUsed = false;
     S.adContinueUsed = false;   /* Task 12 rev1(I-7) */
@@ -38557,7 +38630,10 @@ window.TT_SFX = {
       out.push({ ico: '🐾', disc: 'pet', key: 'rw.petfruit', val: S.gainPet | 0, rar: 'common' });
     }
     if ((o.gem | 0) > 0) {
-      out.push({ ico: '💎', disc: 'gem', key: 'rw.gem', val: o.gem | 0, rar: 'normal' });
+      /* [T14 I-8] 젤리별은 다른 화면 전부 ★(.gem-ic 와 같은 글리프, :16810
+         부근)인데 결과 창만 💎 였다 — ⭐(바로 위 줄의 「스킬 과일」)와도 겹쳐
+         한 시트에서 같은 모양이 다른 재화를 가리켰다. ★ 로 통일. */
+      out.push({ ico: '★', disc: 'gem', key: 'rw.gem', val: o.gem | 0, rar: 'normal' });
     }
     /* 리텐션 래퍼(0910) ④ — 하트 행. 연속 3일 보상이 유일한 소비자고,
        다른 자리는 o.heart 를 넘기지 않으므로 기존 세 시트의 줄 수는 불변이다. */
@@ -40379,10 +40455,12 @@ window.TT_SFX = {
     questAtt();
   }
 
-  /** 배지 · 메뉴 한 줄. «받을 것이 있다»는 사실을 화면 밖에서 말하는 유일한 자리. */
+  /** 배지 · 메뉴 한 줄. «받을 것이 있다»는 사실을 화면 밖에서 말하는 유일한 자리.
+   *  [T14 I-3] #quest-badge 는 판정판 71(T8 설정 정리)로 DOM에서 빠진 죽은
+   *  참조였다 — 왕국 「미션」 이름표의 #kd-mission-badge 로 재배선한다. */
   function questBadges() {
     var n = questClaimable();
-    var b = $('quest-badge');
+    var b = $('kd-mission-badge');
     if (b) {
       b.textContent = n > 0 ? String(n) : '';
       b.hidden = !(n > 0);
@@ -46826,6 +46904,17 @@ window.TT_SFX = {
           tx.textContent = t(b.key);
           lab.appendChild(ic);
           lab.appendChild(tx);
+          /* T14 I-3 (2b②) — 미수령 미션 배지. 새 부품이 아니라 기존
+             `.badge-new`(§2866, :empty/[hidden] 자동 숨김)의 인스턴스다:
+             `.kd-tag`가 이미 inline-flex+gap 이라 셋째 자식으로 얹으면 아이콘·
+             글자와 같은 간격으로 따라간다. 값은 questBadges() 가 채운다. */
+          if (b.id === 'mission') {
+            var qb = document.createElement('b');
+            qb.id = 'kd-mission-badge';
+            qb.className = 'badge-new';
+            qb.hidden = true;
+            lab.appendChild(qb);
+          }
           el.appendChild(lab);
         }
         wrap.appendChild(el);
@@ -46923,6 +47012,7 @@ window.TT_SFX = {
     TW_PORTAL.loadingStop();     /* Task 12 — 왕국 착지 = 로딩 끝(멱등, 최초 1회만 실제 호출) */
     TW_PORTAL.gameplayStop();    /* Task 12 — 메뉴로 들어옴 = 플레이 break(playing 플래그가 중복을 막는다) */
     buildKingdom();
+    questBadges();   /* T14 I-3 — buildKingdom() 이 배지를 매번 새로(숨김) 지으므로 여기서 값을 채운다 */
     showScreen(homeScreen());
     kdPanClamp();
     kdVisit();
@@ -51239,7 +51329,7 @@ window.TT_SFX = {
     startClassic: startClassic, startClassicRush: startClassicRush,
     startClassicDaily: startClassicDaily, openClassicHub: openClassicHub,
     isClassic: isClassic, bestKey: bestKey, rankKeyOf: rankKeyOf,
-    menu: goMenu,
+    menu: goMenu, advAbandon: advAbandon,   /* [T14 I-11] 뒤로가기 파수꾼(F4.2)이 부른다 */
     /* v5 E-1 ranking board — DEBUG HANDLES ONLY, in the same spirit as
      * `state` / `layout` / `render` above: nothing in the game reaches the
      * feature through window.Game, these exist so the data rules (migration,
@@ -53824,7 +53914,12 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
    상시 규율이다(단축은 background-clip 을 리셋한다 — 사고 전력).
    캐시버스트 없음: 신규 파일이라 낡은 항목이 존재할 수 없다. */
 html[lang="en"] .logo-img,
-html[lang="en"] .splash-logo{
+html[lang="en"] .splash-logo,
+/* T14 I-5 (2b①) — 앱 인트로(#app-intro .api-logo)도 같은 교체점. TWA 전용
+   base 규칙(:13161 부근 `background: var(--art-logo) ...`)이 이미 그림 로고를
+   깔아 뒀고, 여기서도 longhand(-image)만 덮어 위치·크기·repeat 은 그대로다.
+   같은 등급이라 **소스 순서 뒤**에서 이겨야 하므로 이 en 블록에 합류시킨다. */
+html[lang="en"] #app-intro .api-logo{
   background-image:url("catalog/art-logo-en.webp");
 }
 
@@ -61347,6 +61442,11 @@ html.menu-v2 #screen-menu .tagline{
 .mode-list [data-part="btn-picture"][data-variant="survival"]  {--bp-fill-img:url("catalog/sian3-btn-survival-blank.webp");  --bp-ink:#2E0B4A;--bp-core:#FFFFFF;}
 .mode-list [data-part="btn-picture"][data-variant="accum90"]   {--bp-fill-img:url("catalog/sian3-btn-accum90-blank.webp");   --bp-ink:#16395B;--bp-core:#F7FCFF;}
 html[lang="en"] .mode-list [data-part="btn-picture"] .bp-badge[data-badge="stage"]{--bp-stage-fs:.0483;--bp-stage-ls:0;}
+/* T14 I-7d — 놀이터 「Arcade」 요약 설명(pg.arcade.d)만 en 에서 말줄임 잘림.
+   같은 timeattack 변주를 쓰는 실제 하위 버튼(arcrow-time/surv/dmg)의 설명은
+   훨씬 짧아 안 잘리므로 변주 전체가 아니라 이 버튼 하나만 스코프 — .mfbtn
+   (:11660 부근) 과 같은 처방(칸을 넓히지 않고 글자를 줄인다), 문구 무변. */
+html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0290; letter-spacing:-.01em; }
 
 
 /* ===========================================================================
@@ -65441,7 +65541,7 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
        modal-howto     게임 방법 닫기 (Esc)
        charpanel       cp-close                                z72  (Esc 도 같은 함수 ← CS37-0910)
        screen-story    컷 건너뛰기 (cutFinish(true))    ← 0909 추가. 없어서 앱이 죽었다
-       modal-pause     Game.menu()   (Esc 는 resume — 일부러 다른 자리. 위 주석 ①)
+       modal-pause     모험=advAbandon()·그 외=Game.menu() (Esc 는 resume — 일부러 다른 자리. 위 주석 ①) ← 0926 정정(T14 I-11)
        screen-map      leaveMap (Esc)
        screen-game     판이 돌면 일시정지 (Esc)
        screen-kingdom  루트(홈) = 흘려보낸다 → TWA 종료   ← 0925 정정(F4.2): 실제 홈은 왕국(45852 homeScreen)
@@ -65516,8 +65616,13 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
       return true;
     }
 
-    /* 7) 일시정지 중 = 메뉴로 나가기 (Esc 와 다른 자리, 위 주석 ①) */
+    /* 7) 일시정지 중 = 메뉴로 나가기 (Esc 와 다른 자리, 위 주석 ①)
+       [T14 I-11] 모험은 일시정지 창의 「지도로 (하트 -1)」과 같은 문으로 맞춘다
+       (advAbandon — 하트 −1·실패 기록·지도 착지). 같은 «일시정지 중 뒤로»가
+       문(버튼 vs 기기 뒤로가기)에 따라 하트 차감이 갈렸던 것을 하나로 합친다.
+       모험 외 모드는 지도가 없으므로 기존 그대로 G.menu(). */
     if (S && S.paused) {
+      if (S.mode === 'adv' && G.advAbandon) { G.advAbandon(); return true; }
       if (G.menu) { G.menu(); return true; }
       return true;
     }
@@ -68239,6 +68344,11 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
 }
 .kd-bldg.kd-hit .kd-tag{ margin-top: 0; }
 .kd-tag b{ font-weight: 700; position: relative; z-index: 1; }
+/* T14 I-7c — 「Story Theater」(en) 만 이름표 안쪽 여백을 넘어 판 테에 닿는다
+   (diag-plates: 글자 상자 오른끝이 −0.5~−0.7px, 다른 en 이름표는 안 걸림).
+   .mfbtn(:11660 부근)과 같은 처방 — 칸이 아니라 글자를 줄인다. 이 건물 하나만
+   스코프(다른 이름표는 무변), 문구 무변. */
+html[lang="en"] #kd-b-circus .kd-tag b{ font-size: .88em; letter-spacing: -.02em; }
 .kd-tag-ic{
   position: relative; z-index: 1;
   flex: 0 0 auto;
@@ -68276,6 +68386,14 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
 .kd-tag[data-tone="orange"]{ --kd-tag-a: var(--role-orange-face-b); --kd-tag-b: var(--role-orange-contact); --kd-tag-ink: var(--role-orange-outline); }
 .kd-tag[data-tone="pink"]  { --kd-tag-a: var(--role-pink-contact);   --kd-tag-b: var(--role-pink-outline);   --kd-tag-ink: var(--role-pink-outline); }
 .kd-bldg:active .kd-tag{ transform: translateY(calc(var(--f2-ph) * .04)); }
+/* T14 I-3 — 미션 이름표 배지. `.badge-new`(§2866) 그대로, 색만 이 알약 자기
+   잉크(--kd-tag-ink, mint 톤)로 — 원래 값(--m-logo-2/--m-chip-line)은 메뉴
+   화면 전용 톤이라 이 알약 위에서는 안 어울린다. 자리는 부모 flex의 gap이
+   맡아 여기서 위치값을 새로 만들 것이 없다. */
+#kd-mission-badge.badge-new{
+  color: var(--kd-tag-ink);
+  box-shadow: inset 0 0 0 1px var(--kd-tag-ink);
+}
 /* 놀이터 선택 창 — 제목은 퀘스트 판(.w6m 글자 제목)과 같은 문법, 줄은 클래식 시트의 줄. */
 #modal-playground .sheet{ display: flex; flex-direction: column; }
 /* 환영 말풍선은 안내일 뿐 누르는 것이 아니다 — 그 아래 성 탭 자리를 가로채지 않게(실측: castle-top 탭을 먹었다). */
