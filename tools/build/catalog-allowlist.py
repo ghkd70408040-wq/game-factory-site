@@ -82,7 +82,7 @@ _JS_LINE_COMMENT_RE = re.compile(r"(?:^|(?<=[\s;{}()=,]))//[^\n]*", re.M)
 _BLOCK_COMMENT_RE = re.compile(r"/\*.*?\*/", re.S)
 
 # 무조건 제외 — 은퇴·밀려난 판·백업
-DENY_DIRS = ('_retired', '_superseded')
+DENY_DIRS = ('_retired', '_superseded', '_candidates')
 DENY_FILE_RE = re.compile(r"(\.bak$|\.bak[.\-]|\.bak-)", re.I)
 
 # 바깥(배포 URL) 소비자가 이름을 들고 있어 스캔으로 안 잡히는 것 — `publish:pin`
