@@ -730,8 +730,31 @@ html[data-platform="web"] [data-app-only]{display:none !important}
    did exactly that and left the rewarded-ad button visible on the Time Rush game
    over screen (review, blocking bug B). This blanket rule closes the whole class of
    bug at once; the three known offenders are restated below next to their own
-   declarations so the reason survives a future refactor of this line. */
-[hidden] { display: none !important; }
+   declarations so the reason survives a future refactor of this line.
+   [64-fix2 ④ 2026-09-27] 그 blanket rule 이 (0,1,0) 이라 **클래스 규칙의
+   !important** 에는 졌다 — `.w6m .sheet .btn{display:flex !important}`(0,3,0)가
+   결과 시트 #adv-ad(「광고 보고 하트 +1」)를 포털 밖·클리어 화면에도 세웠고
+   (라이브 35e650a 실측: hidden=true · computed flex · 262x48), 같은 부류로 모험
+   일시정지 #pz-restart · 타임러시 게임오버 #btn-continue 와 모달 버튼 전부
+   (.w6m .sheet .btn* · .w6m .set-tg · .w6m .rank-tab · .cta-jelly)가 hidden 을
+   못 먹었다(전수 = scratchpad/release-0925/fix2/hidden-audit-before). 그래서
+   :not(#\#) 세 겹 = (3,1,0) 으로 올린다 — 이 파일에서 display 를 !important 로
+   주는 작성자 규칙은 id 가 최대 둘(#app.battle #actionbar … 류)이라 전부 이긴다.
+   `#\#` 은 id 가 「#」 인 요소(없다)라 매칭 대상은 [hidden] 과 똑같다.
+   ⚠ 「hidden 인데 보여야 하는」 요소를 만들지 않는다 — 그런 자리는 자기 표식을
+   쓴다(바로 아래 [data-wide-only]). id 셋 이상으로 display !important 를 주는
+   규칙이 생기면 이 줄도 한 겹 더 올린다(스모크 fix2 의 전수 what-if 가 잡는다). */
+[hidden]:not(#\#):not(#\#):not(#\#) { display: none !important; }
+
+/* [64-fix2 ④] PC 가로 분기 전용 요소 셋(#pc-bg · #pc-left · #pc-right)의 봉인.
+   전에는 `hidden` 을 달고 태어나 위 규칙에 숨고, <style id="pc-landscape"> 가
+   `X[hidden]{display:block !important}` 로 그 hidden 을 뚫어 켰다 — 「hidden 인데
+   보이는」 유일한 의도 사례였다. hidden 은 이제 언제나 이기므로 표식을
+   data-wide-only 로 바꾸고 봉인을 여기 둔다. 선택자 모양·특이도가 옛 것과 같다
+   (속성 선택자 하나 (0,1,0) · !important) — 캐스케이드가 한 글자도 안 바뀐다.
+   봉인이 pc-landscape 블록 **밖**에 있어야 그 블록을 지웠을 때도 세 요소가 안
+   살아난다(롤백 밸브 단일 — 그 블록 머리 주석). */
+[data-wide-only] { display: none !important; }
 
 html, body {
   margin: 0;
@@ -3617,6 +3640,10 @@ li.roll-in { animation: rollin 380ms var(--spring) backwards; }
   font-size: 13px;
   line-height: 1.45;
   color: var(--prim-ink);            /* 51: --tx-dim -> --ink (위 절) */
+  /* [64-fix2 ⑤ 2026-09-27] 한글 낱말 가운데서 끊지 않는다(캐릭창 설명판 본문과 같은 짝).
+     「이름<br>설명」 구조에서 390 폭에 「…나가 / 요.」 한 글자 줄이 생겼다. 규칙 요약 판은 무변(실측). */
+  word-break: keep-all;
+  overflow-wrap: anywhere;
 }
 /* 강조도 같은 잉크다. 굵기만 다르다 — 강조만 다른 색으로 남기면 그 자리가
    새 «최악» 이 된다(착수 전에는 b 만 --tx 라 비강조 획이 안 잡혔다). */
@@ -15177,14 +15204,20 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
       </div>
       <div class="dh-side dh-foe" data-slot="side-foe">
         <b id="duel-foe-name" class="dh-name"></b><span id="duel-foe-lv" class="dh-lv">Lv.1</span>
-        <div class="dh-bar"><i id="duel-foe-fill" class="dh-fill"></i><span id="duel-foe-n" class="dh-num">0 / 0</span></div>
+        <div class="dh-bar"><i id="duel-foe-fill" class="dh-fill"></i></div>
         <div class="dh-sub"><i id="duel-foe-atk" class="dh-subfill"></i></div>
       </div>
       <div class="dh-side dh-me" data-slot="side-me">
         <b id="duel-me-name" class="dh-name"></b><span id="duel-me-lv" class="dh-lv">Lv.1</span>
-        <div class="dh-bar"><i id="duel-me-fill" class="dh-fill"></i><span id="duel-me-n" class="dh-num">0 / 0</span></div>
+        <div class="dh-bar"><i id="duel-me-fill" class="dh-fill"></i></div>
         <div class="dh-sub"><i id="duel-me-atk" class="dh-subfill"></i></div>
       </div>
+      <!-- 64-fix2 ② (사용자 반려 2026-09-27 「숫자가 게이지 바에 가려져서 지저분」) — 체력
+           숫자는 막대 **밖**, 막대 바로 아래 빈 띠에 선다. .dh-bar·.dh-side 는 overflow:hidden
+           이라 그 안에 두면 띠의 아래쪽이 잘린다 — 그래서 #duel-hud 의 직계로 옮겼다.
+           자리·크기 근거는 CSS 「64-fix2 ②」 절(#app.battle #duel-hud .dh-num). -->
+      <span id="duel-foe-n" class="dh-num">0 / 0</span>
+      <span id="duel-me-n" class="dh-num">0 / 0</span>
       <span id="duel-dmg" class="dh-dmg" data-slot="dmg"></span>
     </div>
     <!-- v2 HUD strip. Collapses to 0px when both children are [hidden] (no vertical
@@ -15273,11 +15306,12 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
     <div id="board-scroll">
       <div id="board"></div>
     </div>
-    <!-- W9 PC 날개 판 2장. 세로에서는 `hidden` 그대로라 존재하지 않는 것과
-         같고, <style id="pc-landscape"> 가 가로 분기에서만 [hidden] 을 뚫어
-         켠다. 스타일 블록을 지우면 이 둘도 함께 사라진다(롤백 밸브 단일). -->
-    <div id="pc-left" hidden aria-hidden="true"></div>
-    <div id="pc-right" hidden aria-hidden="true"></div>
+    <!-- W9 PC 날개 판 2장. 세로에서는 [data-wide-only] 봉인(기본 절, [hidden]
+         규칙 옆)으로 존재하지 않는 것과 같고, <style id="pc-landscape"> 가 가로
+         분기에서만 그 봉인을 뚫어 켠다(64-fix2 ④ — 전에는 hidden 을 뚫었다).
+         스타일 블록을 지우면 이 둘도 함께 사라진다(롤백 밸브 단일). -->
+    <div id="pc-left" data-wide-only aria-hidden="true"></div>
+    <div id="pc-right" data-wide-only aria-hidden="true"></div>
     <!-- ============================================================
          TENNY — 숫자 짝꿍 마스코트 (오리지널 벡터. 이모지 글리프 0)
          컨셉: 게임의 규칙이 그대로 캐릭터가 된 형태다. 몸통은 타일과 같은
@@ -15723,7 +15757,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
 
   <!-- W9 PC 와이드 배경판. 세 스크린보다 **뒤**에 놓아야 일반 형제
        결합자(#screen-map.active ~ #pc-bg)로 현재 화면을 읽을 수 있다. -->
-  <div id="pc-bg" hidden aria-hidden="true"></div>
+  <div id="pc-bg" data-wide-only aria-hidden="true"></div>
 
   <!-- ===== Modals ===== -->
   <!-- How to play — 5 panels. The connection rule used to be crammed into one
@@ -16188,7 +16222,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
             <path class="cav-mouth" d="M18.4 30 C20.4 33.4 23.6 33.4 25.6 30"/>
           </svg>
           <span class="cc-name" data-i18n="char.ppyak.name">Ppyak</span>
-          <span class="cc-pass" data-i18n="char.ppyak.pass">Skill: 8s free link — far tiles connect</span>
+          <span class="cc-pass" data-i18n="char.ppyak.pass">For 8 seconds, tiles far apart can link too. Ice tiles break in one match while it lasts.</span>
         </button>
         <button class="char-card kit-chip-v2 ch-mungchi" data-char="mungchi" type="button" role="radio" aria-checked="false">
           <svg class="cav" viewBox="0 0 44 46" aria-hidden="true" focusable="false">
@@ -16231,7 +16265,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
             <path class="cav-mouth" d="M18.4 30 C20.4 33.4 23.6 33.4 25.6 30"/>
           </svg>
           <span class="cc-name" data-i18n="char.mungchi.name">Mungchi</span>
-          <span class="cc-pass" data-i18n="char.mungchi.pass">Skill: 6s chunky shield — clock and foe gauge stop</span>
+          <span class="cc-pass" data-i18n="char.mungchi.pass">Stops the clock and the villain gauge for 8 seconds. You can keep matching while they are stopped.</span>
         </button>
         <!-- ============================================================
              E3 (2026-08-20) W7 — 신규 동료 둘. "없음" **앞**에 둔다: 그 카드는
@@ -16250,7 +16284,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
             <path class="cav-mouth" d="M18.4 30 C20.4 33.4 23.6 33.4 25.6 30"/>
           </svg>
           <span class="cc-name" data-i18n="char.mongle.name">Mongle</span>
-          <span class="cc-pass" data-i18n="char.mongle.pass">Skill: 4s time puddle — clock and foe gauge stop</span>
+          <span class="cc-pass" data-i18n="char.mongle.pass">Stops the clock and the villain gauge for 4 seconds. You can keep matching while they are stopped.</span>
         </button>
         <button class="char-card kit-chip-v2 ch-churup" data-char="churup" type="button" role="radio" aria-checked="false">
           <svg class="cav" viewBox="0 0 44 46" aria-hidden="true" focusable="false">
@@ -16261,7 +16295,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
             <path class="cav-mouth" d="M18.4 30 C20.4 33.4 23.6 33.4 25.6 30"/>
           </svg>
           <span class="cc-name" data-i18n="char.churup.name">Churup</span>
-          <span class="cc-pass" data-i18n="char.churup.pass">Skill: one big bite — 1 row re-shuffled</span>
+          <span class="cc-pass" data-i18n="char.churup.pass">Picks a row with two or more tiles left and reshuffles it. It also blocks the next board quake.</span>
         </button>
         <!-- ============================================================
              W6.5a (2026-08-20) — 신규 동료 넷. 자리는 위 W7 주석의 계약 그대로다:
@@ -16282,7 +16316,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
             <path class="cav-mouth" d="M18.4 30 C20.4 33.4 23.6 33.4 25.6 30"/>
           </svg>
           <span class="cc-name" data-i18n="char.mukmul.name">Inky</span>
-          <span class="cc-pass" data-i18n="char.mukmul.pass">Skill: ink blast — 5 tiles repainted alike</span>
+          <span class="cc-pass" data-i18n="char.mukmul.pass">Repaints 5 tiles into the most common number on the board.</span>
         </button>
         <button class="char-card kit-chip-v2 ch-tiktok" data-char="tiktok" type="button" role="radio" aria-checked="false">
           <svg class="cav" viewBox="0 0 44 46" aria-hidden="true" focusable="false">
@@ -16293,7 +16327,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
             <path class="cav-mouth" d="M18.4 30 C20.4 33.4 23.6 33.4 25.6 30"/>
           </svg>
           <span class="cc-name" data-i18n="char.tiktok.name">TikTok</span>
-          <span class="cc-pass" data-i18n="char.tiktok.pass">Skill: 6s time stop — keep matching</span>
+          <span class="cc-pass" data-i18n="char.tiktok.pass">Stops time for 6 seconds. You can keep matching while the clock and the villain gauge are stopped.</span>
         </button>
         <button class="char-card kit-chip-v2 ch-kkultteok" data-char="kkultteok" type="button" role="radio" aria-checked="false">
           <svg class="cav" viewBox="0 0 44 46" aria-hidden="true" focusable="false">
@@ -16304,7 +16338,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
             <path class="cav-mouth" d="M18.4 30 C20.4 33.4 23.6 33.4 25.6 30"/>
           </svg>
           <span class="cc-name" data-i18n="char.kkultteok.name">Honeybee</span>
-          <span class="cc-pass" data-i18n="char.kkultteok.pass">Skill: summon 2 golden fruits</span>
+          <span class="cc-pass" data-i18n="char.kkultteok.pass">Turns 2 fruits into golden fruits. A match with a golden fruit scores 3 times the points.</span>
         </button>
         <button class="char-card kit-chip-v2 ch-bangul" data-char="bangul" type="button" role="radio" aria-checked="false">
           <svg class="cav" viewBox="0 0 44 46" aria-hidden="true" focusable="false">
@@ -16315,7 +16349,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
             <path class="cav-mouth" d="M18.4 30 C20.4 33.4 23.6 33.4 25.6 30"/>
           </svg>
           <span class="cc-name" data-i18n="char.bangul.name">Bubbly</span>
-          <span class="cc-pass" data-i18n="char.bangul.pass">Skill: bubble wave — 2 blockers cleared</span>
+          <span class="cc-pass" data-i18n="char.bangul.pass">Washes away 2 blocker or ice tiles. Hidden numbers come back all at once.</span>
         </button>
         <!-- ============================================================
              2c - CODEX P09/P10 신규 동료 둘. 자리는 위 두 주석의 계약 그대로다:
@@ -16335,7 +16369,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
             <path class="cav-mouth" d="M18.4 30 C20.4 33.4 23.6 33.4 25.6 30"/>
           </svg>
           <span class="cc-name" data-i18n="char.sseokssak.name">Sweepy</span>
-          <span class="cc-pass" data-i18n="char.sseokssak.pass">Skill: big sweep — 6 live tiles cleared</span>
+          <span class="cc-pass" data-i18n="char.sseokssak.pass">Clears 7 of the remaining tiles at once. It also blocks the next board quake.</span>
         </button>
         <button class="char-card kit-chip-v2 ch-banjjak" data-char="banjjak" type="button" role="radio" aria-checked="false">
           <svg class="cav" viewBox="0 0 44 46" aria-hidden="true" focusable="false">
@@ -16346,7 +16380,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
             <path class="cav-mouth" d="M18.4 30 C20.4 33.4 23.6 33.4 25.6 30"/>
           </svg>
           <span class="cc-name" data-i18n="char.banjjak.name">Sparky</span>
-          <span class="cc-pass" data-i18n="char.banjjak.pass">Skill: spark charge — Skill gauge +40%p</span>
+          <span class="cc-pass" data-i18n="char.banjjak.pass">Fills the Skill gauge by 48% at once.</span>
         </button>
         <!-- "없음" 은 캐릭터가 아니라 선택지라서 아바타 자리에 기호가 온다.
              빈 카드로 두면 로딩에 실패한 것으로 읽힌다. -->
@@ -16525,9 +16559,18 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
             <p class="ci-tag"><span class="ci-tag-k" data-i18n="pick.rec">Best for</span><b class="ci-tag-v kit-pill-v2" data-variant="soft" id="cp-pet-tag">&nbsp;</b><!-- [PG-0910] 파편 잔액 — 아이템 칸이 쓰는 그 크리스탈 액자(.cp-crystal.cp-gem)의 인스턴스 하나다. 새 도형 0 · 새 그림 0. 숫자는 «지금 보고 있는 레버 색»의 잔액이고, 그 색은 data-stat 이 말한다. --><b class="cp-crystal cp-gem cp-shardgem" id="cp-pet-shard" data-stat="power" hidden><i class="cp-cr-ic" aria-hidden="true">💎</i><b class="cp-gem-n">0</b></b></p>
             <!-- [T10-0926] 「추천 조합」 — 스탯 막대·강화 자리에 대신 선다(같은
                  목록-태그 부품 .ci-tag 의 인스턴스, 새 부품 0). 값은 syncPetInfo()
-                 가 petComboNames() 로 채운다(펫의 편중 레버 petLeadLever() 와 같은
+                 가 petComboNames() 로 채운다(64-fix2 ⑥ 에서 petComboIds() 로 바뀜 — 아래 카드 주석)(펫의 편중 레버 petLeadLever() 와 같은
                  스탯의 HERO_STATS 최댓값 1~2명, 새 데이터 0). -->
-            <p class="ci-tag" id="cp-pet-combo"><span class="ci-tag-k" data-i18n="pet.combo.k">Best team</span><b class="ci-tag-v kit-pill-v2" data-variant="soft" id="cp-pet-combo-v">&nbsp;</b></p>
+            <!-- 64-fix2 ⑥ (사용자 반려 2026-09-27 「추천 조합 글이 전부 겹쳐져 엉망 · 빈 공간만큼 제대로」) —
+                 스탯 막대가 빠진 자리 전체를 쓰는 추천 조합 **카드**. 종전 줄(.ci-tag 두 번째
+                 인스턴스)은 .ci-tag 절대 자리에 첫 줄 위로 겹쳐 앉았다. 부품은 전부 기존 인스턴스:
+                 상자 = [스킬] 상자와 같은 .ci-desc.kit-box-v2 · 초상 .ci-chip · 이름 .ci-tag-v 알약.
+                 값은 syncPetInfo() 가 petComboIds() 로 채운다(규칙 무변). -->
+            <div class="ci-desc kit-box-v2 cp-rec" id="cp-pet-combo" hidden>
+              <p class="cp-rec-k" data-i18n="pet.combo.k">Best team</p>
+              <p class="cp-rec-who" id="cp-pet-combo-v"></p>
+              <p class="cp-rec-why" id="cp-pet-combo-why"></p>
+            </div>
             <!-- [PG-0910] W3 — 네 줄이 이제 **강화 손잡이**를 갖는다.
                  aria-hidden 을 뗄 이유: 안에 누를 수 있는 버튼이 생겼다 —
                  스크린리더에 안 보이는 버튼은 도달할 수 없는 버튼이다.
@@ -16544,7 +16587,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
               <!-- 0901 ④-b — 펫 칸은 값이 동적이라 data-i18n 대신 id 로 채운다
                    (같은 줄의 cp-pet-pass 규약 그대로). 펫 미선택이면 비어 접힌다. -->
               <p class="cc-name" id="cp-pet-nameline"><i class="cc-ic" aria-hidden="true"><svg viewBox="0 0 40 40" aria-hidden="true" focusable="false"><path d="M20.6 30.6 17.4 37" stroke="#B9A8D6" stroke-width="2.6" stroke-linecap="round"/><path d="M13 12.5a6.4 6.4 0 0 1 6.4-5.6 6.4 6.4 0 0 1 6.2 4.8 5.6 5.6 0 0 1 5 5.5 5.6 5.6 0 0 1-3.4 5.2 5.9 5.9 0 0 1-5.4 4.6 6.2 6.2 0 0 1-5.3-2.4 5.8 5.8 0 0 1-6.2-3.2 5.6 5.6 0 0 1 2.7-8.9Z" fill="#FDF8FC" stroke="#C9B7DE" stroke-width="1.5" stroke-linejoin="round"/><ellipse cx="20.2" cy="17.6" rx="3.1" ry="2.7" fill="#E39D9A"/><ellipse cx="15.6" cy="13.4" rx="1.5" ry="1.9" fill="#E39D9A"/><ellipse cx="19.6" cy="11.6" rx="1.5" ry="1.9" fill="#E39D9A"/><ellipse cx="23.6" cy="12.9" rx="1.5" ry="1.9" fill="#E39D9A"/><path d="M8 8.5 8.9 11l2.5.9-2.5.9L8 15.3l-.9-2.5L4.6 12l2.5-.9Z" fill="#FCE69F"/><path d="M33 22.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8Z" fill="#FCE69F"/><path d="M31.5 8.6l.6 1.6 1.6.6-1.6.6-.6 1.6-.6-1.6-1.6-.6 1.6-.6Z" fill="#FCE69F"/></svg></i><b id="cp-pet-passname"></b></p>
-              <p class="cc-line"><b class="cc-k" id="cp-pet-passk" data-i18n="cp.sk.skill">Skill</b><span class="cc-pass" id="cp-pet-pass">&nbsp;</span></p>
+              <p class="cc-line"><b class="cc-k" id="cp-pet-passk" data-i18n="cp.sk.skill" hidden>Skill</b><span class="cc-pass" id="cp-pet-pass">&nbsp;</span></p>
               <p class="cc-line" id="cp-pet-useline"><b class="cc-k cc-k-u" data-i18n="cp.sk.use">Uses</b><span class="cc-ult" id="cp-pet-use">&nbsp;</span></p>
               <!-- 0909 copy-flow ④ — 펫 미선택일 때 「사용 -」 대신 서는 한 줄.
                    내용은 JS 가 PET_FREE 에서 뽑아 채운다(syncPetInfo) — 무료 동료
@@ -16754,10 +16797,10 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
                catalog/duel-medal-*.webp · 전투 HUD 가 이미 소비 · 무접촉 참조).
                각 설명 줄이 자기 메달을 이고 서서 그림↔글 1:1. -->
           <ol class="rules-list">
-            <li><i class="rules-medal" aria-hidden="true" style="--mi:url('catalog/duel-medal-attack.webp')"></i><span data-i18n-html="skills.s1"><b>Attack</b> &mdash; fills with every point you score, and fires on its own when full.</span></li>
-            <li><i class="rules-medal" aria-hidden="true" style="--mi:url('catalog/duel-medal-special.webp')"></i><span data-i18n-html="skills.s2"><b>Special</b> &mdash; fills only when you <b>alternate</b> sum-10 and same-number matches. One hit is worth two attacks.</span></li>
-            <li><i class="rules-medal" aria-hidden="true" style="--mi:url('catalog/duel-medal-awaken.webp')"></i><span data-i18n-html="skills.s3"><b>Awakening</b> &mdash; every match charges it, faster the higher your combo. It turns the board your way for a few seconds.</span></li>
-            <li><i class="rules-medal" aria-hidden="true" style="--mi:url('catalog/duel-medal-pet.webp')"></i><span data-i18n-html="skills.s4"><b>Pet</b> &mdash; your chosen pet&rsquo;s skill, a few uses each round.</span></li>
+            <li><i class="rules-medal" aria-hidden="true" style="--mi:url('catalog/duel-medal-attack.webp')"></i><span data-i18n-html="skills.s1"><b>Attack</b> fills with every point you score, and fires on its own when full.</span></li>
+            <li><i class="rules-medal" aria-hidden="true" style="--mi:url('catalog/duel-medal-special.webp')"></i><span data-i18n-html="skills.s2"><b>Awakening</b> fills only when you <b>alternate</b> sum-10 and same-number matches. One hit is worth two attacks.</span></li>
+            <li><i class="rules-medal" aria-hidden="true" style="--mi:url('catalog/duel-medal-awaken.webp')"></i><span data-i18n-html="skills.s3"><b>Skill</b> charges with every match, faster the higher your combo. It turns the board your way for a few seconds.</span></li>
+            <li><i class="rules-medal" aria-hidden="true" style="--mi:url('catalog/duel-medal-pet.webp')"></i><span data-i18n-html="skills.s4"><b>Pet</b> calls your chosen pet&rsquo;s skill a set number of times each round.</span></li>
           </ol>
           <p class="rules-note" data-i18n-html="skills.note">A <b>skill fruit</b> fills the skill gauge at once; a <b>pet fruit</b> gives one more Pet use.</p>
         </div>
@@ -26849,9 +26892,9 @@ window.TT_SFX = {
       'char.twin.name': 'Twin',
       'char.twin.pass': 'Same-number match +60%',
       'char.ppyak.name': 'Ppyak',
-      'char.ppyak.pass': 'Skill: 8s free link — far tiles connect',
+      'char.ppyak.pass': 'For 8 seconds, tiles far apart can link too. Ice tiles break in one match while it lasts.',
       'char.mungchi.name': 'Mungchi',
-      'char.mungchi.pass': 'Skill: 6s chunky shield — clock and foe gauge stop',
+      'char.mungchi.pass': 'Stops the clock and the villain gauge for 8 seconds. You can keep matching while they are stopped.',
       'char.jelly.name': 'Jelly',
       'char.jelly.pass': '10% chance: that match ×3',
 
@@ -26923,9 +26966,9 @@ window.TT_SFX = {
       /* --- W7 신규 동료 둘. 기술명(skill.mongle.name / skill.churup.name)은
              W3 이 이미 세워 뒀으므로 여기서는 이름과 한 줄 소개뿐이다. --- */
       'char.mongle.name': 'Mongle',
-      'char.mongle.pass': 'Skill: 4s time puddle — clock and foe gauge stop',
+      'char.mongle.pass': 'Stops the clock and the villain gauge for 4 seconds. You can keep matching while they are stopped.',
       'char.churup.name': 'Churup',
-      'char.churup.pass': 'Skill: one big bite — 1 row re-shuffled',
+      'char.churup.pass': 'Picks a row with two or more tiles left and reshuffles it. It also blocks the next board quake.',
       /* --- W6.5a 신규 동료 넷. 영문명은 뜻이 통하는 이름으로 옮긴다(음차가 아니라
              번역이다 — 먹물/째깍/꿀떡/방울은 전부 **의성·의태의 뜻**이 이름이라,
              음차하면 영어권에서는 뜻 없는 음절이 된다):
@@ -26934,22 +26977,22 @@ window.TT_SFX = {
              ⚠ 표시명만 갈리고 **코드 id 는 넷 다 그대로**다(mukmul/tiktok/
              kkultteok/bangul) — 에셋 파일명·CSS 변수·기술 표가 전부 id 를 쓴다. --- */
       'char.mukmul.name': 'Inky',
-      'char.mukmul.pass': 'Skill: ink blast — 5 tiles repainted alike',
+      'char.mukmul.pass': 'Repaints 5 tiles into the most common number on the board.',
       'char.tiktok.name': 'TikTok',
-      'char.tiktok.pass': 'Skill: 6s time stop — keep matching',
+      'char.tiktok.pass': 'Stops time for 6 seconds. You can keep matching while the clock and the villain gauge are stopped.',
       'char.kkultteok.name': 'Honeybee',
-      'char.kkultteok.pass': 'Skill: summon 2 golden fruits',
+      'char.kkultteok.pass': 'Turns 2 fruits into golden fruits. A match with a golden fruit scores 3 times the points.',
       'char.bangul.name': 'Bubbly',
-      'char.bangul.pass': 'Skill: bubble wave — 2 blockers cleared',
+      'char.bangul.pass': 'Washes away 2 blocker or ice tiles. Hidden numbers come back all at once.',
       /* W6.5a — 삐약의 소개도 갈린다(§16-B-3 이관). 이름은 그대로다. */
-      'char.ppyak.pass2': 'Skill: 8s free link — far tiles connect',
+      'char.ppyak.pass2': 'For 8 seconds, tiles far apart can link too. Ice tiles break in one match while it lasts.',
       /* 2c - CODEX P09/P10.  Portrait art landed 2026-09-10; both ids are now in
          CHAR_STD, so the card paints the standard crop and the shared inline SVG
          drops back to being a fallback (setArt's data-art rule). */
       'char.sseokssak.name': 'Sweepy',
-      'char.sseokssak.pass': 'Skill: big sweep — 6 live tiles cleared',
+      'char.sseokssak.pass': 'Clears 7 of the remaining tiles at once. It also blocks the next board quake.',
       'char.banjjak.name': 'Sparky',
-      'char.banjjak.pass': 'Skill: spark charge — Skill gauge +40%p',
+      'char.banjjak.pass': 'Fills the Skill gauge by 48% at once.',
       /* --- W7 리액션 말풍선. 여섯 사건 + 별 = 일곱 줄 × 신규 주인공 둘.
              한 줄 216px nowrap 규약은 기존 셋과 같다(길면 말줄임표가 된다). --- */
       'say.combo.pudding': 'Hold the line!',
@@ -27119,10 +27162,10 @@ window.TT_SFX = {
          카드에서 "각성", 버튼에서 "awaken", 토스트에서 "게이지"라고 부르면 셋이
          같은 것인 줄 모른다. EN·KO 키 순서도 같게 유지한다. */
       'skills.title': 'Four buttons in battle',
-      'skills.s1': '<b>Attack</b> — fills with every point you score, and fires on its own when full.',
-      'skills.s2': '<b>Special</b> — fills only when you <b>alternate</b> sum-10 and same-number matches. One hit is worth two attacks.',
-      'skills.s3': '<b>Skill</b> — every match charges it, faster the higher your combo. It turns the board your way for a few seconds.',
-      'skills.s4': '<b>Pet</b> — your chosen pet\'s skill, a few uses each round.',
+      'skills.s1': '<b>Attack</b> fills with every point you score, and fires on its own when full.',
+      'skills.s2': '<b>Awakening</b> fills only when you <b>alternate</b> sum-10 and same-number matches. One hit is worth two attacks.',
+      'skills.s3': '<b>Skill</b> charges with every match, faster the higher your combo. It turns the board your way for a few seconds.',
+      'skills.s4': '<b>Pet</b> calls your chosen pet\'s skill a set number of times each round.',
       'skills.note': 'A <b>skill fruit</b> fills the skill gauge at once; a <b>pet fruit</b> gives one more Pet use.',
       'menu.dailydone': "Today's daily: cleared",
       'menu.dailytodo': "Today's daily is waiting",
@@ -27319,6 +27362,18 @@ window.TT_SFX = {
       /* --- §H 캐릭터 추천 태그 -------------------------------------------- */
       'pick.rec': 'Best for',
       'pet.combo.k': 'Best team',
+      /* 64-fix2 ⑥ — 펫 탭 추천 조합 카드의 이유 한 문장(펫 × 첫 추천 캐릭터). 74 에서 스탯·스킬이
+         바뀌면 이 키들만 다시 맞춘다(구조 = pet.combo.why.<펫>.<캐릭터>). */
+      'pet.combo.why.ppyak.twin': "Far tiles link, so Twin's same-number +60% fires more often.",
+      'pet.combo.why.mungchi.pudding': 'The clock stops 8s, so Pudding Knight stacks more points.',
+      'pet.combo.why.mongle.ten': 'The clock stops 4s, so Tenten gathers more sum-10 pairs.',
+      'pet.combo.why.churup.pudding': "A reshuffled row keeps Pudding Knight's chain from breaking.",
+      'pet.combo.why.mukmul.ten': "5 same-number tiles keep pairs flowing during Tenten's skill.",
+      'pet.combo.why.tiktok.twin': 'Time stops 6s, so Twin can gather same-number pairs.',
+      'pet.combo.why.kkultteok.jelly': "Golden fruits' 3x multiplies with both of their jackpots.",
+      'pet.combo.why.bangul.jelly': 'Fewer blockers, more matches, more jackpot rolls for both.',
+      'pet.combo.why.sseokssak.twin': 'Clearing 7 tiles at once speeds up speedrunner Twin.',
+      'pet.combo.why.banjjak.ten': "A 48% Skill gauge boost fires Tenten's skill sooner.",
       /* [Fix round 1 · I-2/I-3, m-5] 새 키 아님 — 위 'cp.pet.empty' 옆의 기존
          'cp.pet.sep'(줄 26248, ' and ')을 그대로 재사용한다. 여기 중복 선언했던
          것(같은 오브젝트 안 후행 선언이 앞선 값을 덮어써 cp.pet.empty 문장의
@@ -27427,11 +27482,11 @@ window.TT_SFX = {
       'rec.why.pudding': 'A cushion on every match keeps long boards alive.',
       'rec.why.sodawitch': 'The gamble ult can shear a quarter off the boss in one stroke.',
       /* ★ 0826 8단계 — 기술 축(PET_REC_ATK)으로 펫을 골랐을 때의 이유 줄. */
-      'rec.why.atk.blk': 'Blocker drops are the main threat here — the Bubbly cleanse washes the dropped blockers away.',
-      'rec.why.atk.freeze': 'A frozen column is the main threat — the TikTok time stop voids the freeze outright.',
-      'rec.why.atk.mask': 'Number blackout is the main threat — the Bubbly cleanse restores every hidden number at once.',
-      'rec.why.atk.quake': 'Board quakes are the main threat — the Churup guard blocks one quake outright.',
-      'rec.why.atk.cycle': 'All four skills rotate in — holding the clock with TikTok leaves a window whichever one lands.',
+      'rec.why.atk.blk': "This boss keeps dropping blockers. Bubbly's Bubble Wave washes away 2 of them at a time.",
+      'rec.why.atk.freeze': 'This boss freezes a column. While TikTok holds time, the freeze does not work.',
+      'rec.why.atk.mask': "This boss hides numbers. Bubbly's Bubble Wave brings every hidden number back at once.",
+      'rec.why.atk.quake': "This boss shakes the board. Churup's Big Bite blocks the next quake.",
+      'rec.why.atk.cycle': 'This boss rotates four attacks. When TikTok stops time, you get a window whatever comes next.',
       'adv.go': 'Start',
       'adv.close': 'Close',
       'adv.missionwin': 'Mission clear! Every match ×{mult} from now on',
@@ -27452,14 +27507,14 @@ window.TT_SFX = {
          같은 키를 시트의 장(HTML)과 전투 중 토스트(평문)가 함께 쓴다 — 토스트는
          htmlPlain() 이 태그만 벗겨서 넣는다. */
       'howto.ten': 'Same numbers make a <b>Twin</b>; adding to 10 makes a <b>Ten</b>. Every Ten loosens the hardened world.',
-      'howto.ult': 'The Special charges by <b>alternating</b> \u2014 Ten, then Twin, then Ten. Repeat the same kind, and the chain breaks.',
+      'howto.ult': 'Awakening charges by <b>alternating</b> \u2014 Ten, then Twin, then Ten. Repeat the same kind, and the chain breaks.',
       'howto.awaken': 'Skill fills faster with bigger combos. When it bursts: for {sec} seconds, <b>every match counts as a Ten Twin combo.</b>',
       'howto.overdrive': 'Chain your attacks and hit <b>OVERDRIVE</b>! It lasts as long as you do \u2014 keep matching, keep firing.',
       'howto.finish': 'When the boss falls: <b>10-second Finish</b>. Clear the final mission on screen \u2014 that\'s the real win.',
       /* \ud310\uc815\ud310 48 \u2014 \uccab \ub9cc\ub545 1\ud68c \uc548\ub0b4. \uc704 howto.* \uac00 \u00ab\uaddc\uce59\u00bb\uc774\ub77c\uba74 \uc774 \ub458\uc740
          \u00ab\uc9c0\uae08 \ub20c\ub7ec\ub3c4 \ub41c\ub2e4\u00bb\ub294 \uc870\uc791 \ud78c\ud2b8\ub2e4(store.tipsSeen). \ud55c \uc904\ub85c \ub05d\ub09c\ub2e4. */
       'tip.awakenReady': 'Skill ready! Tap it.',
-      'tip.ultReady': 'Special ready! Tap it.',
+      'tip.ultReady': 'Awakening ready! Tap it.',
       /* 0901 ⑥-d — I16 이 한 대를 막았을 때 뜨는 한 낱말. */
       'item.guard.block': 'Blocked!',
       'fx.overdrive': 'OVERDRIVE!!',
@@ -27488,11 +27543,11 @@ window.TT_SFX = {
       'duel.hud': 'HP {hp} / ATK {a}% / SP {s}%',
       /* 전투 개편 단계 3 — 하단 네 버튼의 전투 이름과 응답. */
       'act.attack': 'Attack',
-      'act.special': 'Special',
+      'act.special': 'Awaken',
       'act.pet': 'Pet',
       'act.awaken': 'Skill',
       'aria.attack': 'Attack gauge status',
-      'aria.special': 'Fire your special attack',
+      'aria.special': 'Awaken',
       'aria.pet': 'Use your pet skill',
       'aria.awaken': 'Skill',
       /* 게이지 토스트는 "안 찼다"가 아니라 **채우는 법**을 말한다. 안 찼다는 것은
@@ -27502,10 +27557,10 @@ window.TT_SFX = {
          각성은 반대로 얼음 아닌 모든 매치가 채우고 콤보가 높을수록 빨리 찬다
          (30590 의 gaugeBump(S.combo), 잔량 안내는 28121 계열 fireSkill 경로). */
       'duel.atkstat': 'Attack {n}% — it fills with every point you score, and fires on its own when full.',
-      'duel.spstat': 'Special {n}% — it only fills when you alternate sum-10 and same-number matches.',
-      'duel.spgo': 'SPECIAL! -{n}',
-      'duel.petnone': 'No pet yet — pick one and you get their skill a few times each round.',
-      'duel.petout': 'No pet skill left this round — break a pet fruit on the board for one more.',
+      'duel.spstat': 'Awakening {n}% — it only fills when you alternate sum-10 and same-number matches.',
+      'duel.spgo': 'AWAKEN! -{n}',
+      'duel.petnone': 'No pet yet. Pick one and you can use their skill a few times each round.',
+      'duel.petout': 'No pet skill left this round. Break a pet fruit on the board for one more.',
       'duel.petempty': 'Nothing left to peck.',
       'duel.petpeck': 'Peck! {n} tiles cleared',
       /* W2.5 ④ — 마크 과일의 플로트 문구. 토스트가 아니라 **보드 위 플로트**라
@@ -27523,9 +27578,9 @@ window.TT_SFX = {
       /* W3 — 기술이 "숫자 멈춤"으로 승격되면서 문구도 두 사실을 다 말한다:
          시계도 멈추고 악당 게이지도 멈춘다. 하나만 말하면 나머지 하나는
          플레이어가 영영 모르는 효과가 된다. */
-      'duel.petshield': 'Chunky Shield! Clock AND villain gauge frozen for {n}s',
+      'duel.petshield': 'Squishy Shield! Clock and villain gauge frozen for {n}s',
       /* --- W3: 컷인이 붙은 기술들의 이름 한 벌 --- */
-      'skill.sub.sp': 'SPECIAL',
+      'skill.sub.sp': 'AWAKENING',
       'skill.sub.pet': 'PET',
       'skill.sub.foe': 'VILLAIN',
       'skill.sp.name': 'FULL-POWER STRIKE!',
@@ -27534,33 +27589,33 @@ window.TT_SFX = {
          무엇을 하는가"를 말하는 자리라 기술이 갈리면 제목도 갈려야 한다.
          옛 값: 'PPYAK — PECK STORM!' (폴백 petPeck 가 살아 있으므로 지우지
          않고 여기 남긴다 — 되돌리려면 이 한 줄을 도로 쓰면 된다). */
-      'skill.ppyak.name': 'PPYAK — FREE LINK!',
-      'skill.mungchi.name': 'MUNGCHI — TIME FREEZE!',
+      'skill.ppyak.name': "PPYAK'S FREE LINK!",
+      'skill.mungchi.name': "MUNGCHI'S SQUISHY SHIELD!",
       'skill.foe.name': 'BLOCKER RAIN!',
       'duel.tellwarn': 'INCOMING!',
       'duel.timestop': 'TIME STOP',
       /* 아직 등록되지 않은 동료 둘 (MATE_IDS 밖) — 문구만 먼저 선다 */
-      'skill.mongle.name': 'MONGLE — TIME PUDDLE!',
-      'skill.churup.name': 'CHURUP — ONE BIG BITE!',
-      'duel.petmongle': 'Time Puddle! The clock stops for {n}s',
-      'duel.petchurup': 'One Big Bite! {n} row re-rolled',
+      'skill.mongle.name': "MONGLE'S TIME PUDDLE!",
+      'skill.churup.name': "CHURUP'S BIG BITE!",
+      'duel.petmongle': 'Time Puddle! Clock and villain gauge frozen for {n}s',
+      'duel.petchurup': 'Big Bite! {n} row reshuffled',
       /* --- W6.5a 신규 동료 넷 + 삐약 이관 -------------------------------------
          ⚠ 'skill.ppyak.name' 은 위에 **그대로 남는다** — 삐약의 기술이 갈렸으므로
          값만 갈고 자리는 안 옮긴다(폴백 petPeck 가 여전히 그 키를 쓸 수 있다).
          아래 넷은 새 키다. */
-      'skill.tiktok.name': 'TIKTOK — TIME STOP!',
-      'skill.mukmul.name': 'INKY — INK BLAST!',
-      'skill.kkultteok.name': 'HONEYBEE — GOLDEN FRUIT!',
-      'skill.bangul.name': 'BUBBLY — BUBBLE WAVE!',
-      'skill.sseokssak.name': 'SWEEPY - BIG SWEEP!',
-      'skill.banjjak.name': 'SPARKY - SPARK CHARGE!',
-      'duel.pettiktok': 'Time Stop! The clock is held for {n}s — keep popping!',
+      'skill.tiktok.name': "TIKTOK'S TIME STOP!",
+      'skill.mukmul.name': "INKY'S INK SPLASH!",
+      'skill.kkultteok.name': "HONEYBEE'S GOLDEN CALL!",
+      'skill.bangul.name': "BUBBLY'S BUBBLE WAVE!",
+      'skill.sseokssak.name': "SWEEPY'S CLEAN SWEEP!",
+      'skill.banjjak.name': "SPARKY'S SPARK CHARGE!",
+      'duel.pettiktok': 'Time Stop! The clock is held for {n}s. Keep popping!',
       'duel.petppyak': 'Free Link! Far tiles connect for {n}s',
-      'duel.petmukmul': 'Ink Blast! {n} tiles repainted to {v}',
-      'duel.petkkultteok': 'Golden Fruit! {n} gold tiles summoned',
+      'duel.petmukmul': 'Ink Splash! {n} tiles repainted to {v}',
+      'duel.petkkultteok': 'Golden Call! {n} golden fruits summoned',
       'duel.petbangul': 'Bubble Wave! {n} blockers washed away',
       'duel.petclean0': 'Nothing to clean up.',
-      'duel.petsseokssak': 'Big Sweep! {n} tiles cleared',
+      'duel.petsseokssak': 'Clean Sweep! {n} tiles cleared',
       'duel.petbanjjak': 'Spark Charge! Skill gauge +{n}%',
       /* 2c - per-pet lock lines.  One shared line used to tell every locked
          buddy to "beat the stage-10 boss", which was false for seven of the
@@ -27578,7 +27633,7 @@ window.TT_SFX = {
       'pet.lock.sseokssak': 'Make 500 sum-10 matches in total and Sweepy joins you.',
       'pet.lock.banjjak': 'Beat the stage-30 boss and Sparky joins you.',
       /* §4.3 · §4.6 의 대사. 화자는 각각 째깍이·삐약이다. */
-      'pet.timestop.hold': "I've got time held — go!",
+      'pet.timestop.hold': "I've got time held. Go!",
       'pet.timestop.go': 'Pop those fruits, quick!!',
       'pet.freelink.go': 'Ppyak will clear the way!',
       'adv.heartkept': 'Cleared, so no heart was spent.',
@@ -27902,25 +27957,25 @@ window.TT_SFX = {
       'intro.sodawitch.l2': 'Fizz Pop sets off a 20% chance of ×2 on every single match.',
       'intro.sodawitch.l3': 'My skill is Soda Spell — the jackpot chance becomes 40%.',
       'intro.ppyak.l1': "Ppyak! I've been here with you from the very first round.",
-      'intro.ppyak.l2': 'My skill is Free Link — for 8 seconds even far tiles connect.',
+      'intro.ppyak.l2': 'My skill is Free Link. For 8 seconds even far tiles connect.',
       'intro.mungchi.l1': 'Mungchi. Nobody is sturdier than me.',
-      'intro.mungchi.l2': 'My skill is Squishy Shield — 6 seconds where the clock and the foe gauge stop.',
+      'intro.mungchi.l2': 'My skill is Squishy Shield. The clock and the villain gauge stop for 8 seconds.',
       'intro.mongle.l1': 'Mongle here. Call me when time gets tight.',
-      'intro.mongle.l2': 'My skill is Time Puddle — 4 seconds where the clock and the foe gauge stop.',
+      'intro.mongle.l2': 'My skill is Time Puddle. The clock and the villain gauge stop for 4 seconds.',
       'intro.tiktok.l1': 'Tick-tock! I am the one who counts the seconds.',
-      'intro.tiktok.l2': 'My skill is Time Stop — 6 frozen seconds, and you can still match.',
+      'intro.tiktok.l2': 'My skill is Time Stop. Time freezes for 6 seconds, and you can still match.',
       'intro.churup.l1': 'Churup! One bite, one row — leave it to me.',
-      'intro.churup.l2': 'My skill is Big Bite — a whole row gets re-shuffled.',
+      'intro.churup.l2': 'My skill is Big Bite. A whole row gets reshuffled.',
       'intro.kkultteok.l1': 'Honeybee here. Anything sweet belongs to me.',
-      'intro.kkultteok.l2': 'My skill is Golden Call — I summon 2 golden fruits.',
+      'intro.kkultteok.l2': 'My skill is Golden Call. I summon 2 golden fruits.',
       'intro.sseokssak.l1': 'Sweepy! A messy board is exactly my job.',
-      'intro.sseokssak.l2': 'My skill is Clean Sweep — 6 live tiles cleared at once.',
+      'intro.sseokssak.l2': 'My skill is Clean Sweep. 7 of the remaining tiles clear at once.',
       'intro.mukmul.l1': 'Inky. Quietly, and for certain.',
-      'intro.mukmul.l2': 'My skill is Ink Splash — 5 tiles repainted to the same number.',
+      'intro.mukmul.l2': 'My skill is Ink Splash. 5 tiles turn into the same number.',
       'intro.banjjak.l1': 'Sparky! Leave anything that glitters to me.',
-      'intro.banjjak.l2': 'My skill is Spark Charge — your skill gauge fills +40%p.',
+      'intro.banjjak.l2': 'My skill is Spark Charge. Your Skill gauge fills by 48%.',
       'intro.bangul.l1': 'Bubbly here. Stuck spots get loosened with bubbles.',
-      'intro.bangul.l2': 'My skill is Bubble Wave — 2 blockers cleansed.',
+      'intro.bangul.l2': 'My skill is Bubble Wave. 2 blocker tiles get washed away.',
       'skin.gem': '+1 Jelly Star!',
       'skin.base': 'Default',
       'skin.basedesc': 'The look you started with',
@@ -28150,17 +28205,17 @@ window.TT_SFX = {
       'char.banjjak.passname': '번쩍 충전',
       'cp.sk.head': '[스킬]',
       'cp.sk.eff': '효과',
-      'cp.sk.skill': '기술',
+      'cp.sk.skill': '스킬',
       'cp.sk.use': '사용',
       'cp.sk.usev': '한 판에 {n}회',
       'cp.sk.perm': '영구',
-      'cp.sk.none': '혼자 갑니다 — 이번 판에는 펫 기술이 없어요.',
+      'cp.sk.none': '혼자 갑니다. 이번 판에는 펫 스킬이 없어요.',
       /* 0909 copy-flow ④ — 펫 탭 빈 상태 한 줄. `{free}` 는 PET_FREE 에서 나온다
          (petFreeNames). ⚠ 실측 정정: 이 탭은 "펫이 하나도 없는" 상태가 아니다 —
          새 설치도 삐약·뭉치를 이미 갖고 있다(store 리터럴 pets 두 항목 · §14.1 ⓐ).
          비어 보이던 것은 **기본 선택이 「없음」**이었기 때문이다. 그러니 문구도
          "첫 펫을 만나요"가 아니라 "고르면 나온다"가 사실이다. */
-      'cp.pet.empty': '펫을 고르면 여기에 기술이 나와요. {free}는 처음부터 함께예요.',
+      'cp.pet.empty': '펫을 고르면 여기에 스킬이 나와요. {free}는 처음부터 함께예요.',
       'cp.pet.sep': '·',
       'cp.sk.lock': '잠김',
       'aria.loadout': '장비',
@@ -28172,7 +28227,7 @@ window.TT_SFX = {
       'pet.up.poor': '{s}이 {n}개 부족해요',
       'pet.up.done': '{s} 강화! Lv.{lv}',
       'pet.up.maxmsg': '이 레버는 이미 만렙이에요',
-      'pet.up.aria': '{s}을 Lv.{lv}로 강화 — 파편 {n}개',
+      'pet.up.aria': '{s}을 Lv.{lv}로 강화(파편 {n}개)',
       'pet.axis.link': '연결',
       'pet.axis.time': '시간',
       'pet.axis.cleanse': '정화',
@@ -28273,9 +28328,9 @@ window.TT_SFX = {
       'char.twin.name': '트윈 왕자',
       'char.twin.pass': '같은 숫자 매치 +60%',
       'char.ppyak.name': '삐약',
-      'char.ppyak.pass': '기술: 자유 연결 8초 — 떨어진 두 칸도 이어져요',
+      'char.ppyak.pass': '8초 동안 멀리 떨어진 두 칸도 이어서 맞출 수 있어요. 그동안 얼음 칸은 한 번에 깨져요.',
       'char.mungchi.name': '뭉치',
-      'char.mungchi.pass': '기술: 덩어리 방패 6초 — 시계와 악당 게이지가 멈춰요',
+      'char.mungchi.pass': '8초 동안 시계와 악당 게이지를 멈춰요. 멈춘 동안에도 매치는 계속할 수 있어요.',
       'char.jelly.name': '젤리공주',
       'char.jelly.pass': '10% 확률 그 매치 ×3',
 
@@ -28340,25 +28395,25 @@ window.TT_SFX = {
       'skill.sodawitch.name': '탄산 주문!',
       /* --- W7 신규 동료 둘. 기술명은 W3 이 이미 세워 뒀다. --- */
       'char.mongle.name': '몽글',
-      'char.mongle.pass': '기술: 시간 웅덩이 4초 — 시계와 악당 게이지가 멈춰요',
+      'char.mongle.pass': '4초 동안 시계와 악당 게이지를 멈춰요. 멈춘 동안에도 매치는 계속할 수 있어요.',
       'char.churup.name': '츄릅',
-      'char.churup.pass': '기술: 한 입 재굴림 — 한 줄을 다시 섞어요',
+      'char.churup.pass': '숫자가 두 칸 이상 남은 줄 하나를 골라 다시 섞어요. 다음 판 흔들기도 한 번 막아 줘요.',
       /* --- W6.5a 신규 동료 넷. 사용자 확정 표시명이다. --- */
       'char.mukmul.name': '먹물이',
-      'char.mukmul.pass': '기술: 먹물 발사 — 5칸을 같은 숫자로',
+      'char.mukmul.pass': '판에서 가장 많은 숫자로 5칸을 물들여요.',
       'char.tiktok.name': '째깍이',
-      'char.tiktok.pass': '기술: 타임스톱 6초 — 멈춘 동안에도 매치 가능',
+      'char.tiktok.pass': '6초 동안 시간을 멈춰요. 시계와 악당 게이지가 멈춘 동안에도 매치할 수 있어요.',
       'char.kkultteok.name': '꿀떡이',
-      'char.kkultteok.pass': '기술: 황금 열매 2개 소환',
+      'char.kkultteok.pass': '열매 2개를 황금 열매로 바꿔요. 황금 열매가 든 매치는 점수가 3배예요.',
       'char.bangul.name': '방울이',
-      'char.bangul.pass': '기술: 거품 파도 — 방해 타일 2개 정화',
-      'char.ppyak.pass2': '기술: 자유 연결 8초 — 떨어진 두 칸도 이어져요',
+      'char.bangul.pass': '방해 타일(블로커·얼음) 2개를 씻어 내요. 가려진 숫자도 한 번에 되돌려요.',
+      'char.ppyak.pass2': '8초 동안 멀리 떨어진 두 칸도 이어서 맞출 수 있어요. 그동안 얼음 칸은 한 번에 깨져요.',
       /* 2c - CODEX P09/P10.  초상 에셋이 2026-09-10 에 배선됐다(CHAR_STD 안) —
          카드는 표준 4크롭을 그리고 공용 인라인 SVG 는 폴백으로 내려앉았다. */
       'char.sseokssak.name': '썩싹이',
-      'char.sseokssak.pass': '기술: 큰 정리 — 산 타일 6칸 제거',
+      'char.sseokssak.pass': '남은 타일 중 7칸을 한 번에 지워요. 다음 판 흔들기도 한 번 막아 줘요.',
       'char.banjjak.name': '반짝이',
-      'char.banjjak.pass': '기술: 반짝 충전 — 스킬 게이지 +40%p',
+      'char.banjjak.pass': '스킬 게이지를 한 번에 48% 채워요.',
       /* --- W7 리액션 말풍선 (일곱 줄 × 둘). 짧게 — 말풍선은 nowrap 216px 이다 --- */
       'say.combo.pudding': '버텨, 계속!',
       'say.jackpot.pudding': '운이 따르는군!',
@@ -28514,10 +28569,10 @@ window.TT_SFX = {
          카드에서 "각성", 버튼에서 "awaken", 토스트에서 "게이지"라고 부르면 셋이
          같은 것인 줄 모른다. EN·KO 키 순서도 같게 유지한다. */
       'skills.title': '전투의 네 버튼',
-      'skills.s1': '<b>공격</b> — 점수를 낼수록 차고, 다 차면 저절로 나가요.',
-      'skills.s2': '<b>필살기</b> — <b>합이 10</b>과 <b>같은 숫자</b>를 <b>번갈아</b> 맞춰야 차요. 한 방이 공격 두 번치예요.',
-      'skills.s3': '<b>스킬</b> — 매치마다 차고, 콤보가 높을수록 빨리 차요. 잠깐 동안 판이 내 편이 돼요.',
-      'skills.s4': '<b>펫소환</b> — 고른 펫의 기술이에요. 한 판에 쓸 수 있는 횟수가 정해져 있어요.',
+      'skills.s1': '<b>공격</b>은 점수를 낼수록 차고, 다 차면 저절로 나가요.',
+      'skills.s2': '<b>각성</b>은 <b>합이 10</b>과 <b>같은 숫자</b>를 <b>번갈아</b> 맞춰야 차요. 한 방이 공격 두 번치예요.',
+      'skills.s3': '<b>스킬</b>은 매치마다 차고, 콤보가 높을수록 빨리 차요. 잠깐 동안 판이 내 편이 돼요.',
+      'skills.s4': '<b>펫소환</b>은 고른 펫의 스킬을 불러요. 한 판에 쓸 수 있는 횟수가 정해져 있어요.',
       'skills.note': '<b>스킬 과일</b>은 스킬을 단번에 채우고, <b>펫 과일</b>은 펫 횟수를 하나 늘려 줘요.',
       'menu.dailydone': '오늘 데일리 완료',
       'menu.dailytodo': '오늘의 데일리가 기다려요',
@@ -28695,6 +28750,18 @@ window.TT_SFX = {
       /* --- §H 캐릭터 추천 태그 -------------------------------------------- */
       'pick.rec': '추천',
       'pet.combo.k': '추천 조합',
+      /* 64-fix2 ⑥ — 펫 탭 추천 조합 카드의 이유 한 문장(펫 × 첫 추천 캐릭터). 74 에서 스탯·스킬이
+         바뀌면 이 키들만 다시 맞춘다(구조 = pet.combo.why.<펫>.<캐릭터>). */
+      'pet.combo.why.ppyak.twin': '먼 칸도 이어져 트윈 왕자의 같은 숫자 +60%가 자주 터져요.',
+      'pet.combo.why.mungchi.pudding': '시계가 8초 멈춘 동안 푸딩 기사가 매치 점수를 더 쌓아요.',
+      'pet.combo.why.mongle.ten': '시계가 4초 멈춘 동안 텐텐 왕자가 합10 짝을 더 모아요.',
+      'pet.combo.why.churup.pudding': '막힌 줄을 다시 섞어 푸딩 기사의 사슬이 끊기지 않아요.',
+      'pet.combo.why.mukmul.ten': '같은 숫자 5칸이 생겨 텐텐 왕자의 스킬 동안 짝이 끊기지 않아요.',
+      'pet.combo.why.tiktok.twin': '시간이 6초 멈춘 동안 트윈 왕자가 같은 숫자 짝을 모아요.',
+      'pet.combo.why.kkultteok.jelly': '황금 열매의 점수 3배가 두 사람의 잭팟 배수와 함께 곱해져요.',
+      'pet.combo.why.bangul.jelly': '방해 타일이 씻겨 매치가 늘면 두 사람의 잭팟 기회도 늘어요.',
+      'pet.combo.why.sseokssak.twin': '7칸을 한 번에 치워 스피드러너 트윈 왕자의 판이 빨라져요.',
+      'pet.combo.why.banjjak.ten': '스킬 게이지가 48% 차서 텐텐 왕자의 스킬이 빨리 터져요.',
       /* [Fix round 1 · I-2/I-3, m-5] 새 키 아님 — 'cp.pet.empty' 옆의 기존
          'cp.pet.sep'(줄 27636, '·')을 그대로 재사용한다(EN과 동일 사유). */
       'char.ten.tag': '전략가',
@@ -28787,11 +28854,11 @@ window.TT_SFX = {
       'rec.why.pudding': '매치마다 완충이 붙어 긴 판을 끝까지 끌고 간다.',
       'rec.why.sodawitch': '도박 궁이 보스 체력의 4분의 1을 한 번에 깎는다.',
       /* ★ 0826 8단계 — 기술 축(PET_REC_ATK)으로 펫을 골랐을 때의 이유 줄. */
-      'rec.why.atk.blk': '블로커 투하가 주력이다 — 방울이의 정화가 떨어진 방해를 씻어 낸다.',
-      'rec.why.atk.freeze': '한 열 얼리기가 주력이다 — 째깍이의 타임스톱이 얼리기를 통째로 무효로 만든다.',
-      'rec.why.atk.mask': '숫자 가리기가 주력이다 — 방울이의 정화가 가려진 숫자를 한 번에 되돌린다.',
-      'rec.why.atk.quake': '판 흔들기가 주력이다 — 츄릅의 가드가 흔들림 한 번을 통째로 막는다.',
-      'rec.why.atk.cycle': '네 기술이 돌아가며 온다 — 째깍이가 시계를 잡으면 어느 차례가 와도 대응 창이 남는다.',
+      'rec.why.atk.blk': '이 보스는 블로커를 자주 떨어뜨려요. 방울이의 거품 파도가 블로커를 2개씩 씻어 내요.',
+      'rec.why.atk.freeze': '이 보스는 한 줄을 얼려요. 째깍이가 시간을 멈춘 동안에는 얼리기가 통하지 않아요.',
+      'rec.why.atk.mask': '이 보스는 숫자를 가려요. 방울이의 거품 파도가 가려진 숫자를 한 번에 되돌려요.',
+      'rec.why.atk.quake': '이 보스는 판을 흔들어요. 츄릅의 크게 한 입이 다음 흔들기를 한 번 막아 줘요.',
+      'rec.why.atk.cycle': '이 보스는 네 가지 공격을 번갈아 써요. 째깍이가 시간을 멈추면 어떤 공격이 와도 대응할 틈이 생겨요.',
       'adv.go': '시작',
       'adv.close': '닫기',
       'adv.missionwin': '미션 성공! 이제 매치마다 ×{mult}',
@@ -28808,13 +28875,13 @@ window.TT_SFX = {
       'story.s50.taunt': '"지금은 안 돼! 심장 없이는 못 이겨 — 물러나서, 힘을 모아."',
       /* ---- 0901 ⑥-c — 개념 튜토리얼 5장 (STORY-SCRIPT-0831 §3 원문) ---- */
       'howto.ten': '같은 숫자는 <b>트윈</b>, 합이 10이면 <b>텐</b>. 텐을 만들수록 굳은 세계가 풀려요.',
-      'howto.ult': '필살기는 <b>번갈아</b> 채워요 \u2014 텐 다음 트윈, 트윈 다음 텐. 같은 것만 반복하면 사슬이 끊겨요.',
+      'howto.ult': '각성은 <b>번갈아</b> 채워요 \u2014 텐 다음 트윈, 트윈 다음 텐. 같은 것만 반복하면 사슬이 끊겨요.',
       'howto.awaken': '스킬 게이지는 콤보가 클수록 빨리 차요. 터지면 {sec}초간, <b>모든 매치가 텐트윈 콤보</b>가 돼요.',
       'howto.overdrive': '공격이 꼬리를 물면 <b>폭주</b>! 멈추지 않는 한 계속돼요 \u2014 계속 맞추면, 계속 쏴요.',
       'howto.finish': '보스가 쓰러지면 <b>피니시 10초</b>. 화면에 뜬 마지막 미션을 해내야 진짜 승리예요.',
       /* 판정판 48 — 첫 만땅 1회 안내(사용자 지시 문구 그대로 + 행동 한 마디). */
       'tip.awakenReady': '스킬 준비! 눌러 보세요.',
-      'tip.ultReady': '필살기 준비! 눌러 보세요.',
+      'tip.ultReady': '각성 준비! 눌러 보세요.',
       /* 0901 ⑥-d — I16 이 한 대를 막았을 때 뜨는 한 낱말. */
       'item.guard.block': '막았다!',
       'fx.overdrive': '폭주!!',
@@ -28843,11 +28910,11 @@ window.TT_SFX = {
       'duel.hud': 'HP {hp} / 공격 {a}% / 필살 {s}%',
       /* 전투 개편 단계 3 — 하단 네 버튼의 전투 이름과 응답. */
       'act.attack': '공격',
-      'act.special': '필살기',
+      'act.special': '각성',
       'act.pet': '펫소환',
       'act.awaken': '스킬',
       'aria.attack': '공격 게이지 상태',
-      'aria.special': '필살기 발동',
+      'aria.special': '각성 발동',
       'aria.pet': '펫 스킬 사용',
       'aria.awaken': '스킬',
       /* 게이지 토스트는 "안 찼다"가 아니라 **채우는 법**을 말한다. 안 찼다는 것은
@@ -28858,10 +28925,10 @@ window.TT_SFX = {
          (30590 의 gaugeBump(S.combo), 잔량 안내는 28121 계열 fireSkill 경로).
          토스트는 평문이라 <b> 를 쓰지 않는다 — 강조는 낱말 순서로만 준다. */
       'duel.atkstat': '공격 {n}% — 점수를 낼수록 차고, 다 차면 저절로 나가요.',
-      'duel.spstat': '필살기 {n}% — 합이 10과 같은 숫자를 번갈아 맞춰야 차요.',
-      'duel.spgo': '필살기! -{n}',
-      'duel.petnone': '펫이 없어요 — 펫을 고르면 그 기술을 판마다 몇 번 쓸 수 있어요.',
-      'duel.petout': '이번 판 펫 기술을 다 썼어요 — 판 위의 펫 과일을 깨면 한 번 더 생겨요.',
+      'duel.spstat': '각성 {n}% — 합이 10과 같은 숫자를 번갈아 맞춰야 차요.',
+      'duel.spgo': '각성! -{n}',
+      'duel.petnone': '펫이 없어요. 펫을 고르면 그 스킬을 판마다 몇 번 쓸 수 있어요.',
+      'duel.petout': '이번 판 펫 스킬을 다 썼어요. 판 위의 펫 과일을 깨면 한 번 더 생겨요.',
       'duel.petempty': '쪼아먹을 타일이 없어요.',
       'duel.petpeck': '쪼아먹기! {n}칸 정리',
       /* W2.5 ④ — 마크 과일의 플로트 문구(사용자 확정 문구에서 판정판 64
@@ -28877,38 +28944,38 @@ window.TT_SFX = {
       /* W3 — 기술이 "숫자 멈춤"으로 승격되면서 문구도 두 사실을 다 말한다:
          시계도 멈추고 악당 게이지도 멈춘다. 하나만 말하면 나머지 하나는
          플레이어가 영영 모르는 효과가 된다. */
-      'duel.petshield': '덩어리 방패! {n}초 동안 시간도 악당 게이지도 멈춰요',
+      'duel.petshield': '말랑 방패! {n}초 동안 시계도 악당 게이지도 멈춰요',
       /* --- W3: 컷인이 붙은 기술들의 이름 한 벌 --- */
-      'skill.sub.sp': '필살기',
-      'skill.sub.pet': '펫 기술',
+      'skill.sub.sp': '각성',
+      'skill.sub.pet': '펫 스킬',
       'skill.sub.foe': '악당 기술',
       'skill.sp.name': '혼신의 일격!',
       /* W6.5a — 값만 갈린다(위 en 주석 참조). 옛 값: '삐약 — 쪼아먹기 폭풍!' */
-      'skill.ppyak.name': '삐약 — 자유 연결!',
-      'skill.mungchi.name': '뭉치 — 시간 정지!',
+      'skill.ppyak.name': '삐약의 자유 연결!',
+      'skill.mungchi.name': '뭉치의 말랑 방패!',
       'skill.foe.name': '블로커 비!',
       'duel.tellwarn': '온다!',
       'duel.timestop': '시간 정지',
       /* 아직 등록되지 않은 동료 둘 (MATE_IDS 밖) — 문구만 먼저 선다 */
-      'skill.mongle.name': '몽글 — 시간 웅덩이!',
-      'skill.churup.name': '츄릅 — 한 입 재굴림!',
-      'duel.petmongle': '시간 웅덩이! {n}초 동안 시계가 멈춰요',
-      'duel.petchurup': '한 입 재굴림! {n}줄을 다시 굴렸어요',
+      'skill.mongle.name': '몽글의 시간 웅덩이!',
+      'skill.churup.name': '츄릅의 크게 한 입!',
+      'duel.petmongle': '시간 웅덩이! {n}초 동안 시계도 악당 게이지도 멈춰요',
+      'duel.petchurup': '크게 한 입! {n}줄을 다시 섞었어요',
       /* --- W6.5a 신규 동료 넷 + 삐약 이관 (PET-SYSTEM §3.5 · §4.3 · §4.6 · §16) --- */
-      'skill.tiktok.name': '째깍이 — 타임스톱!',
-      'skill.mukmul.name': '먹물이 — 먹물 발사!',
-      'skill.kkultteok.name': '꿀떡이 — 황금 열매!',
-      'skill.bangul.name': '방울이 — 거품 파도!',
-      'skill.sseokssak.name': '썩싹이 — 큰 정리!',
-      'skill.banjjak.name': '반짝이 — 반짝 충전!',
-      'duel.pettiktok': '타임스톱! {n}초 동안 시계를 잡아 뒀어요 — 지금 터트려요!',
+      'skill.tiktok.name': '째깍이의 타임 스톱!',
+      'skill.mukmul.name': '먹물이의 잉크 물들이기!',
+      'skill.kkultteok.name': '꿀떡이의 황금 소환!',
+      'skill.bangul.name': '방울이의 거품 파도!',
+      'skill.sseokssak.name': '썩싹이의 싹쓸이!',
+      'skill.banjjak.name': '반짝이의 번쩍 충전!',
+      'duel.pettiktok': '타임 스톱! {n}초 동안 시계를 잡아 뒀어요. 지금 터트려요!',
       'duel.petppyak': '자유 연결! {n}초 동안 멀리 떨어진 숫자도 이어져요',
-      'duel.petmukmul': '먹물 발사! {n}칸이 {v}(으)로 물들었어요',
-      'duel.petkkultteok': '황금 열매! 골드 타일 {n}개가 열렸어요',
+      'duel.petmukmul': '잉크 물들이기! {n}칸이 {v}(으)로 물들었어요',
+      'duel.petkkultteok': '황금 소환! 황금 열매 {n}개가 열렸어요',
       'duel.petbangul': '거품 파도! 방해 {n}개를 씻어 냈어요',
       'duel.petclean0': '씻어 낼 방해가 없어요.',
-      'duel.petsseokssak': '큰 정리! {n}칸을 치웠어요',
-      'duel.petbanjjak': '반짝 충전! 스킬 게이지 +{n}%',
+      'duel.petsseokssak': '싹쓸이! {n}칸을 치웠어요',
+      'duel.petbanjjak': '번쩍 충전! 스킬 게이지 +{n}%',
       /* 2c - 펫별 잠금 안내.  종전에는 여덟 전부가 "10탄 보스"를 돌려
          썼고, 그것은 일곱에게 거짓말이었다.  아래 줄들은 실제 게이트와
          **같은 사실**을 말한다: PET_FREE / PET_BOSS / PET_AWK_NEED /
@@ -29195,25 +29262,25 @@ window.TT_SFX = {
       'intro.sodawitch.l2': '「탄산 팡」이 매치마다 20% 확률로 ×2 를 터뜨려.',
       'intro.sodawitch.l3': '내 스킬은 탄산 주문 — 잭팟 확률이 40%가 돼.',
       'intro.ppyak.l1': '삐약! 처음부터 너랑 같이 있었어.',
-      'intro.ppyak.l2': '내 기술은 「자유 연결」 — 8초 동안 떨어진 두 칸도 이어져.',
+      'intro.ppyak.l2': '내 스킬은 「자유 연결」이야. 8초 동안 떨어진 두 칸도 이어져.',
       'intro.mungchi.l1': '뭉치야. 든든한 건 내가 제일이지.',
-      'intro.mungchi.l2': '내 기술은 「덩어리 방패」 — 6초간 시계와 악당 게이지가 멈춰.',
+      'intro.mungchi.l2': '내 스킬은 「말랑 방패」야. 8초 동안 시계와 악당 게이지가 멈춰.',
       'intro.mongle.l1': '몽글이에요. 시간이 급할 때 불러 주세요.',
-      'intro.mongle.l2': '내 기술은 「시간 웅덩이」 — 4초간 시계와 악당 게이지가 멈춰요.',
+      'intro.mongle.l2': '내 스킬은 「시간 웅덩이」예요. 4초 동안 시계와 악당 게이지가 멈춰요.',
       'intro.tiktok.l1': '째깍! 나는 시간을 세는 펫이야.',
-      'intro.tiktok.l2': '내 기술은 「타임스톱」 — 6초 멈춘 동안에도 매치할 수 있어.',
+      'intro.tiktok.l2': '내 스킬은 「타임 스톱」이야. 6초 동안 멈춘 시간에도 매치할 수 있어.',
       'intro.churup.l1': '츄릅! 한 입에 한 줄, 자신 있어요.',
-      'intro.churup.l2': '내 기술은 「한 입 재굴림」 — 한 줄을 통째로 다시 섞어요.',
+      'intro.churup.l2': '내 스킬은 「크게 한 입」이에요. 한 줄을 통째로 다시 섞어요.',
       'intro.kkultteok.l1': '꿀떡이예요. 달콤한 건 다 제 몫이죠.',
-      'intro.kkultteok.l2': '내 기술은 「황금 소환」 — 황금 열매를 2개 불러요.',
+      'intro.kkultteok.l2': '내 스킬은 「황금 소환」이에요. 황금 열매를 2개 불러요.',
       'intro.sseokssak.l1': '썩싹! 지저분한 판은 제가 싹 치워요.',
-      'intro.sseokssak.l2': '내 기술은 「큰 정리」 — 산 타일 6칸을 한 번에 없애요.',
+      'intro.sseokssak.l2': '내 스킬은 「싹쓸이」예요. 남은 타일 7칸을 한 번에 없애요.',
       'intro.mukmul.l1': '먹물이야. 조용히, 그리고 확실하게.',
-      'intro.mukmul.l2': '내 기술은 「먹물 발사」 — 5칸을 같은 숫자로 바꿔.',
+      'intro.mukmul.l2': '내 스킬은 「잉크 물들이기」야. 5칸을 같은 숫자로 바꿔.',
       'intro.banjjak.l1': '반짝! 번쩍이는 건 다 나한테 맡겨.',
-      'intro.banjjak.l2': '내 기술은 「반짝 충전」 — 스킬 게이지를 +40%p 채워 줘.',
+      'intro.banjjak.l2': '내 스킬은 「번쩍 충전」이야. 스킬 게이지를 48% 채워 줘.',
       'intro.bangul.l1': '방울이에요. 막힌 자리는 거품으로 풀어요.',
-      'intro.bangul.l2': '내 기술은 「거품 파도」 — 방해 타일 2개를 정화해요.',
+      'intro.bangul.l2': '내 스킬은 「거품 파도」예요. 방해 타일 2개를 씻어 내요.',
       'skin.gem': '젤리별 +1!',
       'skin.base': '기본',
       'skin.basedesc': '처음부터 함께한 모습',
@@ -31853,8 +31920,19 @@ window.TT_SFX = {
     if (typeof document === 'undefined' || !document.querySelectorAll) return;
     cpBuild();   /* ⑰ — 얼굴을 붙이기 전에 방울(3벌)이 서 있게 한다(멱등) */
     var nodes = document.querySelectorAll('#char-pick .char-card, #cp-info .ci-chip, #cp-rack .cp-th');
-    for (var i = 0; i < nodes.length; i++) {
-      var el = nodes[i];
+    for (var i = 0; i < nodes.length; i++) paintSkinArt(nodes[i]);
+    /* 그림이 하나도 없는 자리는 SVG 폴백이 채운다. 무대의 카드는 마크업에 .cav 를
+       이미 들고 있지만 랙과 칩은 비어 있으므로, 여기서 한 번 복제해 넣는다
+       (카드에서 복제 = 새 SVG 0 개, 6차 규약). */
+    fillSvgFallback('#cp-rack .cp-th');
+    fillSvgFallback('#cp-info .ci-chip');
+  }
+
+  /** 64-fix2 ⑥ — applySkins 의 **한 자리** 칠하기(종전 반복문 몸통을 그대로 옮겼다).
+   *  펫 탭 추천 카드의 초상 칩(syncPetInfo)도 이 함수 하나로 칠한다. 그 칩은
+   *  data-char=<추천 캐릭터> 를 들고 있어서, 펫 탭에서 스킨을 장착해 applySkins 가
+   *  다시 돌아도 펫(#cp-petinfo 의 data-char)이 아니라 그 캐릭터의 그림이 선다. */
+  function paintSkinArt(el) {
       var id = el.getAttribute('data-char');
       if (!id) {
         var par = el.parentNode;
@@ -31908,12 +31986,6 @@ window.TT_SFX = {
          이제 이 둘을 읽는 곳은 **스킨 표(SKINS) 하나뿐**이고, 그 자리에서도 위
          설명대로 버려진다. 굽는 것 자체는 그대로 두지만(art-embed 소유), 여기
          적힌 "사각 크롭"이 바로 컷툰에서 불투명 직사각형으로 터진 그 소재다. */
-    }
-    /* 그림이 하나도 없는 자리는 SVG 폴백이 채운다. 무대의 카드는 마크업에 .cav 를
-       이미 들고 있지만 랙과 칩은 비어 있으므로, 여기서 한 번 복제해 넣는다
-       (카드에서 복제 = 새 SVG 0 개, 6차 규약). */
-    fillSvgFallback('#cp-rack .cp-th');
-    fillSvgFallback('#cp-info .ci-chip');
   }
 
   /**
@@ -32748,10 +32820,29 @@ window.TT_SFX = {
     /* [Fix round 1 · I-2/I-3] 「추천 조합」 — 스탯 자리에 대신 선다. 펫 미선택
        이거나(id 없음) 맞는 캐릭터가 0명이면(combo 빈 문자열) 줄 자체를 접는다
        (요소는 안 지운다 — 위 emp/useln과 같은 hidden 토글 문법). */
-    var comboRow = $('cp-pet-combo');
-    var comboTx = id ? petComboNames(id) : '';
-    cpTxt($('cp-pet-combo-v'), null, comboTx);
-    if (comboRow) comboRow.hidden = !comboTx;
+    /* 64-fix2 ⑥ — 추천 조합 카드: 초상(.ci-chip) + 이름 알약(.ci-tag-v) 을 추천 캐릭터마다,
+       그 아래 이유 한 문장(pet.combo.why.<펫>.<첫 캐릭터>). 추천이 없으면 카드를 접는다. */
+    var comboRow = $('cp-pet-combo'), comboWho = $('cp-pet-combo-v'), comboWhy = $('cp-pet-combo-why');
+    var recIds = id ? petComboIds(id) : [];
+    if (comboWho && typeof document !== 'undefined') {
+      while (comboWho.firstChild) comboWho.removeChild(comboWho.firstChild);
+      for (i = 0; i < recIds.length; i++) {
+        var rc = recIds[i];
+        var rchip = document.createElement('i');
+        rchip.className = 'ci-chip kit-slot-v2 kit-slot-v2--portrait ch-' + rc;
+        rchip.setAttribute('aria-hidden', 'true');
+        rchip.setAttribute('data-char', rc);   /* applySkins 가 펫이 아니라 이 캐릭터로 칠하게 */
+        paintSkinArt(rchip);                   /* 캐릭터 판 초상 칩과 같은 칠(장착 스킨 포함) */
+        var rname = document.createElement('b');
+        rname.className = 'ci-tag-v kit-pill-v2';
+        rname.setAttribute('data-variant', 'soft');
+        rname.textContent = t('char.' + rc + '.name');
+        comboWho.appendChild(rchip);
+        comboWho.appendChild(rname);
+      }
+    }
+    cpTxt(comboWhy, null, recIds.length ? t('pet.combo.why.' + id + '.' + recIds[0]) : '');
+    if (comboRow) comboRow.hidden = !recIds.length;
     if (!id) {
       cpTxt($('cp-pet-pass'), 'cp.sk.none');
       cpTxt($('cp-pet-use'), null, '-');
@@ -32773,6 +32864,7 @@ window.TT_SFX = {
       cpTxt(uk.parentNode.querySelector('.cc-k'), lock ? 'cp.sk.lock' : 'cp.sk.use');
     }
     fitDesc($('cp-pet-desc'));
+    fitDesc(comboRow);        /* 64-fix2 ⑥ — 추천 카드도 같은 「잘림 0」: 넘치면 글자를 줄인다(펫마다 다시 잰다) */
     cpPetStage();             /* 구경 중인 펫이 무대에도 선다(없으면 히어로) */
     cpCenterAll();
   }
@@ -32809,7 +32901,7 @@ window.TT_SFX = {
      petLeadLever, 위)와 같은 스탯인 캐릭터만(동률 포함 1~2명) — "다섯 중
      레버값이 제일 큰 사람"이 아니라 "그 사람 안에서 그 스탯이 1위인가"이다.
      없으면 빈 문자열(줄 숨김은 호출부가 담당). 구분자는 cp.pet.sep 키. */
-  function petComboNames(id) {
+  function petComboIds(id) {
     var lever = PET_UP_STAT[petLeadLever(id)] || 'power';
     var pct = heroStatPct(), i, m, row, best, bestKeys, names = [];
     for (i = 0; i < HERO_IDS.length; i++) {
@@ -32820,9 +32912,11 @@ window.TT_SFX = {
         if (row[m].eff > best) { best = row[m].eff; bestKeys = [STAT_KEYS[m]]; }
         else if (row[m].eff === best) { bestKeys.push(STAT_KEYS[m]); }
       }
-      if (bestKeys.indexOf(lever) >= 0) names.push(t('char.' + HERO_IDS[i] + '.name'));
+      if (bestKeys.indexOf(lever) >= 0) names.push(HERO_IDS[i]);
     }
-    return names.slice(0, 2).join(t('cp.pet.sep'));
+    /* 64-fix2 ⑥ — 이름 문자열 대신 id(1~2명)를 돌려준다: 카드가 초상·이름 알약·이유 문장을
+       id 로 세운다(규칙·순서·상한 2 는 무변). */
+    return names.slice(0, 2);
   }
 
   /**
@@ -54324,7 +54418,13 @@ html[lang="en"] #app-intro .api-logo{
   justify-content:center !important;
   gap:6px;
   min-height:52px !important;
-  padding:0 18px !important;
+  /* [64-fix2 ③ 2026-09-27 · 사용자 「글자가 아래로 처짐 — 정렬 비율 똑바로」] 세로 여백 =
+     바닥 밴드 두께(아래 box-shadow 의 inset 0 -6px 0)를 **위아래 같게**. 종전 0 이면 글자
+     덩어리가 상자 전체(밴드 포함)를 채워, 줄이 넘는 라벨은 둘째 줄이 밴드 위로 내려앉았다
+     (실측 en #adv-ad 「Watch an ad for +1 / heart」 — 잉크 409~452 가 상자 406~456 을 거의
+     다 채움). 위아래가 같으므로 한 줄 라벨의 내용 상자 가운데는 그대로다(화소 무변 — 하네스
+     대조로 확인). 잉크 중심 − 면(링 안·밴드 위) 중심 실측은 font-audit 「잉크 중심」 축. */
+  padding:6px 18px !important;
   border:0 !important;
   border-image:none !important;
   border-width:0 !important;
@@ -55327,7 +55427,9 @@ html[lang="en"] #app-intro .api-logo{
 
    ⚠ 롤백 밸브: **이 <style> 블록 하나만** 통째로 지우면 W9 이전으로 정확히
      돌아간다. 신규 DOM 세 개(#pc-bg / #pc-left / #pc-right)는 마크업에서
-     `hidden` 을 달고 태어나므로, 이 블록이 없으면 한 픽셀도 그리지 않는다.
+     `data-wide-only` 를 달고 태어나고 그 봉인([data-wide-only]{display:none
+     !important})이 기본 절에 있으므로(64-fix2 ④ — 전에는 `hidden`), 이 블록이
+     없으면 한 픽셀도 그리지 않는다.
      (그래서 봉인 규칙을 이 블록 안에 두지 않았다 — 블록을 지웠을 때 새 요소가
       되살아나는 사고가 구조적으로 불가능하다.)
 
@@ -55355,11 +55457,12 @@ html[lang="en"] #app-intro .api-logo{
      "지금 켜져 있는 스크린"을 읽을 수 있다 — JS 도 :has() 도 필요 없다.
      z-index:-2 는 #app 의 isolation:isolate 안에 갇히고, #app::before(=-1,
      피버 비네트)보다 아래·#app 자기 배경보다 위에 앉는다. */
-  /* ⚠ `display` 세 곳의 !important 는 취향이 아니라 필수다: 브라우저 UA 시트가
-     `[hidden] { display: none !important }` 로 잠가 두어, 작성자 규칙이
-     아무리 특이해도 important 없이는 못 뚫는다. 대신 그 대가로 세로에서는
-     **CSS 한 줄 없이도** 세 요소가 확실히 사라진다(롤백 밸브 단일의 근거). */
-  #pc-bg[hidden] {
+  /* ⚠ `display` 세 곳의 !important 는 취향이 아니라 필수다: 기본 절 봉인이
+     `[data-wide-only] { display: none !important }` 로 잠가 두어(64-fix2 ④ —
+     전에는 `[hidden]` 이었다, 특이도·중요도 동일), important 없이는 못 뚫는다.
+     대신 그 대가로 세로에서는 **이 블록의 CSS 한 줄 없이도** 세 요소가 확실히
+     사라진다(롤백 밸브 단일의 근거). */
+  #pc-bg[data-wide-only] {
     display: block !important;
     position: fixed;
     inset: 0;
@@ -55533,13 +55636,13 @@ html[lang="en"] #app-intro .api-logo{
   /* ---- 3-a. 날개 판 (#pc-left / #pc-right) -------------------------------
      #pc-left 는 캐릭터 카드 그 자체이고(비전투 row2), #pc-right 는 액션·메달
      넷이 앉는 세로 프레임이다. 둘 다 z-index:0 — 알맹이(z:1)가 언제나 위. */
-  #screen-game.active #pc-left[hidden],
-  #screen-game.active #pc-right[hidden] {
-    display: block !important;   /* UA 의 [hidden]{display:none !important} 를 뚫는다 */
+  #screen-game.active #pc-left[data-wide-only],
+  #screen-game.active #pc-right[data-wide-only] {
+    display: block !important;   /* 기본 절 [data-wide-only]{display:none !important} 를 뚫는다 */
     position: relative;
     z-index: 0;
   }
-  #screen-game.active #pc-left[hidden] {
+  #screen-game.active #pc-left[data-wide-only] {
     grid-column: 1;
     grid-row: 2;
     height: 200px;
@@ -55550,14 +55653,14 @@ html[lang="en"] #app-intro .api-logo{
        전투    4 x 94(메달)  + 3 x 10(gap) + 32(padding) = 438
      span 안에 1fr 행(row6)이 들어 있으므로, 이 높이는 위쪽 자동 행들을
      밀지 않는다 — 남는 몫은 전부 1fr 이 흡수한다. */
-  #screen-game.active #pc-right[hidden] {
+  #screen-game.active #pc-right[data-wide-only] {
     grid-column: 3;
     grid-row: 2 / 7;
     align-self: start;
     height: 378px;
   }
   /* 전투에는 캐릭터 카드가 없다(#app.battle #hero-slot{display:none} 과 짝). */
-  #app.battle #screen-game.active #pc-left[hidden] { display: none !important; }
+  #app.battle #screen-game.active #pc-left[data-wide-only] { display: none !important; }
 
   /* ✅ 0901 ⑧b — 전투 좌측의 **빈 유리 상자 두 개**를 접는다.
      row3(#combo-wrap)·row4(#hud-row)는 보드 옆 날개로 올라와 있는데, 전투에서는
@@ -55571,8 +55674,8 @@ html[lang="en"] #app-intro .api-logo{
   #app.battle #screen-game.active #hud-row { display: none !important; }
 
   /* 날개 유리 문법 — 판 넷이 같은 레시피를 쓴다(새 아트 0). */
-  #screen-game.active #pc-left[hidden],
-  #screen-game.active #pc-right[hidden],
+  #screen-game.active #pc-left[data-wide-only],
+  #screen-game.active #pc-right[data-wide-only],
   #screen-game.active #combo-wrap,
   #screen-game.active #hud-row,
   #screen-game.active #boss-bar {
@@ -55706,11 +55809,11 @@ html[lang="en"] #app-intro .api-logo{
   }
   /* 메달을 하단에서 우 날개로 빼면 세로 예산 111px 이 보드로 돌아온다. */
   #app.battle #screen-game.active #board-scroll,
-  #app.battle #screen-game.active #pc-right[hidden],
+  #app.battle #screen-game.active #pc-right[data-wide-only],
   #app.battle #screen-game.active #actionbar {
     grid-row: 3 / 7;
   }
-  #app.battle #screen-game.active #pc-right[hidden] { height: 438px; }
+  #app.battle #screen-game.active #pc-right[data-wide-only] { height: 438px; }
 }
 </style>
 
@@ -59276,6 +59379,50 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   line-height: 1.30;
   color: var(--f2-ink);
 }
+/* 64-fix2 ⑥ — 펫 탭 추천 조합 카드(= 위 [스킬] 상자와 같은 부품의 두 번째 인스턴스).
+   자리: 캐릭터 탭 스탯 막대 블록과 같은 가장자리 — 왼변 .050W · 윗변 .2450W · 폭 .46389W
+   (#charpanel .cc-stats 의 값 그대로), 밑변은 옆 [스킬] 상자 밑변(.1580 + .3230 − .0214 =
+   .4596W)에 맞춰 두 상자가 한 선에서 끝난다 → 높이 .4596 − .2450 = .2146W. 오른변 .5139W 와
+   [스킬] 상자 왼변 .5952W 사이 .0813W 는 캐릭터 탭 막대↔상자 여백 그대로(주석 58796 실측).
+   글꼴: 머리 = .ci-tag-k 와 같은 .030W·800 · 이유 문장 = 상자 본문 .0285W(상속) · 이름 알약 =
+   .ci-tag-v 그대로. 초상 = .ci-chip(.1469 x .1347W)의 .42 배. 새 색 0. */
+#charpanel .ci-desc.cp-rec {
+  left:   calc(var(--f2-w) * .050);
+  top:    calc(var(--f2-w) * .2450);
+  width:  calc(var(--f2-w) * .46389);
+  height: calc(var(--f2-w) * .2146);
+  justify-content: center;
+  padding: calc(var(--f2-w) * .014) calc(var(--f2-w) * .020);
+  gap: calc(var(--f2-w) * .010);
+}
+#charpanel .cp-rec .cp-rec-k {
+  margin: 0;
+  font-size: calc(var(--f2-w) * .030);
+  font-weight: 800;
+  line-height: 1.15;
+}
+#charpanel .cp-rec .cp-rec-who {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: calc(var(--f2-w) * .012);
+}
+#charpanel .cp-rec .cp-rec-who .ci-chip {
+  position: relative;
+  flex: 0 0 auto;
+  width:  calc(var(--f2-w) * .1469 * .42);
+  height: calc(var(--f2-w) * .1347 * .42);
+  border-radius: calc(var(--f2-w) * .0327 * .42);
+}
+#charpanel .cp-rec .cp-rec-who .ci-tag-v {
+  min-width: 0;
+}
+#charpanel .cp-rec .cp-rec-why {
+  margin: 0;
+  font-weight: 700;
+  word-break: keep-all;        /* [스킬] 상자 본문(.cc-pass/.cc-ult)과 같은 짝 — 「잭 / 팟」 방지 */
+  overflow-wrap: anywhere;
+}
 #charpanel .ci-desc .cc-head {
   flex: 0 0 auto;
   margin: 0;
@@ -59421,6 +59568,10 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   display: inline-flex;
   flex-direction: column;
   gap: calc(var(--f2-w) * .004);
+  /* [64-fix2 ③ 2026-09-27] 두 줄(라벨 + ★수) 묶음을 kit-btn-v2 **면** 가운데로. 면 중심 =
+     상자 중심 − (.1320 − .0355)/2 bh(하단 발광 밴드 .1320 · 림 .0355, kit-btn-v2 기하) →
+     아래 여백 2 × .048bh. 종전엔 묶음이 상자 가운데라 면보다 2.7~3.5px 아래(잉크 중심 축). */
+  padding-bottom: calc(var(--f2-bh) * .096);
   margin: 0;
   border: 0;
   border-image: none;
@@ -65966,8 +66117,8 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
   font: 800 9px/1 var(--font-latin);
   white-space: nowrap;
 }
-.dh-foe .dh-num { color: #FFF1F1; text-shadow: 0 1px 2px rgba(0, 0, 0, .85); }
-.dh-me  .dh-num { color: #16374E; text-shadow: 0 1px 1px rgba(255, 255, 255, .70); }
+#duel-foe-n { color: #FFF1F1; text-shadow: 0 1px 2px rgba(0, 0, 0, .85); }   /* 64-fix2 ② — 숫자가 .dh-foe 밖(#duel-hud 직계)으로 나가 id 로 받는다 */
+#duel-me-n  { color: #16374E; text-shadow: 0 1px 1px rgba(255, 255, 255, .70); }
 /* 공격 게이지. 시안에는 없지만 전투 정보로는 필수다 — 만땅이 곧 자동 발동이라
    "언제 나가나"가 화면에 없으면 공격도 피격도 사고처럼 읽힌다. 주 HP 바 아래
    2px 로만 눕혀서 시안의 구도(두 체력바 + 가운데 시계)를 흔들지 않는다. */
@@ -66302,7 +66453,7 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
 }
 #app.battle .dh-foe .dh-name{color:#FED7EA !important;text-shadow:0 1px 2px rgba(66,11,53,.92);}
 #app.battle .dh-foe .dh-lv  {color:#FFC2DE !important;text-shadow:0 1px 2px rgba(66,11,53,.92);}
-#app.battle .dh-foe .dh-num {color:#FFF1F6 !important;text-shadow:0 1px 2px rgba(40,0,16,.95);}
+#app.battle #duel-foe-n {color:#FFF1F6 !important;text-shadow:0 1px 2px rgba(40,0,16,.95);}
 /* 흰 라벨은 밝은 하늘 유리 위에 선다 — 흰 대 흰이라 **획 외곽선**이 대비를
    만든다(시안의 Cloud HP 가 쓰는 바로 그 수법). 사방 1px 짙은 강청 그림자. */
 #app.battle .dh-me .dh-name{color:#FFFFFF !important;
@@ -66311,7 +66462,7 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
 #app.battle .dh-me .dh-lv  {color:#F2FBFF !important;
   text-shadow:0 1px 0 rgba(43,71,99,.95),0 -1px 0 rgba(43,71,99,.80),
     1px 0 0 rgba(43,71,99,.80),-1px 0 0 rgba(43,71,99,.80);}
-#app.battle .dh-me .dh-num {color:#16374E !important;text-shadow:0 1px 1px rgba(255,255,255,.80);}
+#app.battle #duel-me-n {color:#16374E !important;text-shadow:0 1px 1px rgba(255,255,255,.80);}
 #app.battle .dh-me .dh-dmg {color:#255C82 !important;text-shadow:0 1px 1px rgba(255,255,255,.72);}
 /* [jelly-c 0910 · 태그 수리 (a)] 여기 있어야 할 style 닫는 태그가 빠져 있었다.
    그래서 아래 두 개의 style 여는 줄(jelly-box-core · sian-hud-rebuild)이 HTML
@@ -67248,10 +67399,33 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
 #app.battle .dh-foe .dh-sub{left:10.5%;top:70.5%;width:79.0%;height:5%;}
 #app.battle .dh-me  .dh-sub{left:17.5%;top:70.5%;width:66.5%;height:5%;}
 #app.battle .dh-fill::after{border-radius:999px 999px 0 0;}
+/* 64-fix2 ② (사용자 반려 2026-09-27) — 체력 숫자를 막대 **밖**으로. 규칙(브리프):
+   막대 바로 아래 · 악당은 왼쪽 정렬 · 나는 오른쪽 정렬(이름표와 같은 쪽) · 판 테두리·
+   보드·콤보·버튼과 겹침 0 · 글꼴·외곽선 문법 그대로 · ≥11px(390).
+   자리 = 막대 홈 아래 끝(.dh-track top 26.1 + height 4.2 = 30.3cqw)부터 판 테두리의
+   안쪽 밝은 선이 시작하는 곳(32.74cqw, 390·405·480 픽셀 실측 — 판 그림 기준)까지의
+   빈 띠 2.44cqw. 글자 잉크(숫자 캡 높이 = 글자 크기의 0.66배 = 1.88cqw)가 그 띠의
+   가운데에 앉아 위아래로 0.28cqw(390 에서 1.1px)씩 빈다.
+   가로 = 막대 끝 장식의 안쪽 가장자리: 악당 = 뼈 캡(.dh-orn--fl) 오른끝 4.77+3.27 =
+   8.04cqw 에서 시작 · 나 = 날개 캡(.dh-orn--mr) 왼끝 91.85cqw 에서 끝. 나 쪽은 끝 숫자의
+   잉크가 글자 폭보다 ~0.07em 오른쪽으로 넘쳐(480·405 실측 1px) 캡 상자에 닿으므로
+   숫자 크기의 0.1em(0.1 x 2.83 = 0.28cqw)만큼 안으로 들인다: right 8.15 + 0.28 = 8.43cqw.
+   장식 상자(아래 끝 30.9cqw)는 띠 위쪽 끝과 세로로 겹치므로 그 가장자리 안쪽에서만 쓴다.
+   이름 줄(대안 자리)은 여유가 모자랐다: 악당 이름~Lv 알약 64px(ko)·53px(en) < 숫자
+   75~88px, 나 19px < 48px(390 실측, 보고서 ②).
+   크기 2.80 → 2.83cqw: 390 에서 10.92px → 11.04px(브리프 ≥11px).
+   세로 가운데 = **잉크** 기준: 이 글꼴의 숫자 잉크는 줄 상자 가운데보다 0.1em 아래에
+   앉는다(390·480 실측 — 잉크 높이 0.82em). 상자(띠)는 그대로 두고 padding-bottom
+   0.2em(border-box)으로 글자만 0.1em 올려 잉크를 띠 가운데에 둔다. */
 #app.battle #duel-hud .dh-num{
-  font-size:10px;font-size:2.80cqw;
-  z-index:1;
+  inset:auto;
+  top:30.3cqw;height:2.44cqw;
+  padding-bottom:0.2em;
+  font-size:11px;font-size:2.83cqw;
+  z-index:6;
 }
+#app.battle #duel-hud #duel-foe-n{ left:8.04cqw; justify-content:flex-start; }
+#app.battle #duel-hud #duel-me-n{ right:8.43cqw; justify-content:flex-end; }
 /* 누적 데미지 — 시안에 자리가 없어 성과 큰구름 사이의 빈 하늘에 눕힌다. */
 #app.battle #duel-dmg{
   position:absolute;
@@ -67363,6 +67537,10 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
   #app.battle #duel-hud .dh-orn--fr{ left:43.54vw; width:3.77vw; background-position:-4.00vw -0.07vw; }
   #app.battle #duel-hud .dh-orn--ml{ left:56.80vw; width:5.92vw; background-position:-0.10vw -0.03vw; }
   #app.battle #duel-hud .dh-orn--mr{ left:91.85vw; width:5.98vw; background-position:-6.27vw -0.03vw; }
+  /* 64-fix2 ② 체력 숫자(막대 아래 띠) — 위 정식 경로의 vw 등가 */
+  #app.battle #duel-hud .dh-num{ top:30.3vw; height:2.44vw; }
+  #app.battle #duel-hud #duel-foe-n{ left:8.04vw; }
+  #app.battle #duel-hud #duel-me-n{ right:8.43vw; }
   /* 모험 캡슐 = 위 판 홈 (핵심) */
   #app.battle #duel-timer{ left:29.0vw; top:8.4vw; width:42.3vw; height:15.7vw; --wcap-w:42.3vw; --wcap-h:15.7vw; }
   /* 모험 펫 방울 */
@@ -68494,7 +68672,12 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
   gap: calc(var(--f2-ph) * .16);
   width: auto;
   max-width: 100%;
-  padding: 0 calc(var(--f2-ph) * .42);
+  /* [64-fix2 ③ 2026-09-27] 아래 여백 .08H — 아이콘+글자 묶음을 알약 **면**(겉선·림 안, 접지
+     밴드·하단 발광 위) 가운데로. .kit-pill-v2 실측 기하(외곽선 .027H · 림 .027H · 하단 발광
+     .107H)에서 면 중심은 상자 중심보다 (.134−.054)/2 = .04H 위 → 여백 차 2 × .04H.
+     종전 0 이면 묶음이 상자 가운데에 서서 면보다 .04H 아래였다(390 1.3px · 가로 PC 4.3px,
+     font-audit 「잉크 중심」 축 실측). 글자·아이콘 크기·알약 높이는 무변. */
+  padding: 0 calc(var(--f2-ph) * .42) calc(var(--f2-ph) * .08);
   margin-top: 0;
   font-family: var(--font-display);
   font-size: calc(var(--f2-ph) * .50);
