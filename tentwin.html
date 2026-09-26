@@ -176,6 +176,243 @@ html[data-platform="web"] [data-app-only]{display:none !important}
 })();
 </script>
 <!-- ==PLATFORM-FLAG:END== -->
+<!-- ==TW-PORTAL:BEGIN== Task 12 (MASTER-PLAN §3-A) — CrazyGames SDK 어댑터.
+     실명·시그니처 출처: scratchpad/release-0925/audit/CRAZYGAMES-SDK-REF.md (SDK v3).
+     계약: `TW_PORTAL.env` 는 'crazygames' | 'none' 둘뿐이다. env!=='crazygames' 인
+     동안(=포털 밖: Pages·itch·TWA·로컬) 아래 공개 메서드는 전부 즉시-콜백 no-op —
+     호출 지점(game.js 쪽)은 이 모듈이 준비됐는지 스스로 묻지 않는다. 이 스크립트는
+     game.js(부팅 스크립트) **앞**에 있어야 한다(§Code Organization). -->
+<script>
+(function () {
+  'use strict';
+  var env = 'none';            /* 'crazygames' | 'none' — 확정 전엔 'none'과 동일 동작 */
+  var ready = false;            /* CG.init() 이 resolve 되고 environment==='crazygames' 확인됨 */
+  var CG = null;                /* window.CrazyGames.SDK 캐시 */
+  var loginState = null;        /* null=미확인 · false=미로그인 · user 객체=로그인 */
+  /* loadingStartSent/loadingStopSent = SDK 에 실제로 보낸 적 있는가(멱등 가드).
+     loadingStopReq = game.js 가 loadingStop() 을 요청했는가(SDK 준비 전에 올 수
+     있어 markReady 가 나중에 대신 보낸다). */
+  var loadingStartSent = false, loadingStopReq = false, loadingStopSent = false;
+  var midgameCount = 0, lastMidgameAt = 0;
+  var MIDGAME_COOLDOWN_MS = 3 * 60 * 1000;   /* 문서: "usual midgame ad request interval is 3 minutes" */
+  var adBusy = false;
+  var acctWaiters = [];          /* syncAccountUI 콜백 — 로그인 확인 전에 불리면 여기 쌓인다 */
+
+  function safe(fn) {
+    try { fn(); } catch (e) { try { console.error('[TW_PORTAL]', e); } catch (e2) {} }
+  }
+
+  /* ---- 광고 중 음소거/복구 · 입력 잠금 ------------------------------------
+     문서(§4): "mute the audio and pause the game when the ad starts...
+     unmute the audio and continue the game when the ad finishes/fails".
+     Juice(전역 window.Juice, tentwin.html 본문의 오디오/FX 모듈)의 soundOn()
+     으로 **광고 전 실제 상태**를 읽어 그 값 그대로 되돌린다 — 사용자가 이미
+     음소거해 뒀으면 광고 뒤에도 무음이 유지된다(무조건 true 로 켜면 그 설정을
+     어긴다). 입력 잠금은 투명 전체화면 오버레이 하나(새 CSS 0줄 — 인라인
+     style 만) — 실제 CrazyGames 광고는 자체 전면 오버레이라 대개 안 보이지만,
+     local 시뮬레이션·요청~재생 사이 틈을 막아 둔다. */
+  function twMute() {
+    try {
+      if (window.Juice && typeof window.Juice.soundOn === 'function') {
+        var was = window.Juice.soundOn();
+        window.Juice.setSound(false);
+        return was;
+      }
+    } catch (e) {}
+    return null;
+  }
+  function twUnmute(was) {
+    try {
+      if (was !== null && window.Juice && typeof window.Juice.setSound === 'function') window.Juice.setSound(was);
+    } catch (e) {}
+  }
+  function twLockInput() {
+    try {
+      var el = document.createElement('div');
+      el.setAttribute('aria-hidden', 'true');
+      el.style.position = 'fixed';
+      el.style.inset = '0';
+      el.style.zIndex = '2147483647';
+      el.style.background = 'transparent';
+      (document.body || document.documentElement).appendChild(el);
+      return el;
+    } catch (e) { return null; }
+  }
+  function twUnlockInput(el) {
+    try { if (el && el.parentNode) el.parentNode.removeChild(el); } catch (e) {}
+  }
+  function flushAcctWaiters() {
+    var q = acctWaiters; acctWaiters = [];
+    for (var i = 0; i < q.length; i++) safe(function (f) { return function () { f(loginState); }; }(q[i]));
+  }
+  function fetchUser() {
+    if (!ready) { loginState = false; flushAcctWaiters(); return; }
+    var p;
+    try { p = CG.user.getUser(); } catch (e) { loginState = false; flushAcctWaiters(); return; }
+    Promise.resolve(p).then(function (u) { loginState = u || false; flushAcctWaiters(); })
+                       .catch(function () { loginState = false; flushAcctWaiters(); });
+  }
+  function onAuthChange(u) { loginState = u || false; flushAcctWaiters(); }
+
+  function markReady(sdk) {
+    CG = sdk;
+    try { env = (CG.environment === 'crazygames') ? 'crazygames' : 'none'; }
+    catch (e) { env = 'none'; }
+    ready = (env === 'crazygames');
+    if (!ready) { loginState = false; flushAcctWaiters(); return; }
+    safe(function () {
+      if (!loadingStartSent) { loadingStartSent = true; CG.game.loadingStart(); }
+      if (loadingStopReq && !loadingStopSent) { loadingStopSent = true; CG.game.loadingStop(); }
+    });
+    safe(fetchUser);
+    safe(function () { if (CG.user && CG.user.addAuthListener) CG.user.addAuthListener(onAuthChange); });
+  }
+
+  function tryInit(sdk) {
+    if (!sdk || typeof sdk.init !== 'function') { env = 'none'; ready = false; return; }
+    var p;
+    try { p = sdk.init(); } catch (e) { env = 'none'; ready = false; return; }
+    Promise.resolve(p).then(function () { markReady(sdk); })
+                       .catch(function () { env = 'none'; ready = false; });
+  }
+
+  /* ---- SDK 스크립트 조건부 주입 --------------------------------------------
+     이미 window.CrazyGames 가 있으면(스모크 하네스가 가짜 SDK 를 주입한 경우
+     포함) 그것부터 쓴다 — self/top 판정보다 **우선**해야 테스트가 가능하다.
+     그렇지 않고 self===top(iframe 밖: GitHub Pages 직접 방문·TWA)이면 포털일 수
+     없으므로(포털은 항상 iframe) 네트워크 요청 자체를 하지 않는다. iframe 안
+     (itch 도 포함)에서만 실제로 시도하고, async 라 파싱을 막지 않으며 실패해도
+     (itch 등) onerror 가 즉시 env='none' 으로 정리한다. */
+  try {
+    if (window.CrazyGames && window.CrazyGames.SDK) {
+      tryInit(window.CrazyGames.SDK);
+    } else if (window.self === window.top) {
+      env = 'none';
+    } else {
+      var _s = document.createElement('script');
+      _s.src = 'https://sdk.crazygames.com/crazygames-sdk-v3.js';
+      _s.async = true;
+      _s.onload = function () { safe(function () { tryInit(window.CrazyGames && window.CrazyGames.SDK); }); };
+      _s.onerror = function () { env = 'none'; ready = false; };
+      document.head.appendChild(_s);
+    }
+  } catch (e) { env = 'none'; ready = false; }
+
+  window.TW_PORTAL = {
+    get env() { return env; },
+
+    /* ---- 로딩 (부팅 시작 → 왕국 착지) -------------------------------------- */
+    loadingStart: function () {
+      if (ready && !loadingStartSent) { loadingStartSent = true; safe(function () { CG.game.loadingStart(); }); }
+      /* ready 가 아직 아니면 아무 것도 안 한다 — markReady() 가 SDK 준비되는
+         대로 loadingStart 를 (loadingStop 보다 먼저) 대신 보낸다. */
+    },
+    loadingStop: function () {
+      loadingStopReq = true;
+      if (ready && !loadingStopSent) { loadingStopSent = true; safe(function () { CG.game.loadingStop(); }); }
+    },
+
+    /* ---- 플레이 구간 ---------------------------------------------------- */
+    gameplayStart: function () { if (ready) safe(function () { CG.game.gameplayStart(); }); },
+    gameplayStop:  function () { if (ready) safe(function () { CG.game.gameplayStop(); }); },
+
+    /* ---- happytime — "Use this feature sparingly"(문서) ------------------- */
+    happytime: function () { if (ready) safe(function () { CG.game.happytime(); }); },
+
+    /* ---- midgame 광고 — 결과 창을 열기 **직전**에 호출. 첫 판 제외(세션당
+       1회 스킵) · 최소 간격 3분. done 은 성공/실패/취소/스킵 어느 경로든
+       정확히 한 번 불린다 — 호출부는 done() 안에서 이어서 결과 창을 연다. */
+    requestMidgameAd: function (done) {
+      done = done || function () {};
+      if (ready) safe(function () { CG.game.gameplayStop(); });   // "판이 끝났다"는 광고 여부와 무관한 사실
+      if (!ready || adBusy) { done(); return; }
+      midgameCount++;
+      if (midgameCount <= 1) { done(); return; }                  // 첫 판 제외
+      var now = Date.now();
+      if (now - lastMidgameAt < MIDGAME_COOLDOWN_MS) { done(); return; }
+      lastMidgameAt = now;
+      adBusy = true;
+      var finished = false, wasSound = null, lockEl = null;
+      function finish() {
+        if (finished) return; finished = true; adBusy = false;
+        twUnlockInput(lockEl); twUnmute(wasSound);
+        done();
+      }
+      try {
+        CG.ad.requestAd('midgame', {
+          adStarted: function () { wasSound = twMute(); lockEl = twLockInput(); },
+          adFinished: finish,
+          adError: finish
+        });
+      } catch (e) { try { console.error('[TW_PORTAL]', e); } catch (e2) {} finish(); }
+    },
+
+    /* ---- rewarded 광고 — 하트 +1 · 이어하기 공용. onResult(true|false) 는
+       성공/실패/취소 어느 경로든 정확히 한 번 불린다. 보상은 true 일 때만. */
+    requestRewardedAd: function (kind, onResult) {
+      onResult = onResult || function () {};
+      if (!ready || adBusy) { onResult(false); return; }
+      adBusy = true;
+      var finished = false, wasSound = null, lockEl = null;
+      function done(ok) {
+        if (finished) return; finished = true; adBusy = false;
+        twUnlockInput(lockEl); twUnmute(wasSound);
+        onResult(!!ok);
+      }
+      try {
+        CG.ad.requestAd('rewarded', {
+          adStarted: function () { wasSound = twMute(); lockEl = twLockInput(); },
+          adFinished: function () { done(true); },
+          adError: function () { done(false); }
+        });
+      } catch (e) { try { console.error('[TW_PORTAL]', e); } catch (e2) {} done(false); }
+    },
+
+    /* ---- 저장 미러 — 로그인 유저만(브리프 정책). raw 는 JSON.stringify(store) —
+       바이트 수를 로그하고 1MB(1048576B) 초과 시 보내지 않는다(문서 §Data). */
+    mirrorSave: function (raw) {
+      if (!ready || !loginState || typeof raw !== 'string') return;
+      safe(function () {
+        var bytes;
+        try { bytes = new TextEncoder().encode(raw).length; } catch (e) { bytes = raw.length; }
+        try { console.log('[TW_PORTAL] mirrorSave bytes=' + bytes); } catch (e2) {}
+        if (bytes > 1048576) { try { console.warn('[TW_PORTAL] save exceeds 1MB — skip mirror'); } catch (e3) {} return; }
+        CG.data.setItem('tentwin.v1', raw);
+      });
+    },
+    /* cb(rawStringOrNull) — 로그인 미확인이면 확인될 때까지 기다렸다 부른다. */
+    loadCloudSave: function (cb) {
+      cb = cb || function () {};
+      if (!ready) { cb(null); return; }
+      if (loginState === null) { acctWaiters.push(function () { window.TW_PORTAL.loadCloudSave(cb); }); return; }
+      if (!loginState) { cb(null); return; }
+      var p;
+      try { p = CG.data.getItem('tentwin.v1'); } catch (e) { cb(null); return; }
+      Promise.resolve(p).then(function (v) { cb(v || null); }).catch(function () { cb(null); });
+    },
+
+    /* ---- 계정 UI — apply(null)=포털 아님(숨김) · apply(false)=미로그인 ·
+       apply(user)=로그인({username,...}). 로그인 확인 전이면 확인될 때까지 대기. */
+    syncAccountUI: function (apply) {
+      apply = apply || function () {};
+      if (env !== 'crazygames') { apply(null); return; }
+      if (loginState === null) { acctWaiters.push(apply); return; }
+      apply(loginState);
+    },
+    /* cb(userOrFalse) — showAuthPrompt() 성공 시 user, 취소/실패 시 false. */
+    requestLogin: function (cb) {
+      cb = cb || function () {};
+      if (!ready) { cb(false); return; }
+      safe(function () {
+        Promise.resolve(CG.user.showAuthPrompt()).then(function (u) {
+          loginState = u || false; flushAcctWaiters(); cb(loginState);
+        }).catch(function () { cb(false); });
+      });
+    }
+  };
+})();
+</script>
+<!-- ==TW-PORTAL:END== -->
 <style>
 /* ==DISPLAY-FONT:BEGIN== generated by tools/subset-display-font.js — do not edit by hand */
 /*
@@ -16395,6 +16632,14 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
   <div id="modal-settings" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="set-h"><div class="sheet jbox jbox--modal" data-part="modal-plate">
     <h2 id="set-h" data-i18n="settings.title">Settings</h2>
     <button class="r10-x x-btn" type="button" data-w6x="st-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
+    <!-- Task 12 — 계정 줄. 포털 밖(TW_PORTAL.env!=='crazygames')이면 이 div 는
+         hidden 그대로다(픽셀 0). 이름 표시는 기존 젤리 캡슐 인스턴스(kit-pill-v2)
+         재사용 — 새 재질 0. -->
+    <div id="portal-acct" class="set-row" hidden>
+      <span class="set-k" data-i18n="portal.account">Account</span>
+      <b id="portal-acct-name" class="set-tg kit-pill-v2" data-variant="soft" hidden></b>
+      <button id="portal-acct-login" class="set-tg" type="button" data-i18n="portal.login" hidden>Log in</button>
+    </div>
     <div class="set-list">
       <div class="set-row"><span class="set-k" data-i18n="settings.sound">Sound</span><button id="st-sound" class="set-tg" type="button" data-i18n-aria="aria.sound" aria-label="Sound" aria-pressed="true">On</button></div>
       <div class="set-row"><span class="set-k" data-i18n="settings.vibe">Vibration</span><button id="st-vibe" class="set-tg" type="button" data-i18n-aria="aria.vibe" aria-label="Vibration" aria-pressed="true">On</button></div>
@@ -22193,6 +22438,10 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
   var API = {
     init: init,
     setSound: setSound,
+    /* Task 12 — 현재 음소거 여부 조회(설정은 못 건드리는 순수 getter). CrazyGames
+       광고 브래킷(TW_PORTAL)이 광고 중 무음 처리 뒤 "원래 값"으로 되돌리는 데
+       쓴다 — store.sound 를 직접 건드리지 않고 되돌리려면 이 값이 필요했다. */
+    soundOn: function () { return soundOn; },
     setVibrate: setVibrate,
     resumeAudio: resumeAudio,
     /* 14차 #38 — 제스처 태스크 안에서 부를 것. 이름/시그니처 고정. */
@@ -25219,9 +25468,11 @@ window.TT_SFX = {
     }
     return o;
   }
-  function readStore() {
+  function readStore(rawIn) {
     try {
-      var raw = window.localStorage.getItem(LS_KEY);
+      /* Task 12 — rawIn 은 TW_PORTAL 클라우드 병합 전용 인자다(기본 호출은
+         인자 없이 그대로 호출되어 이전과 동일하게 localStorage 를 읽는다). */
+      var raw = rawIn || window.localStorage.getItem(LS_KEY);
       if (!raw) return;
       var o;
       try { o = JSON.parse(raw); }
@@ -25780,8 +26031,9 @@ window.TT_SFX = {
   function persist() {
     if (persistReadOnly) return;   // 미래 버전 저장 보호 (migrateStore)
     store.schemaVersion = SCHEMA_VERSION;
+    var raw = JSON.stringify(store);
     try {
-      window.localStorage.setItem(LS_KEY, JSON.stringify(store));
+      window.localStorage.setItem(LS_KEY, raw);
     } catch (e) {
       /* quota or private mode: 게임은 계속 돈다 — 알리기만 한다(세션당 1회) */
       if (!saveFailWarned) {
@@ -25789,6 +26041,7 @@ window.TT_SFX = {
         try { toast(t('toast.savefail')); } catch (e2) { /* 알림 때문에 저장 경로가 죽지 않는다 */ }
       }
     }
+    TW_PORTAL.mirrorSave(raw);   /* Task 12 — 로그인 유저만 내부에서 실제 전송(no-op 기본) */
   }
 
   function saveProgress() {
@@ -27537,7 +27790,15 @@ window.TT_SFX = {
       'soon.body': 'Under construction — check back after the next update!',
       'kd.visit': 'Yesterday-you saved up {n} Jelly Stars.',
       'kd.visit.first': 'Welcome to Jellypang Kingdom!',
-      'kd.res.aria': 'Say hello'
+      'kd.res.aria': 'Say hello',
+
+      /* Task 12 — CrazyGames 포털 어댑터. 전부 TW_PORTAL.env==='crazygames' 일
+         때만 쓰인다(요소가 그 전엔 hidden). 실명 근거:
+         scratchpad/release-0925/audit/CRAZYGAMES-SDK-REF.md */
+      'portal.login': 'Log in with CrazyGames',
+      'portal.account': 'Account',
+      'portal.watchad.heart': 'Watch an ad for +1 heart',
+      'portal.watchad.continue': 'Watch an ad to continue'
     },
 
     ko: {
@@ -28809,7 +29070,13 @@ window.TT_SFX = {
       'soon.body': '공사 중이에요! 다음 업데이트를 기다려 주세요.',
       'kd.visit': '어제의 내가 젤리별 {n}개를 모아 뒀어요.',
       'kd.visit.first': '젤리팡 왕국에 온 걸 환영해요!',
-      'kd.res.aria': '인사하기'
+      'kd.res.aria': '인사하기',
+
+      /* Task 12 — CrazyGames 포털 어댑터(en 쪽 주석 참조) */
+      'portal.login': 'CrazyGames 계정으로 로그인',
+      'portal.account': '계정',
+      'portal.watchad.heart': '광고 보고 하트 +1',
+      'portal.watchad.continue': '광고 보고 이어하기'
     }
   };
 
@@ -31581,6 +31848,7 @@ window.TT_SFX = {
     if (!el) return;
     el.hidden = false;
     syncToggleLabels();
+    TW_PORTAL.syncAccountUI(twApplyAccountUI);   /* Task 12 — 계정 줄 표시/숨김 */
     /* 판정판 50 — 퀘스트 배지는 «설정을 여는 그 순간»에 맞춘다. 화면 밖에서
        매번 굴리지 않는 이유는 questClaimable() 이 저장을 읽고 굴리기 때문이다. */
     try { questBadges(); } catch (eq) { /* 부팅 전 */ }
@@ -31590,6 +31858,22 @@ window.TT_SFX = {
     var el = $('modal-settings');
     if (el) el.hidden = true;
     J.sfx.ui();
+  }
+
+  /* Task 12 — apply(null)=포털 아님(행 숨김) · apply(false)=미로그인(로그인
+   * 버튼) · apply(user)=로그인(이름 캡슐). TW_PORTAL.syncAccountUI 의 콜백. */
+  function twApplyAccountUI(loginStateOrNull) {
+    var row = $('portal-acct'); if (!row) return;
+    if (loginStateOrNull === null) { row.hidden = true; return; }
+    row.hidden = false;
+    var nameEl = $('portal-acct-name'), loginBtn = $('portal-acct-login');
+    if (loginStateOrNull) {
+      if (nameEl) { nameEl.hidden = false; nameEl.textContent = loginStateOrNull.username || t('portal.account'); }
+      if (loginBtn) loginBtn.hidden = true;
+    } else {
+      if (nameEl) nameEl.hidden = true;
+      if (loginBtn) loginBtn.hidden = false;
+    }
   }
 
   /* =========================================================================
@@ -35229,6 +35513,7 @@ window.TT_SFX = {
   }
 
   function startStage(stage, seed) {
+    TW_PORTAL.gameplayStart();   /* Task 12 — 판 시작(또는 재개) 신호 */
     clearTimers();
     stopComboLoop();
     endFever(true);
@@ -38525,25 +38810,33 @@ window.TT_SFX = {
 
     // [AD PLACEHOLDER — interstitial] shown once every 3 stages. Replace the
     // slot reveal below with the portal's interstitial SDK call before submit.
+    // Task 12 — 이 슬롯 문법(모달 안 배너)은 쓰지 않는다: 실제 정책은 모달을
+    // **열기 직전** SDK 전면 광고 요청이라(아래 requestMidgameAd), 이 토글은
+    // 그대로 둬도 무해하다(.ad-slot 은 .ad-live 없이는 항상 display:none).
     var inter = document.querySelector('.ad-slot[data-ad-slot="interstitial"]');
     if (inter) inter.hidden = !(S.stage % 3 === 0);
 
-    openModal('modal-clear');
-    /* W-C §10 — 루트 리빌. 엔들리스에는 아직 마크 과일이 없어(수확은 전투 판의
-       것이다) 이 자리는 대개 조용하지만, 배선을 여기 두는 것이 §10.3 의 "점진
-       확장" 그대로다: §11 파편이 붙는 순간 이 창이 **한 줄도 안 고치고** 같은
-       연출을 얻는다. 획득이 0 인 판에서는 rewardReveal 이 스스로 생략한다. */
-    rewardReveal('clear-reward', rewardItems({ gem: S.gainJstar }), { sheetId: 'modal-clear' });
+    /* Task 12 — midgame 광고는 결과 창을 열기 **직전**. TW_PORTAL 이 내부에서
+       gameplayStop·첫 판 제외·3분 쿨다운·no-op(포털 밖)을 전부 처리하므로 이
+       호출부는 done 콜백 하나만 안다 — 실패/취소/스킵 전부 done() 이 불린다. */
+    TW_PORTAL.requestMidgameAd(function () {
+      openModal('modal-clear');
+      /* W-C §10 — 루트 리빌. 엔들리스에는 아직 마크 과일이 없어(수확은 전투 판의
+         것이다) 이 자리는 대개 조용하지만, 배선을 여기 두는 것이 §10.3 의 "점진
+         확장" 그대로다: §11 파편이 붙는 순간 이 창이 **한 줄도 안 고치고** 같은
+         연출을 얻는다. 획득이 0 인 판에서는 rewardReveal 이 스스로 생략한다. */
+      rewardReveal('clear-reward', rewardItems({ gem: S.gainJstar }), { sheetId: 'modal-clear' });
 
-    /* Time Rush exists but nothing has ever pointed at it. The first stage clear is
-     * the moment the player has proved they understand the board, which is when a
-     * second mode stops being noise — and it fires exactly once, ever. The delay
-     * lets the clear modal's own celebration land first. */
-    if (!store.rushHintShown && S.mode === 'endless') {
-      store.rushHintShown = true;
-      persist();
-      later(function () { toast(t('toast.rushopen')); }, 900);
-    }
+      /* Time Rush exists but nothing has ever pointed at it. The first stage clear is
+       * the moment the player has proved they understand the board, which is when a
+       * second mode stops being noise — and it fires exactly once, ever. The delay
+       * lets the clear modal's own celebration land first. */
+      if (!store.rushHintShown && S.mode === 'endless') {
+        store.rushHintShown = true;
+        persist();
+        later(function () { toast(t('toast.rushopen')); }, 900);
+      }
+    });
   }
 
   function nextStage() {
@@ -38743,14 +39036,19 @@ window.TT_SFX = {
        거짓이라 문구·비활성이 착수 전과 한 글자도 다르지 않다. */
     paintContinueBtn();
     later(function () {
-      openModal('modal-over');
-      // Fired with the sheet, not before it: the float text is drawn on #fx
-      // above the modal, and landing it on an empty board reads as a glitch.
-      celebrateRank(newRank);
-      /* W-C §10 — 진 판에도 리빌이 붙는다. 수확은 판 중에 확정되므로 "졌지만
-         얻은 것"은 실재하고, 그걸 안 보여 주면 게임오버가 손해로만 읽힌다.
-         **획득이 있을 때만** 열리는 것은 rewardReveal 이 보장한다. */
-      rewardReveal('over-reward', rewardItems({ gem: S.gainJstar }), { sheetId: 'modal-over' });
+      /* Task 12 — midgame 광고는 결과 창을 열기 **직전**(onStageClear 와 같은
+         계약). 520ms 지연은 기존 그대로(플로트 텍스트 타이밍), 그 뒤 광고
+         요청 → done() 에서 모달을 연다. */
+      TW_PORTAL.requestMidgameAd(function () {
+        openModal('modal-over');
+        // Fired with the sheet, not before it: the float text is drawn on #fx
+        // above the modal, and landing it on an empty board reads as a glitch.
+        celebrateRank(newRank);
+        /* W-C §10 — 진 판에도 리빌이 붙는다. 수확은 판 중에 확정되므로 "졌지만
+           얻은 것"은 실재하고, 그걸 안 보여 주면 게임오버가 손해로만 읽힌다.
+           **획득이 있을 때만** 열리는 것은 rewardReveal 이 보장한다. */
+        rewardReveal('over-reward', rewardItems({ gem: S.gainJstar }), { sheetId: 'modal-over' });
+      });
     }, 520);
   }
 
@@ -38786,11 +39084,14 @@ window.TT_SFX = {
     if (rush) return;
     var used = !!S.continueUsed;
     var gem  = used && appGemContinue();
-    cont.disabled = used && !gem;
+    /* Task 12 — 포털 rewarded 경로. gem(TWA 전용)과는 플랫폼이 갈려 겹치지
+     * 않는다 — CrazyGames 는 웹이라 appGemContinue() 가 항상 false. */
+    var ad   = used && !gem && TW_PORTAL.env === 'crazygames';
+    cont.disabled = used && !gem && !ad;
     if (gem) cont.setAttribute('data-app-only', 'gem-continue');
     else cont.removeAttribute('data-app-only');
-    var key  = !used ? 'over.continue' : (gem ? 'over.continue.gem' : 'over.continue.used');
-    var akey = (used && !gem) ? 'aria.continue.used' : 'aria.continue';
+    var key  = !used ? 'over.continue' : (gem ? 'over.continue.gem' : (ad ? 'portal.watchad.continue' : 'over.continue.used'));
+    var akey = (used && !gem && !ad) ? 'aria.continue.used' : 'aria.continue';
     cont.setAttribute('data-i18n', key);
     cont.setAttribute('data-i18n-aria', akey);
     headText(cont, t(key));
@@ -38799,6 +39100,20 @@ window.TT_SFX = {
 
   function doContinue() {
     if (S.continueUsed) {
+      /* Task 12 — 포털이면 유료(TWA 전용) 대신 rewarded 광고를 제안한다.
+       * appGemContinue() 가 참인 동안(TWA)은 기존 결제 경로가 그대로 우선한다
+       * — 웹(CrazyGames 포함)에서는 언제나 거짓이라 겹치지 않는다. 보상은
+       * done(true) 콜백 안에서만 지급된다(실패·취소는 여기서 아무 일도 없다,
+       * 즉 게임이 멈추지 않는다). */
+      if (TW_PORTAL.env === 'crazygames' && !appGemContinue()) {
+        TW_PORTAL.requestRewardedAd('continue', function (ok) {
+          if (ok) { twGrantContinue(); return; }
+          toast(t('toast.usedstage'));
+          J.sfx.fail();
+          paintContinueBtn();
+        });
+        return;
+      }
       /* 웹에서 2회차는 버튼이 이미 비활성이라 여기 닿지 않는다 — 키보드·자동화
          경로가 직접 부를 때를 위한 백스톱이다. 어느 경로로 들어와도 두 번째를
          **공짜로 주지 않는다**는 것이 이 항목의 전부다.
@@ -38812,8 +39127,13 @@ window.TT_SFX = {
       }
       toast(t('shop.continue.paid', { n: JEWEL_COST.continue2 }));
     }
-    // [AD PLACEHOLDER — rewarded] the real build awaits the portal rewarded-ad
-    // callback here; only grant the reward once the ad reports completion.
+    twGrantContinue();
+  }
+
+  /** Task 12 — 이어하기 실제 지급. 원래 doContinue() 의 끝자락이던 것을 이름
+   * 붙은 함수로 뺐다(로직 변경 없음) — 무료 1회·보석·rewarded 광고 성공 셋이
+   * 전부 이 하나로 들어온다("이어하기" 는 언제나 같은 한 가지 일이다). */
+  function twGrantContinue() {
     S.continueUsed = true;
     S.adds += 2;
     S.running = true;
@@ -40043,6 +40363,7 @@ window.TT_SFX = {
 
   function pause() {
     if (!S.running || S.paused) return;
+    TW_PORTAL.gameplayStop();   /* Task 12 — 일시정지 = 플레이 break */
     S.paused = true;
     S.pausedAt = now();
     stopComboLoop();
@@ -40153,6 +40474,7 @@ window.TT_SFX = {
     var held = S.pausedAt ? Math.max(0, now() - S.pausedAt) : 0;
     S.pausedAt = 0;
     S.paused = false;
+    TW_PORTAL.gameplayStart();   /* Task 12 — 재개 = 플레이 재시작 신호 */
     closeModal('modal-pause');
     S.howtoFromPause = false;
     J.sfx.ui();
@@ -41899,6 +42221,7 @@ window.TT_SFX = {
 
   /** 격파 대연출. 전면 효과가 허용되는 두 자리 중 하나다(컷인·격파 마일스톤). */
   function bossDefeatFx() {
+    TW_PORTAL.happytime();   /* Task 12 — 보스 격파(문서 예시 그대로) */
     var el = $('boss-bar');
     if (el && el.classList) el.classList.add('down');
     /* 단계 4: 전투에서는 같은 격파 연출이 #duel-hud 의 악당 진영에서 일어난다
@@ -44784,6 +45107,7 @@ window.TT_SFX = {
          한다. 위 식은 여기서만 계산되고 stars 로 접혀 사라졌다 — 한 칸에 남긴다. */
       S.starEase = !!ease;
       stars = advStarsFor(p, S.score, S.advShuf, ease, S.tenCount | 0);
+      if (stars === 3) TW_PORTAL.happytime();   /* Task 12 — 별 3(문서 "reaching a highscore" 급 성취) */
       /* 9차 §9 — 젤리별 적립. **새로 딴 별의 개수만큼**이다: 같은 탄을 다시 깨도
          별이 늘지 않으면 지갑도 늘지 않는다(반복 파밍 차단). 지도의 별 합계는
          종전대로 성취 지표라 여기서 깎이지 않는다 — 둘은 다른 계좌다. */
@@ -46446,7 +46770,40 @@ window.TT_SFX = {
   }
 
   /** 홈으로 들어간다. 「탭하여 시작」·게임 종료·지도 뒤로가 전부 이 문을 지난다. */
+  /* Task 12 — 진행도 비교 함수 하나: advMax(최고 해금 탄) 우선, 같으면 advStars
+     합계(총 별 개수)로 tie-break. store 의 스테이지/별 축을 그대로 쓴다(새 필드 0). */
+  function twProgressScore(s) {
+    var stars = 0, k;
+    if (s && s.advStars) {
+      for (k in s.advStars) { if (Object.prototype.hasOwnProperty.call(s.advStars, k)) stars += (s.advStars[k] | 0); }
+    }
+    return { max: (s && (s.advMax | 0)) || 1, stars: stars };
+  }
+  function twIsBetter(a, b) { return (a.max !== b.max) ? (a.max > b.max) : (a.stars > b.stars); }
+
+  /** 부팅 병합 — 클라우드(SDK.data)가 로컬보다 앞서면 채택, 아니면 로컬을 미러.
+   *  readStore(raw) 를 재사용해 기존 필드 소독 파이프라인 그대로 병합한다. */
+  function twSyncCloudProgress() {
+    TW_PORTAL.loadCloudSave(function (raw) {
+      if (!raw) { persist(); return; }   // 클라우드 없음 — 로컬을 그대로 미러
+      var cloud;
+      try { cloud = JSON.parse(raw); } catch (e) { return; }
+      if (!cloud || typeof cloud !== 'object') return;
+      if (twIsBetter(twProgressScore(cloud), twProgressScore(store))) {
+        readStore(raw);
+        persist();
+        syncMenu(); syncHud(); kdSync(); paintHearts();
+        try { console.log('[TW_PORTAL] cloud save applied'); } catch (e2) {}
+      } else {
+        persist();   // 로컬이 앞서거나 같음 — mirrorSave 로 클라우드 갱신(persist 안에서)
+      }
+    });
+  }
+
   function enterKingdom() {
+    TW_PORTAL.loadingStop();     /* Task 12 — 왕국 착지 = 로딩 끝(멱등, 최초 1회만 실제 호출) */
+    TW_PORTAL.gameplayStop();    /* Task 12 — 메뉴로 들어옴 = 플레이 break */
+    twSyncCloudProgress();       /* Task 12 — 부팅 병합(비교 함수 위 twIsBetter) */
     buildKingdom();
     showScreen(homeScreen());
     kdPanClamp();
@@ -46598,6 +46955,33 @@ window.TT_SFX = {
       if (empty) wait.textContent = t('adv.heartwait', { t: fmtHeartWait(heartNextMs()) });
     }
     if (ad) ad.hidden = !empty;
+    if (ad && empty) twSyncAdHeartLabel(ad);   /* Task 12 — 포털이면 "광고 보고 하트 +1"로 교체 */
+  }
+
+  /* Task 12 — #node-ad 는 원래 "coming soon" 고정 문구(hidden 전환만 기존 것).
+   * 포털 밖이면 손대지 않는다(픽셀 0). 포털이면 data-i18n 자체를 갈아 끼운다 —
+   * paintContinueBtn 주석과 같은 이유(언어 토글이 되돌리지 못하게). */
+  function twSyncAdHeartLabel(el) {
+    if (TW_PORTAL.env !== 'crazygames') return;
+    el.setAttribute('data-i18n', 'portal.watchad.heart');
+    el.textContent = t('portal.watchad.heart');
+  }
+
+  /* Task 12 — 하트 0 rewarded 진입점 공용 핸들러: 결과 창은 없고(하트는 결과가
+   * 아니라 자원) 노드카드 #node-ad · 상단 하트 캡슐(#kd-top-hearts·#map-hearts)
+   * 셋이 전부 이 한 함수를 쓴다. 포털 밖·하트>0 이면 조용히 아무 일도 없다. */
+  function twWatchAdForHeart() {
+    if (TW_PORTAL.env !== 'crazygames') return;
+    heartsTick();
+    if (store.hearts > 0) return;
+    TW_PORTAL.requestRewardedAd('heart', function (ok) {
+      if (!ok) return;
+      grantHearts(1);
+      toast(t('shop.heart.ok'));
+      paintHearts();
+      paintNodeHearts();
+      kdSync();
+    });
   }
 
   function openNodeCard(n) {
@@ -48925,6 +49309,15 @@ window.TT_SFX = {
   }
 
   function wire() {
+    /* Task 12 — CrazyGames 어댑터 클릭 배선. 핸들러 내부가 포털 여부·하트 수량을
+     * 스스로 확인하므로 여기서는 무조건 붙인다(포털 밖에서는 탭해도 오늘과
+     * 똑같이 아무 일도 없다 — 전에도 무핸들러였다). */
+    on($('node-ad'), 'click', twWatchAdForHeart);
+    on($('kd-top-hearts'), 'click', twWatchAdForHeart);
+    on($('map-hearts'), 'click', twWatchAdForHeart);
+    on($('portal-acct-login'), 'click', function () {
+      TW_PORTAL.requestLogin(function (u) { twApplyAccountUI(u); });
+    });
     // --- menu ---
     /* v4 10차 §C — 메뉴는 네 버튼이고, 모드는 시트 안이다. 각 모드의 동작은
        9차와 **한 글자도 다르지 않다**: 부르는 자리만 한 겹 안으로 들어갔다. */
@@ -50479,6 +50872,7 @@ window.TT_SFX = {
   /* ==[INTRO-0910]:JS:END== */
 
   function init() {
+    TW_PORTAL.loadingStart();   /* Task 12 — 부팅 시작 신호. 포털 밖이면 no-op */
     /* ==[INTRO-0910]== 부팅 청크 8 — **아래 배열의 순서는 착수 전 init() 본문
        그대로**다(한 줄도 자리를 바꾸지 않았다). 웹에서는 이 배열을 그 자리에서
        차례로 돌린다 = 한 덩이 = 착수 전과 동일한 실행이다(§19.9-4: 1차는 앱에서만
@@ -50710,6 +51104,9 @@ window.TT_SFX = {
     reconcileRanks: reconcileRanks, submitRank: submitRank,
     celebrateRank: celebrateRank, openRankModal: openRank, setRankTab: setRankTab,
     onGameOver: onGameOver, onStageClear: onStageClear, finishDaily: finishDaily,
+    /* Task 12 스모크 전용 핸들 — 게임 코드는 이 중 무엇도 window.Game 을 거쳐
+       부르지 않는다(위 battleRefill 주석과 같은 계약). */
+    startStage: startStage,
     /* 리텐션 래퍼(0910) — DEBUG HANDLE ONLY, 위 규약 그대로다. 마일스톤은
        누적 매치 100 회를 실제로 채워야 닿는 자리라, 지급·중복방지를 관문이
        판정하려면 이 문 하나가 필요하다(게임 코드는 이것을 거쳐 부르지 않는다). */
