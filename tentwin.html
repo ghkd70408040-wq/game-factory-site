@@ -45322,8 +45322,13 @@ window.TT_SFX = {
       var prevStars = store.advStars[key] | 0;
       /* Task 12 rev1(I-9) — "처음" 3★ 만(문서 "Use this feature sparingly").
          prevStars 를 먼저 구해야 재클리어와 구분된다 — 원래 순서(별 계산 직후)
-         는 매번 3★ 로 다시 깰 때마다 발화했다. */
-      if (stars === 3 && prevStars < 3) TW_PORTAL.happytime();
+         는 매번 3★ 로 다시 깰 때마다 발화했다.
+         재리뷰 1회차(Important) — 보스 판은 아래 p.boss 쪽에서 1회 이미
+         쏜다. 그 판이 "처음 3★"이기까지 하면 조건 둘 다 참이 돼 같은
+         틱에 두 번 발화했다 — !p.boss 로 갈라 보스 판의 몫은 그쪽 1곳에만
+         맡긴다(보스 판은 별 수와 무관하게 격파 자체로 1회, 일반 판은
+         처음 3★ 로 1회 — 서로 안 겹친다). */
+      if (stars === 3 && prevStars < 3 && !p.boss) TW_PORTAL.happytime();
       if (stars > prevStars) {
         store.advStars[key] = stars;
         store.jstar = (store.jstar | 0) + (stars - prevStars);
