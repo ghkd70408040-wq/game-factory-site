@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>TenTwin</title>
-<meta name="description" content="TenTwin — match tiles that are equal or sum to 10.">
+<title>Ten Twin</title>
+<meta name="description" content="Ten Twin — match tiles that are equal or sum to 10.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='rgb(22,19,31)'/%3E%3Crect x='7' y='13' width='25' height='25' rx='6' fill='rgb(102,217,240)'/%3E%3Crect x='32' y='26' width='25' height='25' rx='6' fill='rgb(240,125,102)'/%3E%3C/svg%3E">
 <link rel="manifest" href="tentwin.webmanifest">
 <style>
@@ -11,11 +11,16 @@ html,body{margin:0;height:100%;background:#191426;overflow:hidden}
 #col{position:fixed;top:0;bottom:0;left:0;right:0;margin:0 auto;width:clamp(360px,56.25vh,480px);max-width:100vw;z-index:1;background:#000;box-shadow:0 0 0 1px rgba(255,255,255,.08),0 30px 80px rgba(0,0,0,.55)}
 #game{display:block;width:100%;height:100%;border:0}
 </style></head>
-<body><div id="bg"></div><div id="col"><iframe id="game" title="TenTwin" allow="autoplay; fullscreen; clipboard-write; web-share"></iframe></div>
+<body><div id="bg"></div><div id="col"><iframe id="game" title="Ten Twin" allow="autoplay; fullscreen; clipboard-write; web-share"></iframe></div>
 <script>
+/* final-fix I-1(재범위, 2026-09-26 지휘자 판정) — 교차 창 SDK 공유는 하지
+   않는다(부모/자식 어느 쪽도 상대 window 를 참조하지 않는다). 이 껍데기는
+   그저 안쪽 iframe 의 쿼리에 tw_shell=1 을 보태 "나는 세로 기둥 안에서
+   돈다"는 사실만 알린다 — 기존 search·hash 전달은 그대로 유지한다. */
 (function(){
   var f=document.getElementById('game');
-  f.src='tentwin.html'+location.search+location.hash;
+  var q = location.search ? (location.search+'&tw_shell=1') : '?tw_shell=1';
+  f.src='tentwin.html'+q+location.hash;
   f.addEventListener('load',function(){try{f.contentWindow.focus();}catch(e){}});
 })();
 </script></body></html>

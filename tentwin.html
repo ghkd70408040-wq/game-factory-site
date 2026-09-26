@@ -17,6 +17,11 @@
 /* 짧은 변 ≥600(데스크톱·태블릿, 세로·가로 무관, T6)은 껍데기 play.html(세로 기둥 iframe)로
    — 판정판 64. 프레임 안(itch·play)·?noshell=1·앱은 제외. */
 (function(){try{
+  /* final-fix I-2 — zip 산출물의 index.html(build-packages.py 가 tentwin.html
+     본문을 그대로 그 이름으로 넣는다, play.html 은 zip에서 빠진다)이 짧은 변
+     ≥600 창에서 열리면 존재하지 않는 play.html 로 리다이렉트돼 404 로 끝났다.
+     이 리다이렉트는 파일명이 정확히 tentwin.html 일 때만 돈다. */
+  if(!/\/tentwin\.html$/i.test(location.pathname))return;
   if(/\/play\.html$/i.test(location.pathname))return;
   if(window.self!==window.top)return;
   var q=location.search;
@@ -33,9 +38,9 @@
      toggle (html[data-theme]) only re-skins the page; the browser bar is cosmetic. -->
 <meta name="theme-color" content="#16131f" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#f6f1e8" media="(prefers-color-scheme: light)">
-<meta name="description" content="TenTwin — match tiles that are equal or sum to 10.">
+<meta name="description" content="Ten Twin — match tiles that are equal or sum to 10.">
 <meta name="color-scheme" content="dark light">
-<title>TenTwin</title>
+<title>Ten Twin</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='rgb(22,19,31)'/%3E%3Crect x='7' y='13' width='25' height='25' rx='6' fill='rgb(102,217,240)'/%3E%3Crect x='32' y='26' width='25' height='25' rx='6' fill='rgb(240,125,102)'/%3E%3C/svg%3E">
 <!-- ==PLATFORM-FLAG:BEGIN== DESIGN §17 W1 · 판정판 31 — 런타임 플랫폼 플래그 (web / twa)
      ────────────────────────────────────────────────────────────────────────────
@@ -205,12 +210,18 @@ html[data-platform="web"] [data-app-only]{display:none !important}
   var playing = false;
   var midgameCount = 0, lastMidgameAt = 0;
   var MIDGAME_COOLDOWN_MS = 3 * 60 * 1000;   /* 문서: "usual midgame ad request interval is 3 minutes" */
-  var AD_START_TIMEOUT_MS = 10 * 1000;   /* I-8 — adStarted 가 이 안에 안 오면 포기 */
+  var AD_START_TIMEOUT_MS = 40 * 1000;   /* final-fix I-3(was I-8) — 10s 는 너무 짧아 늦게
+     시작한 광고와 겹쳤다(포기 판정 뒤 도착 = 결과 창 위에 소리 겹침·보상 없이
+     끝까지 재생). unfilled/adblock/cooldown 은 SDK 가 adError 로 즉시 알려
+     주므로 이 타이머는 "SDK 가 아무 말도 없는" 드문 경우만 막으면 된다. */
   var AD_MAX_MS = 120 * 1000;            /* I-8 — adStarted 뒤 이 안에 안 끝나면 강제 종료 */
   var adBusy = false;
   var adsBlocked = false;   /* I-11 — adsDisabledBasicLaunch/adblock 이면 세션 동안 참 */
   var acctWaiters = [];          /* syncAccountUI 콜백 — 로그인 확인 전에 불리면 여기 쌓인다 */
   var acctApply = null;          /* m-1 — 마지막으로 등록된 계정 UI 갱신 콜백(구독) */
+  var acctAvailable = true;      /* final-fix M-3 — CG.user.isUserAccountAvailable===false
+     (또는 user 모듈 자체가 없음) 이면 거짓. 거짓인 동안 계정 줄은 apply(null)
+     (=숨김)로만 갱신된다 — "로그인" 죽은 버튼을 남기지 않는다. */
 
   function safe(fn) {
     try { fn(); } catch (e) { try { console.error('[TW_PORTAL]', e); } catch (e2) {} }
@@ -293,18 +304,32 @@ html[data-platform="web"] [data-app-only]{display:none !important}
     if (!ready || adBusy || !ADS_ENABLED) { onDone(false); return; }
     adBusy = true;
     var finished = false, wasSound = null, lockEl = null, startTimer = 0, capTimer = 0;
-    function finish(ok) {
-      if (finished) return; finished = true; adBusy = false;
+    /* final-fix I-3 — cleanup() 은 입력 잠금 해제·음소거 복구만 하고, onDone
+       호출과 분리했다. 시작 타임아웃이 먼저 돌아 finish(false) 가 이미 나간
+       뒤(finished=true)에도 adStarted 가 **늦게** 도착하면: 아래 adStarted
+       분기가 그대로 돌아 음소거+입력 잠금을 걸고(늦게 실제로 재생되는 광고가
+       결과 화면 위에서 소리·입력과 겹치지 않게), 그 광고의 진짜 종료(adFinished/
+       adError) 또는 AD_MAX_MS(120s) 캡에서 cleanup() 만 다시 돈다. onDone 은
+       one-shot 그대로다 — 늦은 종료는 onDone 을 다시 부르지 않는다(보상은
+       재지급하지 않는다, 결과 화면은 이미 되돌아간 상태 그대로 계속 쓸 수
+       있다). */
+    function cleanup() {
       if (startTimer) { clearTimeout(startTimer); startTimer = 0; }
       if (capTimer) { clearTimeout(capTimer); capTimer = 0; }
-      twUnlockInput(lockEl); twUnmute(wasSound);
+      if (lockEl) { twUnlockInput(lockEl); lockEl = null; }
+      if (wasSound !== null) { twUnmute(wasSound); wasSound = null; }
+    }
+    function finish(ok) {
+      adBusy = false;
+      cleanup();
+      if (finished) return; finished = true;
       onDone(!!ok);
     }
     startTimer = setTimeout(function () { finish(false); }, AD_START_TIMEOUT_MS);
     try {
       CG.ad.requestAd(type, {
         adStarted: function () {
-          if (finished || lockEl) return;   // I-8 — 늦거나 중복된 adStarted 무시
+          if (lockEl) return;   // 이미 처리 중(정상 또는 늦은 재도착 방어) — 중복만 무시
           if (startTimer) { clearTimeout(startTimer); startTimer = 0; }
           lastMidgameAt = Date.now();        // m-4
           wasSound = twMute(); lockEl = twLockInput();
@@ -318,14 +343,21 @@ html[data-platform="web"] [data-app-only]{display:none !important}
 
   function flushAcctWaiters() {
     var q = acctWaiters; acctWaiters = [];
-    for (var i = 0; i < q.length; i++) safe(function (f) { return function () { f(loginState); }; }(q[i]));
+    var v = acctAvailable ? loginState : null;   // final-fix M-3
+    for (var i = 0; i < q.length; i++) safe(function (f) { return function () { f(v); }; }(q[i]));
   }
   /* m-1 — 구독형 UI 리스너. acctApply 는 openSettings 가 syncAccountUI 를 부를
      때마다 "마지막으로 연 그 콜백"으로 갱신되고, 인증 상태가 나중에 바뀌면
      (사이트 헤더 로그인 등) 여기서 다시 불러 화면을 최신으로 맞춘다. */
-  function applyAcctNow() { if (acctApply) safe(function () { acctApply(loginState); }); }
+  function applyAcctNow() { if (acctApply) safe(function () { acctApply(acctAvailable ? loginState : null); }); }
   function fetchUser() {
     if (!ready) { loginState = false; flushAcctWaiters(); applyAcctNow(); return; }
+    /* final-fix M-3 — 계정 시스템이 없는 환경에서는 getUser()/showAuthPrompt() 가
+       있어도 의미가 없다. isUserAccountAvailable 은 속성(함수 아님, SDK 레퍼런스
+       §5 "whether the user account system is available"). */
+    if (!CG.user || CG.user.isUserAccountAvailable === false) {
+      acctAvailable = false; loginState = false; flushAcctWaiters(); applyAcctNow(); return;
+    }
     var p;
     try { p = CG.user.getUser(); } catch (e) { loginState = false; flushAcctWaiters(); applyAcctNow(); return; }
     Promise.resolve(p).then(
@@ -345,6 +377,13 @@ html[data-platform="web"] [data-app-only]{display:none !important}
       if (!loadingStartSent) { loadingStartSent = true; CG.game.loadingStart(); }
       if (loadingStopReq && !loadingStopSent) { loadingStopSent = true; CG.game.loadingStop(); }
     });
+    /* final-fix M-2 — SDK 준비 전에 이미 doGameplayStart() 가 불렸으면(playing
+       이 그 요청의 마지막 상태다) ready 검사에 막혀 CG.game.gameplayStart() 가
+       한 번도 안 나갔다. 여기서 그 마지막 상태를 존중해 뒤늦게 보낸다 — Stop 이
+       나중에 왔으면(playing===false) 아무 것도 보낼 필요가 없다(둘이 상쇄).
+       doGameplayStart/Stop 자체는 그대로 두어(한 곳만 고친다) 이후 호출은
+       ready===true 라 평소처럼 통과한다. */
+    if (playing) safe(function () { CG.game.gameplayStart(); });
     safe(fetchUser);
     safe(function () { if (CG.user && CG.user.addAuthListener) CG.user.addAuthListener(onAuthChange); });
   }
@@ -378,9 +417,19 @@ html[data-platform="web"] [data-app-only]{display:none !important}
      그렇지 않고 포털 긍정 신호가 없으면(GitHub Pages 직접 방문·TWA·itch·
      데스크톱 play.html 껍데기 전부 포함) 네트워크 요청 자체를 하지 않는다.
      신호가 있을 때만 실제로 시도하고, async 라 파싱을 막지 않으며 실패해도
-     onerror 가 즉시 env='none' 으로 정리한다. */
+     onerror 가 즉시 env='none' 으로 정리한다.
+
+     final-fix I-1(재범위, 2026-09-26) — play.html(세로 기둥 껍데기) 은 안쪽
+     iframe 쿼리에 tw_shell=1 을 붙인다. 이 값이 자기 자신의 location.search
+     에 있으면 **완전 no-op**(env='none', 아래 나머지 분기 전부 건너뜀) —
+     가짜 SDK 사전 주입이 있어도 무시한다. 교차 창 SDK 공유(부모 window 참조)
+     는 하지 않는다 — 이 어댑터는 어떤 경우에도 window.parent 를 읽지 않는다.
+     껍데기 안에서 SDK 를 실제로 어떻게 부를지는 아직 미정이라(Full zip 보류
+     사유), Basic zip 은 당분간 이 no-op 로 나간다. */
   try {
-    if (window.CrazyGames && window.CrazyGames.SDK) {
+    if (/[?&]tw_shell=1(&|$)/.test(location.search)) {
+      env = 'none';
+    } else if (window.CrazyGames && window.CrazyGames.SDK) {
       tryInit(window.CrazyGames.SDK);
     } else if (!looksLikePortal()) {
       env = 'none';
@@ -448,8 +497,14 @@ html[data-platform="web"] [data-app-only]{display:none !important}
        등)마다 다시 불린다(applyAcctNow) — 화면이 낡지 않는다. */
     syncAccountUI: function (apply) {
       apply = apply || function () {};
-      if (env !== 'crazygames') { apply(null); return; }
+      /* final-fix M-1 — acctApply 갱신을 env 검사보다 먼저 한다. SDK 초기화가
+         끝나기 전(이 시점 env 는 아직 'none')에 설정을 열면 예전 코드는 여기서
+         바로 return 해 acctApply 를 남기지 않았다 — 나중에 markReady→fetchUser
+         가 로그인 상태를 알아내도 되돌려 줄 콜백이 없어, 설정을 닫았다 다시 열
+         때까지 계정 줄이 갱신되지 않았다. */
       acctApply = apply;
+      if (env !== 'crazygames') { apply(null); return; }
+      if (!acctAvailable) { apply(null); return; }   // final-fix M-3
       if (loginState === null) { acctWaiters.push(apply); return; }
       apply(loginState);
     },
@@ -14517,7 +14572,7 @@ html[data-platform="twa"] #app-intro.is-hold .api-char{
 <!-- ==RELEASE:BEGIN== 출시 메타 (scratchpad/release-0908/apply-head.py 가 생성·교체, 본문 무접촉) -->
 <meta name="build" content="8decb36-20260908-1716">
 <meta name="application-name" content="텐트윈 젤리팡 월드">
-<meta name="description" lang="ko" content="숫자 젤리를 골라 10을 만들어 터뜨리는 퍼즐 — 모험·아케이드·데일리·타임러시·클래식. TenTwin Jelly Pang World: pick number jellies that equal or sum to 10.">
+<meta name="description" lang="ko" content="숫자 젤리를 골라 10을 만들어 터뜨리는 퍼즐 — 모험·아케이드·데일리·타임러시·클래식. Ten Twin Jelly Pang World: pick number jellies that equal or sum to 10.">
 <link rel="manifest" href="tentwin.webmanifest">
 <link rel="canonical" href="https://ghkd70408040-wq.github.io/game-factory-site/tentwin.html">
 <meta name="robots" content="index,follow">
@@ -14539,7 +14594,7 @@ html[data-platform="twa"] #app-intro.is-hold .api-char{
 <meta property="og:locale:alternate" content="en_US">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="텐트윈 젤리팡 월드 — 숫자 젤리 퍼즐">
-<meta name="twitter:description" content="TenTwin Jelly Pang World — pick number jellies that equal or sum to 10. Free, no install, works offline.">
+<meta name="twitter:description" content="Ten Twin Jelly Pang World — pick number jellies that equal or sum to 10. Free, no install, works offline.">
 <meta name="twitter:image" content="https://ghkd70408040-wq.github.io/game-factory-site/catalog/og-card.jpg">
 <script>
 /* ---------------------------------------------------------------------------
@@ -25555,6 +25610,17 @@ window.TT_SFX = {
   ];
   var persistReadOnly = false;   // 미래 버전 저장을 만나면 true — 덮어쓰지 않는다
   var storeLoaded = false;       // [F7.1-0925 fix1 M1] loadStore() 가 끝까지 돌면 true
+  var saveROWarned = false;      // final-fix I-4 — 세션당 1회만 아래 토스트
+  /* final-fix I-4 — 손상 저장(필드 소독 실패)·부팅 0단계 실패로 이 세션이
+     읽기 전용이 되는 순간 세션당 1회 알린다. 이전에는 persistReadOnly=true 만
+     세우고 아무 말도 하지 않아, 플레이어는 진행이 저장되지 않는다는 사실을
+     영영 몰랐다(새로고침 = 새 세션이라 되살아나는 자리도 없다). toast.savefail
+     (저장 **쓰기** 실패, quota/private mode)과는 다른 상황이라 새 키를 쓴다. */
+  function noteSaveReadOnly() {
+    persistReadOnly = true;
+    if (saveROWarned) return; saveROWarned = true;
+    try { toast(t('toast.savero')); } catch (e) { /* 알림 때문에 부팅이 죽지 않는다 */ }
+  }
   function backupRaw(tag, raw) {
     try { window.localStorage.setItem(LS_BAK_PREFIX + tag, raw); } catch (e) { /* quota/private: ignore */ }
   }
@@ -26111,7 +26177,7 @@ window.TT_SFX = {
          덮어써, 방금 남긴 회전 백업 2개까지 전부 반쪼가리 사본이 되어
          무의미해진다. */
       if (raw) backupRawStamped(raw);
-      persistReadOnly = true;
+      noteSaveReadOnly();   // final-fix I-4
     }
   }
 
@@ -26758,6 +26824,9 @@ window.TT_SFX = {
          한 줄에 들어가는 길이여야 한다: #toast 는 `white-space: nowrap` 이고
          `max-width: 84vw` 라, 길면 알약이 화면을 가로지른다. */
       'toast.savefail': 'Progress can’t be saved',
+      /* final-fix I-4 — persistReadOnly(손상 저장·부팅 실패) 전용, 위 savefail
+         (quota/private mode 쓰기 실패)과는 다른 상황이라 새 키. */
+      'toast.savero': "Saving isn't working right now — progress this session won't be saved.",
       'toast.noadds': 'No adds left',
       'toast.empty': 'Board is empty',
       'toast.nohints': 'No hints left',
@@ -26840,7 +26909,7 @@ window.TT_SFX = {
       'char.pudding.title': 'Shield of the Jelly Court',
       'char.pudding.tag': 'Defender',
       'char.pudding.pass': 'Pudding Guard — +60% on a 10-sum, +15% on anything else. No match is wasted.',
-      'char.pudding.ult': 'Pudding Shield — {sec}s where every match counts as a TenTwin combo',
+      'char.pudding.ult': 'Pudding Shield — {sec}s where every match counts as a Ten Twin combo',
       'char.pudding.tip': 'Pick him to hold the line and stack the chain.',
       'skill.pudding.name': 'PUDDING SHIELD!',
       /* --- W7 소다 마녀 (각성 = 젤리 타임 계열 · 지속은 SKILL_MS.sodawitch) --- */
@@ -26961,7 +27030,7 @@ window.TT_SFX = {
       'mission.bomb.one': 'Blow up 1 tile with a bomb',
       /* ★ 0901 ⑦ P1 — 교차 미션. MISSION_GOALS 에는 아무것도 안 넣는다: 그 표는
          pickMission(엔들리스·클래식) 전용이고 모험은 advMissionGoal 을 쓴다. */
-      'mission.chain3': 'Reach a TenTwin chain of 3, {goal} times',
+      'mission.chain3': 'Reach a Ten Twin chain of 3, {goal} times',
       /* v3 — missions that change how you play. The {goal} of `mission.col` is a
          column number, not a count; see MISSION_GOALS.col.
          (No apostrophe in this comment on purpose: the i18n audit brace-matches
@@ -26973,7 +27042,7 @@ window.TT_SFX = {
       'mission.prog': '{n}/{goal}',
       /* §3 피니시 — STAGES 의 피니시 어휘. 같은 미션 id 라도 평시 문장과 다르다. */
       'finish.mission.sum10': 'Ten ×{goal}',
-      'finish.mission.chain3': 'TenTwin chain ×{goal}',
+      'finish.mission.chain3': 'Ten Twin chain ×{goal}',
       'finish.mission.sprint': '{goal} matches, right now',
       'finish.sub': 'FINISH CHANCE',
       'mission.done': 'Mission complete!',
@@ -27246,7 +27315,7 @@ window.TT_SFX = {
       'aria.cutskipall': 'Skip the whole story',
       'settings.gallery': 'Story gallery',
       'settings.credits': 'Credits',
-      'credits.body': 'TenTwin: Jelly Pang World — art & music by the author, built with the game factory.',
+      'credits.body': 'Ten Twin: Jelly Pang World — art & music by the author, built with the game factory.',
       /* --- §H 캐릭터 추천 태그 -------------------------------------------- */
       'pick.rec': 'Best for',
       'pet.combo.k': 'Best team',
@@ -27384,7 +27453,7 @@ window.TT_SFX = {
          htmlPlain() 이 태그만 벗겨서 넣는다. */
       'howto.ten': 'Same numbers make a <b>Twin</b>; adding to 10 makes a <b>Ten</b>. Every Ten loosens the hardened world.',
       'howto.ult': 'The Special charges by <b>alternating</b> \u2014 Ten, then Twin, then Ten. Repeat the same kind, and the chain breaks.',
-      'howto.awaken': 'Skill fills faster with bigger combos. When it bursts: for {sec} seconds, <b>every match counts as a TenTwin combo.</b>',
+      'howto.awaken': 'Skill fills faster with bigger combos. When it bursts: for {sec} seconds, <b>every match counts as a Ten Twin combo.</b>',
       'howto.overdrive': 'Chain your attacks and hit <b>OVERDRIVE</b>! It lasts as long as you do \u2014 keep matching, keep firing.',
       'howto.finish': 'When the boss falls: <b>10-second Finish</b>. Clear the final mission on screen \u2014 that\'s the real win.',
       /* \ud310\uc815\ud310 48 \u2014 \uccab \ub9cc\ub545 1\ud68c \uc548\ub0b4. \uc704 howto.* \uac00 \u00ab\uaddc\uce59\u00bb\uc774\ub77c\uba74 \uc774 \ub458\uc740
@@ -27541,7 +27610,7 @@ window.TT_SFX = {
       'skill.ten.name': "Prince's Blessing!",
       'skill.twin.name': 'Twin Oath!',
       'skill.jelly.name': 'JELLY TIME!',
-      'skill.on.summon': 'TenTwin Skill! Every match is a TenTwin chain now!',
+      'skill.on.summon': 'Ten Twin Skill! Every match is a Ten Twin chain now!',
       'skill.on.jelly': 'Jelly Time! Jackpot odds are up to 40%',
 
       /* 임팩트 오버레이 3종.
@@ -27578,7 +27647,7 @@ window.TT_SFX = {
       'boss.atk.quake': 'Board Quake',
       'boss.atk.cycle': 'All Four, Rotating',
       'boss.cond.sum10': 'Land {n} sum-10 matches',
-      'boss.cond.chain3': 'Reach a TenTwin chain of 3, {n} times',
+      'boss.cond.chain3': 'Reach a Ten Twin chain of 3, {n} times',
       'boss.cond.sprint': 'Land {n} back-to-back matches',
       'boss.cond.mission2': 'Clear {n} missions in a row',
       'boss.goal': 'Take down {b}',
@@ -27819,16 +27888,16 @@ window.TT_SFX = {
       'intro.done': '▶ Close',
       'intro.ten.l1': "I am Prince Tenten. There is always one more path, you know.",
       'intro.ten.l2': "My Prince's Blessing pays back every sum-10 match at +60%.",
-      'intro.ten.l3': 'And when I use my skill I call my brother — every match becomes a TenTwin combo.',
+      'intro.ten.l3': 'And when I use my skill I call my brother — every match becomes a Ten Twin combo.',
       'intro.twin.l1': "Twin here! I can't stand slow — try to keep up.",
       'intro.twin.l2': 'My Twin Vow makes every same-number match +60%.',
-      'intro.twin.l3': 'Use my skill and I call Tenten over — everything counts as a TenTwin combo.',
+      'intro.twin.l3': 'Use my skill and I call Tenten over — everything counts as a Ten Twin combo.',
       'intro.jelly.l1': "I'm the Jelly Princess. I waited a long time. My turn to protect you now.",
       'intro.jelly.l2': "The Princess's Warmth gives a 10% chance to triple that match.",
       'intro.jelly.l3': 'My skill is Jelly Time — the jackpot chance climbs to 40%.',
       'intro.pudding.l1': 'Pudding Knight, at your service. The bigger the rush, the firmer I stand.',
       'intro.pudding.l2': 'Pudding Guard gives +60% on a 10-sum and +15% on anything else. No match is wasted.',
-      'intro.pudding.l3': 'When I use my skill the shield opens — every match counts as a TenTwin combo.',
+      'intro.pudding.l3': 'When I use my skill the shield opens — every match counts as a Ten Twin combo.',
       'intro.sodawitch.l1': 'Soda Witch. One big bang — that is my taste.',
       'intro.sodawitch.l2': 'Fizz Pop sets off a 20% chance of ×2 on every single match.',
       'intro.sodawitch.l3': 'My skill is Soda Spell — the jackpot chance becomes 40%.',
@@ -27884,10 +27953,10 @@ window.TT_SFX = {
       'aria.nextchar': 'Next character',
       'aria.close': 'Close',
       'char.ten.title': 'First Prince of Tentwin',
-      'char.ten.ult': "Prince's Blessing — {sec}s where every match counts as a TenTwin combo",
+      'char.ten.ult': "Prince's Blessing — {sec}s where every match counts as a Ten Twin combo",
       'char.ten.tip': 'Pick him when sum-10 pairs are everywhere.',
       'char.twin.title': 'Second Prince of Tentwin',
-      'char.twin.ult': 'Twin Oath — {sec}s where every match counts as a TenTwin combo',
+      'char.twin.ult': 'Twin Oath — {sec}s where every match counts as a Ten Twin combo',
       'char.twin.tip': 'Pick him when the same numbers pile up.',
       'char.jelly.title': 'Princess of the Jelly Pang World',
       'char.jelly.ult': 'Jelly Time — {sec}s at a 40% jackpot chance',
@@ -28183,6 +28252,7 @@ window.TT_SFX = {
 
       /* 출시 점검 0909 ②(승인 A4) — 저장 실패 알림(en 쪽과 같은 키). */
       'toast.savefail': '진행이 저장되지 않아요',
+      'toast.savero': '저장에 문제가 있어 이번에는 진행이 저장되지 않아요.',
       'toast.noadds': '추가 횟수를 다 썼어요',
       'toast.empty': '보드가 비었어요',
       'toast.nohints': '힌트를 다 썼어요',
@@ -39279,6 +39349,11 @@ window.TT_SFX = {
          계약). 520ms 지연은 기존 그대로(플로트 텍스트 타이밍), 그 뒤 광고
          요청 → done() 에서 모달을 연다. */
       TW_PORTAL.requestMidgameAd(function () {
+        /* final-fix M-4 — 위 paintContinueBtn() 은 광고 요청 **전** 상태로
+           칠해졌다. 그 광고가 adsDisabledBasicLaunch/adblock 로 adsBlocked 를
+           세우면(noteAdError) canReward() 가 바뀌어 이어하기 버튼의 "광고 보고
+           이어하기" 문구·활성 여부가 낡는다 — 시트를 열기 직전에 다시 칠한다. */
+        paintContinueBtn();
         openModal('modal-over');
         // Fired with the sheet, not before it: the float text is drawn on #fx
         // above the modal, and landing it on an empty board reads as a glitch.
@@ -39655,7 +39730,7 @@ window.TT_SFX = {
     var d = dailyShown || dailyBestNow();   // W7.5 — 방금 끝낸 판의 칸
     if (!d) return '';
     // Language-independent by design (contract §8).
-    return withShareLink('TenTwin #' + d.n + ' ✅ ' + fmtTime(d.timeSec) + ' 🔥' + d.maxCombo + 'x' +
+    return withShareLink('Ten Twin #' + d.n + ' ✅ ' + fmtTime(d.timeSec) + ' 🔥' + d.maxCombo + 'x' +
            (d.grade ? ' ' + d.grade : '') + '\n' + (d.grid || ''), dailyShareUrl(d));
   }
 
@@ -39746,7 +39821,7 @@ window.TT_SFX = {
       : Math.max(0, (S.arcLastValue | 0));
     ensureArcadeBest();
     var b = store.arcadeBest[mode];
-    return withShareLink('TenTwin ⚔ ' + arcModeName(mode) + '\n' +
+    return withShareLink('Ten Twin ⚔ ' + arcModeName(mode) + '\n' +
            arcValueText(mode, value) + ' · ' + arcDirText(mode) +
            (b && typeof b.value === 'number'
               ? '\n👑 ' + arcValueText(mode, b.value) : '') +
@@ -39775,7 +39850,7 @@ window.TT_SFX = {
   function scoreShareText() {
     var o = S.overInfo;
     if (!o) return '';
-    return withShareLink('TenTwin ' + (o.rush ? '⚡ Time Rush ' : '') + o.score +
+    return withShareLink('Ten Twin ' + (o.rush ? '⚡ Time Rush ' : '') + o.score +
                     (o.rush ? '' : ' · Stage ' + o.stage) + ' 🍬\n' + t('share.beat'));
   }
   function shareScore() { copyToClipboard(scoreShareText()); }
@@ -40016,7 +40091,7 @@ window.TT_SFX = {
       /* 영문 회차의 로고는 --art-logo 가 아니라 별도 파일이다(html[lang="en"]
          .logo-img 가 background-image 만 덮는 그 규약) — 변수를 읽어서는 알 수
          없으므로 여기서 같은 판정을 한 번 더 한다. */
-      var logoUrl = (currentLang() === 'en') ? 'catalog/art-logo-en.webp'
+      var logoUrl = (currentLang() === 'en') ? 'catalog/art-logo-en2.webp'   /* final-fix M-5 */
                                              : shareCardCssUrl('--art-logo');
       var charUrl = shareCardCssUrl('--ch-' + charId() + '-full');
       Promise.all([shareCardLoad(logoUrl), shareCardLoad(charUrl)]).then(function (ims) {
@@ -47232,8 +47307,14 @@ window.TT_SFX = {
       wait.hidden = !empty;
       if (empty) wait.textContent = t('adv.heartwait', { t: fmtHeartWait(heartNextMs()) });
     }
-    if (ad) ad.hidden = !empty;
-    if (ad && empty) twSyncAdHeartLabel(ad);   /* Task 12 — 포털이면 "광고 보고 하트 +1"로 교체 */
+    /* final-fix I-5 — 광고 없는 빌드(Basic Launch·Pages·itch)에서도 하트 0 이면
+       이 버튼이 "Get a heart (coming soon)" 으로 노출됐다 — 포털에 올라간 그
+       빌드가 자기 포털 출시를 예고하는 모양이었다. #adv-ad(결과 시트 쪽 짝)는
+       이미 이 조건으로 hidden 을 결정한다(:paintAdvSheet) — 같은 조건으로
+       맞춘다: 포털+canReward() 가 아니면 하트가 0 이어도 완전히 숨는다. */
+    var nodeAdOk = TW_PORTAL.env === 'crazygames' && TW_PORTAL.canReward();
+    if (ad) ad.hidden = !(empty && nodeAdOk);
+    if (ad && empty && nodeAdOk) twSyncAdHeartLabel(ad);
   }
 
   /* Task 12 rev1(I-11) — #node-ad 는 원래 "coming soon" 고정 문구. 포털이고
@@ -49836,13 +49917,12 @@ window.TT_SFX = {
     on($('node-go'), 'click', function () {
       advStart(parseInt(this.getAttribute('data-n'), 10) | 0);
     });
-    /* Task 12 rev1(I-3) — 포털+canReward() 면 rewarded 하트 요청, 아니면 원래
-     * "coming soon" 안내(웹·Basic Launch 등). 예전엔 이 핸들러 하나뿐이라
-     * 포털에서도 무조건 이 토스트가 떴다(같은 요소에 T12 가 핸들러를 하나 더
-     * 붙여 이중 발화였다) — 이제 한 핸들러가 갈라 부른다. */
+    /* final-fix I-5 — #node-ad 는 이제 paintNodeHearts() 가 포털+canReward() 일
+     * 때만 보이게 한다(그 밖은 hidden) — 이 핸들러는 그 한 경로만 남는다.
+     * "coming soon" 토스트 가지는 지운다(광고 없는 빌드가 자기 포털 출시를
+     * 예고하지 않는다). */
     on($('node-ad'), 'click', function () {
-      if (TW_PORTAL.env === 'crazygames' && TW_PORTAL.canReward()) { twWatchAdForHeart(this); return; }
-      toast(t('adv.adsoon')); J.sfx.fail();
+      twWatchAdForHeart(this);
     });
     /* Task 12 rev1(I-6) — 결과 시트 쪽 진입점. hidden 이 아닐 때만(paintAdvSheet
        가 이미 포털·canReward()·하트0 을 확인했다) 진짜 뜬다. */
@@ -51152,7 +51232,7 @@ window.TT_SFX = {
         /* [F7.1-0925 fix1 M1] i 는 위 줄에서 이미 후증가됐다 — 0번째 청크(loadStore)
            가 방금 실패했다는 뜻은 i===1 이다(콘솔 메시지의 "chunk 1"과 같은 값).
            init() 안 !APP 루프의 i===0 과 같은 사건, 다른 변수 관례일 뿐이다. */
-        if (i === 1 && !storeLoaded) persistReadOnly = true;
+        if (i === 1 && !storeLoaded) noteSaveReadOnly();   // final-fix I-4
       }
       aplProgress(i, steps.length);
       if (i < steps.length) { bootYield(run); return; }
@@ -51285,7 +51365,7 @@ window.TT_SFX = {
           /* [F7.1-0925 fix1 M1] 0번째 단계(loadStore) 자체가 죽으면 저장을 읽지도
              못한 상태다 — 이후 아무 판이나 돌다가 persist() 가 빈 기본값으로
              LS_KEY 원본을 덮어쓰지 않게 잠근다(migrateStore 의 그 장치 재사용). */
-          if (i === 0 && !storeLoaded) persistReadOnly = true;
+          if (i === 0 && !storeLoaded) noteSaveReadOnly();   // final-fix I-4
         }
       }
       return;
@@ -53976,13 +54056,18 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
   border-radius:14px;
 }
 
-/* ---- 영문 로고 (art-logo-en.webp) -----------------------------------------
+/* ---- 영문 로고 (art-logo-en2.webp) ----------------------------------------
    같은 560x326 판이라 aspect-ratio 도 자리도 한 줄 안 바뀐다 — 갈리는 것은
    **그림 주소 하나**뿐이다. html[lang="en"] 스코프라 한국어판은 --art-logo
    (art-embed 가 구운 data URI)를 그대로 쓴다.
    background 단축을 쓰지 않고 background-image 만 덮는 이유는 이 파일의
    상시 규율이다(단축은 background-clip 을 리셋한다 — 사고 전력).
-   캐시버스트 없음: 신규 파일이라 낡은 항목이 존재할 수 없다. */
+   final-fix M-5 — 이 로고 그림을 다시 만들었을 때 옛 파일명(art-logo-en.webp)
+   그대로 덮어썼다면, sw.js 의 catalog/ cache-first 경로가 새 SW 가 활성화되는
+   다음 방문까지 옛 그림을 계속 돌려준다("신규 파일이라 캐시버스트가 필요
+   없다"는 옛 전제는 **같은 이름을 다시 쓸 때만** 유효하다). 그래서 이번엔
+   파일명 자체를 bump 했다(art-logo-en2.webp, 옛 파일은 그대로 둔다) — 이후
+   또 다시 만들면 또 다음 번호로. */
 html[lang="en"] .logo-img,
 html[lang="en"] .splash-logo,
 /* T14 I-5 (2b①) — 앱 인트로(#app-intro .api-logo)도 같은 교체점. TWA 전용
@@ -53990,7 +54075,7 @@ html[lang="en"] .splash-logo,
    깔아 뒀고, 여기서도 longhand(-image)만 덮어 위치·크기·repeat 은 그대로다.
    같은 등급이라 **소스 순서 뒤**에서 이겨야 하므로 이 en 블록에 합류시킨다. */
 html[lang="en"] #app-intro .api-logo{
-  background-image:url("catalog/art-logo-en.webp");
+  background-image:url("catalog/art-logo-en2.webp");   /* final-fix M-5 */
 }
 
 /* ===========================================================================
