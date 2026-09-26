@@ -7195,6 +7195,16 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   padding: 0 calc(var(--f2-w) * .030);
 }
 #modal-invite .ci-tag { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 8px 0 0; }
+/* [수정 1회차 b · 우려4] .ci-tag-v(kit-pill-v2)는 기준 인스턴스 #charpanel
+   (:57839 부근, "전략가")에서 --f2-ink 를 --role-f2-ink-charsel 로 받는데,
+   #modal-invite(:56644 의 charsel 토큰 재정의 범위 밖)는 그 지역 재정의가
+   없어 :root 기본값 --role-f2-ink(:55614) 로 떨어진다(실측: charpanel
+   #5B4F62 vs modal-invite #6B5F6E — 같은 부품, 다른 값). 그래서 "두근두근파"
+   에 은은한 흰 글로우(text-shadow)와 살짝 다른 잉크색이 남는다. 기준
+   인스턴스의 값을 이 스코프에서 직접 받아 맞춘다 — 새 원시값 0(기존 토큰
+   재사용), color 를 currentColor 로 읽는 -webkit-text-stroke 도 같이 따라와
+   맞는다(실측: stroke 색은 항상 color 와 같은 값이었다). */
+#modal-invite .ci-tag-v { color: var(--role-f2-ink-charsel); text-shadow: none; }
 #modal-invite .cc-stats,
 #charget .cg-stats {
   display: flex;
