@@ -3787,12 +3787,24 @@ li.roll-in { animation: rollin 380ms var(--spring) backwards; }
   left: 50%;
   bottom: calc(var(--safe-b) + 90px);
   z-index: 80;
+  /* [64-fix3c ① 2026-10-01 · 지휘자 판정 A] 한 줄(84vw)을 넘는 문장은 줄을 바꿔 **위로** 자란다
+     (아래 변 자리 그대로). 종전 nowrap 은 긴 도움말·스탯 토스트를 알약 밖으로 흘려 끝이 잘렸다
+     (360 폭에서 ko 14 · en 26 문장). width:max-content 가 한 줄 토스트를 종전과 같은 폭으로
+     둔다 — 없으면 left:50% 고정 요소의 줄 바꿈 폭이 50vw 로 잡혀 50~84vw 짜리 한 줄까지 두 줄이
+     된다(실측). 한 줄은 픽셀 0, 여러 줄은 가운데 정렬 + 줄 균형. 한글은 저장소 문단 관례
+     (keep-all + anywhere)로 낱말 가운데서 끊지 않는다. 줄 간격은 물려받는 값 그대로(줄 간격 토큰
+     없음). 아래 pointer-events:none 이 떠 있는 동안에도 판 칸·행동 막대 버튼을 눌리게 둔다. */
+  width: max-content;
   max-width: 84vw;
   padding: 11px 20px;
   border-radius: 999px;
   font-size: 14px;
   font-weight: 700;
-  white-space: nowrap;
+  white-space: normal;
+  text-align: center;
+  text-wrap: balance;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
   color: var(--prim-ink);
   background: var(--c5);
   box-shadow: 0 10px 30px rgba(0, 0, 0, .5);
@@ -14641,7 +14653,7 @@ html[data-platform="twa"] #app-intro.is-hold .api-char{
 <meta property="og:locale:alternate" content="en_US">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="텐트윈 젤리팡 월드 — 숫자 젤리 퍼즐">
-<meta name="twitter:description" content="Ten Twin Jelly Pang World — pick number jellies that equal or sum to 10. Free, no install, works offline.">
+<meta name="twitter:description" content="Ten Twin Jelly Pang World: pick number jellies that equal or sum to 10. Free, no install, works offline.">
 <meta name="twitter:image" content="https://ghkd70408040-wq.github.io/game-factory-site/catalog/og-card.jpg">
 <script>
 /* ---------------------------------------------------------------------------
@@ -24824,7 +24836,7 @@ window.TT_SFX = {
   function isCapsuleHead(el) {
     try {
       return !!(el && el.matches &&
-        el.matches('.modal-v2 .mv2-sheet > h2, .modal-v2 .mv2-head > h2, #modal-node .r10-ribbon > h2, #modal-clear .sheet > h2, #modal-adv:not(.is-advscript):not(.is-advfinish) .sheet > h2'));
+        el.matches('.modal-v2 .mv2-sheet > h2, .modal-v2 .mv2-head > h2, #modal-node .r10-ribbon > h2, #modal-clear .sheet > h2, #modal-adv:not(.is-advfinish) .sheet > h2'));
     } catch (e) { return false; }
   }
   function headText(el, s) {
@@ -24912,7 +24924,7 @@ window.TT_SFX = {
   }
   function fitHeads(root) {
     var list = (root || document).querySelectorAll(
-      '.modal-v2 .mv2-sheet > h2, .modal-v2 .mv2-head > h2, #modal-node .r10-ribbon > h2, #modal-clear .sheet > h2, #modal-adv:not(.is-advscript):not(.is-advfinish) .sheet > h2');
+      '.modal-v2 .mv2-sheet > h2, .modal-v2 .mv2-head > h2, #modal-node .r10-ribbon > h2, #modal-clear .sheet > h2, #modal-adv:not(.is-advfinish) .sheet > h2');
     for (var i = 0; i < list.length; i++) fitHead(list[i]);
   }
   try {
@@ -24949,7 +24961,7 @@ window.TT_SFX = {
   /** 창이 열릴 때 한 번 더 — 내가 못 찾은 쓰기 경로가 있어도 여기서 되살아난다. */
   function healHeads(root) {
     var list = (root || document).querySelectorAll(
-      '.modal-v2 .mv2-sheet > h2, .modal-v2 .mv2-head > h2, #modal-node .r10-ribbon > h2, #modal-clear .sheet > h2, #modal-adv:not(.is-advscript):not(.is-advfinish) .sheet > h2');
+      '.modal-v2 .mv2-sheet > h2, .modal-v2 .mv2-head > h2, #modal-node .r10-ribbon > h2, #modal-clear .sheet > h2, #modal-adv:not(.is-advfinish) .sheet > h2');
     for (var i = 0; i < list.length; i++) {
       var h = list[i];
       if (h.firstElementChild && h.firstElementChild.className === 'mvh-title'
@@ -26884,8 +26896,8 @@ window.TT_SFX = {
       'aria.dailyMenu': 'Back to main menu',
 
       /* 출시 점검 0909 ②(승인 A4) — 저장 실패(쿼터·시크릿 모드) 알림.
-         한 줄에 들어가는 길이여야 한다: #toast 는 `white-space: nowrap` 이고
-         `max-width: 84vw` 라, 길면 알약이 화면을 가로지른다. */
+         [64-fix3c] #toast 는 84vw 를 넘으면 줄을 바꿔 위로 자란다(종전 nowrap 은 알약 밖으로
+         흘렀다). 그래도 한 줄에 들어가는 짧은 문장이 가장 빨리 읽힌다. */
       'toast.savefail': 'Progress can’t be saved',
       /* final-fix I-4 — persistReadOnly(손상 저장·부팅 실패) 전용, 위 savefail
          (quota/private mode 쓰기 실패)과는 다른 상황이라 새 키. */
@@ -45860,7 +45872,7 @@ window.TT_SFX = {
   function paintAdvSheet(win, stars, why, p) {
     var sheet = $('modal-adv');
     if (sheet && sheet.classList) sheet.classList.toggle('lost', !win);
-    /* E34-0903 — 다섯 갈래 중 그림이 있는 둘만 표시한다. 나머지 셋은 클래스가 안 붙어 CSS 레터링 그대로다. 상태 표시 한 줄. */
+    /* E34-0903 — 다섯 갈래 중 둘(각본·완주)에 상태 클래스를 단다. 그림 제목은 완주 하나뿐이다(각본 패배 그림은 64-fix3c 에서 은퇴 → CSS 레터링). 상태 표시 한 줄. */
     if (sheet && sheet.classList) { sheet.classList.toggle('is-advscript', !win && why === 'scripted'); sheet.classList.toggle('is-advfinish', !win && why === 'finish'); }
     setText('adv-title', win
       ? t(p.boss ? 'adv.bosswin' : 'adv.win', { n: p.n })
@@ -60075,7 +60087,7 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
 .modal-v2 .mv2-head  > h2 > .mvh-title,
 #modal-node .r10-ribbon > h2 > .mvh-title,
 #modal-clear .sheet > h2 > .mvh-title,
-#modal-adv:not(.is-advscript):not(.is-advfinish) .sheet > h2 > .mvh-title {
+#modal-adv:not(.is-advfinish) .sheet > h2 > .mvh-title {
   /* [E14-0902] 정본 work-lettering.css 동기. 위 주석의 「paint-order 가 테를
      채움 아래로 내리므로 바깥 절반만 보인다」는 **틀렸다** — 채움이 transparent
      라 -webkit-text-stroke 는 폭 전체가 보인다(.060em 이 렌더에서 6.25px
@@ -60143,7 +60155,7 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
   .modal-v2 .mv2-head  > h2 > .mvh-title,
   #modal-node .r10-ribbon > h2 > .mvh-title,
   #modal-clear .sheet > h2 > .mvh-title,
-  #modal-adv:not(.is-advscript):not(.is-advfinish) .sheet > h2 > .mvh-title {
+  #modal-adv:not(.is-advfinish) .sheet > h2 > .mvh-title {
     background-image: none;
     color: #FFFFFF;
     -webkit-text-fill-color: #FFFFFF;
@@ -64765,11 +64777,11 @@ html[lang="en"] #modal-mode[data-arcade-only] .r10-ribbon{ --ttl:url("catalog/tt
    ⚠ webp 정본 창은 무접촉(그림 유지) — 지시서 「동적 번호 창만」 준수:
      · #modal-over(막힘 ttl-over·타임업 ttl-overrush): 동적 번호 없이 고정 문구 두
        벌이 각자 webp 정본이라 **레터링 제외**(::after 그림층에 상주 — 겹치면 안 됨).
-     · #modal-adv.is-advscript / .is-advfinish(각본·완주): 이 둘만 webp 이므로
-       `:not()` 로 뺐다. 승·패·보스승 셋은 클래스가 없어 여기 레터링이 선다.
+     · #modal-adv.is-advfinish(완주): webp 라 `:not()` 로 뺐다. 승·패·보스승 셋과 각본 패배
+       (.is-advscript — 64-fix3c 2026-10-01 에 그림 제목 은퇴)는 여기 레터링이 선다.
      · howto·settings·skin·pause·rank·play·classic·chars 는 애초에 선택자 밖. */
 #modal-clear .sheet > h2,
-#modal-adv:not(.is-advscript):not(.is-advfinish) .sheet > h2 {
+#modal-adv:not(.is-advfinish) .sheet > h2 {
   --mvh-fs: .80;
   --mvh-fs-min: .42;
   font-size: calc(var(--wcap-h) * var(--mvh-fs));
@@ -64780,16 +64792,17 @@ html[lang="en"] #modal-mode[data-arcade-only] .r10-ribbon{ --ttl:url("catalog/tt
      over : paintOverModal 이 #modal-over 에 .is-rush 를 토글한다 — 러시 종료
             (over.rush.title 「시간 종료!」) ↔ 막힘(over.title). E32 가 CSS
             레터링으로 되돌린 이유가 「가르는 클래스가 없다」였고 그것이 이 줄로 닫힌다.
-     adv  : paintAdvSheet 가 .is-advscript / .is-advfinish 를 토글한다. 다섯 갈래 중
-            그림이 있는 둘뿐이고, 나머지 셋(win/bosswin/lose)은 값이 들어가는 동적
-            제목이라 클래스가 안 붙는다 — 안 붙으면 아래 두 목록이 한 줄도 안 걸려
-            CSS 레터링 그대로다.
+     adv  : paintAdvSheet 가 .is-advscript / .is-advfinish 를 토글한다. 그림 제목이 서는
+            것은 완주(.is-advfinish) 하나뿐이다 — 각본 패배(.is-advscript)는 64-fix3c 에서
+            그림을 은퇴하고 승·패·보스승과 같은 CSS 레터링으로 섰다(클래스는 상태 표시로만
+            남는다). 클래스가 없거나 is-advscript 면 아래 두 목록이 한 줄도 안 걸린다.
      arc  : paintArcSheet 가 .is-arctime / .is-arcsurv / .is-arcdmg 를 토글한다. */
 html[lang="ko"] #modal-over.is-rush .sheet > h2{ --ttl:url("catalog/ttl-overrush-ko.webp"); }
 html[lang="en"] #modal-over.is-rush .sheet > h2{ --ttl:url("catalog/ttl-overrush-en.webp"); }
-html[lang="ko"] #modal-adv.is-advscript .sheet > h2{ --ttl:url("catalog/ttl-advscript-ko.webp"); }
+/* [64-fix3c 2026-10-01] 각본 패배(.is-advscript) 그림 제목 두 장(ttl-advscript ko/en)은 은퇴 —
+   대시가 그림에 박혀 있었다(「1차전 – 후퇴」). 글자 키 adv.result.scripted(「1차전: 후퇴」)를
+   승·패·보스승과 같은 CSS 레터링(.mvh-title)으로 그린다. 한 에셋 = 한 레시피 · 부활 금지. */
 html[lang="ko"] #modal-adv.is-advfinish .sheet > h2{ --ttl:url("catalog/ttl-advfinish-ko.webp"); }
-html[lang="en"] #modal-adv.is-advscript .sheet > h2{ --ttl:url("catalog/ttl-advscript-en.webp"); }
 html[lang="en"] #modal-adv.is-advfinish .sheet > h2{ --ttl:url("catalog/ttl-advfinish-en.webp"); }
 html[lang="ko"] #modal-arc.is-arctime .sheet > h2{ --ttl:url("catalog/ttl-arctime-ko.webp"); }
 html[lang="ko"] #modal-arc.is-arcsurv .sheet > h2{ --ttl:url("catalog/ttl-arcsurv-ko.webp"); }
@@ -64808,7 +64821,6 @@ html[lang="en"] #modal-arc.is-arcdmg .sheet > h2{ --ttl:url("catalog/ttl-arcdmg-
 #modal-pause .sheet > h2,
 #modal-rank .sheet > h2,
 #modal-over .sheet > h2,
-#modal-adv.is-advscript .sheet > h2,
 #modal-adv.is-advfinish .sheet > h2,
 #modal-arc.is-arctime .sheet > h2,
 #modal-arc.is-arcsurv .sheet > h2,
@@ -64833,7 +64845,6 @@ html[lang="en"] #modal-arc.is-arcdmg .sheet > h2{ --ttl:url("catalog/ttl-arcdmg-
 #modal-pause .sheet > h2::after,
 #modal-rank .sheet > h2::after,
 #modal-over .sheet > h2::after,
-#modal-adv.is-advscript .sheet > h2::after,
 #modal-adv.is-advfinish .sheet > h2::after,
 #modal-arc.is-arctime .sheet > h2::after,
 #modal-arc.is-arcsurv .sheet > h2::after,
@@ -65518,7 +65529,7 @@ html[lang="en"] #modal-arc.is-arcdmg .sheet > h2{ --ttl:url("catalog/ttl-arcdmg-
 #modal-node .r10-ribbon > h2,
 #modal-shop .r10-ribbon > h2,
 #modal-clear .sheet > h2,
-#modal-adv:not(.is-advscript):not(.is-advfinish) .sheet > h2 {
+#modal-adv:not(.is-advfinish) .sheet > h2 {
   --mvh-fs: .695;
 }
 
@@ -65529,7 +65540,7 @@ html[lang="en"] #modal-arc.is-arcdmg .sheet > h2{ --ttl:url("catalog/ttl-arcdmg-
    그대로 옮기면 새 죽은 선택자를 만든다(components-gate m3 A급). */
 #modal-node .r10-ribbon > h2 > .mvh-title,
 #modal-clear .sheet > h2 > .mvh-title,
-#modal-adv:not(.is-advscript):not(.is-advfinish) .sheet > h2 > .mvh-title {
+#modal-adv:not(.is-advfinish) .sheet > h2 > .mvh-title {
   --lt-optical-y: .0781em;
   top: var(--lt-optical-y);
 }
