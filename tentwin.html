@@ -68449,6 +68449,18 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
 #modal-quest .qs-tab .cpt-lab{
   min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
 }
+/* [64 RC · 단계 A] 탭 「에픽」 잉크 세로 광학 보정 — 한국어만, 이 탭 하나만.
+   font-audit 390 ko: 「픽」이 fix3d 에서 표시 글꼴(주아)로 그려지며 이 탭 글자의 잉크 중심이
+   탭 안전 상자 중심보다 1.57px 위로 올라갔다(FAIL 기준 1.5 · 목표 1.0).
+   같은 줄 「일일」「주간」·en 「Epic」은 한 화소도 안 바꾸려고 이 탭의 글자 상자에만
+   padding-top 을 준다 — 글자 상자는 탭 안에서 가운데 맞춤이라 잉크는 그 절반만큼 내려간다
+   (캐릭터 이름 알약의 --cs-name-dy 와 같은 방식). 서체·크기·색·상자 폭은 그대로.
+   글자 자리는 px 단위로 떨어져서 효과는 0 또는 정확히 1px — 390 에서 에픽 -1.57 → -0.57,
+   이미 1px 안쪽인 360(-0.53)·480(-0.60)은 닿지 않는다(실측, 이 탭 줄의 나머지 탭은 무변). */
+html[lang="ko"] #modal-quest .qs-tab[data-qtab="epic"] .cpt-lab{
+  --qs-epic-dy: calc(var(--f2-w) * .0030);
+  padding-top: var(--qs-epic-dy);
+}
 
 /* ---- 출석 7일 — 값은 §21④ 의 store.streak / streakClaimed 만 읽는다 ------- */
 #modal-quest .qs-att{
