@@ -38,7 +38,7 @@
      toggle (html[data-theme]) only re-skins the page; the browser bar is cosmetic. -->
 <meta name="theme-color" content="#16131f" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#f6f1e8" media="(prefers-color-scheme: light)">
-<meta name="description" content="Ten Twin — match tiles that are equal or sum to 10.">
+<meta name="description" content="Ten Twin: match tiles that are equal or sum to 10.">
 <meta name="color-scheme" content="dark light">
 <title>Ten Twin</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='rgb(22,19,31)'/%3E%3Crect x='7' y='13' width='25' height='25' rx='6' fill='rgb(102,217,240)'/%3E%3Crect x='32' y='26' width='25' height='25' rx='6' fill='rgb(240,125,102)'/%3E%3C/svg%3E">
@@ -3409,6 +3409,7 @@ li.roll-in { animation: rollin 380ms var(--spring) backwards; }
   --hcard-rim:    var(--prim-white-a55);  /* = .kit-box-v2::after 안쪽 흰 림 */
   --hcard-lo:     var(--prim-black-a07);         /* = .kit-box-v2::after 밑동 그림자 */
   --hcard-r:      18px;                     /* 코너 (.kit-box-v2 = .0354×판폭) */
+  --hcard-gap:    4px;                      /* [64-fix3b (g)] 카드 안 이웃 간격 = 종전 .sub-score margin-bottom 4px(같은 값에 이름만) */
 }
 #modal-howto .howto-art{
   position: relative;
@@ -3459,6 +3460,13 @@ li.roll-in { animation: rollin 380ms var(--spring) backwards; }
   box-shadow: inset 0 0 0 1.5px var(--hcard-rim), inset 0 -2px 0 var(--hcard-lo);
   color: var(--prim-ink);
 }
+/* [64-fix3b (g) · 지휘자 판정 2026-09-27] 진 판 결과 카드에 광고 버튼(#adv-ad · 포털·하트 0·보상 가능일 때만
+   선다)이 서면 하트 줄 바로 밑에 붙었다(상자 사이 0 · 잉크 사이 2~4px — 사용자 반려 #24 모양, 광고가 켜지는
+   포털에서 재발). 카드 안 이웃 간격(설명 → 하트 = .sub-score margin-bottom 4px)과 **같은 토큰**을 광고 버튼
+   위에 둔다 — 두 간격이 --hcard-gap 하나를 읽는다(값 4px 그대로 · 새 값 0). 광고가 꺼진 평소 화면은
+   #adv-ad 가 display:none 이라 여백이 생기지 않는다(픽셀 0). */
+#modal-adv .result-card .sub-score{ margin-bottom: var(--hcard-gap); }
+#modal-adv .result-card #adv-ad{ margin-top: var(--hcard-gap); }
 /* ── 공유 카드 미리보기 썸네일 (판정판 53) ───────────────────────────────
    결과 시트 셋(#modal-daily · #modal-arc · #modal-over)이 공유 버튼 바로 위에
    띄우는 1080x1350 카드의 축소판이다.
@@ -14611,7 +14619,7 @@ html[data-platform="twa"] #app-intro.is-hold .api-char{
 <!-- ==RELEASE:BEGIN== 출시 메타 (scratchpad/release-0908/apply-head.py 가 생성·교체, 본문 무접촉) -->
 <meta name="build" content="8decb36-20260908-1716">
 <meta name="application-name" content="텐트윈 젤리팡 월드">
-<meta name="description" lang="ko" content="숫자 젤리를 골라 10을 만들어 터뜨리는 퍼즐 — 모험·아케이드·데일리·타임러시·클래식. Ten Twin Jelly Pang World: pick number jellies that equal or sum to 10.">
+<meta name="description" lang="ko" content="숫자 젤리를 골라 10을 만들어 터뜨리는 퍼즐이에요. 모험·아케이드·데일리·타임 러시·클래식을 즐겨요. Ten Twin Jelly Pang World: pick number jellies that equal or sum to 10.">
 <link rel="manifest" href="tentwin.webmanifest">
 <link rel="canonical" href="https://ghkd70408040-wq.github.io/game-factory-site/tentwin.html">
 <meta name="robots" content="index,follow">
@@ -14871,7 +14879,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
                syncCharSummary() 가 선택 패널의 카드에서 복제해 온다(6차의 복제
                규약 그대로 — 새 SVG 0 개). 이름을 옆에 적던 9차의 두 번째 줄은
                §6.8 의 "칩 + 라벨 한 줄" 규칙에 걸려 사라졌다. -->
-          <button id="char-open" class="mbtn mbtn-char" type="button" data-i18n-aria="aria.charopen" aria-label="Heroes — choose a character"><span class="mbtn-chip mc-char" aria-hidden="true"><span id="co-hero" class="co-av"></span></span><span class="mbtn-lab" data-i18n="pick.title">Heroes</span></button>
+          <button id="char-open" class="mbtn mbtn-char" type="button" data-i18n-aria="aria.charopen" aria-label="Heroes: choose a character"><span class="mbtn-chip mc-char" aria-hidden="true"><span id="co-hero" class="co-av"></span></span><span class="mbtn-lab" data-i18n="pick.title">Heroes</span></button>
           <button id="btn-settings" class="mbtn mbtn-set" type="button" data-i18n-aria="aria.settings" aria-label="Settings"><span class="mbtn-chip mc-gear" aria-hidden="true"></span><span class="mbtn-lab" data-i18n="menu.settings">Settings</span></button>
         </div>
       </div>
@@ -14960,7 +14968,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
     <footer id="kd-bot" class="hudbar jbox jbox--strip">
       <span class="hchip" id="kd-bot-b1"><span class="hc-ico hc-star" aria-hidden="true"></span><b id="kd-bot-b1-v">0</b></span>
       <button id="kd-bot-plate" type="button" data-i18n-aria="menu.adv" aria-label="Adventure"><span class="mp-txt"><b id="kd-bot-ch-k" data-i18n="menu.adv">Adventure</b><i id="kd-bot-ch-n">Chapter 1</i></span></button>
-      <button id="kd-bot-char" class="mfbtn mfbtn-l" type="button" data-i18n-aria="aria.charopen" aria-label="Heroes — choose a character"><span data-i18n="pick.title">Heroes</span></button>
+      <button id="kd-bot-char" class="mfbtn mfbtn-l" type="button" data-i18n-aria="aria.charopen" aria-label="Heroes: choose a character"><span data-i18n="pick.title">Heroes</span></button>
       <button id="kd-bot-rec" class="mfbtn mfbtn-r" type="button" data-i18n-aria="aria.rank" aria-label="Records"><span data-i18n="settings.rank">Records</span></button>
     </footer>
   </section>
@@ -15018,7 +15026,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
         <button id="map-chapter" class="mp-txt" type="button" aria-haspopup="dialog" data-i18n-aria="aria.minimap" aria-label="See all chapters"><b id="map-ch-k">CHAPTER 1</b><i id="map-ch-n">Chapter 1</i></button>
         <button id="map-ch-next" data-part="btn-map-arrow" data-variant="next" class="mp-arrow" type="button" data-i18n-aria="aria.chnext" aria-label="Next chapter">&rsaquo;</button>
       </div>
-      <button id="map-char" class="mfbtn mfbtn-l" type="button" data-i18n-aria="aria.charopen" aria-label="Heroes — choose a character"><span data-i18n="pick.title">Heroes</span></button>
+      <button id="map-char" class="mfbtn mfbtn-l" type="button" data-i18n-aria="aria.charopen" aria-label="Heroes: choose a character"><span data-i18n="pick.title">Heroes</span></button>
       <button id="map-rec" class="mfbtn mfbtn-r" type="button" data-i18n-aria="aria.rank" aria-label="Records"><span data-i18n="settings.rank">Records</span></button>
     </footer>
   </section>
@@ -15228,8 +15236,8 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
            숫자는 막대 **밖**, 막대 바로 아래 빈 띠에 선다. .dh-bar·.dh-side 는 overflow:hidden
            이라 그 안에 두면 띠의 아래쪽이 잘린다 — 그래서 #duel-hud 의 직계로 옮겼다.
            자리·크기 근거는 CSS 「64-fix2 ②」 절(#app.battle #duel-hud .dh-num). -->
-      <span id="duel-foe-n" class="dh-num">0 / 0</span>
-      <span id="duel-me-n" class="dh-num">0 / 0</span>
+      <span id="duel-foe-n" class="dh-num"><span class="dh-hp">0 <span class="dh-sl">/</span> 0</span></span>
+      <span id="duel-me-n" class="dh-num"><span class="dh-hp">0 <span class="dh-sl">/</span> 0</span></span>
       <span id="duel-dmg" class="dh-dmg" data-slot="dmg"></span>
     </div>
     <!-- v2 HUD strip. Collapses to 0px when both children are [hidden] (no vertical
@@ -16696,7 +16704,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
           <h3 class="rules-title" data-i18n="rules.title">Three rules. That is all.</h3>
           <ol class="rules-list">
             <li><span class="rules-num" aria-hidden="true">1</span><span data-i18n-html="rules.r1">Same number, or two that make <b>10</b>.</span></li>
-            <li><span class="rules-num" aria-hidden="true">2</span><span data-i18n-html="rules.r2">Joined by a <b>straight path</b> — across, down, or diagonal.</span></li>
+            <li><span class="rules-num" aria-hidden="true">2</span><span data-i18n-html="rules.r2">Joined by a <b>straight path</b> across, down, or diagonally.</span></li>
             <li><span class="rules-num" aria-hidden="true">3</span><span data-i18n-html="rules.r3">Or the <b>end</b> of a row to the <b>start</b> of the next.</span></li>
           </ol>
           <p class="rules-note" data-i18n="rules.note">Either way, nothing may be left standing in between.</p>
@@ -16750,7 +16758,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
             <path d="M107 51 L127 31" class="art-link"/>
           </svg>
         </div>
-        <p data-i18n-html="howto.p3">The two tiles must sit on a <b>straight line</b> &mdash; any of the 8 directions.</p>
+        <p data-i18n-html="howto.p3">The two tiles must sit on a <b>straight line</b>. Any of the 8 directions works.</p>
       </div>
 
       <!-- 4 / 5 — neighbours in reading order (end of a row wraps to the next) -->
@@ -16770,7 +16778,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
             <path d="M183 35 H191 V56 H9 V77 H21" class="art-wrap"/>
           </svg>
         </div>
-        <p data-i18n-html="howto.p4">&hellip;or be <b>neighbors in reading order</b> &mdash; the end of a row wraps to the start of the next.</p>
+        <p data-i18n-html="howto.p4">&hellip;or be <b>neighbors in reading order</b>. The end of a row wraps to the start of the next.</p>
       </div>
 
       <!-- 5 / 5 — a fully emptied row collapses -->
@@ -16790,7 +16798,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
             <path d="M62 92 v10 M54 96 l8 8 l8 -8 M138 92 v10 M130 96 l8 8 l8 -8" class="art-arrow"/>
           </svg>
         </div>
-        <p data-i18n-html="howto.p5">Empty a whole row and it <b>collapses</b> &mdash; everything above drops down.</p>
+        <p data-i18n-html="howto.p5">Empty a whole row and it <b>collapses</b>. Everything above drops down.</p>
       </div>
 
       <!-- 전투 기술 카드 — 도움말의 **마지막** 장. 맨 뒤에 두는 이유는 두 가지다:
@@ -16892,7 +16900,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
   <div id="modal-soon" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="soon-h"><div class="sheet jbox jbox--modal" data-part="modal-plate">
     <h2 id="soon-h" data-i18n="soon.title">Coming Soon</h2>
     <button class="r10-x x-btn" type="button" data-w6x="soon-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
-    <p class="cut-line" data-i18n="soon.body">Under construction — check back after the next update!</p>
+    <p class="cut-line" data-i18n="soon.body">Under construction. Check back after the next update!</p>
     <button id="soon-close" data-part="btn-modal" data-variant="primary" class="btn btn-primary" type="button" data-i18n="settings.close">Close</button>
   </div></div>
 
@@ -17301,7 +17309,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
   <div id="modal-classic" class="modal r10m" hidden role="dialog" aria-modal="true" aria-labelledby="classic-h"><div class="sheet r10-panel jbox jbox--modal" data-part="modal-plate">
     <div class="r10-ribbon"><h2 id="classic-h" data-i18n="classic.title">Classic</h2></div>
     <button id="classic-close" class="r10-x x-btn" type="button" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
-    <p id="classic-lead" data-i18n="classic.lead">No skills, no items, no passives. Clear the board for the next one — stuck ends the run, Rush ends at 90s, Daily is one board a day.</p>
+    <p id="classic-lead" data-i18n="classic.lead">No skills, no items, no passives. Clear the board for the next one. Stuck ends the run, Rush ends at 90s, Daily is one board a day.</p>
     <!-- ===== 0911 판정판 49 ② — 「스킬·펫 사용」 토글 =========================
          사용자 판정: 플레이 시트의 아케이드·데일리·타임러시는 클래식 세 줄과
          **같은 세 종목**이고, 갈리는 것은 「스킬·펫을 쓰나」 하나뿐이다. 그래서
@@ -17322,7 +17330,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
     <div class="mode-list">
       <button id="classic-arcade" class="mode-row" data-part="btn-picture" data-variant="arcade" type="button">
         <span class="nchip nchip-arc bp-icon" aria-hidden="true"></span>
-        <span class="mode-t bp-text"><b class="btnf-let bp-let" data-i18n="classic.arcade">Endless</b><i class="btnf-let bp-let" data-i18n="classic.arcade.d">Endless, pure.</i></span>
+        <span class="mode-t bp-text"><b class="btnf-let bp-let" data-i18n="classic.arcade">Endless</b><i class="btnf-let bp-let" data-i18n="classic.arcade.d">No timer, pure play.</i></span>
         <span id="classic-arcade-b" class="mode-b bp-badge bp-let" data-badge="rank"></span>
       </button>
       <button id="classic-rush" class="mode-row" data-part="btn-picture" data-variant="timerush" type="button">
@@ -26661,7 +26669,7 @@ window.TT_SFX = {
 
       'aria.logo': 'Ten Twin Jelly Pang World',
       'aria.splash': 'Tap the screen to start',
-      'aria.play': 'Play endless mode',
+      'aria.play': 'Play Endless mode',
       'aria.daily': "Play today's daily puzzle",
       'aria.howto': 'How to play',
       'aria.sound': 'Sound',
@@ -26676,9 +26684,9 @@ window.TT_SFX = {
       /* Panels 3-5. The connection rule used to be one dense paragraph on a
          single slide (review #2: "연결 규칙을 아무도 안 알려줌"); it is now three
          slides, one idea each, matching the five .howto-panel elements. */
-      'howto.p3': 'The two tiles must sit on a <b>straight line</b> — any of the 8 directions.',
-      'howto.p4': '…or be <b>neighbors in reading order</b> — the end of a row wraps to the start of the next.',
-      'howto.p5': 'Empty a whole row and it <b>collapses</b> — everything above drops down.',
+      'howto.p3': 'The two tiles must sit on a <b>straight line</b>. Any of the 8 directions works.',
+      'howto.p4': '…or be <b>neighbors in reading order</b>. The end of a row wraps to the start of the next.',
+      'howto.p5': 'Empty a whole row and it <b>collapses</b>. Everything above drops down.',
       'howto.prev': 'Prev',
       'howto.next': 'Next',
       'howto.close': 'Got it',
@@ -26881,11 +26889,11 @@ window.TT_SFX = {
       'toast.savefail': 'Progress can’t be saved',
       /* final-fix I-4 — persistReadOnly(손상 저장·부팅 실패) 전용, 위 savefail
          (quota/private mode 쓰기 실패)과는 다른 상황이라 새 키. */
-      'toast.savero': "Saving isn't working right now — progress this session won't be saved.",
+      'toast.savero': "Saving is off. This session won't be saved.",
       'toast.noadds': 'No adds left',
       'toast.empty': 'Board is empty',
       'toast.nohints': 'No hints left',
-      'toast.nomoves': 'No moves — use Add',
+      'toast.nomoves': 'No moves. Use Add.',
       'toast.noundo': 'No undo left',
       'toast.usedstage': 'Already used this stage',
       'toast.copied': 'Copied!',
@@ -27060,8 +27068,8 @@ window.TT_SFX = {
       'hud.rush': 'Time left',
       'toast.addcd': 'Add ready in {n}s',
       /* DESIGN §12.3 — 자동 백스톱이 대신 눌렀을 때. 사과가 아니라 안내다. */
-      'toast.autoadd': 'No moves left — adding for you!',
-      'toast.rushnext': 'Board cleared — next!',
+      'toast.autoadd': 'No moves left. Adding for you!',
+      'toast.rushnext': 'Board cleared. Next!',
       'over.rush.title': "Time's up!",
       'over.rush.best': 'Rush best',
       'act.addfree': '∞',
@@ -27116,7 +27124,7 @@ window.TT_SFX = {
       'grade.s.msg': 'Flawless run!',
       'grade.a.msg': 'Sharp work.',
       'grade.b.msg': 'Solid clear.',
-      'grade.c.msg': 'Cleared — try it faster.',
+      'grade.c.msg': 'Cleared. Try it faster.',
       'milestone.title': 'Match #{n}!',
       'milestone.title.rw': 'Match #{n}! Jelly Stars +{v}',
       'milestone.sub': 'What a streak. Keep going.',
@@ -27144,9 +27152,9 @@ window.TT_SFX = {
          폐기 이유는 TUT_BOARDS 주석에 있다 — 1행 판은 꺾임과 줄바꿈을 보여 줄 수
          없었다. 화자는 **텐텐**이다(STORY-CUTS §캐릭터: 짧고 단정, 존댓말 안 씀).
          시스템 안내문이 아니라 컷툰 속 인물이 옆에서 가르치는 말투여야 한다. */
-      'tut.s1': 'Two <b>7</b>s, one above the other. Straight line — tap them.',
+      'tut.s1': 'Two <b>7</b>s, one above the other, in a straight line. Tap them.',
       'tut.s2': 'Two <b>2</b>s up there. Try those.',
-      'tut.s2fail': 'See? Bent lines do not connect. Straight only — and diagonals count. <b>7</b> and <b>3</b> make <b>10</b>.',
+      'tut.s2fail': 'See? Bent lines do not connect. Straight only, and diagonals count. <b>7</b> and <b>3</b> make <b>10</b>.',
       'tut.s3': 'End of the row, start of the next. Those two <b>6</b>s still reach each other.',
       'tut.s3fail': 'Not that one. Go from the <b>end</b> of a row to the <b>start</b> of the next.',
       'tut.done': 'That\'s the basics. Now beat the villain!',
@@ -27161,7 +27169,7 @@ window.TT_SFX = {
       'rules.c4': 'Overdrive',
       'rules.c5': 'Finish',
       'rules.r1': 'Same number, or two that make <b>10</b>.',
-      'rules.r2': 'Joined by a <b>straight path</b> — across, down, or diagonal.',
+      'rules.r2': 'Joined by a <b>straight path</b> across, down, or diagonally.',
       'rules.r3': 'Or the <b>end</b> of a row to the <b>start</b> of the next.',
       'rules.note': 'Either way, nothing may be left standing in between.',
       /* 전투 기술 카드(도움말 마지막 장). 만든 사람 본인도 필살기가 무엇으로 차는지
@@ -27189,7 +27197,7 @@ window.TT_SFX = {
       'aria.shuffle': 'Shuffle the board',
       'toast.shuffled': 'Shuffled!',
       'toast.shufflestuck': 'Stuck! Shuffling for you.',
-      'toast.shufflelocked': 'There are still matches — find them!',
+      'toast.shufflelocked': 'There are still matches. Find them!',
       /* 0901 ⑥-f D6 — 재배치조차 못 여는 판. 실패를 자기 문장으로 말한다. */
       'toast.shufflefail': 'No moves left, even after a re-deal.',
       'toast.noshuffle': 'No shuffles left.',
@@ -27197,7 +27205,7 @@ window.TT_SFX = {
          칸을 특정하지 못한 극단적 경우의 폴백으로 계속 살아 있고, 되돌릴 근거
          이기도 하다. 다만 이제 "값은 맞는데 거부됐다" 전체가 아니라 **진짜로
          일직선이 막힌 경우**에만 도달한다. */
-      'toast.blocked': 'Right numbers — but the path is blocked.',
+      'toast.blocked': 'Right numbers, but the path is blocked.',
       'toast.blockedBy': '{n} is in the way.',
       /* 14차 #34 — 두 문구를 갈아 끼웠다. 옛 값(키를 따옴표로 감싸 적으면
          tools/verify.js 의 i18n 중복 검사가 주석을 정의로 세므로 `키 = 값`으로 적는다):
@@ -27213,7 +27221,7 @@ window.TT_SFX = {
          튜토리얼이 쓰는 어휘가 "straight path"라서 낱말만 맞춘다 — 배운 말과 다른
          말로 상기시키면 학습이 전이되지 않는다. */
       'toast.notLine': 'That is not a straight path.',
-      'toast.alignRemind': 'A straight path — or the end of a row to the start of the next.',
+      'toast.alignRemind': 'A straight path, or wrap to the next row.',
       'combo.5': 'UNSTOPPABLE!',
 
       /* ---- v4: progression visibility ---- */
@@ -27251,9 +27259,9 @@ window.TT_SFX = {
       'rank.tab.classic': 'Classic',
       'rank.tab.classicrush': 'Classic Rush',
       'rank.tab.classicdaily': 'Classic Daily',
-      'rank.hint.classic': 'Your 5 best Classic runs — no skills, no items.',
-      'rank.hint.classic-rush': 'Your 5 best Classic Time Rush runs — skill only.',
-      'rank.hint.classic-daily': "Your 5 fastest Classic Daily clears — everyone on even ground.",
+      'rank.hint.classic': 'Your 5 best Classic runs, with no skills or items.',
+      'rank.hint.classic-rush': 'Your 5 best Classic Time Rush runs, on skill alone.',
+      'rank.hint.classic-daily': "Your 5 fastest Classic Daily clears, all on even ground.",
       'rank.empty': 'No record yet',
       'rank.dateunknown': 'earlier',
       'rank.close': 'Close',
@@ -27266,7 +27274,7 @@ window.TT_SFX = {
       'rank.meta.daily': '#{n} · {combo}× · {date}',
       'rank.new': '🏆 New #{n} record!',
       'rank.new1': '🏆 New best ever!',
-      'rank.overline': 'New personal record — #{n}',
+      'rank.overline': 'New personal record: #{n}',
       'aria.rank': 'Records',
       'aria.rankClose': 'Close records',
       'aria.rankTab': 'Pick which records to show',
@@ -27315,7 +27323,7 @@ window.TT_SFX = {
          (감사 D3 「막히면 끝이에요」가 안 보임), 부품(t3-btn-picture)의 글자 안전
          상자는 구운 그림 실측값이라 넓힐 수 없다. 그래서 종료 조건을 잘림이 원리적으로
          없는 자리(리드 <p> — 접힌다)인 이 한 줄로 옮겼다. 정보는 한 자도 안 잃었다. */
-      'classic.lead': 'No skills, no items, no passives. Clear the board for the next one — stuck ends the run, Rush ends at 90s, Daily is one board a day.',
+      'classic.lead': 'No skills, no items, no passives. Clear the board for the next one. Stuck ends the run, Rush ends at 90s, Daily is one board a day.',
       'classic.arcade': 'Endless',
       /* 0901 ⑥-f D7 (CLASSIC-AUDIT-0831 §5) — 「다 지우면 다음 판이 온다」가
          화면 어디에도 안 적혀 있었다. 사용자가 "전부 없애는 게 클래식"으로
@@ -27325,7 +27333,7 @@ window.TT_SFX = {
            아케이드 — 판을 비우면 다음 판 · 막히면 끝
            타임 러시 — 판을 비우면 다음 판 · 90초로 끝  (D1 수리 뒤 막힘도 끝)
            데일리   — 판을 비우면 결과 · 하루 한 판 */
-      'classic.arcade.d': 'Endless, pure.',
+      'classic.arcade.d': 'No timer, pure play.',
       'classic.rush': 'Time Rush',
       'classic.rush.d': '90s, skill only.',
       'classic.daily': 'Daily',
@@ -27361,7 +27369,7 @@ window.TT_SFX = {
       'arc.share': 'Share',
       'aria.arcShare': 'Share your arcade record with a result card image',
       'rank.arc.title': 'Arcade Duel',
-      'aria.cont': 'Classic — pure skill modes',
+      'aria.cont': 'Classic: pure skill modes',
       'aria.chprev': 'Previous chapter',
       'aria.chnext': 'Next chapter',
       'aria.gallery': 'Story gallery',
@@ -27370,7 +27378,7 @@ window.TT_SFX = {
       'aria.cutskipall': 'Skip the whole story',
       'settings.gallery': 'Story gallery',
       'settings.credits': 'Credits',
-      'credits.body': 'Ten Twin: Jelly Pang World — art & music by the author, built with the game factory.',
+      'credits.body': 'Ten Twin: Jelly Pang World · Art & music by the author, built with the game factory.',
       /* --- §H 캐릭터 추천 태그 -------------------------------------------- */
       'pick.rec': 'Best for',
       'pet.combo.k': 'Best team',
@@ -27458,7 +27466,7 @@ window.TT_SFX = {
       'adv.hud.score': '{n} / {goal}',
       'adv.hud.digit': '{d}: {n} / {goal}',
       'adv.hud.time': 'Cleared {n} / {goal}',
-      'adv.goalhit': 'Goal reached — now go for stars!',
+      'adv.goalhit': 'Goal reached! Now go for stars!',
       'adv.hand.blk': 'Blockers ×{n}',
       'adv.hand.lock': 'Locked tiles ×{n}',
       'adv.hand.noshuffle': 'No shuffle',
@@ -27484,13 +27492,13 @@ window.TT_SFX = {
       /* B7 — 「목표」라는 낱말을 승리선에서 뗀다. 이 수는 별 두 개가 열리는
          **점수선**이지 이겨야 하는 조건이 아니다(승리는 악당 체력). */
       'node.bestv': '{b} / ★★ line {g} = {p}%',
-      'node.bestnone': 'No record yet — ★★ line {g}',
+      'node.bestnone': 'No record yet · ★★ line {g}',
       'node.rec': 'Why this hero',
       'node.recpet': 'Why this pet',
       'node.pet': 'Pet pick',
-      'rec.why.ten': 'Sum-10 matches pay +60% for Tenten — this stage is full of them.',
+      'rec.why.ten': 'Sum-10 matches pay +60% for Tenten, and this stage is full of them.',
       'rec.why.twin': 'Same-number matches pay +60% for Twin, and they chain fastest.',
-      'rec.why.jelly': 'Jackpot variance pushes clear speed — best where the clock is the goal.',
+      'rec.why.jelly': 'Jackpot variance pushes clear speed. It is best where the clock is the goal.',
       'rec.why.pudding': 'A cushion on every match keeps long boards alive.',
       'rec.why.sodawitch': 'The gamble ult can shear a quarter off the boss in one stroke.',
       /* ★ 0826 8단계 — 기술 축(PET_REC_ATK)으로 펫을 골랐을 때의 이유 줄. */
@@ -27502,17 +27510,17 @@ window.TT_SFX = {
       'adv.go': 'Start',
       'adv.close': 'Close',
       'adv.missionwin': 'Mission clear! Every match ×{mult} from now on',
-      'adv.missionfail': 'Mission time is up — the stage goes on.',
+      'adv.missionfail': 'Mission time is up. The stage goes on.',
       'adv.crumble': 'The blockers crumbled!',
       'adv.win': 'Stage {n} clear!',
       'adv.bosswin': 'Boss {n} down!',
       'adv.lose': 'Stage {n} failed',
       /* 0901 ⑥-b §2 — STORY-SCRIPT-0831 §2 「50탄 각본 세트」 원문 이식.
          자리표시 문구를 정본으로 갈았다. .sub 는 신설(결과 시트 아랫줄). */
-      'adv.result.scripted': 'Round One — Retreat',
+      'adv.result.scripted': 'Round One: Retreat',
       'adv.result.scripted.sub': 'You didn\'t lose. The story just began. Chapter 6 is open.',
       'adv.result.finish': 'The finish slipped away',
-      'story.s50.taunt': '"Not yet! Without the Heart you can\'t win — fall back, and gather your strength."',
+      'story.s50.taunt': '"Not yet! Without the Heart you can\'t win. Fall back, and gather your strength."',
       /* ---- 0901 ⑥-c — 개념 튜토리얼 5장 (STORY-SCRIPT-0831 §3 원문) --------
          대본의 마크다운 강조 **…** 는 이 파일의 기존 도움말 문법대로 <b> 로 옮겼다
          (howto.p1~p5 와 같은 data-i18n-html 규약). 낱말은 한 자도 안 바꿨다.
@@ -27521,8 +27529,8 @@ window.TT_SFX = {
       'howto.ten': 'Same numbers make a <b>Twin</b>; adding to 10 makes a <b>Ten</b>. Every Ten loosens the hardened world.',
       'howto.ult': 'Awakening charges when you <b>alternate</b>. Match Ten, then Twin, then Ten again. Repeat the same kind and the chain breaks.',
       'howto.awaken': 'Skill fills faster with bigger combos. When it bursts: for {sec} seconds, <b>every match counts as a Ten Twin combo.</b>',
-      'howto.overdrive': 'Chain your attacks and hit <b>OVERDRIVE</b>! It lasts as long as you do \u2014 keep matching, keep firing.',
-      'howto.finish': 'When the boss falls: <b>10-second Finish</b>. Clear the final mission on screen \u2014 that\'s the real win.',
+      'howto.overdrive': 'Chain your attacks and hit <b>OVERDRIVE</b>! It lasts as long as you do. Keep matching, keep firing.',
+      'howto.finish': 'When the boss falls: <b>10-second Finish</b>. Clear the final mission on screen. That\'s the real win.',
       /* \ud310\uc815\ud310 48 \u2014 \uccab \ub9cc\ub545 1\ud68c \uc548\ub0b4. \uc704 howto.* \uac00 \u00ab\uaddc\uce59\u00bb\uc774\ub77c\uba74 \uc774 \ub458\uc740
          \u00ab\uc9c0\uae08 \ub20c\ub7ec\ub3c4 \ub41c\ub2e4\u00bb\ub294 \uc870\uc791 \ud78c\ud2b8\ub2e4(store.tipsSeen). \ud55c \uc904\ub85c \ub05d\ub09c\ub2e4. */
       'tip.awakenReady': 'Skill ready! Tap it.',
@@ -27533,8 +27541,8 @@ window.TT_SFX = {
       'adv.note3': 'Three stars. Nothing left to take here.',
       'adv.note.next': 'Score {n} for the second star.',
       /* 0901 ⑥-e — 남은 조건을 이름으로 말하는 줄. {m} 은 아래 miss.* 를 ' · ' 로 이은 것. */
-      'adv.note.miss2': 'Second star needs \u2014 {m}',
-      'adv.note.miss3': 'Third star needs \u2014 {m}',
+      'adv.note.miss2': 'For the second star, you need {m}.',
+      'adv.note.miss3': 'For the third star, you need {m}.',
       'adv.miss.score': '{n} points',
       'adv.miss.ease': 'time or adds to spare',
       'adv.miss.shuffle': 'no shuffles',
@@ -27568,7 +27576,7 @@ window.TT_SFX = {
          맞춰 연쇄가 오를 때만 찬다(34327: tw.chain > twPrev 일 때만 sp += 2*pts).
          각성은 반대로 얼음 아닌 모든 매치가 채우고 콤보가 높을수록 빨리 찬다
          (30590 의 gaugeBump(S.combo), 잔량 안내는 28121 계열 fireSkill 경로). */
-      'duel.atkstat': 'Attack {n}% — it fills with every point you score, and fires on its own when full.',
+      'duel.atkstat': 'Attack {n}%. It fills with every point you score, and fires on its own when full.',
       'duel.spstat': 'Awakening is at {n}%. It only fills when you alternate sum-10 and same-number matches.',
       'duel.spgo': 'AWAKEN! -{n}',
       'duel.petnone': 'No pet yet. Pick one and you can use their skill a few times each round.',
@@ -27706,7 +27714,7 @@ window.TT_SFX = {
       'boss.cocoa.name': 'King Cocoa',
       /* 0901 ⑥-b §2 — 등장 한 줄. 50탄 = intro · 100탄 = rematch. */
       'boss.cocoa.intro': '"I swallowed the Heart. Your \'Ten\' is only half a thing now."',
-      'boss.cocoa.rematch': '"You again. \u2026That look — you\'ve got the Heart back."',
+      'boss.cocoa.rematch': '"You again. \u2026That look. You\'ve got the Heart back."',
       /* 0826 6단계 — 공격 기술의 이름. 지금은 한 종류뿐이고, 7단계가 늘린다. */
       'boss.atk.blk': 'Blocker Drop',
       'boss.atk.freeze': 'Column Freeze',
@@ -27721,7 +27729,7 @@ window.TT_SFX = {
       'boss.prog': '{c} · {n}/{goal}',
       /* 0910 — bossArmUlt 가 부르는 것은 castSkill(= 각성)이다. 「필살기」로
          쓰면 하단 필살기 버튼(doSpecial)이 저절로 나간 줄로 읽힌다. */
-      'boss.armed': 'Opening found — SKILL INCOMING!',
+      'boss.armed': 'Opening found! SKILL INCOMING!',
       'boss.weak': 'OPENING!',
       'boss.tell': '{b} is winding up…',
       'boss.atk': 'Blockers dropped! (×{n})',
@@ -27734,7 +27742,7 @@ window.TT_SFX = {
       'char.locked.hint': 'Still locked. Beat the stage-10 boss to set her free.',
       'unlock.title': 'Jelly Princess is free!',
       'unlock.line': 'Thank you! I am coming with you!',
-      'unlock.sub': 'Jelly Princess joins your party — pick her in the menu.',
+      'unlock.sub': 'Jelly Princess joins your party. Pick her in the menu.',
       'unlock.go': 'Welcome aboard!',
 
       /* --- v4 6차 §B: 캐릭터 선택 패널 --- */
@@ -27955,19 +27963,19 @@ window.TT_SFX = {
       'intro.done': '▶ Close',
       'intro.ten.l1': "I am Prince Tenten. There is always one more path, you know.",
       'intro.ten.l2': "My Prince's Blessing pays back every sum-10 match at +60%.",
-      'intro.ten.l3': 'And when I use my skill I call my brother — every match becomes a Ten Twin combo.',
-      'intro.twin.l1': "Twin here! I can't stand slow — try to keep up.",
+      'intro.ten.l3': 'And when I use my skill, I call my brother. Every match becomes a Ten Twin combo.',
+      'intro.twin.l1': "Twin here! I can't stand slow. Try to keep up.",
       'intro.twin.l2': 'My Twin Vow makes every same-number match +60%.',
-      'intro.twin.l3': 'Use my skill and I call Tenten over — everything counts as a Ten Twin combo.',
+      'intro.twin.l3': 'Use my skill and I call Tenten over. Everything counts as a Ten Twin combo.',
       'intro.jelly.l1': "I'm the Jelly Princess. I waited a long time. My turn to protect you now.",
       'intro.jelly.l2': "The Princess's Warmth gives a 10% chance to triple that match.",
-      'intro.jelly.l3': 'My skill is Jelly Time — the jackpot chance climbs to 40%.',
+      'intro.jelly.l3': 'My skill is Jelly Time. The jackpot chance climbs to 40%.',
       'intro.pudding.l1': 'Pudding Knight, at your service. The bigger the rush, the firmer I stand.',
       'intro.pudding.l2': 'Pudding Guard gives +60% on a 10-sum and +15% on anything else. No match is wasted.',
-      'intro.pudding.l3': 'When I use my skill the shield opens — every match counts as a Ten Twin combo.',
-      'intro.sodawitch.l1': 'Soda Witch. One big bang — that is my taste.',
+      'intro.pudding.l3': 'When I use my skill, the shield opens. Every match counts as a Ten Twin combo.',
+      'intro.sodawitch.l1': 'Soda Witch. One big bang. That is my taste.',
       'intro.sodawitch.l2': 'Fizz Pop sets off a 20% chance of ×2 on every single match.',
-      'intro.sodawitch.l3': 'My skill is Soda Spell — the jackpot chance becomes 40%.',
+      'intro.sodawitch.l3': 'My skill is Soda Spell. The jackpot chance becomes 40%.',
       'intro.ppyak.l1': "Ppyak! I've been here with you from the very first round.",
       'intro.ppyak.l2': 'My skill is Free Link. For 8 seconds even far tiles connect.',
       'intro.mungchi.l1': 'Mungchi. Nobody is sturdier than me.',
@@ -27976,7 +27984,7 @@ window.TT_SFX = {
       'intro.mongle.l2': 'My skill is Time Puddle. The clock and the villain gauge stop for 4 seconds.',
       'intro.tiktok.l1': 'Tick-tock! I am the one who counts the seconds.',
       'intro.tiktok.l2': 'My skill is Time Stop. Time freezes for 6 seconds, and you can still match.',
-      'intro.churup.l1': 'Churup! One bite, one row — leave it to me.',
+      'intro.churup.l1': 'Churup! One bite, one row. Leave it to me.',
       'intro.churup.l2': 'My skill is Big Bite. A whole row gets reshuffled.',
       'intro.kkultteok.l1': 'Honeybee here. Anything sweet belongs to me.',
       'intro.kkultteok.l2': 'My skill is Golden Call. I summon 2 golden fruits.',
@@ -28015,7 +28023,7 @@ window.TT_SFX = {
       'stat.jelly.2': 'Luck',
       'stat.jelly.3': 'Bounciness',
       'stat.jelly.4': 'Courage',
-      'aria.charopen': 'Heroes — choose a character',
+      'aria.charopen': 'Heroes: choose a character',
       'aria.prevchar': 'Previous character',
       'aria.nextchar': 'Next character',
       'aria.close': 'Close',
@@ -28077,7 +28085,7 @@ window.TT_SFX = {
       'mode.title.arcade': 'Arcade Duel',
       'kd.soon': 'Opening soon!',
       'soon.title': 'Coming Soon',
-      'soon.body': 'Under construction — check back after the next update!',
+      'soon.body': 'Under construction. Check back after the next update!',
       'kd.visit': 'Yesterday-you saved up {n} Jelly Stars.',
       'kd.visit.first': 'Welcome to Jelly Pang Kingdom!',
       'kd.res.aria': 'Say hello',
@@ -28118,7 +28126,7 @@ window.TT_SFX = {
 
       'aria.logo': 'Ten Twin 젤리 팡 월드',
       'aria.splash': '화면을 터치하면 시작합니다',
-      'aria.play': '엔들리스 모드 시작',
+      'aria.play': '무한 모드 시작',
       'aria.daily': '오늘의 데일리 퍼즐 풀기',
       'aria.howto': '게임 방법',
       'aria.sound': '소리',
@@ -28131,7 +28139,7 @@ window.TT_SFX = {
       'howto.p1': '<b>같은 숫자</b> 타일 두 개를 탭하세요.',
       'howto.p2': '…또는 <b>합이 10</b>이 되는 두 개를요.',
       /* 3~5번 패널. 연결 규칙 한 덩어리를 셋으로 쪼갠 판 (리뷰 #2). */
-      'howto.p3': '두 타일은 <b>일직선</b>에 있어야 해요 — 8방향 어디든 좋아요.',
+      'howto.p3': '두 타일은 <b>일직선</b>에 있어야 해요. 8방향 어디든 좋아요.',
       'howto.p4': '…또는 <b>읽는 순서로 이웃</b>이면 돼요. 줄 끝은 다음 줄 첫 칸과 이어져요.',
       'howto.p5': '한 줄을 다 비우면 <b>그 줄이 사라지고</b> 위쪽이 아래로 내려와요.',
       'howto.prev': '이전',
@@ -28314,7 +28322,7 @@ window.TT_SFX = {
       'daily.share': '공유하기',
       'daily.menu': '메인 메뉴',
       /* 판정판 53 — en 쪽 주석과 같은 이유로 보이는 라벨('결과 복사')이 앞머리다. */
-      'aria.share': '데일리 결과 공유하기 — 결과 카드 이미지 포함',
+      'aria.share': '결과 카드 이미지와 함께 데일리 결과 공유하기',
       'aria.dailyMenu': '메인 메뉴로',
 
       /* 출시 점검 0909 ②(승인 A4) — 저장 실패 알림(en 쪽과 같은 키). */
@@ -28323,7 +28331,7 @@ window.TT_SFX = {
       'toast.noadds': '추가 횟수를 다 썼어요',
       'toast.empty': '보드가 비었어요',
       'toast.nohints': '힌트를 다 썼어요',
-      'toast.nomoves': '지울 수 있는 짝이 없어요 — 추가를 눌러 보세요',
+      'toast.nomoves': '지울 수 있는 짝이 없어요. 추가를 눌러 보세요.',
       'toast.noundo': '되돌리기를 다 썼어요',
       'toast.usedstage': '이번 단계에선 이미 썼어요',
       'toast.copied': '복사했어요!',
@@ -28479,7 +28487,7 @@ window.TT_SFX = {
       'hud.rush': '남은 시간',
       'toast.addcd': '{n}초 뒤에 또 쓸 수 있어요',
       /* DESIGN §12.3 — 자동 백스톱이 대신 눌렀을 때. 사과가 아니라 안내다. */
-      'toast.autoadd': '이을 게 없네요 — 제가 추가할게요!',
+      'toast.autoadd': '이을 게 없네요. 제가 추가할게요!',
       'toast.rushnext': '보드 클리어! 다음 판으로',
       'over.rush.title': '시간 종료!',
       'over.rush.best': '러시 최고',
@@ -28531,7 +28539,7 @@ window.TT_SFX = {
          (style.css 가 `#tut-text b` 를 스타일링하기 때문). howto.p* 와 마찬가지로
          전부 우리가 쓴 리터럴이라 사용자 입력이 섞일 여지가 없다. */
       'over.share': '공유하기',
-      'aria.overShare': '점수 공유하기 — 결과 카드 이미지 포함',
+      'aria.overShare': '결과 카드 이미지와 함께 점수 공유하기',
       'tut.skip': '건너뛰기',
       'aria.tutSkip': '튜토리얼 건너뛰기',
       'aria.theme': '테마',
@@ -28553,7 +28561,7 @@ window.TT_SFX = {
          한 문장 20자 감각을 지킨다 — 아이가 소리 내어 읽는다(§0). */
       'tut.s1': '<b>7</b>이 위아래로 둘. 곧게 이어지지? 눌러 봐.',
       'tut.s2': '저기 <b>2</b>도 두 개네. 눌러 봐.',
-      'tut.s2fail': '봤지? 꺾이면 안 이어져. 곧은 길만 통해 — 비스듬한 것도 곧은 길이야. <b>7</b>과 <b>3</b>, 합이 <b>10</b>.',
+      'tut.s2fail': '봤지? 꺾이면 안 이어져. 곧은 길만 통해. 비스듬한 것도 곧은 길이야. <b>7</b>과 <b>3</b>, 합이 <b>10</b>.',
       'tut.s3': '줄 끝이랑 다음 줄 첫 칸. 저 <b>6</b> 둘은 아직 닿아 있어.',
       'tut.s3fail': '거기 말고. 줄 <b>끝</b>에서 다음 줄 <b>첫 칸</b>으로 이어 봐.',
       'tut.done': '이게 기본이야. 이제 악당을 물리쳐 봐!',
@@ -28595,10 +28603,10 @@ window.TT_SFX = {
       'act.shuffle': '섞기',
       'aria.shuffle': '보드 섞기',
       'toast.shuffled': '싹 섞었어요!',
-      'toast.shufflestuck': '막혔네요 — 제가 섞어드릴게요!',
+      'toast.shufflestuck': '막혔네요. 제가 섞어드릴게요!',
       'toast.shufflelocked': '아직 맞출 짝이 남았어요!',
       /* 0901 ⑥-f D6 — 재배치조차 못 여는 판. 실패를 자기 문장으로 말한다. */
-      'toast.shufflefail': '다시 섞어도 짝이 없어요 \u2014 여기까지!',
+      'toast.shufflefail': '다시 섞어도 짝이 없어요. 여기까지예요!',
       'toast.noshuffle': '섞기를 다 썼어요.',
       /* 14차 #32 — 거부 사유별 문구. 셋 다 아이가 소리 내어 읽는 길이(§0, 20자
          감각)를 넘지 않는다. blockedBy 의 조사는 {n} 뒤가 아니라 "타일" 뒤에
@@ -28652,9 +28660,9 @@ window.TT_SFX = {
       'rank.tab.classic': '클래식',
       'rank.tab.classicrush': '클래식 러시',
       'rank.tab.classicdaily': '클래식 데일리',
-      'rank.hint.classic': '클래식 최고 점수 TOP 5 — 스킬도 아이템도 없이.',
-      'rank.hint.classic-rush': '클래식 타임 러시 최고 점수 TOP 5 — 실력만으로.',
-      'rank.hint.classic-daily': '클래식 데일리 최단 시간 TOP 5 — 모두가 같은 조건.',
+      'rank.hint.classic': '스킬도 아이템도 없이 겨룬 클래식 최고 점수 TOP 5',
+      'rank.hint.classic-rush': '실력만으로 겨룬 클래식 타임 러시 최고 점수 TOP 5',
+      'rank.hint.classic-daily': '모두가 같은 조건으로 겨룬 클래식 데일리 최단 시간 TOP 5',
       'rank.empty': '아직 비었어요',
       'rank.dateunknown': '예전 기록',
       'rank.close': '닫기',
@@ -28704,13 +28712,13 @@ window.TT_SFX = {
       'aria.thcell': '{c}장 이야기 다시 보기',
       'mode.arcade': '무한 모드',
       'mode.arcade.d': '끝없이. 최고 기록에 도전해요.',
-      'mode.daily.d': '하루 한 판 — 모두가 같은 판.',
+      'mode.daily.d': '하루 한 판, 모두가 같은 판이에요.',
       /* [감사 1-A] 60초 → 90초 (RUSH_MS = 90000). 위 en 주석 참조. */
       'mode.rush.d': '90초. 맞추면 시간 추가.',
       /* --- W7.5 클래식 허브 ------------------------------------------- */
       'classic.title': '클래식',
       /* D7 종료 조건 이관(위 en 주석 참조) — 리드는 접히므로 잘림이 없다. */
-      'classic.lead': '스킬도 아이템도 패시브도 없어요. 판을 비우면 다음 판 — 막히면 끝, 러시는 90초, 데일리는 하루 한 판.',
+      'classic.lead': '스킬도 아이템도 패시브도 없어요. 판을 비우면 다음 판이 나와요. 막히면 끝, 러시는 90초, 데일리는 하루 한 판이에요.',
       'classic.arcade': '무한 모드',
       /* 0901 ⑥-f D7 — 종료 조건 한 구절(위 en 주석 참조). */
       'classic.arcade.d': '끝없이, 순수하게.',
@@ -28747,9 +28755,9 @@ window.TT_SFX = {
       'arc.again': '다시하기',
       'arc.menu': '메인메뉴',
       'arc.share': '공유하기',
-      'aria.arcShare': '아케이드 기록 공유하기 — 결과 카드 이미지 포함',
+      'aria.arcShare': '결과 카드 이미지와 함께 아케이드 기록 공유하기',
       'rank.arc.title': '아케이드 대전',
-      'aria.cont': '클래식 — 순수 실력 모드',
+      'aria.cont': '클래식: 순수 실력 모드',
       'aria.chprev': '이전 챕터',
       'aria.chnext': '다음 챕터',
       'aria.gallery': '스토리 갤러리',
@@ -28758,7 +28766,7 @@ window.TT_SFX = {
       'aria.cutskipall': '이야기 전부 건너뛰기',
       'settings.gallery': '스토리 갤러리',
       'settings.credits': '제작진',
-      'credits.body': '텐트윈: 젤리팡 월드 — 그림·음악 제작자 제공, 게임 공장에서 만들었습니다.',
+      'credits.body': '텐트윈: 젤리팡 월드 · 그림·음악 제작자 제공, 게임 공장에서 만들었어요.',
       /* --- §H 캐릭터 추천 태그 -------------------------------------------- */
       'pick.rec': '추천',
       'pet.combo.k': '추천 조합',
@@ -28856,13 +28864,13 @@ window.TT_SFX = {
       'node.cond': '약점',
       'node.best': '내 최고',
       'node.bestv': '{b}점 / ★★선 {g}점 = {p}%',
-      'node.bestnone': '아직 기록 없음 — ★★선 {g}점',
+      'node.bestnone': '아직 기록 없음 · ★★선 {g}점',
       'node.rec': '이 캐릭인 이유',
       'node.recpet': '이 펫인 이유',
       'node.pet': '추천 펫',
-      'rec.why.ten': '합10 매치에 +60% — 이 판이 요구하는 매치가 곧 텐텐의 배수다.',
-      'rec.why.twin': '같은 숫자 매치에 +60% — 교대 연쇄가 가장 빨리 붙는다.',
-      'rec.why.jelly': '잭팟 분산이 제거 속도를 민다 — 시계가 목표인 판에서 가장 세다.',
+      'rec.why.ten': '합10 매치는 +60%예요. 이 판이 요구하는 매치가 곧 텐텐의 배수예요.',
+      'rec.why.twin': '같은 숫자 매치는 +60%예요. 교대 연쇄가 가장 빨리 붙어요.',
+      'rec.why.jelly': '잭팟 분산이 제거 속도를 올려요. 시계가 목표인 판에서 가장 강해요.',
       'rec.why.pudding': '매치마다 완충이 붙어 긴 판을 끝까지 끌고 간다.',
       'rec.why.sodawitch': '도박 궁이 보스 체력의 4분의 1을 한 번에 깎는다.',
       /* ★ 0826 8단계 — 기술 축(PET_REC_ATK)으로 펫을 골랐을 때의 이유 줄. */
@@ -28874,22 +28882,22 @@ window.TT_SFX = {
       'adv.go': '시작',
       'adv.close': '닫기',
       'adv.missionwin': '미션 성공! 이제 매치마다 ×{mult}',
-      'adv.missionfail': '미션 시간 종료 — 스테이지는 계속돼요.',
+      'adv.missionfail': '미션 시간이 끝났어요. 스테이지는 계속돼요.',
       'adv.crumble': '블로커가 와르르 무너졌어요!',
       'adv.win': '{n}탄 클리어!',
       'adv.bosswin': '{n}탄 보스 격파!',
       'adv.lose': '{n}탄 실패',
       /* 0901 ⑥-b §2 — STORY-SCRIPT-0831 §2 원문. 머리글 '1차전 — 후퇴' 는
          이미 정본과 같아 그대로 두고, 자막 두 개만 갈았다(taunt · 신설 sub). */
-      'adv.result.scripted': '1차전 — 후퇴',
+      'adv.result.scripted': '1차전: 후퇴',
       'adv.result.scripted.sub': '진 게 아니에요. 이야기가 이제 시작된 거예요. 6챕터가 열렸어요.',
       'adv.result.finish': '피니시를 놓쳤어요',
-      'story.s50.taunt': '"지금은 안 돼! 심장 없이는 못 이겨 — 물러나서, 힘을 모아."',
+      'story.s50.taunt': '"지금은 안 돼! 심장 없이는 못 이겨. 물러나서, 힘을 모아."',
       /* ---- 0901 ⑥-c — 개념 튜토리얼 5장 (STORY-SCRIPT-0831 §3 원문) ---- */
       'howto.ten': '같은 숫자는 <b>트윈</b>, 합이 10이면 <b>텐</b>. 텐을 만들수록 굳은 세계가 풀려요.',
       'howto.ult': '각성은 <b>번갈아</b> 채워요. 텐 다음엔 트윈, 트윈 다음엔 텐을 맞춰요. 같은 것만 반복하면 사슬이 끊겨요.',
       'howto.awaken': '스킬 게이지는 콤보가 클수록 빨리 차요. 터지면 {sec}초간, <b>모든 매치가 텐트윈 콤보</b>가 돼요.',
-      'howto.overdrive': '공격이 꼬리를 물면 <b>폭주</b>! 멈추지 않는 한 계속돼요 \u2014 계속 맞추면, 계속 쏴요.',
+      'howto.overdrive': '공격이 꼬리를 물면 <b>폭주</b>! 멈추지 않는 한 계속돼요. 계속 맞추면, 계속 쏴요.',
       'howto.finish': '보스가 쓰러지면 <b>피니시 10초</b>. 화면에 뜬 마지막 미션을 해내야 진짜 승리예요.',
       /* 판정판 48 — 첫 만땅 1회 안내(사용자 지시 문구 그대로 + 행동 한 마디). */
       'tip.awakenReady': '스킬 준비! 눌러 보세요.',
@@ -28900,8 +28908,8 @@ window.TT_SFX = {
       'adv.note3': '별 세 개. 여기서 더 가져갈 게 없어요.',
       'adv.note.next': '{n}점이면 별 두 개예요.',
       /* 0901 ⑥-e — 남은 조건을 이름으로 말하는 줄. {m} 은 아래 miss.* 를 ' · ' 로 이은 것. */
-      'adv.note.miss2': '별 두 개까지 \u2014 {m}',
-      'adv.note.miss3': '별 세 개까지 \u2014 {m}',
+      'adv.note.miss2': '별 두 개까지 남은 조건이에요. {m}',
+      'adv.note.miss3': '별 세 개까지 남은 조건이에요. {m}',
       'adv.miss.score': '{n}점',
       'adv.miss.ease': '시간 또는 추가 여유',
       'adv.miss.shuffle': '셔플 0회',
@@ -28936,7 +28944,7 @@ window.TT_SFX = {
          각성은 반대로 얼음 아닌 모든 매치가 채우고 콤보가 높을수록 빨리 찬다
          (30590 의 gaugeBump(S.combo), 잔량 안내는 28121 계열 fireSkill 경로).
          토스트는 평문이라 <b> 를 쓰지 않는다 — 강조는 낱말 순서로만 준다. */
-      'duel.atkstat': '공격 {n}% — 점수를 낼수록 차고, 다 차면 저절로 나가요.',
+      'duel.atkstat': '공격 {n}%. 점수를 낼수록 차고, 다 차면 저절로 나가요.',
       'duel.spstat': '각성 {n}%예요. 합이 10과 같은 숫자를 번갈아 맞춰야 차요.',
       'duel.spgo': '각성! -{n}',
       'duel.petnone': '펫이 없어요. 펫을 고르면 그 스킬을 판마다 몇 번 쓸 수 있어요.',
@@ -29069,7 +29077,7 @@ window.TT_SFX = {
       'boss.goal': '{b} 격파',
       'boss.prog': '{c} · {n}/{goal}',
       /* 0910 — bossArmUlt -> castSkill(각성). 하단 필살기 버튼과 다른 사건이다. */
-      'boss.armed': '빈틈 발견 — 스킬 발동!',
+      'boss.armed': '빈틈 발견! 스킬 발동!',
       'boss.weak': '빈틈!',
       'boss.tell': '{b}가 노려보고 있어요…',
       'boss.atk': '블로커가 떨어졌어요! ({n}개)',
@@ -29082,7 +29090,7 @@ window.TT_SFX = {
       'char.locked.hint': '아직 잠겨 있어요. 10탄 보스를 이기면 풀려나요.',
       'unlock.title': '젤리공주 구출!',
       'unlock.line': '고마워! 나도 같이 갈래!',
-      'unlock.sub': '젤리공주가 합류했어요 — 메뉴에서 고를 수 있어요.',
+      'unlock.sub': '젤리공주가 합류했어요. 메뉴에서 고를 수 있어요.',
       'unlock.go': '같이 가자!',
 
       /* --- v4 6차 §B: 캐릭터 선택 패널 --- */
@@ -29260,19 +29268,19 @@ window.TT_SFX = {
       'intro.done': '▶ 닫기',
       'intro.ten.l1': '나는 텐텐 왕자. 길은 언제나 하나쯤 더 있는 법이오.',
       'intro.ten.l2': '내 「왕자의 축복」은 합이 10인 짝을 +60%로 갚아 주지.',
-      'intro.ten.l3': '스킬을 쓰면 트윈을 부른다 — 그동안은 모든 매치가 텐트윈 콤보요.',
-      'intro.twin.l1': '트윈 왕자야. 느린 건 못 참아 — 따라와 봐!',
+      'intro.ten.l3': '스킬을 쓰면 트윈을 부른다. 그동안은 모든 매치가 텐트윈 콤보요.',
+      'intro.twin.l1': '트윈 왕자야. 느린 건 못 참아. 따라와 봐!',
       'intro.twin.l2': '「쌍둥이 맹세」로 같은 숫자 매치는 +60%야.',
-      'intro.twin.l3': '스킬을 쓰면 형을 부른다 — 그동안은 전부 텐트윈 콤보!',
-      'intro.jelly.l1': '젤리공주예요. 오래 기다렸어요 — 이제 내가 지킬 차례예요.',
+      'intro.twin.l3': '스킬을 쓰면 형을 부른다. 그동안은 전부 텐트윈 콤보!',
+      'intro.jelly.l1': '젤리공주예요. 오래 기다렸어요. 이제 내가 지킬 차례예요.',
       'intro.jelly.l2': '「공주의 온기」가 10% 확률로 그 매치를 ×3 으로 부풀려요.',
-      'intro.jelly.l3': '내 스킬은 젤리 타임 — 잭팟 확률이 40%까지 올라가요.',
-      'intro.pudding.l1': '푸딩 기사입니다. 급할수록 단단하게 — 내가 앞에 서겠소.',
-      'intro.pudding.l2': '「푸딩 방패」는 합10에 +60%, 나머지에도 +15% — 헛치는 매치가 없소.',
-      'intro.pudding.l3': '스킬을 쓰면 방패를 펼친다 — 그동안 모든 매치가 텐트윈 콤보요.',
+      'intro.jelly.l3': '내 스킬은 젤리 타임이에요. 잭팟 확률이 40%까지 올라가요.',
+      'intro.pudding.l1': '푸딩 기사입니다. 급할수록 단단하게. 내가 앞에 서겠소.',
+      'intro.pudding.l2': '「푸딩 방패」는 합10에 +60%, 나머지에도 +15%. 헛치는 매치가 없소.',
+      'intro.pudding.l3': '스킬을 쓰면 방패를 펼친다. 그동안 모든 매치가 텐트윈 콤보요.',
       'intro.sodawitch.l1': '소다 마녀야. 크게 한 번, 그게 내 취향이지.',
       'intro.sodawitch.l2': '「탄산 팡」이 매치마다 20% 확률로 ×2 를 터뜨려.',
-      'intro.sodawitch.l3': '내 스킬은 탄산 주문 — 잭팟 확률이 40%가 돼.',
+      'intro.sodawitch.l3': '내 스킬은 탄산 주문이야. 잭팟 확률이 40%가 돼.',
       'intro.ppyak.l1': '삐약! 처음부터 너랑 같이 있었어.',
       'intro.ppyak.l2': '내 스킬은 「자유 연결」이야. 8초 동안 떨어진 두 칸도 이어져.',
       'intro.mungchi.l1': '뭉치야. 든든한 건 내가 제일이지.',
@@ -42955,6 +42963,34 @@ window.TT_SFX = {
     setText(id, s);
   }
 
+  /* [64-fix3b (f) · 지휘자 판정 안 A 2026-09-27] 체력 숫자 — 빗금 「/」만 .85em(.dh-sl). 숫자 잉크가
+     막대 마지막 어두운 줄과 판 안쪽 밝은 선 사이 빈 띠에 위·아래 1px 씩 비어 앉는다(CSS 「64-fix3b (f)」).
+     글자는 세 조각(지금 값 · 빗금 · 최대) — 조각은 마크업이 처음부터 들고 있고(0 <span class="dh-sl">/</span> 0)
+     여기서는 **텍스트 노드 값만** 갈아 끼운다. 매 틱 새 요소를 만들지 않는다(성능 규칙 9) · 같은 값이면
+     쓰지 않는다(dhText 와 같은 규율). textContent 는 종전과 같은 「지금 / 최대」 다. */
+  function dhHp(c, k, id, cur, max) {
+    var s = cur + ' / ' + max;
+    if (c[k] === s) return;
+    c[k] = s;
+    var e = $(id);
+    if (!e) return;
+    var w = e.firstElementChild;
+    if (!w || w.className !== 'dh-hp' || w.childNodes.length !== 3 || w.firstChild.nodeType !== 3 || w.lastChild.nodeType !== 3) {
+      e.textContent = '';
+      w = document.createElement('span');
+      w.className = 'dh-hp';
+      w.appendChild(document.createTextNode(''));
+      var sl = document.createElement('span');
+      sl.className = 'dh-sl';
+      sl.textContent = '/';
+      w.appendChild(sl);
+      w.appendChild(document.createTextNode(''));
+      e.appendChild(w);
+    }
+    w.firstChild.nodeValue = cur + ' ';
+    w.lastChild.nodeValue = ' ' + max;
+  }
+
   /* 3단계 — 체력바 한 칸. dhVar 과 갈라 놓은 이유는 «한 값이 네 가지를 정하기»
      때문이다: 필 배율 · 잔상 출발점(--hv2-hp-prev) · 위험(<25%) · 빈 바.
      ▣ 읽기가 한 번도 없다. 전부 style/attribute **쓰기**뿐이라 강제 리플로우가
@@ -42988,8 +43024,8 @@ window.TT_SFX = {
     dhVar(c, 'mr', 'duel-me-fill', '--hp', m.hpMax > 0 ? Math.max(0, m.hp) / m.hpMax : 0);
     dhVar(c, 'fa', 'duel-foe-atk', '--atk', f.atkMax > 0 ? Math.min(1, f.atk / f.atkMax) : 0);
     dhVar(c, 'ma', 'duel-me-atk', '--atk', m.atkMax > 0 ? Math.min(1, m.atk / m.atkMax) : 0);
-    dhText(c, 'fn', 'duel-foe-n', Math.max(0, Math.ceil(f.hp)) + ' / ' + f.hpMax);
-    dhText(c, 'mn', 'duel-me-n', Math.max(0, Math.ceil(m.hp)) + ' / ' + m.hpMax);
+    dhHp(c, 'fn', 'duel-foe-n', Math.max(0, Math.ceil(f.hp)), f.hpMax);
+    dhHp(c, 'mn', 'duel-me-n', Math.max(0, Math.ceil(m.hp)), m.hpMax);
     dhText(c, 'dm', 'duel-dmg', 'DMG ' + (d.dmg | 0) + bossCondSuffix());
   }
 
@@ -67447,13 +67483,20 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
    세로 가운데 = **잉크** 기준: 이 글꼴의 숫자 잉크는 줄 상자 가운데보다 0.1em 아래에
    앉는다(390·480 실측 — 잉크 높이 0.82em). 상자(띠)는 그대로 두고 padding-bottom
    0.2em(border-box)으로 글자만 0.1em 올려 잉크를 띠 가운데에 둔다. */
+/* [64-fix3b (f) · 지휘자 판정 안 A 2026-09-27] 빗금 「/」만 .85em — 숫자 크기(11px · 2.83cqw)는 그대로.
+   종전 잉크 9줄(빗금이 숫자보다 1px 아래로 내려감)이 숫자 잉크 8줄(390)로 줄어든다. 그러면 잉크 가운데가
+   0.05em 위로 올라가므로 위 64-fix2 ② 의 「잉크 기준 가운데」 규칙 그대로 올림을 0.1em → 0.05em 으로
+   다시 맞춘다(padding-bottom 0.2em → 0.1em · border-box). DPR1 픽셀 줄 실측 360·390·480 × ko·en ×
+   악당·주인공: 막대 마지막 어두운 줄과 위 1px · 판 안쪽 밝은 선과 아래 1px (빗금만 줄이면 위 0 · 아래 2)
+   — scratchpad/release-0925/fix3/fix3b/diag-hp-f-2.json · smoke-fix3b f. */
 #app.battle #duel-hud .dh-num{
   inset:auto;
   top:30.3cqw;height:2.44cqw;
-  padding-bottom:0.2em;
+  padding-bottom:0.1em;
   font-size:11px;font-size:2.83cqw;
   z-index:6;
 }
+#duel-hud .dh-num .dh-sl{ font-size:.85em; }
 #app.battle #duel-hud #duel-foe-n{ left:8.04cqw; justify-content:flex-start; }
 #app.battle #duel-hud #duel-me-n{ right:8.43cqw; justify-content:flex-end; }
 /* 누적 데미지 — 시안에 자리가 없어 성과 큰구름 사이의 빈 하늘에 눕힌다. */
