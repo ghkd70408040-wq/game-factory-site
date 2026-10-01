@@ -34956,7 +34956,8 @@ window.TT_SFX = {
     if (!m || m.done) return;
     m.done = true;
     S.missionUntil = 0;                // 성공했으므로 시계는 더 이상 의미가 없다
-    S.score += MISSION_SCORE * awakenMult();   // 74 — 각성 ×2 는 얻는 점수 전부(§27.3)
+    var missionPts = MISSION_SCORE * awakenMult();   // 74 — 각성 ×2 는 얻는 점수 전부(§27.3). 아래 토스트도 이 한 값을 쓴다
+    S.score += missionPts;
     S.adds += 1;                       // reward loops straight back into resources
     badgePop('mission-badge');
     badgePop('add-badge');
@@ -34981,7 +34982,7 @@ window.TT_SFX = {
          아무 일도 하지 않으므로 여기서 모드를 다시 물을 이유가 없다. */
       bossOnMissionDone();
     } else {
-      toast(t('mission.reward', { score: MISSION_SCORE }));
+      toast(t('mission.reward', { score: missionPts }));
     }
     syncHud();
   }
@@ -37172,12 +37173,15 @@ window.TT_SFX = {
       /* §2 배율 오버레이 — **실제로 곱해진 값**을 화면에 띄운다. 반려 문장이
          정확히 이것이었다: "크리티컬만 봐서는 무슨 일이 벌어진지 몰라. ×2 같은
          뭔가 실질적인 시각 정보가 필요해."
-         값은 바로 위 점수식의 곱항을 **그대로** 다시 곱한 것이다. gain 식은 한
-         글자도 안 건드렸는데, 그 식의 반올림 위치와 곱하는 순서가 결과를 바꾸기
-         때문이다(PURE/133 이 재는 값이 한 톨도 움직이면 안 된다) — 표시 때문에
-         계산식을 손대는 것은 금지다. 여기 쓰인 fx·gold·tw·mm·st 는 전부
-         이미 계산이 끝난 값이라 상태를 한 번도 다시 전진시키지 않고,
-         comboScoreMult 는 순수 함수라 다시 불러도 안전하다.
+         값은 바로 위 점수식의 곱항을 **그대로** 다시 곱한 것이다. 이 오버레이는
+         gain 식을 건드리지 않는다 — 그 식의 반올림 위치와 곱하는 순서가 결과를
+         바꾸기 때문이다(PURE/133 이 재는 값이 한 톨도 움직이면 안 된다). 표시
+         때문에 계산식을 손대는 것은 금지다. 74 에서 gain 식에 곱 한 항이 늘기는
+         했다 — 반올림 뒤의 `gain = gainPre * aw`(각성 ×2, 위 주석)다. 그것은 각성
+         규칙(§27.3)이 한 일이고 표시 때문이 아니다. 오버레이는 같은 aw 를 그대로
+         곱할 뿐이다. 여기 쓰인 fx·gold·tw·mm·st·aw 는 전부 이미 계산이 끝난
+         값이라 상태를 한 번도 다시 전진시키지 않고, comboScoreMult 는 순수
+         함수라 다시 불러도 안전하다.
          엣지에서만 띄운다: 배수는
          콤보가 살아 있는 동안 매 매치 서 있으므로 매치마다 띄우면 그건 정보가
          아니라 소음이고, 보드 위 글자가 짝 찾기를 가린다. 정수 계단이 **오를
