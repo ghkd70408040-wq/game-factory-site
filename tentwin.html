@@ -31688,6 +31688,7 @@ window.TT_SFX = {
    * 엔들리스·러시는 그럴 이유가 없다. 판이 어차피 매번 다른 시드고, 오히려
    * 여기서 시드 파생을 쓰면 "같은 시드를 다시 만나면 잭팟 자리도 같다"는
    * 재현성이 생겨 리롤 어뷰징의 표면이 된다. 그쪽은 Math.random 이 맞다.
+   * ⚠ 판정판 74 — 아래 데일리 가지(JELLY_SALT·JELLY_GOLDEN 포함)는 74 이후 실행되지 않는 가지다: statMult 가 데일리에서 잭팟을 굴리기 전에 1 로 돌아간다(정리 태스크 — 코드는 지우지 않는다).
    */
   function jackpotRoll() {
     if (!isDaily()) return Math.random();
@@ -33203,6 +33204,7 @@ window.TT_SFX = {
              pud: 1 };
     syncTwChip();
     mateChip('');
+    charFxTxt = ''; charFxJp = false;   /* 판정판 74 — 주인공 칩의 잭팟 강조 기억도 판 단위(charFx) */
   }
 
   /* =========================================================================
@@ -33421,16 +33423,24 @@ window.TT_SFX = {
   }
 
   /** 판정판 74 — 캐릭터 곱항의 화면 쪽(옛 passiveFx). 점수와 분리 — 연출이 실패해도 점수는 안 흔들린다.
-   *  주인공 칩: 잭팟이면 'x3!'(강조 — 잭팟 스탯이 다섯 캐릭터 모두에 생겼으므로 전원, 적중 1.5~4.5% 라 드물다),
+   *  주인공 칩: 잭팟이면 'x3!'(강조 — 잭팟 스탯이 다섯 캐릭터 모두에 생겼으므로 전원, 적중 0.75~4.5% 라 드물다),
    *  아니면 이번 매치 스탯 보너스 '+N%'. 동료 칩은 동료 곱항 은퇴로 늘 숨긴다.
    *  칩 노출 빈도 = 옛 passiveFx 그대로(HUD GREEN 은 「글자 값만」 — 착수 전 점검 W12): 텐텐·트윈은 자기 보너스가 붙은
-   *  매치(st.own)에서만 켜고, 젤리·푸딩·마녀는 매 매치 켠다. 그래서 pvChip 안의 기존 void offsetWidth 재시작도 옛
-   *  빈도 그대로다(새 호출 0 · 빈도 증가 0 — MOTION-SPEC §6). */
+   *  매치(st.own)에서만 켜고, 젤리·푸딩·마녀는 매 매치 켠다. 예외 하나 — 텐텐·트윈의 잭팟 강조는 다음 매치가 자기
+   *  보너스 매치가 아니어도 그 매치에서 한 번 내려 직전 보너스 글자(없으면 숨김)로 되돌린다(리뷰 m-1 ①). 그래서 pvChip
+   *  안의 기존 강제 리플로우 재시작은 옛 빈도에서 잭팟 직후 한 번 늘어날 뿐이다(새 호출 줄 0 — MOTION-SPEC §6). */
+  var charFxTxt = '';     /* 마지막 자기 보너스 글자('+N%', 없으면 '') — 잭팟 강조를 내릴 때 되돌릴 값 */
+  var charFxJp = false;   /* 칩이 지금 잭팟 강조(x3!)인가. 둘 다 판 단위 — passiveReset 이 지운다 */
   function charFx(st, x, y) {
     var key = charKeyColor();
     mateChip('');
     if (!st) return;
+    if (st.own) {
+      var n = Math.round((st.det - 1) * 100);
+      charFxTxt = n > 0 ? ('+' + n + '%') : '';
+    }
     if (st.jp) {
+      charFxJp = true;
       pvChip('x' + JACKPOT_MULT + '!', true);
       J.shockwave(x, y, key);
       J.burst(x, y, key, 26);
@@ -33442,9 +33452,12 @@ window.TT_SFX = {
       floatOnBoard(x, y - 96, t('pv.jelly.hit'), key, 34);
       return;
     }
-    if (!st.own) return;   /* 텐텐의 같은 수 매치·트윈의 합10 매치 — 칩을 새로 켜지 않는다(옛 빈도, 점검 W12) */
-    var n = Math.round((st.det - 1) * 100);
-    pvChip(n > 0 ? ('+' + n + '%') : '', false);
+    if (!st.own) {   /* 텐텐의 같은 수 매치·트윈의 합10 매치 — 칩을 새로 켜지 않는다(옛 빈도, 점검 W12) */
+      if (charFxJp) { charFxJp = false; pvChip(charFxTxt, false); }   /* 잭팟 강조만 한 번 내린다(리뷰 m-1 ①) */
+      return;
+    }
+    charFxJp = false;
+    pvChip(charFxTxt, false);
   }
 
   /* --- 콤보 고조 ------------------------------------------------------------ */
@@ -34119,13 +34132,13 @@ window.TT_SFX = {
    * 서로 다른 기술이 아니다. 전투 전용 즉발 타격은 doSpecial 쪽이고 그것만
    * 「필살기」라 부른다. 화면 문구가 이 갈래를 말하는 자리는 이제 없다.
    *
-   * E3 W7 — 신규 주인공 둘이 **기존 두 효과를 나눠 갖는다**. 새 kind 를 만들지
-   * 않은 것이 이 표의 요점이다: kind 가 늘면 applySkill 뿐 아니라 그것을 읽는
-   * 네 곳(twinApply·passiveApply·jackpotP·syncSkill)이 전부 갈라지고, 그 순간
-   * "각성이 무엇을 하는가"가 코드 한 곳에서 안 읽힌다.
+   * E3 W7 — 신규 주인공 둘이 기존 두 효과를 나눠 가졌었다(푸딩 = summon · 마녀 = jellytime). 판정판 74 가 마녀에게
+   * 새 kind 'soda'(모든 매치 ×1.4 확정, 수치안 §5-1 W1)를 주었다. kind 를 읽는 곳은 이제 셋이다 — statMult(summon =
+   * 텐·트윈 보너스 둘 다 · jellytime = 잭팟 +20%p · soda = ×1.4) · twinApply(summon 사슬) · applySkill(화면 클래스
+   * skill-jelly · 토스트). kind 가 늘면 이 셋을 함께 본다.
    *   푸딩 방패  = summon    한 판의 사슬을 대신 세워 준다(형이 옆에 붙는 그림)
-   *   탄산 주문  = soda      모든 매치 ×1.4 확정(74 — 젤리 타임에서 갈라섰다, 수치안 §5-1 W1)
-   * 변주는 **지속시간**으로만 낸다(SKILL_MS). 기존 셋의 값은 한 글자도 안 바뀐다. */
+   *   탄산 주문  = soda      모든 매치 ×1.4 확정
+   * 푸딩의 변주는 지속시간(SKILL_MS)뿐이다. */
   var SKILL_KIND = { jelly: 'jellytime', sodawitch: 'soda' };   /* 74 — 탄산 주문은 젤리 타임과 다른 스킬(모든 매치 ×1.4, 수치안 §5-1 W1) */
   function skillKindOf(id) { return SKILL_KIND[id] || 'summon'; }
 
