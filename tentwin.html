@@ -4447,6 +4447,10 @@ html[lang="ko"] .act-t { font-size: 11.5px; }
 html[lang="ko"] .tagline,
 html[lang="ko"] #tut-text,
 html[lang="ko"] .howto-panel p { line-height: 1.6; }
+/* [64 RC 2026-10-01 · 지휘자 판정] 도움말 본문(한글)이 낱말 가운데서 끊기고(「횟수/를」) 마지막 줄에
+   한 글자만 남던(「…8방향 어디든 좋아 / 요.」) 것을 저장소 한글 문단 관례 — .rules-list li · #toast 와
+   같은 keep-all + anywhere 짝 — 로 맞춘다. 한국어만 건다: en 은 규칙이 닿지 않으니 구조상 무변. */
+html[lang="ko"] .howto-panel p { word-break: keep-all; overflow-wrap: anywhere; }
 /* v3 tutorial copy: hangul at 500, no Latin tracking (see the block header). */
 html[lang="ko"] #tut-text { font-weight: 500; letter-spacing: 0; }
 
@@ -13421,6 +13425,13 @@ html[data-platform="twa"] #app-intro.is-hold .api-char{
 #modal-arc #arc-who { font-size: 13.5px; }
 #modal-arc #arc-best { color: #8A5A06; font-weight: 800; }
 #modal-arc #arc-when { font-size: 12px; color: #7A6154; }
+/* ⑤ 버튼 줄(다시하기 · 공유하기 · 메인메뉴). [64 RC 2026-10-01 · 지휘자 판정] 한글 낱말이 가운데서
+   끊겼다(「다시/하기」 「공유하/기」 「메인메/뉴」 — 390 폭에서 칸 90.7px · 글자 안쪽 54.7px, 칸이 두 줄
+   65px 로 커졌다). 저장소 한글 관례의 keep-all 만 건다: 짝인 anywhere 는 이 칸에서 낱말이 안 들어가면
+   도로 가운데서 끊어 아무것도 못 고친다(실측). min-width:0 은 keep-all 이 flex 칸의 최소 폭을 낱말
+   폭으로 키워 줄이 넘치는 것을 막는다 — 칸 폭은 종전과 같은 몫이고 글자는 18px 안쪽 여백 위에 앉는다
+   (390 폭 알약 끝과 글자 사이 8px 이상). 한국어만 — en(「Main menu」)은 규칙이 닿지 않아 무변. */
+html[lang="ko"] #modal-arc .sheet-row .btn { word-break: keep-all; min-width: 0; }
 
 /* ===== 기록창에 덧붙는 아케이드 3줄 ======================================
    위 여섯 탭의 규칙은 한 줄도 안 바뀐다 — 전부 `.rank-arc*` 스코프다.
