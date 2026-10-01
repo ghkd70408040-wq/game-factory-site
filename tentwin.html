@@ -23654,8 +23654,8 @@ window.TT_SFX = {
    * 챕터2·3 은 par 대비 수확이 좋고(적은 타수로도 밴드), 챕터4·5 는 나쁘다.
    * 여기서 그 요철을 펴는 것이 이 표의 일이다.
    *   실측 승률(전) 일반 ~99% · 보스 0~80%  →  (후) 아래 주석의 표 참조. */
-  var DUEL_NEED_CH      = [11, 10, 10, 12, 13, 12, 12, 11, 11, 12];
-  var DUEL_NEED_BOSS_CH = [12, 10, 11, 11, 11,  9,  9,  9, 11, 11];
+  var DUEL_NEED_CH      = [11, 10, 10, 13, 14, 13, 14, 13, 13, 14];   /* 74 — 수치안 §7-1: 옛 표 × 장비 티어 보정 G(1–3챕 1.00 · 4–6 1.10 · 7–8 1.15 · 9–10 1.20) 반올림 */
+  var DUEL_NEED_BOSS_CH = [12, 10, 11, 12, 12, 10, 10, 10, 13, 13];
   var DUEL_ME_HP = 100;
   var DUEL_FOE_ATK_MAX = 100;
   var DUEL_MISS_GAIN = 12;           // ① 매치 불가 탭   (~8회면 만땅)
@@ -45082,17 +45082,32 @@ window.TT_SFX = {
     var v = (i >= 0 && i < arr.length) ? arr[i] : fb;
     return (v > 0) ? v : fb;
   }
-  /** ★★ 가 요구하는 점수. 카드·결과 시트·판정이 **모두 이 한 함수**를 읽는다. */
+  /* 판정판 74 — 별 점수선 = 적 HP 비례(수치안 §7-2 권고). ★★ = 0.80 × HP(「처치, 또는 시간 종료 때
+     적 HP 80% 이상」), ★★★ = 1.10 × HP + 무셔플 + 텐 조건(그대로). 1~3탄은 × 0.85 온보딩 완화 유지.
+     50탄(각본 보스)과 전투 끔(TW_BATTLE=false) 폴백만 옛 탄별 계수 ADV_STAR2_K/ADV_STAR3_K 를 쓴다. */
+  var ADV_STAR2_HP = 0.80;
+  var ADV_STAR3_HP = 1.10;
+  var ADV_STAR_EARLY_K = 0.85;
+  var ADV_STAR_SCRIPTED = 50;
+  function advStarHp(plan) {
+    var n = plan ? plan.n : 1;
+    return duelFoeHpMax(n) * (n <= ADV_STAR_EARLY ? ADV_STAR_EARLY_K : 1);
+  }
+  function advStarLegacy(plan, arr, fb) {
+    var n = plan ? plan.n : 1;
+    return Math.round((plan && plan.par > 0 ? plan.par : 1) * advDiffK(n) * advStarK(arr, n, fb));
+  }
+  /** ★★ 가 요구하는 점수. 카드·결과 시트·판정이 모두 이 한 함수를 읽는다. */
   function advStar2Need(plan) {
     var n = plan ? plan.n : 1;
-    return Math.round((plan && plan.par > 0 ? plan.par : 1) * advDiffK(n) *
-                      advStarK(ADV_STAR2_K, n, ADV_STAR2_FALLBACK));
+    if (!TW_BATTLE || n === ADV_STAR_SCRIPTED) return advStarLegacy(plan, ADV_STAR2_K, ADV_STAR2_FALLBACK);
+    return Math.round(ADV_STAR2_HP * advStarHp(plan));
   }
   /** ★★★ 가 요구하는 점수(세 항 중 첫째). */
   function advStar3Need(plan) {
     var n = plan ? plan.n : 1;
-    return Math.round((plan && plan.par > 0 ? plan.par : 1) * advDiffK(n) *
-                      advStarK(ADV_STAR3_K, n, ADV_STAR3_FALLBACK));
+    if (!TW_BATTLE || n === ADV_STAR_SCRIPTED) return advStarLegacy(plan, ADV_STAR3_K, ADV_STAR3_FALLBACK);
+    return Math.round(ADV_STAR3_HP * advStarHp(plan));
   }
   function advStarsFor(plan, score, shuffled, ease, tenCount) {
     var s = 1;
