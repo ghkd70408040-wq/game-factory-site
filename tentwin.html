@@ -25306,6 +25306,9 @@ window.TT_SFX = {
      ×3 이 다시 뜬다. 콤보가 1 로 돌아가는 매치에서 0 으로 닫힌다. */
   var multFxTier = 0;
   var lastGainRec = { gainPre: 0, gain: 0, bombPre: 0, bombGain: 0, aw: 1, fx: 1, st: 1, tw: 1, im: 1, mm: 1 };   /* 74 — 스모크 손잡이(게임 코드는 안 읽는다). 미리 만든 한 객체의 필드만 매치마다 고친다 — 게임 중 객체 생성 0(점검 R5) */
+  /* 74 — 각성 배지 글자는 초나 언어가 바뀔 때만 만든다(시계 할당 0, 성능 규칙 9) */
+  var AWK_LEFT_ARG = { n: 0 };
+  var awkBadgeSec = -1, awkBadgeLang = '', awkBadgeTxt = '';
   /* 낮은 계단의 연타 방지. ×2 는 콤보 2 마다 서고 콤보 2 는 이 게임에서 아주
      흔하다 — 실측(자동 매칭 3초)에서 ×2 가 네 번 떴다. 계단 규칙만으로는 그것이
      안 잡히는데, 매번 **서로 다른 콤보 묶음**이라 전부 정당한 엣지이기 때문이다.
@@ -34953,7 +34956,7 @@ window.TT_SFX = {
     if (!m || m.done) return;
     m.done = true;
     S.missionUntil = 0;                // 성공했으므로 시계는 더 이상 의미가 없다
-    S.score += MISSION_SCORE;
+    S.score += MISSION_SCORE * awakenMult();   // 74 — 각성 ×2 는 얻는 점수 전부(§27.3)
     S.adds += 1;                       // reward loops straight back into resources
     badgePop('mission-badge');
     badgePop('add-badge');
@@ -36512,7 +36515,7 @@ window.TT_SFX = {
   /** Board emptied in Time Rush: roll straight into the next one, no modal. */
   function rushNextBoard() {
     S.stage += 1;
-    S.score += 100 * S.stage;      // small board-clear bonus; time is the prize
+    S.score += 100 * S.stage * awakenMult();   // small board-clear bonus; time is the prize · 74 — 각성 ×2 는 얻는 점수 전부(§27.3)
     J.sfx.win();
     if (typeof window !== 'undefined') {
       J.confetti(window.innerWidth / 2, window.innerHeight * 0.4);
@@ -37146,9 +37149,11 @@ window.TT_SFX = {
     lg.fx = fx; lg.st = st.mult; lg.tw = tw.mult; lg.im = im; lg.mm = mm;
     S.score += gain + bombGain;
     if (S.feverOn) S.feverScore += gain + bombGain;
-    /* 전투(단계 2): 공격 게이지는 점수와 **같은 값**을 같은 순간에 받는다. 점수식
-       (위 블록)은 한 글자도 바뀌지 않았고 S.score 도 그대로 적립되므로 별·최고점
-       계산은 종전과 완전히 같다 — 두 계좌가 나란히 갈 뿐이다. */
+    /* 전투(단계 2): 공격 게이지는 점수와 **같은 값**을 같은 순간에 받는다. 74 부터는
+       그 값에 각성 ×2 가 이미 곱해져 있다 — 점수식에 반올림 뒤의 곱 한 항(aw)이
+       늘었고, 두 계좌(S.score · me.atk)는 그 값을 나란히 받는다. 별·최고점 계산은
+       S.score 를 그대로 읽으므로 각성 중에 얻은 점수도 들어간다(수치안 §6-4). 각성
+       게이지(me.sp) 적립만 ×2 전 점수(ptsPre)로 하고, 각성 중에는 멈춘다. */
     /* 0901 ⑥-d H2ⓑ — I11 crossnecklace. 조건은 **교차 사슬이 전진한 매치**이고
        (twPrev 를 위에서 이미 떠 두었다 — 그 값이 여기 있는 이유가 그것이다),
        적립은 gaugeBump 가 쓰는 그 gaugeGain(combo) 의 ITEM_CROSS_GAUGE_K 배다.
@@ -43295,6 +43300,7 @@ window.TT_SFX = {
    * @param iceOnly 얼음만 깼는가 — 매치가 아닌 것은 사슬도 타이머도 건드리지 않는다
    * @param twPrev  twinApply **전**의 교대 사슬 길이 (전진 판정의 유일한 근거)
    * @param ptsPre  74 — 각성 ×2 를 곱하기 **전**의 점수(gainPre + bombPre). 각성 게이지 적립은 이 값으로 한다. 생략하면 pts
+   *                (aw 계산과 awakenOn 사이에 마감이 지나는 짧은 틈의 방어선이기도 하다 — 그 틈에 적립이 열려도 기준은 ×2 전 점수)
    */
   function duelOnMatch(pts, iceOnly, tw, twPrev, ptsPre) {
     var d = S.duel;
@@ -43321,8 +43327,9 @@ window.TT_SFX = {
            있는 「달성 벨」(A5·C#6·E6 + A6)이고, 각성 전용음(awakenMax = 성가풍
            상행 스윕)과 음색이 겹치지 않아 **귀로도 둘이 갈린다** — 화면에서
            무지개/금빛이 하는 구별을 소리에서도 지킨다(§15.3 과 같은 규율).
-           ⚠ 게이지 산술(DUEL_SP_MULT · 조건)은 한 글자도 안 바뀐다. 위 한 줄은
-             바뀐 값을 **읽기만** 한다. */
+           ⚠ 게이지 산술의 계수(DUEL_SP_MULT)는 안 바뀐다. 74 에서 조건에 !awakenOn()
+             (각성 중 적립 정지)이 붙고 적립 기준이 ×2 전 점수(ptsPre)가 됐다. 이
+             알림 코드는 바뀐 값을 **읽기만** 한다. */
         if (!spWas && d.me.sp >= d.me.spMax) {
           if (J.sfx.milestone) J.sfx.milestone();
           J.vibrate(34);
@@ -43717,10 +43724,24 @@ window.TT_SFX = {
   }
   function awakenMult() { return awakenOn() ? AWAKEN_SCORE_MULT : 1; }
   function awakenLeftMs() { return awakenOn() ? Math.max(0, S.duel.awkUntil - now()) : 0; }
+  /** 남은 초(올림). 배지와 「각성 중이에요」 안내가 같은 수를 읽는다. */
+  function awakenLeftSec() { return Math.ceil(awakenLeftMs() / 1000); }
+  /** 각성 배지 글자. 배지를 쓰는 곳은 syncBattleActs 하나다. 초나 언어가 바뀔 때만 t() 를 부른다 — 200ms 시계가 매 틱
+      글자·인자 객체를 새로 만들면 성능 규칙 9(게임 중 객체 생성 금지) 위반이라, 인자 객체도 미리 만든 AWK_LEFT_ARG 하나를 쓴다. */
+  function awakenBadgeText() {
+    var n = awakenLeftSec(), lg = currentLang();
+    if (n !== awkBadgeSec || lg !== awkBadgeLang) {
+      awkBadgeSec = n; awkBadgeLang = lg;
+      AWK_LEFT_ARG.n = n;
+      awkBadgeTxt = t('act.awk.left', AWK_LEFT_ARG);
+    }
+    return awkBadgeTxt;
+  }
   function awakenStart() {
     var d = S.duel;
     if (!d || d.down) return;
     d.awkUntil = now() + AWAKEN_MS;
+    awkBadgeSec = -1;                    // 배지 글자 캐시를 비운다 — 새 각성은 처음 값부터 다시 만든다
     if (J.sfx.milestone) J.sfx.milestone();
     J.screenPulse();
     J.vibrate(40);
@@ -43728,12 +43749,12 @@ window.TT_SFX = {
     syncHud();
     syncDuel();
   }
-  /** 200ms 시계. 정지 중에는 흐르지 않는다(마감은 shiftDeadlines 가 민다). 끝나면 조용히 끈다. */
+  /** 200ms 시계. 정지 중에는 흐르지 않는다(마감은 shiftDeadlines 가 민다). 끝나면 조용히 끈다.
+      배지는 여기서 쓰지 않는다 — 두 시계가 매 틱 syncHud 를 먼저 부르고, 그 안의 syncBattleActs 가 배지의 유일한 기록자다. */
   function awakenTick() {
     var d = S.duel;
     if (!d || !(d.awkUntil > 0) || S.paused) return;
     if (now() >= d.awkUntil) { d.awkUntil = 0; syncHud(); syncDuel(); return; }
-    setText('hint-badge', t('act.awk.left', { n: Math.ceil(awakenLeftMs() / 1000) }));
   }
 
   /** 2번 버튼. 미만땅·각성 중에도 반드시 응답한다(잔량·남은 초 토스트). */
@@ -43741,7 +43762,7 @@ window.TT_SFX = {
     var d = S.duel;
     if (!d || d.down || !S.running || S.paused) return;
     if (awakenOn()) {
-      toast(t('duel.awkon', { n: Math.ceil(awakenLeftMs() / 1000) }));
+      toast(t('duel.awkon', { n: awakenLeftSec() }));
       J.sfx.ui();
       return;
     }
@@ -44434,7 +44455,7 @@ window.TT_SFX = {
     setText('add-badge', duelAtkPct() + '%');
     /* 74 — 각성 중에는 배지가 남은 초를 센다(N초). 끝나면 게이지 % 로 돌아온다. */
     var awk = awakenOn();
-    setText('hint-badge', awk ? t('act.awk.left', { n: Math.ceil(awakenLeftMs() / 1000) }) : (duelSpPct() + '%'));
+    setText('hint-badge', awk ? awakenBadgeText() : (duelSpPct() + '%'));
     setText('undo-badge', d.petLeft | 0);
     setText('shuffle-badge', duelGaugePct() + '%');
     /* 공격 버튼은 절대 흐려지지 않는다 — 표시기라서 항상 읽혀야 한다.
