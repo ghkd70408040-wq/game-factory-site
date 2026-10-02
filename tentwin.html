@@ -32817,7 +32817,7 @@ window.TT_SFX = {
    * 펫 탭의 정보 판. **사용자가 지적한 그 자리**다 — 시안 A 의 [패시브 스킬]
    * 박스에 고른(또는 구경 중인) 펫의 기술이 통째로 들어간다.
    *   이름  char.<id>.name        기술·효과·수치·지속  char.<id>.pass  (수는 상수 파생 자리표시자)
-   *   성향  pet.axis.<axis>       잠김  petLockText(id) — 안 가진 펫만 사용 줄에서 해금 조건을 말한다
+   *   성향  pet.axis.<axis>       잠김  petLockText(id) — 토스트·초대 창이 말한다(설명판의 사용 줄은 접힘)
    *   추천  petSynOf(id)          추천 캐릭터 + 이유 한 문장(pet.syn.<id>)
    * 74 — 펫은 스킬만 있다: 막대 넷·강화·「한 판에 N회」 줄은 은퇴했다(사용자 2026-09-25).
    */
@@ -32860,7 +32860,7 @@ window.TT_SFX = {
        하면 되는지 한 줄로 말한다. 요소를 지우지 않고 hidden 만 토글하는 것은
        같은 판의 `.cc-name:has(> b:empty)` 접기와 같은 문법이다. */
     var emp = $('cp-pet-empty'), useln = $('cp-pet-useline');
-    if (useln) useln.hidden = !lock;   /* 74 — 「한 판에 N회」 은퇴(사용자 2026-09-25). 잠긴 펫만 해금 조건을 말한다 */
+    if (useln) useln.hidden = true;   /* 74 — 사용 줄은 은퇴. 잠긴 펫의 해금 조건은 토스트·초대 창이 말한다(설명판 넘침 0) */
     if (emp) {
       if (id) emp.hidden = true;
       else { emp.textContent = t('cp.pet.empty', { free: petFreeNames() }); emp.hidden = false; }
