@@ -6720,14 +6720,9 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   background-repeat: no-repeat;
   background-position: center;
 }
-/* WD-2 §10.2 4·5번 슬롯 — 파편 4색·상자·아이템·펫. 위 세 줄과 **같은 이유**로
+/* WD-2 §10.2 4·5번 슬롯 — 상자·아이템·펫. 위 세 줄과 **같은 이유**로
    판 위 배지의 그라디언트를 그대로 옮겨 적었다(같은 것이 같게 생겨야 한다).
-   키는 화면색이 아니라 스탯 이름(STAT_KEYS)이다 — 색은 표현이고 뜻은 스탯이라,
-   저장·연출·statEff 가 같은 낱말 하나로 줄을 맞추는 쪽이 어긋날 자리가 없다. */
-.rw-ico[data-disc="shard-power"]   { --rw-disc: radial-gradient(circle at 38% 32%, var(--role-rw-shard-power-1) 0 30%, var(--role-rw-shard-power-2) 62%, var(--role-rw-shard-power-3) 100%); }
-.rw-ico[data-disc="shard-steady"]  { --rw-disc: radial-gradient(circle at 38% 32%, var(--role-rw-shard-steady-1) 0 30%, var(--role-rw-shard-steady-2) 62%, var(--role-rw-shard-steady-3) 100%); }
-.rw-ico[data-disc="shard-agility"] { --rw-disc: radial-gradient(circle at 38% 32%, var(--role-rw-shard-agility-1) 0 30%, var(--role-rw-shard-agility-2) 62%, var(--role-rw-shard-agility-3) 100%); }
-.rw-ico[data-disc="shard-luck"]    { --rw-disc: radial-gradient(circle at 38% 32%, var(--role-rw-star-1) 0 30%, var(--role-rw-shard-luck-2) 62%, var(--role-rw-shard-luck-3) 100%); }
+   (74 — 파편 4색 원반 shard-power · steady · agility · luck 은 파편 경제와 함께 은퇴했다.) */
 .rw-ico[data-disc="gift"] {
   --rw-disc: radial-gradient(circle at 38% 32%,
     var(--role-rw-star-1) 0 20%, var(--role-rw-pet-2) 42%, var(--role-rw-gift-3) 62%, var(--role-rw-shard-agility-2) 80%, var(--role-rw-shard-steady-2) 100%);
@@ -6994,38 +6989,14 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   --mk-glyph: '⭐';
   --mk-disc: radial-gradient(circle at 38% 32%, var(--role-rw-star-1) 0 30%, var(--role-rw-star-2) 62%, var(--role-rw-star-3) 100%);
 }
-/* ---- WD-2 §11.5 · §11.6-D — 파편 4색 + 갓차 상자 -----------------------------
+/* ---- WD-2 §11.6-D — 갓차 상자 ------------------------------------------------
    위 두 값(pet/star)과 **문법이 한 글자도 다르지 않다**: 값마다 `--mk-glyph`
    하나와 `--mk-disc` 하나뿐이고, 공용 얼굴(위 `.tile[data-mk]:not(.dead)::after`)
-   은 손대지 않았다. 발주도 파일도 base64 도 여전히 0 이다 — 5800 주석의
-   "발주 0 — 코드 배지" 선례가 이번에도 그대로 참이다.
-
-   원반 색은 §11.1 의 색↔스탯 매핑 정본이고, 값은 JS 쪽 STAT_FX_COLOR 의 네 색
-   (#FF7A59 / #5FD08A / #59B7FF / #FFD34D)에서 그대로 뽑았다. 같은 스탯이 판
-   위에서와 발동 플로트에서 다른 색이면 "그 스탯"으로 안 읽힌다.
-
-   글리프를 넷 다 💎 로 둔 것은 의도다. 이 체계에서 **뜻을 나르는 것은 색**이고
-   (빨강=폭발력 …), 글리프까지 넷으로 갈라 놓으면 네 개가 "파편"이라는 한
-   덩어리로 안 읽혀 판 위에 서로 무관한 배지가 넷 떠 있는 것이 된다.
-   상자(gift)만 🎁 에 무지개 원반인데, 이유가 정반대다: 상자는 색이 내용을 뜻하지
-   **않아야** 한다 — "열기 전까지 미공개"가 §11.6 이 말한 기대감의 핵심이라,
-   색으로 내용이 새면 상자가 상자가 아니게 된다. */
-.tile[data-mk="shard-r"] {
-  --mk-glyph: '💎';
-  --mk-disc: radial-gradient(circle at 38% 32%, var(--role-rw-shard-power-1) 0 30%, var(--role-rw-shard-power-2) 62%, var(--role-rw-shard-power-3) 100%);
-}
-.tile[data-mk="shard-g"] {
-  --mk-glyph: '💎';
-  --mk-disc: radial-gradient(circle at 38% 32%, var(--role-rw-shard-steady-1) 0 30%, var(--role-rw-shard-steady-2) 62%, var(--role-rw-shard-steady-3) 100%);
-}
-.tile[data-mk="shard-b"] {
-  --mk-glyph: '💎';
-  --mk-disc: radial-gradient(circle at 38% 32%, var(--role-rw-shard-agility-1) 0 30%, var(--role-rw-shard-agility-2) 62%, var(--role-rw-shard-agility-3) 100%);
-}
-.tile[data-mk="shard-gold"] {
-  --mk-glyph: '💎';
-  --mk-disc: radial-gradient(circle at 38% 32%, var(--role-rw-star-1) 0 30%, var(--role-rw-shard-luck-2) 62%, var(--role-rw-shard-luck-3) 100%);
-}
+   은 손대지 않았다. 발주도 파일도 base64 도 여전히 0 이다.
+   상자(gift)는 🎁 에 무지개 원반이다. 상자는 색이 내용을 뜻하지 **않아야** 한다 —
+   "열기 전까지 미공개"가 §11.6 이 말한 기대감의 핵심이라, 색으로 내용이 새면
+   상자가 상자가 아니게 된다.
+   (74 — 파편 4색 배지 shard-r · g · b · gold 는 파편 경제와 함께 은퇴했다. 색 토큰 --role-rw-shard-* 는 남는다.) */
 .tile[data-mk="gift"] {
   --mk-glyph: '🎁';
   --mk-disc: radial-gradient(circle at 38% 32%,
@@ -22918,7 +22889,7 @@ window.TT_SFX = {
   /* 저장 스키마 버전(출시 체크리스트 권고 R-15, 0908). 값이 없는 옛 저장은 v0 로
    * 읽는다. 올릴 때는 SCHEMA_MIGRATIONS 에 함수를 **끝에 하나** 붙이고 이 수를 +1.
    * 다운그레이드(미래 버전 저장을 옛 빌드가 읽음)는 읽기 전용 + 백업 키 보존. */
-  var SCHEMA_VERSION = 1;
+  var SCHEMA_VERSION = 2;   // 74 — 파편 폐기 이전(v1to2)
   var LS_BAK_PREFIX = LS_KEY + '.bak-';
   var ROWGO_STAGGER = 35;   // ms per column, left -> right
   var DEAL_STAGGER = 30;    // ms per new tile...
@@ -23277,10 +23248,8 @@ window.TT_SFX = {
     heartsFull: 50,                  // §20.3 하트 즉시 회복 (0 → 5)
     heartOne:   12,                  // §20.3 하트 1개
     continue2:  40,                  // §20.3 · §21 ① 계속하기 2회차부터
-    skin:      100,                  // §20.3 스킨 (젬리별 25 × 「1★ ≈ 4💎」)
-    shardPack:  60                   // §20.3 확정 파편 팩(색 선택)
-  };
-  var SHARD_PACK_N = 30;             // §20.3 「고른 색 30알」
+    skin:      100                   // §20.3 스킨 (젬리별 25 × 「1★ ≈ 4💎」)
+  };                                 /* 74 — 확정 파편 팩(shardPack 60💎 · 고른 색 30알)은 파편 경제와 함께 은퇴했다 */
   /* §20.3 「1💎 → 4★」 의 2단. 한 방향만 — ★ → 💎 는 없다. */
   var JSTAR_TRADE = [{ jewel: 25, star: 100 }, { jewel: 100, star: 400 }];
   /* §20.5 가격 사다리. `sku` 는 W3(Digital Goods)가 쓸 상품 ID 이고,
@@ -23291,7 +23260,7 @@ window.TT_SFX = {
     { sku: 'jewel_l_330',  tier: 'l',  krw: 5500,  n: 330 },
     { sku: 'jewel_xl_720', tier: 'xl', krw: 11000, n: 720 }
   ];
-  var START_PACK = { sku: 'jewel_start', krw: 1200, n: 60, hearts: 5, shards: 30 };
+  var START_PACK = { sku: 'jewel_start', krw: 1200, n: 60, hearts: 5, jstar: 3 };   /* 74 — 옛 파편 30알 = 10:1 로 젤리별 3 */
   var DAILY_FREE_MS = 24 * 60 * 60 * 1000;   // §20.4 24h 잠금
   var DAILY_FREE_JEWEL = 5;                  // §20.4 「신규 5💎」
   var DAILY_FREE_HEART = 1;
@@ -25524,6 +25493,8 @@ window.TT_SFX = {
     shards: { power: 0, steady: 0, agility: 0, luck: 0 },
     shardDry: { power: 0, steady: 0, agility: 0, luck: 0 },
     /* [PG-0910] DESIGN §16.6 — 누적 **획득**(차감 안 함).
+     * (74 — 파편 경제 은퇴 뒤에는 보존 필드다. v1to2 가 누적 ÷ 10 을 gearEver 로 옮겨 꿀떡이 게이트
+     *  petGearCheck(PET_GEAR_NEED)가 그쪽을 읽는다. 아래는 74 이전의 사정이다.)
      * 왜 잔액과 따로 두는가: 꿀떡이 천장(petShardCheck)이 지금까지 잔액 합을
      * 읽었는데, 이번 파도가 **소비**를 만들었다. 그대로 두면 300을 모았다가
      * 강화에 12를 쓰면 해금 조건이 **후퇴**한다 — 천장(확률에 안 걸려도 확정
@@ -25588,6 +25559,8 @@ window.TT_SFX = {
        존재 이유는 오직 하나, 아케이드 판의 점수가 store.bestRush 로 새어 들어가는
        경로를 문법적으로 없애는 것이다(bestKey 주석 참조). */
     bestArcade: 0,
+    /* 74 — 저장 이전 v2(v1to2): 파편 환급 기록 · 장비 과일 누적(꿀떡이 게이트) · 각성 ×2 이전의 arc-dmg 기록 보존 칸. */
+    v74: null, gearEver: 0, arcadeBestLegacy: {},
     /* --- [KD57-0911] 젤리팡 왕국 — DESIGN §26.7 저장 스키마 --------------
      * 칸 하나가 통째로 **신규**이고 **가법(加法)**이다. 기존 화폐 세 칸
      * (`hearts` 생명 · `jstar` 젤리별 · `shards` 파편)은 이름도 뜻도 한 글자
@@ -25681,8 +25654,86 @@ window.TT_SFX = {
    * 사슬은 readStore 의 필드별 채택 **앞**에서 돈다 — 채택 코드는 언제나 현재
    * 모양만 알면 된다. v0→v1 은 구조가 같아 스탬프만 찍는다(필드별 이사는 이미
    * 채택 코드 안에 있다: charId→mateId 등). */
+  /* 판정판 74 — 「다이아(💎 파편)로 스탯 올리기」 폐기(사용자 2026-09-25)의 저장 이전. v1 → v2 에서 한 번만 돈다
+     (persist 가 schemaVersion 2 를 쓰면 다시 안 돈다). 같은 원문을 다시 읽으면 같은 결과다(결정론).
+     ① 파편 잔액 + 펫 레버에 쓴 파편(레버 한 칸 lv = Σ(12+4(n−1)) = 2·lv² + 10·lv, lv10 = 300)을 색 = 스탯으로 모아
+     ② 30알당 그 스탯 일반 장비 +1레벨(없으면 획득, Lv12 상한) ③ 남은 알은 10알당 젤리별 1 — **올림**(잃는 알 0).
+        젤리별은 여기서 o.jstar 에 쓰지 않는다: readStore 가 o.jstar 가 없으면 별 합계로 채우므로, 지급은 readStore 가
+        채택 뒤 v74.jstar 를 한 번 더한다(v74.paid 표식 — 같은 저장에 남아 두 번 안 준다).
+     ④ 파편 잔액만 0. statLv·shardEver·shardDry·pets[i].up·옛 arc-dmg 기록은 지우지 않는다(되돌리기·기록).
+     ⑤ 열의 조각(I09)은 74 에서 장신구 → 무기 칸으로 옮겼다(Task 6). v1 저장의 장신구 칸 열의 조각은 무기 칸이 차 있으면
+        (같은 캐릭터가 다른 무기를 함께 낌) 장착만 풀고, 비어 있으면 그대로 무기가 된다 — 보유는 그대로(잃는 것 0,
+        Task 8 보충 2026-10-02). 그 밖의 무기 겹침(손댄 저장)은 목록에서 먼저 온 것 하나만 남긴다(뺀 것은 보유 그대로).
+     ⑥ 각성 ×2 로 비교가 깨진 arc-dmg 최고 기록은 arcadeBestLegacy 로 옮겨 보존, 새 기록은 처음부터(수치안 §6-5).
+     ⑦ 꿀떡이 해금 진행: 파편 누적 300 → 장비 과일 30, 같은 비율(누적 ÷ 10)로 옮긴다.
+     표는 전부 리터럴이다 — readStore 가 ITEM_POOL 보다 먼저 돌아도 결과가 같게. */
+  var V74_NUM_CAP = 999999;   /* 옛 파편 소독 상한 SHARD_HOLD_MAX 와 같은 값의 리터럴(초기화 순서와 무관하게) */
+  var V74_SHARD_PER_LV = 30;
+  var V74_SHARD_PER_JSTAR = 10;
+  var V74_LV_MAX = 12;
+  var V74_STATS = ['power', 'steady', 'agility', 'luck'];
+  var V74_COMMON = { power: 'flint', steady: 'softcushion', agility: 'windribbon', luck: 'rabbitfoot' };
+  var V74_LEVER = { pwr: 'power', std: 'steady', agi: 'agility', luk: 'luck' };
+  var V74_WEAPONS = ['flint', 'fizzjelly', 'flamescepter', 'heatshard'];
+  function v74Num(v) { return (typeof v === 'number' && isFinite(v) && v > 0) ? Math.min(V74_NUM_CAP, Math.floor(v)) : 0; }
+  function v74LeverShards(lv) { var n = Math.min(10, v74Num(lv)); return 2 * n * n + 10 * n; }
+  function v1to2(o) {
+    var i, k, bal = {}, refund = {}, gear = {}, rest = 0, lvSum = 0;
+    var sh = (o.shards && typeof o.shards === 'object') ? o.shards : {};
+    for (i = 0; i < V74_STATS.length; i++) { k = V74_STATS[i]; bal[k] = v74Num(sh[k]); refund[k] = 0; }
+    if (Array.isArray(o.pets)) {
+      for (i = 0; i < o.pets.length; i++) {
+        var pe = o.pets[i];
+        if (!pe || typeof pe !== 'object' || !pe.up || typeof pe.up !== 'object') continue;
+        for (var lk in V74_LEVER) {
+          if (Object.prototype.hasOwnProperty.call(V74_LEVER, lk)) refund[V74_LEVER[lk]] += v74LeverShards(pe.up[lk]);
+        }
+      }
+    }
+    if (!o.items || typeof o.items !== 'object') o.items = {};
+    if (!o.items.own || typeof o.items.own !== 'object') o.items.own = {};
+    if (!o.items.src || typeof o.items.src !== 'object') o.items.src = {};
+    for (i = 0; i < V74_STATS.length; i++) {
+      k = V74_STATS[i];
+      var total = bal[k] + refund[k], id = V74_COMMON[k];
+      var had = Math.min(V74_LV_MAX, v74Num(o.items.own[id]));
+      var nl = Math.min(V74_LV_MAX, had + Math.floor(total / V74_SHARD_PER_LV));
+      if (nl > had) { o.items.own[id] = nl; gear[id] = nl - had; lvSum += nl - had; if (!had) o.items.src[id] = 'farm'; }
+      rest += total - (nl - had) * V74_SHARD_PER_LV;
+    }
+    o.shards = { power: 0, steady: 0, agility: 0, luck: 0 };
+    if (o.items.eq && typeof o.items.eq === 'object') {
+      for (var ck in o.items.eq) {
+        if (!Object.prototype.hasOwnProperty.call(o.items.eq, ck) || !Array.isArray(o.items.eq[ck])) continue;
+        var lst = o.items.eq[ck], otherW = false, seenW = false, keep = [];
+        for (var q = 0; q < lst.length; q++) {
+          if (lst[q] !== 'heatshard' && V74_WEAPONS.indexOf(lst[q]) >= 0) otherW = true;
+        }
+        for (q = 0; q < lst.length; q++) {
+          var iid = lst[q];
+          if (iid === 'heatshard' && otherW) continue;   /* ⑤ 무기 칸이 차 있다 — 열의 조각은 장착만 푼다 */
+          if (V74_WEAPONS.indexOf(iid) >= 0) { if (seenW) continue; seenW = true; }
+          keep.push(iid);
+        }
+        o.items.eq[ck] = keep;
+      }
+    }
+    var moved = false;
+    if (o.arcadeBest && typeof o.arcadeBest === 'object' && o.arcadeBest['arc-dmg']) {
+      o.arcadeBestLegacy = { 'arc-dmg': o.arcadeBest['arc-dmg'] };
+      delete o.arcadeBest['arc-dmg'];
+      moved = true;
+    }
+    var ever = 0, se = (o.shardEver && typeof o.shardEver === 'object') ? o.shardEver : {};
+    for (i = 0; i < V74_STATS.length; i++) ever += v74Num(se[V74_STATS[i]]);
+    o.gearEver = Math.max(v74Num(o.gearEver), Math.floor(ever / 10));
+    o.v74 = { shards: bal, refund: refund, gear: gear, jstar: Math.ceil(rest / V74_SHARD_PER_JSTAR),
+              lv: lvSum, arcdmg: moved, shown: 0, paid: 0 };
+    return o;
+  }
   var SCHEMA_MIGRATIONS = [
-    function v0to1(o) { return o; }
+    function v0to1(o) { return o; },
+    v1to2
   ];
   var persistReadOnly = false;   // 미래 버전 저장을 만나면 true — 덮어쓰지 않는다
   var storeLoaded = false;       // [F7.1-0925 fix1 M1] loadStore() 가 끝까지 돌면 true
@@ -25957,6 +26008,11 @@ window.TT_SFX = {
              기존 플레이어에게만 안 지키면 업데이트가 손해로 읽힌다. */
           store.jstar = advStarsTotalOf(store.advStars);
         }
+        /* 74 — v1to2 가 계산한 파편 환산 젤리별. 지급 표식을 같은 저장에 남겨 두 번 주지 않는다. */
+        if (o.v74 && typeof o.v74 === 'object' && !o.v74.paid) {
+          store.jstar = (store.jstar | 0) + Math.max(0, o.v74.jstar | 0);
+          o.v74.paid = 1;
+        }
         /* 판정판 50 — 퀘스트·에픽. 모양이 어긋나면 그 칸만 버린다(9차
            sanitizeCountMap 과 같은 규율). 없으면 기본값이 곧 정답이라
            SCHEMA_MIGRATIONS 는 한 줄도 안 늘었다. */
@@ -26165,11 +26221,12 @@ window.TT_SFX = {
             }
           }
           /* 74 — 획득 원천. 아는 id 만, 값은 itemSrcOf 로 정규화('farm'|'gacha'|'gift'|'shop', 모르는 값 = 'farm').
-             없으면 {}(= 원천 모름, 74 이전 획득). 변수 이름 srcIn — 같은 블록 장착 루프의 isrc 와 겹치지 않게. */
+             없으면 {}(= 원천 모름, 74 이전 획득). 변수 이름 srcIn — 같은 블록 장착 루프의 isrc 와 겹치지 않게.
+             보유하지 않은 장비의 원천은 버린다(위 own 채택 뒤라 store.items.own 이 기준 — P4 선물 삭제 규칙과 같은 불변식, Task 8). */
           store.items.src = {};
           var srcIn = (o.items && o.items.src && typeof o.items.src === 'object') ? o.items.src : {};
           for (var isk in srcIn) {
-            if (!Object.prototype.hasOwnProperty.call(srcIn, isk) || !itemById(isk)) continue;
+            if (!Object.prototype.hasOwnProperty.call(srcIn, isk) || !itemById(isk) || !store.items.own[isk]) continue;
             store.items.src[isk] = itemSrcOf(srcIn[isk]);
           }
         }
@@ -26250,6 +26307,10 @@ window.TT_SFX = {
         else if (typeof o.advMax === 'number' && (o.advMax | 0) > ADV_CHAPTER) {
           store.jellyOn = true;
         }
+        /* 74 — 새 칸 셋(v1to2 가 만들거나 v2 저장이 들고 온다). */
+        if (o.v74 && typeof o.v74 === 'object') store.v74 = o.v74;
+        if (typeof o.gearEver === 'number' && isFinite(o.gearEver)) store.gearEver = Math.max(0, o.gearEver | 0);
+        if (o.arcadeBestLegacy && typeof o.arcadeBestLegacy === 'object') store.arcadeBestLegacy = o.arcadeBestLegacy;
       }
     } catch (e) {
       /* private mode / corrupt JSON: run with defaults */
@@ -26681,7 +26742,7 @@ window.TT_SFX = {
          없는 기능은 예고하지 않는다. 한 줄 안에서 끝나는 길이로 쓴다. */
       'load.tip1': 'Clear pairs that make 10, or match twins.',
       'load.tip2': 'One heart refills every 30 minutes.',
-      'load.tip3': 'Shard colour shows the stat it raises.',
+      'load.tip3': 'Alternate sum-10 and same-number pairs to fill Awakening.',
       'load.tip4': 'Tap the ⓘ next to a stat to read it.',
       'load.tip5': 'Skill fires once the gauge is full.',
       'load.tip6': 'Pet skills can turn a battle around.',
@@ -26763,13 +26824,7 @@ window.TT_SFX = {
       'rw.gem': 'Jelly Stars',
       'rw.heart': 'Hearts',
 
-      /* WD-2 §11 파편 · §11.6 갓차 · §14 펫. 파편 이름은 색이 아니라 **스탯**을
-         말한다 — 색은 화면의 것이고, 결과창이 알려 줄 값어치가 있는 것은
-         "무엇이 세지는가"다(§11.1 매핑). */
-      'rw.shard.power': 'Power shard',
-      'rw.shard.steady': 'Steady shard',
-      'rw.shard.agility': 'Agility shard',
-      'rw.shard.luck': 'Luck shard',
+      /* WD-2 §11.6 갓차 · §14 펫. (74 — 결과 시트 파편 줄 rw.shard.* 넷은 파편 경제와 함께 은퇴했다.) */
       'mk.gift': 'Gift box!',
       'pet.get': '{n} joined you!',
       'cp.items': 'Items',
@@ -26899,6 +26954,9 @@ window.TT_SFX = {
       /* final-fix I-4 — persistReadOnly(손상 저장·부팅 실패) 전용, 위 savefail
          (quota/private mode 쓰기 실패)과는 다른 상황이라 새 키. */
       'toast.savero': "Saving isn't working right now. Progress this session won't be saved.",
+      /* 74 — 저장 이전 v2(v1to2) 알림: 사용자에게 보이는 첫 왕국에서 한 번(v74Notice). */
+      'v74.convert': '💎 Shard upgrades are gone. Your shards became {g} gear levels and {s} jelly stars.',
+      'v74.arcdmg': 'Awakening now gives ×{am} points, so the Duel damage record starts fresh. Your old record is saved.',
       'toast.noadds': 'No adds left',
       'toast.empty': 'Board is empty',
       'toast.nohints': 'No hints left',
@@ -27637,14 +27695,14 @@ window.TT_SFX = {
          buddy to "beat the stage-10 boss", which was false for seven of the
          eight.  Each line below states the gate that actually holds it:
          PET_FREE / PET_BOSS / PET_AWK_NEED / PET_NODELAY_NEED /
-         PET_SHARD_NEED / PET_GACHA / PET_TEN_NEED.  Move a gate, move a line. */
+         PET_GEAR_NEED / PET_GACHA / PET_TEN_NEED.  Move a gate, move a line. */
       'pet.lock.ppyak': 'Ppyak is with you from the very first round.',
       'pet.lock.mungchi': 'Mungchi is with you from the very first round.',
       'pet.lock.mongle': 'Match 10 times in a row with no delay and Mongle joins you.',
       'pet.lock.churup': 'Churup turns up in the rare slot of an Adventure gift box.',
       'pet.lock.mukmul': 'Beat the stage-20 boss and Inky joins you.',
       'pet.lock.tiktok': 'Chain 3 skills in a row and TikTok joins you.',
-      'pet.lock.kkultteok': 'Collect 300 shards and Honeybee joins you.',
+      'pet.lock.kkultteok': 'Collect 30 gear fruits and Honeybee joins you.',
       'pet.lock.bangul': 'Beat the stage-40 boss and Bubbly joins you.',
       'pet.lock.sseokssak': 'Make 500 sum-10 matches in total and Sweepy joins you.',
       'pet.lock.banjjak': 'Beat the stage-30 boss and Sparky joins you.',
@@ -27907,7 +27965,7 @@ window.TT_SFX = {
       'shop.pack.xl': 'Chest of jewels',
       'shop.pack.d': '{n} jewels',
       'shop.start': 'Starter pack',
-      'shop.start.d': '{n} jewels + {h} hearts + {s} shards',
+      'shop.start.d': '{n} jewels + {h} hearts + {s} jelly stars',
       'shop.trade': 'Jelly Stars {s}',
       'shop.trade.d': 'Jewels to Jelly Stars. One way only.',
       'shop.trade.ok': 'Jelly Stars +{s}',
@@ -27916,12 +27974,6 @@ window.TT_SFX = {
       'shop.heart1': 'One heart',
       'shop.heart1.d': 'Skip the 30-minute wait',
       'shop.heart.ok': 'Hearts restored!',
-      'shop.shard.power': 'Power shards',
-      'shop.shard.steady': 'Steady shards',
-      'shop.shard.agility': 'Agility shards',
-      'shop.shard.luck': 'Luck shards',
-      'shop.shard.d': 'Exactly {n} of the color you pick',
-      'shop.shard.ok': 'Shards +{n}',
       'shop.bundle1': 'Adventure bundle',
       'shop.bundle1.d': 'Hearts and items in one go',
       'shop.bundle2': 'Heart bundle',
@@ -28112,7 +28164,7 @@ window.TT_SFX = {
       /* ==[INTRO-0910]== 로딩 팁 8종 (§19.7) — en 쪽과 같은 8키. 근거 주석은 그쪽. */
       'load.tip1': '합이 10이거나 같은 숫자면 사라져요.',
       'load.tip2': '하트는 30분에 하나씩 채워져요.',
-      'load.tip3': '파편 색이 곧 올라가는 스탯이에요.',
+      'load.tip3': '합이 10인 짝과 같은 숫자 짝을 번갈아 맞추면 각성 게이지가 차요.',
       'load.tip4': '능력치 옆 ⓘ 를 누르면 설명이 나와요.',
       'load.tip5': '스킬은 게이지가 가득 찼을 때 터져요.',
       'load.tip6': '펫 스킬 한 방이 전투를 뒤집어요.',
@@ -28191,14 +28243,7 @@ window.TT_SFX = {
       'rw.gem': '젤리별',
       'rw.heart': '하트',
 
-      /* WD-2 §11 파편 · §11.6 갓차 · §14 펫. 위 두 줄과 같은 규율이다 — 판 위
-         배지와 결과창이 **같은 말**을 써야 그게 그건 줄 안다. 파편 이름이 색이
-         아니라 스탯인 것도 그래서다: 판에서는 색으로 알아보고 결과창에서는
-         "무엇이 세지는가"로 알아보는데, 그 둘을 잇는 낱말이 스탯이다(§11.1). */
-      'rw.shard.power': '폭발력 파편',
-      'rw.shard.steady': '꾸준함 파편',
-      'rw.shard.agility': '순발력 파편',
-      'rw.shard.luck': '행운 파편',
+      /* WD-2 §11.6 갓차 · §14 펫. (74 — 결과 시트 파편 줄 rw.shard.* 넷은 파편 경제와 함께 은퇴했다.) */
       'mk.gift': '선물 상자!',
       'pet.get': '{n} 합류!',
       'cp.items': '아이템',
@@ -28312,6 +28357,9 @@ window.TT_SFX = {
       /* 출시 점검 0909 ②(승인 A4) — 저장 실패 알림(en 쪽과 같은 키). */
       'toast.savefail': '진행이 저장되지 않아요',
       'toast.savero': '저장에 문제가 있어 이번에는 진행이 저장되지 않아요.',
+      /* 74 — 저장 이전 v2(v1to2) 알림: 사용자에게 보이는 첫 왕국에서 한 번(v74Notice). */
+      'v74.convert': '💎 파편 강화가 없어져서, 모아 둔 파편을 장비 {g}레벨과 젤리별 {s}개로 바꿨어요.',
+      'v74.arcdmg': '각성이 점수 {am}배로 바뀌어서 대전 누적 피해 기록을 새로 시작해요. 예전 기록은 저장해 뒀어요.',
       'toast.noadds': '추가 횟수를 다 썼어요',
       'toast.empty': '보드가 비었어요',
       'toast.nohints': '힌트를 다 썼어요',
@@ -28973,14 +29021,14 @@ window.TT_SFX = {
       /* 2c - 펫별 잠금 안내.  종전에는 여덟 전부가 "10탄 보스"를 돌려
          썼고, 그것은 일곱에게 거짓말이었다.  아래 줄들은 실제 게이트와
          **같은 사실**을 말한다: PET_FREE / PET_BOSS / PET_AWK_NEED /
-         PET_NODELAY_NEED / PET_SHARD_NEED / PET_GACHA / PET_TEN_NEED. */
+         PET_NODELAY_NEED / PET_GEAR_NEED / PET_GACHA / PET_TEN_NEED. */
       'pet.lock.ppyak': '처음부터 함께 있는 펫이에요.',
       'pet.lock.mungchi': '처음부터 함께 있는 펫이에요.',
       'pet.lock.mongle': '쉬지 않고 10연속 매치하면 합류해요.',
       'pet.lock.churup': '모험 선물 상자의 희귀 자리에서 만날 수 있어요.',
       'pet.lock.mukmul': '20탄 보스를 이기면 합류해요.',
       'pet.lock.tiktok': '스킬을 3연속으로 터뜨리면 합류해요.',
-      'pet.lock.kkultteok': '파편을 300개 모으면 합류해요.',
+      'pet.lock.kkultteok': '장비 과일을 30개 모으면 합류해요.',
       'pet.lock.bangul': '40탄 보스를 이기면 합류해요.',
       'pet.lock.sseokssak': '합이 10인 매치를 누적 500회 하면 합류해요.',
       'pet.lock.banjjak': '30탄 보스를 이기면 합류해요.',
@@ -29201,7 +29249,7 @@ window.TT_SFX = {
       'shop.pack.xl': '보석 궤짝',
       'shop.pack.d': '보석 {n}개',
       'shop.start': '시작 팩',
-      'shop.start.d': '보석 {n}개 + 하트 {h}개 + 파편 {s}알',
+      'shop.start.d': '보석 {n}개 + 하트 {h}개 + 젤리별 {s}개',
       'shop.trade': '젤리별 {s}개',
       'shop.trade.d': '보석을 젤리별로. 한 방향만 바꿀 수 있어요.',
       'shop.trade.ok': '젤리별 +{s}개',
@@ -29210,12 +29258,6 @@ window.TT_SFX = {
       'shop.heart1': '하트 1개',
       'shop.heart1.d': '30분 기다림을 건너뛰어요',
       'shop.heart.ok': '하트를 채웠어요!',
-      'shop.shard.power': '힘 파편',
-      'shop.shard.steady': '끈기 파편',
-      'shop.shard.agility': '민첩 파편',
-      'shop.shard.luck': '행운 파편',
-      'shop.shard.d': '고른 색으로 정확히 {n}알',
-      'shop.shard.ok': '파편 +{n}알',
       'shop.bundle1': '모험 번들',
       'shop.bundle1.d': '하트와 아이템을 한 번에',
       'shop.bundle2': '하트 번들',
@@ -29621,14 +29663,12 @@ window.TT_SFX = {
      * 것은 결과 시트가 "무엇을 얻었나"를 말하기 위한 사본일 뿐이다. 그래서
      * 저장하지 않는다 — 판이 끝나면 뜻이 없고, 다음 판은 0 에서 시작한다. */
     gainPet: 0, gainStar: 0,
-    /* WD-2 §11 · §11.6 · §14 — 같은 성질의 사본 넷. 지갑(store.shards)·아이템·
-     * 펫 보유는 **수확하는 그 순간** 이미 늘었고, 여기 쌓이는 것은 결과 시트가
-     * 읽을 목록뿐이다. 그래서 저장하지 않는다(판이 끝나면 뜻이 없다).
-     *   gainShard { power,… } 이번 판에 판에서 직접 주운 파편
+    /* WD-2 §11.6 · §14 — 같은 성질의 사본 셋. 아이템·펫 보유는 **수확하는 그 순간**
+     * 이미 늘었고, 여기 쌓이는 것은 결과 시트가 읽을 목록뿐이다. 그래서 저장하지
+     * 않는다(판이 끝나면 뜻이 없다). (74 — 판에서 주운 파편 사본 gainShard 는 파편 경제와 함께 은퇴했다.)
      *   gainGift  openGachaRoll() 이 돌려준 서술자 목록 (상자 개봉 결과)
      *   gainPets  이번 판에 합류한 펫 id — §10.2 5번(최희귀) 자리를 쓴다
      *   giftLeft  §11.6-C 이번 탄에 아직 심지 않은 상자 수 (0 또는 1) */
-    gainShard: { power: 0, steady: 0, agility: 0, luck: 0 },
     gainGift: [], gainPets: [], giftLeft: 0,
     /* §14.2 ⓑ/§14.3 — 이번 판에서 한 대라도 맞았는가. duelHitMe 한 곳에서만
      * 켜진다. 딱지(ttakji)가 이 빌드에 없어 지금은 **카운터만** 남기지만,
@@ -35641,8 +35681,7 @@ window.TT_SFX = {
     hvReset();
     S.harvest = 0;
     S.gainJstar = 0;
-    /* WD-2 — 새 사본 넷도 판 단위다(위 주석의 이유 그대로). */
-    S.gainShard = { power: 0, steady: 0, agility: 0, luck: 0 };
+    /* WD-2 — 새 사본 셋도 판 단위다(위 주석의 이유 그대로). */
     S.gainGift = [];
     S.gainPets = [];
     S.hitTaken = false;
@@ -36925,12 +36964,10 @@ window.TT_SFX = {
      * 마크를 **즉시 지우는** 것이 이중 발동을 막는 유일한 장치다: 이 셀은 곧
      * dead 가 되어 리필에 밀려 나가지만, 그 사이에 판을 읽는 경로(스냅샷·저장·
      * findFullDeadRows)가 아직 마크를 볼 수 있다. */
-    /* WD-2 §11.5 — 파편 넷과 상자가 같은 문법으로 합류한다. 세고 지우기만 하는
+    /* WD-2 §11.6 — 상자가 같은 문법으로 합류한다(74 — 파편 넷은 은퇴했다). 세고 지우기만 하는
        것도, 폭탄에 휩쓸린 것까지 세는 것도, 마크를 즉시 지워 이중 발동을 막는
-       것도 위 주석 그대로다. 파편은 스탯 이름으로 모은다(색은 화면의 것). */
+       것도 위 주석 그대로다. 그 밖의 마크(옛 판에 남은 것 등)는 효과 없이 지워진다. */
     var mkPet = 0, mkStar = 0, mkGift = 0;
-    var mkShard = { power: 0, steady: 0, agility: 0, luck: 0 };
-    var mkShardAny = 0;
     for (var mki = 0; mki < dying.length + blown.length; mki++) {
       var mkIdx = mki < dying.length ? dying[mki] : blown[mki - dying.length];
       var mkc = S.cells[mkIdx];
@@ -36938,7 +36975,6 @@ window.TT_SFX = {
       if (mkc.mk === 'pet') mkPet++;
       else if (mkc.mk === 'star') mkStar++;
       else if (mkc.mk === 'gift') mkGift++;
-      else if (SHARD_STAT[mkc.mk]) { mkShard[SHARD_STAT[mkc.mk]]++; mkShardAny++; }
       mkc.mk = '';
     }
 
@@ -37169,7 +37205,7 @@ window.TT_SFX = {
      * 두 효과 다 **전투 전용**이다. 마크 자체가 battleRefill 에서만 나므로
      * 비전투 판에는 mk 가 존재할 수 없지만, 방어적으로 게이트를 한 겹 둔다 —
      * 저장된 옛 판이나 손잡이(window.Game)로 심어진 셀이 여기 닿을 수 있다. */
-    if ((mkPet || mkStar || mkShardAny || mkGift) && battleOn()) {
+    if ((mkPet || mkStar || mkGift) && battleOn()) {
       /* W-C §10 — 결과 시트가 읽을 사본. 효과 적용과 **같은 게이트 안**에 두는
          것이 요점이다: 게이트 밖에서 세면 전투가 아닌 판(마크가 존재할 수 없는
          판)에 손잡이로 심어진 셀까지 집계돼, 시트가 아무도 받지 못한 보상을
@@ -37204,27 +37240,6 @@ window.TT_SFX = {
         if (typeof window !== 'undefined') {
           J.shockwave(mkC.x, mkC.y, '#FFD34D');
         }
-      }
-      /* 💎 파편 (WD-2 §11.5) — 지갑에 넣고 천장 카운터를 굴린다. 효과가 즉발이
-         아니라 **적립**인 것이 위 둘과 다른 점이고, 그래서 여기서 persist 한다:
-         펫 잔여·게이지는 모험의 saveProgress 가 매 매치 쓰는 값이지만 파편은
-         그 저장 경로에 없던 신규 필드라, 탭이 닫히면 판 중에 모은 것이 통째로
-         사라진다. 플로트는 색별로 하나씩 — 넷을 한 줄로 합치면 "무슨 색을
-         얼마나 얻었나"가 §11.4 편중 메타에서 읽을 값어치가 있는 정보인데 그게
-         사라진다. 높이를 색마다 벌리는 것도 같은 이유(겹치면 안 읽힌다). */
-      if (mkShardAny) {
-        shardCredit(mkShard);
-        for (var shi = 0; shi < STAT_KEYS.length; shi++) {
-          var shk = STAT_KEYS[shi];
-          if (!mkShard[shk]) continue;
-          S.gainShard[shk] += mkShard[shk];
-          floatOnBoard(mkC.x, mkC.y - 44 - shi * 16,
-                       SHARD_ICO + '+' + mkShard[shk], STAT_FX_COLOR[shk]);
-        }
-        petShardCheck();          // §14.2 ⓓ 꿀떡이 천장
-        persist();
-        J.sfx.mission();
-        J.vibrate(18);
       }
       /* 🎁 갓차 상자 (WD-2 §11.6) — 여기서 **열기만** 하고, 무엇이 나왔는지는
          결과 시트가 말한다. 판 위에서 내용을 다 보여 주면 "열기 전까지 미공개"
@@ -37585,33 +37600,23 @@ window.TT_SFX = {
   var MK_STAR_RATE = 0.015;    // ⭐ 각성 과일 — 스폰 칸당 1.5%
   var MK_MAX_EACH  = 1;        // 판에 동시에 떠 있을 수 있는 수 (종류별)
   var MK_PET_CAP   = DUEL_PET_MAX + 2;  // 펫 과일로 넘길 수 있는 잔여 상한 (기본 2 → 4)
-  /* ---- WD-2 §11.3 · §11.6-C — 파편·상자 스폰 계수 --------------------------
-     §11.3 기본 드랍률의 권고 밴드는 **8~12%** 이고 그 한가운데 10% 를 골랐다.
-     밴드 끝(8/12)이 아니라 가운데인 이유: 이 값은 아직 심 검증 전이고(§11.3 ⚠
-     "경제 인플레 가드"), 가운데 값은 위아래 어느 쪽으로 조정하든 한 자리만
-     고치면 되는 유일한 출발점이다. 단위는 위 두 값과 같은 **스폰 1칸당**이다.
-
-     MK_SHARD_MAX 는 MK_MAX_EACH 와 같은 일을 한다(동시 존재 상한). 값이 2 인
-     것은 파편이 네 색이라 1 이면 "이번 판엔 빨강만"이 되어 §11.4 의 편중 메타가
-     화면에서 안 읽히기 때문이고, 3 이상을 안 쓰는 것은 펫·각성·상자까지 합치면
-     배지가 여섯이 되어 짝 찾는 눈을 가리기 때문이다.
-
+  /* ---- WD-2 §11.6-C — 상자 스폰 계수 ------------------------------------------
+     (74 — 파편 드랍률 SHARD_RATE 0.10 · 동시 상한 MK_SHARD_MAX 2 는 파편 경제와 함께 은퇴했다.)
      상자는 판당 1개(§11.6-C)라 스폰률이 "그 판 어딘가에서 한 번은 나온다"를
      보장할 만큼만 있으면 된다 — 높이면 첫 리필에 몰려 나와 "우연"이 아니게 된다. */
-  var SHARD_RATE      = 0.10;
-  var MK_SHARD_MAX    = 2;
   var GIFT_SPAWN_RATE = 0.02;
   /* 누적 경계. 추첨 루프가 매 칸마다 덧셈을 다시 하지 않게 미리 접어 둔다.
      밴드 순서는 확률 오름차순이 아니라 **도입 순서**다 — pet/star 의 구간이
      종전과 한 톨도 안 움직여야 이미 저장된 판·기존 재현 테스트가 그대로 산다.
        [0, .03)        pet
        [.03, .045)     star
-       [.045, .145)    shard   (§11.3 8~12% 밴드의 가운데 10%)
+       [.045, .145)    (빈 띠 — 74 에서 파편 띠가 은퇴했다. Task 9 가 각성 · 장비 과일로 채운다)
        [.145, .165)    gift    (§11.6-C 판당 1개라 낮게)
-     넷 다 상한이 걸려 있어 판 위 배지는 최대 pet1 + star1 + shard2 + gift1 = 5 다. */
+     상자 띠는 MK_GIFT_LO 로 옛 자리(옛 파편 띠 끝 .145)에 고정한다 — 빈 띠가 생겨도 상자 띠가 앞으로 당겨지지 않는다(재현성).
+     셋 다 상한이 걸려 있어 판 위 배지는 최대 pet1 + star1 + gift1 = 3 이다. */
   var MK_STAR_HI  = MK_PET_RATE + MK_STAR_RATE;
-  var MK_SHARD_HI = MK_STAR_HI + SHARD_RATE;
-  var MK_GIFT_HI  = MK_SHARD_HI + GIFT_SPAWN_RATE;
+  var MK_GIFT_LO = 0.145;   /* 74 — 선물 상자 띠 자리 고정(옛 파편 띠 끝) — 재현성 */
+  var MK_GIFT_HI = MK_GIFT_LO + GIFT_SPAWN_RATE;
 
   /** 스폰 난수. (gridSeed, refillSeq) 파생이라 재도전하면 같은 판 · 같은 스폰이다.
    *  단계 2에서 순번의 집이 S.duel 로 옮겨졌다 — 값은 같은 0에서 같은 폭으로 오르
@@ -37658,21 +37663,19 @@ window.TT_SFX = {
        sp 가 붙은 칸은 건너뛴다: 지금 battleRefill 의 스폰은 sp 를 안 붙이므로 이
        분기는 늘 거짓이지만, 뒷날 스폰이 특수를 얹게 되면 "폭탄이면서 펫"이라는
        읽을 수 없는 타일이 나는 것을 여기서 막는다. */
-    /* WD-2 §11.5 · §11.6-C — 파편 넷과 상자가 같은 추첨에 합류한다. 세는 칸이
-       둘에서 넷으로 는 것뿐이고, pet/star 의 판정은 한 글자도 안 바뀐다.
+    /* WD-2 §11.6-C — 상자가 같은 추첨에 합류한다(74 — 파편 넷은 은퇴했다). pet/star 의 판정은 한 글자도 안 바뀐다.
        ⚠ **비전투 모드는 여기 못 닿는다**: 이 함수는 battleOn() 인 판에서만
        불리고, 엔들리스/러시/데일리/클래식의 판 생성기(genBoardExt·applySpecials)
        에는 mk 를 심는 줄이 없다. 그래서 §11.2 가 요구한 "데일리·클래식 드랍 0"
-       은 새 게이트 없이 **구조로** 성립한다 — 파편·상자가 mk 채널에 얹히는 순간
+       은 새 게이트 없이 **구조로** 성립한다 — 상자가 mk 채널에 얹히는 순간
        그 배제를 공짜로 물려받는다. */
     var mkHave = { pet: 0, star: 0 };
-    var mkShardHave = 0, mkGiftHave = 0;
+    var mkGiftHave = 0;
     for (var q = 0; q < out.length; q++) {
       var oc = out[q];
       if (!oc || oc.dead || !oc.mk) continue;
       if (mkHave[oc.mk] !== undefined) mkHave[oc.mk]++;
       else if (oc.mk === 'gift') mkGiftHave++;
-      else if (SHARD_STAT[oc.mk]) mkShardHave++;
     }
     for (var si = 0; si < spawns.length; si++) {
       var r2 = rng();                                   // 상한과 무관하게 언제나 1회
@@ -37682,17 +37685,7 @@ window.TT_SFX = {
         if (mkHave.pet < MK_MAX_EACH) { sc.mk = 'pet'; mkHave.pet++; }
       } else if (r2 < MK_STAR_HI) {
         if (mkHave.star < MK_MAX_EACH) { sc.mk = 'star'; mkHave.star++; }
-      } else if (r2 < MK_SHARD_HI) {
-        /* 색 추첨도 **상한과 무관하게 언제나 1회** 뽑는다. 위 r2 와 같은 이유다:
-           상한에 걸린 회차에서 소비를 건너뛰면 판 상태가 난수 스트림을 갈라
-           (gridSeed, refillSeq) 재현성이 깨진다.
-           ⚠ 다만 색 자체는 세이브(shardDry 천장)를 읽으므로, 같은 탄을 다시
-           깨면 마크가 **같은 자리**에 뜨되 색은 달라질 수 있다. 천장이 계정
-           단위인 이상 피할 수 없고, 재현성이 지켜야 하는 것(판 모양·스폰 위치)
-           은 그대로다. */
-        var sk = shardDropFor(S.stage, rng);
-        if (mkShardHave < MK_SHARD_MAX) { sc.mk = SHARD_MK[sk]; mkShardHave++; }
-      } else if (r2 < MK_GIFT_HI) {
+      } else if (r2 >= MK_GIFT_LO && r2 < MK_GIFT_HI) {
         /* §11.6-C — 판당 1개. S.giftLeft 는 탄 진입에서 60% 로 한 번 굴린 결과
            (1 = 이번 탄에 상자가 있다)이고, 여기서 하나를 심으면 0 이 되어 그
            판에서는 두 번 다시 안 나온다. */
@@ -38583,27 +38576,20 @@ window.TT_SFX = {
     if ((o.heart | 0) > 0) {
       out.push({ ico: '❤️', disc: 'heart', key: 'rw.heart', val: o.heart | 0, rar: 'normal' });
     }
-    /* ---- WD-2 §11 · §11.6 · §14 — 예약돼 있던 4·5번 슬롯이 내용을 얻는다 ------
+    /* ---- WD-2 §11.6 · §14 — 예약돼 있던 4·5번 슬롯이 내용을 얻는다 ----------------
      * 위 각주가 약속한 그대로다: **push 몇 줄이 늘 뿐** 연출·CSS·사운드·타이밍은
-     * 한 줄도 안 바뀌었다. 자리도 §10.2 의 고정 순서 그대로 — 파편/상자가 4번,
+     * 한 줄도 안 바뀌었다. 자리도 §10.2 의 고정 순서 그대로 — 상자가 4번,
      * 펫 합류가 5번(최희귀)이라 여기(젤리별 뒤)가 정확히 그 자리다.
+     * (74 — 판에서 주운 파편 줄(common)은 파편 경제와 함께 은퇴했다.)
      *
      * 희귀도(rar) 배정은 **정직하게** 한다. 흔한 것을 희귀로 칠하면 그 다음에
      * 정말 희귀한 것이 왔을 때 화면이 같은 말을 두 번 하게 되고, 4단 차등(§10.2)
      * 이 통째로 뜻을 잃는다:
-     *   파편            common  (판에서 흔히 줍는다)
      *   일반 아이템      normal
      *   희귀 아이템      rare
      *   영웅 아이템·펫   epic    (대형 컷인 급)
      * ------------------------------------------------------------------------ */
-    var i, k;
-    for (i = 0; i < STAT_KEYS.length; i++) {
-      k = STAT_KEYS[i];
-      if ((S.gainShard[k] | 0) > 0) {
-        out.push({ ico: SHARD_ICO, disc: 'shard-' + k, key: 'rw.shard.' + k,
-                   val: S.gainShard[k] | 0, rar: 'common' });
-      }
-    }
+    var i;
     /* 상자 개봉 결과. 펫이 나온 상자는 여기서 건너뛴다 — 펫은 아래 gainPets 가
        한 번 더 들고 있고(grantPet 이 넣는다), 두 곳에서 밀면 같은 합류를 두 번
        축하하게 된다. 목록의 소유자를 하나로 두는 쪽이 언제나 안전하다. */
@@ -39364,25 +39350,18 @@ window.TT_SFX = {
        하루에 두 번 받는 길을 만들지 않는 것이 이 분기의 전부다. */
     var streakGot = { heart: 0, jstar: 0, days: [] };
     if (!classicRun && !replay) { bumpStreak(); streakGot = claimStreakRewards(); }
-    /* [PG-0910] §16.3-ⓔ — 데일리 1일 1회 완주 파편 5알. 색은 shardDropFor(0, …)
-       = 균등 + 기존 천장 규율이다(새 추첨표 0).
+    /* [PG-0910] §16.3-ⓔ — 데일리 1일 1회 완주 보상. 74 에서 파편 5알 → 젤리별 DAILY_JSTAR 로 바뀌었다
+       (파편 경제 은퇴 — 10:1 환율로 0.5 알을 올림, 잃는 값 0).
        왜 순수성에 안 걸리는가: **판 규칙에 한 글자도 안 닿는다** — 같은 시드·같은
        보드·같은 규칙이고, 늘어난 것은 판이 끝난 뒤의 지갑뿐이다. 클래식 데일리가
        빠진 것도 streak 과 같은 근거다(하루에 두 번 받는 길을 만들지 않는다).
-       수 5 의 근거: 판당 수확 하한 10 보다 작다 — 한 판보다 작아 데일리가
-       파밍을 대체하지 못한다. (74 이전에는 상자의 파편 수 3 보다 크다는 조건도
-       있었다. 상자의 파편 칸이 은퇴해 그 비교 대상이 없어졌다.)
-       딥링크 재도전(replay)을 따로 걸지 않는 이유: 아래 store.shardDailyDate 가
+       딥링크 재도전(replay)을 따로 걸지 않는 이유: 아래 store.shardDailyDate(옛 이름 그대로)가
        이미 «오늘 한 번» 을 잠그므로, 남의 판을 풀든 내 판을 풀든 하루에 들어오는
-       파편은 토탈로 5알 하나다. */
+       보상은 토탈로 하나다. 결과 시트는 S.gainJstar 를 젤리별 줄(아래 rewardItems 의 gem)에 합친다. */
     if (!classicRun && store.shardDailyDate !== todayKey()) {
       store.shardDailyDate = todayKey();
-      var dsk = shardDropFor(0), dsg = {}, dsi;
-      for (dsi = 0; dsi < STAT_KEYS.length; dsi++) dsg[STAT_KEYS[dsi]] = 0;
-      dsg[dsk] = PET_DAILY_SHARD;
-      shardCredit(dsg);
-      S.gainShard[dsk] = (S.gainShard[dsk] | 0) + PET_DAILY_SHARD;   /* 결과 시트 보상 행 */
-      petShardCheck();
+      store.jstar = (store.jstar | 0) + DAILY_JSTAR;
+      S.gainJstar = (S.gainJstar | 0) + DAILY_JSTAR;
     }
     /* 판정판 50 — 「오늘의 데일리」 축. 클래식은 streak 을 안 올리므로(위 주석)
        퀘스트도 같은 분기 안에 둔다 — 하루에 두 번 받는 길을 만들지 않는다. */
@@ -44577,27 +44556,7 @@ window.TT_SFX = {
     });
   }
 
-  /* ---- 소비처 ④ 확정 파편 팩 (§20.3 · §20.9) ------------------------------ */
-
-  /**
-   * 60💎 → **고른 색** 30알. 확률형이 아니다 — 색을 고르는 확정 팩이고, 그래서
-   * 한국 확률형 아이템 공시 의무를 트리거하지 않는다(§20.9).
-   *
-   * ⚠ 왜 `shardCredit()` 을 안 부르는가 — 그 함수는 **수확**(판 위에서 딴 것)의
-   *   경로라 색별 소프트 천장(`store.shardDry`, §11.3)을 함께 움직인다. 천장이
-   *   세는 것은 「추첨에서 그 색이 안 나온 횟수」이고, 산 것은 추첨이 아니다.
-   *   구매가 천장을 리셋하면 다음 판의 확률이 돈으로 움직이게 된다.
-   * ⚠ `shardEver` 같은 **누적 획득 칸은 이 파일에 없다**(전문 grep 0). 그래서
-   *   도감·업적이 따로 읽을 두 번째 칸이 없고, 여기서 더할 곳도 `store.shards`
-   *   하나뿐이다. 나중에 그 칸이 생기면 이 함수가 같이 갱신해야 한다.
-   */
-  function jewelBuyShards(k) {
-    if (STAT_KEYS.indexOf(k) < 0) return false;
-    if (!jewelSpend(JEWEL_COST.shardPack, 'shard-pack')) return false;
-    store.shards[k] = clamp((store.shards[k] | 0) + SHARD_PACK_N, 0, SHARD_HOLD_MAX);
-    persist();
-    return true;
-  }
+  /* (74 — 소비처 ④ 확정 파편 팩 jewelBuyShards 는 파편 경제와 함께 은퇴했다.) */
 
   /* ---- 젤리별 교환 (§20.3) ------------------------------------------------- */
 
@@ -44744,7 +44703,7 @@ window.TT_SFX = {
         sku: START_PACK.sku,
         ic: 'shop-ic-bundle-1',
         title: t('shop.start'),
-        sub: t('shop.start.d', { n: START_PACK.n, h: START_PACK.hearts, s: START_PACK.shards }),
+        sub: t('shop.start.d', { n: START_PACK.n, h: START_PACK.hearts, s: START_PACK.jstar }),
         price: shopKrw(START_PACK.krw), dis: true
       }));
       wrap.appendChild(pay);
@@ -44764,7 +44723,8 @@ window.TT_SFX = {
       /* [SHOP-0910 판정] §20.4 는 「하트·아이템」과 「파편」을 따로 뒀지만, 지휘자
          확정 탭 구성은 넷([보석|젤리별|번들|스킨])이다. 그래서 **하트 카드와
          확정 파편 팩을 번들 탭에 함께** 둔다 — 셋 다 「확정형 묶음」이라는 같은
-         성격이고, 탭을 다섯으로 늘리면 확정 구성이 깨진다. */
+         성격이고, 탭을 다섯으로 늘리면 확정 구성이 깨진다.
+         (74 — 확정 파편 팩 네 줄은 파편 경제와 함께 은퇴했다. 이 탭에는 하트 카드와 결제 묶음이 남는다.) */
       wrap.appendChild(shopCard({
         ic: 'shop-ic-heart',
         title: t('shop.heart5'),
@@ -44781,16 +44741,6 @@ window.TT_SFX = {
         act: 'heart1',
         dis: jewelBalance() < JEWEL_COST.heartOne
       }));
-      for (i = 0; i < STAT_KEYS.length; i++) {
-        wrap.appendChild(shopCard({
-          ic: 'shop-ic-bundle-2',
-          title: t('shop.shard.' + STAT_KEYS[i]),
-          sub: t('shop.shard.d', { n: SHARD_PACK_N }),
-          price: t('shop.price.jewel', { n: JEWEL_COST.shardPack }),
-          act: 'shard:' + STAT_KEYS[i],
-          dis: jewelBalance() < JEWEL_COST.shardPack
-        }));
-      }
       var bpay = document.createElement('div');
       bpay.id = 'shop-pay';
       bpay.className = 'shop-pay';
@@ -44866,13 +44816,6 @@ window.TT_SFX = {
     if (a.indexOf('star:') === 0) {
       var si = parseInt(a.slice(5), 10);
       if (jewelTradeStars(si)) { toast(t('shop.trade.ok', { s: JSTAR_TRADE[si].star })); J.sfx.win(); }
-      else J.sfx.fail();
-      buildShopBody();
-      return;
-    }
-    if (a.indexOf('shard:') === 0) {
-      var sk = a.slice(6);
-      if (jewelBuyShards(sk)) { toast(t('shop.shard.ok', { n: SHARD_PACK_N })); J.sfx.win(); }
       else J.sfx.fail();
       buildShopBody();
       return;
@@ -47017,6 +46960,7 @@ window.TT_SFX = {
     kdPanClamp();
     kdVisit();
     kdIdleSchedule();
+    v74Notice();
   }
 
   /* --- 건물 탭 -------------------------------------------------------------- */
@@ -48142,186 +48086,22 @@ window.TT_SFX = {
     return r;
   }
 
-  /** 발동 플로트의 색. 네 칸이 화면에서 서로 안 헷갈리는 최소 조건이다. */
-  var STAT_FX_COLOR = {
-    power:   '#FF7A59',
-    steady:  '#5FD08A',
-    agility: '#59B7FF',
-    luck:    '#FFD34D'
-  };
-
   /* =========================================================================
-   * WD-2 §11 파편 경제 · §11.6 갓차 상자 · §14 펫 획득
+   * WD-2 §11 파편 경제 — 판정판 74 에서 은퇴했다(사용자 2026-09-25 「다이아로 스탯 올리기 폐기」, DESIGN §27.7)
    *
-   * 이 블록의 모든 수치는 **신규 경제 계수**다. 기존 밸런스 계수·점수식·WD-1 의
-   * 스탯 엔진 산술에는 한 글자도 닿지 않는다(§11.5·§11.6-D "밸런스 무접촉,
-   * PURE·133 불변"). 아이템 효과가 스탯에 얹히는 자리도 statEff 의 clamp **안**
-   * 이라, §12.3 이 잠근 상한을 넘길 수 있는 경로가 새로 생기지 않는다.
-   *
-   * 색↔스탯 매핑은 §11.1 이 정본이다:
-   *   빨강 shard-r    → power   (폭발력)
-   *   초록 shard-g    → steady  (꾸준함)
-   *   파랑 shard-b    → agility (순발력)
-   *   금색 shard-gold → luck    (행운)
-   * 저장·계산은 전부 **스탯 이름**으로 하고 색은 화면에서만 쓴다 — 두 낱말을
-   * 섞으면 세이브·연출·statEff 셋이 서로 다른 키로 같은 것을 부르게 된다.
+   * 판 위 파편 띠(battleRefill) · 수확과 발동 플로트(resolveMatch) · 색 추첨(shardDropFor · 챕터 우세색 ·
+   * 천장 가중) · 지갑 적립/차감(shardCredit · shardSpend) · 데일리 완주 파편 · 상점 확정 파편 팩 ·
+   * 결과 시트 파편 줄이 전부 나갔다. 저장 필드 셋(shards · shardEver · shardDry)은 지우지 않는다 —
+   * readStore 가 아래 두 상한으로 소독만 하고, 잔액은 v1to2 가 장비 레벨 + 젤리별로 바꾼 뒤 0 이다
+   * (누적 · 천장 기록은 그대로 남는다 — 되돌리기 · 기록용).
    * ========================================================================= */
 
-  /** 판 위 mk 값 ← 스탯 이름. CSS 의 `.tile[data-mk="shard-*"]` 와 짝이다. */
-  var SHARD_MK = {
-    power: 'shard-r', steady: 'shard-g', agility: 'shard-b', luck: 'shard-gold'
-  };
-  /** 그 역. 수확 루프가 셀의 mk 를 스탯으로 되읽을 때 쓴다. */
-  var SHARD_STAT = {
-    'shard-r': 'power', 'shard-g': 'steady', 'shard-b': 'agility', 'shard-gold': 'luck'
-  };
-  /** 결과 시트 슬롯의 아이콘. 판 위 글리프(💎)와 같은 것이어야 한다(§10.3). */
-  var SHARD_ICO = '💎';
-
-  /* 드랍률 SHARD_RATE · 동시 상한 MK_SHARD_MAX · 상자 스폰률 GIFT_SPAWN_RATE 는
-     **스폰 계수**라 mk 상수표(MK_PET_RATE 옆)에 산다 — 밴드 경계를 그 자리에서
-     접어야 하고, 그러려면 값이 그 줄보다 먼저 초기화돼 있어야 한다. */
-
-  /* §11.3 소프트 천장. 그 색이 마른 채로 이 횟수를 넘기면 **다음 파편은 확정**
-     으로 그 색이다. 하드 천장(뽑기 N회 확정)은 §11.3 이 배제했다.
-     ⚠ 단위 이탈 명시: 스펙 문구는 "N판"인데 여기 세는 것은 **파편을 수확한
-     사건 1회**다. 판 단위로 세면 같은 20 이라도 한 판을 오래 붙든 사람과 짧게
-     끊는 사람에게 전혀 다른 천장이 되고, 무엇보다 파편이 한 판에 여러 번 나는
-     구조(스폰 1칸당 추첨)와 단위가 어긋난다. 드랍 단위가 더 촘촘하므로 천장은
-     스펙보다 **빨리** 오지 늦게 오지 않는다 — 안전한 방향의 이탈이다. */
+  /* 천장 카운터(shardDry)의 소독 상한. 74 이전에는 그 색이 이 횟수만큼 마르면 다음 파편이 확정이었다(§11.3). */
   var SHARD_PITY = 20;
-  /* 마른 횟수 1회당 붙는 가중치. 기본 가중이 2~4 이므로 20회면 가중이 22~24 가
-     되어 확정(위 SHARD_PITY 분기) 전에 이미 사실상 그 색이 나온다 = "점증"(§11.3). */
-  var SHARD_DRY_W = 1;
-  var SHARD_W_LEAD = 4;      // §11.4 우세색
-  var SHARD_W_REST = 2;      // §11.4 나머지 (편중은 "유리"지 "강제" 아님)
   /* 세이브 소독용 안전 상한. 실제로 닿을 수 없는 값이고, 남의 손을 탄 세이브가
-     10^9 을 들고 와도 화면과 산술이 안 깨지게 입구에서 자른다(STAT_LV_MAX 규율). */
+     10^9 을 들고 와도 화면과 산술이 안 깨지게 입구에서 자른다(STAT_LV_MAX 규율).
+     저장 이전기의 V74_NUM_CAP 이 같은 값의 리터럴이다. */
   var SHARD_HOLD_MAX = 999999;
-
-  /* §11.4 드랍표. 챕터1·4 빨강 / 2·5 파랑 / 3·6 초록 — 3주기라 표를 여섯 줄로
-     적지 않고 `(ch-1) % 3` 으로 적었다. 두 표현은 1~6 에서 **완전히 같고**,
-     챕터가 7 이상으로 늘어도 같은 주기가 그대로 이어진다.
-     금색(행운)이 어느 챕터의 우세색도 아닌 것은 표 그대로다 — 금색의 자리는
-     "보석 전용 스테이지(주간 로테이션)"인데 그 모드가 아직 없다. 그래도 금색은
-     어디서나 나온다(가중 SHARD_W_REST) — §11.4 각주의 하드월 금지 원칙. */
-  var SHARD_LEAD_CYCLE = ['power', 'agility', 'steady'];
-
-  function shardLeadOf(ch) {
-    var i = ((ch | 0) - 1) % SHARD_LEAD_CYCLE.length;
-    if (i < 0) i += SHARD_LEAD_CYCLE.length;
-    return SHARD_LEAD_CYCLE[i];
-  }
-
-  /** store.shardDry 를 안전하게 읽는다. 손상·부재 = 0. */
-  function shardDryOf(k) {
-    var m = (store && store.shardDry && typeof store.shardDry === 'object')
-      ? store.shardDry : null;
-    var v = m ? m[k] : 0;
-    return (typeof v === 'number' && isFinite(v)) ? clamp(v | 0, 0, SHARD_PITY) : 0;
-  }
-
-  /**
-   * §11.4 + §11.3 — 이번 파편이 **무슨 색인가**. 챕터 편중 가중에 마른 색의
-   * 점증 가중을 더한 룰렛이고, 천장에 닿은 색이 있으면 그 색을 확정으로 낸다.
-   *
-   * @param stage 탄 번호. advChapter/advIsBoss 를 그대로 재사용한다.
-   * @param rnd   선택적 난수원. 하네스가 Math.random 을 전역으로 갈아 끼우지
-   *              않고도 표를 결정론적으로 돌려 볼 수 있게 하는 이음매다.
-   * @return STAT_KEYS 중 하나
-   */
-  function shardDropFor(stage, rnd) {
-    var r = (typeof rnd === 'function') ? rnd : Math.random;
-    /* ⚠ 난수는 **언제나 맨 먼저** 한 번 뽑는다 — 천장에 걸려 답이 이미 정해진
-       회차에도 그렇다. 호출부(battleRefill)가 "파편 밴드에 들어오면 rng 를
-       정확히 한 번 더 쓴다"에 기대어 (gridSeed, refillSeq) 재현성을 지키고
-       있어서, 소비를 건너뛰는 분기가 하나라도 있으면 **세이브 상태가 판의 난수
-       스트림을 가른다**(천장이 찬 사람과 안 찬 사람이 서로 다른 판을 본다).
-       마크 자리는 이 한 줄로 세이브와 무관해지고, 달라지는 것은 색뿐이다. */
-    var roll = r();
-    var n = stage | 0;
-    /* 보스탄은 **균등**(§11.4 "보스탄 = 균등 + 소량 보너스"). 우세색을 안 주는
-       것이 보너스의 뜻이다 — 보스는 원하는 색을 고르러 오는 자리가 아니다. */
-    var lead = advIsBoss(n) ? '' : shardLeadOf(advChapter(n));
-    var w = [], tot = 0, i, k, dry, forced = '';
-    for (i = 0; i < STAT_KEYS.length; i++) {
-      k = STAT_KEYS[i];
-      dry = shardDryOf(k);
-      /* 천장 — 소프트의 끝은 확정이다. 먼저 닿은 색이 이긴다(둘이 동시에 마를
-         일은 실제로 없다: 한 번의 수확이 한 색만 0 으로 되돌린다). */
-      if (dry >= SHARD_PITY && !forced) forced = k;
-      var wv = (k === lead ? SHARD_W_LEAD : SHARD_W_REST) + dry * SHARD_DRY_W;
-      w.push(wv);
-      tot += wv;
-    }
-    if (forced) return forced;
-    var t2 = roll * tot;
-    for (i = 0; i < w.length; i++) {
-      t2 -= w[i];
-      if (t2 < 0) return STAT_KEYS[i];
-    }
-    return STAT_KEYS[STAT_KEYS.length - 1];     // 부동소수 꼬리 방어
-  }
-
-  /**
-   * 수확한 파편을 지갑에 넣고 천장 카운터를 갱신한다. 카운터를 **스폰이 아니라
-   * 수확**에서 움직이는 것이 요점이다: §11.3 이 세는 것은 "미획득"이지 "미출현"이
-   * 아니고, 스폰에서 세면 판에 떠 있다가 못 터뜨린 파편이 획득으로 기록된다.
-   * 덤으로 리필 경로가 세이브를 안 건드리게 되어 (gridSeed, refillSeq) 재현성
-   * 논의에 새 변수가 끼지 않는다.
-   * @param got { power, steady, agility, luck } 이번에 실제로 딴 수
-   */
-  function shardCredit(got) {
-    var any = 0, i, k, n;
-    for (i = 0; i < STAT_KEYS.length; i++) {
-      k = STAT_KEYS[i];
-      n = got[k] | 0;
-      if (n > 0) any = 1;
-      store.shards[k] = clamp((store.shards[k] | 0) + n, 0, SHARD_HOLD_MAX);
-      /* [PG-0910] 누적 획득은 **적립의 짝**이다 — 지갑을 올리는 자리가 여기
-         하나뿐이므로 둘이 갈라질 경로가 원리적으로 없다. */
-      if (n > 0) {
-        store.shardEver[k] = clamp((store.shardEver[k] | 0) + n, 0, SHARD_HOLD_MAX);
-      }
-    }
-    if (!any) return;
-    for (i = 0; i < STAT_KEYS.length; i++) {
-      k = STAT_KEYS[i];
-      if ((got[k] | 0) > 0) store.shardDry[k] = 0;
-      else store.shardDry[k] = clamp(shardDryOf(k) + 1, 0, SHARD_PITY);
-    }
-  }
-
-  /** 지금 **지갑에 있는** 파편의 합(잔액). 강화로 줄어든다. */
-  function shardTotal() {
-    var s = 0;
-    for (var i = 0; i < STAT_KEYS.length; i++) s += store.shards[STAT_KEYS[i]] | 0;
-    return s;
-  }
-
-  /* [PG-0910] §16.6 — 누적 획득의 합. §14 ⓓ 천장(꿀떡이)이 이젠 이쪽을 읽는다.
-     이름을 shardTotal 그대로 두고 속만 바꾸지 않은 이유: 두 수는 이제 서로 다른
-     사실이라 한 이름을 나눠 쓰면 호출부가 무엇을 묻는지 코드에서 안 읽힌다. */
-  function shardEverTotal() {
-    var s = 0;
-    for (var i = 0; i < STAT_KEYS.length; i++) s += store.shardEver[STAT_KEYS[i]] | 0;
-    return s;
-  }
-
-  /**
-   * [PG-0910] §16.6 — shardCredit 의 짝. 그 색 잔액에서 n 을 뺀다.
-   * **부분 차감 금지**: 모자라면 한 톨도 안 쓰고 false 를 돌려준다 —
-   * «산 것도 없는데 잔액만 줄었다» 는 상태를 만들 경로 자체를 두지 않는다.
-   * 누적(shardEver)은 **안 건드린다** — 그것이 이 둘을 갈라 둔 이유다.
-   */
-  function shardSpend(k, n) {
-    n = n | 0;
-    if (n <= 0) return false;
-    if (STAT_KEYS.indexOf(k) < 0) return false;
-    if ((store.shards[k] | 0) < n) return false;
-    store.shards[k] = clamp((store.shards[k] | 0) - n, 0, SHARD_HOLD_MAX);
-    return true;
-  }
 
   /* -------------------------------------------------------------------------
    * §11.6-B 아이템 풀 — 12종 (3티어 × 4스탯)
@@ -48642,7 +48422,7 @@ window.TT_SFX = {
    *   ⓑ 보스4(40탄)    방울이 bangul
    *   ⓒ 각성 연쇄 3회  째깍이 tiktok
    *   ⓒ 무딜레이 10연속 몽글 mongle
-   *   ⓓ 파편 누적 천장 꿀떡이 kkultteok
+   *   ⓓ 장비 과일 누적 꿀떡이 kkultteok   (74 — 옛 「파편 누적 천장」 300 → 장비 과일 30, petGearCheck)
    *   ⓔ 갓차 희귀 5%   츄릅 churup
    * ---------------------------------------------------------------------- */
   var PET_FREE = ['ppyak', 'mungchi'];                    // §14.1 ⓐ
@@ -48656,13 +48436,7 @@ window.TT_SFX = {
   var PET_BOSS = { 20: 'mukmul', 30: 'banjjak', 40: 'bangul' };
   var PET_AWK_NEED = 3;        // §14.2 ⓒ 째깍이 — 각성 연쇄 3회 (= EXPL_STREAK_CAP)
   var PET_NODELAY_NEED = 10;   // §14.2 ⓒ 몽글 — 무딜레이 10연속 매칭
-  /* §14.2 ⓓ 꿀떡이 — "파편 누적 N개 교환(천장)". ⚠ 스펙의 N 은 미정이고(§14.3
-     ⚠③ "파편 교환 비용 밸런스"가 사용자 확정 대상), 교환 UI 는 선택창 2.0 의
-     것이라 이번 라운드에 없다. 그래서 **누적 획득**이 이 수에 닿으면 자동으로
-     합류하는 형태로만 구현했다 — 파편은 차감하지 않는다. 천장의 뜻(확률에 안
-     걸려도 확정 획득하는 안전판, §14.2 각주)은 그대로 살고, 교환 UI 가 오면
-     이 한 줄이 그 버튼의 조건식으로 옮겨 가면 된다. */
-  var PET_SHARD_NEED = 300;
+  /* §14.2 ⓓ 꿀떡이 — 74 에서 「파편 누적 300」이 「장비 과일 누적 30」(PET_GEAR_NEED)으로 바뀌었다. 상수와 판정은 petGearCheck 자리. */
   /* 2c — CODEX P09 썩싹이: "텐 매치 누적 500회". 텐을 쓰게 만드는 보상이라
      조건이 반드시 **합10 매치**여야 한다(전체 매치 수로 대체하면 트윈만 골라도
      받게 되어 의도가 통째로 사라진다). 그래서 계정 단위 카운터 store.tenTotal
@@ -48692,12 +48466,12 @@ window.TT_SFX = {
    * [PG-0910] 펫 저장 칸 — 레버·강화·편중 스탯은 판정판 74 에서 은퇴했다(DESIGN §27.6·§27.7)
    *
    * 펫은 스킬만 있다(사용자 2026-09-25 「펫의 능력치는 필요없다」). 여기 남은 것은
-   * 저장 칸 `pets[i].up` 의 소독(makePetUp·makePetEntry)과 데일리 파편 상수뿐이다.
-   * `up` 칸은 세이브 호환을 위해 지우지 않는다 — 환급은 Task 8(DESIGN §27.7).
+   * 저장 칸 `pets[i].up` 의 소독(makePetUp·makePetEntry)과 데일리 완주 젤리별 상수뿐이다.
+   * `up` 칸은 세이브 호환을 위해 지우지 않는다 — 환급은 저장 이전 v1to2(DESIGN §27.7)가 한 번 한다.
    * ========================================================================= */
-  var PET_UP_LV_MAX = 10;      // 저장된 강화 단수의 소독 상한(은퇴한 레버 칸 — 환급 전까지 보존)
+  var PET_UP_LV_MAX = 10;      // 저장된 강화 단수의 소독 상한(은퇴한 레버 칸 — v1to2 가 환급한 뒤에도 기록으로 보존)
   var PET_UP_KEYS   = ['pwr', 'std', 'agi', 'luk'];
-  var PET_DAILY_SHARD = 5;     // §16.3-ⓔ 데일리 1일 1회 완주 보상
+  var DAILY_JSTAR = 1;   /* 74 — 옛 데일리 파편 5알(= 10:1 환율로 0.5) → 젤리별 1(올림, 잃는 값 0) */
 
   /** 강화 칸 넷을 소독해 만든다. 소독 규율은 statLv 블록 그대로 —
    *  아는 키만 · 유한한 숫자만 · 범위 안 정수만. */
@@ -48820,11 +48594,31 @@ window.TT_SFX = {
     if (dirty) persist();
   }
 
-  /** §14.2 ⓓ — 파편 천장. 파편이 늘어난 직후에만 볼 값이라 따로 떼어 뒀다.
-   *  [PG-0910] 잔액(shardTotal)이 아니라 **누적 획득**(shardEverTotal)을 읽는다 —
-   *  §16.6 의 그 한 줄. 이제 파편을 강화에 써도 해금이 뒤로 가지 않는다. */
-  function petShardCheck() {
-    if (!petOwned('kkultteok') && shardEverTotal() >= PET_SHARD_NEED) grantPet('kkultteok');
+  var PET_GEAR_NEED = 30;   /* 74 — 꿀떡이: 장비 과일 누적 30개(옛 파편 누적 300 과 같은 비율 — 이전기가 진행을 ÷10 으로 옮긴다) */
+  function petGearCheck() {
+    if (!petOwned('kkultteok') && (store.gearEver | 0) >= PET_GEAR_NEED) grantPet('kkultteok');
+  }
+  /** 이전 알림을 띄울 수 있나 = 사용자가 실제로 보는 왕국: 스플래시가 걷혔고(splashDone — 첫 사용자 탭 뒤) 왕국 화면이
+      활성이고 열린 모달이 없다. 부팅 청크의 enterKingdom() 은 스플래시 밑이라 여기서 거짓이다(착수 전 점검 C4). */
+  function v74NoticeReady() {
+    if (!splashDone) return false;
+    var kd = $('screen-kingdom');
+    if (!kd || !kd.classList.contains('active')) return false;
+    return !document.querySelector('.modal:not([hidden])');
+  }
+  /** 이전 결과를 한 번만 알린다. 조용히 바뀐 지갑은 「사라졌다」로 읽힌다. 사용자에게 보이는 첫 왕국에서만 띄우고
+      **띄운 그 순간** 소비·저장한다(shown = 1 → persist). 조건이 안 맞으면 소비하지 않고 다음 기회(스플래시 해제 뒤 타이머 ·
+      다음 enterKingdom)를 기다린다. 읽기 전용 세션이면 저장이 안 되므로 다음에도 다시 알린다. */
+  var V74_NOTICE_DELAY = 360;   /* 스플래시 퇴장(320ms) 뒤 — 걷히는 판 밑에 알림이 깔리지 않게 */
+  function v74Notice() {
+    petGearCheck();
+    var v = store.v74;
+    if (!v || v.shown || !v74NoticeReady()) return false;
+    if ((v.lv | 0) > 0 || (v.jstar | 0) > 0) toast(t('v74.convert', { g: v.lv | 0, s: v.jstar | 0 }));
+    if (v.arcdmg) later(function () { toast(t('v74.arcdmg')); }, 2600);
+    v.shown = 1;
+    persist();
+    return true;
   }
 
   /**
@@ -50580,6 +50374,7 @@ window.TT_SFX = {
        prefers-reduced-motion 에서 트랜지션 시간이 0 이라 이벤트가 안 올 수 있어서다. */
     setTimeout(function () { el.hidden = true; }, 320);
     splashAudioHook();
+    setTimeout(v74Notice, V74_NOTICE_DELAY);   /* 74 — 첫 사용자 탭으로 스플래시가 걷히면 그 왕국에서 이전 알림(C4) */
   }
 
   /* ---- 14차 수리 2 — 「누를 때」와 「뗄 때」를 가른다 -------------------------
@@ -51234,7 +51029,7 @@ window.TT_SFX = {
        데스크톱 브라우저에서도 결제 카드의 자리를 재야 한다»는 관문의 요구다. */
     jewelGrant: jewelGrant, jewelSpend: jewelSpend, jewelBalance: jewelBalance,
     jewelRefillHearts: jewelRefillHearts, jewelBuyHeart: jewelBuyHeart,
-    jewelBuyShards: jewelBuyShards, jewelTradeStars: jewelTradeStars,
+    jewelTradeStars: jewelTradeStars,
     appGemContinue: appGemContinue, jewelPayContinue: jewelPayContinue,
     claimDailyFree: claimDailyFree, dailyFreeLeft: dailyFreeLeft,
     openShop: openShop, closeShop: closeShop, shopTab: shopTab,
@@ -51299,25 +51094,24 @@ window.TT_SFX = {
        중 무엇도 window.Game 을 거쳐 부르지 않는다.
        관문이 확인해야 하는 것은 "표에 적힌 확률이 정말 그 확률인가"인데, 그것을
        실제 플레이로 재려면 수천 판이 필요하다. 그래서 **난수원을 인자로 받는**
-       이음매를 뒀다: shardDropFor(stage, rnd) · openGachaRoll(rnd) 둘 다 함수
-       하나를 넘기면 그 스트림만 쓴다. Math.random 을 전역으로 갈아 끼우지
+       이음매를 뒀다: openGachaRoll(rnd) 는 함수 하나를 넘기면 그 스트림만 쓴다(74 — 파편 색
+       추첨 shardDropFor 는 파편 경제와 함께 은퇴했다). Math.random 을 전역으로 갈아 끼우지
        않는 것이 요점이다 — 그 방법은 판 생성·연출·다른 확률까지 함께 물들여서
        "무엇을 쟀는지"가 흐려지고, 되돌리기를 잊으면 다음 시나리오가 조용히
-       오염된다. store 는 이미 위에서 나가 있으므로 하네스가 store.shards /
-       store.shardDry / store.giftNoItem / store.pets 를 직접 읽고 심으면 된다. */
+       오염된다. store 는 이미 위에서 나가 있으므로 하네스가 store.giftNoItem /
+       store.pets 를 직접 읽고 심으면 된다. */
     ITEM_POOL: ITEM_POOL, ITEM_SLOTS: ITEM_SLOTS, ITEM_TIER_EFF: ITEM_TIER_EFF,
     GACHA_OPEN_WEIGHTS: GACHA_OPEN_WEIGHTS, GACHA_BOX_STAGES: GACHA_BOX_STAGES,
     GACHA_STAGE_P: GACHA_STAGE_P, GACHA_PITY: GACHA_PITY,
-    SHARD_RATE: SHARD_RATE, SHARD_PITY: SHARD_PITY, SHARD_MK: SHARD_MK,
-    MK_SHARD_MAX: MK_SHARD_MAX, GIFT_SPAWN_RATE: GIFT_SPAWN_RATE,
-    shardDropFor: shardDropFor, shardCredit: shardCredit, shardTotal: shardTotal,
+    GIFT_SPAWN_RATE: GIFT_SPAWN_RATE,
     /* [PG-0910] 스모크 손잡이. 게임 코드는 이 중 무엇도 window.Game 을 거쳐
        부르지 않는다(위 debug handles 와 같은 규약) — 관문이 «곱항이 정말 1 인가»
        를 사람 눈이 아니라 숫자로 확인할 수 있어야 하기 때문에 있다. */
-    shardSpend: shardSpend, shardEverTotal: shardEverTotal, persist: persist,
+    persist: persist,
     petPowN: petPowN, petDurMs: petDurMs, petUses: petUses, petRareP: petRareP,
     PET_UP_LV_MAX: PET_UP_LV_MAX,
-    PET_DAILY_SHARD: PET_DAILY_SHARD, PET_SHARD_NEED: PET_SHARD_NEED,
+    /* 74 — 저장 이전 v2 손잡이(smoke-v74-t8): 이전기 소독 상한 · 이전 알림 · 꿀떡이 장비 과일 게이트. */
+    V74_NUM_CAP: V74_NUM_CAP, v74Notice: v74Notice, petGearCheck: petGearCheck, PET_GEAR_NEED: PET_GEAR_NEED,
     openGachaRoll: openGachaRoll, isGachaStage: isGachaStage,
     itemById: itemById, itemEffOf: itemEffOf, itemStatBonus: itemStatBonus,
     /* 0901 ⑥-d — 관문 하네스가 "곱항이 정말 1 인가"를 사람 눈이 아니라 숫자로
@@ -51337,7 +51131,7 @@ window.TT_SFX = {
     charGetFx: charGetFx, charGetEnd: charGetEnd, getLifeMs: getLifeMs,
     introDue: introDue, introPlay: introPlay, introLines: introLines,
     cinNext: cinNext, introSeenChar: introSeenChar,
-    petShardCheck: petShardCheck, petGachaPool: petGachaPool,
+    petGachaPool: petGachaPool,
     syncMateLocks: syncMateLocks,
     PET_FREE: PET_FREE, PET_BOSS: PET_BOSS, MATE_IDS: MATE_IDS,
     /* 2c — 저장 스키마 v2 손잡이. 마이그레이션 검증이 심고 읽는 자리다. */
