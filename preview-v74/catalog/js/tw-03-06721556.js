@@ -1,0 +1,1 @@
+window.GAME_DEFAULT_LANG='ko';
