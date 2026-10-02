@@ -25521,9 +25521,11 @@ window.TT_SFX = {
      *               이름을 쓰면 statEff·아이템·연출이 같은 낱말로 줄을 맞춘다.
      *   shardDry    색별 마른 횟수 (§11.3 소프트 천장). 그 색을 실제로 **수확한**
      *               순간 0 으로 돌아가고, 다른 색이 나온 수확마다 1 오른다.
-     *   items       { own: { itemId: lv }, eq: { charId: [itemId, …] } }.
+     *   items       { own: { itemId: lv }, eq: { charId: [itemId, …] }, src: { itemId: 원천 } }.
      *               모양을 최소로 잡은 것은 이 라운드의 UI 가 자리표(보유/장착
      *               목록)뿐이기 때문이다 — 선택창 2.0 이 오면 여기 위에 얹는다.
+     *               src(74)는 grantItem 이 적는 획득 원천('farm'|'gacha'|'gift'|'shop')이다.
+     *               없으면 {} — 74 이전에 얻은 것이라 원천을 모른다.
      *   giftNoItem  아이템 없이 지나간 연속 상자 수 (§11.6-A 소프트 천장 12).
      *   pets        보유 펫 id 목록 (§14). ⚠ **기본값은 무료 둘뿐**이고, 옛
      *               세이브는 readStore 가 여덟 전부를 채워 준다(소급 잠금 금지).
@@ -25540,7 +25542,7 @@ window.TT_SFX = {
      * 획득하는 안전판)의 뜻을 정면으로 깨는 것이라 천장은 누적을 읽어야 한다.
      * 이전기는 readStore 한 줄이다(옆에 적어 둔 시딩). */
     shardEver: { power: 0, steady: 0, agility: 0, luck: 0 },
-    items: { own: {}, eq: {} },
+    items: { own: {}, eq: {}, src: {} },
     giftNoItem: 0,
     /* 2c — 모양이 바뀌었다: 문자열 배열 -> **항목 배열** [{id, lv, evo}].
      * lv/evo 는 아직 아무 계산도 안 읽는다(성장·진화는 다음 파도) — 지금
@@ -26172,6 +26174,14 @@ window.TT_SFX = {
               }
               if (ilist.length) store.items.eq[ihd] = ilist.slice(0, ITEM_SLOTS.length);
             }
+          }
+          /* 74 — 획득 원천. 아는 id 만, 값은 itemSrcOf 로 정규화('farm'|'gacha'|'gift'|'shop', 모르는 값 = 'farm').
+             없으면 {}(= 원천 모름, 74 이전 획득). 변수 이름 srcIn — 같은 블록 장착 루프의 isrc 와 겹치지 않게. */
+          store.items.src = {};
+          var srcIn = (o.items && o.items.src && typeof o.items.src === 'object') ? o.items.src : {};
+          for (var isk in srcIn) {
+            if (!Object.prototype.hasOwnProperty.call(srcIn, isk) || !itemById(isk)) continue;
+            store.items.src[isk] = itemSrcOf(srcIn[isk]);
           }
         }
         if (typeof o.giftNoItem === 'number' && isFinite(o.giftNoItem)) {
@@ -26870,7 +26880,7 @@ window.TT_SFX = {
       'item.lastcharm.fl': 'Some people do better once they panic. This is for them.',
       'item.awakecatalyst.nm': 'Skill Catalyst',
       'item.awakecatalyst.fl': 'It does not shine itself. It only brings the shining forward.',
-      'item.puddingcharm.nm': 'Pudding Shield',
+      'item.puddingcharm.nm': 'Pudding Charm',
       'item.puddingcharm.fl': 'A piece the Pudding Knight handed over, saying he did not need it.',
       'item.soon': 'Coming soon',
 
@@ -28305,7 +28315,7 @@ window.TT_SFX = {
       'item.lastcharm.fl': '초조할 때 더 잘 되는 사람이 있다. 그런 사람을 위한 물건.',
       'item.awakecatalyst.nm': '스킬 촉매',
       'item.awakecatalyst.fl': '자기가 빛나지는 않는다. 빛나는 순간을 당길 뿐이다.',
-      'item.puddingcharm.nm': '푸딩 방패',
+      'item.puddingcharm.nm': '푸딩 부적',
       'item.puddingcharm.fl': '푸딩 기사가 나눠준 조각. 본인은 필요 없다며 준다.',
       'item.soon': '준비 중',
 
@@ -37179,7 +37189,9 @@ window.TT_SFX = {
          때문에 계산식을 손대는 것은 금지다. 74 에서 gain 식에 곱 한 항이 늘기는
          했다 — 반올림 뒤의 `gain = gainPre * aw`(각성 ×2, 위 주석)다. 그것은 각성
          규칙(§27.3)이 한 일이고 표시 때문이 아니다. 오버레이는 같은 aw 를 그대로
-         곱할 뿐이다. 여기 쓰인 fx·gold·tw·mm·st·aw 는 전부 이미 계산이 끝난
+         곱할 뿐이다. 아이템 점수 곱 im 도 같다 — 점수식에는 있었는데 여기서 빠져
+         있어 행동형 장비가 걸린 매치의 화면 배율이 실제보다 작게 보였다(판정판 74
+         에서 더했다). 여기 쓰인 fx·gold·tw·mm·st·aw·im 는 전부 이미 계산이 끝난
          값이라 상태를 한 번도 다시 전진시키지 않고, comboScoreMult 는 순수
          함수라 다시 불러도 안전하다.
          엣지에서만 띄운다: 배수는
@@ -37192,7 +37204,7 @@ window.TT_SFX = {
       if (S.combo <= 1) { multFxTier = 0; multFxUntil = 0; }
       var mDisp = comboScoreMult(S.combo, S.mode !== 'adv') *
                   ((gold && !isClassic()) ? GOLD_MULT : 1) *
-                  fx * tw.mult * mm * st.mult * aw;
+                  fx * tw.mult * mm * st.mult * aw * im;
       var mTier = Math.floor(mDisp + 1e-9);
       if (mTier >= 2 && mTier > multFxTier &&
           (mTier >= 4 || (now() - multFxAt) > MULT_FX_MIN_MS)) {
@@ -38761,9 +38773,8 @@ window.TT_SFX = {
     for (i = 0; i < S.gainGift.length; i++) {
       var g = S.gainGift[i];
       if (!g) continue;
-      if (g.kind === 'shard') {
-        out.push({ ico: '🎁', disc: 'gift', key: 'rw.shard.' + g.stat,
-                   val: g.n | 0, rar: 'common' });
+      if (g.kind === 'gem') {
+        out.push({ ico: '★', disc: 'gem', key: 'rw.gem', val: g.n | 0, rar: 'normal' });
       } else if (g.kind === 'item') {
         var gi = itemById(g.id);
         out.push({ ico: (gi && gi.ico) || '🎁', disc: 'item', key: 'item.' + g.id + '.nm',
@@ -39521,8 +39532,9 @@ window.TT_SFX = {
        왜 순수성에 안 걸리는가: **판 규칙에 한 글자도 안 닿는다** — 같은 시드·같은
        보드·같은 규칙이고, 늘어난 것은 판이 끝난 뒤의 지갑뿐이다. 클래식 데일리가
        빠진 것도 streak 과 같은 근거다(하루에 두 번 받는 길을 만들지 않는다).
-       수 5 의 근거: GACHA_SHARD_N(3) < 5 < 판당 수확 하한 10 — 상자보다 크고
-       한 판보다 작아 데일리가 파밍을 대체하지 못한다.
+       수 5 의 근거: 판당 수확 하한 10 보다 작다 — 한 판보다 작아 데일리가
+       파밍을 대체하지 못한다. (74 이전에는 상자의 파편 수 3 보다 크다는 조건도
+       있었다. 상자의 파편 칸이 은퇴해 그 비교 대상이 없어졌다.)
        딥링크 재도전(replay)을 따로 걸지 않는 이유: 아래 store.shardDailyDate 가
        이미 «오늘 한 번» 을 잠그므로, 남의 판을 풀든 내 판을 풀든 하루에 들어오는
        파편은 토탈로 5알 하나다. */
@@ -48492,11 +48504,9 @@ window.TT_SFX = {
   /* ---- 0901 ⑥-d 아이템 효과 계수 (DESIGN-ITEMS.md §1.3 표) ----------------
    * 전부 **신설** 대문자 상수다. 기존 133 계수는 한 글자도 재사용·수정하지
    * 않았다(§3.1 규칙: 기존 키 값 변경 = 하드 FAIL / 신규 키 = PASS).
-   * 특히 I09 는 캐릭터 패시브의 TEN_SUM10_MULT 를 **빌리지 않는다** — 둘은
-   * 뜻이 다르고, 그 값을 건드리면 캐릭터 배수까지 같이 움직인다(§3.1). */
-  var ITEM_TENMATCH_MULT  = 1.15;   // I09 heatshard     — 텐(합10) 매치 점수
-  var ITEM_TWINMATCH_MULT = 1.15;   // I10 twinmirror    — 트윈(같은 수) 매치 점수
-  var ITEM_CHAIN_MULT     = 1.20;   // I12 chainbracelet — 콤보 문턱 위 점수
+   * 74 — 열의 조각(I09)·쌍둥이 거울(I10)은 스탯형으로 흡수돼 텐·트윈 매치 점수
+   * 계수 둘을 지웠다. 남은 계수는 I11~I14 의 것이다. */
+  var ITEM_CHAIN_MULT     = 1.08;   // I12 — 74: +20% 는 콤보가 안 끊겨 상시 = 기본 점수 13점급(과함) → +8%(수치안 §4-3)
   var ITEM_CHAIN_COMBO    = 3;      // I12 그 문턱
   var ITEM_FIRST_MULT     = 3;      // I13 firstcharm    — 판 첫 채점 매치
   var ITEM_LAST_MULT      = 1.40;   // I14 lastcharm     — 막판 점수
@@ -48552,8 +48562,8 @@ window.TT_SFX = {
           각성 적립이 이미 포화 근처라 I15(×1.25)와 I11(+50%)을 함께 끼면
           각성이 상시화되어 목표 대역(SKILL 50~65%)을 넘길 수 있다 — 심(§5)이
           먼저다. 지시(⑥-d)도 I09~I14·I16 만 켜라고 적고 있다. */
-    { id: 'heatshard',     kind: 'act', stat: 'power',   tier: 'rare', slot: 'trinket', ico: '🔥', enabled: true,  codex: 'I09', eff: '텐 매치 점수 +15%' },
-    { id: 'twinmirror',    kind: 'act', stat: 'power',   tier: 'rare', slot: 'trinket', ico: '🪞', enabled: true,  codex: 'I10', eff: '트윈 매치 점수 +15%' },
+    { id: 'heatshard',     kind: 'stat', stat: 'power',   tier: 'rare', slot: 'weapon',  ico: '🔥', codex: 'I09' },   /* 74 — 「텐 매치 +15%」 행동형 → 텐 파워 스탯형(희귀)으로 흡수(스펙 §B ①-b) */
+    { id: 'twinmirror',    kind: 'stat', stat: 'agility', tier: 'rare', slot: 'trinket', ico: '🪞', codex: 'I10' },  /* 74 — 「트윈 매치 +15%」 → 트윈 파워 스탯형(희귀) */
     { id: 'crossnecklace', kind: 'act', stat: 'agility', tier: 'epic', slot: 'trinket', ico: '📿', enabled: true,  codex: 'I11', eff: '텐↔트윈 교차 시 각성 게이지 +50%' },
     { id: 'chainbracelet', kind: 'act', stat: 'power',   tier: 'rare', slot: 'trinket', ico: '⛓',      enabled: true,  codex: 'I12', eff: '콤보 3+ 에서 점수 +20%' },
     { id: 'firstcharm',    kind: 'act', stat: 'luck',    tier: 'rare', slot: 'trinket', ico: '🎯', enabled: true,  codex: 'I13', eff: '첫 매치 점수 x3' },
@@ -48567,6 +48577,25 @@ window.TT_SFX = {
       if (ITEM_POOL[i].id === id) return ITEM_POOL[i];
     }
     return null;
+  }
+
+  /* 판정판 74 — 장비 그림 하나의 출처(조사 §8-3·§9-7). 그림이 **도착한 id 만** ITEM_ART 에 크기별 완성 경로 문자열
+     리터럴로 있고(행 하나 = 256·96·64 세 경로), 없으면 칸 종류의 슬롯 실루엣을 그린다(2단 구조 — Task 14 가 이 표만 채운다).
+     경로를 조립하지 않는 이유: 배포 허용 목록 생성기(site/tools/build/catalog-allowlist.py 의 REF_RE)와 build-dist.py 는
+     코드 안의 리터럴 경로만 찾는다 — 조립하면 Pages·zip 배포본에서 그림이 빠진다(착수 전 점검 C13).
+     등급 색·빛·액자는 그림에 없다: 소비처의 코드 층(data-tier, 기존 보상 토큰)이 칠한다. */
+  var ITEM_ART = {};
+  var ITEM_ART_SIL = { weapon: 'catalog/slot-ic-skill.webp', aux: 'catalog/slot-ic-skin.webp', trinket: 'catalog/slot-ic-item.webp' };
+  function itemArtUrl(id, size) {
+    var it = itemById(id);
+    if (!it) return '';
+    var sz = (size === 256 || size === 64) ? size : 96;
+    var row = ITEM_ART[id];
+    return (row && row[sz]) ? row[sz] : (ITEM_ART_SIL[it.slot] || ITEM_ART_SIL.trinket);
+  }
+  function itemArtCss(id, size) {
+    var u = itemArtUrl(id, size);
+    return u ? ('url("' + u + '")') : 'none';
   }
 
   /** 그 장비가 막대에 더하는 점수 = 희귀도(일반 1 · 희귀 2 · 영웅 3) + ⌊Lv/4⌋(Lv4·8·12 에 +1) — 수치안 §4-1. */
@@ -48631,26 +48660,28 @@ window.TT_SFX = {
    * H1 — 매치 점수 곱항. gain 식 맨 끝에 한 항으로 합류한다(§1.2).
    * 순수 읽기다: 상태를 하나도 전진시키지 않으므로 매치당 몇 번 읽어도 같다.
    * (그래도 호출은 매치당 한 번이다 — 다른 곱항들과 같은 규율.)
+   * 74 — 열의 조각(I09)·쌍둥이 거울(I10)은 스탯형으로 흡수돼 이 함수에서 빠졌다.
+   * 곱항은 I12·I13·I14 뿐이다.
    */
   function itemScoreMult(va, vb) {
     if (!featuresOn()) return 1;
-    var m = 1, k = matchKind(va, vb);
-    if (k === 'sum10' && itemOn('heatshard')) m *= ITEM_TENMATCH_MULT;      // I09
-    if (k === 'same' && itemOn('twinmirror')) m *= ITEM_TWINMATCH_MULT;     // I10
+    var m = 1;
     if ((S.combo | 0) >= ITEM_CHAIN_COMBO && itemOn('chainbracelet')) m *= ITEM_CHAIN_MULT;  // I12
     /* I13 — 판의 **첫 채점 매치**. S.matches++ 는 채점 뒤에 돈다(:31567)이라
        이 자리에서 0 인 것이 곧 "아직 한 수도 안 셌다"이다. */
     if ((S.matches | 0) === 0 && itemOn('firstcharm')) m *= ITEM_FIRST_MULT;  // I13
-    /* I14 — 잔여 시간은 **타임드 모드에만** 있는 개념이다(§1.3 주의). 모험은
-       카운트다운이 아니라 rushLeftMs() 가 0 을 돌려주고, 그래서 조건이 영영
-       거짓이다(무해). 러시·아케이드 타임에서만 산다. */
-    if (isRush() && rushLeftMs() > 0 && rushLeftMs() <= ITEM_LAST_SEC * 1000
-        && itemOn('lastcharm')) m *= ITEM_LAST_MULT;                       // I14
+    /* I14 — 74: 모험에서도 켠다. 장비 과일·상자로 모험에서 얻는 물건이 모험에서 안 듣는 것은 함정이다(수치안 §4-3 ×1.084, §9-6 위임 판단). */
+    var lastLeft = (S.mode === 'adv') ? advLeftMs() : (isRush() ? rushLeftMs() : 0);
+    if (lastLeft > 0 && lastLeft <= ITEM_LAST_SEC * 1000 && itemOn('lastcharm')) m *= ITEM_LAST_MULT;   // I14
     return m;
   }
 
-  /** 아이템 지급/강화. 이미 있으면 레벨이 오른다(§11.6-B "레벨업"). */
-  function grantItem(id) {
+  var ITEM_SRC = ['farm', 'gacha', 'gift', 'shop'];   /* 74 — 획득 원천: 파밍 · 뽑기(P3) · 선물(P4) · 상점 특가(P3). 74 가 실제로 쓰는 값은 'farm' 뿐 */
+  function itemSrcOf(v) { return (v === 'gacha' || v === 'gift' || v === 'shop') ? v : 'farm'; }   /* 모르는 값·빈 값 = 'farm' — 리터럴 비교라 readStore 가 먼저 돌아도 같다 */
+
+  /** 아이템 지급/강화. 이미 있으면 레벨이 오른다(§11.6-B "레벨업").
+   *  src 는 획득 원천('farm'|'gacha'|'gift'|'shop', 생략·모르는 값 = 'farm')으로 store.items.src[id] 에 적힌다(74). */
+  function grantItem(id, src) {
     var it = itemById(id);
     if (!it) return null;
     /* 2c — 효과가 아직 없는 아이템은 **보유가 될 수 없다**. 여기서 막지 않으면
@@ -48661,6 +48692,8 @@ window.TT_SFX = {
     var had = own[id] | 0;
     var lv = clamp(had + 1, 1, ITEM_LV_MAX);
     own[id] = lv;
+    if (!store.items.src || typeof store.items.src !== 'object') store.items.src = {};
+    store.items.src[id] = itemSrcOf(src);   /* 74 — 획득 원천(P3 뽑기·특가 상점·P4 선물과 합칠 자리) */
     /* 처음 얻은 아이템은 빈 슬롯이 있으면 바로 끼워 준다. 자리표 UI 뿐인 이번
        라운드에서 "얻었는데 아무 일도 안 일어난다"를 막는 최소 장치다. */
     if (!had) {
@@ -48690,15 +48723,11 @@ window.TT_SFX = {
   /* §11.6-C — 출현 탄 안에서의 출현률. "~60%(항상은 아님 = 우연)". 판마다가
      아니라 **탄 진입 한 번**에만 굴린다(§11.6-C "매판 확정이면 파밍이 노동"). */
   var GACHA_STAGE_P = 0.60;
-  /* §11.6-A 개봉표. 파편 70 / 아이템 25 / 희귀 5. */
-  var GACHA_OPEN_WEIGHTS = { shard: 0.70, item: 0.25, rare: 0.05 };
+  /* §11.6-A 개봉표. 장비 95 / 희귀 5. */
+  var GACHA_OPEN_WEIGHTS = { item: 0.95, rare: 0.05 };   /* 74 — 파편 칸 은퇴(스펙 §D-2 「개봉표 장비 95 / 희귀 5」) */
   /* §11.6-A 소프트 천장 — 연속 12상자 아이템 미획득이면 다음 상자는 아이템 확정. */
   var GACHA_PITY = 12;
-  /* 상자에서 나오는 파편 수. ⚠ **스펙에 수가 없다**(§11.6-A 는 "흔함 — 즉시
-     카운트업"까지만 적었다). 판에서 직접 줍는 한 알보다는 커야 상자가 상자답고,
-     한 판 수확분(대략 10~30알)을 넘으면 상자가 파밍을 대체해 버린다. 그 사이의
-     작은 수 3 을 골랐다 — 조정하려면 이 한 줄만 고치면 된다. */
-  var GACHA_SHARD_N = 3;
+  var GACHA_FALLBACK_JSTAR = 3;   /* 풀이 비는 경우(이론상 없음)의 안전판 */
   /* 아이템 슬롯이 걸렸을 때 티어 비율. ⚠ 이것도 스펙에 없다(§11.6-A 는
      "아이템(일반/희귀)" 까지만). 영웅은 5% 희귀 슬롯의 몫이므로 여기서는 안
      나온다 — 그 배타성이 "영웅"이라는 낱말의 값어치다. */
@@ -48732,56 +48761,35 @@ window.TT_SFX = {
    *
    * @param rnd 선택적 난수원(하네스 이음매). 없으면 Math.random.
    * @return 연출이 그대로 그릴 수 있는 서술자
-   *         { kind:'shard', stat, n } | { kind:'item', id, lv, isNew, tier }
-   *         | { kind:'pet', id }
+   *         { kind:'item', id, lv, isNew, tier } | { kind:'pet', id }
+   *         | { kind:'gem', n }   (풀이 비었을 때의 안전판 — gachaFallback)
    */
   function openGachaRoll(rnd) {
     var r = (typeof rnd === 'function') ? rnd : Math.random;
     var roll = r();
-    var w = GACHA_OPEN_WEIGHTS;
-    /* 천장 먼저. 연속 12상자를 아이템 없이 지났으면 이번은 아이템 확정이다 —
-       추첨을 굴린 **뒤에** 덮어쓰지 않고 앞에서 가르는 것이 요점이다(굴리고
-       덮으면 위 roll 이 무슨 뜻이었는지 코드에서 안 읽힌다). */
     var forced = (store.giftNoItem | 0) >= GACHA_PITY;
-    /* [PG-0910] §16.3-ⓒ 행운 레버 — 희귀 슬롯만 넓힌다. 파편 몫(.70)은
-       한 톨도 안 움직이고 아이템이 그만큼 줄어든다. eff=2 면 rareP = .05 이라
-       경계가 .95 — 오늘의 표와 **한 화소도 다르지 않다**. */
-    var rareP = petRareP();
-    var kind;
-    if (forced) kind = 'item';
-    else if (roll < w.shard) kind = 'shard';
-    else if (roll < 1 - rareP) kind = 'item';
-    else kind = 'rare';
-
-    if (kind === 'shard') {
-      store.giftNoItem = (store.giftNoItem | 0) + 1;
-      var sk = shardDropFor(S.stage, r);
-      var got = {};
-      for (var i = 0; i < STAT_KEYS.length; i++) got[STAT_KEYS[i]] = 0;
-      got[sk] = GACHA_SHARD_N;
-      shardCredit(got);
-      return { kind: 'shard', stat: sk, n: GACHA_SHARD_N };
-    }
+    var kind = (forced || roll < 1 - petRareP()) ? 'item' : 'rare';
     if (kind === 'item') {
       store.giftNoItem = 0;
       var tier = (r() < GACHA_ITEM_RARE_P) ? 'rare' : 'common';
-      var g = grantItem(gachaPickItem(tier, r));
+      var g = grantItem(gachaPickItem(tier, r), 'farm');
       if (g) return { kind: 'item', id: g.id, lv: g.lv, isNew: g.isNew, tier: tier };
-      return { kind: 'shard', stat: 'luck', n: GACHA_SHARD_N };   // 풀이 비면 폴백
+      return gachaFallback();
     }
-    /* 5% 희귀 슬롯 (§11.6-A · §14 ⓔ). **먼저 미보유 펫**을 시도하고, 다 가졌으면
-       영웅 아이템으로 떨어진다. 순서가 이렇게 정해진 것은 §14.1 의 배분 때문이다:
-       갓차는 펫 수집 경로 다섯 중 하나이고, 펫이 남아 있는 동안 그 자리를 아이템이
-       차지하면 츄릅에게 갈 길이 하나 줄어든다. */
+    /* 5% 희귀 칸 — 먼저 미보유 펫, 다 가졌으면 영웅 장비(종전 규칙 그대로). */
     var want = petGachaPool();
     if (want.length) {
       var pid = want[Math.min(want.length - 1, (r() * want.length) | 0)];
       if (grantPet(pid)) return { kind: 'pet', id: pid };
     }
     store.giftNoItem = 0;
-    var eg = grantItem(gachaPickItem('epic', r));
+    var eg = grantItem(gachaPickItem('epic', r), 'farm');
     if (eg) return { kind: 'item', id: eg.id, lv: eg.lv, isNew: eg.isNew, tier: 'epic' };
-    return { kind: 'shard', stat: 'luck', n: GACHA_SHARD_N };
+    return gachaFallback();
+  }
+  function gachaFallback() {
+    store.jstar = (store.jstar | 0) + GACHA_FALLBACK_JSTAR;
+    return { kind: 'gem', n: GACHA_FALLBACK_JSTAR };
   }
 
   /* -------------------------------------------------------------------------
@@ -49205,11 +49213,12 @@ window.TT_SFX = {
       if (it.enabled === false) continue;   /* 2c — 데이터만 있는 것은 안 그린다 */
       lv = own[it.id] | 0;
       if (lv <= 0) continue;
-      /* 표시값은 레벨이 아니라 **지금 주는 %p** 다. 레벨은 내부 사정이고,
+      /* 표시값은 레벨이 아니라 **지금 주는 점수** 다(74 — 캐릭터 막대와 같은 단위라
+         '%' 를 뗐다). 레벨은 내부 사정이고,
          플레이어가 비교하고 싶은 것은 "이걸 끼면 얼마나 오르나"다.
-         행동형(kind:'act')은 %p 가 아니라 규칙을 바꿔 값이 없으므로
+         행동형(kind:'act')은 점수가 아니라 규칙을 바꿔 값이 없으므로
          값 알약을 달지 않는다 — 없는 수를 적는 것보다 안 적는 편이 맞다. */
-      val = (it.kind === 'stat') ? ('+' + itemEffOf(it.id, lv) + '%') : '';
+      val = (it.kind === 'stat') ? ('+' + itemEffOf(it.id, lv)) : '';
       wrap.appendChild(cpItemCell(eq.indexOf(it.id) >= 0 ? 'eq' : 'own',
                                   it.slot, it.ico, val, it.id, it.tier,
                                   t('item.' + it.id + '.nm')));
@@ -51567,6 +51576,7 @@ window.TT_SFX = {
        확인할 수 있어야 한다(위 debug handles 와 같은 규약). */
     itemScoreMult: itemScoreMult, itemOn: itemOn, ITEM_POOL: ITEM_POOL,
     grantItem: grantItem, toggleItem: toggleItem, syncItemList: syncItemList,
+    itemArtUrl: itemArtUrl, itemArtCss: itemArtCss, ITEM_ART: ITEM_ART, itemSrcOf: itemSrcOf, ITEM_SRC: ITEM_SRC,
     petOwned: petOwned, grantPet: grantPet, petCondBump: petCondBump,
     /* ==[INV-0911]== 초대·연출·자기소개 손잡이 (DESIGN §23.7 smoke).
        게임 코드는 이 중 무엇도 window.Game 을 거쳐 부르지 않는다 — 관문의
