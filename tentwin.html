@@ -37327,7 +37327,7 @@ window.TT_SFX = {
       else if (mkc.mk === 'star') mkStar++;
       else if (mkc.mk === 'gift') mkGift++;
       else if (mkc.mk === 'awk') mkAwk++;
-      else if (mkc.mk === 'gear') mkGear.push({ id: mkc.mkItem, tier: mkc.mkTier });
+      else if (mkc.mk === 'gear') mkGear.push({ id: mkc.mkItem, tier: mkc.mkTier, i: mkIdx });   /* i = 그 칸 — 획득 비행이 이 칸에서 출발한다(T11) */
       mkc.mk = ''; mkc.mkItem = ''; mkc.mkTier = '';
     }
 
@@ -37603,7 +37603,8 @@ window.TT_SFX = {
         J.sfx.mission();
         J.vibrate(24);
       }
-      for (var gfk = 0; gfk < mkGear.length; gfk++) harvestGear(mkGear[gfk], mkC.x, mkC.y - 100 - gfk * 18, false);
+      /* 74 T11 — 획득 비행은 거둔 장비 칸 한가운데에서 떠오른다(시안 mock-fruit-get ①). 판에 장비 과일은 동시 1개라 칸 읽기는 매치당 한 번이다. */
+      for (var gfk = 0; gfk < mkGear.length; gfk++) { var gfc = tileCenter(mkGear[gfk].i); harvestGear(mkGear[gfk], gfc.x, gfc.y, false); }
       /* 🎁 갓차 상자 (WD-2 §11.6) — 여기서 **열기만** 하고, 무엇이 나왔는지는
          결과 시트가 말한다. 판 위에서 내용을 다 보여 주면 "열기 전까지 미공개"
          (§11.6)가 판 한복판에서 소비돼 버려 §10 의 띵-띵-띵이 이미 아는 것을
@@ -48841,13 +48842,15 @@ window.TT_SFX = {
   }
   /* 판정판 74 — 장비 과일 연출 준비물(조사 §9-8·§9-9). 부팅(gearFxInit)에서 한 번 만들고 판 중에는 고쳐 쓰기만 한다
      (착수 전 점검 R6). 시간·이징 = CSS 토큰을 한 번 읽은 값, 거리 = 칸 크기 ts 의 비율(목업 52px 칸에서 호 높이 40px → .77,
-     +1 글자 6px → .15) — JS 리터럴 ms·이징·px 0(점검 W6). 배율(1.35·1.22·.55)과 호 비율(.45·.2)은 MOTION-SPEC §3 행(Step 2)의 모양 값. */
+     +1 글자 6px → .15) — JS 리터럴 ms·이징·px 0(점검 W6). 배율(1.35·1.1·.8 · 튐 1.22)과 호 비율(.45·.2)은 MOTION-SPEC §3 행(Step 2)의 모양 값. */
   var MK_FX_POOL_N = 4, GEAR_FLY_N = 3, GEAR_ARC_LIFT = 0.77, GEAR_PLUS_LIFT = 0.15;
   var mkFxPool = [], gearFlyPool = [], gearFlyNext = 0;
   var GEAR_FX = { d1: 0, d2: 0, d3: 0, spring: '', easeOut: '' };
   var GEAR_KF_UP = [{ transform: 'translate(-50%,-50%) scale(1)', opacity: 1 }, { transform: 'translate(-50%,-50%) scale(1.35)', opacity: 1 }];
+  /* 리뷰 전 판정(2026-10-04): 크기·불투명도는 시안 mock-fruit-get 을 따른다 — ① 칸에서 1.35 로 떠오름 ② 호 가운데 1.1 ③ 방울 곁 .8,
+     호 내내 불투명(opacity 1)하고 도착할 때 숨긴다(gearFlyLand). 브리프의 「끝 .55 · 불투명도 1→0」 은 시안과 달라 바꿨다. */
   var GEAR_KF_ARC = [{ transform: 'translate(-50%,-50%) scale(1.35)', opacity: 1 }, { transform: '', opacity: 1, offset: 0.5 },
-                     { transform: '', opacity: 0 }];
+                     { transform: '', opacity: 1 }];
   var GEAR_KF_BUMP = [{ transform: 'scale(1)' }, { transform: 'scale(1.22)' }, { transform: 'scale(1)' }];
   var GEAR_OPT_UP = { duration: 0, easing: 'linear', fill: 'forwards' };
   var GEAR_OPT_ARC = { duration: 0, easing: 'linear', fill: 'forwards' };
@@ -48935,8 +48938,8 @@ window.TT_SFX = {
   function gearFlyArc(ev) {
     var fly = ev && ev.target && ev.target.effect ? ev.target.effect.target : null;
     if (!fly) return;
-    GEAR_KF_ARC[1].transform = 'translate(calc(-50% + ' + (fly.__tx * 0.45) + 'px), calc(-50% + ' + (fly.__ty * 0.2 - ts * GEAR_ARC_LIFT) + 'px)) scale(1)';
-    GEAR_KF_ARC[2].transform = 'translate(calc(-50% + ' + fly.__tx + 'px), calc(-50% + ' + fly.__ty + 'px)) scale(.55)';
+    GEAR_KF_ARC[1].transform = 'translate(calc(-50% + ' + (fly.__tx * 0.45) + 'px), calc(-50% + ' + (fly.__ty * 0.2 - ts * GEAR_ARC_LIFT) + 'px)) scale(1.1)';
+    GEAR_KF_ARC[2].transform = 'translate(calc(-50% + ' + fly.__tx + 'px), calc(-50% + ' + fly.__ty + 'px)) scale(.8)';
     fly.animate(GEAR_KF_ARC, GEAR_OPT_ARC).onfinish = gearFlyLand;
   }
   function gearFlyLand(ev) {
