@@ -6954,6 +6954,9 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
    sp 붙은 칸을 건너뛴다). */
 .tile[data-mk]:not(.dead)::after {
   content: var(--mk-glyph, '');
+  /* 74 — 기본 `.tile::after`(취소 빗금)는 opacity 0 이다. 표식이 그것을 물려받아 배지가 안 보였다(Task 0 보고 §9.1). 초기값 = 1 —
+     리터럴 1 은 css-primitives 의 opacity 리터럴로 세어져 N0 가 늘기 때문에 키워드로 쓴다. */
+  opacity: initial;
   position: absolute;
   top: 3%;
   right: 3%;
@@ -7002,6 +7005,16 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   --mk-disc: radial-gradient(circle at 38% 32%,
     var(--role-rw-star-1) 0 20%, var(--role-rw-pet-2) 42%, var(--role-rw-gift-3) 62%, var(--role-rw-shard-agility-2) 80%, var(--role-rw-shard-steady-2) 100%);
 }
+.tile[data-mk="awk"] {
+  --mk-glyph: '⚡';
+  --mk-disc: radial-gradient(circle at 38% 32%, var(--role-rw-shard-power-1) 0 30%, var(--role-rw-shard-power-2) 62%, var(--role-rw-shard-power-3) 100%);
+}
+/* 74 — 장비 과일 최소판: 원반 = 등급색(일반 민트 · 희귀 하늘 · 영웅 보라, 기존 보상 토큰), 글리프 = 장비 이모지(인라인 --mk-glyph).
+   Task 11 이 조사 §9-8 혼합형(그림 배지 + 후광·빛살 + 영웅 칸 빛)으로 바꾼다. */
+.tile[data-mk="gear"][data-mk-tier="common"] { --mk-disc: radial-gradient(circle at 38% 32%, var(--role-rw-shard-steady-1) 0 30%, var(--role-rw-shard-steady-2) 62%, var(--role-rw-shard-steady-3) 100%); }
+.tile[data-mk="gear"][data-mk-tier="rare"]   { --mk-disc: radial-gradient(circle at 38% 32%, var(--role-rw-shard-agility-1) 0 30%, var(--role-rw-shard-agility-2) 62%, var(--role-rw-shard-agility-3) 100%); }
+.tile[data-mk="gear"][data-mk-tier="epic"]   { --mk-disc: radial-gradient(circle at 38% 32%, var(--role-rw-item-1) 0 30%, var(--role-rw-item-2) 62%, var(--role-rw-item-3) 100%); }
+.rw-ico[data-disc="awk"] { --rw-disc: radial-gradient(circle at 38% 32%, var(--role-rw-shard-power-1) 0 30%, var(--role-rw-shard-power-2) 62%, var(--role-rw-shard-power-3) 100%); }
 /* 터지는 중·죽은 칸에서는 배지가 먼저 사라진다. §7A 의 gold/ice ::after 가
    `.pop`/`.rowgo` 에서 opacity:0 이 되는 것과 **같은 문법**이다 — 빈 우물 위에
    발자국만 떠 있으면 그 칸이 아직 살아 있는 것으로 읽힌다. */
@@ -24645,6 +24658,9 @@ window.TT_SFX = {
          과일이 조용히 증발하거나(되돌린 판에 마크 없음) 되살아난다(이미 쓴
          마크가 다시 생김). sp/ice 와 같은 이유로 같은 줄에 산다. */
       if (c.mk) o.mk = c.mk;
+      /* 74 — 장비 과일은 무엇이었는지(mkItem)와 등급(mkTier)까지 EXT 필드다. 빠지면 되돌리기·이어하기·스냅샷에서 칸이 빈 배지가 된다. */
+      if (c.mkItem) o.mkItem = c.mkItem;
+      if (c.mkTier) o.mkTier = c.mkTier;
       out.push(o);
     }
     return out;
@@ -26769,7 +26785,7 @@ window.TT_SFX = {
          없는 기능은 예고하지 않는다. 한 줄 안에서 끝나는 길이로 쓴다. */
       'load.tip1': 'Clear pairs that make 10, or match twins.',
       'load.tip2': 'One heart refills every 30 minutes.',
-      'load.tip3': 'Alternate pair types to fill Awakening.',
+      'load.tip3': 'Pop a gear fruit to collect that gear.',
       'load.tip4': 'Tap the ⓘ next to a stat to read it.',
       'load.tip5': 'Skill fires once the gauge is full.',
       'load.tip6': 'Pet skills can turn a battle around.',
@@ -26848,6 +26864,7 @@ window.TT_SFX = {
          규칙에 맞춘다(skills.note 의 기존 <b>pet fruit</b> 표기와도 일치). */
       'rw.starfruit': 'Skill fruit',
       'rw.petfruit': 'Pet fruit',
+      'rw.awkfruit': 'Awakening Fruit',
       'rw.gem': 'Jelly Stars',
       'rw.heart': 'Hearts',
 
@@ -27275,7 +27292,7 @@ window.TT_SFX = {
       'skills.s2': '<b>Awakening</b> fills only when you <b>alternate</b> sum-10 and same-number matches. Tap it and every point you earn is <b>×{am}</b> for {awk}s.',
       'skills.s3': "<b>Skill</b> fills with every match, faster at higher combos. Tap it to fire your hero's own skill.",
       'skills.s4': '<b>Pet</b> uses your chosen pet\'s skill. You start each round with {pu} uses and gain one for every pet fruit you pop (up to {pmax}).',
-      'skills.note': 'A <b>skill fruit</b> fills the skill gauge at once; a <b>pet fruit</b> gives one more Pet use.',
+      'skills.note': 'A <b>skill fruit</b> fills the Skill gauge and an <b>awakening fruit</b> fills the Awakening gauge at once. A <b>pet fruit</b> adds one Pet use, and popping a <b>gear fruit</b> gives you that gear.',
       'menu.dailydone': "Today's daily: cleared",
       'menu.dailytodo': "Today's daily is waiting",
       'hud.daily': 'Daily',
@@ -27678,6 +27695,12 @@ window.TT_SFX = {
          짧아야 한다: 터진 그 자리에서 한 줄로 읽히고 사라지는 글자다. */
       'mk.pet': '+1 PET!',
       'mk.star': 'SKILL MAX!',
+      'mk.awk': 'AWAKEN MAX!',
+      'mk.gear': 'Got {tier} {name}!',
+      'mk.gearmax': '{name} is maxed! +{j} jelly star',
+      'drops.tier.common': 'Common',
+      'drops.tier.rare': 'Rare',
+      'drops.tier.epic': 'Epic',
       /* W3 — 기술이 "숫자 멈춤"으로 승격되면서 문구도 두 사실을 다 말한다:
          시계도 멈추고 악당 게이지도 멈춘다. 하나만 말하면 나머지 하나는
          플레이어가 영영 모르는 효과가 된다. */
@@ -28193,7 +28216,7 @@ window.TT_SFX = {
       /* ==[INTRO-0910]== 로딩 팁 8종 (§19.7) — en 쪽과 같은 8키. 근거 주석은 그쪽. */
       'load.tip1': '합이 10이거나 같은 숫자면 사라져요.',
       'load.tip2': '하트는 30분에 하나씩 채워져요.',
-      'load.tip3': '두 가지 짝을 번갈아 맞추면 각성 게이지가 차요.',
+      'load.tip3': '장비 과일을 터뜨리면 그 장비를 얻어요.',
       'load.tip4': '능력치 옆 ⓘ 를 누르면 설명이 나와요.',
       'load.tip5': '스킬은 게이지가 가득 찼을 때 터져요.',
       'load.tip6': '펫 스킬 한 방이 전투를 뒤집어요.',
@@ -28269,6 +28292,7 @@ window.TT_SFX = {
          "각성", 결과창에서는 다른 이름으로 부르면 그게 그건 줄 모른다. */
       'rw.starfruit': '스킬 과일',
       'rw.petfruit': '펫 과일',
+      'rw.awkfruit': '각성 과일',
       'rw.gem': '젤리별',
       'rw.heart': '하트',
 
@@ -28649,7 +28673,7 @@ window.TT_SFX = {
       'skills.s2': '<b>각성</b> 게이지는 합이 10인 짝과 같은 숫자 짝을 <b>번갈아</b> 맞출 때만 차요. 누르면 {awk}초 동안 얻는 점수가 <b>{am}배</b>예요.',
       'skills.s3': '<b>스킬</b> 게이지는 매치마다 차고, 콤보가 높을수록 빨리 차요. 누르면 캐릭터마다 다른 스킬이 발동해요.',
       'skills.s4': '<b>펫소환</b>은 고른 펫의 스킬을 써요. 판마다 {pu}번으로 시작하고, 펫 과일을 터뜨릴 때마다 한 번씩 늘어요(최대 {pmax}번).',
-      'skills.note': '<b>스킬 과일</b>은 스킬을 단번에 채우고, <b>펫 과일</b>은 펫 횟수를 하나 늘려 줘요.',
+      'skills.note': '<b>스킬 과일</b>은 스킬 게이지를, <b>각성 과일</b>은 각성 게이지를 단번에 채워요. <b>펫 과일</b>은 펫 소환을 한 번 늘려 주고, <b>장비 과일</b>을 터뜨리면 그 장비를 얻어요.',
       'menu.dailydone': '오늘 데일리 완료',
       'menu.dailytodo': '오늘의 데일리가 기다려요',
       'hud.daily': '데일리',
@@ -29014,6 +29038,12 @@ window.TT_SFX = {
          였다, 리뷰 m8). */
       'mk.pet': '+1 펫!',
       'mk.star': '스킬 MAX!',
+      'mk.awk': '각성 MAX!',
+      'mk.gear': '{tier} {name} 획득!',
+      'mk.gearmax': '{name} 최대 레벨! 젤리별 +{j}',
+      'drops.tier.common': '일반',
+      'drops.tier.rare': '희귀',
+      'drops.tier.epic': '영웅',
       /* W3 — 기술이 "숫자 멈춤"으로 승격되면서 문구도 두 사실을 다 말한다:
          시계도 멈추고 악당 게이지도 멈춘다. 하나만 말하면 나머지 하나는
          플레이어가 영영 모르는 효과가 된다. */
@@ -29694,6 +29724,8 @@ window.TT_SFX = {
      * 것은 결과 시트가 "무엇을 얻었나"를 말하기 위한 사본일 뿐이다. 그래서
      * 저장하지 않는다 — 판이 끝나면 뜻이 없고, 다음 판은 0 에서 시작한다. */
     gainPet: 0, gainStar: 0,
+    /* 74 — 같은 성질의 사본 둘: 각성 과일 수 · 수확한 장비 목록 [{ id, lv, tier, max, isNew }](harvestGear 가 쌓는다). 저장하지 않는다. */
+    gainAwk: 0, gainGear: [],
     /* WD-2 §11.6 · §14 — 같은 성질의 사본 셋. 아이템·펫 보유는 **수확하는 그 순간**
      * 이미 늘었고, 여기 쌓이는 것은 결과 시트가 읽을 목록뿐이다. 그래서 저장하지
      * 않는다(판이 끝나면 뜻이 없다). (74 — 판에서 주운 파편 사본 gainShard 는 파편 경제와 함께 은퇴했다.)
@@ -30257,8 +30289,14 @@ window.TT_SFX = {
     var mk = c.mk || '';
     if (mk) {
       if (el.getAttribute('data-mk') !== mk) el.setAttribute('data-mk', mk);
+      /* 74 — 장비 과일: 등급(data-mk-tier)이 원반 색을, 그 장비의 이모지(인라인 --mk-glyph)가 글리프를 정한다. 다른 마크로 바뀌면 둘 다 걷힌다. */
+      var mt = (mk === 'gear') ? (c.mkTier || 'common') : '';
+      if ((el.getAttribute('data-mk-tier') || '') !== mt) { if (mt) el.setAttribute('data-mk-tier', mt); else el.removeAttribute('data-mk-tier'); }
+      var gl = (mk === 'gear' && itemById(c.mkItem)) ? JSON.stringify(itemById(c.mkItem).ico) : '';
+      if (el.__mkGl !== gl) { el.__mkGl = gl; if (gl) el.style.setProperty('--mk-glyph', gl); else el.style.removeProperty('--mk-glyph'); }
     } else if (el.hasAttribute && el.hasAttribute('data-mk')) {
       el.removeAttribute('data-mk');
+      el.removeAttribute('data-mk-tier'); if (el.__mkGl) { el.__mkGl = ''; el.style.removeProperty('--mk-glyph'); }
     }
     positionTile(el, i);
   }
@@ -35705,6 +35743,8 @@ window.TT_SFX = {
        위에서 later() 큐를 비웠으므로 남는 것은 리스너뿐이다. */
     S.gainPet = 0;
     S.gainStar = 0;
+    S.gainAwk = 0;
+    S.gainGear = [];
     S.gainGem = 0;
     /* 수확 피날레(DESIGN §25)도 같은 이유로 판 단위다: 보너스 사본을 안 지우면
        다음 판의 결과 시트가 지난 판의 수확을 다시 말하고, 진행 중이던 rAF 루프가
@@ -36998,7 +37038,7 @@ window.TT_SFX = {
     /* WD-2 §11.6 — 상자가 같은 문법으로 합류한다(74 — 파편 넷은 은퇴했다). 세고 지우기만 하는
        것도, 폭탄에 휩쓸린 것까지 세는 것도, 마크를 즉시 지워 이중 발동을 막는
        것도 위 주석 그대로다. 그 밖의 마크(옛 판에 남은 것 등)는 효과 없이 지워진다. */
-    var mkPet = 0, mkStar = 0, mkGift = 0;
+    var mkPet = 0, mkStar = 0, mkGift = 0, mkAwk = 0, mkGear = [];
     for (var mki = 0; mki < dying.length + blown.length; mki++) {
       var mkIdx = mki < dying.length ? dying[mki] : blown[mki - dying.length];
       var mkc = S.cells[mkIdx];
@@ -37006,7 +37046,9 @@ window.TT_SFX = {
       if (mkc.mk === 'pet') mkPet++;
       else if (mkc.mk === 'star') mkStar++;
       else if (mkc.mk === 'gift') mkGift++;
-      mkc.mk = '';
+      else if (mkc.mk === 'awk') mkAwk++;
+      else if (mkc.mk === 'gear') mkGear.push({ id: mkc.mkItem, tier: mkc.mkTier });
+      mkc.mk = ''; mkc.mkItem = ''; mkc.mkTier = '';
     }
 
     // --- 6. score: base × gold × fever, then the bomb bonus -----------------
@@ -37236,7 +37278,7 @@ window.TT_SFX = {
      * 두 효과 다 **전투 전용**이다. 마크 자체가 battleRefill 에서만 나므로
      * 비전투 판에는 mk 가 존재할 수 없지만, 방어적으로 게이트를 한 겹 둔다 —
      * 저장된 옛 판이나 손잡이(window.Game)로 심어진 셀이 여기 닿을 수 있다. */
-    if ((mkPet || mkStar || mkGift) && battleOn()) {
+    if ((mkPet || mkStar || mkGift || mkAwk || mkGear.length) && battleOn()) {
       /* W-C §10 — 결과 시트가 읽을 사본. 효과 적용과 **같은 게이트 안**에 두는
          것이 요점이다: 게이트 밖에서 세면 전투가 아닌 판(마크가 존재할 수 없는
          판)에 손잡이로 심어진 셀까지 집계돼, 시트가 아무도 받지 못한 보상을
@@ -37272,6 +37314,16 @@ window.TT_SFX = {
           J.shockwave(mkC.x, mkC.y, '#FFD34D');
         }
       }
+      if (mkAwk && S.duel) {
+        /* ⚡ 각성 과일 — 각성 게이지 즉시 만땅(각성 중이어도 다음 것을 채운다: 적립 정지는 「매치 적립」 규칙이다). */
+        var dA = S.duel;
+        if (dA.me.sp < dA.me.spMax) { dA.me.sp = dA.me.spMax; fullCue('btn-hint'); tipOnce('ultReady', 'tip.ultReady'); }
+        S.gainAwk = (S.gainAwk | 0) + mkAwk;
+        floatOnBoard(mkC.x, mkC.y - 58, t('mk.awk'), GEAR_TIER_INK.epic);
+        J.sfx.mission();
+        J.vibrate(24);
+      }
+      for (var gfk = 0; gfk < mkGear.length; gfk++) harvestGear(mkGear[gfk], mkC.x, mkC.y - 100 - gfk * 18, false);
       /* 🎁 갓차 상자 (WD-2 §11.6) — 여기서 **열기만** 하고, 무엇이 나왔는지는
          결과 시트가 말한다. 판 위에서 내용을 다 보여 주면 "열기 전까지 미공개"
          (§11.6)가 판 한복판에서 소비돼 버려 §10 의 띵-띵-띵이 이미 아는 것을
@@ -37628,7 +37680,9 @@ window.TT_SFX = {
    * 않는다(재도전하면 같은 판 · 같은 스폰).
    * ========================================================================= */
   var MK_PET_RATE  = 0.03;     // 🐾 펫 과일 — 스폰 칸당 3%
-  var MK_STAR_RATE = 0.015;    // ⭐ 각성 과일 — 스폰 칸당 1.5%
+  var MK_STAR_RATE = 0.015;    // ⭐ 스킬 과일 — 스폰 칸당 1.5%
+  var MK_AWK_RATE  = 0.015;    // ⚡ 각성 과일 — 스폰 칸당 1.5%, d.me.sp 즉시 만땅(스펙 §D-2)
+  var MK_AWK_HI = MK_PET_RATE + MK_STAR_RATE + MK_AWK_RATE;   // = .06
   var MK_MAX_EACH  = 1;        // 판에 동시에 떠 있을 수 있는 수 (종류별)
   var MK_PET_CAP   = DUEL_PET_MAX + 2;  // 펫 과일로 넘길 수 있는 잔여 상한 (기본 2 → 4)
   /* ---- WD-2 §11.6-C — 상자 스폰 계수 ------------------------------------------
@@ -37639,12 +37693,14 @@ window.TT_SFX = {
   /* 누적 경계. 추첨 루프가 매 칸마다 덧셈을 다시 하지 않게 미리 접어 둔다.
      밴드 순서는 확률 오름차순이 아니라 **도입 순서**다 — pet/star 의 구간이
      종전과 한 톨도 안 움직여야 이미 저장된 판·기존 재현 테스트가 그대로 산다.
-       [0, .03)        pet
-       [.03, .045)     star
-       [.045, .145)    (빈 띠 — 74 에서 파편 띠가 은퇴했다. Task 9 가 각성 · 장비 과일로 채운다)
-       [.145, .165)    gift    (§11.6-C 판당 1개라 낮게)
-     상자 띠는 MK_GIFT_LO 로 옛 자리(옛 파편 띠 끝 .145)에 고정한다 — 빈 띠가 생겨도 상자 띠가 앞으로 당겨지지 않는다(재현성).
-     셋 다 상한이 걸려 있어 판 위 배지는 최대 pet1 + star1 + gift1 = 3 이다. */
+       [0, .03)        pet     펫
+       [.03, .045)     star    스킬
+       [.045, .06)     awk     각성
+       [.06, .06+rate) gear    장비(rate = dropTableFor(n).rate — 모험만)
+       [.145, .165)    gift    상자(§11.6-C 판당 1개라 낮게)
+     상자 띠는 MK_GIFT_LO 로 옛 자리(옛 파편 띠 끝 .145)에 고정한다 — 장비 띠는 .06 에서 MK_GIFT_LO 까지가 상한(GEAR_RATE_MAX)이라 둘이 겹치지 않고,
+     장비 띠가 덜 차도 상자 띠가 앞으로 당겨지지 않는다(재현성). 장비 띠 [.06, .145) 안의 스폰은 상한·모드와 무관하게 추첨 3회를 더 쓴다.
+     다섯 다 상한 MK_MAX_EACH 가 걸려 있어 판 위 배지는 최대 pet1 + star1 + awk1 + gear1 + gift1 = 5 이다. */
   var MK_STAR_HI  = MK_PET_RATE + MK_STAR_RATE;
   var MK_GIFT_LO = 0.145;   /* 74 — 선물 상자 띠 자리 고정(옛 파편 띠 끝) — 재현성 */
   var MK_GIFT_HI = MK_GIFT_LO + GIFT_SPAWN_RATE;
@@ -37700,8 +37756,10 @@ window.TT_SFX = {
        에는 mk 를 심는 줄이 없다. 그래서 §11.2 가 요구한 "데일리·클래식 드랍 0"
        은 새 게이트 없이 **구조로** 성립한다 — 상자가 mk 채널에 얹히는 순간
        그 배제를 공짜로 물려받는다. */
-    var mkHave = { pet: 0, star: 0 };
+    var mkHave = { pet: 0, star: 0, awk: 0, gear: 0 };
     var mkGiftHave = 0;
+    /* 74 — 장비 과일은 모험에서만 난다(아케이드 대전에는 없다). 그래도 rng 소비는 같다(아래 장비 띠). */
+    var dt = (S.mode === 'adv') ? dropTableFor(S.stage) : null, gearRate = dt ? dt.rate : 0;
     for (var q = 0; q < out.length; q++) {
       var oc = out[q];
       if (!oc || oc.dead || !oc.mk) continue;
@@ -37716,6 +37774,15 @@ window.TT_SFX = {
         if (mkHave.pet < MK_MAX_EACH) { sc.mk = 'pet'; mkHave.pet++; }
       } else if (r2 < MK_STAR_HI) {
         if (mkHave.star < MK_MAX_EACH) { sc.mk = 'star'; mkHave.star++; }
+      } else if (r2 < MK_AWK_HI) {
+        /* [.045, .06) ⚡ 각성 과일 — d.me.sp 즉시 만땅. 전투 판(모험·아케이드 대전) 전부. */
+        if (mkHave.awk < MK_MAX_EACH) { sc.mk = 'awk'; mkHave.awk++; }
+      } else if (r2 < MK_GEAR_LO + GEAR_RATE_MAX) {
+        /* [.06, .145) 장비 과일 띠. 추첨은 상한·모드와 무관하게 언제나 3회 소비(재현성), 뽑힌 장비가 배지에 실린다. */
+        var gr = dt ? gearRollFrom(dt.tiers, dt.statP, rng) : (rng(), rng(), rng(), null);
+        if (gr && gr.id && r2 < MK_GEAR_LO + gearRate && mkHave.gear < MK_MAX_EACH) {
+          sc.mk = 'gear'; sc.mkItem = gr.id; sc.mkTier = gr.tier; mkHave.gear++;
+        }
       } else if (r2 >= MK_GIFT_LO && r2 < MK_GIFT_HI) {
         /* §11.6-C — 판당 1개. S.giftLeft 는 탄 진입에서 60% 로 한 번 굴린 결과
            (1 = 이번 탄에 상자가 있다)이고, 여기서 하나를 심으면 0 이 되어 그
@@ -38352,6 +38419,14 @@ window.TT_SFX = {
     S.harvest = 0;
 
     var i, live = [];
+    /* 74 — 클리어 때 판에 남은 장비 과일은 자동으로 거둔다(스펙 §G10 권고). 물결이 그 칸도 쓸어 가므로 개별 연출은 없다. */
+    for (i = 0; i < S.cells.length; i++) {
+      var gc = S.cells[i];
+      if (gc && !gc.dead && gc.mk === 'gear') {
+        harvestGear({ id: gc.mkItem, tier: gc.mkTier }, 0, 0, true);
+        gc.mk = ''; gc.mkItem = ''; gc.mkTier = '';
+      }
+    }
     /* 인덱스 오름차순 = 행 우선 = **좌→우·위→아래**. 물결의 방향이 곧 배열 순서라
        정렬이 필요 없다(S.cells 가 COLS 폭의 행 우선 배열이다). */
     for (i = 0; i < S.cells.length; i++) {
@@ -38592,6 +38667,7 @@ window.TT_SFX = {
     if ((S.gainPet | 0) > 0) {
       out.push({ ico: '🐾', disc: 'pet', key: 'rw.petfruit', val: S.gainPet | 0, rar: 'common' });
     }
+    if ((S.gainAwk | 0) > 0) out.push({ ico: '⚡', disc: 'awk', key: 'rw.awkfruit', val: S.gainAwk | 0, rar: 'common' });
     if ((o.gem | 0) > 0) {
       /* [T14 I-8, 리뷰 IM-3 정정] 젤리별은 다른 화면 전부 그림 --lib-star-gold
          (.gem-ic 문법 — 문자는 숨김)인데 결과 창만 💎 문자였다. 글자 ★ 는
@@ -38635,6 +38711,12 @@ window.TT_SFX = {
                    val: g.lv | 0,
                    rar: g.tier === 'epic' ? 'epic' : (g.tier === 'rare' ? 'rare' : 'normal') });
       }
+    }
+    for (i = 0; i < (S.gainGear || []).length; i++) {
+      var gg = S.gainGear[i], git = itemById(gg.id);
+      out.push(gg.max ? { ico: '★', disc: 'gem', key: 'rw.gem', val: GEAR_MAX_JSTAR, rar: 'normal' }
+                      : { ico: (git && git.ico) || '🎁', disc: 'item', key: 'item.' + gg.id + '.nm', val: gg.lv,
+                          rar: gg.tier === 'epic' ? 'epic' : (gg.tier === 'rare' ? 'rare' : 'normal') });
     }
     for (i = 0; i < S.gainPets.length; i++) {
       out.push({ ico: '🐾', disc: 'petnew', key: 'char.' + S.gainPets[i] + '.name',
@@ -45323,6 +45405,7 @@ window.TT_SFX = {
        * §14.2 각주 "매 보스가 헤드라인 해금 1개(중복 없음)".
        * grantPet 이 멱등이라 이미 가진 사람에게는 아무 일도 안 일어난다. */
       if (p.boss && PET_BOSS[p.n]) grantPet(PET_BOSS[p.n]);
+      if (p.boss) { var bg = gearBossRoll(p.n, Math.random); if (bg && bg.id) harvestGear(bg, 0, 0, true); }   /* 74 — 보스 확정 장비 1개. 판 사본 S.gainGear 에 실려 결과 시트가 읽는다 */
       /* §14.3 조건 카운터 ③ — 보스를 한 대도 안 맞고 깼는가.
        * ⚠ **이 카운터로 열리는 펫은 없다**. §14.2 는 이 조건에 딱지(ttakji)를
        * 걸어 뒀지만 딱지는 이 빌드의 MATE_IDS 에 없는 캐릭터라, 없는 id 를
@@ -48358,6 +48441,114 @@ window.TT_SFX = {
     return { id: id, lv: lv, isNew: !had, tier: it.tier, stat: it.stat };
   }
 
+  /* =========================================================================
+   * 판정판 74 — 장비 과일 파밍(스펙 §D · 조사 §9). 숫자 출처는 dropTableFor(n) 하나: 판 추첨(battleRefill →
+   * gearRollFrom)과 획득표 모달·스테이지 카드가 같은 표를 읽는다(advStar2Need 선례). 장비 과일은 모험에서만.
+   * ========================================================================= */
+  var MK_GEAR_LO = 0.06;        // 장비 과일 띠 시작 = 펫 .03 + 스킬 .015 + 각성 .015
+  var GEAR_RATE_MAX = 0.085;    // 띠 끝이 선물 상자 띠(MK_GIFT_LO .145)를 넘지 않는 상한
+  var GEAR_RATE_CH = [0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03];   // 챕터별 스폰 칸당 — Task 10 이 실측 보정
+  var GEAR_TIER_CH = [[90, 10, 0], [90, 10, 0], [90, 10, 0], [75, 22, 3], [75, 22, 3], [75, 22, 3],
+                      [60, 32, 8], [60, 32, 8], [60, 32, 8], [50, 38, 12]];            // [일반, 희귀, 영웅] % (스펙 §D-2)
+  var GEAR_LEAD_CYCLE = ['power', 'agility', 'steady', 'luck'];   // 챕터 우세 스탯: 텐 → 트윈 → 기본 → 잭팟 순환
+  var GEAR_LEAD_P = 40;                                           // 우세 스탯 %, 나머지 셋 20%씩
+  var GEAR_BOSS_TIER = [0, 60, 40];                               // 보스 클리어 확정 1개 — 4챕부터
+  var GEAR_BOSS_TIER_EARLY = [0, 100, 0];                         // 1~3챕 보스 — 영웅은 4챕부터(스펙 §D-2 티어 게이트)
+  var GEAR_AVG_CH = [0.3, 0.3, 0.3, 0.4, 0.4, 0.4, 0.5, 0.5, 0.5, 0.6];   // 판당 평균(표시) — Task 10 실측값으로 교체
+  var GEAR_MAX_JSTAR = 1;                                         // 이미 Lv12 인 장비가 또 나오면 젤리별 +1
+  var GEAR_TIERS = ['common', 'rare', 'epic'];
+  var GEAR_TIER_TOK = { common: '--role-rw-shard-steady-3', rare: '--role-rw-shard-agility-3', epic: '--role-rw-item-3' };
+  var GEAR_TIER_INK = { common: '', rare: '', epic: '' };   // JS 연출 색 — 부팅 때 gearInkInit() 이 위 토큰에서 한 번 채운다(JS 색 리터럴 0, 점검 W7)
+  function gearInkInit() {
+    var cs = null;
+    try { cs = getComputedStyle(document.documentElement); } catch (e) { cs = null; }
+    for (var k in GEAR_TIER_TOK) {
+      if (Object.prototype.hasOwnProperty.call(GEAR_TIER_TOK, k)) GEAR_TIER_INK[k] = cs ? String(cs.getPropertyValue(GEAR_TIER_TOK[k]) || '').trim() : '';
+    }
+  }
+
+  function gearChapter(n) {
+    var c = advChapter(n) | 0;
+    return c < 1 ? 1 : (c > GEAR_TIER_CH.length ? GEAR_TIER_CH.length : c);
+  }
+  /** 그 스탯·티어의 스탯형 장비 id(희귀 텐 = 폭죽 젤리·열의 조각, 희귀 트윈 = 탄산 부츠·쌍둥이 거울). */
+  function gearPool(stat, tier) {
+    var out = [];
+    for (var i = 0; i < ITEM_POOL.length; i++) {
+      var it = ITEM_POOL[i];
+      if (it.kind === 'stat' && it.enabled !== false && it.stat === stat && it.tier === tier) out.push(it.id);
+    }
+    return out;
+  }
+  function dropTableFor(n) {
+    var ch = gearChapter(n), tp = GEAR_TIER_CH[ch - 1];
+    var lead = GEAR_LEAD_CYCLE[(ch - 1) % GEAR_LEAD_CYCLE.length];
+    var tiers = { common: tp[0] / 100, rare: tp[1] / 100, epic: tp[2] / 100 };
+    var statP = {}, items = [], i, j, q;
+    for (i = 0; i < STAT_KEYS.length; i++) {
+      statP[STAT_KEYS[i]] = (STAT_KEYS[i] === lead ? GEAR_LEAD_P : (100 - GEAR_LEAD_P) / 3) / 100;
+    }
+    for (i = 0; i < GEAR_TIERS.length; i++) {
+      var tr = GEAR_TIERS[i];
+      if (!(tiers[tr] > 0)) continue;
+      for (j = 0; j < STAT_KEYS.length; j++) {
+        var pool = gearPool(STAT_KEYS[j], tr);
+        for (q = 0; q < pool.length; q++) {
+          items.push({ id: pool[q], tier: tr, stat: STAT_KEYS[j], p: tiers[tr] * statP[STAT_KEYS[j]] / pool.length });
+        }
+      }
+    }
+    var bt = advIsBoss(n) ? (ch >= 4 ? GEAR_BOSS_TIER : GEAR_BOSS_TIER_EARLY) : null;
+    return {
+      n: n, chapter: ch, lead: lead, rate: Math.min(GEAR_RATE_MAX, GEAR_RATE_CH[ch - 1]),
+      tiers: tiers, statP: statP, items: items, avg: GEAR_AVG_CH[ch - 1],
+      boss: bt ? { common: bt[0] / 100, rare: bt[1] / 100, epic: bt[2] / 100 } : null,
+      use: { pet: MK_PET_RATE, star: MK_STAR_RATE, awk: MK_AWK_RATE },
+      gift: isGachaStage(n) ? { stageP: GACHA_STAGE_P, item: GACHA_OPEN_WEIGHTS.item, rare: GACHA_OPEN_WEIGHTS.rare } : null
+    };
+  }
+  /** 장비 한 개. rng 는 언제나 정확히 3번(티어 · 스탯 · 같은 칸 여럿 중 하나) — (gridSeed, refillSeq) 재현성. */
+  function gearRollFrom(tiers, statP, rng) {
+    var r1 = rng(), r2 = rng(), r3 = rng();
+    var tier = r1 < tiers.common ? 'common' : (r1 < tiers.common + tiers.rare ? 'rare' : 'epic');
+    var acc = 0, stat = STAT_KEYS[STAT_KEYS.length - 1];
+    for (var i = 0; i < STAT_KEYS.length; i++) { acc += statP[STAT_KEYS[i]]; if (r2 < acc) { stat = STAT_KEYS[i]; break; } }
+    var pool = gearPool(stat, tier);
+    return { id: pool.length ? pool[Math.min(pool.length - 1, (r3 * pool.length) | 0)] : '', tier: tier, stat: stat };
+  }
+  function gearRoll(n, rng) { var d = dropTableFor(n); return gearRollFrom(d.tiers, d.statP, rng); }
+  function gearBossRoll(n, rng) { var d = dropTableFor(n); return d.boss ? gearRollFrom(d.boss, d.statP, rng) : null; }
+
+  /** 장비 과일 하나를 거둔다: 지급(레벨 +1 · Lv12 면 젤리별) · 원천 farm · 판 사본 · 누적(꿀떡이) · 저장 · 연출. */
+  function harvestGear(g, x, y, quiet) {
+    if (!g || !g.id || !itemById(g.id)) return null;
+    var own = (store.items && store.items.own) || {};
+    var had = own[g.id] | 0, res;
+    if (had >= ITEM_LV_MAX) {
+      store.jstar = (store.jstar | 0) + GEAR_MAX_JSTAR;
+      res = { id: g.id, lv: had, tier: g.tier, max: true, isNew: false };
+    } else {
+      var gr = grantItem(g.id, 'farm');
+      if (!gr) return null;
+      res = { id: gr.id, lv: gr.lv, tier: g.tier, max: false, isNew: gr.isNew };
+    }
+    S.gainGear.push(res);
+    store.gearEver = (store.gearEver | 0) + 1;
+    petGearCheck();
+    persist();
+    if (!quiet) gearPopFx(res, x, y);
+    return res;
+  }
+  /** 획득 연출 — 최소판(기존 주스 어휘만). Task 11 이 조사 §9-9 연출로 바꾼다. */
+  function gearPopFx(res, x, y) {
+    var col = GEAR_TIER_INK[res.tier] || GEAR_TIER_INK.common, name = t('item.' + res.id + '.nm');
+    floatOnBoard(x, y, res.max ? t('mk.gearmax', { name: name, j: GEAR_MAX_JSTAR })
+                               : t('mk.gear', { tier: t('drops.tier.' + res.tier), name: name }), col);
+    if (typeof window !== 'undefined') J.shockwave(x, y, col);
+    J.sfx.mission();
+    J.vibrate(res.tier === 'epic' ? 40 : 22);
+  }
+
   /* -------------------------------------------------------------------------
    * §11.6-C 상자 배치 · §11.6-A 개봉표
    * ---------------------------------------------------------------------- */
@@ -50871,6 +51062,7 @@ window.TT_SFX = {
       function () {
         wire();
         setHowto(0);
+        gearInkInit();   /* 74 — 장비 과일 연출색을 보상 토큰에서 한 번 읽는다(JS 색 리터럴 0) */
       },
       function () {
         /* v4 10차 §H — 스탯 막대를 패시브 계수에서 계산해 채운다. 마크업의 --v 는
@@ -51175,6 +51367,10 @@ window.TT_SFX = {
     grantItem: grantItem, toggleItem: toggleItem, syncItemList: syncItemList,
     itemArtUrl: itemArtUrl, itemArtCss: itemArtCss, ITEM_ART: ITEM_ART, itemSrcOf: itemSrcOf, ITEM_SRC: ITEM_SRC,
     petOwned: petOwned, grantPet: grantPet, petCondBump: petCondBump,
+    /* 74 — 파밍 기계 손잡이(smoke-v74-t9 · Task 10 하네스). 게임 코드는 이 중 무엇도 window.Game 을 거쳐 부르지 않는다. */
+    dropTableFor: dropTableFor, gearRoll: gearRoll, gearRollFrom: gearRollFrom, gearBossRoll: gearBossRoll,
+    harvestGear: harvestGear, gearPopFx: gearPopFx, MK_AWK_RATE: MK_AWK_RATE, GEAR_RATE_CH: GEAR_RATE_CH,
+    GEAR_TIER_CH: GEAR_TIER_CH, GEAR_AVG_CH: GEAR_AVG_CH, GEAR_LEAD_CYCLE: GEAR_LEAD_CYCLE,
     /* ==[INV-0911]== 초대·연출·자기소개 손잡이 (DESIGN §23.7 smoke).
        게임 코드는 이 중 무엇도 window.Game 을 거쳐 부르지 않는다 — 관문의
        실클릭 사슬(잠긴 카드 → 창 → 부족 비활성 → 시드 충족 → 초대 → 연출 →
