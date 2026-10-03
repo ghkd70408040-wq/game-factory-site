@@ -6654,7 +6654,9 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
    획득이 0 이면 <ul> 이 [hidden] 인 채로 남아 연출 자체가 생략된다. */
 .reward-reveal {
   list-style: none;
-  margin: 10px 0 4px;
+  --rw-mt: 10px;   /* 위 · 아래 바깥 여백 — 한 번만 적는다. 모험 결과 목록(#modal-adv #adv-reward)이 같은 두 값을 읽어 빛 여백만큼 되갚는다 */
+  --rw-mb: 4px;
+  margin: var(--rw-mt) 0 var(--rw-mb);
   padding: 0;
   display: flex;
   flex-direction: column;
@@ -6664,8 +6666,9 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
 /* 74 T9 — 모험 결과 시트: 줄이 늘어도 아래 두 버튼이 창 안에 있게 **목록만** 안에서 스크롤한다(#modal-rank #rank-list 와 같은 처방 — 판은
    `.w6m .sheet` 의 overflow:visible !important 라 스스로 스크롤 상자가 못 된다). 판 높이는 base `.sheet` 의 max-height:100% 가 .modal 안쪽으로 가둔다.
    제목 판 · 결과 카드 · 버튼은 줄지 않고(flex:0 0 auto) 목록만 줄어든다 — 줄이 적으면 목록이 안 줄어 픽셀이 그대로다.
-   --rw-bleed(이 처방의 새 길이 값 하나): 목록 상자를 판 안쪽 여백(30px) 안으로 양옆만큼 넓히고 안쪽 여백으로 되갚는다 — 줄 위치는 그대로이고,
-   rw-pop 의 1.14배 튀어나옴이 overflow 에 잘리지 않는다. 스크롤바는 감춘다(줄이 잘려 보이는 것이 곧 「더 있다」는 신호). */
+   --rw-bleed(이 처방의 새 길이 값 하나): 목록 상자를 사방으로 그만큼 넓히고(양옆은 판 안쪽 여백 30px 안, 위 · 아래는 이웃과 겹친다) 안쪽 여백으로 되갚는다 —
+   줄 위치는 그대로이고, 영웅 줄의 바깥 빛(22px)과 rw-pop 의 튀어나옴이 overflow 에 잘리지 않는다(위 · 아래 바깥 여백은 .reward-reveal 의 --rw-mt · --rw-mb 에서
+   빼 되갚는다). 스크롤바는 감춘다(줄이 잘려 보이는 것이 곧 「더 있다」는 신호). */
 #modal-adv .sheet > h2,
 #modal-adv .result-card,
 #modal-adv #adv-again,
@@ -6674,13 +6677,13 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   --rw-bleed: 24px;
   flex: 0 1 auto;
   min-height: 0;
+  margin-top: calc(var(--rw-mt) - var(--rw-bleed));
+  margin-bottom: calc(var(--rw-mb) - var(--rw-bleed));
   margin-left: calc(var(--rw-bleed) * -1);
   margin-right: calc(var(--rw-bleed) * -1);
-  padding-left: var(--rw-bleed);
-  padding-right: var(--rw-bleed);
+  padding: var(--rw-bleed);
   overflow-y: auto;
   overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
 #modal-adv #adv-reward::-webkit-scrollbar { width: 0; height: 0; }
@@ -29753,6 +29756,8 @@ window.TT_SFX = {
     gainPet: 0, gainStar: 0,
     /* 74 — 같은 성질의 사본 둘: 각성 과일 수 · 수확한 장비 목록 [{ id, lv, tier, max, isNew }](harvestGear 가 쌓는다). 저장하지 않는다. */
     gainAwk: 0, gainGear: [],
+    /* 74 — 이 판의 장비 획득표(dropTableFor 결과). 판 시작(startStage)에서 한 번 계산하고 battleRefill 이 읽는다 — 모험이 아니면 null. 저장하지 않는다. */
+    dropTable: null,
     /* WD-2 §11.6 · §14 — 같은 성질의 사본 셋. 아이템·펫 보유는 **수확하는 그 순간**
      * 이미 늘었고, 여기 쌓이는 것은 결과 시트가 읽을 목록뿐이다. 그래서 저장하지
      * 않는다(판이 끝나면 뜻이 없다). (74 — 판에서 주운 파편 사본 gainShard 는 파편 경제와 함께 은퇴했다.)
@@ -30319,11 +30324,17 @@ window.TT_SFX = {
       /* 74 — 장비 과일: 등급(data-mk-tier)이 원반 색을, 그 장비의 이모지(인라인 --mk-glyph)가 글리프를 정한다. 다른 마크로 바뀌면 둘 다 걷힌다. */
       var mt = (mk === 'gear') ? (c.mkTier || 'common') : '';
       if ((el.getAttribute('data-mk-tier') || '') !== mt) { if (mt) el.setAttribute('data-mk-tier', mt); else el.removeAttribute('data-mk-tier'); }
-      var gl = (mk === 'gear' && itemById(c.mkItem)) ? JSON.stringify(itemById(c.mkItem).ico) : '';
-      if (el.__mkGl !== gl) { el.__mkGl = gl; if (gl) el.style.setProperty('--mk-glyph', gl); else el.style.removeProperty('--mk-glyph'); }
+      /* 글리프는 장비가 바뀔 때만 다시 만든다(타일에 id 를 캐시 — 칠하기마다 찾기 · JSON 변환 0).
+         JSON.stringify 는 CSS 문자열 이스케이프가 아니다 — 지금 아이콘은 이모지뿐이라 안전하다. 아이콘에 \ 나 제어 문자가 들어오면 깨진다. */
+      var gi = (mk === 'gear') ? (c.mkItem || '') : '';
+      if (el.__mkGi !== gi) {
+        el.__mkGi = gi;
+        var mi = gi ? itemById(gi) : null;
+        if (mi) el.style.setProperty('--mk-glyph', JSON.stringify(mi.ico)); else el.style.removeProperty('--mk-glyph');
+      }
     } else if (el.hasAttribute && el.hasAttribute('data-mk')) {
       el.removeAttribute('data-mk');
-      el.removeAttribute('data-mk-tier'); if (el.__mkGl) { el.__mkGl = ''; el.style.removeProperty('--mk-glyph'); }
+      el.removeAttribute('data-mk-tier'); if (el.__mkGi) { el.__mkGi = ''; el.style.removeProperty('--mk-glyph'); }
     }
     positionTile(el, i);
   }
@@ -35772,6 +35783,9 @@ window.TT_SFX = {
     S.gainStar = 0;
     S.gainAwk = 0;
     S.gainGear = [];
+    /* 74 — 장비 획득표는 판마다 한 번(리필마다 새 객체 0, 전역 제약 14). 모험만 — 아케이드 대전 · 비전투 모드는 null(장비 과일 없음).
+       S.stage 는 아래에서 정해지므로 인자 stage 를 쓴다. */
+    S.dropTable = (S.mode === 'adv') ? dropTableFor(stage) : null;
     S.gainGem = 0;
     /* 수확 피날레(DESIGN §25)도 같은 이유로 판 단위다: 보너스 사본을 안 지우면
        다음 판의 결과 시트가 지난 판의 수확을 다시 말하고, 진행 중이던 rAF 루프가
@@ -37065,7 +37079,8 @@ window.TT_SFX = {
     /* WD-2 §11.6 — 상자가 같은 문법으로 합류한다(74 — 파편 넷은 은퇴했다). 세고 지우기만 하는
        것도, 폭탄에 휩쓸린 것까지 세는 것도, 마크를 즉시 지워 이중 발동을 막는
        것도 위 주석 그대로다. 그 밖의 마크(옛 판에 남은 것 등)는 효과 없이 지워진다. */
-    var mkPet = 0, mkStar = 0, mkGift = 0, mkAwk = 0, mkGear = [];
+    /* 74 — mkGear 는 모듈 수준 버퍼(MK_GEAR_BUF)를 매치마다 비워 다시 쓴다(매치 경로 새 배열 0). 원소는 장비 과일을 거둘 때만 생긴다. */
+    var mkPet = 0, mkStar = 0, mkGift = 0, mkAwk = 0, mkGear = MK_GEAR_BUF; mkGear.length = 0;
     for (var mki = 0; mki < dying.length + blown.length; mki++) {
       var mkIdx = mki < dying.length ? dying[mki] : blown[mki - dying.length];
       var mkc = S.cells[mkIdx];
@@ -37785,8 +37800,9 @@ window.TT_SFX = {
        그 배제를 공짜로 물려받는다. */
     var mkHave = { pet: 0, star: 0, awk: 0, gear: 0 };
     var mkGiftHave = 0;
-    /* 74 — 장비 과일은 모험에서만 난다(아케이드 대전에는 없다). 그래도 rng 소비는 같다(아래 장비 띠). */
-    var dt = (S.mode === 'adv') ? dropTableFor(S.stage) : null, gearRate = dt ? dt.rate : 0;
+    /* 74 — 장비 과일은 모험에서만 난다(아케이드 대전에는 없다 — S.dropTable 이 null). 표는 판 시작 때 한 번 계산한 것을 읽는다(리필마다 새 객체 0).
+       표가 없어도 rng 소비는 같다(아래 장비 띠). */
+    var dt = S.dropTable, gearRate = dt ? dt.rate : 0;
     for (var q = 0; q < out.length; q++) {
       var oc = out[q];
       if (!oc || oc.dead || !oc.mk) continue;
@@ -48472,7 +48488,8 @@ window.TT_SFX = {
    * 판정판 74 — 장비 과일 파밍(스펙 §D · 조사 §9). 숫자 출처는 dropTableFor(n) 하나: 판 추첨(battleRefill →
    * gearRollFrom)과 획득표 모달·스테이지 카드가 같은 표를 읽는다(advStar2Need 선례). 장비 과일은 모험에서만.
    * ========================================================================= */
-  var MK_GEAR_LO = 0.06;        // 장비 과일 띠 시작 = 펫 .03 + 스킬 .015 + 각성 .015
+  var MK_GEAR_LO = MK_AWK_HI;   // 장비 과일 띠 시작 = 각성 띠 끝(= 펫 .03 + 스킬 .015 + 각성 .015) — 띠 경계의 출처는 하나
+  var MK_GEAR_BUF = [];         // 매치 경로가 장비 과일을 모아 두는 버퍼 하나(resolveMatch 가 매치마다 비워 다시 쓴다)
   var GEAR_RATE_MAX = 0.085;    // 띠 끝이 선물 상자 띠(MK_GIFT_LO .145)를 넘지 않는 상한
   var GEAR_RATE_CH = [0.0043, 0.0043, 0.0043, 0.0057, 0.0057, 0.0057, 0.0071, 0.0071, 0.0071, 0.0086];   // 챕터별 스폰 칸당 — Task 10 이 실측 보정
   var GEAR_TIER_CH = [[90, 10, 0], [90, 10, 0], [90, 10, 0], [75, 22, 3], [75, 22, 3], [75, 22, 3],
@@ -48498,14 +48515,29 @@ window.TT_SFX = {
     var c = advChapter(n) | 0;
     return c < 1 ? 1 : (c > GEAR_TIER_CH.length ? GEAR_TIER_CH.length : c);
   }
-  /** 그 스탯·티어의 스탯형 장비 id(희귀 텐 = 폭죽 젤리·열의 조각, 희귀 트윈 = 탄산 부츠·쌍둥이 거울). */
-  function gearPool(stat, tier) {
-    var out = [];
-    for (var i = 0; i < ITEM_POOL.length; i++) {
-      var it = ITEM_POOL[i];
-      if (it.kind === 'stat' && it.enabled !== false && it.stat === stat && it.tier === tier) out.push(it.id);
+  /** 그 스탯·티어의 스탯형 장비 id(희귀 텐 = 폭죽 젤리·열의 조각, 희귀 트윈 = 탄산 부츠·쌍둥이 거울).
+   *  (스탯, 등급) 12칸 표는 부팅 때 한 번 만든다(gearPoolInit) — 판 중에는 만들어 둔 배열을 돌려줄 뿐이다(호출자는 읽기만 한다). */
+  var GEAR_POOL = null;
+  var GEAR_POOL_NONE = [];
+  function gearPoolInit() {
+    var tbl = {}, i, j, k;
+    for (i = 0; i < STAT_KEYS.length; i++) {
+      tbl[STAT_KEYS[i]] = {};
+      for (j = 0; j < GEAR_TIERS.length; j++) {
+        var arr = [];
+        for (k = 0; k < ITEM_POOL.length; k++) {
+          var it = ITEM_POOL[k];
+          if (it.kind === 'stat' && it.enabled !== false && it.stat === STAT_KEYS[i] && it.tier === GEAR_TIERS[j]) arr.push(it.id);
+        }
+        tbl[STAT_KEYS[i]][GEAR_TIERS[j]] = arr;
+      }
     }
-    return out;
+    GEAR_POOL = tbl;
+  }
+  function gearPool(stat, tier) {
+    if (!GEAR_POOL) gearPoolInit();   /* 부팅 단계가 먼저 돌지만, 그 앞에서 불려도 같은 표가 선다 */
+    var row = GEAR_POOL[stat];
+    return (row && row[tier]) || GEAR_POOL_NONE;
   }
   function dropTableFor(n) {
     var ch = gearChapter(n), tp = GEAR_TIER_CH[ch - 1];
@@ -51090,6 +51122,7 @@ window.TT_SFX = {
         wire();
         setHowto(0);
         gearInkInit();   /* 74 — 장비 과일 연출색을 보상 토큰에서 한 번 읽는다(JS 색 리터럴 0) */
+        gearPoolInit();  /* 74 — 장비 (스탯, 등급) 표를 한 번 만든다(판 중 새 배열 0) */
       },
       function () {
         /* v4 10차 §H — 스탯 막대를 패시브 계수에서 계산해 채운다. 마크업의 --v 는
@@ -51398,6 +51431,7 @@ window.TT_SFX = {
     dropTableFor: dropTableFor, gearRoll: gearRoll, gearRollFrom: gearRollFrom, gearBossRoll: gearBossRoll,
     harvestGear: harvestGear, gearPopFx: gearPopFx, MK_AWK_RATE: MK_AWK_RATE, GEAR_RATE_CH: GEAR_RATE_CH,
     GEAR_TIER_CH: GEAR_TIER_CH, GEAR_AVG_CH: GEAR_AVG_CH, GEAR_LEAD_CYCLE: GEAR_LEAD_CYCLE,
+    MK_GEAR_LO: MK_GEAR_LO, MK_GEAR_BUF: MK_GEAR_BUF,
     /* ==[INV-0911]== 초대·연출·자기소개 손잡이 (DESIGN §23.7 smoke).
        게임 코드는 이 중 무엇도 window.Game 을 거쳐 부르지 않는다 — 관문의
        실클릭 사슬(잠긴 카드 → 창 → 부족 비활성 → 시드 충족 → 초대 → 연출 →
