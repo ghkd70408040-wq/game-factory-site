@@ -6661,6 +6661,29 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   gap: 6px;
 }
 .reward-reveal[hidden] { display: none; }
+/* 74 T9 — 모험 결과 시트: 줄이 늘어도 아래 두 버튼이 창 안에 있게 **목록만** 안에서 스크롤한다(#modal-rank #rank-list 와 같은 처방 — 판은
+   `.w6m .sheet` 의 overflow:visible !important 라 스스로 스크롤 상자가 못 된다). 판 높이는 base `.sheet` 의 max-height:100% 가 .modal 안쪽으로 가둔다.
+   제목 판 · 결과 카드 · 버튼은 줄지 않고(flex:0 0 auto) 목록만 줄어든다 — 줄이 적으면 목록이 안 줄어 픽셀이 그대로다.
+   --rw-bleed(이 처방의 새 길이 값 하나): 목록 상자를 판 안쪽 여백(30px) 안으로 양옆만큼 넓히고 안쪽 여백으로 되갚는다 — 줄 위치는 그대로이고,
+   rw-pop 의 1.14배 튀어나옴이 overflow 에 잘리지 않는다. 스크롤바는 감춘다(줄이 잘려 보이는 것이 곧 「더 있다」는 신호). */
+#modal-adv .sheet > h2,
+#modal-adv .result-card,
+#modal-adv #adv-again,
+#modal-adv #adv-map { flex: 0 0 auto; }
+#modal-adv #adv-reward {
+  --rw-bleed: 24px;
+  flex: 0 1 auto;
+  min-height: 0;
+  margin-left: calc(var(--rw-bleed) * -1);
+  margin-right: calc(var(--rw-bleed) * -1);
+  padding-left: var(--rw-bleed);
+  padding-right: var(--rw-bleed);
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+#modal-adv #adv-reward::-webkit-scrollbar { width: 0; height: 0; }
 .rw-slot {
   display: flex;
   align-items: center;
@@ -6957,6 +6980,10 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   /* 74 — 기본 `.tile::after`(취소 빗금)는 opacity 0 이다. 표식이 그것을 물려받아 배지가 안 보였다(Task 0 보고 §9.1). 초기값 = 1 —
      리터럴 1 은 css-primitives 의 opacity 리터럴로 세어져 N0 가 늘기 때문에 키워드로 쓴다. */
   opacity: initial;
+  /* 74 — 기본 `.tile::after` 의 left: 8% 가 아래 right: 3% 를 이겨 배지가 좌상단에 앉았고(이 블록의 뜻은 우상단), 기본 rotate(-38deg) 는
+     animation: none(움직임 줄이기)에서 그대로 남아 배지가 기울었다. 둘 다 풀어 우상단 · 기울기 0 으로 둔다(맥박 키프레임은 transform 을 자기가 정한다). */
+  left: auto;
+  transform: none;
   position: absolute;
   top: 3%;
   right: 3%;
@@ -26864,7 +26891,7 @@ window.TT_SFX = {
          규칙에 맞춘다(skills.note 의 기존 <b>pet fruit</b> 표기와도 일치). */
       'rw.starfruit': 'Skill fruit',
       'rw.petfruit': 'Pet fruit',
-      'rw.awkfruit': 'Awakening Fruit',
+      'rw.awkfruit': 'Awakening fruit',
       'rw.gem': 'Jelly Stars',
       'rw.heart': 'Hearts',
 
@@ -27292,7 +27319,7 @@ window.TT_SFX = {
       'skills.s2': '<b>Awakening</b> fills only when you <b>alternate</b> sum-10 and same-number matches. Tap it and every point you earn is <b>×{am}</b> for {awk}s.',
       'skills.s3': "<b>Skill</b> fills with every match, faster at higher combos. Tap it to fire your hero's own skill.",
       'skills.s4': '<b>Pet</b> uses your chosen pet\'s skill. You start each round with {pu} uses and gain one for every pet fruit you pop (up to {pmax}).',
-      'skills.note': 'A <b>skill fruit</b> fills the Skill gauge and an <b>awakening fruit</b> fills the Awakening gauge at once. A <b>pet fruit</b> adds one Pet use, and popping a <b>gear fruit</b> gives you that gear.',
+      'skills.note': '<b>Skill fruit</b> and <b>awakening fruit</b> fill their gauges at once. <b>Pet fruit</b> adds a Pet use. Pop a <b>gear fruit</b> to get that gear.',
       'menu.dailydone': "Today's daily: cleared",
       'menu.dailytodo': "Today's daily is waiting",
       'hud.daily': 'Daily',
