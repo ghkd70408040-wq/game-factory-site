@@ -26125,16 +26125,33 @@ window.TT_SFX = {
   ];
   var persistReadOnly = false;   // 미래 버전 저장을 만나면 true — 덮어쓰지 않는다
   var storeLoaded = false;       // [F7.1-0925 fix1 M1] loadStore() 가 끝까지 돌면 true
-  var saveROWarned = false;      // final-fix I-4 — 세션당 1회만 아래 토스트
+  var saveROWarned = false;      // final-fix I-4 — 세션당 1회만 아래 토스트(실제로 띄운 순간 쓴다 — 출시 전 A)
+  var saveROPending = false;     // 출시 전 A — 스플래시 밑에서 불려 아직 못 알린 알림(걷힌 뒤 saveROFlush 가 띄운다)
   /* final-fix I-4 — 손상 저장(필드 소독 실패)·부팅 0단계 실패로 이 세션이
      읽기 전용이 되는 순간 세션당 1회 알린다. 이전에는 persistReadOnly=true 만
      세우고 아무 말도 하지 않아, 플레이어는 진행이 저장되지 않는다는 사실을
      영영 몰랐다(새로고침 = 새 세션이라 되살아나는 자리도 없다). toast.savefail
-     (저장 **쓰기** 실패, quota/private mode)과는 다른 상황이라 새 키를 쓴다. */
+     (저장 **쓰기** 실패, quota/private mode)과는 다른 상황이라 새 키를 쓴다.
+     출시 전 A(74 최종 리뷰 O-1) — 이 함수는 부팅 중에 불려 토스트가 스플래시(z 200) 밑(토스트 z 80)에서 뜬 채
+     약 2.6초 뒤 사라졌고 세션당 1회 표식도 그 순간 써 버려, 플레이어는 한 번도 못 봤다. 스플래시가 떠 있으면(splashDone 이
+     거짓) 읽기 전용 표식과 「알릴 것이 있다」만 세우고, splashDismiss 가 걷힌 뒤 saveROFlush 로 띄운다 — 표식은 그때 쓴다.
+     스플래시가 이미 걷힌 뒤에 불리면 지금처럼 바로 띄운다. */
   function noteSaveReadOnly() {
     persistReadOnly = true;
-    if (saveROWarned) return; saveROWarned = true;
+    if (saveROWarned) return;
+    saveROPending = true;
+    if (splashDone) saveROFlush();
+  }
+  function saveROFlush() {
+    if (!saveROPending || saveROWarned) return;
+    saveROPending = false; saveROWarned = true;
     try { toast(t('toast.savero')); } catch (e) { /* 알림 때문에 부팅이 죽지 않는다 */ }
+  }
+  /** 대기 중인 저장 알림이 화면에 머무는 시간(ms) — splashDismiss 가 v74Notice 를 그만큼 늦춘다. 토스트 길이 규칙 그대로(toastMs: 줄 수가
+      둘 이상이면 글자 수에 비례, 최대 TOAST_MS_MAX) — 줄 수는 그릴 때 정해지므로 2 줄 값(한 줄이면 그보다 짧아 알림이 먼저 걷힌다). */
+  function saveROHoldMs() {
+    if (!saveROPending || saveROWarned) return 0;
+    try { return toastMs(t('toast.savero'), 2); } catch (e) { return 0; }
   }
   function backupRaw(tag, raw) {
     try { window.localStorage.setItem(LS_BAK_PREFIX + tag, raw); } catch (e) { /* quota/private: ignore */ }
@@ -26160,9 +26177,11 @@ window.TT_SFX = {
     var from = (typeof o.schemaVersion === 'number' && isFinite(o.schemaVersion)) ? (o.schemaVersion | 0) : 0;
     if (from > SCHEMA_VERSION) {
       /* 이 빌드보다 새 저장 — 모르는 필드를 지우거나 덮어쓰면 그쪽 진행이 날아간다.
-       * 읽을 수 있는 만큼만 읽고, 원본은 백업 키에 보존, 이 세션은 저장하지 않는다. */
+       * 읽을 수 있는 만큼만 읽고, 원본은 백업 키에 보존, 이 세션은 저장하지 않는다.
+       * 출시 전 A — 읽기 전용이 되는 모든 경로는 알린다(지휘자 판정): 새 판 저장을 옛 판이 연 이 분기도 noteSaveReadOnly 가
+       * 플래그를 세우고 세션당 한 번 토스트한다(이전에는 말없이 읽기 전용이었다). */
       backupRaw(String(from), raw);
-      persistReadOnly = true;
+      noteSaveReadOnly();
       try { console.warn('[tentwin] save schema v' + from + ' > v' + SCHEMA_VERSION + ': read-only, backup ' + LS_BAK_PREFIX + from); } catch (e) {}
       return o;
     }
@@ -51461,13 +51480,17 @@ window.TT_SFX = {
        실드가 이미 서 있어야 한다. */
     splashArmShield();
     var el = document.getElementById('splash');
-    if (!el) { splashAudioHook(); return; }
+    if (!el) { splashAudioHook(); saveROFlush(); return; }
     el.classList.add('is-out');
     /* 트랜지션이 끝나면 DOM 에서 뺀다. transitionend 에만 의존하지 않는 이유는
        prefers-reduced-motion 에서 트랜지션 시간이 0 이라 이벤트가 안 올 수 있어서다. */
     setTimeout(function () { el.hidden = true; }, 320);
     splashAudioHook();
-    setTimeout(v74Notice, V74_NOTICE_DELAY);   /* 74 — 첫 사용자 탭으로 스플래시가 걷히면 그 왕국에서 이전 알림(C4) */
+    /* 출시 전 A — 부팅 중에 못 알린 읽기 전용 저장 알림을 스플래시가 걷히는 같은 320ms 시점에 띄운다. 알림이 대기 중이면 v74Notice 는
+       그 토스트가 떠 있는 시간만큼 늦춘다(토스트는 덮어쓰기라 먼저 뜨면 저장 알림이 지워진다 — 저장 알림이 먼저). */
+    var roHold = saveROHoldMs();
+    setTimeout(saveROFlush, 320);   /* 대기가 없으면 아무 일도 안 한다 */
+    setTimeout(v74Notice, V74_NOTICE_DELAY + roHold);   /* 74 — 첫 사용자 탭으로 스플래시가 걷히면 그 왕국에서 이전 알림(C4) */
   }
 
   /* ---- 14차 수리 2 — 「누를 때」와 「뗄 때」를 가른다 -------------------------
