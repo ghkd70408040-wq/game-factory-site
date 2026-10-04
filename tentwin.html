@@ -17813,6 +17813,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
     <!-- 판정판 53 — 공유 카드 미리보기. 이 시트에는 .result-card 가 없어(위 주석의
          「#modal-over 의 시트 문법을 그대로 쓴다」에서 카드 상자만 빠져 있다)
          공유 버튼 바로 위, 줄 순서의 맨 끝에 놓는다. -->
+    <ul id="arc-reward" class="reward-reveal" aria-live="polite" hidden></ul>
     <img id="arc-card-thumb" class="share-thumb" alt="" aria-hidden="true" hidden>
     <div class="sheet-row">
       <button id="arc-again" class="btn btn-primary" data-i18n="arc.again">Retry</button>
@@ -27266,6 +27267,7 @@ window.TT_SFX = {
       'rw.petfruit': 'Pet fruit',
       'rw.awkfruit': 'Awakening fruit',
       'rw.gem': 'Jelly Stars',
+      'rw.coin': 'Coins',
       'rw.heart': 'Hearts',
 
       /* WD-2 §11.6 갓차 · §14 펫. (74 — 결과 시트 파편 줄 rw.shard.* 넷은 파편 경제와 함께 은퇴했다.) */
@@ -28110,7 +28112,7 @@ window.TT_SFX = {
       'mk.star': 'SKILL MAX!',
       'mk.awk': 'AWAKEN MAX!',
       'mk.gear': 'Got {tier} {name}!',
-      'mk.gearmax': '{name} is maxed! +{j} jelly star',
+      'mk.gearmax': '{name} is maxed! +{c} coins',
       'drops.tier.common': 'Common',
       'drops.tier.rare': 'Rare',
       'drops.tier.epic': 'Epic',
@@ -28734,6 +28736,7 @@ window.TT_SFX = {
       'rw.petfruit': '펫 과일',
       'rw.awkfruit': '각성 과일',
       'rw.gem': '젤리별',
+      'rw.coin': '코인',
       'rw.heart': '하트',
 
       /* WD-2 §11.6 갓차 · §14 펫. (74 — 결과 시트 파편 줄 rw.shard.* 넷은 파편 경제와 함께 은퇴했다.) */
@@ -29493,7 +29496,7 @@ window.TT_SFX = {
       'mk.star': '스킬 MAX!',
       'mk.awk': '각성 MAX!',
       'mk.gear': '{tier} {name} 획득!',
-      'mk.gearmax': '{name} 최대 레벨! 젤리별 +{j}',
+      'mk.gearmax': '{name} 최대 레벨! 코인 +{c}',
       'drops.tier.common': '일반',
       'drops.tier.rare': '희귀',
       'drops.tier.epic': '영웅',
@@ -36800,6 +36803,7 @@ window.TT_SFX = {
     S.arcLastValue = value | 0;
     var res = submit ? arcSubmitBest(mode, value)
                      : { best: store.arcadeBest[mode] || null, fresh: false };
+    runCoinPay(coinForArc(!!res.fresh, why === 'clear'));
     dropProgress();
     persist();
 
@@ -36830,7 +36834,7 @@ window.TT_SFX = {
       /* onGameOver 와 같은 리듬(520ms). 연출이 끝나기 전에 시트를 올리면 격파
          이펙트가 시트 뒤에서 혼자 돌다 끝난다. */
       later(function () {
-        TW_PORTAL.requestMidgameAd(function () { openModal('modal-arc'); });   /* Task 12 rev1(C-1) */
+        TW_PORTAL.requestMidgameAd(function () { openModal('modal-arc'); rewardReveal('arc-reward', (S.gainCoin | 0) > 0 ? [coinRewardItem(S.gainCoin)] : [], { sheetId: 'modal-arc' }); });   /* Task 12 rev1(C-1) */
       }, 520);
     };
     if (why === 'clear') { harvestFinale(arcTail); return; }
@@ -39180,6 +39184,7 @@ window.TT_SFX = {
       out.push({ ico: '🐾', disc: 'pet', key: 'rw.petfruit', val: S.gainPet | 0, rar: 'common' });
     }
     if ((S.gainAwk | 0) > 0) out.push({ ico: '⚡', disc: 'awk', key: 'rw.awkfruit', val: S.gainAwk | 0, rar: 'common' });
+    if ((o.coin | 0) > 0) out.push(coinRewardItem(o.coin | 0));   /* P3 — 코인이 별보다 앞(흔한 것 먼저, §10.2 순서) */
     if ((o.gem | 0) > 0) {
       /* [T14 I-8, 리뷰 IM-3 정정] 젤리별은 다른 화면 전부 그림 --lib-star-gold
          (.gem-ic 문법 — 문자는 숨김)인데 결과 창만 💎 문자였다. 글자 ★ 는
@@ -39226,7 +39231,7 @@ window.TT_SFX = {
     }
     for (i = 0; i < (S.gainGear || []).length; i++) {
       var gg = S.gainGear[i], git = itemById(gg.id);
-      out.push(gg.max ? { ico: '★', disc: 'gem', key: 'rw.gem', val: GEAR_MAX_JSTAR, rar: 'normal' }
+      out.push(gg.max ? coinRewardItem(gg.refund | 0)
                       : { ico: (git && git.ico) || '🎁', disc: 'item', key: 'item.' + gg.id + '.nm', val: gg.lv,
                           rar: gg.tier === 'epic' ? 'epic' : (gg.tier === 'rare' ? 'rare' : 'normal'),
                           art: itemArtUrl(gg.id, 96) });   /* 74 T11 — 결과 줄에 장비 그림(.rw-ico[data-art]) */
@@ -39743,6 +39748,7 @@ window.TT_SFX = {
       rankFresh.mode = rkey;
       rankFresh.pos = newRank;
     }
+    runCoinPay(coinForRank(newRank));   /* P3 — 기록판 순위로 세 단 */
 
     // Freeze exactly what the modal shows. Re-painting later (a language
     // toggle, say) then cannot read state that has moved on in the meantime.
@@ -39783,7 +39789,7 @@ window.TT_SFX = {
         /* W-C §10 — 진 판에도 리빌이 붙는다. 수확은 판 중에 확정되므로 "졌지만
            얻은 것"은 실재하고, 그걸 안 보여 주면 게임오버가 손해로만 읽힌다.
            **획득이 있을 때만** 열리는 것은 rewardReveal 이 보장한다. */
-        rewardReveal('over-reward', rewardItems({ gem: S.gainJstar }), { sheetId: 'modal-over' });
+        rewardReveal('over-reward', rewardItems({ gem: S.gainJstar, coin: S.gainCoin | 0 }), { sheetId: 'modal-over' });
       });
     }, 520);
   }
@@ -40014,10 +40020,7 @@ window.TT_SFX = {
     /* replay 여도 이 줄은 그대로다 — streakGot 이 이미 전부 0 이라 «데일리
        보상» 은 한 톨도 안 들어가고, 남는 것은 판 중에 확정된 수확(S.gainJstar)
        뿐이다. 그것까지 숨기면 실제로 번 것을 안 보여 주는 거짓말이 된다. */
-    dailyReward = rewardItems({
-      gem:   (S.gainJstar | 0) + (streakGot.jstar | 0),
-      heart: streakGot.heart | 0
-    });
+    /* (P3 — 이 문장은 코인 때문에 순위가 나온 뒤, 아래 submitRank 다음으로 옮겼다.) */
     if (streakGot.days.length) {
       toast(t('streak.reward', { d: streakGot.days[streakGot.days.length - 1] }));
     }
@@ -40036,6 +40039,13 @@ window.TT_SFX = {
       maxCombo: S.maxCombo, grade: rec.grade, date: todayKey()
     });
     if (dRank > 0) { rankFresh.mode = rankKeyOf(); rankFresh.pos = dRank; }
+    /* P3 — 코인은 순위가 나온 뒤에야 정해진다. 보상 행도 그래서 여기서 만든다(옮기기 전과 같은 값 + 코인). */
+    runCoinPay(coinForRank(dRank));
+    dailyReward = rewardItems({
+      gem:   (S.gainJstar | 0) + (streakGot.jstar | 0),
+      heart: streakGot.heart | 0,
+      coin:  S.gainCoin | 0
+    });
     /* replay 는 store 에 칸이 없으므로 방금 만든 기록을 직접 넘겨 준다.
        Task 12 rev1(Phase B 우려4 판정) — 4번째 인자 true 는 "판이 막 끝났다"
        는 뜻이고, midgame 광고 게이팅은 **이 경로에서만** 켠다. */
@@ -45249,6 +45259,32 @@ window.TT_SFX = {
     if (store.deals.day !== d) { store.deals.day = d; for (i = 0; i < P3_DEAL_IDS.length; i++) store.deals.b[P3_DEAL_IDS[i]] = 0; }
   }
 
+  /* ---- 코인 수입(스펙 §4-f) — 판이 끝나는 네 자리(advFinish · onGameOver · finishDaily · arcFinish)만 부른다 ---- */
+  var COIN_ADV_FIRST = 20, COIN_ADV_FIRST_STAR = 10;   /* 모험 첫 클리어 20 + 별 하나당 10 */
+  var COIN_ADV_RE = 10, COIN_ADV_RE_STAR = 5;          /* 다시 깨면 10 + 별 하나당 5 */
+  var COIN_BOSS_MULT = 2;                               /* 보스탄 첫 클리어만(스펙 §4-f 괄호 자리) */
+  /* 모험 밖 한 판의 세 단. 스펙의 「점수 3단」을 **내 기록판 기준**으로 가른다(모드마다 점수 폭이 달라
+     한 문턱을 못 쓴다): 보통 · 기록판 5위 안(아케이드는 격파) · 새 1위(아케이드는 새 최고). §28.2 */
+  var COIN_RUN = [15, 25, 40];
+  function coinForAdv(first, stars, boss) {
+    var s = clamp(stars | 0, 0, 3);
+    if (!first) return COIN_ADV_RE + COIN_ADV_RE_STAR * s;                                /* 재클리어 — 보스도 ×1 */
+    return (COIN_ADV_FIRST + COIN_ADV_FIRST_STAR * s) * (boss ? COIN_BOSS_MULT : 1);    /* 첫 클리어 — 보스 ×2 */
+  }
+  function coinForRank(rank) { return rank === 1 ? COIN_RUN[2] : (rank > 1 ? COIN_RUN[1] : COIN_RUN[0]); }
+  function coinForArc(fresh, clear) { return fresh ? COIN_RUN[2] : (clear ? COIN_RUN[1] : COIN_RUN[0]); }
+  /** 한 판의 코인은 **판 하나에 한 번**이다. 판의 이름표는 S.startedAt(진입 함수가 판마다 새로 세운다) —
+      이어하기로 같은 판이 다시 끝나면 더 큰 단과의 차이만 준다. S.gainCoin = 이번 시트가 보여 줄 몫. */
+  function runCoinPay(want) {
+    if (S.coinRunAt !== S.startedAt) { S.coinRunAt = S.startedAt; S.runCoin = 0; }
+    var pay = Math.max(0, (want | 0) - (S.runCoin | 0));
+    if (pay > 0) { coinGrant(pay, 'run'); S.runCoin = (S.runCoin | 0) + pay; }
+    S.gainCoin = pay;
+    return pay;
+  }
+  /** 결과 창 줄 하나(rewardReveal 의 항목 모양). 그림은 CSS(.rw-ico[data-disc="coin"])가 코인 원반으로 칠한다. */
+  function coinRewardItem(n) { return { ico: '●', disc: 'coin', key: 'rw.coin', val: n | 0, rar: 'normal' }; }
+
   /* ---- 소비처 ① 하트 (§20.3) ---------------------------------------------- */
 
   /** 0 → 5 즉시 회복 = 50💎. 가득 찼으면 아무 일도 안 한다(버튼도 비활성). */
@@ -45967,6 +46003,7 @@ window.TT_SFX = {
    */
   function advFinish(win, why) {
     if (!S.running) return;                       // 두 번 들어오지 않는다
+    S.gainCoin = 0;   /* P3 — 진 판은 0 */
     TW_PORTAL.gameplayStop();   /* Task 12 rev1(C-1) — 판이 끝나는 즉시(연출·컷신이 이어져도) */
     S.running = false;
     S.busy = true;
@@ -46036,6 +46073,9 @@ window.TT_SFX = {
         store.jstar = (store.jstar | 0) + (stars - prevStars);
         gemGain = stars - prevStars;
       }
+      /* P3 — 코인(놀면 쌓이는 돈). 첫 클리어 = 이 판 전에 이 탄 별이 0. 보스탄은 두 배. */
+      S.gainCoin = coinForAdv(prevStars === 0, stars, !!p.boss);
+      coinGrant(S.gainCoin, 'adv');
       store.advFails[key] = 0;
       if (p.n >= (store.advMax | 0)) store.advMax = p.n + 1;
       /* 판정판 50 — 「클리어」·「★★ 이상」·주간 누계 둘. 별은 **새로 딴 별**
@@ -46183,7 +46223,7 @@ window.TT_SFX = {
       var txt = (sv && !sv.hidden) ? String(sv.textContent || '') : '';
       var full = 0;
       for (var i = 0; i < txt.length; i++) { if (txt.charAt(i) === '★') full++; }
-      rewardReveal('adv-reward', rewardItems({ gem: (S.gainGem | 0) + (S.gainJstar | 0) }), {
+      rewardReveal('adv-reward', rewardItems({ gem: (S.gainGem | 0) + (S.gainJstar | 0), coin: S.gainCoin | 0 }), {
         starEl: 'adv-stars',
         stars: full,
         sheetId: 'modal-adv'
@@ -49274,7 +49314,6 @@ window.TT_SFX = {
   var GEAR_BOSS_TIER = [0, 60, 40];                               // 보스 클리어 확정 1개 — 4챕부터
   var GEAR_BOSS_TIER_EARLY = [0, 100, 0];                         // 1~3챕 보스 — 영웅은 4챕부터(스펙 §D-2 티어 게이트)
   var GEAR_AVG_CH = [0.3, 0.3, 0.3, 0.4, 0.4, 0.4, 0.5, 0.5, 0.5, 0.6];   // 판당 평균(표시) = rate 설계 기대값 70 × rate. 70 = 판당 수확 ÷ rate(0.03 대표본 57 · 0.01 표본 72 · 0.0045 대 표본 69.5, 낮은 rate 일수록 70 으로 모인다) — Task 10 하네스
-  var GEAR_MAX_JSTAR = 1;                                         // 이미 Lv12 인 장비가 또 나오면 젤리별 +1
   var GEAR_TIERS = ['common', 'rare', 'epic'];
   var GEAR_TIER_TOK = { common: '--role-rw-shard-steady-3', rare: '--role-rw-shard-agility-3', epic: '--role-rw-item-3' };
   var GEAR_TIER_INK = { common: '', rare: '', epic: '' };   // JS 연출 색 — 부팅 때 gearInkInit() 이 위 토큰에서 한 번 채운다(JS 색 리터럴 0, 점검 W7)
@@ -49420,8 +49459,9 @@ window.TT_SFX = {
     var own = (store.items && store.items.own) || {};
     var had = own[g.id] | 0, res;
     if (had >= ITEM_LV_MAX) {
-      store.jstar = (store.jstar | 0) + GEAR_MAX_JSTAR;
-      res = { id: g.id, lv: had, tier: g.tier, max: true, isNew: false };
+      var back = GACHA_REFUND[g.tier] | 0;   /* P3 — 최고 레벨 중복 = 코인 환급(뽑기 grantItemOrRefund 와 같은 표 — 원장 판정 (1)) */
+      if (back > 0) coinGrant(back, 'refund');
+      res = { id: g.id, lv: had, tier: g.tier, max: true, isNew: false, refund: back };
     } else {
       var gr = grantItem(g.id, 'farm');
       if (!gr) return null;
@@ -49530,7 +49570,7 @@ window.TT_SFX = {
     var anim = typeof window !== 'undefined' && !fxReduced() && gearFlyPool.length > 0;
     if (anim && !GEAR_GEO.ok) gearGeoRead();   /* ok 는 resolveMatch 머리가 매치마다 내리고 다시 채운다 */
     var name = t('item.' + res.id + '.nm');
-    toast(res.max ? t('mk.gearmax', { name: name, j: GEAR_MAX_JSTAR }) : t('mk.gear', { tier: t('drops.tier.' + res.tier), name: name }));
+    toast(res.max ? t('mk.gearmax', { name: name, c: res.refund | 0 }) : t('mk.gear', { tier: t('drops.tier.' + res.tier), name: name }));
     J.sfx.mission();
     J.vibrate(res.tier === 'epic' ? 40 : 22);
     if (!anim) return;
@@ -52322,6 +52362,7 @@ window.TT_SFX = {
     paintShopBalance: paintShopBalance,
     /* P3 — 재화·상점 상태 손잡이(위 규약 그대로 — 게임 코드는 window.Game 을 거쳐 부르지 않는다). */
     coinBalance: coinBalance, coinGrant: coinGrant, coinSpend: coinSpend, starGrant: starGrant, starSpend: starSpend, grantItemOrRefund: grantItemOrRefund, p3Roll: p3Roll, p3Ensure: p3Ensure, advStarTotal: advStarTotal, GACHA_REFUND: GACHA_REFUND, COIN_MAX: COIN_MAX, P3_AD_CAP: P3_AD_CAP, P3_DEAL_CAP: P3_DEAL_CAP,
+    coinForAdv: coinForAdv, coinForRank: coinForRank, coinForArc: coinForArc, runCoinPay: runCoinPay, COIN_RUN: COIN_RUN,
     shopPayForce: function (v) { shopPayForce = v ? 1 : 0; shopSyncPay(); },
     /* W-C §10 루트 리빌 — DEBUG HANDLES ONLY, 위 규약 그대로다(게임 코드는 이
      * 중 무엇도 window.Game 을 거쳐 부르지 않는다). 관문이 슬롯 순서·타이밍·
@@ -70218,6 +70259,19 @@ html[lang="en"] #kd-b-circus .kd-tag b{ font-size: .88em; letter-spacing: -.02em
   #modal-node .nc-drop { --nc-fr: calc(var(--nc-u) * 46); }
   #modal-node .nc-nm { display: none; }
   #modal-node .nc-note { display: none; }
+}
+</style>
+<style id="shop-p3">
+/* ==== [P3] 상점·재화·뽑기 — 새 원시값 0: 색·불투명도는 기존 토큰, 좌표는 cqw/%. 되돌리기 = 이 블록과 [P3-*] 표식 자리 삭제. ==== */
+/* 결과 창 코인 줄 — 별(.rw-ico[data-disc="gem"])과 같은 문법, 그림만 코인 원반(왕국 위 코인 칩과 같은 자산). */
+.rw-ico[data-disc="coin"]{
+  font-size: 0;
+  color: transparent;
+  text-shadow: none;
+  background-image: var(--lib-glyph-coin);
+  background-size: 60% 60%;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 </style>
 </body>
