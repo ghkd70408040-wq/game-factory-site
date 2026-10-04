@@ -14185,7 +14185,8 @@ html[lang="ko"] #modal-arc .sheet-row .btn { word-break: keep-all; min-width: 0;
    ▣ 색은 이 블록 안의 지역 변수 둘로만 산다. 전역 팔레트(--f2-*)에 새 이름을
      더하지 않는 것이 규율이다 — 한 화면의 강조색이 전역 토큰이 되면 다음 화면이
      그것을 상속받고, 그때부터 색은 아무 뜻도 없어진다. */
-#modal-node .node-info {
+#modal-node .node-info,
+#modal-drops .dr-list {
   --nk-pink: var(--role-nk-pink-node);
   --nk-pink-soft: var(--role-nk-pink-soft-node);
   list-style: none;
@@ -14197,9 +14198,13 @@ html[lang="ko"] #modal-arc .sheet-row .btn { word-break: keep-all; min-width: 0;
   border-radius: 13px;
   background: var(--nk-pink-soft);
 }
-#modal-node .node-info > li { display: flex; align-items: baseline; gap: 9px; }
+#modal-node .node-info > li,
+#modal-drops .dr-row { display: flex; align-items: baseline; gap: 9px; }
 #modal-node .node-info > li[hidden] { display: none; }
-#modal-node .node-info > li > b {
+#modal-node .node-info > li > b,
+#modal-drops .dr-h,
+#modal-drops .dr-meta,
+#modal-drops .dr-note {
   flex: 0 0 auto;
   min-width: 68px;
   font-family: var(--font-display);
@@ -14207,7 +14212,10 @@ html[lang="ko"] #modal-arc .sheet-row .btn { word-break: keep-all; min-width: 0;
   letter-spacing: .3px;
   color: var(--nk-pink);
 }
-#modal-node .node-info > li > i {
+#modal-node .node-info > li > i,
+#modal-drops .dr-name,
+#modal-drops .dr-p,
+#modal-drops .dr-sub {
   flex: 1 1 auto;
   min-width: 0;
   font-style: normal;
@@ -49111,6 +49119,8 @@ window.TT_SFX = {
         li.className = 'dr-row';
         li.setAttribute('data-item', r.id);
         li.setAttribute('data-tier', r.tier);
+        /* 낭독: 칸이 aria-hidden 이라 보유 · 레벨을 못 읽는다 — 줄에 이름 · 등급 · (보유면 레벨) · 확률을 쉼표로 이은 라벨(기존 키 조합 — 새 키 0, 수정 1회차 M4) */
+        li.setAttribute('aria-label', nm + ', ' + t('drops.tier.' + r.tier) + (lv > 0 ? ', ' + t('drops.lv', { lv: lv, max: ITEM_LV_MAX }) : '') + ', ' + t('drops.chance', { p: pctTxt(r.p) }));
         /* 획득표 칸은 보기 전용 — cpItemCell 의 'own' 은 <button aria-pressed> 라 누를 곳 없는 포커스가 생긴다.
            늘 'empty'(<span aria-hidden>)로 만들고 보유면 data-state 만 own 으로 바꿔 모양을 맞춘다(착수 전 점검 W19). */
         var cell = cpItemCell('empty', it.slot, '', lv > 0 ? t('drops.lv', { lv: lv, max: ITEM_LV_MAX }) : '', r.id, r.tier, nm);
@@ -49136,6 +49146,7 @@ window.TT_SFX = {
         var b = document.createElement('b'); b.className = 'dr-name'; b.textContent = t('drops.use.' + u[0]); li.appendChild(b);
         var m = document.createElement('i'); m.className = 'dr-meta'; m.textContent = t('drops.use.' + u[0] + '.d'); li.appendChild(m);   /* 제목 + 문장 — 콜론 공식 금지(점검 W1) */
         var pc = document.createElement('span'); pc.className = 'dr-p'; pc.textContent = t('drops.use.p', { x: pctTxt(d.use[u[0]]) }); li.appendChild(pc);
+        li.setAttribute('aria-label', t('drops.use.' + u[0]) + ', ' + t('drops.use.' + u[0] + '.d') + ', ' + t('drops.use.p', { x: pctTxt(d.use[u[0]]) }));
         use.appendChild(li);
       });
     }
@@ -53440,7 +53451,8 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
 #modal-rank #rank-tabs,
 #modal-rank #rank-hint,
 #modal-rank #rank-close{ flex:0 0 auto; }
-#modal-rank #rank-list{
+#modal-rank #rank-list,
+#modal-drops .dr-body{
   flex:0 1 auto;
   min-height:0;
   overflow-y:auto;
@@ -53448,7 +53460,8 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
   -webkit-overflow-scrolling:touch;
   scrollbar-width:none;
 }
-#modal-rank #rank-list::-webkit-scrollbar{ width:0; height:0; }
+#modal-rank #rank-list::-webkit-scrollbar,
+#modal-drops .dr-body::-webkit-scrollbar{ width:0; height:0; }
 
 /* --- ⑩ [0904] 탭 알약 면색을 정본 역할토큰(--btn-*)으로 ----------------------
    반려 사유였던 **갈색 겉선**(#6E463A = --j-outline)과 크림을 걷는다. 면·겉선·
@@ -65687,7 +65700,8 @@ html[lang="en"] #modal-arc.is-arcdmg .sheet > h2{ --ttl:url("catalog/ttl-arcdmg-
 #modal-node .r10-ribbon,
 #modal-drops .r10-ribbon     { margin-bottom: 0; }
 #modal-node .node-chips:empty { display: none; }   /* 빈 칩 줄이 먹던 한 칸 */
-#modal-node .node-info      { margin: 0; }
+#modal-node .node-info,
+#modal-drops .dr-list      { margin: 0; }
 #modal-node .node-stars     { margin: 0; }
 #modal-node .nrow           { min-height: 48px; }
 /* 하트 줄 — 시작 버튼의 접지(3px)·드롭(7/16px) 밖으로. 격자 8 + 8 = 16 */
@@ -69392,69 +69406,41 @@ html[lang="en"] #kd-b-circus .kd-tag b{ font-size: .88em; letter-spacing: -.02em
 
 <style id="drops-74">
 /* ===== 74 T12 — 획득표 모달(#modal-drops) =====================================
-   스펙 §D-3 「노드 카드와 같은 조각」. 판·리본·X·제목 레터링은 노드 카드(#modal-node)의 규칙 선택자 목록에, 칸(.cp-crystal.cp-gem.cp-islot)·값 알약은
-   캐릭터 창(#charpanel)의 규칙 선택자 목록에 #modal-drops 를 **더해** 쓴다(선언 복사 0 · 새 값 0 — 넓힌 자리 표는 DESIGN §27.11).
-   이 블록이 새로 정하는 것은 셋뿐이다: ① 목록만 스크롤하는 구획(#modal-rank #rank-list 처방) ② 줄 배치(grid) · 글자(노드 카드 .node-info 의 선언·토큰을 그대로)
-   ③ 칸이 캐릭터 창 밖에서 읽는 토큰 다섯의 이름 연결과 등급 겉선 색(기존 보상 토큰). */
+   스펙 §D-3 「노드 카드와 같은 조각」. 새로 그리지 않고 **원래 규칙의 선택자 목록에 #modal-drops 범위 선택자를 더해** 쓴다(선언 복사 0 · 새 px 리터럴 0 — 넓힌 자리 표는 DESIGN §27.11):
+     · 판 · 리본 · X · 제목 레터링 = 노드 카드(#modal-node) 규칙 · 목록 상자 · 줄 글자 = 노드 카드 .node-info 규칙(상자 · li · b · i)
+     · 칸(.cp-crystal.cp-gem.cp-islot) · 값 알약 = 캐릭터 창(#charpanel) 규칙 · 스크롤 구획 = 기록 창 #modal-rank #rank-list 규칙
+   이 블록이 새로 정하는 것은 줄 배치(grid) · 칸이 캐릭터 창 밖에서 읽는 토큰 다섯의 이름 연결 · 등급 겉선 색(기존 보상 토큰)과, 넓힌 규칙을 이 모달에 맞추는 한두 줄뿐이다. */
 
-/* ---- 목록만 스크롤 — 판 · 리본 · X 는 이 상자 밖이라 고정 -------------------------
-   판(.r10m .sheet)은 overflow:visible 이라 스스로 스크롤 상자가 못 된다. 판 높이는 base .sheet 의 max-height:100% 가 .modal 안쪽으로 가두고,
-   그 안에서 이 상자만 줄어 구른다(#modal-rank #rank-list · #modal-adv #adv-reward 와 같은 처방). 스크롤바는 감춘다(잘려 보이는 것이 곧 「더 있다」). */
+/* ---- 목록만 스크롤 — flex · min-height · overflow · 스크롤바는 #modal-rank #rank-list 규칙에 더한 선택자가 낸다. 판 · 리본 · X 는 이 상자 밖이라 고정 -----------
+   여기는 이 상자 고유의 것: 구역을 세로로 쌓고(간격 = 판의 세로 리듬 그대로 — gap: inherit), 한글 낱말 중간에서 안 끊는다(이 파일의 관례 word-break: keep-all). */
 #modal-drops .dr-body {
-  --nk-pink: var(--role-nk-pink-node);
-  --nk-pink-soft: var(--role-nk-pink-soft-node);
+  --nk-pink: var(--role-nk-pink-node);   /* 구역 제목(.dr-h)은 목록 밖이라 넓힌 .node-info 상자 규칙의 변수를 못 받는다 — 같은 토큰을 같은 이름으로 잇는다 */
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  flex: 0 1 auto;
-  min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  word-break: keep-all;   /* 한글 낱말 중간에서 안 끊는다(이 파일의 관례 — word-break: keep-all 30곳). 안 들어가는 낱말만 overflow-wrap 이 끊는다 */
+  gap: inherit;
+  word-break: keep-all;
 }
-#modal-drops .dr-body::-webkit-scrollbar { width: 0; height: 0; }
 #modal-drops .dr-body > .dr-sec { flex: 0 0 auto; }
-#modal-drops .dr-sec { display: flex; flex-direction: column; gap: 6px; }
+#modal-drops .dr-sec { display: flex; flex-direction: column; gap: inherit; }
 #modal-drops .dr-sec[hidden] { display: none; }
 
-/* ---- 글자 — 노드 카드 .node-info 의 줄 타이포(라벨 b · 값 i)를 그대로 ----------------- */
-#modal-drops .dr-h {
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: 13px;
-  letter-spacing: .3px;
-  color: var(--nk-pink);
-}
-#modal-drops .dr-sub {
-  margin: 0;
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 1.32;
+/* ---- 글자 — 모양은 노드 카드 .node-info 줄 규칙(라벨 li > b · 값 li > i)에 더한 선택자가 낸다 ---------------------------------------
+   라벨 모양 = .dr-h · .dr-meta · .dr-note(크기만) / 값 모양 = .dr-name · .dr-p · .dr-sub. 아래는 그 규칙이 이 모달에 안 맞는 곳만 덮는다. */
+#modal-drops .dr-h,
+#modal-drops .dr-sub,
+#modal-drops .dr-note { margin: 0; }
+#modal-drops .dr-h,
+#modal-drops .dr-meta,
+#modal-drops .dr-note { min-width: 0; }   /* li > b 규칙의 최소 폭(라벨 칸)은 grid 칸 · 문장에 맞지 않는다 */
+#modal-drops .dr-note {                   /* 주석 문장은 라벨 줄의 글자 크기만 받는다 */
+  font-family: inherit;
+  font-weight: normal;
+  letter-spacing: normal;
   color: var(--prim-art-ink);
-}
-#modal-drops .dr-note {
-  margin: 0;
-  font-size: 11.5px;
-  line-height: 1.32;
-  color: var(--prim-art-ink);
-}
-
-/* ---- 목록 상자 = 노드 카드 .node-info 상자(분홍 바탕 · 안여백 · 줄 간격) ----------------- */
-#modal-drops .dr-list {
-  list-style: none;
-  margin: 0;
-  padding: 9px 11px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  border-radius: 13px;
-  background: var(--nk-pink-soft);
 }
 
 /* ---- 줄: [칸 · 두 줄] [이름 / 메타] [확률] ------------------------------------------
-   칸이 두 줄을 먹고(grid-row 1 / 3), 이름 · 메타가 가운데 두 줄, 확률이 오른쪽. 칸 크기는 캐릭터 창 칸 규칙(.cp-gem)이 낸다.
+   칸이 두 줄을 먹고(grid-row 1 / 3), 이름 · 메타가 가운데 두 줄, 확률이 오른쪽. 칸 크기는 캐릭터 창 칸 규칙(.cp-gem)이 낸다. 가로 간격 · 줄 상자는 넓힌 .node-info li 규칙이 낸다.
    칸이 캐릭터 창 밖에서 읽는 토큰 다섯은 #charpanel 에만 선언돼 있어(--f2-item-* · --f2-ink · --f2-tab-on) 같은 이름으로 같은 토큰을 잇는다(새 값 0). */
 #modal-drops .dr-row {
   --f2-ink: var(--role-f2-ink-charsel);
@@ -69465,55 +69451,27 @@ html[lang="en"] #kd-b-circus .kd-tag b{ font-size: .88em; letter-spacing: -.02em
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   grid-template-rows: auto auto;
-  column-gap: 9px;
+  row-gap: 0;   /* 넓힌 li 규칙의 gap 은 가로(칸 ↔ 글자)만 쓴다 */
   align-items: center;
 }
 #modal-drops .dr-row .cp-islot { grid-column: 1; grid-row: 1 / 3; }
-#modal-drops .dr-name {
-  grid-column: 2;
-  grid-row: 1;
-  align-self: end;
-  min-width: 0;
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 1.32;
-  color: var(--prim-art-ink);
-  overflow-wrap: anywhere;
-}
-#modal-drops .dr-meta {
-  grid-column: 2;
-  grid-row: 2;
-  align-self: start;
-  min-width: 0;
-  font-style: normal;
-  font-family: var(--font-display);
-  font-size: 11.5px;
-  letter-spacing: .3px;
-  color: var(--nk-pink);
-  overflow-wrap: anywhere;
-}
-#modal-drops .dr-p {
-  grid-column: 3;
-  grid-row: 1 / 3;
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 1.32;
-  color: var(--prim-art-ink);
-  text-align: right;
-}
-/* 사용 과일 줄 = 제목 + 문장 두 줄(점검 W1). 글리프 크기는 노드 카드 줄 아이콘(.ni-ic) 22px. */
+#modal-drops .dr-name { grid-column: 2; grid-row: 1; align-self: end; overflow-wrap: anywhere; }
+#modal-drops .dr-meta { grid-column: 2; grid-row: 2; align-self: start; font-style: normal; font-weight: bolder; overflow-wrap: anywhere; }   /* 메타는 i 라 라벨 b 의 UA 굵기를 명시한다 */
+#modal-drops .dr-p { grid-column: 3; grid-row: 1 / 3; text-align: right; }
+/* 사용 과일 줄 = 제목 + 문장 두 줄(점검 W1). 글리프 크기 = 칸 부품 글자 크기의 비율(.cp-gem 의 font-size 와 같은 .0500 × --f2-w). */
 #modal-drops .dr-use .dr-glyph {
   grid-column: 1;
   grid-row: 1 / 3;
   font-style: normal;
-  font-size: 22px;
+  font-size: calc(var(--f2-w) * .0500);
   line-height: 1;
 }
 
 /* ---- 등급 액자 · 상태 면 ---------------------------------------------------------
    칸 그림은 openDrops 가 인라인으로 깐다(itemArtCss — 도착 전에는 칸 종류의 실루엣). 그림 상자 크기·맞춤(center/contain)은 넓힌 .cp-cr-ic 규칙이 낸다.
    액자 = 캐릭터 창 장착 칸(eq) 규칙을 칸 전부에 입힌 것(링 선언 그대로) 위에 색만 등급 토큰으로 갈아 끼운다.
-   면: 미보유(empty) = 칸 부품 기본 면 · 보유(own) = 캐릭터 창 own 면(넓힌 own 규칙). eq 규칙이 둘 다 장착 면으로 덮으므로 미보유만 기본 면으로 되돌린다. */
+   면: 보유(own) = 캐릭터 창 own 면(넓힌 own 규칙 — 특이도가 넓힌 eq 규칙보다 높아 그대로 이긴다). 미보유(empty)만 넓힌 eq 규칙이 장착 면을 씌우므로
+   칸 틀 재질 규칙(#charpanel .cp-crystal 의 --wslot-face)과 같은 토큰으로 되돌린다 — 그 규칙의 기본 면이 바뀌면 이 줄도 같이 바꾼다. */
 #modal-drops .dr-row .cp-islot[data-state="empty"] { --wslot-face: var(--role-wslot-face-crystal); }
 #modal-drops .dr-row[data-tier="common"] .cp-islot { --wslot-L3-line: var(--role-rw-shard-steady-3); }
 #modal-drops .dr-row[data-tier="rare"] .cp-islot { --wslot-L3-line: var(--role-rw-shard-agility-3); }
