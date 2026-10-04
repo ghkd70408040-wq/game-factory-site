@@ -334,7 +334,8 @@ inset 0 -5px 0 #A296AC;
 #modal-rank #rank-tabs,
 #modal-rank #rank-hint,
 #modal-rank #rank-close{ flex:0 0 auto; }
-#modal-rank #rank-list{
+#modal-rank #rank-list,
+#modal-drops .dr-body{
 flex:0 1 auto;
 min-height:0;
 overflow-y:auto;
@@ -342,7 +343,8 @@ overflow-x:hidden;
 -webkit-overflow-scrolling:touch;
 scrollbar-width:none;
 }
-#modal-rank #rank-list::-webkit-scrollbar{ width:0; height:0; }
+#modal-rank #rank-list::-webkit-scrollbar,
+#modal-drops .dr-body::-webkit-scrollbar{ width:0; height:0; }
 .w6m .rank-tab{
 --btn-face-a:var(--role-mint-face-a); --btn-face-b:var(--role-mint-face-b); --btn-outline:var(--role-mint-outline); --btn-contact:var(--role-mint-contact);
 background-image:linear-gradient(180deg, var(--btn-face-a) 0%, var(--btn-face-a) 47%,
@@ -2336,6 +2338,41 @@ radial-gradient(closest-side, rgba(255,255,255,.95), rgba(255,255,255,0)) 3% 16%
 radial-gradient(closest-side, rgba(255,255,255,.9),  rgba(255,255,255,0)) 11% 11%/4.5% 14% no-repeat,
 radial-gradient(closest-side, rgba(255,255,255,.85), rgba(255,255,255,0)) 96% 74%/4% 18% no-repeat;
 }
+.kit-pill-v2--chip,
+.kit-pill-v2--soft{
+border: 0;
+font-family: inherit; font-weight: 600; line-height: 1;
+font-size: var(--f2-chip-fs, calc(var(--f2-w) * .0362));
+color: var(--prim-art-ink);
+}
+.kit-pill-v2--chip{                           /* .pill: 테 .05H · 띠 .10H · 광 .167H · 그림자 .067/.133H · 모서리 .333H */
+border-radius: calc(var(--f2-ph) * .3333);
+background: var(--f2-pill);
+box-shadow:
+inset 0 0 0 calc(var(--f2-ph) * .05) var(--f2-pill-line),
+inset 0 calc(var(--f2-ph) * -.1) 0 var(--prim-black-a07),
+inset 0 calc(var(--f2-ph) * -.1667) 0 color-mix(in srgb, var(--prim-white) calc(var(--mo-mk-70) * 100%), transparent),
+0 calc(var(--f2-ph) * .0667) calc(var(--f2-ph) * .1333) color-mix(in srgb, var(--role-f2-chip-line) calc(var(--mo-mk-35) * 100%), transparent);
+}
+.kit-pill-v2--chip::before{                   /* 광점 1 — 좌 .2H · 위 .133H · .4H × .167H */
+inset: auto;
+left: calc(var(--f2-ph) * .2); top: calc(var(--f2-ph) * .1333);
+width: calc(var(--f2-ph) * .4); height: calc(var(--f2-ph) * .1667);
+border-radius: 50%;
+background: radial-gradient(closest-side, var(--role-menu-chip-hi-light), transparent);
+}
+.kit-pill-v2--chip::after,
+.kit-pill-v2--soft::before,
+.kit-pill-v2--soft::after{ content: none; }
+.kit-pill-v2--soft{                           /* .clear: 테 .034H · 띠 .091H · 윗광 .045/.023H · 그림자 .045/.114H · 모서리 .318H */
+border-radius: calc(var(--f2-ph) * .3182);
+background: linear-gradient(180deg, var(--role-ch-tiktok-body), var(--role-f2-pill-soft));
+box-shadow:
+inset 0 0 0 calc(var(--f2-ph) * .0341) var(--role-f2-pill-soft-e),
+inset 0 calc(var(--f2-ph) * -.0909) 0 color-mix(in srgb, var(--role-f2-pill-soft-e) calc(var(--mo-mk-35) * 100%), transparent),
+inset 0 calc(var(--f2-ph) * .0455) calc(var(--f2-ph) * .0227) var(--prim-white-a90),
+0 calc(var(--f2-ph) * .0455) calc(var(--f2-ph) * .1136) var(--role-f2-pill-charsel);
+}
 :root{
 --f2-hi:      var(--role-f2-hi);                /* 6  강조 림   */
 --f2-pill-a-1:   var(--role-f2-pill-a-1);  /* 7  A 헤더 알약 위 (글자·광택 없는 x=240, 림 바로 아래) */
@@ -3096,7 +3133,8 @@ background: linear-gradient(180deg,
 color-mix(in srgb, var(--f2-box) calc(var(--cps-body-a) * 100%), transparent),
 color-mix(in srgb, var(--f2-box-2) calc(var(--cps-body-a) * 100%), transparent));
 }
-#charpanel .cp-crystal {
+#charpanel .cp-crystal,
+#modal-drops .cp-crystal {
 position: relative;
 box-sizing: border-box;
 flex: 0 0 auto;
@@ -3621,11 +3659,6 @@ pointer-events: none;
 #charpanel .cs-bar[style*="--v0:0%"] > .cs-b0,
 #charpanel .cs-bar[style*="--v0: 0%"] > .cs-b0,
 #charpanel .cs-bar.is-b0same > .cs-b0 { display: none; }
-#charpanel #cp-pet-stats { width: calc(var(--f2-w) * .500); }
-#charpanel #cp-pet-stats .cs { gap: calc(var(--f2-w) * .014); }
-#charpanel #cp-pet-stats .cs-k { flex: 0 0 calc(var(--f2-w) * .140); }
-#charpanel #cp-pet-stats .cs-bar { margin-left: calc(var(--f2-w) * .021); }
-#charpanel #cp-pet-stats .cs-up,
 #charpanel .cc-stats .cs-up {
 position: relative;
 flex: 0 0 calc(var(--f2-w) * .080);
@@ -3646,75 +3679,17 @@ font-size: calc(var(--f2-w) * .0235);
 font-weight: 900;
 line-height: 1;
 text-shadow: none;
-cursor: pointer;
--webkit-tap-highlight-color: transparent;
-transition: transform var(--dur-1) var(--ease-out), opacity var(--dur-1) var(--ease-out);
 }
-#charpanel #cp-pet-stats .cs-up[data-stat="power"],
 #charpanel .cc-stats .cs-up[data-stat="power"]     { box-shadow: inset 0 0 0 calc(var(--f2-w) * .0030) var(--role-rw-shard-power-2); }
-#charpanel #cp-pet-stats .cs-up[data-stat="steady"],
 #charpanel .cc-stats .cs-up[data-stat="steady"]    { box-shadow: inset 0 0 0 calc(var(--f2-w) * .0030) var(--role-rw-shard-steady-2); }
-#charpanel #cp-pet-stats .cs-up[data-stat="agility"],
 #charpanel .cc-stats .cs-up[data-stat="agility"]   { box-shadow: inset 0 0 0 calc(var(--f2-w) * .0030) var(--role-rw-shard-agility-2); }
-#charpanel #cp-pet-stats .cs-up[data-stat="luck"],
 #charpanel .cc-stats .cs-up[data-stat="luck"]      { box-shadow: inset 0 0 0 calc(var(--f2-w) * .0030) var(--role-rw-shard-luck-2); }
-#charpanel #cp-pet-stats .cs-up::after,
 #charpanel .cc-stats .cs-up::after {
 content: "";
 position: absolute;
 inset: calc(var(--f2-w) * -.0078) calc(var(--f2-w) * -.0060);
 }
-#charpanel #cp-pet-stats .cs-up > .cs-up-n,
-#charpanel .cc-stats .cs-up > .cs-up-n { pointer-events: none; }
-#charpanel #cp-pet-stats .cs-up:active,
-#charpanel .cc-stats .cs-up:active { transform: scale(.94); }
 #charpanel .cc-stats .cs-up { pointer-events: none; }
-#charpanel .cc-stats .cs-up:active { transform: none; }
-#charpanel #cp-pet-stats .cs-up[disabled] { opacity: .42; cursor: default; }
-#charpanel #cp-pet-stats .cs-up[data-max="1"] { font-size: calc(var(--f2-w) * .0200); letter-spacing: -.02em; }
-@keyframes pg-bar-pop {
-0%   { transform: scaleY(1); }
-38%  { transform: scaleY(1.42); }
-100% { transform: scaleY(1); }
-}
-#charpanel #cp-pet-stats .cs-bar.is-up { animation: pg-bar-pop var(--dur-2) var(--ease-out) 1; }
-#charpanel #cp-petinfo .ci-tag .cp-shardgem {
-width: auto;
-height: calc(var(--f2-w) * .046);
-aspect-ratio: auto;
-flex-direction: row;
-gap: calc(var(--f2-w) * .006);
-padding: 0 calc(var(--f2-w) * .014);
-border-radius: 999px;
-cursor: default;
-font-size: calc(var(--f2-w) * .026);
-}
-#charpanel #cp-petinfo .cp-shardgem > .cp-cr-ic {
-flex: 0 0 auto;
-font-size: calc(var(--f2-w) * .026);
-line-height: 1;
-}
-#charpanel #cp-petinfo .cp-shardgem > .cp-gem-n {
-display: block;
-min-width: calc(var(--f2-w) * .030);
-padding: 0 calc(var(--f2-w) * .005);
-border-radius: 999px;
-background: var(--f2-pill-soft);
-font-size: calc(var(--f2-w) * .022);
-font-weight: 900;
-line-height: 1.4;
-text-align: center;
-color: var(--f2-ink);
-}
-#charpanel #cp-petinfo .cp-shardgem[data-stat="power"]   > .cp-cr-ic { color: var(--role-rw-shard-power-2); }
-#charpanel #cp-petinfo .cp-shardgem[data-stat="steady"]  > .cp-cr-ic { color: var(--role-rw-shard-steady-2); }
-#charpanel #cp-petinfo .cp-shardgem[data-stat="agility"] > .cp-cr-ic { color: var(--role-rw-shard-agility-2); }
-#charpanel #cp-petinfo .cp-shardgem[data-stat="luck"]    > .cp-cr-ic { color: var(--role-rw-shard-luck-2); }
-@media (prefers-reduced-motion: reduce) {
-#charpanel #cp-pet-stats .cs-bar.is-up { animation: none; }
-#charpanel #cp-pet-stats .cs-up,
-#charpanel .cc-stats .cs-up { transition: none; }
-}
 #charpanel .cs-hit {
 position: absolute;
 left:   calc(var(--f2-w) * .050);            /* = .cc-stats 왼끝 */
@@ -4159,6 +4134,7 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
 .modal-v2 .mv2-sheet > h2 > .mvh-title,
 .modal-v2 .mv2-head  > h2 > .mvh-title,
 #modal-node .r10-ribbon > h2 > .mvh-title,
+#modal-drops .r10-ribbon > h2 > .mvh-title,
 #modal-clear .sheet > h2 > .mvh-title,
 #modal-adv:not(.is-advfinish) .sheet > h2 > .mvh-title {
 --lt-plum-w:  .0429em;   /* 자두 테 = 2.99%Hc */
@@ -4209,6 +4185,7 @@ drop-shadow(0 .028em .026em var(--lt-drop));
 .modal-v2 .mv2-sheet > h2 > .mvh-title,
 .modal-v2 .mv2-head  > h2 > .mvh-title,
 #modal-node .r10-ribbon > h2 > .mvh-title,
+#modal-drops .r10-ribbon > h2 > .mvh-title,
 #modal-clear .sheet > h2 > .mvh-title,
 #modal-adv:not(.is-advfinish) .sheet > h2 > .mvh-title {
 background-image: none;
@@ -5068,6 +5045,7 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
 #modal-minimap .r10-ribbon,
 #modal-theater .r10-ribbon,
 #modal-node .r10-ribbon,
+#modal-drops .r10-ribbon,
 #modal-shop .r10-ribbon,
 #modal-mode .r10-ribbon,
 #modal-classic .r10-ribbon,
@@ -5207,6 +5185,7 @@ calc((var(--wcap-a-rim) - var(--wcap-a-in)) * 100%), transparent);
 #modal-minimap .r10-ribbon,
 #modal-theater .r10-ribbon,
 #modal-node .r10-ribbon,
+#modal-drops .r10-ribbon,
 #modal-shop .r10-ribbon,
 #modal-mode .r10-ribbon,
 #modal-classic .r10-ribbon,
@@ -5245,6 +5224,7 @@ close);
 #modal-minimap .r10-ribbon::before,
 #modal-theater .r10-ribbon::before,
 #modal-node .r10-ribbon::before,
+#modal-drops .r10-ribbon::before,
 #modal-shop .r10-ribbon::before,
 #modal-mode .r10-ribbon::before,
 #modal-classic .r10-ribbon::before,
@@ -5797,7 +5777,8 @@ rgba(255,255,255, var(--wchip-rim-a)),
 0 0 calc(var(--f2-cd) * .103) calc(var(--f2-cd) * .022) var(--role-f2-hi-halo),
 0 calc(var(--f2-cd) * .025) calc(var(--f2-cd) * .06) var(--role-f2-cast);
 }
-#charpanel .cp-crystal{
+#charpanel .cp-crystal,
+#modal-drops .cp-crystal{
 --wslot-w: 100%;
 --wslot-L3-w:    calc(var(--f2-ref-w) * 0.00400);
 --wslot-L3-line: var(--mode-a-outline-chip-base);
@@ -5836,7 +5817,8 @@ padding-left: calc(var(--f2-w) * .0090);
 padding-right: calc(var(--f2-w) * .0090);
 z-index: 2;
 }
-#charpanel .cp-side-rack .cp-gem{
+#charpanel .cp-side-rack .cp-gem,
+#modal-drops .cp-gem{
 flex: 0 0 auto;
 flex-direction: column;
 gap: calc(var(--f2-w) * .0020);
@@ -5845,7 +5827,8 @@ height: calc(var(--f2-w) * .1094);
 aspect-ratio: auto;
 font-size: calc(var(--f2-w) * .0500);
 }
-#charpanel .cp-side-rack .cp-gem-n{
+#charpanel .cp-side-rack .cp-gem-n,
+#modal-drops .cp-gem-n{
 display: block;
 min-width: calc(var(--f2-w) * .0300);
 padding: 0 calc(var(--f2-w) * .0060);
@@ -5858,8 +5841,10 @@ font-weight: 900;
 line-height: 1.45;
 color: var(--f2-ink);
 }
-#charpanel .cp-side-rack .cp-gem-n[hidden]{ display: none; }
-#charpanel .cp-side-rack .cp-crystal > .cp-cr-ic {
+#charpanel .cp-side-rack .cp-gem-n[hidden],
+#modal-drops .cp-gem-n[hidden]{ display: none; }
+#charpanel .cp-side-rack .cp-crystal > .cp-cr-ic,
+#modal-drops .cp-crystal > .cp-cr-ic {
 flex: 0 0 auto;
 display: block;
 font-size: 0;
@@ -5881,14 +5866,22 @@ font-size: inherit;
 color: var(--f2-ink);
 line-height: 1;
 }
-#charpanel .cp-side-rack .cp-islot[data-state="empty"] {
+#charpanel .cp-side-rack .cp-islot[data-state="own"] > .cp-cr-ic[data-art],
+#charpanel .cp-side-rack .cp-islot[data-state="eq"]  > .cp-cr-ic[data-art] {
+width: calc(var(--f2-w) * .0640);
+height: calc(var(--f2-w) * .0640);
+}
+#charpanel .cp-side-rack .cp-islot[data-state="empty"],
+#modal-drops .dr-row .cp-islot {
 cursor: default;
 pointer-events: none;
 }
-#charpanel .cp-side-rack .cp-islot[data-state="own"] {
+#charpanel .cp-side-rack .cp-islot[data-state="own"],
+#modal-drops .dr-row .cp-islot[data-state="own"] {
 --wslot-face: var(--f2-item-face);
 }
-#charpanel .cp-side-rack .cp-islot[data-state="eq"] {
+#charpanel .cp-side-rack .cp-islot[data-state="eq"],
+#modal-drops .dr-row .cp-islot {
 --wslot-face: var(--f2-item-on);
 --wslot-L3-line: var(--f2-item-line);
 --wslot-a-in: .929;
@@ -5911,7 +5904,8 @@ calc(var(--wslot-L3-a) * 100%), transparent),
 #app.classic #classic-hud .ch-fx > .ch-jelly{ --hudj-L3-line: var(--mode-b-outline); --hudj-face: var(--mode-b-face); --hudj-face-top: var(--mode-b-face); --hudj-face-y: 100%; --hudj-rim-c: var(--mode-b-rim); }
 .wf-cap{ --wcap-L3-line: var(--mode-a-outline); --wcap-face: var(--mode-a-face); --wcap-face-top: var(--role-wcap-face-top-modal-title-node); --wcap-face-y: 100%; --wcap-rim-c: var(--mode-a-rim); }
 .wf-chip{ --wchip-L3-line: var(--mode-a-outline-chip); }
-#charpanel .cp-crystal{ --wslot-L3-line: var(--role-wslot-L3-line-crystal); }
+#charpanel .cp-crystal,
+#modal-drops .cp-crystal{ --wslot-L3-line: var(--role-wslot-L3-line-crystal); }
 #charpanel .cp-fx > .cp-jelly,
 #charpanel .cp-fx > .cp-gnd{
 --cpj-tab-h:  calc(var(--cpj-w) * .07005);
@@ -6241,7 +6235,8 @@ margin-inline: auto;
 #modal-mode .mode-list { gap: calc(var(--f2-w) * .0120); }
 #charpanel { --cs-side: calc(var(--f2-w) * .2730); }
 #charpanel .cp-side-rack { gap: calc(var(--f2-w) * .0213); }
-#charpanel .cp-side-rack .cp-gem {
+#charpanel .cp-side-rack .cp-gem,
+#modal-drops .cp-gem {
 width:  calc(var(--f2-w) * .1381);
 height: calc(var(--f2-w) * .1356);
 }
@@ -6349,6 +6344,7 @@ calc(var(--f2-w) * .0956) !important;
 #modal-minimap .r10-ribbon,
 #modal-theater .r10-ribbon,
 #modal-node .r10-ribbon,
+#modal-drops .r10-ribbon,
 #modal-shop .r10-ribbon,
 #modal-mode .r10-ribbon,
 #modal-classic .r10-ribbon,
@@ -6376,6 +6372,7 @@ text-shadow:0 1px 0 rgba(255,255,255,.9), 0 2px 4px rgba(120,110,150,.35);
 #modal-minimap .r10-ribbon,
 #modal-theater .r10-ribbon,
 #modal-node .r10-ribbon,
+#modal-drops .r10-ribbon,
 #modal-shop .r10-ribbon,
 #modal-mode .r10-ribbon,
 #modal-classic .r10-ribbon,
@@ -6422,6 +6419,7 @@ calc((var(--wcap-a-rim) - var(--wcap-a-in)) * 100%), transparent);
 #modal-minimap .r10-ribbon,
 #modal-theater .r10-ribbon,
 #modal-node .r10-ribbon,
+#modal-drops .r10-ribbon,
 #modal-shop .r10-ribbon,
 #modal-mode .r10-ribbon,
 #modal-classic .r10-ribbon{
@@ -6647,6 +6645,7 @@ text-align: center;
 #modal-minimap .r10-ribbon > h2,
 #modal-theater .r10-ribbon > h2,
 #modal-node .r10-ribbon > h2,
+#modal-drops .r10-ribbon > h2,
 #modal-shop .r10-ribbon > h2,
 #modal-mode .r10-ribbon > h2,
 #modal-classic .r10-ribbon > h2 {
@@ -6658,7 +6657,8 @@ line-height: inherit;
 }
 #modal-minimap .sheet.r10-panel,
 #modal-theater .sheet.r10-panel,
-#modal-node .sheet.r10-panel {
+#modal-node .sheet.r10-panel,
+#modal-drops .sheet.r10-panel {
 border-image: none;
 border-style: none;
 border-width: 0;
@@ -6686,7 +6686,8 @@ box-shadow: none;
 /* == node-card-0904 == */
 
 #modal-node .node-seal { display: none !important; }
-#modal-node .r10-ribbon > h2 {
+#modal-node .r10-ribbon > h2,
+#modal-drops .r10-ribbon > h2 {
 --mvh-fs: .80;
 --mvh-fs-min: .42;
 font-size: calc(var(--wcap-h) * var(--mvh-fs));
@@ -6812,10 +6813,13 @@ text-shadow: 0 1px 0 rgba(79, 58, 92, .70);
 
 /* == node-modal-slot == */
 
-#modal-node .sheet          { row-gap: 8px; }
-#modal-node .r10-ribbon     { margin-bottom: 0; }
+#modal-node .sheet,
+#modal-drops .sheet          { row-gap: 8px; }
+#modal-node .r10-ribbon,
+#modal-drops .r10-ribbon     { margin-bottom: 0; }
 #modal-node .node-chips:empty { display: none; }   /* 빈 칩 줄이 먹던 한 칸 */
-#modal-node .node-info      { margin: 0; }
+#modal-node .node-info,
+#modal-drops .dr-list      { margin: 0; }
 #modal-node .node-stars     { margin: 0; }
 #modal-node .nrow           { min-height: 48px; }
 #modal-node .node-hearts    { margin-top: 8px; }
@@ -6849,7 +6853,8 @@ overflow: hidden;
 text-overflow: ellipsis;
 }
 #modal-node .nrow-hero .nthumb .node-hero-av,
-#modal-node .node-info > li > .ni-pet-av {
+#modal-node .node-info > li > .ni-pet-av,
+#modal-node .nc-face {
 position: relative;
 flex: 0 0 48px;
 width: 48px;
@@ -6866,7 +6871,8 @@ inset 0 2.24px 2.24px rgba(255, 255, 255, .72),
 inset 0 -4.11px 3.92px rgba(118, 90, 138, .40);
 }
 #modal-node .nrow-hero .nthumb .node-hero-av::before,
-#modal-node .node-info > li > .ni-pet-av::before {
+#modal-node .node-info > li > .ni-pet-av::before,
+#modal-node .nc-face::before {
 content: "";
 position: absolute;
 left: 10%; top: 9%; width: 18%; height: 15%;
@@ -6878,6 +6884,7 @@ z-index: 2;
 #modal-node .nrow-hero .nthumb .node-hero-av[data-art="std"]::after,
 #modal-node .node-info > li > .ni-pet-av[data-art="std"]::after { content: none; }
 #modal-node .nrow-hero .nthumb .node-hero-av        { --cap-art: var(--slot-std, none); }
+#modal-node .nc-face                                { --cap-art: var(--slot-std, none); }   /* 74 T13 — 편성 줄 얼굴(같은 계약) */
 #modal-node .node-info > li > .ni-pet-av { --cap-art: var(--slot-std, none); }
 #modal-node .node-info > li#node-i-pet { align-items: center; gap: 8px; }
 #modal-node .node-stars  { font-size: 13px; }
@@ -6885,18 +6892,21 @@ z-index: 2;
 
 /* == node-title-fit == */
 
-#modal-node .r10-ribbon > h2 {
+#modal-node .r10-ribbon > h2,
+#modal-drops .r10-ribbon > h2 {
 display: flex;
 align-items: center;
 justify-content: center;
 }
 #modal-node .r10-ribbon > h2,
+#modal-drops .r10-ribbon > h2,
 #modal-shop .r10-ribbon > h2,
 #modal-clear .sheet > h2,
 #modal-adv:not(.is-advfinish) .sheet > h2 {
 --mvh-fs: .695;
 }
 #modal-node .r10-ribbon > h2 > .mvh-title,
+#modal-drops .r10-ribbon > h2 > .mvh-title,
 #modal-clear .sheet > h2 > .mvh-title,
 #modal-adv:not(.is-advfinish) .sheet > h2 > .mvh-title {
 --lt-optical-y: .0781em;
