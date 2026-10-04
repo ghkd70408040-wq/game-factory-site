@@ -28113,6 +28113,7 @@ window.TT_SFX = {
       'mk.awk': 'AWAKEN MAX!',
       'mk.gear': 'Got {tier} {name}!',
       'mk.gearmax': '{name} is maxed! +{c} coins',
+      'mk.gearmax0': '{name} is maxed!',
       'drops.tier.common': 'Common',
       'drops.tier.rare': 'Rare',
       'drops.tier.epic': 'Epic',
@@ -29497,6 +29498,7 @@ window.TT_SFX = {
       'mk.awk': '각성 MAX!',
       'mk.gear': '{tier} {name} 획득!',
       'mk.gearmax': '{name} 최대 레벨! 코인 +{c}',
+      'mk.gearmax0': '{name} 최대 레벨!',
       'drops.tier.common': '일반',
       'drops.tier.rare': '희귀',
       'drops.tier.epic': '영웅',
@@ -30230,6 +30232,9 @@ window.TT_SFX = {
        칸을 가른 이유: advFinish 가 gainGem 을 **대입**으로 덮어쓰므로 같은
        칸을 쓰면 모험 판에서 넘은 마일스톤 보상이 조용히 사라진다. */
     gainJstar: 0,
+    /* P3 — 판 결과 코인의 사본. gainCoin = 이번 시트가 보여 줄 몫 · runCoin = 이 판에서 이미 준 몫 ·
+       coinRunAt = 그 몫이 어느 판(S.startedAt)의 것인가. 이어하기로 같은 판이 두 번 끝나도 한 번만 준다(runCoinPay). */
+    gainCoin: 0, runCoin: 0, coinRunAt: 0,
     feverOn: false, feverUntil: 0, feverScore: 0, feverCdUntil: 0,
     rushEndAt: 0, addCdUntil: 0, rushBeatAt: 0,
     pausedAt: 0,             // wall clock at pause, used to shift deadlines
@@ -45285,7 +45290,7 @@ window.TT_SFX = {
   var COIN_ADV_RE = 10, COIN_ADV_RE_STAR = 5;          /* 다시 깨면 10 + 별 하나당 5 */
   var COIN_BOSS_MULT = 2;                               /* 보스탄 첫 클리어만(스펙 §4-f 괄호 자리) */
   /* 모험 밖 한 판의 세 단. 스펙의 「점수 3단」을 **내 기록판 기준**으로 가른다(모드마다 점수 폭이 달라
-     한 문턱을 못 쓴다): 보통 · 기록판 5위 안(아케이드는 격파) · 새 1위(아케이드는 새 최고). §28.2 */
+     한 문턱을 못 쓴다): 보통 · 기록판 5위 안(아케이드는 타임어택 격파만) · 새 1위(아케이드는 새 최고). §28.2 */
   var COIN_RUN = [15, 25, 40];
   function coinForAdv(first, stars, boss) {
     var s = clamp(stars | 0, 0, 3);
@@ -45294,10 +45299,13 @@ window.TT_SFX = {
   }
   function coinForRank(rank) { return rank === 1 ? COIN_RUN[2] : (rank > 1 ? COIN_RUN[1] : COIN_RUN[0]); }
   function coinForArc(fresh, clear) { return fresh ? COIN_RUN[2] : (clear ? COIN_RUN[1] : COIN_RUN[0]); }
+  /** 짝을 하나도 맞추지 않은 판은 코인 0 — 자리 비움 농사 방지(지휘자 판정 2026-10-05, 모든 모드 공통). 판 안의 기존 카운터 S.matches. */
+  function coinPlayed() { return (S.matches | 0) > 0; }
   /** 한 판의 코인은 **판 하나에 한 번**이다. 판의 이름표는 S.startedAt(진입 함수가 판마다 새로 세운다) —
       이어하기로 같은 판이 다시 끝나면 더 큰 단과의 차이만 준다. S.gainCoin = 이번 시트가 보여 줄 몫. */
   function runCoinPay(want) {
     if (S.coinRunAt !== S.startedAt) { S.coinRunAt = S.startedAt; S.runCoin = 0; }
+    if (!coinPlayed()) want = 0;
     var pay = Math.max(0, (want | 0) - (S.runCoin | 0));
     if (pay > 0) { coinGrant(pay, 'run'); S.runCoin = (S.runCoin | 0) + pay; }
     S.gainCoin = pay;
@@ -46095,8 +46103,8 @@ window.TT_SFX = {
         gemGain = stars - prevStars;
       }
       /* P3 — 코인(놀면 쌓이는 돈). 첫 클리어 = 이 판 전에 이 탄 별이 0. 보스탄은 두 배. */
-      S.gainCoin = coinForAdv(prevStars === 0, stars, !!p.boss);
-      coinGrant(S.gainCoin, 'adv');
+      S.gainCoin = coinPlayed() ? coinForAdv(prevStars === 0, stars, !!p.boss) : 0;   /* 짝 0 판은 0 */
+      if (S.gainCoin > 0) coinGrant(S.gainCoin, 'adv');
       store.advFails[key] = 0;
       if (p.n >= (store.advMax | 0)) store.advMax = p.n + 1;
       /* 판정판 50 — 「클리어」·「★★ 이상」·주간 누계 둘. 별은 **새로 딴 별**
@@ -49474,15 +49482,19 @@ window.TT_SFX = {
   }
   function closeDrops() { dropsN = 0; closeModal('modal-drops'); J.sfx.ui(); }
 
-  /** 장비 과일 하나를 거둔다: 지급(레벨 +1 · Lv12 면 젤리별) · 원천 farm · 판 사본 · 누적(꿀떡이) · 저장 · 연출. */
+  /** 장비 과일 하나를 거둔다: 지급(레벨 +1 · Lv12 면 코인 환급 GACHA_REFUND) · 원천 farm · 판 사본 · 누적(꿀떡이) · 저장 · 연출. */
   function harvestGear(g, x, y, quiet) {
-    if (!g || !g.id || !itemById(g.id)) return null;
+    var it = g && g.id ? itemById(g.id) : null;
+    if (!it) return null;
     var own = (store.items && store.items.own) || {};
     var had = own[g.id] | 0, res;
     if (had >= ITEM_LV_MAX) {
-      var back = GACHA_REFUND[g.tier] | 0;   /* P3 — 최고 레벨 중복 = 코인 환급(뽑기 grantItemOrRefund 와 같은 표 — 원장 판정 (1)) */
-      if (back > 0) coinGrant(back, 'refund');
-      res = { id: g.id, lv: had, tier: g.tier, max: true, isNew: false, refund: back };
+      /* P3 — 최고 레벨 중복 = 코인 환급(뽑기 grantItemOrRefund 와 같은 표 — 원장 판정 (1)). 등급은 장비 자신에게서 읽는다
+         (과일에 달린 등급 g.tier 는 폴백). 판 중이라 coinGrant 의 저장 · 지갑 다시 그리기는 하지 않는다 — 코인만 올리고(상한 999,999,
+         refund = 실제 증가분) 저장은 아래 persist 한 번이 맡는다. 지갑 숫자는 그리는 화면이 열릴 때 읽는다. */
+      var back = GACHA_REFUND[it.tier || g.tier] | 0, before = coinBalance();
+      if (back > 0) store.coin = Math.min(COIN_MAX, before + back);
+      res = { id: g.id, lv: had, tier: g.tier, max: true, isNew: false, refund: coinBalance() - before };
     } else {
       var gr = grantItem(g.id, 'farm');
       if (!gr) return null;
@@ -49591,7 +49603,8 @@ window.TT_SFX = {
     var anim = typeof window !== 'undefined' && !fxReduced() && gearFlyPool.length > 0;
     if (anim && !GEAR_GEO.ok) gearGeoRead();   /* ok 는 resolveMatch 머리가 매치마다 내리고 다시 채운다 */
     var name = t('item.' + res.id + '.nm');
-    toast(res.max ? t('mk.gearmax', { name: name, c: res.refund | 0 }) : t('mk.gear', { tier: t('drops.tier.' + res.tier), name: name }));
+    toast(res.max ? ((res.refund | 0) > 0 ? t('mk.gearmax', { name: name, c: res.refund | 0 }) : t('mk.gearmax0', { name: name }))
+                  : t('mk.gear', { tier: t('drops.tier.' + res.tier), name: name }));   /* 환급이 0(상한)이면 숫자 없는 문장 */
     J.sfx.mission();
     J.vibrate(res.tier === 'epic' ? 40 : 22);
     if (!anim) return;
