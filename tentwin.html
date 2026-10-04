@@ -7078,9 +7078,10 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
 /* 터지는 중·죽은 칸에서는 빛 층도 먼저 사라진다 — 위 `.tile[data-mk].pop::after` 와 같은 규칙(빈 우물 위에 배지만 떠 있으면 그 칸이
    살아 있는 것으로 읽힌다). 매치 순간 표식은 지워지지만 칠하기가 층을 떼는 것은 다음 칠하기(약 300ms 뒤)라 그 사이를 가린다. */
 .tile.pop > .mk-fx, .tile.bombgo > .mk-fx, .tile.rowgo > .mk-fx, .tile.dead > .mk-fx { display: none; }
-.mk-fx[data-tier="common"] { --mk-1: var(--role-rw-shard-steady-1);  --mk-2: var(--role-rw-shard-steady-2);  --mk-3: var(--role-rw-shard-steady-3); }
-.mk-fx[data-tier="rare"]   { --mk-1: var(--role-rw-shard-agility-1); --mk-2: var(--role-rw-shard-agility-2); --mk-3: var(--role-rw-shard-agility-3); }
-.mk-fx[data-tier="epic"]   { --mk-1: var(--role-rw-item-1);          --mk-2: var(--role-rw-item-2);          --mk-3: var(--role-rw-item-3); }
+/* 등급 별칭 — 판 위 층(.mk-fx)과 획득 비행 원반(.mk-fly)이 같은 data-tier 로 받는다. */
+.mk-fx[data-tier="common"], .mk-fly[data-tier="common"] { --mk-1: var(--role-rw-shard-steady-1);  --mk-2: var(--role-rw-shard-steady-2);  --mk-3: var(--role-rw-shard-steady-3); }
+.mk-fx[data-tier="rare"],   .mk-fly[data-tier="rare"]   { --mk-1: var(--role-rw-shard-agility-1); --mk-2: var(--role-rw-shard-agility-2); --mk-3: var(--role-rw-shard-agility-3); }
+.mk-fx[data-tier="epic"],   .mk-fly[data-tier="epic"]   { --mk-1: var(--role-rw-item-1);          --mk-2: var(--role-rw-item-2);          --mk-3: var(--role-rw-item-3); }
 .mk-fx i {
   position: absolute;
   box-sizing: border-box;
@@ -7253,22 +7254,45 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
 /* 움직임 줄이기 = 정적 대체(끄기가 아니라 멈춘 빛): 후광·아우라 .8 · 링 .7(목업 정지값) · 빛살·반짝이·쓸림 끔.
    끄기 규칙은 등급 켜기 규칙(.mk-fx[data-tier=…] …, 명시도 0,3,0)과 같은 명시도로 적어 순서로 이긴다. */
 @media (prefers-reduced-motion: reduce) {
-  .mk-fx * { animation: none; }
+  .mk-fx *, .mk-fx *::before { animation: none; }   /* ::before = 쓸림 막대(.mk-sweep::before) — 쓸림을 켜도 막대가 움직이지 않게 */
   .mk-halo, .mk-aura { opacity: var(--mo-mk-80); }
   .mk-ring { opacity: var(--mo-mk-70); }
   .mk-fx[data-tier] .mk-burst, .mk-fx[data-tier] .mk-spark, .mk-fx[data-tier] .mk-sweep { display: none; }
 }
-/* 획득 비행(MOTION-SPEC §3 17행) — #app 고정 층, 부팅 풀 3개. 판 밖이라 JS 가 --ts 를 인라인으로 준다. */
+/* 획득 비행(MOTION-SPEC §3 17행) — 시안 mock-fruit-get `.fly`(38px 원반 배지 + 안의 그림 inset 6, 52px 칸 기준)를 --ts 비율로 옮겼다
+   (수정 1회차 I3: 38 → .731 · 테 2.6 → .05 · 흰 테 4.2 → .081 · 그림자 0 2 5 → .038 .096 · 바깥 빛 0 0 14 6 → .269 .115 · 그림 inset 6 → .115).
+   색 = 등급 별칭 --mk-1/2/3(data-tier), 영웅은 판 위 배지처럼 금 테. box-shadow 는 정적 값만(움직임은 transform 뿐).
+   #app 고정 층, 부팅 풀 3개. 판 밖이라 JS 가 --ts 를 인라인으로 준다. */
 .mk-fly {
   position: fixed;
   left: 0;
   top: 0;
-  width: calc(var(--ts) * .8);
-  height: calc(var(--ts) * .8);
-  background: center/contain no-repeat;
+  width: calc(var(--ts) * .731);
+  height: calc(var(--ts) * .731);
+  border-radius: 50%;
+  background-image: radial-gradient(circle at 40% 32%, var(--prim-white) 0%, var(--mk-1) 55%, var(--mk-2) 100%);
+  box-shadow:
+    inset 0 0 0 calc(var(--ts) * .05) var(--mk-3),
+    inset 0 0 0 calc(var(--ts) * .081) var(--prim-white-a90),
+    0 calc(var(--ts) * .038) calc(var(--ts) * .096) rgba(var(--prim-ink-plum-rgb), .5),
+    0 0 calc(var(--ts) * .269) calc(var(--ts) * .115) color-mix(in srgb, var(--mk-2) calc(var(--mo-mk-90) * 100%), transparent);
   pointer-events: none;
   z-index: 60;
   will-change: transform, opacity;
+}
+.mk-fly[data-tier="epic"] {
+  box-shadow:
+    inset 0 0 0 calc(var(--ts) * .05) var(--role-rw-star-3),
+    inset 0 0 0 calc(var(--ts) * .081) var(--prim-white-a90),
+    0 calc(var(--ts) * .038) calc(var(--ts) * .096) rgba(var(--prim-ink-plum-rgb), .5),
+    0 0 calc(var(--ts) * .269) calc(var(--ts) * .115) color-mix(in srgb, var(--mk-2) calc(var(--mo-mk-90) * 100%), transparent);
+}
+.mk-fly > i {
+  position: absolute;
+  inset: calc(var(--ts) * .115);
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
 }
 /* 결과 창 「획득 장비」 줄 — 원반 위에 장비 그림(itemArtUrl(id, 96)). 글자(이모지)는 font-size 0 으로 숨긴다. */
 .rw-ico[data-art] {
@@ -30548,7 +30572,8 @@ window.TT_SFX = {
     setCls(el, 'iced1', sp === 'ice' && (c.ice | 0) >= 1);
     /* W2.5 ④ — 특수 마크. sp 와 **같은 문법**(속성 하나, CSS 가 그림 전부 소유)
        이지만 칸이 달라서 서로를 덮지 않는다: 과일 스킨은 [data-sp] 만 보므로
-       마크 과일은 끝까지 과일로 남고, 배지는 `.tile[data-mk]::after` 가 그린다. */
+       마크 과일은 끝까지 과일로 남고, 배지는 `.tile[data-mk]::after` 가 그린다.
+       (74 T11 — 장비 과일만은 예외: 배지 · 빛은 칸에 붙인 `.mk-fx` 층이 그리고, 장비 칸의 ::after 는 꺼져 있다.) */
     var mk = c.mk || '';
     if (mk) {
       if (el.getAttribute('data-mk') !== mk) el.setAttribute('data-mk', mk);
@@ -30563,8 +30588,9 @@ window.TT_SFX = {
         if (fxEl) {
           if (fxEl.parentNode !== el) el.appendChild(fxEl);
           if (fxEl.getAttribute('data-tier') !== mt) fxEl.setAttribute('data-tier', mt);
-          var art = itemArtCss(c.mkItem, 64);
-          if (fxEl.__art !== art) { fxEl.__art = art; fxEl.__ico.style.setProperty('background-image', art); }
+          /* 그림은 장비 id 가 바뀔 때만 다시 쓴다(층에 id 캐시 — 칠하기마다 찾기 · 문자열 0). 캐시를 칸이 아니라 층에 두는 까닭:
+             층은 풀에서 칸 사이를 옮겨 다니므로, 층이 지금 그리고 있는 그림의 id 를 층 자신이 알아야 한다. */
+          if (fxEl.__item !== c.mkItem) { fxEl.__item = c.mkItem; fxEl.__ico.style.setProperty('background-image', itemArtCss(c.mkItem, 64)); }
         }
       } else if (el.__mkFx) {
         mkFxDrop(el);
@@ -37229,6 +37255,10 @@ window.TT_SFX = {
     var myGen = popGen;
 
     var ca = tileCenter(a), cb = tileCenter(b);
+    /* 74 T11 — 장비 과일이 걸릴 수 있는 매치(짝에 장비 과일 · 폭탄)면 획득 비행의 도착점(주인공 초상 상자)을 여기서 읽는다:
+       칸 중심을 읽은 바로 뒤, 이 매치의 첫 DOM 쓰기 전이라 레이아웃을 다시 계산시키지 않는다(읽기-쓰기 교차 금지). */
+    GEAR_GEO.ok = false;
+    if (S.duel && (S.cells[a].mk === 'gear' || S.cells[b].mk === 'gear' || spOf(S.cells, a) === 'bomb' || spOf(S.cells, b) === 'bomb')) gearGeoRead();
     var cola = tileColor(a), colb = tileColor(b);
     var mx = (ca.x + cb.x) / 2, my = (ca.y + cb.y) / 2;
 
@@ -37603,8 +37633,9 @@ window.TT_SFX = {
         J.sfx.mission();
         J.vibrate(24);
       }
-      /* 74 T11 — 획득 비행은 거둔 장비 칸 한가운데에서 떠오른다(시안 mock-fruit-get ①). 판에 장비 과일은 동시 1개라 칸 읽기는 매치당 한 번이다. */
-      for (var gfk = 0; gfk < mkGear.length; gfk++) { var gfc = tileCenter(mkGear[gfk].i); harvestGear(mkGear[gfk], gfc.x, gfc.y, false); }
+      /* 74 T11 — 획득 비행은 거둔 장비 칸 한가운데에서 떠오른다(시안 mock-fruit-get ①). 칸 중심은 매치 머리에서 읽은 칸 a 의 중심(ca)에서
+         격자만큼 옮겨 계산한다 — 위 효과들이 DOM 을 쓴 뒤라 여기서는 레이아웃을 읽지 않는다 · 새 객체 0(수정 1회차 I1). */
+      for (var gfk = 0; gfk < mkGear.length; gfk++) { gearCellFrom(mkGear[gfk].i, a, ca.x, ca.y); harvestGear(mkGear[gfk], GEAR_GEO.fx, GEAR_GEO.fy, false); }
       /* 🎁 갓차 상자 (WD-2 §11.6) — 여기서 **열기만** 하고, 무엇이 나왔는지는
          결과 시트가 말한다. 판 위에서 내용을 다 보여 주면 "열기 전까지 미공개"
          (§11.6)가 판 한복판에서 소비돼 버려 §10 의 띵-띵-띵이 이미 아는 것을
@@ -48845,7 +48876,22 @@ window.TT_SFX = {
      +1 글자 6px → .15) — JS 리터럴 ms·이징·px 0(점검 W6). 배율(1.35·1.1·.8 · 튐 1.22)과 호 비율(.45·.2)은 MOTION-SPEC §3 행(Step 2)의 모양 값. */
   var MK_FX_POOL_N = 4, GEAR_FLY_N = 3, GEAR_ARC_LIFT = 0.77, GEAR_PLUS_LIFT = 0.15;
   var mkFxPool = [], gearFlyPool = [], gearFlyNext = 0;
-  var GEAR_FX = { d1: 0, d2: 0, d3: 0, spring: '', easeOut: '' };
+  var GEAR_FX = { d1: 0, d2: 0, d3: 0 };
+  /* 획득 비행 기하 — 미리 만든 객체 하나(수정 1회차 I1: 읽기-쓰기 교차 금지 · 판 중 새 객체 0).
+     resolveMatch 머리의 읽기 단계(칸 a·b 중심을 읽는 그 자리, 그 매치의 첫 DOM 쓰기 전)에서 gearGeoRead 가 초상 상자를 채우고,
+     수확 부름은 gearCellFrom 으로 거둔 칸 중심을 계산(레이아웃 읽기 0)해 넣는다. ok = 초상 상자를 읽었나(resolveMatch 머리가 매치마다 내린다). */
+  var GEAR_GEO = { ok: false, has: false, dx: 0, dy: 0, dtop: 0, fx: 0, fy: 0 };
+  function gearGeoRead() {
+    var dst = $('duel-me-av'), r = (dst && dst.getBoundingClientRect) ? dst.getBoundingClientRect() : null;
+    GEAR_GEO.has = !!r;
+    if (r) { GEAR_GEO.dx = r.left + r.width / 2; GEAR_GEO.dy = r.top + r.height / 2; GEAR_GEO.dtop = r.top; }
+    GEAR_GEO.ok = true;
+  }
+  /** 칸 i 의 중심 = 이미 읽은 칸 a 의 중심(ax, ay)에서 격자만큼 옮긴 값 — positionTile 과 같은 식(열·행 × (ts + GAP)). 결과는 GEAR_GEO.fx · fy. */
+  function gearCellFrom(i, a, ax, ay) {
+    GEAR_GEO.fx = ax + ((i % COLS) - (a % COLS)) * (ts + GAP);
+    GEAR_GEO.fy = ay + (((i / COLS) | 0) - ((a / COLS) | 0)) * (ts + GAP);
+  }
   var GEAR_KF_UP = [{ transform: 'translate(-50%,-50%) scale(1)', opacity: 1 }, { transform: 'translate(-50%,-50%) scale(1.35)', opacity: 1 }];
   /* 리뷰 전 판정(2026-10-04): 크기·불투명도는 시안 mock-fruit-get 을 따른다 — ① 칸에서 1.35 로 떠오름 ② 호 가운데 1.1 ③ 방울 곁 .8,
      호 내내 불투명(opacity 1)하고 도착할 때 숨긴다(gearFlyLand). 브리프의 「끝 .55 · 불투명도 1→0」 은 시안과 달라 바꿨다. */
@@ -48863,11 +48909,10 @@ window.TT_SFX = {
     GEAR_FX.d1 = parseFloat(tok('--dur-1')) || 0;
     GEAR_FX.d2 = parseFloat(tok('--dur-2')) || 0;
     GEAR_FX.d3 = parseFloat(tok('--dur-3')) || 0;
-    GEAR_FX.spring = tok('--spring') || 'ease';
-    GEAR_FX.easeOut = tok('--ease-out') || 'ease-out';
-    GEAR_OPT_UP.duration = GEAR_FX.d1; GEAR_OPT_UP.easing = GEAR_FX.spring;
-    GEAR_OPT_ARC.duration = GEAR_FX.d3; GEAR_OPT_ARC.easing = GEAR_FX.easeOut;
-    GEAR_OPT_BUMP.duration = GEAR_FX.d2; GEAR_OPT_BUMP.easing = GEAR_FX.spring;
+    var spring = tok('--spring'), easeOut = tok('--ease-out');   /* 토큰이 없으면 옵션 객체의 처음 값을 둔다(그때는 길이도 0) — 리터럴 이징 대체값 0 */
+    GEAR_OPT_UP.duration = GEAR_FX.d1; GEAR_OPT_ARC.duration = GEAR_FX.d3; GEAR_OPT_BUMP.duration = GEAR_FX.d2;
+    if (spring) { GEAR_OPT_UP.easing = spring; GEAR_OPT_BUMP.easing = spring; }
+    if (easeOut) GEAR_OPT_ARC.easing = easeOut;
     for (i = 0; i < MK_FX_POOL_N; i++) {
       var fx = document.createElement('i');
       fx.className = 'mk-fx';
@@ -48876,14 +48921,17 @@ window.TT_SFX = {
                      '<i class="mk-badge"><i class="mk-ico"></i></i><i class="mk-spark"></i><i class="mk-spark b"></i><i class="mk-sweep"></i>';
       fx.__ico = fx.querySelector('.mk-ico');
       fx.__tile = null;
-      fx.__art = '';
+      fx.__item = null;
       mkFxPool.push(fx);
     }
     var host = $('app') || document.body;
     for (i = 0; i < GEAR_FLY_N; i++) {
       var f = document.createElement('i');
-      f.className = 'mk-fly';
+      f.className = 'mk-fly';   /* 시안 mock-fruit-get .fly — 원반 배지(CSS) + 안의 그림(자식 <i>) */
       f.setAttribute('aria-hidden', 'true');
+      f.innerHTML = '<i></i>';
+      f.__ico = f.firstChild;
+      f.__item = null;
       f.hidden = true;
       host.appendChild(f);
       gearFlyPool.push(f);
@@ -48911,25 +48959,29 @@ window.TT_SFX = {
     f.__tile = null;
   }
   /** 획득 연출(조사 §9-9): 떠오름 → 호를 그리며 주인공 방울로 → 방울 튐 + 「+1」 → 토스트. reduced-motion 은 토스트만.
-      비행 상태는 풀 요소 자신에 싣고(__tx·__ty·__land·__tier), 다음 단계 콜백은 이름 있는 함수 둘(gearFlyArc·gearFlyLand)을
-      돌려 쓴다 — 획득마다 새 함수·키프레임 객체를 만들지 않는다(점검 R6). WAAPI 는 animate() 호출 때 키프레임을 복사한다. */
+      비행 상태는 풀 요소 자신에 싣고(__tx·__ty·__has·__lx·__ltop·__tier), 다음 단계 콜백은 이름 있는 함수 둘(gearFlyArc·gearFlyLand)을
+      돌려 쓴다 — 획득마다 새 함수·키프레임 객체를 만들지 않는다(점검 R6). WAAPI 는 animate() 호출 때 키프레임을 복사한다.
+      읽기 먼저(수정 1회차 I1): 기하는 resolveMatch 머리에서 읽어 둔 GEAR_GEO 를 쓴다. 매치 밖에서 불리면(손잡이 · 시험) 여기서,
+      아래의 모든 DOM 쓰기(toast 포함) 전에 읽는다. */
   function gearPopFx(res, x, y) {
+    var anim = typeof window !== 'undefined' && !fxReduced() && gearFlyPool.length > 0;
+    if (anim && !GEAR_GEO.ok) gearGeoRead();   /* ok 는 resolveMatch 머리가 매치마다 내리고 다시 채운다 */
     var name = t('item.' + res.id + '.nm');
     toast(res.max ? t('mk.gearmax', { name: name, j: GEAR_MAX_JSTAR }) : t('mk.gear', { tier: t('drops.tier.' + res.tier), name: name }));
     J.sfx.mission();
     J.vibrate(res.tier === 'epic' ? 40 : 22);
-    if (typeof window === 'undefined' || fxReduced() || !gearFlyPool.length) return;
-    var dst = $('duel-me-av');
-    var r = dst && dst.getBoundingClientRect ? dst.getBoundingClientRect() : null;   /* 읽기 먼저(읽기-쓰기 교차 금지) */
+    if (!anim) return;
     var fly = gearFlyPool[gearFlyNext];
     gearFlyNext = (gearFlyNext + 1) % gearFlyPool.length;
-    fly.__tx = r ? (r.left + r.width / 2 - x) : 0;
-    fly.__ty = r ? (r.top + r.height / 2 - y) : -ts * 3;
-    fly.__land = r;
+    fly.__tx = GEAR_GEO.has ? (GEAR_GEO.dx - x) : 0;
+    fly.__ty = GEAR_GEO.has ? (GEAR_GEO.dy - y) : -ts * 3;
+    fly.__has = GEAR_GEO.has;
+    fly.__lx = GEAR_GEO.dx;
+    fly.__ltop = GEAR_GEO.dtop;
     fly.__tier = res.tier;
     fly.style.setProperty('--ts', ts + 'px');   /* 판 밖 층이라 칸 크기를 인라인으로 준다(.mk-fly 크기 = --ts 비율) */
-    fly.style.setProperty('background-image', itemArtCss(res.id, 96));
-    fly.setAttribute('data-tier', res.tier);
+    if (fly.__item !== res.id) { fly.__item = res.id; fly.__ico.style.setProperty('background-image', itemArtCss(res.id, 96)); }
+    fly.setAttribute('data-tier', res.tier);     /* CSS .mk-fly[data-tier] 가 원반 · 테 색(등급 별칭)을 읽는다 */
     fly.style.left = x + 'px';
     fly.style.top = y + 'px';
     fly.hidden = false;
@@ -48946,9 +48998,9 @@ window.TT_SFX = {
     var fly = ev && ev.target && ev.target.effect ? ev.target.effect.target : null;
     if (!fly) return;
     fly.hidden = true;
-    var dst = $('duel-me-av'), r = fly.__land;
+    var dst = $('duel-me-av');
     if (dst && dst.animate) dst.animate(GEAR_KF_BUMP, GEAR_OPT_BUMP);
-    if (r) J.floatText(r.left + r.width / 2, r.top - ts * GEAR_PLUS_LIFT, '+1', GEAR_TIER_INK[fly.__tier] || GEAR_TIER_INK.common, 22);
+    if (fly.__has) J.floatText(fly.__lx, fly.__ltop - ts * GEAR_PLUS_LIFT, '+1', GEAR_TIER_INK[fly.__tier] || GEAR_TIER_INK.common);   /* 크기 = floatText 기본값 */
   }
 
   /* -------------------------------------------------------------------------
