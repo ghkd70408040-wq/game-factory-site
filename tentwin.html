@@ -23254,7 +23254,7 @@ window.TT_SFX = {
   /* 저장 스키마 버전(출시 체크리스트 권고 R-15, 0908). 값이 없는 옛 저장은 v0 로
    * 읽는다. 올릴 때는 SCHEMA_MIGRATIONS 에 함수를 **끝에 하나** 붙이고 이 수를 +1.
    * 다운그레이드(미래 버전 저장을 옛 빌드가 읽음)는 읽기 전용 + 백업 키 보존. */
-  var SCHEMA_VERSION = 2;   // 74 — 파편 폐기 이전(v1to2)
+  var SCHEMA_VERSION = 3;   /* P3 — 코인·뽑기·광고 상한·특가 칸(가법) */   // 74 — 파편 폐기 이전(v1to2)
   var LS_BAK_PREFIX = LS_KEY + '.bak-';
   var ROWGO_STAGGER = 35;   // ms per column, left -> right
   var DEAL_STAGGER = 30;    // ms per new tile...
@@ -25994,7 +25994,18 @@ window.TT_SFX = {
     achv: {},
     comboMax: 0,      // 계정 최고 콤보 (에픽 combo5/10/20)
     duelWins: 0,      // 아케이드 대전 누적 승 (에픽 duel1/10 · 일일 duel)
-    awkTotal: 0       // 각성 누적 발동 (에픽 awaken50 · 일일 awaken)
+    awkTotal: 0,      // 각성 누적 발동 (에픽 awaken50 · 일일 awaken)
+    /* --- P3 상점·재화(2026-09-27) — 새 칸 다섯, 전부 가법. 소독은 [P3-STATE] 의 *From 함수. ---
+     *   coin    코인 지갑(정수 0..COIN_MAX)
+     *   p3      null = 새 설치 · { shown } = v2to3 을 지난 이전 저장(지갑 안내 1회)
+     *   gacha   { itemPity, goldPity, freeDay, firstItem, firstFriend, happy, petSrc{}, dupPaid{}, log[] }
+     *   adCaps  { day, week, n{coin,item,star,heart,x2}, w{friend} }   — 보상형 광고 상한
+     *   deals   { day, b{gift,gearC,gearR,heart1,trade,heartfull} }     — 특가 하루 한도 */
+    coin: 0,
+    p3: null,
+    gacha: null,
+    adCaps: null,
+    deals: null
   };
 
   /**
@@ -26010,6 +26021,7 @@ window.TT_SFX = {
     readStore();
     reconcileRanks();
     ensureArcadeBest();     // 아케이드 대전 기록판 — 위 reconcile 과 같은 이유로 무조건
+    p3Ensure();       // P3 — 새 설치에도 뽑기·광고·특가 칸이 선다
     /* [F7.1-0925 fix1 M1] 여기까지 왔다 = loadStore 가 끝까지 돌았다는 뜻.
        부팅 0번째 단계(loadStore) 자체가 throw 하면(예: readStore 진입조차 못한
        경우) 이 줄에 닿지 못해 storeLoaded 가 false 로 남는다 — 아래 두 부팅
@@ -26119,9 +26131,17 @@ window.TT_SFX = {
               lv: lvSum, arcdmg: moved, shown: 0, shownArc: 0, paid: 0 };
     return o;
   }
+  /* P3 — v2 → v3. 옮길 값은 없다(가법 칸 넷). 이전 저장에만 「지갑 안내」 표식(p3.shown = 0)을 세운다 —
+     새 설치는 옛 칩(동전 그림 = 모험 별 합계)을 본 적이 없으니 알릴 것도 없다(store.p3 = null 그대로). */
+  function v2to3(o) {
+    if (typeof o.coin !== 'number' || !isFinite(o.coin)) o.coin = 0;
+    if (!o.p3 || typeof o.p3 !== 'object') o.p3 = { shown: 0 };
+    return o;
+  }
   var SCHEMA_MIGRATIONS = [
     function v0to1(o) { return o; },
-    v1to2
+    v1to2,
+    v2to3
   ];
   var persistReadOnly = false;   // 미래 버전 저장을 만나면 true — 덮어쓰지 않는다
   var storeLoaded = false;       // [F7.1-0925 fix1 M1] loadStore() 가 끝까지 돌면 true
@@ -26728,6 +26748,12 @@ window.TT_SFX = {
         if (o.v74 && typeof o.v74 === 'object') store.v74 = o.v74;
         if (typeof o.gearEver === 'number' && isFinite(o.gearEver)) store.gearEver = Math.max(0, o.gearEver | 0);
         if (o.arcadeBestLegacy && typeof o.arcadeBestLegacy === 'object') store.arcadeBestLegacy = o.arcadeBestLegacy;
+        /* P3 — 새 칸(v2to3 가 만들거나 v3 저장이 들고 온다). 전부 소독해서 받는다. */
+        store.coin = clamp(Math.floor(Number(o.coin) || 0), 0, COIN_MAX);
+        if (o.p3 && typeof o.p3 === 'object') store.p3 = { shown: o.p3.shown ? 1 : 0 };
+        store.gacha = gachaStateFrom(o.gacha);
+        store.adCaps = adCapsFrom(o.adCaps);
+        store.deals = dealsFrom(o.deals);
       }
     } catch (e) {
       /* private mode / corrupt JSON: run with defaults */
@@ -45082,6 +45108,147 @@ window.TT_SFX = {
     setText('shop-jewel-menu', jewelBalance());
   }
 
+  /* =========================================================================
+   * [P3-STATE] 재화·상점 상태 — P3(2026-09-27 사용자 반려 ⑭ · 스펙 결정 1)
+   *   하트 = 모험 도전권 · 코인 = 놀면 쌓이는 돈 · 별(store.jstar, 화면 이름 「별」) = 잘해야 모이는 돈.
+   *   (앱) 보석은 확정 상품만 산다 — 보석으로 코인·별을 사지 못하고, 코인·별을 현금으로 팔지 않는다(§20.9).
+   * 쓰기는 네 함수뿐이다(coinGrant · coinSpend · starGrant · starSpend). jewelGrant/jewelSpend 와 같은
+   * 계약: 음수·NaN·소수·0 거부, 모자라면 한 톨도 안 깎는다(부분 차감 없음) — 호출부가 「깎였겠지」 하고
+   * 물건을 먼저 주는 순서를 쓸 수 없게 한다.
+   * ========================================================================= */
+  var COIN_MAX = 999999;
+  var GACHA_ITEM_PITY = 60;      /* 영웅 없이 60회 → 61번째 영웅(스펙 §4-b) */
+  var GACHA_GOLD_PITY = 9;       /* 영웅 없이 9회 → 10번째 영웅 */
+  var GACHA_LOG_MAX = 50;        /* 뽑기 결과 기록 — 분쟁 대비(스펙 §4-f ⑤) */
+  var GACHA_FRIEND_IDS = ['mongle', 'tiktok', 'churup', 'kkultteok', 'sseokssak', 'mukmul', 'banjjak', 'bangul', 'jelly'];
+  var GACHA_REFUND = { common: 30, rare: 80, epic: 250 };   /* 최고 레벨 장비가 또 나오면 코인(스펙 §4-b) */
+  var P3_AD_IDS = ['coin', 'item', 'star', 'heart', 'x2'];   /* 하루 칸 — friend 만 주 칸 */
+  var P3_AD_CAP = { coin: 3, item: 3, star: 2, heart: 3, x2: 10, friend: 1 };
+  var P3_DEAL_IDS = ['gift', 'gearC', 'gearR', 'heart1', 'trade', 'heartfull'];
+  var P3_DEAL_CAP = { gift: 1, gearC: 1, gearR: 1, heart1: 5, trade: 3, heartfull: 1 };
+
+  function coinBalance() { return clamp(Math.floor(Number(store.coin) || 0), 0, COIN_MAX); }
+  function coinGrant(n, reason) {
+    if (!jewelAmountOk(n)) return false;
+    store.coin = Math.min(COIN_MAX, coinBalance() + n);
+    persist();
+    paintWallets();
+    return true;
+  }
+  function coinSpend(n, reason) {
+    if (!jewelAmountOk(n)) return false;
+    var have = coinBalance();
+    if (have < n) return false;
+    store.coin = have - n;
+    persist();
+    paintWallets();
+    return true;
+  }
+  function starGrant(n, reason) {
+    if (!jewelAmountOk(n)) return false;
+    store.jstar = (store.jstar | 0) + n;
+    persist();
+    syncGems();
+    paintWallets();
+    return true;
+  }
+  function starSpend(n, reason) {
+    if (!jewelAmountOk(n)) return false;
+    var have = store.jstar | 0;
+    if (have < n) return false;
+    store.jstar = have - n;
+    persist();
+    syncGems();
+    paintWallets();
+    return true;
+  }
+  /** 지갑 숫자를 그리는 자리 전부. 없는 요소는 setText 가 건너뛴다(Task 3 이 왕국·지도 칩을 더한다). */
+  function paintWallets() {
+    setText('sh-coin-v', arcComma(coinBalance()));
+    setText('sh-star-v', arcComma(store.jstar | 0));
+  }
+
+  /** 장비 한 개(뽑기·특가·선물 공용). 이미 최고 레벨이면 등급별 코인으로 돌려준다.
+   *  파밍(74 harvestGear)은 이 함수를 지나지 않지만 최고 레벨이면 같은 환급표(GACHA_REFUND)를 쓴다(Task 2 — 원장 판정 (1)).
+   *  store.gearEver(꿀떡이 해금 = 수확 누계)는 세지 않는다(스펙 §4-b ④). */
+  function grantItemOrRefund(id, src) {
+    var it = itemById(id);
+    if (!it || it.enabled === false) return null;
+    var had = (store.items && store.items.own) ? (store.items.own[id] | 0) : 0;
+    if (had >= ITEM_LV_MAX) {
+      var back = GACHA_REFUND[it.tier] | 0;
+      if (back > 0) coinGrant(back, 'refund');
+      return { id: id, tier: it.tier, lv: had, lv0: had, isNew: false, max: true, refund: back };
+    }
+    var g = grantItem(id, src);
+    if (!g) return null;
+    return { id: id, tier: it.tier, lv: g.lv, lv0: had, isNew: !!g.isNew, max: false, refund: 0 };
+  }
+
+  /* ---- 저장 칸 소독 — readStore 와 새 설치(p3Ensure)가 같은 함수를 지난다 ---- */
+  function p3Int(v, hi) { return clamp(Math.floor(Number(v) || 0), 0, hi); }
+  function p3Day(v) { return (typeof v === 'string' && /^\d{8}$/.test(v)) ? v : ''; }
+  function gachaStateFrom(g) {
+    var o = (g && typeof g === 'object') ? g : {};
+    var out = {
+      itemPity: p3Int(o.itemPity, GACHA_ITEM_PITY), goldPity: p3Int(o.goldPity, GACHA_GOLD_PITY),
+      freeDay: p3Day(o.freeDay), firstItem: o.firstItem ? 1 : 0, firstFriend: o.firstFriend ? 1 : 0,
+      happy: o.happy ? 1 : 0, petSrc: {}, dupPaid: {}, log: []
+    };
+    var k, i, e;
+    if (o.petSrc && typeof o.petSrc === 'object') {
+      for (k in o.petSrc) {
+        if (!Object.prototype.hasOwnProperty.call(o.petSrc, k) || GACHA_FRIEND_IDS.indexOf(k) < 0) continue;
+        if (o.petSrc[k] === 'gacha' || o.petSrc[k] === 'gift') out.petSrc[k] = o.petSrc[k];
+      }
+    }
+    if (o.dupPaid && typeof o.dupPaid === 'object') {
+      for (k in o.dupPaid) {
+        if (Object.prototype.hasOwnProperty.call(o.dupPaid, k) && GACHA_FRIEND_IDS.indexOf(k) >= 0 && o.dupPaid[k]) out.dupPaid[k] = 1;
+      }
+    }
+    if (Array.isArray(o.log)) {
+      for (i = Math.max(0, o.log.length - GACHA_LOG_MAX); i < o.log.length; i++) {
+        e = o.log[i];
+        if (e && typeof e === 'object' && typeof e.k === 'string' && Array.isArray(e.r)) {
+          out.log.push({ t: Math.floor(Number(e.t) || 0), k: e.k, h: String(e.h || ''), r: e.r.slice(0, 10).map(String) });
+        }
+      }
+    }
+    return out;
+  }
+  function adCapsFrom(a) {
+    var o = (a && typeof a === 'object') ? a : {};
+    var n = (o.n && typeof o.n === 'object') ? o.n : {};
+    var w = (o.w && typeof o.w === 'object') ? o.w : {};
+    var out = { day: p3Day(o.day), week: p3Day(o.week), n: {}, w: { friend: p3Int(w.friend, P3_AD_CAP.friend) } };
+    for (var i = 0; i < P3_AD_IDS.length; i++) out.n[P3_AD_IDS[i]] = p3Int(n[P3_AD_IDS[i]], P3_AD_CAP[P3_AD_IDS[i]]);
+    return out;
+  }
+  function dealsFrom(d) {
+    var o = (d && typeof d === 'object') ? d : {};
+    var b = (o.b && typeof o.b === 'object') ? o.b : {};
+    var out = { day: p3Day(o.day), b: {} };
+    for (var i = 0; i < P3_DEAL_IDS.length; i++) out.b[P3_DEAL_IDS[i]] = p3Int(b[P3_DEAL_IDS[i]], P3_DEAL_CAP[P3_DEAL_IDS[i]]);
+    return out;
+  }
+  /** 새 설치(저장 없음)도 칸이 서게 한다 — readStore 는 저장이 없으면 일찍 돌아간다. */
+  function p3Ensure() {
+    if (typeof store.coin !== 'number' || !isFinite(store.coin)) store.coin = 0;
+    if (!store.gacha || typeof store.gacha !== 'object') store.gacha = gachaStateFrom(null);
+    if (!store.adCaps || typeof store.adCaps !== 'object') store.adCaps = adCapsFrom(null);
+    if (!store.deals || typeof store.deals !== 'object') store.deals = dealsFrom(null);
+  }
+  /** 날짜가 바뀌면 하루 칸을, 주(월요일 시작, weekKey)가 바뀌면 주 칸을 비운다.
+   *  상점을 열 때 · 광고 직전 · 특가 직전에 부른다. 저장은 부른 쪽의 persist 가 한다. */
+  function p3Roll() {
+    p3Ensure();
+    var d = todayKey(), wk = weekKey(), i;
+    if (store.adCaps.day !== d) { store.adCaps.day = d; for (i = 0; i < P3_AD_IDS.length; i++) store.adCaps.n[P3_AD_IDS[i]] = 0; }
+    if (store.adCaps.week !== wk) { store.adCaps.week = wk; store.adCaps.w.friend = 0; }
+    if (store.deals.day !== d) { store.deals.day = d; for (i = 0; i < P3_DEAL_IDS.length; i++) store.deals.b[P3_DEAL_IDS[i]] = 0; }
+  }
+
   /* ---- 소비처 ① 하트 (§20.3) ---------------------------------------------- */
 
   /** 0 → 5 즉시 회복 = 50💎. 가득 찼으면 아무 일도 안 한다(버튼도 비활성). */
@@ -52153,6 +52320,8 @@ window.TT_SFX = {
     claimDailyFree: claimDailyFree, dailyFreeLeft: dailyFreeLeft,
     openShop: openShop, closeShop: closeShop, shopTab: shopTab,
     paintShopBalance: paintShopBalance,
+    /* P3 — 재화·상점 상태 손잡이(위 규약 그대로 — 게임 코드는 window.Game 을 거쳐 부르지 않는다). */
+    coinBalance: coinBalance, coinGrant: coinGrant, coinSpend: coinSpend, starGrant: starGrant, starSpend: starSpend, grantItemOrRefund: grantItemOrRefund, p3Roll: p3Roll, p3Ensure: p3Ensure, advStarTotal: advStarTotal, GACHA_REFUND: GACHA_REFUND, COIN_MAX: COIN_MAX, P3_AD_CAP: P3_AD_CAP, P3_DEAL_CAP: P3_DEAL_CAP,
     shopPayForce: function (v) { shopPayForce = v ? 1 : 0; shopSyncPay(); },
     /* W-C §10 루트 리빌 — DEBUG HANDLES ONLY, 위 규약 그대로다(게임 코드는 이
      * 중 무엇도 window.Game 을 거쳐 부르지 않는다). 관문이 슬롯 순서·타이밍·
