@@ -26095,13 +26095,15 @@ window.TT_SFX = {
         if (!Object.prototype.hasOwnProperty.call(o.items.eq, ck) || !Array.isArray(o.items.eq[ck])) continue;
         var lst = o.items.eq[ck], otherW = false, seenW = false, keep = [];
         for (var q = 0; q < lst.length; q++) {
-          var wl = o.items.own[lst[q]];   /* m4 — 환산 뒤 own 이 양수인 무기만 「다른 무기」(readStore 가 버릴 낡은 줄 제외) */
-          if (lst[q] !== 'heatshard' && V74_WEAPONS.indexOf(lst[q]) >= 0 && typeof wl === 'number' && isFinite(wl) && wl > 0) otherW = true;
+          /* m4 · final-fix m-1 — 보유 판정은 하나: v74Int(own, 1, 12, 0) > 0(유한한 숫자면 Lv1 이상 보유 — 옛 readStore 와 위 환산의 had 가
+             쓰는 판정). 환산 뒤 보유한 무기만 「다른 무기」(readStore 가 버릴 낡은 줄 제외)이고 결과는 목록 순서와 무관하다. */
+          if (lst[q] !== 'heatshard' && V74_WEAPONS.indexOf(lst[q]) >= 0 && v74Int(o.items.own[lst[q]], 1, V74_LV_MAX, 0) > 0) otherW = true;
         }
         for (q = 0; q < lst.length; q++) {
           var iid = lst[q];
           if (iid === 'heatshard' && otherW) continue;   /* ⑤ 무기 칸이 차 있다 — 열의 조각은 장착만 푼다 */
-          if (V74_WEAPONS.indexOf(iid) >= 0) { if (seenW) continue; seenW = true; }
+          /* 무기 한 칸에 하나 — 보유 무기만 센다. 미보유 무기는 keep 에 그대로 둔다(뒤에서 readStore 가 버린다) */
+          if (V74_WEAPONS.indexOf(iid) >= 0 && v74Int(o.items.own[iid], 1, V74_LV_MAX, 0) > 0) { if (seenW) continue; seenW = true; }
           keep.push(iid);
         }
         o.items.eq[ck] = keep;
@@ -26169,9 +26171,10 @@ window.TT_SFX = {
       catch (e) {
         /* 74 T8 수정 1회차 m5 — 이전기가 던지면 반쯤 바뀐 o 를 넘기지 않는다(이전기는 o 를 제자리에서 고친다). 미래 버전
            분기처럼 원문을 백업하고 이 세션은 저장하지 않으며, 원문을 다시 읽어 그대로 돌려준다 — 다음 persist 가 새
-           schemaVersion 을 찍어 이전을 영영 건너뛰게 만들지 않는다. */
+           schemaVersion 을 찍어 이전을 영영 건너뛰게 만들지 않는다. final-fix I-4 규칙 — 읽기 전용이 되면 알린다
+           (noteSaveReadOnly 가 플래그를 세우고 세션당 한 번 토스트). */
         backupRaw(String(from), raw);
-        persistReadOnly = true;
+        noteSaveReadOnly();
         try { console.warn('[tentwin] save migration v' + v + ' -> v' + (v + 1) + ' failed: read-only, backup ' + LS_BAK_PREFIX + from); } catch (e2) {}
         try { return JSON.parse(raw); } catch (e3) { return o; }
       }
