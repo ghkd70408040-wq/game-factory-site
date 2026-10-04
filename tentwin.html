@@ -17460,13 +17460,13 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
     <div class="nc-drops" data-role="drops">
       <b class="nc-h" data-i18n="node.drops">Gear from this stage</b>
       <ul class="nc-drop-list"></ul>
-      <button class="nc-all kit-pill-v2 kit-pill-v2--chip" type="button"><span class="nc-all-t"></span></button>
+      <button class="nc-all kit-pill-v2 kit-pill-v2--chip" type="button"></button>
       <p class="nc-note"></p>
     </div>
     <div class="nc-team" data-role="team">
       <span class="nc-mem" data-mem="hero"><span class="nc-face" data-char-role="hero"><i class="nc-rec" data-i18n="node.recmark" hidden>Pick</i></span><span class="nc-mem-t"><b class="nc-mem-nm"></b><i class="nc-mem-k" data-i18n="pick.hero">Hero</i></span></span>
       <span class="nc-mem" data-mem="pet"><span class="nc-face" data-char-role="pet"><i class="nc-rec" data-i18n="node.recmark" hidden>Pick</i></span><span class="nc-mem-t"><b class="nc-mem-nm"></b><i class="nc-mem-k" data-i18n="pick.mate">Pet</i></span></span>
-      <button class="nc-swap kit-pill-v2 kit-pill-v2--chip" type="button" data-i18n-aria="node.swap.aria" aria-label="Change hero or pet"><span class="nc-swap-g" aria-hidden="true">&#8644;</span></button>
+      <button class="nc-swap kit-pill-v2 kit-pill-v2--chip" type="button" data-i18n-aria="node.swap.aria" aria-label="Change hero or pet">&#8644;</button>
     </div>
     </div><!-- /.nc-body -->
     <div class="nc-legacy" hidden>
@@ -47786,6 +47786,17 @@ window.TT_SFX = {
     }
     pet.querySelector('.nc-rec').hidden = !mid || (advPetRecommend(p) !== mid);
   }
+  /* 수정 2회차 N1 — 접힌 카드가 판보다 길면 구획(.nc-body)만 구르고, 아래에 가려진 내용이 남았을 때만 data-more 를 단다
+     (CSS = 아래 가장자리 흐림 · 끝까지 굴리면 걷힌다 · 스크롤바는 게임 전체처럼 감춘 채). 읽기 한 묶음(scrollHeight · clientHeight ·
+     scrollTop) → 속성 쓰기 하나(모션 규칙 5 — 흐림은 그림 속성이라 배치를 다시 부르지 않는다). 부르는 곳 = 구획 scroll · 구획과 줄의 크기
+     변화(ResizeObserver — 창 크기 · ⓘ 펼침 · 칩 줄 · 글꼴 적재 · 다시 열기). ResizeObserver 가 없는 브라우저는 굴릴 때만 고친다. */
+  function ncBodyMore() {
+    var b = document.querySelector('#modal-node .nc-body');
+    if (!b) return;
+    var more = b.scrollHeight - b.clientHeight - Math.ceil(b.scrollTop) > 0;
+    if (more) { if (!b.hasAttribute('data-more')) b.setAttribute('data-more', ''); }
+    else if (b.hasAttribute('data-more')) b.removeAttribute('data-more');
+  }
   function ncInfoToggle(ev) {
     var b = ev && ev.currentTarget, more = b && b.parentNode.querySelector('.nc-clear-more');
     if (!more) return;
@@ -48004,12 +48015,15 @@ window.TT_SFX = {
       });
     }
     var all = cardEl.querySelector('.nc-all');
-    if (all) { setTextEl(all.querySelector('.nc-all-t'), t('node.drops.all', { k: dt.items.length })); all.onclick = function () { openDrops(p.n); }; }
+    if (all) { setTextEl(all, t('node.drops.all', { k: dt.items.length })); all.onclick = function () { openDrops(p.n); }; }
     /* 확률 메모 = 기존 문장 둘 그대로(지휘자 판정 1-⑦: drops.note · drops.gear.avg — 목업 순서 = 기준 먼저, 평균 다음). */
     setTextEl(cardEl.querySelector('.nc-note'), t('drops.note') + ' ' + t('drops.gear.avg', { a: dt.avg }));
     ncTeam(p);
     paintNodeHearts();
     openModal('modal-node');
+    /* 재리뷰 m5 — 다시 열면 구획은 맨 위부터(앞 탄에서 굴린 자리가 남지 않게). 표시(data-more)는 scroll · ResizeObserver 가 고친다. */
+    var ncb = cardEl.querySelector('.nc-body');
+    if (ncb) ncb.scrollTop = 0;
   }
 
   /**
@@ -50484,6 +50498,16 @@ window.TT_SFX = {
     on($('drops-close'), 'click', closeDrops);   /* 74 T12 */
     on(document.querySelector('#modal-node .nc-info'), 'click', ncInfoToggle);   /* 74 T13 — ⓘ 시간 종료 판정 + 별 조건 */
     on(document.querySelector('#modal-node .nc-swap'), 'click', function () { openCharPanel(); });   /* 74 T13 — ⇄ 캐릭터 창 */
+    (function () {   /* 74 T13 수정 2회차 N1 — 구획 넘침 표시(ncBodyMore) 배선 */
+      var nb = document.querySelector('#modal-node .nc-body');
+      if (!nb) return;
+      on(nb, 'scroll', ncBodyMore);
+      if (typeof ResizeObserver === 'function') {
+        var ro = new ResizeObserver(ncBodyMore);
+        ro.observe(nb);
+        for (var ci = 0; ci < nb.children.length; ci++) ro.observe(nb.children[ci]);
+      }
+    })();
 
     /* W6 — 통일된 열 모달의 우상단 X. 배선을 새로 만들지 않는다: X 는
      * data-w6x 가 가리키는 **이미 배선된 닫기 버튼**을 그대로 누른다. 그래서
@@ -69592,7 +69616,9 @@ html[lang="en"] #kd-b-circus .kd-tag b{ font-size: .88em; letter-spacing: -.02em
    ▣ 색 — 목업 색은 같은 값의 토큰이 있으면 그 토큰, 없으면 가장 가까운 기존 토큰(지휘자 판정 3 · 새 색 토큰 0 ·
      대응표 = 보고서 · 알파는 --prim-white/black-a* 또는 color-mix(토큰 × --mo-mk-*) — 원시값 0).
    ▣ 부품 — 알약(스킬 칩 · 「전체 ›」 · ⇄ · 핸디캡 칩) = kit-pill-v2 kit-pill-v2--chip · 클리어 줄 = kit-pill-v2 kit-pill-v2--soft 인스턴스
-     (수정 1회차 I1 — 변주는 kit-v2 블록에 정식 등록, 여기는 --f2-ph · 배치 · 안쪽 칸 글자만. 칩 글자 기본 --f2-chip-fs 는 아래 판에서 준다).
+     (수정 1회차 I1 — 변주는 kit-v2 블록에 정식 등록, 여기는 --f2-ph · 배치 · 글자만. 칩 글자 기본 --f2-chip-fs 는 아래 판에서 준다.
+     수정 2회차 N2 — 글자는 알약 자기 글자(「전체 ›」 · ⇄ · 핸디캡 칩 = 시안 .pill.more · .swap · .tag 처럼 직접). 안쪽 칸은 시안이 겹 구조인
+     두 곳만 — 두 줄 스킬 칩(시안 .skill-t b · i) · 클리어 줄(시계 · 글 · ⓘ). font-audit 는 이 둘에서 안쪽 글자 요소를 잰다).
      얼굴 캡슐 = 노드 카드의 kit-slot-v2--portrait 인스턴스(node-modal-slot 블록의 규칙 목록에 .nc-face 를 더했다 — 선언 복사 0).
    ▣ 움직임 0(새 transition·animation 없음). 그림자·필터는 정지 값뿐. 작은 화면(창 높이 ≤ 760)은 아래 @media. */
 #modal-node .sheet.r10-panel {
@@ -69613,7 +69639,8 @@ html[lang="en"] #kd-b-circus .kd-tag b{ font-size: .88em; letter-spacing: -.02em
    구른다. 선언은 #rank-list · .dr-body 처방과 같다 — 그 공유 규칙 목록은 Task 12 몫이라 고치지 않고 노드 카드 전용으로 둔다.
    양옆 · 아래 6u 안쪽 여백 = 알약 · 칸 그림자가 구획 가장자리에서 잘리지 않게(같은 만큼 바깥 여백을 빼 자리는 그대로). 위 −2 = 시안 .sub. 줄 사이 = 시안 9. */
 #modal-node .sheet.r10-panel > .nc-body {
-  display: flex; flex-direction: column; row-gap: calc(var(--nc-u) * 9);
+  --nc-gap: calc(var(--nc-u) * 9);
+  display: flex; flex-direction: column; row-gap: var(--nc-gap);
   flex: 0 1 auto; min-height: 0;
   overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none;
   margin: calc(var(--nc-u) * -2) calc(-7.45% - var(--nc-u) * 6) calc(var(--nc-u) * -6);
@@ -69621,6 +69648,13 @@ html[lang="en"] #kd-b-circus .kd-tag b{ font-size: .88em; letter-spacing: -.02em
 }
 #modal-node .nc-body::-webkit-scrollbar { width: 0; height: 0; }
 #modal-node .nc-body > * { flex: 0 0 auto; }
+/* 넘침 표시(수정 2회차 N1 · 지휘자 판정 — 스크롤바 없이 잘리는 상태 0): 구획 아래에 가려진 내용이 남았을 때만(openNodeCard 배선의
+   ncBodyMore 가 data-more 를 단다 · 끝까지 굴리면 걷힌다) 아래 가장자리를 흐린다. 흐림 높이 = 구획 줄 간격 + 아래 안쪽 여백 6u
+   (= 한 줄이 끝나고 다음 줄이 시작될 자리까지 · 새 치수 아님). 마스크는 알파만 쓴다(색 = 기존 토큰 · 움직임 0). */
+#modal-node .sheet.r10-panel > .nc-body[data-more] {
+  -webkit-mask-image: linear-gradient(180deg, var(--prim-white) calc(100% - var(--nc-gap) - var(--nc-u) * 6), transparent);
+          mask-image: linear-gradient(180deg, var(--prim-white) calc(100% - var(--nc-gap) - var(--nc-u) * 6), transparent);
+}
 #modal-node .nc-legacy { display: none; }
 
 /* ---- ① 리본 밑 한 줄 = 챕터 이름 + 얻은 별(목업 .mk .sub · 점검 W10) ---- */
@@ -69745,7 +69779,8 @@ html[lang="en"] #kd-b-circus .kd-tag b{ font-size: .88em; letter-spacing: -.02em
 #modal-node .nc-hp::before { left: 0; background-position: 0 0; }
 #modal-node .nc-hp::after { right: 0; background-position: 100% 0; }
 /* 알약(스킬 칩 · 「전체 ›」 · ⇄ · 핸디캡 칩) = kit-pill-v2 kit-pill-v2--chip 인스턴스, 클리어 줄 = kit-pill-v2 kit-pill-v2--soft 인스턴스
-   (수정 1회차 I1 — 그림 층은 kit-v2 블록의 변주가 그린다. 여기는 크기(--f2-ph) · 배치 · 안쪽 칸 글자만). */
+   (수정 1회차 I1 — 그림 층은 kit-v2 블록의 변주가 그린다. 여기는 크기(--f2-ph) · 배치 · 글자만 — 글자는 알약 자기 글자, 겹 구조인
+   스킬 칩 두 줄 · 클리어 줄만 안쪽 칸(수정 2회차 N2)). */
 /* 스킬 칩(목업 .pill.skill — 높이 38, 모서리는 변주 .333H) 목업의 아이콘 자리는 지휘자 판정 1-③으로 뺐다(왼쪽 여백 = 오른쪽 12). 설명이 두 줄(en)이면 칩이 늘어난다. */
 #modal-node .nc-atk {
   --f2-ph: calc(var(--nc-u) * 38);
@@ -69754,7 +69789,7 @@ html[lang="en"] #kd-b-circus .kd-tag b{ font-size: .88em; letter-spacing: -.02em
   margin: 0;
   padding: calc(var(--nc-u) * 4) calc(var(--nc-u) * 12);
 }
-#modal-node .nc-atk-n { position: relative; font-weight: 700; font-size: calc(var(--nc-u) * 13.5); line-height: 1.1; }   /* 줄 높이는 안쪽 칸에(알약 자기 글자 = 변주 기본) */
+#modal-node .nc-atk-n { position: relative; font-weight: 700; font-size: calc(var(--nc-u) * 13.5); line-height: 1.1; }   /* 두 줄 = 시안 .skill-t b · i(줄 높이 1.1) */
 #modal-node .nc-atk-d { position: relative; font-weight: 500; font-size: calc(var(--nc-u) * 11); line-height: 1.1; color: var(--role-f2-ink); }
 
 /* ---- ③ 클리어 1줄 = 크림 알약(목업 .clear — --role-f2-pill-soft · 겉선 --role-f2-pill-soft-e · 높이 44 · 모서리 14) + 시계 + ⓘ ---- */
@@ -69836,10 +69871,10 @@ html[lang="en"] #kd-b-circus .kd-tag b{ font-size: .88em; letter-spacing: -.02em
   display: inline-flex; align-items: center;
   margin: 0 calc(var(--nc-u) * 2) 0 0;
   padding: 0 calc(var(--nc-u) * 9) 0 calc(var(--nc-u) * 10);
+  font-size: calc(var(--nc-u) * 12.5); color: var(--role-lt-ink-node-mv2);   /* 알약 자기 글자 = 시안 .pill.more 12.5 · 자주 */
   white-space: nowrap;
   cursor: pointer;
 }
-#modal-node .nc-all-t { position: relative; font-size: calc(var(--nc-u) * 12.5); color: var(--role-lt-ink-node-mv2); }
 #modal-node .nc-drop-list {
   grid-column: 1 / -1; grid-row: 2;
   display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: calc(var(--nc-u) * 8);
@@ -69968,15 +70003,17 @@ html[lang="en"] #kd-b-circus .kd-tag b{ font-size: .88em; letter-spacing: -.02em
   width: var(--f2-ph);
   /* 광학 정렬: font-audit 잉크 중심 실측 dy −1.11px @480(= −1.12u) → 위 여백 2.25u(글자 1.12u 내림) */
   margin: 0 0 0 auto; padding: calc(var(--nc-u) * 2.25) 0 0;
+  font-family: var(--font-display); font-weight: 400; font-size: calc(var(--nc-u) * 18); line-height: 1;   /* 알약 자기 글자 = 시안 .swap */
+  color: var(--role-lt-ink-node-mv2);
   cursor: pointer;
 }
-#modal-node .nc-swap-g { position: relative; font-family: var(--font-display); font-weight: 400; font-size: calc(var(--nc-u) * 18); line-height: 1; color: var(--role-lt-ink-node-mv2); }
 
-/* ---- 작은 화면(창 높이 ≤ 820 — 접힌 카드 실측 최대 781px(칩 줄 있는 20탄 · 390x844) + 모달 위아래 여백 36, 점검 C9 의 규칙 그대로 ·
-   수정 1회차에 핸디캡 칩 줄이 들어오며 760 → 820): 포스터 그림 축소 · 장비 칸 축소(이름 숨김, % · Lv 유지) · 확률 메모 생략(조사 §7
-   「확률 설명 줄 생략」) · 구획 줄 사이 9 → 6 · ⓘ 설명은 원래 탭 때만(펼쳐 넘치면 구획만 구른다). 값은 비율뿐(새 원시값 0). ---- */
-@media (max-height: 820px) {
-  #modal-node .sheet.r10-panel > .nc-body { row-gap: calc(var(--nc-u) * 6); }
+/* ---- 작은 화면(창 높이 ≤ 760 — 점검 C9 의 규칙 그대로 · 수정 2회차 N1 지휘자 판정: 문턱 760 복귀, 760 초과 창(데스크톱 1280x800 포함)은
+   칩 줄이 있어도 압축하지 않는다): 포스터 그림 축소 · 장비 칸 축소(이름 숨김, % · Lv 유지) · 확률 메모 생략(조사 §7 「확률 설명 줄 생략」) ·
+   구획 줄 사이 9 → 6. 그래도 판보다 길면(칩 줄 · en 긴 문장 · ⓘ 펼침) 구획만 구르고 위의 아래 가장자리 흐림이 「더 있다」를 보인다.
+   값은 비율뿐(새 원시값 0). ---- */
+@media (max-height: 760px) {
+  #modal-node .sheet.r10-panel > .nc-body { --nc-gap: calc(var(--nc-u) * 6); }
   #modal-node .nc-foe { height: calc(var(--nc-u) * 128); }
   #modal-node .nc-foe::before { left: calc(var(--nc-u) * 9); width: calc(var(--nc-u) * 96); bottom: calc(var(--nc-u) * 6); height: calc(var(--nc-u) * 13); }
   #modal-node .nc-foe-art { width: calc(var(--nc-u) * 114); height: calc(var(--nc-u) * 126); bottom: calc(var(--nc-u) * 8); }
