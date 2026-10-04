@@ -17435,6 +17435,9 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
          줄 순서 = 목업: 리본 밑 챕터·별 → 악당 포스터 → 클리어 1줄 → 나오는 장비 4칸 → 편성 한 줄 → 시작.
          값은 전부 openNodeCard() 가 판과 같은 함수에서 채운다(카드가 새로 계산하는 수 0, 조사 §5). 스모크·비교 촬영은 data-role 로 찾는다.
          옛 줄은 지우지 않고 아래 .nc-legacy 안으로 옮겼다 — openNodeCard() 가 계속 채우지만 앞면엔 안 보인다(데이터·판정 규칙 유지). -->
+    <!-- 수정 1회차 — 카드 줄 여섯은 판 안 스크롤 구획 하나(.nc-body)에 든다: 평소에는 제 높이 그대로(스크롤 0), ⓘ 를 펼쳐
+         작은 창을 넘으면 이 구획만 구른다(#rank-list · .dr-body 와 같은 「판 안 스크롤」 처방 — 리본 · X · 시작 버튼 · 하트 줄은 고정). -->
+    <div class="nc-body">
     <div class="nc-sub" data-role="sub"><span class="nc-chap"></span><span class="nc-stars" role="img"><i></i><i></i><i></i></span></div>
     <div class="nc-foe" data-role="foe">
       <span class="nc-foe-art" aria-hidden="true"></span>
@@ -17442,26 +17445,30 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
         <span class="nc-foe-k" data-i18n="node.foe.label">Opponent</span>
         <b class="nc-foe-name"></b>
         <div class="nc-hp"><i class="nc-hp-bar" aria-hidden="true"></i><small class="nc-hp-k" data-i18n="node.hp.label">HP</small><span class="nc-hp-v"></span></div>
-        <p class="nc-atk"><b class="nc-atk-n"></b><span class="nc-atk-d"></span></p>
+        <p class="nc-atk kit-pill-v2 kit-pill-v2--chip"><b class="nc-atk-n"></b><span class="nc-atk-d"></span></p>
       </div>
     </div>
-    <div class="nc-clear" data-role="clear">
+    <div class="nc-clear kit-pill-v2 kit-pill-v2--soft" data-role="clear">
       <i class="nc-clock" aria-hidden="true"></i>
       <p class="nc-clear-t"></p>
       <button class="nc-info" type="button" data-i18n-aria="node.info.aria" aria-label="How the clock works" aria-expanded="false">i</button>
       <p class="nc-clear-more" hidden></p>
     </div>
+    <!-- 수정 1회차 I2 — 판 규칙(핸디캡: 블로커 · 잠금 · 셔플 금지 · 시간 단축)은 시작 전에 보인다. 클리어 줄 바로 아래 작은 칩 줄,
+         핸디캡이 있는 탄만(advHandBits — 기존 키). 칩 = kit-pill-v2--chip 인스턴스, openNodeCard() 가 채운다. -->
+    <div class="nc-hand" data-role="hand" hidden></div>
     <div class="nc-drops" data-role="drops">
       <b class="nc-h" data-i18n="node.drops">Gear from this stage</b>
       <ul class="nc-drop-list"></ul>
-      <button class="nc-all" type="button"></button>
+      <button class="nc-all kit-pill-v2 kit-pill-v2--chip" type="button"><span class="nc-all-t"></span></button>
       <p class="nc-note"></p>
     </div>
     <div class="nc-team" data-role="team">
       <span class="nc-mem" data-mem="hero"><span class="nc-face" data-char-role="hero"><i class="nc-rec" data-i18n="node.recmark" hidden>Pick</i></span><span class="nc-mem-t"><b class="nc-mem-nm"></b><i class="nc-mem-k" data-i18n="pick.hero">Hero</i></span></span>
       <span class="nc-mem" data-mem="pet"><span class="nc-face" data-char-role="pet"><i class="nc-rec" data-i18n="node.recmark" hidden>Pick</i></span><span class="nc-mem-t"><b class="nc-mem-nm"></b><i class="nc-mem-k" data-i18n="pick.mate">Pet</i></span></span>
-      <button class="nc-swap" type="button" data-i18n-aria="node.swap.aria" aria-label="Change hero or pet">&#8644;</button>
+      <button class="nc-swap kit-pill-v2 kit-pill-v2--chip" type="button" data-i18n-aria="node.swap.aria" aria-label="Change hero or pet"><span class="nc-swap-g" aria-hidden="true">&#8644;</span></button>
     </div>
+    </div><!-- /.nc-body -->
     <div class="nc-legacy" hidden>
     <!-- W-C(0831) 작업C — 스크롤 래퍼. 판(.mv2-sheet)은 이제 **틀**이고
          내용만 여기서 구른다. 머리(h2/.mv2-head)와 X 는 래퍼 **밖**이라
@@ -27957,9 +27964,10 @@ window.TT_SFX = {
       'node.drops.all': 'All {k} ›',
       'node.recmark': 'Pick',
       'node.swap.aria': 'Change hero or pet',
-      'node.stars.got': 'You have {s} of 3 stars on this stage.',
+      'node.stars.got': 'You have {s} stars on this stage.',
       'node.foe.label': 'Opponent',
       'node.hp.label': 'HP',
+      'node.lv': 'Lv{lv}',
       'rec.why.ten': 'Ten Power is high, so the sum-10 pairs common on this stage score big.',
       'rec.why.twin': 'Twin Power is high, so the same-number pairs common on this stage score big.',
       'rec.why.jelly': 'Jackpot is high, so any match can score {jm}×. Strong when the clock is the goal.',
@@ -28210,11 +28218,11 @@ window.TT_SFX = {
       'boss.atk.quake': 'Board Quake',
       'boss.atk.cycle': 'All Four, Rotating',
       /* 판정판 74 T13 — 기술 한 줄 설명(카드 포스터). 대조표 = 보고서(bossDropBlockers · bossFreezeCol · bossMaskCells · bossQuakeRows · BOSS_ATK_CYCLE). */
-      'boss.atk.blk.d': 'Drops blocker tiles onto the board.',
+      'boss.atk.blk.d': 'Drops {n} blocker tiles onto the board.',
       'boss.atk.freeze.d': 'Freezes one column. Frozen tiles take two matches to clear.',
-      'boss.atk.mask.d': 'Hides the numbers on a few tiles.',
-      'boss.atk.quake.d': 'Shakes a few rows and moves the fruit around.',
-      'boss.atk.cycle.d': 'Uses all four skills in turn.',
+      'boss.atk.mask.d': 'Hides the numbers on {n} tiles for {sec}s.',
+      'boss.atk.quake.d': 'Shakes {n} rows and moves the fruit around.',
+      'boss.atk.cycle.d': 'Uses all four skills in turn, switching every {sec}s.',
       'boss.cond.sum10': 'Land {n} sum-10 matches',
       'boss.cond.chain3': 'Reach a Ten Twin chain of 3, {n} times',
       'boss.cond.sprint': 'Land {n} back-to-back matches',
@@ -29345,6 +29353,7 @@ window.TT_SFX = {
       'node.stars.got': '이 탄에서 별 {s}개를 얻었어요.',
       'node.foe.label': '이번 상대',
       'node.hp.label': 'HP',
+      'node.lv': 'Lv{lv}',
       'rec.why.ten': '텐 파워가 높아서, 합이 10인 짝이 많은 이 판에서 점수가 가장 크게 올라요.',
       'rec.why.twin': '트윈 파워가 높아서, 같은 숫자 짝이 많은 이 판에서 점수가 가장 크게 올라요.',
       'rec.why.jelly': '잭팟이 높아서 매치마다 점수 {jm}배를 노려요. 시간이 목표인 판에서 강해요.',
@@ -29575,11 +29584,11 @@ window.TT_SFX = {
       'boss.atk.quake': '판 흔들기',
       'boss.atk.cycle': '네 가지 공격 순환',
       /* 판정판 74 T13 — 기술 한 줄 설명(카드 포스터). 대조표 = 보고서(bossDropBlockers · bossFreezeCol · bossMaskCells · bossQuakeRows · BOSS_ATK_CYCLE). */
-      'boss.atk.blk.d': '판에 방해 블로커를 떨어뜨려요.',
+      'boss.atk.blk.d': '판에 방해 블로커 {n}개를 떨어뜨려요.',
       'boss.atk.freeze.d': '한 열을 얼려요. 언 칸은 두 번 맞춰야 사라져요.',
-      'boss.atk.mask.d': '숫자 몇 칸을 가려요.',
-      'boss.atk.quake.d': '과일 몇 줄을 흔들어 자리를 바꿔요.',
-      'boss.atk.cycle.d': '네 기술을 돌아가며 써요.',
+      'boss.atk.mask.d': '숫자 {n}칸을 {sec}초 동안 가려요.',
+      'boss.atk.quake.d': '과일 {n}줄을 흔들어 자리를 바꿔요.',
+      'boss.atk.cycle.d': '네 기술을 {sec}초마다 돌아가며 써요.',
       'boss.cond.sum10': '합10 매치 {n}회',
       'boss.cond.chain3': '텐트윈 교대 연쇄 3 도달 {n}회',
       'boss.cond.sprint': '쉬지 않고 이어친 매치 {n}회',
@@ -47736,6 +47745,14 @@ window.TT_SFX = {
   function setTextEl(el, s) { if (el && el.textContent !== s) el.textContent = s; }
   /** 피니시 미션 문장 = 전투가 피니시에 들어갈 때 missionText 가 내는 키와 같다(새 문구 0, 착수 전 점검 W11). */
   function ncFinishText(f) { return f ? t('finish.mission.' + f.id, { goal: f.goal | 0 }) : ''; }
+  /** 수정 1회차 I4 — 기술 한 줄 설명의 수 · 시간 = 전투가 실제로 쓰는 상수(사전에 두 번 적지 않는다). */
+  function ncAtkArgs(id) {
+    if (id === 'blk') return { n: DUEL_SKILL_BLK };
+    if (id === 'mask') return { n: DUEL_SKILL_MASK, sec: fmtSec(DUEL_SKILL_MASK_MS) };
+    if (id === 'quake') return { n: DUEL_SKILL_QUAKE };
+    if (id === 'cycle') return { sec: fmtSec(DUEL_SKILL_CYCLE_MS) };
+    return undefined;
+  }
   /** 지휘자 판정 2(2026-10-04 · 목업 A) — 카드 장비 4칸. 1칸 = 확률이 0 보다 큰 장비 중 가장 높은 등급(일반보다 높을 때)의
       최다 확률 장비(같으면 dropTableFor 표 순서), 2~4칸 = 나머지를 확률 큰 순(같으면 표 순서). 모두 일반이면 그냥 확률 상위 4. */
   function ncDropPick(items) {
@@ -47936,7 +47953,7 @@ window.TT_SFX = {
     setTextEl(cardEl.querySelector('.nc-hp-v'), fmtNum(duelFoeHpMax(p.n)));
     var atkId = bossAtkIdOf(foe, p.n);
     setTextEl(cardEl.querySelector('.nc-atk-n'), t('boss.atk.' + atkId));
-    setTextEl(cardEl.querySelector('.nc-atk-d'), t('boss.atk.' + atkId + '.d'));
+    setTextEl(cardEl.querySelector('.nc-atk-d'), t('boss.atk.' + atkId + '.d', ncAtkArgs(atkId)));
     var fin = p.boss ? bossFinishOf(p.n) : null;
     setTextEl(cardEl.querySelector('.nc-clear-t'), fin
       ? t('node.clear.boss', { fsec: fmtSec(DUEL_FINISH_MS), mis: ncFinishText(fin) })
@@ -47945,9 +47962,24 @@ window.TT_SFX = {
        ★ adv.star1 · ★★ adv.star2 + 여유(adv.miss.ease — advStarsFor 의 ease, 결과 창 advStarNote 와 같은 조각·같은 「 · 」) ·
        ★★★ adv.star3(점수 + 셔플 0회 + 합10 N회). 새 문구 0, 줄마다 한 줄(CSS white-space: pre-line). */
     var more = cardEl.querySelector('.nc-clear-more');
-    if (more) { more.hidden = true; more.textContent = [t('node.clear.timeout'), t('adv.star1'),
+    /* 수정 1회차 I2 — 보스 탄은 약점(공략 조건)을 시간 판정 다음 줄에: 옛 카드 #node-i-cond 의 라벨 node.cond + bossCondText(기존 키) */
+    if (more) { more.hidden = true; more.textContent = [t('node.clear.timeout')].concat(
+      p.boss && p.bossDef ? [t('node.cond') + ' \u00B7 ' + bossCondText(p.bossDef)] : [], [t('adv.star1'),
       t('adv.star2', { n: fmtNum(advStar2Need(p)) }) + ' \u00B7 ' + t('adv.miss.ease'),
-      t('adv.star3', { n: fmtNum(advStar3Need(p)), t: advTenNeed(p.n) })].join('\n'); }
+      t('adv.star3', { n: fmtNum(advStar3Need(p)), t: advTenNeed(p.n) })]).join('\n'); }
+    /* 수정 1회차 I2 — 핸디캡 칩 줄(advHandBits = 옛 카드 #node-hand 와 같은 함수 · 같은 키). 없으면 줄째 숨김. */
+    var handRow = cardEl.querySelector('.nc-hand');
+    if (handRow) {
+      var hbits = advHandBits(p);
+      handRow.innerHTML = '';
+      hbits.forEach(function (b) {
+        var hc = document.createElement('span');
+        hc.className = 'nc-hc kit-pill-v2 kit-pill-v2--chip';
+        hc.textContent = b;
+        handRow.appendChild(hc);
+      });
+      handRow.hidden = !hbits.length;
+    }
     /* 다시 열 때 설명 줄은 접힌다 — ⓘ 의 aria-expanded 도 같이 되돌린다(접힌 줄과 「펼침」 표시가 갈라지지 않게). */
     var infoB = cardEl.querySelector('.nc-info');
     if (infoB) infoB.setAttribute('aria-expanded', 'false');
@@ -47967,12 +47999,12 @@ window.TT_SFX = {
         var pc = document.createElement('b'); pc.className = 'nc-p'; pc.textContent = pctTxt(r.p) + '%'; li.appendChild(pc);
         var nm = document.createElement('span'); nm.className = 'nc-nm'; nm.textContent = t('item.' + r.id + '.nm'); li.appendChild(nm);
         var lv = own[r.id] | 0;
-        if (lv > 0) { var lvb = document.createElement('i'); lvb.className = 'nc-lv'; lvb.textContent = t('drops.lv', { lv: lv, max: ITEM_LV_MAX }); li.appendChild(lvb); }
+        if (lv > 0) { var lvb = document.createElement('i'); lvb.className = 'nc-lv'; lvb.textContent = t('node.lv', { lv: lv }); li.appendChild(lvb); }
         list.appendChild(li);
       });
     }
     var all = cardEl.querySelector('.nc-all');
-    if (all) { all.textContent = t('node.drops.all', { k: dt.items.length }); all.onclick = function () { openDrops(p.n); }; }
+    if (all) { setTextEl(all.querySelector('.nc-all-t'), t('node.drops.all', { k: dt.items.length })); all.onclick = function () { openDrops(p.n); }; }
     /* 확률 메모 = 기존 문장 둘 그대로(지휘자 판정 1-⑦: drops.note · drops.gear.avg — 목업 순서 = 기준 먼저, 평균 다음). */
     setTextEl(cardEl.querySelector('.nc-note'), t('drops.note') + ' ' + t('drops.gear.avg', { a: dt.avg }));
     ncTeam(p);
@@ -52077,6 +52109,8 @@ window.TT_SFX = {
     releaseBlockers: releaseBlockers, crumbleBlockers: crumbleBlockers,
     advStart: advStart, openMap: openMap, openNodeCard: openNodeCard,
     ncTeam: ncTeam, duelFoeDef: duelFoeDef,   /* 74 T13 — 편성 줄 · 악당 정의(스모크 t13b 가 읽는다) */
+    ncAtkArgs: ncAtkArgs, DUEL_SKILL_BLK: DUEL_SKILL_BLK, DUEL_SKILL_MASK: DUEL_SKILL_MASK, DUEL_SKILL_MASK_MS: DUEL_SKILL_MASK_MS,
+    DUEL_SKILL_QUAKE: DUEL_SKILL_QUAKE, DUEL_SKILL_CYCLE_MS: DUEL_SKILL_CYCLE_MS,   /* 74 T13 수정 1회차 — 기술 설명 수 · 시간(스모크 t13v) */
     /* v4 10차 — 검증 하네스가 관측해야 하는 값들. 맵 앵커표와 스탯 계산은
        "레퍼런스와 같은가 / 계수에서 나왔는가"를 사람이 눈으로가 아니라 숫자로
        확인해야 하는 항목이라(§A·§H), 읽을 손잡이를 노출한다. */
@@ -57293,6 +57327,46 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
     radial-gradient(closest-side, rgba(255,255,255,.95), rgba(255,255,255,0)) 3% 16%/9% 30% no-repeat,
     radial-gradient(closest-side, rgba(255,255,255,.9),  rgba(255,255,255,0)) 11% 11%/4.5% 14% no-repeat,
     radial-gradient(closest-side, rgba(255,255,255,.85), rgba(255,255,255,0)) 96% 74%/4% 18% no-repeat;
+}
+/* ---- 4b. kit-pill-v2 변주 둘 — 74 T13(2026-10-04 · 지휘자 판정 ⓐ) · 실측 = 시안 stagecard mock.css .pill(H 30) · .clear(H 44) ----
+   기본 알약(헤더 · 이름표)과 층이 다르다: 겉선 = 안쪽 테 하나 · 접지 띠 + 아래 광 두 줄 · 바깥 그림자 하나 · 광점 하나(좌상) — 질감층(::after)과
+   스페큘러 3점은 없다. 치수는 전부 알약 자기 높이 --f2-ph 의 비율(인스턴스는 --f2-ph 만 준다). 색 = 알약 토큰(--f2-pill · --f2-pill-line) ·
+   크림 토큰(--role-f2-pill-soft · -e) · 알파 = --prim-*-a* / --mo-mk-*(원시값 0). 글자 기본 = --f2-chip-fs(없으면 --f2-w × .0362 = 13.5 @390) ·
+   600 · 잉크. 소비처 = 노드 카드(#modal-node): --chip = 스킬 칩 · 「전체 ›」 · ⇄ · 핸디캡 칩 / --soft = 클리어 줄. COMPONENTS §1.4. */
+.kit-pill-v2--chip,
+.kit-pill-v2--soft{
+  border: 0;
+  font-family: inherit; font-weight: 600; line-height: 1;
+  font-size: var(--f2-chip-fs, calc(var(--f2-w) * .0362));
+  color: var(--prim-art-ink);
+}
+.kit-pill-v2--chip{                           /* .pill: 테 .05H · 띠 .10H · 광 .167H · 그림자 .067/.133H · 모서리 .333H */
+  border-radius: calc(var(--f2-ph) * .3333);
+  background: var(--f2-pill);
+  box-shadow:
+    inset 0 0 0 calc(var(--f2-ph) * .05) var(--f2-pill-line),
+    inset 0 calc(var(--f2-ph) * -.1) 0 var(--prim-black-a07),
+    inset 0 calc(var(--f2-ph) * -.1667) 0 color-mix(in srgb, var(--prim-white) calc(var(--mo-mk-70) * 100%), transparent),
+    0 calc(var(--f2-ph) * .0667) calc(var(--f2-ph) * .1333) color-mix(in srgb, var(--role-f2-chip-line) calc(var(--mo-mk-35) * 100%), transparent);
+}
+.kit-pill-v2--chip::before{                   /* 광점 1 — 좌 .2H · 위 .133H · .4H × .167H */
+  inset: auto;
+  left: calc(var(--f2-ph) * .2); top: calc(var(--f2-ph) * .1333);
+  width: calc(var(--f2-ph) * .4); height: calc(var(--f2-ph) * .1667);
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--role-menu-chip-hi-light), transparent);
+}
+.kit-pill-v2--chip::after,
+.kit-pill-v2--soft::before,
+.kit-pill-v2--soft::after{ content: none; }
+.kit-pill-v2--soft{                           /* .clear: 테 .034H · 띠 .091H · 윗광 .045/.023H · 그림자 .045/.114H · 모서리 .318H */
+  border-radius: calc(var(--f2-ph) * .3182);
+  background: linear-gradient(180deg, var(--role-ch-tiktok-body), var(--role-f2-pill-soft));
+  box-shadow:
+    inset 0 0 0 calc(var(--f2-ph) * .0341) var(--role-f2-pill-soft-e),
+    inset 0 calc(var(--f2-ph) * -.0909) 0 color-mix(in srgb, var(--role-f2-pill-soft-e) calc(var(--mo-mk-35) * 100%), transparent),
+    inset 0 calc(var(--f2-ph) * .0455) calc(var(--f2-ph) * .0227) var(--prim-white-a90),
+    0 calc(var(--f2-ph) * .0455) calc(var(--f2-ph) * .1136) var(--role-f2-pill-charsel);
 }
 
 /* ---------- tentwin/ref-v2/kit-btn-v2.css ---------- */
@@ -69488,28 +69562,36 @@ html[lang="en"] #kd-b-circus .kd-tag b{ font-size: .88em; letter-spacing: -.02em
      그래서 판 폭이 360 에 묶이는 414 폭에서도 칸이 판 밖으로 넘치지 않는다(--f2-w 는 판보다 넓어질 수 있다).
    ▣ 색 — 목업 색은 같은 값의 토큰이 있으면 그 토큰, 없으면 가장 가까운 기존 토큰(지휘자 판정 3 · 새 색 토큰 0 ·
      대응표 = 보고서 · 알파는 --prim-white/black-a* 또는 color-mix(토큰 × --mo-mk-*) — 원시값 0).
-   ▣ 부품 — 알약(스킬 칩 · 「전체 ›」 · ⇄) · 크림 알약(클리어 줄) = 목업 mock.css 의 .pill · .clear 규칙(목업이 옮긴 kit-pill-v2 문법)을
-     그대로 옮겼다(.kit-pill-v2 클래스는 안 단다 — font-audit 가 그 클래스 전부를 한 부품으로 묶어 글자 속성을 견준다).
+   ▣ 부품 — 알약(스킬 칩 · 「전체 ›」 · ⇄ · 핸디캡 칩) = kit-pill-v2 kit-pill-v2--chip · 클리어 줄 = kit-pill-v2 kit-pill-v2--soft 인스턴스
+     (수정 1회차 I1 — 변주는 kit-v2 블록에 정식 등록, 여기는 --f2-ph · 배치 · 안쪽 칸 글자만. 칩 글자 기본 --f2-chip-fs 는 아래 판에서 준다).
      얼굴 캡슐 = 노드 카드의 kit-slot-v2--portrait 인스턴스(node-modal-slot 블록의 규칙 목록에 .nc-face 를 더했다 — 선언 복사 0).
    ▣ 움직임 0(새 transition·animation 없음). 그림자·필터는 정지 값뿐. 작은 화면(창 높이 ≤ 760)은 아래 @media. */
 #modal-node .sheet.r10-panel {
   row-gap: calc(var(--f2-w) * .0241);         /* 줄 간격 = 목업 .mk gap 9 @390(공유 규칙의 8 은 그대로 — 이 판만 덮는다) */
   container-type: inline-size;
   --nc-u: .37248cqw;                          /* 목업 1px = 판 안쪽 폭(cqw) × 1.149 / 308.469 = 100cqw / 268.469 */
+  --f2-chip-fs: calc(var(--nc-u) * 11.5);     /* kit-pill-v2--chip/--soft 글자 기본(카드 = 핸디캡 칩) = 시안의 작은 알약 글자 11.5(.clear .tag) */
 }
 /* 안쪽 폭 = 시안(목업 셸은 옛 판 여백 42 → 22.77 @390 로 좁혀 찍었다). 판의 여백·리본은 그대로 두고(= 획득표와 같은 조각 — Task 12
-   t12k 가 계산값 일치를 단언, 시안의 리본 폭 ≈ 201 도 그대로다) 새 줄 다섯과 시작 버튼만 양옆으로 판 안쪽 폭의 7.45% 씩 넓힌다:
+   t12k 가 계산값 일치를 단언, 시안의 리본 폭 ≈ 201 도 그대로다) 카드 줄(.nc-body 구획)과 시작 버튼만 양옆으로 판 안쪽 폭의 7.45% 씩 넓힌다:
    268.47 × (1 + 2 × .0745) = 308.47 = 목업 #slot 폭 @390. 백분율 여백 = 담는 상자(판 안쪽) 폭 기준이라 원시값 0 · px 0. */
-#modal-node .sheet.r10-panel > .nc-sub,
-#modal-node .sheet.r10-panel > .nc-foe,
-#modal-node .sheet.r10-panel > .nc-clear,
-#modal-node .sheet.r10-panel > .nc-drops,
-#modal-node .sheet.r10-panel > .nc-team,
 #modal-node .sheet.r10-panel > #node-go.ncta {
   margin-left: -7.45%;
   margin-right: -7.45%;
+  width: auto;                                 /* 종전 width:100% → 넓힌 여백만큼 늘어나게 */
 }
-#modal-node .sheet.r10-panel > #node-go.ncta { width: auto; }   /* 종전 width:100% → 넓힌 여백만큼 늘어나게 */
+/* 판 안 스크롤 구획(수정 1회차 — ⓘ 를 펼친 작은 창 = 「카드 안 스크롤」): 평소엔 제 높이(스크롤 0), 판(max-height 100%)을 넘으면 이 구획만
+   구른다. 선언은 #rank-list · .dr-body 처방과 같다 — 그 공유 규칙 목록은 Task 12 몫이라 고치지 않고 노드 카드 전용으로 둔다.
+   양옆 · 아래 6u 안쪽 여백 = 알약 · 칸 그림자가 구획 가장자리에서 잘리지 않게(같은 만큼 바깥 여백을 빼 자리는 그대로). 위 −2 = 시안 .sub. 줄 사이 = 시안 9. */
+#modal-node .sheet.r10-panel > .nc-body {
+  display: flex; flex-direction: column; row-gap: calc(var(--nc-u) * 9);
+  flex: 0 1 auto; min-height: 0;
+  overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+  margin: calc(var(--nc-u) * -2) calc(-7.45% - var(--nc-u) * 6) calc(var(--nc-u) * -6);
+  padding: 0 calc(var(--nc-u) * 6) calc(var(--nc-u) * 6);
+}
+#modal-node .nc-body::-webkit-scrollbar { width: 0; height: 0; }
+#modal-node .nc-body > * { flex: 0 0 auto; }
 #modal-node .nc-legacy { display: none; }
 
 /* ---- ① 리본 밑 한 줄 = 챕터 이름 + 얻은 별(목업 .mk .sub · 점검 W10) ---- */
@@ -69517,7 +69599,6 @@ html[lang="en"] #kd-b-circus .kd-tag b{ font-size: .88em; letter-spacing: -.02em
   display: flex; align-items: center; justify-content: center;
   gap: calc(var(--nc-u) * 8);
   height: calc(var(--nc-u) * 20);
-  margin-top: calc(var(--nc-u) * -2);
   font-size: calc(var(--nc-u) * 13);
   font-weight: 600;
   color: var(--role-f2-ink);
@@ -69634,57 +69715,35 @@ html[lang="en"] #kd-b-circus .kd-tag b{ font-size: .88em; letter-spacing: -.02em
 }
 #modal-node .nc-hp::before { left: 0; background-position: 0 0; }
 #modal-node .nc-hp::after { right: 0; background-position: 100% 0; }
-/* 알약 셋(스킬 칩 · 「전체 ›」 · ⇄) = 목업 .mk .pill(kit-pill-v2 문법을 옮긴 것 — 흰 알약 --role-f2-pill · 겉선 --role-f2-pill-line ·
-   접지 띠 · 아래 광 · 좌상 광점). 클래스 .kit-pill-v2 는 안 쓴다: font-audit 가 그 클래스를 한 부품으로 묶어 글자 속성을 왕국 이름표와 견준다. */
-#modal-node .nc-atk,
-#modal-node .nc-all,
-#modal-node .nc-swap {
-  position: relative; box-sizing: border-box;
-  border: 0; border-radius: calc(var(--nc-u) * 10);
-  background: var(--role-f2-pill);
-  box-shadow:
-    inset 0 0 0 calc(var(--nc-u) * 1.5) var(--role-f2-pill-line),
-    inset 0 calc(var(--nc-u) * -3) 0 var(--prim-black-a07),
-    inset 0 calc(var(--nc-u) * -5) 0 color-mix(in srgb, var(--prim-white) calc(var(--mo-mk-70) * 100%), transparent),
-    0 calc(var(--nc-u) * 2) calc(var(--nc-u) * 4) color-mix(in srgb, var(--role-f2-chip-line) calc(var(--mo-mk-35) * 100%), transparent);
-  color: var(--prim-art-ink);
-}
-#modal-node .nc-atk::before,
-#modal-node .nc-all::before,
-#modal-node .nc-swap::before {
-  content: ""; position: absolute;
-  left: calc(var(--nc-u) * 6); top: calc(var(--nc-u) * 4); width: calc(var(--nc-u) * 12); height: calc(var(--nc-u) * 5);
-  border-radius: 50%;
-  background: radial-gradient(closest-side, var(--role-menu-chip-hi-light), transparent);
-}
-/* 스킬 칩(목업 .pill.skill — 높이 38 · 모서리 12). 목업의 아이콘 자리는 지휘자 판정 1-③으로 뺐다(왼쪽 여백 = 오른쪽 12). 설명이 두 줄(en)이면 칩이 늘어난다. */
+/* 알약(스킬 칩 · 「전체 ›」 · ⇄ · 핸디캡 칩) = kit-pill-v2 kit-pill-v2--chip 인스턴스, 클리어 줄 = kit-pill-v2 kit-pill-v2--soft 인스턴스
+   (수정 1회차 I1 — 그림 층은 kit-v2 블록의 변주가 그린다. 여기는 크기(--f2-ph) · 배치 · 안쪽 칸 글자만). */
+/* 스킬 칩(목업 .pill.skill — 높이 38, 모서리는 변주 .333H) 목업의 아이콘 자리는 지휘자 판정 1-③으로 뺐다(왼쪽 여백 = 오른쪽 12). 설명이 두 줄(en)이면 칩이 늘어난다. */
 #modal-node .nc-atk {
+  --f2-ph: calc(var(--nc-u) * 38);
   display: flex; flex-direction: column; justify-content: center; align-items: flex-start;
-  min-height: calc(var(--nc-u) * 38);
+  height: auto; min-height: var(--f2-ph);
   margin: 0;
   padding: calc(var(--nc-u) * 4) calc(var(--nc-u) * 12);
-  border-radius: calc(var(--nc-u) * 12);
-  line-height: 1.1;
 }
-#modal-node .nc-atk-n { position: relative; font-weight: 700; font-size: calc(var(--nc-u) * 13.5); }
-#modal-node .nc-atk-d { position: relative; font-weight: 500; font-size: calc(var(--nc-u) * 11); color: var(--role-f2-ink); }
+#modal-node .nc-atk-n { position: relative; font-weight: 700; font-size: calc(var(--nc-u) * 13.5); line-height: 1.1; }   /* 줄 높이는 안쪽 칸에(알약 자기 글자 = 변주 기본) */
+#modal-node .nc-atk-d { position: relative; font-weight: 500; font-size: calc(var(--nc-u) * 11); line-height: 1.1; color: var(--role-f2-ink); }
 
 /* ---- ③ 클리어 1줄 = 크림 알약(목업 .clear — --role-f2-pill-soft · 겉선 --role-f2-pill-soft-e · 높이 44 · 모서리 14) + 시계 + ⓘ ---- */
 #modal-node .nc-clear {
-  position: relative; box-sizing: border-box;
+  --f2-ph: calc(var(--nc-u) * 44);
   display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start;
   gap: 0 calc(var(--nc-u) * 8);
-  min-height: calc(var(--nc-u) * 44);
+  height: auto; min-height: var(--f2-ph);
   padding: 0 calc(var(--nc-u) * 12) 0 calc(var(--nc-u) * 8);
-  border-radius: calc(var(--nc-u) * 14);
-  background: linear-gradient(180deg, var(--role-ch-tiktok-body), var(--role-f2-pill-soft));
-  box-shadow:
-    inset 0 0 0 calc(var(--nc-u) * 1.5) var(--role-f2-pill-soft-e),
-    inset 0 calc(var(--nc-u) * -4) 0 color-mix(in srgb, var(--role-f2-pill-soft-e) calc(var(--mo-mk-35) * 100%), transparent),
-    inset 0 calc(var(--nc-u) * 2) calc(var(--nc-u) * 1) var(--prim-white-a90),
-    0 calc(var(--nc-u) * 2) calc(var(--nc-u) * 5) var(--role-f2-pill-charsel);
-  font-size: calc(var(--nc-u) * 13); font-weight: 600;
-  color: var(--prim-art-ink);
+}
+/* 핸디캡 칩 줄(수정 1회차 I2) — 클리어 줄 바로 아래, 옛 #node-hand(.node-chips)처럼 왼쪽부터 줄바꿈. 칩 = --chip 인스턴스, 작은 칩(시안 .clear .tag 22 · 여백 8 · 글자 11.5). */
+#modal-node .nc-hand { display: flex; flex-wrap: wrap; gap: calc(var(--nc-u) * 6); }
+#modal-node .nc-hand[hidden] { display: none; }
+#modal-node .nc-hc {
+  --f2-ph: calc(var(--nc-u) * 22);            /* 작은 칩 = 시안 .clear .tag 높이 22 · 안쪽 여백 8 */
+  display: inline-flex; align-items: center;
+  padding: 0 calc(var(--nc-u) * 8);
+  white-space: nowrap;
 }
 #modal-node .nc-clock {
   position: relative; flex: 0 0 auto;
@@ -69743,16 +69802,15 @@ html[lang="en"] #kd-b-circus .kd-tag b{ font-size: .88em; letter-spacing: -.02em
   background: var(--lib-star-gold) center / contain no-repeat;
 }
 #modal-node .nc-all {                        /* 목업 .pill.more — 높이 26 */
+  --f2-ph: calc(var(--nc-u) * 26);
   grid-column: 2; grid-row: 1;
   display: inline-flex; align-items: center;
-  height: calc(var(--nc-u) * 26);
   margin: 0 calc(var(--nc-u) * 2) 0 0;
   padding: 0 calc(var(--nc-u) * 9) 0 calc(var(--nc-u) * 10);
-  font-family: inherit; font-size: calc(var(--nc-u) * 12.5); font-weight: 600; line-height: 1;
-  color: var(--role-lt-ink-node-mv2);
   white-space: nowrap;
   cursor: pointer;
 }
+#modal-node .nc-all-t { position: relative; font-size: calc(var(--nc-u) * 12.5); color: var(--role-lt-ink-node-mv2); }
 #modal-node .nc-drop-list {
   grid-column: 1 / -1; grid-row: 2;
   display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: calc(var(--nc-u) * 8);
@@ -69816,9 +69874,8 @@ html[lang="en"] #kd-b-circus .kd-tag b{ font-size: .88em; letter-spacing: -.02em
   box-shadow: inset 0 calc(var(--nc-u) * -2) 0 var(--prim-line-light), 0 calc(var(--nc-u) * 1) calc(var(--nc-u) * 2) color-mix(in srgb, var(--role-f2-line) calc(var(--mo-mk-45) * 100%), transparent);
 }
 #modal-node .nc-lv {
-  /* 목업은 「Lv2」(액자 아래로 5 걸침). 카드 글자는 기존 drops.lv(「Lv 2/12」 — 더 길다)라 걸치면 확률 글자를 덮는다 →
-     배지 아래 변을 액자 아래 변에 맞춘다(오른쪽 4 걸침은 목업 그대로). */
-  right: calc(50% - var(--nc-fr) / 2 - var(--nc-u) * 4); top: calc(var(--nc-fr) - var(--nc-u) * 17);
+  /* 시안 .frame .lv 자리(수정 1회차 I3): 액자 오른쪽 4 · 아래 5 걸침. 글자 = node.lv 「Lv{lv}」(시안 「Lv2」) */
+  right: calc(50% - var(--nc-fr) / 2 - var(--nc-u) * 4); top: calc(var(--nc-fr) - var(--nc-u) * 12);
   padding: 0 calc(var(--nc-u) * 5);
   font-family: var(--font-display); font-weight: 400; font-size: calc(var(--nc-u) * 11.5);
   background: linear-gradient(180deg, var(--role-menu-logo-2-light), var(--mode-a-outline-chip));
@@ -69875,27 +69932,28 @@ html[lang="en"] #kd-b-circus .kd-tag b{ font-size: .88em; letter-spacing: -.02em
   color: var(--prim-art-ink);
 }
 #modal-node .nc-mem-k { font-style: normal; font-size: calc(var(--nc-u) * 11); font-weight: 600; color: var(--role-f2-ink); white-space: nowrap; }
-#modal-node .nc-swap {                       /* 목업 .swap — 36 × 36 · 모서리 12 */
+#modal-node .nc-swap {                       /* 목업 .swap — 36 × 36 */
+  --f2-ph: calc(var(--nc-u) * 36);
   flex: 0 0 auto;
   display: inline-flex; align-items: center; justify-content: center;
-  width: calc(var(--nc-u) * 36); height: calc(var(--nc-u) * 36);
-  border-radius: calc(var(--nc-u) * 12);
+  width: var(--f2-ph);
   /* 광학 정렬: font-audit 잉크 중심 실측 dy −1.11px @480(= −1.12u) → 위 여백 2.25u(글자 1.12u 내림) */
   margin: 0 0 0 auto; padding: calc(var(--nc-u) * 2.25) 0 0;
-  font-family: var(--font-display); font-weight: 400; font-size: calc(var(--nc-u) * 18); line-height: 1;
-  color: var(--role-lt-ink-node-mv2);
   cursor: pointer;
 }
+#modal-node .nc-swap-g { position: relative; font-family: var(--font-display); font-weight: 400; font-size: calc(var(--nc-u) * 18); line-height: 1; color: var(--role-lt-ink-node-mv2); }
 
-/* ---- 작은 화면(창 높이 ≤ 760 — A 카드 실측 721px + 여유, 점검 C9): 포스터 그림 축소 · 장비 칸 축소(이름 숨김, % · Lv 유지) ·
-   확률 메모 생략(조사 §7 「확률 설명 줄 생략」) · ⓘ 설명은 원래 탭 때만. 값은 비율뿐(새 원시값 0). ---- */
-@media (max-height: 760px) {
-  #modal-node .nc-foe { height: calc(var(--nc-u) * 140); }
-  #modal-node .nc-foe::before { left: calc(var(--nc-u) * 10); width: calc(var(--nc-u) * 104); bottom: calc(var(--nc-u) * 7); height: calc(var(--nc-u) * 14); }
-  #modal-node .nc-foe-art { width: calc(var(--nc-u) * 124); height: calc(var(--nc-u) * 136); bottom: calc(var(--nc-u) * 9); }
-  #modal-node .nc-foe-body { left: calc(var(--nc-u) * 124); top: calc(var(--nc-u) * 10); gap: calc(var(--nc-u) * 6); }
-  #modal-node .nc-foe-name { margin-top: calc(var(--nc-u) * -3); }
-  #modal-node .nc-drop { --nc-fr: calc(var(--nc-u) * 52); }
+/* ---- 작은 화면(창 높이 ≤ 820 — 접힌 카드 실측 최대 781px(칩 줄 있는 20탄 · 390x844) + 모달 위아래 여백 36, 점검 C9 의 규칙 그대로 ·
+   수정 1회차에 핸디캡 칩 줄이 들어오며 760 → 820): 포스터 그림 축소 · 장비 칸 축소(이름 숨김, % · Lv 유지) · 확률 메모 생략(조사 §7
+   「확률 설명 줄 생략」) · 구획 줄 사이 9 → 6 · ⓘ 설명은 원래 탭 때만(펼쳐 넘치면 구획만 구른다). 값은 비율뿐(새 원시값 0). ---- */
+@media (max-height: 820px) {
+  #modal-node .sheet.r10-panel > .nc-body { row-gap: calc(var(--nc-u) * 6); }
+  #modal-node .nc-foe { height: calc(var(--nc-u) * 128); }
+  #modal-node .nc-foe::before { left: calc(var(--nc-u) * 9); width: calc(var(--nc-u) * 96); bottom: calc(var(--nc-u) * 6); height: calc(var(--nc-u) * 13); }
+  #modal-node .nc-foe-art { width: calc(var(--nc-u) * 114); height: calc(var(--nc-u) * 126); bottom: calc(var(--nc-u) * 8); }
+  #modal-node .nc-foe-body { left: calc(var(--nc-u) * 116); top: calc(var(--nc-u) * 8); gap: calc(var(--nc-u) * 5); }
+  #modal-node .nc-foe-name { margin-top: calc(var(--nc-u) * -2); }
+  #modal-node .nc-drop { --nc-fr: calc(var(--nc-u) * 46); }
   #modal-node .nc-nm { display: none; }
   #modal-node .nc-note { display: none; }
 }
