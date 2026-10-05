@@ -10662,6 +10662,7 @@ html.no-art-logo .logo-img  { display: none; }
      상점 이름표·노드 데미지칩·퀘스트 아이템 아이콘 3곳 전용 — HUD 점수칩(.hc-score)은
      사용자 GREEN이라 계속 --lib-glyph-score 를 쓴다(무접촉). */
   --lib-glyph-coin: url("catalog/lib-glyph-coin.webp");
+  --lib-slot-ic-item: url("catalog/slot-ic-item.webp");   /* P3 — 퀘스트 「아이템」 아이콘(코인 원반 오용 해소, 스펙 §4-a) */
   --lib-glyph-flag: url("catalog/lib-glyph-flag.webp");
   --lib-glyph-target: url("catalog/lib-glyph-target.webp");
   --lib-glyph-clock: url("catalog/lib-glyph-clock.webp");
@@ -11508,7 +11509,7 @@ html.no-art-logo .logo-img  { display: none; }
 /* 14차 — 90초 누적 전용. 원래 .nchip-day(달력)를 쓰고 있었는데, 플레이 시트가
    5줄로 합쳐지면서 같은 시트 안의 「데일리」와 아이콘이 겹쳤다. 새 그림 발주 없이
    이미 있는 점수 글리프로 갈라 준다. */
-.nchip-dmg::before  { background-image: var(--lib-glyph-coin); } /* [T8-0926·65] 코인 원반으로(상단 캡슐과 같은 자산) */
+.nchip-dmg::before  { background-image: var(--lib-glyph-score); } /* P3 — 90초 누적 = 점수 글리프(코인 원반은 코인 전용) */
 
 .nrow-t { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .nrow-t > b {
@@ -23519,7 +23520,7 @@ window.TT_SFX = {
     { id: 'duel',   goal: [1, 1, 1],  fix: 2, ico: '--lib-badge-a' },
     { id: 'star2',  goal: [1, 1, 1],  fix: 2, ico: '--lib-star-gold' },
     { id: 'rush',   goal: [1000, 2000, 3500], ico: '--lib-glyph-clock' },
-    { id: 'item',   goal: [1, 1, 1],  fix: 1, ico: '--lib-glyph-coin' }, /* [T8-0926·65] 코인 원반으로 */
+    { id: 'item',   goal: [1, 1, 1],  fix: 1, ico: '--lib-slot-ic-item' }, /* P3 — 코인이 화폐가 되어 원반은 코인 전용 */
     { id: 'match',  goal: [30, 60, 100],      ico: '--lib-glyph-target' },
     { id: 'chain',  goal: [3, 5, 8],          ico: '--lib-glyph-flag' }
   ];
@@ -27270,7 +27271,7 @@ window.TT_SFX = {
       'rw.starfruit': 'Skill fruit',
       'rw.petfruit': 'Pet fruit',
       'rw.awkfruit': 'Awakening fruit',
-      'rw.gem': 'Jelly Stars',
+      'rw.gem': 'Stars',
       'rw.coin': 'Coins',
       'rw.heart': 'Hearts',
 
@@ -27405,10 +27406,11 @@ window.TT_SFX = {
          (quota/private mode 쓰기 실패)과는 다른 상황이라 새 키. */
       'toast.savero': "Saving isn't working right now. Progress this session won't be saved.",
       /* 74 — 저장 이전 v2(v1to2) 알림: 사용자에게 보이는 첫 왕국에서 한 번(v74Notice). 환산 문장은 경우별 셋 — 둘 다 · 장비만 · 젤리별만. */
-      'v74.convert': '💎 Shard upgrades are gone. Your shards became gear levels (+{g}) and jelly stars (+{s}).',
+      'v74.convert': '💎 Shard upgrades are gone. Your shards became gear levels (+{g}) and stars (+{s}).',
       'v74.convert.gear': '💎 Shard upgrades are gone. Your shards became gear levels (+{g}).',
-      'v74.convert.star': '💎 Shard upgrades are gone. Your shards became jelly stars (+{s}).',
+      'v74.convert.star': '💎 Shard upgrades are gone. Your shards became stars (+{s}).',
       'v74.arcdmg': 'Awakening now gives ×{am} points, so the Duel damage record starts fresh. Your old record is saved.',
+      'p3.walletnote': 'The top coin chip is now your coin wallet. Your adventure stars are on the map, in the bottom chip.',
       'toast.noadds': 'No adds left',
       'toast.empty': 'Board is empty',
       'toast.nohints': 'No hints left',
@@ -27638,7 +27640,7 @@ window.TT_SFX = {
       'grade.b.msg': 'Solid clear.',
       'grade.c.msg': 'Cleared. Try it faster.',
       'milestone.title': 'Match #{n}!',
-      'milestone.title.rw': 'Match #{n}! Jelly Stars +{v}',
+      'milestone.title.rw': 'Match #{n}! Stars +{v}',
       'milestone.sub': 'What a streak. Keep going.',
 
       /* ---- v3: tutorial / theme / share ----
@@ -28361,7 +28363,7 @@ window.TT_SFX = {
       'quest.claimall': 'Claim all',
       'quest.none': 'Nothing to claim yet.',
       'quest.ready': 'Ready to claim: {n}',
-      'quest.got': 'Jelly Stars +{v}',
+      'quest.got': 'Stars +{v}',
       'quest.bonus': 'All daily missions cleared! Heart +{n}',
       'quest.att.d': 'Day {n}',
       'settings.quest': 'Missions',
@@ -28428,16 +28430,16 @@ window.TT_SFX = {
       'aria.skins': 'Open skins',
       'skin.btn': 'Skins',
       'skin.title': 'Skins',
-      'skin.balance': 'Jelly Stars',
+      'skin.balance': 'Stars',
       'skin.own': 'Owned',
       'skin.equip': 'Equip',
       'skin.equipped': 'Wearing',
       'skin.buy': 'Buy',
       'skin.soon': 'Coming soon',
       'skin.soonhint': 'A hat for the bichon prince',
-      'skin.confirm': 'Spend {n} Jelly Stars on {name}?',
+      'skin.confirm': 'Spend {n} Stars on {name}?',
       'skin.bought': '{name} unlocked!',
-      'skin.poor': 'Not enough Jelly Stars ({n} more)',
+      'skin.poor': 'Not enough Stars ({n} more)',
       /* ---- [SHOP-0910] 앱 상점 (DESIGN §20). ko 쪽과 **키가 정확히 같다** —
          한쪽에만 있는 키는 그 언어에서 영문 원문이 새어 나오거나 키 자체가
          화면에 찍힌다(t() 의 마지막 줄이 String(key) 다). ---------------- */
@@ -28464,10 +28466,10 @@ window.TT_SFX = {
       'shop.pack.xl': 'Chest of jewels',
       'shop.pack.d': '{n} jewels',
       'shop.start': 'Starter pack',
-      'shop.start.d': '{n} jewels + {h} hearts + {s} jelly stars',
-      'shop.trade': 'Jelly Stars {s}',
-      'shop.trade.d': 'Jewels to Jelly Stars. One way only.',
-      'shop.trade.ok': 'Jelly Stars +{s}',
+      'shop.start.d': '{n} jewels + {h} hearts + {s} stars',
+      'shop.trade': 'Stars {s}',
+      'shop.trade.d': 'Jewels to Stars. One way only.',
+      'shop.trade.ok': 'Stars +{s}',
       'shop.heart5': 'Refill hearts',
       'shop.heart5.d': 'Straight back to {n}',
       'shop.heart1': 'One heart',
@@ -28542,7 +28544,7 @@ window.TT_SFX = {
       'intro.banjjak.l2': 'My skill is Spark Charge. Your Skill gauge fills by {pn}%.',
       'intro.bangul.l1': 'Bubbly here. Stuck spots get loosened with bubbles.',
       'intro.bangul.l2': 'My skill is Bubble Wave. {pn} blocker tiles get washed away.',
-      'skin.gem': '+1 Jelly Star!',
+      'skin.gem': '+1 Star!',
       'skin.base': 'Default',
       'skin.basedesc': 'The look you started with',
       'skin.royal': 'Royal Gown',
@@ -28632,7 +28634,7 @@ window.TT_SFX = {
       'kd.pethouse.alljoined': 'Everyone has already joined!',
       'soon.title': 'Coming Soon',
       'soon.body': 'Under construction. Check back after the next update!',
-      'kd.visit': 'Yesterday-you saved up {n} Jelly Stars.',
+      'kd.visit': 'Yesterday-you saved up {n} Stars.',
       'kd.visit.first': 'Welcome to Jelly Pang Kingdom!',
       'kd.res.aria': 'Say hello',
 
@@ -28740,7 +28742,7 @@ window.TT_SFX = {
       'rw.starfruit': '스킬 과일',
       'rw.petfruit': '펫 과일',
       'rw.awkfruit': '각성 과일',
-      'rw.gem': '젤리별',
+      'rw.gem': '별',
       'rw.coin': '코인',
       'rw.heart': '하트',
 
@@ -28859,10 +28861,11 @@ window.TT_SFX = {
       'toast.savefail': '진행이 저장되지 않아요',
       'toast.savero': '저장에 문제가 있어 이번에는 진행이 저장되지 않아요.',
       /* 74 — 저장 이전 v2(v1to2) 알림: 사용자에게 보이는 첫 왕국에서 한 번(v74Notice). 환산 문장은 경우별 셋 — 둘 다 · 장비만 · 젤리별만. */
-      'v74.convert': '💎 파편 강화가 없어져서, 모아 둔 파편을 장비 {g}레벨과 젤리별 {s}개로 바꿨어요.',
+      'v74.convert': '💎 파편 강화가 없어져서, 모아 둔 파편을 장비 {g}레벨과 별 {s}개로 바꿨어요.',
       'v74.convert.gear': '💎 파편 강화가 없어져서, 모아 둔 파편을 장비 {g}레벨로 바꿨어요.',
-      'v74.convert.star': '💎 파편 강화가 없어져서, 모아 둔 파편을 젤리별 {s}개로 바꿨어요.',
+      'v74.convert.star': '💎 파편 강화가 없어져서, 모아 둔 파편을 별 {s}개로 바꿨어요.',
       'v74.arcdmg': '각성이 점수 {am}배로 바뀌어서 대전 누적 피해 기록을 새로 시작해요. 예전 기록은 저장해 뒀어요.',
+      'p3.walletnote': '위 동전 칸은 이제 코인 지갑이에요. 모은 모험 별은 지도 아래 칸에서 볼 수 있어요.',
       'toast.noadds': '추가 횟수를 다 썼어요',
       'toast.empty': '보드가 비었어요',
       'toast.nohints': '힌트를 다 썼어요',
@@ -29059,7 +29062,7 @@ window.TT_SFX = {
       'grade.b.msg': '무난하게 클리어!',
       'grade.c.msg': '클리어! 다음엔 더 빠르게',
       'milestone.title': '{n}번째 짝!',
-      'milestone.title.rw': '{n}번째 짝! 젤리별 +{v}',
+      'milestone.title.rw': '{n}번째 짝! 별 +{v}',
       'milestone.sub': '이 기세 그대로 가요.',
 
       /* ---- v3: 튜토리얼 / 테마 / 공유 ----
@@ -29710,7 +29713,7 @@ window.TT_SFX = {
       'quest.claimall': '모두 받기',
       'quest.none': '아직 받을 것이 없어요.',
       'quest.ready': '받을 수 있어요: {n}',
-      'quest.got': '젤리별 +{v}',
+      'quest.got': '별 +{v}',
       'quest.bonus': '오늘 미션 전부 완료! 하트 +{n}',
       'quest.att.d': '{n}일째',
       'settings.quest': '미션',
@@ -29765,22 +29768,22 @@ window.TT_SFX = {
       'aria.skins': '스킨 열기',
       'skin.btn': '스킨',
       'skin.title': '스킨',
-      'skin.balance': '젤리별',
+      'skin.balance': '별',
       'skin.own': '보유',
       'skin.equip': '장착',
       'skin.equipped': '착용 중',
       'skin.buy': '구매',
       'skin.soon': '곧 만나요',
       'skin.soonhint': '비숑 왕자의 모자',
-      'skin.confirm': '{name}을(를) 젤리별 {n}개로 살까요?',
+      'skin.confirm': '{name}을(를) 별 {n}개로 살까요?',
       'skin.bought': '{name} 해금!',
-      'skin.poor': '젤리별이 {n}개 부족해요',
+      'skin.poor': '별이 {n}개 부족해요',
       /* ---- [SHOP-0910] 앱 상점 (DESIGN §20). en 쪽과 **키가 정확히 같다**. ---- */
       'aria.shop': '상점 열기',
       'shop.btn': '상점',
       'shop.title': '상점',
       'shop.tab.jewel': '보석',
-      'shop.tab.jstar': '젤리별',
+      'shop.tab.jstar': '별',
       'shop.tab.bundle': '번들',
       'shop.tab.skin': '스킨',
       'shop.krw': '{n}원',
@@ -29799,10 +29802,10 @@ window.TT_SFX = {
       'shop.pack.xl': '보석 궤짝',
       'shop.pack.d': '보석 {n}개',
       'shop.start': '시작 팩',
-      'shop.start.d': '보석 {n}개 + 하트 {h}개 + 젤리별 {s}개',
-      'shop.trade': '젤리별 {s}개',
-      'shop.trade.d': '보석을 젤리별로. 한 방향만 바꿀 수 있어요.',
-      'shop.trade.ok': '젤리별 +{s}개',
+      'shop.start.d': '보석 {n}개 + 하트 {h}개 + 별 {s}개',
+      'shop.trade': '별 {s}개',
+      'shop.trade.d': '보석을 별로. 한 방향만 바꿀 수 있어요.',
+      'shop.trade.ok': '별 +{s}개',
       'shop.heart5': '하트 가득 채우기',
       'shop.heart5.d': '기다림 없이 {n}개로',
       'shop.heart1': '하트 1개',
@@ -29869,7 +29872,7 @@ window.TT_SFX = {
       'intro.banjjak.l2': '내 스킬은 「번쩍 충전」이야. 스킬 게이지를 {pn}% 채워 줘.',
       'intro.bangul.l1': '방울이에요. 막힌 자리는 거품으로 풀어요.',
       'intro.bangul.l2': '내 스킬은 「거품 파도」예요. 방해 타일 {pn}개를 씻어 내요.',
-      'skin.gem': '젤리별 +1!',
+      'skin.gem': '별 +1!',
       'skin.base': '기본',
       'skin.basedesc': '처음부터 함께한 모습',
       'skin.royal': '로열 드레스',
@@ -29952,7 +29955,7 @@ window.TT_SFX = {
       'kd.pethouse.alljoined': '모두 함께하고 있어요!',
       'soon.title': '준비 중',
       'soon.body': '공사 중이에요! 다음 업데이트를 기다려 주세요.',
-      'kd.visit': '어제의 내가 젤리별 {n}개를 모아 뒀어요.',
+      'kd.visit': '어제의 내가 별 {n}개를 모아 뒀어요.',
       'kd.visit.first': '젤리팡 왕국에 온 걸 환영해요!',
       'kd.res.aria': '인사하기',
 
@@ -45183,10 +45186,21 @@ window.TT_SFX = {
     paintWallets();
     return true;
   }
-  /** 지갑 숫자를 그리는 자리 전부. 없는 요소는 setText 가 건너뛴다(Task 3 이 왕국·지도 칩을 더한다). */
+  /** 코인 칩 글자(왕국 위 · 지도 위 — 동전 캡슐은 글자 자리가 오른쪽 반이라 9,999 까지만 종전 크기로 들어간다). 글자 수(쉼표 포함)를
+   *  data-len 으로 같이 적는다 — 6자(10,000~99,999) · 7자(100,000~999,999)일 때만 CSS(shop-p3)가 이미 있는 글자 단계(4.0 · 3.5)로 줄인다.
+   *  짧은 값은 종전 크기 그대로다. 세 자리(kdSync · buildMap · paintWallets)가 이 도우미 하나로 쓴다. */
+  function paintCoinChip(id) {
+    var s = arcComma(coinBalance()), el = $(id);
+    setText(id, s);
+    if (el && el.getAttribute('data-len') !== String(s.length)) el.setAttribute('data-len', String(s.length));
+  }
+  /** 지갑 숫자를 그리는 자리 전부. 없는 요소는 setText 가 건너뛴다(상점 칩 sh-* 는 Task 4 가 만든다).
+   *  판 중 수확(harvestGear)은 store.coin 만 올리고 그리지 않는다 — 지갑이 보이는 화면(왕국 kdSync · 지도 buildMap · 상점 openShop)은 열릴 때
+   *  같은 값을 다시 그린다(Task 3, 지휘자 보충). 지도 아래 칩 map-b1-v 는 지갑이 아니라 진행도(합계/최대)라 여기서 안 그린다. */
   function paintWallets() {
     setText('sh-coin-v', arcComma(coinBalance()));
     setText('sh-star-v', arcComma(store.jstar | 0));
+    paintCoinChip('kd-top-stars-v'); paintCoinChip('map-stars-v'); setText('kd-bot-b1-v', store.jstar | 0);
   }
 
   /** 장비 한 개(뽑기·특가·선물 공용). 이미 최고 레벨이면 등급별 코인으로 돌려준다.
@@ -45317,6 +45331,30 @@ window.TT_SFX = {
   }
   /** 결과 창 줄 하나(rewardReveal 의 항목 모양). 그림은 CSS(.rw-ico[data-disc="coin"])가 코인 원반으로 칠한다. */
   function coinRewardItem(n) { return { ico: '●', disc: 'coin', key: 'rw.coin', val: n | 0, rar: 'normal' }; }
+
+  /* ---- 지갑 안내 1회 — 옛 저장(v2to3 가 p3 칸을 만든 저장)에만. 위 칩이 45(모험 별)에서 0(코인)으로 바뀐
+     이유를 모르면 「사라졌다」로 읽힌다(74 v74Notice 와 같은 이유 · 같은 규칙 — 착수 전 점검 C7):
+     사용자가 실제로 보는 왕국(74 v74NoticeReady — 스플래시가 걷혔고 왕국 활성 · 열린 모달 0)에서만 띄우고
+     **띄운 그 순간** 소비·저장한다. 부팅 청크의 enterKingdom() 은 스플래시 밑이라 여기서 거짓 → 소비 0.
+     순서는 저장 알림 → 74 알림 → P3 알림이다(toast 는 덮어쓰기라 먼저 뜨면 앞 알림이 지워진다). 스플래시 해제 기준 4800ms 에 예약하되
+     (splashDismiss 는 저장 알림이 떠 있던 시간 roHold 를 더한다 · enterKingdom 은 스플래시가 걷힌 뒤에만 예약한다 — 부팅 때 건 타이머는
+     탭이 부팅 뒤 4.8초 안이면 74 알림보다 먼저 떠 버린다), 앞 토스트가 아직 떠 있거나 74 환산 뒤에 대전 기록 안내(v74ArcTimer)가
+     이어질 차례면 그것이 끝난 뒤로 미룬다 — 환산·대전 기록이 둘 다 대기인 첫 공개판 사슬은 4800ms 보다 길다. ---- */
+  var P3_NOTICE_DELAY = 4800;
+  /** 지금 떠 있는 토스트가 몇 ms 뒤에 걷히나. DOM 을 읽지 않는다 — toast() 가 적어 둔 시각·글자·줄 수만 본다(타이머 콜백 안이라). */
+  function toastLeftMs() {
+    return toastAt ? Math.max(0, toastMs(toastText, toastLines) - (now() - toastAt)) : 0;
+  }
+  function p3Notice() {
+    if (!store.p3 || store.p3.shown || !v74NoticeReady()) return false;
+    var wait = toastLeftMs();
+    if (v74ArcTimer) wait = Math.max(wait, 300);   /* 대전 기록 안내가 이어질 차례 — 그 토스트가 뜨고 걷힐 때까지 */
+    if (wait > 0) { setTimeout(p3Notice, wait + 120); return false; }   /* 앞 알림을 덮어쓰지 않는다 — 소비는 띄운 그 순간 */
+    toast(t('p3.walletnote'));
+    store.p3.shown = 1;
+    persist();
+    return true;
+  }
 
   /* ---- 소비처 ① 하트 (§20.3) ---------------------------------------------- */
 
@@ -45635,6 +45673,7 @@ window.TT_SFX = {
     if (!el) return;
     heartsTick();
     paintShopBalance();
+    paintWallets();   /* P3 — 판 중 수확으로 오른 코인도 열 때 맞는다(지갑 칩이 생기면 보인다 · 지휘자 보충) */
     shopTab(shopTabCur);
     el.hidden = false;
     J.sfx.ui();
@@ -45760,6 +45799,9 @@ window.TT_SFX = {
     }
     return sum;
   }
+
+  /** 모험 별의 최대(지도 아래 칩 「합계/최대」). 챕터 수 × 챕터당 탄 × 3 — 챕터가 늘면 같이 는다. */
+  function advStarMax() { return MAP_CHAPTERS.length * ADV_CHAPTER * 3; }
 
   function advStarStr(s) {
     var out = '';
@@ -46996,8 +47038,8 @@ window.TT_SFX = {
     if (pv) pv.disabled = SIAN_MAP ? (mapChap <= 1 && mapPage <= 0) : mapChap <= 1;
     if (nx) nx.disabled = SIAN_MAP ? (mapChap >= lastCh && mapPage >= sianPages() - 1) : mapChap >= lastCh;
 
-    setText('map-stars-v', advStarTotal());
-    setText('map-b1-v', advStarTotal());
+    paintCoinChip('map-stars-v');
+    setText('map-b1-v', advStarTotal() + '/' + advStarMax());   /* P3 결정 2 — 진행도는 「/최대」를 단다 */
     setText('map-b2-v', store.best | 0);
     paintHearts();
     mapFit();
@@ -47750,7 +47792,7 @@ window.TT_SFX = {
     setText('kd-top-hearts-v', store.hearts | 0);
     var ht = $('kd-top-heart-t');
     if (ht) { var ms = heartNextMs(); ht.textContent = ms > 0 ? fmtHeartWait(ms) : t('adv.heartfull'); }
-    setText('kd-top-stars-v', advStarTotal());
+    paintCoinChip('kd-top-stars-v');   /* P3 결정 2 — 위 칩 = 코인 지갑(동전 그림과 값 일치) */
     /* 하단 바 — 젤리별 카운트 · 큰 캡슐 부제 「챕터 n: 이름」(주 라벨 「모험」은
        #kd-bot-ch-k 의 data-i18n=menu.adv 가 채운다). */
     setText('kd-bot-b1-v', store.jstar | 0);
@@ -47804,6 +47846,7 @@ window.TT_SFX = {
     kdVisit();
     kdIdleSchedule();
     v74Notice();
+    if (splashDone) setTimeout(p3Notice, P3_NOTICE_DELAY);   /* P3 — 나중에 왕국으로 돌아올 때. 부팅 때(스플래시 밑)는 걸지 않는다 — splashDismiss 가 건다 */
   }
 
   /* --- 건물 탭 -------------------------------------------------------------- */
@@ -51751,6 +51794,7 @@ window.TT_SFX = {
     var roHold = saveROHoldMs();
     setTimeout(saveROFlush, 320);   /* 대기가 없으면 아무 일도 안 한다 */
     setTimeout(v74Notice, V74_NOTICE_DELAY + roHold);   /* 74 — 첫 사용자 탭으로 스플래시가 걷히면 그 왕국에서 이전 알림(C4) */
+    setTimeout(p3Notice, P3_NOTICE_DELAY + roHold);   /* P3 — 첫 사용자 탭으로 스플래시가 걷히면 74 알림 사슬 뒤에 지갑 안내(C7) */
   }
 
   /* ---- 14차 수리 2 — 「누를 때」와 「뗄 때」를 가른다 -------------------------
@@ -52414,7 +52458,7 @@ window.TT_SFX = {
     openShop: openShop, closeShop: closeShop, shopTab: shopTab,
     paintShopBalance: paintShopBalance,
     /* P3 — 재화·상점 상태 손잡이(위 규약 그대로 — 게임 코드는 window.Game 을 거쳐 부르지 않는다). */
-    coinBalance: coinBalance, coinGrant: coinGrant, coinSpend: coinSpend, starGrant: starGrant, starSpend: starSpend, grantItemOrRefund: grantItemOrRefund, p3Roll: p3Roll, p3Ensure: p3Ensure, advStarTotal: advStarTotal, GACHA_REFUND: GACHA_REFUND, COIN_MAX: COIN_MAX, P3_AD_CAP: P3_AD_CAP, P3_DEAL_CAP: P3_DEAL_CAP,
+    coinBalance: coinBalance, coinGrant: coinGrant, coinSpend: coinSpend, starGrant: starGrant, starSpend: starSpend, grantItemOrRefund: grantItemOrRefund, p3Roll: p3Roll, p3Ensure: p3Ensure, advStarTotal: advStarTotal, advStarMax: advStarMax, GACHA_REFUND: GACHA_REFUND, COIN_MAX: COIN_MAX, P3_AD_CAP: P3_AD_CAP, P3_DEAL_CAP: P3_DEAL_CAP,
     coinForAdv: coinForAdv, coinForRank: coinForRank, coinForArc: coinForArc, runCoinPay: runCoinPay, COIN_RUN: COIN_RUN,
     shopPayForce: function (v) { shopPayForce = v ? 1 : 0; shopSyncPay(); },
     /* W-C §10 루트 리빌 — DEBUG HANDLES ONLY, 위 규약 그대로다(게임 코드는 이
@@ -70352,6 +70396,24 @@ html[lang="en"] #kd-b-circus .kd-tag b{ font-size: .88em; letter-spacing: -.02em
     -webkit-mask-image: linear-gradient(180deg, var(--prim-white) 85%, transparent);
             mask-image: linear-gradient(180deg, var(--prim-white) 85%, transparent);
   }
+}
+/* 코인 칩의 큰 수(P3 T3 · 지휘자 판정 A) — 동전 캡슐은 글자 중심이 칩 폭의 65.7% 라 오른쪽으로 쓸 폭이 칩의 약 69% 뿐이다(실측: 9,999 까지는 종전 크기로 들어가고
+   12,345 는 ×0.98 · 123,456 은 ×0.82 · 999,999 는 ×0.78 이하여야 한다, 네 해상도에서 같은 배율). 글자 수(쉼표 포함)를 paintCoinChip 이 data-len 으로 적고,
+   6자 · 7자일 때만 이 파일에 이미 있는 글자 단계로 줄인다 — 6자 4.0(×0.80) · 7자 3.5(×0.70)(칩 안쪽 여유: 99,999 는 3.6px 이상 · 999,999 는 2.8px 이상, 종전 크기 9,999 는 3.1px 이상). 새 값 0 · 짧은 값(1~5자)은 규칙이 안 걸려 픽셀이 같다.
+   기본 규칙 · 데스크톱 미디어 · 구형 기기 폴백 셋이 각자 원 규칙(5.00)과 같은 단위·같은 미디어 조건으로 따로 선다. */
+#screen-kingdom #kd-top-stars-v[data-len="6"], #screen-map #map-stars-v[data-len="6"] { font-size: 4.0cqw; }
+#screen-kingdom #kd-top-stars-v[data-len="7"], #screen-map #map-stars-v[data-len="7"] { font-size: 3.50cqw; }
+@media (min-aspect-ratio: 1/1) and (min-width: 700px) {
+  #screen-map #map-stars-v[data-len="6"] { font-size: calc(var(--mapui) * 4.0); }
+  #screen-map #map-stars-v[data-len="7"] { font-size: calc(var(--mapui) * 3.50); }
+}
+@media (min-aspect-ratio: 1/1) and (min-width: 700px) and (min-height: 600px) {
+  #screen-kingdom #kd-top-stars-v[data-len="6"] { font-size: calc(var(--mapui) * 4.0); }
+  #screen-kingdom #kd-top-stars-v[data-len="7"] { font-size: calc(var(--mapui) * 3.50); }
+}
+@supports not (width: 1cqw) {
+  #screen-map #map-stars-v[data-len="6"] { font-size: calc(4.0 * var(--cqw)); }
+  #screen-map #map-stars-v[data-len="7"] { font-size: calc(3.50 * var(--cqw)); }
 }
 </style>
 </body>
