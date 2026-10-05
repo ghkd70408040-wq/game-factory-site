@@ -17753,6 +17753,9 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
 
   <div id="modal-over" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="over-title"><div class="sheet jbox jbox--modal" data-part="modal-plate">
     <h2 id="over-title" data-i18n="over.title">Out of moves</h2>
+    <!-- P3 T2 수정 2회차 — 중간 구획(.over-body = 결과 카드 · 순위 줄 · 보상 줄). 평소(창 높이 720 초과)에는 display:contents 라 상자가 없고
+         아래 형제들이 종전처럼 시트의 직접 자식으로 놓인다. 작은 폰(높이 720 이하)에서만 이 구획이 시트 안에서 구르고 버튼 줄은 굴림 밖에 선다(shop-p3 블록). -->
+    <div class="over-body">
     <!-- ⑲ 안쪽 젤리 카드: 점수·최고·스테이지를 판 위 맨글자에서 카드 위로. -->
     <div class="result-card">
     <p class="big-score"><b id="over-score">0</b></p>
@@ -17773,6 +17776,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
          것은 벌어 놓은 것이다(수확은 판 중에 확정된다). 다만 **획득이 있을 때만**
          열린다 — 빈 리스트를 띄우면 "0을 얻었다"를 축하하는 꼴이 된다. -->
     <ul id="over-reward" class="reward-reveal" aria-live="polite" hidden></ul>
+    </div><!-- /.over-body -->
     <!-- AD SLOT: rewarded video, grants +2 Add to continue. Hidden by default;
          the portal rewarded-ad wrapper replaces this div and adds .ad-live. -->
     <div class="ad-slot ad-reward" data-ad-slot="rewarded">Ad</div>
@@ -50771,6 +50775,21 @@ window.TT_SFX = {
         for (var ci = 0; ci < nb.children.length; ci++) ro.observe(nb.children[ci]);
       }
     })();
+    (function () {   /* P3 T2 수정 2회차 — 작은 폰 게임오버 시트의 중간 구획(.over-body) 넘침 표시. ncBodyMore 와 같은 무늬(읽기 한 묶음 → 속성 쓰기 하나) */
+      var ob = document.querySelector('#modal-over .over-body');
+      if (!ob) return;
+      function overBodyMore() {
+        var more = ob.scrollHeight - ob.clientHeight - Math.ceil(ob.scrollTop) > 0;
+        if (more) { if (!ob.hasAttribute('data-more')) ob.setAttribute('data-more', ''); }
+        else if (ob.hasAttribute('data-more')) ob.removeAttribute('data-more');
+      }
+      on(ob, 'scroll', overBodyMore);
+      if (typeof ResizeObserver === 'function') {
+        var oro = new ResizeObserver(overBodyMore);
+        oro.observe(ob);
+        for (var oi = 0; oi < ob.children.length; oi++) oro.observe(ob.children[oi]);
+      }
+    })();
 
     /* W6 — 통일된 열 모달의 우상단 X. 배선을 새로 만들지 않는다: X 는
      * data-w6x 가 가리키는 **이미 배선된 닫기 버튼**을 그대로 누른다. 그래서
@@ -70306,6 +70325,33 @@ html[lang="en"] #kd-b-circus .kd-tag b{ font-size: .88em; letter-spacing: -.02em
   background-size: 60% 60%;
   background-repeat: no-repeat;
   background-position: center;
+}
+/* 작은 폰의 게임오버 시트(수정 2회차 — 320×640 에서 코인 줄이 서면 메인 메뉴 버튼이 창 밖으로 나갔다). 중간 구획 .over-body(결과 카드 · 순위 줄 ·
+   보상 줄)만 시트 안에서 구르고 버튼 줄은 굴림 밖에 둔다 — 노드 카드의 .nc-body 와 같은 무늬(구획만 구름 · 스크롤바 감춤 · 아래에 남은 내용이 있을 때만
+   data-more 로 가장자리를 흐림, 배선 = overBodyMore). 창 높이가 720 을 넘으면 display:contents 라 상자가 없어 종전 배치와 픽셀이 같다(390×844 · 360×740).
+   양옆 · 위아래 10% 안쪽 여백 = 영웅 줄의 바깥 빛과 rw-pop 의 튀어나옴이 구획 가장자리에서 잘리지 않게 하고, 같은 만큼 바깥 여백을 빼 자리는 그대로(% 는
+   담는 상자 폭 기준 — 원시값 0 · 줄 사이 간격은 시트의 row-gap 을 그대로 물려받는다). */
+#modal-over .over-body { display: contents; }
+@media (max-height: 720px) {
+  #modal-over .over-body {
+    display: flex;
+    flex-direction: column;
+    row-gap: inherit;
+    flex: 0 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    margin: -10%;
+    padding: 10%;
+  }
+  #modal-over .over-body::-webkit-scrollbar { width: 0; height: 0; }
+  #modal-over .over-body > * { flex: 0 0 auto; }
+  #modal-over .over-body[data-more] {
+    -webkit-mask-image: linear-gradient(180deg, var(--prim-white) 85%, transparent);
+            mask-image: linear-gradient(180deg, var(--prim-white) 85%, transparent);
+  }
 }
 </style>
 </body>
