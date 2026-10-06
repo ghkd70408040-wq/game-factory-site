@@ -71935,15 +71935,21 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
    길이는 전부 calc(N * var(--mu))(모달 단위 — 위 [P3-T7-F1] 공용 정의 한 줄을 그대로 쓴다). N 은 T7 확률 창과 같은 읽기(지휘자 판정 Q5 · 390 에서 1 mu = 3.37px).
    수정 1회차(리뷰 I-8 · I-9 지휘자 판정): 목업 R1 에는 유리 판이 없다 — 이 창만 예외로 판(.sheet 면 · 그림자 · jbox)을 걷고, 게임에 이미 있는 「보상 순간」 덮개
    #charget .cut-dim(어두운 보라 방사 .90→.97 — 선택자 이음, 새 색 0)을 결과 창 첫 자식으로 두어 WAAPI 로 켠다(25행). 어두운 덮개 위 맨 글자는 밝은 글자 토큰(--prim-white).
-   무대(#gres-stage)는 판 안여백(30px — 8.4 mu, 390 보다 넓은 폰도 안여백 안)까지 넓혀 390 에서 카드 폭 ≈ 65px(목업과 같은 급)이고, #modal-odds 처럼 무대만 안에서 구른다(가로 폰 — 리뷰 I-3).
+   무대(#gres-stage)는 판 안여백(30px — 8.4 mu, 390 보다 넓은 폰도 안여백 안)까지 넓혀 390 에서 카드 폭 ≈ 65px(목업과 같은 급)이다. #modal-odds 처럼 무대만 안에서 구르는 것은
+   가로 폰(왕국 · 상점과 같은 문턱 — 짧은 변 < 600)에서만이다(리뷰 I-3). 세로 · 데스크톱에서 무대는 구르지 않아(overflow visible) 캡슐 빛 층 · 낙하가 무대 상자에 안 잘린다(수정 2회차 N-2).
+   제목 캡슐은 다른 창과 같은 부품이고 면 바탕만 이 창에서 불투명 흰 토큰이다 — 판 없는 어두운 덮개 위에서 유리 면이 회색으로 죽지 않게(목업 R1 흰 캡슐 · 수정 2회차 N-1).
    캡슐(#gres-cap)은 격자 위에 겹친 절대 위치(판정 Q7-c): 캡슐이 숨어도 격자 · 요약 · 버튼은 한 픽셀도 안 움직인다(시험 t8j). 단발은 한 장을 가운데 칸(3열)에.
    반구 둘은 border-box 라 테두리를 넣고도 꼭 반씩이다. [10회 더] 색 = 화폐(data-price — T5 가격 버튼 줄에 선택자 이음 · 판정 Q4 · M-3) · 화폐 그림 = 상점 가격 버튼 조각(.sh-btn-ic, 선택자 이음 · I-7) ·
    모두 열기 = 「확률 보기 ›」 알약과 같은 자(판정 Q1) · 꼬리 알약 = 목업 px ÷ 3.9(판정 Q2) · 칩 = 확률 창 칩과 같은 N(판정 Q3 — 선택자 이음은 위 .gc-chip 줄) · 빈 줄은 접는다(판정 Q6) ·
    아래 버튼 둘 글자 = T5 가격 버튼 4.2(한 줄에 「10회 더 1,350」). NEW 카드는 Lv 줄을 접는다(M-1) · 등장 전 카드는 탭 무시(M-7) · 뒤집는 중(data-flip=h)은 뒷면(I-1). */
 #modal-gres .sheet{ background: none; box-shadow: none; }                      /* 목업 R1 — 판 없음(이 창만 예외). 제목 캡슐은 남긴다 */
+#modal-gres .sheet > h2{ background-color: var(--prim-white); }               /* 수정 2회차 N-1 — 이 창만 밝은 캡슐: 면 바탕만 불투명 흰 토큰(새 값 0). 겉선 · 림 · 면 그림층 · 글자는 부품 그대로(대비 t8f2a · 확률 창 무변 t8f2b) */
 #modal-gres .sheet > h2, #modal-gres .sheet > p, #modal-gres #gres-all, #modal-gres .sheet-row{ flex: 0 0 auto; }
 #modal-gres .sub-score{ color: var(--prim-white); }                            /* 어두운 덮개 위 맨 글자 = 밝은 글자 토큰(대비 시험 t8f1i) */
-#modal-gres #gres-stage{ position: relative; flex: 0 1 auto; min-height: 0; margin: 0 calc(-8.4 * var(--mu)); overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+#modal-gres #gres-stage{ position: relative; flex: 0 1 auto; min-height: 0; margin: 0 calc(-8.4 * var(--mu)); overflow: visible; }   /* 수정 2회차 N-2 — 구르지 않는다(빛 · 낙하 안 잘림 t8f2c · t8f2d) */
+@media (min-aspect-ratio: 1/1) and (max-height: 599.98px){                     /* 가로 폰만 무대가 안에서 구른다(리뷰 I-3 · t8f1m) */
+  #modal-gres #gres-stage{ overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+}
 #modal-gres #gres-stage::-webkit-scrollbar{ width: 0; height: 0; }
 #modal-gres #gres-grid{ list-style: none; margin: calc(2.6 * var(--mu)) 0; padding: 0; display: grid; grid-template-columns: repeat(5, 1fr); gap: calc(1.8 * var(--mu)); perspective: calc(200 * var(--mu)); }
 #modal-gres #gres-grid[data-n="1"] .gres-card{ grid-column: 3; }
