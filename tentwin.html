@@ -10503,7 +10503,8 @@ html.no-art-logo .logo-img  { display: none; }
    주는 값(95.7vw) 그대로 두고, 글자 크기만 .sk-act 자신이 원래 썼던 그 수치
    (12px, 새 원시값 아님 — :9757 원래 선언 재확인)로 kit-pill-v2 의 calc() 를
    덮는다. --f2-w 를 옮기지 않은 것은 판단 편차이며 보고에 남긴다. */
-#modal-skin .sk-act.kit-pill-v2{
+#modal-skin .sk-act.kit-pill-v2,
+#sh-body .sh-sk .sk-act.kit-pill-v2{   /* P3 T5 — 상점 꾸미기 판의 같은 줄도 같은 규칙(스킨 시트와 같은 크기·색) */
   min-width: 0;
   min-height: 0;
   font-size: 12px;
@@ -10512,7 +10513,8 @@ html.no-art-logo .logo-img  { display: none; }
    기록판 모드 탭, :51803 부근)의 켜짐 변주와 같은 민트 레시피만 얹는다(껍데기·
    질감층은 kit-pill-v2가 그린다). 「착용 중」은 손대지 않는다 —
    kit-pill-v2[soft][disabled] 의 기존 opacity .55 그대로다. */
-#modal-skin .sk-act.kit-pill-v2[data-equip]{
+#modal-skin .sk-act.kit-pill-v2[data-equip],
+#sh-body .sh-sk .sk-act.kit-pill-v2[data-equip]{
   --f2-pill-soft: linear-gradient(180deg, var(--role-mint-face-a) 0%, var(--role-mint-face-a) 47%, var(--role-mint-face-b) 47%, var(--role-mint-face-b) 100%);
   --f2-ink: var(--prim-white);
   --role-f2-pill-soft-e: var(--role-mint-outline);
@@ -17322,7 +17324,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
                    [data-part="modal-plate"]` + `.r10-ribbon` + `.r10-x`).
                   재질은 클래스 계약이 그대로 주므로 CSS 에서 한 값도 안 적는다.
          · 탭   = 킷 탭 부품 `.kit-tab-v2`(캐릭창 카테고리 탭과 같은 부품).
-                  변주 축은 kind = [jewel, jstar, bundle, skin] 넷.
+                  변주 축은 kind = [jewel, bundle] 둘(P3 T5 — 별 교환·스킨 탭은 은퇴: 스킨은 상점 꾸미기 탭, §28.5).
          · 카드 = 그림 버튼/캡슐 문법의 변주 `[data-part="shop-card"]`.
          · X    = 같은 `.r10-x.x-btn` (기존 위임 배선이 그대로 받는다)
 
@@ -17346,9 +17348,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
     </div>
     <div id="shop-tabs" class="shop-tabs" role="tablist" aria-label="Shop">
       <button class="shop-tab kit-tab-v2" type="button" role="tab" data-shop-tab="jewel" aria-selected="true" data-active><span class="shop-tl" data-i18n="shop.tab.jewel">Jewels</span></button>
-      <button class="shop-tab kit-tab-v2" type="button" role="tab" data-shop-tab="jstar" aria-selected="false"><span class="shop-tl" data-i18n="shop.tab.jstar">Stars</span></button>
       <button class="shop-tab kit-tab-v2" type="button" role="tab" data-shop-tab="bundle" aria-selected="false"><span class="shop-tl" data-i18n="shop.tab.bundle">Bundles</span></button>
-      <button class="shop-tab kit-tab-v2" type="button" role="tab" data-shop-tab="skin" aria-selected="false"><span class="shop-tl" data-i18n="shop.tab.skin">Skins</span></button>
     </div>
     <!-- 내용물은 buildShopBody() 가 탭마다 통째로 다시 그린다. 마크업에 카드를
          굳히지 않은 이유는 값(잔액·일일 무료 잠금·첫 구매 배지)이 상태에
@@ -23658,8 +23658,7 @@ window.TT_SFX = {
     continue2:  40,                  // §20.3 · §21 ① 계속하기 2회차부터
     skin:      100                   // §20.3 스킨 (젬리별 25 × 「1★ ≈ 4💎」)
   };                                 /* 74 — 확정 파편 팩(shardPack 60💎 · 고른 색 30알)은 파편 경제와 함께 은퇴했다 */
-  /* §20.3 「1💎 → 4★」 의 2단. 한 방향만 — ★ → 💎 는 없다. */
-  var JSTAR_TRADE = [{ jewel: 25, star: 100 }, { jewel: 100, star: 400 }];
+  /* P3 T5 — 보석 → 별 교환 은퇴(뽑기 재화를 현금으로 팔지 않는다, §20.9 · DESIGN §28.5). 앱 보석 창은 보석 · 번들 둘뿐이다. */
   /* §20.5 가격 사다리. `sku` 는 W3(Digital Goods)가 쓸 상품 ID 이고,
      이 파도는 **적기만** 한다 — 결제 호출은 한 줄도 없다. */
   var JEWEL_PACKS = [
@@ -27460,6 +27459,27 @@ window.TT_SFX = {
       'aria.starplus': 'Get more stars',
       'aria.shoptabs': 'Shop sections',
       'time.hm': '{h}h {m}m',
+      /* P3 Task 5 — 특가 · 꾸미기 탭(상점 화면). 가격·한도·지급 수는 사전에 적지 않는다(카드가 상수로 채운다). */
+      'deals.title': "Today's Deals",
+      'deals.hi': "Welcome! Here are today's deals.",
+      'deals.gift': 'Daily Gift',
+      'deals.gift.d': 'Once a day',
+      'deals.gear': "Today's Gear",
+      'deals.sure': '{name} for sure',
+      'deals.heart1': 'One Heart',
+      'deals.trade': 'Trade for Stars',
+      'deals.heartfull': 'Full Hearts',
+      'deals.claim': 'Claim',
+      'deals.done': 'Tomorrow',
+      'deals.maxed': 'Max level',
+      'deals.got': 'You got {name}.',
+      'deals.foot': 'All deals are fixed items. You see what you get before you buy. They change every day at midnight.',
+      'deals.foot2': 'You can trade coins for stars up to {n} times a day.',
+      'deco.title': 'Skins',
+      'deco.for': 'Skins for {name}',
+      'coin.got': '+{n} coins',
+      'star.got': '+{n} stars',
+      'gacha.nocoin': 'You need {n} more coins.',
       'toast.noadds': 'No adds left',
       'toast.empty': 'Board is empty',
       'toast.nohints': 'No hints left',
@@ -28496,9 +28516,7 @@ window.TT_SFX = {
       'shop.btn': 'Shop',
       'shop.title': 'Shop',
       'shop.tab.jewel': 'Jewels',
-      'shop.tab.jstar': 'Stars',
       'shop.tab.bundle': 'Bundles',
-      'shop.tab.skin': 'Skins',
       'shop.krw': 'KRW {n}',
       'shop.price.jewel': '\uD83D\uDC8E {n}',
       'shop.soon': 'Coming soon',
@@ -28516,9 +28534,6 @@ window.TT_SFX = {
       'shop.pack.d': '{n} jewels',
       'shop.start': 'Starter pack',
       'shop.start.d': '{n} jewels + {h} hearts + {s} stars',
-      'shop.trade': 'Stars {s}',
-      'shop.trade.d': 'Jewels to Stars. One way only.',
-      'shop.trade.ok': 'Stars +{s}',
       'shop.heart5': 'Refill hearts',
       'shop.heart5.d': 'Straight back to {n}',
       'shop.heart1': 'One heart',
@@ -28528,9 +28543,6 @@ window.TT_SFX = {
       'shop.bundle1.d': 'Hearts and items in one go',
       'shop.bundle2': 'Heart bundle',
       'shop.bundle2.d': 'A long evening of play',
-      'shop.skin': 'Skins',
-      'shop.skin.d': 'Buy any skin with {n} jewels',
-      'shop.skin.open': 'Open',
       'shop.skin.confirm': 'Spend {n} jewels on {name}?',
       'shop.poor': 'Not enough jewels ({n} more)',
       'shop.poor.continue': 'Not enough jewels to continue',
@@ -28927,6 +28939,27 @@ window.TT_SFX = {
       'aria.starplus': '별 더 얻기',
       'aria.shoptabs': '상점 칸 고르기',
       'time.hm': '{h}시간 {m}분',
+      /* P3 Task 5 — 특가 · 꾸미기 탭(상점 화면). 가격·한도·지급 수는 사전에 적지 않는다(카드가 상수로 채운다). */
+      'deals.title': '오늘의 특가',
+      'deals.hi': '어서 와요! 오늘의 특가예요.',
+      'deals.gift': '매일 선물',
+      'deals.gift.d': '하루 한 번',
+      'deals.gear': '오늘의 장비',
+      'deals.sure': '{name} 확정',
+      'deals.heart1': '하트 하나',
+      'deals.trade': '별로 바꾸기',
+      'deals.heartfull': '하트 가득',
+      'deals.claim': '무료 받기',
+      'deals.done': '내일 다시',
+      'deals.maxed': '최고 레벨',
+      'deals.got': '{name}을(를) 받았어요.',
+      'deals.foot': '특가는 모두 확정 상품이에요. 무엇을 받는지 미리 보여요. 매일 자정에 새로 바뀌어요.',
+      'deals.foot2': '코인을 별로 바꾸기는 하루 {n}번까지예요.',
+      'deco.title': '스킨',
+      'deco.for': '{name}에게 입힐 스킨이에요.',
+      'coin.got': '코인 +{n}',
+      'star.got': '별 +{n}',
+      'gacha.nocoin': '코인이 {n}개 부족해요.',
       'toast.noadds': '추가 횟수를 다 썼어요',
       'toast.empty': '보드가 비었어요',
       'toast.nohints': '힌트를 다 썼어요',
@@ -29844,9 +29877,7 @@ window.TT_SFX = {
       'shop.btn': '상점',
       'shop.title': '상점',
       'shop.tab.jewel': '보석',
-      'shop.tab.jstar': '별',
       'shop.tab.bundle': '번들',
-      'shop.tab.skin': '스킨',
       'shop.krw': '{n}원',
       'shop.price.jewel': '\uD83D\uDC8E {n}',
       'shop.soon': '준비 중',
@@ -29864,9 +29895,6 @@ window.TT_SFX = {
       'shop.pack.d': '보석 {n}개',
       'shop.start': '시작 팩',
       'shop.start.d': '보석 {n}개 + 하트 {h}개 + 별 {s}개',
-      'shop.trade': '별 {s}개',
-      'shop.trade.d': '보석을 별로. 한 방향만 바꿀 수 있어요.',
-      'shop.trade.ok': '별 +{s}개',
       'shop.heart5': '하트 가득 채우기',
       'shop.heart5.d': '기다림 없이 {n}개로',
       'shop.heart1': '하트 1개',
@@ -29876,9 +29904,6 @@ window.TT_SFX = {
       'shop.bundle1.d': '하트와 아이템을 한 번에',
       'shop.bundle2': '하트 번들',
       'shop.bundle2.d': '저녁 내내 놀 수 있는 만큼',
-      'shop.skin': '스킨',
-      'shop.skin.d': '보석 {n}개로 어떤 스킨이든',
-      'shop.skin.open': '열기',
       'shop.skin.confirm': '{name}을(를) 보석 {n}개로 살까요?',
       'shop.poor': '보석이 {n}개 부족해요',
       'shop.poor.continue': '이어하려면 보석이 더 필요해요',
@@ -32918,12 +32943,15 @@ window.TT_SFX = {
    * ======================================================================= */
   function skinTargetId() { return HERO_IDS[cpIdx] || charId(); }
 
-  function buildSkinList() {
-    var wrap = $('sk-list');
+  /** 스킨 줄을 root 에 그린다(없으면 스킨 시트 #sk-list). withBase = 상점 꾸미기 판(P3 T5): 스킨표가 없는 캐릭터(푸딩 기사 · 소다 마녀)에도 「기본 · 착용 중」
+   *  한 줄을 둔다 — 새 문구 0(skin.base · skin.basedesc · skin.equipped). 스킨 시트(#modal-skin)는 표가 비면 종전대로 빈 목록이다(픽셀 무변). */
+  function buildSkinList(root, withBase) {
+    var wrap = root || $('sk-list');
     if (!wrap) return;
     var id = skinTargetId();
     var list = skinsFor(id);
     var cur = equippedSkin(id);
+    if (withBase && !list.length) { list = [{ id: id + '.base', name: 'skin.base', desc: 'skin.basedesc', cost: 0 }]; cur = list[0]; }
     wrap.innerHTML = '';
     for (var i = 0; i < list.length; i++) {
       var sk = list[i];
@@ -32998,6 +33026,26 @@ window.TT_SFX = {
     try { if (window.TW && window.TW.applyPlatformGates) window.TW.applyPlatformGates(wrap); } catch (e) {}
   }
 
+  /** 스킨 줄 위임 — 스킨 시트(#sk-list)와 상점 꾸미기 판이 같이 쓴다(P3 T5). 본문은 wire() 에 있던 그대로이고 `this` 만 ev.currentTarget 이다. */
+  function skinListClick(ev) {
+    var root = ev && ev.currentTarget;
+    var el = ev && ev.target;
+    while (el && el !== root && !(el.getAttribute &&
+           (el.getAttribute('data-buy') || el.getAttribute('data-buyjewel') ||
+            el.getAttribute('data-equip')))) el = el.parentNode;
+    if (!el || el === root || !el.getAttribute) return;
+    var b = el.getAttribute('data-buy');
+    if (b) { buySkin(b); return; }
+    /* [SHOP-0910] 보석 경로. 위 젤리별 분기 **뒤**에 오는 것이 요점이다 —
+       한 버튼이 두 지갑을 건드리는 일이 문법적으로 없다. */
+    var bj = el.getAttribute('data-buyjewel');
+    if (bj) { buySkinJewel(bj); return; }
+    var e = el.getAttribute('data-equip');
+    if (e) equipSkin(e);
+  }
+  /** 구매·장착이 스킨 시트 목록(#sk-list)만 고치면 상점 꾸미기 판 줄이 낡는다 — 판이 떠 있으면 이 탭만 다시 그린다(스크롤 유지 · 띠 별 잔액 포함, P3 T5). */
+  function skinShopSync() { if (shopActive() && shopTab2 === 'deco') paintShopTab('deco'); }
+
   function openSkins() {
     var el = $('modal-skin');
     if (!el) return;
@@ -33008,7 +33056,6 @@ window.TT_SFX = {
   function closeSkins() {
     var el = $('modal-skin');
     if (el) el.hidden = true;
-    if (shopActive()) paintWallets();   /* P3 T4 수정 1회차 I-1 — 상점 화면 위에서 스킨을 샀으면 띠 별 잔액 */
     J.sfx.ui();
   }
 
@@ -33019,6 +33066,7 @@ window.TT_SFX = {
     persist();
     applySkins();
     buildSkinList();
+    skinShopSync();
     J.sfx.ui();
   }
 
@@ -33051,6 +33099,7 @@ window.TT_SFX = {
       persist();
       applySkins();
       buildSkinList();
+      skinShopSync();
       toast(t('skin.bought', { name: t(sk2.name) }));
       J.sfx.win();
     });
@@ -45573,6 +45622,137 @@ window.TT_SFX = {
     if (b) { var c = shopFreeCount(); b.textContent = c > 0 ? String(c) : ''; b.hidden = !(c > 0); }
   }
 
+  /* ---- 특가 탭(스펙 §4-c ② · 목업 B2) — 전부 확정 상품. 하루 한도 store.deals.b(자정 초기화 = p3Roll). ---- */
+  var DEAL_GIFT_COIN = 100;                      /* 매일 선물 */
+  var DEAL_GEAR_PRICE = { common: 300, rare: 900 };
+  var DEAL_HEART1 = 60;                          /* 하트 1개 — 하루 5 */
+  var DEAL_TRADE = { coin: 500, star: 5 };       /* 코인 500 → 별 5 — 하루 3 */
+  var DEAL_HEARTFULL = 250;                      /* 하트 가득 — 하루 1 */
+  var DEAL_SALT = { common: 0x5EED01, rare: 0x5EED02 };
+  /** 오늘의 장비 — 날짜로 정해진다(모두에게 같은 물건, 자정에 바뀐다). 켜진 장비 풀에서 등급별 하나. */
+  function dealGearOf(tier) {
+    var pool = [], i;
+    for (i = 0; i < ITEM_POOL.length; i++) if (ITEM_POOL[i].tier === tier && ITEM_POOL[i].enabled !== false) pool.push(ITEM_POOL[i].id);
+    if (!pool.length) return '';
+    var r = mulberry32((parseInt(todayKey(), 10) ^ DEAL_SALT[tier]) >>> 0)();
+    return pool[Math.min(pool.length - 1, Math.floor(r * pool.length))];
+  }
+  function dealLeft(k) { p3Roll(); return Math.max(0, (P3_DEAL_CAP[k] | 0) - (store.deals.b[k] | 0)); }
+  /** 한 번 산다. 검사를 전부 먼저 하고(한도·최고 레벨·가득·잔액), 그다음 차감 → 지급 → 한도 +1 → 저장. */
+  function dealBuy(k) {
+    if (dealLeft(k) <= 0) return { err: 'limit' };
+    var price = 0, gear = '', tier = '';
+    if (k === 'gearC' || k === 'gearR') {
+      tier = (k === 'gearC') ? 'common' : 'rare';
+      gear = dealGearOf(tier);
+      if (!gear || ((store.items.own[gear] | 0) >= ITEM_LV_MAX)) return { err: 'max' };
+      price = DEAL_GEAR_PRICE[tier];
+    } else if (k === 'heart1') price = DEAL_HEART1;
+    else if (k === 'trade') price = DEAL_TRADE.coin;
+    else if (k === 'heartfull') {
+      heartsTick();
+      if ((store.hearts | 0) >= HEART_MAX) return { err: 'full' };
+      price = DEAL_HEARTFULL;
+    } else if (k !== 'gift') return { err: 'bad' };
+    if (price > 0 && coinBalance() < price) return { err: 'coin', need: price - coinBalance() };
+    var got = null;
+    if (k === 'gift') { coinGrant(DEAL_GIFT_COIN, 'deal-gift'); got = { coin: DEAL_GIFT_COIN }; }
+    else {
+      if (!coinSpend(price, 'deal-' + k)) return { err: 'coin', need: price - coinBalance() };
+      if (gear) got = grantItemOrRefund(gear, 'shop');
+      else if (k === 'heart1') { grantHearts(1); got = { heart: 1 }; }
+      else if (k === 'trade') { starGrant(DEAL_TRADE.star, 'deal-trade'); got = { star: DEAL_TRADE.star }; }
+      else { store.hearts = HEART_MAX; store.heartAt = Date.now(); got = { heartfull: 1 }; }
+    }
+    store.deals.b[k] = (store.deals.b[k] | 0) + 1;
+    persist();
+    return { ok: true, got: got };
+  }
+  /** 상점 화면 카드 — 앱 보석 창 shopCard 의 부품 인스턴스(격자 변주 data-layout="grid"). 버튼은 킷 젤리 CTA(.cta-jelly),
+   *  색은 가격 종류(data-price: coin 노랑 · star 분홍 · free/ad 초록 · ok 표준)가 역할색 토큰으로 칠한다. */
+  function shopCard2(o) {
+    var card = document.createElement('div');
+    card.className = 'shop-card';
+    card.setAttribute('data-part', 'shop-card');
+    card.setAttribute('data-layout', o.layout || 'grid');
+    if (o.tier) card.setAttribute('data-tier', o.tier);
+    var hd = document.createElement('b'); hd.className = 'shop-cn'; hd.textContent = o.title; card.appendChild(hd);
+    if (o.badge) { var bd = document.createElement('em'); bd.className = 'shop-badge'; bd.textContent = o.badge; card.appendChild(bd); }
+    var ic = document.createElement('i'); ic.className = 'shop-ic ' + (o.ic || ''); ic.setAttribute('aria-hidden', 'true');
+    if (o.icCss) ic.style.setProperty('background-image', o.icCss);
+    card.appendChild(ic);
+    if (o.qty) { var q = document.createElement('span'); q.className = 'shop-qty'; q.textContent = o.qty; card.appendChild(q); }
+    if (o.sub) { var sb = document.createElement('span'); sb.className = 'shop-cd'; sb.textContent = o.sub; card.appendChild(sb); }
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'cta-jelly sh-btn';
+    b.setAttribute('data-price', o.price || 'ok');
+    if (o.coinIc) { var ci = document.createElement('i'); ci.className = 'sh-btn-ic sh-btn-ic--' + o.coinIc; ci.setAttribute('aria-hidden', 'true'); b.appendChild(ci); }
+    b.appendChild(document.createTextNode(o.label));
+    if (o.dis) b.disabled = true; else if (o.act) b.setAttribute('data-sh-act', o.act);
+    card.appendChild(b);
+    return card;
+  }
+  SHOP_PAINT.deals = function (body) {
+    var bub = $('sh-bubble');
+    if (bub) {
+      bub.innerHTML = '';
+      var p = document.createElement('span'); p.textContent = t('deals.hi'); bub.appendChild(p);
+      var clk = document.createElement('b'); clk.id = 'sh-clock'; clk.className = 'kit-pill-v2'; clk.setAttribute('data-variant', 'soft');
+      clk.textContent = shopClockText(); bub.appendChild(clk);
+      bub.hidden = false;
+    }
+    var head = document.createElement('div'); head.className = 'kit-pill-v2 sh-head'; head.setAttribute('data-variant', 'header');
+    head.textContent = t('deals.title'); body.appendChild(head);
+    var grid = document.createElement('div'); grid.className = 'sh-grid'; body.appendChild(grid);
+    var lim = function (k) { return (store.deals.b[k] | 0) + '/' + P3_DEAL_CAP[k]; };
+    var money = function (k, n) { return dealLeft(k) > 0 ? { label: arcComma(n), coinIc: 'coin', price: 'coin', act: 'deal:' + k }
+                                                       : { label: t('deals.done'), price: 'ok', dis: true }; };
+    var gC = dealGearOf('common'), gR = dealGearOf('rare');
+    var cards = [
+      Object.assign({ title: t('deals.gift'), ic: 'shop-ic-coin', qty: '×' + DEAL_GIFT_COIN, sub: t('deals.gift.d') },
+        dealLeft('gift') > 0 ? { label: t('deals.claim'), price: 'free', act: 'deal:gift' } : { label: t('deals.done'), price: 'ok', dis: true }),
+      Object.assign({ title: t('deals.gear'), tier: 'common', icCss: itemArtCss(gC, 96), sub: t('deals.sure', { name: t('item.' + gC + '.nm') }) },
+        (store.items.own[gC] | 0) >= ITEM_LV_MAX ? { label: t('deals.maxed'), price: 'ok', dis: true } : money('gearC', DEAL_GEAR_PRICE.common)),
+      Object.assign({ title: t('deals.gear'), tier: 'rare', badge: t('drops.tier.rare'), icCss: itemArtCss(gR, 96), sub: t('deals.sure', { name: t('item.' + gR + '.nm') }) },
+        (store.items.own[gR] | 0) >= ITEM_LV_MAX ? { label: t('deals.maxed'), price: 'ok', dis: true } : money('gearR', DEAL_GEAR_PRICE.rare)),
+      Object.assign({ title: t('deals.heart1'), ic: 'shop-ic-heart', sub: lim('heart1') }, money('heart1', DEAL_HEART1)),
+      Object.assign({ title: t('deals.trade'), ic: 'shop-ic-jstar-1', qty: '×' + DEAL_TRADE.star, sub: lim('trade') }, money('trade', DEAL_TRADE.coin)),
+      Object.assign({ title: t('deals.heartfull'), ic: 'shop-ic-heart', sub: lim('heartfull') },
+        (store.hearts | 0) >= HEART_MAX ? { label: t('deals.done'), price: 'ok', dis: true } : money('heartfull', DEAL_HEARTFULL))
+    ];
+    for (var i = 0; i < cards.length; i++) grid.appendChild(shopCard2(cards[i]));
+    var f1 = document.createElement('p'); f1.className = 'sh-fine'; f1.textContent = t('deals.foot'); body.appendChild(f1);
+    var f2 = document.createElement('p'); f2.className = 'sh-fine'; f2.textContent = t('deals.foot2', { n: P3_DEAL_CAP.trade }); body.appendChild(f2);
+  };
+  SHOP_DOTS.deals = function () { return dealLeft('gift') > 0 ? 1 : 0; };
+  SHOP_ACTS.deal = function (k) {
+    var r = dealBuy(k);
+    if (r.ok) {
+      if (r.got && r.got.coin) toast(t('coin.got', { n: r.got.coin }));
+      else if (r.got && r.got.star) toast(t('star.got', { n: r.got.star }));
+      else if (r.got && r.got.id) toast(t('deals.got', { name: t('item.' + r.got.id + '.nm') }));
+      else toast(t('shop.heart.ok'));
+      J.sfx.win();
+    } else {
+      if (r.err === 'coin') toast(t('gacha.nocoin', { n: r.need }));
+      J.sfx.fail();
+    }
+    paintShopTab(shopTab2);   /* 구매 뒤 = 이 탭만 다시(스크롤 자리 유지 · 띠·점·번역을 같이 맞춘다) — 처음으로 돌리는 전체 다시 그리기는 열기·탭 전환만 */
+  };
+
+  /* ---- 꾸미기 탭 — 기존 스킨 목록(buildSkinList)을 판 안에 그대로 그린다(새 모양 0, 스펙 §4-c ④). 대상 = 지금 고른 캐릭터(skinTargetId) 하나,
+     대상 바꾸기 알약은 없다(목업 B4). 왕국 장식은 뒤 파도. ---- */
+  SHOP_PAINT.deco = function (body) {
+    var head = document.createElement('div'); head.className = 'kit-pill-v2 sh-head'; head.setAttribute('data-variant', 'header');
+    head.textContent = t('deco.title'); body.appendChild(head);
+    var who = document.createElement('p'); who.className = 'sh-fine'; who.textContent = t('deco.for', { name: t('char.' + skinTargetId() + '.name') });
+    body.appendChild(who);
+    var list = document.createElement('div'); list.className = 'sk-list sh-sk'; body.appendChild(list);
+    list.addEventListener('click', skinListClick);
+    buildSkinList(list, true);
+  };
+
   /* ---- 소비처 ① 하트 (§20.3) ---------------------------------------------- */
 
   /** 0 → 5 즉시 회복 = 50💎. 가득 찼으면 아무 일도 안 한다(버튼도 비활성). */
@@ -45644,6 +45824,7 @@ window.TT_SFX = {
       persist();
       applySkins();
       buildSkinList();
+      skinShopSync();
       toast(t('skin.bought', { name: t(sk2.name) }));
       J.sfx.win();
     });
@@ -45651,20 +45832,7 @@ window.TT_SFX = {
 
   /* (74 — 소비처 ④ 확정 파편 팩 jewelBuyShards 는 파편 경제와 함께 은퇴했다.) */
 
-  /* ---- 젤리별 교환 (§20.3) ------------------------------------------------- */
-
-  /** 1💎 → 4★ 의 2단. **한 방향뿐**이다 — ★ → 💎 는 없다(§20.3). */
-  function jewelTradeStars(i) {
-    var d = JSTAR_TRADE[i | 0];
-    if (!d) return false;
-    if (!jewelSpend(d.jewel, 'jstar-trade')) return false;
-    store.jstar = (store.jstar | 0) + d.star;
-    persist();
-    syncGems();
-    paintShopBalance();
-    if (shopActive()) paintWallets();   /* P3 T4 수정 1회차 I-1 — 보석 창이 상점 화면 위에 떠 있으면 띠 별 잔액도 */
-    return true;
-  }
+  /* ---- 별 교환(§20.3)은 P3 에서 은퇴했다 — 보석으로 뽑기 재화(별)를 사지 않는다. 스킨은 상점 꾸미기 탭이 판다(DESIGN §28.5). ---- */
 
   /* ---- 일일 무료 (§20.4) --------------------------------------------------- */
 
@@ -45801,18 +45969,6 @@ window.TT_SFX = {
         price: shopKrw(START_PACK.krw), dis: true
       }));
       wrap.appendChild(pay);
-    } else if (shopTabCur === 'jstar') {
-      for (i = 0; i < JSTAR_TRADE.length; i++) {
-        d = JSTAR_TRADE[i];
-        wrap.appendChild(shopCard({
-          ic: 'shop-ic-jstar-' + (i + 1),
-          title: t('shop.trade', { s: d.star }),
-          sub: t('shop.trade.d'),
-          price: t('shop.price.jewel', { n: d.jewel }),
-          act: 'star:' + i,
-          dis: jewelBalance() < d.jewel
-        }));
-      }
     } else if (shopTabCur === 'bundle') {
       /* [SHOP-0910 판정] §20.4 는 「하트·아이템」과 「파편」을 따로 뒀지만, 지휘자
          확정 탭 구성은 넷([보석|젤리별|번들|스킨])이다. 그래서 **하트 카드와
@@ -45849,17 +46005,6 @@ window.TT_SFX = {
         price: shopKrw(5500), dis: true
       }));
       wrap.appendChild(bpay);
-    } else {
-      /* 스킨 탭 = **기존 스킨 상점 재사용**. 격자를 복제하지 않는다(§20.4) —
-         한 줄이 `#modal-skin` 을 열고, 그 창의 각 스킨에 「💎 100」 버튼이
-         젤리별 버튼 **옆에** 하나 더 서 있다(buildSkinList). */
-      wrap.appendChild(shopCard({
-        ic: 'shop-ic-jewel',
-        title: t('shop.skin'),
-        sub: t('shop.skin.d', { n: JEWEL_COST.skin }),
-        price: t('shop.skin.open'),
-        act: 'skin'
-      }));
     }
     shopSyncPay();
     applyI18n();
@@ -45867,7 +46012,7 @@ window.TT_SFX = {
 
   /** 탭 전환. 화면 상태의 근거는 shopTabCur 하나뿐이다(cpTab 과 같은 규약). */
   function shopTab(k) {
-    var ok = ['jewel', 'jstar', 'bundle', 'skin'];
+    var ok = ['jewel', 'bundle'];   /* P3 T5 — 별 교환 은퇴(뽑기 재화를 현금으로 팔지 않는다 §20.9) · 스킨 = 상점 꾸미기 탭 */
     shopTabCur = (ok.indexOf(k) >= 0) ? k : 'jewel';
     var root = $('shop-tabs');
     if (root && root.querySelectorAll) {
@@ -45900,7 +46045,7 @@ window.TT_SFX = {
   function closeShop() {
     var el = $('modal-shop');
     if (el) el.hidden = true;
-    if (shopActive()) paintWallets();   /* P3 T4 수정 1회차 I-1 — 상점 화면 위의 보석 창에서 별 교환·스킨 구매 뒤 닫으면 띠 잔액 */
+    if (shopActive()) paintShopTab(shopTab2);   /* P3 T5 — 별 교환은 은퇴, 보석 창이 아직 바꾸는 것은 하트 뿐: 닫으면 띠 하트와 특가 판(하트 가득 카드)이 따라온다 */
     J.sfx.ui();
   }
 
@@ -45909,14 +46054,6 @@ window.TT_SFX = {
     if (a === 'daily') { claimDailyFree(); return; }
     if (a === 'heart5') { if (jewelRefillHearts()) { toast(t('shop.heart.ok')); J.sfx.win(); } else J.sfx.fail(); buildShopBody(); return; }
     if (a === 'heart1') { if (jewelBuyHeart()) { toast(t('shop.heart.ok')); J.sfx.win(); } else J.sfx.fail(); buildShopBody(); return; }
-    if (a.indexOf('star:') === 0) {
-      var si = parseInt(a.slice(5), 10);
-      if (jewelTradeStars(si)) { toast(t('shop.trade.ok', { s: JSTAR_TRADE[si].star })); J.sfx.win(); }
-      else J.sfx.fail();
-      buildShopBody();
-      return;
-    }
-    if (a === 'skin') { openSkins(); return; }
   }
 
   /* ---- 3. 별 · 진행 ------------------------------------------------------ */
@@ -51305,21 +51442,7 @@ window.TT_SFX = {
     });
     on($('cf-no'), 'click', closeConfirm);
     on($('modal-skin'), 'click', function (ev) { if (ev && ev.target === this) closeSkins(); });
-    on($('sk-list'), 'click', function (ev) {
-      var el = ev && ev.target;
-      while (el && el !== this && !(el.getAttribute &&
-             (el.getAttribute('data-buy') || el.getAttribute('data-buyjewel') ||
-              el.getAttribute('data-equip')))) el = el.parentNode;
-      if (!el || el === this || !el.getAttribute) return;
-      var b = el.getAttribute('data-buy');
-      if (b) { buySkin(b); return; }
-      /* [SHOP-0910] 보석 경로. 위 젤리별 분기 **뒤**에 오는 것이 요점이다 —
-         한 버튼이 두 지갑을 건드리는 일이 문법적으로 없다. */
-      var bj = el.getAttribute('data-buyjewel');
-      if (bj) { buySkinJewel(bj); return; }
-      var e = el.getAttribute('data-equip');
-      if (e) equipSkin(e);
-    });
+    on($('sk-list'), 'click', skinListClick);   /* P3 T5 — 이름 있는 함수(buildSkinList 옆) · 상점 꾸미기 판도 같은 위임을 쓴다 */
     /* 썸네일 랙 = **보기** 전환. setChar 을 부르지 않는 것이 요점이다 —
        구경과 결정을 가르는 6차의 규약이 랙에서도 그대로다. */
     /* ⑰ 방울 탭 = 그 방울이 정중앙으로. 논리 인덱스가 아니라 **탭한 렌더 방울**의
@@ -52689,7 +52812,6 @@ window.TT_SFX = {
        데스크톱 브라우저에서도 결제 카드의 자리를 재야 한다»는 관문의 요구다. */
     jewelGrant: jewelGrant, jewelSpend: jewelSpend, jewelBalance: jewelBalance,
     jewelRefillHearts: jewelRefillHearts, jewelBuyHeart: jewelBuyHeart,
-    jewelTradeStars: jewelTradeStars,
     appGemContinue: appGemContinue, jewelPayContinue: jewelPayContinue,
     claimDailyFree: claimDailyFree, dailyFreeLeft: dailyFreeLeft,
     openShop: openShop, closeShop: closeShop, shopTab: shopTab,
@@ -52836,6 +52958,7 @@ window.TT_SFX = {
     KD_TAP_CAP: KD_TAP_CAP,
     /* P3 Task 4 — 가게 화면 손잡이(스모크·촬영용). 게임 코드는 이 중 무엇도 window.Game 을 거쳐 부르지 않는다. */
     openShopScreen: openShopScreen, closeShopScreen: closeShopScreen, setShopTab: setShopTab, portalAdsOk: portalAdsOk, portalAdsSync: portalAdsSync, SHOP_ART: SHOP_ART, shopFreeCount: shopFreeCount,
+    dealBuy: dealBuy, dealGearOf: dealGearOf, dealLeft: dealLeft,   /* P3 T5 — 특가 */
     paintShopTab: paintShopTab, SHOP_PAINT: SHOP_PAINT, SHOP_DOTS: SHOP_DOTS,   /* 수정 1회차 M-2 · M-6 — 탭 태스크 스모크가 표에 자기 함수를 넣어 본다 */
     mateId: mateId, setMate: setMate, cpTab: cpTab, openCharPanel: openCharPanel,
     duelFoeFull: duelFoeFull, PET_SKILL: PET_SKILL,
@@ -70773,6 +70896,59 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
    전폭(#app max-width:none)으로 두면 1cqw 가 12.8px 라 띠 218px · 판 55px 가 됐다(실측). 가로 폰(<600)은 왕국 폭 캡 절(clamp)에 합류해 있다. */
 @media (min-aspect-ratio: 1/1) and (min-width: 700px) and (min-height: 600px){
   #screen-shop{ width: calc(var(--mapui) * 100); max-width: 100vw; margin-left: auto; margin-right: auto; --f2-w: calc(var(--mapui) * 100); }
+}
+
+/* ---- [P3-T5] 특가 · 꾸미기 탭 — 판 안 카드(앱 보석 창 shop-card 부품의 인스턴스 · 격자 변주) · 머리 알약 · 작은 글씨 · 말풍선 시계 · 스킨 줄 묶음 ----
+   길이는 전부 calc(N * var(--cqw)) 다(공통 보충 「상점 화면 규약」). 상점의 --cqw 는 여기서 1cqw(기둥 폭의 1%)를 받고, cqw 를 모르는 기기는 이 블록 맨 끝
+   @supports 블록이 같은 이름을 기둥 폭 / 100 으로 바꾼다 — 그래서 규칙마다 대체를 따로 두지 않는다(정의가 없으면 var() 가 무효가 돼 길이가 통째로 사라진다).
+   색은 Task 4 토큰 표의 역할색뿐 · 치수는 목업 B2 · B4(390 기준 px ÷ 3.9). */
+#screen-shop{ --cqw: 1cqw; }
+/* 머리 알약 = kit-pill-v2[header](5a 차이표 D1 · D2): 높이 44px(11.28cqw) · 좌우 26px(6.67cqw) · 글 주아 21.84px(5.6cqw) 흰 글 + 아래 겉선색 그림자 */
+#sh-body .sh-head{ display: flex; width: max-content; margin: 0 auto calc(2.6 * var(--cqw)); padding: 0 calc(6.67 * var(--cqw));
+  --f2-bh: calc(11.28 * var(--cqw)); font-family: var(--font-display); font-weight: 400; font-size: calc(5.6 * var(--cqw)); line-height: 1;
+  text-shadow: 0 calc(.385 * var(--cqw)) 0 var(--role-f2-pill-a-ln); }
+#sh-body .sh-grid{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: calc(2.05 * var(--cqw)); }
+#sh-body .shop-card[data-layout="grid"]{ position: relative; display: flex; flex-direction: column; align-items: center; gap: calc(1.2 * var(--cqw));
+  min-height: calc(46 * var(--cqw)); padding: calc(2.6 * var(--cqw)) calc(1.8 * var(--cqw)); border-radius: calc(4.6 * var(--cqw)); box-sizing: border-box;
+  background: var(--role-f2-pill); border: calc(.4 * var(--cqw)) solid var(--role-f2-pill-line); color: var(--prim-art-ink); }
+#sh-body .shop-card .shop-cn{ font-size: calc(3.6 * var(--cqw)); }
+#sh-body .shop-card .shop-ic{ width: calc(18 * var(--cqw)); height: calc(18 * var(--cqw)); background: center / contain no-repeat; }
+#sh-body .shop-card .shop-ic.shop-ic-coin{ background-image: var(--lib-glyph-coin); }
+#sh-body .shop-card .shop-ic.shop-ic-heart{ background-image: url("catalog/shop-ic-heart.webp"); }
+#sh-body .shop-card .shop-ic.shop-ic-jstar-1{ background-image: url("catalog/shop-ic-jstar-1.webp"); }
+#sh-body .shop-card[data-tier="common"] .shop-ic{ border-radius: calc(3.6 * var(--cqw)); border: calc(.8 * var(--cqw)) solid var(--role-rw-shard-steady-3); background-color: var(--role-rw-shard-steady-1); }
+#sh-body .shop-card[data-tier="rare"]   .shop-ic{ border-radius: calc(3.6 * var(--cqw)); border: calc(.8 * var(--cqw)) solid var(--role-rw-shard-agility-3); background-color: var(--role-rw-shard-agility-1); }
+#sh-body .shop-card .shop-badge{ position: absolute; left: calc(1.5 * var(--cqw)); top: calc(-2 * var(--cqw)); font-style: normal;
+  padding: calc(.4 * var(--cqw)) calc(2 * var(--cqw)); border-radius: 999em; font-size: calc(3 * var(--cqw)); font-weight: 800; line-height: 1.3;
+  background: var(--role-pink-face-b); color: var(--prim-white); }
+/* 지급 수(×100 · ×5)는 목업 B2 처럼 그림 오른쪽 아래에 겹쳐 앉힌다 — 흐름에 두면 카드가 한 줄 커져 두 줄 카드가 판(450px)에 안 들어간다 */
+#sh-body .shop-card .shop-qty{ position: absolute; right: calc(3.5 * var(--cqw)); top: calc(22.5 * var(--cqw)); font-size: calc(4.2 * var(--cqw)); font-weight: 800; line-height: 1;
+  paint-order: stroke fill; -webkit-text-stroke: calc(.5 * var(--cqw)) var(--prim-white); }
+#sh-body .shop-card .shop-cd{ font-size: calc(3 * var(--cqw)); color: var(--role-f2-ink); }
+#sh-body .sh-btn{ min-height: 0 !important; padding: 0 calc(1 * var(--cqw)) !important; width: 100%; height: calc(10.8 * var(--cqw)); margin-top: auto; font-size: calc(4.2 * var(--cqw)); }
+#sh-body .sh-btn[data-price="coin"]{ --btn-face-a: var(--role-yellow-face-a); --btn-face-b: var(--role-yellow-face-b); --btn-outline: var(--role-yellow-outline); --btn-contact: var(--role-yellow-contact); }
+#sh-body .sh-btn[data-price="star"]{ --btn-face-a: var(--role-pink-face-a); --btn-face-b: var(--role-pink-face-b); --btn-outline: var(--role-pink-outline); --btn-contact: var(--role-pink-contact); }
+#sh-body .sh-btn[data-price="free"],
+#sh-body .sh-btn[data-price="ad"]{ --btn-face-a: var(--role-mint-face-a); --btn-face-b: var(--role-mint-face-b); --btn-outline: var(--role-mint-outline); --btn-contact: var(--role-mint-contact); }
+#sh-body .sh-btn[data-price="ok"]{ --btn-face-a: var(--role-lilac-face-a); --btn-face-b: var(--role-lilac-face-b); --btn-outline: var(--role-lilac-outline); --btn-contact: var(--role-lilac-contact); }
+#sh-body .sh-btn-ic{ width: calc(4.6 * var(--cqw)); height: calc(4.6 * var(--cqw)); margin-right: calc(.8 * var(--cqw)); background: center / contain no-repeat; }
+#sh-body .sh-btn-ic--coin{ background-image: var(--lib-glyph-coin); }
+#sh-body .sh-btn-ic--star{ background-image: var(--lib-star-gold); }
+#sh-body .sh-fine{ margin: calc(2.6 * var(--cqw)) 0 0; font-size: calc(3 * var(--cqw)); line-height: 1.5; text-align: center; color: var(--role-f2-ink); }
+#sh-body .sh-fine + .sh-fine{ margin-top: 0; }
+/* 말풍선(특가) — 목업 B2: 상인 오른쪽 · 안 = 한 줄 인사 + 남은 시간 알약(kit-pill-v2[soft] 119 x 23px · 글 13px). 좌표는 무대(#sh-stage) 안, 위 + 안전 영역(판 위 끝과 같은 규칙). */
+#sh-bubble{ box-sizing: border-box; left: calc(43.6 * var(--cqw)); top: calc(26.7 * var(--cqw) + var(--safe-t)); width: calc(50.3 * var(--cqw)); padding: calc(2 * var(--cqw)) calc(2.8 * var(--cqw)); border-radius: calc(4.1 * var(--cqw));
+  background: var(--prim-white); border: calc(.4 * var(--cqw)) solid var(--role-f2-pill-line); color: var(--prim-art-ink); font-size: calc(3.4 * var(--cqw)); }
+#sh-bubble > .kit-pill-v2{ display: flex; width: max-content; margin-top: calc(1.2 * var(--cqw)); --f2-bh: calc(5.9 * var(--cqw)); font-size: calc(3.3 * var(--cqw)); }
+#screen-shop[data-stab="deals"] #sh-host{ left: calc(6 * var(--cqw)); right: auto; }
+/* 특가 판의 머리 알약은 판 위 끝에 걸쳐 선다(목업 B2: 알약 위 27px 가 판 밖) — 판 안 상자를 그만큼 위로 늘린다(판은 넘침을 안 자른다). 꾸미기 판은 목업 B4 대로 판 안이다. */
+#screen-shop[data-stab="deals"] #sh-body{ top: calc(-6.9 * var(--cqw)); }
+/* 꾸미기 탭 스킨 줄 묶음(5a 차이표 D3 · D4): 대상 줄 밑 틈 2.6cqw · 판이 통째로 스크롤하므로 묶음 안쪽 스크롤은 끈다(.sk-list 기본 max-height 46vh) ·
+   알약 자(--f2-w) = #modal-skin 이 쓰는 값과 같은 식(폰 세로 = 95.7% 폭 · 데스크톱 = 폰 기준폭 390 x .957) — 「장착」 · 「착용 중」이 스킨 시트와 같은 크기가 되게 한다.
+   크기·민트 면 규칙은 위 `.sk-act.kit-pill-v2` 규칙(스킨 시트와 합류 선택자)이 준다. */
+#sh-body .sh-sk{ --f2-w: calc(95.7 * var(--cqw)); margin-top: calc(2.6 * var(--cqw)); max-height: none; overflow-y: visible; }
+@media (min-aspect-ratio: 1/1) and (min-width: 700px){
+  #sh-body .sh-sk{ --f2-w: calc(var(--f2-phone-w) * .957); }
 }
 
 /* ---- cqw 를 모르는 기기(iOS 15 · Chrome 104 급) 폴백 — 반드시 위 기본 규칙 **뒤**(수정 2회차 N-1) ----
