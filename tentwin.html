@@ -17951,6 +17951,25 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
     <button id="odds-close" data-part="btn-modal" data-variant="primary" class="btn btn-primary" type="button" data-i18n="rank.close">Close</button>
   </div></div>
 
+  <!-- [P3-GRES] 뽑기 결과(목업 mock-R1-item10.png). 판 = 정본 모달 판 · 카드 = 등급 액자(코드) + 장비 그림(itemArtCss).
+       결과는 **이미 저장된 뒤**에만 이 창이 열린다(gachaBuy 가 persist 를 끝낸 값) — 연출은 보여 주기만 한다.
+       #gres-stage = 캡슐(#gres-cap)을 격자(#gres-grid) 위에 겹치는 자리(지휘자 판정 Q7-c) — 캡슐이 사라져도 아래 줄이 안 움직인다. -->
+  <div id="modal-gres" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="gres-title"><div class="sheet jbox jbox--modal" data-part="modal-plate">
+    <h2 id="gres-title"></h2>
+    <p id="gres-note" class="sub-score"></p>
+    <div id="gres-stage">
+      <div id="gres-cap" aria-hidden="true"><i class="gres-light"></i><i class="gres-top"></i><i class="gres-bot"></i></div>
+      <ul id="gres-grid"></ul>
+    </div>
+    <p id="gres-sum"></p>
+    <p id="gres-pity" class="sub-score"></p>
+    <button id="gres-all" class="kit-pill-v2" data-variant="soft" type="button" data-i18n="gres.openall">Open all</button>
+    <div class="sheet-row">
+      <button id="gres-ok" data-part="btn-modal" data-variant="primary" class="btn btn-primary" type="button" data-i18n="gres.ok">OK</button>
+      <button id="gres-again" data-part="btn-modal" data-variant="yellow" class="btn btn-primary" type="button"></button>
+    </div>
+  </div></div>
+
   <div id="toast" role="status" aria-live="polite"></div>
 
   <!-- ============================================================
@@ -27525,7 +27544,20 @@ window.TT_SFX = {
       'odds.rule.friend': "Only friends you don't have yet. Rarity weights common {c}, rare {r}, epic {e} are shared by the friends left.",
       'odds.foot1': 'Pulls use only coins, stars and ad rewards. They are never sold for money.',
       'odds.foot2': 'The odds shown come from the same table the draw uses. Decimals are rounded. ({date})',
-      'gres.title': 'Pulled ×{n}',
+      /* P3 Task 8 — 뽑기 결과 창(캡슐 · 카드 뒤집기 · 요약). 레벨 · 코인 · 회수는 자리표시자(호출부가 채운다). */
+      'gres.title1': 'Result',
+      'gres.title10': 'Pull ×{n} Result',
+      'gres.ten.up': 'A rare or better was guaranteed.',
+      'gres.pity.hit': 'The guarantee gave you an epic!',
+      'gres.pity.reset': 'The epic guarantee count starts over.',
+      'gres.lvup': 'Lv{a}→{b}',
+      'gres.sum': 'New {a} · Level up {b}',
+      'gres.refund': '{n} coins back',
+      'gres.new': 'NEW',
+      'gres.ok': 'OK',
+      'gres.again10': '{n} more',
+      'gres.again1': 'Once more',
+      'gres.openall': 'Open all',
       'toast.noadds': 'No adds left',
       'toast.empty': 'Board is empty',
       'toast.nohints': 'No hints left',
@@ -29037,7 +29069,20 @@ window.TT_SFX = {
       'odds.rule.friend': '아직 없는 친구만 나와요. 등급 무게 일반 {c}, 희귀 {r}, 영웅 {e}를 남은 친구끼리 나눠요.',
       'odds.foot1': '코인, 별, 광고 보상으로만 뽑아요. 현금으로 팔지 않아요.',
       'odds.foot2': '보이는 확률은 실제 추첨에 쓰는 표와 같은 값이에요. 소수점 아래는 반올림했어요. ({date} 기준)',
-      'gres.title': '{n}회 뽑았어요',
+      /* P3 Task 8 — 뽑기 결과 창(캡슐 · 카드 뒤집기 · 요약). 레벨 · 코인 · 회수는 자리표시자(호출부가 채운다). */
+      'gres.title1': '뽑기 결과',
+      'gres.title10': '{n}회 뽑기 결과',
+      'gres.ten.up': '희귀 이상 한 개가 확정으로 나왔어요.',
+      'gres.pity.hit': '천장으로 영웅이 나왔어요!',
+      'gres.pity.reset': '영웅 천장을 처음부터 다시 세요.',
+      'gres.lvup': 'Lv{a}→{b}',
+      'gres.sum': '새 장비 {a} · 레벨업 {b}',
+      'gres.refund': '코인 {n} 돌려받음',
+      'gres.new': 'NEW',
+      'gres.ok': '확인',
+      'gres.again10': '{n}회 더',
+      'gres.again1': '한 번 더',
+      'gres.openall': '모두 열기',
       'toast.noadds': '추가 횟수를 다 썼어요',
       'toast.empty': '보드가 비었어요',
       'toast.nohints': '힌트를 다 썼어요',
@@ -45863,11 +45908,137 @@ window.TT_SFX = {
     try { gachaShow(r, function () { gachaBusy = false; if (shopActive()) paintShopTab(shopTab2); }); shown = true; }
     finally { if (!shown) { gachaBusy = false; if (shopActive()) paintShopTab(shopTab2); } }   /* 연출이 예외로 멈춰도 뽑기 탭이 잠기지 않게 — 구매는 이미 저장됐다(착수 전 점검 C2) */
   }
-  /** 결과 보여 주기 — Task 8 이 결과 창·연출로 통째 바꾼다. 여기서는 토스트 한 줄, 끝은 다음 작업 틱(같은 틱 연타를 막는다). */
+  /* ---- [P3-GRES] 뽑기 결과 — 친구는 #charget(초대와 같은 획득 화면), 장비는 결과 창. 모션 = MOTION-SPEC §3 19~23행. ---- */
+  var gresRes = null, gresDone = null, gresAnims = [];
+  var easeTokCache = {}, durTokCache = {};
+  /** CSS 지속 토큰(--dur-1/2/3 = 160/260/420ms)을 ms 수로 한 번 읽는다. 74 개정판에는 이 함수가 없어 P3 가 정의한다(착수 전 점검 C2).
+      못 읽으면 0(= 즉시) — 연출이 멈추지 않고 끝 상태로 간다. */
+  function durTok(name) {
+    if (durTokCache[name] !== undefined) return durTokCache[name];
+    var v = 0;
+    try { v = parseFloat(String(getComputedStyle(document.documentElement).getPropertyValue(name) || '')) || 0; } catch (e) { v = 0; }
+    durTokCache[name] = v > 0 ? v : 0;
+    return durTokCache[name];
+  }
+  /** CSS 이징 토큰(cubic-bezier 문자열)을 한 번 읽는다 — WAAPI 는 CSS 변수를 못 받는다. */
+  function easeTok(name) {
+    if (easeTokCache[name] !== undefined) return easeTokCache[name];
+    var v = '';
+    try { v = String(getComputedStyle(document.documentElement).getPropertyValue(name) || '').trim(); } catch (e) { v = ''; }
+    easeTokCache[name] = v || 'linear';
+    return easeTokCache[name];
+  }
+  function gresAnim(el, frames, dur, ease, delay) {
+    if (!el || !el.animate) return null;
+    var a = el.animate(frames, { duration: dur, easing: easeTok(ease), delay: delay || 0, fill: 'both' });
+    gresAnims.push(a);
+    return a;
+  }
   function gachaShow(res, done) {
-    toast(t('gres.title', { n: res.n }));
-    J.sfx.win();
-    setTimeout(function () { if (done) done(); }, 0);
+    var i, ep = false;
+    for (i = 0; i < res.items.length; i++) if (res.items[i].tier === 'epic') ep = true;
+    if (res.kind === 'friend') {
+      var id = res.items[0].id;
+      TW_PORTAL.happytime();                          /* 새 친구 = 드문 성취(스펙 §4-d, 최대 9번) */
+      charGetFx(id, function () {
+        introPlay(id, function () { if (cgToastMsg) { toast(cgToastMsg); cgToastMsg = ''; } if (done) done(); });
+      });
+      return;
+    }
+    if (ep && !store.gacha.happy) { store.gacha.happy = 1; persist(); TW_PORTAL.happytime(); }   /* 첫 영웅 한 번만 */
+    gresDone = done || null;
+    gresOpen(res);
+  }
+  function gresCard(it) {
+    var li = document.createElement('li');
+    li.className = 'gres-card';
+    li.setAttribute('data-tier', it.tier);
+    li.setAttribute('data-flip', '0');
+    li.innerHTML = '<i class="gres-glow"></i><i class="gres-back"></i><i class="gres-art"></i><b class="gres-new"></b><em class="gres-lv"></em><span class="gres-nm"></span>';
+    li.querySelector('.gres-art').style.setProperty('background-image', itemArtCss(it.id, 96));
+    li.querySelector('.gres-new').textContent = it.isNew ? t('gres.new') : '';
+    li.querySelector('.gres-lv').textContent = it.max ? t('gres.refund', { n: it.refund }) : t('gres.lvup', { a: it.lv0 | 0, b: it.lv | 0 });   /* 사전 밖 글자 0(착수 전 점검 W8) */
+    li.querySelector('.gres-nm').textContent = t('item.' + it.id + '.nm');
+    return li;
+  }
+  function gresOpen(res) {
+    gresRes = res;
+    gresAnims = [];
+    var grid = $('gres-grid'), i, ten = false, pity = false, epic = false, nNew = 0, nUp = 0, refund = 0;
+    grid.innerHTML = '';
+    grid.setAttribute('data-n', String(res.items.length));   /* 단발 = 한 장을 가운데 칸에(CSS) — 캡슐이 그 위에서 열린다(지휘자 판정 Q7-c) */
+    for (i = 0; i < res.items.length; i++) {
+      var it = res.items[i];
+      grid.appendChild(gresCard(it));
+      if (it.how === 'ten') ten = true;
+      if (it.how === 'pity') pity = true;
+      if (it.tier === 'epic') epic = true;
+      if (it.isNew) nNew++; else if (!it.max) nUp++;
+      refund += it.refund | 0;
+    }
+    setText('gres-title', t(res.n > 1 ? 'gres.title10' : 'gres.title1', { n: res.n }));
+    setText('gres-note', pity ? t('gres.pity.hit') : (ten ? t('gres.ten.up') : ''));
+    var sum = $('gres-sum'); sum.innerHTML = '';
+    ['epic', 'rare', 'common'].forEach(function (tr) {
+      var n = res.items.filter(function (x) { return x.tier === tr; }).length;
+      if (!n) return;
+      var s = document.createElement('span'); s.className = 'gres-s'; s.setAttribute('data-tier', tr); s.setAttribute('data-n', String(n));
+      var c = document.createElement('b'); c.className = 'gc-chip'; c.textContent = t('drops.tier.' + tr) + ' ' + n; s.appendChild(c);
+      sum.appendChild(s);
+    });
+    var tail = document.createElement('span'); tail.className = 'kit-pill-v2 gres-t'; tail.setAttribute('data-variant', 'soft');
+    tail.textContent = t('gres.sum', { a: nNew, b: nUp }) + (refund ? ' ' + t('gres.refund', { n: refund }) : '');
+    sum.appendChild(tail);
+    var tb = gachaTable(res.kind);
+    setText('gres-pity', epic ? t('gres.pity.reset') : '');   /* 맨숫자 「0」 없는 문장(착수 전 점검 C9) */
+    var again = $('gres-again'), agN = res.n > 1 ? GACHA_TEN : 1, agP = res.n > 1 ? tb.ten : tb.price;
+    again.textContent = t(res.n > 1 ? 'gres.again10' : 'gres.again1', { n: agN }) + ' ' + arcComma(agP);
+    again.setAttribute('data-again', res.kind + ':' + agN + ':' + GACHA_CUR[res.kind]);
+    again.setAttribute('data-price', GACHA_CUR[res.kind]);   /* 화폐 = 버튼 색(코인 노랑 · 별 분홍 — T5 가격 버튼의 data-price 와 같은 낱말, 지휘자 판정 Q4) */
+    $('gres-all').hidden = res.items.length < 2;
+    openModal('modal-gres');
+    J.sfx.ui();
+    var top = 'common';
+    for (i = 0; i < res.items.length; i++) if (res.items[i].tier === 'epic' || (res.items[i].tier === 'rare' && top === 'common')) top = res.items[i].tier;
+    var cap = $('gres-cap');
+    cap.setAttribute('data-tier', top);
+    if (rwReduced()) { cap.hidden = true; gresOpenAll(true); return; }
+    cap.hidden = false;
+    var d1 = durTok('--dur-1'), d2 = durTok('--dur-2'), d3 = durTok('--dur-3');
+    gresAnim(cap, [{ transform: 'translateY(-60%)', opacity: 0 }, { transform: 'translateY(0)', opacity: 1 }], d3, '--drop', 0);
+    gresAnim(cap.querySelector('.gres-top'), [{ transform: 'rotate(0)' }, { transform: 'rotate(6deg)' }, { transform: 'rotate(-6deg)' }, { transform: 'rotate(0)' }], d2 * 2, '--ease-out', d3);
+    gresAnim(cap.querySelector('.gres-light'), [{ opacity: 0 }, { opacity: 1 }, { opacity: 0.6 }], d2 * 2, '--ease-out', d3);
+    var open = gresAnim(cap.querySelector('.gres-top'), [{ transform: 'translate(0, 0) rotate(0)', opacity: 1 }, { transform: 'translate(-30%, -60%) rotate(-24deg)', opacity: 0 }], d2, '--spring', d3 + d2 * 2);
+    if (open) open.onfinish = function () { cap.hidden = true; };
+    var cards = grid.querySelectorAll('.gres-card');
+    for (i = 0; i < cards.length; i++) gresAnim(cards[i], [{ opacity: 0, transform: 'scale(.9)' }, { opacity: 1, transform: 'scale(1)' }], d2, '--ease-out', d3 + d2 * 3 + i * d1 / 2);
+  }
+  /** 한 장 뒤집기 — 반(90°)까지 돌고, 가운데서 앞면으로 바꾸고, 돌아온다. */
+  function gresFlip(li, instant) {
+    if (!li || li.getAttribute('data-flip') === '1') return;
+    if (instant || !li.animate) { li.setAttribute('data-flip', '1'); return; }
+    var d1 = durTok('--dur-1');
+    var a = gresAnim(li, [{ transform: 'rotateY(0)' }, { transform: 'rotateY(90deg)' }], d1, '--ease-out', 0);
+    if (!a) { li.setAttribute('data-flip', '1'); return; }
+    a.onfinish = function () {
+      li.setAttribute('data-flip', '1');
+      gresAnim(li, [{ transform: 'rotateY(90deg)' }, { transform: 'rotateY(0)' }], d1, '--ease-out', 0);
+    };
+    J.sfx.ui();
+  }
+  function gresOpenAll(instant) {
+    var cards = document.querySelectorAll('#gres-grid .gres-card'), d1 = durTok('--dur-1'), i;
+    for (i = 0; i < cards.length; i++) {
+      if (instant) gresFlip(cards[i], true);
+      else (function (li, k) { setTimeout(function () { gresFlip(li, false); }, k * d1); })(cards[i], i);
+    }
+  }
+  function gresClose() {
+    for (var i = 0; i < gresAnims.length; i++) { try { gresAnims[i].cancel(); } catch (e) {} }
+    gresAnims = [];
+    closeModal('modal-gres');
+    var fn = gresDone; gresDone = null;
+    if (fn) fn();
   }
   function gachaFreeBtn(kind) {
     var g = store.gacha;
@@ -52000,6 +52171,11 @@ window.TT_SFX = {
       if (el) { oddsKind = el.getAttribute('data-otab'); oddsPaint(); var ob = $('odds-body'); if (ob) ob.scrollTop = 0; J.sfx.ui(); }
     });
     on($('modal-odds'), 'click', function (ev) { if (ev && ev.target === this) closeOdds(); });
+    /* P3 T8 — 뽑기 결과 창: 카드 탭(위임) · 모두 열기 · 확인 · 한 번 더(data-again = 종류:수:화폐). 동작 줄이기면 뒤집기는 즉시 앞면. */
+    on($('gres-grid'), 'click', function (ev) { var li = ev.target && ev.target.closest ? ev.target.closest('.gres-card') : null; if (li) gresFlip(li, rwReduced()); });
+    on($('gres-all'), 'click', function () { gresOpenAll(rwReduced()); });
+    on($('gres-ok'), 'click', gresClose);
+    on($('gres-again'), 'click', function () { var a = (this.getAttribute('data-again') || '').split(':'); gresClose(); if (a.length === 3) gachaRun(a[0], parseInt(a[1], 10) || 1, a[2]); });
     on($('shop-tabs'), 'click', function (ev) {
       var el = ev && ev.target;
       while (el && el !== this && !(el.getAttribute && el.getAttribute('data-shop-tab'))) el = el.parentNode;
@@ -52186,6 +52362,7 @@ window.TT_SFX = {
         if ($('modal-shop') && !$('modal-shop').hidden &&
             !($('modal-skin') && !$('modal-skin').hidden)) { closeShop(); return; }
         if ($('modal-odds') && !$('modal-odds').hidden) { closeOdds(); return; }   /* P3 T7 — 확률 창은 상점 화면 위의 한 겹이라 먼저 닫힌다 */
+        if ($('modal-gres') && !$('modal-gres').hidden) { gresClose(); return; }   /* P3 T8 — 결과 창도 상점 화면 위의 한 겹 · 닫으면 gachaBusy 가 풀린다 */
         if ($('screen-shop') && $('screen-shop').classList.contains('active')) { closeShopScreen(); return; }   /* P3 — 상점 화면 = 왕국 위 한 겹 */
       // W7.5 — 클래식 허브도 메뉴 위의 한 겹이라 모드 시트와 같은 우선순위다.
       if ($('modal-classic') && !$('modal-classic').hidden) { closeClassicHub(); return; }
@@ -53410,6 +53587,7 @@ window.TT_SFX = {
     dealBuy: dealBuy, dealGearOf: dealGearOf, dealLeft: dealLeft,   /* P3 T5 — 특가 */
     gachaTable: gachaTable, gachaPull: gachaPull, gachaBuy: gachaBuy, gachaPick: gachaPick, gachaDrawItem: gachaDrawItem, friendOwned: friendOwned, grantFriend: grantFriend, GACHA_PRICE: GACHA_PRICE, GACHA_TIER_P: GACHA_TIER_P, GACHA_TEN_UP: GACHA_TEN_UP,   /* P3 T6 — 뽑기 엔진(표 한 출처) */
     gachaKindSet: gachaKindSet, gachaRun: gachaRun, openOdds: openOdds, closeOdds: closeOdds, pctText: pctText,   /* P3 T7 — 뽑기 탭 · 확률 정보 창 */
+    gresOpenAll: gresOpenAll, gresClose: gresClose,   /* P3 T8 — 뽑기 결과 창(캡슐 · 카드 뒤집기) */
     paintShopTab: paintShopTab, SHOP_PAINT: SHOP_PAINT, SHOP_DOTS: SHOP_DOTS,   /* 수정 1회차 M-2 · M-6 — 탭 태스크 스모크가 표에 자기 함수를 넣어 본다 */
     mateId: mateId, setMate: setMate, cpTab: cpTab, openCharPanel: openCharPanel,
     duelFoeFull: duelFoeFull, PET_SKILL: PET_SKILL,
@@ -63454,6 +63632,7 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
 #modal-arc .sheet > h2,
 #modal-daily .sheet > h2,
 #modal-odds .sheet > h2,
+#modal-gres .sheet > h2,
 #modal-clear .sheet > h2,
 #modal-rank .sheet > h2,
 #modal-minimap .r10-ribbon,
@@ -63700,6 +63879,7 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
   #modal-arc .sheet > h2,
   #modal-daily .sheet > h2,
   #modal-odds .sheet > h2,
+  #modal-gres .sheet > h2,
   #modal-clear .sheet > h2,
   #modal-rank .sheet > h2,
   #modal-minimap .r10-ribbon,
@@ -63741,6 +63921,7 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
   #modal-arc .sheet > h2::before,
   #modal-daily .sheet > h2::before,
   #modal-odds .sheet > h2::before,
+  #modal-gres .sheet > h2::before,
   #modal-clear .sheet > h2::before,
   #modal-rank .sheet > h2::before,
   #modal-minimap .r10-ribbon::before,
@@ -65887,6 +66068,7 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
 #modal-arc .sheet > h2,
 #modal-daily .sheet > h2,
 #modal-odds .sheet > h2,
+#modal-gres .sheet > h2,
 #modal-clear .sheet > h2,
 #modal-rank .sheet > h2,
 #modal-minimap .r10-ribbon,
@@ -66160,6 +66342,7 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
 #modal-arc .sheet > h2,
 #modal-daily .sheet > h2,
 #modal-odds .sheet > h2,
+#modal-gres .sheet > h2,
 #modal-clear .sheet > h2,
 #modal-rank .sheet > h2,
 #modal-minimap .r10-ribbon,
@@ -66227,6 +66410,7 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
 #modal-arc .sheet > h2,
 #modal-daily .sheet > h2,
 #modal-odds .sheet > h2,
+#modal-gres .sheet > h2,
 #modal-clear .sheet > h2,
 #modal-rank .sheet > h2{
   --wcap-w: calc(56.84% + 35.2408px);      /* .sheet.jbox--modal — 안여백 차 62px 고정 */
@@ -71476,10 +71660,10 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
 #sh-body .gc-tiers .gc-tr{ display: flex; align-items: center; gap: calc(2 * var(--cqw)); padding: calc(1.2 * var(--cqw)) 0; font-size: calc(3.4 * var(--cqw)); color: var(--prim-art-ink); }
 #odds-body .od-tier{ display: flex; align-items: center; gap: calc(2 * var(--mu)); padding: calc(1.2 * var(--mu)) 0; font-size: calc(3.4 * var(--mu)); color: var(--prim-art-ink); }
 #sh-body .gc-tiers .gc-tr em, #odds-body .od-tier .od-p{ margin-left: auto; font-style: normal; font-weight: 800; }
-/* 등급 칩 — 길이는 쓰이는 자리의 단위(상점 판 = --cqw · 확률 창 = --mu), 색 · 모양은 한 규칙 */
+/* 등급 칩 — 길이는 쓰이는 자리의 단위(상점 판 = --cqw · 확률 창 · 결과 창 = --mu), 색 · 모양은 한 규칙 */
 .gc-chip{ display: inline-block; text-align: center; font-style: normal; color: var(--prim-white); background: var(--role-rw-shard-steady-3); }
 #sh-body .gc-chip{ min-width: calc(11 * var(--cqw)); padding: calc(.6 * var(--cqw)) calc(2 * var(--cqw)); border-radius: calc(3 * var(--cqw)); }
-#modal-odds .gc-chip{ min-width: calc(11 * var(--mu)); padding: calc(.6 * var(--mu)) calc(2 * var(--mu)); border-radius: calc(3 * var(--mu)); }
+#modal-odds .gc-chip, #modal-gres .gc-chip{ min-width: calc(11 * var(--mu)); padding: calc(.6 * var(--mu)) calc(2 * var(--mu)); border-radius: calc(3 * var(--mu)); }   /* P3 T8 — 결과 창 요약 칩도 같은 N(판정 Q3) */
 [data-tier="rare"] > .gc-chip{ background: var(--role-rw-shard-agility-3); }
 [data-tier="epic"] > .gc-chip{ background: var(--role-rw-item-3); }
 /* ---- 확률 창(목업 P): 절 셋은 옅은 판(.well 문법) · 장비별은 2열 ---- */
@@ -71510,6 +71694,55 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
 #modal-odds .sh-fine + .sh-fine{ margin-top: 0; }
 #modal-odds .od-ic{ width: calc(6.2 * var(--mu)); height: calc(6.2 * var(--mu)); flex: none; background: center / contain no-repeat; }
 #modal-odds .od-rules ul{ margin: 0; padding-left: calc(4 * var(--mu)); list-style: disc; text-align: left; font-size: calc(3.3 * var(--mu)); line-height: 1.55; color: var(--prim-art-ink); }
+
+/* ---- [P3-T8] 뽑기 결과 창(목업 R1) — 카드 = 등급 액자(74 등급 토큰) · 영웅 뒤 금빛 = 정적 층 · 뒤집기 = transform 만 · 모션 = MOTION-SPEC §3 19~23행 ----
+   길이는 전부 calc(N * var(--mu))(모달 단위 — 위 [P3-T7-F1] 공용 정의 한 줄을 그대로 쓴다). N 은 T7 확률 창과 같은 읽기(지휘자 판정 Q5 · 390 에서 1 mu = 3.37px).
+   캡슐(#gres-cap)은 격자 위에 겹친 절대 위치(판정 Q7-c): #gres-stage 가 자리를 주고, 캡슐이 숨어도 격자 · 요약 · 버튼은 한 픽셀도 안 움직인다(시험 t8j).
+   단발은 한 장을 가운데 칸(3열)에 두어 캡슐이 그 위에서 열린다. 반구 둘은 border-box 라 테두리를 넣고도 꼭 반씩이다(안 주면 테두리만큼 겹친다).
+   [10회 더] 색 = 화폐(data-price — T5 가격 버튼과 같은 낱말 · 판정 Q4) · 모두 열기 = 「확률 보기 ›」 알약과 같은 자(판정 Q1) · 꼬리 알약 = 목업 px ÷ 3.9(판정 Q2) ·
+   칩 = 확률 창 칩과 같은 N(판정 Q3 — 선택자 이음은 위 .gc-chip 줄) · 빈 줄은 접는다(판정 Q6) · 아래 버튼 둘 글자 = T5 가격 버튼 4.2(한 줄에 「10회 더 1,350」). */
+#modal-gres #gres-stage{ position: relative; }
+#modal-gres #gres-grid{ list-style: none; margin: calc(2.6 * var(--mu)) 0; padding: 0; display: grid; grid-template-columns: repeat(5, 1fr); gap: calc(1.8 * var(--mu)); perspective: calc(200 * var(--mu)); }
+#modal-gres #gres-grid[data-n="1"] .gres-card{ grid-column: 3; }
+#modal-gres .gres-card{ position: relative; aspect-ratio: 3 / 4.4; border-radius: calc(3.6 * var(--mu)); transform-style: preserve-3d;
+  background: linear-gradient(180deg, var(--role-rw-shard-steady-1), var(--role-rw-shard-steady-2)); border: calc(.8 * var(--mu)) solid var(--role-rw-shard-steady-3); }
+#modal-gres .gres-card[data-tier="rare"]{ background: linear-gradient(180deg, var(--role-rw-shard-agility-1), var(--role-rw-shard-agility-2)); border-color: var(--role-rw-shard-agility-3); }
+#modal-gres .gres-card[data-tier="epic"]{ background: linear-gradient(180deg, var(--role-rw-item-1), var(--role-rw-item-2)); border-color: var(--role-rw-item-3); }
+#modal-gres .gres-glow{ position: absolute; inset: calc(-1.2 * var(--mu)); border-radius: calc(4.6 * var(--mu)); pointer-events: none;
+  background: radial-gradient(closest-side, var(--role-rw-star-2), transparent); display: none; }
+#modal-gres .gres-card[data-tier="epic"] .gres-glow{ display: block; }
+#modal-gres .gres-back{ position: absolute; inset: 0; border-radius: calc(2.8 * var(--mu)); background: var(--role-f2-pill) var(--lib-star-gold) center / 40% no-repeat; }
+#modal-gres .gres-card[data-flip="1"] .gres-back,
+#modal-gres .gres-card[data-flip="1"] .gres-glow{ display: none; }
+#modal-gres .gres-card[data-flip="0"] .gres-art,
+#modal-gres .gres-card[data-flip="0"] .gres-new,
+#modal-gres .gres-card[data-flip="0"] .gres-lv,
+#modal-gres .gres-card[data-flip="0"] .gres-nm{ display: none; }
+#modal-gres .gres-art{ position: absolute; left: 10%; top: 8%; width: 80%; aspect-ratio: 1; background: center / contain no-repeat; }
+#modal-gres .gres-new{ position: absolute; left: calc(-1 * var(--mu)); top: calc(-2.4 * var(--mu)); padding: calc(.4 * var(--mu)) calc(1.4 * var(--mu)); font-size: calc(2.6 * var(--mu)); color: var(--prim-white);
+  background: var(--prim-art-pink) url("catalog/badge-new-blank.webp") center / 100% 100% no-repeat; border-radius: calc(2 * var(--mu)); }
+#modal-gres .gres-new:empty{ display: none; }
+#modal-gres .gres-lv{ position: absolute; left: 6%; right: 6%; bottom: 20%; text-align: center; font-style: normal; font-size: calc(2.5 * var(--mu));
+  color: var(--prim-white); background: var(--prim-art-ink); border-radius: calc(2 * var(--mu)); }
+#modal-gres .gres-nm{ position: absolute; left: 0; right: 0; bottom: 3%; text-align: center; font-size: calc(2.6 * var(--mu)); color: var(--prim-art-ink); }
+#modal-gres #gres-sum{ display: flex; flex-wrap: wrap; justify-content: center; gap: calc(1.2 * var(--mu)); font-size: calc(3.4 * var(--mu)); }
+#modal-gres .gres-t{ --f2-bh: calc(5.9 * var(--mu)); font-size: calc(3.3 * var(--mu)); }
+#modal-gres #gres-all{ --f2-bh: calc(5.64 * var(--mu)); font-size: calc(3.2 * var(--mu)); width: max-content; margin: 0 auto; }
+#modal-gres .sub-score:empty{ display: none; }
+#modal-gres #gres-cap{ position: absolute; z-index: 1; pointer-events: none; width: calc(30 * var(--mu)); height: calc(30 * var(--mu)); left: calc(50% - 15 * var(--mu)); top: calc(50% - 15 * var(--mu)); }
+#modal-gres #gres-cap[hidden]{ display: none; }
+#modal-gres .gres-light{ position: absolute; inset: -30%; border-radius: 50%; background: radial-gradient(closest-side, var(--role-rw-shard-steady-2), transparent); }
+#modal-gres #gres-cap[data-tier="rare"] .gres-light{ background: radial-gradient(closest-side, var(--role-rw-shard-agility-2), transparent); }
+#modal-gres #gres-cap[data-tier="epic"] .gres-light{ background: radial-gradient(closest-side, var(--role-rw-item-2), transparent); }
+#modal-gres .gres-top, #modal-gres .gres-bot{ position: absolute; left: 0; right: 0; height: 50%; box-sizing: border-box; }
+#modal-gres .gres-top{ top: 0; border-radius: calc(15 * var(--mu)) calc(15 * var(--mu)) 0 0; background: var(--role-rw-shard-steady-2); border: calc(.8 * var(--mu)) solid var(--prim-art-ink); }
+#modal-gres #gres-cap[data-tier="rare"] .gres-top{ background: var(--role-rw-shard-agility-2); }
+#modal-gres #gres-cap[data-tier="epic"] .gres-top{ background: var(--role-rw-item-2); }
+#modal-gres .gres-bot{ bottom: 0; border-radius: 0 0 calc(15 * var(--mu)) calc(15 * var(--mu)); background: var(--prim-white); border: calc(.8 * var(--mu)) solid var(--prim-art-ink); }
+#modal-gres .sheet-row .btn{ flex: 1 1 0; font-size: calc(4.2 * var(--mu)); }
+#modal-gres #gres-again[data-price="coin"]{ --btn-face-a: var(--role-yellow-face-a); --btn-face-b: var(--role-yellow-face-b); --btn-outline: var(--role-yellow-outline); --btn-contact: var(--role-yellow-contact); }
+#modal-gres #gres-again[data-price="star"]{ --btn-face-a: var(--role-pink-face-a); --btn-face-b: var(--role-pink-face-b); --btn-outline: var(--role-pink-outline); --btn-contact: var(--role-pink-contact); }
+@media (prefers-reduced-motion: reduce){ #modal-gres #gres-cap{ display: none; } }
 
 /* ---- cqw 를 모르는 기기(iOS 15 · Chrome 104 급) 폴백 — 반드시 위 기본 규칙 **뒤**(수정 2회차 N-1) ----
    사용자 지정 속성(--f2-w · --cqw)은 cqw 를 모르는 기기도 값(100cqw)으로 받아들여 버려지지 않으므로, 대체가 앞에 있으면 기본이 덮어 쓰는 자리에서
