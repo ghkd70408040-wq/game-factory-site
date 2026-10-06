@@ -49735,6 +49735,160 @@ window.TT_SFX = {
   }
 
   /* =========================================================================
+   * [P3-GACHA] 뽑기 3종(스펙 §4-b) — 표 한 출처. 추첨(gachaPull) · 확률 창(Task 7) · 결과 연출(Task 8)이
+   * 전부 gachaTable(kind) 하나를 읽는다(표시 = 추첨 · 2025-08-01 징벌적 손해배상 대비).
+   * 천장·10회 보장은 추첨 **앞**에서 가른다(openGachaRoll 의 forced 선례). 결제·추첨·지급·천장·기록은
+   * gachaBuy 한 곳에서 한 묶음으로 하고 persist 한 번 — 연출은 저장이 끝난 뒤에만 시작한다.
+   * 판 위 선물 상자(openGachaRoll, 74 개봉표 95/5)와는 다른 장치다 — 이름이 비슷할 뿐 무접촉.
+   * ========================================================================= */
+  var GACHA_KINDS = ['item', 'gold', 'friend'];
+  var GACHA_PRICE = { item: 150, item10: 1350, gold: 30, friend: 20 };   /* 코인 · 코인 · 별 · 별 */
+  var GACHA_CUR = { item: 'coin', gold: 'star', friend: 'star' };
+  var GACHA_TEN = 10;
+  var GACHA_TIER_P = { item: { common: 0.75, rare: 0.22, epic: 0.03 }, gold: { rare: 0.85, epic: 0.15 } };
+  var GACHA_TEN_UP = { rare: 0.88, epic: 0.12 };        /* 10회: 앞 9칸이 전부 일반이면 10번째 */
+  var GACHA_FRIEND_W = { common: 6, rare: 3, epic: 1 };  /* 남은 친구끼리 나누는 무게 */
+  var GACHA_FRIEND_TIER = { mongle: 'common', tiktok: 'common', churup: 'common',
+                            kkultteok: 'rare', sseokssak: 'rare', mukmul: 'rare',
+                            banjjak: 'epic', bangul: 'epic', jelly: 'epic' };   /* = 초대 사다리 0~12 / 16~25 / 30~45★ 순서 */
+  var GACHA_TIERS = ['common', 'rare', 'epic'];
+
+  function gachaItemsOf(tier) {
+    var out = [], i;
+    for (i = 0; i < ITEM_POOL.length; i++) if (ITEM_POOL[i].tier === tier && ITEM_POOL[i].enabled !== false) out.push(ITEM_POOL[i].id);
+    return out;
+  }
+  /** 친구 보유 — 펫은 store.pets, 젤리공주(주인공)는 해금 여부. */
+  function friendOwned(id) { return id === 'jelly' ? heroUnlocked('jelly') : petOwned(id); }
+  /** 표 한 출처. rows[i] = { id, tier, p } (합 1). 친구는 **지금 남은 친구만**으로 다시 나눈다. */
+  function gachaTable(kind) {
+    p3Ensure();
+    var tb = { kind: kind, cur: GACHA_CUR[kind], price: GACHA_PRICE[kind], ten: kind === 'item' ? GACHA_PRICE.item10 : 0,
+               tiers: [], rows: [], pity: 0, pityAt: 0, left: 0, all: 0 };
+    var i, j, tier, ids, p, n;
+    if (kind === 'friend') {
+      var W = 0, left = [];
+      for (i = 0; i < GACHA_FRIEND_IDS.length; i++) {
+        if (!friendOwned(GACHA_FRIEND_IDS[i])) { left.push(GACHA_FRIEND_IDS[i]); W += GACHA_FRIEND_W[GACHA_FRIEND_TIER[GACHA_FRIEND_IDS[i]]]; }
+      }
+      tb.all = GACHA_FRIEND_IDS.length;
+      tb.left = left.length;
+      for (i = 0; i < left.length; i++) tb.rows.push({ id: left[i], tier: GACHA_FRIEND_TIER[left[i]], p: GACHA_FRIEND_W[GACHA_FRIEND_TIER[left[i]]] / W });
+      for (j = 0; j < GACHA_TIERS.length; j++) {
+        tier = GACHA_TIERS[j]; p = 0; n = 0;
+        for (i = 0; i < tb.rows.length; i++) if (tb.rows[i].tier === tier) { p += tb.rows[i].p; n++; }
+        if (n) tb.tiers.push({ tier: tier, p: p, n: n, each: p / n });
+      }
+      return tb;
+    }
+    var TP = GACHA_TIER_P[kind] || {};
+    for (j = 0; j < GACHA_TIERS.length; j++) {
+      tier = GACHA_TIERS[j];
+      if (!TP[tier]) continue;
+      ids = gachaItemsOf(tier);
+      tb.tiers.push({ tier: tier, p: TP[tier], n: ids.length, each: ids.length ? TP[tier] / ids.length : 0 });
+      for (i = 0; i < ids.length; i++) tb.rows.push({ id: ids[i], tier: tier, p: TP[tier] / ids.length });
+    }
+    tb.pityAt = (kind === 'item') ? GACHA_ITEM_PITY : GACHA_GOLD_PITY;
+    tb.pity = (kind === 'item') ? (store.gacha.itemPity | 0) : (store.gacha.goldPity | 0);
+    return tb;
+  }
+  /** 가중 한 번 — rng() 정확히 1회. rows = [{…, p}] (합 1). */
+  function gachaPick(rows, rng) {
+    var u = rng(), acc = 0;
+    for (var i = 0; i < rows.length; i++) { acc += rows[i].p; if (u < acc) return rows[i]; }
+    return rows[rows.length - 1];
+  }
+  /** 장비 한 칸 — rng 정확히 2회(등급 · 등급 안). forced: '' = 표대로 · 'epic' = 천장 · 'up' = 10회 보장(희귀 88 / 영웅 12). */
+  function gachaDrawItem(tb, rng, forced) {
+    var tierRows = [], i;
+    if (forced === 'epic') tierRows = [{ tier: 'epic', p: 1 }];
+    else if (forced === 'up') tierRows = [{ tier: 'rare', p: GACHA_TEN_UP.rare }, { tier: 'epic', p: GACHA_TEN_UP.epic }];
+    else for (i = 0; i < tb.tiers.length; i++) tierRows.push({ tier: tb.tiers[i].tier, p: tb.tiers[i].p });
+    var tier = gachaPick(tierRows, rng).tier, inTier = [];
+    for (i = 0; i < tb.rows.length; i++) if (tb.rows[i].tier === tier) inTier.push({ id: tb.rows[i].id, tier: tier, p: 0 });
+    for (i = 0; i < inTier.length; i++) inTier[i].p = 1 / inTier.length;
+    return gachaPick(inTier, rng);
+  }
+  /** 추첨만(결제·지급 없음). 천장 칸(store.gacha.itemPity/goldPity)은 여기서 움직인다 — 영웅이면 0, 아니면 +1(상한 = 천장). */
+  function gachaPull(kind, count, rng) {
+    var r = (typeof rng === 'function') ? rng : Math.random;
+    var tb = gachaTable(kind), out = [], g = store.gacha, i, k;
+    if (kind === 'friend') {
+      var pool = tb.rows.slice();
+      for (i = 0; i < count && pool.length; i++) {
+        var W = 0;
+        for (k = 0; k < pool.length; k++) W += GACHA_FRIEND_W[pool[k].tier];
+        for (k = 0; k < pool.length; k++) pool[k].p = GACHA_FRIEND_W[pool[k].tier] / W;
+        var f = gachaPick(pool, r);
+        out.push({ id: f.id, tier: f.tier, how: '' });
+        pool.splice(pool.indexOf(f), 1);
+      }
+      return out;
+    }
+    var cap = (kind === 'item') ? GACHA_ITEM_PITY : GACHA_GOLD_PITY, allCommon = true;
+    for (i = 0; i < count; i++) {
+      var pityNow = (kind === 'item') ? g.itemPity : g.goldPity, forced = '', how = '';
+      if (pityNow >= cap) { forced = 'epic'; how = 'pity'; }
+      else if (kind === 'item' && count === GACHA_TEN && i === GACHA_TEN - 1 && allCommon) { forced = 'up'; how = 'ten'; }
+      var d = gachaDrawItem(tb, r, forced);
+      if (d.tier !== 'common') allCommon = false;
+      if (d.tier === 'epic') { if (kind === 'item') g.itemPity = 0; else g.goldPity = 0; }
+      else if (kind === 'item') g.itemPity = Math.min(cap, (g.itemPity | 0) + 1);
+      else g.goldPity = Math.min(cap, (g.goldPity | 0) + 1);
+      out.push({ id: d.id, tier: d.tier, how: how });
+    }
+    return out;
+  }
+  /** 친구 합류(뽑기·선물 공용) — 원천을 적는다(Task 10 의 「이미 가진 친구를 보스가 주면 별 +10」이 읽는다). */
+  function grantFriend(id, src) {
+    if (GACHA_FRIEND_IDS.indexOf(id) < 0 || friendOwned(id)) return false;
+    if (id === 'jelly') { store.jellyOn = true; syncCharPick(); }
+    else if (!grantPet(id, true)) return false;
+    if (src === 'gacha' || src === 'gift') store.gacha.petSrc[id] = src;
+    persist();
+    return true;
+  }
+  /** 한 번 산다. how = 'coin'|'star'(가격) · 'free'(매일 무료 1, 아이템만) · 'first'(첫 방문 1, 아이템·친구) · 'ad'(광고 보상 — Task 9).
+   *  검사를 전부 먼저 → 차감 → 무료 표식 → 추첨 → 지급 → 기록 → persist 한 번. 실패는 상태를 한 톨도 안 바꾼다. */
+  function gachaBuy(kind, count, how, rng) {
+    if (GACHA_KINDS.indexOf(kind) < 0) return { err: 'bad' };
+    p3Ensure();
+    var n = (kind === 'item' && count === GACHA_TEN) ? GACHA_TEN : 1, g = store.gacha, cur = GACHA_CUR[kind], cost = 0;
+    if (kind === 'friend' && gachaTable('friend').left <= 0) return { err: 'allfriends' };
+    if (how === 'free') { if (kind !== 'item' || n !== 1 || g.freeDay === todayKey()) return { err: 'used' }; }
+    else if (how === 'first') {
+      if (n !== 1 || kind === 'gold') return { err: 'used' };
+      if (kind === 'item' ? g.firstItem : g.firstFriend) return { err: 'used' };
+    } else if (how === 'ad') { if (n !== 1 || kind === 'gold') return { err: 'bad' }; }
+    else if (how === 'coin' || how === 'star') {
+      if (how !== cur) return { err: 'bad' };
+      cost = (n === GACHA_TEN) ? GACHA_PRICE.item10 : GACHA_PRICE[kind];
+      var have = (cur === 'coin') ? coinBalance() : (store.jstar | 0);
+      if (have < cost) return { err: cur, need: cost - have };
+    } else return { err: 'bad' };
+    /* 여기부터 한 묶음 — 되돌리지 않는다. */
+    if (cost > 0 && !(cur === 'coin' ? coinSpend(cost, 'gacha-' + kind) : starSpend(cost, 'gacha-' + kind))) return { err: cur, need: cost };
+    if (how === 'free') g.freeDay = todayKey();
+    if (how === 'first') { if (kind === 'item') g.firstItem = 1; else g.firstFriend = 1; }
+    var picks = gachaPull(kind, n, rng), items = [], i, res;
+    for (i = 0; i < picks.length; i++) {
+      if (kind === 'friend') {
+        grantFriend(picks[i].id, 'gacha');
+        res = { id: picks[i].id, tier: picks[i].tier, isNew: true, friend: true };
+      } else {
+        res = grantItemOrRefund(picks[i].id, 'gacha') || { id: picks[i].id, tier: picks[i].tier, lv: 0 };
+      }
+      res.how = picks[i].how;
+      items.push(res);
+    }
+    g.log.push({ t: Date.now(), k: kind, h: how, r: items.map(function (x) { return x.id + ':' + x.tier + ':' + (x.lv | 0); }) });
+    if (g.log.length > GACHA_LOG_MAX) g.log.splice(0, g.log.length - GACHA_LOG_MAX);
+    persist();
+    return { ok: true, kind: kind, n: n, how: how, items: items };
+  }
+
+  /* =========================================================================
    * 판정판 74 — 장비 과일 파밍(스펙 §D · 조사 §9). 숫자 출처는 dropTableFor(n) 하나: 판 추첨(battleRefill →
    * gearRollFrom)과 획득표 모달·스테이지 카드가 같은 표를 읽는다(advStar2Need 선례). 장비 과일은 모험에서만.
    * ========================================================================= */
@@ -52959,6 +53113,7 @@ window.TT_SFX = {
     /* P3 Task 4 — 가게 화면 손잡이(스모크·촬영용). 게임 코드는 이 중 무엇도 window.Game 을 거쳐 부르지 않는다. */
     openShopScreen: openShopScreen, closeShopScreen: closeShopScreen, setShopTab: setShopTab, portalAdsOk: portalAdsOk, portalAdsSync: portalAdsSync, SHOP_ART: SHOP_ART, shopFreeCount: shopFreeCount,
     dealBuy: dealBuy, dealGearOf: dealGearOf, dealLeft: dealLeft,   /* P3 T5 — 특가 */
+    gachaTable: gachaTable, gachaPull: gachaPull, gachaBuy: gachaBuy, gachaPick: gachaPick, gachaDrawItem: gachaDrawItem, friendOwned: friendOwned, grantFriend: grantFriend, GACHA_PRICE: GACHA_PRICE, GACHA_TIER_P: GACHA_TIER_P, GACHA_TEN_UP: GACHA_TEN_UP,   /* P3 T6 — 뽑기 엔진(표 한 출처) */
     paintShopTab: paintShopTab, SHOP_PAINT: SHOP_PAINT, SHOP_DOTS: SHOP_DOTS,   /* 수정 1회차 M-2 · M-6 — 탭 태스크 스모크가 표에 자기 함수를 넣어 본다 */
     mateId: mateId, setMate: setMate, cpTab: cpTab, openCharPanel: openCharPanel,
     duelFoeFull: duelFoeFull, PET_SKILL: PET_SKILL,
