@@ -17796,8 +17796,9 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
   <div id="modal-over" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="over-title"><div class="sheet jbox jbox--modal" data-part="modal-plate">
     <h2 id="over-title" data-i18n="over.title">Out of moves</h2>
     <!-- P3 T2 수정 2회차 — 중간 구획(.over-body = 결과 카드 · 순위 줄 · 보상 줄). 평소(창 높이 720 초과)에는 display:contents 라 상자가 없고
-         아래 형제들이 종전처럼 시트의 직접 자식으로 놓인다. 작은 폰(높이 720 이하)에서만 이 구획이 시트 안에서 구르고 버튼 줄은 굴림 밖에 선다(shop-p3 블록). -->
-    <div class="over-body">
+         아래 형제들이 종전처럼 시트의 직접 자식으로 놓인다. 작은 폰(높이 720 이하 · 포털은 코인 2배 줄이 서므로 790 이하)에서만 이 구획이 시트 안에서 구르고
+         버튼 줄은 굴림 밖에 선다. 규칙은 데일리 · 아케이드와 공용 클래스 .res-body 한 벌(shop-p3 의 [P3-T9] 블록 — T9 수정 1회차). .over-body 는 Task 2 시험이 읽는 이름이라 남긴다. -->
+    <div class="over-body res-body">
     <!-- ⑲ 안쪽 젤리 카드: 점수·최고·스테이지를 판 위 맨글자에서 카드 위로. -->
     <div class="result-card">
     <p class="big-score"><b id="over-score">0</b></p>
@@ -17850,9 +17851,9 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
          (있으면 applyI18n 이 값을 지운다 — #over-title 과 같은 규약). -->
   <div id="modal-arc" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="arc-title"><div class="sheet jbox jbox--modal" data-part="modal-plate">
     <h2 id="arc-title">Arcade</h2>
-    <!-- P3 T9 — 중간 구획(.arc-body = 기록 · 보상 · 코인 2배 줄 · 카드 미리보기). 평소(창 높이 720 초과)에는 display:contents 라 상자가 없고 형제들이 종전처럼 시트의
-         직접 자식으로 놓인다. 작은 폰(높이 720 이하)에서만 이 구획이 시트 안에서 구르고 버튼 줄은 굴림 밖에 선다(shop-p3 블록 · #modal-over 의 .over-body 와 같은 무늬). -->
-    <div class="arc-body">
+    <!-- P3 T9 — 중간 구획(.res-body = 기록 · 보상 · 코인 2배 줄 · 카드 미리보기). 평소에는 display:contents 라 상자가 없고 형제들이 종전처럼 시트의 직접 자식으로 놓인다.
+         작은 폰에서만 이 구획이 시트 안에서 구르고 버튼 줄은 굴림 밖에 선다 — 게임오버 · 데일리와 같은 공용 클래스 한 벌(shop-p3 의 [P3-T9] 블록). -->
+    <div class="res-body">
     <p class="big-score"><b id="arc-value">0</b></p>
     <!-- 수확 피날레(DESIGN §25.7). 아케이드의 큰 숫자는 종전대로 **기록**(시간·
          피해)이라 보너스를 합칠 자리가 아니다 — 그래서 별도 행이다. -->
@@ -17872,7 +17873,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
       <button class="btn btn-secondary cx2-no" type="button" data-i18n="coin.x2.no">Just take</button>
     </div>
     <img id="arc-card-thumb" class="share-thumb" alt="" aria-hidden="true" hidden>
-    </div><!-- /.arc-body -->
+    </div><!-- /.res-body -->
     <div class="sheet-row">
       <button id="arc-again" class="btn btn-primary" data-i18n="arc.again">Retry</button>
       <button id="arc-share" class="btn btn-ghost" data-i18n-aria="aria.arcShare" data-i18n="arc.share" aria-label="Share your record">Share</button>
@@ -17882,6 +17883,8 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
 
   <div id="modal-daily" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="daily-title"><div class="sheet jbox jbox--modal" data-part="modal-plate">
     <h2 id="daily-title">Daily #1</h2>
+    <!-- P3 T9 수정 1회차 — 중간 구획(.res-body = 기록 · 보상 · 코인 2배 줄 · 순위 · 격자 · 카드 미리보기). 게임오버 · 아케이드와 공용 클래스 한 벌(shop-p3 의 [P3-T9] 블록). 평소에는 display:contents. -->
+    <div class="res-body">
     <p id="daily-stats"></p>
     <!-- 리텐션 래퍼(0910) ④ — 세 결과 시트가 이미 쓰던 보상 행 부품을
          그대로 받는다(새 그림 0 · 새 CSS 0). 획득이 0 이면 rewardReveal 이
@@ -17899,6 +17902,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
          버튼 바로 위에 둔다. 이모지 격자(#daily-grid) 다음인 것은 의도다:
          카드가 그 격자를 다시 그리지 않으므로 둘은 서로 다른 것을 보여 준다. -->
     <img id="daily-card-thumb" class="share-thumb" alt="" aria-hidden="true" hidden>
+    </div><!-- /.res-body -->
     <button id="btn-share" data-part="btn-modal" data-variant="yellow" class="btn btn-primary" data-i18n-aria="aria.share" data-i18n="daily.share" aria-label="Share your daily result with a result card image">Share</button>
     <button id="btn-daily-menu" data-part="btn-modal" data-variant="purple" class="btn btn-ghost" data-i18n-aria="aria.dailyMenu" data-i18n="daily.menu" aria-label="Back to main menu">Main menu</button>
   </div></div>
@@ -46347,9 +46351,17 @@ window.TT_SFX = {
     return true;
   }
   var adBusyP3 = false;
-  /** 조건은 광고 **앞**에서만 본다 — 끝까지 본 사람에게는 반드시 준다(광고 1번 = 보상 1번). after(참거짓) = 호출부의 다시 그리기. */
+  /** 광고 뽑기가 못 나갔을 때의 토스트 — gachaRun 과 같은 글(새 문구 0). 거기 없는 실패(켜진 장비가 0종인 등급 따위)는 광고 실패 글. */
+  function adBuyFailToast(r) {
+    if (r.err === 'allfriends') toast(t('gacha.friend.all'));
+    else if (r.err === 'used') toast(t('gacha.used'));
+    else toast(t('portal.ad.fail'));
+  }
+  /** 조건은 광고 **앞**에서만 본다 — 끝까지 본 사람에게는 반드시 준다(광고 1번 = 보상 1번). after(참거짓) = 호출부의 다시 그리기.
+      뽑기(아이템 · 친구)는 gachaRun 과 같은 계약: 연출 중(gachaBusy)에는 광고를 안 걸고, 결과를 **먼저** 만든 뒤 ok 일 때만 상한을 쓴다(실패한 뽑기가 상한만 깎지 않게). */
   function watchAdFor(id, btn, after) {
-    if (adBusyP3 || !adRowOk(id)) return;
+    var draw = (id === 'item' || id === 'friend');
+    if (adBusyP3 || (draw && gachaBusy) || !adRowOk(id)) return;
     adBusyP3 = true;
     if (btn) btn.disabled = true;
     TW_PORTAL.requestRewardedAd('p3-' + id, function (ok) {
@@ -46357,14 +46369,17 @@ window.TT_SFX = {
       if (btn) btn.disabled = false;
       portalAdsSync();
       if (!ok) { toast(t('portal.ad.fail')); J.sfx.fail(); if (after) after(false); return; }
-      adCapUse(id);
       var res = null;
+      if (draw) {
+        res = gachaBuy(id, 1, 'ad');
+        if (!res.ok) { adBuyFailToast(res); J.sfx.fail(); if (after) after(false); return; }
+      }
+      adCapUse(id);
       if (id === 'coin') { coinGrant(P3_AD_COIN, 'ad'); toast(t('coin.got', { n: P3_AD_COIN })); }
       else if (id === 'star') { starGrant(P3_AD_STAR, 'ad'); toast(t('star.got', { n: P3_AD_STAR })); }
       else if (id === 'heart') { grantHearts(1); paintHearts(); toast(t('shop.heart.ok')); }
-      else res = gachaBuy(id, 1, 'ad');
       J.sfx.win();
-      if (res && res.ok) {
+      if (res) {
         gachaBusy = true;
         var shown = false;
         try { gachaShow(res, function () { gachaBusy = false; if (after) after(true); }); shown = true; }
@@ -46375,7 +46390,7 @@ window.TT_SFX = {
   }
   SHOP_PAINT.free = function (body, scene) {
     if (scene) {
-      var tt = document.createElement('div'); tt.className = 'kit-pill-v2 fr-title'; tt.setAttribute('data-variant', 'header');
+      var tt = document.createElement('div'); tt.className = 'kit-pill-v2 sh-head fr-title'; tt.setAttribute('data-variant', 'header');
       var pl = document.createElement('i'); pl.className = 'fr-play'; pl.setAttribute('aria-hidden', 'true'); tt.appendChild(pl);
       tt.appendChild(document.createTextNode(t('free.title'))); scene.appendChild(tt);
       var rs = document.createElement('div'); rs.className = 'kit-pill-v2 fr-reset'; rs.setAttribute('data-variant', 'soft');
@@ -46393,7 +46408,8 @@ window.TT_SFX = {
       else sub = t('free.left.day', { n: left, m: cap });
       var title = t('free.' + id, { n: id === 'coin' ? P3_AD_COIN : P3_AD_STAR });
       var card = shopCard2({ layout: 'row', title: title, ic: IC[id], sub: sub, coinIc: okNow ? 'play' : '',
-                             label: okNow ? t('free.get') : t('free.tomorrow'), price: okNow ? 'ad' : 'ok', dis: !okNow, act: 'ad:' + id });
+                             label: okNow ? t('free.get') : ((id === 'heart' && (store.hearts | 0) >= HEART_MAX && left > 0) ? t('adv.heartfull') : t('free.tomorrow')),   /* 하트 가득 = 「MAX」(특가 탭과 같은 낱말) · 「내일 다시」 는 상한을 다 쓴 경우만 */
+                             price: okNow ? 'ad' : 'ok', dis: !okNow, act: 'ad:' + id });
       card.setAttribute('data-ad', id);
       list.appendChild(card);
     }
@@ -46426,9 +46442,10 @@ window.TT_SFX = {
     var tok = S.x2Token, n = S.gainCoin | 0;
     if (el.classList.contains('cx2-no')) { S.x2Done = tok; paintCoinX2(); J.sfx.ui(); return; }
     if (!(portalAdsOk() && adCapLeft('x2') > 0 && n > 0 && S.x2Done !== tok)) return;
-    el.disabled = true;
+    var pair = el.parentNode.querySelectorAll('button'), pi;
+    for (pi = 0; pi < pair.length; pi++) pair[pi].disabled = true;   /* 요청 중에는 「그냥 받기」도 잠근다 — 끝까지 본 사람의 보상이 사라지지 않게(M-3) */
     TW_PORTAL.requestRewardedAd('p3-x2', function (ok) {
-      el.disabled = false;
+      for (pi = 0; pi < pair.length; pi++) pair[pi].disabled = false;
       portalAdsSync();
       if (ok && S.x2Done !== tok) { adCapUse('x2'); coinGrant(n, 'ad-x2'); toast(t('coin.x2.got', { n: n })); J.sfx.win(); S.x2Done = tok; }
       else if (!ok) { toast(t('portal.ad.fail')); J.sfx.fail(); }
@@ -52030,9 +52047,8 @@ window.TT_SFX = {
         for (var ci = 0; ci < nb.children.length; ci++) ro.observe(nb.children[ci]);
       }
     })();
-    ['#modal-over .over-body', '#modal-arc .arc-body'].forEach(function (sel) {   /* P3 T2 수정 2회차 · T9 — 작은 폰 결과 창(게임오버 · 아케이드)의 중간 구획(.over-body · .arc-body) 넘침 표시. ncBodyMore 와 같은 무늬(읽기 한 묶음 → 속성 쓰기 하나) */
-      var ob = document.querySelector(sel);
-      if (!ob) return;
+    var resBodies = document.querySelectorAll('.res-body');   /* P3 T2 수정 2회차 · T9 — 작은 폰 결과 창(게임오버 · 데일리 · 아케이드)의 중간 구획 .res-body 넘침 표시. ncBodyMore 와 같은 무늬(읽기 한 묶음 → 속성 쓰기 하나) */
+    for (var rbi = 0; rbi < resBodies.length; rbi++) (function (ob) {
       function overBodyMore() {
         var more = ob.scrollHeight - ob.clientHeight - Math.ceil(ob.scrollTop) > 0;
         if (more) { if (!ob.hasAttribute('data-more')) ob.setAttribute('data-more', ''); }
@@ -52044,7 +52060,7 @@ window.TT_SFX = {
         oro.observe(ob);
         for (var oi = 0; oi < ob.children.length; oi++) oro.observe(ob.children[oi]);
       }
-    });
+    })(resBodies[rbi]);
 
     /* W6 — 통일된 열 모달의 우상단 X. 배선을 새로 만들지 않는다: X 는
      * data-w6x 가 가리키는 **이미 배선된 닫기 버튼**을 그대로 누른다. 그래서
@@ -71626,33 +71642,7 @@ html[lang="en"] #kd-b-circus .kd-tag b{ font-size: .88em; letter-spacing: -.02em
   background-repeat: no-repeat;
   background-position: center;
 }
-/* 작은 폰의 게임오버 시트(수정 2회차 — 320×640 에서 코인 줄이 서면 메인 메뉴 버튼이 창 밖으로 나갔다). 중간 구획 .over-body(결과 카드 · 순위 줄 ·
-   보상 줄)만 시트 안에서 구르고 버튼 줄은 굴림 밖에 둔다 — 노드 카드의 .nc-body 와 같은 무늬(구획만 구름 · 스크롤바 감춤 · 아래에 남은 내용이 있을 때만
-   data-more 로 가장자리를 흐림, 배선 = overBodyMore). 창 높이가 720 을 넘으면 display:contents 라 상자가 없어 종전 배치와 픽셀이 같다(390×844 · 360×740).
-   양옆 · 위아래 10% 안쪽 여백 = 영웅 줄의 바깥 빛과 rw-pop 의 튀어나옴이 구획 가장자리에서 잘리지 않게 하고, 같은 만큼 바깥 여백을 빼 자리는 그대로(% 는
-   담는 상자 폭 기준 — 원시값 0 · 줄 사이 간격은 시트의 row-gap 을 그대로 물려받는다). */
-#modal-over .over-body { display: contents; }
-@media (max-height: 720px) {
-  #modal-over .over-body {
-    display: flex;
-    flex-direction: column;
-    row-gap: inherit;
-    flex: 0 1 auto;
-    min-height: 0;
-    overflow-y: auto;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    margin: -10%;
-    padding: 10%;
-  }
-  #modal-over .over-body::-webkit-scrollbar { width: 0; height: 0; }
-  #modal-over .over-body > * { flex: 0 0 auto; }
-  #modal-over .over-body[data-more] {
-    -webkit-mask-image: linear-gradient(180deg, var(--prim-white) 85%, transparent);
-            mask-image: linear-gradient(180deg, var(--prim-white) 85%, transparent);
-  }
-}
+/* 작은 폰 결과 창의 가운데 구획 .res-body(게임오버 · 데일리 · 아케이드) — 규칙은 아래 [P3-T9] 블록의 한 벌이다(Task 2 수정 2회차의 .over-body 규칙을 T9 수정 1회차에서 옮겼다). */
 /* 코인 칩의 큰 수(P3 T3 · 지휘자 판정 A) — 동전 캡슐은 글자 중심이 칩 폭의 65.7% 라 오른쪽으로 쓸 폭이 칩의 약 69% 뿐이다(실측: 9,999 까지는 종전 크기로 들어가고
    12,345 는 ×0.98 · 123,456 은 ×0.82 · 999,999 는 ×0.78 이하여야 한다, 네 해상도에서 같은 배율). 글자 수(쉼표 포함)를 paintCoinChip 이 data-len 으로 적고,
    6자 · 7자일 때만 이 파일에 이미 있는 글자 단계로 줄인다 — 6자 4.10(×0.82) · 7자 3.5(×0.70). 수정 1회차: 4.40 · 4.2 는 99,999 의 오른쪽 여유가 하한 2.5px 에 못 미쳐 4.10 이 하한을 지키는 가장 큰 기존 단계다(대표 값 12,345 · 99,999 · 100,000 · 999,999 는 ≥ 2.5px · 가장 넓은 숫자 「4」 로 채운 44,444 · 444,444 는 칩 안 ≥ 0). 새 값 0 · 짧은 값(1~5자)은 규칙이 안 걸려 픽셀이 같다. 상점 띠 코인(#screen-shop)은 Task 4 가 잰 4.0 · 3.5 그대로다.
@@ -72003,9 +71993,7 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
    줄 변주의 칸은 그림 상자(.shop-icbox — Task 5 가 그림 + 지급 수를 한 상자로 묶었다)가 받는다 · 그림 안의 .shop-ic 는 그 상자 안에서 크기만 정한다.
    ▶ 는 글자가 아니라 CSS 삼각형(border) — 글꼴에 의존하지 않는다. .fr-play 는 상점 판(제목 알약)과 결과 창 버튼(코인 두 배)이 함께 써서 길이를 글자 크기(em)로
    준다: 상점에서는 제목 글자 5.6 단위의 2.4 · 1.5 · 1.2 와 같은 값이고, cqw 가 없는 결과 창에서도 버튼 글자를 따라 크기가 선다. */
-#sh-scene .fr-title{ position: absolute; left: calc(5.6 * var(--cqw)); top: calc(24.6 * var(--cqw)); z-index: 6; width: max-content; padding: 0 calc(6.67 * var(--cqw));
-  --f2-bh: calc(11.28 * var(--cqw)); font-family: var(--font-display); font-weight: 400; font-size: calc(5.6 * var(--cqw)); line-height: 1; white-space: nowrap;
-  text-shadow: 0 calc(.385 * var(--cqw)) 0 var(--role-f2-pill-a-ln); }   /* 머리 알약 인스턴스 = 위 .sh-head 와 같은 값(높이 44px · 좌우 26px · 주아 흰 글 + 아래 겉선색 그림자) */
+#sh-scene .fr-title{ position: absolute; left: calc(5.6 * var(--cqw)); top: calc(24.6 * var(--cqw)); z-index: 6; }   /* 자리만 — 치수 · 글꼴 · 그림자는 JS 가 함께 다는 .sh-head(머리 알약 인스턴스, 위 [P3-T5]) */
 #sh-scene .fr-reset{ position: absolute; left: calc(5.6 * var(--cqw)); top: calc(39.5 * var(--cqw)); font-size: calc(3.1 * var(--cqw)); z-index: 6; gap: .3em; }   /* 알약은 flex 라 글 뒤 공백이 접힌다 — 글과 시계 사이는 gap 으로 */
 .fr-play{ display: inline-block; width: 0; height: 0; margin-right: .214em; vertical-align: middle;
   border-left: .429em solid currentColor; border-top: .268em solid transparent; border-bottom: .268em solid transparent; }
@@ -72027,12 +72015,17 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
 #screen-shop[data-stab="free"] #sh-host{ right: calc(2 * var(--cqw)); top: calc(22.6 * var(--cqw)); bottom: auto; }
 .coin-x2[hidden]{ display: none; }
 
-/* 작은 폰의 아케이드 결과 창(지휘자 보충 · Task 2 판정 이월) — 2배 줄이 서면 320×640 에서 「다시 · 공유 · 메인 메뉴」 줄이 창 밖으로 나간다(실측: 줄이 서기 전에도 아래 끝 639/640).
-   게임오버 시트(위 .over-body)와 같은 무늬: 가운데 구획 .arc-body(기록 · 보상 · 2배 줄 · 카드 미리보기)만 시트 안에서 구르고 버튼 줄은 굴림 밖에 선다.
-   창 높이가 720 을 넘으면 display:contents 라 상자가 없어 종전 배치와 픽셀이 같다(390×844 · 360×740). 안쪽 여백 · 바깥 여백 · 가장자리 흐림은 .over-body 와 같은 값(% 는 담는 상자 폭 기준). */
-#modal-arc .arc-body { display: contents; }
-@media (max-height: 720px) {
-  #modal-arc .arc-body {
+/* [P3-T9-F1] 작은 폰 결과 창의 가운데 구획 .res-body(게임오버 · 데일리 · 아케이드 — 세 창이 **한 벌**을 쓴다. 수정 1회차 I-3: 전엔 구획 CSS 가 글자 그대로 복제돼 있었다).
+   Task 2 수정 2회차의 무늬: 320×640 에서 코인 줄이 서면 메인 메뉴 버튼이 창 밖으로 나갔다 → 가운데 구획(결과 카드 · 기록 · 보상 줄 · 2배 줄 · 카드 미리보기)만 시트 안에서 구르고
+   버튼 줄은 굴림 밖에 둔다 — 노드 카드의 .nc-body 와 같은 무늬(스크롤바 감춤 · 아래에 남은 내용이 있을 때만 data-more 로 가장자리를 흐림, 배선 = overBodyMore).
+   양옆 · 위아래 10% 안쪽 여백 = 영웅 줄의 바깥 빛과 rw-pop 의 튀어나옴이 구획 가장자리에서 잘리지 않게 하고, 같은 만큼 바깥 여백을 빼 자리는 그대로(% 는 담는 상자 폭 기준 ·
+   줄 사이 간격은 시트의 row-gap 을 그대로 물려받는다). 창 높이가 문턱을 넘으면 display:contents 라 상자가 없어 종전 배치와 픽셀이 같다.
+   문턱: 포털 밖 720(Task 2) · **포털 790** — 포털에서는 코인 2배 줄(61px + 줄 간격 10 = 71)이 서서 같은 시트가 그만큼 길어진다. 근거(probe-t9f1-fit — 폭 320~430 · 줄이 선 시트):
+   게임오버는 창 높이 770 까지 · 아케이드는 730 까지 넘치고, 720 + 71 = 791 → 790(Task 2 가 줄 없는 시트에 둔 여유 20 과 같은 만큼). 포털 밖 721~790 은 마지막 규칙이 contents 로
+   되돌린다(= 포털 밖 픽셀 무변 — 시험 t9v). 마지막 규칙은 `not all and (max-height: 720px)` 라 720 이하와 정확히 맞물린다(소수 높이 틈 0). */
+.res-body { display: contents; }
+@media (max-height: 790px) {
+  .res-body {
     display: flex;
     flex-direction: column;
     row-gap: inherit;
@@ -72045,12 +72038,15 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
     margin: -10%;
     padding: 10%;
   }
-  #modal-arc .arc-body::-webkit-scrollbar { width: 0; height: 0; }
-  #modal-arc .arc-body > * { flex: 0 0 auto; }
-  #modal-arc .arc-body[data-more] {
+  .res-body::-webkit-scrollbar { width: 0; height: 0; }
+  .res-body > * { flex: 0 0 auto; }
+  .res-body[data-more] {
     -webkit-mask-image: linear-gradient(180deg, var(--prim-white) 85%, transparent);
             mask-image: linear-gradient(180deg, var(--prim-white) 85%, transparent);
   }
+}
+@media not all and (max-height: 720px) {
+  html:not([data-portal="cg"]) .res-body { display: contents; }
 }
 
 /* ---- cqw 를 모르는 기기(iOS 15 · Chrome 104 급) 폴백 — 반드시 위 기본 규칙 **뒤**(수정 2회차 N-1) ----
