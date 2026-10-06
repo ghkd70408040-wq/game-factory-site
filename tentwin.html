@@ -17937,6 +17937,20 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
     <button id="quest-close" data-part="btn-modal" data-variant="primary" class="btn btn-primary" data-i18n-aria="aria.close" data-i18n="rank.close" aria-label="Close">Close</button>
   </div></div>
 
+  <!-- [P3-ODDS] 확률 정보(게임 안 자율 공시, 스펙 §2·§4-b · 목업 mock-P-odds.png). 판 = 정본 모달 판 인스턴스,
+       탭 = 킷 탭(.kit-tab-v2 — #modal-quest 와 같은 문법). 숫자는 전부 gachaTable 한 출처에서 온다. -->
+  <div id="modal-odds" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="odds-h"><div class="sheet jbox jbox--modal" data-part="modal-plate">
+    <h2 id="odds-h" data-i18n="odds.title">Odds</h2>
+    <button class="r10-x x-btn" type="button" data-w6x="odds-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
+    <div id="odds-tabs" class="kit-frame-v2__tabs qs-tabs" role="tablist" data-i18n-aria="odds.title" aria-label="Odds">
+      <button class="kit-tab-v2 qs-tab od-tab" type="button" role="tab" data-otab="item" data-active aria-selected="true"><span class="cpt-lab" data-i18n="gacha.item">Item Capsule</span></button>
+      <button class="kit-tab-v2 qs-tab od-tab" type="button" role="tab" data-otab="gold" aria-selected="false"><span class="cpt-lab" data-i18n="gacha.gold">Golden Capsule</span></button>
+      <button class="kit-tab-v2 qs-tab od-tab" type="button" role="tab" data-otab="friend" aria-selected="false"><span class="cpt-lab" data-i18n="gacha.friend">Friend Capsule</span></button>
+    </div>
+    <div id="odds-body" class="od-body"></div>
+    <button id="odds-close" data-part="btn-modal" data-variant="primary" class="btn btn-primary" type="button" data-i18n="rank.close">Close</button>
+  </div></div>
+
   <div id="toast" role="status" aria-live="polite"></div>
 
   <!-- ============================================================
@@ -27480,6 +27494,38 @@ window.TT_SFX = {
       'coin.got': '+{n} coins',
       'star.got': '+{n} stars',
       'gacha.nocoin': 'You need {n} more coins.',
+      /* P3 Task 7 — 뽑기 탭 · 확률 정보 창. 가격·확률·천장·환급·무게는 사전에 적지 않는다(gachaTable 과 추첨 상수가 채운다). */
+      'gacha.item': 'Item Capsule',
+      'gacha.gold': 'Golden Capsule',
+      'gacha.friend': 'Friend Capsule',
+      'gacha.item.d': 'Any gear can come out!',
+      'gacha.gold.d': 'Only rare and epic gear!',
+      'gacha.friend.d': 'Only new friends!',
+      'gacha.one': 'Pull once',
+      'gacha.ten': 'Pull ×{n}',
+      'gacha.free.first': 'First pull free',
+      'gacha.free.daily': 'Free pull today',
+      'gacha.odds': 'See odds ›',
+      'gacha.pity': 'Epic guarantee {n}/{max}',
+      'gacha.friend.left': 'You have {have}/{all}. One of the {left} left will come.',
+      'gacha.friend.all': 'You have every friend. It opens again when a new friend arrives.',
+      'gacha.friend.note': 'To be sure of a friend, invite them at the Pet House. Bosses and goals also bring friends.',
+      'gacha.chance.now': 'Odds now (friends left)',
+      'gacha.nostar': 'You need {n} more stars.',
+      'gacha.used': 'Already used today.',
+      'odds.title': 'Odds',
+      'odds.tier': 'Odds by rarity (per pull)',
+      'odds.items': 'Odds per gear',
+      'odds.friends': 'Odds per friend',
+      'odds.rules': 'Guarantees and repeats',
+      'odds.tier.row': '{n} kinds, {each} each',
+      'odds.rule.ten': 'In a pull ×{n}, if the first ones are all common, the last one is rare or better. Rare is {r} and epic is {e}.',
+      'odds.rule.pity': 'After {n} pulls without an epic, the next pull is a sure epic. Now {c}/{n}.',
+      'odds.rule.dup': 'A repeat raises the level by one. At the top level {max}, you get coins back. Common gives {c}, rare {r}, and epic {e}.',
+      'odds.rule.friend': "Only friends you don't have yet. Rarity weights common {c}, rare {r}, epic {e} are shared by the friends left.",
+      'odds.foot1': 'Pulls use only coins, stars and ad rewards. They are never sold for money.',
+      'odds.foot2': 'The odds shown come from the same table the draw uses. Decimals are rounded. ({date})',
+      'gres.title': 'Pulled ×{n}',
       'toast.noadds': 'No adds left',
       'toast.empty': 'Board is empty',
       'toast.nohints': 'No hints left',
@@ -28960,6 +29006,38 @@ window.TT_SFX = {
       'coin.got': '코인 +{n}',
       'star.got': '별 +{n}',
       'gacha.nocoin': '코인이 {n}개 부족해요.',
+      /* P3 Task 7 — 뽑기 탭 · 확률 정보 창. 가격·확률·천장·환급·무게는 사전에 적지 않는다(gachaTable 과 추첨 상수가 채운다). */
+      'gacha.item': '아이템 캡슐',
+      'gacha.gold': '황금 캡슐',
+      'gacha.friend': '친구 캡슐',
+      'gacha.item.d': '모든 장비가 나올 수 있어요!',
+      'gacha.gold.d': '희귀와 영웅 장비만 나와요!',
+      'gacha.friend.d': '새 친구만 나와요!',
+      'gacha.one': '한 번 뽑기',
+      'gacha.ten': '{n}회 뽑기',
+      'gacha.free.first': '처음 한 번 무료',
+      'gacha.free.daily': '오늘 무료 뽑기',
+      'gacha.odds': '확률 보기 ›',
+      'gacha.pity': '영웅 천장 {n}/{max}',
+      'gacha.friend.left': '가진 친구 {have}/{all}, 남은 {left}명 중 한 명이 와요',
+      'gacha.friend.all': '친구를 모두 모았어요. 새 친구가 오면 다시 열려요.',
+      'gacha.friend.note': '원하는 친구를 꼭 데려오려면 펫 하우스에서 초대해요. 보스와 조건으로도 친구를 만나요.',
+      'gacha.chance.now': '지금 확률 (남은 친구 기준)',
+      'gacha.nostar': '별이 {n}개 부족해요.',
+      'gacha.used': '오늘은 이미 썼어요.',
+      'odds.title': '확률 정보',
+      'odds.tier': '등급 확률 (한 번 기준)',
+      'odds.items': '장비별 확률',
+      'odds.friends': '친구별 확률',
+      'odds.rules': '보장과 중복 규칙',
+      'odds.tier.row': '{n}종, 각 {each}',
+      'odds.rule.ten': '{n}회 뽑기에서 앞 칸이 모두 일반이면 마지막 칸은 희귀 이상이에요. 희귀 {r}, 영웅 {e}예요.',
+      'odds.rule.pity': '영웅 없이 {n}회를 뽑으면 다음 한 번은 영웅이 확정이에요. 지금 {c}/{n}이에요.',
+      'odds.rule.dup': '같은 장비가 또 나오면 레벨이 하나 올라요. 최고 레벨 {max}이면 코인으로 돌려받아요. 일반 {c}, 희귀 {r}, 영웅 {e}개예요.',
+      'odds.rule.friend': '아직 없는 친구만 나와요. 등급 무게 일반 {c}, 희귀 {r}, 영웅 {e}를 남은 친구끼리 나눠요.',
+      'odds.foot1': '코인, 별, 광고 보상으로만 뽑아요. 현금으로 팔지 않아요.',
+      'odds.foot2': '보이는 확률은 실제 추첨에 쓰는 표와 같은 값이에요. 소수점 아래는 반올림했어요. ({date} 기준)',
+      'gres.title': '{n}회 뽑았어요',
       'toast.noadds': '추가 횟수를 다 썼어요',
       'toast.empty': '보드가 비었어요',
       'toast.nohints': '힌트를 다 썼어요',
@@ -45759,6 +45837,196 @@ window.TT_SFX = {
     buildSkinList(list, true);
   };
 
+  /* ---- 뽑기 탭(목업 B1) — 표 한 출처(gachaTable)만 읽는다. 기계는 발주 ② 전까지 CSS 규칙 기하(.gm-ph). ---- */
+  var gachaKind = 'item', gachaBusy = false;
+  function pctText(p, digits) { return (p * 100).toFixed(digits) + '%'; }
+  function gachaKindSet(k) {
+    if (GACHA_KINDS.indexOf(k) < 0) return;
+    gachaKind = k;
+    if (shopTab2 === 'gacha' && shopActive()) paintShopTab(shopTab2, true);   /* 종류가 바뀌면 판 내용이 통째로 바뀐다 → 스크롤도 처음으로 */
+  }
+  /** 결제 + 결과. 연타·연출 중 재진입은 gachaBusy 한 칸이 막는다. */
+  function gachaRun(kind, n, how) {
+    if (gachaBusy) return;
+    var r = gachaBuy(kind, n, how);
+    if (!r.ok) {
+      if (r.err === 'coin') toast(t('gacha.nocoin', { n: r.need }));
+      else if (r.err === 'star') toast(t('gacha.nostar', { n: r.need }));
+      else if (r.err === 'allfriends') toast(t('gacha.friend.all'));
+      else if (r.err === 'used') toast(t('gacha.used'));
+      J.sfx.fail();
+      return;
+    }
+    gachaBusy = true;
+    var shown = false;
+    try { gachaShow(r, function () { gachaBusy = false; paintShopTab(shopTab2); }); shown = true; }
+    finally { if (!shown) { gachaBusy = false; paintShopTab(shopTab2); } }   /* 연출이 예외로 멈춰도 뽑기 탭이 잠기지 않게 — 구매는 이미 저장됐다(착수 전 점검 C2) */
+  }
+  /** 결과 보여 주기 — Task 8 이 결과 창·연출로 통째 바꾼다. 여기서는 토스트 한 줄, 끝은 다음 작업 틱(같은 틱 연타를 막는다). */
+  function gachaShow(res, done) {
+    toast(t('gres.title', { n: res.n }));
+    J.sfx.win();
+    setTimeout(function () { if (done) done(); }, 0);
+  }
+  function gachaFreeBtn(kind) {
+    var g = store.gacha;
+    if (kind === 'item' && !g.firstItem) return { label: t('gacha.free.first'), price: 'free', act: 'gbuy:item:1:first' };
+    if (kind === 'friend' && !g.firstFriend) return { label: t('gacha.free.first'), price: 'free', act: 'gbuy:friend:1:first' };
+    if (kind === 'item' && g.freeDay !== todayKey()) return { label: t('gacha.free.daily'), price: 'free', act: 'gbuy:item:1:free' };
+    return null;   /* Task 9 가 여기에 광고 버튼(포털 전용)을 더한다 */
+  }
+  function gachaBtn(o) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'cta-jelly sh-btn';
+    b.setAttribute('data-price', o.price);
+    if (o.coinIc) { var ci = document.createElement('i'); ci.className = 'sh-btn-ic sh-btn-ic--' + o.coinIc; ci.setAttribute('aria-hidden', 'true'); b.appendChild(ci); }
+    b.appendChild(document.createTextNode(o.label));
+    if (o.portal) b.setAttribute('data-portal-only', '');
+    if (o.dis) b.disabled = true; else b.setAttribute('data-sh-act', o.act);
+    return b;
+  }
+  SHOP_PAINT.gacha = function (body, scene) {
+    var tb = gachaTable(gachaKind), i;
+    /* 무대: 종류 알약 셋 · 이름 리본 · 기계(임시 CSS) · 친구면 돔 안 남은 얼굴 · 말풍선 */
+    if (scene) {
+      var pills = document.createElement('div'); pills.className = 'gc-kinds';
+      for (i = 0; i < GACHA_KINDS.length; i++) {
+        var pk = document.createElement('button'); pk.type = 'button'; pk.className = 'kit-pill-v2 gc-kind';
+        pk.setAttribute('data-variant', GACHA_KINDS[i] === gachaKind ? 'header' : 'soft');
+        pk.setAttribute('data-kind', GACHA_KINDS[i]); pk.setAttribute('data-sh-act', 'gkind:' + GACHA_KINDS[i]);
+        pk.textContent = t('gacha.' + GACHA_KINDS[i]); pills.appendChild(pk);
+      }
+      scene.appendChild(pills);
+      var rb = document.createElement('div'); rb.className = 'kit-pill-v2 gc-title'; rb.setAttribute('data-variant', 'header');
+      rb.textContent = t('gacha.' + gachaKind); scene.appendChild(rb);
+      var m = document.createElement('div'); m.className = 'gm-ph'; m.setAttribute('data-kind', gachaKind);
+      m.innerHTML = '<i class="gm-dome"></i><i class="gm-body"></i><i class="gm-knob"></i><i class="gm-slot"></i>';
+      if (gachaKind === 'friend') {
+        for (i = 0; i < tb.rows.length && i < 9; i++) {
+          var face = document.createElement('i'); face.className = 'gm-face'; face.setAttribute('data-tier', tb.rows[i].tier);
+          /* 얼굴 칸 좌표 = 세 열 · 줄마다 아래로. CSS round() 는 iOS 15.4 미만·Chrome 125 미만이 모른다(이 파일은 iOS 15 · Chrome 104 급까지 선다) → JS 가 두 변수(%)로 준다 */
+          face.style.setProperty('--gm-x', (15 + (i % 3) * 24) + '%');
+          face.style.setProperty('--gm-y', (12 + Math.floor(i / 3) * 17) + '%');
+          setArt(face, '--gm-face', stdArt(tb.rows[i].id, 'thumb'), '');
+          m.appendChild(face);
+        }
+      }
+      scene.appendChild(m);
+      var sub = document.createElement('div'); sub.className = 'kit-pill-v2 gc-sub'; sub.setAttribute('data-variant', 'soft'); sub.id = 'gc-pity';
+      sub.textContent = gachaKind === 'friend' ? (tb.left ? t('gacha.friend.left', { have: tb.all - tb.left, all: tb.all, left: tb.left }) : t('gacha.friend.all'))
+                                               : t('gacha.pity', { n: tb.pity, max: tb.pityAt });
+      scene.appendChild(sub);
+    }
+    var bub = $('sh-bubble');
+    if (bub) { bub.textContent = t('gacha.' + gachaKind + '.d'); bub.hidden = false; }
+    /* 판: 버튼 줄 · 지금 확률 · 확률 보기 · 작은 글씨 */
+    var row = document.createElement('div'); row.className = 'gc-btns'; body.appendChild(row);
+    var dis = (gachaKind === 'friend' && tb.left <= 0);
+    var fb = dis ? null : gachaFreeBtn(gachaKind);
+    if (fb) row.appendChild(gachaBtn(fb));
+    var ic = GACHA_CUR[gachaKind] === 'coin' ? 'coin' : 'star', pr = GACHA_CUR[gachaKind] === 'coin' ? 'coin' : 'star';
+    row.appendChild(gachaBtn({ label: t('gacha.one') + ' ' + arcComma(tb.price), coinIc: ic, price: dis ? 'ok' : pr, act: 'gbuy:' + gachaKind + ':1:' + pr, dis: dis }));   /* 닫힌 버튼은 특가 탭처럼 「ok」(연보라) */
+    if (gachaKind === 'item') row.appendChild(gachaBtn({ label: t('gacha.ten', { n: GACHA_TEN }) + ' ' + arcComma(tb.ten), coinIc: 'coin', price: 'coin', act: 'gbuy:item:' + GACHA_TEN + ':coin' }));
+    var hd = document.createElement('div'); hd.className = 'gc-oddhd';
+    var hs = document.createElement('span'); hs.textContent = t(gachaKind === 'friend' ? 'gacha.chance.now' : 'odds.tier'); hd.appendChild(hs);
+    var link = document.createElement('button'); link.type = 'button'; link.className = 'kit-pill-v2 gc-oddlink'; link.setAttribute('data-variant', 'soft');
+    link.setAttribute('data-sh-act', 'godds:' + gachaKind); link.textContent = t('gacha.odds'); hd.appendChild(link);
+    body.appendChild(hd);
+    var og = document.createElement('div'); og.id = 'gc-odds'; og.className = gachaKind === 'friend' ? 'gc-og' : 'gc-tiers'; body.appendChild(og);
+    if (gachaKind === 'friend') {
+      for (i = 0; i < tb.rows.length; i++) {
+        var oc = document.createElement('div'); oc.className = 'gc-oc'; oc.setAttribute('data-id', tb.rows[i].id); oc.setAttribute('data-tier', tb.rows[i].tier);
+        var fi = document.createElement('i'); setArt(fi, '--gm-face', stdArt(tb.rows[i].id, 'thumb'), ''); oc.appendChild(fi);
+        var sp = document.createElement('span');
+        var nb = document.createElement('b'); nb.textContent = t('char.' + tb.rows[i].id + '.name'); sp.appendChild(nb);
+        var pe = document.createElement('em'); pe.textContent = pctText(tb.rows[i].p, 2); sp.appendChild(pe);
+        oc.appendChild(sp); og.appendChild(oc);
+      }
+    } else {
+      for (i = 0; i < tb.tiers.length; i++) {
+        var tr = document.createElement('div'); tr.className = 'gc-tr'; tr.setAttribute('data-tier', tb.tiers[i].tier);
+        var chip = document.createElement('b'); chip.className = 'gc-chip'; chip.textContent = t('drops.tier.' + tb.tiers[i].tier); tr.appendChild(chip);
+        var mid = document.createElement('span'); mid.textContent = t('odds.tier.row', { n: tb.tiers[i].n, each: pctText(tb.tiers[i].each, 3) }); tr.appendChild(mid);
+        var tot = document.createElement('em'); tot.textContent = pctText(tb.tiers[i].p, 3); tr.appendChild(tot);
+        og.appendChild(tr);
+      }
+    }
+    var fine = document.createElement('p'); fine.className = 'sh-fine';
+    fine.textContent = gachaKind === 'friend' ? t('gacha.friend.note') : t('odds.foot1');
+    body.appendChild(fine);
+  };
+  SHOP_DOTS.gacha = function () {
+    p3Ensure();   /* 새 설치는 store.gacha 가 아직 없다 — 왕국 배지가 먼저 이 함수를 부른다 */
+    var g = store.gacha, n = 0;
+    if (!g.firstItem) n++;
+    if (!g.firstFriend && gachaTable('friend').left > 0) n++;
+    if (g.freeDay !== todayKey()) n++;
+    return n;
+  };
+  SHOP_ACTS.gkind = function (k) { gachaKindSet(k); J.sfx.ui(); };
+  SHOP_ACTS.gbuy = function (arg) { var p = arg.split(':'); gachaRun(p[0], parseInt(p[1], 10) || 1, p[2]); };
+  SHOP_ACTS.godds = function (k) { openOdds(k); };
+
+  /* ---- 확률 정보 창 — 캡슐마다 등급 확률 · 개별 확률 · 10회 보장 · 천장(지금 카운터) · 중복 규칙 · 현금 판매 없음. ---- */
+  var oddsKind = 'item';
+  function openOdds(kind) {
+    oddsKind = GACHA_KINDS.indexOf(kind) >= 0 ? kind : 'item';
+    oddsPaint();
+    openModal('modal-odds');
+    var ob = $('odds-body'); if (ob) ob.scrollTop = 0;
+    J.sfx.ui();
+  }
+  function closeOdds() { closeModal('modal-odds'); J.sfx.ui(); }
+  function oddsRow(cls, id, name, p, art) {
+    var r = document.createElement('div'); r.className = 'od-row ' + cls; if (id) r.setAttribute('data-id', id);
+    if (art) { var i = document.createElement('i'); i.className = 'od-ic'; i.style.setProperty('background-image', art); r.appendChild(i); }
+    var n = document.createElement('span'); n.className = 'od-n'; n.textContent = name; r.appendChild(n);
+    var v = document.createElement('b'); v.className = 'od-p'; v.textContent = p; r.appendChild(v);
+    return r;
+  }
+  function oddsPaint() {
+    var tabs = document.querySelectorAll('#odds-tabs .od-tab'), i, tb = gachaTable(oddsKind), d = oddsKind === 'friend' ? 2 : 3;
+    for (i = 0; i < tabs.length; i++) {
+      var on = tabs[i].getAttribute('data-otab') === oddsKind;
+      tabs[i].setAttribute('aria-selected', on ? 'true' : 'false');
+      if (on) tabs[i].setAttribute('data-active', ''); else tabs[i].removeAttribute('data-active');
+    }
+    var b = $('odds-body'); if (!b) return;
+    b.innerHTML = '';
+    var s1 = document.createElement('section'); s1.className = 'od-sec';
+    var h1 = document.createElement('h3'); h1.textContent = t('odds.tier'); s1.appendChild(h1);
+    for (i = 0; i < tb.tiers.length; i++) {
+      var tr = oddsRow('od-tier', '', t('odds.tier.row', { n: tb.tiers[i].n, each: pctText(tb.tiers[i].each, d) }), pctText(tb.tiers[i].p, d));
+      tr.setAttribute('data-tier', tb.tiers[i].tier);
+      var chip = document.createElement('em'); chip.className = 'gc-chip'; chip.textContent = t('drops.tier.' + tb.tiers[i].tier); tr.insertBefore(chip, tr.firstChild);
+      s1.appendChild(tr);
+    }
+    b.appendChild(s1);
+    var s2 = document.createElement('section'); s2.className = 'od-sec od-list';
+    var h2 = document.createElement('h3'); h2.textContent = t(oddsKind === 'friend' ? 'odds.friends' : 'odds.items'); s2.appendChild(h2);
+    for (i = 0; i < tb.rows.length; i++) {
+      var id = tb.rows[i].id, fr = oddsKind === 'friend';
+      s2.appendChild(oddsRow('', id, t(fr ? ('char.' + id + '.name') : ('item.' + id + '.nm')), pctText(tb.rows[i].p, d),
+                             fr ? stdArt(id, 'thumb') : itemArtCss(id, 64)));
+    }
+    if (!tb.rows.length) { var none = document.createElement('p'); none.textContent = t('gacha.friend.all'); s2.appendChild(none); }
+    b.appendChild(s2);
+    var s3 = document.createElement('section'); s3.className = 'od-sec od-rules';
+    var h3 = document.createElement('h3'); h3.textContent = t('odds.rules'); s3.appendChild(h3);
+    var ul = document.createElement('ul'), li;
+    var rules = [];
+    if (oddsKind === 'item') rules.push(t('odds.rule.ten', { n: GACHA_TEN, r: pctText(GACHA_TEN_UP.rare, 0), e: pctText(GACHA_TEN_UP.epic, 0) }));
+    if (oddsKind !== 'friend') rules.push(t('odds.rule.pity', { n: tb.pityAt, c: tb.pity }));
+    if (oddsKind !== 'friend') rules.push(t('odds.rule.dup', { max: ITEM_LV_MAX, c: GACHA_REFUND.common, r: GACHA_REFUND.rare, e: GACHA_REFUND.epic }));
+    else rules.push(t('odds.rule.friend', { c: GACHA_FRIEND_W.common, r: GACHA_FRIEND_W.rare, e: GACHA_FRIEND_W.epic }));
+    for (i = 0; i < rules.length; i++) { li = document.createElement('li'); li.textContent = rules[i]; ul.appendChild(li); }
+    s3.appendChild(ul);
+    b.appendChild(s3);
+    var f1 = document.createElement('p'); f1.className = 'sh-fine'; f1.textContent = t('odds.foot1'); b.appendChild(f1);
+    var f2 = document.createElement('p'); f2.className = 'sh-fine'; f2.textContent = t('odds.foot2', { date: todayKey().slice(0, 4) + '.' + todayKey().slice(4, 6) }); b.appendChild(f2);
+  }
+
   /* ---- 소비처 ① 하트 (§20.3) ---------------------------------------------- */
 
   /** 0 → 5 즉시 회복 = 50💎. 가득 찼으면 아무 일도 안 한다(버튼도 비활성). */
@@ -51723,6 +51991,13 @@ window.TT_SFX = {
     portalAdsSync(); on(window, 'tw:portal', portalAdsSync);   /* P3 — 부팅 때 게이트를 세우고, SDK 준비(env 확정) 알림에 다시 칠한다 — 상점을 안 연 세션도 결과 창 2배 줄이 산다 */
     on($('shop-close'), 'click', closeShop);
     on($('modal-shop'), 'click', function (ev) { if (ev && ev.target === this) closeShop(); });
+    /* P3 T7 — 확률 정보 창: 닫기 · 판 바깥 클릭 · 탭 위임 하나(탭이 늘어도 배선이 안 는다). X 는 data-w6x 위임이 #odds-close 를 누른다. */
+    on($('odds-close'), 'click', closeOdds);
+    on($('odds-tabs'), 'click', function (ev) {
+      var el = ev.target && ev.target.closest ? ev.target.closest('[data-otab]') : null;
+      if (el) { oddsKind = el.getAttribute('data-otab'); oddsPaint(); var ob = $('odds-body'); if (ob) ob.scrollTop = 0; J.sfx.ui(); }
+    });
+    on($('modal-odds'), 'click', function (ev) { if (ev && ev.target === this) closeOdds(); });
     on($('shop-tabs'), 'click', function (ev) {
       var el = ev && ev.target;
       while (el && el !== this && !(el.getAttribute && el.getAttribute('data-shop-tab'))) el = el.parentNode;
@@ -51908,6 +52183,7 @@ window.TT_SFX = {
            F4.1 자리가 나중에 바뀌면 이 조건이 다시 유효한 안전망이 된다. */
         if ($('modal-shop') && !$('modal-shop').hidden &&
             !($('modal-skin') && !$('modal-skin').hidden)) { closeShop(); return; }
+        if ($('modal-odds') && !$('modal-odds').hidden) { closeOdds(); return; }   /* P3 T7 — 확률 창은 상점 화면 위의 한 겹이라 먼저 닫힌다 */
         if ($('screen-shop') && $('screen-shop').classList.contains('active')) { closeShopScreen(); return; }   /* P3 — 상점 화면 = 왕국 위 한 겹 */
       // W7.5 — 클래식 허브도 메뉴 위의 한 겹이라 모드 시트와 같은 우선순위다.
       if ($('modal-classic') && !$('modal-classic').hidden) { closeClassicHub(); return; }
@@ -53131,6 +53407,7 @@ window.TT_SFX = {
     openShopScreen: openShopScreen, closeShopScreen: closeShopScreen, setShopTab: setShopTab, portalAdsOk: portalAdsOk, portalAdsSync: portalAdsSync, SHOP_ART: SHOP_ART, shopFreeCount: shopFreeCount,
     dealBuy: dealBuy, dealGearOf: dealGearOf, dealLeft: dealLeft,   /* P3 T5 — 특가 */
     gachaTable: gachaTable, gachaPull: gachaPull, gachaBuy: gachaBuy, gachaPick: gachaPick, gachaDrawItem: gachaDrawItem, friendOwned: friendOwned, grantFriend: grantFriend, GACHA_PRICE: GACHA_PRICE, GACHA_TIER_P: GACHA_TIER_P, GACHA_TEN_UP: GACHA_TEN_UP,   /* P3 T6 — 뽑기 엔진(표 한 출처) */
+    gachaKindSet: gachaKindSet, gachaRun: gachaRun, openOdds: openOdds, closeOdds: closeOdds, pctText: pctText,   /* P3 T7 — 뽑기 탭 · 확률 정보 창 */
     paintShopTab: paintShopTab, SHOP_PAINT: SHOP_PAINT, SHOP_DOTS: SHOP_DOTS,   /* 수정 1회차 M-2 · M-6 — 탭 태스크 스모크가 표에 자기 함수를 넣어 본다 */
     mateId: mateId, setMate: setMate, cpTab: cpTab, openCharPanel: openCharPanel,
     duelFoeFull: duelFoeFull, PET_SKILL: PET_SKILL,
@@ -71126,6 +71403,91 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
 @media (min-aspect-ratio: 1/1) and (min-width: 700px){
   #sh-body .sh-sk{ --f2-w: calc(var(--f2-phone-w) * .957); }
 }
+
+/* ---- [P3-T7] 뽑기 탭 · 확률 정보 창 — 길이는 전부 calc(N * var(--cqw)) (공통 보충 「상점 화면 규약」). 세로 자리는 무대 높이의 % ----
+   목업 B1 · 무대 높이 500px 기준(종류 알약 top 66 · 리본 top 104 · 기계 top 150 224x285 · 천장 알약 top 438) — 판 위 끝이 두 영역(폭 제한 · 높이 제한) 모두에서
+   무대 높이의 약 95% 라서 % 로 두면 375x667 같은 낮은 화면에서도 기계·알약이 판과 안 겹친다(착수 전 점검 W14). 390x844 에서는 목업 px 그대로다.
+   확률 창(#modal-odds)은 상점 화면 밖의 모달이라 --cqw 가 없다: 모달의 자(--f2-w, #modal-quest 와 같은 자)를 110.8 로 나눠 같은 이름으로 준다.
+   근거: 목업 P 의 절 안쪽 폭 338px = 86.7 단위(3.9px)인데 우리 판의 절 안쪽 폭은 390 폰에서 292px(판 테두리 안쪽 여백 30px) — 단위를 292 / 86.7 = 3.37px
+   (= --f2-w 373.2 / 110.8)로 줄이면 목업의 줄 안 칸 비율(이름 · 확률 · 칩)이 그대로 선다. 데스크톱은 .modal 이 --f2-w 를 폰 폭에 고정해서 판이 커져도 글자가 안 커진다.
+   cqw 단위를 안 쓰므로 구형 대체가 필요 없다. */
+#sh-scene .gc-kinds{ position: absolute; left: 0; right: 0; top: 13.2%; display: flex; justify-content: center; gap: calc(1.5 * var(--cqw)); z-index: 6; }
+#sh-scene .gc-kind{ --f2-bh: calc(7.18 * var(--cqw)); padding: 0 calc(3 * var(--cqw)); font-size: calc(3.2 * var(--cqw)); white-space: nowrap; }
+#sh-scene .gc-title{ position: absolute; left: 50%; top: 20.8%; transform: translateX(-50%); z-index: 6;
+  --f2-bh: calc(11.28 * var(--cqw)); padding: 0 calc(5.64 * var(--cqw)); font-family: var(--font-display); font-weight: 400; font-size: calc(6.2 * var(--cqw)); line-height: 1; white-space: nowrap; }
+#sh-scene .gc-sub{ position: absolute; left: 50%; top: 87.6%; transform: translateX(-50%); z-index: 6;
+  --f2-bh: calc(6.67 * var(--cqw)); width: max-content; max-width: calc(94 * var(--cqw)); height: auto; min-height: var(--f2-bh); padding-top: calc(.8 * var(--cqw)); padding-bottom: calc(.8 * var(--cqw)); text-align: center; line-height: 1.25;
+  font-size: calc(3.2 * var(--cqw)); }
+/* 말풍선(뽑기) — 목업 B1: 기계 오른쪽 · 상인 위(왼쪽 250px · 위 238px) · 글 11.5px 굵게. 특가 말풍선(위 규칙)의 자리·크기만 덮는다. */
+#screen-shop[data-stab="gacha"] #sh-bubble{ left: calc(64.1 * var(--cqw)); top: 47.6%; width: max-content; max-width: calc(34 * var(--cqw));
+  padding: calc(1.5 * var(--cqw)) calc(2.3 * var(--cqw)); border-radius: calc(3.6 * var(--cqw)); font-size: calc(3 * var(--cqw)); font-weight: 700; line-height: 1.3; word-break: keep-all; text-wrap: balance; }
+/* 임시 기계(발주 ② 전) — 규칙 기하만: 유리 돔 원 + 역할색 몸통 + 손잡이. 색 = 캡슐 역할(아이템 민트 · 황금 노랑 · 친구 분홍). 크기 = 무대 높이 57% · 목업 비율 224:285. */
+#sh-scene .gm-ph{ position: absolute; left: 50%; top: 30%; height: 57%; width: auto; aspect-ratio: 224 / 285; transform: translateX(-50%); z-index: 3;
+  --gm-a: var(--role-mint-face-a); --gm-b: var(--role-mint-face-b); --gm-o: var(--role-mint-outline); }
+#sh-scene .gm-ph[data-kind="gold"]{ --gm-a: var(--role-yellow-face-a); --gm-b: var(--role-yellow-face-b); --gm-o: var(--role-yellow-outline); }
+#sh-scene .gm-ph[data-kind="friend"]{ --gm-a: var(--role-pink-face-a); --gm-b: var(--role-pink-face-b); --gm-o: var(--role-pink-outline); }
+#sh-scene .gm-dome{ position: absolute; left: 3%; top: 0; width: 94%; aspect-ratio: 1; border-radius: 50%;
+  background: radial-gradient(circle at 38% 30%, var(--role-glass-face-a), var(--role-glass-face-b)); border: calc(.9 * var(--cqw)) solid var(--role-glass-outline); }
+#sh-scene .gm-body{ position: absolute; left: 0; right: 0; bottom: 0; height: 44%; border-radius: calc(6 * var(--cqw));
+  background: linear-gradient(180deg, var(--gm-a), var(--gm-b)); border: calc(.9 * var(--cqw)) solid var(--gm-o); }
+#sh-scene .gm-knob{ position: absolute; left: 36%; bottom: 17%; width: 28%; aspect-ratio: 1; border-radius: 50%;
+  background: var(--prim-white); border: calc(.9 * var(--cqw)) solid var(--gm-o); }
+#sh-scene .gm-slot{ position: absolute; left: 30%; bottom: 3%; width: 40%; height: 9%; border-radius: calc(3 * var(--cqw)); background: var(--prim-art-ink); }
+/* 돔 안 얼굴 칸 — 좌표는 JS 가 --gm-x · --gm-y(%)로 준다(세 열 · 줄마다 아래로). CSS round() 는 구형(iOS 15.4 미만 · Chrome 125 미만)이 몰라서 안 쓴다. */
+#sh-scene .gm-face{ position: absolute; width: 17%; aspect-ratio: 1; border-radius: 50%; z-index: 1; left: var(--gm-x, 15%); top: var(--gm-y, 12%);
+  background: var(--prim-white) var(--gm-face, none) center / 112% no-repeat; border: calc(.6 * var(--cqw)) solid var(--role-rw-shard-steady-3); }
+#sh-scene .gm-face[data-tier="rare"]{ border-color: var(--role-rw-shard-agility-3); }
+#sh-scene .gm-face[data-tier="epic"]{ border-color: var(--role-rw-item-3); }
+#screen-shop[data-art~="machine"] #sh-scene .gm-dome,
+#screen-shop[data-art~="machine"] #sh-scene .gm-body,
+#screen-shop[data-art~="machine"] #sh-scene .gm-knob,
+#screen-shop[data-art~="machine"] #sh-scene .gm-slot{ display: none; }
+/* ---- 뽑기 판: 버튼 줄 · 확률 머리 · 친구 3열 격자 / 등급 요약 세 줄 ---- */
+#sh-body .gc-btns{ display: flex; gap: calc(2.05 * var(--cqw)); }
+#sh-body .gc-btns .sh-btn{ flex: 1 1 0; min-width: 0; height: calc(12.3 * var(--cqw)); margin-top: 0; line-height: 1.1; }
+#sh-body .gc-oddhd{ display: flex; justify-content: space-between; align-items: center; margin: calc(3.6 * var(--cqw)) 0 calc(1.5 * var(--cqw)); font-size: calc(3.2 * var(--cqw)); color: var(--prim-art-ink); }
+#sh-body .gc-oddlink{ --f2-bh: calc(5.64 * var(--cqw)); padding: 0 calc(2.6 * var(--cqw)); font-size: calc(3.2 * var(--cqw)); white-space: nowrap; }
+#sh-body .gc-og{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: calc(1.5 * var(--cqw)); }
+#sh-body .gc-oc{ display: flex; align-items: center; gap: calc(1.5 * var(--cqw)); height: calc(12.8 * var(--cqw)); padding: 0 calc(1.5 * var(--cqw)); border-radius: calc(3.6 * var(--cqw)); box-sizing: border-box;
+  background: var(--role-f2-pill); border: calc(.3 * var(--cqw)) solid var(--role-f2-pill-line); }
+#sh-body .gc-oc i{ flex: none; width: calc(9.2 * var(--cqw)); height: calc(9.2 * var(--cqw)); border-radius: 50%; background: var(--prim-white) var(--gm-face, none) center / 112% no-repeat;
+  border: calc(.5 * var(--cqw)) solid var(--role-rw-shard-steady-3); box-sizing: border-box; }
+#sh-body .gc-oc[data-tier="rare"] i{ border-color: var(--role-rw-shard-agility-3); }
+#sh-body .gc-oc[data-tier="epic"] i{ border-color: var(--role-rw-item-3); }
+#sh-body .gc-oc span{ min-width: 0; }
+#sh-body .gc-oc b{ display: block; font-size: calc(3.1 * var(--cqw)); color: var(--prim-art-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#sh-body .gc-oc em{ display: block; font-style: normal; font-weight: 800; font-size: calc(3.2 * var(--cqw)); color: var(--role-rw-shard-steady-3); }
+#sh-body .gc-oc[data-tier="rare"] em{ color: var(--role-rw-shard-agility-3); }
+#sh-body .gc-oc[data-tier="epic"] em{ color: var(--role-rw-item-3); }
+#sh-body .gc-tiers .gc-tr, #odds-body .od-tier{ display: flex; align-items: center; gap: calc(2 * var(--cqw)); padding: calc(1.2 * var(--cqw)) 0; font-size: calc(3.4 * var(--cqw)); color: var(--prim-art-ink); }
+#sh-body .gc-tiers .gc-tr em, #odds-body .od-tier .od-p{ margin-left: auto; font-style: normal; font-weight: 800; }
+.gc-chip{ display: inline-block; min-width: calc(11 * var(--cqw)); padding: calc(.6 * var(--cqw)) calc(2 * var(--cqw)); border-radius: calc(3 * var(--cqw)); text-align: center; font-style: normal;
+  color: var(--prim-white); background: var(--role-rw-shard-steady-3); }
+[data-tier="rare"] > .gc-chip{ background: var(--role-rw-shard-agility-3); }
+[data-tier="epic"] > .gc-chip{ background: var(--role-rw-item-3); }
+/* ---- 확률 창(목업 P): 절 셋은 옅은 판(.well 문법) · 장비별은 2열 ---- */
+#modal-odds{ --cqw: calc(var(--f2-w) / 110.8); }
+#modal-odds .sheet{ display: flex; flex-direction: column; }
+#modal-odds .sheet > h2, #modal-odds #odds-tabs, #modal-odds #odds-close{ flex: 0 0 auto; }
+/* 탭 = #modal-quest 의 탭 줄과 같은 값(어깨 필렛 끔 · 표시 글꼴 · 한 줄 말줄임) — 안 주면 부품 기본 글자 크기로 「아이템 캡슐」 이 두 줄로 접힌다 */
+#modal-odds .qs-tabs{ margin: calc(var(--f2-w) * .0180) 0 0; }
+#modal-odds .qs-tab::before{ content: none; }
+#modal-odds .qs-tab{ font-family: var(--font-display); font-size: calc(var(--f2-w) * .0330); color: var(--f2-ink); }
+#modal-odds .qs-tab .cpt-lab{ min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* 몸통만 안에서 구른다(판 자신은 overflow:visible !important 라 스크롤 상자가 못 된다 — #modal-quest 의 목록과 같은 처방) */
+#modal-odds .od-body{ flex: 0 1 auto; min-height: 0; margin: calc(var(--f2-w) * .0180) 0 0; max-height: 62vh; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+#modal-odds .od-body::-webkit-scrollbar{ width: 0; height: 0; }
+#modal-odds .od-sec{ margin: 0 0 calc(2.6 * var(--cqw)); padding: calc(2.6 * var(--cqw)) calc(3.1 * var(--cqw)); border-radius: calc(4.6 * var(--cqw)); background: var(--role-f2-pill); border: calc(.3 * var(--cqw)) solid var(--role-f2-pill-line); }
+#modal-odds .od-sec h3{ margin: 0 0 calc(1.5 * var(--cqw)); font-size: calc(3.8 * var(--cqw)); color: var(--prim-art-ink); text-align: left; }
+#modal-odds .od-list{ display: grid; grid-template-columns: 1fr 1fr; column-gap: calc(3 * var(--cqw)); }
+#modal-odds .od-list h3{ grid-column: 1 / -1; }
+#modal-odds .od-row{ display: flex; align-items: center; gap: calc(1.5 * var(--cqw)); font-size: calc(3.3 * var(--cqw)); color: var(--prim-art-ink); }
+#modal-odds .od-row .od-p{ margin-left: auto; flex: none; }
+#modal-odds .od-row .od-n{ min-width: 0; word-break: keep-all; overflow-wrap: anywhere; }
+#modal-odds .sh-fine{ margin: calc(2.6 * var(--cqw)) 0 0; font-size: calc(3 * var(--cqw)); line-height: 1.5; text-align: center; color: var(--role-f2-ink); }
+#modal-odds .sh-fine + .sh-fine{ margin-top: 0; }
+#modal-odds .od-ic{ width: calc(6.2 * var(--cqw)); height: calc(6.2 * var(--cqw)); flex: none; background: center / contain no-repeat; }
+#modal-odds .od-rules ul{ margin: 0; padding-left: calc(4 * var(--cqw)); list-style: disc; text-align: left; font-size: calc(3.3 * var(--cqw)); line-height: 1.55; color: var(--prim-art-ink); }
 
 /* ---- cqw 를 모르는 기기(iOS 15 · Chrome 104 급) 폴백 — 반드시 위 기본 규칙 **뒤**(수정 2회차 N-1) ----
    사용자 지정 속성(--f2-w · --cqw)은 cqw 를 모르는 기기도 값(100cqw)으로 받아들여 버려지지 않으므로, 대체가 앞에 있으면 기본이 덮어 쓰는 자리에서
