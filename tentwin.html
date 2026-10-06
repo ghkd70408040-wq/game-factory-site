@@ -70063,7 +70063,7 @@ html[lang="en"] #kd-b-circus .kd-tag b{ font-size: .88em; letter-spacing: -.02em
    되돌림 규칙이 필요 없다 — `.hudbar` 기본(`left/right:0;width:auto`)이 왕국 캡을 그대로
    따라간다(실측 §fix1 보고 참조). */
 @media (min-aspect-ratio: 1/1) and (max-height: 599.98px) {
-  #screen-kingdom, #screen-shop { width: clamp(360px, 56.25vh, 480px); max-width: 100vw; margin-left: auto; margin-right: auto; }
+  #screen-kingdom, #screen-shop { --col-w: clamp(360px, 56.25vh, 480px); width: var(--col-w); max-width: 100vw; margin-left: auto; margin-right: auto; }   /* --col-w: 상점 cqw 폴백이 기둥 폭을 읽는 자(P3 T4 수정 2회차 N-2) — 값·식은 종전 그대로, clamp 는 한 번만 */
 }
 
 #kd-visit{
@@ -70662,40 +70662,7 @@ html[lang="en"] #kd-b-circus .kd-tag b{ font-size: .88em; letter-spacing: -.02em
   #screen-map #map-stars-v[data-len="6"] { font-size: calc(4.10 * var(--cqw)); }
   #screen-shop #sh-coin-v[data-len="6"] { font-size: calc(4.0 * var(--cqw)); }
   #screen-map #map-stars-v[data-len="7"], #screen-shop #sh-coin-v[data-len="7"] { font-size: calc(3.50 * var(--cqw)); }
-  /* 상점 위 띠 글자 크기 폴백(아래 cqw 규칙과 같은 수 — 지도 폴백 규칙 합류분의 5.40/4.40/5.00/5.60 을 덮는다) */
-  #screen-shop #sh-hearts-v { font-size: calc(4.62 * var(--cqw)); }
-  #screen-shop #sh-heart-t { font-size: calc(2.69 * var(--cqw)); }
-  #screen-shop #sh-coin-v { font-size: calc(4.10 * var(--cqw)); }
-  #screen-shop #sh-star-v { font-size: calc(4.62 * var(--cqw)); }
-  /* 수정 1회차 I-3 — cqw 를 모르는 기기(iOS 15 · Chrome 104 급)의 **틀 좌표 전부**(지도 compat-p1 과 같은 문법 · 아래 cqw 규칙과 같은 수).
-     없으면 cqw 선언이 통째로 버려져 뒤로 버튼이 0×0 이 되고 iOS 에는 Esc 도 기기 뒤로가기도 없어 상점에 갇힌다. --cqw 는 위 #screen-map, #screen-shop 정의. */
-  #sh-top { height: calc(17 * var(--cqw)); }
-  #sh-back { left: calc(2.05 * var(--cqw)); top: calc(2.82 * var(--cqw)); width: calc(11.28 * var(--cqw)); height: calc(11.28 * var(--cqw)); }
-  #sh-hearts { left: calc(15.38 * var(--cqw)); top: calc(3.33 * var(--cqw)); width: calc(27.18 * var(--cqw)); height: calc(10.26 * var(--cqw)); }
-  #sh-coin { left: calc(44.62 * var(--cqw)); top: calc(3.33 * var(--cqw)); width: calc(23.59 * var(--cqw)); height: calc(10.26 * var(--cqw)); }
-  #sh-star { left: calc(70.26 * var(--cqw)); top: calc(3.33 * var(--cqw)); width: calc(25.13 * var(--cqw)); height: calc(10.26 * var(--cqw)); }
-  #sh-top .sh-plus { top: calc(5.77 * var(--cqw)); width: calc(5.38 * var(--cqw)); height: calc(5.38 * var(--cqw)); font-size: calc(4.3 * var(--cqw)); border: calc(.4 * var(--cqw)) solid var(--role-mint-outline); }
-  #sh-coin-plus { left: calc(66.4 * var(--cqw)); }
-  #sh-star-plus { left: calc(93.6 * var(--cqw)); }
-  #sh-top .sh-plus::before { margin-top: calc(11.3 * var(--cqw) / -2); height: calc(11.3 * var(--cqw)); width: calc(11.3 * var(--cqw)); }
-  #sh-coin-plus::before { right: calc((71.78 - .4 - 70.26) * var(--cqw)); }
-  #sh-star-plus::before { right: calc((98.98 - .4 - 100) * var(--cqw)); }
-  #sh-stage { height: calc(min(calc(128.2 * var(--cqw)), 60%) + var(--safe-t)); }
-  #screen-shop[data-stab="deals"] #sh-stage { height: calc(min(calc(76.9 * var(--cqw)), 40%) + var(--safe-t)); }
-  #screen-shop[data-stab="free"] #sh-stage, #screen-shop[data-stab="deco"] #sh-stage { height: calc(min(calc(64.1 * var(--cqw)), 34%) + var(--safe-t)); }
-  #sh-awning { left: calc(-2.6 * var(--cqw)); right: calc(-2.6 * var(--cqw)); height: calc(16.4 * var(--cqw));
-    background: repeating-linear-gradient(90deg, var(--prim-art-pink) 0 calc(7.18 * var(--cqw)), var(--prim-white) calc(7.18 * var(--cqw)) calc(14.36 * var(--cqw))); }
-  #screen-shop[data-stab="free"] #sh-awning { background: repeating-linear-gradient(90deg, var(--role-mint-face-a) 0 calc(7.18 * var(--cqw)), var(--prim-white) calc(7.18 * var(--cqw)) calc(14.36 * var(--cqw))); }
-  #sh-host { right: calc(2 * var(--cqw)); bottom: calc(2 * var(--cqw)); width: calc(28.7 * var(--cqw)); height: calc(38.5 * var(--cqw)); }
-  #sh-plate { left: calc(2.56 * var(--cqw)); right: calc(2.56 * var(--cqw)); bottom: calc(22.6 * var(--cqw) + var(--safe-b)); top: calc(min(calc(122.6 * var(--cqw)), 57%) + var(--safe-t)); }
-  #screen-shop[data-stab="deals"] #sh-plate { top: calc(min(calc(72.3 * var(--cqw)), 36%) + var(--safe-t)); }
-  #screen-shop[data-stab="free"] #sh-plate, #screen-shop[data-stab="deco"] #sh-plate { top: calc(min(calc(57.9 * var(--cqw)), 30%) + var(--safe-t)); }
-  #sh-body { inset: calc(3 * var(--cqw)) calc(3.5 * var(--cqw)); }
-  #sh-tabs { left: calc(2.05 * var(--cqw)); right: calc(2.05 * var(--cqw)); bottom: calc(2.05 * var(--cqw) + var(--safe-b)); height: calc(19 * var(--cqw)); gap: calc(1.54 * var(--cqw)); padding: calc(1.8 * var(--cqw)); }
-  #sh-tabs .sh-tab { border-radius: calc(4.1 * var(--cqw)); gap: calc(.3 * var(--cqw)); font-size: calc(3.6 * var(--cqw)); }
-  #sh-tabs .sh-tab-ic { width: calc(9.2 * var(--cqw)); height: calc(8.2 * var(--cqw)); }
-  #sh-tabs .sh-dot { right: calc(1.5 * var(--cqw)); top: calc(1.2 * var(--cqw)); }
-  #screen-shop > * { --f2-w: calc(100 * var(--cqw)); }
+  /* 상점의 글자 크기·틀 좌표·--f2-w·--cqw 폴백은 이 파일 **끝**의 @supports not 블록에 있다(수정 2회차 N-1 — 기본 규칙 뒤여야 한다). */
 }
 /* 아래 칩 둘의 긴 값(P3 T3 수정 1회차 · 리뷰 I1) — 지도 아래 「합계/최대」(#map-b1-v)와 왕국 아래 별 지갑(#kd-bot-b1-v)은 글자 중심이 칩 폭의 57.7% 라
    글자가 길면 왼쪽 끝이 칩 배경의 별 그림(stage-pill_star.webp 의 별 윤곽 오른쪽 끝 = 그림 폭의 30.4%)에 걸친다 — 「45/300」 이 이미 걸렸고 「300/300」 은 7px 였다.
@@ -70725,7 +70692,8 @@ html[lang="en"] #kd-b-circus .kd-tag b{ font-size: .88em; letter-spacing: -.02em
   background: var(--prim-bg-light);
 }
 /* --f2-w(킷 부품의 자) = 상점 기둥 폭(수정 1회차 I-4): 기둥이 컨테이너라 자식에서 100cqw 가 곧 기둥 폭이다 — 폰 390 · 가로 폰 360(clamp 캡) · 데스크톱 430 을
-   한 줄로 덮는다(:root 의 95.7vw 가 새면 5a 가 본 머리 알약 ~202px 가 된다). 데스크톱 절의 --f2-w 는 판정 ①② 의 글자 그대로 남긴다(같은 값). */
+   한 줄로 덮는다(:root 의 95.7vw 가 새면 5a 가 본 머리 알약 ~202px 가 된다). 데스크톱 절의 --f2-w 는 판정 ①② 의 글자 그대로 남긴다(같은 값).
+   cqw 를 모르는 기기의 대체(calc(100 * var(--cqw)))는 이 파일 끝 @supports not 블록 — 사용자 지정 속성이라 **이 줄보다 뒤**여야 이긴다(수정 2회차 N-1). */
 #screen-shop > *{ --f2-w: 100cqw; }
 /* 포털 게이트 — html[data-portal="cg"] 가 아니면(포털 밖·광고 막힘·아직 판정 전) 전부 0px. */
 html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
@@ -70748,9 +70716,10 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
 }
 #sh-coin-plus{ left: 66.4cqw; }
 #sh-star-plus{ left: 93.6cqw; }
-/* + 버튼 누르는 상자(수정 1회차 M-4): 보이는 원(5.38cqw)은 그대로, 의사요소로 11.3cqw(390 에서 44px) 상자를 깐다 — 세로는 가운데, 오른쪽 끝은 다음 알약(별
-   70.26cqw)·기둥 끝(100cqw)에 맞춰 그것을 안 덮고, 나머지는 자기 알약 위로 넓힌다. right 는 패딩 상자 기준이라 테두리 .4cqw 를 뺀다. */
-#sh-top .sh-plus::before{ content: ""; position: absolute; top: 50%; margin-top: calc(11.3cqw / -2); height: 11.3cqw; width: 11.3cqw; }
+/* + 버튼 누르는 상자(수정 1회차 M-4 · 수정 2회차 N-3): 보이는 원(5.38cqw)은 그대로, 의사요소로 가로 14.1cqw(320 에서 45px — 정수 격자에서 44 가 보장되는 폭) × 세로 16.9cqw(띠 17cqw 안에서 최대 —
+   320 에서 54px) 상자를 깐다 — 세로는 버튼 가운데(띠 0.01~16.91cqw 안), 오른쪽 끝은 다음 알약(별 70.26cqw)·기둥 끝(100cqw)에 맞춰 그것을 안 덮고, 나머지는 자기
+   알약 위로 넓힌다(알약은 span 이라 탭 표적이 아니다). right 는 패딩 상자 기준이라 테두리 .4cqw 를 뺀다. */
+#sh-top .sh-plus::before{ content: ""; position: absolute; top: 50%; margin-top: calc(16.9cqw / -2); height: 16.9cqw; width: 14.1cqw; }
 #sh-coin-plus::before{ right: calc(71.78cqw - .4cqw - 70.26cqw); }
 #sh-star-plus::before{ right: calc(98.98cqw - .4cqw - 100cqw); }
 
@@ -70804,6 +70773,48 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
    전폭(#app max-width:none)으로 두면 1cqw 가 12.8px 라 띠 218px · 판 55px 가 됐다(실측). 가로 폰(<600)은 왕국 폭 캡 절(clamp)에 합류해 있다. */
 @media (min-aspect-ratio: 1/1) and (min-width: 700px) and (min-height: 600px){
   #screen-shop{ width: calc(var(--mapui) * 100); max-width: 100vw; margin-left: auto; margin-right: auto; --f2-w: calc(var(--mapui) * 100); }
+}
+
+/* ---- cqw 를 모르는 기기(iOS 15 · Chrome 104 급) 폴백 — 반드시 위 기본 규칙 **뒤**(수정 2회차 N-1) ----
+   사용자 지정 속성(--f2-w · --cqw)은 cqw 를 모르는 기기도 값(100cqw)으로 받아들여 버려지지 않으므로, 대체가 앞에 있으면 기본이 덮어 쓰는 자리에서
+   무효(초기값)가 된다 — 일반 속성(width 등)은 cqw 선언이 통째로 버려져 순서가 상관없지만 같은 블록에 둔다. 지도 compat-p1 과 같은 문법 · 위 cqw 규칙과 같은 수.
+   --cqw = 상점 기둥 폭 / 100(수정 2회차 N-2): 세로 = 창 폭(#app 상한 --app-max, compat-p1 과 같은 식) · 가로 폰 = --col-w(위 clamp 캡) / 100 · 데스크톱 = --mapui.
+   흉내 시험(smoke-p3-t4 t4p·t4u)은 @supports 판정만 뒤집어 이 순서를 그대로 검사한다. */
+@supports not (width: 1cqw) {
+  #screen-shop { --cqw: min(1vw, calc(var(--app-max) / 100)); }
+  @media (min-aspect-ratio: 1/1) and (max-height: 599.98px) { #screen-shop { --cqw: calc(var(--col-w) / 100); } }
+  @media (min-aspect-ratio: 1/1) and (min-width: 700px) and (min-height: 600px) { #screen-shop { --cqw: var(--mapui); } }
+  #screen-shop > * { --f2-w: calc(100 * var(--cqw)); }
+  #screen-shop #sh-hearts-v { font-size: calc(4.62 * var(--cqw)); }
+  #screen-shop #sh-heart-t { font-size: calc(2.69 * var(--cqw)); }
+  #screen-shop #sh-coin-v { font-size: calc(4.10 * var(--cqw)); }
+  #screen-shop #sh-star-v { font-size: calc(4.62 * var(--cqw)); }
+  #sh-top { height: calc(17 * var(--cqw)); }
+  #sh-back { left: calc(2.05 * var(--cqw)); top: calc(2.82 * var(--cqw)); width: calc(11.28 * var(--cqw)); height: calc(11.28 * var(--cqw)); }
+  #sh-hearts { left: calc(15.38 * var(--cqw)); top: calc(3.33 * var(--cqw)); width: calc(27.18 * var(--cqw)); height: calc(10.26 * var(--cqw)); }
+  #sh-coin { left: calc(44.62 * var(--cqw)); top: calc(3.33 * var(--cqw)); width: calc(23.59 * var(--cqw)); height: calc(10.26 * var(--cqw)); }
+  #sh-star { left: calc(70.26 * var(--cqw)); top: calc(3.33 * var(--cqw)); width: calc(25.13 * var(--cqw)); height: calc(10.26 * var(--cqw)); }
+  #sh-top .sh-plus { top: calc(5.77 * var(--cqw)); width: calc(5.38 * var(--cqw)); height: calc(5.38 * var(--cqw)); font-size: calc(4.3 * var(--cqw)); border: calc(.4 * var(--cqw)) solid var(--role-mint-outline); }
+  #sh-coin-plus { left: calc(66.4 * var(--cqw)); }
+  #sh-star-plus { left: calc(93.6 * var(--cqw)); }
+  #sh-top .sh-plus::before { margin-top: calc(16.9 * var(--cqw) / -2); height: calc(16.9 * var(--cqw)); width: calc(14.1 * var(--cqw)); }
+  #sh-coin-plus::before { right: calc((71.78 - .4 - 70.26) * var(--cqw)); }
+  #sh-star-plus::before { right: calc((98.98 - .4 - 100) * var(--cqw)); }
+  #sh-stage { height: calc(min(calc(128.2 * var(--cqw)), 60%) + var(--safe-t)); }
+  #screen-shop[data-stab="deals"] #sh-stage { height: calc(min(calc(76.9 * var(--cqw)), 40%) + var(--safe-t)); }
+  #screen-shop[data-stab="free"] #sh-stage, #screen-shop[data-stab="deco"] #sh-stage { height: calc(min(calc(64.1 * var(--cqw)), 34%) + var(--safe-t)); }
+  #sh-awning { left: calc(-2.6 * var(--cqw)); right: calc(-2.6 * var(--cqw)); height: calc(16.4 * var(--cqw));
+    background: repeating-linear-gradient(90deg, var(--prim-art-pink) 0 calc(7.18 * var(--cqw)), var(--prim-white) calc(7.18 * var(--cqw)) calc(14.36 * var(--cqw))); }
+  #screen-shop[data-stab="free"] #sh-awning { background: repeating-linear-gradient(90deg, var(--role-mint-face-a) 0 calc(7.18 * var(--cqw)), var(--prim-white) calc(7.18 * var(--cqw)) calc(14.36 * var(--cqw))); }
+  #sh-host { right: calc(2 * var(--cqw)); bottom: calc(2 * var(--cqw)); width: calc(28.7 * var(--cqw)); height: calc(38.5 * var(--cqw)); }
+  #sh-plate { left: calc(2.56 * var(--cqw)); right: calc(2.56 * var(--cqw)); bottom: calc(22.6 * var(--cqw) + var(--safe-b)); top: calc(min(calc(122.6 * var(--cqw)), 57%) + var(--safe-t)); }
+  #screen-shop[data-stab="deals"] #sh-plate { top: calc(min(calc(72.3 * var(--cqw)), 36%) + var(--safe-t)); }
+  #screen-shop[data-stab="free"] #sh-plate, #screen-shop[data-stab="deco"] #sh-plate { top: calc(min(calc(57.9 * var(--cqw)), 30%) + var(--safe-t)); }
+  #sh-body { inset: calc(3 * var(--cqw)) calc(3.5 * var(--cqw)); }
+  #sh-tabs { left: calc(2.05 * var(--cqw)); right: calc(2.05 * var(--cqw)); bottom: calc(2.05 * var(--cqw) + var(--safe-b)); height: calc(19 * var(--cqw)); gap: calc(1.54 * var(--cqw)); padding: calc(1.8 * var(--cqw)); }
+  #sh-tabs .sh-tab { border-radius: calc(4.1 * var(--cqw)); gap: calc(.3 * var(--cqw)); font-size: calc(3.6 * var(--cqw)); }
+  #sh-tabs .sh-tab-ic { width: calc(9.2 * var(--cqw)); height: calc(8.2 * var(--cqw)); }
+  #sh-tabs .sh-dot { right: calc(1.5 * var(--cqw)); top: calc(1.2 * var(--cqw)); }
 }
 </style>
 </body>
