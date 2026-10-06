@@ -27608,6 +27608,8 @@ window.TT_SFX = {
       'coin.x2': 'Double coins',
       'coin.x2.no': 'Just take',
       'coin.x2.got': 'You got {n} more coins!',
+      /* P3 Task 10 — 이미 가진 친구를 보스·조건이 또 주면 별로 바꿔 준다(별 수는 자리표시자 — P3_DUP_STAR 가 채운다). */
+      'gacha.dup.star': '{name} is already with you, so you got {n} stars.',
       'toast.noadds': 'No adds left',
       'toast.empty': 'Board is empty',
       'toast.nohints': 'No hints left',
@@ -29157,6 +29159,8 @@ window.TT_SFX = {
       'coin.x2': '코인 두 배',
       'coin.x2.no': '그냥 받기',
       'coin.x2.got': '코인 {n}개를 더 받았어요!',
+      /* P3 Task 10 — 이미 가진 친구를 보스·조건이 또 주면 별로 바꿔 준다(별 수는 자리표시자 — P3_DUP_STAR 가 채운다). */
+      'gacha.dup.star': '{name}은(는) 이미 함께해서 별 {n}개로 바꿨어요.',
       'toast.noadds': '추가 횟수를 다 썼어요',
       'toast.empty': '보드가 비었어요',
       'toast.nohints': '힌트를 다 썼어요',
@@ -47226,14 +47230,14 @@ window.TT_SFX = {
       if (p.boss && p.n === ADV_CHAPTER && !store.jellyOn) {
         store.jellyOn = true;
         freed = true;
-      }
+      } else if (p.boss && p.n === ADV_CHAPTER) friendDupPay('jelly');   /* P3 — 뽑기로 먼저 온 젤리공주면 별 +10(구출 장면은 안 나온다 — 사용자 결정 대기 항목) */
       /* ---- WD-2 §14.2 ⓑ — 보스 격파 펫 --------------------------------------
        * 위 젤리공주 블록과 **같은 문법**이고, 다른 것은 표를 읽는다는 점뿐이다:
        * 보스2(20탄) → 먹물이 · 보스4(40탄) → 방울이. 10탄·30탄이 표에 없는 것은
        * 그 자리의 헤드라인이 캐릭터(젤리공주·푸딩기사)이기 때문이다 —
        * §14.2 각주 "매 보스가 헤드라인 해금 1개(중복 없음)".
        * grantPet 이 멱등이라 이미 가진 사람에게는 아무 일도 안 일어난다. */
-      if (p.boss && PET_BOSS[p.n]) grantPet(PET_BOSS[p.n]);
+      if (p.boss && PET_BOSS[p.n] && !grantPet(PET_BOSS[p.n])) friendDupPay(PET_BOSS[p.n]);   /* P3 — 이미 뽑은 친구면 별 +10 */
       if (p.boss) { var bg = gearBossRoll(p.n, Math.random); if (bg && bg.id) harvestGear(bg, 0, 0, true); }   /* 74 — 보스 확정 장비 1개. 판 사본 S.gainGear 에 실려 결과 시트가 읽는다 */
       /* §14.3 조건 카운터 ③ — 보스를 한 대도 안 맞고 깼는가.
        * ⚠ **이 카운터로 열리는 펫은 없다**. §14.2 는 이 조건에 딱지(ttakji)를
@@ -50603,6 +50607,18 @@ window.TT_SFX = {
     return { ok: true, kind: kind, n: n, how: how, items: items };
   }
 
+  /* ---- 중복 친구 — 뽑기·선물로 먼저 온 친구의 해금 조건(보스·연쇄·수확…)을 나중에 채우면 친구마다 한 번 별 +10
+     (스펙 §4-b 「손해 0」). 보통 경로로 온 친구(petSrc 없음)는 아무 일도 없다. ---- */
+  var P3_DUP_STAR = 10;
+  function friendDupPay(id) {
+    var g = store.gacha;
+    if (!g || !g.petSrc[id] || g.dupPaid[id]) return false;
+    g.dupPaid[id] = 1;
+    starGrant(P3_DUP_STAR, 'dup-friend');
+    toast(t('gacha.dup.star', { name: t('char.' + id + '.name'), n: P3_DUP_STAR }));
+    return true;
+  }
+
   /* =========================================================================
    * 판정판 74 — 장비 과일 파밍(스펙 §D · 조사 §9). 숫자 출처는 dropTableFor(n) 하나: 판 추첨(battleRefill →
    * gearRollFrom)과 획득표 모달·스테이지 카드가 같은 표를 읽는다(advStar2Need 선례). 장비 과일은 모험에서만.
@@ -51178,13 +51194,16 @@ window.TT_SFX = {
     if (awkStreak > (store.awkChainMax | 0)) { store.awkChainMax = awkStreak; dirty = true; }
     if (stdyRun > (store.noDelayMax | 0)) { store.noDelayMax = stdyRun; dirty = true; }
     if ((store.awkChainMax | 0) >= PET_AWK_NEED && !petOwned('tiktok')) grantPet('tiktok');
+    if ((store.awkChainMax | 0) >= PET_AWK_NEED) friendDupPay('tiktok');   /* P3 — 뽑기로 먼저 온 째깍이면 별 +10 한 번 */
     if ((store.noDelayMax | 0) >= PET_NODELAY_NEED && !petOwned('mongle')) grantPet('mongle');
+    if ((store.noDelayMax | 0) >= PET_NODELAY_NEED) friendDupPay('mongle');   /* P3 — 뽑기로 먼저 온 몽글이면 별 +10 한 번 */
     if (dirty) persist();
   }
 
   var PET_GEAR_NEED = 30;   /* 74 — 꿀떡이: 장비 과일 누적 30개(옛 파편 누적 300 과 같은 비율 — 이전기가 진행을 ÷10 으로 옮긴다) */
   function petGearCheck() {
     if (!petOwned('kkultteok') && (store.gearEver | 0) >= PET_GEAR_NEED) grantPet('kkultteok');
+    if ((store.gearEver | 0) >= PET_GEAR_NEED) friendDupPay('kkultteok');   /* P3 — 뽑기로 먼저 온 꿀떡이면 별 +10 한 번 */
   }
   /** 이전 알림을 띄울 수 있나 = 사용자가 실제로 보는 왕국: 스플래시가 걷혔고(splashDone — 첫 사용자 탭 뒤) 왕국 화면이
       활성이고 열린 모달이 없다. 부팅 청크의 enterKingdom() 은 스플래시 밑이라 여기서 거짓이다(착수 전 점검 C4). */
@@ -51245,6 +51264,7 @@ window.TT_SFX = {
     if (!petOwned('sseokssak') && (store.tenTotal | 0) >= PET_TEN_NEED) {
       grantPet('sseokssak');
     }
+    if ((store.tenTotal | 0) >= PET_TEN_NEED) friendDupPay('sseokssak');   /* P3 — 뽑기로 먼저 온 썩싹이면 별 +10 한 번 */
   }
 
   /**
@@ -53850,6 +53870,7 @@ window.TT_SFX = {
     gachaKindSet: gachaKindSet, gachaRun: gachaRun, openOdds: openOdds, closeOdds: closeOdds, pctText: pctText,   /* P3 T7 — 뽑기 탭 · 확률 정보 창 */
     gresOpenAll: gresOpenAll, gresClose: gresClose, gresOpen: gresOpen,   /* P3 T8 — 뽑기 결과 창(캡슐 · 카드 뒤집기). gresOpen 은 수정 1회차(결제 없이 여는 손잡이 — 성능 귀속 측정 · 뒤 태스크) */
     adCapLeft: adCapLeft, adRowOk: adRowOk, watchAdFor: watchAdFor, paintCoinX2: paintCoinX2, twWatchAdForHeart: twWatchAdForHeart, P3_AD_COIN: P3_AD_COIN, P3_AD_STAR: P3_AD_STAR,   /* P3 T9 — 보상형 광고 */
+    friendDupPay: friendDupPay, P3_DUP_STAR: P3_DUP_STAR,   /* P3 T10 — 중복 친구 별 +10 */
     paintShopTab: paintShopTab, SHOP_PAINT: SHOP_PAINT, SHOP_DOTS: SHOP_DOTS,   /* 수정 1회차 M-2 · M-6 — 탭 태스크 스모크가 표에 자기 함수를 넣어 본다 */
     mateId: mateId, setMate: setMate, cpTab: cpTab, openCharPanel: openCharPanel,
     duelFoeFull: duelFoeFull, PET_SKILL: PET_SKILL,
