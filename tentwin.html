@@ -45582,6 +45582,8 @@ window.TT_SFX = {
     var body = $('sh-body'), scene = $('sh-scene');
     var keep = (body && !resetScroll) ? body.scrollTop : 0;
     if (scene) scene.innerHTML = '';          /* 무대 위 탭 전용 장식(뽑기 기계 등) — 탭 함수가 채운다 */
+    var plateEl = $('sh-plate');              /* 판 직속 머리(.sh-phead — 판 위 끝에 걸친 알약, 스크롤 상자 밖). 탭 함수가 다시 단다(P3 T5 수정 1회차 I-1) */
+    if (plateEl) { var olds = plateEl.querySelectorAll('.sh-phead'); for (var oi = olds.length - 1; oi >= 0; oi--) plateEl.removeChild(olds[oi]); }
     if (body) {
       body.innerHTML = '';
       (SHOP_PAINT[tab] || SHOP_PAINT.gacha)(body, scene);
@@ -45678,10 +45680,12 @@ window.TT_SFX = {
     if (o.tier) card.setAttribute('data-tier', o.tier);
     var hd = document.createElement('b'); hd.className = 'shop-cn'; hd.textContent = o.title; card.appendChild(hd);
     if (o.badge) { var bd = document.createElement('em'); bd.className = 'shop-badge'; bd.textContent = o.badge; card.appendChild(bd); }
+    var box = document.createElement('span'); box.className = 'shop-icbox';   /* 그림 + 지급 수 — 지급 수는 그림 상자 오른쪽 아래에 붙는다(제목이 두 줄로 접혀도 같은 자리, 리뷰 M-4) */
     var ic = document.createElement('i'); ic.className = 'shop-ic ' + (o.ic || ''); ic.setAttribute('aria-hidden', 'true');
     if (o.icCss) ic.style.setProperty('background-image', o.icCss);
-    card.appendChild(ic);
-    if (o.qty) { var q = document.createElement('span'); q.className = 'shop-qty'; q.textContent = o.qty; card.appendChild(q); }
+    box.appendChild(ic);
+    if (o.qty) { var q = document.createElement('span'); q.className = 'shop-qty'; q.textContent = o.qty; box.appendChild(q); }
+    card.appendChild(box);
     if (o.sub) { var sb = document.createElement('span'); sb.className = 'shop-cd'; sb.textContent = o.sub; card.appendChild(sb); }
     var b = document.createElement('button');
     b.type = 'button';
@@ -45702,8 +45706,10 @@ window.TT_SFX = {
       clk.textContent = shopClockText(); bub.appendChild(clk);
       bub.hidden = false;
     }
-    var head = document.createElement('div'); head.className = 'kit-pill-v2 sh-head'; head.setAttribute('data-variant', 'header');
-    head.textContent = t('deals.title'); body.appendChild(head);
+    /* 머리 알약은 판 위 끝에 걸쳐 선다(목업 B2) — 스크롤 상자(#sh-body) 안에 두면 상자를 판 위로 늘려야 해서 스크롤한 카드가 판 밖에 그려진다(리뷰 I-1) → 판 직속 */
+    var head = document.createElement('div'); head.className = 'kit-pill-v2 sh-head sh-phead'; head.setAttribute('data-variant', 'header');
+    head.textContent = t('deals.title');
+    var plateEl = $('sh-plate'); if (plateEl) plateEl.appendChild(head);
     var grid = document.createElement('div'); grid.className = 'sh-grid'; body.appendChild(grid);
     var lim = function (k) { return (store.deals.b[k] | 0) + '/' + P3_DEAL_CAP[k]; };
     var money = function (k, n) { return dealLeft(k) > 0 ? { label: arcComma(n), coinIc: 'coin', price: 'coin', act: 'deal:' + k }
@@ -45719,7 +45725,7 @@ window.TT_SFX = {
       Object.assign({ title: t('deals.heart1'), ic: 'shop-ic-heart', sub: lim('heart1') }, money('heart1', DEAL_HEART1)),
       Object.assign({ title: t('deals.trade'), ic: 'shop-ic-jstar-1', qty: '×' + DEAL_TRADE.star, sub: lim('trade') }, money('trade', DEAL_TRADE.coin)),
       Object.assign({ title: t('deals.heartfull'), ic: 'shop-ic-heart', sub: lim('heartfull') },
-        (store.hearts | 0) >= HEART_MAX ? { label: t('deals.done'), price: 'ok', dis: true } : money('heartfull', DEAL_HEARTFULL))
+        ((store.hearts | 0) >= HEART_MAX && dealLeft('heartfull') > 0) ? { label: t('adv.heartfull'), price: 'ok', dis: true } : money('heartfull', DEAL_HEARTFULL))   /* 가득이라 못 사면 「MAX」 · 「내일 다시」 는 한도를 다 쓴 경우만 */
     ];
     for (var i = 0; i < cards.length; i++) grid.appendChild(shopCard2(cards[i]));
     var f1 = document.createElement('p'); f1.className = 'sh-fine'; f1.textContent = t('deals.foot'); body.appendChild(f1);
@@ -45732,7 +45738,7 @@ window.TT_SFX = {
       if (r.got && r.got.coin) toast(t('coin.got', { n: r.got.coin }));
       else if (r.got && r.got.star) toast(t('star.got', { n: r.got.star }));
       else if (r.got && r.got.id) toast(t('deals.got', { name: t('item.' + r.got.id + '.nm') }));
-      else toast(t('shop.heart.ok'));
+      else if (r.got && (r.got.heart || r.got.heartfull)) toast(t('shop.heart.ok'));   /* 알 수 없는 종류면 토스트 없음 */
       J.sfx.win();
     } else {
       if (r.err === 'coin') toast(t('gacha.nocoin', { n: r.need }));
@@ -45971,7 +45977,8 @@ window.TT_SFX = {
       wrap.appendChild(pay);
     } else if (shopTabCur === 'bundle') {
       /* [SHOP-0910 판정] §20.4 는 「하트·아이템」과 「파편」을 따로 뒀지만, 지휘자
-         확정 탭 구성은 넷([보석|젤리별|번들|스킨])이다. 그래서 **하트 카드와
+         확정 탭 구성은 넷([보석|젤리별|번들|스킨])이었다(P3 T5 — 별 교환·스킨 탭이 은퇴해 지금은 [보석|번들] 둘, §28.5;
+         가게 화면의 무료 탭은 포털에서만, §28.4). 그래서 **하트 카드와
          확정 파편 팩을 번들 탭에 함께** 둔다 — 셋 다 「확정형 묶음」이라는 같은
          성격이고, 탭을 다섯으로 늘리면 확정 구성이 깨진다.
          (74 — 확정 파편 팩 네 줄은 파편 경제와 함께 은퇴했다. 이 탭에는 하트 카드와 결제 묶음이 남는다.) */
@@ -71059,9 +71066,11 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
    색은 Task 4 토큰 표의 역할색뿐 · 치수는 목업 B2 · B4(390 기준 px ÷ 3.9). */
 #screen-shop{ --cqw: 1cqw; }
 /* 머리 알약 = kit-pill-v2[header](5a 차이표 D1 · D2): 높이 44px(11.28cqw) · 좌우 26px(6.67cqw) · 글 주아 21.84px(5.6cqw) 흰 글 + 아래 겉선색 그림자 */
-#sh-body .sh-head{ display: flex; width: max-content; margin: 0 auto calc(2.6 * var(--cqw)); padding: 0 calc(6.67 * var(--cqw));
+#screen-shop .sh-head{ display: flex; width: max-content; margin: 0 auto calc(2.6 * var(--cqw)); padding: 0 calc(6.67 * var(--cqw));
   --f2-bh: calc(11.28 * var(--cqw)); font-family: var(--font-display); font-weight: 400; font-size: calc(5.6 * var(--cqw)); line-height: 1;
   text-shadow: 0 calc(.385 * var(--cqw)) 0 var(--role-f2-pill-a-ln); }
+/* 판 직속 머리(특가): 판 위 끝에 걸쳐 선다 — 목업 B2 의 알약 위 27px(6.9cqw)가 판 밖. 스크롤 상자 밖이라 카드가 스크롤돼도 판 밖에 그려지지 않는다(리뷰 I-1). */
+#sh-plate > .sh-phead{ position: absolute; z-index: 2; left: 0; right: 0; top: calc(-6.9 * var(--cqw)); margin: 0 auto; }
 #sh-body .sh-grid{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: calc(2.05 * var(--cqw)); }
 #sh-body .shop-card[data-layout="grid"]{ position: relative; display: flex; flex-direction: column; align-items: center; gap: calc(1.2 * var(--cqw));
   min-height: calc(46 * var(--cqw)); padding: calc(2.6 * var(--cqw)) calc(1.8 * var(--cqw)); border-radius: calc(4.6 * var(--cqw)); box-sizing: border-box;
@@ -71076,10 +71085,12 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
 #sh-body .shop-card .shop-badge{ position: absolute; left: calc(1.5 * var(--cqw)); top: calc(-2 * var(--cqw)); font-style: normal;
   padding: calc(.4 * var(--cqw)) calc(2 * var(--cqw)); border-radius: 999em; font-size: calc(3 * var(--cqw)); font-weight: 800; line-height: 1.3;
   background: var(--role-pink-face-b); color: var(--prim-white); }
-/* 지급 수(×100 · ×5)는 목업 B2 처럼 그림 오른쪽 아래에 겹쳐 앉힌다 — 흐름에 두면 카드가 한 줄 커져 두 줄 카드가 판(450px)에 안 들어간다 */
-#sh-body .shop-card .shop-qty{ position: absolute; right: calc(3.5 * var(--cqw)); top: calc(22.5 * var(--cqw)); font-size: calc(4.2 * var(--cqw)); font-weight: 800; line-height: 1;
+/* 지급 수(×100 · ×5)는 목업 B2 처럼 그림 상자(.shop-icbox) 오른쪽 아래에 겹쳐 앉힌다 — 흐름에 두면 두 줄 카드가 판(450px)에 안 들어가고, 카드 위 끝 기준 고정 높이에 두면 제목이 두 줄로 접힐 때(영어) 그림과 어긋난다 */
+#sh-body .shop-icbox{ position: relative; display: flex; }
+#sh-body .shop-card .shop-qty{ position: absolute; right: calc(-1.1 * var(--cqw)); bottom: calc(-.5 * var(--cqw)); font-size: calc(4.2 * var(--cqw)); font-weight: 800; line-height: 1;
   paint-order: stroke fill; -webkit-text-stroke: calc(.5 * var(--cqw)) var(--prim-white); }
 #sh-body .shop-card .shop-cd{ font-size: calc(3 * var(--cqw)); color: var(--role-f2-ink); }
+/* min-height · padding 의 !important: .cta-jelly 가 둘을 !important 로 주어서(중요도가 선택자 특정도보다 먼저) 같은 !important 로만 덮인다 — 빼 보면(좌우 18px 이 이겨) 390 에서도 「무료 받기」가 「무료 받 / 기」 로 꺾인다(시험 t5f1) */
 #sh-body .sh-btn{ min-height: 0 !important; padding: 0 calc(1 * var(--cqw)) !important; width: 100%; height: calc(10.8 * var(--cqw)); margin-top: auto; font-size: calc(4.2 * var(--cqw)); }
 #sh-body .sh-btn[data-price="coin"]{ --btn-face-a: var(--role-yellow-face-a); --btn-face-b: var(--role-yellow-face-b); --btn-outline: var(--role-yellow-outline); --btn-contact: var(--role-yellow-contact); }
 #sh-body .sh-btn[data-price="star"]{ --btn-face-a: var(--role-pink-face-a); --btn-face-b: var(--role-pink-face-b); --btn-outline: var(--role-pink-outline); --btn-contact: var(--role-pink-contact); }
@@ -71096,8 +71107,8 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
   background: var(--prim-white); border: calc(.4 * var(--cqw)) solid var(--role-f2-pill-line); color: var(--prim-art-ink); font-size: calc(3.4 * var(--cqw)); }
 #sh-bubble > .kit-pill-v2{ display: flex; width: max-content; margin-top: calc(1.2 * var(--cqw)); --f2-bh: calc(5.9 * var(--cqw)); font-size: calc(3.3 * var(--cqw)); }
 #screen-shop[data-stab="deals"] #sh-host{ left: calc(6 * var(--cqw)); right: auto; }
-/* 특가 판의 머리 알약은 판 위 끝에 걸쳐 선다(목업 B2: 알약 위 27px 가 판 밖) — 판 안 상자를 그만큼 위로 늘린다(판은 넘침을 안 자른다). 꾸미기 판은 목업 B4 대로 판 안이다. */
-#screen-shop[data-stab="deals"] #sh-body{ top: calc(-6.9 * var(--cqw)); }
+/* 특가 판의 스크롤 상자는 머리 알약(판 직속, 위 걸침) 밑부터 — 첫 카드 자리는 머리가 상자 안에 있던 때와 같다(판 위 끝 + 4.5cqw + 안쪽 여백 2.5cqw = 7cqw). 상자가 판 위로 나가지 않는다(리뷰 I-1). 꾸미기 판은 목업 B4 대로 머리가 판 안(상자 안)이다. */
+#screen-shop[data-stab="deals"] #sh-body{ top: calc(4.5 * var(--cqw)); padding-top: calc(2.5 * var(--cqw)); }   /* 안쪽 여백 = 「희귀」 표가 카드 위로 걸친 만큼(상자 위 끝에서 안 잘림) */
 /* 꾸미기 탭 스킨 줄 묶음(5a 차이표 D3 · D4): 대상 줄 밑 틈 2.6cqw · 판이 통째로 스크롤하므로 묶음 안쪽 스크롤은 끈다(.sk-list 기본 max-height 46vh) ·
    알약 자(--f2-w) = #modal-skin 이 쓰는 값과 같은 식(폰 세로 = 95.7% 폭 · 데스크톱 = 폰 기준폭 390 x .957) — 「장착」 · 「착용 중」이 스킨 시트와 같은 크기가 되게 한다.
    크기·민트 면 규칙은 위 `.sk-act.kit-pill-v2` 규칙(스킨 시트와 합류 선택자)이 준다. */
