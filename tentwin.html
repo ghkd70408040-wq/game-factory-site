@@ -551,7 +551,7 @@ html[data-platform="web"] [data-app-only]{display:none !important}
 /*
  * Pretendard (c) 2021 Kil Hyung-jin — Reserved Font Name "Pretendard".
  * Licensed under the SIL Open Font License v1.1. Full text: tools/PRETENDARD-OFL.txt
- * Subset to the 984 glyphs this UI actually renders (866 hangul).
+ * Subset to the 981 glyphs this UI actually renders (866 hangul).
  * Regenerate after changing Korean copy: node tools/subset-korean-font.js --html site/tentwin.html --chars <current glyphs> --out <block> (then splice)
  */
 @font-face {
@@ -45859,8 +45859,9 @@ window.TT_SFX = {
     }
     gachaBusy = true;
     var shown = false;
-    try { gachaShow(r, function () { gachaBusy = false; paintShopTab(shopTab2); }); shown = true; }
-    finally { if (!shown) { gachaBusy = false; paintShopTab(shopTab2); } }   /* 연출이 예외로 멈춰도 뽑기 탭이 잠기지 않게 — 구매는 이미 저장됐다(착수 전 점검 C2) */
+    /* 연출 도중 상점을 닫을 수 있다(Task 8 은 연출이 길다) — gachaBusy 해제는 닫혀도 그대로, 다시 그리기는 상점이 떠 있을 때만 */
+    try { gachaShow(r, function () { gachaBusy = false; if (shopActive()) paintShopTab(shopTab2); }); shown = true; }
+    finally { if (!shown) { gachaBusy = false; if (shopActive()) paintShopTab(shopTab2); } }   /* 연출이 예외로 멈춰도 뽑기 탭이 잠기지 않게 — 구매는 이미 저장됐다(착수 전 점검 C2) */
   }
   /** 결과 보여 주기 — Task 8 이 결과 창·연출로 통째 바꾼다. 여기서는 토스트 한 줄, 끝은 다음 작업 틱(같은 틱 연타를 막는다). */
   function gachaShow(res, done) {
@@ -46005,10 +46006,11 @@ window.TT_SFX = {
     b.appendChild(s1);
     var s2 = document.createElement('section'); s2.className = 'od-sec od-list';
     var h2 = document.createElement('h3'); h2.textContent = t(oddsKind === 'friend' ? 'odds.friends' : 'odds.items'); s2.appendChild(h2);
+    var box = document.createElement('div'); box.className = 'od-box'; s2.appendChild(box);   /* 높이가 정해진 안쪽 스크롤 상자 — 규칙 절 · 바닥 글이 첫 화면에 들게(리뷰 I-2). 마지막 줄이 반쯤 잘려 보이는 것이 「더 있다」 신호 */
     for (i = 0; i < tb.rows.length; i++) {
       var id = tb.rows[i].id, fr = oddsKind === 'friend';
-      s2.appendChild(oddsRow('', id, t(fr ? ('char.' + id + '.name') : ('item.' + id + '.nm')), pctText(tb.rows[i].p, d),
-                             fr ? stdArt(id, 'thumb') : itemArtCss(id, 64)));
+      box.appendChild(oddsRow('', id, t(fr ? ('char.' + id + '.name') : ('item.' + id + '.nm')), pctText(tb.rows[i].p, d),
+                              fr ? stdArt(id, 'thumb') : itemArtCss(id, 64)));
     }
     if (!tb.rows.length) { var none = document.createElement('p'); none.textContent = t('gacha.friend.all'); s2.appendChild(none); }
     b.appendChild(s2);
@@ -63451,6 +63453,7 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
 #modal-adv .sheet > h2,
 #modal-arc .sheet > h2,
 #modal-daily .sheet > h2,
+#modal-odds .sheet > h2,
 #modal-clear .sheet > h2,
 #modal-rank .sheet > h2,
 #modal-minimap .r10-ribbon,
@@ -63696,6 +63699,7 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
   #modal-adv .sheet > h2,
   #modal-arc .sheet > h2,
   #modal-daily .sheet > h2,
+  #modal-odds .sheet > h2,
   #modal-clear .sheet > h2,
   #modal-rank .sheet > h2,
   #modal-minimap .r10-ribbon,
@@ -63736,6 +63740,7 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
   #modal-adv .sheet > h2::before,
   #modal-arc .sheet > h2::before,
   #modal-daily .sheet > h2::before,
+  #modal-odds .sheet > h2::before,
   #modal-clear .sheet > h2::before,
   #modal-rank .sheet > h2::before,
   #modal-minimap .r10-ribbon::before,
@@ -65881,6 +65886,7 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
 #modal-adv .sheet > h2,
 #modal-arc .sheet > h2,
 #modal-daily .sheet > h2,
+#modal-odds .sheet > h2,
 #modal-clear .sheet > h2,
 #modal-rank .sheet > h2,
 #modal-minimap .r10-ribbon,
@@ -66153,6 +66159,7 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
 #modal-adv .sheet > h2,
 #modal-arc .sheet > h2,
 #modal-daily .sheet > h2,
+#modal-odds .sheet > h2,
 #modal-clear .sheet > h2,
 #modal-rank .sheet > h2,
 #modal-minimap .r10-ribbon,
@@ -66219,6 +66226,7 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
 #modal-adv .sheet > h2,
 #modal-arc .sheet > h2,
 #modal-daily .sheet > h2,
+#modal-odds .sheet > h2,
 #modal-clear .sheet > h2,
 #modal-rank .sheet > h2{
   --wcap-w: calc(56.84% + 35.2408px);      /* .sheet.jbox--modal — 안여백 차 62px 고정 */
@@ -71407,10 +71415,12 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
 /* ---- [P3-T7] 뽑기 탭 · 확률 정보 창 — 길이는 전부 calc(N * var(--cqw)) (공통 보충 「상점 화면 규약」). 세로 자리는 무대 높이의 % ----
    목업 B1 · 무대 높이 500px 기준(종류 알약 top 66 · 리본 top 104 · 기계 top 150 224x285 · 천장 알약 top 438) — 판 위 끝이 두 영역(폭 제한 · 높이 제한) 모두에서
    무대 높이의 약 95% 라서 % 로 두면 375x667 같은 낮은 화면에서도 기계·알약이 판과 안 겹친다(착수 전 점검 W14). 390x844 에서는 목업 px 그대로다.
-   확률 창(#modal-odds)은 상점 화면 밖의 모달이라 --cqw 가 없다: 모달의 자(--f2-w, #modal-quest 와 같은 자)를 110.8 로 나눠 같은 이름으로 준다.
-   근거: 목업 P 의 절 안쪽 폭 338px = 86.7 단위(3.9px)인데 우리 판의 절 안쪽 폭은 390 폰에서 292px(판 테두리 안쪽 여백 30px) — 단위를 292 / 86.7 = 3.37px
-   (= --f2-w 373.2 / 110.8)로 줄이면 목업의 줄 안 칸 비율(이름 · 확률 · 칩)이 그대로 선다. 데스크톱은 .modal 이 --f2-w 를 폰 폭에 고정해서 판이 커져도 글자가 안 커진다.
-   cqw 단위를 안 쓰므로 구형 대체가 필요 없다. */
+   확률 창(#modal-odds)은 상점 화면 밖의 모달이라 상점의 --cqw(기둥 폭의 1% — 컨테이너 단위)가 없다. 모달 길이의 단위는 **--mu**(모달 단위)다 — 이름이 다른 것은 뜻이 달라서다.
+   --mu 는 컨테이너 단위가 아니라 모달의 자(--f2-w, vw 기반 — #modal-quest 가 쓰는 그 자)를 110.8 로 나눈 값이라 cqw 를 모르는 기기에서도 그대로 선다(구형 대체 불필요).
+   P3 창 전부가 쓰는 정의는 한 곳(아래 #modal-odds, #modal-gres)이다 — Task 8 결과 창이 같은 값을 그대로 쓴다.
+   110.8 의 유도: 390 폭에서 --f2-w = 95.7vw = 373.2px. 목업 P 의 절 안쪽 폭 338px = 86.7 단위(목업 px ÷ 3.9)이고 우리 판의 절 안쪽 폭은 390 폰에서 292px(= 판 354px − 테두리 안쪽 여백 62px)다.
+   목업과 같은 줄 안 칸 비율(이름 · 확률 · 칩)이 서려면 1 단위 = 292 ÷ 86.7 = 3.368px — 즉 373.2 ÷ 3.368 = 110.8. 320 폭에서는 --f2-w 가 306.2px 라 1 단위 2.76px 로, 1280 데스크톱에서는 --f2-w 가
+   폰 폭 390 의 95.7% 로 고정돼 3.368px 그대로다(판이 커져도 글자가 안 커진다). 한 창 안의 치수는 --mu 하나로 쓴다 — 퀘스트 창의 --f2-w × k 값도 같은 비례(k × 110.8)라 N × --mu 로 옮겼다. */
 #sh-scene .gc-kinds{ position: absolute; left: 0; right: 0; top: 13.2%; display: flex; justify-content: center; gap: calc(1.5 * var(--cqw)); z-index: 6; }
 #sh-scene .gc-kind{ --f2-bh: calc(7.18 * var(--cqw)); padding: 0 calc(3 * var(--cqw)); font-size: calc(3.2 * var(--cqw)); white-space: nowrap; }
 #sh-scene .gc-title{ position: absolute; left: 50%; top: 20.8%; transform: translateX(-50%); z-index: 6;
@@ -71445,6 +71455,10 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
 /* ---- 뽑기 판: 버튼 줄 · 확률 머리 · 친구 3열 격자 / 등급 요약 세 줄 ---- */
 #sh-body .gc-btns{ display: flex; gap: calc(2.05 * var(--cqw)); }
 #sh-body .gc-btns .sh-btn{ flex: 1 1 0; min-width: 0; height: calc(12.3 * var(--cqw)); margin-top: 0; line-height: 1.1; }
+/* 두 줄로 접힌 라벨(아이템 첫날 버튼 셋)에서도 코인 그림이 설계 크기를 지킨다 — flex 축소를 받으면 18px 가 11px 로 줄어 버튼 왼쪽 끝에 붙는다(리뷰 I-3) */
+#sh-body .gc-btns .sh-btn-ic{ flex: none; }
+/* 판 윗테두리와 버튼 줄 사이 틈 — 목업 B1: 판 위 끝 478px · 버튼 위 끝 496px = 18px ÷ 3.9 = 4.6cqw. #sh-body 의 위 안쪽(3cqw)에 1.6cqw 를 더한다 */
+#screen-shop[data-stab="gacha"] #sh-body{ padding-top: calc(1.6 * var(--cqw)); }
 #sh-body .gc-oddhd{ display: flex; justify-content: space-between; align-items: center; margin: calc(3.6 * var(--cqw)) 0 calc(1.5 * var(--cqw)); font-size: calc(3.2 * var(--cqw)); color: var(--prim-art-ink); }
 #sh-body .gc-oddlink{ --f2-bh: calc(5.64 * var(--cqw)); padding: 0 calc(2.6 * var(--cqw)); font-size: calc(3.2 * var(--cqw)); white-space: nowrap; }
 #sh-body .gc-og{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: calc(1.5 * var(--cqw)); }
@@ -71459,35 +71473,43 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
 #sh-body .gc-oc em{ display: block; font-style: normal; font-weight: 800; font-size: calc(3.2 * var(--cqw)); color: var(--role-rw-shard-steady-3); }
 #sh-body .gc-oc[data-tier="rare"] em{ color: var(--role-rw-shard-agility-3); }
 #sh-body .gc-oc[data-tier="epic"] em{ color: var(--role-rw-item-3); }
-#sh-body .gc-tiers .gc-tr, #odds-body .od-tier{ display: flex; align-items: center; gap: calc(2 * var(--cqw)); padding: calc(1.2 * var(--cqw)) 0; font-size: calc(3.4 * var(--cqw)); color: var(--prim-art-ink); }
+#sh-body .gc-tiers .gc-tr{ display: flex; align-items: center; gap: calc(2 * var(--cqw)); padding: calc(1.2 * var(--cqw)) 0; font-size: calc(3.4 * var(--cqw)); color: var(--prim-art-ink); }
+#odds-body .od-tier{ display: flex; align-items: center; gap: calc(2 * var(--mu)); padding: calc(1.2 * var(--mu)) 0; font-size: calc(3.4 * var(--mu)); color: var(--prim-art-ink); }
 #sh-body .gc-tiers .gc-tr em, #odds-body .od-tier .od-p{ margin-left: auto; font-style: normal; font-weight: 800; }
-.gc-chip{ display: inline-block; min-width: calc(11 * var(--cqw)); padding: calc(.6 * var(--cqw)) calc(2 * var(--cqw)); border-radius: calc(3 * var(--cqw)); text-align: center; font-style: normal;
-  color: var(--prim-white); background: var(--role-rw-shard-steady-3); }
+/* 등급 칩 — 길이는 쓰이는 자리의 단위(상점 판 = --cqw · 확률 창 = --mu), 색 · 모양은 한 규칙 */
+.gc-chip{ display: inline-block; text-align: center; font-style: normal; color: var(--prim-white); background: var(--role-rw-shard-steady-3); }
+#sh-body .gc-chip{ min-width: calc(11 * var(--cqw)); padding: calc(.6 * var(--cqw)) calc(2 * var(--cqw)); border-radius: calc(3 * var(--cqw)); }
+#modal-odds .gc-chip{ min-width: calc(11 * var(--mu)); padding: calc(.6 * var(--mu)) calc(2 * var(--mu)); border-radius: calc(3 * var(--mu)); }
 [data-tier="rare"] > .gc-chip{ background: var(--role-rw-shard-agility-3); }
 [data-tier="epic"] > .gc-chip{ background: var(--role-rw-item-3); }
 /* ---- 확률 창(목업 P): 절 셋은 옅은 판(.well 문법) · 장비별은 2열 ---- */
-#modal-odds{ --cqw: calc(var(--f2-w) / 110.8); }
+/* [P3-T7-F1] P3 창 공용 모달 단위(위 머리 주석 — 유도 · 비례). Task 8 의 #modal-gres 도 이 줄을 쓴다. */
+#modal-odds, #modal-gres{ --mu: calc(var(--f2-w) / 110.8); }
 #modal-odds .sheet{ display: flex; flex-direction: column; }
 #modal-odds .sheet > h2, #modal-odds #odds-tabs, #modal-odds #odds-close{ flex: 0 0 auto; }
-/* 탭 = #modal-quest 의 탭 줄과 같은 값(어깨 필렛 끔 · 표시 글꼴 · 한 줄 말줄임) — 안 주면 부품 기본 글자 크기로 「아이템 캡슐」 이 두 줄로 접힌다 */
-#modal-odds .qs-tabs{ margin: calc(var(--f2-w) * .0180) 0 0; }
+/* 탭 = #modal-quest 의 탭 줄과 같은 값(어깨 필렛 끔 · 표시 글꼴 · 한 줄 말줄임) — 안 주면 부품 기본 글자 크기로 「아이템 캡슐」 이 두 줄로 접힌다.
+   퀘스트 창의 --f2-w × .0180 · × .0330 은 --f2-w = 110.8 mu 라 1.99 mu · 3.66 mu 다(같은 비례). */
+#modal-odds .qs-tabs{ margin: calc(1.99 * var(--mu)) 0 0; }
 #modal-odds .qs-tab::before{ content: none; }
-#modal-odds .qs-tab{ font-family: var(--font-display); font-size: calc(var(--f2-w) * .0330); color: var(--f2-ink); }
+#modal-odds .qs-tab{ font-family: var(--font-display); font-size: calc(3.66 * var(--mu)); color: var(--f2-ink); }
 #modal-odds .qs-tab .cpt-lab{ min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-/* 몸통만 안에서 구른다(판 자신은 overflow:visible !important 라 스크롤 상자가 못 된다 — #modal-quest 의 목록과 같은 처방) */
-#modal-odds .od-body{ flex: 0 1 auto; min-height: 0; margin: calc(var(--f2-w) * .0180) 0 0; max-height: 62vh; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+/* 몸통은 판이 모자랄 때만 안에서 구른다(판 자신은 overflow:visible !important 라 스크롤 상자가 못 된다 — #modal-quest 의 목록과 같은 처방). 높이 상한은 두지 않는다:
+   장비별 · 친구별 목록이 자기 안쪽 상자(.od-box)로 구르므로 한 화면에 절 셋과 바닥 글이 다 든다(리뷰 I-2). */
+#modal-odds .od-body{ flex: 0 1 auto; min-height: 0; margin: calc(1.99 * var(--mu)) 0 0; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
 #modal-odds .od-body::-webkit-scrollbar{ width: 0; height: 0; }
-#modal-odds .od-sec{ margin: 0 0 calc(2.6 * var(--cqw)); padding: calc(2.6 * var(--cqw)) calc(3.1 * var(--cqw)); border-radius: calc(4.6 * var(--cqw)); background: var(--role-f2-pill); border: calc(.3 * var(--cqw)) solid var(--role-f2-pill-line); }
-#modal-odds .od-sec h3{ margin: 0 0 calc(1.5 * var(--cqw)); font-size: calc(3.8 * var(--cqw)); color: var(--prim-art-ink); text-align: left; }
-#modal-odds .od-list{ display: grid; grid-template-columns: 1fr 1fr; column-gap: calc(3 * var(--cqw)); }
-#modal-odds .od-list h3{ grid-column: 1 / -1; }
-#modal-odds .od-row{ display: flex; align-items: center; gap: calc(1.5 * var(--cqw)); font-size: calc(3.3 * var(--cqw)); color: var(--prim-art-ink); }
+#modal-odds .od-sec{ margin: 0 0 calc(2.6 * var(--mu)); padding: calc(2.6 * var(--mu)) calc(3.1 * var(--mu)); border-radius: calc(4.6 * var(--mu)); background: var(--role-f2-pill); border: calc(.3 * var(--mu)) solid var(--role-f2-pill-line); }
+#modal-odds .od-sec h3{ margin: 0 0 calc(1.5 * var(--mu)); font-size: calc(3.8 * var(--mu)); color: var(--prim-art-ink); text-align: left; }
+/* 장비별 · 친구별 목록 = 높이가 정해진 안쪽 스크롤 상자(목업 P 의 구성). 숨긴 스크롤바 대신 마지막 줄이 반쯤 잘려 보이는 것이 「더 있다」 신호다(#modal-rank 의 목록과 같은 처방) */
+#modal-odds .od-box{ display: grid; grid-template-columns: 1fr 1fr; column-gap: calc(3 * var(--mu)); align-content: start; box-sizing: border-box; max-height: calc(28 * var(--mu)); padding-bottom: calc(.6 * var(--mu)); overflow-y: auto; overflow-x: hidden;
+  -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+#modal-odds .od-box::-webkit-scrollbar{ width: 0; height: 0; }
+#modal-odds .od-row{ display: flex; align-items: center; gap: calc(1.5 * var(--mu)); font-size: calc(3.3 * var(--mu)); color: var(--prim-art-ink); }
 #modal-odds .od-row .od-p{ margin-left: auto; flex: none; }
-#modal-odds .od-row .od-n{ min-width: 0; word-break: keep-all; overflow-wrap: anywhere; }
-#modal-odds .sh-fine{ margin: calc(2.6 * var(--cqw)) 0 0; font-size: calc(3 * var(--cqw)); line-height: 1.5; text-align: center; color: var(--role-f2-ink); }
+#modal-odds .od-row .od-n{ min-width: 0; text-align: left; word-break: keep-all; overflow-wrap: anywhere; }
+#modal-odds .sh-fine{ margin: calc(2.6 * var(--mu)) 0 0; font-size: calc(3 * var(--mu)); line-height: 1.5; text-align: center; color: var(--role-f2-ink); }
 #modal-odds .sh-fine + .sh-fine{ margin-top: 0; }
-#modal-odds .od-ic{ width: calc(6.2 * var(--cqw)); height: calc(6.2 * var(--cqw)); flex: none; background: center / contain no-repeat; }
-#modal-odds .od-rules ul{ margin: 0; padding-left: calc(4 * var(--cqw)); list-style: disc; text-align: left; font-size: calc(3.3 * var(--cqw)); line-height: 1.55; color: var(--prim-art-ink); }
+#modal-odds .od-ic{ width: calc(6.2 * var(--mu)); height: calc(6.2 * var(--mu)); flex: none; background: center / contain no-repeat; }
+#modal-odds .od-rules ul{ margin: 0; padding-left: calc(4 * var(--mu)); list-style: disc; text-align: left; font-size: calc(3.3 * var(--mu)); line-height: 1.55; color: var(--prim-art-ink); }
 
 /* ---- cqw 를 모르는 기기(iOS 15 · Chrome 104 급) 폴백 — 반드시 위 기본 규칙 **뒤**(수정 2회차 N-1) ----
    사용자 지정 속성(--f2-w · --cqw)은 cqw 를 모르는 기기도 값(100cqw)으로 받아들여 버려지지 않으므로, 대체가 앞에 있으면 기본이 덮어 쓰는 자리에서
