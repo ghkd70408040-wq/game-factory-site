@@ -17760,6 +17760,10 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
          수확분) → 코인/젤리별 → **별 3슬롯**(아래 #adv-stars 가 그 슬롯이고,
          리빌이 픽을 하나씩 점등한다). 그래서 리스트가 별보다 위에 앉는다. -->
     <ul id="adv-reward" class="reward-reveal" aria-live="polite" hidden></ul>
+    <div class="sheet-row coin-x2" data-sheet="adv" data-portal-only hidden>
+      <button class="btn btn-secondary cx2-yes" type="button"><i class="fr-play" aria-hidden="true"></i><span data-i18n="coin.x2">Double coins</span></button>
+      <button class="btn btn-secondary cx2-no" type="button" data-i18n="coin.x2.no">Just take</button>
+    </div>
     <!-- ⑲ 안쪽 젤리 카드: 별·점수·안내 두 줄을 판 위 맨글자에서 카드 위로.
          id 는 한 글자도 안 바뀌므로 paintAdvSheet/countUp 배선 무접촉. -->
     <div class="result-card">
@@ -17814,6 +17818,10 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
          것은 벌어 놓은 것이다(수확은 판 중에 확정된다). 다만 **획득이 있을 때만**
          열린다 — 빈 리스트를 띄우면 "0을 얻었다"를 축하하는 꼴이 된다. -->
     <ul id="over-reward" class="reward-reveal" aria-live="polite" hidden></ul>
+    <div class="sheet-row coin-x2" data-sheet="over" data-portal-only hidden>
+      <button class="btn btn-secondary cx2-yes" type="button"><i class="fr-play" aria-hidden="true"></i><span data-i18n="coin.x2">Double coins</span></button>
+      <button class="btn btn-secondary cx2-no" type="button" data-i18n="coin.x2.no">Just take</button>
+    </div>
     </div><!-- /.over-body -->
     <!-- AD SLOT: rewarded video, grants +2 Add to continue. Hidden by default;
          the portal rewarded-ad wrapper replaces this div and adds .ad-live. -->
@@ -17842,6 +17850,9 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
          (있으면 applyI18n 이 값을 지운다 — #over-title 과 같은 규약). -->
   <div id="modal-arc" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="arc-title"><div class="sheet jbox jbox--modal" data-part="modal-plate">
     <h2 id="arc-title">Arcade</h2>
+    <!-- P3 T9 — 중간 구획(.arc-body = 기록 · 보상 · 코인 2배 줄 · 카드 미리보기). 평소(창 높이 720 초과)에는 display:contents 라 상자가 없고 형제들이 종전처럼 시트의
+         직접 자식으로 놓인다. 작은 폰(높이 720 이하)에서만 이 구획이 시트 안에서 구르고 버튼 줄은 굴림 밖에 선다(shop-p3 블록 · #modal-over 의 .over-body 와 같은 무늬). -->
+    <div class="arc-body">
     <p class="big-score"><b id="arc-value">0</b></p>
     <!-- 수확 피날레(DESIGN §25.7). 아케이드의 큰 숫자는 종전대로 **기록**(시간·
          피해)이라 보너스를 합칠 자리가 아니다 — 그래서 별도 행이다. -->
@@ -17856,7 +17867,12 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
          「#modal-over 의 시트 문법을 그대로 쓴다」에서 카드 상자만 빠져 있다)
          공유 버튼 바로 위, 줄 순서의 맨 끝에 놓는다. -->
     <ul id="arc-reward" class="reward-reveal" aria-live="polite" hidden></ul>
+    <div class="sheet-row coin-x2" data-sheet="arc" data-portal-only hidden>
+      <button class="btn btn-secondary cx2-yes" type="button"><i class="fr-play" aria-hidden="true"></i><span data-i18n="coin.x2">Double coins</span></button>
+      <button class="btn btn-secondary cx2-no" type="button" data-i18n="coin.x2.no">Just take</button>
+    </div>
     <img id="arc-card-thumb" class="share-thumb" alt="" aria-hidden="true" hidden>
+    </div><!-- /.arc-body -->
     <div class="sheet-row">
       <button id="arc-again" class="btn btn-primary" data-i18n="arc.again">Retry</button>
       <button id="arc-share" class="btn btn-ghost" data-i18n-aria="aria.arcShare" data-i18n="arc.share" aria-label="Share your record">Share</button>
@@ -17871,6 +17887,10 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
          그대로 받는다(새 그림 0 · 새 CSS 0). 획득이 0 이면 rewardReveal 이
          아무것도 열지 않으므로 평소의 데일리 결과창은 픽셀 하나 안 바뀐다. -->
     <ul id="daily-reward" class="reward-reveal" aria-live="polite" hidden></ul>
+    <div class="sheet-row coin-x2" data-sheet="daily" data-portal-only hidden>
+      <button class="btn btn-secondary cx2-yes" type="button"><i class="fr-play" aria-hidden="true"></i><span data-i18n="coin.x2">Double coins</span></button>
+      <button class="btn btn-secondary cx2-no" type="button" data-i18n="coin.x2.no">Just take</button>
+    </div>
     <!-- v5 E-1: daily's twin of #over-rank-line. showDailyResult() owns it and
          syncDynamicI18n() re-paints it, so a language toggle cannot revert it. -->
     <p id="daily-rank-line" class="rank-line" hidden></p>
@@ -27558,6 +27578,30 @@ window.TT_SFX = {
       'gres.again10': '{n} more',
       'gres.again1': 'Once more',
       'gres.openall': 'Open all',
+      /* P3 Task 9 — 무료(광고) 탭 · 뽑기 탭 광고 버튼 · 결과 창 코인 2배. 횟수 · 코인 · 별 수는 자리표시자(호출부가 상수로 채운다). */
+      'free.title': 'Watch and Get',
+      'free.reset': 'Resets at midnight. Time left',
+      'free.coin': '+{n} Coins',
+      'free.item': 'One Item Capsule pull',
+      'free.star': '+{n} Stars',
+      'free.heart': 'One Heart',
+      'free.friend': 'One Friend Capsule pull',
+      'free.x2': 'Double coins on results',
+      'free.left.day': '{n}/{m} left today',
+      'free.left.week': '{n}/{m} this week, resets Monday',
+      'free.heart.full': 'Locked while your hearts are full',
+      'free.friend.none': 'Locked when no new friend is left',
+      'free.x2.d': 'On the result screen after a round, {n}/{m} used today',
+      'free.x2.where': 'After a round',
+      'free.get': 'Get',
+      'free.tomorrow': 'Tomorrow',
+      'free.foot1': 'One ad gives one reward. There are no ad buttons during a round.',
+      'free.foot2': 'Without ads you can get the same things with coins, deals and missions.',
+      'gacha.ad': 'Watch an ad to pull',
+      'gacha.ad.week': 'Free pull, once a week',
+      'coin.x2': 'Double coins',
+      'coin.x2.no': 'Just take',
+      'coin.x2.got': 'You got {n} more coins!',
       'toast.noadds': 'No adds left',
       'toast.empty': 'Board is empty',
       'toast.nohints': 'No hints left',
@@ -29083,6 +29127,30 @@ window.TT_SFX = {
       'gres.again10': '{n}회 더',
       'gres.again1': '한 번 더',
       'gres.openall': '모두 열기',
+      /* P3 Task 9 — 무료(광고) 탭 · 뽑기 탭 광고 버튼 · 결과 창 코인 2배. 횟수 · 코인 · 별 수는 자리표시자(호출부가 상수로 채운다). */
+      'free.title': '광고 보고 받기',
+      'free.reset': '매일 자정에 초기화돼요. 남은 시간',
+      'free.coin': '코인 +{n}',
+      'free.item': '아이템 캡슐 한 번',
+      'free.star': '별 +{n}',
+      'free.heart': '하트 하나',
+      'free.friend': '친구 캡슐 한 번',
+      'free.x2': '결과 화면 코인 두 배',
+      'free.left.day': '오늘 남은 횟수 {n}/{m}',
+      'free.left.week': '이번 주 {n}/{m}, 월요일에 초기화돼요',
+      'free.heart.full': '하트가 가득하면 잠겨요',
+      'free.friend.none': '새 친구가 없으면 잠겨요',
+      'free.x2.d': '판이 끝난 결과 화면에서, 오늘 {n}/{m} 사용',
+      'free.x2.where': '판이 끝나면',
+      'free.get': '받기',
+      'free.tomorrow': '내일 다시',
+      'free.foot1': '광고 한 번에 보상 한 번이에요. 판을 하는 동안에는 광고 버튼이 없어요.',
+      'free.foot2': '광고 없이도 코인, 특가, 미션으로 같은 것을 얻을 수 있어요.',
+      'gacha.ad': '광고 보고 뽑기',
+      'gacha.ad.week': '무료 뽑기, 주 한 번',
+      'coin.x2': '코인 두 배',
+      'coin.x2.no': '그냥 받기',
+      'coin.x2.got': '코인 {n}개를 더 받았어요!',
       'toast.noadds': '추가 횟수를 다 썼어요',
       'toast.empty': '보드가 비었어요',
       'toast.nohints': '힌트를 다 썼어요',
@@ -30453,6 +30521,9 @@ window.TT_SFX = {
     /* P3 — 판 결과 코인의 사본. gainCoin = 이번 시트가 보여 줄 몫 · runCoin = 이 판에서 이미 준 몫 ·
        coinRunAt = 그 몫이 어느 판(S.startedAt)의 것인가. 이어하기로 같은 판이 두 번 끝나도 한 번만 준다(runCoinPay). */
     gainCoin: 0, runCoin: 0, coinRunAt: 0,
+    /* P3 T9 — 결과 창 코인 2배(판당 1회). x2Token = 판이 끝나 코인을 낼 때마다 +1(runCoinPay · advFinish) · x2Done = 2배를 받았거나 「그냥 받기」를 누른 판의 x2Token ·
+       x2Sheet = 방금 판이 끝난 결과 창('adv' | 'over' | 'daily' | 'arc' · '' = 없음) — 그 창의 줄만 보인다(paintCoinX2). */
+    x2Token: 0, x2Done: 0, x2Sheet: '',
     feverOn: false, feverUntil: 0, feverScore: 0, feverCdUntil: 0,
     rushEndAt: 0, addCdUntil: 0, rushBeatAt: 0,
     pausedAt: 0,             // wall clock at pause, used to shift deadlines
@@ -37082,7 +37153,7 @@ window.TT_SFX = {
       /* onGameOver 와 같은 리듬(520ms). 연출이 끝나기 전에 시트를 올리면 격파
          이펙트가 시트 뒤에서 혼자 돌다 끝난다. */
       later(function () {
-        TW_PORTAL.requestMidgameAd(function () { openModal('modal-arc'); rewardReveal('arc-reward', (S.gainCoin | 0) > 0 ? [coinRewardItem(S.gainCoin)] : [], { sheetId: 'modal-arc' }); });   /* Task 12 rev1(C-1) */
+        TW_PORTAL.requestMidgameAd(function () { openModal('modal-arc'); rewardReveal('arc-reward', (S.gainCoin | 0) > 0 ? [coinRewardItem(S.gainCoin)] : [], { sheetId: 'modal-arc' }); paintCoinX2('arc'); });   /* Task 12 rev1(C-1) · P3 T9 */
       }, 520);
     };
     if (why === 'clear') { harvestFinale(arcTail); return; }
@@ -40038,6 +40109,7 @@ window.TT_SFX = {
            얻은 것"은 실재하고, 그걸 안 보여 주면 게임오버가 손해로만 읽힌다.
            **획득이 있을 때만** 열리는 것은 rewardReveal 이 보장한다. */
         rewardReveal('over-reward', rewardItems({ gem: S.gainJstar, coin: S.gainCoin | 0 }), { sheetId: 'modal-over' });
+        paintCoinX2('over');   /* P3 T9 — 방금 끝난 판의 창에만 2배 줄 */
       });
     }, 520);
   }
@@ -40349,6 +40421,7 @@ window.TT_SFX = {
       celebrateRank(dailyRank);
       later(function () {
         rewardReveal('daily-reward', drw, { sheetId: 'modal-daily' });
+        paintCoinX2(viaFinish ? 'daily' : '');   /* P3 T9 — 허브에서 오늘 결과를 다시 열 때는 직전 다른 판의 줄이 뜨지 않게 창 이름을 비운다(W18) */
       }, 420);
     };
     if (viaFinish) { TW_PORTAL.requestMidgameAd(openTail); } else { openTail(); }
@@ -45565,6 +45638,7 @@ window.TT_SFX = {
     var pay = Math.max(0, (want | 0) - (S.runCoin | 0));
     if (pay > 0) { coinGrant(pay, 'run'); S.runCoin = (S.runCoin | 0) + pay; }
     S.gainCoin = pay;
+    S.x2Token = (S.x2Token | 0) + 1;   /* P3 — 결과 창 2배는 판 끝마다 한 번 */
     return pay;
   }
   /** 결과 창 줄 하나(rewardReveal 의 항목 모양). 그림은 CSS(.rw-ico[data-disc="coin"])가 코인 원반으로 칠한다. */
@@ -46045,7 +46119,9 @@ window.TT_SFX = {
     if (kind === 'item' && !g.firstItem) return { label: t('gacha.free.first'), price: 'free', act: 'gbuy:item:1:first' };
     if (kind === 'friend' && !g.firstFriend) return { label: t('gacha.free.first'), price: 'free', act: 'gbuy:friend:1:first' };
     if (kind === 'item' && g.freeDay !== todayKey()) return { label: t('gacha.free.daily'), price: 'free', act: 'gbuy:item:1:free' };
-    return null;   /* Task 9 가 여기에 광고 버튼(포털 전용)을 더한다 */
+    if (kind === 'item' && adRowOk('item')) return { label: t('gacha.ad'), price: 'ad', coinIc: 'play', act: 'ad:item', portal: true };   /* P3 T9 — 포털 전용 */
+    if (kind === 'friend' && adRowOk('friend')) return { label: t('gacha.ad.week'), price: 'ad', coinIc: 'play', act: 'ad:friend', portal: true };
+    return null;
   }
   function gachaBtn(o) {
     var b = document.createElement('button');
@@ -46198,6 +46274,125 @@ window.TT_SFX = {
     b.appendChild(s3);
     var f1 = document.createElement('p'); f1.className = 'sh-fine'; f1.textContent = t('odds.foot1'); b.appendChild(f1);
     var f2 = document.createElement('p'); f2.className = 'sh-fine'; f2.textContent = t('odds.foot2', { date: todayKey().slice(0, 4) + '.' + todayKey().slice(4, 6) }); b.appendChild(f2);
+  }
+
+  /* =========================================================================
+   * [P3-ADS] 보상형 광고 여섯 자리(스펙 §4-d · 결정 6) — 무료 탭 다섯(코인 · 아이템 캡슐 · 별 · 하트 · 친구 캡슐) + 결과 창 코인 2배.
+   * 전부 portalAdsOk() 일 때만(CrazyGames + canReward) · 광고 1번 = 보상 1번 · 보상은 requestRewardedAd 의 onResult(true)(= adFinished)에서만 ·
+   * 실패 · 취소 · adError = 0 · 판 진행 화면에는 버튼이 없다(무료 탭 · 뽑기 탭 · 판 사이 결과 창뿐). 광고 없는 대안은 늘 있다(가격 · 매일 선물 · 미션).
+   * ========================================================================= */
+  var P3_AD_COIN = 100, P3_AD_STAR = 3;
+  var P3_AD_ROWS = ['coin', 'item', 'star', 'heart', 'friend'];
+  /** 이 자리의 오늘(친구는 이번 주) 남은 횟수. p3Roll 이 자정 · 월요일 초기화를 먼저 맞춘다. */
+  function adCapLeft(id) {
+    p3Roll();
+    if (id === 'friend') return Math.max(0, P3_AD_CAP.friend - (store.adCaps.w.friend | 0));
+    return Math.max(0, (P3_AD_CAP[id] | 0) - (store.adCaps.n[id] | 0));
+  }
+  function adCapUse(id) {
+    if (id === 'friend') store.adCaps.w.friend = (store.adCaps.w.friend | 0) + 1;
+    else store.adCaps.n[id] = (store.adCaps.n[id] | 0) + 1;
+    persist();
+  }
+  /** 이 자리의 광고를 지금 보여도 되는가 — 포털 · 상한 · 자리 조건(하트 가득 = 잠김, 새 친구 0 = 잠김). */
+  function adRowOk(id) {
+    if (!portalAdsOk() || adCapLeft(id) <= 0) return false;
+    if (id === 'heart') {
+      if ((store.hearts | 0) >= HEART_MAX) return false;   /* 가득이면 heartsTick 이 매번 저장한다(M-5) — 부르기 전에 거른다. 가득은 틱으로 풀리지 않는다 */
+      heartsTick();
+      return (store.hearts | 0) < HEART_MAX;
+    }
+    if (id === 'friend') return gachaTable('friend').left > 0;
+    return true;
+  }
+  var adBusyP3 = false;
+  /** 조건은 광고 **앞**에서만 본다 — 끝까지 본 사람에게는 반드시 준다(광고 1번 = 보상 1번). after(참거짓) = 호출부의 다시 그리기. */
+  function watchAdFor(id, btn, after) {
+    if (adBusyP3 || !adRowOk(id)) return;
+    adBusyP3 = true;
+    if (btn) btn.disabled = true;
+    TW_PORTAL.requestRewardedAd('p3-' + id, function (ok) {
+      adBusyP3 = false;
+      if (btn) btn.disabled = false;
+      portalAdsSync();
+      if (!ok) { toast(t('portal.ad.fail')); J.sfx.fail(); if (after) after(false); return; }
+      adCapUse(id);
+      var res = null;
+      if (id === 'coin') { coinGrant(P3_AD_COIN, 'ad'); toast(t('coin.got', { n: P3_AD_COIN })); }
+      else if (id === 'star') { starGrant(P3_AD_STAR, 'ad'); toast(t('star.got', { n: P3_AD_STAR })); }
+      else if (id === 'heart') { grantHearts(1); paintHearts(); toast(t('shop.heart.ok')); }
+      else res = gachaBuy(id, 1, 'ad');
+      J.sfx.win();
+      if (res && res.ok) {
+        gachaBusy = true;
+        var shown = false;
+        try { gachaShow(res, function () { gachaBusy = false; if (after) after(true); }); shown = true; }
+        finally { if (!shown) { gachaBusy = false; if (after) after(true); } }   /* 연출 예외에도 뽑기 탭이 잠기지 않게(착수 전 점검 C2) */
+      }
+      else if (after) after(true);
+    });
+  }
+  SHOP_PAINT.free = function (body, scene) {
+    if (scene) {
+      var tt = document.createElement('div'); tt.className = 'kit-pill-v2 fr-title'; tt.setAttribute('data-variant', 'header');
+      var pl = document.createElement('i'); pl.className = 'fr-play'; pl.setAttribute('aria-hidden', 'true'); tt.appendChild(pl);
+      tt.appendChild(document.createTextNode(t('free.title'))); scene.appendChild(tt);
+      var rs = document.createElement('div'); rs.className = 'kit-pill-v2 fr-reset'; rs.setAttribute('data-variant', 'soft');
+      rs.appendChild(document.createTextNode(t('free.reset') + ' '));
+      var clk = document.createElement('b'); clk.id = 'sh-clock'; clk.textContent = shopClockText(); rs.appendChild(clk);
+      scene.appendChild(rs);
+    }
+    var list = document.createElement('div'); list.className = 'fr-list'; list.setAttribute('data-portal-only', ''); body.appendChild(list);
+    var IC = { coin: 'shop-ic-coin', item: 'shop-ic-machine-item', star: 'shop-ic-star', heart: 'shop-ic-heart', friend: 'shop-ic-machine-friend' };
+    for (var i = 0; i < P3_AD_ROWS.length; i++) {
+      var id = P3_AD_ROWS[i], left = adCapLeft(id), cap = P3_AD_CAP[id], okNow = adRowOk(id), sub;
+      if (id === 'heart' && (store.hearts | 0) >= HEART_MAX) sub = t('free.heart.full');
+      else if (id === 'friend' && gachaTable('friend').left <= 0) sub = t('free.friend.none');
+      else if (id === 'friend') sub = t('free.left.week', { n: left, m: cap });
+      else sub = t('free.left.day', { n: left, m: cap });
+      var title = t('free.' + id, { n: id === 'coin' ? P3_AD_COIN : P3_AD_STAR });
+      var card = shopCard2({ layout: 'row', title: title, ic: IC[id], sub: sub, coinIc: okNow ? 'play' : '',
+                             label: okNow ? t('free.get') : t('free.tomorrow'), price: okNow ? 'ad' : 'ok', dis: !okNow, act: 'ad:' + id });
+      card.setAttribute('data-ad', id);
+      list.appendChild(card);
+    }
+    var used = store.adCaps.n.x2 | 0, x2 = shopCard2({ layout: 'row', title: t('free.x2'), ic: 'shop-ic-coin-3',
+      sub: t('free.x2.d', { n: used, m: P3_AD_CAP.x2 }), label: used < P3_AD_CAP.x2 ? t('free.x2.where') : t('free.tomorrow'), price: 'ok', dis: true });
+    x2.setAttribute('data-ad', 'x2');
+    list.appendChild(x2);
+    var f1 = document.createElement('p'); f1.className = 'sh-fine'; f1.setAttribute('data-portal-only', ''); f1.textContent = t('free.foot1'); body.appendChild(f1);
+    var f2 = document.createElement('p'); f2.className = 'sh-fine'; f2.setAttribute('data-portal-only', ''); f2.textContent = t('free.foot2'); body.appendChild(f2);
+  };
+  SHOP_DOTS.free = function () { var n = 0; for (var i = 0; i < P3_AD_ROWS.length; i++) if (adRowOk(P3_AD_ROWS[i])) n++; return n; };
+  /** 광고 보상 뒤 = 이 탭만 다시 그린다(스크롤 자리 유지 — 상점 화면 규약). 광고가 막혀 이 탭이 더는 못 서면(adsDisabled · 광고 차단) 뽑기 탭으로 돌아간다(상점 처음 그리기의 탭 가드와 같은 계약). */
+  SHOP_ACTS.ad = function (id, el) {
+    watchAdFor(id, el, function () { if (!shopActive()) return; if (shopTabOk(shopTab2)) paintShopTab(shopTab2); else setShopTab('gacha'); });
+  };
+
+  /* ---- 결과 창 코인 2배(판 사이 · 판당 1 · 하루 10). 「그냥 받기」와 같은 부품(.btn.btn-secondary) · 같은 크기(CrazyGames 요건). ---- */
+  /** sheet = 방금 판이 끝난 결과 창('adv'|'over'|'daily'|'arc') — 판이 끝나는 네 자리만 넘긴다. 그 창의 줄만 칠하고 나머지는 숨긴다
+      (허브에서 다시 연 옛 결과 창에 직전 다른 판의 2배 줄이 뜨지 않게 — 착수 전 점검 W18). 게이트를 먼저 세운다(C8). */
+  function paintCoinX2(sheet) {
+    if (sheet !== undefined) S.x2Sheet = sheet;   /* '' = 어느 창도 아님(허브에서 옛 결과를 다시 열 때) · 인자 없음 = 그대로(▶ · 그냥 받기 뒤 다시 칠하기) */
+    portalAdsSync();
+    var show = portalAdsOk() && adCapLeft('x2') > 0 && (S.gainCoin | 0) > 0 && S.x2Done !== S.x2Token;
+    var rows = document.querySelectorAll('.coin-x2');
+    for (var i = 0; i < rows.length; i++) rows[i].hidden = !(show && rows[i].getAttribute('data-sheet') === S.x2Sheet);
+  }
+  function coinX2Click(ev) {
+    var el = ev.target && ev.target.closest ? ev.target.closest('.cx2-yes, .cx2-no') : null;
+    if (!el) return;
+    var tok = S.x2Token, n = S.gainCoin | 0;
+    if (el.classList.contains('cx2-no')) { S.x2Done = tok; paintCoinX2(); J.sfx.ui(); return; }
+    if (!(portalAdsOk() && adCapLeft('x2') > 0 && n > 0 && S.x2Done !== tok)) return;
+    el.disabled = true;
+    TW_PORTAL.requestRewardedAd('p3-x2', function (ok) {
+      el.disabled = false;
+      portalAdsSync();
+      if (ok && S.x2Done !== tok) { adCapUse('x2'); coinGrant(n, 'ad-x2'); toast(t('coin.x2.got', { n: n })); J.sfx.win(); S.x2Done = tok; }
+      else if (!ok) { toast(t('portal.ad.fail')); J.sfx.fail(); }
+      paintCoinX2();
+    });
   }
 
   /* ---- 소비처 ① 하트 (§20.3) ---------------------------------------------- */
@@ -46955,6 +47150,7 @@ window.TT_SFX = {
       /* P3 — 코인(놀면 쌓이는 돈). 첫 클리어 = 이 판 전에 이 탄 별이 0. 보스탄은 두 배. */
       S.gainCoin = coinPlayed() ? coinForAdv(prevStars === 0, stars, !!p.boss) : 0;   /* 짝 0 판은 0 */
       if (S.gainCoin > 0) coinGrant(S.gainCoin, 'adv');
+      S.x2Token = (S.x2Token | 0) + 1;   /* P3 — 결과 창 2배는 판 끝마다 한 번 */
       store.advFails[key] = 0;
       if (p.n >= (store.advMax | 0)) store.advMax = p.n + 1;
       /* 판정판 50 — 「클리어」·「★★ 이상」·주간 누계 둘. 별은 **새로 딴 별**
@@ -47107,6 +47303,7 @@ window.TT_SFX = {
         stars: full,
         sheetId: 'modal-adv'
       });
+      paintCoinX2('adv');   /* P3 T9 */
     });
   }
 
@@ -47225,7 +47422,7 @@ window.TT_SFX = {
     /* Task 12 rev1(I-6) — rewarded 하트 버튼: 진 판·하트 0·포털·canReward() 일 때만. */
     var advAdBtn = $('adv-ad');
     if (advAdBtn) {
-      advAdBtn.hidden = !(!win && store.hearts <= 0 && TW_PORTAL.env === 'crazygames' && TW_PORTAL.canReward());
+      advAdBtn.hidden = !(!win && store.hearts <= 0 && TW_PORTAL.env === 'crazygames' && TW_PORTAL.canReward() && adCapLeft('heart') > 0);
       advAdBtn.disabled = false;
     }
     var again = $('adv-again');
@@ -48804,7 +49001,7 @@ window.TT_SFX = {
        빌드가 자기 포털 출시를 예고하는 모양이었다. #adv-ad(결과 시트 쪽 짝)는
        이미 이 조건으로 hidden 을 결정한다(:paintAdvSheet) — 같은 조건으로
        맞춘다: 포털+canReward() 가 아니면 하트가 0 이어도 완전히 숨는다. */
-    var nodeAdOk = TW_PORTAL.env === 'crazygames' && TW_PORTAL.canReward();
+    var nodeAdOk = TW_PORTAL.env === 'crazygames' && TW_PORTAL.canReward() && adCapLeft('heart') > 0;
     if (ad) ad.hidden = !(empty && nodeAdOk);
     if (ad && empty && nodeAdOk) twSyncAdHeartLabel(ad);
   }
@@ -48832,10 +49029,12 @@ window.TT_SFX = {
    * (portal.ad.fail) — "이미 썼어요" 문구와 섞지 않는다. */
   function twWatchAdForHeart(btn, extraRepaint) {
     if (store.hearts > 0) return;
+    if (adCapLeft('heart') <= 0) { toast(t('free.tomorrow')); return; }   /* P3 — 무료 탭 하트 광고와 합산 하루 3 */
     if (btn) btn.disabled = true;
     TW_PORTAL.requestRewardedAd('heart', function (ok) {
       if (btn) btn.disabled = false;
       if (ok) {
+        adCapUse('heart');
         grantHearts(1);
         toast(t('shop.heart.ok'));
         paintHearts();
@@ -51790,8 +51989,8 @@ window.TT_SFX = {
         for (var ci = 0; ci < nb.children.length; ci++) ro.observe(nb.children[ci]);
       }
     })();
-    (function () {   /* P3 T2 수정 2회차 — 작은 폰 게임오버 시트의 중간 구획(.over-body) 넘침 표시. ncBodyMore 와 같은 무늬(읽기 한 묶음 → 속성 쓰기 하나) */
-      var ob = document.querySelector('#modal-over .over-body');
+    ['#modal-over .over-body', '#modal-arc .arc-body'].forEach(function (sel) {   /* P3 T2 수정 2회차 · T9 — 작은 폰 결과 창(게임오버 · 아케이드)의 중간 구획(.over-body · .arc-body) 넘침 표시. ncBodyMore 와 같은 무늬(읽기 한 묶음 → 속성 쓰기 하나) */
+      var ob = document.querySelector(sel);
       if (!ob) return;
       function overBodyMore() {
         var more = ob.scrollHeight - ob.clientHeight - Math.ceil(ob.scrollTop) > 0;
@@ -51804,7 +52003,7 @@ window.TT_SFX = {
         oro.observe(ob);
         for (var oi = 0; oi < ob.children.length; oi++) oro.observe(ob.children[oi]);
       }
-    })();
+    });
 
     /* W6 — 통일된 열 모달의 우상단 X. 배선을 새로 만들지 않는다: X 는
      * data-w6x 가 가리키는 **이미 배선된 닫기 버튼**을 그대로 누른다. 그래서
@@ -51841,6 +52040,8 @@ window.TT_SFX = {
         btn.hidden = true;
       });
     });
+    /* P3 T9 — 결과 창 코인 2배 줄(네 창): ▶ = 광고 한 번 · 그냥 받기 = 그 판의 2배 기회 끝 */
+    var cx2 = document.querySelectorAll('.coin-x2'); for (var cxi = 0; cxi < cx2.length; cxi++) on(cx2[cxi], 'click', coinX2Click);
     on($('adv-map'), 'click', function () {
       closeModal('modal-adv');
       J.sfx.ui();
@@ -53588,6 +53789,7 @@ window.TT_SFX = {
     gachaTable: gachaTable, gachaPull: gachaPull, gachaBuy: gachaBuy, gachaPick: gachaPick, gachaDrawItem: gachaDrawItem, friendOwned: friendOwned, grantFriend: grantFriend, GACHA_PRICE: GACHA_PRICE, GACHA_TIER_P: GACHA_TIER_P, GACHA_TEN_UP: GACHA_TEN_UP,   /* P3 T6 — 뽑기 엔진(표 한 출처) */
     gachaKindSet: gachaKindSet, gachaRun: gachaRun, openOdds: openOdds, closeOdds: closeOdds, pctText: pctText,   /* P3 T7 — 뽑기 탭 · 확률 정보 창 */
     gresOpenAll: gresOpenAll, gresClose: gresClose,   /* P3 T8 — 뽑기 결과 창(캡슐 · 카드 뒤집기) */
+    adCapLeft: adCapLeft, adRowOk: adRowOk, watchAdFor: watchAdFor, paintCoinX2: paintCoinX2, twWatchAdForHeart: twWatchAdForHeart, P3_AD_COIN: P3_AD_COIN, P3_AD_STAR: P3_AD_STAR,   /* P3 T9 — 보상형 광고 */
     paintShopTab: paintShopTab, SHOP_PAINT: SHOP_PAINT, SHOP_DOTS: SHOP_DOTS,   /* 수정 1회차 M-2 · M-6 — 탭 태스크 스모크가 표에 자기 함수를 넣어 본다 */
     mateId: mateId, setMate: setMate, cpTab: cpTab, openCharPanel: openCharPanel,
     duelFoeFull: duelFoeFull, PET_SKILL: PET_SKILL,
@@ -71743,6 +71945,61 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
 #modal-gres #gres-again[data-price="coin"]{ --btn-face-a: var(--role-yellow-face-a); --btn-face-b: var(--role-yellow-face-b); --btn-outline: var(--role-yellow-outline); --btn-contact: var(--role-yellow-contact); }
 #modal-gres #gres-again[data-price="star"]{ --btn-face-a: var(--role-pink-face-a); --btn-face-b: var(--role-pink-face-b); --btn-outline: var(--role-pink-outline); --btn-contact: var(--role-pink-contact); }
 @media (prefers-reduced-motion: reduce){ #modal-gres #gres-cap{ display: none; } }
+
+/* ---- [P3-T9] 무료(광고) 탭(목업 B3) · 결과 창 코인 2배 줄 — 상점 판 안 길이는 calc(N * var(--cqw)) (공통 보충 「상점 화면 규약」) ----
+   무료 탭 = 제목 알약(kit-pill-v2 header) · 초기화 알약(soft) · 줄 카드(shop-card 의 줄 변주 data-layout="row" — 그림 상자 · 이름 · 남은 횟수 · 초록 ▶ 버튼 · 닫히면 연보라).
+   줄 변주의 칸은 그림 상자(.shop-icbox — Task 5 가 그림 + 지급 수를 한 상자로 묶었다)가 받는다 · 그림 안의 .shop-ic 는 그 상자 안에서 크기만 정한다.
+   ▶ 는 글자가 아니라 CSS 삼각형(border) — 글꼴에 의존하지 않는다. .fr-play 는 상점 판(제목 알약)과 결과 창 버튼(코인 두 배)이 함께 써서 길이를 글자 크기(em)로
+   준다: 상점에서는 제목 글자 5.6 단위의 2.4 · 1.5 · 1.2 와 같은 값이고, cqw 가 없는 결과 창에서도 버튼 글자를 따라 크기가 선다. */
+#sh-scene .fr-title{ position: absolute; left: calc(5.6 * var(--cqw)); top: calc(24.6 * var(--cqw)); z-index: 6; width: max-content; padding: 0 calc(6.67 * var(--cqw));
+  --f2-bh: calc(11.28 * var(--cqw)); font-family: var(--font-display); font-weight: 400; font-size: calc(5.6 * var(--cqw)); line-height: 1; white-space: nowrap;
+  text-shadow: 0 calc(.385 * var(--cqw)) 0 var(--role-f2-pill-a-ln); }   /* 머리 알약 인스턴스 = 위 .sh-head 와 같은 값(높이 44px · 좌우 26px · 주아 흰 글 + 아래 겉선색 그림자) */
+#sh-scene .fr-reset{ position: absolute; left: calc(5.6 * var(--cqw)); top: calc(39.5 * var(--cqw)); font-size: calc(3.1 * var(--cqw)); z-index: 6; gap: .3em; }   /* 알약은 flex 라 글 뒤 공백이 접힌다 — 글과 시계 사이는 gap 으로 */
+.fr-play{ display: inline-block; width: 0; height: 0; margin-right: .214em; vertical-align: middle;
+  border-left: .429em solid currentColor; border-top: .268em solid transparent; border-bottom: .268em solid transparent; }
+#sh-body .fr-list{ display: flex; flex-direction: column; gap: calc(1.8 * var(--cqw)); }
+#sh-body .sh-btn-ic--play{ width: 0; height: 0; background: none; border-left: calc(2.4 * var(--cqw)) solid currentColor;
+  border-top: calc(1.5 * var(--cqw)) solid transparent; border-bottom: calc(1.5 * var(--cqw)) solid transparent; }
+#sh-body .shop-card[data-layout="row"]{ display: grid; grid-template-columns: calc(13.3 * var(--cqw)) 1fr calc(26.7 * var(--cqw)); grid-template-rows: auto auto; align-items: center;
+  column-gap: calc(2.6 * var(--cqw)); min-height: calc(17.4 * var(--cqw)); padding: calc(1.5 * var(--cqw)) calc(2.6 * var(--cqw)) calc(1.5 * var(--cqw)) calc(2 * var(--cqw)); border-radius: calc(4.6 * var(--cqw)); box-sizing: border-box;
+  background: var(--role-f2-pill); border: calc(.4 * var(--cqw)) solid var(--role-f2-pill-line); color: var(--prim-art-ink); }
+#sh-body .shop-card[data-layout="row"] .shop-icbox{ grid-row: 1 / 3; grid-column: 1; }
+#sh-body .shop-card[data-layout="row"] .shop-ic{ width: calc(13.3 * var(--cqw)); height: calc(13.3 * var(--cqw)); }
+#sh-body .shop-card[data-layout="row"] .shop-cn{ grid-column: 2; font-size: calc(3.9 * var(--cqw)); align-self: end; }
+#sh-body .shop-card[data-layout="row"] .shop-cd{ grid-column: 2; align-self: start; }
+#sh-body .shop-card[data-layout="row"] .sh-btn{ grid-row: 1 / 3; grid-column: 3; margin: 0; }
+#sh-body .shop-card .shop-ic.shop-ic-star{ background-image: var(--lib-star-gold); }
+#sh-body .shop-card .shop-ic.shop-ic-coin-3{ background-image: var(--lib-glyph-coin); }
+#sh-body .shop-card .shop-ic.shop-ic-machine-item{ background-image: url("catalog/slot-ic-item.webp"); }
+#sh-body .shop-card .shop-ic.shop-ic-machine-friend{ background-image: url("catalog/slot-ic-skin.webp"); }
+#screen-shop[data-stab="free"] #sh-host{ right: calc(2 * var(--cqw)); top: calc(22.6 * var(--cqw)); bottom: auto; }
+.coin-x2[hidden]{ display: none; }
+
+/* 작은 폰의 아케이드 결과 창(지휘자 보충 · Task 2 판정 이월) — 2배 줄이 서면 320×640 에서 「다시 · 공유 · 메인 메뉴」 줄이 창 밖으로 나간다(실측: 줄이 서기 전에도 아래 끝 639/640).
+   게임오버 시트(위 .over-body)와 같은 무늬: 가운데 구획 .arc-body(기록 · 보상 · 2배 줄 · 카드 미리보기)만 시트 안에서 구르고 버튼 줄은 굴림 밖에 선다.
+   창 높이가 720 을 넘으면 display:contents 라 상자가 없어 종전 배치와 픽셀이 같다(390×844 · 360×740). 안쪽 여백 · 바깥 여백 · 가장자리 흐림은 .over-body 와 같은 값(% 는 담는 상자 폭 기준). */
+#modal-arc .arc-body { display: contents; }
+@media (max-height: 720px) {
+  #modal-arc .arc-body {
+    display: flex;
+    flex-direction: column;
+    row-gap: inherit;
+    flex: 0 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    margin: -10%;
+    padding: 10%;
+  }
+  #modal-arc .arc-body::-webkit-scrollbar { width: 0; height: 0; }
+  #modal-arc .arc-body > * { flex: 0 0 auto; }
+  #modal-arc .arc-body[data-more] {
+    -webkit-mask-image: linear-gradient(180deg, var(--prim-white) 85%, transparent);
+            mask-image: linear-gradient(180deg, var(--prim-white) 85%, transparent);
+  }
+}
 
 /* ---- cqw 를 모르는 기기(iOS 15 · Chrome 104 급) 폴백 — 반드시 위 기본 규칙 **뒤**(수정 2회차 N-1) ----
    사용자 지정 속성(--f2-w · --cqw)은 cqw 를 모르는 기기도 값(100cqw)으로 받아들여 버려지지 않으므로, 대체가 앞에 있으면 기본이 덮어 쓰는 자리에서
