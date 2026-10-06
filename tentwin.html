@@ -45688,7 +45688,7 @@ window.TT_SFX = {
   var SHOP_TABS = ['gacha', 'deals', 'free', 'deco', 'jewel'];
   var SHOP_HOST = { gacha: 'banjjak', deals: 'kkultteok', free: 'tiktok', deco: 'mongle' };   /* 목업 B1·B2·B3 의 상인 */
   /* 발주 그림 도착 표(74 ITEM_ART 와 같은 2단 구조) — 1 이면 #screen-shop[data-art~=키] 가 서고 CSS 가 그림으로 바꾼다. */
-  var SHOP_ART = { bg: 0, machine: 0, capsule: 0, coin: 0, tabs: 0, host: 0 };
+  var SHOP_ART = { bg: 1, machine: 1, capsule: 1, coin: 1, tabs: 1, host: 0 };   /* P3 T12 — 도착한 그림만 1. host 0 = 꿀떡이 상인 포즈(선택 ⑥)는 발주하지 않았다(지휘자 판정 — 기존 full 그림으로 선다) */
   var SHOP_PAINT = { gacha: function () {}, deals: function () {}, free: function () {}, deco: function () {} };
   var SHOP_DOTS = { gacha: function () { return 0; }, deals: function () { return 0; }, free: function () { return 0; } };
   var SHOP_ACTS = {};
@@ -45767,6 +45767,7 @@ window.TT_SFX = {
     var art = [], k;
     for (k in SHOP_ART) if (Object.prototype.hasOwnProperty.call(SHOP_ART, k) && SHOP_ART[k]) art.push(k);
     root.setAttribute('data-art', art.join(' '));
+    document.documentElement.setAttribute('data-shop-art', art.join(' '));   /* 결과 창(#modal-gres)은 #screen-shop 밖 — 캡슐 그림 규칙이 html 표식을 읽는다 */
     var tabs = root.querySelectorAll('.sh-tab');
     for (var i = 0; i < tabs.length; i++) {
       tabs[i].setAttribute('aria-selected', tabs[i].getAttribute('data-stab') === shopTab2 ? 'true' : 'false');
@@ -72076,6 +72077,33 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
   html:not([data-portal="cg"]) .res-body { display: contents; }
 }
 
+/* ---- [P3-T12] 발주 그림 도착(SHOP_ART → #screen-shop[data-art] · html[data-shop-art]) — 임시 CSS 를 끄고 그림을 켠다 ----
+   그림은 이 속성이 서는 때(상점을 열고 shopPaint 가 칠한 뒤)에만 읽힌다 — 부트 · 왕국 · 판에는 요청 0(PERF A2 · 시험 t12e). 새 원시값 0 · 길이는 % 와 calc(N * var(--cqw)).
+   기계 그림(448x570 = 임시 기계 상자 224x285 의 2배)은 임시 기계 상자(.gm-ph)에 그대로 앉는다 — 같은 비율이라 contain 이 상자를 꼭 채운다.
+   돔 안 얼굴(.gm-face)은 임시 기계 돔(상자 폭의 94%)을 기준으로 놓였던 것이라 그림의 유리 돔(실측: 그림 폭의 약 50% · 아래는 목깃에서 끊김)보다 크다 — 그림이 켜지면 JS 가 주는 세 열 · 줄
+   좌표(--gm-x · --gm-y)를 그대로 읽어 유리 안(매니페스트 slot_safe.dome)에 줄여 앉힌다(좌표 = 15 · 39 · 63% → 34.5 · 45.2 · 55.9% 열 · 12 · 29 · 46% → 20.5 · 29.1 · 37.7% 줄). */
+#screen-shop[data-art~="bg"] #sh-stage{ background: url("catalog/t3-shop-interior.webp") center top / cover no-repeat; }
+#screen-shop[data-art~="bg"] #sh-awning{ display: none; }
+#screen-shop[data-art~="machine"] #sh-scene .gm-ph{ background: url("catalog/t4-gacha-machine-mint.webp") center / contain no-repeat; }
+#screen-shop[data-art~="machine"] #sh-scene .gm-ph[data-kind="gold"]{ background-image: url("catalog/t4-gacha-machine-gold.webp"); }
+#screen-shop[data-art~="machine"] #sh-scene .gm-ph[data-kind="friend"]{ background-image: url("catalog/t4-gacha-machine-pink.webp"); }
+#screen-shop[data-art~="machine"] #sh-scene .gm-face{ width: 9.4%; left: calc(27.8% + var(--gm-x, 15%) * .4464); top: calc(14.46% + var(--gm-y, 12%) * .5056); }
+#screen-shop[data-art~="tabs"] #sh-tabs .sh-tab[data-stab="gacha"] .sh-tab-ic{ background-image: url("catalog/tab-ic-gacha.webp"); }
+#screen-shop[data-art~="tabs"] #sh-tabs .sh-tab[data-stab="free"]  .sh-tab-ic{ background-image: url("catalog/tab-ic-free.webp"); }
+#screen-shop[data-art~="coin"] #sh-body .shop-ic.shop-ic-coin{ background-image: url("catalog/shop-ic-coin-2.webp"); }
+#screen-shop[data-art~="coin"] #sh-body .shop-card[data-ad="coin"] .shop-ic{ background-image: url("catalog/shop-ic-coin-1.webp"); }
+#screen-shop[data-art~="coin"] #sh-body .shop-ic.shop-ic-coin-3{ background-image: url("catalog/shop-ic-coin-3.webp"); }
+/* 캡슐 — 닫힘 한 장(512x512)을 위 · 아래 반쪽에 나눠 쓴다(열림 그림은 없다 — 착수 전 점검 W13). 윗반은 흰/연회색 그림 위에 등급 토큰색을 **곱한다**(등급색은 그림에 굽지 않는다, 스펙 §4-e ③).
+   결과 창은 #screen-shop 밖이라 html 표식으로 켠다. 계획의 마스크 틴트(윗반 = 등급색 면 + 그림 알파 마스크)는 갈색 겉선과 광택을 지워 아랫반과 안 맞아(scratchpad/p3/t12/cap-probe.png)
+   그림을 배경으로 두고 등급색을 곱하기 의사요소로 얹는 쪽으로 바꿨다 — 계획이 허용한 대체(보고에 적음). 선택자에 #gres-cap 을 넣은 것은 T8 의 등급별 `background` 줄임 규칙(#modal-gres #gres-cap[data-tier] .gres-top)이
+   그림을 지우지 못하게 특정도를 한 칸 위에 두려는 것이다. (선택 ⑥ 상인 포즈 규칙은 그림이 없어 두지 않았다 — 경로 리터럴이 허용 목록 · 404 검사에 걸리지 않게, 착수 전 점검 W13 · 시험 t12g) */
+html[data-shop-art~="capsule"] #modal-gres #gres-cap .gres-top,
+html[data-shop-art~="capsule"] #modal-gres #gres-cap .gres-bot{ border: 0; border-radius: 0; background: url("catalog/t4-gacha-capsule-closed.webp") center top / 100% 200% no-repeat; }
+html[data-shop-art~="capsule"] #modal-gres #gres-cap .gres-bot{ background-position: center bottom; }
+html[data-shop-art~="capsule"] #modal-gres #gres-cap .gres-top::before{ content: ""; position: absolute; inset: 0; mix-blend-mode: multiply; background: var(--role-rw-shard-steady-2);
+  -webkit-mask: url("catalog/t4-gacha-capsule-closed.webp") center top / 100% 200% no-repeat; mask: url("catalog/t4-gacha-capsule-closed.webp") center top / 100% 200% no-repeat; }
+html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="rare"] .gres-top::before{ background: var(--role-rw-shard-agility-2); }
+html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top::before{ background: var(--role-rw-item-2); }
 /* ---- cqw 를 모르는 기기(iOS 15 · Chrome 104 급) 폴백 — 반드시 위 기본 규칙 **뒤**(수정 2회차 N-1) ----
    사용자 지정 속성(--f2-w · --cqw)은 cqw 를 모르는 기기도 값(100cqw)으로 받아들여 버려지지 않으므로, 대체가 앞에 있으면 기본이 덮어 쓰는 자리에서
    무효(초기값)가 된다 — 일반 속성(width 등)은 cqw 선언이 통째로 버려져 순서가 상관없지만 같은 블록에 둔다. 지도 compat-p1 과 같은 문법 · 위 cqw 규칙과 같은 수.
