@@ -17235,7 +17235,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
   <div id="modal-skin" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="sk-h"><div class="sheet jbox jbox--modal" data-part="modal-plate">
     <h2 id="sk-h" data-i18n="skin.title">Skins</h2>
     <button class="r10-x x-btn" type="button" data-w6x="sk-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
-    <p class="sk-bal"><span data-i18n="skin.balance">Jelly Stars</span><b class="sk-bal-v"><i class="gem-ic" aria-hidden="true">★</i><span id="sk-gems">0</span></b></p>
+    <p class="sk-bal"><span data-i18n="skin.balance">Stars</span><b class="sk-bal-v"><i class="gem-ic" aria-hidden="true">★</i><span id="sk-gems">0</span></b></p>
     <div id="sk-list" class="sk-list"></div>
     <button id="sk-close" data-part="btn-modal" data-variant="primary" class="btn btn-primary" type="button" data-i18n="settings.close">Close</button>
   </div></div>
@@ -17265,7 +17265,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
       <span class="cs"><b class="cs-k" data-i18n="stat.k4">Jackpot</b><i class="cs-bar kit-gauge-v2"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i></span>
     </div>
     <p id="iv-why" class="cut-line"></p>
-    <p class="sk-bal"><span data-i18n="skin.balance">Jelly Stars</span><b class="sk-bal-v"><i class="gem-ic" aria-hidden="true">&#9733;</i><span id="iv-gems">0</span></b></p>
+    <p class="sk-bal"><span data-i18n="skin.balance">Stars</span><b class="sk-bal-v"><i class="gem-ic" aria-hidden="true">&#9733;</i><span id="iv-gems">0</span></b></p>
     <!-- 「다음 초대까지 ★ n/N」. 무료(N=0)이면 이 줄 통째로 hidden 이다 —
          0/0 게이지는 아무것도 말하지 않는다(DESIGN §23.2 ⓑ). -->
     <p id="iv-prog-row" class="sk-bal"><span id="iv-prog-k" data-i18n="invite.next">To the next invite</span><b class="sk-bal-v"><i class="gem-ic" aria-hidden="true">&#9733;</i><span id="iv-prog-v">0/0</span></b></p>
@@ -45244,21 +45244,23 @@ window.TT_SFX = {
     paintWallets();
     return true;
   }
-  /** 코인 칩 글자(왕국 위 · 지도 위 — 동전 캡슐은 글자 자리가 오른쪽 반이라 9,999 까지만 종전 크기로 들어간다). 글자 수(쉼표 포함)를
-   *  data-len 으로 같이 적는다 — 6자(10,000~99,999) · 7자(100,000~999,999)일 때만 CSS(shop-p3)가 이미 있는 글자 단계(4.0 · 3.5)로 줄인다.
-   *  짧은 값은 종전 크기 그대로다. 세 자리(kdSync · buildMap · paintWallets)가 이 도우미 하나로 쓴다. */
-  function paintCoinChip(id) {
-    var s = arcComma(coinBalance()), el = $(id);
+  /** 칩 값 글자와 글자 수(쉼표 포함)를 같이 쓴다 — 글자 수를 data-len 으로 적고, CSS(shop-p3)가 길이별로 이미 있는 글자 단계로 줄인다.
+   *  쓰는 칩 넷: 왕국 위 · 지도 위(코인) · 지도 아래(모험 별 합계/최대) · 왕국 아래(별 지갑). 같은 값이면 쓰지 않는다. */
+  function paintChipText(id, s) {
+    var el = $(id);
     setText(id, s);
     if (el && el.getAttribute('data-len') !== String(s.length)) el.setAttribute('data-len', String(s.length));
   }
+  /** 코인 칩(왕국 위 · 지도 위 · 상점 띠 — 동전 캡슐은 글자 자리가 오른쪽 반이라 9,999 까지만 종전 크기로 들어간다): 6자(10,000~99,999)
+   *  4.10 · 7자(100,000~999,999) 3.5. 짧은 값은 종전 크기 그대로다. 세 자리(kdSync · buildMap · paintWallets)가 이 도우미를 쓴다. */
+  function paintCoinChip(id) { paintChipText(id, arcComma(coinBalance())); }
   /** 지갑 숫자를 그리는 자리 전부. 없는 요소는 setText 가 건너뛴다(상점 칩 sh-* 는 Task 4 가 만든다).
    *  판 중 수확(harvestGear)은 store.coin 만 올리고 그리지 않는다 — 지갑이 보이는 화면(왕국 kdSync · 지도 buildMap · 상점 openShop)은 열릴 때
    *  같은 값을 다시 그린다(Task 3, 지휘자 보충). 지도 아래 칩 map-b1-v 는 지갑이 아니라 진행도(합계/최대)라 여기서 안 그린다. */
   function paintWallets() {
     paintCoinChip('sh-coin-v');   /* 상점 띠 코인도 큰 수 줄임(data-len 6·7 — 지휘자 판정 2026-10-06, 왕국·지도 칩과 같은 도우미) */
     setText('sh-star-v', arcComma(store.jstar | 0));
-    paintCoinChip('kd-top-stars-v'); paintCoinChip('map-stars-v'); setText('kd-bot-b1-v', store.jstar | 0);
+    paintCoinChip('kd-top-stars-v'); paintCoinChip('map-stars-v'); paintChipText('kd-bot-b1-v', arcComma(store.jstar | 0));
   }
 
   /** 장비 한 개(뽑기·특가·선물 공용). 이미 최고 레벨이면 등급별 코인으로 돌려준다.
@@ -45406,6 +45408,7 @@ window.TT_SFX = {
   function p3Notice() {
     if (!store.p3 || store.p3.shown || !v74NoticeReady()) return false;
     var wait = toastLeftMs();
+    if (v74DueAt > now()) wait = Math.max(wait, v74DueAt - now());   /* 74 알림 타이머가 아직 안 울렸다 — 그 알림이 먼저 뜨고 나서(수정 1회차 m4) */
     if (v74ArcTimer) wait = Math.max(wait, 300);   /* 대전 기록 안내가 이어질 차례 — 그 토스트가 뜨고 걷힐 때까지 */
     if (wait > 0) { setTimeout(p3Notice, wait + 120); return false; }   /* 앞 알림을 덮어쓰지 않는다 — 소비는 띄운 그 순간 */
     toast(t('p3.walletnote'));
@@ -47230,7 +47233,7 @@ window.TT_SFX = {
     if (nx) nx.disabled = SIAN_MAP ? (mapChap >= lastCh && mapPage >= sianPages() - 1) : mapChap >= lastCh;
 
     paintCoinChip('map-stars-v');
-    setText('map-b1-v', advStarTotal() + '/' + advStarMax());   /* P3 결정 2 — 진행도는 「/최대」를 단다 */
+    paintChipText('map-b1-v', advStarTotal() + '/' + advStarMax());   /* P3 결정 2 — 진행도는 「/최대」를 단다(별 그림에 안 걸리게 5·6·7자 단계 줄임) */
     setText('map-b2-v', store.best | 0);
     paintHearts();
     mapFit();
@@ -47988,7 +47991,7 @@ window.TT_SFX = {
     paintCoinChip('kd-top-stars-v');   /* P3 결정 2 — 위 칩 = 코인 지갑(동전 그림과 값 일치) */
     /* 하단 바 — 젤리별 카운트 · 큰 캡슐 부제 「챕터 n: 이름」(주 라벨 「모험」은
        #kd-bot-ch-k 의 data-i18n=menu.adv 가 채운다). */
-    setText('kd-bot-b1-v', store.jstar | 0);
+    paintChipText('kd-bot-b1-v', arcComma(store.jstar | 0));   /* 위 칩(코인)과 같은 쉼표 표기 + 글자 수별 줄임(5자는 종전 크기) */
     setText('kd-bot-ch-n', t('map.plate' + chapMax()));
   }
 
@@ -50168,6 +50171,7 @@ window.TT_SFX = {
       있으면 그 읽기 시간(toastMs)을 다 채운 뒤 맨 setTimeout 으로 띄운다 — 판 타이머 later() 는 판 시작 · 메뉴 · 포기의
       clearTimers() 가 지우고, toast() 는 대기열이 아니라 덮어쓰기라서다(⑫ 규칙과 같은 이유). */
   var V74_NOTICE_DELAY = 360;   /* 스플래시 퇴장(320ms) 뒤 — 걷히는 판 밑에 알림이 깔리지 않게 */
+  var v74DueAt = 0;             /* P3 수정 1회차 m4 — splashDismiss 가 건 v74Notice 타이머가 울릴 시각(now() 시계). p3Notice 가 이보다 이르면 미룬다 */
   var v74ArcTimer = 0;          /* arc-dmg 안내 대기(맨 setTimeout) — 도는 동안에는 enterKingdom 이 먼저 띄우지 않는다 */
   function v74ArcNotice() {
     v74ArcTimer = 0;
@@ -52000,6 +52004,7 @@ window.TT_SFX = {
        그 토스트가 떠 있는 시간만큼 늦춘다(토스트는 덮어쓰기라 먼저 뜨면 저장 알림이 지워진다 — 저장 알림이 먼저). */
     var roHold = saveROHoldMs();
     setTimeout(saveROFlush, 320);   /* 대기가 없으면 아무 일도 안 한다 */
+    v74DueAt = now() + V74_NOTICE_DELAY + roHold;
     setTimeout(v74Notice, V74_NOTICE_DELAY + roHold);   /* 74 — 첫 사용자 탭으로 스플래시가 걷히면 그 왕국에서 이전 알림(C4) */
     setTimeout(p3Notice, P3_NOTICE_DELAY + roHold);   /* P3 — 첫 사용자 탭으로 스플래시가 걷히면 74 알림 사슬 뒤에 지갑 안내(C7) */
   }
@@ -70614,26 +70619,45 @@ html[lang="en"] #kd-b-circus .kd-tag b{ font-size: .88em; letter-spacing: -.02em
 }
 /* 코인 칩의 큰 수(P3 T3 · 지휘자 판정 A) — 동전 캡슐은 글자 중심이 칩 폭의 65.7% 라 오른쪽으로 쓸 폭이 칩의 약 69% 뿐이다(실측: 9,999 까지는 종전 크기로 들어가고
    12,345 는 ×0.98 · 123,456 은 ×0.82 · 999,999 는 ×0.78 이하여야 한다, 네 해상도에서 같은 배율). 글자 수(쉼표 포함)를 paintCoinChip 이 data-len 으로 적고,
-   6자 · 7자일 때만 이 파일에 이미 있는 글자 단계로 줄인다 — 6자 4.0(×0.80) · 7자 3.5(×0.70)(칩 안쪽 여유: 99,999 는 3.6px 이상 · 999,999 는 2.8px 이상, 종전 크기 9,999 는 3.1px 이상). 새 값 0 · 짧은 값(1~5자)은 규칙이 안 걸려 픽셀이 같다.
+   6자 · 7자일 때만 이 파일에 이미 있는 글자 단계로 줄인다 — 6자 4.10(×0.82) · 7자 3.5(×0.70). 수정 1회차: 4.40 · 4.2 는 99,999 의 오른쪽 여유가 하한 2.5px 에 못 미쳐 4.10 이 하한을 지키는 가장 큰 기존 단계다(대표 값 12,345 · 99,999 · 100,000 · 999,999 는 ≥ 2.5px · 가장 넓은 숫자 「4」 로 채운 44,444 · 444,444 는 칩 안 ≥ 0). 새 값 0 · 짧은 값(1~5자)은 규칙이 안 걸려 픽셀이 같다. 상점 띠 코인(#screen-shop)은 Task 4 가 잰 4.0 · 3.5 그대로다.
    기본 규칙 · 데스크톱 미디어 · 구형 기기 폴백 셋이 각자 원 규칙(5.00)과 같은 단위·같은 미디어 조건으로 따로 선다. */
-#screen-kingdom #kd-top-stars-v[data-len="6"], #screen-map #map-stars-v[data-len="6"], #screen-shop #sh-coin-v[data-len="6"] { font-size: 4.0cqw; }
+#screen-kingdom #kd-top-stars-v[data-len="6"], #screen-map #map-stars-v[data-len="6"] { font-size: 4.10cqw; }
+#screen-shop #sh-coin-v[data-len="6"] { font-size: 4.0cqw; }
 #screen-kingdom #kd-top-stars-v[data-len="7"], #screen-map #map-stars-v[data-len="7"], #screen-shop #sh-coin-v[data-len="7"] { font-size: 3.50cqw; }
 @media (min-aspect-ratio: 1/1) and (min-width: 700px) {
-  #screen-map #map-stars-v[data-len="6"] { font-size: calc(var(--mapui) * 4.0); }
+  #screen-map #map-stars-v[data-len="6"] { font-size: calc(var(--mapui) * 4.10); }
   #screen-map #map-stars-v[data-len="7"] { font-size: calc(var(--mapui) * 3.50); }
 }
 @media (min-aspect-ratio: 1/1) and (min-width: 700px) and (min-height: 600px) {
-  #screen-kingdom #kd-top-stars-v[data-len="6"] { font-size: calc(var(--mapui) * 4.0); }
+  #screen-kingdom #kd-top-stars-v[data-len="6"] { font-size: calc(var(--mapui) * 4.10); }
   #screen-kingdom #kd-top-stars-v[data-len="7"] { font-size: calc(var(--mapui) * 3.50); }
 }
 @supports not (width: 1cqw) {
-  #screen-map #map-stars-v[data-len="6"], #screen-shop #sh-coin-v[data-len="6"] { font-size: calc(4.0 * var(--cqw)); }
+  #screen-map #map-stars-v[data-len="6"] { font-size: calc(4.10 * var(--cqw)); }
+  #screen-shop #sh-coin-v[data-len="6"] { font-size: calc(4.0 * var(--cqw)); }
   #screen-map #map-stars-v[data-len="7"], #screen-shop #sh-coin-v[data-len="7"] { font-size: calc(3.50 * var(--cqw)); }
   /* 상점 위 띠 글자 크기 폴백(아래 cqw 규칙과 같은 수 — 지도 폴백 규칙 합류분의 5.40/4.40/5.00/5.60 을 덮는다) */
   #screen-shop #sh-hearts-v { font-size: calc(4.62 * var(--cqw)); }
   #screen-shop #sh-heart-t { font-size: calc(2.69 * var(--cqw)); }
   #screen-shop #sh-coin-v { font-size: calc(4.10 * var(--cqw)); }
   #screen-shop #sh-star-v { font-size: calc(4.62 * var(--cqw)); }
+}
+/* 아래 칩 둘의 긴 값(P3 T3 수정 1회차 · 리뷰 I1) — 지도 아래 「합계/최대」(#map-b1-v)와 왕국 아래 별 지갑(#kd-bot-b1-v)은 글자 중심이 칩 폭의 57.7% 라
+   글자가 길면 왼쪽 끝이 칩 배경의 별 그림(stage-pill_star.webp 의 별 윤곽 오른쪽 끝 = 그림 폭의 30.4%)에 걸친다 — 「45/300」 이 이미 걸렸고 「300/300」 은 7px 였다.
+   코인 칩과 같은 방식: paintChipText 가 글자 수(쉼표 포함)를 data-len 으로 적고, 길이별로 **이 파일에 이미 있는 글자 단계**로 줄인다. 단계는 대표 값이
+   별 그림 오른쪽 끝에서 ≥ 2.5px · 가장 넓은 숫자 「4」 로 채운 값이 ≥ 0px 인 가장 큰 단계로 네 폭(360 · 390 · 414 · 1280)에서 쟀다(scratchpad/p3/probe-t3f1-steps.py):
+     지도 아래 5자 5.00(「0/300」) · 6자 4.2(「45/300」) · 7자 3.5(「300/300」) — 진행도는 늘 「/300」 이 붙어 5자부터다.
+     왕국 아래 5자 이하는 종전 5.60 그대로(규칙 없음 · 「1,234」) · 6자 4.62(「12,345」) · 7자 3.5(「999,999」).
+   원 규칙(5.60cqw)은 데스크톱 따로 없이 cqw 하나(띠가 자기 컨테이너)라 기본 + 폴백(지도만 — 왕국은 원 폴백이 없다) 둘이다. 새 값 0. */
+#screen-map #map-b1-v[data-len="5"] { font-size: 5.00cqw; }
+#screen-map #map-b1-v[data-len="6"] { font-size: 4.2cqw; }
+#screen-map #map-b1-v[data-len="7"] { font-size: 3.50cqw; }
+#screen-kingdom #kd-bot-b1-v[data-len="6"] { font-size: 4.62cqw; }
+#screen-kingdom #kd-bot-b1-v[data-len="7"] { font-size: 3.50cqw; }
+@supports not (width: 1cqw) {
+  #screen-map #map-b1-v[data-len="5"] { font-size: calc(5.00 * var(--cqw)); }
+  #screen-map #map-b1-v[data-len="6"] { font-size: calc(4.2 * var(--cqw)); }
+  #screen-map #map-b1-v[data-len="7"] { font-size: calc(3.50 * var(--cqw)); }
 }
 /* ---- [P3-SHOP] 상점 화면 틀 — 왕국(#screen-kingdom)과 같은 컨테이너 규약: cqw 좌표 · 전체 높이 · 넘침 숨김 ---- */
 #screen-shop{
