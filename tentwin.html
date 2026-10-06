@@ -234,7 +234,10 @@ html[data-platform="web"] [data-app-only]{display:none !important}
      "이 세션 내내" 가 아니다(I-6 의 실패 토스트로만 처리). */
   function noteAdError(errorData) {
     var code = errorData && errorData.code;
-    if (code === 'adsDisabledBasicLaunch' || code === 'adblock') adsBlocked = true;
+    if ((code === 'adsDisabledBasicLaunch' || code === 'adblock') && !adsBlocked) {
+      adsBlocked = true;
+      try { window.dispatchEvent(new Event('tw:portal')); } catch (e) {}   /* P3 T4 수정 1회차 M-1 — 게이트(html[data-portal])가 상점을 안 열어도 off 로 */
+    }
   }
 
   /* playing 플래그 전이만 SDK 로 보낸다(C-1/m-10) — 클로저 함수로 둬서 공개
@@ -15301,14 +15304,14 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
       <p id="sh-bubble" hidden></p>
     </div>
     <div id="sh-plate" class="jbox jbox--modal" data-part="modal-plate">
-      <div id="sh-body"></div>
+      <div id="sh-body" role="tabpanel" aria-labelledby="sh-tab-gacha"></div>
     </div>
     <footer id="sh-tabs" class="jbox jbox--strip" role="tablist" data-i18n-aria="aria.shoptabs" aria-label="Shop sections">
-      <button class="rank-tab sh-tab" type="button" role="tab" data-stab="gacha" aria-selected="true"><i class="sh-tab-ic" aria-hidden="true"></i><span data-i18n="shop2.tab.gacha">Capsules</span><b class="badge-new sh-dot" hidden></b></button>
-      <button class="rank-tab sh-tab" type="button" role="tab" data-stab="deals" aria-selected="false"><i class="sh-tab-ic" aria-hidden="true"></i><span data-i18n="shop2.tab.deals">Deals</span><b class="badge-new sh-dot" hidden></b></button>
-      <button class="rank-tab sh-tab" type="button" role="tab" data-stab="free" data-portal-only aria-selected="false"><i class="sh-tab-ic" aria-hidden="true"></i><span data-i18n="shop2.tab.free">Free</span><b class="badge-new sh-dot" hidden></b></button>
-      <button class="rank-tab sh-tab" type="button" role="tab" data-stab="deco" aria-selected="false"><i class="sh-tab-ic" aria-hidden="true"></i><span data-i18n="shop2.tab.deco">Style</span></button>
-      <button class="rank-tab sh-tab" type="button" role="tab" data-stab="jewel" data-app-only aria-selected="false"><i class="sh-tab-ic" aria-hidden="true"></i><span data-i18n="shop2.tab.jewel">Jewels</span></button>
+      <button class="rank-tab sh-tab" id="sh-tab-gacha" type="button" role="tab" aria-controls="sh-body" data-stab="gacha" aria-selected="true"><i class="sh-tab-ic" aria-hidden="true"></i><span data-i18n="shop2.tab.gacha">Capsules</span><b class="badge-new sh-dot" hidden></b></button>
+      <button class="rank-tab sh-tab" id="sh-tab-deals" type="button" role="tab" aria-controls="sh-body" data-stab="deals" aria-selected="false"><i class="sh-tab-ic" aria-hidden="true"></i><span data-i18n="shop2.tab.deals">Deals</span><b class="badge-new sh-dot" hidden></b></button>
+      <button class="rank-tab sh-tab" id="sh-tab-free" type="button" role="tab" aria-controls="sh-body" data-stab="free" data-portal-only aria-selected="false"><i class="sh-tab-ic" aria-hidden="true"></i><span data-i18n="shop2.tab.free">Free</span><b class="badge-new sh-dot" hidden></b></button>
+      <button class="rank-tab sh-tab" id="sh-tab-deco" type="button" role="tab" aria-controls="sh-body" data-stab="deco" aria-selected="false"><i class="sh-tab-ic" aria-hidden="true"></i><span data-i18n="shop2.tab.deco">Style</span></button>
+      <button class="rank-tab sh-tab" id="sh-tab-jewel" type="button" role="tab" aria-controls="sh-body" data-stab="jewel" data-app-only aria-selected="false"><i class="sh-tab-ic" aria-hidden="true"></i><span data-i18n="shop2.tab.jewel">Jewels</span></button>
     </footer>
   </section>
 
@@ -30143,19 +30146,21 @@ window.TT_SFX = {
    * data-i18n-html is used only by the three how-to paragraphs; every value is
    * one of our own literals above, so no user input ever reaches innerHTML.
    */
-  function applyI18n() {
+  /** root 를 주면 그 안만 다시 건다(P3 T4 수정 1회차 M-2 — 상점 판을 다시 칠할 때 문서 전체를 돌지 않는다). 없으면 종전대로 문서 전체 + lang. */
+  function applyI18n(root) {
     if (typeof document === 'undefined') return;
-    try { document.documentElement.lang = currentLang(); } catch (e) { /* ignore */ }
+    var scope = root || document;
+    if (!root) { try { document.documentElement.lang = currentLang(); } catch (e) { /* ignore */ } }
     var i, list;
-    list = document.querySelectorAll('[data-i18n]');
+    list = scope.querySelectorAll('[data-i18n]');
     for (i = 0; i < list.length; i++) {
       headText(list[i], t(list[i].getAttribute('data-i18n')));
     }
-    list = document.querySelectorAll('[data-i18n-html]');
+    list = scope.querySelectorAll('[data-i18n-html]');
     for (i = 0; i < list.length; i++) {
       list[i].innerHTML = t(list[i].getAttribute('data-i18n-html'));
     }
-    list = document.querySelectorAll('[data-i18n-aria]');
+    list = scope.querySelectorAll('[data-i18n-aria]');
     for (i = 0; i < list.length; i++) {
       list[i].setAttribute('aria-label', t(list[i].getAttribute('data-i18n-aria')));
     }
@@ -33003,6 +33008,7 @@ window.TT_SFX = {
   function closeSkins() {
     var el = $('modal-skin');
     if (el) el.hidden = true;
+    if (shopActive()) paintWallets();   /* P3 T4 수정 1회차 I-1 — 상점 화면 위에서 스킨을 샀으면 띠 별 잔액 */
     J.sfx.ui();
   }
 
@@ -45462,7 +45468,7 @@ window.TT_SFX = {
   function shopTickFn() {
     var el = $('screen-shop');
     if (!el || !el.classList.contains('active')) { clearInterval(shopTick); shopTick = 0; return; }
-    heartsTick();
+    if (store.hearts < HEART_MAX) heartsTick();   /* 수정 1회차 M-5 — 가득이면 heartsTick 이 매초 heartAt 을 고쳐 저장하므로 회복이 올 수 있을 때만(저장 = 하트가 늘 때만) */
     paintShopHearts();
     var clk = $('sh-clock');
     if (clk) clk.textContent = shopClockText();
@@ -45479,10 +45485,14 @@ window.TT_SFX = {
     shopPaint();
     J.sfx.ui();
   }
+  /** 상점 화면이 떠 있나 — 그 위의 창(보석·스킨)이 잔액을 바꾸고 닫힐 때 띠를 다시 그릴지 가른다(수정 1회차 I-1). */
+  function shopActive() { var el = $('screen-shop'); return !!(el && el.classList && el.classList.contains('active')); }
+  /** 다음 하트까지 남은 ms — heartNextMs 와 달리 heartsTick 을 부르지 않는다(가득일 때 heartsTick 은 매초 heartAt 을 고쳐 저장한다 — 수정 1회차 M-5). */
+  function shopHeartMs() { return store.hearts >= HEART_MAX ? 0 : Math.max(0, (Number(store.heartAt) || 0) + HEART_MS - Date.now()); }
   function paintShopHearts() {
     setText('sh-hearts-v', store.hearts | 0);
     var ht = $('sh-heart-t');
-    if (ht) { var ms = heartNextMs(); ht.textContent = ms > 0 ? fmtHeartWait(ms) : t('adv.heartfull'); }
+    if (ht) { var ms = shopHeartMs(); ht.textContent = ms > 0 ? fmtHeartWait(ms) : t('adv.heartfull'); }
   }
   function msToMidnight() {
     var n = new Date(), m = new Date(n.getFullYear(), n.getMonth(), n.getDate() + 1);
@@ -45505,20 +45515,33 @@ window.TT_SFX = {
     for (var i = 0; i < tabs.length; i++) {
       tabs[i].setAttribute('aria-selected', tabs[i].getAttribute('data-stab') === shopTab2 ? 'true' : 'false');
     }
-    paintWallets();
-    paintShopHearts();
     var host = $('sh-host');
     if (host) setArt(host, '--sh-host', stdArt(SHOP_HOST[shopTab2] || 'kkultteok', 'full'), '');
     var bub = $('sh-bubble');
     if (bub) { bub.hidden = true; bub.textContent = ''; }
+    var panel = $('sh-body');
+    if (panel) panel.setAttribute('aria-labelledby', 'sh-tab-' + shopTab2);   /* 수정 1회차 M-3 — 판(tabpanel)의 이름 = 선택된 탭 */
+    paintShopTab(shopTab2, true);   /* 전체 다시 그리기 = 탭 하나 다시 그리기 + 스크롤 처음으로(열기·탭 전환) — 수정 1회차 M-2 */
+  }
+  /** 탭 하나만 다시 그린다 — **탭 태스크(5·7·9)가 구매·갱신 뒤 부르는 API**(수정 1회차 M-2). 판 안을 다시 채우되 스크롤 자리는 지키고(resetScroll 이
+   *  참일 때만 처음으로), 지갑·하트·점을 맞추고, 번역은 상점 뿌리 안에서만 다시 건다(문서 전체 순회 0). tab 이 지금 탭이 아니면 전환(setShopTab)이다. */
+  function paintShopTab(tab, resetScroll) {
+    var root = $('screen-shop');
+    if (!root) return;
+    tab = tab || shopTab2;
+    if (tab !== shopTab2) { setShopTab(tab); return; }
     var body = $('sh-body'), scene = $('sh-scene');
+    var keep = (body && !resetScroll) ? body.scrollTop : 0;
     if (scene) scene.innerHTML = '';          /* 무대 위 탭 전용 장식(뽑기 기계 등) — 탭 함수가 채운다 */
     if (body) {
       body.innerHTML = '';
-      (SHOP_PAINT[shopTab2] || SHOP_PAINT.gacha)(body, scene);
+      (SHOP_PAINT[tab] || SHOP_PAINT.gacha)(body, scene);
+      if (keep) body.scrollTop = keep;
     }
+    paintWallets();
+    paintShopHearts();
     shopDots();
-    applyI18n();
+    applyI18n(root);
     try { if (window.TW && window.TW.applyPlatformGates) window.TW.applyPlatformGates(root); } catch (e) {}
   }
   function shopAct2(a, el) {
@@ -45639,6 +45662,7 @@ window.TT_SFX = {
     persist();
     syncGems();
     paintShopBalance();
+    if (shopActive()) paintWallets();   /* P3 T4 수정 1회차 I-1 — 보석 창이 상점 화면 위에 떠 있으면 띠 별 잔액도 */
     return true;
   }
 
@@ -45876,6 +45900,7 @@ window.TT_SFX = {
   function closeShop() {
     var el = $('modal-shop');
     if (el) el.hidden = true;
+    if (shopActive()) paintWallets();   /* P3 T4 수정 1회차 I-1 — 상점 화면 위의 보석 창에서 별 교환·스킨 구매 뒤 닫으면 띠 잔액 */
     J.sfx.ui();
   }
 
@@ -47942,8 +47967,8 @@ window.TT_SFX = {
         }
         wrap.appendChild(el);
       }
-      /* §18.7 규약 함수 — 웹에서 상점 건물을 감추는 일은 이것이 한다.
-         새 숨김 방식을 만들지 않았다(메뉴의 #shop-entry 와 같은 경로). */
+      /* §18.7 규약 함수 — app 표식(data-app-only)이 있는 건물만 웹에서 감춘다(지금은 없다: 상점 건물은 P3 §28.4 부터
+         웹·앱 공용 입구다). 새 숨김 방식을 만들지 않았다(메뉴의 #shop-entry 와 같은 경로). */
       try { if (window.TW && window.TW.applyPlatformGates) window.TW.applyPlatformGates(wrap); } catch (e) {}
     }
     var rw = $('kd-res');
@@ -52461,7 +52486,7 @@ window.TT_SFX = {
       },
       // Daily already finished today? The menu button routes to the result screen.
       /* [KD57-0911] 인트로(§19)「탭하여 시작」의 착지 = **왕국**(§26.1).
-         웹·앱 공통이고 플랫폼 플래그와 무관하다 — 상점 «건물»만 data-app-only.
+         웹·앱 공통이고 플랫폼 플래그와 무관하다 — 상점 건물도 P3(§28.4)부터 웹·앱 공용 입구다(앱 전용은 메뉴의 #shop-entry 뿐).
          되돌리기 = 이 한 줄을 showScreen('screen-menu') 로. */
       function () { enterKingdom(); },
       // review #2: the connection rule was never taught, so the tutorial is forced on
@@ -52811,6 +52836,7 @@ window.TT_SFX = {
     KD_TAP_CAP: KD_TAP_CAP,
     /* P3 Task 4 — 가게 화면 손잡이(스모크·촬영용). 게임 코드는 이 중 무엇도 window.Game 을 거쳐 부르지 않는다. */
     openShopScreen: openShopScreen, closeShopScreen: closeShopScreen, setShopTab: setShopTab, portalAdsOk: portalAdsOk, portalAdsSync: portalAdsSync, SHOP_ART: SHOP_ART, shopFreeCount: shopFreeCount,
+    paintShopTab: paintShopTab, SHOP_PAINT: SHOP_PAINT, SHOP_DOTS: SHOP_DOTS,   /* 수정 1회차 M-2 · M-6 — 탭 태스크 스모크가 표에 자기 함수를 넣어 본다 */
     mateId: mateId, setMate: setMate, cpTab: cpTab, openCharPanel: openCharPanel,
     duelFoeFull: duelFoeFull, PET_SKILL: PET_SKILL,
     openModeSheet: openModeSheet, openAdventure: openAdventure,
@@ -70641,6 +70667,35 @@ html[lang="en"] #kd-b-circus .kd-tag b{ font-size: .88em; letter-spacing: -.02em
   #screen-shop #sh-heart-t { font-size: calc(2.69 * var(--cqw)); }
   #screen-shop #sh-coin-v { font-size: calc(4.10 * var(--cqw)); }
   #screen-shop #sh-star-v { font-size: calc(4.62 * var(--cqw)); }
+  /* 수정 1회차 I-3 — cqw 를 모르는 기기(iOS 15 · Chrome 104 급)의 **틀 좌표 전부**(지도 compat-p1 과 같은 문법 · 아래 cqw 규칙과 같은 수).
+     없으면 cqw 선언이 통째로 버려져 뒤로 버튼이 0×0 이 되고 iOS 에는 Esc 도 기기 뒤로가기도 없어 상점에 갇힌다. --cqw 는 위 #screen-map, #screen-shop 정의. */
+  #sh-top { height: calc(17 * var(--cqw)); }
+  #sh-back { left: calc(2.05 * var(--cqw)); top: calc(2.82 * var(--cqw)); width: calc(11.28 * var(--cqw)); height: calc(11.28 * var(--cqw)); }
+  #sh-hearts { left: calc(15.38 * var(--cqw)); top: calc(3.33 * var(--cqw)); width: calc(27.18 * var(--cqw)); height: calc(10.26 * var(--cqw)); }
+  #sh-coin { left: calc(44.62 * var(--cqw)); top: calc(3.33 * var(--cqw)); width: calc(23.59 * var(--cqw)); height: calc(10.26 * var(--cqw)); }
+  #sh-star { left: calc(70.26 * var(--cqw)); top: calc(3.33 * var(--cqw)); width: calc(25.13 * var(--cqw)); height: calc(10.26 * var(--cqw)); }
+  #sh-top .sh-plus { top: calc(5.77 * var(--cqw)); width: calc(5.38 * var(--cqw)); height: calc(5.38 * var(--cqw)); font-size: calc(4.3 * var(--cqw)); border: calc(.4 * var(--cqw)) solid var(--role-mint-outline); }
+  #sh-coin-plus { left: calc(66.4 * var(--cqw)); }
+  #sh-star-plus { left: calc(93.6 * var(--cqw)); }
+  #sh-top .sh-plus::before { margin-top: calc(11.3 * var(--cqw) / -2); height: calc(11.3 * var(--cqw)); width: calc(11.3 * var(--cqw)); }
+  #sh-coin-plus::before { right: calc((71.78 - .4 - 70.26) * var(--cqw)); }
+  #sh-star-plus::before { right: calc((98.98 - .4 - 100) * var(--cqw)); }
+  #sh-stage { height: calc(min(calc(128.2 * var(--cqw)), 60%) + var(--safe-t)); }
+  #screen-shop[data-stab="deals"] #sh-stage { height: calc(min(calc(76.9 * var(--cqw)), 40%) + var(--safe-t)); }
+  #screen-shop[data-stab="free"] #sh-stage, #screen-shop[data-stab="deco"] #sh-stage { height: calc(min(calc(64.1 * var(--cqw)), 34%) + var(--safe-t)); }
+  #sh-awning { left: calc(-2.6 * var(--cqw)); right: calc(-2.6 * var(--cqw)); height: calc(16.4 * var(--cqw));
+    background: repeating-linear-gradient(90deg, var(--prim-art-pink) 0 calc(7.18 * var(--cqw)), var(--prim-white) calc(7.18 * var(--cqw)) calc(14.36 * var(--cqw))); }
+  #screen-shop[data-stab="free"] #sh-awning { background: repeating-linear-gradient(90deg, var(--role-mint-face-a) 0 calc(7.18 * var(--cqw)), var(--prim-white) calc(7.18 * var(--cqw)) calc(14.36 * var(--cqw))); }
+  #sh-host { right: calc(2 * var(--cqw)); bottom: calc(2 * var(--cqw)); width: calc(28.7 * var(--cqw)); height: calc(38.5 * var(--cqw)); }
+  #sh-plate { left: calc(2.56 * var(--cqw)); right: calc(2.56 * var(--cqw)); bottom: calc(22.6 * var(--cqw) + var(--safe-b)); top: calc(min(calc(122.6 * var(--cqw)), 57%) + var(--safe-t)); }
+  #screen-shop[data-stab="deals"] #sh-plate { top: calc(min(calc(72.3 * var(--cqw)), 36%) + var(--safe-t)); }
+  #screen-shop[data-stab="free"] #sh-plate, #screen-shop[data-stab="deco"] #sh-plate { top: calc(min(calc(57.9 * var(--cqw)), 30%) + var(--safe-t)); }
+  #sh-body { inset: calc(3 * var(--cqw)) calc(3.5 * var(--cqw)); }
+  #sh-tabs { left: calc(2.05 * var(--cqw)); right: calc(2.05 * var(--cqw)); bottom: calc(2.05 * var(--cqw) + var(--safe-b)); height: calc(19 * var(--cqw)); gap: calc(1.54 * var(--cqw)); padding: calc(1.8 * var(--cqw)); }
+  #sh-tabs .sh-tab { border-radius: calc(4.1 * var(--cqw)); gap: calc(.3 * var(--cqw)); font-size: calc(3.6 * var(--cqw)); }
+  #sh-tabs .sh-tab-ic { width: calc(9.2 * var(--cqw)); height: calc(8.2 * var(--cqw)); }
+  #sh-tabs .sh-dot { right: calc(1.5 * var(--cqw)); top: calc(1.2 * var(--cqw)); }
+  #screen-shop > * { --f2-w: calc(100 * var(--cqw)); }
 }
 /* 아래 칩 둘의 긴 값(P3 T3 수정 1회차 · 리뷰 I1) — 지도 아래 「합계/최대」(#map-b1-v)와 왕국 아래 별 지갑(#kd-bot-b1-v)은 글자 중심이 칩 폭의 57.7% 라
    글자가 길면 왼쪽 끝이 칩 배경의 별 그림(stage-pill_star.webp 의 별 윤곽 오른쪽 끝 = 그림 폭의 30.4%)에 걸친다 — 「45/300」 이 이미 걸렸고 「300/300」 은 7px 였다.
@@ -70669,11 +70724,14 @@ html[lang="en"] #kd-b-circus .kd-tag b{ font-size: .88em; letter-spacing: -.02em
   container-type: inline-size;
   background: var(--prim-bg-light);
 }
+/* --f2-w(킷 부품의 자) = 상점 기둥 폭(수정 1회차 I-4): 기둥이 컨테이너라 자식에서 100cqw 가 곧 기둥 폭이다 — 폰 390 · 가로 폰 360(clamp 캡) · 데스크톱 430 을
+   한 줄로 덮는다(:root 의 95.7vw 가 새면 5a 가 본 머리 알약 ~202px 가 된다). 데스크톱 절의 --f2-w 는 판정 ①② 의 글자 그대로 남긴다(같은 값). */
+#screen-shop > *{ --f2-w: 100cqw; }
 /* 포털 게이트 — html[data-portal="cg"] 가 아니면(포털 밖·광고 막힘·아직 판정 전) 전부 0px. */
 html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
 
 /* 위 띠: 목업 .hud(top 10px · 높이 46px · 왼쪽 여백 8px · 간격 8px) — 뒤로 44 · 하트 106 · 코인 92 · 별 98 px */
-#sh-top{ position: absolute; left: 0; right: 0; top: 0; height: 17cqw; z-index: 6; }
+#sh-top{ position: absolute; left: 0; right: 0; top: var(--safe-t); height: 17cqw; z-index: 6; }   /* 수정 1회차 I-2 — 상태 표시줄·노치 아래(왕국 #kd-top 과 같은 토큰) */
 /* 긴 이름으로만 적는다 — 줄임(background:)을 쓰면 특정도가 더 높은 이 규칙이 아래 #sh-* 의 그림을 지운다. */
 #sh-top .sh-chip{ position: absolute; border: 0; padding: 0; background-color: transparent;
   background-position: center; background-size: 100% 100%; background-repeat: no-repeat; }
@@ -70690,13 +70748,18 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
 }
 #sh-coin-plus{ left: 66.4cqw; }
 #sh-star-plus{ left: 93.6cqw; }
+/* + 버튼 누르는 상자(수정 1회차 M-4): 보이는 원(5.38cqw)은 그대로, 의사요소로 11.3cqw(390 에서 44px) 상자를 깐다 — 세로는 가운데, 오른쪽 끝은 다음 알약(별
+   70.26cqw)·기둥 끝(100cqw)에 맞춰 그것을 안 덮고, 나머지는 자기 알약 위로 넓힌다. right 는 패딩 상자 기준이라 테두리 .4cqw 를 뺀다. */
+#sh-top .sh-plus::before{ content: ""; position: absolute; top: 50%; margin-top: calc(11.3cqw / -2); height: 11.3cqw; width: 11.3cqw; }
+#sh-coin-plus::before{ right: calc(71.78cqw - .4cqw - 70.26cqw); }
+#sh-star-plus::before{ right: calc(98.98cqw - .4cqw - 100cqw); }
 
 /* 무대(가게 안): 탭마다 높이가 다르다 — 뽑기 500px · 특가 300px · 무료/꾸미기 250px(목업 .shopbg) */
-#sh-stage{ position: absolute; left: 0; right: 0; top: 0; height: min(128.2cqw, 60%); overflow: hidden;
-  background: linear-gradient(180deg, var(--prim-bg-light), var(--prim-art-pink-2)); }
-#screen-shop[data-stab="deals"] #sh-stage{ height: min(76.9cqw, 40%); }
+#sh-stage{ position: absolute; left: 0; right: 0; top: 0; height: calc(min(128.2cqw, 60%) + var(--safe-t)); overflow: hidden;
+  background: linear-gradient(180deg, var(--prim-bg-light), var(--prim-art-pink-2)); }   /* 높이 + 안전 위 — 판 위 끝이 그만큼 내려가도 무대 끝과의 겹침(22px)이 같다(수정 1회차 I-2) */
+#screen-shop[data-stab="deals"] #sh-stage{ height: calc(min(76.9cqw, 40%) + var(--safe-t)); }
 #screen-shop[data-stab="free"]  #sh-stage,
-#screen-shop[data-stab="deco"]  #sh-stage{ height: min(64.1cqw, 34%); }
+#screen-shop[data-stab="deco"]  #sh-stage{ height: calc(min(64.1cqw, 34%) + var(--safe-t)); }
 /* 발주 ① 전 임시 차양(목업 .awn: 높이 64px · 줄 28px) — 그림이 오면 [data-art~="bg"] 가 끈다(Task 12). */
 #sh-awning{ position: absolute; left: -2.6cqw; right: -2.6cqw; top: 0; height: 16.4cqw;
   background: repeating-linear-gradient(90deg, var(--prim-art-pink) 0 7.18cqw, var(--prim-white) 7.18cqw 14.36cqw); }
@@ -70708,14 +70771,14 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
 #sh-bubble{ position: absolute; z-index: 5; margin: 0; }
 
 /* 판: 목업 .panel(left 10px · 아래 끝 756px 고정 · 위 = 탭마다) — 짧은 화면에서는 위를 올리고 판 안을 스크롤 */
-#sh-plate{ position: absolute; left: 2.56cqw; right: 2.56cqw; bottom: 22.6cqw; top: min(122.6cqw, 57%); z-index: 4; }
-#screen-shop[data-stab="deals"] #sh-plate{ top: min(72.3cqw, 36%); }
+#sh-plate{ position: absolute; left: 2.56cqw; right: 2.56cqw; bottom: calc(22.6cqw + var(--safe-b)); top: calc(min(122.6cqw, 57%) + var(--safe-t)); z-index: 4; }   /* 안전 영역 위·아래(수정 1회차 I-2) */
+#screen-shop[data-stab="deals"] #sh-plate{ top: calc(min(72.3cqw, 36%) + var(--safe-t)); }
 #screen-shop[data-stab="free"]  #sh-plate,
-#screen-shop[data-stab="deco"]  #sh-plate{ top: min(57.9cqw, 30%); }
+#screen-shop[data-stab="deco"]  #sh-plate{ top: calc(min(57.9cqw, 30%) + var(--safe-t)); }
 #sh-body{ position: absolute; inset: 3cqw 3.5cqw; overflow-y: auto; overscroll-behavior: contain; }
 
 /* 아래 띠: 목업 .botnav(좌우·아래 8px · 높이 74px · 간격 6px) · 탭 = 젤리 알약(.rank-tab, 선택 = 노랑) 인스턴스 */
-#sh-tabs{ position: absolute; left: 2.05cqw; right: 2.05cqw; bottom: 2.05cqw; height: 19cqw; z-index: 6;
+#sh-tabs{ position: absolute; left: 2.05cqw; right: 2.05cqw; bottom: calc(2.05cqw + var(--safe-b)); height: 19cqw; z-index: 6;   /* 홈 인디케이터 위(왕국 #kd-bot 과 같은 토큰 — 수정 1회차 I-2) */
   display: flex; gap: 1.54cqw; padding: 1.8cqw; box-sizing: border-box; }
 #sh-tabs .sh-tab{ position: relative; flex: 1 1 0; height: 100%; padding: 0; border-radius: 4.1cqw;
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .3cqw; font-size: 3.6cqw; }
