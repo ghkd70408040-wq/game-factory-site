@@ -45688,7 +45688,7 @@ window.TT_SFX = {
   var SHOP_TABS = ['gacha', 'deals', 'free', 'deco', 'jewel'];
   var SHOP_HOST = { gacha: 'banjjak', deals: 'kkultteok', free: 'tiktok', deco: 'mongle' };   /* 목업 B1·B2·B3 의 상인 */
   /* 발주 그림 도착 표(74 ITEM_ART 와 같은 2단 구조) — 1 이면 #screen-shop[data-art~=키] 가 서고 CSS 가 그림으로 바꾼다. */
-  var SHOP_ART = { bg: 1, machine: 1, capsule: 1, coin: 1, tabs: 1, host: 0 };   /* P3 T12 — 도착한 그림만 1. host 0 = 꿀떡이 상인 포즈(선택 ⑥)는 발주하지 않았다(지휘자 판정 — 기존 full 그림으로 선다) */
+  var SHOP_ART = { bg: 1, machine: 1, capsule: 1, coin: 1, tabs: 1, host: 0 };   /* P3 T12 · host 0 = 상인 포즈 미발주(DESIGN §28.11) */
   var SHOP_PAINT = { gacha: function () {}, deals: function () {}, free: function () {}, deco: function () {} };
   var SHOP_DOTS = { gacha: function () { return 0; }, deals: function () { return 0; }, free: function () { return 0; } };
   var SHOP_ACTS = {};
@@ -45767,7 +45767,7 @@ window.TT_SFX = {
     var art = [], k;
     for (k in SHOP_ART) if (Object.prototype.hasOwnProperty.call(SHOP_ART, k) && SHOP_ART[k]) art.push(k);
     root.setAttribute('data-art', art.join(' '));
-    document.documentElement.setAttribute('data-shop-art', art.join(' '));   /* 결과 창(#modal-gres)은 #screen-shop 밖 — 캡슐 그림 규칙이 html 표식을 읽는다 */
+    document.documentElement.setAttribute('data-shop-art', art.join(' '));   /* #modal-gres 용 */
     var tabs = root.querySelectorAll('.sh-tab');
     for (var i = 0; i < tabs.length; i++) {
       tabs[i].setAttribute('aria-selected', tabs[i].getAttribute('data-stab') === shopTab2 ? 'true' : 'false');
@@ -46209,7 +46209,7 @@ window.TT_SFX = {
           setArt(face, '--gm-face', stdArt(tb.rows[i].id, 'thumb'), '');
           m.appendChild(face);
         }
-        if (tb.rows.length) m.setAttribute('data-rows', String(Math.ceil(Math.min(tb.rows.length, 9) / 3)));   /* P3 T12 — 줄 수(1 · 2 · 3): 그림이 켜지면 CSS 가 유리 세로 가운데로 맞춘다 */
+        if (tb.rows.length) m.setAttribute('data-rows', String(Math.ceil(Math.min(tb.rows.length, 9) / 3)));   /* 줄 수 — DESIGN §28.11 */
       }
       scene.appendChild(m);
       var sub = document.createElement('div'); sub.className = 'kit-pill-v2 gc-sub'; sub.setAttribute('data-variant', 'soft'); sub.id = 'gc-pity';
@@ -72090,36 +72090,28 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
   html:not([data-portal="cg"]) .res-body { display: contents; }
 }
 
-/* ---- [P3-T12] 발주 그림 도착(SHOP_ART → #screen-shop[data-art] · html[data-shop-art]) — 임시 CSS 를 끄고 그림을 켠다 ----
-   그림은 이 속성이 서는 때(상점을 열고 shopPaint 가 칠한 뒤)에만 읽힌다 — 부트 · 왕국 · 판에는 요청 0(PERF A2 · 시험 t12e). 새 원시값 0 · 길이는 % 와 calc(N * var(--cqw)).
-   기계 그림(448x570 = 임시 기계 상자 224x285 의 2배)은 임시 기계 상자(.gm-ph)에 그대로 앉는다 — 같은 비율이라 contain 이 상자를 꼭 채운다.
-   돔 안 얼굴(.gm-face)은 임시 기계 돔(상자 폭의 94%)을 기준으로 놓였던 것이라 그림의 유리 돔(실측: 그림 폭의 약 50% · 아래는 목깃에서 끊김)보다 크다 — 그림이 켜지면 JS 가 주는 세 열 · 줄
-   좌표(--gm-x · --gm-y)를 그대로 읽어 유리 안(매니페스트 slot_safe.dome)에 줄여 앉힌다(좌표 = 15 · 39 · 63% → 34.5 · 45.2 · 55.9% 열 · 12 · 29 · 46% → 20.5 · 29.1 · 37.7% 줄). */
-#screen-shop[data-art~="bg"] #sh-stage{ background: url("catalog/t3-shop-interior.webp") center top / cover no-repeat; }
+/* ---- [P3-T12] 발주 그림 도착(SHOP_ART → #screen-shop[data-art] · html[data-shop-art]) — 임시 CSS 를 끄고 그림을 켠다 · 설명 → DESIGN §28.11 ---- */
+#screen-shop[data-art~="bg"] #sh-stage{ background: url("catalog/t3-shop-interior.webp") center calc(-16.41 * var(--cqw)) / cover no-repeat; }
 #screen-shop[data-art~="bg"] #sh-awning{ display: none; }
 #screen-shop[data-art~="machine"] #sh-scene .gm-ph{ background: url("catalog/t4-gacha-machine-mint.webp") center / contain no-repeat; }
 #screen-shop[data-art~="machine"] #sh-scene .gm-ph[data-kind="gold"]{ background-image: url("catalog/t4-gacha-machine-gold.webp"); }
 #screen-shop[data-art~="machine"] #sh-scene .gm-ph[data-kind="friend"]{ background-image: url("catalog/t4-gacha-machine-pink.webp"); }
 #screen-shop[data-art~="machine"] #sh-scene .gm-face{ width: 9.4%; left: calc(27.8% + var(--gm-x, 15%) * .4464); top: calc(14.46% + var(--gm-y, 12%) * .5056); }
-/* 얼굴이 두 줄(4~6명) · 한 줄(1~3명)이면 유리 안전 상자(slot_safe.dome — 448x570 에서 y 94 · h 166 → 가운데 y 177 = 기계 상자 높이의 31.05%)의 세로 가운데로 내린다 —
-   세 줄(7~9명)은 유리에 꽉 차서(격자 가운데 187) 그대로. 줄 간격 24.5/285 = 8.596% · 두 줄 가운데 = 첫 줄 중심 76.25 → 지금(69)보다 7.25/285 = 2.544% 아래 · 한 줄은 중심 88.5 → 19.5/285 = 6.842% 아래. */
+/* 얼굴 두 줄 · 한 줄 = 유리 세로 가운데(세 줄은 그대로) → DESIGN §28.11 */
 #screen-shop[data-art~="machine"] #sh-scene .gm-ph[data-rows="2"] .gm-face{ top: calc(14.46% + var(--gm-y, 12%) * .5056 + 2.544%); }
 #screen-shop[data-art~="machine"] #sh-scene .gm-ph[data-rows="1"] .gm-face{ top: calc(14.46% + var(--gm-y, 12%) * .5056 + 6.842%); }
-/* 뽑기 탭 말풍선: 임시 기계(상자 폭 100% 몸통) 때 정한 왼쪽 64.1cqw 가 그림 유리 돔 오른쪽 겉선(상자 가운데 + 알파 x 340/448 → 64.9cqw)에 3px 겹쳤다 — 그림이 켜지면 65.5cqw 로 밀고
-   오른쪽 끝(98.1cqw)은 그대로 두려고 최대 폭을 34 → 32.5cqw 로 줄인다(시험 t12p: 폭 여섯 · 종류 셋 겹침 0). */
+/* 뽑기 탭 말풍선 = 돔 겉선과 겹침 0 → DESIGN §28.11 */
 #screen-shop[data-art~="machine"][data-stab="gacha"] #sh-bubble{ left: calc(65.5 * var(--cqw)); max-width: calc(32.5 * var(--cqw)); }
 #screen-shop[data-art~="tabs"] #sh-tabs .sh-tab[data-stab="gacha"] .sh-tab-ic{ background-image: url("catalog/tab-ic-gacha.webp"); }
 #screen-shop[data-art~="tabs"] #sh-tabs .sh-tab[data-stab="free"]  .sh-tab-ic{ background-image: url("catalog/tab-ic-free.webp"); }
+/* 아래 첫 두 줄(.shop-ic-coin · [data-ad="coin"])은 특정도가 같아 뒤 줄이 이긴다 — 순서를 바꾸면 무료 탭 코인 줄이 더미로 바뀐다(시험 t12l) */
 #screen-shop[data-art~="coin"] #sh-body .shop-ic.shop-ic-coin{ background-image: url("catalog/shop-ic-coin-2.webp"); }
 #screen-shop[data-art~="coin"] #sh-body .shop-card[data-ad="coin"] .shop-ic{ background-image: url("catalog/shop-ic-coin-1.webp"); }
 #screen-shop[data-art~="coin"] #sh-body .shop-ic.shop-ic-coin-3{ background-image: url("catalog/shop-ic-coin-3.webp"); }
-/* 무료 탭 「아이템 캡슐 한 번」 줄 = 민트 기계 · 「친구 캡슐 한 번」 줄 = 분홍 기계 — 이미 넣은 기계 그림을 줄 아이콘 상자(contain)에 줄여 쓴다(새 그림 0, 판정 2026-10-07). */
+/* 무료 탭 기계 줄 아이콘(이미 넣은 그림을 줄여 씀) → DESIGN §28.11 */
 #screen-shop[data-art~="machine"] #sh-body .shop-ic.shop-ic-machine-item{ background-image: url("catalog/t4-gacha-machine-mint.webp"); }
 #screen-shop[data-art~="machine"] #sh-body .shop-ic.shop-ic-machine-friend{ background-image: url("catalog/t4-gacha-machine-pink.webp"); }
-/* 캡슐 — 닫힘 한 장(512x512)을 위 · 아래 반쪽에 나눠 쓴다(열림 그림은 없다 — 착수 전 점검 W13). 윗반은 흰/연회색 그림 위에 등급 토큰색을 **곱한다**(등급색은 그림에 굽지 않는다, 스펙 §4-e ③).
-   결과 창은 #screen-shop 밖이라 html 표식으로 켠다. 계획의 마스크 틴트(윗반 = 등급색 면 + 그림 알파 마스크)는 갈색 겉선과 광택을 지워 아랫반과 안 맞아(scratchpad/p3/t12/cap-probe.png)
-   그림을 배경으로 두고 등급색을 곱하기 의사요소로 얹는 쪽으로 바꿨다 — 계획이 허용한 대체(보고에 적음). 선택자에 #gres-cap 을 넣은 것은 T8 의 등급별 `background` 줄임 규칙(#modal-gres #gres-cap[data-tier] .gres-top)이
-   그림을 지우지 못하게 특정도를 한 칸 위에 두려는 것이다. (선택 ⑥ 상인 포즈 규칙은 그림이 없어 두지 않았다 — 경로 리터럴이 허용 목록 · 404 검사에 걸리지 않게, 착수 전 점검 W13 · 시험 t12g) */
+/* 캡슐 = 닫힘 한 장을 위 · 아래 반쪽으로 · 윗반은 등급색 곱하기(#gres-cap 은 T8 줄임 규칙보다 특정도를 올리려는 것) → DESIGN §28.11 */
 html[data-shop-art~="capsule"] #modal-gres #gres-cap .gres-top,
 html[data-shop-art~="capsule"] #modal-gres #gres-cap .gres-bot{ border: 0; border-radius: 0; background: url("catalog/t4-gacha-capsule-closed.webp") center top / 100% 200% no-repeat; }
 html[data-shop-art~="capsule"] #modal-gres #gres-cap .gres-bot{ background-position: center bottom; }
