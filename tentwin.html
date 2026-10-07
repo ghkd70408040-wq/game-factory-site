@@ -46005,7 +46005,10 @@ window.TT_SFX = {
   function gachaPlay(res, after) {
     if (gachaBusy) { gachaQueue.push({ res: res, after: after }); return; }
     gachaBusy = true;
-    var shown = false, end = function () {
+    var shown = false, fired = false, end = function () {
+      /* 끝 콜백은 한 번만 — 연출이 끝 콜백을 예약한 뒤 예외로 멈추면 아래 finally 와 나중의 끝 콜백이 둘 다 불러, 호출부 콜백이 두 번 돌고 둘째가 줄에서 다음 결과를 하나 더 꺼냈다(리뷰 M-2) */
+      if (fired) return;
+      fired = true;
       gachaBusy = false;
       if (after) after(true);
       var q = gachaQueue.shift();
@@ -72038,16 +72041,28 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
 #modal-gres .sub-score{ color: var(--prim-white); }                            /* 어두운 덮개 위 맨 글자 = 밝은 글자 토큰(대비 시험 t8f1i) */
 #modal-gres #gres-stage{ position: relative; flex: 0 1 auto; min-height: 0; margin: 0 calc(-8.4 * var(--mu)); overflow: visible; }   /* 수정 2회차 N-2 — 구르지 않는다(빛 · 낙하 안 잘림 t8f2c · t8f2d) */
 /* 묶음 B B15 — 높이가 짧은 창(가로 폰 · 분할 화면 세로 · 작은 세로 폰)은 무대만 안에서 구른다(리뷰 I-3 · t8f1m — 종전엔 가로 폰만이라 세로로 짧은 창에서는 카드가 요약 · 버튼 밑으로 겹쳤다) · 세로 보통 높이(≥ 600)는 안 구른다(빛 층 잘림 없음 t8f2c).
-   무대 최소 높이 = 카드 한 줄 + 격자 위 틈 + 숨통 1 mu — 그 밑으로는 안 줄어 첫 카드 줄이 늘 보인다(667×375 · 568×320 에서 높이 0 이던 것). 카드 한 줄 높이는 판 폭에서 나온다(실측 4폭: 판 폭 W = 판 − 안여백 60px + 16.8 mu,
-   카드 폭 = (W − 4 × 1.8 mu) ÷ 5, 높이 = 폭 × 4.4/3 → 0.2933 × (판 − 60px) + 2.816 mu · 틈 2.6 mu · 숨통 1 mu = 0.2933 × (판 − 60px) + 6.4 mu). 판 폭 = min(창 폭 − 36px, 380px).
-   모달 자(--f2-w)는 폭 700 밑 가로 폰에서 95.7vw 를 따라가 제목 캡슐 · 요약 · 버튼이 폰의 1.5배로 커져 무대가 밀렸다 — 폭 700 이상 창이 이미 쓰는 폰 상한(390px × .957)에 더해 높이로도 한 번 더 누른다(--mu 는 이 자에서 나온다):
-   무대 밖 부분은 약 70 mu 라 판 전체 ≈ 76.4 mu + 0.2933 × (판 − 60px) 가 창 높이 − 판 위아래 여백 36px 안에 들 값 → mu ≤ (창 높이 − 36px − 0.2933 × (판 − 60px)) ÷ 76.4, 자 = × 110.8 ÷ 76.4 = × 1.4503.
-   판은 면이 없는 창(위 .sheet{ background: none })이라 위 · 아래 안여백(23px · 30px)과 줄 간격(10px)은 빈 공간이다 — 짧은 창에서만 같은 값을 모달 단위로 줄여(1.8 · 2.4 · 1.2 mu) 판 전체가 창 안에 들게 한다(568×320 에서 확인 · 10회 더가 화면 밖으로 밀리던 것).
+   무대 최소 높이 = 카드 한 줄 + 격자 위 틈 + 숨통 1 mu = --gres-row + 6.4 mu — 그 밑으로는 안 줄어 첫 카드 줄이 늘 보인다(667×375 · 568×320 에서 높이 0 이던 것). 카드 한 줄 높이 --gres-row 는 판 폭에서 나온다(실측 4폭: 무대 폭 W = 판 − 안여백 60px + 16.8 mu,
+   카드 폭 = (W − 4 × 1.8 mu) ÷ 5, 높이 = 폭 × 4.4/3 → 0.2933 × (판 − 60px) + 2.816 mu · 틈 2.6 mu · 숨통 1 mu). 판 폭 = min(창 폭 − 36px, 380px).
+   모달 자(--f2-w)는 폭 700 밑 가로 폰에서 95.7vw 를 따라가 제목 캡슐 · 요약 · 버튼이 폰의 1.5배로 커져 무대가 밀렸다 — 폭 700 이상 창이 이미 쓰는 폰 상한(폰 기준폭 × .957)에 더해 높이로도 한 번 더 누른다(--mu 는 이 자에서 나온다):
+   무대 밖 부분은 약 70 mu 라 판 전체 ≈ 76.4 mu + --gres-row 가 창 높이 − 판 위아래 여백 36px 안에 들 값 → mu ≤ (창 높이 − 36px − --gres-row) ÷ 76.4, 자 = × 110.8 ÷ 76.4 = × 1.4503.
+   수정 1회차(리뷰 I-3): ① 식에 쓰는 길이는 아래 사용자 지정 속성 셋에 한 번씩만 적는다(같은 긴 식이 두 번 있던 것). 이 파일에는 판 폭 · 안여백 · 모달 바깥 여백을 담은 토큰이 없다 — 원래 규칙들이 글자 그대로 쓴다: 380px = 기본 모달 판 `.sheet{ max-width: 380px }` ·
+   36px = 기본 `.modal` 바깥 여백 18px 둘 · 60px = `.w6m .sheet` 좌우 안여백 30px 둘(SECTION 25 ① 판). 같은 값이니 그 규칙이 바뀌면 여기도 따라 바꾼다. ② 폰 기준폭은 토큰 --f2-phone-w 를 읽는다 — 폭 700 이상 데스크톱 미디어가 :root 에 세우는 그 값이고
+   `.modal{ --f2-w: min(95.7vw, calc(var(--f2-phone-w) * .957)) }` 이 읽는 것이다. 그 미디어 밖(폭 700 미만 — 이 블록이 막아야 하는 바로 그 자리)에서는 토큰이 정의되지 않아 같은 값 390px 를 대체값으로 둔다. ③ 뷰포트 높이는 dvh(주소창이 오르내려도 보이는 높이 —
+   이 파일의 다른 100dvh 와 같은 관례). 사용자 지정 속성은 단위를 모르는 기기에서 값이 통째로 무효가 되므로 vh 를 먼저 세우고 dvh 를 아는 기기만 @supports 로 덮는다. ④ 미디어 조건 599.98px 은 같은 문턱을 쓰는 기존 규칙과 같은 값이다 — 왕국 절 끝
+   `@media (min-aspect-ratio: 1/1) and (max-height: 599.98px)`(가로 폰 캡 · 상한을 599.98px 로 잡은 이유는 그 위 주석) · 상점 가로 폰 --cqw 대체(아래 끝 @supports not 블록) · 이 창의 옛 구르기 문턱 — 변수를 못 쓰는 자리라 리터럴이다.
+   판은 면이 없는 창(위 .sheet{ background: none })이라 위 · 아래 안여백(23px · 30px)과 줄 간격(10px)은 빈 공간이다 — 짧은 창에서만 같은 값을 `1.8 · 2.4 · 1.2 mu` 로 줄인다(568×320 에서 이것이 없으면 최소 높이가 확인 · 10회 더를 화면 밖으로 밀었다 · 지휘자 추인 2026-10-07).
+   안여백 두 줄만 !important 다: `.w6m .sheet{ padding: 23px 30px 30px !important }`(특정도 0,2,0)가 이미 !important 라서, 순서나 특정도만으로는 못 이기고 같은 !important 에 더 높은 특정도(#modal-gres .sheet — 1,1,0)로만 이긴다. 줄 간격은 일반 선언이다.
    창이 낮지 않으면(≥ 600) 이 블록이 안 선다. */
 @media (max-height: 599.98px){
-  #modal-gres{ --f2-w: min(95.7vw, calc(390px * .957), calc((100vh - 36px - .29333 * (min(100vw - 36px, 380px) - 60px)) * 1.4503)); }
+  #modal-gres{
+    --gres-vh: 100vh;
+    --gres-sheet: min(100vw - 36px, 380px);
+    --gres-row: calc(.29333 * (var(--gres-sheet) - 60px));
+    --f2-w: min(95.7vw, calc(var(--f2-phone-w, 390px) * .957), calc((var(--gres-vh) - 36px - var(--gres-row)) * 1.4503));
+  }
+  @supports (height: 100dvh){ #modal-gres{ --gres-vh: 100dvh; } }
   #modal-gres .sheet{ padding-top: calc(1.8 * var(--mu)) !important; padding-bottom: calc(2.4 * var(--mu)) !important; row-gap: calc(1.2 * var(--mu)); }
-  #modal-gres #gres-stage{ overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; min-height: calc(.29333 * (min(100vw - 36px, 380px) - 60px) + 6.4 * var(--mu)); }
+  #modal-gres #gres-stage{ overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; min-height: calc(var(--gres-row) + 6.4 * var(--mu)); }
 }
 #modal-gres #gres-stage::-webkit-scrollbar{ width: 0; height: 0; }
 #modal-gres #gres-grid{ list-style: none; margin: calc(2.6 * var(--mu)) 0; padding: 0; display: grid; grid-template-columns: repeat(5, 1fr); gap: calc(1.8 * var(--mu)); perspective: calc(200 * var(--mu)); }
@@ -72188,15 +72203,6 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
    지름 4.42cqw(390 에서 17.2px = 왕국 상점 이름표 배지 높이 17.25) · 글자 2.69(기존 상점 글자 단계 가운데 390 에서 9.5px 에 가장 가까운 것 · 10.5px) → DESIGN §28.14 */
 #sh-tabs .sh-dot{ display: flex; align-items: center; justify-content: center; box-sizing: border-box; width: calc(4.42 * var(--cqw)); height: calc(4.42 * var(--cqw)); padding: 0;
   border-radius: 50%; background: var(--role-pink-face-b); color: var(--prim-white); box-shadow: none; font-size: calc(2.69 * var(--cqw)); line-height: 1; letter-spacing: 0; }
-
-/* [P3-B12] 묶음 B 13b-B — 데스크톱 뽑기 탭: 판 안 작은 글씨 잘림(리뷰 M-7). 1280×800 에서 판 몸통이 아이템 · 황금 18px · 친구 53px 모자라 맨 아래 작은 글씨가 판 아래 끝에서 잘렸다
-   (데스크톱 기둥 430px · 1cqw 4.3px 에서는 높이가 모자란 쪽 57% 가 이기는 구간이라 판이 247px 뿐이었다). 판 위 끝 = 종전 식(122.6 cqw · 57%)에 「친구 탭 내용이 다 드는 높이」(100% − 92.7 cqw = 판 아래 22.6 + 내용 70.1)를
-   한 갈래 더해 가장 위의 것 · 단 50% 보다 위로는 안 올린다(더 낮은 창은 판 안에서 구른다 — 상점 화면 규약). 키가 큰 창(≥ 925)은 cqw 갈래가 이겨 종전과 같다. 무대 높이 = 판 위 끝 + 판과 겹침(5.6 cqw 와 2.5% 중 작은 것 —
-   종전 5.6 cqw · 3%)이라 천장 알약(무대 87.6%)이 판 위 끝 밑으로 안 내려간다(t7g). 폰 세로 · 가로 폰은 이 미디어 밖이라 그대로다(360 의 판 스크롤은 판 스크롤이면 그대로). */
-@media (min-aspect-ratio: 1/1) and (min-width: 700px) and (min-height: 600px){
-  #screen-shop[data-stab="gacha"] #sh-plate{ top: calc(min(122.6 * var(--cqw), max(min(57%, 100% - 92.7 * var(--cqw)), 50%)) + var(--safe-t)); }
-  #screen-shop[data-stab="gacha"] #sh-stage{ height: calc(min(122.6 * var(--cqw), max(min(57%, 100% - 92.7 * var(--cqw)), 50%)) + min(5.6 * var(--cqw), 2.5%) + var(--safe-t)); }
-}
 
 /* [P3-B13] 묶음 B 13b-B — 결과 창 「코인 두 배」 · 「그냥 받기」 글자는 낱말 단위로만 접힌다(320 폭에서 「그냥 받 / 기」 로 낱말 한가운데서 꺾였다) — 한 줄에 안 들면 공백에서 두 줄 */
 .coin-x2 .btn{ word-break: keep-all; }
