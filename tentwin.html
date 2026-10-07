@@ -6299,12 +6299,6 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   opacity: .72;
   word-break: keep-all;
 }
-/* 하트 글리프는 이모지가 아니라 CSS 도형이다 — 이모지는 폰트에 따라 색과 폭이
-   달라지고, 한글 서브셋 폰트를 쓰는 이 빌드에서는 통째로 폴백될 수 있다. */
-/* [13b-C A2] 소비처 0 — 규칙 삭제: .mh-ico */
-/* [13b-C A2] 소비처 0 — 규칙 삭제: .mh-ico::before, .mh-ico::after */
-/* [13b-C A2] 소비처 0 — 규칙 삭제: .mh-ico::before */
-/* [13b-C A2] 소비처 0 — 규칙 삭제: .mh-ico::after */
 
 #map-scroll {
   position: relative;      /* mapScrollToCurrent() 의 offsetTop 기준이 된다 */
@@ -12225,8 +12219,6 @@ html[lang="en"] .mfbtn { font-size: 8px; letter-spacing: -.15px; }
 #modal-confirm .sheet p { color: var(--prim-art-ink); }
 
 /* 주버튼 — 창마다 도서관 버튼 조각 (ROUND10-SPEC §C 표) */
-/* [13b-C A2] 소비처 0 — 규칙 삭제: .lbtn */
-/* [13b-C A2] 소비처 0 — 규칙 삭제: .lbtn:active */
 #modal-pause .btn-primary,
 #modal-tutorial .btn-primary,
 #modal-clear .btn-primary,
@@ -27835,8 +27827,6 @@ window.TT_SFX = {
          isReadingConnected), note = 두 갈래에 공통으로 걸리는 "사이가 비어야 한다".
          네 줄을 넘기지 않는다 — 요약이 길어지면 그것은 더 이상 요약이 아니다. */
       'rules.title': 'Three rules. That is all.',
-      /* 0901 ⑥-c — 개념 장 머리글 2개. 나머지 셋은 이미 있는 낱말을 쓴다
-         (rules.c1 은 새로, 필살기·각성은 하단 버튼 라벨 act.special / act.awaken). */
       'rules.r1': 'Same number, or two that make <b>10</b>.',
       'rules.r2': 'Joined by a <b>straight path</b> across, down, or diagonally.',
       'rules.r3': 'Or the <b>end</b> of a row to the <b>start</b> of the next.',
@@ -28127,13 +28117,10 @@ window.TT_SFX = {
       'adv.star2': '★★ Score {n}',
       'adv.star3': '★★★ Score {n} + no shuffles + {t} sum-10 matches',
       /* 0826 6단계 — 노드 카드의 신필드 다섯 줄. */
-      /* B9 — 일반탄에도 서는 줄이라 「보스」를 뗐다. 위 두 키는 두 사전에
-         남겨 둔다(한쪽만 빼면 en/ko 대칭이 깨진다 — 뺄 거면 둘을 같이). */
+      /* B9 — 일반탄에도 서는 줄이라 「보스」를 뗐다. */
       'node.foehp': 'Villain HP',
       'node.cond': 'Weak point',
       'node.best': 'Your best',
-      /* B7 — 「목표」라는 낱말을 승리선에서 뗀다. 이 수는 별 두 개가 열리는
-         **점수선**이지 이겨야 하는 조건이 아니다(승리는 악당 체력). */
       'node.rec': 'Why this hero',
       'node.recpet': 'Why this pet',
       /* 판정판 74 T13 — 스테이지 카드 A(조사 §9 · 지휘자 판정 2026-10-04). {sec} 는 매개변수(p.sec)라 i18nDerived 대상이 아니다. */
@@ -29287,7 +29274,6 @@ window.TT_SFX = {
          낱말을 튜토리얼 대사·리마인더 토스트와 **똑같이** 맞춘다(곧은 길 · 줄 끝 ·
          다음 줄 첫 칸). 세 곳이 다른 말을 쓰면 셋 다 안 외워진다. */
       'rules.title': '규칙은 셋뿐이야',
-      /* 0901 ⑥-c — 개념 장 머리글 2개(+텐/트윈). */
       'rules.r1': '같은 숫자, 또는 합이 <b>10</b>',
       'rules.r2': '가로·세로·대각선 <b>곧은 길</b>로 이어질 것',
       'rules.r3': '또는 줄 <b>끝</b>에서 다음 줄 <b>첫 칸</b>으로',
@@ -43410,13 +43396,14 @@ window.TT_SFX = {
         petFace || 'url("catalog/duel-cloud-baby.webp")');
       /* 은퇴 (2026-09-03 · ㊾ C) — 「없으면 칸도 없다」로 칩을 접던 한 줄을 걷었다.
          걷은 이유: 그 처분의 전제(「폴백 그림 duel-cloud-baby 가 사라졌다」)가 이제
-         거짓이다 — 같은 파도가 .hv2-face--pet 의 CSS 폴백을 배포본 원문대로
-         되돌려 구름을 다시 쥐어 줬다. 배포본 JS 원문(tentwin.deployed.html:34190~34195)에는
+         거짓이다 — 구름은 위 줄의 `--char-thumb` 폴백으로 다시 쥐어 있다(그때 되살렸던
+         옛 CSS 폴백 .hv2-face--pet 은 13b-C 에서 소비처 0 으로 지웠다 — 펫 방울은 0904 부터
+         .ct-art 가 그린다). 배포본 JS 원문(tentwin.deployed.html:34190~34195)에는
          이 접기 줄이 아예 없고, 그래서 배포본은 **같은 1단**에서 펫 방울을
          53.59 x 54.94 app px 로 렌더한다. 현행만 0x0 이었다 — 회귀다.
          되돌릴 한 줄(원문 그대로):
            baby.style.display = petFace ? '' : 'none';
-         되돌린다면 .hv2-face--pet 의 폴백도 함께 none 으로 돌려야 짝이 맞는다. */
+         되돌린다면 위 `--char-thumb` 의 구름 폴백도 함께 걷어야 짝이 맞는다. */
     }
   }
 
@@ -49159,7 +49146,7 @@ window.TT_SFX = {
       if (p.boss) setText('node-cond-v', bossCondText(p.bossDef));
     }
     var bestV = store.advBest[String(n)] | 0;
-    /* ⑪(0904) 내 최고 = 점수만(없으면 「—」). node.bestv/node.bestnone 키는 사전에 남는다. */
+    /* ⑪(0904) 내 최고 = 점수만(없으면 「—」). */
     setText('node-best-v', bestV > 0 ? fmtNum(bestV) : '—');
     /* ★ 0826 8단계 — 펫을 기술 축으로 골랐으면 이유도 그 기술을 말해야 한다.
        카드가 두 개의 서로 다른 축을 동시에 말하면 그것은 조언이 아니라 소음이다. */
@@ -62314,8 +62301,6 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
 }
 .kit-hud-v2__line{ grid-row:1; grid-column:2; }
 .kit-hud-v2__side--me .kit-hud-v2__line{ grid-column:1; justify-content:flex-end; }
-/* [13b-C A2] 소비처 0 — 규칙 삭제: .kit-hud-v2__side > .hv2-atk */
-/* [13b-C A2] 소비처 0 — 규칙 삭제: .kit-hud-v2__side--me > .hv2-atk */
 
 /* 3순위: 이름 + Lv 를 한 줄로 합친다 (줄 수를 안 늘린다) */
 .kit-hud-v2__line{
@@ -62406,32 +62391,6 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
   display:grid; place-items:center;
   cursor:default;
 }
-/* 얼굴은 칩의 배경이 아니라 **자식**이다: .kit-chip-v2 의 background 는 유리
-   면(그라데이션 + --f2-chip-fill)이라 그 자리에 그림을 넣으면 유리가 사라진다.
-   값은 종전 그대로 duelHudMount 가 넣는다(--bs-face 표 · --duel-me-face ·
-   --pet-face). 셋 다 없으면 빈 유리 칩이 남는다 — 빈 사각형이 생길 자리가 없다. */
-/* 🚨 선택자 무게 주의 — 킷의 `.kit-chip-v2 > *{position:relative;z-index:1}` 가
-   (0,1,1) 이라 `.hv2-face`(0,1,0) 한 겹으로는 진다. 실측에서 그대로 졌다:
-   position 이 relative 로 돌아가 inset 이 값을 못 하고 상자가 0x0 이 되어
-   초상 셋이 전부 **빈 유리 칩**으로 떴다(01-adv-battle 1차). 자손 한 칸을 더
-   붙여 (0,3,0) 으로 올린다. */
-/* [13b-C A2] 소비처 0 — 규칙 삭제: .kit-hud-v2 .kit-chip-v2 > .hv2-face */
-/* [13b-C A2] 소비처 0 — 규칙 삭제: .hv2-face--foe */
-/* [13b-C A2] 소비처 0 — 규칙 삭제: .hv2-face--me */
-/* C (2026-09-03 · ㊾) — 배포본 회귀 복원. 폴백이 `none` 이라 펫 미장착 1단에서
-   그림이 한 장도 없었다 — #duel-baby 상자가 0x0 으로 접혔다.
-   배포본 원문(scratchpad/deployed-ref/tentwin.deployed.html:40802)이 쥐고 있던
-   시안 구름을 그대로 되돌린다 — 구름 파일은 폴백이자 롤백 밸브다.
-   되돌릴 한 줄(원문 그대로):
-     .hv2-face--pet{ background-image: var(--pet-face, none); }
-   ※ 재질(면 없는 유리 · --wchip-a-in 0 · --wchip-milk-a 0)과 자리는 현행 chip 정본이다 —
-     이 파도는 그쪽을 한 자리도 안 건드렸다. */
-/* [13b-C A2] 소비처 0 — 규칙 삭제: .hv2-face--pet */
-
-/* ---- 공격 게이지 (시안 밖 · 전투 정보) ----------------------------- */
-/* [13b-C A2] 소비처 0 — 규칙 삭제: .hv2-atk */
-/* [13b-C A2] 소비처 0 — 규칙 삭제: .hv2-atk__fill */
-/* [13b-C A2] 소비처 0 — 규칙 삭제: .kit-hud-v2__side--foe .hv2-atk__fill */
 
 /* ============================================================
    4. 상태 — transform / opacity 만 애니메이트한다. filter 금지.
@@ -64533,7 +64492,6 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
   left: calc(var(--dhW) * .84002);
   top:  calc(var(--dhT) + var(--dhW) * .00885);
 }
-/* [13b-C A2] 소비처 0 — 규칙 삭제: #duel-hud > .wf-chip > .hv2-face */
 
 /* ---------------------------------------------------------------------------
    내용물 — 시안의 자리로 옮긴다 (DOM id 는 한 글자도 안 바뀐다)
@@ -64749,9 +64707,6 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
 #duel-hud .kit-hud-v2__side--foe::after {  left:  92.591%; top: 20.964%; width: 12.256%; height: 84.464%; }
 #duel-hud .kit-hud-v2__side--me::before {  left: -11.925%; top: 14.821%; width: 22.414%; height: 86.000%; }
 #duel-hud .kit-hud-v2__side--me::after  {  left:  88.695%; top: 13.286%; width: 22.412%; height: 86.000%; }
-/* 공격 게이지 — 시안엔 없지만 「언제 자동 발동하나」를 말하는 전투 정보라
-   지우지 않는다(§18.4b .dh-sub 의 근거 그대로). 홈 바닥 립에 붙인다. */
-/* [13b-C A2] 소비처 0 — 규칙 삭제: #duel-hud .kit-hud-v2__side > .hv2-atk */
 /* 초상 2칸 = 같은 chip 변주. 위 직사각 바(판 A)에서 캡슐 좌·우를 끼고 앉는다.
    세로 중심은 시안의 펫 방울과 **같은 줄**(cy .08264W) 이라 판 A 위의 둥근
    부속 넷(일시정지 · 악당 · 나 · 펫)이 한 줄로 선다.
@@ -65980,15 +65935,13 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
 
 /* ---- CV-6. 2회전 — 1회전 재측에서 남은 칸 --------------------------
    (가) 내용 셀이 width:100% 라 음수 여백이 폭을 안 늘렸다(자리만 밀렸다).
-   (나) 플레이 모달의 네 행은 .mode-list 가 아니라 .mv2-scroll 직속이다.
-   (다) 제목 캡슐 — 두 시안이 둘 다 «더 놓고 좀 좁다»고 말한다:
+   (나) 제목 캡슐 — 두 시안이 둘 다 «더 놓고 좀 좁다»고 말한다:
        81f987cb  캡슐 x201..567 · y310..429  → w .5672 · h .1855 (판폭 647)
        fffae90b  캡슐 x161..672 · y 24..166  → w .6154 · h .1719 (화면폭 832)
      착수 전 모달 .6254/.1537 · 캐릭터창 .5933/.1333.
      캐릭터창 쪽은 14차 유물 `max-height: 52px`(고정 px)가 높이를 막고
      있었다 — --f2-w 가 커지는 화면에서는 비율이 더 무너졌다. */
 #modal-tutorial #tut-stage { width: auto; }
-/* [13b-C A2] 소비처 0 — 규칙 삭제: #modal-mode .mv2-scroll */
 
 
 #charpanel { --cs-head: calc(var(--f2-w) * .1796); }
@@ -66101,15 +66054,13 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
   background-repeat:no-repeat !important;
 }
 
-/* ---- CV-11. 5회전 재측 — 남은 세로 칸 둘 ---------------------------
-   (가) 튜토리얼 제목 캡슐가 판 위변에서 24px 떨어져 있다(.0649 판폭).
+/* ---- CV-11. 5회전 재측 — 남은 세로 칸 하나 -------------------------
+   튜토리얼 제목 캡슐가 판 위변에서 24px 떨어져 있다(.0649 판폭).
        81f987cb 는 15px(.0232)다. padding-top 만으로는 그 24 가 안 줄어들어
        (상위 규칙이 여백을 따로 들고 있다) h2 에 직접 음수 여백을 준다.
-       줄어든 15.4px 는 «버튼→판바닥» 칸에서 되찾는다(시안 .1005 · 우리 .0838).
-   (나) 플레이 모달 첫 행이 .2678 판폭 — 32f6be9b 는 .2508 다. */
+       줄어든 15.4px 는 «버튼→판바닥» 칸에서 되찾는다(시안 .1005 · 우리 .0838). */
 #modal-tutorial .mv2-sheet > h2 { margin-top: calc(var(--f2-w) * -.0413); }
 #modal-tutorial .mv2-sheet { padding-bottom: calc(var(--f2-w) * .0956); }
-/* [13b-C A2] 소비처 0 — 규칙 삭제: #modal-mode .mv2-scroll */
 
 /* ---- CV-12. 진범 — `.w6m .sheet { padding:23px 30px 30px !important }` (:42978)
    판의 안여백이 **고정 px + !important** 이다. 그래서 CV-7 의 padding 두 줄이
