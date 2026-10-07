@@ -26539,7 +26539,8 @@ window.TT_SFX = {
           }
         }
         if (typeof o.jstar === 'number' && isFinite(o.jstar)) {
-          store.jstar = Math.min(STAR_MAX, Math.max(0, o.jstar | 0));   /* P3 T1 수정 1회차 M3 — starGrant 와 같은 상한(STAR_MAX) */
+          /* 묶음 B B3 — 코인 읽기와 같은 식. `| 0` 은 2^31 이상을 음수로 감아 0 으로 만들었다 */
+          store.jstar = clamp(Math.floor(Number(o.jstar) || 0), 0, STAR_MAX);   /* P3 T1 수정 1회차 M3 — starGrant 와 같은 상한(STAR_MAX) */
         } else {
           /* 9차 이전 세이브에는 지갑이 없다. 이미 딴 별을 소급 적립한다 —
              "지금까지 모은 별이 화폐가 된다"가 §9 의 약속이고, 그 약속을
@@ -41624,7 +41625,8 @@ window.TT_SFX = {
     S.comboUntil = 0;
     var keepEnd = S.rushEndAt;
     startStage(S.stage, isDaily() ? dailySeed() : S.seed);
-    if (isDaily()) { S.startedAt = Date.now(); startTimer(); }
+    /* 묶음 B B5 — 데일리의 다시 시작은 새 시도다(startDaily 의 새 판과 같은 넷). 옛 짝이 남으면 아무것도 안 하고 끝내도 코인을 받는다 */
+    if (isDaily()) { S.score = 0; S.matches = 0; S.maxCombo = 1; S.startedAt = Date.now(); syncHud(); startTimer(); }
     if (isRush()) { S.rushEndAt = keepEnd; startRushLoop(); }
     J.sfx.ui();
   }
@@ -45359,6 +45361,9 @@ window.TT_SFX = {
     return Math.max(0, store.heartAt + HEART_MS - Date.now());
   }
 
+  /** 다음 하트까지 남은 ms — heartsTick 을 부르지 않는다(가득일 때 매초 저장 방지). */
+  function heartWaitMs() { return store.hearts >= HEART_MAX ? 0 : Math.max(0, (Number(store.heartAt) || 0) + HEART_MS - Date.now()); }
+
   function spendHeart() {
     heartsTick();
     if (store.hearts <= 0) return false;
@@ -45453,9 +45458,15 @@ window.TT_SFX = {
    * [P3-STATE] 재화·상점 상태 — P3(2026-09-27 사용자 반려 ⑭ · 스펙 결정 1)
    *   하트 = 모험 도전권 · 코인 = 놀면 쌓이는 돈 · 별(store.jstar, 화면 이름 「별」) = 잘해야 모이는 돈.
    *   (앱) 보석은 확정 상품만 산다 — 보석으로 코인·별을 사지 못하고, 코인·별을 현금으로 팔지 않는다(§20.9).
-   * 쓰기는 네 함수뿐이다(coinGrant · coinSpend · starGrant · starSpend). jewelGrant/jewelSpend 와 같은
+   * P3 이후 새 쓰기는 네 함수만 쓴다(coinGrant · coinSpend · starGrant · starSpend). jewelGrant/jewelSpend 와 같은
    * 계약: 음수·NaN·소수·0 거부, 모자라면 한 톨도 안 깎는다(부분 차감 없음) — 호출부가 「깎였겠지」 하고
    * 물건을 먼저 주는 순서를 쓸 수 없게 한다.
+   * 예외(묶음 B B4·B6 — 알려진 직접 쓰기):
+   *   코인 — 판 중 수확 harvestGear 가 store.coin 을 직접 올린다(판 중 지갑·저장을 그리지 않으려고 · COIN_MAX 상한은 스스로 적용).
+   *   별(P3 이전 코드 — 직접 쓰기 유지) — buySkin 확인 콜백 · inviteBuy · checkMilestone(마일스톤 보상) · questClaim(퀘스트 보상 수령) ·
+   *     claimStreakRewards · finishDaily · advFinish(모험 판 클리어 별 증가분) · kdVisit(왕국 방문 보상) · kdResTap(왕국 동료 탭 보상) ·
+   *     gachaFallback. 그리고 readStore 의 소급 · v74 환산 두 줄.
+   *     이 자리의 별은 STAR_MAX 를 거치지 않는다. 다음 로드 때 readStore 가 자른다. 실제 플레이로는 닿지 않는 값이다.
    * ========================================================================= */
   var COIN_MAX = 999999;
   var STAR_MAX = 999999;         /* 별 잔액 상한 — COIN_MAX · V74_NUM_CAP · SHARD_HOLD_MAX 와 같은 값 가족(수정 1회차 M3 판정 b). 실제 플레이로는
@@ -45743,12 +45754,10 @@ window.TT_SFX = {
   }
   /** 상점 화면이 떠 있나 — 그 위의 창(보석·스킨)이 잔액을 바꾸고 닫힐 때 띠를 다시 그릴지 가른다(수정 1회차 I-1). */
   function shopActive() { var el = $('screen-shop'); return !!(el && el.classList && el.classList.contains('active')); }
-  /** 다음 하트까지 남은 ms — heartNextMs 와 달리 heartsTick 을 부르지 않는다(가득일 때 heartsTick 은 매초 heartAt 을 고쳐 저장한다 — 수정 1회차 M-5). */
-  function shopHeartMs() { return store.hearts >= HEART_MAX ? 0 : Math.max(0, (Number(store.heartAt) || 0) + HEART_MS - Date.now()); }
   function paintShopHearts() {
     setText('sh-hearts-v', store.hearts | 0);
     var ht = $('sh-heart-t');
-    if (ht) { var ms = shopHeartMs(); ht.textContent = ms > 0 ? fmtHeartWait(ms) : t('adv.heartfull'); }
+    if (ht) { var ms = heartWaitMs(); ht.textContent = ms > 0 ? fmtHeartWait(ms) : t('adv.heartfull'); }
   }
   function msToMidnight() {
     var n = new Date(), m = new Date(n.getFullYear(), n.getMonth(), n.getDate() + 1);
@@ -48456,11 +48465,12 @@ window.TT_SFX = {
   }
 
   function paintHearts() {
-    heartsTick();
+    /* 묶음 B B7 — 가득이면 정산을 건너뛴다(가득일 때 heartsTick 은 매초 heartAt 을 고쳐 저장한다). spendHeart 가 먼저 heartsTick 을 불러 회복 시계는 그대로다 */
+    if (store.hearts < HEART_MAX) heartsTick();
     setText('map-hearts-v', store.hearts);
     var w = $('map-heart-t');
     if (!w) return;
-    var ms = heartNextMs();
+    var ms = heartWaitMs();
     /* 2026-08-20 결함C — 슬롯이 "다음 mm:ss"/"Next in mm:ss" 를 못 담아 개수(40.7%)와
        겹치고 배지 밖으로 넘쳤다. 슬롯 폭에 맞게 시계만 얹는다.
        원본: w.textContent = ms > 0 ? t('adv.heartin', { t: fmtHeartWait(ms) }) : t('adv.heartfull'); */
@@ -70004,7 +70014,8 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
    컨테이너 폭 환산(--cqw = 앱 폭의 1%, 앱 폭 = min(100vw, --app-max)). 폴백 강제 검증: scratchpad/fallback-0908. */
 @supports not (width: 1cqw) {
   /* 맵 화면 — 상단 바(뒤로·하트·별·설정)·하단 바가 컨테이너 단위만 써서 통째로 사라지던 것 */
-  #screen-map, #screen-shop { --cqw: min(1vw, calc(var(--app-max) / 100)); }   /* P3 — 상점 위 띠 글자 폴백도 같은 자를 읽는다 */
+  /* 상점의 --cqw 대체는 shop-p3 끝 블록이 기둥 폭/100 으로 정한다(P3 T4 수정 2회차 — 묶음 B B8) */
+  #screen-map { --cqw: min(1vw, calc(var(--app-max) / 100)); }
   #screen-map #map-top { height: calc(20 * var(--cqw)); }
   #screen-map #map-back { left: calc(3.76 * var(--cqw)); top: calc(3.83 * var(--cqw)); width: calc(14.99 * var(--cqw)); height: calc(15.46 * var(--cqw)); }
   #screen-map #map-hearts { left: calc(21.91 * var(--cqw)); top: calc(5.51 * var(--cqw)); width: calc(33.32 * var(--cqw)); height: calc(12.60 * var(--cqw)); }
@@ -72104,7 +72115,7 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
 #screen-shop[data-art~="machine"][data-stab="gacha"] #sh-bubble{ left: calc(65.5 * var(--cqw)); max-width: calc(32.5 * var(--cqw)); }
 #screen-shop[data-art~="tabs"] #sh-tabs .sh-tab[data-stab="gacha"] .sh-tab-ic{ background-image: url("catalog/tab-ic-gacha.webp"); }
 #screen-shop[data-art~="tabs"] #sh-tabs .sh-tab[data-stab="free"]  .sh-tab-ic{ background-image: url("catalog/tab-ic-free.webp"); }
-/* 아래 첫 두 줄(.shop-ic-coin · [data-ad="coin"])은 특정도가 같아 뒤 줄이 이긴다 — 순서를 바꾸면 무료 탭 코인 줄이 더미로 바뀐다(시험 t12l) */
+/* 아래 둘째 줄 [data-ad="coin"] 이 더 특정해(2,4,0 > 2,3,0) 무료 탭 코인 줄은 coin-1 이 이긴다(시험 t12l) */
 #screen-shop[data-art~="coin"] #sh-body .shop-ic.shop-ic-coin{ background-image: url("catalog/shop-ic-coin-2.webp"); }
 #screen-shop[data-art~="coin"] #sh-body .shop-card[data-ad="coin"] .shop-ic{ background-image: url("catalog/shop-ic-coin-1.webp"); }
 #screen-shop[data-art~="coin"] #sh-body .shop-ic.shop-ic-coin-3{ background-image: url("catalog/shop-ic-coin-3.webp"); }
