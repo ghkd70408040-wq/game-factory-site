@@ -40371,7 +40371,8 @@ window.TT_SFX = {
     });
     if (dRank > 0) { rankFresh.mode = rankKeyOf(); rankFresh.pos = dRank; }
     /* P3 — 코인은 순위가 나온 뒤에야 정해진다. 보상 행도 그래서 여기서 만든다(옮기기 전과 같은 값 + 코인). */
-    runCoinPay(coinForRank(dRank));
+    /* 묶음 B B18 — 지난 날짜 딥링크 판(replay)은 놀이만이다: 코인 0. 오늘 데일리의 하루 한 번(shardDailyDate · 기록 칸)은 replay 가 못 잠그는 길이라 거듭 열면 판마다 15 를 받았다(P3-COIN-EXPLOIT replay-daily). */
+    runCoinPay(replay ? 0 : coinForRank(dRank));
     dailyReward = rewardItems({
       gem:   (S.gainJstar | 0) + (streakGot.jstar | 0),
       heart: streakGot.heart | 0,
@@ -41620,6 +41621,10 @@ window.TT_SFX = {
     S.paused = false;
     S.pausedAt = 0;
     S.howtoFromPause = false;
+    /* 묶음 B B19 — 모험은 판을 여는 순서가 advStart 한 곳에 있다(점수 · 짝 · 시작 시각 → startStage → 판 시계 S.advEndAt · 200ms 모험 시계 · 「빡!」 배너).
+       startStage 는 S.advEndAt 을 0 으로 지우므로 그것만 다시 부르면 시계가 안 서서(advLeftMs 0) 첫 틱이 곧바로 시간 종료로 읽고, 적 HP · 내 HP 가 둘 다 100% 라
+       동률 = 플레이어 승리(duelTimeoutWin)로 판이 0.3초 만에 끝났다(별 · 코인까지 줬다). 처음 진입과 같은 길로 다시 연다 — 하트는 처음 진입처럼 안 건드린다. */
+    if (S.mode === 'adv') { advStart(S.stage); J.sfx.ui(); return; }
     hurryReset();          // 같은 이유 — 다시 시작하면 화면 상태도 처음으로
     S.combo = 1;
     S.comboUntil = 0;
@@ -45978,29 +45983,44 @@ window.TT_SFX = {
 
   /* ---- 뽑기 탭(목업 B1) — 표 한 출처(gachaTable)만 읽는다. 기계는 발주 ② 전까지 CSS 규칙 기하(.gm-ph). ---- */
   var gachaKind = 'item', gachaBusy = false;
-  function pctText(p, digits) { return (p * 100).toFixed(digits) + '%'; }
+  /* 확률 글자 — 표준 반올림(절반은 올림). toFixed 는 이진 부동소수 때문에 절반 경계(예 0.00015 → 0.01%)가 내림될 수 있어 정수로 먼저 반올림한다(리뷰 M-6). EPSILON 곱은 1.4999… 로 새는 절반 값을 건진다 */
+  function pctText(p, digits) { var k = Math.pow(10, digits); return (Math.round(p * Math.pow(10, digits + 2) * (1 + Number.EPSILON)) / k).toFixed(digits) + '%'; }
   function gachaKindSet(k) {
     if (GACHA_KINDS.indexOf(k) < 0) return;
     gachaKind = k;
     if (shopTab2 === 'gacha' && shopActive()) paintShopTab(shopTab2, true);   /* 종류가 바뀌면 판 내용이 통째로 바뀐다 → 스크롤도 처음으로 */
   }
-  /** 결제 + 결과. 연타·연출 중 재진입은 gachaBusy 한 칸이 막는다. */
-  function gachaRun(kind, n, how) {
-    if (gachaBusy) return;
-    var r = gachaBuy(kind, n, how);
-    if (!r.ok) {
-      if (r.err === 'coin') toast(t('gacha.nocoin', { n: r.need }));
-      else if (r.err === 'star') toast(t('gacha.nostar', { n: r.need }));
-      else if (r.err === 'allfriends') toast(t('gacha.friend.all'));
-      else if (r.err === 'used') toast(t('gacha.used'));
-      J.sfx.fail();
-      return;
-    }
+  /* 뽑기 실패 토스트 한 곳 — 일반 뽑기(gachaRun)와 광고 뽑기(watchAdFor)가 같이 쓴다(묶음 B B13). elseKey = 그 자리의 실패 글 사전 키: 광고 뽑기는 광고 실패 글, 일반 뽑기는 없음 —
+     일반 실패 문구가 사전에 없어서 닿지 않는 오류(err 'bad')는 소리만 난다(리뷰 M-4 — 새 문구 0). */
+  function gachaFailToast(r, elseKey) {
+    if (r.err === 'coin') toast(t('gacha.nocoin', { n: r.need }));
+    else if (r.err === 'star') toast(t('gacha.nostar', { n: r.need }));
+    else if (r.err === 'allfriends') toast(t('gacha.friend.all'));
+    else if (r.err === 'used') toast(t('gacha.used'));
+    else if (elseKey) toast(t(elseKey));
+  }
+  /* 결과 연출 한 판 — 일반 뽑기와 광고 뽑기가 같이 쓴다. 연출 중에 또 결과가 오면(결과는 이미 저장됐다) 버리지 않고 줄을 세워 앞 연출이 끝난 뒤 이어 보여 준다(묶음 B B14 — 지휘자 판정).
+     after(true) = 호출부의 다시 그리기. 연출 도중 상점을 닫을 수 있다(Task 8 은 연출이 길다) — gachaBusy 해제는 닫혀도 그대로이고 다시 그리기는 호출부가 상점이 떠 있을 때만 한다. */
+  var gachaQueue = [];
+  function gachaPlay(res, after) {
+    if (gachaBusy) { gachaQueue.push({ res: res, after: after }); return; }
     gachaBusy = true;
-    var shown = false;
-    /* 연출 도중 상점을 닫을 수 있다(Task 8 은 연출이 길다) — gachaBusy 해제는 닫혀도 그대로, 다시 그리기는 상점이 떠 있을 때만 */
-    try { gachaShow(r, function () { gachaBusy = false; if (shopActive()) paintShopTab(shopTab2); }); shown = true; }
-    finally { if (!shown) { gachaBusy = false; if (shopActive()) paintShopTab(shopTab2); } }   /* 연출이 예외로 멈춰도 뽑기 탭이 잠기지 않게 — 구매는 이미 저장됐다(착수 전 점검 C2) */
+    var shown = false, end = function () {
+      gachaBusy = false;
+      if (after) after(true);
+      var q = gachaQueue.shift();
+      if (q) gachaPlay(q.res, q.after);
+    };
+    try { gachaShow(res, end); shown = true; }
+    /* 연출이 예외로 멈춰도 뽑기 탭이 잠기지 않게 — 구매는 이미 저장됐다(착수 전 점검 C2) */
+    finally { if (!shown) end(); }
+  }
+  /** 결제 + 결과. 연타·연출 중 재진입은 gachaBusy 한 칸이, 광고가 도는 사이는 adBusyP3 가 막는다(묶음 B B14). */
+  function gachaRun(kind, n, how) {
+    if (gachaBusy || adBusyP3) return;
+    var r = gachaBuy(kind, n, how);
+    if (!r.ok) { gachaFailToast(r); J.sfx.fail(); return; }
+    gachaPlay(r, function () { if (shopActive()) paintShopTab(shopTab2); });
   }
   /* ---- [P3-GRES] 뽑기 결과 — 친구는 #charget(초대와 같은 획득 화면), 장비는 결과 창. 모션 = MOTION-SPEC §3 19~26행.
           수정 1회차(리뷰 I-1 · I-2 · I-5 · I-7 · M-1 · M-2 · M-5 · M-6 · M-7 · M-9): 타이머 보관 · 뒤집는 중 표식 · 읽기 먼저 · 그림은 다음 프레임 · 코인 그림 · NEW 카드 Lv 숨김. ---- */
@@ -46282,6 +46302,8 @@ window.TT_SFX = {
     oddsKind = GACHA_KINDS.indexOf(kind) >= 0 ? kind : 'item';
     oddsPaint();
     openModal('modal-odds');
+    /* 창이 보인 뒤에야 줄 높이를 읽을 수 있다 */
+    oddsFitBox();
     var ob = $('odds-body'); if (ob) ob.scrollTop = 0;
     J.sfx.ui();
   }
@@ -46319,7 +46341,8 @@ window.TT_SFX = {
       box.appendChild(oddsRow('', id, t(fr ? ('char.' + id + '.name') : ('item.' + id + '.nm')), pctText(tb.rows[i].p, d),
                               fr ? stdArt(id, 'thumb') : itemArtCss(id, 64)));
     }
-    if (!tb.rows.length) { var none = document.createElement('p'); none.textContent = t('gacha.friend.all'); s2.appendChild(none); }
+    /* 친구를 다 모았으면 빈 목록 상자는 숨긴다(묶음 B B12) */
+    if (!tb.rows.length) { box.hidden = true; var none = document.createElement('p'); none.textContent = t('gacha.friend.all'); s2.appendChild(none); }
     b.appendChild(s2);
     var s3 = document.createElement('section'); s3.className = 'od-sec od-rules';
     var h3 = document.createElement('h3'); h3.textContent = t('odds.rules'); s3.appendChild(h3);
@@ -46334,6 +46357,28 @@ window.TT_SFX = {
     b.appendChild(s3);
     var f1 = document.createElement('p'); f1.className = 'sh-fine'; f1.textContent = t('odds.foot1'); b.appendChild(f1);
     var f2 = document.createElement('p'); f2.className = 'sh-fine'; f2.textContent = t('odds.foot2', { date: todayKey().slice(0, 4) + '.' + todayKey().slice(4, 6) }); b.appendChild(f2);
+    oddsFitBox();
+  }
+  /* 목록 상자(.od-box)의 높이를 줄 수로 정한다(묶음 B B12 — 320 폭의 「더 있다」 신호). 줄 높이가 이름 두 줄 접힘으로 폭마다 달라 길이 상한(28 mu)만으로는 어떤 폭에서는 온전한 줄에서 딱 끊긴다 →
+     상한을 처음 넘는 줄(격자 줄)을 찾아 그 줄의 반에서 끊는다(마지막으로 보이는 줄이 늘 반쯤 잘려 「더 있다」). 레이아웃을 읽으므로 창이 보일 때만 돈다(openOdds 가 연 뒤 한 번 더 부른다). */
+  function oddsFitBox() {
+    var m = $('modal-odds'), box = m && !m.hidden ? m.querySelector('.od-box') : null;
+    if (!box || box.hidden) return;
+    box.style.maxHeight = '';
+    var cs = getComputedStyle(box), cap = parseFloat(cs.maxHeight), pad = parseFloat(cs.paddingBottom) || 0;
+    if (!(cap > 0)) return;
+    box.scrollTop = 0;
+    /* offsetTop · offsetHeight = 변형(창 여는 확대 애니)이 안 섞인 레이아웃 값 — 상자와 줄의 offsetParent 가 같다 */
+    var kids = box.children, i, tp, bt, top0 = -1, bot0 = 0;
+    for (i = 0; i < kids.length; i++) {
+      tp = kids[i].offsetTop - box.offsetTop; bt = tp + kids[i].offsetHeight;
+      if (top0 < 0) { if (bt > cap - pad + 0.5) { top0 = tp; bot0 = bt; } }
+      /* 같은 격자 줄의 다른 칸 중 가장 큰 아래 끝 */
+      else if (Math.abs(tp - top0) < 1) bot0 = Math.max(bot0, bt);
+    }
+    /* 다 들어간다 — 스크롤 0 */
+    if (top0 < 0) return;
+    box.style.maxHeight = (top0 + (bot0 - top0) / 2 + pad) + 'px';
   }
 
   /* =========================================================================
@@ -46366,12 +46411,6 @@ window.TT_SFX = {
     return true;
   }
   var adBusyP3 = false;
-  /** 광고 뽑기가 못 나갔을 때의 토스트 — gachaRun 과 같은 글(새 문구 0). 거기 없는 실패(켜진 장비가 0종인 등급 따위)는 광고 실패 글. */
-  function adBuyFailToast(r) {
-    if (r.err === 'allfriends') toast(t('gacha.friend.all'));
-    else if (r.err === 'used') toast(t('gacha.used'));
-    else toast(t('portal.ad.fail'));
-  }
   /** 조건은 광고 **앞**에서만 본다 — 끝까지 본 사람에게는 반드시 준다(광고 1번 = 보상 1번). after(참거짓) = 호출부의 다시 그리기.
       뽑기(아이템 · 친구)는 gachaRun 과 같은 계약: 연출 중(gachaBusy)에는 광고를 안 걸고, 결과를 **먼저** 만든 뒤 ok 일 때만 상한을 쓴다(실패한 뽑기가 상한만 깎지 않게). */
   function watchAdFor(id, btn, after) {
@@ -46387,19 +46426,16 @@ window.TT_SFX = {
       var res = null;
       if (draw) {
         res = gachaBuy(id, 1, 'ad');
-        if (!res.ok) { adBuyFailToast(res); J.sfx.fail(); if (after) after(false); return; }
+        /* 광고 뽑기가 못 나갔을 때 — gachaRun 과 같은 글 · 거기 없는 실패(켜진 장비가 0종인 등급 따위)는 광고 실패 글 */
+        if (!res.ok) { gachaFailToast(res, 'portal.ad.fail'); J.sfx.fail(); if (after) after(false); return; }
       }
       adCapUse(id);
       if (id === 'coin') { coinGrant(P3_AD_COIN, 'ad'); toast(t('coin.got', { n: P3_AD_COIN })); }
       else if (id === 'star') { starGrant(P3_AD_STAR, 'ad'); toast(t('star.got', { n: P3_AD_STAR })); }
       else if (id === 'heart') { grantHearts(1); paintHearts(); toast(t('shop.heart.ok')); }
       J.sfx.win();
-      if (res) {
-        gachaBusy = true;
-        var shown = false;
-        try { gachaShow(res, function () { gachaBusy = false; if (after) after(true); }); shown = true; }
-        finally { if (!shown) { gachaBusy = false; if (after) after(true); } }   /* 연출 예외에도 뽑기 탭이 잠기지 않게(착수 전 점검 C2) */
-      }
+      /* 연출 중이면 줄을 세워 끝난 뒤 이어 보여 준다(묶음 B B14 — 결과는 이미 저장됐다) */
+      if (res) gachaPlay(res, after);
       else if (after) after(true);
     });
   }
@@ -53892,7 +53928,7 @@ window.TT_SFX = {
     openShopScreen: openShopScreen, closeShopScreen: closeShopScreen, setShopTab: setShopTab, portalAdsOk: portalAdsOk, portalAdsSync: portalAdsSync, SHOP_ART: SHOP_ART, shopFreeCount: shopFreeCount,
     dealBuy: dealBuy, dealGearOf: dealGearOf, dealLeft: dealLeft,   /* P3 T5 — 특가 */
     gachaTable: gachaTable, gachaPull: gachaPull, gachaBuy: gachaBuy, gachaPick: gachaPick, gachaDrawItem: gachaDrawItem, friendOwned: friendOwned, grantFriend: grantFriend, GACHA_PRICE: GACHA_PRICE, GACHA_TIER_P: GACHA_TIER_P, GACHA_TEN_UP: GACHA_TEN_UP,   /* P3 T6 — 뽑기 엔진(표 한 출처) */
-    gachaKindSet: gachaKindSet, gachaRun: gachaRun, openOdds: openOdds, closeOdds: closeOdds, pctText: pctText,   /* P3 T7 — 뽑기 탭 · 확률 정보 창 */
+    gachaKindSet: gachaKindSet, gachaRun: gachaRun, gachaPlay: gachaPlay, openOdds: openOdds, closeOdds: closeOdds, pctText: pctText,   /* P3 T7 — 뽑기 탭 · 확률 정보 창 */
     gresOpenAll: gresOpenAll, gresClose: gresClose, gresOpen: gresOpen,   /* P3 T8 — 뽑기 결과 창(캡슐 · 카드 뒤집기). gresOpen 은 수정 1회차(결제 없이 여는 손잡이 — 성능 귀속 측정 · 뒤 태스크) */
     adCapLeft: adCapLeft, adRowOk: adRowOk, watchAdFor: watchAdFor, paintCoinX2: paintCoinX2, twWatchAdForHeart: twWatchAdForHeart, P3_AD_COIN: P3_AD_COIN, P3_AD_STAR: P3_AD_STAR,   /* P3 T9 — 보상형 광고 */
     friendDupPay: friendDupPay, P3_DUP_STAR: P3_DUP_STAR,   /* P3 T10 — 중복 친구 별 +10 */
@@ -72001,8 +72037,17 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
 #modal-gres .sheet > h2, #modal-gres .sheet > p, #modal-gres #gres-all, #modal-gres .sheet-row{ flex: 0 0 auto; }
 #modal-gres .sub-score{ color: var(--prim-white); }                            /* 어두운 덮개 위 맨 글자 = 밝은 글자 토큰(대비 시험 t8f1i) */
 #modal-gres #gres-stage{ position: relative; flex: 0 1 auto; min-height: 0; margin: 0 calc(-8.4 * var(--mu)); overflow: visible; }   /* 수정 2회차 N-2 — 구르지 않는다(빛 · 낙하 안 잘림 t8f2c · t8f2d) */
-@media (min-aspect-ratio: 1/1) and (max-height: 599.98px){                     /* 가로 폰만 무대가 안에서 구른다(리뷰 I-3 · t8f1m) */
-  #modal-gres #gres-stage{ overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+/* 묶음 B B15 — 높이가 짧은 창(가로 폰 · 분할 화면 세로 · 작은 세로 폰)은 무대만 안에서 구른다(리뷰 I-3 · t8f1m — 종전엔 가로 폰만이라 세로로 짧은 창에서는 카드가 요약 · 버튼 밑으로 겹쳤다) · 세로 보통 높이(≥ 600)는 안 구른다(빛 층 잘림 없음 t8f2c).
+   무대 최소 높이 = 카드 한 줄 + 격자 위 틈 + 숨통 1 mu — 그 밑으로는 안 줄어 첫 카드 줄이 늘 보인다(667×375 · 568×320 에서 높이 0 이던 것). 카드 한 줄 높이는 판 폭에서 나온다(실측 4폭: 판 폭 W = 판 − 안여백 60px + 16.8 mu,
+   카드 폭 = (W − 4 × 1.8 mu) ÷ 5, 높이 = 폭 × 4.4/3 → 0.2933 × (판 − 60px) + 2.816 mu · 틈 2.6 mu · 숨통 1 mu = 0.2933 × (판 − 60px) + 6.4 mu). 판 폭 = min(창 폭 − 36px, 380px).
+   모달 자(--f2-w)는 폭 700 밑 가로 폰에서 95.7vw 를 따라가 제목 캡슐 · 요약 · 버튼이 폰의 1.5배로 커져 무대가 밀렸다 — 폭 700 이상 창이 이미 쓰는 폰 상한(390px × .957)에 더해 높이로도 한 번 더 누른다(--mu 는 이 자에서 나온다):
+   무대 밖 부분은 약 70 mu 라 판 전체 ≈ 76.4 mu + 0.2933 × (판 − 60px) 가 창 높이 − 판 위아래 여백 36px 안에 들 값 → mu ≤ (창 높이 − 36px − 0.2933 × (판 − 60px)) ÷ 76.4, 자 = × 110.8 ÷ 76.4 = × 1.4503.
+   판은 면이 없는 창(위 .sheet{ background: none })이라 위 · 아래 안여백(23px · 30px)과 줄 간격(10px)은 빈 공간이다 — 짧은 창에서만 같은 값을 모달 단위로 줄여(1.8 · 2.4 · 1.2 mu) 판 전체가 창 안에 들게 한다(568×320 에서 확인 · 10회 더가 화면 밖으로 밀리던 것).
+   창이 낮지 않으면(≥ 600) 이 블록이 안 선다. */
+@media (max-height: 599.98px){
+  #modal-gres{ --f2-w: min(95.7vw, calc(390px * .957), calc((100vh - 36px - .29333 * (min(100vw - 36px, 380px) - 60px)) * 1.4503)); }
+  #modal-gres .sheet{ padding-top: calc(1.8 * var(--mu)) !important; padding-bottom: calc(2.4 * var(--mu)) !important; row-gap: calc(1.2 * var(--mu)); }
+  #modal-gres #gres-stage{ overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; min-height: calc(.29333 * (min(100vw - 36px, 380px) - 60px) + 6.4 * var(--mu)); }
 }
 #modal-gres #gres-stage::-webkit-scrollbar{ width: 0; height: 0; }
 #modal-gres #gres-grid{ list-style: none; margin: calc(2.6 * var(--mu)) 0; padding: 0; display: grid; grid-template-columns: repeat(5, 1fr); gap: calc(1.8 * var(--mu)); perspective: calc(200 * var(--mu)); }
@@ -72143,6 +72188,18 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
    지름 4.42cqw(390 에서 17.2px = 왕국 상점 이름표 배지 높이 17.25) · 글자 2.69(기존 상점 글자 단계 가운데 390 에서 9.5px 에 가장 가까운 것 · 10.5px) → DESIGN §28.14 */
 #sh-tabs .sh-dot{ display: flex; align-items: center; justify-content: center; box-sizing: border-box; width: calc(4.42 * var(--cqw)); height: calc(4.42 * var(--cqw)); padding: 0;
   border-radius: 50%; background: var(--role-pink-face-b); color: var(--prim-white); box-shadow: none; font-size: calc(2.69 * var(--cqw)); line-height: 1; letter-spacing: 0; }
+
+/* [P3-B12] 묶음 B 13b-B — 데스크톱 뽑기 탭: 판 안 작은 글씨 잘림(리뷰 M-7). 1280×800 에서 판 몸통이 아이템 · 황금 18px · 친구 53px 모자라 맨 아래 작은 글씨가 판 아래 끝에서 잘렸다
+   (데스크톱 기둥 430px · 1cqw 4.3px 에서는 높이가 모자란 쪽 57% 가 이기는 구간이라 판이 247px 뿐이었다). 판 위 끝 = 종전 식(122.6 cqw · 57%)에 「친구 탭 내용이 다 드는 높이」(100% − 92.7 cqw = 판 아래 22.6 + 내용 70.1)를
+   한 갈래 더해 가장 위의 것 · 단 50% 보다 위로는 안 올린다(더 낮은 창은 판 안에서 구른다 — 상점 화면 규약). 키가 큰 창(≥ 925)은 cqw 갈래가 이겨 종전과 같다. 무대 높이 = 판 위 끝 + 판과 겹침(5.6 cqw 와 2.5% 중 작은 것 —
+   종전 5.6 cqw · 3%)이라 천장 알약(무대 87.6%)이 판 위 끝 밑으로 안 내려간다(t7g). 폰 세로 · 가로 폰은 이 미디어 밖이라 그대로다(360 의 판 스크롤은 판 스크롤이면 그대로). */
+@media (min-aspect-ratio: 1/1) and (min-width: 700px) and (min-height: 600px){
+  #screen-shop[data-stab="gacha"] #sh-plate{ top: calc(min(122.6 * var(--cqw), max(min(57%, 100% - 92.7 * var(--cqw)), 50%)) + var(--safe-t)); }
+  #screen-shop[data-stab="gacha"] #sh-stage{ height: calc(min(122.6 * var(--cqw), max(min(57%, 100% - 92.7 * var(--cqw)), 50%)) + min(5.6 * var(--cqw), 2.5%) + var(--safe-t)); }
+}
+
+/* [P3-B13] 묶음 B 13b-B — 결과 창 「코인 두 배」 · 「그냥 받기」 글자는 낱말 단위로만 접힌다(320 폭에서 「그냥 받 / 기」 로 낱말 한가운데서 꺾였다) — 한 줄에 안 들면 공백에서 두 줄 */
+.coin-x2 .btn{ word-break: keep-all; }
 
 /* ---- cqw 를 모르는 기기(iOS 15 · Chrome 104 급) 폴백 — 반드시 위 기본 규칙 **뒤**(수정 2회차 N-1) ----
    사용자 지정 속성(--f2-w · --cqw)은 cqw 를 모르는 기기도 값(100cqw)으로 받아들여 버려지지 않으므로, 대체가 앞에 있으면 기본이 덮어 쓰는 자리에서
