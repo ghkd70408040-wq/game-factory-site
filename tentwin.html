@@ -46209,6 +46209,7 @@ window.TT_SFX = {
           setArt(face, '--gm-face', stdArt(tb.rows[i].id, 'thumb'), '');
           m.appendChild(face);
         }
+        if (tb.rows.length) m.setAttribute('data-rows', String(Math.ceil(Math.min(tb.rows.length, 9) / 3)));   /* P3 T12 — 줄 수(1 · 2 · 3): 그림이 켜지면 CSS 가 유리 세로 가운데로 맞춘다 */
       }
       scene.appendChild(m);
       var sub = document.createElement('div'); sub.className = 'kit-pill-v2 gc-sub'; sub.setAttribute('data-variant', 'soft'); sub.id = 'gc-pity';
@@ -70296,7 +70297,6 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
 .shop-ic-jewel-l { --ic: url("catalog/shop-ic-jewel-l.webp"); }
 .shop-ic-jewel-xl{ --ic: url("catalog/shop-ic-jewel-xl.webp"); }
 .shop-ic-jstar-1 { --ic: url("catalog/shop-ic-jstar-1.webp"); }
-.shop-ic-jstar-2 { --ic: url("catalog/shop-ic-jstar-2.webp"); }
 .shop-ic-bundle-1{ --ic: url("catalog/shop-ic-bundle-1.webp"); }
 .shop-ic-bundle-2{ --ic: url("catalog/shop-ic-bundle-2.webp"); }
 .shop-ic-heart   { --ic: url("catalog/shop-ic-heart.webp"); }
@@ -72088,11 +72088,21 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
 #screen-shop[data-art~="machine"] #sh-scene .gm-ph[data-kind="gold"]{ background-image: url("catalog/t4-gacha-machine-gold.webp"); }
 #screen-shop[data-art~="machine"] #sh-scene .gm-ph[data-kind="friend"]{ background-image: url("catalog/t4-gacha-machine-pink.webp"); }
 #screen-shop[data-art~="machine"] #sh-scene .gm-face{ width: 9.4%; left: calc(27.8% + var(--gm-x, 15%) * .4464); top: calc(14.46% + var(--gm-y, 12%) * .5056); }
+/* 얼굴이 두 줄(4~6명) · 한 줄(1~3명)이면 유리 안전 상자(slot_safe.dome — 448x570 에서 y 94 · h 166 → 가운데 y 177 = 기계 상자 높이의 31.05%)의 세로 가운데로 내린다 —
+   세 줄(7~9명)은 유리에 꽉 차서(격자 가운데 187) 그대로. 줄 간격 24.5/285 = 8.596% · 두 줄 가운데 = 첫 줄 중심 76.25 → 지금(69)보다 7.25/285 = 2.544% 아래 · 한 줄은 중심 88.5 → 19.5/285 = 6.842% 아래. */
+#screen-shop[data-art~="machine"] #sh-scene .gm-ph[data-rows="2"] .gm-face{ top: calc(14.46% + var(--gm-y, 12%) * .5056 + 2.544%); }
+#screen-shop[data-art~="machine"] #sh-scene .gm-ph[data-rows="1"] .gm-face{ top: calc(14.46% + var(--gm-y, 12%) * .5056 + 6.842%); }
+/* 뽑기 탭 말풍선: 임시 기계(상자 폭 100% 몸통) 때 정한 왼쪽 64.1cqw 가 그림 유리 돔 오른쪽 겉선(상자 가운데 + 알파 x 340/448 → 64.9cqw)에 3px 겹쳤다 — 그림이 켜지면 65.5cqw 로 밀고
+   오른쪽 끝(98.1cqw)은 그대로 두려고 최대 폭을 34 → 32.5cqw 로 줄인다(시험 t12p: 폭 여섯 · 종류 셋 겹침 0). */
+#screen-shop[data-art~="machine"][data-stab="gacha"] #sh-bubble{ left: calc(65.5 * var(--cqw)); max-width: calc(32.5 * var(--cqw)); }
 #screen-shop[data-art~="tabs"] #sh-tabs .sh-tab[data-stab="gacha"] .sh-tab-ic{ background-image: url("catalog/tab-ic-gacha.webp"); }
 #screen-shop[data-art~="tabs"] #sh-tabs .sh-tab[data-stab="free"]  .sh-tab-ic{ background-image: url("catalog/tab-ic-free.webp"); }
 #screen-shop[data-art~="coin"] #sh-body .shop-ic.shop-ic-coin{ background-image: url("catalog/shop-ic-coin-2.webp"); }
 #screen-shop[data-art~="coin"] #sh-body .shop-card[data-ad="coin"] .shop-ic{ background-image: url("catalog/shop-ic-coin-1.webp"); }
 #screen-shop[data-art~="coin"] #sh-body .shop-ic.shop-ic-coin-3{ background-image: url("catalog/shop-ic-coin-3.webp"); }
+/* 무료 탭 「아이템 캡슐 한 번」 줄 = 민트 기계 · 「친구 캡슐 한 번」 줄 = 분홍 기계 — 이미 넣은 기계 그림을 줄 아이콘 상자(contain)에 줄여 쓴다(새 그림 0, 판정 2026-10-07). */
+#screen-shop[data-art~="machine"] #sh-body .shop-ic.shop-ic-machine-item{ background-image: url("catalog/t4-gacha-machine-mint.webp"); }
+#screen-shop[data-art~="machine"] #sh-body .shop-ic.shop-ic-machine-friend{ background-image: url("catalog/t4-gacha-machine-pink.webp"); }
 /* 캡슐 — 닫힘 한 장(512x512)을 위 · 아래 반쪽에 나눠 쓴다(열림 그림은 없다 — 착수 전 점검 W13). 윗반은 흰/연회색 그림 위에 등급 토큰색을 **곱한다**(등급색은 그림에 굽지 않는다, 스펙 §4-e ③).
    결과 창은 #screen-shop 밖이라 html 표식으로 켠다. 계획의 마스크 틴트(윗반 = 등급색 면 + 그림 알파 마스크)는 갈색 겉선과 광택을 지워 아랫반과 안 맞아(scratchpad/p3/t12/cap-probe.png)
    그림을 배경으로 두고 등급색을 곱하기 의사요소로 얹는 쪽으로 바꿨다 — 계획이 허용한 대체(보고에 적음). 선택자에 #gres-cap 을 넣은 것은 T8 의 등급별 `background` 줄임 규칙(#modal-gres #gres-cap[data-tier] .gres-top)이
@@ -72104,6 +72114,7 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap .gres-top::before{ content:
   -webkit-mask: url("catalog/t4-gacha-capsule-closed.webp") center top / 100% 200% no-repeat; mask: url("catalog/t4-gacha-capsule-closed.webp") center top / 100% 200% no-repeat; }
 html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="rare"] .gres-top::before{ background: var(--role-rw-shard-agility-2); }
 html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top::before{ background: var(--role-rw-item-2); }
+
 /* ---- cqw 를 모르는 기기(iOS 15 · Chrome 104 급) 폴백 — 반드시 위 기본 규칙 **뒤**(수정 2회차 N-1) ----
    사용자 지정 속성(--f2-w · --cqw)은 cqw 를 모르는 기기도 값(100cqw)으로 받아들여 버려지지 않으므로, 대체가 앞에 있으면 기본이 덮어 쓰는 자리에서
    무효(초기값)가 된다 — 일반 속성(width 등)은 cqw 선언이 통째로 버려져 순서가 상관없지만 같은 블록에 둔다. 지도 compat-p1 과 같은 문법 · 위 cqw 규칙과 같은 수.
