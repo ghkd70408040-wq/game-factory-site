@@ -58131,10 +58131,9 @@ html[lang="en"] #app-intro .api-logo{
 /* ===========================================================================
    14차 HUD 수리 — 킷 부품 **인라인 배선** (2026-08-23)
    ---------------------------------------------------------------------------
-   출처(정본): site/catalog/ui-kit.css §② .kit-jelly · §③ .kit-cap
-               site/catalog/ui-kit-hud.css §2 (구획선)
-   이 블록은 그 정본을 **기계적으로 옮겨 온 사본**이다. 정본을 고치면 여기도
-   같이 고친다 — 두 벌이 갈라지면 계보 분열이 재발한다.
+   출처(정본): site/catalog/ui-kit-hud.css §2 (구획선)
+   이 블록에는 아래 «소비처» 규칙(D~I)만 남았다 — 킷 부품 사본(.kit-cap · .kit-jelly ·
+   구획선 호스트)은 소비처가 0 이라 걷었다. 정본의 구획선을 고치면 여기 구획선도 같이 고친다.
 
    ▣ 왜 <link> 가 아니라 인라인인가 (판단 근거)
      ⓐ 이 게임은 **오프라인 단일 HTML** 로 itch.io iframe 에 올라간다
@@ -58148,7 +58147,7 @@ html[lang="en"] #app-intro .api-logo{
         한 줄도 지우지 않고 덮는다. **롤백 = 이 style 블록 하나 삭제.**
 
    ▣ 손대는 것 (그 밖은 건드리지 않는다)
-     1 모달 타이틀 캡슐 12자리    비트맵 glass-capsule-v4.webp → 코드 .kit-cap
+     1 모달 타이틀 캡슐 12자리    비트맵 glass-capsule-v4.webp → 코드 캡슐
      2 클래식 상단 캡슐·좌우 알약  같은 비트맵 → 같은 코드 부품
      3 전투 하단 액션바 받침       glass-hud-bar-st.webp → 코드 · **격자 소멸**
      4 전투 스킬 4칸 라벨판        메달에 구워진 명패 → 코드 캡슐
@@ -58168,125 +58167,6 @@ html[lang="en"] #app-intro .api-logo{
      → 받침을 코드로 그리면 이 결함은 **구조적으로 소멸한다.**
    =========================================================================== */
 
-/* ═══ A. 부품 .kit-cap — 캡슐 **하나**. 변주는 곡률과 색뿐 ════════════════ */
-.kit-cap{
-  --cap-r: 999px;  --cap-h: 52px;
-  --cap-a:var(--role-mint-face-a); --cap-b:var(--role-mint-face-b); --cap-drop:var(--role-mint-outline); --cap-band:var(--role-mint-contact);
-  --cap-edge:var(--mL-outline);
-  --cap-s:.706;
-  position:relative; box-sizing:border-box;
-  display:flex; align-items:center; justify-content:center; gap:6px;
-  min-height:var(--cap-h); padding:0 18px;
-  border:0; border-radius:var(--cap-r);
-  background-color:transparent;
-  background-image:linear-gradient(180deg,var(--cap-a) 0%,var(--cap-a) 47%,
-                                          var(--cap-b) 47%,var(--cap-b) 100%);
-  box-shadow:0 3px 0 var(--cap-drop),
-             0 7px 16px rgba(83,28,40,.22),
-             inset 0 0 0 2.5px var(--cap-edge),
-             inset 0 -6px 0 var(--cap-band);
-  color:#FFFFFF; line-height:1.15; text-align:center;
-  text-shadow:0 1.5px 0 rgba(110,70,58,.55);
-  --jelly-h:var(--cap-h); --jelly-s:var(--cap-s); --jelly-spec:0;
-}
-.kit-cap > *{ position:relative; z-index:2; }
-
-/* ═══ B. 부품 .kit-jelly — 상대 휘도 기반 젤리 오버레이 ═══════════════════
-   흰/검 α 를 고정하지 않고 **밑판 sRGB 루마 --jelly-s 의 함수 하나**로 낸다:
-     흰 α = D/(1-S)   ·   검 α = D'/S     (D = 기준α x (1-S0) · D' = 기준α x S0)
-   S0 = 버튼 4색 평균 .5305. --jelly-s 를 선언하지 않으면 두 배율이 정확히 1 이
-   되어 종전 상수(.31/.18/.12/.11/.17/.88) 그대로다 — 버튼 무회귀가 «확인» 이
-   아니라 **구조**인 이유다(실측 diff 0px).
-   밝은 캡슐(S .901)에서 림-밴드 총 진폭 7.8 → **48.2 sRGB** (6.2배).
-   길이에는 절대 하한(--n-ring 1px / --n-blur .6px)을 씌워 얇은 바에서
-   서브픽셀로 사라지던 성분을 살린다(하한은 --btn-h 최소 44px 의 비례값보다
-   작으므로 버튼에서는 발동하지 않는다).                                    */
-.kit-jelly,
-.kit-jelly-host::before,
-.kit-cap::before{
-  content:''; position:absolute; inset:0;
-  border-radius:inherit; box-sizing:border-box; pointer-events:none;
-  --jh:var(--jelly-h,56px);
-  --jelly-s0:.5305;
-  --js:var(--jelly-s,var(--jelly-s0));
-  --_hw:calc((1 - var(--jelly-s0)) / (1 - var(--js)));
-  --_hb:calc(var(--jelly-s0) / var(--js));
-  --a-rim:min(1,calc(.31 * var(--_hw)));
-  --a-gl1:min(1,calc(.18 * var(--_hw)));
-  --a-gl2:min(1,calc(.12 * var(--_hw)));
-  --a-top:min(1,calc(.11 * var(--_hw)));
-  --a-spec:min(1,calc(.88 * var(--_hw)));
-  --a-band:min(1,calc(.17 * var(--_hb)));
-  --n-ring:1px; --n-blur:.6px;
-  --j:var(--jelly,1);
-  --j-r:calc(var(--j) * var(--jelly-rim,1));
-  --j-g:calc(var(--j) * var(--jelly-glow,1));
-  --j-b:calc(var(--j) * var(--jelly-band,1));
-  --j-t:calc(var(--j) * var(--jelly-top,1));
-  --j-s:calc(var(--j) * var(--jelly-spec,1));
-  border-style:solid;
-  border-width:
-    max(var(--n-ring),calc(var(--jh) * var(--jelly-band-t,.030)))
-    max(var(--n-ring),calc(var(--jh) * var(--jelly-band-x,.050)))
-    max(var(--n-ring),calc(var(--jh) * var(--jelly-band-w,.118)))
-    max(var(--n-ring),calc(var(--jh) * var(--jelly-band-x,.050)));
-  border-color:rgba(0,0,0,calc(var(--a-band) * var(--j-b)));
-  box-shadow:
-    inset 0 0 max(var(--n-blur),calc(var(--jh) * .014))
-              max(var(--n-ring),calc(var(--jh) * .048))
-      rgba(255,255,255,calc(var(--a-rim) * var(--j-r))),
-    inset 0 calc(var(--jh) * -1.055) max(var(--n-blur),calc(var(--jh) * .040)) calc(var(--jh) * -1)
-      rgba(255,255,255,calc(var(--a-gl1) * var(--j-g))),
-    inset 0 calc(var(--jh) * -1.13) max(var(--n-blur),calc(var(--jh) * .085)) calc(var(--jh) * -1)
-      rgba(255,255,255,calc(var(--a-gl2) * var(--j-g))),
-    inset 0 calc(var(--jh) * 1.13) max(var(--n-blur),calc(var(--jh) * .085)) calc(var(--jh) * -1)
-      rgba(255,255,255,calc(var(--a-top) * var(--j-t)));
-  background:
-    radial-gradient(max(var(--n-ring),calc(var(--jh) * .075))
-                    max(var(--n-ring),calc(var(--jh) * .050))
-      at calc(100% - var(--jh) * .208) calc(100% - var(--jh) * .265),
-      rgba(255,255,255,calc(var(--a-spec) * var(--j-s))),rgba(255,255,255,0) 72%);
-  background-clip:padding-box;
-}
-.kit-jelly{ z-index:1; }
-
-/* 색 변주 — catalog 표 그대로. --cap-s 는 면 두 단의 47/53 가중 sRGB 루마. */
-.kit-cap--mint  { --cap-a:var(--role-mint-face-a); --cap-b:var(--role-mint-face-b); --cap-drop:var(--role-mint-outline); --cap-band:var(--role-mint-contact); --cap-s:.706; }
-.kit-cap--blue  { --cap-a:var(--role-blue-face-a); --cap-b:var(--role-blue-face-b); --cap-drop:var(--role-blue-outline); --cap-band:var(--role-blue-contact); --cap-s:.674; }
-.kit-cap--pink  { --cap-a:var(--role-pink-face-a); --cap-b:var(--role-pink-face-b); --cap-drop:var(--role-pink-outline); --cap-band:var(--role-pink-contact); --cap-s:.636; }
-.kit-cap--yellow{ --cap-a:var(--role-yellow-face-a); --cap-b:var(--role-yellow-face-b); --cap-drop:var(--role-yellow-outline); --cap-band:var(--role-yellow-contact); --cap-s:.806; }
-.kit-cap--orange{ --cap-a:var(--role-orange-face-a); --cap-b:var(--role-orange-face-b); --cap-drop:var(--role-orange-outline); --cap-band:var(--role-orange-contact); --cap-s:.685; }
-.kit-cap--purple{ --cap-a:var(--role-purple-face-a); --cap-b:var(--role-purple-face-b); --cap-drop:var(--role-purple-outline); --cap-band:var(--role-purple-contact); --cap-s:.621; }
-.kit-cap--lilac { --cap-a:var(--role-lilac-face-a); --cap-b:var(--role-lilac-face-b); --cap-drop:var(--role-lilac-outline); --cap-band:var(--role-lilac-contact); --cap-s:.718; }
-/* 진주 유리 — 옛 비트맵 캡슐이 서던 자리(모달 헤더·클래식 상단)를 잇는 색.
-   «유리» 정체성은 유지하고 기하만 젤리 문법으로 바꾼다.                    */
-.kit-cap--glass { --cap-a:var(--role-glass-face-a); --cap-b:var(--role-glass-face-b); --cap-drop:var(--role-glass-outline); --cap-band:var(--role-glass-contact); --cap-s:.874; }
-.kit-cap--tray  { --cap-a:var(--role-tray-face-a); --cap-b:var(--role-tray-face-b); --cap-drop:var(--role-tray-outline); --cap-band:var(--role-tray-contact); --cap-s:.812; }
-
-/* ═══ C. 구획선 — 사용자 요구 «에너지 바에 라인을 쳐야 한다» ══════════════
-   ⚠ **트랙에 얹는다. 채움에 얹지 않는다** — 채움은 scaleX 로 늘어나므로 거기
-     얹으면 구획 간격이 값에 따라 변한다(눈금이 아니게 된다).
-   간격 실측(2026-08-23 · 390x844 DPR3 전투 HUD 1배율 캡처):
-     플레이어 레일 눈금 7개 · 간격 **50 device px = 16.67 CSS px** → **8구간**. */
-.kit-ticks-host{ --gauge-seg:8; --gauge-tick-w:1.5px; --gauge-tick-c:rgba(var(--prim-ink-plum-rgb),.34); }
-.kit-ticks-host::after{
-  content:''; position:absolute; inset:0; border-radius:inherit;
-  pointer-events:none; z-index:4;
-  background:
-    repeating-linear-gradient(90deg,
-      rgba(255,255,255,0) 0,
-      rgba(255,255,255,0) calc(100% / var(--gauge-seg)),
-      rgba(255,255,255,.26) calc(100% / var(--gauge-seg)),
-      rgba(255,255,255,.26) calc(100% / var(--gauge-seg) + var(--gauge-tick-w) * .7)),
-    repeating-linear-gradient(90deg,
-      rgba(0,0,0,0) 0,
-      rgba(0,0,0,0) calc(100% / var(--gauge-seg) - var(--gauge-tick-w)),
-      var(--gauge-tick-c) calc(100% / var(--gauge-seg) - var(--gauge-tick-w)),
-      var(--gauge-tick-c) calc(100% / var(--gauge-seg)));
-  -webkit-mask:linear-gradient(90deg,#000 0 calc(100% - var(--gauge-tick-w)),transparent 0);
-          mask:linear-gradient(90deg,#000 0 calc(100% - var(--gauge-tick-w)),transparent 0);
-}
-
 /* ═══════════════════════════════════════════════════════════════════════════
    D. 소비처 ① — 모달 타이틀 캡슐 12자리
    ---------------------------------------------------------------------------
@@ -58302,8 +58182,7 @@ html[lang="en"] #app-intro .api-logo{
 /* 🚨 MODAL v2 (2026-08-26) 삭제 — 위 :42636 과 **같은 부품의 두 번째 벌**이다
    (0823 판: --cap-a/--cap-b 유리 캡슐 + 젤리 오버레이 + ttl 레터링). 소비처가
    열세 자리 전부 모달 헤더뿐이라 MODAL v2 의 캡슐로 통째 갈렸다. 근거·되돌리기는
-   :42636 의 주석과 같다. .kit-cap / .kit-jelly 계열(바로 위)은 **안 건드렸다** —
-   맵·전투 HUD 의 소비처가 살아 있다. */
+   :42636 의 주석과 같다. */
 /* 🚨 사용자 반려(0823) — "캐릭터 선택 창 ... 캐릭터 글자 없앤 것도 일부러 그런
    거야?". 14자리 중 **#charpanel 한 자리만** 레터링이 사라졌고, 원인은 위 두
    블록이 아니라 :8035 의 **옛 리본 노치**다:
