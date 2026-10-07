@@ -26912,6 +26912,10 @@ window.TT_SFX = {
       score: S.score, adds: S.adds, addsV: 2, hints: S.hints, startedAt: S.startedAt,
       matches: S.matches, maxCombo: S.maxCombo, gridSeed: S.gridSeed,
       addSeq: S.addSeq,
+      /* P3 최종 수정(I-1) — 이 판에서 이미 받은 코인 몫(runCoin)과 결과 창 2배 표식(x2Done · x2Token). 이어하기(twGrantContinue)가 같은 판을 되살려 같은 S.startedAt 으로
+         다시 저장하므로, 새로고침 · 탭이 죽은 뒤 재개(restoreSave)를 지나도 같은 판이 두 번째로 끝날 때 runCoinPay 가 차이만 주고 2배 줄이 같은 판에 다시 서지 않는다.
+         판 이름표(S.coinRunAt)가 이 판이 아니면 0 — 앞 판의 몫이 S.runCoin 에 남은 채 시작한 새 판이 그 몫을 이미 받은 줄 알면 덜 받는다. 옛 저장본은 이 칸이 없어 0(P3 전 판은 코인을 받은 적이 없다). */
+      runCoin: S.coinRunAt === S.startedAt ? (S.runCoin | 0) : 0, x2Done: S.x2Done | 0, x2Token: S.x2Token | 0,
       /* Both halves of the shuffle state, or a reload would either hand out a free
        * extra shuffle (budget lost) or replay the SAME arrangement (ordinal lost). */
       shuffles: S.shuffles, shuffleCount: S.shuffleCount,
@@ -37206,6 +37210,9 @@ window.TT_SFX = {
     S.matches = sv.matches || 0;
     S.maxCombo = sv.maxCombo || 1;
     S.startedAt = sv.startedAt || Date.now();
+    /* P3 최종 수정(I-1) — 같은 판을 되살린다: 판 코인 몫 · 2배 표식을 저장본에서(옛 저장본은 칸이 없어 0), 판 이름표 = 이 판, 이번 시트 몫은 0 부터. */
+    S.runCoin = sv.runCoin | 0; S.coinRunAt = S.startedAt; S.gainCoin = 0;
+    S.x2Done = sv.x2Done | 0; S.x2Token = sv.x2Token | 0;
     S.undoLeft = 1;
     S.snapshot = null;
     S.sel = -1;
@@ -41437,6 +41444,9 @@ window.TT_SFX = {
   }
 
   function restartStage() {
+    /* 손잡이 전용 — 모험의 다시 시작 버튼은 pause() 가 숨긴다(실제 플레이로는 못 누른다). 손잡이로 닿았을 때 하트가 0 이면 advStart 는 노드 카드만 열고 돌아와
+       일시정지 창은 닫히고 판은 멈춘 채 시계만 풀렸다(최종 리뷰 M-1) — 하트가 0 이면 일시정지 창을 닫지 않고 그대로 돌아간다(멈춘 판 유지). 하트는 advStart 와 같은 정산(heartsTick) 뒤에 본다. */
+    if (S.mode === 'adv') { heartsTick(); if (store.hearts <= 0) return; }
     closeModal('modal-pause');
     S.paused = false;
     S.pausedAt = 0;
@@ -45911,7 +45921,8 @@ window.TT_SFX = {
     li.innerHTML = '<i class="gres-glow"></i><i class="gres-back"></i><i class="gres-art"></i><b class="gres-new"></b><em class="gres-lv"></em><span class="gres-nm"></span>';
     li.querySelector('.gres-new').textContent = it.isNew ? t('gres.new') : '';
     /* 새 장비는 NEW 배지만(목업 R1 · 리뷰 M-1 — 「Lv0→1」 은 게임에 없는 값). 사전 밖 글자 0(착수 전 점검 W8) */
-    li.querySelector('.gres-lv').textContent = it.isNew ? '' : (it.max ? t('gres.refund', { n: it.refund }) : t('gres.lvup', { a: it.lv0 | 0, b: it.lv | 0 }));
+    /* 환급 0(잔액이 코인 상한에 닿아 잘린 경우)은 문구를 안 찍는다 — 꼬리 알약(gresOpen 의 `if (refund)`) · 수확 토스트와 같은 규칙(최종 리뷰 M-2) */
+    li.querySelector('.gres-lv').textContent = it.isNew ? '' : (it.max ? ((it.refund | 0) > 0 ? t('gres.refund', { n: it.refund }) : '') : t('gres.lvup', { a: it.lv0 | 0, b: it.lv | 0 }));
     li.querySelector('.gres-nm').textContent = t('item.' + it.id + '.nm');
     return li;
   }
@@ -46122,16 +46133,24 @@ window.TT_SFX = {
 
   /* ---- 확률 정보 창 — 캡슐마다 등급 확률 · 개별 확률 · 10회 보장 · 천장(지금 카운터) · 중복 규칙 · 현금 판매 없음. ---- */
   var oddsKind = 'item';
+  /** 최종 리뷰 M-4 — 확률 창이 열려 있는 동안만 크기 · 방향이 바뀌면 목록 상자 높이를 다시 잰다(줄 높이가 폭마다 달라 열 때 잰 px 상한이 어긋난다). 읽기 한 묶음 → 쓰기 하나는 oddsFitBox 안
+      (resize 는 브라우저가 프레임당 한 번만 쏜다). 창이 닫혀 있으면 듣기를 뗀다(closeOdds 말고 다른 길로 닫혀도 첫 이벤트에서). 같은 함수 참조의 addEventListener 는 중복 등록이 안 된다. */
+  function oddsRefit() {
+    var m = $('modal-odds');
+    if (m && !m.hidden) { oddsFitBox(); return; }
+    window.removeEventListener('resize', oddsRefit); window.removeEventListener('orientationchange', oddsRefit);
+  }
   function openOdds(kind) {
     oddsKind = GACHA_KINDS.indexOf(kind) >= 0 ? kind : 'item';
     oddsPaint();
     openModal('modal-odds');
     /* 창이 보인 뒤에야 줄 높이를 읽을 수 있다 */
     oddsFitBox();
+    window.addEventListener('resize', oddsRefit); window.addEventListener('orientationchange', oddsRefit);
     var ob = $('odds-body'); if (ob) ob.scrollTop = 0;
     J.sfx.ui();
   }
-  function closeOdds() { closeModal('modal-odds'); J.sfx.ui(); }
+  function closeOdds() { closeModal('modal-odds'); oddsRefit(); J.sfx.ui(); }
   function oddsRow(cls, id, name, p, art) {
     var r = document.createElement('div'); r.className = 'od-row ' + cls; if (id) r.setAttribute('data-id', id);
     if (art) { var i = document.createElement('i'); i.className = 'od-ic'; i.style.setProperty('background-image', art); r.appendChild(i); }
@@ -48737,7 +48756,8 @@ window.TT_SFX = {
     /* 하단 바 — 젤리별 카운트 · 큰 캡슐 부제 「챕터 n: 이름」(주 라벨 「모험」은
        #kd-bot-ch-k 의 data-i18n=menu.adv 가 채운다). */
     paintChipText('kd-bot-b1-v', arcComma(store.jstar | 0));   /* 위 칩(코인)과 같은 쉼표 표기 + 글자 수별 줄임(5자는 종전 크기) */
-    setText('kd-bot-ch-n', t('map.plate' + chapMax()));
+    /* 100탄 완주(advMax 101 → chapMax 11)여도 마지막 장 명판 — buildMap 의 lastCh 와 같은 clamp(없으면 사전 키 map.plate11 이 그대로 찍힌다) */
+    setText('kd-bot-ch-n', t('map.plate' + Math.min(MAP_CHAPTERS.length, chapMax())));
   }
 
   /* --- 방문 보상 (§26.6 「어제의 나」) ---------------------------------------
@@ -71798,25 +71818,27 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
 #modal-gres #gres-stage{ position: relative; flex: 0 1 auto; min-height: 0; margin: 0 calc(-8.4 * var(--mu)); overflow: visible; }   /* 수정 2회차 N-2 — 구르지 않는다(빛 · 낙하 안 잘림 t8f2c · t8f2d) */
 /* 묶음 B B15 — 높이가 짧은 창(가로 폰 · 분할 화면 세로 · 작은 세로 폰)은 무대만 안에서 구른다(리뷰 I-3 · t8f1m — 종전엔 가로 폰만이라 세로로 짧은 창에서는 카드가 요약 · 버튼 밑으로 겹쳤다) · 세로 보통 높이(≥ 600)는 안 구른다(빛 층 잘림 없음 t8f2c).
    무대 최소 높이 = 카드 한 줄 + 격자 위 틈 + 숨통 1 mu = --gres-row + 6.4 mu — 그 밑으로는 안 줄어 첫 카드 줄이 늘 보인다(667×375 · 568×320 에서 높이 0 이던 것). 카드 한 줄 높이 --gres-row 는 판 폭에서 나온다(실측 4폭: 무대 폭 W = 판 − 안여백 60px + 16.8 mu,
-   카드 폭 = (W − 4 × 1.8 mu) ÷ 5, 높이 = 폭 × 4.4/3 → 0.2933 × (판 − 60px) + 2.816 mu · 틈 2.6 mu · 숨통 1 mu). 판 폭 = min(창 폭 − 36px, 380px).
+   카드 폭 = (W − 4 × 1.8 mu) ÷ 5, 높이 = 폭 × 4.4/3 → 0.2933 × (판 − 60px) + 2.816 mu · 틈 2.6 mu · 숨통 1 mu). 판 폭 = min(창 폭 − 36px − 좌우 안전 영역, 380px).
    모달 자(--f2-w)는 폭 700 밑 가로 폰에서 95.7vw 를 따라가 제목 캡슐 · 요약 · 버튼이 폰의 1.5배로 커져 무대가 밀렸다 — 폭 700 이상 창이 이미 쓰는 폰 상한(폰 기준폭 × .957)에 더해 높이로도 한 번 더 누른다(--mu 는 이 자에서 나온다):
-   무대 밖 부분은 약 70 mu 라 판 전체 ≈ 76.4 mu + --gres-row 가 창 높이 − 판 위아래 여백 36px 안에 들 값 → mu ≤ (창 높이 − 36px − --gres-row) ÷ 76.4, 자 = × 110.8 ÷ 76.4 = × 1.4503.
+   무대 밖 부분은 약 70 mu 라 판 전체 ≈ 76.4 mu + --gres-row 가 창 높이 − 판 위아래 여백 36px − 위아래 안전 영역 안에 들 값 → mu ≤ (창 높이 − 36px − 위아래 안전 영역 − --gres-row) ÷ 76.4, 자 = × 110.8 ÷ 76.4 = × 1.4503.
    수정 1회차(리뷰 I-3): ① 식에 쓰는 길이는 아래 사용자 지정 속성 셋에 한 번씩만 적는다(같은 긴 식이 두 번 있던 것). 이 파일에는 판 폭 · 안여백 · 모달 바깥 여백을 담은 토큰이 없다 — 원래 규칙들이 글자 그대로 쓴다: 380px = 기본 모달 판 `.sheet{ max-width: 380px }` ·
    36px = 기본 `.modal` 바깥 여백 18px 둘 · 60px = `.w6m .sheet` 좌우 안여백 30px 둘(SECTION 25 ① 판). 같은 값이니 그 규칙이 바뀌면 여기도 따라 바꾼다. ② 폰 기준폭은 토큰 --f2-phone-w 를 읽는다 — 폭 700 이상 데스크톱 미디어가 :root 에 세우는 그 값이고
    `.modal{ --f2-w: min(95.7vw, calc(var(--f2-phone-w) * .957)) }` 이 읽는 것이다. 그 미디어 밖(폭 700 미만 — 이 블록이 막아야 하는 바로 그 자리)에서는 토큰이 정의되지 않아 같은 값 390px 를 대체값으로 둔다. ③ 뷰포트 높이는 dvh(주소창이 오르내려도 보이는 높이 —
    이 파일의 다른 100dvh 와 같은 관례). 사용자 지정 속성은 단위를 모르는 기기에서 값이 통째로 무효가 되므로 vh 를 먼저 세우고 dvh 를 아는 기기만 @supports 로 덮는다. ④ 미디어 조건 599.98px 은 같은 문턱을 쓰는 기존 규칙과 같은 값이다 — 왕국 절 끝
    `@media (min-aspect-ratio: 1/1) and (max-height: 599.98px)`(가로 폰 캡 · 상한을 599.98px 로 잡은 이유는 그 위 주석) · 상점 가로 폰 --cqw 대체(아래 끝 @supports not 블록) · 이 창의 옛 구르기 문턱 — 변수를 못 쓰는 자리라 리터럴이다.
    판은 면이 없는 창(위 .sheet{ background: none })이라 위 · 아래 안여백(23px · 30px)과 줄 간격(10px)은 빈 공간이다 — 짧은 창에서만 같은 값을 `1.8 · 2.4 · 1.2 mu` 로 줄인다(568×320 에서 이것이 없으면 최소 높이가 확인 · 10회 더를 화면 밖으로 밀었다 · 지휘자 추인 2026-10-07).
-   안여백 두 줄만 !important 다: `.w6m .sheet{ padding: 23px 30px 30px !important }`(특정도 0,2,0)가 이미 !important 라서, 순서나 특정도만으로는 못 이기고 같은 !important 에 더 높은 특정도(#modal-gres .sheet — 1,1,0)로만 이긴다. 줄 간격은 일반 선언이다.
+   ⑤ 안전 영역(최종 리뷰 I-2): 기준이 되는 `.modal` 안여백은 안전 영역 + 18px(`calc(var(--safe-t) + 18px)` 꼴)이라 실제로 쓸 수 있는 폭 · 높이는 창 − 36px − 안전 영역이다 — 판 폭 식에 `--safe-l` · `--safe-r`,
+   높이 항에 `--safe-t` · `--safe-b` 를 뺀다(`:root` 의 기존 토큰 — 새 값 0). 안전 영역이 0 이 아닌 기기(노치 폰 가로)에서만 값이 달라지고 헤드리스(안전 영역 0)는 종전과 같다. `!important` 의 이유는 그 줄(아래 #modal-gres .sheet)에 적었다.
    창이 낮지 않으면(≥ 600) 이 블록이 안 선다. */
 @media (max-height: 599.98px){
   #modal-gres{
     --gres-vh: 100vh;
-    --gres-sheet: min(100vw - 36px, 380px);
+    --gres-sheet: min(100vw - 36px - var(--safe-l) - var(--safe-r), 380px);
     --gres-row: calc(.29333 * (var(--gres-sheet) - 60px));
-    --f2-w: min(95.7vw, calc(var(--f2-phone-w, 390px) * .957), calc((var(--gres-vh) - 36px - var(--gres-row)) * 1.4503));
+    --f2-w: min(95.7vw, calc(var(--f2-phone-w, 390px) * .957), calc((var(--gres-vh) - 36px - var(--safe-t) - var(--safe-b) - var(--gres-row)) * 1.4503));
   }
   @supports (height: 100dvh){ #modal-gres{ --gres-vh: 100dvh; } }
+  /* 안여백 두 줄만 !important — `.w6m .sheet{ padding: 23px 30px 30px !important }`(특정도 0,2,0)가 이미 !important 라서 순서나 특정도만으로는 못 이긴다: 같은 !important 에 더 높은 특정도(#modal-gres .sheet — 1,1,0)로만 이긴다. 줄 간격(row-gap)은 일반 선언이다. */
   #modal-gres .sheet{ padding-top: calc(1.8 * var(--mu)) !important; padding-bottom: calc(2.4 * var(--mu)) !important; row-gap: calc(1.2 * var(--mu)); }
   #modal-gres #gres-stage{ overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; min-height: calc(var(--gres-row) + 6.4 * var(--mu)); }
 }
@@ -71845,7 +71867,10 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
 #modal-gres .gres-lv{ position: absolute; left: 6%; right: 6%; bottom: 20%; text-align: center; font-style: normal; font-size: calc(2.5 * var(--mu));
   color: var(--prim-white); background: var(--prim-art-ink); border-radius: calc(2 * var(--mu)); }
 #modal-gres .gres-lv:empty{ display: none; }
-#modal-gres .gres-nm{ position: absolute; left: 0; right: 0; bottom: 3%; text-align: center; font-size: calc(2.6 * var(--mu)); color: var(--prim-art-ink); }
+/* 이름은 한 줄 — 영어 긴 이름이 두 줄로 꺾여 위 레벨 알약과 맞닿던 것(T14 관찰 · 최종 수정). 넘치면 말줄임(…) · 한국어는 모두 한 줄이라 무변.
+   가로만 자르고(세로를 자르면 글자 그림자가 잘려 한국어 외형이 바뀐다) 상자를 양옆 1 mu 넓힌 만큼 안여백을 줘 글자 자리 · 줄임 기준 폭은 종전과 같고 글자 그림자(3px 번짐)는 잘리지 않는다.
+   `overflow: hidden` 이 앞에 있는 것은 clip 을 모르는 기기(iOS 15 급)의 대체다 — 뒤 두 선언이 무효라 hidden 이 남아 한 줄 · 말줄임은 서고 글자 그림자만 잘린다. */
+#modal-gres .gres-nm{ position: absolute; left: calc(-1 * var(--mu)); right: calc(-1 * var(--mu)); padding: 0 var(--mu); bottom: 3%; text-align: center; font-size: calc(2.6 * var(--mu)); color: var(--prim-art-ink); white-space: nowrap; overflow: hidden; overflow-x: clip; overflow-y: visible; text-overflow: ellipsis; }
 #modal-gres #gres-sum{ display: flex; flex-wrap: wrap; justify-content: center; gap: calc(1.2 * var(--mu)); font-size: calc(3.4 * var(--mu)); }
 #modal-gres .gres-t{ --f2-bh: calc(5.9 * var(--mu)); font-size: calc(3.3 * var(--mu)); gap: calc(1.5 * var(--mu)); }
 #modal-gres #gres-all{ --f2-bh: calc(5.64 * var(--mu)); font-size: calc(3.2 * var(--mu)); width: max-content; margin: 0 auto; }
