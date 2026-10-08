@@ -15,7 +15,7 @@ var COMBO_EXP_BASE = 1.18;
 var COMBO_MULT_CAP = 400;
 var COMBO_MULT_CAP_ADV = 40;
 var LS_KEY = 'tentwin.v74p';
-var SCHEMA_VERSION = 2;   // 74 — 파편 폐기 이전(v1to2)
+var SCHEMA_VERSION = 3;   /* P3 — 코인·뽑기·광고 상한·특가 칸(가법) */
 var LS_BAK_PREFIX = LS_KEY + '.bak-';
 var ROWGO_STAGGER = 35;   // ms per column, left -> right
 var DEAL_STAGGER = 30;    // ms per new tile...
@@ -116,7 +116,7 @@ var DAILY_QUESTS = [
 { id: 'duel',   goal: [1, 1, 1],  fix: 2, ico: '--lib-badge-a' },
 { id: 'star2',  goal: [1, 1, 1],  fix: 2, ico: '--lib-star-gold' },
 { id: 'rush',   goal: [1000, 2000, 3500], ico: '--lib-glyph-clock' },
-{ id: 'item',   goal: [1, 1, 1],  fix: 1, ico: '--lib-glyph-coin' }, /* [T8-0926·65] 코인 원반으로 */
+{ id: 'item',   goal: [1, 1, 1],  fix: 1, ico: '--lib-slot-ic-item' }, /* P3 — 코인이 화폐가 되어 원반은 코인 전용 */
 { id: 'match',  goal: [30, 60, 100],      ico: '--lib-glyph-target' },
 { id: 'chain',  goal: [3, 5, 8],          ico: '--lib-glyph-flag' }
 ];
@@ -168,7 +168,6 @@ heartOne:   12,                  // §20.3 하트 1개
 continue2:  40,                  // §20.3 · §21 ① 계속하기 2회차부터
 skin:      100                   // §20.3 스킨 (젬리별 25 × 「1★ ≈ 4💎」)
 };                                 /* 74 — 확정 파편 팩(shardPack 60💎 · 고른 색 30알)은 파편 경제와 함께 은퇴했다 */
-var JSTAR_TRADE = [{ jewel: 25, star: 100 }, { jewel: 100, star: 400 }];
 var JEWEL_PACKS = [
 { sku: 'jewel_s_60',   tier: 's',  krw: 1200,  n: 60 },
 { sku: 'jewel_m_180',  tier: 'm',  krw: 3300,  n: 180 },
@@ -1162,12 +1161,18 @@ quests: null,
 achv: {},
 comboMax: 0,      // 계정 최고 콤보 (에픽 combo5/10/20)
 duelWins: 0,      // 아케이드 대전 누적 승 (에픽 duel1/10 · 일일 duel)
-awkTotal: 0       // 각성 누적 발동 (에픽 awaken50 · 일일 awaken)
+awkTotal: 0,      // 각성 누적 발동 (에픽 awaken50 · 일일 awaken)
+coin: 0,
+p3: null,
+gacha: null,
+adCaps: null,
+deals: null
 };
 function loadStore() {
 readStore();
 reconcileRanks();
 ensureArcadeBest();     // 아케이드 대전 기록판 — 위 reconcile 과 같은 이유로 무조건
+p3Ensure();       // P3 — 새 설치에도 뽑기·광고·특가 칸이 선다
 storeLoaded = true;
 }
 var V74_NUM_CAP = 999999;   /* 옛 파편 소독 상한 SHARD_HOLD_MAX 와 같은 값의 리터럴(초기화 순서와 무관하게) */
@@ -1224,13 +1229,12 @@ for (var ck in o.items.eq) {
 if (!Object.prototype.hasOwnProperty.call(o.items.eq, ck) || !Array.isArray(o.items.eq[ck])) continue;
 var lst = o.items.eq[ck], otherW = false, seenW = false, keep = [];
 for (var q = 0; q < lst.length; q++) {
-var wl = o.items.own[lst[q]];   /* m4 — 환산 뒤 own 이 양수인 무기만 「다른 무기」(readStore 가 버릴 낡은 줄 제외) */
-if (lst[q] !== 'heatshard' && V74_WEAPONS.indexOf(lst[q]) >= 0 && typeof wl === 'number' && isFinite(wl) && wl > 0) otherW = true;
+if (lst[q] !== 'heatshard' && V74_WEAPONS.indexOf(lst[q]) >= 0 && v74Int(o.items.own[lst[q]], 1, V74_LV_MAX, 0) > 0) otherW = true;
 }
 for (q = 0; q < lst.length; q++) {
 var iid = lst[q];
 if (iid === 'heatshard' && otherW) continue;   /* ⑤ 무기 칸이 차 있다 — 열의 조각은 장착만 푼다 */
-if (V74_WEAPONS.indexOf(iid) >= 0) { if (seenW) continue; seenW = true; }
+if (V74_WEAPONS.indexOf(iid) >= 0 && v74Int(o.items.own[iid], 1, V74_LV_MAX, 0) > 0) { if (seenW) continue; seenW = true; }
 keep.push(iid);
 }
 o.items.eq[ck] = keep;
@@ -1246,17 +1250,34 @@ o.v74 = { shards: bal, refund: refund, gear: gear, jstar: Math.ceil(rest / V74_S
 lv: lvSum, arcdmg: moved, shown: 0, shownArc: 0, paid: 0 };
 return o;
 }
+function v2to3(o) {
+if (typeof o.coin !== 'number' || !isFinite(o.coin)) o.coin = 0;
+if (!o.p3 || typeof o.p3 !== 'object') o.p3 = { shown: 0 };
+return o;
+}
 var SCHEMA_MIGRATIONS = [
 function v0to1(o) { return o; },
-v1to2
+v1to2,
+v2to3
 ];
 var persistReadOnly = false;   // 미래 버전 저장을 만나면 true — 덮어쓰지 않는다
 var storeLoaded = false;       // [F7.1-0925 fix1 M1] loadStore() 가 끝까지 돌면 true
-var saveROWarned = false;      // final-fix I-4 — 세션당 1회만 아래 토스트
+var saveROWarned = false;      // final-fix I-4 — 세션당 1회만 아래 토스트(실제로 띄운 순간 쓴다 — 출시 전 A)
+var saveROPending = false;     // 출시 전 A — 스플래시 밑에서 불려 아직 못 알린 알림(걷힌 뒤 saveROFlush 가 띄운다)
 function noteSaveReadOnly() {
 persistReadOnly = true;
-if (saveROWarned) return; saveROWarned = true;
+if (saveROWarned) return;
+saveROPending = true;
+if (splashDone) saveROFlush();
+}
+function saveROFlush() {
+if (!saveROPending || saveROWarned) return;
+saveROPending = false; saveROWarned = true;
 try { toast(t('toast.savero')); } catch (e) { /* 알림 때문에 부팅이 죽지 않는다 */ }
+}
+function saveROHoldMs() {
+if (!saveROPending || saveROWarned) return 0;
+try { return toastMs(t('toast.savero'), 2); } catch (e) { return 0; }
 }
 function backupRaw(tag, raw) {
 try { window.localStorage.setItem(LS_BAK_PREFIX + tag, raw); } catch (e) { /* quota/private: ignore */ }
@@ -1278,7 +1299,7 @@ function migrateStore(o, raw) {
 var from = (typeof o.schemaVersion === 'number' && isFinite(o.schemaVersion)) ? (o.schemaVersion | 0) : 0;
 if (from > SCHEMA_VERSION) {
 backupRaw(String(from), raw);
-persistReadOnly = true;
+noteSaveReadOnly();
 try { console.warn('[tentwin] save schema v' + from + ' > v' + SCHEMA_VERSION + ': read-only, backup ' + LS_BAK_PREFIX + from); } catch (e) {}
 return o;
 }
@@ -1286,7 +1307,7 @@ for (var v = from; v < SCHEMA_VERSION; v++) {
 try { o = SCHEMA_MIGRATIONS[v](o) || o; }
 catch (e) {
 backupRaw(String(from), raw);
-persistReadOnly = true;
+noteSaveReadOnly();
 try { console.warn('[tentwin] save migration v' + v + ' -> v' + (v + 1) + ' failed: read-only, backup ' + LS_BAK_PREFIX + from); } catch (e2) {}
 try { return JSON.parse(raw); } catch (e3) { return o; }
 }
@@ -1424,7 +1445,7 @@ if (typeof ev === 'string' && skinById(ev)) store.equipped[ek] = ev;
 }
 }
 if (typeof o.jstar === 'number' && isFinite(o.jstar)) {
-store.jstar = Math.max(0, o.jstar | 0);
+store.jstar = clamp(Math.floor(Number(o.jstar) || 0), 0, STAR_MAX);   /* P3 T1 수정 1회차 M3 — starGrant 와 같은 상한(STAR_MAX) */
 } else {
 store.jstar = advStarsTotalOf(store.advStars);
 }
@@ -1640,6 +1661,11 @@ store.jellyOn = true;
 if (o.v74 && typeof o.v74 === 'object') store.v74 = o.v74;
 if (typeof o.gearEver === 'number' && isFinite(o.gearEver)) store.gearEver = Math.max(0, o.gearEver | 0);
 if (o.arcadeBestLegacy && typeof o.arcadeBestLegacy === 'object') store.arcadeBestLegacy = o.arcadeBestLegacy;
+store.coin = clamp(Math.floor(Number(o.coin) || 0), 0, COIN_MAX);
+if (o.p3 && typeof o.p3 === 'object') store.p3 = { shown: o.p3.shown ? 1 : 0 };
+store.gacha = gachaStateFrom(o.gacha);
+store.adCaps = adCapsFrom(o.adCaps);
+store.deals = dealsFrom(o.deals);
 }
 } catch (e) {
 if (raw) backupRawStamped(raw);
@@ -1684,6 +1710,7 @@ cells: cloneCells(S.cells),
 score: S.score, adds: S.adds, addsV: 2, hints: S.hints, startedAt: S.startedAt,
 matches: S.matches, maxCombo: S.maxCombo, gridSeed: S.gridSeed,
 addSeq: S.addSeq,
+runCoin: S.coinRunAt === S.startedAt ? (S.runCoin | 0) : 0, x2Done: S.x2Done | 0, x2Token: S.x2Token | 0,
 shuffles: S.shuffles, shuffleCount: S.shuffleCount,
 lastMission: store.lastMissionId || '',
 mission: S.mission ? {
@@ -1868,9 +1895,7 @@ en: {
 'load.tip7': 'The daily puzzle builds your streak.',
 'load.tip8': 'Stuck? Shuffle makes new pairs.',
 'aria.logo': 'Ten Twin Jelly Pang World',
-'aria.splash': 'Tap the screen to start',
 'aria.play': 'Play Endless mode',
-'aria.daily': "Play today's daily puzzle",
 'aria.howto': 'How to play',
 'aria.sound': 'Sound',
 'aria.classicSkills': 'Toggle skills and pets',
@@ -1900,10 +1925,6 @@ en: {
 'aria.hint': 'Show a hint',
 'aria.undo': 'Undo last match',
 'pause.title': 'Paused',
-'pause.sound.on': 'Sound: On',
-'pause.sound.off': 'Sound: Off',
-'pause.vibe.on': 'Vibration: On',
-'pause.vibe.off': 'Vibration: Off',
 'pause.lang': 'Language: English',
 'pause.howto': 'How to play',
 'pause.restart': 'Restart stage',
@@ -1927,7 +1948,8 @@ en: {
 'rw.starfruit': 'Skill fruit',
 'rw.petfruit': 'Pet fruit',
 'rw.awkfruit': 'Awakening fruit',
-'rw.gem': 'Jelly Stars',
+'rw.gem': 'Stars',
+'rw.coin': 'Coins',
 'rw.heart': 'Hearts',
 'mk.gift': 'Gift box!',
 'pet.get': '{n} joined you!',
@@ -1948,9 +1970,7 @@ en: {
 'char.sseokssak.passname': 'Clean Sweep',
 'char.banjjak.passname': 'Spark Charge',
 'cp.sk.head': '[Skill]',
-'cp.sk.eff': 'Effect',
 'cp.sk.skill': 'Skill',
-'cp.sk.perm': 'Always on',
 'cp.sk.none': 'Going solo. No pet skill this run.',
 'cp.pet.empty': 'Pick a pet and their skill shows up here. {free} are with you from the very first round.',
 'cp.pet.sep': ' and ',
@@ -2027,10 +2047,109 @@ en: {
 'aria.dailyMenu': 'Back to main menu',
 'toast.savefail': 'Progress can’t be saved',
 'toast.savero': "Saving isn't working right now. Progress this session won't be saved.",
-'v74.convert': '💎 Shard upgrades are gone. Your shards became gear levels (+{g}) and jelly stars (+{s}).',
+'v74.convert': '💎 Shard upgrades are gone. Your shards became gear levels (+{g}) and stars (+{s}).',
 'v74.convert.gear': '💎 Shard upgrades are gone. Your shards became gear levels (+{g}).',
-'v74.convert.star': '💎 Shard upgrades are gone. Your shards became jelly stars (+{s}).',
+'v74.convert.star': '💎 Shard upgrades are gone. Your shards became stars (+{s}).',
 'v74.arcdmg': 'Awakening now gives ×{am} points, so the Duel damage record starts fresh. Your old record is saved.',
+'p3.walletnote': 'The top coin chip is now your coin wallet. Your adventure stars are on the map, in the bottom chip.',
+'shop2.title': 'Shop',
+'shop2.tab.gacha': 'Capsules',
+'shop2.tab.deals': 'Deals',
+'shop2.tab.free': 'Free',
+'shop2.tab.deco': 'Style',
+'shop2.tab.jewel': 'Jewels',
+'aria.shopback': 'Back to the kingdom',
+'aria.coinplus': 'Get more coins',
+'aria.starplus': 'Get more stars',
+'aria.shoptabs': 'Shop sections',
+'time.hm': '{h}h {m}m',
+'deals.title': "Today's Deals",
+'deals.hi': "Welcome! Here are today's deals.",
+'deals.gift': 'Daily Gift',
+'deals.gift.d': 'Once a day',
+'deals.gear': "Today's Gear",
+'deals.sure': '{name} for sure',
+'deals.heart1': 'One Heart',
+'deals.trade': 'Trade for Stars',
+'deals.heartfull': 'Full Hearts',
+'deals.claim': 'Claim',
+'deals.done': 'Tomorrow',
+'deals.maxed': 'Max level',
+'deals.got': 'You got {name}.',
+'deals.foot': 'All deals are fixed items. You see what you get before you buy. They change every day at midnight.',
+'deals.foot2': 'You can trade coins for stars up to {n} times a day.',
+'deco.title': 'Skins',
+'deco.for': 'Skins for {name}',
+'coin.got': '+{n} coins',
+'star.got': '+{n} stars',
+'gacha.nocoin': 'You need {n} more coins.',
+'gacha.item': 'Item Capsule',
+'gacha.gold': 'Golden Capsule',
+'gacha.friend': 'Friend Capsule',
+'gacha.item.d': 'Any gear can come out!',
+'gacha.gold.d': 'Only rare and epic gear!',
+'gacha.friend.d': 'Only new friends!',
+'gacha.one': 'Pull once',
+'gacha.ten': 'Pull ×{n}',
+'gacha.free.first': 'First pull free',
+'gacha.free.daily': 'Free pull today',
+'gacha.odds': 'See odds ›',
+'gacha.pity': 'Epic guarantee {n}/{max}',
+'gacha.friend.left': 'You have {have}/{all}. One of the {left} left will come.',
+'gacha.friend.all': 'You have every friend. It opens again when a new friend arrives.',
+'gacha.friend.note': 'To be sure of a friend, invite them at the Pet House. Bosses and goals also bring friends.',
+'gacha.chance.now': 'Odds now (friends left)',
+'gacha.nostar': 'You need {n} more stars.',
+'gacha.used': 'Already used today.',
+'odds.title': 'Odds',
+'odds.tier': 'Odds by rarity (per pull)',
+'odds.items': 'Odds per gear',
+'odds.friends': 'Odds per friend',
+'odds.rules': 'Guarantees and repeats',
+'odds.tier.row': '{n} kinds, {each} each',
+'odds.rule.ten': 'In a pull ×{n}, if the first ones are all common, the last one is rare or better. Rare is {r} and epic is {e}.',
+'odds.rule.pity': 'After {n} pulls without an epic, the next pull is a sure epic. Now {c}/{n}.',
+'odds.rule.dup': 'A repeat raises the level by one. At the top level {max}, you get coins back. Common gives {c}, rare {r}, and epic {e}.',
+'odds.rule.friend': "Only friends you don't have yet. Rarity weights common {c}, rare {r}, epic {e} are shared by the friends left.",
+'odds.foot1': 'Pulls use only coins, stars and ad rewards. They are never sold for money.',
+'odds.foot2': 'The odds shown come from the same table the draw uses. Decimals are rounded. ({date})',
+'gres.title1': 'Result',
+'gres.title10': 'Pull ×{n} Result',
+'gres.ten.up': 'A rare or better was guaranteed.',
+'gres.pity.hit': 'The guarantee gave you an epic!',
+'gres.pity.reset': 'The epic guarantee count starts over.',
+'gres.lvup': 'Lv{a}→{b}',
+'gres.sum': 'New {a} · Level up {b}',
+'gres.refund': '{n} coins back',
+'gres.new': 'NEW',
+'gres.ok': 'OK',
+'gres.again10': '{n} more',
+'gres.again1': 'Once more',
+'gres.openall': 'Open all',
+'free.title': 'Watch and Get',
+'free.reset': 'Resets at midnight. Time left',
+'free.coin': '+{n} Coins',
+'free.item': 'One Item Capsule pull',
+'free.star': '+{n} Stars',
+'free.heart': 'One Heart',
+'free.friend': 'One Friend Capsule pull',
+'free.x2': 'Double coins on results',
+'free.left.day': '{n}/{m} left today',
+'free.left.week': '{n}/{m} this week, resets Monday',
+'free.heart.full': 'Locked while your hearts are full',
+'free.friend.none': 'Locked when no new friend is left',
+'free.x2.d': 'On the result screen after a round, {n}/{m} used today',
+'free.x2.where': 'After a round',
+'free.get': 'Get',
+'free.tomorrow': 'Tomorrow',
+'free.foot1': 'One ad gives one reward. There are no ad buttons during a round.',
+'free.foot2': 'Without ads you can get the same things with coins, deals and missions.',
+'gacha.ad': 'Watch an ad to pull',
+'gacha.ad.week': 'Free pull, once a week',
+'coin.x2': 'Double coins',
+'coin.x2.no': 'Just take',
+'coin.x2.got': 'You got {n} more coins!',
+'gacha.dup.star': '{name} is already with you, so you got {n} stars.',
 'toast.noadds': 'No adds left',
 'toast.empty': 'Board is empty',
 'toast.nohints': 'No hints left',
@@ -2142,11 +2261,7 @@ en: {
 'combo.tier3': 'UNREAL!',
 'combo.tier4': 'LEGENDARY!',
 'lang.short': 'EN',
-'menu.rush': 'Time Rush',
-'menu.rushdesc': '90 seconds. Every match buys time.',
 'menu.bestrush': 'Rush {score}',
-'aria.rush': 'Play time rush mode',
-'hud.rush': 'Time left',
 'toast.addcd': 'Add ready in {n}s',
 'toast.autoadd': 'No moves left. Adding for you!',
 'toast.rushnext': 'Board cleared. Next!',
@@ -2180,7 +2295,6 @@ en: {
 'mission.reward': '+{score} & Add +1',
 'fever.on': 'FEVER!',
 'fever.off': 'FEVER +{score}',
-'clear.grade': 'Rank',
 'grade.s': 'S',
 'grade.a': 'A',
 'grade.b': 'B',
@@ -2190,7 +2304,7 @@ en: {
 'grade.b.msg': 'Solid clear.',
 'grade.c.msg': 'Cleared. Try it faster.',
 'milestone.title': 'Match #{n}!',
-'milestone.title.rw': 'Match #{n}! Jelly Stars +{v}',
+'milestone.title.rw': 'Match #{n}! Stars +{v}',
 'milestone.sub': 'What a streak. Keep going.',
 'over.share': 'Share',
 'aria.overShare': 'Share your score with a result card image',
@@ -2199,7 +2313,6 @@ en: {
 'aria.theme': 'Theme',
 'aria.pzTheme': 'Change theme',
 'pause.theme.dark': 'Theme: Dark',
-'pause.theme.light': 'Theme: Light',
 'tut.replay': 'Try it',
 'tut.s1': 'Two <b>7</b>s, one above the other, in a straight line. Tap them.',
 'tut.s2': 'Two <b>2</b>s up there. Try those.',
@@ -2208,9 +2321,6 @@ en: {
 'tut.s3fail': 'Not that one. Go from the <b>end</b> of a row to the <b>start</b> of the next.',
 'tut.done': 'That\'s the basics. Now beat the villain!',
 'rules.title': 'Three rules. That is all.',
-'rules.c1': 'Ten & Twin',
-'rules.c4': 'Overdrive',
-'rules.c5': 'Finish',
 'rules.r1': 'Same number, or two that make <b>10</b>.',
 'rules.r2': 'Joined by a <b>straight path</b> across, down, or diagonally.',
 'rules.r3': 'Or the <b>end</b> of a row to the <b>start</b> of the next.',
@@ -2237,11 +2347,7 @@ en: {
 'toast.notLine': 'That is not a straight path.',
 'toast.alignRemind': 'A straight path, or the end of a row to the start of the next.',
 'combo.5': 'UNSTOPPABLE!',
-'menu.continueStage': 'Stage {stage}',
-'hero.streak': 'Streak',
 'streak.reward': '{d}-day streak reward!',
-'hero.best': 'Best stage',
-'menu.new': 'NEW',
 'toast.rushopen': 'Time Rush unlocked!',
 'clear.nextpreview': 'Next: {cells} tiles · {what}',
 'clear.nextpreviewplain': 'Next: {cells} tiles',
@@ -2303,9 +2409,6 @@ en: {
 'theater.title': 'Story Theater',
 'theater.locked': 'Reach Chapter {n} to unlock',
 'aria.thcell': 'Chapter {c} story replay',
-'mode.arcade': 'Endless',
-'mode.arcade.d': 'Endless. Chase your best.',
-'mode.daily.d': 'One board a day, for all.',
 'mode.rush.d': '90s. Each match adds time.',
 'classic.title': 'Classic',
 'classic.lead': 'No skills, no items, no passives. Clear the board for the next one. Stuck ends the run, Rush ends at 90s, Daily is one board a day.',
@@ -2347,13 +2450,8 @@ en: {
 'aria.cont': 'Classic: pure skill modes',
 'aria.chprev': 'Previous chapter',
 'aria.chnext': 'Next chapter',
-'aria.gallery': 'Story gallery',
-'aria.credits': 'Credits',
 'aria.cutskip': 'Skip the story',
 'aria.cutskipall': 'Skip the whole story',
-'settings.gallery': 'Story gallery',
-'settings.credits': 'Credits',
-'credits.body': 'Ten Twin: Jelly Pang World · Art & music by the author, built with the game factory.',
 'pick.rec': 'Best for',
 'pet.combo.k': 'Best team',
 'pet.syn.ppyak': 'Far tiles link up, so the princes find their pairs.',
@@ -2404,16 +2502,10 @@ en: {
 'cut.p3b': 'No! If the princes see me like THIS\u2026',
 'cut.p3c': 'My wedding is RUINED!',
 'cut.p4': 'I\u2019ll make my own way out!',
-'aria.adv': 'Open the adventure map',
 'aria.mapback': 'Back to the menu',
-'adv.title': 'Adventure',
 'adv.stagen': 'Stage {n}',
 'adv.stagebadge': 'S{n}',
 'adv.bossn': 'Boss {n}',
-'adv.chapn': 'Chapter {n}',
-'adv.chap1': 'Green Grape Hills',
-'adv.chap2': 'Soda Sea',
-'adv.chap3': 'Strawberry Volcano',
 'adv.locked': 'Clear the stage before it first.',
 'adv.nodearia': 'Stage {n}, {s} stars',
 'adv.goal.score': 'Score {n} points',
@@ -2427,26 +2519,14 @@ en: {
 'adv.hand.lock': 'Locked tiles ×{n}',
 'adv.hand.noshuffle': 'No shuffle',
 'adv.hand.timecut': 'Short clock',
-'adv.hand.none': 'No handicap',
-'adv.mission': 'Mission',
-'adv.goal': 'Goal',
-'adv.handicap': 'Handicap',
-'adv.recommend': 'Recommended',
-'adv.stars': 'Stars',
 'adv.star1': '★ Clear the stage',
 'adv.star2': '★★ Score {n}',
 'adv.star3': '★★★ Score {n} + no shuffles + {t} sum-10 matches',
-'node.bosshp': 'Boss HP',
-'node.bossatk': 'Boss skill',
 'node.foehp': 'Villain HP',
-'node.foeatk': 'Villain skill',
 'node.cond': 'Weak point',
 'node.best': 'Your best',
-'node.bestv': '{b} / ★★ line {g} = {p}%',
-'node.bestnone': 'No record yet · ★★ line {g}',
 'node.rec': 'Why this hero',
 'node.recpet': 'Why this pet',
-'node.pet': 'Pet pick',
 'node.clear': 'Knock it down in {sec}s',
 'node.clear.boss': 'Knock it down, then {mis} within {fsec}s',
 'node.clear.timeout': 'When time runs out, the higher remaining HP share wins. A tie goes to you.',
@@ -2470,7 +2550,6 @@ en: {
 'rec.why.atk.quake': "This boss shakes the board. Churup's Big Bite blocks the next quake.",
 'rec.why.atk.cycle': 'This boss rotates four attacks. When TikTok stops time, you get a window whatever comes next.',
 'adv.go': 'Start',
-'adv.close': 'Close',
 'adv.missionwin': 'Mission clear! Every match ×{mult} from now on',
 'adv.missionfail': 'Mission time is up. The stage goes on.',
 'adv.crumble': 'The blockers crumbled!',
@@ -2531,7 +2610,8 @@ en: {
 'mk.star': 'SKILL MAX!',
 'mk.awk': 'AWAKEN MAX!',
 'mk.gear': 'Got {tier} {name}!',
-'mk.gearmax': '{name} is maxed! +{j} jelly star',
+'mk.gearmax': '{name} is maxed! +{c} coins',
+'mk.gearmax0': '{name} is maxed!',
 'drops.tier.common': 'Common',
 'drops.tier.rare': 'Rare',
 'drops.tier.epic': 'Epic',
@@ -2608,7 +2688,6 @@ en: {
 'adv.heartfull': 'MAX',   /* 2026-08-19 한/영 공통 표기로 통일 */
 'adv.heartwait': 'Out of hearts. Next one in {t}.',
 'adv.ad': 'Get a heart (coming soon)',
-'adv.adsoon': 'Coming when the game goes live on the portal.',
 'adv.hearts': 'Hearts',
 'aria.skill': 'Use your skill',
 'skill.ready': 'GO!',
@@ -2665,15 +2744,12 @@ en: {
 'unlock.sub': 'Jelly Princess joins your party. Pick her in the menu.',
 'unlock.go': 'Welcome aboard!',
 'pick.title': 'Heroes',
-'pick.change': 'Change',
 'pick.go': 'Confirm',
 'pick.locked': 'Locked',
 'pick.passive': 'Passive',
 'pick.ult': 'Skill',
 'menu.sub': 'Jelly Pang World',
 'pick.head': 'Heroes',
-'adv.goal.k': 'Final goal',
-'adv.goal.v': 'Jelly Castle',
 'stat.k1': 'Ten Power',
 'stat.k2': 'Base Score',
 'stat.k3': 'Twin Power',
@@ -2699,11 +2775,9 @@ en: {
 'quest.claimall': 'Claim all',
 'quest.none': 'Nothing to claim yet.',
 'quest.ready': 'Ready to claim: {n}',
-'quest.got': 'Jelly Stars +{v}',
+'quest.got': 'Stars +{v}',
 'quest.bonus': 'All daily missions cleared! Heart +{n}',
 'quest.att.d': 'Day {n}',
-'settings.quest': 'Missions',
-'aria.quest': 'Open missions',
 'aria.questTab': 'Pick which missions to show',
 'menu.quest': 'Missions {n}/{g}',
 'dq.m10': 'Make a Ten {n} times',
@@ -2759,26 +2833,21 @@ en: {
 'aria.skins': 'Open skins',
 'skin.btn': 'Skins',
 'skin.title': 'Skins',
-'skin.balance': 'Jelly Stars',
-'skin.own': 'Owned',
+'skin.balance': 'Stars',
 'skin.equip': 'Equip',
 'skin.equipped': 'Wearing',
-'skin.buy': 'Buy',
 'skin.soon': 'Coming soon',
 'skin.soonhint': 'A hat for the bichon prince',
-'skin.confirm': 'Spend {n} Jelly Stars on {name}?',
+'skin.confirm': 'Spend {n} Stars on {name}?',
 'skin.bought': '{name} unlocked!',
-'skin.poor': 'Not enough Jelly Stars ({n} more)',
+'skin.poor': 'Not enough Stars ({n} more)',
 'aria.shop': 'Open shop',
 'shop.btn': 'Shop',
 'shop.title': 'Shop',
 'shop.tab.jewel': 'Jewels',
-'shop.tab.jstar': 'Stars',
 'shop.tab.bundle': 'Bundles',
-'shop.tab.skin': 'Skins',
 'shop.krw': 'KRW {n}',
 'shop.price.jewel': '\uD83D\uDC8E {n}',
-'shop.soon': 'Coming soon',
 'shop.daily': 'Daily free',
 'shop.daily.d': '{n} jewels + 1 heart, once a day',
 'shop.daily.wait': 'Come back tomorrow',
@@ -2792,10 +2861,7 @@ en: {
 'shop.pack.xl': 'Chest of jewels',
 'shop.pack.d': '{n} jewels',
 'shop.start': 'Starter pack',
-'shop.start.d': '{n} jewels + {h} hearts + {s} jelly stars',
-'shop.trade': 'Jelly Stars {s}',
-'shop.trade.d': 'Jewels to Jelly Stars. One way only.',
-'shop.trade.ok': 'Jelly Stars +{s}',
+'shop.start.d': '{n} jewels + {h} hearts + {s} stars',
 'shop.heart5': 'Refill hearts',
 'shop.heart5.d': 'Straight back to {n}',
 'shop.heart1': 'One heart',
@@ -2805,9 +2871,6 @@ en: {
 'shop.bundle1.d': 'Hearts and items in one go',
 'shop.bundle2': 'Heart bundle',
 'shop.bundle2.d': 'A long evening of play',
-'shop.skin': 'Skins',
-'shop.skin.d': 'Buy any skin with {n} jewels',
-'shop.skin.open': 'Open',
 'shop.skin.confirm': 'Spend {n} jewels on {name}?',
 'shop.poor': 'Not enough jewels ({n} more)',
 'shop.poor.continue': 'Not enough jewels to continue',
@@ -2860,7 +2923,7 @@ en: {
 'intro.banjjak.l2': 'My skill is Spark Charge. Your Skill gauge fills by {pn}%.',
 'intro.bangul.l1': 'Bubbly here. Stuck spots get loosened with bubbles.',
 'intro.bangul.l2': 'My skill is Bubble Wave. {pn} blocker tiles get washed away.',
-'skin.gem': '+1 Jelly Star!',
+'skin.gem': '+1 Star!',
 'skin.base': 'Default',
 'skin.basedesc': 'The look you started with',
 'skin.royal': 'Royal Gown',
@@ -2875,18 +2938,6 @@ en: {
 'skin.bearmintdesc': 'Cool mint fur',
 'skin.bearblue': 'Sky Bear',
 'skin.bearbluedesc': 'Clear sky-blue fur',
-'stat.ten.1': 'Arithmetic',
-'stat.ten.2': 'Composure',
-'stat.ten.3': 'Brotherhood',
-'stat.ten.4': 'Love of 10',
-'stat.twin.1': 'Reflexes',
-'stat.twin.2': 'Mischief',
-'stat.twin.3': 'Brotherhood',
-'stat.twin.4': 'Twin bond',
-'stat.jelly.1': 'Sweetness',
-'stat.jelly.2': 'Luck',
-'stat.jelly.3': 'Bounciness',
-'stat.jelly.4': 'Courage',
 'aria.charopen': 'Heroes: choose a character',
 'aria.prevchar': 'Previous character',
 'aria.nextchar': 'Next character',
@@ -2937,7 +2988,7 @@ en: {
 'kd.pethouse.alljoined': 'Everyone has already joined!',
 'soon.title': 'Coming Soon',
 'soon.body': 'Under construction. Check back after the next update!',
-'kd.visit': 'Yesterday-you saved up {n} Jelly Stars.',
+'kd.visit': 'Yesterday-you saved up {n} Stars.',
 'kd.visit.first': 'Welcome to Jelly Pang Kingdom!',
 'kd.res.aria': 'Say hello',
 'portal.login': 'Log in',
@@ -2965,9 +3016,7 @@ ko: {
 'load.tip7': '데일리를 매일 풀면 연속 기록이 쌓여요.',
 'load.tip8': '막히면 섞기로 새 짝을 만들어요.',
 'aria.logo': 'Ten Twin 젤리 팡 월드',
-'aria.splash': '화면을 터치하면 시작합니다',
 'aria.play': '무한 모드 시작',
-'aria.daily': '오늘의 데일리 퍼즐 풀기',
 'aria.howto': '게임 방법',
 'aria.sound': '소리',
 'aria.classicSkills': '스킬·펫 사용 켜고끄기',
@@ -2997,10 +3046,6 @@ ko: {
 'aria.hint': '힌트 보기',
 'aria.undo': '방금 지운 짝 되돌리기',
 'pause.title': '일시정지',
-'pause.sound.on': '소리: 켜짐',
-'pause.sound.off': '소리: 꺼짐',
-'pause.vibe.on': '진동: 켜짐',
-'pause.vibe.off': '진동: 꺼짐',
 'pause.lang': '언어: 한국어',
 'pause.howto': '게임 방법',
 'pause.restart': '단계 다시하기',
@@ -3024,7 +3069,8 @@ ko: {
 'rw.starfruit': '스킬 과일',
 'rw.petfruit': '펫 과일',
 'rw.awkfruit': '각성 과일',
-'rw.gem': '젤리별',
+'rw.gem': '별',
+'rw.coin': '코인',
 'rw.heart': '하트',
 'mk.gift': '선물 상자!',
 'pet.get': '{n} 합류!',
@@ -3045,9 +3091,7 @@ ko: {
 'char.sseokssak.passname': '싹쓸이',
 'char.banjjak.passname': '번쩍 충전',
 'cp.sk.head': '[스킬]',
-'cp.sk.eff': '효과',
 'cp.sk.skill': '스킬',
-'cp.sk.perm': '영구',
 'cp.sk.none': '혼자 가요. 이번 판에는 펫 스킬이 없어요.',
 'cp.pet.empty': '펫을 고르면 여기에 스킬이 나와요. {free}는 처음부터 함께예요.',
 'cp.pet.sep': '·',
@@ -3124,10 +3168,109 @@ ko: {
 'aria.dailyMenu': '메인 메뉴로',
 'toast.savefail': '진행이 저장되지 않아요',
 'toast.savero': '저장에 문제가 있어 이번에는 진행이 저장되지 않아요.',
-'v74.convert': '💎 파편 강화가 없어져서, 모아 둔 파편을 장비 {g}레벨과 젤리별 {s}개로 바꿨어요.',
+'v74.convert': '💎 파편 강화가 없어져서, 모아 둔 파편을 장비 {g}레벨과 별 {s}개로 바꿨어요.',
 'v74.convert.gear': '💎 파편 강화가 없어져서, 모아 둔 파편을 장비 {g}레벨로 바꿨어요.',
-'v74.convert.star': '💎 파편 강화가 없어져서, 모아 둔 파편을 젤리별 {s}개로 바꿨어요.',
+'v74.convert.star': '💎 파편 강화가 없어져서, 모아 둔 파편을 별 {s}개로 바꿨어요.',
 'v74.arcdmg': '각성이 점수 {am}배로 바뀌어서 대전 누적 피해 기록을 새로 시작해요. 예전 기록은 저장해 뒀어요.',
+'p3.walletnote': '위 동전 칸은 이제 코인 지갑이에요. 모은 모험 별은 지도 아래 칸에서 볼 수 있어요.',
+'shop2.title': '상점',
+'shop2.tab.gacha': '뽑기',
+'shop2.tab.deals': '특가',
+'shop2.tab.free': '무료',
+'shop2.tab.deco': '꾸미기',
+'shop2.tab.jewel': '보석',
+'aria.shopback': '왕국으로 돌아가기',
+'aria.coinplus': '코인 더 얻기',
+'aria.starplus': '별 더 얻기',
+'aria.shoptabs': '상점 칸 고르기',
+'time.hm': '{h}시간 {m}분',
+'deals.title': '오늘의 특가',
+'deals.hi': '어서 와요! 오늘의 특가예요.',
+'deals.gift': '매일 선물',
+'deals.gift.d': '하루 한 번',
+'deals.gear': '오늘의 장비',
+'deals.sure': '{name} 확정',
+'deals.heart1': '하트 하나',
+'deals.trade': '별로 바꾸기',
+'deals.heartfull': '하트 가득',
+'deals.claim': '무료 받기',
+'deals.done': '내일 다시',
+'deals.maxed': '최고 레벨',
+'deals.got': '{name}을(를) 받았어요.',
+'deals.foot': '특가는 모두 확정 상품이에요. 무엇을 받는지 미리 보여요. 매일 자정에 새로 바뀌어요.',
+'deals.foot2': '코인을 별로 바꾸기는 하루 {n}번까지예요.',
+'deco.title': '스킨',
+'deco.for': '{name}에게 입힐 스킨이에요.',
+'coin.got': '코인 +{n}',
+'star.got': '별 +{n}',
+'gacha.nocoin': '코인이 {n}개 부족해요.',
+'gacha.item': '아이템 캡슐',
+'gacha.gold': '황금 캡슐',
+'gacha.friend': '친구 캡슐',
+'gacha.item.d': '모든 장비가 나올 수 있어요!',
+'gacha.gold.d': '희귀와 영웅 장비만 나와요!',
+'gacha.friend.d': '새 친구만 나와요!',
+'gacha.one': '한 번 뽑기',
+'gacha.ten': '{n}회 뽑기',
+'gacha.free.first': '처음 한 번 무료',
+'gacha.free.daily': '오늘 무료 뽑기',
+'gacha.odds': '확률 보기 ›',
+'gacha.pity': '영웅 천장 {n}/{max}',
+'gacha.friend.left': '가진 친구 {have}/{all}, 남은 {left}명 중 한 명이 와요',
+'gacha.friend.all': '친구를 모두 모았어요. 새 친구가 오면 다시 열려요.',
+'gacha.friend.note': '원하는 친구를 꼭 데려오려면 펫 하우스에서 초대해요. 보스와 조건으로도 친구를 만나요.',
+'gacha.chance.now': '지금 확률 (남은 친구 기준)',
+'gacha.nostar': '별이 {n}개 부족해요.',
+'gacha.used': '오늘은 이미 썼어요.',
+'odds.title': '확률 정보',
+'odds.tier': '등급 확률 (한 번 기준)',
+'odds.items': '장비별 확률',
+'odds.friends': '친구별 확률',
+'odds.rules': '보장과 중복 규칙',
+'odds.tier.row': '{n}종, 각 {each}',
+'odds.rule.ten': '{n}회 뽑기에서 앞 칸이 모두 일반이면 마지막 칸은 희귀 이상이에요. 희귀 {r}, 영웅 {e}예요.',
+'odds.rule.pity': '영웅 없이 {n}회를 뽑으면 다음 한 번은 영웅이 확정이에요. 지금 {c}/{n}이에요.',
+'odds.rule.dup': '같은 장비가 또 나오면 레벨이 하나 올라요. 최고 레벨 {max}이면 코인으로 돌려받아요. 일반 {c}, 희귀 {r}, 영웅 {e}개예요.',
+'odds.rule.friend': '아직 없는 친구만 나와요. 등급 무게 일반 {c}, 희귀 {r}, 영웅 {e}를 남은 친구끼리 나눠요.',
+'odds.foot1': '코인, 별, 광고 보상으로만 뽑아요. 현금으로 팔지 않아요.',
+'odds.foot2': '보이는 확률은 실제 추첨에 쓰는 표와 같은 값이에요. 소수점 아래는 반올림했어요. ({date} 기준)',
+'gres.title1': '뽑기 결과',
+'gres.title10': '{n}회 뽑기 결과',
+'gres.ten.up': '희귀 이상 한 개가 확정으로 나왔어요.',
+'gres.pity.hit': '천장으로 영웅이 나왔어요!',
+'gres.pity.reset': '영웅 천장을 처음부터 다시 세요.',
+'gres.lvup': 'Lv{a}→{b}',
+'gres.sum': '새 장비 {a} · 레벨업 {b}',
+'gres.refund': '코인 {n} 돌려받음',
+'gres.new': 'NEW',
+'gres.ok': '확인',
+'gres.again10': '{n}회 더',
+'gres.again1': '한 번 더',
+'gres.openall': '모두 열기',
+'free.title': '광고 보고 받기',
+'free.reset': '매일 자정에 초기화돼요. 남은 시간',
+'free.coin': '코인 +{n}',
+'free.item': '아이템 캡슐 한 번',
+'free.star': '별 +{n}',
+'free.heart': '하트 하나',
+'free.friend': '친구 캡슐 한 번',
+'free.x2': '결과 화면 코인 두 배',
+'free.left.day': '오늘 남은 횟수 {n}/{m}',
+'free.left.week': '이번 주 {n}/{m}, 월요일에 초기화돼요',
+'free.heart.full': '하트가 가득하면 잠겨요',
+'free.friend.none': '새 친구가 없으면 잠겨요',
+'free.x2.d': '판이 끝난 결과 화면에서, 오늘 {n}/{m} 사용',
+'free.x2.where': '판이 끝나면',
+'free.get': '받기',
+'free.tomorrow': '내일 다시',
+'free.foot1': '광고 한 번에 보상 한 번이에요. 판을 하는 동안에는 광고 버튼이 없어요.',
+'free.foot2': '광고 없이도 코인, 특가, 미션으로 같은 것을 얻을 수 있어요.',
+'gacha.ad': '광고 보고 뽑기',
+'gacha.ad.week': '무료 뽑기, 주 한 번',
+'coin.x2': '코인 두 배',
+'coin.x2.no': '그냥 받기',
+'coin.x2.got': '코인 {n}개를 더 받았어요!',
+'gacha.dup.star': '{name}은(는) 이미 함께해서 별 {n}개로 바꿨어요.',
 'toast.noadds': '추가 횟수를 다 썼어요',
 'toast.empty': '보드가 비었어요',
 'toast.nohints': '힌트를 다 썼어요',
@@ -3239,11 +3382,7 @@ ko: {
 'combo.tier3': '말도 안 돼!',
 'combo.tier4': '전설이다!',
 'lang.short': '한',
-'menu.rush': '타임 러시',
-'menu.rushdesc': '90초 승부. 짝을 지울수록 시간이 늘어요.',
 'menu.bestrush': '러시 {score}점',
-'aria.rush': '타임 러시 모드 시작',
-'hud.rush': '남은 시간',
 'toast.addcd': '{n}초 뒤에 또 쓸 수 있어요',
 'toast.autoadd': '이을 게 없네요. 제가 추가할게요!',
 'toast.rushnext': '보드 클리어! 다음 판으로',
@@ -3271,7 +3410,6 @@ ko: {
 'mission.reward': '+{score}점 & 추가 +1',
 'fever.on': '피버 타임!',
 'fever.off': '피버 +{score}점',
-'clear.grade': '등급',
 'grade.s': 'S',
 'grade.a': 'A',
 'grade.b': 'B',
@@ -3281,7 +3419,7 @@ ko: {
 'grade.b.msg': '무난하게 클리어!',
 'grade.c.msg': '클리어! 다음엔 더 빠르게',
 'milestone.title': '{n}번째 짝!',
-'milestone.title.rw': '{n}번째 짝! 젤리별 +{v}',
+'milestone.title.rw': '{n}번째 짝! 별 +{v}',
 'milestone.sub': '이 기세 그대로 가요.',
 'over.share': '공유하기',
 'aria.overShare': '결과 카드 이미지와 함께 점수 공유하기',
@@ -3290,7 +3428,6 @@ ko: {
 'aria.theme': '테마',
 'aria.pzTheme': '테마 바꾸기',
 'pause.theme.dark': '테마: 어둡게',
-'pause.theme.light': '테마: 밝게',
 'tut.replay': '직접 해보기',
 'tut.s1': '<b>7</b>이 위아래로 둘. 곧게 이어지지? 눌러 봐.',
 'tut.s2': '저기 <b>2</b>도 두 개네. 눌러 봐.',
@@ -3299,9 +3436,6 @@ ko: {
 'tut.s3fail': '거기 말고. 줄 <b>끝</b>에서 다음 줄 <b>첫 칸</b>으로 이어 봐.',
 'tut.done': '이게 기본이야. 이제 악당을 물리쳐 봐!',
 'rules.title': '규칙은 셋뿐이야',
-'rules.c1': '텐과 트윈',
-'rules.c4': '폭주',
-'rules.c5': '피니시',
 'rules.r1': '같은 숫자, 또는 합이 <b>10</b>',
 'rules.r2': '가로·세로·대각선 <b>곧은 길</b>로 이어질 것',
 'rules.r3': '또는 줄 <b>끝</b>에서 다음 줄 <b>첫 칸</b>으로',
@@ -3328,11 +3462,7 @@ ko: {
 'toast.notLine': '곧은 길이 아니에요',
 'toast.alignRemind': '곧은 길, 또는 줄 끝과 다음 줄 첫 칸',
 'combo.5': '이걸 멈춰?!',
-'menu.continueStage': '{stage}단계',
-'hero.streak': '연속 출석',
 'streak.reward': '연속 {d}일 보상!',
-'hero.best': '최고 단계',
-'menu.new': 'NEW',
 'toast.rushopen': '타임 러시 열렸어요!',
 'clear.nextpreview': '다음: {cells}칸 · {what}',
 'clear.nextpreviewplain': '다음: {cells}칸',
@@ -3394,9 +3524,6 @@ ko: {
 'theater.title': '스토리 극장',
 'theater.locked': '{n}챕터에 도착하면 열려요',
 'aria.thcell': '{c}장 이야기 다시 보기',
-'mode.arcade': '무한 모드',
-'mode.arcade.d': '끝없이. 최고 기록에 도전해요.',
-'mode.daily.d': '하루 한 판, 모두가 같은 판이에요.',
 'mode.rush.d': '90초. 맞추면 시간 추가.',
 'classic.title': '클래식',
 'classic.lead': '스킬도 아이템도 패시브도 없어요. 판을 비우면 다음 판, 막히면 끝. 러시는 90초, 데일리는 하루 한 판이에요.',
@@ -3438,13 +3565,8 @@ ko: {
 'aria.cont': '클래식: 순수 실력 모드',
 'aria.chprev': '이전 챕터',
 'aria.chnext': '다음 챕터',
-'aria.gallery': '스토리 갤러리',
-'aria.credits': '제작진',
 'aria.cutskip': '스토리 건너뛰기',
 'aria.cutskipall': '이야기 전부 건너뛰기',
-'settings.gallery': '스토리 갤러리',
-'settings.credits': '제작진',
-'credits.body': '텐트윈: 젤리팡 월드 · 그림·음악 제작자 제공, 게임 공장에서 만들었어요.',
 'pick.rec': '추천',
 'pet.combo.k': '추천 조합',
 'pet.syn.ppyak': '떨어진 칸도 이어져 두 왕자가 짝을 고르기 쉬워요.',
@@ -3495,16 +3617,10 @@ ko: {
 'cut.p3b': '안 돼! 이 모습을 왕자님들께 보이면\u2026',
 'cut.p3c': '내 결혼은 끝이야!',
 'cut.p4': '길은 내가 뚫는다!',
-'aria.adv': '모험 지도 열기',
 'aria.mapback': '메뉴로 돌아가기',
-'adv.title': '모험',
 'adv.stagen': '{n}탄',
 'adv.stagebadge': '{n}탄',
 'adv.bossn': '{n}탄 보스',
-'adv.chapn': '{n}챕터',
-'adv.chap1': '청포도 언덕',
-'adv.chap2': '소다 바다',
-'adv.chap3': '딸기 화산',
 'adv.locked': '앞 탄부터 깨야 열려요.',
 'adv.nodearia': '{n}탄, 별 {s}개',
 'adv.goal.score': '{n}점 모으기',
@@ -3518,26 +3634,14 @@ ko: {
 'adv.hand.lock': '잠금 {n}개',
 'adv.hand.noshuffle': '셔플 금지',
 'adv.hand.timecut': '시간 단축',
-'adv.hand.none': '방해 없음',
-'adv.mission': '미션',
-'adv.goal': '목표',
-'adv.handicap': '방해',
-'adv.recommend': '추천',
-'adv.stars': '별 조건',
 'adv.star1': '★ 클리어',
 'adv.star2': '★★ {n}점',
 'adv.star3': '★★★ {n}점 + 셔플 0회 + 합10 {t}회',
-'node.bosshp': '보스 체력',
-'node.bossatk': '보스 기술',
 'node.foehp': '악당 체력',
-'node.foeatk': '악당 기술',
 'node.cond': '약점',
 'node.best': '내 최고',
-'node.bestv': '{b}점 / ★★선 {g}점 = {p}%',
-'node.bestnone': '아직 기록 없음 · ★★선 {g}점',
 'node.rec': '이 캐릭인 이유',
 'node.recpet': '이 펫인 이유',
-'node.pet': '추천 펫',
 'node.clear': '{sec}초 안에 쓰러뜨리기',
 'node.clear.boss': '쓰러뜨리고 {fsec}초 안에 {mis}',
 'node.clear.timeout': '시간이 끝나면 남은 체력 비율로 승부해요. 같으면 내가 이겨요.',
@@ -3561,7 +3665,6 @@ ko: {
 'rec.why.atk.quake': '이 보스는 판을 흔들어요. 츄릅의 크게 한 입이 다음 흔들기를 한 번 막아 줘요.',
 'rec.why.atk.cycle': '이 보스는 네 가지 공격을 번갈아 써요. 째깍이가 시간을 멈추면 어떤 공격이 와도 대응할 틈이 생겨요.',
 'adv.go': '시작',
-'adv.close': '닫기',
 'adv.missionwin': '미션 성공! 이제 매치마다 ×{mult}',
 'adv.missionfail': '미션 시간이 끝났어요. 스테이지는 계속돼요.',
 'adv.crumble': '블로커가 와르르 무너졌어요!',
@@ -3622,7 +3725,8 @@ ko: {
 'mk.star': '스킬 MAX!',
 'mk.awk': '각성 MAX!',
 'mk.gear': '{tier} {name} 획득!',
-'mk.gearmax': '{name} 최대 레벨! 젤리별 +{j}',
+'mk.gearmax': '{name} 최대 레벨! 코인 +{c}',
+'mk.gearmax0': '{name} 최대 레벨!',
 'drops.tier.common': '일반',
 'drops.tier.rare': '희귀',
 'drops.tier.epic': '영웅',
@@ -3699,7 +3803,6 @@ ko: {
 'adv.heartfull': 'MAX',   /* 2026-08-19 사용자 반려 — "가득"이 촌스럽다. 한/영 공통 MAX */
 'adv.heartwait': '하트가 없어요. 다음 하트까지 {t}.',
 'adv.ad': '하트 받기 (준비 중)',
-'adv.adsoon': '포털 출시 후 제공돼요.',
 'adv.hearts': '하트',
 'aria.skill': '스킬 쓰기',
 'skill.ready': '발동!',
@@ -3756,15 +3859,12 @@ ko: {
 'unlock.sub': '젤리공주가 합류했어요. 메뉴에서 고를 수 있어요.',
 'unlock.go': '같이 가자!',
 'pick.title': '캐릭터',
-'pick.change': '변경',
 'pick.go': '선택 완료',
 'pick.locked': '잠김',
 'pick.passive': '패시브',
 'pick.ult': '스킬',
 'menu.sub': '젤리팡 월드',
 'pick.head': '캐릭터 선택',
-'adv.goal.k': '최종 목적지',
-'adv.goal.v': '젤리 성',
 'stat.k1': '텐 파워',
 'stat.k2': '기본 점수',
 'stat.k3': '트윈 파워',
@@ -3790,11 +3890,9 @@ ko: {
 'quest.claimall': '모두 받기',
 'quest.none': '아직 받을 것이 없어요.',
 'quest.ready': '받을 수 있어요: {n}',
-'quest.got': '젤리별 +{v}',
+'quest.got': '별 +{v}',
 'quest.bonus': '오늘 미션 전부 완료! 하트 +{n}',
 'quest.att.d': '{n}일째',
-'settings.quest': '미션',
-'aria.quest': '미션 열기',
 'aria.questTab': '어떤 미션을 볼지 고르기',
 'menu.quest': '미션 {n}/{g}',
 'dq.m10': '합 텐 {n}번 만들기',
@@ -3845,26 +3943,21 @@ ko: {
 'aria.skins': '스킨 열기',
 'skin.btn': '스킨',
 'skin.title': '스킨',
-'skin.balance': '젤리별',
-'skin.own': '보유',
+'skin.balance': '별',
 'skin.equip': '장착',
 'skin.equipped': '착용 중',
-'skin.buy': '구매',
 'skin.soon': '곧 만나요',
 'skin.soonhint': '비숑 왕자의 모자',
-'skin.confirm': '{name}을(를) 젤리별 {n}개로 살까요?',
+'skin.confirm': '{name}을(를) 별 {n}개로 살까요?',
 'skin.bought': '{name} 해금!',
-'skin.poor': '젤리별이 {n}개 부족해요',
+'skin.poor': '별이 {n}개 부족해요',
 'aria.shop': '상점 열기',
 'shop.btn': '상점',
 'shop.title': '상점',
 'shop.tab.jewel': '보석',
-'shop.tab.jstar': '젤리별',
 'shop.tab.bundle': '번들',
-'shop.tab.skin': '스킨',
 'shop.krw': '{n}원',
 'shop.price.jewel': '\uD83D\uDC8E {n}',
-'shop.soon': '준비 중',
 'shop.daily': '일일 무료',
 'shop.daily.d': '하루 한 번, 보석 {n}개 + 하트 1개',
 'shop.daily.wait': '내일 다시 받을 수 있어요',
@@ -3878,10 +3971,7 @@ ko: {
 'shop.pack.xl': '보석 궤짝',
 'shop.pack.d': '보석 {n}개',
 'shop.start': '시작 팩',
-'shop.start.d': '보석 {n}개 + 하트 {h}개 + 젤리별 {s}개',
-'shop.trade': '젤리별 {s}개',
-'shop.trade.d': '보석을 젤리별로. 한 방향만 바꿀 수 있어요.',
-'shop.trade.ok': '젤리별 +{s}개',
+'shop.start.d': '보석 {n}개 + 하트 {h}개 + 별 {s}개',
 'shop.heart5': '하트 가득 채우기',
 'shop.heart5.d': '기다림 없이 {n}개로',
 'shop.heart1': '하트 1개',
@@ -3891,9 +3981,6 @@ ko: {
 'shop.bundle1.d': '하트와 아이템을 한 번에',
 'shop.bundle2': '하트 번들',
 'shop.bundle2.d': '저녁 내내 놀 수 있는 만큼',
-'shop.skin': '스킨',
-'shop.skin.d': '보석 {n}개로 어떤 스킨이든',
-'shop.skin.open': '열기',
 'shop.skin.confirm': '{name}을(를) 보석 {n}개로 살까요?',
 'shop.poor': '보석이 {n}개 부족해요',
 'shop.poor.continue': '이어하려면 보석이 더 필요해요',
@@ -3946,7 +4033,7 @@ ko: {
 'intro.banjjak.l2': '내 스킬은 「번쩍 충전」이야. 스킬 게이지를 {pn}% 채워 줘.',
 'intro.bangul.l1': '방울이에요. 막힌 자리는 거품으로 풀어요.',
 'intro.bangul.l2': '내 스킬은 「거품 파도」예요. 방해 타일 {pn}개를 씻어 내요.',
-'skin.gem': '젤리별 +1!',
+'skin.gem': '별 +1!',
 'skin.base': '기본',
 'skin.basedesc': '처음부터 함께한 모습',
 'skin.royal': '로열 드레스',
@@ -3961,18 +4048,6 @@ ko: {
 'skin.bearmintdesc': '시원한 민트빛 털',
 'skin.bearblue': '하늘 곰돌이',
 'skin.bearbluedesc': '맑은 하늘빛 털',
-'stat.ten.1': '계산력',
-'stat.ten.2': '침착함',
-'stat.ten.3': '우애',
-'stat.ten.4': '합10 사랑',
-'stat.twin.1': '순발력',
-'stat.twin.2': '장난기',
-'stat.twin.3': '우애',
-'stat.twin.4': '트윈 사랑',
-'stat.jelly.1': '달콤함',
-'stat.jelly.2': '행운',
-'stat.jelly.3': '탱글탱글',
-'stat.jelly.4': '용기',
 'aria.charopen': '캐릭터 선택 열기',
 'aria.prevchar': '이전 캐릭터',
 'aria.nextchar': '다음 캐릭터',
@@ -4023,7 +4098,7 @@ ko: {
 'kd.pethouse.alljoined': '모두 함께하고 있어요!',
 'soon.title': '준비 중',
 'soon.body': '공사 중이에요! 다음 업데이트를 기다려 주세요.',
-'kd.visit': '어제의 내가 젤리별 {n}개를 모아 뒀어요.',
+'kd.visit': '어제의 내가 별 {n}개를 모아 뒀어요.',
 'kd.visit.first': '젤리팡 왕국에 온 걸 환영해요!',
 'kd.res.aria': '인사하기',
 'portal.login': '로그인',
@@ -4094,19 +4169,20 @@ return (d === null) ? m : d;
 });
 return s;
 }
-function applyI18n() {
+function applyI18n(root) {
 if (typeof document === 'undefined') return;
-try { document.documentElement.lang = currentLang(); } catch (e) { /* ignore */ }
+var scope = root || document;
+if (!root) { try { document.documentElement.lang = currentLang(); } catch (e) { /* ignore */ } }
 var i, list;
-list = document.querySelectorAll('[data-i18n]');
+list = scope.querySelectorAll('[data-i18n]');
 for (i = 0; i < list.length; i++) {
 headText(list[i], t(list[i].getAttribute('data-i18n')));
 }
-list = document.querySelectorAll('[data-i18n-html]');
+list = scope.querySelectorAll('[data-i18n-html]');
 for (i = 0; i < list.length; i++) {
 list[i].innerHTML = t(list[i].getAttribute('data-i18n-html'));
 }
-list = document.querySelectorAll('[data-i18n-aria]');
+list = scope.querySelectorAll('[data-i18n-aria]');
 for (i = 0; i < list.length; i++) {
 list[i].setAttribute('aria-label', t(list[i].getAttribute('data-i18n-aria')));
 }
@@ -4179,6 +4255,8 @@ gainGift: [], gainPets: [], giftLeft: 0,
 hitTaken: false,
 gainGem: 0,
 gainJstar: 0,
+gainCoin: 0, runCoin: 0, coinRunAt: 0,
+x2Token: 0, x2Done: 0, x2Sheet: '',
 feverOn: false, feverUntil: 0, feverScore: 0, feverCdUntil: 0,
 rushEndAt: 0, addCdUntil: 0, rushBeatAt: 0,
 pausedAt: 0,             // wall clock at pause, used to shift deadlines
@@ -5485,12 +5563,13 @@ if (loginBtn) loginBtn.hidden = false;
 }
 }
 function skinTargetId() { return HERO_IDS[cpIdx] || charId(); }
-function buildSkinList() {
-var wrap = $('sk-list');
+function buildSkinList(root, withBase) {
+var wrap = root || $('sk-list');
 if (!wrap) return;
 var id = skinTargetId();
 var list = skinsFor(id);
 var cur = equippedSkin(id);
+if (withBase && !list.length) { list = [{ id: id + '.base', name: 'skin.base', desc: 'skin.basedesc', cost: 0 }]; cur = list[0]; }
 wrap.innerHTML = '';
 for (var i = 0; i < list.length; i++) {
 var sk = list[i];
@@ -5549,6 +5628,21 @@ wrap.appendChild(row);
 syncGems();
 try { if (window.TW && window.TW.applyPlatformGates) window.TW.applyPlatformGates(wrap); } catch (e) {}
 }
+function skinListClick(ev) {
+var root = ev && ev.currentTarget;
+var el = ev && ev.target;
+while (el && el !== root && !(el.getAttribute &&
+(el.getAttribute('data-buy') || el.getAttribute('data-buyjewel') ||
+el.getAttribute('data-equip')))) el = el.parentNode;
+if (!el || el === root || !el.getAttribute) return;
+var b = el.getAttribute('data-buy');
+if (b) { buySkin(b); return; }
+var bj = el.getAttribute('data-buyjewel');
+if (bj) { buySkinJewel(bj); return; }
+var e = el.getAttribute('data-equip');
+if (e) equipSkin(e);
+}
+function skinShopSync() { if (shopActive() && shopTab2 === 'deco') paintShopTab('deco'); }
 function openSkins() {
 var el = $('modal-skin');
 if (!el) return;
@@ -5568,6 +5662,7 @@ store.equipped[skinTargetId()] = sk.id;
 persist();
 applySkins();
 buildSkinList();
+skinShopSync();
 J.sfx.ui();
 }
 function buySkin(sid) {
@@ -5591,6 +5686,7 @@ store.equipped[skinTargetId()] = sk2.id;
 persist();
 applySkins();
 buildSkinList();
+skinShopSync();
 toast(t('skin.bought', { name: t(sk2.name) }));
 J.sfx.win();
 });
@@ -7766,6 +7862,7 @@ ensureArcadeBest();
 S.arcLastValue = value | 0;
 var res = submit ? arcSubmitBest(mode, value)
 : { best: store.arcadeBest[mode] || null, fresh: false };
+runCoinPay(coinForArc(!!res.fresh, why === 'clear'));
 dropProgress();
 persist();
 var board = $('board');
@@ -7785,7 +7882,7 @@ var arcTail = function () {
 paintArcSheet(mode, why, value, res);
 shareCardPrep('arc', 'arc-card-thumb');
 later(function () {
-TW_PORTAL.requestMidgameAd(function () { openModal('modal-arc'); });   /* Task 12 rev1(C-1) */
+TW_PORTAL.requestMidgameAd(function () { openModal('modal-arc'); rewardReveal('arc-reward', (S.gainCoin | 0) > 0 ? [coinRewardItem(S.gainCoin)] : [], { sheetId: 'modal-arc' }); paintCoinX2('arc'); });   /* Task 12 rev1(C-1) · P3 T9 */
 }, 520);
 };
 if (why === 'clear') { harvestFinale(arcTail); return; }
@@ -7931,6 +8028,8 @@ S.hints = typeof sv.hints === 'number' ? sv.hints : 3;
 S.matches = sv.matches || 0;
 S.maxCombo = sv.maxCombo || 1;
 S.startedAt = sv.startedAt || Date.now();
+S.runCoin = sv.runCoin | 0; S.coinRunAt = S.startedAt; S.gainCoin = 0;
+S.x2Done = sv.x2Done | 0; S.x2Token = sv.x2Token | 0;
 S.undoLeft = 1;
 S.snapshot = null;
 S.sel = -1;
@@ -9056,6 +9155,7 @@ if ((S.gainPet | 0) > 0) {
 out.push({ ico: '🐾', disc: 'pet', key: 'rw.petfruit', val: S.gainPet | 0, rar: 'common' });
 }
 if ((S.gainAwk | 0) > 0) out.push({ ico: '⚡', disc: 'awk', key: 'rw.awkfruit', val: S.gainAwk | 0, rar: 'common' });
+if ((o.coin | 0) > 0) out.push(coinRewardItem(o.coin | 0));   /* P3 — 코인이 별보다 앞(흔한 것 먼저, §10.2 순서) */
 if ((o.gem | 0) > 0) {
 out.push({ ico: '★', disc: 'gem', key: 'rw.gem', val: o.gem | 0, rar: 'normal' });
 }
@@ -9077,7 +9177,7 @@ rar: g.tier === 'epic' ? 'epic' : (g.tier === 'rare' ? 'rare' : 'normal') });
 }
 for (i = 0; i < (S.gainGear || []).length; i++) {
 var gg = S.gainGear[i], git = itemById(gg.id);
-out.push(gg.max ? { ico: '★', disc: 'gem', key: 'rw.gem', val: GEAR_MAX_JSTAR, rar: 'normal' }
+out.push(gg.max ? coinRewardItem(gg.refund | 0)
 : { ico: (git && git.ico) || '🎁', disc: 'item', key: 'item.' + gg.id + '.nm', val: gg.lv,
 rar: gg.tier === 'epic' ? 'epic' : (gg.tier === 'rare' ? 'rare' : 'normal'),
 art: itemArtUrl(gg.id, 96) });   /* 74 T11 — 결과 줄에 장비 그림(.rw-ico[data-art]) */
@@ -9391,6 +9491,7 @@ if (newRank > 0) {
 rankFresh.mode = rkey;
 rankFresh.pos = newRank;
 }
+runCoinPay(coinForRank(newRank));   /* P3 — 기록판 순위로 세 단 */
 S.overInfo = {
 rush: rush,
 score: S.score,
@@ -9407,7 +9508,8 @@ TW_PORTAL.requestMidgameAd(function () {
 paintContinueBtn();
 openModal('modal-over');
 celebrateRank(newRank);
-rewardReveal('over-reward', rewardItems({ gem: S.gainJstar }), { sheetId: 'modal-over' });
+rewardReveal('over-reward', rewardItems({ gem: S.gainJstar, coin: S.gainCoin | 0 }), { sheetId: 'modal-over' });
+paintCoinX2('over');   /* P3 T9 — 방금 끝난 판의 창에만 2배 줄 */
 });
 }, 520);
 }
@@ -9537,10 +9639,6 @@ grade: gradeFor(S.adds, S.maxCombo, sec, 3, extBoardSize(3)),
 grid: buildEmojiGrid(S.gridSeed)
 };
 if (!replay) store[bestSlot] = rec;
-dailyReward = rewardItems({
-gem:   (S.gainJstar | 0) + (streakGot.jstar | 0),
-heart: streakGot.heart | 0
-});
 if (streakGot.days.length) {
 toast(t('streak.reward', { d: streakGot.days[streakGot.days.length - 1] }));
 }
@@ -9552,6 +9650,12 @@ timeSec: sec, n: dailyNumber(), matches: S.matches,
 maxCombo: S.maxCombo, grade: rec.grade, date: todayKey()
 });
 if (dRank > 0) { rankFresh.mode = rankKeyOf(); rankFresh.pos = dRank; }
+runCoinPay(replay ? 0 : coinForRank(dRank));
+dailyReward = rewardItems({
+gem:   (S.gainJstar | 0) + (streakGot.jstar | 0),
+heart: streakGot.heart | 0,
+coin:  S.gainCoin | 0
+});
 showDailyResult(dRank, classicRun, replay ? rec : undefined, true);
 }
 function showDailyResult(rank, classicRun, rec, viaFinish) {
@@ -9575,6 +9679,7 @@ shareCardPrep('daily', 'daily-card-thumb');
 celebrateRank(dailyRank);
 later(function () {
 rewardReveal('daily-reward', drw, { sheetId: 'modal-daily' });
+paintCoinX2(viaFinish ? 'daily' : '');   /* P3 T9 — 허브에서 오늘 결과를 다시 열 때는 직전 다른 판의 줄이 뜨지 않게 창 이름을 비운다(W18) */
 }, 420);
 };
 if (viaFinish) { TW_PORTAL.requestMidgameAd(openTail); } else { openTail(); }
@@ -10324,16 +10429,18 @@ syncMenu();
 enterKingdom();
 }
 function restartStage() {
+if (S.mode === 'adv') { heartsTick(); if (store.hearts <= 0) return; }
 closeModal('modal-pause');
 S.paused = false;
 S.pausedAt = 0;
 S.howtoFromPause = false;
+if (S.mode === 'adv') { advStart(S.stage); J.sfx.ui(); return; }
 hurryReset();          // 같은 이유 — 다시 시작하면 화면 상태도 처음으로
 S.combo = 1;
 S.comboUntil = 0;
 var keepEnd = S.rushEndAt;
 startStage(S.stage, isDaily() ? dailySeed() : S.seed);
-if (isDaily()) { S.startedAt = Date.now(); startTimer(); }
+if (isDaily()) { S.score = 0; S.matches = 0; S.maxCombo = 1; S.startedAt = Date.now(); syncHud(); startTimer(); }
 if (isRush()) { S.rushEndAt = keepEnd; startRushLoop(); }
 J.sfx.ui();
 }
@@ -12417,6 +12524,7 @@ heartsTick();
 if (store.hearts >= HEART_MAX) return 0;
 return Math.max(0, store.heartAt + HEART_MS - Date.now());
 }
+function heartWaitMs() { return store.hearts >= HEART_MAX ? 0 : Math.max(0, (Number(store.heartAt) || 0) + HEART_MS - Date.now()); }
 function spendHeart() {
 heartsTick();
 if (store.hearts <= 0) return false;
@@ -12461,6 +12569,926 @@ setText('shop-jewel', jewelBalance());
 setText('shop-jstar', store.jstar | 0);
 setText('shop-jewel-menu', jewelBalance());
 }
+var COIN_MAX = 999999;
+var STAR_MAX = 999999;         /* 별 잔액 상한 — COIN_MAX · V74_NUM_CAP · SHARD_HOLD_MAX 와 같은 값 가족(수정 1회차 M3 판정 b). 실제 플레이로는
+닿지 않는 값이라 손상 저장만 막는다: starGrant 가 여기서 멈추고 readStore 의 별 읽기도 같은 clamp */
+var GACHA_ITEM_PITY = 60;      /* 영웅 없이 60회 → 61번째 영웅(스펙 §4-b) */
+var GACHA_GOLD_PITY = 9;       /* 영웅 없이 9회 → 10번째 영웅 */
+var GACHA_LOG_MAX = 50;        /* 뽑기 결과 기록 — 분쟁 대비(스펙 §4-f ⑤) */
+var GACHA_FRIEND_IDS = ['mongle', 'tiktok', 'churup', 'kkultteok', 'sseokssak', 'mukmul', 'banjjak', 'bangul', 'jelly'];
+var GACHA_REFUND = { common: 30, rare: 80, epic: 250 };   /* 최고 레벨 장비가 또 나오면 코인(스펙 §4-b) */
+var P3_AD_IDS = ['coin', 'item', 'star', 'heart', 'x2'];   /* 하루 칸 — friend 만 주 칸 */
+var P3_AD_CAP = { coin: 3, item: 3, star: 2, heart: 3, x2: 10, friend: 1 };
+var P3_DEAL_IDS = ['gift', 'gearC', 'gearR', 'heart1', 'trade', 'heartfull'];
+var P3_DEAL_CAP = { gift: 1, gearC: 1, gearR: 1, heart1: 5, trade: 3, heartfull: 1 };
+function coinBalance() { return clamp(Math.floor(Number(store.coin) || 0), 0, COIN_MAX); }
+function coinGrant(n, reason) {
+if (!jewelAmountOk(n)) return false;
+store.coin = Math.min(COIN_MAX, coinBalance() + n);
+persist();
+paintWallets();
+return true;
+}
+function coinSpend(n, reason) {
+if (!jewelAmountOk(n)) return false;
+var have = coinBalance();
+if (have < n) return false;
+store.coin = have - n;
+persist();
+paintWallets();
+return true;
+}
+function starGrant(n, reason) {
+if (!jewelAmountOk(n)) return false;
+store.jstar = Math.min(STAR_MAX, (store.jstar | 0) + n);   /* 상한에서 멈춘다 — 실제 증가분은 잔액 차로 읽는다(반환은 참/거짓, M2 와 같은 규칙) */
+persist();
+syncGems();
+paintWallets();
+return true;
+}
+function starSpend(n, reason) {
+if (!jewelAmountOk(n)) return false;
+var have = store.jstar | 0;
+if (have < n) return false;
+store.jstar = have - n;
+persist();
+syncGems();
+paintWallets();
+return true;
+}
+function paintChipText(id, s) {
+var el = $(id);
+setText(id, s);
+if (el && el.getAttribute('data-len') !== String(s.length)) el.setAttribute('data-len', String(s.length));
+}
+function paintCoinChip(id) { paintChipText(id, arcComma(coinBalance())); }
+function paintWallets() {
+paintCoinChip('sh-coin-v');   /* 상점 띠 코인도 큰 수 줄임(data-len 6·7 — 지휘자 판정 2026-10-06, 왕국·지도 칩과 같은 도우미) */
+setText('sh-star-v', arcComma(store.jstar | 0));
+paintCoinChip('kd-top-stars-v'); paintCoinChip('map-stars-v'); paintChipText('kd-bot-b1-v', arcComma(store.jstar | 0));
+}
+function grantItemOrRefund(id, src) {
+var it = itemById(id);
+if (!it || it.enabled === false) return null;
+var had = (store.items && store.items.own) ? (store.items.own[id] | 0) : 0;
+if (had >= ITEM_LV_MAX) {
+var back = GACHA_REFUND[it.tier] | 0, before = coinBalance();
+if (back > 0) coinGrant(back, 'refund');
+return { id: id, tier: it.tier, lv: had, lv0: had, isNew: false, max: true, refund: coinBalance() - before };
+}
+var g = grantItem(id, src);
+if (!g) return null;
+return { id: id, tier: it.tier, lv: g.lv, lv0: had, isNew: !!g.isNew, max: false, refund: 0 };
+}
+function p3Int(v, hi) { return clamp(Math.floor(Number(v) || 0), 0, hi); }
+function p3Day(v) { return (typeof v === 'string' && /^\d{8}$/.test(v)) ? v : ''; }
+function gachaStateFrom(g) {
+var o = (g && typeof g === 'object') ? g : {};
+var out = {
+itemPity: p3Int(o.itemPity, GACHA_ITEM_PITY), goldPity: p3Int(o.goldPity, GACHA_GOLD_PITY),
+freeDay: p3Day(o.freeDay), firstItem: o.firstItem ? 1 : 0, firstFriend: o.firstFriend ? 1 : 0,
+happy: o.happy ? 1 : 0, petSrc: {}, dupPaid: {}, log: []
+};
+var k, i, e;
+if (o.petSrc && typeof o.petSrc === 'object') {
+for (k in o.petSrc) {
+if (!Object.prototype.hasOwnProperty.call(o.petSrc, k) || GACHA_FRIEND_IDS.indexOf(k) < 0) continue;
+if (o.petSrc[k] === 'gacha' || o.petSrc[k] === 'gift') out.petSrc[k] = o.petSrc[k];
+}
+}
+if (o.dupPaid && typeof o.dupPaid === 'object') {
+for (k in o.dupPaid) {
+if (Object.prototype.hasOwnProperty.call(o.dupPaid, k) && GACHA_FRIEND_IDS.indexOf(k) >= 0 && o.dupPaid[k]) out.dupPaid[k] = 1;
+}
+}
+if (Array.isArray(o.log)) {
+for (i = Math.max(0, o.log.length - GACHA_LOG_MAX); i < o.log.length; i++) {
+e = o.log[i];
+if (e && typeof e === 'object' && typeof e.k === 'string' && Array.isArray(e.r)) {
+out.log.push({ t: Math.floor(Number(e.t) || 0), k: e.k, h: String(e.h || ''), r: e.r.slice(0, 10).map(String) });
+}
+}
+}
+return out;
+}
+function adCapsFrom(a) {
+var o = (a && typeof a === 'object') ? a : {};
+var n = (o.n && typeof o.n === 'object') ? o.n : {};
+var w = (o.w && typeof o.w === 'object') ? o.w : {};
+var out = { day: p3Day(o.day), week: p3Day(o.week), n: {}, w: { friend: p3Int(w.friend, P3_AD_CAP.friend) } };
+for (var i = 0; i < P3_AD_IDS.length; i++) out.n[P3_AD_IDS[i]] = p3Int(n[P3_AD_IDS[i]], P3_AD_CAP[P3_AD_IDS[i]]);
+return out;
+}
+function dealsFrom(d) {
+var o = (d && typeof d === 'object') ? d : {};
+var b = (o.b && typeof o.b === 'object') ? o.b : {};
+var out = { day: p3Day(o.day), b: {} };
+for (var i = 0; i < P3_DEAL_IDS.length; i++) out.b[P3_DEAL_IDS[i]] = p3Int(b[P3_DEAL_IDS[i]], P3_DEAL_CAP[P3_DEAL_IDS[i]]);
+return out;
+}
+function gachaShapeOk(g) {
+return !!g && typeof g === 'object' && typeof g.itemPity === 'number' && typeof g.goldPity === 'number' && typeof g.freeDay === 'string'
+&& !!g.petSrc && typeof g.petSrc === 'object' && !!g.dupPaid && typeof g.dupPaid === 'object' && Array.isArray(g.log);
+}
+function adCapsShapeOk(a) {
+if (!a || typeof a !== 'object' || !a.n || typeof a.n !== 'object' || !a.w || typeof a.w !== 'object') return false;
+for (var i = 0; i < P3_AD_IDS.length; i++) { if (typeof a.n[P3_AD_IDS[i]] !== 'number') return false; }
+return typeof a.w.friend === 'number' && typeof a.day === 'string' && typeof a.week === 'string';
+}
+function dealsShapeOk(d) {
+if (!d || typeof d !== 'object' || !d.b || typeof d.b !== 'object' || typeof d.day !== 'string') return false;
+for (var i = 0; i < P3_DEAL_IDS.length; i++) { if (typeof d.b[P3_DEAL_IDS[i]] !== 'number') return false; }
+return true;
+}
+function p3Ensure() {
+if (typeof store.coin !== 'number' || !isFinite(store.coin)) store.coin = 0;
+if (!gachaShapeOk(store.gacha)) store.gacha = gachaStateFrom(store.gacha);
+if (!adCapsShapeOk(store.adCaps)) store.adCaps = adCapsFrom(store.adCaps);
+if (!dealsShapeOk(store.deals)) store.deals = dealsFrom(store.deals);
+}
+function p3Roll() {
+p3Ensure();
+var d = todayKey(), wk = weekKey(), i;
+if (store.adCaps.day !== d) { store.adCaps.day = d; for (i = 0; i < P3_AD_IDS.length; i++) store.adCaps.n[P3_AD_IDS[i]] = 0; }
+if (store.adCaps.week !== wk) { store.adCaps.week = wk; store.adCaps.w.friend = 0; }
+if (store.deals.day !== d) { store.deals.day = d; for (i = 0; i < P3_DEAL_IDS.length; i++) store.deals.b[P3_DEAL_IDS[i]] = 0; }
+}
+var COIN_ADV_FIRST = 20, COIN_ADV_FIRST_STAR = 10;   /* 모험 첫 클리어 20 + 별 하나당 10 */
+var COIN_ADV_RE = 10, COIN_ADV_RE_STAR = 5;          /* 다시 깨면 10 + 별 하나당 5 */
+var COIN_BOSS_MULT = 2;                               /* 보스탄 첫 클리어만(스펙 §4-f 괄호 자리) */
+var COIN_RUN = [15, 25, 40];
+function coinForAdv(first, stars, boss) {
+var s = clamp(stars | 0, 0, 3);
+if (!first) return COIN_ADV_RE + COIN_ADV_RE_STAR * s;                                /* 재클리어 — 보스도 ×1 */
+return (COIN_ADV_FIRST + COIN_ADV_FIRST_STAR * s) * (boss ? COIN_BOSS_MULT : 1);    /* 첫 클리어 — 보스 ×2 */
+}
+function coinForRank(rank) { return rank === 1 ? COIN_RUN[2] : (rank > 1 ? COIN_RUN[1] : COIN_RUN[0]); }
+function coinForArc(fresh, clear) { return fresh ? COIN_RUN[2] : (clear ? COIN_RUN[1] : COIN_RUN[0]); }
+function coinPlayed() { return (S.matches | 0) > 0; }
+function runCoinPay(want) {
+if (S.coinRunAt !== S.startedAt) { S.coinRunAt = S.startedAt; S.runCoin = 0; }
+if (!coinPlayed()) want = 0;
+var pay = Math.max(0, (want | 0) - (S.runCoin | 0));
+if (pay > 0) { coinGrant(pay, 'run'); S.runCoin = (S.runCoin | 0) + pay; }
+S.gainCoin = pay;
+S.x2Token = (S.x2Token | 0) + 1;   /* P3 — 결과 창 2배는 판 끝마다 한 번 */
+return pay;
+}
+function coinRewardItem(n) { return { ico: '●', disc: 'coin', key: 'rw.coin', val: n | 0, rar: 'normal' }; }
+var P3_NOTICE_DELAY = 4800;
+function toastLeftMs() {
+return toastAt ? Math.max(0, toastMs(toastText, toastLines) - (now() - toastAt)) : 0;
+}
+function p3Notice() {
+if (!store.p3 || store.p3.shown || !v74NoticeReady()) return false;
+var wait = toastLeftMs();
+if (v74DueAt > now()) wait = Math.max(wait, v74DueAt - now());   /* 74 알림 타이머가 아직 안 울렸다 — 그 알림이 먼저 뜨고 나서(수정 1회차 m4) */
+if (v74ArcTimer) wait = Math.max(wait, 300);   /* 대전 기록 안내가 이어질 차례 — 그 토스트가 뜨고 걷힐 때까지 */
+if (wait > 0) { setTimeout(p3Notice, wait + 120); return false; }   /* 앞 알림을 덮어쓰지 않는다 — 소비는 띄운 그 순간 */
+toast(t('p3.walletnote'));
+store.p3.shown = 1;
+persist();
+return true;
+}
+var SHOP_TABS = ['gacha', 'deals', 'free', 'deco', 'jewel'];
+var SHOP_HOST = { gacha: 'banjjak', deals: 'kkultteok', free: 'tiktok', deco: 'mongle' };   /* 목업 B1·B2·B3 의 상인 */
+var SHOP_ART = { bg: 1, machine: 1, capsule: 1, coin: 1, tabs: 1, host: 0 };   /* P3 T12 · host 0 = 상인 포즈 미발주(DESIGN §28.11) */
+var SHOP_PAINT = { gacha: function () {}, deals: function () {}, free: function () {}, deco: function () {} };
+var SHOP_DOTS = { gacha: function () { return 0; }, deals: function () { return 0; }, free: function () { return 0; } };
+var SHOP_ACTS = {};
+var shopTab2 = 'gacha';
+var shopTick = 0;
+function portalAdsOk() { return TW_PORTAL.env === 'crazygames' && TW_PORTAL.canReward(); }
+function portalAdsSync() {
+try { document.documentElement.setAttribute('data-portal', portalAdsOk() ? 'cg' : 'off'); } catch (e) {}
+}
+function shopTabOk(k) {
+if (SHOP_TABS.indexOf(k) < 0) return false;
+if (k === 'free') return portalAdsOk();
+if (k === 'jewel') return appGemContinue();
+return true;
+}
+function openShopScreen(tab) {
+heartsTick();
+p3Roll();
+portalAdsSync();
+var want = (tab === 'jewel') ? 'gacha' : tab;
+shopTab2 = shopTabOk(want) ? want : 'gacha';
+showScreen('screen-shop');
+shopPaint();
+if (shopTick) clearInterval(shopTick);
+shopTick = setInterval(shopTickFn, 1000);
+if (tab === 'jewel' && shopTabOk('jewel')) openShop();
+J.sfx.ui();
+}
+function shopTickFn() {
+var el = $('screen-shop');
+if (!el || !el.classList.contains('active')) { clearInterval(shopTick); shopTick = 0; return; }
+if (store.hearts < HEART_MAX) heartsTick();   /* 수정 1회차 M-5 — 가득이면 heartsTick 이 매초 heartAt 을 고쳐 저장하므로 회복이 올 수 있을 때만(저장 = 하트가 늘 때만) */
+paintShopHearts();
+var clk = $('sh-clock');
+if (clk) clk.textContent = shopClockText();
+}
+function closeShopScreen() {
+if (shopTick) { clearInterval(shopTick); shopTick = 0; }
+J.sfx.ui();
+enterKingdom();
+}
+function setShopTab(tab) {
+if (tab === 'jewel') { if (shopTabOk('jewel')) openShop(); return; }
+if (!shopTabOk(tab) || tab === shopTab2) return;
+shopTab2 = tab;
+shopPaint();
+J.sfx.ui();
+}
+function shopActive() { var el = $('screen-shop'); return !!(el && el.classList && el.classList.contains('active')); }
+function paintShopHearts() {
+setText('sh-hearts-v', store.hearts | 0);
+var ht = $('sh-heart-t');
+if (ht) { var ms = heartWaitMs(); ht.textContent = ms > 0 ? fmtHeartWait(ms) : t('adv.heartfull'); }
+}
+function msToMidnight() {
+var n = new Date(), m = new Date(n.getFullYear(), n.getMonth(), n.getDate() + 1);
+return Math.max(0, m.getTime() - n.getTime());
+}
+function shopClockText() {
+var ms = msToMidnight();
+return t('time.hm', { h: Math.floor(ms / 3600000), m: Math.floor((ms % 3600000) / 60000) });
+}
+function shopPaint() {
+var root = $('screen-shop');
+if (!root) return;
+portalAdsSync();
+if (!shopTabOk(shopTab2)) shopTab2 = 'gacha';   /* 세션 중 광고가 막히면(애드블록·Basic) 무료 탭에 남지 않는다 */
+root.setAttribute('data-stab', shopTab2);
+var art = [], k;
+for (k in SHOP_ART) if (Object.prototype.hasOwnProperty.call(SHOP_ART, k) && SHOP_ART[k]) art.push(k);
+root.setAttribute('data-art', art.join(' '));
+document.documentElement.setAttribute('data-shop-art', art.join(' '));   /* #modal-gres 용 */
+var tabs = root.querySelectorAll('.sh-tab');
+for (var i = 0; i < tabs.length; i++) {
+tabs[i].setAttribute('aria-selected', tabs[i].getAttribute('data-stab') === shopTab2 ? 'true' : 'false');
+}
+var host = $('sh-host');
+if (host) setArt(host, '--sh-host', stdArt(SHOP_HOST[shopTab2] || 'kkultteok', 'full'), '');
+var bub = $('sh-bubble');
+if (bub) { bub.hidden = true; bub.textContent = ''; }
+var panel = $('sh-body');
+if (panel) panel.setAttribute('aria-labelledby', 'sh-tab-' + shopTab2);   /* 수정 1회차 M-3 — 판(tabpanel)의 이름 = 선택된 탭 */
+paintShopTab(shopTab2, true);   /* 전체 다시 그리기 = 탭 하나 다시 그리기 + 스크롤 처음으로(열기·탭 전환) — 수정 1회차 M-2 */
+}
+function paintShopTab(tab, resetScroll) {
+var root = $('screen-shop');
+if (!root) return;
+tab = tab || shopTab2;
+if (tab !== shopTab2) { setShopTab(tab); return; }
+var body = $('sh-body'), scene = $('sh-scene');
+var keep = (body && !resetScroll) ? body.scrollTop : 0;
+if (scene) scene.innerHTML = '';          /* 무대 위 탭 전용 장식(뽑기 기계 등) — 탭 함수가 채운다 */
+var plateEl = $('sh-plate');              /* 판 직속 머리(.sh-phead — 판 위 끝에 걸친 알약, 스크롤 상자 밖). 탭 함수가 다시 단다(P3 T5 수정 1회차 I-1) */
+if (plateEl) { var olds = plateEl.querySelectorAll('.sh-phead'); for (var oi = olds.length - 1; oi >= 0; oi--) plateEl.removeChild(olds[oi]); }
+if (body) {
+body.innerHTML = '';
+(SHOP_PAINT[tab] || SHOP_PAINT.gacha)(body, scene);
+if (keep) body.scrollTop = keep;
+}
+paintWallets();
+paintShopHearts();
+shopDots();
+applyI18n(root);
+try { if (window.TW && window.TW.applyPlatformGates) window.TW.applyPlatformGates(root); } catch (e) {}
+}
+function shopAct2(a, el) {
+var i = a.indexOf(':'), name = i < 0 ? a : a.slice(0, i), arg = i < 0 ? '' : a.slice(i + 1);
+if (SHOP_ACTS[name]) SHOP_ACTS[name](arg, el);
+}
+function shopFreeCount() {
+var n = 0, k;
+for (k in SHOP_DOTS) {
+if (!Object.prototype.hasOwnProperty.call(SHOP_DOTS, k)) continue;
+if (k === 'free' && !portalAdsOk()) continue;
+n += SHOP_DOTS[k]() | 0;
+}
+return n;
+}
+function shopDots() {
+var root = $('screen-shop');
+if (root) {
+var dots = root.querySelectorAll('.sh-tab .sh-dot');
+for (var i = 0; i < dots.length; i++) {
+var k = dots[i].parentNode.getAttribute('data-stab');
+var n = (SHOP_DOTS[k] && (k !== 'free' || portalAdsOk())) ? (SHOP_DOTS[k]() | 0) : 0;
+dots[i].textContent = n > 0 ? String(n) : '';
+dots[i].hidden = !(n > 0);
+}
+}
+var b = $('kd-shop-badge');
+if (b) { var c = shopFreeCount(); b.textContent = c > 0 ? String(c) : ''; b.hidden = !(c > 0); }
+}
+var DEAL_GIFT_COIN = 100;                      /* 매일 선물 */
+var DEAL_GEAR_PRICE = { common: 300, rare: 900 };
+var DEAL_HEART1 = 60;                          /* 하트 1개 — 하루 5 */
+var DEAL_TRADE = { coin: 500, star: 5 };       /* 코인 500 → 별 5 — 하루 3 */
+var DEAL_HEARTFULL = 250;                      /* 하트 가득 — 하루 1 */
+var DEAL_SALT = { common: 0x5EED01, rare: 0x5EED02 };
+function dealGearOf(tier) {
+var pool = [], i;
+for (i = 0; i < ITEM_POOL.length; i++) if (ITEM_POOL[i].tier === tier && ITEM_POOL[i].enabled !== false) pool.push(ITEM_POOL[i].id);
+if (!pool.length) return '';
+var r = mulberry32((parseInt(todayKey(), 10) ^ DEAL_SALT[tier]) >>> 0)();
+return pool[Math.min(pool.length - 1, Math.floor(r * pool.length))];
+}
+function dealLeft(k) { p3Roll(); return Math.max(0, (P3_DEAL_CAP[k] | 0) - (store.deals.b[k] | 0)); }
+function dealBuy(k) {
+if (dealLeft(k) <= 0) return { err: 'limit' };
+var price = 0, gear = '', tier = '';
+if (k === 'gearC' || k === 'gearR') {
+tier = (k === 'gearC') ? 'common' : 'rare';
+gear = dealGearOf(tier);
+if (!gear || ((store.items.own[gear] | 0) >= ITEM_LV_MAX)) return { err: 'max' };
+price = DEAL_GEAR_PRICE[tier];
+} else if (k === 'heart1') price = DEAL_HEART1;
+else if (k === 'trade') price = DEAL_TRADE.coin;
+else if (k === 'heartfull') {
+heartsTick();
+if ((store.hearts | 0) >= HEART_MAX) return { err: 'full' };
+price = DEAL_HEARTFULL;
+} else if (k !== 'gift') return { err: 'bad' };
+if (price > 0 && coinBalance() < price) return { err: 'coin', need: price - coinBalance() };
+var got = null;
+if (k === 'gift') { coinGrant(DEAL_GIFT_COIN, 'deal-gift'); got = { coin: DEAL_GIFT_COIN }; }
+else {
+if (!coinSpend(price, 'deal-' + k)) return { err: 'coin', need: price - coinBalance() };
+if (gear) got = grantItemOrRefund(gear, 'shop');
+else if (k === 'heart1') { grantHearts(1); got = { heart: 1 }; }
+else if (k === 'trade') { starGrant(DEAL_TRADE.star, 'deal-trade'); got = { star: DEAL_TRADE.star }; }
+else { store.hearts = HEART_MAX; store.heartAt = Date.now(); got = { heartfull: 1 }; }
+}
+store.deals.b[k] = (store.deals.b[k] | 0) + 1;
+persist();
+return { ok: true, got: got };
+}
+function shopCard2(o) {
+var card = document.createElement('div');
+card.className = 'shop-card';
+card.setAttribute('data-part', 'shop-card');
+card.setAttribute('data-layout', o.layout || 'grid');
+if (o.tier) card.setAttribute('data-tier', o.tier);
+var hd = document.createElement('b'); hd.className = 'shop-cn'; hd.textContent = o.title; card.appendChild(hd);
+if (o.badge) { var bd = document.createElement('em'); bd.className = 'shop-badge'; bd.textContent = o.badge; card.appendChild(bd); }
+var box = document.createElement('span'); box.className = 'shop-icbox';   /* 그림 + 지급 수 — 지급 수는 그림 상자 오른쪽 아래에 붙는다(제목이 두 줄로 접혀도 같은 자리, 리뷰 M-4) */
+var ic = document.createElement('i'); ic.className = 'shop-ic ' + (o.ic || ''); ic.setAttribute('aria-hidden', 'true');
+if (o.icCss) ic.style.setProperty('background-image', o.icCss);
+box.appendChild(ic);
+if (o.qty) { var q = document.createElement('span'); q.className = 'shop-qty'; q.textContent = o.qty; box.appendChild(q); }
+card.appendChild(box);
+if (o.sub) { var sb = document.createElement('span'); sb.className = 'shop-cd'; sb.textContent = o.sub; card.appendChild(sb); }
+var b = document.createElement('button');
+b.type = 'button';
+b.className = 'cta-jelly sh-btn';
+b.setAttribute('data-price', o.price || 'ok');
+if (o.coinIc) { var ci = document.createElement('i'); ci.className = 'sh-btn-ic sh-btn-ic--' + o.coinIc; ci.setAttribute('aria-hidden', 'true'); b.appendChild(ci); }
+b.appendChild(document.createTextNode(o.label));
+if (o.dis) b.disabled = true; else if (o.act) b.setAttribute('data-sh-act', o.act);
+card.appendChild(b);
+return card;
+}
+SHOP_PAINT.deals = function (body) {
+var bub = $('sh-bubble');
+if (bub) {
+bub.innerHTML = '';
+var p = document.createElement('span'); p.textContent = t('deals.hi'); bub.appendChild(p);
+var clk = document.createElement('b'); clk.id = 'sh-clock'; clk.className = 'kit-pill-v2'; clk.setAttribute('data-variant', 'soft');
+clk.textContent = shopClockText(); bub.appendChild(clk);
+bub.hidden = false;
+}
+var head = document.createElement('div'); head.className = 'kit-pill-v2 sh-head sh-phead'; head.setAttribute('data-variant', 'header');
+head.textContent = t('deals.title');
+var plateEl = $('sh-plate'); if (plateEl) plateEl.appendChild(head);
+var grid = document.createElement('div'); grid.className = 'sh-grid'; body.appendChild(grid);
+var lim = function (k) { return (store.deals.b[k] | 0) + '/' + P3_DEAL_CAP[k]; };
+var money = function (k, n) { return dealLeft(k) > 0 ? { label: arcComma(n), coinIc: 'coin', price: 'coin', act: 'deal:' + k }
+: { label: t('deals.done'), price: 'ok', dis: true }; };
+var gC = dealGearOf('common'), gR = dealGearOf('rare');
+var cards = [
+Object.assign({ title: t('deals.gift'), ic: 'shop-ic-coin', qty: '×' + DEAL_GIFT_COIN, sub: t('deals.gift.d') },
+dealLeft('gift') > 0 ? { label: t('deals.claim'), price: 'free', act: 'deal:gift' } : { label: t('deals.done'), price: 'ok', dis: true }),
+Object.assign({ title: t('deals.gear'), tier: 'common', icCss: itemArtCss(gC, 96), sub: t('deals.sure', { name: t('item.' + gC + '.nm') }) },
+(store.items.own[gC] | 0) >= ITEM_LV_MAX ? { label: t('deals.maxed'), price: 'ok', dis: true } : money('gearC', DEAL_GEAR_PRICE.common)),
+Object.assign({ title: t('deals.gear'), tier: 'rare', badge: t('drops.tier.rare'), icCss: itemArtCss(gR, 96), sub: t('deals.sure', { name: t('item.' + gR + '.nm') }) },
+(store.items.own[gR] | 0) >= ITEM_LV_MAX ? { label: t('deals.maxed'), price: 'ok', dis: true } : money('gearR', DEAL_GEAR_PRICE.rare)),
+Object.assign({ title: t('deals.heart1'), ic: 'shop-ic-heart', sub: lim('heart1') }, money('heart1', DEAL_HEART1)),
+Object.assign({ title: t('deals.trade'), ic: 'shop-ic-jstar-1', qty: '×' + DEAL_TRADE.star, sub: lim('trade') }, money('trade', DEAL_TRADE.coin)),
+Object.assign({ title: t('deals.heartfull'), ic: 'shop-ic-heart', sub: lim('heartfull') },
+((store.hearts | 0) >= HEART_MAX && dealLeft('heartfull') > 0) ? { label: t('adv.heartfull'), price: 'ok', dis: true } : money('heartfull', DEAL_HEARTFULL))   /* 가득이라 못 사면 「MAX」 · 「내일 다시」 는 한도를 다 쓴 경우만 */
+];
+for (var i = 0; i < cards.length; i++) grid.appendChild(shopCard2(cards[i]));
+var f1 = document.createElement('p'); f1.className = 'sh-fine'; f1.textContent = t('deals.foot'); body.appendChild(f1);
+var f2 = document.createElement('p'); f2.className = 'sh-fine'; f2.textContent = t('deals.foot2', { n: P3_DEAL_CAP.trade }); body.appendChild(f2);
+};
+SHOP_DOTS.deals = function () { return dealLeft('gift') > 0 ? 1 : 0; };
+SHOP_ACTS.deal = function (k) {
+var r = dealBuy(k);
+if (r.ok) {
+if (r.got && r.got.coin) toast(t('coin.got', { n: r.got.coin }));
+else if (r.got && r.got.star) toast(t('star.got', { n: r.got.star }));
+else if (r.got && r.got.id) toast(t('deals.got', { name: t('item.' + r.got.id + '.nm') }));
+else if (r.got && (r.got.heart || r.got.heartfull)) toast(t('shop.heart.ok'));   /* 알 수 없는 종류면 토스트 없음 */
+J.sfx.win();
+} else {
+if (r.err === 'coin') toast(t('gacha.nocoin', { n: r.need }));
+J.sfx.fail();
+}
+paintShopTab(shopTab2);   /* 구매 뒤 = 이 탭만 다시(스크롤 자리 유지 · 띠·점·번역을 같이 맞춘다) — 처음으로 돌리는 전체 다시 그리기는 열기·탭 전환만 */
+};
+SHOP_PAINT.deco = function (body) {
+var head = document.createElement('div'); head.className = 'kit-pill-v2 sh-head'; head.setAttribute('data-variant', 'header');
+head.textContent = t('deco.title'); body.appendChild(head);
+var who = document.createElement('p'); who.className = 'sh-fine'; who.textContent = t('deco.for', { name: t('char.' + skinTargetId() + '.name') });
+body.appendChild(who);
+var list = document.createElement('div'); list.className = 'sk-list sh-sk'; body.appendChild(list);
+list.addEventListener('click', skinListClick);
+buildSkinList(list, true);
+};
+var gachaKind = 'item', gachaBusy = false;
+function pctText(p, digits) { var k = Math.pow(10, digits); return (Math.round(p * Math.pow(10, digits + 2) * (1 + Number.EPSILON)) / k).toFixed(digits) + '%'; }
+function gachaKindSet(k) {
+if (GACHA_KINDS.indexOf(k) < 0) return;
+gachaKind = k;
+if (shopTab2 === 'gacha' && shopActive()) paintShopTab(shopTab2, true);   /* 종류가 바뀌면 판 내용이 통째로 바뀐다 → 스크롤도 처음으로 */
+}
+function gachaFailToast(r, elseKey) {
+if (r.err === 'coin') toast(t('gacha.nocoin', { n: r.need }));
+else if (r.err === 'star') toast(t('gacha.nostar', { n: r.need }));
+else if (r.err === 'allfriends') toast(t('gacha.friend.all'));
+else if (r.err === 'used') toast(t('gacha.used'));
+else if (elseKey) toast(t(elseKey));
+}
+var gachaQueue = [];
+function gachaPlay(res, after) {
+if (gachaBusy) { gachaQueue.push({ res: res, after: after }); return; }
+gachaBusy = true;
+var shown = false, fired = false, end = function () {
+if (fired) return;
+fired = true;
+gachaBusy = false;
+if (after) after(true);
+var q = gachaQueue.shift();
+if (q) gachaPlay(q.res, q.after);
+};
+try { gachaShow(res, end); shown = true; }
+finally { if (!shown) end(); }
+}
+function gachaRun(kind, n, how) {
+if (gachaBusy || adBusyP3) return;
+var r = gachaBuy(kind, n, how);
+if (!r.ok) { gachaFailToast(r); J.sfx.fail(); return; }
+gachaPlay(r, function () { if (shopActive()) paintShopTab(shopTab2); });
+}
+var gresDone = null, gresAnims = [], gresTimers = [];
+var easeTokCache = {}, durTokCache = {};
+var GRES_DUR = ['--dur-1', '--dur-2', '--dur-3'], GRES_EASE = ['--ease', '--ease-out', '--drop', '--spring'];
+function durTok(name) {
+if (durTokCache[name] !== undefined) return durTokCache[name];
+var v = 0;
+try { v = parseFloat(String(getComputedStyle(document.documentElement).getPropertyValue(name) || '')) || 0; } catch (e) { v = 0; }
+durTokCache[name] = v > 0 ? v : 0;
+return durTokCache[name];
+}
+function easeTok(name) {
+if (easeTokCache[name] !== undefined) return easeTokCache[name];
+var v = '';
+try { v = String(getComputedStyle(document.documentElement).getPropertyValue(name) || '').trim(); } catch (e) { v = ''; }
+easeTokCache[name] = v || 'linear';
+return easeTokCache[name];
+}
+function gresTokPrime() {
+var i;
+for (i = 0; i < GRES_DUR.length; i++) durTok(GRES_DUR[i]);
+for (i = 0; i < GRES_EASE.length; i++) easeTok(GRES_EASE[i]);
+}
+function gresAnim(el, frames, dur, ease, delay, fill) {
+if (!el || !el.animate) return null;
+var a = el.animate(frames, { duration: dur, easing: easeTok(ease), delay: delay || 0, fill: fill || 'both' });
+gresAnims.push(a);
+return a;
+}
+function gresClear() {
+var i;
+for (i = 0; i < gresAnims.length; i++) { try { gresAnims[i].cancel(); } catch (e) {} }
+for (i = 0; i < gresTimers.length; i++) clearTimeout(gresTimers[i]);
+gresAnims = []; gresTimers = [];
+}
+function gachaShow(res, done) {
+var i, ep = false;
+for (i = 0; i < res.items.length; i++) if (res.items[i].tier === 'epic') ep = true;
+if (res.kind === 'friend') {
+var id = res.items[0].id;
+TW_PORTAL.happytime();                          /* 새 친구 = 드문 성취(스펙 §4-d, 최대 9번) */
+charGetFx(id, function () {
+introPlay(id, function () { if (cgToastMsg) { toast(cgToastMsg); cgToastMsg = ''; } if (done) done(); });
+});
+return;
+}
+if (ep && !store.gacha.happy) { store.gacha.happy = 1; persist(); TW_PORTAL.happytime(); }   /* 첫 영웅 한 번만 */
+gresDone = done || null;
+gresOpen(res);
+}
+function gresCard(it) {
+var li = document.createElement('li');
+li.className = 'gres-card';
+li.setAttribute('data-tier', it.tier);
+li.setAttribute('data-flip', '0');
+li.setAttribute('data-how', it.how || '');   /* 천장(pity) · 10회 보장(ten) 칸 표식 — CSS 강조는 뒤 태스크 몫(리뷰 M-9) */
+li.innerHTML = '<i class="gres-glow"></i><i class="gres-back"></i><i class="gres-art"></i><b class="gres-new"></b><em class="gres-lv"></em><span class="gres-nm"></span>';
+li.querySelector('.gres-new').textContent = it.isNew ? t('gres.new') : '';
+li.querySelector('.gres-lv').textContent = it.isNew ? '' : (it.max ? ((it.refund | 0) > 0 ? t('gres.refund', { n: it.refund }) : '') : t('gres.lvup', { a: it.lv0 | 0, b: it.lv | 0 }));
+li.querySelector('.gres-nm').textContent = t('item.' + it.id + '.nm');
+return li;
+}
+function gresOpen(res) {
+gresTokPrime();                                   /* 읽기 먼저(모션 규칙 5) — 아래 DOM 쓰기 뒤에 getComputedStyle 0 */
+var d1 = durTok('--dur-1'), d2 = durTok('--dur-2'), d3 = durTok('--dur-3'), reduced = rwReduced();
+gresClear();                                      /* 앞 결과의 타이머 · 애니(「10회 더」 로 바로 바꿀 때 — 리뷰 I-1) */
+var grid = $('gres-grid'), i, it, li, ten = false, pity = false, epic = false, nNew = 0, nUp = 0, refund = 0, arts = [];
+grid.innerHTML = '';
+grid.setAttribute('data-n', String(res.items.length));   /* 단발 = 한 장을 가운데 칸에(CSS) — 캡슐이 그 위에서 열린다(지휘자 판정 Q7-c) */
+grid.setAttribute('data-ready', reduced ? '1' : '0');   /* 등장 전(투명) 카드는 탭을 무시한다(리뷰 M-7) */
+for (i = 0; i < res.items.length; i++) {
+it = res.items[i];
+li = gresCard(it);
+grid.appendChild(li);
+arts.push([li.querySelector('.gres-art'), itemArtCss(it.id, 96)]);
+if (it.how === 'ten') ten = true;
+if (it.how === 'pity') pity = true;
+if (it.tier === 'epic') epic = true;
+if (it.isNew) nNew++; else if (!it.max) nUp++;
+refund += it.refund | 0;
+}
+setText('gres-title', t(res.n > 1 ? 'gres.title10' : 'gres.title1', { n: res.n }));
+setText('gres-note', pity ? t('gres.pity.hit') : (ten ? t('gres.ten.up') : ''));
+var sum = $('gres-sum'); sum.innerHTML = '';
+['epic', 'rare', 'common'].forEach(function (tr) {
+var n = res.items.filter(function (x) { return x.tier === tr; }).length;
+if (!n) return;
+var s = document.createElement('span'); s.className = 'gres-s'; s.setAttribute('data-tier', tr); s.setAttribute('data-n', String(n));
+var c = document.createElement('b'); c.className = 'gc-chip'; c.textContent = t('drops.tier.' + tr) + ' ' + n; s.appendChild(c);
+sum.appendChild(s);
+});
+var tail = document.createElement('span'); tail.className = 'kit-pill-v2 gres-t'; tail.setAttribute('data-variant', 'soft');
+var ts = document.createElement('span'); ts.textContent = t('gres.sum', { a: nNew, b: nUp }); tail.appendChild(ts);
+if (refund) { var trf = document.createElement('span'); trf.className = 'gres-rf'; trf.textContent = t('gres.refund', { n: refund }); tail.appendChild(trf); }
+sum.appendChild(tail);
+var tb = gachaTable(res.kind);
+setText('gres-pity', epic ? t('gres.pity.reset') : '');   /* 맨숫자 「0」 없는 문장(착수 전 점검 C9) */
+var again = $('gres-again'), agN = res.n > 1 ? GACHA_TEN : 1, agP = res.n > 1 ? tb.ten : tb.price, cur = GACHA_CUR[res.kind];
+again.textContent = '';
+again.appendChild(document.createTextNode(t(res.n > 1 ? 'gres.again10' : 'gres.again1', { n: agN })));
+var ic = document.createElement('i'); ic.className = 'sh-btn-ic sh-btn-ic--' + cur; ic.setAttribute('aria-hidden', 'true'); again.appendChild(ic);
+again.appendChild(document.createTextNode(arcComma(agP)));
+again.setAttribute('data-again', res.kind + ':' + agN + ':' + cur);
+again.setAttribute('data-price', cur);
+$('gres-all').hidden = res.items.length < 2;
+openModal('modal-gres');
+J.sfx.ui();
+var top = 'common';
+for (i = 0; i < res.items.length; i++) if (res.items[i].tier === 'epic' || (res.items[i].tier === 'rare' && top === 'common')) top = res.items[i].tier;
+var cap = $('gres-cap'), dim = document.querySelector('#modal-gres > .cut-dim');
+cap.setAttribute('data-tier', top);
+var paintArts = function () { for (var k = 0; k < arts.length; k++) arts[k][0].style.setProperty('background-image', arts[k][1]); };
+if (reduced) {
+paintArts();
+gresAnim(dim, [{ opacity: 0 }, { opacity: 1 }], 0, '--ease-out', 0);   /* 25행 대체 — 덮개 끝 상태 바로 */
+cap.hidden = true; gresOpenAll(true); return;
+}
+requestAnimationFrame(paintArts);
+gresAnim(dim, [{ opacity: 0 }, { opacity: 1 }], d2, '--ease-out', 0);                                                            /* 25 덮개 켜기 */
+cap.hidden = false;
+gresAnim(cap, [{ transform: 'translateY(-60%)', opacity: 0 }, { transform: 'translateY(0)', opacity: 1 }], d3, '--drop', 0);      /* 19 낙하 */
+gresAnim(cap.querySelector('.gres-top'), [{ transform: 'rotate(0)' }, { transform: 'rotate(6deg)' }, { transform: 'rotate(-6deg)' }, { transform: 'rotate(0)' }], d2 * 2, '--ease-out', d3);   /* 20 흔들림 */
+gresAnim(cap.querySelector('.gres-light'), [{ opacity: 0 }, { opacity: 1 }, { opacity: 0.6 }], d2 * 2, '--ease-out', d3);       /* 20 빛 */
+gresAnim(cap.querySelector('.gres-top'), [{ transform: 'translate(0, 0) rotate(0)', opacity: 1 }, { transform: 'translate(-30%, -60%) rotate(-24deg)', opacity: 0 }], d2, '--spring', d3 + d2 * 2, 'forwards');
+var gone = gresAnim(cap.querySelector('.gres-bot'), [{ opacity: 1 }, { opacity: 0 }], d2, '--ease', d3 + d2 * 3, 'forwards');
+gresAnim(cap.querySelector('.gres-light'), [{ opacity: 0.6 }, { opacity: 0 }], d2, '--ease', d3 + d2 * 3, 'forwards');
+if (gone) gone.onfinish = function () { cap.hidden = true; };
+var cards = grid.querySelectorAll('.gres-card'), last = null;
+for (i = 0; i < cards.length; i++) last = gresAnim(cards[i], [{ opacity: 0, transform: 'scale(.9)' }, { opacity: 1, transform: 'scale(1)' }], d2, '--ease-out', d3 + d2 * 3 + i * d1 / 2);   /* 24 등장 */
+if (last) last.onfinish = function () { grid.setAttribute('data-ready', '1'); };
+else grid.setAttribute('data-ready', '1');
+}
+function gresFlip(li, instant) {
+if (!li || li.getAttribute('data-flip') !== '0') return;
+if (instant || !li.animate) { li.setAttribute('data-flip', '1'); return; }
+var d1 = durTok('--dur-1');
+var a = gresAnim(li, [{ transform: 'rotateY(0)' }, { transform: 'rotateY(90deg)' }], d1, '--ease-out', 0);
+if (!a) { li.setAttribute('data-flip', '1'); return; }
+li.setAttribute('data-flip', 'h');
+a.onfinish = function () {
+li.setAttribute('data-flip', '1');
+gresAnim(li, [{ transform: 'rotateY(90deg)' }, { transform: 'rotateY(0)' }], d1, '--ease-out', 0);
+};
+J.sfx.ui();
+}
+function gresOpenAll(instant) {
+var cards = document.querySelectorAll('#gres-grid .gres-card'), d1 = durTok('--dur-1'), i;
+for (i = 0; i < cards.length; i++) {
+if (instant) gresFlip(cards[i], true);
+else (function (li, k) { gresTimers.push(setTimeout(function () { gresFlip(li, false); }, k * d1)); })(cards[i], i);
+}
+}
+function gresClose() {
+gresClear();
+closeModal('modal-gres');
+var fn = gresDone; gresDone = null;
+if (fn) fn();
+}
+function gachaFreeBtn(kind) {
+var g = store.gacha;
+if (kind === 'item' && !g.firstItem) return { label: t('gacha.free.first'), price: 'free', act: 'gbuy:item:1:first' };
+if (kind === 'friend' && !g.firstFriend) return { label: t('gacha.free.first'), price: 'free', act: 'gbuy:friend:1:first' };
+if (kind === 'item' && g.freeDay !== todayKey()) return { label: t('gacha.free.daily'), price: 'free', act: 'gbuy:item:1:free' };
+if (kind === 'item' && adRowOk('item')) return { label: t('gacha.ad'), price: 'ad', coinIc: 'play', act: 'ad:item', portal: true };   /* P3 T9 — 포털 전용 */
+if (kind === 'friend' && adRowOk('friend')) return { label: t('gacha.ad.week'), price: 'ad', coinIc: 'play', act: 'ad:friend', portal: true };
+return null;
+}
+function gachaBtn(o) {
+var b = document.createElement('button');
+b.type = 'button';
+b.className = 'cta-jelly sh-btn';
+b.setAttribute('data-price', o.price);
+if (o.coinIc) { var ci = document.createElement('i'); ci.className = 'sh-btn-ic sh-btn-ic--' + o.coinIc; ci.setAttribute('aria-hidden', 'true'); b.appendChild(ci); }
+b.appendChild(document.createTextNode(o.label));
+if (o.portal) b.setAttribute('data-portal-only', '');
+if (o.dis) b.disabled = true; else b.setAttribute('data-sh-act', o.act);
+return b;
+}
+SHOP_PAINT.gacha = function (body, scene) {
+var tb = gachaTable(gachaKind), i;
+if (scene) {
+var pills = document.createElement('div'); pills.className = 'gc-kinds';
+for (i = 0; i < GACHA_KINDS.length; i++) {
+var pk = document.createElement('button'); pk.type = 'button'; pk.className = 'kit-pill-v2 gc-kind';
+pk.setAttribute('data-variant', GACHA_KINDS[i] === gachaKind ? 'header' : 'soft');
+pk.setAttribute('data-kind', GACHA_KINDS[i]); pk.setAttribute('data-sh-act', 'gkind:' + GACHA_KINDS[i]);
+pk.textContent = t('gacha.' + GACHA_KINDS[i]); pills.appendChild(pk);
+}
+scene.appendChild(pills);
+var rb = document.createElement('div'); rb.className = 'kit-pill-v2 gc-title'; rb.setAttribute('data-variant', 'header');
+rb.textContent = t('gacha.' + gachaKind); scene.appendChild(rb);
+var m = document.createElement('div'); m.className = 'gm-ph'; m.setAttribute('data-kind', gachaKind);
+m.innerHTML = '<i class="gm-dome"></i><i class="gm-body"></i><i class="gm-knob"></i><i class="gm-slot"></i>';
+if (gachaKind === 'friend') {
+for (i = 0; i < tb.rows.length && i < 9; i++) {
+var face = document.createElement('i'); face.className = 'gm-face'; face.setAttribute('data-tier', tb.rows[i].tier);
+face.style.setProperty('--gm-x', (15 + (i % 3) * 24) + '%');
+face.style.setProperty('--gm-y', (12 + Math.floor(i / 3) * 17) + '%');
+setArt(face, '--gm-face', stdArt(tb.rows[i].id, 'thumb'), '');
+m.appendChild(face);
+}
+if (tb.rows.length) m.setAttribute('data-rows', String(Math.ceil(Math.min(tb.rows.length, 9) / 3)));   /* 줄 수 — DESIGN §28.11 */
+}
+scene.appendChild(m);
+var sub = document.createElement('div'); sub.className = 'kit-pill-v2 gc-sub'; sub.setAttribute('data-variant', 'soft'); sub.id = 'gc-pity';
+sub.textContent = gachaKind === 'friend' ? (tb.left ? t('gacha.friend.left', { have: tb.all - tb.left, all: tb.all, left: tb.left }) : t('gacha.friend.all'))
+: t('gacha.pity', { n: tb.pity, max: tb.pityAt });
+scene.appendChild(sub);
+}
+var bub = $('sh-bubble');
+if (bub) { bub.textContent = t('gacha.' + gachaKind + '.d'); bub.hidden = false; }
+var row = document.createElement('div'); row.className = 'gc-btns'; body.appendChild(row);
+var dis = (gachaKind === 'friend' && tb.left <= 0);
+var fb = dis ? null : gachaFreeBtn(gachaKind);
+if (fb) row.appendChild(gachaBtn(fb));
+var ic = GACHA_CUR[gachaKind] === 'coin' ? 'coin' : 'star', pr = GACHA_CUR[gachaKind] === 'coin' ? 'coin' : 'star';
+row.appendChild(gachaBtn({ label: t('gacha.one') + ' ' + arcComma(tb.price), coinIc: ic, price: dis ? 'ok' : pr, act: 'gbuy:' + gachaKind + ':1:' + pr, dis: dis }));   /* 닫힌 버튼은 특가 탭처럼 「ok」(연보라) */
+if (gachaKind === 'item') row.appendChild(gachaBtn({ label: t('gacha.ten', { n: GACHA_TEN }) + ' ' + arcComma(tb.ten), coinIc: 'coin', price: 'coin', act: 'gbuy:item:' + GACHA_TEN + ':coin' }));
+var hd = document.createElement('div'); hd.className = 'gc-oddhd';
+var hs = document.createElement('span'); hs.textContent = t(gachaKind === 'friend' ? 'gacha.chance.now' : 'odds.tier'); hd.appendChild(hs);
+var link = document.createElement('button'); link.type = 'button'; link.className = 'kit-pill-v2 gc-oddlink'; link.setAttribute('data-variant', 'soft');
+link.setAttribute('data-sh-act', 'godds:' + gachaKind); link.textContent = t('gacha.odds'); hd.appendChild(link);
+body.appendChild(hd);
+var og = document.createElement('div'); og.id = 'gc-odds'; og.className = gachaKind === 'friend' ? 'gc-og' : 'gc-tiers'; body.appendChild(og);
+if (gachaKind === 'friend') {
+for (i = 0; i < tb.rows.length; i++) {
+var oc = document.createElement('div'); oc.className = 'gc-oc'; oc.setAttribute('data-id', tb.rows[i].id); oc.setAttribute('data-tier', tb.rows[i].tier);
+var fi = document.createElement('i'); setArt(fi, '--gm-face', stdArt(tb.rows[i].id, 'thumb'), ''); oc.appendChild(fi);
+var sp = document.createElement('span');
+var nb = document.createElement('b'); nb.textContent = t('char.' + tb.rows[i].id + '.name'); sp.appendChild(nb);
+var pe = document.createElement('em'); pe.textContent = pctText(tb.rows[i].p, 2); sp.appendChild(pe);
+oc.appendChild(sp); og.appendChild(oc);
+}
+} else {
+for (i = 0; i < tb.tiers.length; i++) {
+var tr = document.createElement('div'); tr.className = 'gc-tr'; tr.setAttribute('data-tier', tb.tiers[i].tier);
+var chip = document.createElement('b'); chip.className = 'gc-chip'; chip.textContent = t('drops.tier.' + tb.tiers[i].tier); tr.appendChild(chip);
+var mid = document.createElement('span'); mid.textContent = t('odds.tier.row', { n: tb.tiers[i].n, each: pctText(tb.tiers[i].each, 3) }); tr.appendChild(mid);
+var tot = document.createElement('em'); tot.textContent = pctText(tb.tiers[i].p, 3); tr.appendChild(tot);
+og.appendChild(tr);
+}
+}
+var fine = document.createElement('p'); fine.className = 'sh-fine';
+fine.textContent = gachaKind === 'friend' ? t('gacha.friend.note') : t('odds.foot1');
+body.appendChild(fine);
+};
+SHOP_DOTS.gacha = function () {
+p3Ensure();   /* 새 설치는 store.gacha 가 아직 없다 — 왕국 배지가 먼저 이 함수를 부른다 */
+var g = store.gacha, n = 0;
+if (!g.firstItem) n++;
+if (!g.firstFriend && gachaTable('friend').left > 0) n++;
+if (g.freeDay !== todayKey()) n++;
+return n;
+};
+SHOP_ACTS.gkind = function (k) { gachaKindSet(k); J.sfx.ui(); };
+SHOP_ACTS.gbuy = function (arg) { var p = arg.split(':'); gachaRun(p[0], parseInt(p[1], 10) || 1, p[2]); };
+SHOP_ACTS.godds = function (k) { openOdds(k); };
+var oddsKind = 'item';
+function oddsRefit() {
+var m = $('modal-odds');
+if (m && !m.hidden) { oddsFitBox(); return; }
+window.removeEventListener('resize', oddsRefit); window.removeEventListener('orientationchange', oddsRefit);
+}
+function openOdds(kind) {
+oddsKind = GACHA_KINDS.indexOf(kind) >= 0 ? kind : 'item';
+oddsPaint();
+openModal('modal-odds');
+oddsFitBox();
+window.addEventListener('resize', oddsRefit); window.addEventListener('orientationchange', oddsRefit);
+var ob = $('odds-body'); if (ob) ob.scrollTop = 0;
+J.sfx.ui();
+}
+function closeOdds() { closeModal('modal-odds'); oddsRefit(); J.sfx.ui(); }
+function oddsRow(cls, id, name, p, art) {
+var r = document.createElement('div'); r.className = 'od-row ' + cls; if (id) r.setAttribute('data-id', id);
+if (art) { var i = document.createElement('i'); i.className = 'od-ic'; i.style.setProperty('background-image', art); r.appendChild(i); }
+var n = document.createElement('span'); n.className = 'od-n'; n.textContent = name; r.appendChild(n);
+var v = document.createElement('b'); v.className = 'od-p'; v.textContent = p; r.appendChild(v);
+return r;
+}
+function oddsPaint() {
+var tabs = document.querySelectorAll('#odds-tabs .od-tab'), i, tb = gachaTable(oddsKind), d = oddsKind === 'friend' ? 2 : 3;
+for (i = 0; i < tabs.length; i++) {
+var on = tabs[i].getAttribute('data-otab') === oddsKind;
+tabs[i].setAttribute('aria-selected', on ? 'true' : 'false');
+if (on) tabs[i].setAttribute('data-active', ''); else tabs[i].removeAttribute('data-active');
+}
+var b = $('odds-body'); if (!b) return;
+b.innerHTML = '';
+var s1 = document.createElement('section'); s1.className = 'od-sec';
+var h1 = document.createElement('h3'); h1.textContent = t('odds.tier'); s1.appendChild(h1);
+for (i = 0; i < tb.tiers.length; i++) {
+var tr = oddsRow('od-tier', '', t('odds.tier.row', { n: tb.tiers[i].n, each: pctText(tb.tiers[i].each, d) }), pctText(tb.tiers[i].p, d));
+tr.setAttribute('data-tier', tb.tiers[i].tier);
+var chip = document.createElement('em'); chip.className = 'gc-chip'; chip.textContent = t('drops.tier.' + tb.tiers[i].tier); tr.insertBefore(chip, tr.firstChild);
+s1.appendChild(tr);
+}
+b.appendChild(s1);
+var s2 = document.createElement('section'); s2.className = 'od-sec od-list';
+var h2 = document.createElement('h3'); h2.textContent = t(oddsKind === 'friend' ? 'odds.friends' : 'odds.items'); s2.appendChild(h2);
+var box = document.createElement('div'); box.className = 'od-box'; s2.appendChild(box);   /* 높이가 정해진 안쪽 스크롤 상자 — 규칙 절 · 바닥 글이 첫 화면에 들게(리뷰 I-2). 마지막 줄이 반쯤 잘려 보이는 것이 「더 있다」 신호 */
+for (i = 0; i < tb.rows.length; i++) {
+var id = tb.rows[i].id, fr = oddsKind === 'friend';
+box.appendChild(oddsRow('', id, t(fr ? ('char.' + id + '.name') : ('item.' + id + '.nm')), pctText(tb.rows[i].p, d),
+fr ? stdArt(id, 'thumb') : itemArtCss(id, 64)));
+}
+if (!tb.rows.length) { box.hidden = true; var none = document.createElement('p'); none.textContent = t('gacha.friend.all'); s2.appendChild(none); }
+b.appendChild(s2);
+var s3 = document.createElement('section'); s3.className = 'od-sec od-rules';
+var h3 = document.createElement('h3'); h3.textContent = t('odds.rules'); s3.appendChild(h3);
+var ul = document.createElement('ul'), li;
+var rules = [];
+if (oddsKind === 'item') rules.push(t('odds.rule.ten', { n: GACHA_TEN, r: pctText(GACHA_TEN_UP.rare, 0), e: pctText(GACHA_TEN_UP.epic, 0) }));
+if (oddsKind !== 'friend') rules.push(t('odds.rule.pity', { n: tb.pityAt, c: tb.pity }));
+if (oddsKind !== 'friend') rules.push(t('odds.rule.dup', { max: ITEM_LV_MAX, c: GACHA_REFUND.common, r: GACHA_REFUND.rare, e: GACHA_REFUND.epic }));
+else rules.push(t('odds.rule.friend', { c: GACHA_FRIEND_W.common, r: GACHA_FRIEND_W.rare, e: GACHA_FRIEND_W.epic }));
+for (i = 0; i < rules.length; i++) { li = document.createElement('li'); li.textContent = rules[i]; ul.appendChild(li); }
+s3.appendChild(ul);
+b.appendChild(s3);
+var f1 = document.createElement('p'); f1.className = 'sh-fine'; f1.textContent = t('odds.foot1'); b.appendChild(f1);
+var f2 = document.createElement('p'); f2.className = 'sh-fine'; f2.textContent = t('odds.foot2', { date: todayKey().slice(0, 4) + '.' + todayKey().slice(4, 6) }); b.appendChild(f2);
+oddsFitBox();
+}
+function oddsFitBox() {
+var m = $('modal-odds'), box = m && !m.hidden ? m.querySelector('.od-box') : null;
+if (!box || box.hidden) return;
+box.style.maxHeight = '';
+var cs = getComputedStyle(box), cap = parseFloat(cs.maxHeight), pad = parseFloat(cs.paddingBottom) || 0;
+if (!(cap > 0)) return;
+box.scrollTop = 0;
+var kids = box.children, i, tp, bt, top0 = -1, bot0 = 0;
+for (i = 0; i < kids.length; i++) {
+tp = kids[i].offsetTop - box.offsetTop; bt = tp + kids[i].offsetHeight;
+if (top0 < 0) { if (bt > cap - pad + 0.5) { top0 = tp; bot0 = bt; } }
+else if (Math.abs(tp - top0) < 1) bot0 = Math.max(bot0, bt);
+}
+if (top0 < 0) return;
+box.style.maxHeight = (top0 + (bot0 - top0) / 2 + pad) + 'px';
+}
+var P3_AD_COIN = 100, P3_AD_STAR = 3;
+var P3_AD_ROWS = ['coin', 'item', 'star', 'heart', 'friend'];
+function adCapLeft(id) {
+p3Roll();
+if (id === 'friend') return Math.max(0, P3_AD_CAP.friend - (store.adCaps.w.friend | 0));
+return Math.max(0, (P3_AD_CAP[id] | 0) - (store.adCaps.n[id] | 0));
+}
+function adCapUse(id) {
+if (id === 'friend') store.adCaps.w.friend = (store.adCaps.w.friend | 0) + 1;
+else store.adCaps.n[id] = (store.adCaps.n[id] | 0) + 1;
+persist();
+}
+function adRowOk(id) {
+if (!portalAdsOk() || adCapLeft(id) <= 0) return false;
+if (id === 'heart') {
+if ((store.hearts | 0) >= HEART_MAX) return false;   /* 가득이면 heartsTick 이 매번 저장한다(M-5) — 부르기 전에 거른다. 가득은 틱으로 풀리지 않는다 */
+heartsTick();
+return (store.hearts | 0) < HEART_MAX;
+}
+if (id === 'friend') return gachaTable('friend').left > 0;
+return true;
+}
+var adBusyP3 = false;
+function watchAdFor(id, btn, after) {
+var draw = (id === 'item' || id === 'friend');
+if (adBusyP3 || (draw && gachaBusy) || !adRowOk(id)) return;
+adBusyP3 = true;
+if (btn) btn.disabled = true;
+TW_PORTAL.requestRewardedAd('p3-' + id, function (ok) {
+adBusyP3 = false;
+if (btn) btn.disabled = false;
+portalAdsSync();
+if (!ok) { toast(t('portal.ad.fail')); J.sfx.fail(); if (after) after(false); return; }
+var res = null;
+if (draw) {
+res = gachaBuy(id, 1, 'ad');
+if (!res.ok) { gachaFailToast(res, 'portal.ad.fail'); J.sfx.fail(); if (after) after(false); return; }
+}
+adCapUse(id);
+if (id === 'coin') { coinGrant(P3_AD_COIN, 'ad'); toast(t('coin.got', { n: P3_AD_COIN })); }
+else if (id === 'star') { starGrant(P3_AD_STAR, 'ad'); toast(t('star.got', { n: P3_AD_STAR })); }
+else if (id === 'heart') { grantHearts(1); paintHearts(); toast(t('shop.heart.ok')); }
+J.sfx.win();
+if (res) gachaPlay(res, after);
+else if (after) after(true);
+});
+}
+SHOP_PAINT.free = function (body, scene) {
+if (scene) {
+var tt = document.createElement('div'); tt.className = 'kit-pill-v2 sh-head fr-title'; tt.setAttribute('data-variant', 'header');
+var pl = document.createElement('i'); pl.className = 'fr-play'; pl.setAttribute('aria-hidden', 'true'); tt.appendChild(pl);
+tt.appendChild(document.createTextNode(t('free.title'))); scene.appendChild(tt);
+var rs = document.createElement('div'); rs.className = 'kit-pill-v2 fr-reset'; rs.setAttribute('data-variant', 'soft');
+rs.appendChild(document.createTextNode(t('free.reset') + ' '));
+var clk = document.createElement('b'); clk.id = 'sh-clock'; clk.textContent = shopClockText(); rs.appendChild(clk);
+scene.appendChild(rs);
+}
+var list = document.createElement('div'); list.className = 'fr-list'; list.setAttribute('data-portal-only', ''); body.appendChild(list);
+var IC = { coin: 'shop-ic-coin', item: 'shop-ic-machine-item', star: 'shop-ic-star', heart: 'shop-ic-heart', friend: 'shop-ic-machine-friend' };
+for (var i = 0; i < P3_AD_ROWS.length; i++) {
+var id = P3_AD_ROWS[i], left = adCapLeft(id), cap = P3_AD_CAP[id], okNow = adRowOk(id), sub;
+if (id === 'heart' && (store.hearts | 0) >= HEART_MAX) sub = t('free.heart.full');
+else if (id === 'friend' && gachaTable('friend').left <= 0) sub = t('free.friend.none');
+else if (id === 'friend') sub = t('free.left.week', { n: left, m: cap });
+else sub = t('free.left.day', { n: left, m: cap });
+var title = t('free.' + id, { n: id === 'coin' ? P3_AD_COIN : P3_AD_STAR });
+var card = shopCard2({ layout: 'row', title: title, ic: IC[id], sub: sub, coinIc: okNow ? 'play' : '',
+label: okNow ? t('free.get') : ((id === 'heart' && (store.hearts | 0) >= HEART_MAX && left > 0) ? t('adv.heartfull') : t('free.tomorrow')),   /* 하트 가득 = 「MAX」(특가 탭과 같은 낱말) · 「내일 다시」 는 상한을 다 쓴 경우만 */
+price: okNow ? 'ad' : 'ok', dis: !okNow, act: 'ad:' + id });
+card.setAttribute('data-ad', id);
+list.appendChild(card);
+}
+var used = store.adCaps.n.x2 | 0, x2 = shopCard2({ layout: 'row', title: t('free.x2'), ic: 'shop-ic-coin-3',
+sub: t('free.x2.d', { n: used, m: P3_AD_CAP.x2 }), label: used < P3_AD_CAP.x2 ? t('free.x2.where') : t('free.tomorrow'), price: 'ok', dis: true });
+x2.setAttribute('data-ad', 'x2');
+list.appendChild(x2);
+var f1 = document.createElement('p'); f1.className = 'sh-fine'; f1.setAttribute('data-portal-only', ''); f1.textContent = t('free.foot1'); body.appendChild(f1);
+var f2 = document.createElement('p'); f2.className = 'sh-fine'; f2.setAttribute('data-portal-only', ''); f2.textContent = t('free.foot2'); body.appendChild(f2);
+};
+SHOP_DOTS.free = function () { var n = 0; for (var i = 0; i < P3_AD_ROWS.length; i++) if (adRowOk(P3_AD_ROWS[i])) n++; return n; };
+SHOP_ACTS.ad = function (id, el) {
+watchAdFor(id, el, function () { if (!shopActive()) return; if (shopTabOk(shopTab2)) paintShopTab(shopTab2); else setShopTab('gacha'); });
+};
+function paintCoinX2(sheet) {
+if (sheet !== undefined) S.x2Sheet = sheet;   /* '' = 어느 창도 아님(허브에서 옛 결과를 다시 열 때) · 인자 없음 = 그대로(▶ · 그냥 받기 뒤 다시 칠하기) */
+portalAdsSync();
+var show = portalAdsOk() && adCapLeft('x2') > 0 && (S.gainCoin | 0) > 0 && S.x2Done !== S.x2Token;
+var rows = document.querySelectorAll('.coin-x2');
+for (var i = 0; i < rows.length; i++) rows[i].hidden = !(show && rows[i].getAttribute('data-sheet') === S.x2Sheet);
+}
+function coinX2Click(ev) {
+var el = ev.target && ev.target.closest ? ev.target.closest('.cx2-yes, .cx2-no') : null;
+if (!el) return;
+var tok = S.x2Token, n = S.gainCoin | 0;
+if (el.classList.contains('cx2-no')) { S.x2Done = tok; paintCoinX2(); J.sfx.ui(); return; }
+if (!(portalAdsOk() && adCapLeft('x2') > 0 && n > 0 && S.x2Done !== tok)) return;
+var pair = el.parentNode.querySelectorAll('button'), pi;
+for (pi = 0; pi < pair.length; pi++) pair[pi].disabled = true;   /* 요청 중에는 「그냥 받기」도 잠근다 — 끝까지 본 사람의 보상이 사라지지 않게(M-3) */
+TW_PORTAL.requestRewardedAd('p3-x2', function (ok) {
+for (pi = 0; pi < pair.length; pi++) pair[pi].disabled = false;
+portalAdsSync();
+if (ok && S.x2Done !== tok) { adCapUse('x2'); coinGrant(n, 'ad-x2'); toast(t('coin.x2.got', { n: n })); J.sfx.win(); S.x2Done = tok; }
+else if (!ok) { toast(t('portal.ad.fail')); J.sfx.fail(); }
+paintCoinX2();
+});
+}
 function jewelRefillHearts() {
 heartsTick();
 if (store.hearts >= HEART_MAX) return false;
@@ -12504,19 +13532,10 @@ store.equipped[skinTargetId()] = sk2.id;
 persist();
 applySkins();
 buildSkinList();
+skinShopSync();
 toast(t('skin.bought', { name: t(sk2.name) }));
 J.sfx.win();
 });
-}
-function jewelTradeStars(i) {
-var d = JSTAR_TRADE[i | 0];
-if (!d) return false;
-if (!jewelSpend(d.jewel, 'jstar-trade')) return false;
-store.jstar = (store.jstar | 0) + d.star;
-persist();
-syncGems();
-paintShopBalance();
-return true;
 }
 function dailyFreeLeft() {
 var at = Math.floor(Number(store.dailyFreeAt) || 0);
@@ -12620,18 +13639,6 @@ sub: t('shop.start.d', { n: START_PACK.n, h: START_PACK.hearts, s: START_PACK.js
 price: shopKrw(START_PACK.krw), dis: true
 }));
 wrap.appendChild(pay);
-} else if (shopTabCur === 'jstar') {
-for (i = 0; i < JSTAR_TRADE.length; i++) {
-d = JSTAR_TRADE[i];
-wrap.appendChild(shopCard({
-ic: 'shop-ic-jstar-' + (i + 1),
-title: t('shop.trade', { s: d.star }),
-sub: t('shop.trade.d'),
-price: t('shop.price.jewel', { n: d.jewel }),
-act: 'star:' + i,
-dis: jewelBalance() < d.jewel
-}));
-}
 } else if (shopTabCur === 'bundle') {
 wrap.appendChild(shopCard({
 ic: 'shop-ic-heart',
@@ -12663,20 +13670,12 @@ title: t('shop.bundle2'), sub: t('shop.bundle2.d'),
 price: shopKrw(5500), dis: true
 }));
 wrap.appendChild(bpay);
-} else {
-wrap.appendChild(shopCard({
-ic: 'shop-ic-jewel',
-title: t('shop.skin'),
-sub: t('shop.skin.d', { n: JEWEL_COST.skin }),
-price: t('shop.skin.open'),
-act: 'skin'
-}));
 }
 shopSyncPay();
 applyI18n();
 }
 function shopTab(k) {
-var ok = ['jewel', 'jstar', 'bundle', 'skin'];
+var ok = ['jewel', 'bundle'];   /* P3 T5 — 별 교환 은퇴(뽑기 재화를 현금으로 팔지 않는다 §20.9) · 스킨 = 상점 꾸미기 탭 */
 shopTabCur = (ok.indexOf(k) >= 0) ? k : 'jewel';
 var root = $('shop-tabs');
 if (root && root.querySelectorAll) {
@@ -12696,6 +13695,7 @@ var el = $('modal-shop');
 if (!el) return;
 heartsTick();
 paintShopBalance();
+paintWallets();   /* P3 — 판 중 수확으로 오른 코인도 열 때 맞는다(지갑 칩이 생기면 보인다 · 지휘자 보충) */
 shopTab(shopTabCur);
 el.hidden = false;
 J.sfx.ui();
@@ -12703,20 +13703,13 @@ J.sfx.ui();
 function closeShop() {
 var el = $('modal-shop');
 if (el) el.hidden = true;
+if (shopActive()) paintShopTab(shopTab2);   /* P3 T5 — 별 교환은 은퇴, 보석 창이 아직 바꾸는 것은 하트 뿐: 닫으면 띠 하트와 특가 판(하트 가득 카드)이 따라온다 */
 J.sfx.ui();
 }
 function shopAct(a) {
 if (a === 'daily') { claimDailyFree(); return; }
 if (a === 'heart5') { if (jewelRefillHearts()) { toast(t('shop.heart.ok')); J.sfx.win(); } else J.sfx.fail(); buildShopBody(); return; }
 if (a === 'heart1') { if (jewelBuyHeart()) { toast(t('shop.heart.ok')); J.sfx.win(); } else J.sfx.fail(); buildShopBody(); return; }
-if (a.indexOf('star:') === 0) {
-var si = parseInt(a.slice(5), 10);
-if (jewelTradeStars(si)) { toast(t('shop.trade.ok', { s: JSTAR_TRADE[si].star })); J.sfx.win(); }
-else J.sfx.fail();
-buildShopBody();
-return;
-}
-if (a === 'skin') { openSkins(); return; }
 }
 function advStarK(arr, n, fb) {
 var i = (n | 0) - 1;
@@ -12761,6 +13754,7 @@ if (Object.prototype.hasOwnProperty.call(store.advStars, k)) sum += store.advSta
 }
 return sum;
 }
+function advStarMax() { return MAP_CHAPTERS.length * ADV_CHAPTER * 3; }
 function advStarStr(s) {
 var out = '';
 for (var i = 1; i <= 3; i++) out += (i <= s) ? '★' : '☆';
@@ -12940,6 +13934,7 @@ runBang();
 }
 function advFinish(win, why) {
 if (!S.running) return;                       // 두 번 들어오지 않는다
+S.gainCoin = 0;   /* P3 — 진 판은 0 */
 TW_PORTAL.gameplayStop();   /* Task 12 rev1(C-1) — 판이 끝나는 즉시(연출·컷신이 이어져도) */
 S.running = false;
 S.busy = true;
@@ -12959,6 +13954,7 @@ var key = String(p.n);
 var stars = 0;
 var gemGain = 0;                              // 이 판이 적립한 젤리별
 var freed = false;                            // 이 판이 젤리공주를 풀어 줬는가
+var dupIds = [];                              // P3 T10 — 이 판 끝에서 별 +10 으로 바뀐 친구들(알림은 skin.gem 토스트 뒤에 차례로)
 if ((S.score | 0) > (store.advBest[key] | 0)) store.advBest[key] = S.score | 0;
 if (win) {
 var ease = (p.sec > 0 && advLeftMs() >= p.sec * 250) ||
@@ -12972,6 +13968,9 @@ store.advStars[key] = stars;
 store.jstar = (store.jstar | 0) + (stars - prevStars);
 gemGain = stars - prevStars;
 }
+S.gainCoin = coinPlayed() ? coinForAdv(prevStars === 0, stars, !!p.boss) : 0;   /* 짝 0 판은 0 */
+if (S.gainCoin > 0) coinGrant(S.gainCoin, 'adv');
+S.x2Token = (S.x2Token | 0) + 1;   /* P3 — 결과 창 2배는 판 끝마다 한 번 */
 store.advFails[key] = 0;
 if (p.n >= (store.advMax | 0)) store.advMax = p.n + 1;
 dqBump('clear', 1);
@@ -12982,9 +13981,9 @@ if (p.boss) { TW_PORTAL.happytime(); grantHearts(ADV_BOSS_HEART); }   // Task 12
 if (p.boss && p.n === ADV_CHAPTER && !store.jellyOn) {
 store.jellyOn = true;
 freed = true;
-}
-if (p.boss && PET_BOSS[p.n]) grantPet(PET_BOSS[p.n]);
-if (p.boss) { var bg = gearBossRoll(p.n, Math.random); if (bg && bg.id) harvestGear(bg, 0, 0, true); }   /* 74 — 보스 확정 장비 1개. 판 사본 S.gainGear 에 실려 결과 시트가 읽는다 */
+} else if (p.boss && p.n === ADV_CHAPTER && friendDupPay('jelly', true)) dupIds.push('jelly');   /* P3 — 뽑기로 먼저 온 젤리공주면 별 +10(구출 장면은 안 나온다 — 사용자 결정 대기 항목) */
+if (p.boss && PET_BOSS[p.n] && !grantPet(PET_BOSS[p.n]) && friendDupPay(PET_BOSS[p.n], true)) dupIds.push(PET_BOSS[p.n]);   /* P3 — 이미 뽑은 친구면 별 +10 */
+if (p.boss) { dupTray = dupIds; try { var bg = gearBossRoll(p.n, Math.random); if (bg && bg.id) harvestGear(bg, 0, 0, true); } finally { dupTray = null; } }   /* 74 — 보스 확정 장비 1개. 판 사본 S.gainGear 에 실려 결과 시트가 읽는다 · P3 — 이 수확의 petGearCheck 가 부르는 꿀떡이 중복 알림은 dupIds 로 모은다 */
 if (p.boss && !S.hitTaken) store.bossNoHit = (store.bossNoHit | 0) + 1;
 persist();
 achvCheck();                  /* 판정판 50 — 별·챕터·펫 축이 여기서 움직인다 */
@@ -12993,6 +13992,8 @@ J.vibrate(40);
 heroSay('clear', 6);
 if (stars > 0) later(function () { heroSay('star'); }, 240);
 if (gemGain > 0) later(function () { toast(t('skin.gem')); }, 700);
+var dupAt = gemGain > 0 ? 700 + toastMs(t('skin.gem'), 1) : 0;
+dupIds.forEach(function (id) { var msg = friendDupMsg(id); later(function () { toast(msg); }, dupAt); dupAt += toastMs(msg, 2); });
 if (typeof window !== 'undefined') {
 J.confetti(window.innerWidth / 2, window.innerHeight * 0.42);
 later(function () { J.confetti(window.innerWidth * 0.28, window.innerHeight * 0.5); }, 170);
@@ -13049,11 +14050,12 @@ var sv = $('adv-stars');
 var txt = (sv && !sv.hidden) ? String(sv.textContent || '') : '';
 var full = 0;
 for (var i = 0; i < txt.length; i++) { if (txt.charAt(i) === '★') full++; }
-rewardReveal('adv-reward', rewardItems({ gem: (S.gainGem | 0) + (S.gainJstar | 0) }), {
+rewardReveal('adv-reward', rewardItems({ gem: (S.gainGem | 0) + (S.gainJstar | 0), coin: S.gainCoin | 0 }), {
 starEl: 'adv-stars',
 stars: full,
 sheetId: 'modal-adv'
 });
+paintCoinX2('adv');   /* P3 T9 */
 });
 }
 function runUnlock() {
@@ -13133,7 +14135,7 @@ setText('adv-hearts', win
 : t('adv.heartlost', { n: Math.max(0, store.hearts) }));
 var advAdBtn = $('adv-ad');
 if (advAdBtn) {
-advAdBtn.hidden = !(!win && store.hearts <= 0 && TW_PORTAL.env === 'crazygames' && TW_PORTAL.canReward());
+advAdBtn.hidden = !(!win && store.hearts <= 0 && TW_PORTAL.env === 'crazygames' && TW_PORTAL.canReward() && adCapLeft('heart') > 0);
 advAdBtn.disabled = false;
 }
 var again = $('adv-again');
@@ -13479,8 +14481,8 @@ var pv = $('map-ch-prev'), nx = $('map-ch-next');
 var lastCh = Math.min(MAP_CHAPTERS.length, chapMax());
 if (pv) pv.disabled = SIAN_MAP ? (mapChap <= 1 && mapPage <= 0) : mapChap <= 1;
 if (nx) nx.disabled = SIAN_MAP ? (mapChap >= lastCh && mapPage >= sianPages() - 1) : mapChap >= lastCh;
-setText('map-stars-v', advStarTotal());
-setText('map-b1-v', advStarTotal());
+paintCoinChip('map-stars-v');
+paintChipText('map-b1-v', advStarTotal() + '/' + advStarMax());   /* P3 결정 2 — 진행도는 「/최대」를 단다(별 그림에 안 걸리게 5·6·7자 단계 줄임) */
 setText('map-b2-v', store.best | 0);
 paintHearts();
 mapFit();
@@ -13716,11 +14718,11 @@ if (mapMoved > 6 && !mapRaf) mapRaf = requestAnimationFrame(mapGlide);
 else mapVel = 0;
 }
 function paintHearts() {
-heartsTick();
+if (store.hearts < HEART_MAX) heartsTick();
 setText('map-hearts-v', store.hearts);
 var w = $('map-heart-t');
 if (!w) return;
-var ms = heartNextMs();
+var ms = heartWaitMs();
 w.textContent = ms > 0 ? fmtHeartWait(ms) : t('adv.heartfull');
 }
 function startMapTicker() {
@@ -13799,11 +14801,7 @@ art: 'url("catalog/t3-bldg2-mission.webp")',
 go: function () { openQuest('daily'); } },
 { id: 'shop',       l: 21, t: 58.4, w: 33, h: 14, chap: 1, key: 'kd.shop', tone: 'orange', ic: 'coin', roof: 8.8, /* [T8-0926·65] score(톱니 테두리 오자산) -> coin(상단 캡슐 파생 원반) */
 art: 'url("catalog/t3-bldg2-shop.webp")',
-go: function () {
-var twa = false;
-try { twa = !!(window.TW && window.TW.platform === 'twa'); } catch (e) { twa = false; }
-if (twa) openShop(); else openSkins();
-} },
+go: function () { openShopScreen('gacha'); } },
 { id: 'post',       l: 81.7, t: 58.4, w: 33, h: 14.6, chap: 1, key: 'kd.post', tone: 'pink', ic: 'flag', roof: 5.8,
 art: 'url("catalog/t3-bldg2-post.webp")',
 go: function () { kdSoonModal(); } },
@@ -13921,6 +14919,13 @@ qb.className = 'badge-new';
 qb.hidden = true;
 lab.appendChild(qb);
 }
+if (b.id === 'shop') {
+var sb = document.createElement('b');
+sb.id = 'kd-shop-badge';
+sb.className = 'badge-new';
+sb.hidden = true;
+lab.appendChild(sb);
+}
 el.appendChild(lab);
 }
 wrap.appendChild(el);
@@ -13962,9 +14967,9 @@ function kdSync() {
 setText('kd-top-hearts-v', store.hearts | 0);
 var ht = $('kd-top-heart-t');
 if (ht) { var ms = heartNextMs(); ht.textContent = ms > 0 ? fmtHeartWait(ms) : t('adv.heartfull'); }
-setText('kd-top-stars-v', advStarTotal());
-setText('kd-bot-b1-v', store.jstar | 0);
-setText('kd-bot-ch-n', t('map.plate' + chapMax()));
+paintCoinChip('kd-top-stars-v');   /* P3 결정 2 — 위 칩 = 코인 지갑(동전 그림과 값 일치) */
+paintChipText('kd-bot-b1-v', arcComma(store.jstar | 0));   /* 위 칩(코인)과 같은 쉼표 표기 + 글자 수별 줄임(5자는 종전 크기) */
+setText('kd-bot-ch-n', t('map.plate' + Math.min(MAP_CHAPTERS.length, chapMax())));
 }
 function kdVisit() {
 var k = kdStore(), line = $('kd-visit');
@@ -13990,11 +14995,13 @@ TW_PORTAL.loadingStop();     /* Task 12 — 왕국 착지 = 로딩 끝(멱등, �
 TW_PORTAL.gameplayStop();    /* Task 12 — 메뉴로 들어옴 = 플레이 break(playing 플래그가 중복을 막는다) */
 buildKingdom();
 questBadges();   /* T14 I-3 — buildKingdom() 이 배지를 매번 새로(숨김) 지으므로 여기서 값을 채운다 */
+shopDots();
 showScreen(homeScreen());
 kdPanClamp();
 kdVisit();
 kdIdleSchedule();
 v74Notice();
+if (splashDone) setTimeout(p3Notice, P3_NOTICE_DELAY);   /* P3 — 나중에 왕국으로 돌아올 때. 부팅 때(스플래시 밑)는 걸지 않는다 — splashDismiss 가 건다 */
 }
 function kdBldgTap(id) {
 var b = kdBuilding(id), el = $('kd-b-' + id);
@@ -14117,7 +15124,7 @@ if (wait) {
 wait.hidden = !empty;
 if (empty) wait.textContent = t('adv.heartwait', { t: fmtHeartWait(heartNextMs()) });
 }
-var nodeAdOk = TW_PORTAL.env === 'crazygames' && TW_PORTAL.canReward();
+var nodeAdOk = TW_PORTAL.env === 'crazygames' && TW_PORTAL.canReward() && adCapLeft('heart') > 0;
 if (ad) ad.hidden = !(empty && nodeAdOk);
 if (ad && empty && nodeAdOk) twSyncAdHeartLabel(ad);
 }
@@ -14132,10 +15139,12 @@ el.textContent = t('adv.ad');
 }
 function twWatchAdForHeart(btn, extraRepaint) {
 if (store.hearts > 0) return;
+if (adCapLeft('heart') <= 0) { toast(t('free.tomorrow')); return; }   /* P3 — 무료 탭 하트 광고와 합산 하루 3 */
 if (btn) btn.disabled = true;
 TW_PORTAL.requestRewardedAd('heart', function (ok) {
 if (btn) btn.disabled = false;
 if (ok) {
+adCapUse('heart');
 grantHearts(1);
 toast(t('shop.heart.ok'));
 paintHearts();
@@ -14861,6 +15870,164 @@ store.items.eq[cid] = eq;
 }
 return { id: id, lv: lv, isNew: !had, tier: it.tier, stat: it.stat };
 }
+var GACHA_KINDS = ['item', 'gold', 'friend'];
+var GACHA_PRICE = { item: 150, item10: 1350, gold: 30, friend: 20 };   /* 코인 · 코인 · 별 · 별 */
+var GACHA_CUR = { item: 'coin', gold: 'star', friend: 'star' };
+var GACHA_TEN = 10;
+var GACHA_TIER_P = { item: { common: 0.75, rare: 0.22, epic: 0.03 }, gold: { rare: 0.85, epic: 0.15 } };
+var GACHA_TEN_UP = { rare: 0.88, epic: 0.12 };        /* 10회: 앞 9칸이 전부 일반이면 10번째 */
+var GACHA_FRIEND_W = { common: 6, rare: 3, epic: 1 };  /* 남은 친구끼리 나누는 무게 */
+var GACHA_FRIEND_TIER = { mongle: 'common', tiktok: 'common', churup: 'common',
+kkultteok: 'rare', sseokssak: 'rare', mukmul: 'rare',
+banjjak: 'epic', bangul: 'epic', jelly: 'epic' };   /* = 초대 사다리 0~12 / 16~25 / 30~45★ 순서 */
+var GACHA_TIERS = ['common', 'rare', 'epic'];
+function gachaItemsOf(tier) {
+var out = [], i;
+for (i = 0; i < ITEM_POOL.length; i++) if (ITEM_POOL[i].tier === tier && ITEM_POOL[i].enabled !== false) out.push(ITEM_POOL[i].id);
+return out;
+}
+function friendOwned(id) { return charOwned(id); }
+function friendRowsOf(ids) {
+var rows = [], W = 0, i, tier;
+for (i = 0; i < ids.length; i++) W += GACHA_FRIEND_W[GACHA_FRIEND_TIER[ids[i]]];
+for (i = 0; i < ids.length; i++) { tier = GACHA_FRIEND_TIER[ids[i]]; rows.push({ id: ids[i], tier: tier, p: W ? GACHA_FRIEND_W[tier] / W : 0 }); }
+return rows;
+}
+function gachaTable(kind) {
+p3Ensure();
+var tb = { kind: kind, cur: GACHA_CUR[kind], price: GACHA_PRICE[kind], ten: kind === 'item' ? GACHA_PRICE.item10 : 0,
+tiers: [], rows: [], pity: 0, pityAt: 0, left: 0, all: 0 };
+var i, j, tier, ids, p, n;
+if (kind === 'friend') {
+var left = [];
+for (i = 0; i < GACHA_FRIEND_IDS.length; i++) if (!friendOwned(GACHA_FRIEND_IDS[i])) left.push(GACHA_FRIEND_IDS[i]);
+tb.all = GACHA_FRIEND_IDS.length;
+tb.left = left.length;
+tb.rows = friendRowsOf(left);
+for (j = 0; j < GACHA_TIERS.length; j++) {
+tier = GACHA_TIERS[j]; p = 0; n = 0;
+for (i = 0; i < tb.rows.length; i++) if (tb.rows[i].tier === tier) { p += tb.rows[i].p; n++; }
+if (n) tb.tiers.push({ tier: tier, p: p, n: n, each: p / n });
+}
+return tb;
+}
+var TP = GACHA_TIER_P[kind] || {};
+for (j = 0; j < GACHA_TIERS.length; j++) {
+tier = GACHA_TIERS[j];
+if (!TP[tier]) continue;
+ids = gachaItemsOf(tier);
+tb.tiers.push({ tier: tier, p: TP[tier], n: ids.length, each: ids.length ? TP[tier] / ids.length : 0 });
+for (i = 0; i < ids.length; i++) tb.rows.push({ id: ids[i], tier: tier, p: TP[tier] / ids.length });
+}
+tb.pityAt = (kind === 'item') ? GACHA_ITEM_PITY : GACHA_GOLD_PITY;
+tb.pity = (kind === 'item') ? (store.gacha.itemPity | 0) : (store.gacha.goldPity | 0);
+return tb;
+}
+function gachaPick(rows, rng) {
+var u = rng(), acc = 0;
+for (var i = 0; i < rows.length; i++) { acc += rows[i].p; if (u < acc) return rows[i]; }
+return rows[rows.length - 1];
+}
+function gachaDrawItem(tb, rng, forced) {
+var tierRows = [], i;
+if (forced === 'epic') tierRows = [{ tier: 'epic', p: 1 }];
+else if (forced === 'up') tierRows = [{ tier: 'rare', p: GACHA_TEN_UP.rare }, { tier: 'epic', p: GACHA_TEN_UP.epic }];
+else for (i = 0; i < tb.tiers.length; i++) tierRows.push({ tier: tb.tiers[i].tier, p: tb.tiers[i].p });
+var tier = gachaPick(tierRows, rng).tier, inTier = [];
+for (i = 0; i < tb.rows.length; i++) if (tb.rows[i].tier === tier) inTier.push({ id: tb.rows[i].id, tier: tier, p: 0 });
+for (i = 0; i < inTier.length; i++) inTier[i].p = 1 / inTier.length;
+return gachaPick(inTier, rng);
+}
+function gachaPull(kind, count, rng) {
+var r = (typeof rng === 'function') ? rng : Math.random;
+var tb = gachaTable(kind), out = [], g = store.gacha, i, k;
+if (kind === 'friend') {
+var rows = tb.rows, ids;
+for (i = 0; i < count && rows.length; i++) {
+var f = gachaPick(rows, r);                       /* 첫 칸은 표의 p 그대로 — 표시 = 추첨 */
+out.push({ id: f.id, tier: f.tier, how: '' });
+ids = [];
+for (k = 0; k < rows.length; k++) if (rows[k].id !== f.id) ids.push(rows[k].id);
+rows = friendRowsOf(ids);                         /* 다음 칸(count > 1)은 남은 친구로 같은 도우미가 다시 나눈다(수정 1회차 M-7) */
+}
+return out;
+}
+var cap = (kind === 'item') ? GACHA_ITEM_PITY : GACHA_GOLD_PITY, allCommon = true;
+for (i = 0; i < count; i++) {
+var pityNow = (kind === 'item') ? g.itemPity : g.goldPity, forced = '', how = '';
+if (pityNow >= cap) { forced = 'epic'; how = 'pity'; }
+else if (kind === 'item' && count === GACHA_TEN && i === GACHA_TEN - 1 && allCommon) { forced = 'up'; how = 'ten'; }
+var d = gachaDrawItem(tb, r, forced);
+if (d.tier !== 'common') allCommon = false;
+if (d.tier === 'epic') { if (kind === 'item') g.itemPity = 0; else g.goldPity = 0; }
+else if (kind === 'item') g.itemPity = Math.min(cap, (g.itemPity | 0) + 1);
+else g.goldPity = Math.min(cap, (g.goldPity | 0) + 1);
+out.push({ id: d.id, tier: d.tier, how: how });
+}
+return out;
+}
+function grantFriend(id, src) {
+if (GACHA_FRIEND_IDS.indexOf(id) < 0 || friendOwned(id)) return false;
+if (id === 'jelly') { store.jellyOn = true; syncCharPick(); }
+else if (!grantPet(id, true)) return false;
+if (src === 'gacha' || src === 'gift') store.gacha.petSrc[id] = src;
+persist();
+return true;
+}
+function gachaBuy(kind, count, how, rng) {
+if (GACHA_KINDS.indexOf(kind) < 0) return { err: 'bad' };
+p3Ensure();
+var n = (kind === 'item' && count === GACHA_TEN) ? GACHA_TEN : 1, g = store.gacha, cur = GACHA_CUR[kind], cost = 0;
+if (kind === 'friend' && gachaTable('friend').left <= 0) return { err: 'allfriends' };
+if (kind !== 'friend') {   /* 수정 1회차 M-4 — 어느 등급이든 켜진 장비가 0종이면 차감 **전**에 거른다(빈 등급에서 추첨이 던지면 코인만 사라진다) */
+var tiers = gachaTable(kind).tiers, ti;
+for (ti = 0; ti < tiers.length; ti++) if (!(tiers[ti].n > 0)) return { err: 'bad' };
+}
+if (how === 'free') { if (kind !== 'item' || n !== 1 || g.freeDay === todayKey()) return { err: 'used' }; }
+else if (how === 'first') {
+if (n !== 1 || kind === 'gold') return { err: 'used' };
+if (kind === 'item' ? g.firstItem : g.firstFriend) return { err: 'used' };
+} else if (how === 'ad') { if (n !== 1 || kind === 'gold') return { err: 'bad' }; }
+else if (how === 'coin' || how === 'star') {
+if (how !== cur) return { err: 'bad' };
+cost = (n === GACHA_TEN) ? GACHA_PRICE.item10 : GACHA_PRICE[kind];
+var have = (cur === 'coin') ? coinBalance() : (store.jstar | 0);
+if (have < cost) return { err: cur, need: cost - have };
+} else return { err: 'bad' };
+if (cost > 0 && !(cur === 'coin' ? coinSpend(cost, 'gacha-' + kind) : starSpend(cost, 'gacha-' + kind))) {
+return { err: cur, need: cost - (cur === 'coin' ? coinBalance() : (store.jstar | 0)) };   /* 수정 1회차 M-3 — 검사 단계와 같은 뜻(모자란 양) */
+}
+if (how === 'free') g.freeDay = todayKey();
+if (how === 'first') { if (kind === 'item') g.firstItem = 1; else g.firstFriend = 1; }
+var picks = gachaPull(kind, n, rng), items = [], i, res;
+for (i = 0; i < picks.length; i++) {
+if (kind === 'friend') {
+res = { id: picks[i].id, tier: picks[i].tier, isNew: grantFriend(picks[i].id, 'gacha'), friend: true };   /* 수정 1회차 M-1 — 합류가 안 됐으면 isNew false */
+} else {
+res = grantItemOrRefund(picks[i].id, 'gacha') || { id: picks[i].id, tier: picks[i].tier, lv: 0 };
+}
+res.how = picks[i].how;
+items.push(res);
+}
+g.log.push({ t: Date.now(), k: kind, h: how, r: items.map(function (x) { return x.id + ':' + x.tier + ':' + (x.lv | 0); }) });
+if (g.log.length > GACHA_LOG_MAX) g.log.splice(0, g.log.length - GACHA_LOG_MAX);
+persist();
+return { ok: true, kind: kind, n: n, how: how, items: items };
+}
+var P3_DUP_STAR = 10;
+var dupTray = null;
+function friendDupMsg(id) { return t('gacha.dup.star', { name: t('char.' + id + '.name'), n: P3_DUP_STAR }); }
+function friendDupPay(id, quiet) {
+var g = store.gacha;
+if (!g || !g.petSrc[id] || g.dupPaid[id]) return false;
+if (!starGrant(P3_DUP_STAR, 'dup-friend')) return false;
+g.dupPaid[id] = 1;
+persist();
+if (quiet) return true;
+if (dupTray) dupTray.push(id);
+else toast(friendDupMsg(id));
+return true;
+}
 var MK_GEAR_LO = MK_AWK_HI;   // 장비 과일 띠 시작 = 각성 띠 끝(= 펫 .03 + 스킬 .015 + 각성 .015) — 띠 경계의 출처는 하나
 var MK_GEAR_BUF = [];         // 매치 경로가 장비 과일을 모아 두는 버퍼 하나(resolveMatch 가 매치마다 비워 다시 쓴다)
 var GEAR_RATE_MAX = 0.085;    // 띠 끝이 선물 상자 띠(MK_GIFT_LO .145)를 넘지 않는 상한
@@ -14872,7 +16039,6 @@ var GEAR_LEAD_P = 40;                                           // 우세 스탯
 var GEAR_BOSS_TIER = [0, 60, 40];                               // 보스 클리어 확정 1개 — 4챕부터
 var GEAR_BOSS_TIER_EARLY = [0, 100, 0];                         // 1~3챕 보스 — 영웅은 4챕부터(스펙 §D-2 티어 게이트)
 var GEAR_AVG_CH = [0.3, 0.3, 0.3, 0.4, 0.4, 0.4, 0.5, 0.5, 0.5, 0.6];   // 판당 평균(표시) = rate 설계 기대값 70 × rate. 70 = 판당 수확 ÷ rate(0.03 대표본 57 · 0.01 표본 72 · 0.0045 대 표본 69.5, 낮은 rate 일수록 70 으로 모인다) — Task 10 하네스
-var GEAR_MAX_JSTAR = 1;                                         // 이미 Lv12 인 장비가 또 나오면 젤리별 +1
 var GEAR_TIERS = ['common', 'rare', 'epic'];
 var GEAR_TIER_TOK = { common: '--role-rw-shard-steady-3', rare: '--role-rw-shard-agility-3', epic: '--role-rw-item-3' };
 var GEAR_TIER_INK = { common: '', rare: '', epic: '' };   // JS 연출 색 — 부팅 때 gearInkInit() 이 위 토큰에서 한 번 채운다(JS 색 리터럴 0, 점검 W7)
@@ -15001,12 +16167,14 @@ J.sfx.ui();
 }
 function closeDrops() { dropsN = 0; closeModal('modal-drops'); J.sfx.ui(); }
 function harvestGear(g, x, y, quiet) {
-if (!g || !g.id || !itemById(g.id)) return null;
+var it = g && g.id ? itemById(g.id) : null;
+if (!it) return null;
 var own = (store.items && store.items.own) || {};
 var had = own[g.id] | 0, res;
 if (had >= ITEM_LV_MAX) {
-store.jstar = (store.jstar | 0) + GEAR_MAX_JSTAR;
-res = { id: g.id, lv: had, tier: g.tier, max: true, isNew: false };
+var back = GACHA_REFUND[it.tier || g.tier] | 0, before = coinBalance();
+if (back > 0) store.coin = Math.min(COIN_MAX, before + back);
+res = { id: g.id, lv: had, tier: g.tier, max: true, isNew: false, refund: coinBalance() - before };
 } else {
 var gr = grantItem(g.id, 'farm');
 if (!gr) return null;
@@ -15099,7 +16267,8 @@ function gearPopFx(res, x, y) {
 var anim = typeof window !== 'undefined' && !fxReduced() && gearFlyPool.length > 0;
 if (anim && !GEAR_GEO.ok) gearGeoRead();   /* ok 는 resolveMatch 머리가 매치마다 내리고 다시 채운다 */
 var name = t('item.' + res.id + '.nm');
-toast(res.max ? t('mk.gearmax', { name: name, j: GEAR_MAX_JSTAR }) : t('mk.gear', { tier: t('drops.tier.' + res.tier), name: name }));
+toast(res.max ? ((res.refund | 0) > 0 ? t('mk.gearmax', { name: name, c: res.refund | 0 }) : t('mk.gearmax0', { name: name }))
+: t('mk.gear', { tier: t('drops.tier.' + res.tier), name: name }));   /* 환급이 0(상한)이면 숫자 없는 문장 */
 J.sfx.mission();
 J.vibrate(res.tier === 'epic' ? 40 : 22);
 if (!anim) return;
@@ -15272,12 +16441,15 @@ var dirty = false;
 if (awkStreak > (store.awkChainMax | 0)) { store.awkChainMax = awkStreak; dirty = true; }
 if (stdyRun > (store.noDelayMax | 0)) { store.noDelayMax = stdyRun; dirty = true; }
 if ((store.awkChainMax | 0) >= PET_AWK_NEED && !petOwned('tiktok')) grantPet('tiktok');
+if ((store.awkChainMax | 0) >= PET_AWK_NEED) friendDupPay('tiktok');   /* P3 — 뽑기로 먼저 온 째깍이면 별 +10 한 번 */
 if ((store.noDelayMax | 0) >= PET_NODELAY_NEED && !petOwned('mongle')) grantPet('mongle');
+if ((store.noDelayMax | 0) >= PET_NODELAY_NEED) friendDupPay('mongle');   /* P3 — 뽑기로 먼저 온 몽글이면 별 +10 한 번 */
 if (dirty) persist();
 }
 var PET_GEAR_NEED = 30;   /* 74 — 꿀떡이: 장비 과일 누적 30개(옛 파편 누적 300 과 같은 비율 — 이전기가 진행을 ÷10 으로 옮긴다) */
 function petGearCheck() {
 if (!petOwned('kkultteok') && (store.gearEver | 0) >= PET_GEAR_NEED) grantPet('kkultteok');
+if ((store.gearEver | 0) >= PET_GEAR_NEED) friendDupPay('kkultteok');   /* P3 — 뽑기로 먼저 온 꿀떡이면 별 +10 한 번 */
 }
 function v74NoticeReady() {
 if (!splashDone) return false;
@@ -15286,6 +16458,7 @@ if (!kd || !kd.classList.contains('active')) return false;
 return !document.querySelector('.modal:not([hidden])');
 }
 var V74_NOTICE_DELAY = 360;   /* 스플래시 퇴장(320ms) 뒤 — 걷히는 판 밑에 알림이 깔리지 않게 */
+var v74DueAt = 0;             /* P3 수정 1회차 m4 — splashDismiss 가 건 v74Notice 타이머가 울릴 시각(now() 시계). p3Notice 가 이보다 이르면 미룬다 */
 var v74ArcTimer = 0;          /* arc-dmg 안내 대기(맨 setTimeout) — 도는 동안에는 enterKingdom 이 먼저 띄우지 않는다 */
 function v74ArcNotice() {
 v74ArcTimer = 0;
@@ -15319,6 +16492,7 @@ store.tenTotal = (store.tenTotal | 0) + 1;
 if (!petOwned('sseokssak') && (store.tenTotal | 0) >= PET_TEN_NEED) {
 grantPet('sseokssak');
 }
+if ((store.tenTotal | 0) >= PET_TEN_NEED) friendDupPay('sseokssak');   /* P3 — 뽑기로 먼저 온 썩싹이면 별 +10 한 번 */
 }
 function petLockText(id) {
 var k = 'pet.lock.' + id, s = t(k);
@@ -15826,6 +17000,20 @@ ro.observe(nb);
 for (var ci = 0; ci < nb.children.length; ci++) ro.observe(nb.children[ci]);
 }
 })();
+var resBodies = document.querySelectorAll('.res-body');   /* P3 T2 수정 2회차 · T9 — 작은 폰 결과 창(게임오버 · 데일리 · 아케이드)의 중간 구획 .res-body 넘침 표시. ncBodyMore 와 같은 무늬(읽기 한 묶음 → 속성 쓰기 하나) */
+for (var rbi = 0; rbi < resBodies.length; rbi++) (function (ob) {
+function overBodyMore() {
+var more = ob.scrollHeight - ob.clientHeight - Math.ceil(ob.scrollTop) > 0;
+if (more) { if (!ob.hasAttribute('data-more')) ob.setAttribute('data-more', ''); }
+else if (ob.hasAttribute('data-more')) ob.removeAttribute('data-more');
+}
+on(ob, 'scroll', overBodyMore);
+if (typeof ResizeObserver === 'function') {
+var oro = new ResizeObserver(overBodyMore);
+oro.observe(ob);
+for (var oi = 0; oi < ob.children.length; oi++) oro.observe(ob.children[oi]);
+}
+})(resBodies[rbi]);
 on(document, 'click', function (e) {
 var n = e && e.target, x = null;
 while (n && n !== document) {
@@ -15849,6 +17037,7 @@ setText('adv-hearts', t('adv.heartlost', { n: Math.max(0, store.hearts) }));
 btn.hidden = true;
 });
 });
+var cx2 = document.querySelectorAll('.coin-x2'); for (var cxi = 0; cxi < cx2.length; cxi++) on(cx2[cxi], 'click', coinX2Click);
 on($('adv-map'), 'click', function () {
 closeModal('modal-adv');
 J.sfx.ui();
@@ -15998,19 +17187,7 @@ if (fn) fn(); else closeConfirm();
 });
 on($('cf-no'), 'click', closeConfirm);
 on($('modal-skin'), 'click', function (ev) { if (ev && ev.target === this) closeSkins(); });
-on($('sk-list'), 'click', function (ev) {
-var el = ev && ev.target;
-while (el && el !== this && !(el.getAttribute &&
-(el.getAttribute('data-buy') || el.getAttribute('data-buyjewel') ||
-el.getAttribute('data-equip')))) el = el.parentNode;
-if (!el || el === this || !el.getAttribute) return;
-var b = el.getAttribute('data-buy');
-if (b) { buySkin(b); return; }
-var bj = el.getAttribute('data-buyjewel');
-if (bj) { buySkinJewel(bj); return; }
-var e = el.getAttribute('data-equip');
-if (e) equipSkin(e);
-});
+on($('sk-list'), 'click', skinListClick);   /* P3 T5 — 이름 있는 함수(buildSkinList 옆) · 상점 꾸미기 판도 같은 위임을 쓴다 */
 on($('cp-rack'), 'click', function (ev) {
 if (now() - cpSwipeAt < 400) return;   /* 스와이프 직후의 합성 클릭 무시 */
 var el = ev && ev.target;
@@ -16063,9 +17240,32 @@ goMenu();
 on($('pz-resume'), 'click', resume);
 on($('btn-next'), 'click', nextStage);
 on($('btn-continue'), 'click', doContinue);
-on($('btn-shop'), 'click', openShop);
+on($('btn-shop'), 'click', function () { openShopScreen('jewel'); });
+on($('screen-shop'), 'click', function (ev) {
+var el = ev && ev.target;
+while (el && el !== this && !(el.getAttribute && (el.getAttribute('data-sh-act') || el.id === 'sh-back' ||
+el.id === 'sh-coin-plus' || el.id === 'sh-star-plus' || (el.classList && el.classList.contains('sh-tab'))))) el = el.parentNode;
+if (!el || el === this || !el.getAttribute) return;
+if (el.id === 'sh-back') { closeShopScreen(); return; }
+if (el.id === 'sh-coin-plus' || el.id === 'sh-star-plus') { setShopTab(portalAdsOk() ? 'free' : 'deals'); return; }
+if (el.classList && el.classList.contains('sh-tab')) { setShopTab(el.getAttribute('data-stab')); return; }
+if (!el.disabled) shopAct2(el.getAttribute('data-sh-act'), el);
+});
+portalAdsSync(); on(window, 'tw:portal', portalAdsSync);   /* P3 — 부팅 때 게이트를 세우고, SDK 준비(env 확정) 알림에 다시 칠한다 — 상점을 안 연 세션도 결과 창 2배 줄이 산다 */
 on($('shop-close'), 'click', closeShop);
 on($('modal-shop'), 'click', function (ev) { if (ev && ev.target === this) closeShop(); });
+on($('odds-close'), 'click', closeOdds);
+on($('odds-tabs'), 'click', function (ev) {
+var el = ev.target && ev.target.closest ? ev.target.closest('[data-otab]') : null;
+if (el) { oddsKind = el.getAttribute('data-otab'); oddsPaint(); var ob = $('odds-body'); if (ob) ob.scrollTop = 0; J.sfx.ui(); }
+});
+on($('modal-odds'), 'click', function (ev) { if (ev && ev.target === this) closeOdds(); });
+on($('gres-grid'), 'click', function (ev) { var li = ev.target && ev.target.closest ? ev.target.closest('.gres-card') : null; if (li) gresFlip(li, rwReduced()); });
+on($('gres-all'), 'click', function () { gresOpenAll(rwReduced()); });
+on($('gres-ok'), 'click', gresClose);
+on($('gres-again'), 'click', function () { var a = (this.getAttribute('data-again') || '').split(':'); gresClose(); if (a.length === 3) gachaRun(a[0], parseInt(a[1], 10) || 1, a[2]); });
+on($('modal-gres'), 'click', function (ev) { var tg = ev && ev.target; if (tg === this || (tg && tg.parentNode === this && tg.classList && tg.classList.contains('cut-dim'))) gresClose(); });
+gresTokPrime();   /* 모션 토큰 일곱을 부팅 때 미리 읽는다 — 첫 뽑기의 여는 프레임에 강제 스타일 재계산 0(리뷰 I-5 · 모션 규칙 5) */
 on($('shop-tabs'), 'click', function (ev) {
 var el = ev && ev.target;
 while (el && el !== this && !(el.getAttribute && el.getAttribute('data-shop-tab'))) el = el.parentNode;
@@ -16164,6 +17364,9 @@ if ($('modal-mode') && !$('modal-mode').hidden) { closeModeSheet(); return; }
 if ($('modal-playground') && !$('modal-playground').hidden) { closePlayground(); J.sfx.ui(); return; }
 if ($('modal-shop') && !$('modal-shop').hidden &&
 !($('modal-skin') && !$('modal-skin').hidden)) { closeShop(); return; }
+if ($('modal-odds') && !$('modal-odds').hidden) { closeOdds(); return; }   /* P3 T7 — 확률 창은 상점 화면 위의 한 겹이라 먼저 닫힌다 */
+if ($('modal-gres') && !$('modal-gres').hidden) { gresClose(); return; }   /* P3 T8 — 결과 창도 상점 화면 위의 한 겹 · 닫으면 gachaBusy 가 풀린다 */
+if ($('screen-shop') && $('screen-shop').classList.contains('active')) { closeShopScreen(); return; }   /* P3 — 상점 화면 = 왕국 위 한 겹 */
 if ($('modal-classic') && !$('modal-classic').hidden) { closeClassicHub(); return; }
 if ($('modal-minimap') && !$('modal-minimap').hidden) { closeMinimap(); return; }
 if ($('modal-drops') && !$('modal-drops').hidden) { closeDrops(); return; }
@@ -16305,11 +17508,15 @@ if (splashDone) return;
 splashDone = true;
 splashArmShield();
 var el = document.getElementById('splash');
-if (!el) { splashAudioHook(); return; }
+if (!el) { splashAudioHook(); saveROFlush(); return; }
 el.classList.add('is-out');
 setTimeout(function () { el.hidden = true; }, 320);
 splashAudioHook();
-setTimeout(v74Notice, V74_NOTICE_DELAY);   /* 74 — 첫 사용자 탭으로 스플래시가 걷히면 그 왕국에서 이전 알림(C4) */
+var roHold = saveROHoldMs();
+setTimeout(saveROFlush, 320);   /* 대기가 없으면 아무 일도 안 한다 */
+v74DueAt = now() + V74_NOTICE_DELAY + roHold;
+setTimeout(v74Notice, V74_NOTICE_DELAY + roHold);   /* 74 — 첫 사용자 탭으로 스플래시가 걷히면 그 왕국에서 이전 알림(C4) */
+setTimeout(p3Notice, P3_NOTICE_DELAY + roHold);   /* P3 — 첫 사용자 탭으로 스플래시가 걷히면 74 알림 사슬 뒤에 지갑 안내(C7) */
 }
 function splashDown() {
 if (splashDone) return;
@@ -16662,11 +17869,12 @@ DQ_REWARD: DQ_REWARD,
 store: store,
 jewelGrant: jewelGrant, jewelSpend: jewelSpend, jewelBalance: jewelBalance,
 jewelRefillHearts: jewelRefillHearts, jewelBuyHeart: jewelBuyHeart,
-jewelTradeStars: jewelTradeStars,
 appGemContinue: appGemContinue, jewelPayContinue: jewelPayContinue,
 claimDailyFree: claimDailyFree, dailyFreeLeft: dailyFreeLeft,
 openShop: openShop, closeShop: closeShop, shopTab: shopTab,
 paintShopBalance: paintShopBalance,
+coinBalance: coinBalance, coinGrant: coinGrant, coinSpend: coinSpend, starGrant: starGrant, starSpend: starSpend, grantItemOrRefund: grantItemOrRefund, p3Roll: p3Roll, p3Ensure: p3Ensure, advStarTotal: advStarTotal, advStarMax: advStarMax, GACHA_REFUND: GACHA_REFUND, COIN_MAX: COIN_MAX, P3_AD_CAP: P3_AD_CAP, P3_DEAL_CAP: P3_DEAL_CAP,
+coinForAdv: coinForAdv, coinForRank: coinForRank, coinForArc: coinForArc, runCoinPay: runCoinPay, COIN_RUN: COIN_RUN,
 shopPayForce: function (v) { shopPayForce = v ? 1 : 0; shopSyncPay(); },
 rewardReveal: rewardReveal, rewardItems: rewardItems, openAdvSheet: openAdvSheet,
 J: J,
@@ -16746,6 +17954,14 @@ kdResTap: kdResTap, kdUnlocked: kdUnlocked, kdBuilding: kdBuilding,
 kdResidents: kdResidents, kdStore: kdStore, homeScreen: homeScreen,
 KD_BUILDINGS: KD_BUILDINGS, KD_ZONES: KD_ZONES, KD_DECO: KD_DECO,
 KD_TAP_CAP: KD_TAP_CAP,
+openShopScreen: openShopScreen, closeShopScreen: closeShopScreen, setShopTab: setShopTab, portalAdsOk: portalAdsOk, portalAdsSync: portalAdsSync, SHOP_ART: SHOP_ART, shopFreeCount: shopFreeCount,
+dealBuy: dealBuy, dealGearOf: dealGearOf, dealLeft: dealLeft,   /* P3 T5 — 특가 */
+gachaTable: gachaTable, gachaPull: gachaPull, gachaBuy: gachaBuy, gachaPick: gachaPick, gachaDrawItem: gachaDrawItem, friendOwned: friendOwned, grantFriend: grantFriend, GACHA_PRICE: GACHA_PRICE, GACHA_TIER_P: GACHA_TIER_P, GACHA_TEN_UP: GACHA_TEN_UP,   /* P3 T6 — 뽑기 엔진(표 한 출처) */
+gachaKindSet: gachaKindSet, gachaRun: gachaRun, gachaPlay: gachaPlay, openOdds: openOdds, closeOdds: closeOdds, pctText: pctText,   /* P3 T7 — 뽑기 탭 · 확률 정보 창 */
+gresOpenAll: gresOpenAll, gresClose: gresClose, gresOpen: gresOpen,   /* P3 T8 — 뽑기 결과 창(캡슐 · 카드 뒤집기). gresOpen 은 수정 1회차(결제 없이 여는 손잡이 — 성능 귀속 측정 · 뒤 태스크) */
+adCapLeft: adCapLeft, adRowOk: adRowOk, watchAdFor: watchAdFor, paintCoinX2: paintCoinX2, twWatchAdForHeart: twWatchAdForHeart, P3_AD_COIN: P3_AD_COIN, P3_AD_STAR: P3_AD_STAR,   /* P3 T9 — 보상형 광고 */
+friendDupPay: friendDupPay, P3_DUP_STAR: P3_DUP_STAR,   /* P3 T10 — 중복 친구 별 +10 */
+paintShopTab: paintShopTab, SHOP_PAINT: SHOP_PAINT, SHOP_DOTS: SHOP_DOTS,   /* 수정 1회차 M-2 · M-6 — 탭 태스크 스모크가 표에 자기 함수를 넣어 본다 */
 mateId: mateId, setMate: setMate, cpTab: cpTab, openCharPanel: openCharPanel,
 duelFoeFull: duelFoeFull, PET_SKILL: PET_SKILL,
 openModeSheet: openModeSheet, openAdventure: openAdventure,

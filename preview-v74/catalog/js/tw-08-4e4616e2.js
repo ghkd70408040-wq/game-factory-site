@@ -83,6 +83,8 @@ return true;
 }
 var map = d.getElementById('screen-map');
 if (map && map.classList && map.classList.contains('active')) { esc(); return true; }
+var shop = d.getElementById('screen-shop');
+if (shop && shop.classList && shop.classList.contains('active')) { esc(); return true; }
 if (S && S.running) { esc(); return true; }
 return false;
 }
