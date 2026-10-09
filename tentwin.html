@@ -10473,7 +10473,6 @@ html.no-art-logo .logo-img  { display: none; }
    버튼을 지우지 않는 것이 이 한 줄의 이유다 — 왜 못 누르는지 말할 자리가
    남아야 「다음 판에 다시」가 읽힐 수 있다. */
 #btn-continue[disabled] { opacity: .45; cursor: default; pointer-events: none; }
-.sk-act.buy { background: linear-gradient(180deg, var(--prim-art-gold) 0%, var(--prim-art-gold) 46%, var(--prim-art-yel-2) 46%, var(--prim-art-yel-2) 100%); box-shadow: inset 0 2px 0 rgba(255,255,255,.34), 0 0 0 2.5px var(--mL-outline), 0 3px 0 #C98A1E; color: var(--prim-art-ink); }
 /* [Fix round 1 · I-9] 알약 크기 체계만 쓰게 .sk-act 의 min-width/min-height/
    font-size 적용을 여기서 끈다(min-height:36px 가 kit-pill-v2 의 계산 높이를
    짓눌러 8px 짜리 글자가 36px 상자에 뜨는 원인이었다 — 실측
@@ -10483,8 +10482,7 @@ html.no-art-logo .logo-img  { display: none; }
    주는 값(95.7vw) 그대로 두고, 글자 크기만 .sk-act 자신이 원래 썼던 그 수치
    (12px, 새 원시값 아님 — :9757 원래 선언 재확인)로 kit-pill-v2 의 calc() 를
    덮는다. --f2-w 를 옮기지 않은 것은 판단 편차이며 보고에 남긴다. */
-#modal-skin .sk-act.kit-pill-v2,
-#sh-body .sh-sk .sk-act.kit-pill-v2{   /* P3 T5 — 상점 꾸미기 판의 같은 줄도 같은 규칙(스킨 시트와 같은 크기·색) */
+#modal-skin .sk-act.kit-pill-v2{
   min-width: 0;
   min-height: 0;
   font-size: 12px;
@@ -10493,8 +10491,7 @@ html.no-art-logo .logo-img  { display: none; }
    기록판 모드 탭, :51803 부근)의 켜짐 변주와 같은 민트 레시피만 얹는다(껍데기·
    질감층은 kit-pill-v2가 그린다). 「착용 중」은 손대지 않는다 —
    kit-pill-v2[soft][disabled] 의 기존 opacity .55 그대로다. */
-#modal-skin .sk-act.kit-pill-v2[data-equip],
-#sh-body .sh-sk .sk-act.kit-pill-v2[data-equip]{
+#modal-skin .sk-act.kit-pill-v2[data-equip]{
   --f2-pill-soft: linear-gradient(180deg, var(--role-mint-face-a) 0%, var(--role-mint-face-a) 47%, var(--role-mint-face-b) 47%, var(--role-mint-face-b) 100%);
   --f2-ink: var(--prim-white);
   --role-f2-pill-soft-e: var(--role-mint-outline);
@@ -15173,7 +15170,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
 
            잔액 칩 id — `#shop-jewel-menu`. 모달 상단의 정본 칩 두 개가
            `#shop-jewel` · `#shop-jstar`(§20.4)라 같은 이름을 두 번 못 쓴다.
-           기존 `cp-gems` / `sk-gems` 는 **젤리별** 값이라 무접촉이다(§20.1).
+           기존 `cp-gems` / `sk-gems` 는 **젤리별** 값이라 무접촉이다(§20.1). [rc1009] 그 두 자리는 은퇴했다(캐릭터 화면 = 고르기만).
            ============================================================ -->
       <div id="shop-entry" data-app-only>
         <span class="shop-chip"><i class="shop-ic shop-ic-jewel" aria-hidden="true"></i><b id="shop-jewel-menu">0</b></span>
@@ -16909,9 +16906,9 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
           </div>
         </div>
         <div class="cp-foot">
-          <!-- 젤리별 잔액 + 스킨 시트 진입. 잔액을 버튼 안에 둔 이유는 스킨을
-               열기 **전에** 살 수 있는지가 보여야 하기 때문이다. -->
-          <button id="cp-skin" class="cp-skinbtn kit-btn-v2" data-kind="secondary" type="button" data-i18n-aria="aria.skins" aria-label="Skins"><span class="cs-lab" data-i18n="skin.btn">Skins</span><span class="cs-gem"><i class="gem-ic" aria-hidden="true">★</i><span id="cp-gems">0</span></span></button>
+          <!-- 스킨 시트 진입. [rc1009 · 사용자 2026-10-09] 캐릭터 화면은 스킨을 고르기만 하는 곳이라(얻기 = 상점 꾸미기 캡슐)
+               버튼 안의 별 잔액(.cs-gem · #cp-gems)을 걷었다 — 라벨 한 줄. -->
+          <button id="cp-skin" class="cp-skinbtn kit-btn-v2" data-kind="secondary" type="button" data-i18n-aria="aria.skins" aria-label="Skins"><span class="cs-lab" data-i18n="skin.btn">Skins</span></button>
           <button id="cp-go" class="cp-go kit-btn-v2" data-kind="primary" type="button" data-i18n="pick.go">Choose!</button>
         </div>
         </div>
@@ -17204,7 +17201,6 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
   <div id="modal-skin" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="sk-h"><div class="sheet jbox jbox--modal" data-part="modal-plate">
     <h2 id="sk-h" data-i18n="skin.title">Skins</h2>
     <button class="r10-x x-btn" type="button" data-w6x="sk-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
-    <p class="sk-bal"><span data-i18n="skin.balance">Stars</span><b class="sk-bal-v"><i class="gem-ic" aria-hidden="true">★</i><span id="sk-gems">0</span></b></p>
     <div id="sk-list" class="sk-list"></div>
     <button id="sk-close" data-part="btn-modal" data-variant="primary" class="btn btn-primary" type="button" data-i18n="settings.close">Close</button>
   </div></div>
@@ -27495,8 +27491,6 @@ window.TT_SFX = {
       'deals.got': 'You got {name}.',
       'deals.foot': 'All deals are fixed items. You see what you get before you buy. They change every day at midnight.',
       'deals.foot2': 'You can trade coins for stars up to {n} times a day.',
-      'deco.title': 'Skins',
-      'deco.for': 'Skins for {name}',
       'coin.got': '+{n} coins',
       'star.got': '+{n} stars',
       'gacha.nocoin': 'You need {n} more coins.',
@@ -27515,20 +27509,30 @@ window.TT_SFX = {
       'gacha.pity': 'Epic guarantee {n}/{max}',
       'gacha.friend.left': 'You have {have}/{all}. One of the {left} left will come.',
       'gacha.friend.all': 'You have every friend. It opens again when a new friend arrives.',
-      'gacha.friend.note': 'To be sure of a friend, invite them at the Pet House. Bosses and goals also bring friends.',
+      'gacha.friend.note': 'Bosses and goals also bring friends.',
       'gacha.chance.now': 'Odds now (friends left)',
       'gacha.nostar': 'You need {n} more stars.',
       'gacha.used': 'Already used today.',
+      /* rc1009(사용자 2026-10-09) — 상점 꾸미기 탭 = 꾸미기 캡슐(뽑기 방식). 값 · 수는 자리표시자(호출부가 표 · 상수로 채운다). */
+      'gacha.skin': 'Style Capsule',
+      'gacha.skin.d': "Only skins you don't have yet!",
+      'gacha.skin.left': 'You have {have}/{all}. One of the {left} left will come.',
+      'gacha.skin.all': 'You have every skin. It opens again when a new skin arrives.',
+      'gacha.skin.none': 'No skins to get right now. New friends or skins will open it.',
+      'gacha.skin.note': 'Put on your skins from Skins on the character screen.',
+      'gacha.skin.now': 'Odds now (skins left)',
       'odds.title': 'Odds',
       'odds.tier': 'Odds by rarity (per pull)',
       'odds.items': 'Odds per gear',
       'odds.friends': 'Odds per friend',
+      'odds.skins': 'Odds per skin',
       'odds.rules': 'Guarantees and repeats',
       'odds.tier.row': '{n} kinds, {each} each',
       'odds.rule.ten': 'In a pull ×{n}, if the first ones are all common, the last one is rare or better. Rare is {r} and epic is {e}.',
       'odds.rule.pity': 'After {n} pulls without an epic, the next pull is a sure epic. Now {c}/{n}.',
       'odds.rule.dup': 'A repeat raises the level by one. At the top level {max}, you get coins back. Common gives {c}, rare {r}, and epic {e}.',
       'odds.rule.friend': "Only friends you don't have yet. Rarity weights common {c}, rare {r}, epic {e} are shared by the friends left.",
+      'odds.skin.dup': 'Skins you have never come out.',
       'odds.foot1': 'Pulls use only coins, stars and ad rewards. They are never sold for money.',
       'odds.foot2': 'The odds shown come from the same table the draw uses. Decimals are rounded. ({date})',
       /* P3 Task 8 — 뽑기 결과 창(캡슐 · 카드 뒤집기 · 요약). 레벨 · 코인 · 회수는 자리표시자(호출부가 채운다). */
@@ -27539,6 +27543,7 @@ window.TT_SFX = {
       'gres.pity.reset': 'The epic guarantee count starts over.',
       'gres.lvup': 'Lv{a}→{b}',
       'gres.sum': 'New {a} · Level up {b}',
+      'gres.skin.sum': 'New skin {a}',
       'gres.refund': '{n} coins back',
       'gres.new': 'NEW',
       'gres.ok': 'OK',
@@ -28542,6 +28547,7 @@ window.TT_SFX = {
       'skin.balance': 'Stars',
       'skin.equip': 'Equip',
       'skin.equipped': 'Wearing',
+      'skin.inshop': 'In the Shop',   /* rc1009 — 없는 유료 스킨 줄의 닫힌 알약(얻는 곳 = 상점 꾸미기 캡슐) */
       'skin.soon': 'Coming soon',
       'skin.soonhint': 'A hat for the bichon prince',
       'skin.confirm': 'Spend {n} Stars on {name}?',
@@ -28717,7 +28723,6 @@ window.TT_SFX = {
       'pg.arcade': 'Arcade',
       'pg.arcade.d': 'Time Attack, Survival, 90s Damage.',
       'mode.title.arcade': 'Arcade Duel',
-      'kd.pethouse.alljoined': 'Everyone has already joined!',
       'soon.title': 'Coming Soon',
       'soon.body': 'Under construction. Check back after the next update!',
       'kd.visit': 'Yesterday-you saved up {n} Stars.',
@@ -28972,8 +28977,6 @@ window.TT_SFX = {
       'deals.got': '{name}을(를) 받았어요.',
       'deals.foot': '특가는 모두 확정 상품이에요. 무엇을 받는지 미리 보여요. 매일 자정에 새로 바뀌어요.',
       'deals.foot2': '코인을 별로 바꾸기는 하루 {n}번까지예요.',
-      'deco.title': '스킨',
-      'deco.for': '{name}에게 입힐 스킨이에요.',
       'coin.got': '코인 +{n}',
       'star.got': '별 +{n}',
       'gacha.nocoin': '코인이 {n}개 부족해요.',
@@ -28992,20 +28995,30 @@ window.TT_SFX = {
       'gacha.pity': '영웅 천장 {n}/{max}',
       'gacha.friend.left': '가진 친구 {have}/{all}, 남은 {left}명 중 한 명이 와요',
       'gacha.friend.all': '친구를 모두 모았어요. 새 친구가 오면 다시 열려요.',
-      'gacha.friend.note': '원하는 친구를 꼭 데려오려면 펫 하우스에서 초대해요. 보스와 조건으로도 친구를 만나요.',
+      'gacha.friend.note': '보스와 조건으로도 친구를 만나요.',
       'gacha.chance.now': '지금 확률 (남은 친구 기준)',
       'gacha.nostar': '별이 {n}개 부족해요.',
       'gacha.used': '오늘은 이미 썼어요.',
+      /* rc1009(사용자 2026-10-09) — 상점 꾸미기 탭 = 꾸미기 캡슐(뽑기 방식). 값 · 수는 자리표시자(호출부가 표 · 상수로 채운다). */
+      'gacha.skin': '꾸미기 캡슐',
+      'gacha.skin.d': '아직 없는 스킨만 나와요!',
+      'gacha.skin.left': '가진 스킨 {have}/{all}, 남은 {left}개 중 하나가 나와요',
+      'gacha.skin.all': '스킨을 모두 모았어요. 새 스킨이 오면 다시 열려요.',
+      'gacha.skin.none': '지금은 뽑을 스킨이 없어요. 새 친구나 새 스킨이 오면 열려요.',
+      'gacha.skin.note': '뽑은 스킨은 캐릭터 화면의 스킨에서 입혀요.',
+      'gacha.skin.now': '지금 확률 (남은 스킨 기준)',
       'odds.title': '확률 정보',
       'odds.tier': '등급 확률 (한 번 기준)',
       'odds.items': '장비별 확률',
       'odds.friends': '친구별 확률',
+      'odds.skins': '스킨별 확률',
       'odds.rules': '보장과 중복 규칙',
       'odds.tier.row': '{n}종, 각 {each}',
       'odds.rule.ten': '{n}회 뽑기에서 앞 칸이 모두 일반이면 마지막 칸은 희귀 이상이에요. 희귀 {r}, 영웅 {e}예요.',
       'odds.rule.pity': '영웅 없이 {n}회를 뽑으면 다음 한 번은 영웅이 확정이에요. 지금 {c}/{n}이에요.',
       'odds.rule.dup': '같은 장비가 또 나오면 레벨이 하나 올라요. 최고 레벨 {max}이면 코인으로 돌려받아요. 일반 {c}, 희귀 {r}, 영웅 {e}개예요.',
       'odds.rule.friend': '아직 없는 친구만 나와요. 등급 무게 일반 {c}, 희귀 {r}, 영웅 {e}를 남은 친구끼리 나눠요.',
+      'odds.skin.dup': '가진 스킨은 나오지 않아요.',
       'odds.foot1': '코인, 별, 광고 보상으로만 뽑아요. 현금으로 팔지 않아요.',
       'odds.foot2': '보이는 확률은 실제 추첨에 쓰는 표와 같은 값이에요. 소수점 아래는 반올림했어요. ({date} 기준)',
       /* P3 Task 8 — 뽑기 결과 창(캡슐 · 카드 뒤집기 · 요약). 레벨 · 코인 · 회수는 자리표시자(호출부가 채운다). */
@@ -29016,6 +29029,7 @@ window.TT_SFX = {
       'gres.pity.reset': '영웅 천장을 처음부터 다시 세요.',
       'gres.lvup': 'Lv{a}→{b}',
       'gres.sum': '새 장비 {a} · 레벨업 {b}',
+      'gres.skin.sum': '새 스킨 {a}',
       'gres.refund': '코인 {n} 돌려받음',
       'gres.new': 'NEW',
       'gres.ok': '확인',
@@ -29906,6 +29920,7 @@ window.TT_SFX = {
       'skin.balance': '별',
       'skin.equip': '장착',
       'skin.equipped': '착용 중',
+      'skin.inshop': '상점에서 만나요',
       'skin.soon': '곧 만나요',
       'skin.soonhint': '비숑 왕자의 모자',
       'skin.confirm': '{name}을(를) 별 {n}개로 살까요?',
@@ -30064,7 +30079,6 @@ window.TT_SFX = {
       'pg.arcade': '아케이드',
       'pg.arcade.d': '타임어택·서바이벌·90초 누적',
       'mode.title.arcade': '아케이드 대전',
-      'kd.pethouse.alljoined': '모두 함께하고 있어요!',
       'soon.title': '준비 중',
       'soon.body': '공사 중이에요! 다음 업데이트를 기다려 주세요.',
       'kd.visit': '어제의 내가 별 {n}개를 모아 뒀어요.',
@@ -32580,7 +32594,6 @@ window.TT_SFX = {
     syncItemList();       /* WD-2 §11.6-B — 보유/장착 자리표 */
     syncCharSummary();
     applySkins();
-    syncGems();
     /* WD-1 §13.5 — 막대는 강화에 따라 움직이므로 부팅 1회로는 모자란다. 패널이
        열릴 때마다 다시 칠한다: 멱등하고 값이 같으면 아무 일도 안 일어나므로
        (applyHeroStats 주석 참조) 여는 비용은 사실상 0 이고, 대신 "강화하고
@@ -32591,11 +32604,9 @@ window.TT_SFX = {
     fitAllDesc();             /* charsel v2 — 잘림 0 은 실측으로만 보장된다 */
   }
 
-  /** 젤리별 잔액을 표시하는 두 자리. */
-  function syncGems() {
-    setText('cp-gems', store.jstar | 0);
-    setText('sk-gems', store.jstar | 0);
-  }
+  /* [rc1009 · 사용자 2026-10-09] syncGems()(캐릭터 화면 #cp-gems · 스킨 시트 #sk-gems 두 자리의 별 잔액) 은퇴 — 캐릭터 화면은 사지 않는 곳(고르기만)이라
+     잔액 두 자리를 마크업에서 지웠고 그 둘만 칠하던 함수와 부르던 곳(별 지급 · 차감 · 왕국 방문 · 왕국 탭 · 스킨 줄 · 캐릭터 창 열기)을 함께 지웠다.
+     같은 별 잔액의 다른 자리(초대 창 iv-gems · 상점 띠 · 보석 창)는 각자의 함수가 그대로 칠한다. */
 
   /* =========================================================================
    * v4 6차 §B — 캐릭터 선택 패널
@@ -32972,15 +32983,16 @@ window.TT_SFX = {
    * ======================================================================= */
   function skinTargetId() { return HERO_IDS[cpIdx] || charId(); }
 
-  /** 스킨 줄을 root 에 그린다(없으면 스킨 시트 #sk-list). withBase = 상점 꾸미기 판(P3 T5): 스킨표가 없는 캐릭터(푸딩 기사 · 소다 마녀)에도 「기본 · 착용 중」
-   *  한 줄을 둔다 — 새 문구 0(skin.base · skin.basedesc · skin.equipped). 스킨 시트(#modal-skin)는 표가 비면 종전대로 빈 목록이다(픽셀 무변). */
-  function buildSkinList(root, withBase) {
-    var wrap = root || $('sk-list');
+  /** 스킨 줄을 스킨 시트(#sk-list)에 그린다. [rc1009 · 사용자 2026-10-09 「스킨을 선택가능한건 캐릭터 선택창에서만 가능하게해」] 여기는 **고르는 곳**이다 —
+   *  얻는 곳은 상점 꾸미기 캡슐이라 없는 유료 스킨 줄에는 구매 버튼(★ · 앱 💎) 대신 닫힌 알약 「상점에서 만나요」(skin.inshop) 하나가 선다.
+   *  스킨표가 없는 캐릭터(푸딩 기사 · 소다 마녀)도 「기본 · 착용 중」 한 줄을 둔다(종전 상점 꾸미기 판 전용이던 withBase 동작을 시트의 기본으로 — 새 문구 0). */
+  function buildSkinList() {
+    var wrap = $('sk-list');
     if (!wrap) return;
     var id = skinTargetId();
     var list = skinsFor(id);
     var cur = equippedSkin(id);
-    if (withBase && !list.length) { list = [{ id: id + '.base', name: 'skin.base', desc: 'skin.basedesc', cost: 0 }]; cur = list[0]; }
+    if (!list.length) { list = [{ id: id + '.base', name: 'skin.base', desc: 'skin.basedesc', cost: 0 }]; cur = list[0]; }
     wrap.innerHTML = '';
     for (var i = 0; i < list.length; i++) {
       var sk = list[i];
@@ -33014,9 +33026,12 @@ window.TT_SFX = {
         act.textContent = t('skin.soon');
         act.disabled = true;
       } else if (!skinOwned(sk)) {
-        act.className += ' buy';
-        act.textContent = '★' + sk.cost;
-        act.setAttribute('data-buy', sk.id);
+        /* [rc1009] 닫힌 알약 = 「착용 중」과 같은 kit-pill-v2[soft][disabled] 변주(새 값 0). 구매 함수(buySkin · buySkinJewel)와
+           skinListClick 의 구매 분기는 남아 있고 화면이 그 버튼(data-buy · data-buyjewel)을 그리지 않을 뿐이다. */
+        act.className += ' kit-pill-v2';
+        act.setAttribute('data-variant', 'soft');
+        act.textContent = t('skin.inshop');
+        act.disabled = true;
       } else if (cur && cur.id === sk.id) {
         /* [T8-0926 · Task10 스킨 버튼] 「착용 중」= 기존 kit-pill-v2[soft][disabled]
            변주 그대로(회색조 opacity .55, 새 값 0). */
@@ -33034,28 +33049,15 @@ window.TT_SFX = {
         act.setAttribute('data-equip', sk.id);
       }
       row.appendChild(act);
-      /* [SHOP-0910] 소비처 ③ — 젤리별 버튼 **옆에** 「💎 100」을 하나 더한다.
-         위 `act`(젤리별 경로)는 한 글자도 안 바뀌었다(§20.3 「젤리별 경로를
-         없애지 않는다」). 새 버튼만 `data-app-only` 라 웹에서는 DOM 이 hidden 이고
-         탭 순서에서도 빠진다 = 웹 픽셀 0. */
-      if (!sk.soon && !skinOwned(sk)) {
-        var jact = document.createElement('button');
-        jact.type = 'button';
-        jact.className = 'sk-act buy sk-act-jewel';
-        jact.setAttribute('data-app-only', '');
-        jact.setAttribute('data-buyjewel', sk.id);
-        jact.textContent = '\uD83D\uDC8E' + JEWEL_COST.skin;
-        row.appendChild(jact);
-      }
       wrap.appendChild(row);
     }
-    syncGems();
     /* 목록을 다시 그렸으므로 방금 만든 노드에 §18.7 규약을 한 번 더 적용한다.
        (새 숨김 방식을 만들지 않는다 — 규약 함수를 그대로 부른다) */
     try { if (window.TW && window.TW.applyPlatformGates) window.TW.applyPlatformGates(wrap); } catch (e) {}
   }
 
-  /** 스킨 줄 위임 — 스킨 시트(#sk-list)와 상점 꾸미기 판이 같이 쓴다(P3 T5). 본문은 wire() 에 있던 그대로이고 `this` 만 ev.currentTarget 이다. */
+  /** 스킨 줄 위임 — 스킨 시트(#sk-list)(P3 T5 · [rc1009] 상점 꾸미기 판의 스킨 줄은 은퇴). 본문은 wire() 에 있던 그대로이고 `this` 만 ev.currentTarget 이다.
+   *  구매 분기(data-buy · data-buyjewel)는 [rc1009] 화면이 그 버튼을 그리지 않아 닿지 않지만 지우지 않았다(브리프 C-3). */
   function skinListClick(ev) {
     var root = ev && ev.currentTarget;
     var el = ev && ev.target;
@@ -33072,7 +33074,7 @@ window.TT_SFX = {
     var e = el.getAttribute('data-equip');
     if (e) equipSkin(e);
   }
-  /** 구매·장착이 스킨 시트 목록(#sk-list)만 고치면 상점 꾸미기 판 줄이 낡는다 — 판이 떠 있으면 이 탭만 다시 그린다(스크롤 유지 · 띠 별 잔액 포함, P3 T5). */
+  /** 구매·장착 뒤 상점 꾸미기 탭이 떠 있으면 이 탭만 다시 그린다(스크롤 유지 · 띠 별 잔액 포함, P3 T5). [rc1009] 탭 내용은 꾸미기 캡슐 — 남은 후보가 store.skins 로 정해진다. */
   function skinShopSync() { if (shopActive() && shopTab2 === 'deco') paintShopTab('deco'); }
 
   function openSkins() {
@@ -33135,6 +33137,7 @@ window.TT_SFX = {
   }
 
   /* ==[INV-0911]:JS:BEGIN== 캐릭터 초대 · 획득 연출 · 자기소개 (DESIGN §23)
+   * [rc1009 · 사용자 2026-10-09] 초대 창 입구 0 — 친구는 상점 친구 캡슐과 보스 · 조건으로만 온다(아래 초대 창 코드는 휴면 · window.Game 손잡이와 하네스 컷만 창을 직접 연다).
    * ---------------------------------------------------------------------------
    * 세 구멍이 한 배관이라 한 블록이다(§23.1): 잠긴 카드가 «막다른 골목»이고,
    * 얻는 순간이 «토스트 한 줄»이며, 얻은 뒤에도 «누구인지 모른다».
@@ -33728,9 +33731,9 @@ window.TT_SFX = {
   /** 큰 "선택!" — 지금 보고 있는 캐릭터로 결정하고 닫는다. */
   function cpConfirm() {
     var id = HERO_IDS[cpIdx];
-    /* [INV-0911] 카드 탭과 같은 문이다 — 두 입구가 잠금을 다르게 다루면 안 된다. */
+    /* [INV-0911] 카드 탭(setChar)과 같은 말이다 — 두 입구가 잠금을 다르게 다루면 안 된다.
+       [rc1009 · 사용자 2026-10-09] 초대 창 입구는 닫혔다 — 친구는 상점 친구 캡슐과 보스 · 조건으로만 온다. */
     if (!heroUnlocked(id)) {
-      if (openInvite(id)) return;
       toast(t('char.locked.hint')); J.sfx.fail(); return;
     }
     setChar(id);              // 이미 그 캐릭터면 조용히 아무 일도 하지 않는다
@@ -33778,11 +33781,10 @@ window.TT_SFX = {
     if (HERO_IDS.indexOf(id) < 0 || id === store.charId) return;
     /* 잠긴 캐릭터는 고를 수 없다. 조용히 무시하지 않고 이유를 말하는 것이
        중요하다 — 카드가 눌리는데 아무 일도 안 일어나면 고장으로 읽힌다.
-       [INV-0911] 이제 그 «이유»는 토스트가 아니라 **문**이다(DESIGN §23.2):
-       초대할 수 있으면 초대 창이 열리고, 초대 대상이 아닌 id 에서만 종전
-       토스트로 떨어진다 — 잠긴 카드가 막다른 골목이 아니게 되는 것이 요점이다. */
+       [INV-0911] 한때 그 «이유»는 초대 창이라는 **문**이었다(DESIGN §23.2).
+       [rc1009 · 사용자 2026-10-09] 그 입구는 닫혔다 — 친구는 상점 친구 캡슐과
+       보스 · 조건으로만 온다. 그래서 다시 토스트 한 줄이 이유를 말한다. */
     if (!heroUnlocked(id)) {
-      if (openInvite(id)) return;
       toast(t('char.locked.hint')); J.sfx.fail(); return;
     }
     store.charId = id;
@@ -33803,10 +33805,9 @@ window.TT_SFX = {
        것이 중요한 것도 setChar 와 같다(카드가 눌리는데 아무 일도 안 일어나면
        고장으로 읽힌다). 문구·소리까지 그대로 재사용한다 — 잠금이라는 사건이
        주인공 카드와 펫 카드에서 다른 말을 하면 그것이 두 번째 체계가 된다.
-       [INV-0911] 그 «같은 말»이 이제 같은 **문**이기도 하다 — 주인공 카드와
-       똑같이 초대 창이 먼저 열리고, 초대 대상이 아닌 펫에서만 토스트로 떨어진다. */
+       [INV-0911] 한때 그 «같은 말»이 초대 창이라는 같은 **문**이기도 했다.
+       [rc1009 · 사용자 2026-10-09] 주인공 카드와 똑같이 그 입구는 닫혔다 — 토스트 한 줄이다. */
     if (v && !petOwned(v)) {
-      if (openInvite(v)) return;
       toast(petLockText(v)); J.sfx.fail(); return;
     }
     if (v === mateId()) return;
@@ -45283,7 +45284,7 @@ window.TT_SFX = {
   }
 
   /** 잔액 표시 갱신. 세 자리(메뉴 칩 · 모달 💎 · 모달 ★)가 전부 여기서만 바뀐다.
-   *  ⚠ 기존 `cp-gems` / `sk-gems` 는 **젤리별** 값이라 이름·값 무접촉이다(§20.1). */
+   *  ⚠ 기존 `cp-gems` / `sk-gems` 는 **젤리별** 값이라 이름·값 무접촉이다(§20.1). [rc1009] 그 두 자리는 은퇴했다(캐릭터 화면 = 고르기만). */
   function paintShopBalance() {
     setText('shop-jewel', jewelBalance());
     setText('shop-jstar', store.jstar | 0);
@@ -45338,7 +45339,6 @@ window.TT_SFX = {
     if (!jewelAmountOk(n)) return false;
     store.jstar = Math.min(STAR_MAX, (store.jstar | 0) + n);   /* 상한에서 멈춘다 — 실제 증가분은 잔액 차로 읽는다(반환은 참/거짓, M2 와 같은 규칙) */
     persist();
-    syncGems();
     paintWallets();
     return true;
   }
@@ -45348,7 +45348,6 @@ window.TT_SFX = {
     if (have < n) return false;
     store.jstar = have - n;
     persist();
-    syncGems();
     paintWallets();
     return true;
   }
@@ -45800,24 +45799,17 @@ window.TT_SFX = {
     paintShopTab(shopTab2);   /* 구매 뒤 = 이 탭만 다시(스크롤 자리 유지 · 띠·점·번역을 같이 맞춘다) — 처음으로 돌리는 전체 다시 그리기는 열기·탭 전환만 */
   };
 
-  /* ---- 꾸미기 탭 — 기존 스킨 목록(buildSkinList)을 판 안에 그대로 그린다(새 모양 0, 스펙 §4-c ④). 대상 = 지금 고른 캐릭터(skinTargetId) 하나,
-     대상 바꾸기 알약은 없다(목업 B4). 왕국 장식은 뒤 파도. ---- */
-  SHOP_PAINT.deco = function (body) {
-    var head = document.createElement('div'); head.className = 'kit-pill-v2 sh-head'; head.setAttribute('data-variant', 'header');
-    head.textContent = t('deco.title'); body.appendChild(head);
-    var who = document.createElement('p'); who.className = 'sh-fine'; who.textContent = t('deco.for', { name: t('char.' + skinTargetId() + '.name') });
-    body.appendChild(who);
-    var list = document.createElement('div'); list.className = 'sk-list sh-sk'; body.appendChild(list);
-    list.addEventListener('click', skinListClick);
-    buildSkinList(list, true);
-  };
+  /* ---- 꾸미기 탭 = 꾸미기 캡슐([rc1009] 사용자 2026-10-09 「상점에서 역할은 그저 구매해서 뽑는거지 … 그냥 갓차 식으로 해놔」).
+     뽑기 탭과 같은 부품 · 같은 배치(paintCapsule)이고 종류 알약 줄만 없다. 상점 안에 장착 · 착용 중 같은 고르기 UI 는 0 —
+     고르기는 캐릭터 화면 스킨 시트만이다. 무료 · 첫 방문 · 광고 · 천장이 없어 탭 점(SHOP_DOTS)도 없다. ---- */
+  SHOP_PAINT.deco = function (body, scene) { paintCapsule(body, scene, 'skin', false); };
 
   /* ---- 뽑기 탭(목업 B1) — 표 한 출처(gachaTable)만 읽는다. 기계는 발주 ② 전까지 CSS 규칙 기하(.gm-ph). ---- */
   var gachaKind = 'item', gachaBusy = false;
   /* 확률 글자 — 표준 반올림(절반은 올림). toFixed 는 이진 부동소수 때문에 절반 경계(예 0.00015 → 0.01%)가 내림될 수 있어 정수로 먼저 반올림한다(리뷰 M-6). EPSILON 곱은 1.4999… 로 새는 절반 값을 건진다 */
   function pctText(p, digits) { var k = Math.pow(10, digits); return (Math.round(p * Math.pow(10, digits + 2) * (1 + Number.EPSILON)) / k).toFixed(digits) + '%'; }
   function gachaKindSet(k) {
-    if (GACHA_KINDS.indexOf(k) < 0) return;
+    if (GACHA_TAB_KINDS.indexOf(k) < 0) return;   /* 뽑기 탭 알약 셋만 — 꾸미기 캡슐은 꾸미기 탭이 그린다 */
     gachaKind = k;
     if (shopTab2 === 'gacha' && shopActive()) paintShopTab(shopTab2, true);   /* 종류가 바뀌면 판 내용이 통째로 바뀐다 → 스크롤도 처음으로 */
   }
@@ -45827,6 +45819,7 @@ window.TT_SFX = {
     if (r.err === 'coin') toast(t('gacha.nocoin', { n: r.need }));
     else if (r.err === 'star') toast(t('gacha.nostar', { n: r.need }));
     else if (r.err === 'allfriends') toast(t('gacha.friend.all'));
+    else if (r.err === 'allskins') toast(t(skinEmptyKey(gachaTable('skin'))));   /* [rc1009] 탭 알약과 같은 문장(지휘자 판정 Q5) */
     else if (r.err === 'used') toast(t('gacha.used'));
     else if (elseKey) toast(t(elseKey));
   }
@@ -45922,8 +45915,8 @@ window.TT_SFX = {
     li.querySelector('.gres-new').textContent = it.isNew ? t('gres.new') : '';
     /* 새 장비는 NEW 배지만(목업 R1 · 리뷰 M-1 — 「Lv0→1」 은 게임에 없는 값). 사전 밖 글자 0(착수 전 점검 W8) */
     /* 환급 0(잔액이 코인 상한에 닿아 잘린 경우)은 문구를 안 찍는다 — 꼬리 알약(gresOpen 의 `if (refund)`) · 수확 토스트와 같은 규칙(최종 리뷰 M-2) */
-    li.querySelector('.gres-lv').textContent = it.isNew ? '' : (it.max ? ((it.refund | 0) > 0 ? t('gres.refund', { n: it.refund }) : '') : t('gres.lvup', { a: it.lv0 | 0, b: it.lv | 0 }));
-    li.querySelector('.gres-nm').textContent = t('item.' + it.id + '.nm');
+    li.querySelector('.gres-lv').textContent = (it.isNew || it.skin) ? '' : (it.max ? ((it.refund | 0) > 0 ? t('gres.refund', { n: it.refund }) : '') : t('gres.lvup', { a: it.lv0 | 0, b: it.lv | 0 }));
+    li.querySelector('.gres-nm').textContent = it.skin ? skinNameOf(it.id) : t('item.' + it.id + '.nm');   /* [rc1009] 꾸미기 캡슐 = 스킨 이름 */
     return li;
   }
   function gresOpen(res) {
@@ -45938,7 +45931,7 @@ window.TT_SFX = {
       it = res.items[i];
       li = gresCard(it);
       grid.appendChild(li);
-      arts.push([li.querySelector('.gres-art'), itemArtCss(it.id, 96)]);
+      arts.push([li.querySelector('.gres-art'), it.skin ? skinThumbCss(it.id) : itemArtCss(it.id, 96)]);   /* [rc1009] 스킨 = art.thumb · 없으면 img */
       if (it.how === 'ten') ten = true;
       if (it.how === 'pity') pity = true;
       if (it.tier === 'epic') epic = true;
@@ -45948,7 +45941,7 @@ window.TT_SFX = {
     setText('gres-title', t(res.n > 1 ? 'gres.title10' : 'gres.title1', { n: res.n }));
     setText('gres-note', pity ? t('gres.pity.hit') : (ten ? t('gres.ten.up') : ''));
     var sum = $('gres-sum'); sum.innerHTML = '';
-    ['epic', 'rare', 'common'].forEach(function (tr) {
+    if (res.kind !== 'skin') ['epic', 'rare', 'common'].forEach(function (tr) {   /* [rc1009] 스킨에는 등급 칩 줄이 없다 */
       var n = res.items.filter(function (x) { return x.tier === tr; }).length;
       if (!n) return;
       var s = document.createElement('span'); s.className = 'gres-s'; s.setAttribute('data-tier', tr); s.setAttribute('data-n', String(n));
@@ -45957,7 +45950,7 @@ window.TT_SFX = {
     });
     /* 꼬리 알약 = 글자 조각 둘(새 장비 · 레벨업 / 환급) — 사이 간격은 CSS gap(리뷰 M-2 · 사전 문구 그대로) */
     var tail = document.createElement('span'); tail.className = 'kit-pill-v2 gres-t'; tail.setAttribute('data-variant', 'soft');
-    var ts = document.createElement('span'); ts.textContent = t('gres.sum', { a: nNew, b: nUp }); tail.appendChild(ts);
+    var ts = document.createElement('span'); ts.textContent = res.kind === 'skin' ? t('gres.skin.sum', { a: nNew }) : t('gres.sum', { a: nNew, b: nUp }); tail.appendChild(ts);
     if (refund) { var trf = document.createElement('span'); trf.className = 'gres-rf'; trf.textContent = t('gres.refund', { n: refund }); tail.appendChild(trf); }
     sum.appendChild(tail);
     var tb = gachaTable(res.kind);
@@ -46048,61 +46041,72 @@ window.TT_SFX = {
     if (o.dis) b.disabled = true; else b.setAttribute('data-sh-act', o.act);
     return b;
   }
-  SHOP_PAINT.gacha = function (body, scene) {
-    var tb = gachaTable(gachaKind), i;
-    /* 무대: 종류 알약 셋 · 이름 리본 · 기계(임시 CSS) · 친구면 돔 안 남은 얼굴 · 말풍선 */
+  /* 캡슐 무대 + 판 한 벌 — 뽑기 탭(kind = 지금 종류 · 종류 알약 줄 있음)과 [rc1009] 꾸미기 탭(kind = 'skin' · 알약 줄 없음)이 같이 그린다(같은 부품 · 같은 배치).
+     남은 후보끼리 나누는 캡슐(친구 · 스킨 — capLeft)은 돔 안 썸네일 · 남은 수 알약 · 후보 격자를, 장비 캡슐은 천장 알약 · 등급 요약을 쓴다. */
+  function capLeft(kind) { return kind === 'friend' || kind === 'skin'; }
+  function capRowArt(kind, id) { return kind === 'skin' ? skinThumbCss(id) : stdArt(id, 'thumb'); }
+  function capRowName(kind, id) { return kind === 'skin' ? skinNameOf(id) : t('char.' + id + '.name'); }
+  function capSubText(kind, tb) {
+    if (kind === 'friend') return tb.left ? t('gacha.friend.left', { have: tb.all - tb.left, all: tb.all, left: tb.left }) : t('gacha.friend.all');
+    if (kind === 'skin') return tb.left ? t('gacha.skin.left', { have: tb.all - tb.left, all: tb.all, left: tb.left }) : t(skinEmptyKey(tb));
+    return t('gacha.pity', { n: tb.pity, max: tb.pityAt });
+  }
+  function paintCapsule(body, scene, kind, pills) {
+    var tb = gachaTable(kind), i, lf = capLeft(kind);
+    /* 무대: 종류 알약 셋(뽑기 탭만) · 이름 리본 · 기계(임시 CSS) · 친구 · 스킨이면 돔 안 남은 후보 · 말풍선 */
     if (scene) {
-      var pills = document.createElement('div'); pills.className = 'gc-kinds';
-      for (i = 0; i < GACHA_KINDS.length; i++) {
-        var pk = document.createElement('button'); pk.type = 'button'; pk.className = 'kit-pill-v2 gc-kind';
-        pk.setAttribute('data-variant', GACHA_KINDS[i] === gachaKind ? 'header' : 'soft');
-        pk.setAttribute('data-kind', GACHA_KINDS[i]); pk.setAttribute('data-sh-act', 'gkind:' + GACHA_KINDS[i]);
-        pk.textContent = t('gacha.' + GACHA_KINDS[i]); pills.appendChild(pk);
+      if (pills) {
+        var pl = document.createElement('div'); pl.className = 'gc-kinds';
+        for (i = 0; i < GACHA_TAB_KINDS.length; i++) {
+          var pk = document.createElement('button'); pk.type = 'button'; pk.className = 'kit-pill-v2 gc-kind';
+          pk.setAttribute('data-variant', GACHA_TAB_KINDS[i] === kind ? 'header' : 'soft');
+          pk.setAttribute('data-kind', GACHA_TAB_KINDS[i]); pk.setAttribute('data-sh-act', 'gkind:' + GACHA_TAB_KINDS[i]);
+          pk.textContent = t('gacha.' + GACHA_TAB_KINDS[i]); pl.appendChild(pk);
+        }
+        scene.appendChild(pl);
       }
-      scene.appendChild(pills);
       var rb = document.createElement('div'); rb.className = 'kit-pill-v2 gc-title'; rb.setAttribute('data-variant', 'header');
-      rb.textContent = t('gacha.' + gachaKind); scene.appendChild(rb);
-      var m = document.createElement('div'); m.className = 'gm-ph'; m.setAttribute('data-kind', gachaKind);
+      rb.textContent = t('gacha.' + kind); scene.appendChild(rb);
+      var m = document.createElement('div'); m.className = 'gm-ph'; m.setAttribute('data-kind', kind);
       m.innerHTML = '<i class="gm-dome"></i><i class="gm-body"></i><i class="gm-knob"></i><i class="gm-slot"></i>';
-      if (gachaKind === 'friend') {
+      if (lf) {
         for (i = 0; i < tb.rows.length && i < 9; i++) {
           var face = document.createElement('i'); face.className = 'gm-face'; face.setAttribute('data-tier', tb.rows[i].tier);
           /* 얼굴 칸 좌표 = 세 열 · 줄마다 아래로. CSS round() 는 iOS 15.4 미만·Chrome 125 미만이 모른다(이 파일은 iOS 15 · Chrome 104 급까지 선다) → JS 가 두 변수(%)로 준다 */
           face.style.setProperty('--gm-x', (15 + (i % 3) * 24) + '%');
           face.style.setProperty('--gm-y', (12 + Math.floor(i / 3) * 17) + '%');
-          setArt(face, '--gm-face', stdArt(tb.rows[i].id, 'thumb'), '');
+          setArt(face, '--gm-face', capRowArt(kind, tb.rows[i].id), '');
           m.appendChild(face);
         }
         if (tb.rows.length) m.setAttribute('data-rows', String(Math.ceil(Math.min(tb.rows.length, 9) / 3)));   /* 줄 수 — DESIGN §28.11 */
       }
       scene.appendChild(m);
       var sub = document.createElement('div'); sub.className = 'kit-pill-v2 gc-sub'; sub.setAttribute('data-variant', 'soft'); sub.id = 'gc-pity';
-      sub.textContent = gachaKind === 'friend' ? (tb.left ? t('gacha.friend.left', { have: tb.all - tb.left, all: tb.all, left: tb.left }) : t('gacha.friend.all'))
-                                               : t('gacha.pity', { n: tb.pity, max: tb.pityAt });
+      sub.textContent = capSubText(kind, tb);
       scene.appendChild(sub);
     }
     var bub = $('sh-bubble');
-    if (bub) { bub.textContent = t('gacha.' + gachaKind + '.d'); bub.hidden = false; }
+    if (bub) { bub.textContent = t('gacha.' + kind + '.d'); bub.hidden = false; }
     /* 판: 버튼 줄 · 지금 확률 · 확률 보기 · 작은 글씨 */
     var row = document.createElement('div'); row.className = 'gc-btns'; body.appendChild(row);
-    var dis = (gachaKind === 'friend' && tb.left <= 0);
-    var fb = dis ? null : gachaFreeBtn(gachaKind);
+    var dis = (lf && tb.left <= 0);
+    var fb = dis ? null : gachaFreeBtn(kind);
     if (fb) row.appendChild(gachaBtn(fb));
-    var ic = GACHA_CUR[gachaKind] === 'coin' ? 'coin' : 'star', pr = GACHA_CUR[gachaKind] === 'coin' ? 'coin' : 'star';
-    row.appendChild(gachaBtn({ label: t('gacha.one') + ' ' + arcComma(tb.price), coinIc: ic, price: dis ? 'ok' : pr, act: 'gbuy:' + gachaKind + ':1:' + pr, dis: dis }));   /* 닫힌 버튼은 특가 탭처럼 「ok」(연보라) */
-    if (gachaKind === 'item') row.appendChild(gachaBtn({ label: t('gacha.ten', { n: GACHA_TEN }) + ' ' + arcComma(tb.ten), coinIc: 'coin', price: 'coin', act: 'gbuy:item:' + GACHA_TEN + ':coin' }));
+    var ic = GACHA_CUR[kind] === 'coin' ? 'coin' : 'star', pr = GACHA_CUR[kind] === 'coin' ? 'coin' : 'star';
+    row.appendChild(gachaBtn({ label: t('gacha.one') + ' ' + arcComma(tb.price), coinIc: ic, price: dis ? 'ok' : pr, act: 'gbuy:' + kind + ':1:' + pr, dis: dis }));   /* 닫힌 버튼은 특가 탭처럼 「ok」(연보라) */
+    if (kind === 'item') row.appendChild(gachaBtn({ label: t('gacha.ten', { n: GACHA_TEN }) + ' ' + arcComma(tb.ten), coinIc: 'coin', price: 'coin', act: 'gbuy:item:' + GACHA_TEN + ':coin' }));
     var hd = document.createElement('div'); hd.className = 'gc-oddhd';
-    var hs = document.createElement('span'); hs.textContent = t(gachaKind === 'friend' ? 'gacha.chance.now' : 'odds.tier'); hd.appendChild(hs);
+    var hs = document.createElement('span'); hs.textContent = t(kind === 'friend' ? 'gacha.chance.now' : (kind === 'skin' ? 'gacha.skin.now' : 'odds.tier')); hd.appendChild(hs);
     var link = document.createElement('button'); link.type = 'button'; link.className = 'kit-pill-v2 gc-oddlink'; link.setAttribute('data-variant', 'soft');
-    link.setAttribute('data-sh-act', 'godds:' + gachaKind); link.textContent = t('gacha.odds'); hd.appendChild(link);
+    link.setAttribute('data-sh-act', 'godds:' + kind); link.textContent = t('gacha.odds'); hd.appendChild(link);
     body.appendChild(hd);
-    var og = document.createElement('div'); og.id = 'gc-odds'; og.className = gachaKind === 'friend' ? 'gc-og' : 'gc-tiers'; body.appendChild(og);
-    if (gachaKind === 'friend') {
+    var og = document.createElement('div'); og.id = 'gc-odds'; og.className = lf ? 'gc-og' : 'gc-tiers'; body.appendChild(og);
+    if (lf) {
       for (i = 0; i < tb.rows.length; i++) {
         var oc = document.createElement('div'); oc.className = 'gc-oc'; oc.setAttribute('data-id', tb.rows[i].id); oc.setAttribute('data-tier', tb.rows[i].tier);
-        var fi = document.createElement('i'); setArt(fi, '--gm-face', stdArt(tb.rows[i].id, 'thumb'), ''); oc.appendChild(fi);
+        var fi = document.createElement('i'); setArt(fi, '--gm-face', capRowArt(kind, tb.rows[i].id), ''); oc.appendChild(fi);
         var sp = document.createElement('span');
-        var nb = document.createElement('b'); nb.textContent = t('char.' + tb.rows[i].id + '.name'); sp.appendChild(nb);
+        var nb = document.createElement('b'); nb.textContent = capRowName(kind, tb.rows[i].id); sp.appendChild(nb);
         var pe = document.createElement('em'); pe.textContent = pctText(tb.rows[i].p, 2); sp.appendChild(pe);
         oc.appendChild(sp); og.appendChild(oc);
       }
@@ -46116,9 +46120,10 @@ window.TT_SFX = {
       }
     }
     var fine = document.createElement('p'); fine.className = 'sh-fine';
-    fine.textContent = gachaKind === 'friend' ? t('gacha.friend.note') : t('odds.foot1');
+    fine.textContent = kind === 'friend' ? t('gacha.friend.note') : (kind === 'skin' ? t('gacha.skin.note') : t('odds.foot1'));
     body.appendChild(fine);
-  };
+  }
+  SHOP_PAINT.gacha = function (body, scene) { paintCapsule(body, scene, gachaKind, true); };
   SHOP_DOTS.gacha = function () {
     p3Ensure();   /* 새 설치는 store.gacha 가 아직 없다 — 왕국 배지가 먼저 이 함수를 부른다 */
     var g = store.gacha, n = 0;
@@ -46159,42 +46164,47 @@ window.TT_SFX = {
     return r;
   }
   function oddsPaint() {
-    var tabs = document.querySelectorAll('#odds-tabs .od-tab'), i, tb = gachaTable(oddsKind), d = oddsKind === 'friend' ? 2 : 3;
+    var tabs = document.querySelectorAll('#odds-tabs .od-tab'), i, tb = gachaTable(oddsKind), fr = oddsKind === 'friend', sk = oddsKind === 'skin', d = (fr || sk) ? 2 : 3;
     for (i = 0; i < tabs.length; i++) {
       var on = tabs[i].getAttribute('data-otab') === oddsKind;
       tabs[i].setAttribute('aria-selected', on ? 'true' : 'false');
       if (on) tabs[i].setAttribute('data-active', ''); else tabs[i].removeAttribute('data-active');
     }
+    /* [rc1009 · 지휘자 판정 Q2] 꾸미기 캡슐은 꾸미기 탭에만 있어 탭 줄(아이템 · 황금 · 친구)에 자리가 없다 — 그 확률을 보는 동안만 탭 줄을 숨긴다 */
+    var trow = $('odds-tabs'); if (trow) trow.hidden = sk;
     var b = $('odds-body'); if (!b) return;
     b.innerHTML = '';
-    var s1 = document.createElement('section'); s1.className = 'od-sec';
-    var h1 = document.createElement('h3'); h1.textContent = t('odds.tier'); s1.appendChild(h1);
-    for (i = 0; i < tb.tiers.length; i++) {
-      var tr = oddsRow('od-tier', '', t('odds.tier.row', { n: tb.tiers[i].n, each: pctText(tb.tiers[i].each, d) }), pctText(tb.tiers[i].p, d));
-      tr.setAttribute('data-tier', tb.tiers[i].tier);
-      var chip = document.createElement('em'); chip.className = 'gc-chip'; chip.textContent = t('drops.tier.' + tb.tiers[i].tier); tr.insertBefore(chip, tr.firstChild);
-      s1.appendChild(tr);
+    if (!sk) {   /* 등급 절 — 스킨에는 등급이 없어 절째 뺀다(판정 Q3) */
+      var s1 = document.createElement('section'); s1.className = 'od-sec';
+      var h1 = document.createElement('h3'); h1.textContent = t('odds.tier'); s1.appendChild(h1);
+      for (i = 0; i < tb.tiers.length; i++) {
+        var tr = oddsRow('od-tier', '', t('odds.tier.row', { n: tb.tiers[i].n, each: pctText(tb.tiers[i].each, d) }), pctText(tb.tiers[i].p, d));
+        tr.setAttribute('data-tier', tb.tiers[i].tier);
+        var chip = document.createElement('em'); chip.className = 'gc-chip'; chip.textContent = t('drops.tier.' + tb.tiers[i].tier); tr.insertBefore(chip, tr.firstChild);
+        s1.appendChild(tr);
+      }
+      b.appendChild(s1);
     }
-    b.appendChild(s1);
     var s2 = document.createElement('section'); s2.className = 'od-sec od-list';
-    var h2 = document.createElement('h3'); h2.textContent = t(oddsKind === 'friend' ? 'odds.friends' : 'odds.items'); s2.appendChild(h2);
+    var h2 = document.createElement('h3'); h2.textContent = t(fr ? 'odds.friends' : (sk ? 'odds.skins' : 'odds.items')); s2.appendChild(h2);
     var box = document.createElement('div'); box.className = 'od-box'; s2.appendChild(box);   /* 높이가 정해진 안쪽 스크롤 상자 — 규칙 절 · 바닥 글이 첫 화면에 들게(리뷰 I-2). 마지막 줄이 반쯤 잘려 보이는 것이 「더 있다」 신호 */
     for (i = 0; i < tb.rows.length; i++) {
-      var id = tb.rows[i].id, fr = oddsKind === 'friend';
-      box.appendChild(oddsRow('', id, t(fr ? ('char.' + id + '.name') : ('item.' + id + '.nm')), pctText(tb.rows[i].p, d),
-                              fr ? stdArt(id, 'thumb') : itemArtCss(id, 64)));
+      var id = tb.rows[i].id;
+      box.appendChild(oddsRow('', id, fr ? t('char.' + id + '.name') : (sk ? skinNameOf(id) : t('item.' + id + '.nm')), pctText(tb.rows[i].p, d),
+                              fr ? stdArt(id, 'thumb') : (sk ? skinThumbCss(id) : itemArtCss(id, 64))));
     }
-    /* 친구를 다 모았으면 빈 목록 상자는 숨긴다(묶음 B B12) */
-    if (!tb.rows.length) { box.hidden = true; var none = document.createElement('p'); none.textContent = t('gacha.friend.all'); s2.appendChild(none); }
+    /* 친구 · 스킨을 다 모았으면 빈 목록 상자는 숨긴다(묶음 B B12 · 스킨 문장 = 판정 Q5) */
+    if (!tb.rows.length) { box.hidden = true; var none = document.createElement('p'); none.textContent = t(sk ? skinEmptyKey(tb) : 'gacha.friend.all'); s2.appendChild(none); }
     b.appendChild(s2);
     var s3 = document.createElement('section'); s3.className = 'od-sec od-rules';
     var h3 = document.createElement('h3'); h3.textContent = t('odds.rules'); s3.appendChild(h3);
     var ul = document.createElement('ul'), li;
     var rules = [];
     if (oddsKind === 'item') rules.push(t('odds.rule.ten', { n: GACHA_TEN, r: pctText(GACHA_TEN_UP.rare, 0), e: pctText(GACHA_TEN_UP.epic, 0) }));
-    if (oddsKind !== 'friend') rules.push(t('odds.rule.pity', { n: tb.pityAt, c: tb.pity }));
-    if (oddsKind !== 'friend') rules.push(t('odds.rule.dup', { max: ITEM_LV_MAX, c: GACHA_REFUND.common, r: GACHA_REFUND.rare, e: GACHA_REFUND.epic }));
-    else rules.push(t('odds.rule.friend', { c: GACHA_FRIEND_W.common, r: GACHA_FRIEND_W.rare, e: GACHA_FRIEND_W.epic }));
+    if (!fr && !sk) rules.push(t('odds.rule.pity', { n: tb.pityAt, c: tb.pity }));
+    if (fr) rules.push(t('odds.rule.friend', { c: GACHA_FRIEND_W.common, r: GACHA_FRIEND_W.rare, e: GACHA_FRIEND_W.epic }));
+    else if (sk) rules.push(t('odds.skin.dup'));
+    else rules.push(t('odds.rule.dup', { max: ITEM_LV_MAX, c: GACHA_REFUND.common, r: GACHA_REFUND.rare, e: GACHA_REFUND.epic }));
     for (i = 0; i < rules.length; i++) { li = document.createElement('li'); li.textContent = rules[i]; ul.appendChild(li); }
     s3.appendChild(ul);
     b.appendChild(s3);
@@ -48525,20 +48535,16 @@ window.TT_SFX = {
       go: function () { openShopScreen('gacha'); } },
     /* [64-fix3 ⑩ · 사용자 2026-09-27 「우체국 내용이 펫하우스 내용이야. 이걸 펫하우스로 옮기고」]
        우체국은 새 친구 기능(⑪, 설계 중)이 들어올 때까지 「준비 중」 모달(#modal-soon)이다.
-       초대 창은 아래 펫 하우스가 연다 — 창 내용·동작 무변, 연결만 옮겼다. */
+       초대 창 연결은 그때 펫 하우스로 옮겼다가 [rc1009 · 사용자 2026-10-09] 입구가 닫혔다(아래 펫 하우스 주석). */
     { id: 'post',       l: 81.7, t: 58.4, w: 33, h: 14.6, chap: 1, key: 'kd.post', tone: 'pink', ic: 'flag', roof: 5.8,
       art: 'url("catalog/t3-bldg2-post.webp")',
       go: function () { kdSoonModal(); } },
-    /* 펫 하우스 = 캐릭터·펫 초대 창(판정판 54). 처음 초대 가능한 상대(INVITE_ORDER)를 연다 —
-       옛 「초대 정자」→ 우체국이 쓰던 그 판정 그대로다. [64-fix3d M-9] 초대할 상대가 없으면
-       「곧 열려요!」(우체국 시절 문구)가 아니라 사실대로 「모두 함께하고 있어요!」. */
+    /* [rc1009 · 사용자 2026-10-09 「펫하우스에서 뽑게되는거 시스템 준비중으로 바꿔놔」] 펫 하우스는 새 시스템이 들어올 때까지
+       「준비 중」 모달(#modal-soon — 우체국 · 성과 같은 창)이다. 펫(친구)은 상점 친구 캡슐과 보스 · 조건으로만 온다 — 같은 일을
+       하는 입구를 둘 두지 않는다. 그림 · 이름표 · 자리는 무변이고 진입 함수만 바꿨다(종전 = 초대 창 · 판정판 54). */
     { id: 'pethouse',   l: 17.4, t: 77.8, w: 29, h: 15, chap: 1, key: 'kd.pethouse', tone: 'orange', ic: 'heart', roof: 11.7,
       art: 'url("catalog/t3-bldg2-pethouse.webp")',
-      go: function () {
-        var ids = INVITE_ORDER, i;
-        for (i = 0; i < ids.length; i++) { if (openInvite(ids[i])) return; }
-        kdAllJoined();
-      } },
+      go: function () { kdSoonModal(); } },
     { id: 'playground', l: 82.7, t: 78.1, w: 33, h: 15, chap: 1, key: 'kd.playground', tone: 'violet', ic: 'inf', roof: 16.3,
       art: 'url("catalog/t3-bldg2-playground.webp")',
       go: function () { openPlayground(); } }
@@ -48601,12 +48607,9 @@ window.TT_SFX = {
   /** 잠긴 건물이 요구하는 탄 번호. 미니맵(§14.4)이 쓰는 그 식 그대로다. */
   function kdNeedStage(b) { return chapFirst(b.chap | 0 || 1) - 1; }
 
-  /** [64-fix3d M-9] 펫 하우스에 초대할 상대가 없을 때(모두 합류). 종전 kdSoon()(「곧 열려요!」 ·
-      우편함·초대 정자 시절 임시 배선)은 이 한 곳에서만 쓰였고 kd.soon 키와 함께 은퇴했다. */
-  function kdAllJoined() { toast(t('kd.pethouse.alljoined')); J.sfx.ui(); }
   /* [T8-0926 · 판정판 70] 성 전용 — 토스트가 아니라 모달(#modal-soon)이다.
-     [64-fix3 ⑩] 우체국도 이 모달을 쓴다(초대 창은 펫 하우스로 옮겼다). 펫 하우스의
-     「초대할 상대 없음」은 위 kdAllJoined() 토스트다. */
+     [64-fix3 ⑩] 우체국도 이 모달을 쓴다. [rc1009 · 사용자 2026-10-09] 펫 하우스도 새 시스템이 들어올 때까지 이 모달이다 —
+     초대 창을 열던 진입과 「모두 함께하고 있어요!」 토스트(kdAllJoined · kd.pethouse.alljoined)는 은퇴했다. */
   function kdSoonModal() { openModal('modal-soon'); J.sfx.ui(); }
 
   /* --- 거주자 풀 (§26.3) ----------------------------------------------------
@@ -48782,7 +48785,6 @@ window.TT_SFX = {
     k.tapToday = 0;
     if (!first) store.jstar = (store.jstar | 0) + KD_VISIT_JSTAR;
     persist();
-    syncGems();
     kdSync();
     if (line) {
       line.textContent = t(first ? 'kd.visit.first' : 'kd.visit', { n: KD_VISIT_JSTAR });
@@ -48873,7 +48875,6 @@ window.TT_SFX = {
     k.tapToday = (k.tapToday | 0) + 1;
     store.jstar = (store.jstar | 0) + KD_TAP_JSTAR;
     persist();
-    syncGems();
     kdSync();
     J.sfx.petBell();
   }
@@ -50346,9 +50347,12 @@ window.TT_SFX = {
    * gachaBuy 한 곳에서 한 묶음으로 하고 gachaBuy 끝 persist 한 번(쓰기 함수는 각자 저장 — §28.6 ③) — 연출은 저장이 끝난 뒤에만 시작한다.
    * 판 위 선물 상자(openGachaRoll, 74 개봉표 95/5)와는 다른 장치다 — 이름이 비슷할 뿐 무접촉.
    * ========================================================================= */
-  var GACHA_KINDS = ['item', 'gold', 'friend'];
-  var GACHA_PRICE = { item: 150, item10: 1350, gold: 30, friend: 20 };   /* 코인 · 코인 · 별 · 별 */
-  var GACHA_CUR = { item: 'coin', gold: 'star', friend: 'star' };
+  /* 엔진이 아는 종류(gachaBuy · gachaTable · 확률 창). 'skin' = 꾸미기 캡슐([rc1009] 사용자 2026-10-09 「그냥 갓차 식으로 해놔」) — 상점 꾸미기 탭에만 선다.
+     뽑기 탭의 종류 알약은 GACHA_TAB_KINDS 셋뿐이다(꾸미기 캡슐은 그 줄에 없다). */
+  var GACHA_KINDS = ['item', 'gold', 'friend', 'skin'];
+  var GACHA_TAB_KINDS = ['item', 'gold', 'friend'];
+  var GACHA_PRICE = { item: 150, item10: 1350, gold: 30, friend: 20, skin: SKIN_COST_ROYAL };   /* 코인 · 코인 · 별 · 별 · 별(스킨 = 정본 스킨 값 하나 — 경제 무변) */
+  var GACHA_CUR = { item: 'coin', gold: 'star', friend: 'star', skin: 'star' };
   var GACHA_TEN = 10;
   var GACHA_TIER_P = { item: { common: 0.75, rare: 0.22, epic: 0.03 }, gold: { rare: 0.85, epic: 0.15 } };
   var GACHA_TEN_UP = { rare: 0.88, epic: 0.12 };        /* 10회: 앞 9칸이 전부 일반이면 10번째 */
@@ -50357,6 +50361,7 @@ window.TT_SFX = {
                             kkultteok: 'rare', sseokssak: 'rare', mukmul: 'rare',
                             banjjak: 'epic', bangul: 'epic', jelly: 'epic' };   /* = 초대 사다리 0~12 / 16~25 / 30~45★ 순서 */
   var GACHA_TIERS = ['common', 'rare', 'epic'];
+  var GACHA_SKIN_TIER = 'rare';   /* [rc1009] 스킨 줄의 액자 색(결과 카드 · 돔 · 후보 격자) — 겉모습일 뿐 등급이 아니다(확률 창 등급 절 없음, 지휘자 판정 Q3) */
 
   function gachaItemsOf(tier) {
     var out = [], i;
@@ -50373,12 +50378,47 @@ window.TT_SFX = {
     for (i = 0; i < ids.length; i++) { tier = GACHA_FRIEND_TIER[ids[i]]; rows.push({ id: ids[i], tier: tier, p: W ? GACHA_FRIEND_W[tier] / W : 0 }); }
     return rows;
   }
-  /** 표 한 출처. rows[i] = { id, tier, p } (합 1). 친구는 **지금 남은 친구만**으로 다시 나눈다. */
+  /** [rc1009] 꾸미기 캡슐의 전체 후보 = SKINS 의 모든 줄 가운데 유료(cost > 0)이고 예고(soon)가 아니며 그 캐릭터가 해금된 것(heroUnlocked). 아직 없는지는 표가 가른다. */
+  function gachaSkinsOf() {
+    var out = [], k, i, list;
+    for (k in SKINS) {
+      if (!Object.prototype.hasOwnProperty.call(SKINS, k) || !heroUnlocked(k)) continue;
+      list = SKINS[k];
+      for (i = 0; i < list.length; i++) if (list[i].cost > 0 && !list[i].soon) out.push(list[i]);
+    }
+    return out;
+  }
+  /** 스킨 한 줄의 썸네일 그림 값 — art.thumb 가 있으면 그것, 없으면 img(CSS 변수 이름 → var(...)). 둘 다 없으면 ''(그림 없음). */
+  function skinThumbCss(sid) {
+    var sk = skinById(sid), v = sk ? ((sk.art && sk.art.thumb) || sk.img || '') : '';
+    return v ? ('var(' + v + ')') : '';
+  }
+  function skinNameOf(sid) { var sk = skinById(sid); return sk ? t(sk.name) : ''; }
+  /** 후보 0 일 때의 문장 키(지휘자 판정 Q5) — 해금된 캐릭터의 유료 스킨이 있으면 「모두 모았어요」, 하나도 없으면 「지금은 뽑을 스킨이 없어요」.
+   *  꾸미기 탭 알약 · allskins 토스트 · 확률 창 빈 목록이 같이 쓴다. */
+  function skinEmptyKey(tb) { return (tb && tb.all > 0) ? 'gacha.skin.all' : 'gacha.skin.none'; }
+  /** [rc1009] 스킨 지급 — buySkin 이 성공할 때와 같은 저장(store.skins 에 더하기). 장착은 하지 않는다(고르기는 캐릭터 화면 스킨 시트만 — 사용자 2026-10-09). */
+  function grantSkin(sid) {
+    var sk = skinById(sid);
+    if (!sk || sk.soon || skinOwned(sk)) return false;
+    store.skins.push(sk.id);
+    persist();
+    return true;
+  }
+  /** 표 한 출처. rows[i] = { id, tier, p } (합 1). 친구 · 스킨은 **지금 남은 후보만**으로 다시 나눈다. */
   function gachaTable(kind) {
     p3Ensure();
     var tb = { kind: kind, cur: GACHA_CUR[kind], price: GACHA_PRICE[kind], ten: kind === 'item' ? GACHA_PRICE.item10 : 0,
                tiers: [], rows: [], pity: 0, pityAt: 0, left: 0, all: 0 };
     var i, j, tier, ids, p, n;
+    if (kind === 'skin') {   /* [rc1009] 남은 후보끼리 같은 무게(각 1/남은 수) · 등급 절 없음(tiers 빈 배열) · 천장 · 10회 없음 */
+      var sks = gachaSkinsOf();
+      tb.all = sks.length;
+      for (i = 0; i < sks.length; i++) if (!skinOwned(sks[i])) tb.rows.push({ id: sks[i].id, tier: GACHA_SKIN_TIER, p: 0 });
+      tb.left = tb.rows.length;
+      for (i = 0; i < tb.rows.length; i++) tb.rows[i].p = 1 / tb.left;
+      return tb;
+    }
     if (kind === 'friend') {
       var left = [];
       for (i = 0; i < GACHA_FRIEND_IDS.length; i++) if (!friendOwned(GACHA_FRIEND_IDS[i])) left.push(GACHA_FRIEND_IDS[i]);
@@ -50425,6 +50465,10 @@ window.TT_SFX = {
   function gachaPull(kind, count, rng) {
     var r = (typeof rng === 'function') ? rng : Math.random;
     var tb = gachaTable(kind), out = [], g = store.gacha, i, k;
+    if (kind === 'skin') {   /* [rc1009] 1회만 — 표의 p 그대로(표시 = 추첨) */
+      if (tb.rows.length) { var sp = gachaPick(tb.rows, r); out.push({ id: sp.id, tier: sp.tier, how: '' }); }
+      return out;
+    }
     if (kind === 'friend') {
       var rows = tb.rows, ids;
       for (i = 0; i < count && rows.length; i++) {
@@ -50466,15 +50510,16 @@ window.TT_SFX = {
     p3Ensure();
     var n = (kind === 'item' && count === GACHA_TEN) ? GACHA_TEN : 1, g = store.gacha, cur = GACHA_CUR[kind], cost = 0;
     if (kind === 'friend' && gachaTable('friend').left <= 0) return { err: 'allfriends' };
-    if (kind !== 'friend') {   /* 수정 1회차 M-4 — 어느 등급이든 켜진 장비가 0종이면 차감 **전**에 거른다(빈 등급에서 추첨이 던지면 코인만 사라진다) */
+    if (kind === 'skin' && gachaTable('skin').left <= 0) return { err: 'allskins' };   /* [rc1009] 후보 0 은 차감 전에 거른다 */
+    if (kind !== 'friend' && kind !== 'skin') {   /* 수정 1회차 M-4 — 어느 등급이든 켜진 장비가 0종이면 차감 **전**에 거른다(빈 등급에서 추첨이 던지면 코인만 사라진다) */
       var tiers = gachaTable(kind).tiers, ti;
       for (ti = 0; ti < tiers.length; ti++) if (!(tiers[ti].n > 0)) return { err: 'bad' };
     }
     if (how === 'free') { if (kind !== 'item' || n !== 1 || g.freeDay === todayKey()) return { err: 'used' }; }
     else if (how === 'first') {
-      if (n !== 1 || kind === 'gold') return { err: 'used' };
+      if (n !== 1 || kind === 'gold' || kind === 'skin') return { err: 'used' };
       if (kind === 'item' ? g.firstItem : g.firstFriend) return { err: 'used' };
-    } else if (how === 'ad') { if (n !== 1 || kind === 'gold') return { err: 'bad' }; }
+    } else if (how === 'ad') { if (n !== 1 || kind === 'gold' || kind === 'skin') return { err: 'bad' }; }
     else if (how === 'coin' || how === 'star') {
       if (how !== cur) return { err: 'bad' };
       cost = (n === GACHA_TEN) ? GACHA_PRICE.item10 : GACHA_PRICE[kind];
@@ -50491,6 +50536,8 @@ window.TT_SFX = {
     for (i = 0; i < picks.length; i++) {
       if (kind === 'friend') {
         res = { id: picks[i].id, tier: picks[i].tier, isNew: grantFriend(picks[i].id, 'gacha'), friend: true };   /* 수정 1회차 M-1 — 합류가 안 됐으면 isNew false */
+      } else if (kind === 'skin') {
+        res = { id: picks[i].id, tier: picks[i].tier, isNew: grantSkin(picks[i].id), skin: true };   /* [rc1009] 지급만 — 장착은 안 한다 */
       } else {
         res = grantItemOrRefund(picks[i].id, 'gacha') || { id: picks[i].id, tier: picks[i].tier, lv: 0 };
       }
@@ -52237,7 +52284,7 @@ window.TT_SFX = {
     });
     on($('cf-no'), 'click', closeConfirm);
     on($('modal-skin'), 'click', function (ev) { if (ev && ev.target === this) closeSkins(); });
-    on($('sk-list'), 'click', skinListClick);   /* P3 T5 — 이름 있는 함수(buildSkinList 옆) · 상점 꾸미기 판도 같은 위임을 쓴다 */
+    on($('sk-list'), 'click', skinListClick);   /* P3 T5 — 이름 있는 함수(buildSkinList 옆) */
     /* 썸네일 랙 = **보기** 전환. setChar 을 부르지 않는 것이 요점이다 —
        구경과 결정을 가르는 6차의 규약이 랙에서도 그대로다. */
     /* ⑰ 방울 탭 = 그 방울이 정중앙으로. 논리 인덱스가 아니라 **탭한 렌더 방울**의
@@ -61453,7 +61500,7 @@ html[lang="ko"] #charpanel .cs-tip { word-break: keep-all; overflow-wrap: anywhe
   display: inline-flex;
   flex-direction: column;
   gap: calc(var(--f2-w) * .004);
-  /* [64-fix2 ③ 2026-09-27] 두 줄(라벨 + ★수) 묶음을 kit-btn-v2 **면** 가운데로. 면 중심 =
+  /* [64-fix2 ③ 2026-09-27] 라벨 묶음을([rc1009] ★수 줄은 걷었다 — 라벨 한 줄) kit-btn-v2 **면** 가운데로. 면 중심 =
      상자 중심 − (.1320 − .0355)/2 bh(하단 발광 밴드 .1320 · 림 .0355, kit-btn-v2 기하) →
      아래 여백 2 × .048bh. 종전엔 묶음이 상자 가운데라 면보다 2.7~3.5px 아래(잉크 중심 축). */
   padding-bottom: calc(var(--f2-bh) * .096);
@@ -61467,12 +61514,6 @@ html[lang="ko"] #charpanel .cs-tip { word-break: keep-all; overflow-wrap: anywhe
   color: var(--prim-white);
 }
 #charpanel .cp-skinbtn .cs-lab { position: relative; z-index: 4; font-weight: 900; }
-#charpanel .cp-skinbtn .cs-gem {
-  position: relative; z-index: 4;
-  display: inline-flex; align-items: center; gap: calc(var(--f2-w) * .006);
-  font-weight: 900;
-}
-#charpanel .cp-skinbtn .gem-ic { color: #FFE07A; font-style: normal; }
 #charpanel .cp-go {
   /* [E44-0903] 캐릭창 주버튼도 같은 자(B1 0.4089)로 올린다. 이 버튼은 젤리가 아니라
      kit-btn-v2 라 글자 자가 calc(var(--f2-bh) x .30) 이고, 그 자는 이 빌드의 킷 버튼
@@ -70130,10 +70171,6 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
 }
 #modal-shop .shop-act[disabled]{ opacity: .48; cursor: default; }
 
-/* 스킨 시트의 「\1F48E 100」 버튼 — 젤리별 버튼과 **같은 부품**(.sk-act.buy)이고
-   너비만 자기 글자에 맞춘다. 젤리별 버튼의 값은 한 톨도 안 바뀐다. */
-.sk-act-jewel{ margin-left: 6px; }
-
 /* 데스크톱(1280x800) — 판 폭이 --pw(min(360px,100%))로 고정이라 카드 격자가
    늘어나지 않는다. 탭 글자만 한 단 키워 넷이 나란히 읽히게 한다. */
 @media (min-width: 900px){
@@ -71471,12 +71508,11 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
 #sh-coin-plus::before{ right: calc(71.78cqw - .4cqw - 70.26cqw); }
 #sh-star-plus::before{ right: calc(98.98cqw - .4cqw - 100cqw); }
 
-/* 무대(가게 안): 탭마다 높이가 다르다 — 뽑기 500px · 특가 300px · 무료/꾸미기 250px(목업 .shopbg) */
+/* 무대(가게 안): 탭마다 높이가 다르다 — 뽑기 · 꾸미기 500px · 특가 300px · 무료 250px(목업 .shopbg · [rc1009] 꾸미기 = 꾸미기 캡슐, 뽑기와 같은 배치) */
 #sh-stage{ position: absolute; left: 0; right: 0; top: 0; height: calc(min(128.2cqw, 60%) + var(--safe-t)); overflow: hidden;
   background: linear-gradient(180deg, var(--prim-bg-light), var(--prim-art-pink-2)); }   /* 높이 + 안전 위 — 판 위 끝이 그만큼 내려가도 무대 끝과의 겹침(22px)이 같다(수정 1회차 I-2) */
 #screen-shop[data-stab="deals"] #sh-stage{ height: calc(min(76.9cqw, 40%) + var(--safe-t)); }
-#screen-shop[data-stab="free"]  #sh-stage,
-#screen-shop[data-stab="deco"]  #sh-stage{ height: calc(min(64.1cqw, 34%) + var(--safe-t)); }
+#screen-shop[data-stab="free"]  #sh-stage{ height: calc(min(64.1cqw, 34%) + var(--safe-t)); }
 /* 발주 ① 전 임시 차양(목업 .awn: 높이 64px · 줄 28px) — 그림이 오면 [data-art~="bg"] 가 끈다(Task 12). */
 #sh-awning{ position: absolute; left: -2.6cqw; right: -2.6cqw; top: 0; height: 16.4cqw;
   background: repeating-linear-gradient(90deg, var(--prim-art-pink) 0 7.18cqw, var(--prim-white) 7.18cqw 14.36cqw); }
@@ -71490,8 +71526,7 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
 /* 판: 목업 .panel(left 10px · 아래 끝 756px 고정 · 위 = 탭마다) — 짧은 화면에서는 위를 올리고 판 안을 스크롤 */
 #sh-plate{ position: absolute; left: 2.56cqw; right: 2.56cqw; bottom: calc(22.6cqw + var(--safe-b)); top: calc(min(122.6cqw, 57%) + var(--safe-t)); z-index: 4; }   /* 안전 영역 위·아래(수정 1회차 I-2) */
 #screen-shop[data-stab="deals"] #sh-plate{ top: calc(min(72.3cqw, 36%) + var(--safe-t)); }
-#screen-shop[data-stab="free"]  #sh-plate,
-#screen-shop[data-stab="deco"]  #sh-plate{ top: calc(min(57.9cqw, 30%) + var(--safe-t)); }
+#screen-shop[data-stab="free"]  #sh-plate{ top: calc(min(57.9cqw, 30%) + var(--safe-t)); }
 #sh-body{ position: absolute; inset: 3cqw 3.5cqw; overflow-y: auto; overscroll-behavior: contain; }
 
 /* 아래 띠: 목업 .botnav(좌우·아래 8px · 높이 74px · 간격 6px) · 탭 = 젤리 알약(.rank-tab, 선택 = 노랑) 인스턴스 */
@@ -71570,15 +71605,8 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
   background: var(--prim-white); border: calc(.4 * var(--cqw)) solid var(--role-f2-pill-line); color: var(--prim-art-ink); font-size: calc(3.4 * var(--cqw)); }
 #sh-bubble > .kit-pill-v2{ display: flex; width: max-content; margin-top: calc(1.2 * var(--cqw)); --f2-bh: calc(5.9 * var(--cqw)); font-size: calc(3.3 * var(--cqw)); }
 #screen-shop[data-stab="deals"] #sh-host{ left: calc(6 * var(--cqw)); right: auto; }
-/* 특가 판의 스크롤 상자는 머리 알약(판 직속, 위 걸침) 밑부터 — 첫 카드 자리는 머리가 상자 안에 있던 때와 같다(판 위 끝 + 4.5cqw + 안쪽 여백 2.5cqw = 7cqw). 상자가 판 위로 나가지 않는다(리뷰 I-1). 꾸미기 판은 목업 B4 대로 머리가 판 안(상자 안)이다. */
+/* 특가 판의 스크롤 상자는 머리 알약(판 직속, 위 걸침) 밑부터 — 첫 카드 자리는 머리가 상자 안에 있던 때와 같다(판 위 끝 + 4.5cqw + 안쪽 여백 2.5cqw = 7cqw). 상자가 판 위로 나가지 않는다(리뷰 I-1). */
 #screen-shop[data-stab="deals"] #sh-body{ top: calc(4.5 * var(--cqw)); padding-top: calc(2.5 * var(--cqw)); }   /* 안쪽 여백 = 「희귀」 표가 카드 위로 걸친 만큼(상자 위 끝에서 안 잘림) */
-/* 꾸미기 탭 스킨 줄 묶음(5a 차이표 D3 · D4): 대상 줄 밑 틈 2.6cqw · 판이 통째로 스크롤하므로 묶음 안쪽 스크롤은 끈다(.sk-list 기본 max-height 46vh) ·
-   알약 자(--f2-w) = #modal-skin 이 쓰는 값과 같은 식(폰 세로 = 95.7% 폭 · 데스크톱 = 폰 기준폭 390 x .957) — 「장착」 · 「착용 중」이 스킨 시트와 같은 크기가 되게 한다.
-   크기·민트 면 규칙은 위 `.sk-act.kit-pill-v2` 규칙(스킨 시트와 합류 선택자)이 준다. */
-#sh-body .sh-sk{ --f2-w: calc(95.7 * var(--cqw)); margin-top: calc(2.6 * var(--cqw)); max-height: none; overflow-y: visible; }
-@media (min-aspect-ratio: 1/1) and (min-width: 700px){
-  #sh-body .sh-sk{ --f2-w: calc(var(--f2-phone-w) * .957); }
-}
 
 /* ---- [P3-T7] 뽑기 탭 · 확률 정보 창 — 길이는 전부 calc(N * var(--cqw)) (공통 보충 「상점 화면 규약」). 세로 자리는 무대 높이의 % ----
    목업 B1 · 무대 높이 500px 기준(종류 알약 top 66 · 리본 top 104 · 기계 top 150 224x285 · 천장 알약 top 438) — 판 위 끝이 두 영역(폭 제한 · 높이 제한) 모두에서
@@ -71597,13 +71625,15 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
   --f2-bh: calc(6.67 * var(--cqw)); width: max-content; max-width: calc(94 * var(--cqw)); height: auto; min-height: var(--f2-bh); padding-top: calc(.8 * var(--cqw)); padding-bottom: calc(.8 * var(--cqw)); text-align: center; line-height: 1.25;
   font-size: calc(3.2 * var(--cqw)); }
 /* 말풍선(뽑기) — 목업 B1: 기계 오른쪽 · 상인 위(왼쪽 250px · 위 238px) · 글 11.5px 굵게. 특가 말풍선(위 규칙)의 자리·크기만 덮는다. */
-#screen-shop[data-stab="gacha"] #sh-bubble{ left: calc(64.1 * var(--cqw)); top: 47.6%; width: max-content; max-width: calc(34 * var(--cqw));
+#screen-shop[data-stab="gacha"] #sh-bubble,
+#screen-shop[data-stab="deco"] #sh-bubble{ left: calc(64.1 * var(--cqw)); top: 47.6%; width: max-content; max-width: calc(34 * var(--cqw));
   padding: calc(1.5 * var(--cqw)) calc(2.3 * var(--cqw)); border-radius: calc(3.6 * var(--cqw)); font-size: calc(3 * var(--cqw)); font-weight: 700; line-height: 1.3; word-break: keep-all; text-wrap: balance; }
 /* 임시 기계(발주 ② 전) — 규칙 기하만: 유리 돔 원 + 역할색 몸통 + 손잡이. 색 = 캡슐 역할(아이템 민트 · 황금 노랑 · 친구 분홍). 크기 = 무대 높이 57% · 목업 비율 224:285. */
 #sh-scene .gm-ph{ position: absolute; left: 50%; top: 30%; height: 57%; width: auto; aspect-ratio: 224 / 285; transform: translateX(-50%); z-index: 3;
   --gm-a: var(--role-mint-face-a); --gm-b: var(--role-mint-face-b); --gm-o: var(--role-mint-outline); }
 #sh-scene .gm-ph[data-kind="gold"]{ --gm-a: var(--role-yellow-face-a); --gm-b: var(--role-yellow-face-b); --gm-o: var(--role-yellow-outline); }
-#sh-scene .gm-ph[data-kind="friend"]{ --gm-a: var(--role-pink-face-a); --gm-b: var(--role-pink-face-b); --gm-o: var(--role-pink-outline); }
+#sh-scene .gm-ph[data-kind="friend"],
+#sh-scene .gm-ph[data-kind="skin"]{ --gm-a: var(--role-pink-face-a); --gm-b: var(--role-pink-face-b); --gm-o: var(--role-pink-outline); }
 #sh-scene .gm-dome{ position: absolute; left: 3%; top: 0; width: 94%; aspect-ratio: 1; border-radius: 50%;
   background: radial-gradient(circle at 38% 30%, var(--role-glass-face-a), var(--role-glass-face-b)); border: calc(.9 * var(--cqw)) solid var(--role-glass-outline); }
 #sh-scene .gm-body{ position: absolute; left: 0; right: 0; bottom: 0; height: 44%; border-radius: calc(6 * var(--cqw));
@@ -71626,7 +71656,8 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
 /* 두 줄로 접힌 라벨(아이템 첫날 버튼 셋)에서도 코인 그림이 설계 크기를 지킨다 — flex 축소를 받으면 18px 가 11px 로 줄어 버튼 왼쪽 끝에 붙는다(리뷰 I-3) */
 #sh-body .gc-btns .sh-btn-ic{ flex: none; }
 /* 판 윗테두리와 버튼 줄 사이 틈 — 목업 B1: 판 위 끝 478px · 버튼 위 끝 496px = 18px ÷ 3.9 = 4.6cqw. #sh-body 의 위 안쪽(3cqw)에 1.6cqw 를 더한다 */
-#screen-shop[data-stab="gacha"] #sh-body{ padding-top: calc(1.6 * var(--cqw)); }
+#screen-shop[data-stab="gacha"] #sh-body,
+#screen-shop[data-stab="deco"] #sh-body{ padding-top: calc(1.6 * var(--cqw)); }
 #sh-body .gc-oddhd{ display: flex; justify-content: space-between; align-items: center; margin: calc(3.6 * var(--cqw)) 0 calc(1.5 * var(--cqw)); font-size: calc(3.2 * var(--cqw)); color: var(--prim-art-ink); }
 #sh-body .gc-oddlink{ --f2-bh: calc(5.64 * var(--cqw)); padding: 0 calc(2.6 * var(--cqw)); font-size: calc(3.2 * var(--cqw)); white-space: nowrap; }
 #sh-body .gc-og{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: calc(1.5 * var(--cqw)); }
@@ -71834,13 +71865,15 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
 #screen-shop[data-art~="bg"] #sh-awning{ display: none; }
 #screen-shop[data-art~="machine"] #sh-scene .gm-ph{ background: url("catalog/t4-gacha-machine-mint.webp") center / contain no-repeat; }
 #screen-shop[data-art~="machine"] #sh-scene .gm-ph[data-kind="gold"]{ background-image: url("catalog/t4-gacha-machine-gold.webp"); }
-#screen-shop[data-art~="machine"] #sh-scene .gm-ph[data-kind="friend"]{ background-image: url("catalog/t4-gacha-machine-pink.webp"); }
+#screen-shop[data-art~="machine"] #sh-scene .gm-ph[data-kind="friend"],
+#screen-shop[data-art~="machine"] #sh-scene .gm-ph[data-kind="skin"]{ background-image: url("catalog/t4-gacha-machine-pink.webp"); }
 #screen-shop[data-art~="machine"] #sh-scene .gm-face{ width: 9.4%; left: calc(27.8% + var(--gm-x, 15%) * .4464); top: calc(14.46% + var(--gm-y, 12%) * .5056); }
 /* 얼굴 두 줄 · 한 줄 = 유리 세로 가운데(세 줄은 그대로) → DESIGN §28.11 */
 #screen-shop[data-art~="machine"] #sh-scene .gm-ph[data-rows="2"] .gm-face{ top: calc(14.46% + var(--gm-y, 12%) * .5056 + 2.544%); }
 #screen-shop[data-art~="machine"] #sh-scene .gm-ph[data-rows="1"] .gm-face{ top: calc(14.46% + var(--gm-y, 12%) * .5056 + 6.842%); }
 /* 뽑기 탭 말풍선 = 돔 겉선과 겹침 0 → DESIGN §28.11 */
-#screen-shop[data-art~="machine"][data-stab="gacha"] #sh-bubble{ left: calc(65.5 * var(--cqw)); max-width: calc(32.5 * var(--cqw)); }
+#screen-shop[data-art~="machine"][data-stab="gacha"] #sh-bubble,
+#screen-shop[data-art~="machine"][data-stab="deco"] #sh-bubble{ left: calc(65.5 * var(--cqw)); max-width: calc(32.5 * var(--cqw)); }
 #screen-shop[data-art~="tabs"] #sh-tabs .sh-tab[data-stab="gacha"] .sh-tab-ic{ background-image: url("catalog/tab-ic-gacha.webp"); }
 #screen-shop[data-art~="tabs"] #sh-tabs .sh-tab[data-stab="free"]  .sh-tab-ic{ background-image: url("catalog/tab-ic-free.webp"); }
 /* 아래 둘째 줄 [data-ad="coin"] 이 더 특정해(2,4,0 > 2,3,0) 무료 탭 코인 줄은 coin-1 이 이긴다(시험 t12l) */
@@ -71894,14 +71927,14 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
   #sh-star-plus::before { right: calc((98.98 - .4 - 100) * var(--cqw)); }
   #sh-stage { height: calc(min(calc(128.2 * var(--cqw)), 60%) + var(--safe-t)); }
   #screen-shop[data-stab="deals"] #sh-stage { height: calc(min(calc(76.9 * var(--cqw)), 40%) + var(--safe-t)); }
-  #screen-shop[data-stab="free"] #sh-stage, #screen-shop[data-stab="deco"] #sh-stage { height: calc(min(calc(64.1 * var(--cqw)), 34%) + var(--safe-t)); }
+  #screen-shop[data-stab="free"] #sh-stage { height: calc(min(calc(64.1 * var(--cqw)), 34%) + var(--safe-t)); }
   #sh-awning { left: calc(-2.6 * var(--cqw)); right: calc(-2.6 * var(--cqw)); height: calc(16.4 * var(--cqw));
     background: repeating-linear-gradient(90deg, var(--prim-art-pink) 0 calc(7.18 * var(--cqw)), var(--prim-white) calc(7.18 * var(--cqw)) calc(14.36 * var(--cqw))); }
   #screen-shop[data-stab="free"] #sh-awning { background: repeating-linear-gradient(90deg, var(--role-mint-face-a) 0 calc(7.18 * var(--cqw)), var(--prim-white) calc(7.18 * var(--cqw)) calc(14.36 * var(--cqw))); }
   #sh-host { right: calc(2 * var(--cqw)); bottom: calc(2 * var(--cqw)); width: calc(28.7 * var(--cqw)); height: calc(38.5 * var(--cqw)); }
   #sh-plate { left: calc(2.56 * var(--cqw)); right: calc(2.56 * var(--cqw)); bottom: calc(22.6 * var(--cqw) + var(--safe-b)); top: calc(min(calc(122.6 * var(--cqw)), 57%) + var(--safe-t)); }
   #screen-shop[data-stab="deals"] #sh-plate { top: calc(min(calc(72.3 * var(--cqw)), 36%) + var(--safe-t)); }
-  #screen-shop[data-stab="free"] #sh-plate, #screen-shop[data-stab="deco"] #sh-plate { top: calc(min(calc(57.9 * var(--cqw)), 30%) + var(--safe-t)); }
+  #screen-shop[data-stab="free"] #sh-plate { top: calc(min(calc(57.9 * var(--cqw)), 30%) + var(--safe-t)); }
   #sh-body { inset: calc(3 * var(--cqw)) calc(3.5 * var(--cqw)); }
   #sh-tabs { left: calc(2.05 * var(--cqw)); right: calc(2.05 * var(--cqw)); bottom: calc(2.05 * var(--cqw) + var(--safe-b)); height: calc(19 * var(--cqw)); gap: calc(1.54 * var(--cqw)); padding: calc(1.8 * var(--cqw)); }
   #sh-tabs .sh-tab { border-radius: calc(4.1 * var(--cqw)); gap: calc(.3 * var(--cqw)); font-size: calc(3.6 * var(--cqw)); }
