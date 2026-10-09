@@ -10452,8 +10452,8 @@ html.no-art-logo .logo-img  { display: none; }
   background-clip: padding-box;
 }
 .sk-b { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-.sk-n { font-family: var(--font-display); font-size: 14px; color: var(--prim-art-ink); }
-.sk-d { font-size: 10px; font-weight: 700; color: var(--prim-art-ink-2); }
+.sk-n { font-family: var(--font-display); font-size: 14px; color: var(--prim-art-ink); word-break: keep-all; text-wrap: balance; }   /* [rc1009 수정 1회차 F-3] 어절 줄바꿈 · 고른 줄(한 글자 줄 0) */
+.sk-d { font-size: 10px; font-weight: 700; color: var(--prim-art-ink-2); word-break: keep-all; text-wrap: balance; }
 .sk-act {
   flex: 0 0 auto;
   min-width: 78px;
@@ -45962,7 +45962,11 @@ window.TT_SFX = {
     var ic = document.createElement('i'); ic.className = 'sh-btn-ic sh-btn-ic--' + cur; ic.setAttribute('aria-hidden', 'true'); again.appendChild(ic);
     again.appendChild(document.createTextNode(arcComma(agP)));
     again.setAttribute('data-again', res.kind + ':' + agN + ':' + cur);
-    again.setAttribute('data-price', cur);
+    /* [rc1009 수정 1회차 M-1] 남은 후보형(capLeft — 친구 · 스킨)이 이번 뽑기로 후보 0 이면 닫는다 = 탭 1회 버튼의 「후보 0」 닫힘과 같은 꼴(disabled + data-price ok).
+       다음 결과 창에서 후보가 남으면 다시 연다(disabled 해제 · 화폐로 되돌림). 장비(item · gold)는 언제나 열림. */
+    var agDis = capLeft(res.kind) && tb.left <= 0;
+    again.setAttribute('data-price', agDis ? 'ok' : cur);
+    again.disabled = agDis;
     $('gres-all').hidden = res.items.length < 2;
     openModal('modal-gres');
     J.sfx.ui();
@@ -46044,8 +46048,9 @@ window.TT_SFX = {
   /* 캡슐 무대 + 판 한 벌 — 뽑기 탭(kind = 지금 종류 · 종류 알약 줄 있음)과 [rc1009] 꾸미기 탭(kind = 'skin' · 알약 줄 없음)이 같이 그린다(같은 부품 · 같은 배치).
      남은 후보끼리 나누는 캡슐(친구 · 스킨 — capLeft)은 돔 안 썸네일 · 남은 수 알약 · 후보 격자를, 장비 캡슐은 천장 알약 · 등급 요약을 쓴다. */
   function capLeft(kind) { return kind === 'friend' || kind === 'skin'; }
-  function capRowArt(kind, id) { return kind === 'skin' ? skinThumbCss(id) : stdArt(id, 'thumb'); }
-  function capRowName(kind, id) { return kind === 'skin' ? skinNameOf(id) : t('char.' + id + '.name'); }
+  /* [rc1009 수정 1회차 M-2] 종류 → 이름 · 그림의 한 곳 — 뽑기 · 꾸미기 판과 확률 창(oddsPaint)이 같이 부른다. 장비 갈래 = 확률 창이 쓰던 그대로(itemArtCss 64). */
+  function capRowArt(kind, id) { return kind === 'skin' ? skinThumbCss(id) : (kind === 'friend' ? stdArt(id, 'thumb') : itemArtCss(id, 64)); }
+  function capRowName(kind, id) { return kind === 'skin' ? skinNameOf(id) : (kind === 'friend' ? t('char.' + id + '.name') : t('item.' + id + '.nm')); }
   function capSubText(kind, tb) {
     if (kind === 'friend') return tb.left ? t('gacha.friend.left', { have: tb.all - tb.left, all: tb.all, left: tb.left }) : t('gacha.friend.all');
     if (kind === 'skin') return tb.left ? t('gacha.skin.left', { have: tb.all - tb.left, all: tb.all, left: tb.left }) : t(skinEmptyKey(tb));
@@ -46190,8 +46195,7 @@ window.TT_SFX = {
     var box = document.createElement('div'); box.className = 'od-box'; s2.appendChild(box);   /* 높이가 정해진 안쪽 스크롤 상자 — 규칙 절 · 바닥 글이 첫 화면에 들게(리뷰 I-2). 마지막 줄이 반쯤 잘려 보이는 것이 「더 있다」 신호 */
     for (i = 0; i < tb.rows.length; i++) {
       var id = tb.rows[i].id;
-      box.appendChild(oddsRow('', id, fr ? t('char.' + id + '.name') : (sk ? skinNameOf(id) : t('item.' + id + '.nm')), pctText(tb.rows[i].p, d),
-                              fr ? stdArt(id, 'thumb') : (sk ? skinThumbCss(id) : itemArtCss(id, 64))));
+      box.appendChild(oddsRow('', id, capRowName(oddsKind, id), pctText(tb.rows[i].p, d), capRowArt(oddsKind, id)));   /* M-2 — 이름 · 그림 한 곳 */
     }
     /* 친구 · 스킨을 다 모았으면 빈 목록 상자는 숨긴다(묶음 B B12 · 스킨 문장 = 판정 Q5) */
     if (!tb.rows.length) { box.hidden = true; var none = document.createElement('p'); none.textContent = t(sk ? skinEmptyKey(tb) : 'gacha.friend.all'); s2.appendChild(none); }
@@ -71594,7 +71598,7 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
 #sh-body .sh-btn[data-price="star"], #modal-gres #gres-again[data-price="star"]{ --btn-face-a: var(--role-pink-face-a); --btn-face-b: var(--role-pink-face-b); --btn-outline: var(--role-pink-outline); --btn-contact: var(--role-pink-contact); }
 #sh-body .sh-btn[data-price="free"],
 #sh-body .sh-btn[data-price="ad"]{ --btn-face-a: var(--role-mint-face-a); --btn-face-b: var(--role-mint-face-b); --btn-outline: var(--role-mint-outline); --btn-contact: var(--role-mint-contact); }
-#sh-body .sh-btn[data-price="ok"]{ --btn-face-a: var(--role-lilac-face-a); --btn-face-b: var(--role-lilac-face-b); --btn-outline: var(--role-lilac-outline); --btn-contact: var(--role-lilac-contact); }
+#sh-body .sh-btn[data-price="ok"], #modal-gres #gres-again[data-price="ok"]{ --btn-face-a: var(--role-lilac-face-a); --btn-face-b: var(--role-lilac-face-b); --btn-outline: var(--role-lilac-outline); --btn-contact: var(--role-lilac-contact); }
 #sh-body .sh-btn-ic{ width: calc(4.6 * var(--cqw)); height: calc(4.6 * var(--cqw)); margin-right: calc(.8 * var(--cqw)); background: center / contain no-repeat; }
 #sh-body .sh-btn-ic--coin, #modal-gres .sh-btn-ic--coin{ background-image: var(--lib-glyph-coin); }   /* P3 T8 수정 1회차 — 결과 창 [10회 더] 그림도 같은 조각(I-7) */
 #sh-body .sh-btn-ic--star, #modal-gres .sh-btn-ic--star{ background-image: var(--lib-star-gold); }
@@ -71667,8 +71671,11 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
   border: calc(.5 * var(--cqw)) solid var(--role-rw-shard-steady-3); box-sizing: border-box; }
 #sh-body .gc-oc[data-tier="rare"] i{ border-color: var(--role-rw-shard-agility-3); }
 #sh-body .gc-oc[data-tier="epic"] i{ border-color: var(--role-rw-item-3); }
-#sh-body .gc-oc span{ min-width: 0; }
-#sh-body .gc-oc b{ display: block; font-size: calc(3.1 * var(--cqw)); color: var(--prim-art-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#sh-body .gc-oc span{ min-width: 0; margin-right: calc(-1.5 * var(--cqw)); }   /* [rc1009 수정 1회차 F-2] 이름 상자 = 칸 오른쪽 안쪽 여백(같은 1.5cqw)까지 */
+/* [rc1009 수정 1회차 F-2] 이름 = 말줄임 없이 최대 두 줄 · 어절 단위 줄바꿈(keep-all). 이름 상자는 칸(.gc-oc)의 오른쪽 안쪽 여백(같은 1.5cqw)까지 쓴다 —
+   한 어절이 이름 칸보다 넓은 en 「Honeybee」 가 상자 안에 든다(지휘자 판정 a). 넓힘은 이름 상자 span 의 음수 margin-right(위 규칙) — 한 줄에 들던
+   이름은 상자 폭 · 글자 자리 · 가장자리 숨김(overflow hidden, 말줄임 없음)이 옛 그대로라 픽셀 0(I-1 실측). */
+#sh-body .gc-oc b{ display: block; font-size: calc(3.1 * var(--cqw)); color: var(--prim-art-ink); word-break: keep-all; overflow: hidden; }
 #sh-body .gc-oc em{ display: block; font-style: normal; font-weight: 800; font-size: calc(3.2 * var(--cqw)); color: var(--role-rw-shard-steady-3); }
 #sh-body .gc-oc[data-tier="rare"] em{ color: var(--role-rw-shard-agility-3); }
 #sh-body .gc-oc[data-tier="epic"] em{ color: var(--role-rw-item-3); }
