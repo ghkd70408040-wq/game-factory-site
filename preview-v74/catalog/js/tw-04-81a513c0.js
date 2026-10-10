@@ -1166,7 +1166,8 @@ coin: 0,
 p3: null,
 gacha: null,
 adCaps: null,
-deals: null
+deals: null,
+coinCaps: null
 };
 function loadStore() {
 readStore();
@@ -1666,6 +1667,7 @@ if (o.p3 && typeof o.p3 === 'object') store.p3 = { shown: o.p3.shown ? 1 : 0 };
 store.gacha = gachaStateFrom(o.gacha);
 store.adCaps = adCapsFrom(o.adCaps);
 store.deals = dealsFrom(o.deals);
+store.coinCaps = coinCapsFrom(o.coinCaps);   /* 판정판 102 ① — 반복 코인 하루 셈 */
 }
 } catch (e) {
 if (raw) backupRawStamped(raw);
@@ -2334,10 +2336,10 @@ en: {
 'rules.note': 'Either way, nothing may be left standing in between.',
 'skills.title': 'Four buttons in battle',
 'skills.s1': '<b>Attack</b> fills with every point you score and fires on its own when full.',
-'skills.s2': '<b>Awakening</b> fills only when you <b>alternate</b> sum-10 and same-number matches. Tap it and every point you earn is <b>×{am}</b> for {awk}s.',
+'skills.s2': '<b>Awakening</b> fills only when you <b>alternate</b> sum-10 and same-number matches. Tap it to score <b>×{am}</b> for {awk}s.',
 'skills.s3': "<b>Skill</b> fills with every match, faster at higher combos. Tap it to fire your hero's own skill.",
-'skills.s4': '<b>Pet</b> uses your chosen pet\'s skill. You start each round with {pu} uses and gain one for every pet fruit you pop (up to {pmax}).',
-'skills.note': '<b>Skill fruit</b> and <b>awakening fruit</b> fill their gauges at once. <b>Pet fruit</b> adds a Pet use. Pop a <b>gear fruit</b> to get that gear.',
+'skills.s4': '<b>Pet</b> uses your chosen pet\'s skill. Each round starts with {pu} uses, plus one per pet fruit you pop (up to {pmax}).',
+'skills.note': '<b>Skill fruit</b> and <b>awakening fruit</b> fill their gauges at once. Pop a <b>gear fruit</b> to get that gear.',
 'menu.dailydone': "Today's daily: cleared",
 'menu.dailytodo': "Today's daily is waiting",
 'hud.daily': 'Daily',
@@ -3455,11 +3457,11 @@ ko: {
 'rules.r3': '또는 줄 <b>끝</b>에서 다음 줄 <b>첫 칸</b>으로',
 'rules.note': '어느 쪽이든 사이에 타일이 남아 있으면 안 돼.',
 'skills.title': '전투의 네 버튼',
-'skills.s1': '<b>공격</b> 게이지는 점수를 낼수록 차고, 가득 차면 저절로 공격해요.',
-'skills.s2': '<b>각성</b> 게이지는 합이 10인 짝과 같은 숫자 짝을 <b>번갈아</b> 맞출 때만 차요. 누르면 {awk}초 동안 얻는 점수가 <b>{am}배</b>예요.',
-'skills.s3': '<b>스킬</b> 게이지는 매치마다 차고, 콤보가 높을수록 빨리 차요. 누르면 캐릭터마다 다른 스킬이 발동해요.',
-'skills.s4': '<b>펫소환</b>은 고른 펫의 스킬을 써요. 판마다 {pu}번으로 시작하고, 펫 과일을 터뜨릴 때마다 한 번씩 늘어요(최대 {pmax}번).',
-'skills.note': '<b>스킬 과일</b>은 스킬 게이지를, <b>각성 과일</b>은 각성 게이지를 단번에 채워요. <b>펫 과일</b>은 펫 소환을 한 번 늘려 주고, <b>장비 과일</b>을 터뜨리면 그 장비를 얻어요.',
+'skills.s1': '<b>공격</b> 게이지는 점수를 낼수록 차고, 다 차면 저절로 공격해요.',
+'skills.s2': '<b>각성</b> 게이지는 합이 10인 짝과 같은 숫자 짝을 <b>번갈아</b> 맞출 때만 차요. 누르면 {awk}초 동안 점수가 <b>{am}배</b>예요.',
+'skills.s3': '<b>스킬</b> 게이지는 매치마다, 콤보가 높을수록 빨리 차요. 누르면 캐릭터 스킬을 써요.',
+'skills.s4': '<b>펫소환</b>은 고른 펫 스킬을 써요. 판마다 {pu}번으로 시작해 펫 과일을 터뜨릴 때마다 늘어요(최대 {pmax}번).',
+'skills.note': '<b>스킬 과일</b>과 <b>각성 과일</b>은 자기 게이지를 단번에 채우고, <b>장비 과일</b>을 터뜨리면 그 장비를 얻어요.',
 'menu.dailydone': '오늘 데일리 완료',
 'menu.dailytodo': '오늘의 데일리가 기다려요',
 'hud.daily': '데일리',
@@ -5605,6 +5607,8 @@ var act = document.createElement('button');
 act.type = 'button';
 act.className = 'sk-act';
 if (sk.soon) {
+act.className += ' kit-pill-v2';
+act.setAttribute('data-variant', 'soft');
 act.textContent = t('skin.soon');
 act.disabled = true;
 } else if (!skinOwned(sk)) {
@@ -9488,7 +9492,10 @@ if (newRank > 0) {
 rankFresh.mode = rkey;
 rankFresh.pos = newRank;
 }
-runCoinPay(coinForRank(newRank));   /* P3 — 기록판 순위로 세 단 */
+var overCoin = coinForRank(newRank);   /* P3 — 기록판 순위로 세 단 */
+var sameRunPaid = S.coinRunAt === S.startedAt && (S.runCoin | 0) > 0;   /* 이 판은 이미 오늘 몫을 받았다 → 차이만, 셈 안 씀(102 리뷰 반영 · 지휘자 판정) */
+if (isDaily() && coinPlayed() && !sameRunPaid && !coinCapTake('dOver', COIN_DAILY_OVER_DAY_MAX)) overCoin = 0;   /* 판정판 102 ① — 데일리 게임오버 코인은 새 판 하루 1번(끝까지 finishDaily 는 무변) */
+runCoinPay(overCoin);
 S.overInfo = {
 rush: rush,
 score: S.score,
@@ -12681,6 +12688,10 @@ var out = { day: p3Day(o.day), b: {} };
 for (var i = 0; i < P3_DEAL_IDS.length; i++) out.b[P3_DEAL_IDS[i]] = p3Int(b[P3_DEAL_IDS[i]], P3_DEAL_CAP[P3_DEAL_IDS[i]]);
 return out;
 }
+function coinCapsFrom(c) {
+var o = (c && typeof c === 'object') ? c : {};
+return { day: p3Day(o.day), re: p3Int(o.re, COIN_RE_DAY_MAX), dOver: p3Int(o.dOver, COIN_DAILY_OVER_DAY_MAX) };
+}
 function gachaShapeOk(g) {
 return !!g && typeof g === 'object' && typeof g.itemPity === 'number' && typeof g.goldPity === 'number' && typeof g.freeDay === 'string'
 && !!g.petSrc && typeof g.petSrc === 'object' && !!g.dupPaid && typeof g.dupPaid === 'object' && Array.isArray(g.log);
@@ -12695,11 +12706,15 @@ if (!d || typeof d !== 'object' || !d.b || typeof d.b !== 'object' || typeof d.d
 for (var i = 0; i < P3_DEAL_IDS.length; i++) { if (typeof d.b[P3_DEAL_IDS[i]] !== 'number') return false; }
 return true;
 }
+function coinCapsShapeOk(c) {
+return !!c && typeof c === 'object' && typeof c.day === 'string' && typeof c.re === 'number' && typeof c.dOver === 'number';
+}
 function p3Ensure() {
 if (typeof store.coin !== 'number' || !isFinite(store.coin)) store.coin = 0;
 if (!gachaShapeOk(store.gacha)) store.gacha = gachaStateFrom(store.gacha);
 if (!adCapsShapeOk(store.adCaps)) store.adCaps = adCapsFrom(store.adCaps);
 if (!dealsShapeOk(store.deals)) store.deals = dealsFrom(store.deals);
+if (!coinCapsShapeOk(store.coinCaps)) store.coinCaps = coinCapsFrom(store.coinCaps);
 }
 function p3Roll() {
 p3Ensure();
@@ -12707,9 +12722,11 @@ var d = todayKey(), wk = weekKey(), i;
 if (store.adCaps.day !== d) { store.adCaps.day = d; for (i = 0; i < P3_AD_IDS.length; i++) store.adCaps.n[P3_AD_IDS[i]] = 0; }
 if (store.adCaps.week !== wk) { store.adCaps.week = wk; store.adCaps.w.friend = 0; }
 if (store.deals.day !== d) { store.deals.day = d; for (i = 0; i < P3_DEAL_IDS.length; i++) store.deals.b[P3_DEAL_IDS[i]] = 0; }
+if (store.coinCaps.day !== d) { store.coinCaps.day = d; store.coinCaps.re = 0; store.coinCaps.dOver = 0; }
 }
 var COIN_ADV_FIRST = 20, COIN_ADV_FIRST_STAR = 10;   /* 모험 첫 클리어 20 + 별 하나당 10 */
 var COIN_ADV_RE = 10, COIN_ADV_RE_STAR = 5;          /* 다시 깨면 10 + 별 하나당 5 */
+var COIN_RE_DAY_MAX = 10, COIN_DAILY_OVER_DAY_MAX = 1;   /* 반복 코인 하루 한도 — 다시 깨기 10판 · 데일리 게임오버 1번(판정판 102 ① · 사용자 2026-10-10) */
 var COIN_BOSS_MULT = 2;                               /* 보스탄 첫 클리어만(스펙 §4-f 괄호 자리) */
 var COIN_RUN = [15, 25, 40];
 function coinForAdv(first, stars, boss) {
@@ -12720,6 +12737,12 @@ return (COIN_ADV_FIRST + COIN_ADV_FIRST_STAR * s) * (boss ? COIN_BOSS_MULT : 1);
 function coinForRank(rank) { return rank === 1 ? COIN_RUN[2] : (rank > 1 ? COIN_RUN[1] : COIN_RUN[0]); }
 function coinForArc(fresh, clear) { return fresh ? COIN_RUN[2] : (clear ? COIN_RUN[1] : COIN_RUN[0]); }
 function coinPlayed() { return (S.matches | 0) > 0; }
+function coinCapTake(k, max) {
+p3Roll();
+if ((store.coinCaps[k] | 0) >= max) return false;
+store.coinCaps[k] = (store.coinCaps[k] | 0) + 1;
+return true;
+}
 function runCoinPay(want) {
 if (S.coinRunAt !== S.startedAt) { S.coinRunAt = S.startedAt; S.runCoin = 0; }
 if (!coinPlayed()) want = 0;
@@ -13972,6 +13995,7 @@ store.jstar = (store.jstar | 0) + (stars - prevStars);
 gemGain = stars - prevStars;
 }
 S.gainCoin = coinPlayed() ? coinForAdv(prevStars === 0, stars, !!p.boss) : 0;   /* 짝 0 판은 0 */
+if (S.gainCoin > 0 && prevStars > 0 && !coinCapTake('re', COIN_RE_DAY_MAX)) S.gainCoin = 0;   /* 판정판 102 ① — 다시 깨기 코인은 하루 10판까지(11판째부터 0) */
 if (S.gainCoin > 0) coinGrant(S.gainCoin, 'adv');
 S.x2Token = (S.x2Token | 0) + 1;   /* P3 — 결과 창 2배는 판 끝마다 한 번 */
 store.advFails[key] = 0;
