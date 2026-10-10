@@ -6782,26 +6782,18 @@ display: flex;
 align-items: center;
 gap: 10px;
 padding: 8px 10px;
-border-radius: 14px;
-background: var(--mL-rim);
-box-shadow: inset 0 0 0 2.5px var(--prim-art-salmon);
 text-align: left;
 }
-.sk-item.on { box-shadow: inset 0 0 0 3px var(--prim-art-gold), 0 0 12px rgba(255, 211, 74, .45); }
 .sk-th {
 flex: 0 0 auto;
-width: 46px;
-height: 50px;
-border: 10px solid transparent;
-border-image: var(--ui-chip) 40 stretch;
-border-radius: 14px;
-background: var(--sk-img, none) center 14% / auto 250% no-repeat,
-linear-gradient(180deg, #FBE6D2 0%, var(--prim-art-plate) 100%);
-background-clip: padding-box;
+}
+.sk-th.kit-slot-v2 {
+background: var(--sk-img, none) 50% 50% / cover no-repeat, var(--f2-slot);
+overflow: hidden;
 }
 .sk-b { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-.sk-n { font-family: var(--font-display); font-size: 14px; color: var(--prim-art-ink); }
-.sk-d { font-size: 10px; font-weight: 700; color: var(--prim-art-ink-2); }
+.sk-n { font-family: var(--font-display); font-size: 14px; color: var(--prim-art-ink); word-break: keep-all; text-wrap: balance; }   /* [rc1009 수정 1회차 F-3] 어절 줄바꿈 · 고른 줄(한 글자 줄 0) */
+.sk-d { font-size: 10px; font-weight: 700; color: var(--prim-art-ink-2); word-break: keep-all; text-wrap: balance; }
 .sk-act {
 flex: 0 0 auto;
 min-width: 78px;
@@ -6817,24 +6809,15 @@ box-shadow: inset 0 2px 0 rgba(255, 255, 255, .34), 0 0 0 2.5px var(--mL-outline
 }
 .sk-act[disabled] { opacity: .5; cursor: not-allowed; }
 #btn-continue[disabled] { opacity: .45; cursor: default; pointer-events: none; }
-.sk-act.buy { background: linear-gradient(180deg, var(--prim-art-gold) 0%, var(--prim-art-gold) 46%, var(--prim-art-yel-2) 46%, var(--prim-art-yel-2) 100%); box-shadow: inset 0 2px 0 rgba(255,255,255,.34), 0 0 0 2.5px var(--mL-outline), 0 3px 0 #C98A1E; color: var(--prim-art-ink); }
-#modal-skin .sk-act.kit-pill-v2,
-#sh-body .sh-sk .sk-act.kit-pill-v2{   /* P3 T5 — 상점 꾸미기 판의 같은 줄도 같은 규칙(스킨 시트와 같은 크기·색) */
+#modal-skin .sk-act.kit-pill-v2{
 min-width: 0;
 min-height: 0;
 font-size: 12px;
 }
-#modal-skin .sk-act.kit-pill-v2[data-equip],
-#sh-body .sh-sk .sk-act.kit-pill-v2[data-equip]{
+#modal-skin .sk-act.kit-pill-v2[data-equip]{
 --f2-pill-soft: linear-gradient(180deg, var(--role-mint-face-a) 0%, var(--role-mint-face-a) 47%, var(--role-mint-face-b) 47%, var(--role-mint-face-b) 100%);
 --f2-ink: var(--prim-white);
 --role-f2-pill-soft-e: var(--role-mint-outline);
-}
-.sk-item.soon { opacity: .72; }
-.sk-item.soon .sk-th { background: linear-gradient(180deg, #E7D3BA 0%, #D3B995 100%); }
-.sk-th[data-fit="icon"] {
-background-size: contain, auto;
-background-position: center, center;
 }
 #modal-skin { z-index: 73; }
 #modal-invite { z-index: 73; }
@@ -9516,7 +9499,7 @@ filter: drop-shadow(0 0 10px rgba(102, 240, 159, .40));
 <link rel="preload" as="image" href="catalog/jelly-box-c.webp">
 <link rel="preload" as="image" href="catalog/duel-title-play.webp">
 <!-- ==RELEASE:BEGIN== 출시 메타 (scratchpad/release-0908/apply-head.py 가 생성·교체, 본문 무접촉) -->
-<meta name="build" content="c2f7f93-20261008-0531">
+<meta name="build" content="65aa4e1-20261010-1947">
 <meta name="application-name" content="텐트윈 젤리팡 월드">
 <meta name="description" lang="ko" content="숫자 젤리를 골라 10을 만들어 터뜨리는 퍼즐이에요. 모험·아케이드·데일리·타임 러시·클래식을 즐겨요. Ten Twin Jelly Pang World: pick number jellies that equal or sum to 10.">
 <link rel="manifest" href="tentwin.webmanifest">
@@ -9570,7 +9553,7 @@ navigator.serviceWorker.register('sw.js',{scope:'./'}).catch(function(e){console
 })}
 </script>
 <!-- ==RELEASE:END== -->
-<link rel="preload" as="style" href="tw-late-2440c949.css">
+<link rel="preload" as="style" href="tw-late-3c87da08.css">
 </head>
 <body>
 <!-- ============================================================
@@ -9772,7 +9755,7 @@ navigator.serviceWorker.register('sw.js',{scope:'./'}).catch(function(e){console
 
            잔액 칩 id — `#shop-jewel-menu`. 모달 상단의 정본 칩 두 개가
            `#shop-jewel` · `#shop-jstar`(§20.4)라 같은 이름을 두 번 못 쓴다.
-           기존 `cp-gems` / `sk-gems` 는 **젤리별** 값이라 무접촉이다(§20.1).
+           기존 `cp-gems` / `sk-gems` 는 **젤리별** 값이라 무접촉이다(§20.1). [rc1009] 그 두 자리는 은퇴했다(캐릭터 화면 = 고르기만).
            ============================================================ -->
       <div id="shop-entry" data-app-only>
         <span class="shop-chip"><i class="shop-ic shop-ic-jewel" aria-hidden="true"></i><b id="shop-jewel-menu">0</b></span>
@@ -11102,7 +11085,6 @@ navigator.serviceWorker.register('sw.js',{scope:'./'}).catch(function(e){console
   </svg>
           <div class="cp-side-body">
             <div id="cp-item-list" class="cp-side-rack" role="group" data-i18n-aria="cp.items" aria-label="Items"></div>
-            <p id="cp-item-none" class="cp-item-none" data-i18n="cp.items.none">No items yet. Pop a gift box on an adventure.</p>
           </div>
         </aside>
         <div class="pick-row pick-mate">
@@ -11508,9 +11490,9 @@ navigator.serviceWorker.register('sw.js',{scope:'./'}).catch(function(e){console
           </div>
         </div>
         <div class="cp-foot">
-          <!-- 젤리별 잔액 + 스킨 시트 진입. 잔액을 버튼 안에 둔 이유는 스킨을
-               열기 **전에** 살 수 있는지가 보여야 하기 때문이다. -->
-          <button id="cp-skin" class="cp-skinbtn kit-btn-v2" data-kind="secondary" type="button" data-i18n-aria="aria.skins" aria-label="Skins"><span class="cs-lab" data-i18n="skin.btn">Skins</span><span class="cs-gem"><i class="gem-ic" aria-hidden="true">★</i><span id="cp-gems">0</span></span></button>
+          <!-- 스킨 시트 진입. [rc1009 · 사용자 2026-10-09] 캐릭터 화면은 스킨을 고르기만 하는 곳이라(얻기 = 상점 꾸미기 캡슐)
+               버튼 안의 별 잔액(.cs-gem · #cp-gems)을 걷었다 — 라벨 한 줄. -->
+          <button id="cp-skin" class="cp-skinbtn kit-btn-v2" data-kind="secondary" type="button" data-i18n-aria="aria.skins" aria-label="Skins"><span class="cs-lab" data-i18n="skin.btn">Skins</span></button>
           <button id="cp-go" class="cp-go kit-btn-v2" data-kind="primary" type="button" data-i18n="pick.go">Choose!</button>
         </div>
         </div>
@@ -11803,7 +11785,6 @@ navigator.serviceWorker.register('sw.js',{scope:'./'}).catch(function(e){console
   <div id="modal-skin" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="sk-h"><div class="sheet jbox jbox--modal" data-part="modal-plate">
     <h2 id="sk-h" data-i18n="skin.title">Skins</h2>
     <button class="r10-x x-btn" type="button" data-w6x="sk-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
-    <p class="sk-bal"><span data-i18n="skin.balance">Stars</span><b class="sk-bal-v"><i class="gem-ic" aria-hidden="true">★</i><span id="sk-gems">0</span></b></p>
     <div id="sk-list" class="sk-list"></div>
     <button id="sk-close" data-part="btn-modal" data-variant="primary" class="btn btn-primary" type="button" data-i18n="settings.close">Close</button>
   </div></div>
@@ -12647,7 +12628,7 @@ navigator.serviceWorker.register('sw.js',{scope:'./'}).catch(function(e){console
      이 파일을 빼고 빌드해도 게임은 돈다 — 그때는 모든 슬롯이 기존 신스다. -->
 <script defer src="catalog/js/tw-02-7ea6fa41.js"></script>
 <script defer src="catalog/js/tw-03-06721556.js"></script>
-<script defer src="catalog/js/tw-04-775d6ce4.js"></script>
+<script defer src="catalog/js/tw-04-b0a11a9c.js"></script>
   <!-- ==FRUITDEF:BEGIN== generated by tools/fruit-tiles.js — do not edit by hand -->
   <!-- 열매 실루엣 클립 패스 9종 (DESIGN-V4 §5.8). clipPathUnits="objectBoundingBox"
        라 좌표가 0..1 이고, 타일 크기(--ts)가 어떤 값이든 같은 모양이 나온다.
@@ -12726,7 +12707,7 @@ navigator.serviceWorker.register('sw.js',{scope:'./'}).catch(function(e){console
 
 
 
-<link rel="stylesheet" href="tw-late-2440c949.css">
+<link rel="stylesheet" href="tw-late-3c87da08.css">
 <style id="compat-p1">
 @supports not (width: 1cqw) {
 #screen-map { --cqw: min(1vw, calc(var(--app-max) / 100)); }
@@ -13064,7 +13045,6 @@ line-height: 1.2;
 cursor: pointer;
 }
 #modal-shop .shop-act[disabled]{ opacity: .48; cursor: default; }
-.sk-act-jewel{ margin-left: 6px; }
 @media (min-width: 900px){
 #modal-shop{ --f2-w: 320px; }
 #modal-shop .shop-body{ max-height: 52vh; }
@@ -14056,8 +14036,7 @@ border: .4cqw solid var(--role-mint-outline);
 #sh-stage{ position: absolute; left: 0; right: 0; top: 0; height: calc(min(128.2cqw, 60%) + var(--safe-t)); overflow: hidden;
 background: linear-gradient(180deg, var(--prim-bg-light), var(--prim-art-pink-2)); }   /* 높이 + 안전 위 — 판 위 끝이 그만큼 내려가도 무대 끝과의 겹침(22px)이 같다(수정 1회차 I-2) */
 #screen-shop[data-stab="deals"] #sh-stage{ height: calc(min(76.9cqw, 40%) + var(--safe-t)); }
-#screen-shop[data-stab="free"]  #sh-stage,
-#screen-shop[data-stab="deco"]  #sh-stage{ height: calc(min(64.1cqw, 34%) + var(--safe-t)); }
+#screen-shop[data-stab="free"]  #sh-stage{ height: calc(min(64.1cqw, 34%) + var(--safe-t)); }
 #sh-awning{ position: absolute; left: -2.6cqw; right: -2.6cqw; top: 0; height: 16.4cqw;
 background: repeating-linear-gradient(90deg, var(--prim-art-pink) 0 7.18cqw, var(--prim-white) 7.18cqw 14.36cqw); }
 #screen-shop[data-stab="free"] #sh-awning{
@@ -14068,8 +14047,7 @@ background: var(--sh-host, none) center bottom / contain no-repeat; }
 #sh-bubble{ position: absolute; z-index: 5; margin: 0; }
 #sh-plate{ position: absolute; left: 2.56cqw; right: 2.56cqw; bottom: calc(22.6cqw + var(--safe-b)); top: calc(min(122.6cqw, 57%) + var(--safe-t)); z-index: 4; }   /* 안전 영역 위·아래(수정 1회차 I-2) */
 #screen-shop[data-stab="deals"] #sh-plate{ top: calc(min(72.3cqw, 36%) + var(--safe-t)); }
-#screen-shop[data-stab="free"]  #sh-plate,
-#screen-shop[data-stab="deco"]  #sh-plate{ top: calc(min(57.9cqw, 30%) + var(--safe-t)); }
+#screen-shop[data-stab="free"]  #sh-plate{ top: calc(min(57.9cqw, 30%) + var(--safe-t)); }
 #sh-body{ position: absolute; inset: 3cqw 3.5cqw; overflow-y: auto; overscroll-behavior: contain; }
 #sh-tabs{ position: absolute; left: 2.05cqw; right: 2.05cqw; bottom: calc(2.05cqw + var(--safe-b)); height: 19cqw; z-index: 6;   /* 홈 인디케이터 위(왕국 #kd-bot 과 같은 토큰 — 수정 1회차 I-2) */
 display: flex; gap: 1.54cqw; padding: 1.8cqw; box-sizing: border-box; }
@@ -14117,7 +14095,7 @@ paint-order: stroke fill; -webkit-text-stroke: calc(.5 * var(--cqw)) var(--prim-
 #sh-body .sh-btn[data-price="star"], #modal-gres #gres-again[data-price="star"]{ --btn-face-a: var(--role-pink-face-a); --btn-face-b: var(--role-pink-face-b); --btn-outline: var(--role-pink-outline); --btn-contact: var(--role-pink-contact); }
 #sh-body .sh-btn[data-price="free"],
 #sh-body .sh-btn[data-price="ad"]{ --btn-face-a: var(--role-mint-face-a); --btn-face-b: var(--role-mint-face-b); --btn-outline: var(--role-mint-outline); --btn-contact: var(--role-mint-contact); }
-#sh-body .sh-btn[data-price="ok"]{ --btn-face-a: var(--role-lilac-face-a); --btn-face-b: var(--role-lilac-face-b); --btn-outline: var(--role-lilac-outline); --btn-contact: var(--role-lilac-contact); }
+#sh-body .sh-btn[data-price="ok"], #modal-gres #gres-again[data-price="ok"]{ --btn-face-a: var(--role-lilac-face-a); --btn-face-b: var(--role-lilac-face-b); --btn-outline: var(--role-lilac-outline); --btn-contact: var(--role-lilac-contact); }
 #sh-body .sh-btn-ic{ width: calc(4.6 * var(--cqw)); height: calc(4.6 * var(--cqw)); margin-right: calc(.8 * var(--cqw)); background: center / contain no-repeat; }
 #sh-body .sh-btn-ic--coin, #modal-gres .sh-btn-ic--coin{ background-image: var(--lib-glyph-coin); }   /* P3 T8 수정 1회차 — 결과 창 [10회 더] 그림도 같은 조각(I-7) */
 #sh-body .sh-btn-ic--star, #modal-gres .sh-btn-ic--star{ background-image: var(--lib-star-gold); }
@@ -14128,10 +14106,6 @@ background: var(--prim-white); border: calc(.4 * var(--cqw)) solid var(--role-f2
 #sh-bubble > .kit-pill-v2{ display: flex; width: max-content; margin-top: calc(1.2 * var(--cqw)); --f2-bh: calc(5.9 * var(--cqw)); font-size: calc(3.3 * var(--cqw)); }
 #screen-shop[data-stab="deals"] #sh-host{ left: calc(6 * var(--cqw)); right: auto; }
 #screen-shop[data-stab="deals"] #sh-body{ top: calc(4.5 * var(--cqw)); padding-top: calc(2.5 * var(--cqw)); }   /* 안쪽 여백 = 「희귀」 표가 카드 위로 걸친 만큼(상자 위 끝에서 안 잘림) */
-#sh-body .sh-sk{ --f2-w: calc(95.7 * var(--cqw)); margin-top: calc(2.6 * var(--cqw)); max-height: none; overflow-y: visible; }
-@media (min-aspect-ratio: 1/1) and (min-width: 700px){
-#sh-body .sh-sk{ --f2-w: calc(var(--f2-phone-w) * .957); }
-}
 #sh-scene .gc-kinds{ position: absolute; left: 0; right: 0; top: 13.2%; display: flex; justify-content: center; gap: calc(1.5 * var(--cqw)); z-index: 6; }
 #sh-scene .gc-kind{ --f2-bh: calc(7.18 * var(--cqw)); padding: 0 calc(3 * var(--cqw)); font-size: calc(3.2 * var(--cqw)); white-space: nowrap; }
 #sh-scene .gc-title{ position: absolute; left: 50%; top: 20.8%; transform: translateX(-50%); z-index: 6;
@@ -14139,12 +14113,14 @@ background: var(--prim-white); border: calc(.4 * var(--cqw)) solid var(--role-f2
 #sh-scene .gc-sub{ position: absolute; left: 50%; top: 87.6%; transform: translateX(-50%); z-index: 6;
 --f2-bh: calc(6.67 * var(--cqw)); width: max-content; max-width: calc(94 * var(--cqw)); height: auto; min-height: var(--f2-bh); padding-top: calc(.8 * var(--cqw)); padding-bottom: calc(.8 * var(--cqw)); text-align: center; line-height: 1.25;
 font-size: calc(3.2 * var(--cqw)); }
-#screen-shop[data-stab="gacha"] #sh-bubble{ left: calc(64.1 * var(--cqw)); top: 47.6%; width: max-content; max-width: calc(34 * var(--cqw));
+#screen-shop[data-stab="gacha"] #sh-bubble,
+#screen-shop[data-stab="deco"] #sh-bubble{ left: calc(64.1 * var(--cqw)); top: 47.6%; width: max-content; max-width: calc(34 * var(--cqw));
 padding: calc(1.5 * var(--cqw)) calc(2.3 * var(--cqw)); border-radius: calc(3.6 * var(--cqw)); font-size: calc(3 * var(--cqw)); font-weight: 700; line-height: 1.3; word-break: keep-all; text-wrap: balance; }
 #sh-scene .gm-ph{ position: absolute; left: 50%; top: 30%; height: 57%; width: auto; aspect-ratio: 224 / 285; transform: translateX(-50%); z-index: 3;
 --gm-a: var(--role-mint-face-a); --gm-b: var(--role-mint-face-b); --gm-o: var(--role-mint-outline); }
 #sh-scene .gm-ph[data-kind="gold"]{ --gm-a: var(--role-yellow-face-a); --gm-b: var(--role-yellow-face-b); --gm-o: var(--role-yellow-outline); }
-#sh-scene .gm-ph[data-kind="friend"]{ --gm-a: var(--role-pink-face-a); --gm-b: var(--role-pink-face-b); --gm-o: var(--role-pink-outline); }
+#sh-scene .gm-ph[data-kind="friend"],
+#sh-scene .gm-ph[data-kind="skin"]{ --gm-a: var(--role-pink-face-a); --gm-b: var(--role-pink-face-b); --gm-o: var(--role-pink-outline); }
 #sh-scene .gm-dome{ position: absolute; left: 3%; top: 0; width: 94%; aspect-ratio: 1; border-radius: 50%;
 background: radial-gradient(circle at 38% 30%, var(--role-glass-face-a), var(--role-glass-face-b)); border: calc(.9 * var(--cqw)) solid var(--role-glass-outline); }
 #sh-scene .gm-body{ position: absolute; left: 0; right: 0; bottom: 0; height: 44%; border-radius: calc(6 * var(--cqw));
@@ -14163,7 +14139,8 @@ background: var(--prim-white) var(--gm-face, none) center / 112% no-repeat; bord
 #sh-body .gc-btns{ display: flex; gap: calc(2.05 * var(--cqw)); }
 #sh-body .gc-btns .sh-btn{ flex: 1 1 0; min-width: 0; height: calc(12.3 * var(--cqw)); margin-top: 0; line-height: 1.1; }
 #sh-body .gc-btns .sh-btn-ic{ flex: none; }
-#screen-shop[data-stab="gacha"] #sh-body{ padding-top: calc(1.6 * var(--cqw)); }
+#screen-shop[data-stab="gacha"] #sh-body,
+#screen-shop[data-stab="deco"] #sh-body{ padding-top: calc(1.6 * var(--cqw)); }
 #sh-body .gc-oddhd{ display: flex; justify-content: space-between; align-items: center; margin: calc(3.6 * var(--cqw)) 0 calc(1.5 * var(--cqw)); font-size: calc(3.2 * var(--cqw)); color: var(--prim-art-ink); }
 #sh-body .gc-oddlink{ --f2-bh: calc(5.64 * var(--cqw)); padding: 0 calc(2.6 * var(--cqw)); font-size: calc(3.2 * var(--cqw)); white-space: nowrap; }
 #sh-body .gc-og{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: calc(1.5 * var(--cqw)); }
@@ -14173,8 +14150,8 @@ background: var(--role-f2-pill); border: calc(.3 * var(--cqw)) solid var(--role-
 border: calc(.5 * var(--cqw)) solid var(--role-rw-shard-steady-3); box-sizing: border-box; }
 #sh-body .gc-oc[data-tier="rare"] i{ border-color: var(--role-rw-shard-agility-3); }
 #sh-body .gc-oc[data-tier="epic"] i{ border-color: var(--role-rw-item-3); }
-#sh-body .gc-oc span{ min-width: 0; }
-#sh-body .gc-oc b{ display: block; font-size: calc(3.1 * var(--cqw)); color: var(--prim-art-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#sh-body .gc-oc span{ min-width: 0; margin-right: calc(-1.5 * var(--cqw)); }   /* [rc1009 수정 1회차 F-2] 이름 상자 = 칸 오른쪽 안쪽 여백(같은 1.5cqw)까지 */
+#sh-body .gc-oc b{ display: block; font-size: calc(3.1 * var(--cqw)); color: var(--prim-art-ink); word-break: keep-all; overflow: hidden; }
 #sh-body .gc-oc em{ display: block; font-style: normal; font-weight: 800; font-size: calc(3.2 * var(--cqw)); color: var(--role-rw-shard-steady-3); }
 #sh-body .gc-oc[data-tier="rare"] em{ color: var(--role-rw-shard-agility-3); }
 #sh-body .gc-oc[data-tier="epic"] em{ color: var(--role-rw-item-3); }
@@ -14316,11 +14293,13 @@ html:not([data-portal="cg"]) .res-body { display: contents; }
 #screen-shop[data-art~="bg"] #sh-awning{ display: none; }
 #screen-shop[data-art~="machine"] #sh-scene .gm-ph{ background: url("catalog/t4-gacha-machine-mint.webp") center / contain no-repeat; }
 #screen-shop[data-art~="machine"] #sh-scene .gm-ph[data-kind="gold"]{ background-image: url("catalog/t4-gacha-machine-gold.webp"); }
-#screen-shop[data-art~="machine"] #sh-scene .gm-ph[data-kind="friend"]{ background-image: url("catalog/t4-gacha-machine-pink.webp"); }
+#screen-shop[data-art~="machine"] #sh-scene .gm-ph[data-kind="friend"],
+#screen-shop[data-art~="machine"] #sh-scene .gm-ph[data-kind="skin"]{ background-image: url("catalog/t4-gacha-machine-pink.webp"); }
 #screen-shop[data-art~="machine"] #sh-scene .gm-face{ width: 9.4%; left: calc(27.8% + var(--gm-x, 15%) * .4464); top: calc(14.46% + var(--gm-y, 12%) * .5056); }
 #screen-shop[data-art~="machine"] #sh-scene .gm-ph[data-rows="2"] .gm-face{ top: calc(14.46% + var(--gm-y, 12%) * .5056 + 2.544%); }
 #screen-shop[data-art~="machine"] #sh-scene .gm-ph[data-rows="1"] .gm-face{ top: calc(14.46% + var(--gm-y, 12%) * .5056 + 6.842%); }
-#screen-shop[data-art~="machine"][data-stab="gacha"] #sh-bubble{ left: calc(65.5 * var(--cqw)); max-width: calc(32.5 * var(--cqw)); }
+#screen-shop[data-art~="machine"][data-stab="gacha"] #sh-bubble,
+#screen-shop[data-art~="machine"][data-stab="deco"] #sh-bubble{ left: calc(65.5 * var(--cqw)); max-width: calc(32.5 * var(--cqw)); }
 #screen-shop[data-art~="tabs"] #sh-tabs .sh-tab[data-stab="gacha"] .sh-tab-ic{ background-image: url("catalog/tab-ic-gacha.webp"); }
 #screen-shop[data-art~="tabs"] #sh-tabs .sh-tab[data-stab="free"]  .sh-tab-ic{ background-image: url("catalog/tab-ic-free.webp"); }
 #screen-shop[data-art~="coin"] #sh-body .shop-ic.shop-ic-coin{ background-image: url("catalog/shop-ic-coin-2.webp"); }
@@ -14360,14 +14339,14 @@ border-radius: 50%; background: var(--role-pink-face-b); color: var(--prim-white
 #sh-star-plus::before { right: calc((98.98 - .4 - 100) * var(--cqw)); }
 #sh-stage { height: calc(min(calc(128.2 * var(--cqw)), 60%) + var(--safe-t)); }
 #screen-shop[data-stab="deals"] #sh-stage { height: calc(min(calc(76.9 * var(--cqw)), 40%) + var(--safe-t)); }
-#screen-shop[data-stab="free"] #sh-stage, #screen-shop[data-stab="deco"] #sh-stage { height: calc(min(calc(64.1 * var(--cqw)), 34%) + var(--safe-t)); }
+#screen-shop[data-stab="free"] #sh-stage { height: calc(min(calc(64.1 * var(--cqw)), 34%) + var(--safe-t)); }
 #sh-awning { left: calc(-2.6 * var(--cqw)); right: calc(-2.6 * var(--cqw)); height: calc(16.4 * var(--cqw));
 background: repeating-linear-gradient(90deg, var(--prim-art-pink) 0 calc(7.18 * var(--cqw)), var(--prim-white) calc(7.18 * var(--cqw)) calc(14.36 * var(--cqw))); }
 #screen-shop[data-stab="free"] #sh-awning { background: repeating-linear-gradient(90deg, var(--role-mint-face-a) 0 calc(7.18 * var(--cqw)), var(--prim-white) calc(7.18 * var(--cqw)) calc(14.36 * var(--cqw))); }
 #sh-host { right: calc(2 * var(--cqw)); bottom: calc(2 * var(--cqw)); width: calc(28.7 * var(--cqw)); height: calc(38.5 * var(--cqw)); }
 #sh-plate { left: calc(2.56 * var(--cqw)); right: calc(2.56 * var(--cqw)); bottom: calc(22.6 * var(--cqw) + var(--safe-b)); top: calc(min(calc(122.6 * var(--cqw)), 57%) + var(--safe-t)); }
 #screen-shop[data-stab="deals"] #sh-plate { top: calc(min(calc(72.3 * var(--cqw)), 36%) + var(--safe-t)); }
-#screen-shop[data-stab="free"] #sh-plate, #screen-shop[data-stab="deco"] #sh-plate { top: calc(min(calc(57.9 * var(--cqw)), 30%) + var(--safe-t)); }
+#screen-shop[data-stab="free"] #sh-plate { top: calc(min(calc(57.9 * var(--cqw)), 30%) + var(--safe-t)); }
 #sh-body { inset: calc(3 * var(--cqw)) calc(3.5 * var(--cqw)); }
 #sh-tabs { left: calc(2.05 * var(--cqw)); right: calc(2.05 * var(--cqw)); bottom: calc(2.05 * var(--cqw) + var(--safe-b)); height: calc(19 * var(--cqw)); gap: calc(1.54 * var(--cqw)); padding: calc(1.8 * var(--cqw)); }
 #sh-tabs .sh-tab { border-radius: calc(4.1 * var(--cqw)); gap: calc(.3 * var(--cqw)); font-size: calc(3.6 * var(--cqw)); }

@@ -1984,7 +1984,6 @@ en: {
 'pet.axis.count': 'Harvest',
 'pet.axis.sweep': 'Sweep',
 'pet.axis.awaken': 'Skill',
-'cp.items.none': 'No items yet. Pop a gift box in Adventure.',
 'item.flint.nm': 'Spark Flint',
 'item.flint.fl': 'One small ember is enough to trigger a skill.',
 'item.fizzjelly.nm': 'Firework Jelly',
@@ -2078,8 +2077,6 @@ en: {
 'deals.got': 'You got {name}.',
 'deals.foot': 'All deals are fixed items. You see what you get before you buy. They change every day at midnight.',
 'deals.foot2': 'You can trade coins for stars up to {n} times a day.',
-'deco.title': 'Skins',
-'deco.for': 'Skins for {name}',
 'coin.got': '+{n} coins',
 'star.got': '+{n} stars',
 'gacha.nocoin': 'You need {n} more coins.',
@@ -2097,20 +2094,29 @@ en: {
 'gacha.pity': 'Epic guarantee {n}/{max}',
 'gacha.friend.left': 'You have {have}/{all}. One of the {left} left will come.',
 'gacha.friend.all': 'You have every friend. It opens again when a new friend arrives.',
-'gacha.friend.note': 'To be sure of a friend, invite them at the Pet House. Bosses and goals also bring friends.',
+'gacha.friend.note': 'Bosses and goals also bring friends.',
 'gacha.chance.now': 'Odds now (friends left)',
 'gacha.nostar': 'You need {n} more stars.',
 'gacha.used': 'Already used today.',
+'gacha.skin': 'Style Capsule',
+'gacha.skin.d': "Only skins you don't have yet!",
+'gacha.skin.left': 'You have {have}/{all}. One of the {left} left will come.',
+'gacha.skin.all': 'You have every skin. It opens again when a new skin arrives.',
+'gacha.skin.none': 'No skins to get right now. New friends or skins will open it.',
+'gacha.skin.note': 'Put on your skins from Skins on the character screen.',
+'gacha.skin.now': 'Odds now (skins left)',
 'odds.title': 'Odds',
 'odds.tier': 'Odds by rarity (per pull)',
 'odds.items': 'Odds per gear',
 'odds.friends': 'Odds per friend',
+'odds.skins': 'Odds per skin',
 'odds.rules': 'Guarantees and repeats',
 'odds.tier.row': '{n} kinds, {each} each',
 'odds.rule.ten': 'In a pull ×{n}, if the first ones are all common, the last one is rare or better. Rare is {r} and epic is {e}.',
 'odds.rule.pity': 'After {n} pulls without an epic, the next pull is a sure epic. Now {c}/{n}.',
 'odds.rule.dup': 'A repeat raises the level by one. At the top level {max}, you get coins back. Common gives {c}, rare {r}, and epic {e}.',
 'odds.rule.friend': "Only friends you don't have yet. Rarity weights common {c}, rare {r}, epic {e} are shared by the friends left.",
+'odds.skin.dup': 'Skins you have never come out.',
 'odds.foot1': 'Pulls use only coins, stars and ad rewards. They are never sold for money.',
 'odds.foot2': 'The odds shown come from the same table the draw uses. Decimals are rounded. ({date})',
 'gres.title1': 'Result',
@@ -2120,6 +2126,7 @@ en: {
 'gres.pity.reset': 'The epic guarantee count starts over.',
 'gres.lvup': 'Lv{a}→{b}',
 'gres.sum': 'New {a} · Level up {b}',
+'gres.skin.sum': 'New skin {a}',
 'gres.refund': '{n} coins back',
 'gres.new': 'NEW',
 'gres.ok': 'OK',
@@ -2836,6 +2843,7 @@ en: {
 'skin.balance': 'Stars',
 'skin.equip': 'Equip',
 'skin.equipped': 'Wearing',
+'skin.inshop': 'In the Shop',   /* rc1009 — 없는 유료 스킨 줄의 닫힌 알약(얻는 곳 = 상점 꾸미기 캡슐) */
 'skin.soon': 'Coming soon',
 'skin.soonhint': 'A hat for the bichon prince',
 'skin.confirm': 'Spend {n} Stars on {name}?',
@@ -2985,7 +2993,6 @@ en: {
 'pg.arcade': 'Arcade',
 'pg.arcade.d': 'Time Attack, Survival, 90s Damage.',
 'mode.title.arcade': 'Arcade Duel',
-'kd.pethouse.alljoined': 'Everyone has already joined!',
 'soon.title': 'Coming Soon',
 'soon.body': 'Under construction. Check back after the next update!',
 'kd.visit': 'Yesterday-you saved up {n} Stars.',
@@ -3105,7 +3112,6 @@ ko: {
 'pet.axis.count': '수확',
 'pet.axis.sweep': '청소',
 'pet.axis.awaken': '스킬',
-'cp.items.none': '아직 아이템이 없어요. 모험에서 선물 상자를 터뜨려 보세요.',
 'item.flint.nm': '반짝 부싯돌',
 'item.flint.fl': '작은 불씨도 스킬엔 충분해.',
 'item.fizzjelly.nm': '폭죽 젤리',
@@ -3199,8 +3205,6 @@ ko: {
 'deals.got': '{name}을(를) 받았어요.',
 'deals.foot': '특가는 모두 확정 상품이에요. 무엇을 받는지 미리 보여요. 매일 자정에 새로 바뀌어요.',
 'deals.foot2': '코인을 별로 바꾸기는 하루 {n}번까지예요.',
-'deco.title': '스킨',
-'deco.for': '{name}에게 입힐 스킨이에요.',
 'coin.got': '코인 +{n}',
 'star.got': '별 +{n}',
 'gacha.nocoin': '코인이 {n}개 부족해요.',
@@ -3218,20 +3222,29 @@ ko: {
 'gacha.pity': '영웅 천장 {n}/{max}',
 'gacha.friend.left': '가진 친구 {have}/{all}, 남은 {left}명 중 한 명이 와요',
 'gacha.friend.all': '친구를 모두 모았어요. 새 친구가 오면 다시 열려요.',
-'gacha.friend.note': '원하는 친구를 꼭 데려오려면 펫 하우스에서 초대해요. 보스와 조건으로도 친구를 만나요.',
+'gacha.friend.note': '보스와 조건으로도 친구를 만나요.',
 'gacha.chance.now': '지금 확률 (남은 친구 기준)',
 'gacha.nostar': '별이 {n}개 부족해요.',
 'gacha.used': '오늘은 이미 썼어요.',
+'gacha.skin': '꾸미기 캡슐',
+'gacha.skin.d': '아직 없는 스킨만 나와요!',
+'gacha.skin.left': '가진 스킨 {have}/{all}, 남은 {left}개 중 하나가 나와요',
+'gacha.skin.all': '스킨을 모두 모았어요. 새 스킨이 오면 다시 열려요.',
+'gacha.skin.none': '지금은 뽑을 스킨이 없어요. 새 친구나 새 스킨이 오면 열려요.',
+'gacha.skin.note': '뽑은 스킨은 캐릭터 화면의 스킨에서 입혀요.',
+'gacha.skin.now': '지금 확률 (남은 스킨 기준)',
 'odds.title': '확률 정보',
 'odds.tier': '등급 확률 (한 번 기준)',
 'odds.items': '장비별 확률',
 'odds.friends': '친구별 확률',
+'odds.skins': '스킨별 확률',
 'odds.rules': '보장과 중복 규칙',
 'odds.tier.row': '{n}종, 각 {each}',
 'odds.rule.ten': '{n}회 뽑기에서 앞 칸이 모두 일반이면 마지막 칸은 희귀 이상이에요. 희귀 {r}, 영웅 {e}예요.',
 'odds.rule.pity': '영웅 없이 {n}회를 뽑으면 다음 한 번은 영웅이 확정이에요. 지금 {c}/{n}이에요.',
 'odds.rule.dup': '같은 장비가 또 나오면 레벨이 하나 올라요. 최고 레벨 {max}이면 코인으로 돌려받아요. 일반 {c}, 희귀 {r}, 영웅 {e}개예요.',
 'odds.rule.friend': '아직 없는 친구만 나와요. 등급 무게 일반 {c}, 희귀 {r}, 영웅 {e}를 남은 친구끼리 나눠요.',
+'odds.skin.dup': '가진 스킨은 나오지 않아요.',
 'odds.foot1': '코인, 별, 광고 보상으로만 뽑아요. 현금으로 팔지 않아요.',
 'odds.foot2': '보이는 확률은 실제 추첨에 쓰는 표와 같은 값이에요. 소수점 아래는 반올림했어요. ({date} 기준)',
 'gres.title1': '뽑기 결과',
@@ -3241,6 +3254,7 @@ ko: {
 'gres.pity.reset': '영웅 천장을 처음부터 다시 세요.',
 'gres.lvup': 'Lv{a}→{b}',
 'gres.sum': '새 장비 {a} · 레벨업 {b}',
+'gres.skin.sum': '새 스킨 {a}',
 'gres.refund': '코인 {n} 돌려받음',
 'gres.new': 'NEW',
 'gres.ok': '확인',
@@ -3946,6 +3960,7 @@ ko: {
 'skin.balance': '별',
 'skin.equip': '장착',
 'skin.equipped': '착용 중',
+'skin.inshop': '상점에서 만나요',
 'skin.soon': '곧 만나요',
 'skin.soonhint': '비숑 왕자의 모자',
 'skin.confirm': '{name}을(를) 별 {n}개로 살까요?',
@@ -4095,7 +4110,6 @@ ko: {
 'pg.arcade': '아케이드',
 'pg.arcade.d': '타임어택·서바이벌·90초 누적',
 'mode.title.arcade': '아케이드 대전',
-'kd.pethouse.alljoined': '모두 함께하고 있어요!',
 'soon.title': '준비 중',
 'soon.body': '공사 중이에요! 다음 업데이트를 기다려 주세요.',
 'kd.visit': '어제의 내가 별 {n}개를 모아 뒀어요.',
@@ -5322,15 +5336,10 @@ syncMateLocks();      /* WD-2 §14 — 펫 카드도 같은 자리에서 잠금�
 syncItemList();       /* WD-2 §11.6-B — 보유/장착 자리표 */
 syncCharSummary();
 applySkins();
-syncGems();
 applyHeroStats();
 syncPetInfo();            /* charsel v2 */
 syncSidePanes();
 fitAllDesc();             /* charsel v2 — 잘림 0 은 실측으로만 보장된다 */
-}
-function syncGems() {
-setText('cp-gems', store.jstar | 0);
-setText('sk-gems', store.jstar | 0);
 }
 var cpIdx = 0;
 var cpSwipeAt = 0;        // 스와이프 직후의 click 을 걸러 내기 위한 시각
@@ -5563,23 +5572,23 @@ if (loginBtn) loginBtn.hidden = false;
 }
 }
 function skinTargetId() { return HERO_IDS[cpIdx] || charId(); }
-function buildSkinList(root, withBase) {
-var wrap = root || $('sk-list');
+function buildSkinList() {
+var wrap = $('sk-list');
 if (!wrap) return;
 var id = skinTargetId();
 var list = skinsFor(id);
 var cur = equippedSkin(id);
-if (withBase && !list.length) { list = [{ id: id + '.base', name: 'skin.base', desc: 'skin.basedesc', cost: 0 }]; cur = list[0]; }
+if (!list.length) { list = [{ id: id + '.base', name: 'skin.base', desc: 'skin.basedesc', cost: 0 }]; cur = list[0]; }
 wrap.innerHTML = '';
 for (var i = 0; i < list.length; i++) {
 var sk = list[i];
 var row = document.createElement('div');
-row.className = 'sk-item' + (sk.soon ? ' soon' : '') +
+row.className = 'sk-item kit-box-v2' + (sk.soon ? ' soon' : '') +
 (cur && cur.id === sk.id ? ' on' : '');
 var th = document.createElement('span');
-th.className = 'sk-th';
-if (sk.img) th.style.setProperty('--sk-img', 'var(' + sk.img + ')');
-if (sk.fit) th.setAttribute('data-fit', sk.fit);
+th.className = 'sk-th kit-slot-v2 kit-slot-v2--portrait';
+var art = /\.base$/.test(sk.id) ? stdArt(id, 'thumb') : skinThumbCss(sk.id);
+if (art) th.style.setProperty('--sk-img', art);
 row.appendChild(th);
 var body = document.createElement('span');
 body.className = 'sk-b';
@@ -5599,9 +5608,10 @@ if (sk.soon) {
 act.textContent = t('skin.soon');
 act.disabled = true;
 } else if (!skinOwned(sk)) {
-act.className += ' buy';
-act.textContent = '★' + sk.cost;
-act.setAttribute('data-buy', sk.id);
+act.className += ' kit-pill-v2';
+act.setAttribute('data-variant', 'soft');
+act.textContent = t('skin.inshop');
+act.disabled = true;
 } else if (cur && cur.id === sk.id) {
 act.className += ' kit-pill-v2';
 act.setAttribute('data-variant', 'soft');
@@ -5614,18 +5624,8 @@ act.textContent = t('skin.equip');
 act.setAttribute('data-equip', sk.id);
 }
 row.appendChild(act);
-if (!sk.soon && !skinOwned(sk)) {
-var jact = document.createElement('button');
-jact.type = 'button';
-jact.className = 'sk-act buy sk-act-jewel';
-jact.setAttribute('data-app-only', '');
-jact.setAttribute('data-buyjewel', sk.id);
-jact.textContent = '\uD83D\uDC8E' + JEWEL_COST.skin;
-row.appendChild(jact);
-}
 wrap.appendChild(row);
 }
-syncGems();
 try { if (window.TW && window.TW.applyPlatformGates) window.TW.applyPlatformGates(wrap); } catch (e) {}
 }
 function skinListClick(ev) {
@@ -6097,7 +6097,6 @@ if (advCardN && $('modal-node') && !$('modal-node').hidden) openNodeCard(advCard
 function cpConfirm() {
 var id = HERO_IDS[cpIdx];
 if (!heroUnlocked(id)) {
-if (openInvite(id)) return;
 toast(t('char.locked.hint')); J.sfx.fail(); return;
 }
 setChar(id);              // 이미 그 캐릭터면 조용히 아무 일도 하지 않는다
@@ -6130,7 +6129,6 @@ cards[i].removeAttribute('aria-label');
 function setChar(id) {
 if (HERO_IDS.indexOf(id) < 0 || id === store.charId) return;
 if (!heroUnlocked(id)) {
-if (openInvite(id)) return;
 toast(t('char.locked.hint')); J.sfx.fail(); return;
 }
 store.charId = id;
@@ -6144,7 +6142,6 @@ introGate(id, null);
 function setMate(id) {
 var v = (id === '' || MATE_IDS.indexOf(id) >= 0) ? id : '';
 if (v && !petOwned(v)) {
-if (openInvite(v)) return;
 toast(petLockText(v)); J.sfx.fail(); return;
 }
 if (v === mateId()) return;
@@ -12602,7 +12599,6 @@ function starGrant(n, reason) {
 if (!jewelAmountOk(n)) return false;
 store.jstar = Math.min(STAR_MAX, (store.jstar | 0) + n);   /* 상한에서 멈춘다 — 실제 증가분은 잔액 차로 읽는다(반환은 참/거짓, M2 와 같은 규칙) */
 persist();
-syncGems();
 paintWallets();
 return true;
 }
@@ -12612,7 +12608,6 @@ var have = store.jstar | 0;
 if (have < n) return false;
 store.jstar = have - n;
 persist();
-syncGems();
 paintWallets();
 return true;
 }
@@ -13001,19 +12996,11 @@ J.sfx.fail();
 }
 paintShopTab(shopTab2);   /* 구매 뒤 = 이 탭만 다시(스크롤 자리 유지 · 띠·점·번역을 같이 맞춘다) — 처음으로 돌리는 전체 다시 그리기는 열기·탭 전환만 */
 };
-SHOP_PAINT.deco = function (body) {
-var head = document.createElement('div'); head.className = 'kit-pill-v2 sh-head'; head.setAttribute('data-variant', 'header');
-head.textContent = t('deco.title'); body.appendChild(head);
-var who = document.createElement('p'); who.className = 'sh-fine'; who.textContent = t('deco.for', { name: t('char.' + skinTargetId() + '.name') });
-body.appendChild(who);
-var list = document.createElement('div'); list.className = 'sk-list sh-sk'; body.appendChild(list);
-list.addEventListener('click', skinListClick);
-buildSkinList(list, true);
-};
+SHOP_PAINT.deco = function (body, scene) { paintCapsule(body, scene, 'skin', false); };
 var gachaKind = 'item', gachaBusy = false;
 function pctText(p, digits) { var k = Math.pow(10, digits); return (Math.round(p * Math.pow(10, digits + 2) * (1 + Number.EPSILON)) / k).toFixed(digits) + '%'; }
 function gachaKindSet(k) {
-if (GACHA_KINDS.indexOf(k) < 0) return;
+if (GACHA_TAB_KINDS.indexOf(k) < 0) return;   /* 뽑기 탭 알약 셋만 — 꾸미기 캡슐은 꾸미기 탭이 그린다 */
 gachaKind = k;
 if (shopTab2 === 'gacha' && shopActive()) paintShopTab(shopTab2, true);   /* 종류가 바뀌면 판 내용이 통째로 바뀐다 → 스크롤도 처음으로 */
 }
@@ -13021,6 +13008,7 @@ function gachaFailToast(r, elseKey) {
 if (r.err === 'coin') toast(t('gacha.nocoin', { n: r.need }));
 else if (r.err === 'star') toast(t('gacha.nostar', { n: r.need }));
 else if (r.err === 'allfriends') toast(t('gacha.friend.all'));
+else if (r.err === 'allskins') toast(t(skinEmptyKey(gachaTable('skin'))));   /* [rc1009] 탭 알약과 같은 문장(지휘자 판정 Q5) */
 else if (r.err === 'used') toast(t('gacha.used'));
 else if (elseKey) toast(t(elseKey));
 }
@@ -13102,8 +13090,8 @@ li.setAttribute('data-flip', '0');
 li.setAttribute('data-how', it.how || '');   /* 천장(pity) · 10회 보장(ten) 칸 표식 — CSS 강조는 뒤 태스크 몫(리뷰 M-9) */
 li.innerHTML = '<i class="gres-glow"></i><i class="gres-back"></i><i class="gres-art"></i><b class="gres-new"></b><em class="gres-lv"></em><span class="gres-nm"></span>';
 li.querySelector('.gres-new').textContent = it.isNew ? t('gres.new') : '';
-li.querySelector('.gres-lv').textContent = it.isNew ? '' : (it.max ? ((it.refund | 0) > 0 ? t('gres.refund', { n: it.refund }) : '') : t('gres.lvup', { a: it.lv0 | 0, b: it.lv | 0 }));
-li.querySelector('.gres-nm').textContent = t('item.' + it.id + '.nm');
+li.querySelector('.gres-lv').textContent = (it.isNew || it.skin) ? '' : (it.max ? ((it.refund | 0) > 0 ? t('gres.refund', { n: it.refund }) : '') : t('gres.lvup', { a: it.lv0 | 0, b: it.lv | 0 }));
+li.querySelector('.gres-nm').textContent = it.skin ? skinNameOf(it.id) : t('item.' + it.id + '.nm');   /* [rc1009] 꾸미기 캡슐 = 스킨 이름 */
 return li;
 }
 function gresOpen(res) {
@@ -13118,7 +13106,7 @@ for (i = 0; i < res.items.length; i++) {
 it = res.items[i];
 li = gresCard(it);
 grid.appendChild(li);
-arts.push([li.querySelector('.gres-art'), itemArtCss(it.id, 96)]);
+arts.push([li.querySelector('.gres-art'), it.skin ? skinThumbCss(it.id) : itemArtCss(it.id, 96)]);   /* [rc1009] 스킨 = art.thumb · 없으면 img */
 if (it.how === 'ten') ten = true;
 if (it.how === 'pity') pity = true;
 if (it.tier === 'epic') epic = true;
@@ -13128,7 +13116,7 @@ refund += it.refund | 0;
 setText('gres-title', t(res.n > 1 ? 'gres.title10' : 'gres.title1', { n: res.n }));
 setText('gres-note', pity ? t('gres.pity.hit') : (ten ? t('gres.ten.up') : ''));
 var sum = $('gres-sum'); sum.innerHTML = '';
-['epic', 'rare', 'common'].forEach(function (tr) {
+if (res.kind !== 'skin') ['epic', 'rare', 'common'].forEach(function (tr) {   /* [rc1009] 스킨에는 등급 칩 줄이 없다 */
 var n = res.items.filter(function (x) { return x.tier === tr; }).length;
 if (!n) return;
 var s = document.createElement('span'); s.className = 'gres-s'; s.setAttribute('data-tier', tr); s.setAttribute('data-n', String(n));
@@ -13136,7 +13124,7 @@ var c = document.createElement('b'); c.className = 'gc-chip'; c.textContent = t(
 sum.appendChild(s);
 });
 var tail = document.createElement('span'); tail.className = 'kit-pill-v2 gres-t'; tail.setAttribute('data-variant', 'soft');
-var ts = document.createElement('span'); ts.textContent = t('gres.sum', { a: nNew, b: nUp }); tail.appendChild(ts);
+var ts = document.createElement('span'); ts.textContent = res.kind === 'skin' ? t('gres.skin.sum', { a: nNew }) : t('gres.sum', { a: nNew, b: nUp }); tail.appendChild(ts);
 if (refund) { var trf = document.createElement('span'); trf.className = 'gres-rf'; trf.textContent = t('gres.refund', { n: refund }); tail.appendChild(trf); }
 sum.appendChild(tail);
 var tb = gachaTable(res.kind);
@@ -13147,7 +13135,9 @@ again.appendChild(document.createTextNode(t(res.n > 1 ? 'gres.again10' : 'gres.a
 var ic = document.createElement('i'); ic.className = 'sh-btn-ic sh-btn-ic--' + cur; ic.setAttribute('aria-hidden', 'true'); again.appendChild(ic);
 again.appendChild(document.createTextNode(arcComma(agP)));
 again.setAttribute('data-again', res.kind + ':' + agN + ':' + cur);
-again.setAttribute('data-price', cur);
+var agDis = capLeft(res.kind) && tb.left <= 0;
+again.setAttribute('data-price', agDis ? 'ok' : cur);
+again.disabled = agDis;
 $('gres-all').hidden = res.items.length < 2;
 openModal('modal-gres');
 J.sfx.ui();
@@ -13222,58 +13212,67 @@ if (o.portal) b.setAttribute('data-portal-only', '');
 if (o.dis) b.disabled = true; else b.setAttribute('data-sh-act', o.act);
 return b;
 }
-SHOP_PAINT.gacha = function (body, scene) {
-var tb = gachaTable(gachaKind), i;
-if (scene) {
-var pills = document.createElement('div'); pills.className = 'gc-kinds';
-for (i = 0; i < GACHA_KINDS.length; i++) {
-var pk = document.createElement('button'); pk.type = 'button'; pk.className = 'kit-pill-v2 gc-kind';
-pk.setAttribute('data-variant', GACHA_KINDS[i] === gachaKind ? 'header' : 'soft');
-pk.setAttribute('data-kind', GACHA_KINDS[i]); pk.setAttribute('data-sh-act', 'gkind:' + GACHA_KINDS[i]);
-pk.textContent = t('gacha.' + GACHA_KINDS[i]); pills.appendChild(pk);
+function capLeft(kind) { return kind === 'friend' || kind === 'skin'; }
+function capRowArt(kind, id) { return kind === 'skin' ? skinThumbCss(id) : (kind === 'friend' ? stdArt(id, 'thumb') : itemArtCss(id, 64)); }
+function capRowName(kind, id) { return kind === 'skin' ? skinNameOf(id) : (kind === 'friend' ? t('char.' + id + '.name') : t('item.' + id + '.nm')); }
+function capSubText(kind, tb) {
+if (kind === 'friend') return tb.left ? t('gacha.friend.left', { have: tb.all - tb.left, all: tb.all, left: tb.left }) : t('gacha.friend.all');
+if (kind === 'skin') return tb.left ? t('gacha.skin.left', { have: tb.all - tb.left, all: tb.all, left: tb.left }) : t(skinEmptyKey(tb));
+return t('gacha.pity', { n: tb.pity, max: tb.pityAt });
 }
-scene.appendChild(pills);
+function paintCapsule(body, scene, kind, pills) {
+var tb = gachaTable(kind), i, lf = capLeft(kind);
+if (scene) {
+if (pills) {
+var pl = document.createElement('div'); pl.className = 'gc-kinds';
+for (i = 0; i < GACHA_TAB_KINDS.length; i++) {
+var pk = document.createElement('button'); pk.type = 'button'; pk.className = 'kit-pill-v2 gc-kind';
+pk.setAttribute('data-variant', GACHA_TAB_KINDS[i] === kind ? 'header' : 'soft');
+pk.setAttribute('data-kind', GACHA_TAB_KINDS[i]); pk.setAttribute('data-sh-act', 'gkind:' + GACHA_TAB_KINDS[i]);
+pk.textContent = t('gacha.' + GACHA_TAB_KINDS[i]); pl.appendChild(pk);
+}
+scene.appendChild(pl);
+}
 var rb = document.createElement('div'); rb.className = 'kit-pill-v2 gc-title'; rb.setAttribute('data-variant', 'header');
-rb.textContent = t('gacha.' + gachaKind); scene.appendChild(rb);
-var m = document.createElement('div'); m.className = 'gm-ph'; m.setAttribute('data-kind', gachaKind);
+rb.textContent = t('gacha.' + kind); scene.appendChild(rb);
+var m = document.createElement('div'); m.className = 'gm-ph'; m.setAttribute('data-kind', kind);
 m.innerHTML = '<i class="gm-dome"></i><i class="gm-body"></i><i class="gm-knob"></i><i class="gm-slot"></i>';
-if (gachaKind === 'friend') {
+if (lf) {
 for (i = 0; i < tb.rows.length && i < 9; i++) {
 var face = document.createElement('i'); face.className = 'gm-face'; face.setAttribute('data-tier', tb.rows[i].tier);
 face.style.setProperty('--gm-x', (15 + (i % 3) * 24) + '%');
 face.style.setProperty('--gm-y', (12 + Math.floor(i / 3) * 17) + '%');
-setArt(face, '--gm-face', stdArt(tb.rows[i].id, 'thumb'), '');
+setArt(face, '--gm-face', capRowArt(kind, tb.rows[i].id), '');
 m.appendChild(face);
 }
 if (tb.rows.length) m.setAttribute('data-rows', String(Math.ceil(Math.min(tb.rows.length, 9) / 3)));   /* 줄 수 — DESIGN §28.11 */
 }
 scene.appendChild(m);
 var sub = document.createElement('div'); sub.className = 'kit-pill-v2 gc-sub'; sub.setAttribute('data-variant', 'soft'); sub.id = 'gc-pity';
-sub.textContent = gachaKind === 'friend' ? (tb.left ? t('gacha.friend.left', { have: tb.all - tb.left, all: tb.all, left: tb.left }) : t('gacha.friend.all'))
-: t('gacha.pity', { n: tb.pity, max: tb.pityAt });
+sub.textContent = capSubText(kind, tb);
 scene.appendChild(sub);
 }
 var bub = $('sh-bubble');
-if (bub) { bub.textContent = t('gacha.' + gachaKind + '.d'); bub.hidden = false; }
+if (bub) { bub.textContent = t('gacha.' + kind + '.d'); bub.hidden = false; }
 var row = document.createElement('div'); row.className = 'gc-btns'; body.appendChild(row);
-var dis = (gachaKind === 'friend' && tb.left <= 0);
-var fb = dis ? null : gachaFreeBtn(gachaKind);
+var dis = (lf && tb.left <= 0);
+var fb = dis ? null : gachaFreeBtn(kind);
 if (fb) row.appendChild(gachaBtn(fb));
-var ic = GACHA_CUR[gachaKind] === 'coin' ? 'coin' : 'star', pr = GACHA_CUR[gachaKind] === 'coin' ? 'coin' : 'star';
-row.appendChild(gachaBtn({ label: t('gacha.one') + ' ' + arcComma(tb.price), coinIc: ic, price: dis ? 'ok' : pr, act: 'gbuy:' + gachaKind + ':1:' + pr, dis: dis }));   /* 닫힌 버튼은 특가 탭처럼 「ok」(연보라) */
-if (gachaKind === 'item') row.appendChild(gachaBtn({ label: t('gacha.ten', { n: GACHA_TEN }) + ' ' + arcComma(tb.ten), coinIc: 'coin', price: 'coin', act: 'gbuy:item:' + GACHA_TEN + ':coin' }));
+var ic = GACHA_CUR[kind] === 'coin' ? 'coin' : 'star', pr = GACHA_CUR[kind] === 'coin' ? 'coin' : 'star';
+row.appendChild(gachaBtn({ label: t('gacha.one') + ' ' + arcComma(tb.price), coinIc: ic, price: dis ? 'ok' : pr, act: 'gbuy:' + kind + ':1:' + pr, dis: dis }));   /* 닫힌 버튼은 특가 탭처럼 「ok」(연보라) */
+if (kind === 'item') row.appendChild(gachaBtn({ label: t('gacha.ten', { n: GACHA_TEN }) + ' ' + arcComma(tb.ten), coinIc: 'coin', price: 'coin', act: 'gbuy:item:' + GACHA_TEN + ':coin' }));
 var hd = document.createElement('div'); hd.className = 'gc-oddhd';
-var hs = document.createElement('span'); hs.textContent = t(gachaKind === 'friend' ? 'gacha.chance.now' : 'odds.tier'); hd.appendChild(hs);
+var hs = document.createElement('span'); hs.textContent = t(kind === 'friend' ? 'gacha.chance.now' : (kind === 'skin' ? 'gacha.skin.now' : 'odds.tier')); hd.appendChild(hs);
 var link = document.createElement('button'); link.type = 'button'; link.className = 'kit-pill-v2 gc-oddlink'; link.setAttribute('data-variant', 'soft');
-link.setAttribute('data-sh-act', 'godds:' + gachaKind); link.textContent = t('gacha.odds'); hd.appendChild(link);
+link.setAttribute('data-sh-act', 'godds:' + kind); link.textContent = t('gacha.odds'); hd.appendChild(link);
 body.appendChild(hd);
-var og = document.createElement('div'); og.id = 'gc-odds'; og.className = gachaKind === 'friend' ? 'gc-og' : 'gc-tiers'; body.appendChild(og);
-if (gachaKind === 'friend') {
+var og = document.createElement('div'); og.id = 'gc-odds'; og.className = lf ? 'gc-og' : 'gc-tiers'; body.appendChild(og);
+if (lf) {
 for (i = 0; i < tb.rows.length; i++) {
 var oc = document.createElement('div'); oc.className = 'gc-oc'; oc.setAttribute('data-id', tb.rows[i].id); oc.setAttribute('data-tier', tb.rows[i].tier);
-var fi = document.createElement('i'); setArt(fi, '--gm-face', stdArt(tb.rows[i].id, 'thumb'), ''); oc.appendChild(fi);
+var fi = document.createElement('i'); setArt(fi, '--gm-face', capRowArt(kind, tb.rows[i].id), ''); oc.appendChild(fi);
 var sp = document.createElement('span');
-var nb = document.createElement('b'); nb.textContent = t('char.' + tb.rows[i].id + '.name'); sp.appendChild(nb);
+var nb = document.createElement('b'); nb.textContent = capRowName(kind, tb.rows[i].id); sp.appendChild(nb);
 var pe = document.createElement('em'); pe.textContent = pctText(tb.rows[i].p, 2); sp.appendChild(pe);
 oc.appendChild(sp); og.appendChild(oc);
 }
@@ -13287,9 +13286,10 @@ og.appendChild(tr);
 }
 }
 var fine = document.createElement('p'); fine.className = 'sh-fine';
-fine.textContent = gachaKind === 'friend' ? t('gacha.friend.note') : t('odds.foot1');
+fine.textContent = kind === 'friend' ? t('gacha.friend.note') : (kind === 'skin' ? t('gacha.skin.note') : t('odds.foot1'));
 body.appendChild(fine);
-};
+}
+SHOP_PAINT.gacha = function (body, scene) { paintCapsule(body, scene, gachaKind, true); };
 SHOP_DOTS.gacha = function () {
 p3Ensure();   /* 새 설치는 store.gacha 가 아직 없다 — 왕국 배지가 먼저 이 함수를 부른다 */
 var g = store.gacha, n = 0;
@@ -13325,14 +13325,16 @@ var v = document.createElement('b'); v.className = 'od-p'; v.textContent = p; r.
 return r;
 }
 function oddsPaint() {
-var tabs = document.querySelectorAll('#odds-tabs .od-tab'), i, tb = gachaTable(oddsKind), d = oddsKind === 'friend' ? 2 : 3;
+var tabs = document.querySelectorAll('#odds-tabs .od-tab'), i, tb = gachaTable(oddsKind), fr = oddsKind === 'friend', sk = oddsKind === 'skin', d = (fr || sk) ? 2 : 3;
 for (i = 0; i < tabs.length; i++) {
 var on = tabs[i].getAttribute('data-otab') === oddsKind;
 tabs[i].setAttribute('aria-selected', on ? 'true' : 'false');
 if (on) tabs[i].setAttribute('data-active', ''); else tabs[i].removeAttribute('data-active');
 }
+var trow = $('odds-tabs'); if (trow) trow.hidden = sk;
 var b = $('odds-body'); if (!b) return;
 b.innerHTML = '';
+if (!sk) {   /* 등급 절 — 스킨에는 등급이 없어 절째 뺀다(판정 Q3) */
 var s1 = document.createElement('section'); s1.className = 'od-sec';
 var h1 = document.createElement('h3'); h1.textContent = t('odds.tier'); s1.appendChild(h1);
 for (i = 0; i < tb.tiers.length; i++) {
@@ -13342,24 +13344,25 @@ var chip = document.createElement('em'); chip.className = 'gc-chip'; chip.textCo
 s1.appendChild(tr);
 }
 b.appendChild(s1);
+}
 var s2 = document.createElement('section'); s2.className = 'od-sec od-list';
-var h2 = document.createElement('h3'); h2.textContent = t(oddsKind === 'friend' ? 'odds.friends' : 'odds.items'); s2.appendChild(h2);
+var h2 = document.createElement('h3'); h2.textContent = t(fr ? 'odds.friends' : (sk ? 'odds.skins' : 'odds.items')); s2.appendChild(h2);
 var box = document.createElement('div'); box.className = 'od-box'; s2.appendChild(box);   /* 높이가 정해진 안쪽 스크롤 상자 — 규칙 절 · 바닥 글이 첫 화면에 들게(리뷰 I-2). 마지막 줄이 반쯤 잘려 보이는 것이 「더 있다」 신호 */
 for (i = 0; i < tb.rows.length; i++) {
-var id = tb.rows[i].id, fr = oddsKind === 'friend';
-box.appendChild(oddsRow('', id, t(fr ? ('char.' + id + '.name') : ('item.' + id + '.nm')), pctText(tb.rows[i].p, d),
-fr ? stdArt(id, 'thumb') : itemArtCss(id, 64)));
+var id = tb.rows[i].id;
+box.appendChild(oddsRow('', id, capRowName(oddsKind, id), pctText(tb.rows[i].p, d), capRowArt(oddsKind, id)));   /* M-2 — 이름 · 그림 한 곳 */
 }
-if (!tb.rows.length) { box.hidden = true; var none = document.createElement('p'); none.textContent = t('gacha.friend.all'); s2.appendChild(none); }
+if (!tb.rows.length) { box.hidden = true; var none = document.createElement('p'); none.textContent = t(sk ? skinEmptyKey(tb) : 'gacha.friend.all'); s2.appendChild(none); }
 b.appendChild(s2);
 var s3 = document.createElement('section'); s3.className = 'od-sec od-rules';
 var h3 = document.createElement('h3'); h3.textContent = t('odds.rules'); s3.appendChild(h3);
 var ul = document.createElement('ul'), li;
 var rules = [];
 if (oddsKind === 'item') rules.push(t('odds.rule.ten', { n: GACHA_TEN, r: pctText(GACHA_TEN_UP.rare, 0), e: pctText(GACHA_TEN_UP.epic, 0) }));
-if (oddsKind !== 'friend') rules.push(t('odds.rule.pity', { n: tb.pityAt, c: tb.pity }));
-if (oddsKind !== 'friend') rules.push(t('odds.rule.dup', { max: ITEM_LV_MAX, c: GACHA_REFUND.common, r: GACHA_REFUND.rare, e: GACHA_REFUND.epic }));
-else rules.push(t('odds.rule.friend', { c: GACHA_FRIEND_W.common, r: GACHA_FRIEND_W.rare, e: GACHA_FRIEND_W.epic }));
+if (!fr && !sk) rules.push(t('odds.rule.pity', { n: tb.pityAt, c: tb.pity }));
+if (fr) rules.push(t('odds.rule.friend', { c: GACHA_FRIEND_W.common, r: GACHA_FRIEND_W.rare, e: GACHA_FRIEND_W.epic }));
+else if (sk) rules.push(t('odds.skin.dup'));
+else rules.push(t('odds.rule.dup', { max: ITEM_LV_MAX, c: GACHA_REFUND.common, r: GACHA_REFUND.rare, e: GACHA_REFUND.epic }));
 for (i = 0; i < rules.length; i++) { li = document.createElement('li'); li.textContent = rules[i]; ul.appendChild(li); }
 s3.appendChild(ul);
 b.appendChild(s3);
@@ -14807,11 +14810,7 @@ art: 'url("catalog/t3-bldg2-post.webp")',
 go: function () { kdSoonModal(); } },
 { id: 'pethouse',   l: 17.4, t: 77.8, w: 29, h: 15, chap: 1, key: 'kd.pethouse', tone: 'orange', ic: 'heart', roof: 11.7,
 art: 'url("catalog/t3-bldg2-pethouse.webp")',
-go: function () {
-var ids = INVITE_ORDER, i;
-for (i = 0; i < ids.length; i++) { if (openInvite(ids[i])) return; }
-kdAllJoined();
-} },
+go: function () { kdSoonModal(); } },
 { id: 'playground', l: 82.7, t: 78.1, w: 33, h: 15, chap: 1, key: 'kd.playground', tone: 'violet', ic: 'inf', roof: 16.3,
 art: 'url("catalog/t3-bldg2-playground.webp")',
 go: function () { openPlayground(); } }
@@ -14854,7 +14853,6 @@ if (kdStore().unlocked.indexOf(b.id) >= 0) return true;
 return chapMax() >= (b.chap | 0 || 1);
 }
 function kdNeedStage(b) { return chapFirst(b.chap | 0 || 1) - 1; }
-function kdAllJoined() { toast(t('kd.pethouse.alljoined')); J.sfx.ui(); }
 function kdSoonModal() { openModal('modal-soon'); J.sfx.ui(); }
 function kdArtVar(id) {
 var v = '';
@@ -14981,7 +14979,6 @@ k.lastVisit = Date.now();
 k.tapToday = 0;
 if (!first) store.jstar = (store.jstar | 0) + KD_VISIT_JSTAR;
 persist();
-syncGems();
 kdSync();
 if (line) {
 line.textContent = t(first ? 'kd.visit.first' : 'kd.visit', { n: KD_VISIT_JSTAR });
@@ -15058,7 +15055,6 @@ if ((k.tapToday | 0) >= KD_TAP_CAP) { J.sfx.ui(); return; }
 k.tapToday = (k.tapToday | 0) + 1;
 store.jstar = (store.jstar | 0) + KD_TAP_JSTAR;
 persist();
-syncGems();
 kdSync();
 J.sfx.petBell();
 }
@@ -15870,9 +15866,10 @@ store.items.eq[cid] = eq;
 }
 return { id: id, lv: lv, isNew: !had, tier: it.tier, stat: it.stat };
 }
-var GACHA_KINDS = ['item', 'gold', 'friend'];
-var GACHA_PRICE = { item: 150, item10: 1350, gold: 30, friend: 20 };   /* 코인 · 코인 · 별 · 별 */
-var GACHA_CUR = { item: 'coin', gold: 'star', friend: 'star' };
+var GACHA_KINDS = ['item', 'gold', 'friend', 'skin'];
+var GACHA_TAB_KINDS = ['item', 'gold', 'friend'];
+var GACHA_PRICE = { item: 150, item10: 1350, gold: 30, friend: 20, skin: SKIN_COST_ROYAL };   /* 코인 · 코인 · 별 · 별 · 별(스킨 = 정본 스킨 값 하나 — 경제 무변) */
+var GACHA_CUR = { item: 'coin', gold: 'star', friend: 'star', skin: 'star' };
 var GACHA_TEN = 10;
 var GACHA_TIER_P = { item: { common: 0.75, rare: 0.22, epic: 0.03 }, gold: { rare: 0.85, epic: 0.15 } };
 var GACHA_TEN_UP = { rare: 0.88, epic: 0.12 };        /* 10회: 앞 9칸이 전부 일반이면 10번째 */
@@ -15881,6 +15878,7 @@ var GACHA_FRIEND_TIER = { mongle: 'common', tiktok: 'common', churup: 'common',
 kkultteok: 'rare', sseokssak: 'rare', mukmul: 'rare',
 banjjak: 'epic', bangul: 'epic', jelly: 'epic' };   /* = 초대 사다리 0~12 / 16~25 / 30~45★ 순서 */
 var GACHA_TIERS = ['common', 'rare', 'epic'];
+var GACHA_SKIN_TIER = 'rare';   /* [rc1009] 스킨 줄의 액자 색(결과 카드 · 돔 · 후보 격자) — 겉모습일 뿐 등급이 아니다(확률 창 등급 절 없음, 지휘자 판정 Q3) */
 function gachaItemsOf(tier) {
 var out = [], i;
 for (i = 0; i < ITEM_POOL.length; i++) if (ITEM_POOL[i].tier === tier && ITEM_POOL[i].enabled !== false) out.push(ITEM_POOL[i].id);
@@ -15893,11 +15891,41 @@ for (i = 0; i < ids.length; i++) W += GACHA_FRIEND_W[GACHA_FRIEND_TIER[ids[i]]];
 for (i = 0; i < ids.length; i++) { tier = GACHA_FRIEND_TIER[ids[i]]; rows.push({ id: ids[i], tier: tier, p: W ? GACHA_FRIEND_W[tier] / W : 0 }); }
 return rows;
 }
+function gachaSkinsOf() {
+var out = [], k, i, list;
+for (k in SKINS) {
+if (!Object.prototype.hasOwnProperty.call(SKINS, k) || !heroUnlocked(k)) continue;
+list = SKINS[k];
+for (i = 0; i < list.length; i++) if (list[i].cost > 0 && !list[i].soon) out.push(list[i]);
+}
+return out;
+}
+function skinThumbCss(sid) {
+var sk = skinById(sid), v = sk ? ((sk.art && sk.art.thumb) || sk.img || '') : '';
+return v ? ('var(' + v + ')') : '';
+}
+function skinNameOf(sid) { var sk = skinById(sid); return sk ? t(sk.name) : ''; }
+function skinEmptyKey(tb) { return (tb && tb.all > 0) ? 'gacha.skin.all' : 'gacha.skin.none'; }
+function grantSkin(sid) {
+var sk = skinById(sid);
+if (!sk || sk.soon || skinOwned(sk)) return false;
+store.skins.push(sk.id);
+persist();
+return true;
+}
 function gachaTable(kind) {
 p3Ensure();
 var tb = { kind: kind, cur: GACHA_CUR[kind], price: GACHA_PRICE[kind], ten: kind === 'item' ? GACHA_PRICE.item10 : 0,
 tiers: [], rows: [], pity: 0, pityAt: 0, left: 0, all: 0 };
 var i, j, tier, ids, p, n;
+if (kind === 'skin') {   /* [rc1009] 남은 후보끼리 같은 무게(각 1/남은 수) · 등급 절 없음(tiers 빈 배열) · 천장 · 10회 없음 */
+var sks = gachaSkinsOf();
+tb.all = sks.length;
+for (i = 0; i < sks.length; i++) if (!skinOwned(sks[i])) tb.rows.push({ id: sks[i].id, tier: GACHA_SKIN_TIER, p: 0 });
+tb.left = tb.rows.length;
+for (i = 0; i < tb.rows.length; i++) tb.rows[i].p = 1 / tb.left;
+return tb;
+}
 if (kind === 'friend') {
 var left = [];
 for (i = 0; i < GACHA_FRIEND_IDS.length; i++) if (!friendOwned(GACHA_FRIEND_IDS[i])) left.push(GACHA_FRIEND_IDS[i]);
@@ -15941,6 +15969,10 @@ return gachaPick(inTier, rng);
 function gachaPull(kind, count, rng) {
 var r = (typeof rng === 'function') ? rng : Math.random;
 var tb = gachaTable(kind), out = [], g = store.gacha, i, k;
+if (kind === 'skin') {   /* [rc1009] 1회만 — 표의 p 그대로(표시 = 추첨) */
+if (tb.rows.length) { var sp = gachaPick(tb.rows, r); out.push({ id: sp.id, tier: sp.tier, how: '' }); }
+return out;
+}
 if (kind === 'friend') {
 var rows = tb.rows, ids;
 for (i = 0; i < count && rows.length; i++) {
@@ -15979,15 +16011,16 @@ if (GACHA_KINDS.indexOf(kind) < 0) return { err: 'bad' };
 p3Ensure();
 var n = (kind === 'item' && count === GACHA_TEN) ? GACHA_TEN : 1, g = store.gacha, cur = GACHA_CUR[kind], cost = 0;
 if (kind === 'friend' && gachaTable('friend').left <= 0) return { err: 'allfriends' };
-if (kind !== 'friend') {   /* 수정 1회차 M-4 — 어느 등급이든 켜진 장비가 0종이면 차감 **전**에 거른다(빈 등급에서 추첨이 던지면 코인만 사라진다) */
+if (kind === 'skin' && gachaTable('skin').left <= 0) return { err: 'allskins' };   /* [rc1009] 후보 0 은 차감 전에 거른다 */
+if (kind !== 'friend' && kind !== 'skin') {   /* 수정 1회차 M-4 — 어느 등급이든 켜진 장비가 0종이면 차감 **전**에 거른다(빈 등급에서 추첨이 던지면 코인만 사라진다) */
 var tiers = gachaTable(kind).tiers, ti;
 for (ti = 0; ti < tiers.length; ti++) if (!(tiers[ti].n > 0)) return { err: 'bad' };
 }
 if (how === 'free') { if (kind !== 'item' || n !== 1 || g.freeDay === todayKey()) return { err: 'used' }; }
 else if (how === 'first') {
-if (n !== 1 || kind === 'gold') return { err: 'used' };
+if (n !== 1 || kind === 'gold' || kind === 'skin') return { err: 'used' };
 if (kind === 'item' ? g.firstItem : g.firstFriend) return { err: 'used' };
-} else if (how === 'ad') { if (n !== 1 || kind === 'gold') return { err: 'bad' }; }
+} else if (how === 'ad') { if (n !== 1 || kind === 'gold' || kind === 'skin') return { err: 'bad' }; }
 else if (how === 'coin' || how === 'star') {
 if (how !== cur) return { err: 'bad' };
 cost = (n === GACHA_TEN) ? GACHA_PRICE.item10 : GACHA_PRICE[kind];
@@ -16003,6 +16036,8 @@ var picks = gachaPull(kind, n, rng), items = [], i, res;
 for (i = 0; i < picks.length; i++) {
 if (kind === 'friend') {
 res = { id: picks[i].id, tier: picks[i].tier, isNew: grantFriend(picks[i].id, 'gacha'), friend: true };   /* 수정 1회차 M-1 — 합류가 안 됐으면 isNew false */
+} else if (kind === 'skin') {
+res = { id: picks[i].id, tier: picks[i].tier, isNew: grantSkin(picks[i].id), skin: true };   /* [rc1009] 지급만 — 장착은 안 한다 */
 } else {
 res = grantItemOrRefund(picks[i].id, 'gacha') || { id: picks[i].id, tier: picks[i].tier, lv: 0 };
 }
@@ -16588,8 +16623,6 @@ for (i = n; i < ITEM_CELL_MIN; i++) {
 wrap.appendChild(cpItemCell('empty', ITEM_SLOTS[i % ITEM_SLOTS.length],
 '', '', '', '', ''));
 }
-var em = $('cp-item-none');
-if (em) em.hidden = !!n;
 }
 function toggleItem(id) {
 var it = itemById(id);
@@ -17187,7 +17220,7 @@ if (fn) fn(); else closeConfirm();
 });
 on($('cf-no'), 'click', closeConfirm);
 on($('modal-skin'), 'click', function (ev) { if (ev && ev.target === this) closeSkins(); });
-on($('sk-list'), 'click', skinListClick);   /* P3 T5 — 이름 있는 함수(buildSkinList 옆) · 상점 꾸미기 판도 같은 위임을 쓴다 */
+on($('sk-list'), 'click', skinListClick);   /* P3 T5 — 이름 있는 함수(buildSkinList 옆) */
 on($('cp-rack'), 'click', function (ev) {
 if (now() - cpSwipeAt < 400) return;   /* 스와이프 직후의 합성 클릭 무시 */
 var el = ev && ev.target;
