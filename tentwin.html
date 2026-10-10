@@ -39891,7 +39891,8 @@ window.TT_SFX = {
       rankFresh.pos = newRank;
     }
     var overCoin = coinForRank(newRank);   /* P3 — 기록판 순위로 세 단 */
-    if (isDaily() && coinPlayed() && !coinCapTake('dOver', COIN_DAILY_OVER_DAY_MAX)) overCoin = 0;   /* 판정판 102 ① — 데일리 게임오버 코인은 하루 1번(끝까지 finishDaily 는 무변) */
+    var sameRunPaid = S.coinRunAt === S.startedAt && (S.runCoin | 0) > 0;   /* 이 판은 이미 오늘 몫을 받았다 → 차이만, 셈 안 씀(102 리뷰 반영 · 지휘자 판정) */
+    if (isDaily() && coinPlayed() && !sameRunPaid && !coinCapTake('dOver', COIN_DAILY_OVER_DAY_MAX)) overCoin = 0;   /* 판정판 102 ① — 데일리 게임오버 코인은 새 판 하루 1번(끝까지 finishDaily 는 무변) */
     runCoinPay(overCoin);
 
     // Freeze exactly what the modal shows. Re-painting later (a language
