@@ -26045,12 +26045,14 @@ window.TT_SFX = {
      *   p3      null = 새 설치 · { shown } = v2to3 을 지난 이전 저장(지갑 안내 1회)
      *   gacha   { itemPity, goldPity, freeDay, firstItem, firstFriend, happy, petSrc{}, dupPaid{}, log[] }
      *   adCaps  { day, week, n{coin,item,star,heart,x2}, w{friend} }   — 보상형 광고 상한
-     *   deals   { day, b{gift,gearC,gearR,heart1,trade,heartfull} }     — 특가 하루 한도 */
+     *   deals   { day, b{gift,gearC,gearR,heart1,trade,heartfull} }     — 특가 하루 한도
+     *   coinCaps { day, re, dOver }  — 반복 코인 하루 셈(다시 깨기 · 데일리 게임오버, 판정판 102 ① · 2026-10-10 더한 칸) */
     coin: 0,
     p3: null,
     gacha: null,
     adCaps: null,
-    deals: null
+    deals: null,
+    coinCaps: null
   };
 
   /**
@@ -26800,6 +26802,7 @@ window.TT_SFX = {
         store.gacha = gachaStateFrom(o.gacha);
         store.adCaps = adCapsFrom(o.adCaps);
         store.deals = dealsFrom(o.deals);
+        store.coinCaps = coinCapsFrom(o.coinCaps);   /* 판정판 102 ① — 반복 코인 하루 셈 */
       }
     } catch (e) {
       /* private mode / corrupt JSON: run with defaults */
@@ -39887,7 +39890,9 @@ window.TT_SFX = {
       rankFresh.mode = rkey;
       rankFresh.pos = newRank;
     }
-    runCoinPay(coinForRank(newRank));   /* P3 — 기록판 순위로 세 단 */
+    var overCoin = coinForRank(newRank);   /* P3 — 기록판 순위로 세 단 */
+    if (isDaily() && coinPlayed() && !coinCapTake('dOver', COIN_DAILY_OVER_DAY_MAX)) overCoin = 0;   /* 판정판 102 ① — 데일리 게임오버 코인은 하루 1번(끝까지 finishDaily 는 무변) */
+    runCoinPay(overCoin);
 
     // Freeze exactly what the modal shows. Re-painting later (a language
     // toggle, say) then cannot read state that has moved on in the meantime.
@@ -45418,6 +45423,11 @@ window.TT_SFX = {
     for (var i = 0; i < P3_DEAL_IDS.length; i++) out.b[P3_DEAL_IDS[i]] = p3Int(b[P3_DEAL_IDS[i]], P3_DEAL_CAP[P3_DEAL_IDS[i]]);
     return out;
   }
+  /** 판정판 102 ① — 반복 코인 하루 셈. re = 오늘 코인을 받은 모험 다시 깨기 판수 · dOver = 오늘 코인을 받은 데일리 게임오버 수. */
+  function coinCapsFrom(c) {
+    var o = (c && typeof c === 'object') ? c : {};
+    return { day: p3Day(o.day), re: p3Int(o.re, COIN_RE_DAY_MAX), dOver: p3Int(o.dOver, COIN_DAILY_OVER_DAY_MAX) };
+  }
   /* 수정 1회차 M8 — 칸의 안쪽 모양까지 본다(겉만 객체인 손상 저장·일부만 심은 하네스에서 p3Roll 이 던지지 않게). 어긋난 칸만
      소독기로 다시 세우고 아는 값은 유지한다 — 멀쩡한 칸은 같은 객체 그대로(부른 쪽이 들고 있는 참조가 끊기지 않는다). */
   function gachaShapeOk(g) {
@@ -45434,26 +45444,32 @@ window.TT_SFX = {
     for (var i = 0; i < P3_DEAL_IDS.length; i++) { if (typeof d.b[P3_DEAL_IDS[i]] !== 'number') return false; }
     return true;
   }
+  function coinCapsShapeOk(c) {
+    return !!c && typeof c === 'object' && typeof c.day === 'string' && typeof c.re === 'number' && typeof c.dOver === 'number';
+  }
   /** 새 설치(저장 없음)도 칸이 서게 한다 — readStore 는 저장이 없으면 일찍 돌아간다. */
   function p3Ensure() {
     if (typeof store.coin !== 'number' || !isFinite(store.coin)) store.coin = 0;
     if (!gachaShapeOk(store.gacha)) store.gacha = gachaStateFrom(store.gacha);
     if (!adCapsShapeOk(store.adCaps)) store.adCaps = adCapsFrom(store.adCaps);
     if (!dealsShapeOk(store.deals)) store.deals = dealsFrom(store.deals);
+    if (!coinCapsShapeOk(store.coinCaps)) store.coinCaps = coinCapsFrom(store.coinCaps);
   }
   /** 날짜가 바뀌면 하루 칸을, 주(월요일 시작, weekKey)가 바뀌면 주 칸을 비운다.
-   *  상점을 열 때 · 광고 직전 · 특가 직전에 부른다. 저장은 부른 쪽의 persist 가 한다. */
+   *  상점을 열 때 · 광고 직전 · 특가 직전 · 반복 코인 셈 직전(coinCapTake)에 부른다. 저장은 부른 쪽의 persist 가 한다. */
   function p3Roll() {
     p3Ensure();
     var d = todayKey(), wk = weekKey(), i;
     if (store.adCaps.day !== d) { store.adCaps.day = d; for (i = 0; i < P3_AD_IDS.length; i++) store.adCaps.n[P3_AD_IDS[i]] = 0; }
     if (store.adCaps.week !== wk) { store.adCaps.week = wk; store.adCaps.w.friend = 0; }
     if (store.deals.day !== d) { store.deals.day = d; for (i = 0; i < P3_DEAL_IDS.length; i++) store.deals.b[P3_DEAL_IDS[i]] = 0; }
+    if (store.coinCaps.day !== d) { store.coinCaps.day = d; store.coinCaps.re = 0; store.coinCaps.dOver = 0; }
   }
 
   /* ---- 코인 수입(스펙 §4-f) — 판이 끝나는 네 자리(advFinish · onGameOver · finishDaily · arcFinish)만 부른다 ---- */
   var COIN_ADV_FIRST = 20, COIN_ADV_FIRST_STAR = 10;   /* 모험 첫 클리어 20 + 별 하나당 10 */
   var COIN_ADV_RE = 10, COIN_ADV_RE_STAR = 5;          /* 다시 깨면 10 + 별 하나당 5 */
+  var COIN_RE_DAY_MAX = 10, COIN_DAILY_OVER_DAY_MAX = 1;   /* 반복 코인 하루 한도 — 다시 깨기 10판 · 데일리 게임오버 1번(판정판 102 ① · 사용자 2026-10-10) */
   var COIN_BOSS_MULT = 2;                               /* 보스탄 첫 클리어만(스펙 §4-f 괄호 자리) */
   /* 모험 밖 한 판의 세 단. 스펙의 「점수 3단」을 **내 기록판 기준**으로 가른다(모드마다 점수 폭이 달라
      한 문턱을 못 쓴다): 보통 · 기록판 5위 안(아케이드는 타임어택 격파만) · 새 1위(아케이드는 새 최고). §28.2 */
@@ -45467,6 +45483,14 @@ window.TT_SFX = {
   function coinForArc(fresh, clear) { return fresh ? COIN_RUN[2] : (clear ? COIN_RUN[1] : COIN_RUN[0]); }
   /** 짝을 하나도 맞추지 않은 판은 코인 0 — 자리 비움 농사 방지(지휘자 판정 2026-10-05, 모든 모드 공통). 판 안의 기존 카운터 S.matches. */
   function coinPlayed() { return (S.matches | 0) > 0; }
+  /** 판정판 102 ① — 오늘 k 칸('re' | 'dOver')이 max 미만이면 하나 올리고 참, 다 찼으면 거짓. 코인이 나가는 판에서만 부른다.
+      저장은 부른 쪽의 기존 persist 흐름(이어지는 coinGrant · advFinish 의 persist)이 싣는다. */
+  function coinCapTake(k, max) {
+    p3Roll();
+    if ((store.coinCaps[k] | 0) >= max) return false;
+    store.coinCaps[k] = (store.coinCaps[k] | 0) + 1;
+    return true;
+  }
   /** 한 판의 코인은 **판 하나에 한 번**이다. 판의 이름표는 S.startedAt(진입 함수가 판마다 새로 세운다) —
       이어하기로 같은 판이 다시 끝나면 더 큰 단과의 차이만 준다. S.gainCoin = 이번 시트가 보여 줄 몫. */
   function runCoinPay(want) {
@@ -47097,6 +47121,7 @@ window.TT_SFX = {
       }
       /* P3 — 코인(놀면 쌓이는 돈). 첫 클리어 = 이 판 전에 이 탄 별이 0. 보스탄은 두 배. */
       S.gainCoin = coinPlayed() ? coinForAdv(prevStars === 0, stars, !!p.boss) : 0;   /* 짝 0 판은 0 */
+      if (S.gainCoin > 0 && prevStars > 0 && !coinCapTake('re', COIN_RE_DAY_MAX)) S.gainCoin = 0;   /* 판정판 102 ① — 다시 깨기 코인은 하루 10판까지(11판째부터 0) */
       if (S.gainCoin > 0) coinGrant(S.gainCoin, 'adv');
       S.x2Token = (S.x2Token | 0) + 1;   /* P3 — 결과 창 2배는 판 끝마다 한 번 */
       store.advFails[key] = 0;
