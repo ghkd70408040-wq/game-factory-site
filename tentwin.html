@@ -10151,8 +10151,9 @@ html.no-art-logo .logo-img  { display: none; }
    ▣ 바깥 상자는 한 픽셀도 안 바뀐다 — box-sizing 이 border-box(:199) 라
      52×52 는 보더가 있든 없든 52×52 다. 랙 배치·간격은 그대로고, 대신 그림이
      안쪽 30px 이 아니라 52px 전체를 쓰게 되어 얼굴이 커진다.
-   ▣ --ui-chip / --ui-chip-on 은 **지우지 않는다** — .ci-chip(:8722)·.sk-th(:8072)
-     가 같은 변수를 쓴다. 여기서 참조만 끊는다(롤백은 아래 봉인 주석 한 쌍).
+   ▣ --ui-chip / --ui-chip-on 은 여기서 참조만 끊었다(롤백은 아래 봉인 주석 한 쌍).
+     [2026-10-10 rc1009b] 마지막 소비처 .sk-th 가 kit-slot-v2--portrait 로 옮겨(.ci-chip 은 이미 border-image:none)
+     CSS 소비처가 0 이다. 정의 삭제(매니페스트 · 허용 목록 · 관문 면제 정리와 함께)는 출시 뒤 정리 목록.
    구판 봉인(되돌리기는 이 두 규칙을 되살리고 아래 .ct-art/.cav 의 inset 을
    각각 -4px / -3px 로 돌리면 된다):
      .cp-th{ border:11px solid transparent; border-image:var(--ui-chip) 40 stretch;
@@ -10429,27 +10430,22 @@ html.no-art-logo .logo-img  { display: none; }
 .sk-bal { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 0 0 10px; font-size: 12px; font-weight: 800; color: var(--prim-art-ink-2); }
 .sk-bal-v { display: flex; align-items: center; gap: 4px; font-size: 15px; color: var(--prim-art-ink); }
 .sk-list { display: flex; flex-direction: column; gap: 8px; width: 100%; max-height: 46vh; overflow-y: auto; }
+/* [rc1009b · 사용자 2026-10-09] 줄 = kit-box-v2(모서리 · 테 · 면) · 그림 칸 = kit-slot-v2--portrait(폭 · 높이 · 모서리).
+   옛 연어 테 · 금테 빛(.on) · 예고 줄 흐림(.soon) · --ui-chip 조각 액자는 은퇴 — 착용 중 표시는 줄 오른쪽 알약 「착용 중」 하나다. */
 .sk-item {
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 8px 10px;
-  border-radius: 14px;
-  background: var(--mL-rim);
-  box-shadow: inset 0 0 0 2.5px var(--prim-art-salmon);
   text-align: left;
 }
-.sk-item.on { box-shadow: inset 0 0 0 3px var(--prim-art-gold), 0 0 12px rgba(255, 211, 74, .45); }
 .sk-th {
   flex: 0 0 auto;
-  width: 46px;
-  height: 50px;
-  border: 10px solid transparent;
-  border-image: var(--ui-chip) 40 stretch;
-  border-radius: 14px;
-  background: var(--sk-img, none) center 14% / auto 250% no-repeat,
-              linear-gradient(180deg, #FBE6D2 0%, var(--prim-art-plate) 100%);
-  background-clip: padding-box;
+}
+/* 그림 층은 .kit-slot-v2 의 background 보다 뒤에서 이겨야 해서 두 클래스로 잡는다(#charpanel .ci-chip 의 그림 규약과 같은 꼴). */
+.sk-th.kit-slot-v2 {
+  background: var(--sk-img, none) 50% 50% / cover no-repeat, var(--f2-slot);
+  overflow: hidden;
 }
 .sk-b { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .sk-n { font-family: var(--font-display); font-size: 14px; color: var(--prim-art-ink); word-break: keep-all; text-wrap: balance; }   /* [rc1009 수정 1회차 F-3] 어절 줄바꿈 · 고른 줄(한 글자 줄 0) */
@@ -10495,17 +10491,6 @@ html.no-art-logo .logo-img  { display: none; }
   --f2-pill-soft: linear-gradient(180deg, var(--role-mint-face-a) 0%, var(--role-mint-face-a) 47%, var(--role-mint-face-b) 47%, var(--role-mint-face-b) 100%);
   --f2-ink: var(--prim-white);
   --role-f2-pill-soft-e: var(--role-mint-outline);
-}
-.sk-item.soon { opacity: .72; }
-.sk-item.soon .sk-th { background: linear-gradient(180deg, #E7D3BA 0%, #D3B995 100%); }
-/* 14차 — 이미 프레이밍돼 구워진 그림(곰돌이 5색)은 여기서 다시 당기지 않는다.
-   위의 `auto 250% / center 14%` 는 시트 전신 크롭을 얼굴로 끌어올리려던 값이고,
-   176×194 아이콘에 걸면 머리 위 사탕 더미만 보인다 — 사탕은 다섯 색이 거의 같아서
-   정작 색이 갈리는 몸통이 잘려 나가면 다섯 칸을 눈으로 구분할 수 없다.
-   그림 층만 contain 으로 바꾸고 밑의 크림 그라디언트는 그대로 둔다. */
-.sk-th[data-fit="icon"] {
-  background-size: contain, auto;
-  background-position: center, center;
 }
 /* 14차 — 스킨 시트는 **캐릭터 패널 위에서** 열린다. 여는 버튼(#cp-skin)이 그
    패널 안에 있기 때문이다. 그런데 .modal 은 z-index 70 이고 #charpanel 은
@@ -16500,7 +16485,6 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
   </svg>
           <div class="cp-side-body">
             <div id="cp-item-list" class="cp-side-rack" role="group" data-i18n-aria="cp.items" aria-label="Items"></div>
-            <p id="cp-item-none" class="cp-item-none" data-i18n="cp.items.none">No items yet. Pop a gift box on an adventure.</p>
           </div>
         </aside>
         <div class="pick-row pick-mate">
@@ -27372,7 +27356,6 @@ window.TT_SFX = {
       'pet.axis.count': 'Harvest',
       'pet.axis.sweep': 'Sweep',
       'pet.axis.awaken': 'Skill',
-      'cp.items.none': 'No items yet. Pop a gift box in Adventure.',
       /* §11.6-B 아이템 12종. 한국어 쪽이 확정 시트의 정본이고, 여기는 그 번역이다. */
       'item.flint.nm': 'Spark Flint',
       'item.flint.fl': 'One small ember is enough to trigger a skill.',
@@ -28871,7 +28854,6 @@ window.TT_SFX = {
       'pet.axis.count': '수확',
       'pet.axis.sweep': '청소',
       'pet.axis.awaken': '스킬',
-      'cp.items.none': '아직 아이템이 없어요. 모험에서 선물 상자를 터뜨려 보세요.',
       /* §11.6-B 아이템 12종 — 이름·플레이버는 확정 시트 표 **그대로**다. */
       'item.flint.nm': '반짝 부싯돌',
       'item.flint.fl': '작은 불씨도 스킬엔 충분해.',
@@ -32997,16 +32979,15 @@ window.TT_SFX = {
     for (var i = 0; i < list.length; i++) {
       var sk = list[i];
       var row = document.createElement('div');
-      row.className = 'sk-item' + (sk.soon ? ' soon' : '') +
+      /* [rc1009b · 사용자 2026-10-09 「폐기되었던 인터페이스 에셋 … 바꾸라고」] 줄 = 캐릭터 화면 부품 — 판 kit-box-v2 · 그림 홈 kit-slot-v2--portrait
+         (펫 「추천 조합」 카드의 .ci-desc.kit-box-v2 + .ci-chip 초상 홈 선례). soon · on 은 뜻 표시용 클래스로만 남는다(겉모습 규칙 0 — 착용 중은 알약 하나).
+         그림 = 기본 줄은 캐릭터 화면 초상 칩과 같은 얼굴(stdArt thumb) · 그 밖은 상점 꾸미기 캡슐과 같은 얼굴(skinThumbCss) · 예고 줄은 빈 홈. */
+      row.className = 'sk-item kit-box-v2' + (sk.soon ? ' soon' : '') +
                       (cur && cur.id === sk.id ? ' on' : '');
       var th = document.createElement('span');
-      th.className = 'sk-th';
-      if (sk.img) th.style.setProperty('--sk-img', 'var(' + sk.img + ')');
-      /* 14차 — 이미 아이콘으로 구워진 그림은 화면이 다시 프레이밍하지 않는다.
-         .sk-th 기본값 `auto 250% / center 14%` 는 시트 전신 크롭을 얼굴로 당기려던
-         값이라, 여기 걸면 곰돌이 5색은 머리 위 사탕만 남고 정작 색이 갈리는 몸통이
-         잘려 다섯 칸이 서로 구분되지 않는다. */
-      if (sk.fit) th.setAttribute('data-fit', sk.fit);
+      th.className = 'sk-th kit-slot-v2 kit-slot-v2--portrait';
+      var art = /\.base$/.test(sk.id) ? stdArt(id, 'thumb') : skinThumbCss(sk.id);
+      if (art) th.style.setProperty('--sk-img', art);
       row.appendChild(th);
       var body = document.createElement('span');
       body.className = 'sk-b';
@@ -51379,8 +51360,7 @@ window.TT_SFX = {
       wrap.appendChild(cpItemCell('empty', ITEM_SLOTS[i % ITEM_SLOTS.length],
                                   '', '', '', '', ''));
     }
-    var em = $('cp-item-none');
-    if (em) em.hidden = !!n;
+    /* [rc1009b · 사용자 2026-10-09 「쓸데없이 글씨 넣지 마」] 보유 0 의 빈 안내 글(#cp-item-none · cp.items.none)은 은퇴 — 빈 칸만 선다. */
   }
 
   /** 칩 탭 = 장착 토글. 슬롯(무기/보조/장신구)당 한 개라, 같은 슬롯의 것을 새로
@@ -60109,16 +60089,8 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
    착수 전 이 자리에는 «세로 칩 목록»(.cp-item / .cp-item-list)이 랙 아래에
    따로 있었다 — 같은 보유 아이템을 랙(대표 젬)과 목록(칩)이 **두 벌**로
    그리던 것이다. 랙 하나로 합치고 칩 부품은 은퇴시켰다. 칸의 크기 ·
-   간격 · 액자는 랙 규칙(.cp-side-rack .cp-gem · .cp-crystal)이 그대로 낸다. */
-#charpanel .cp-side .cp-item-none {
-  margin: 0 calc(var(--f2-w) * .0180) calc(var(--f2-w) * .0180);
-  font-size: calc(var(--f2-w) * .026);
-  line-height: 1.3;
-  font-weight: 700;
-  color: var(--f2-ink);
-  text-align: center;
-}
-#charpanel .cp-side .cp-item-none[hidden] { display: none; }
+   간격 · 액자는 랙 규칙(.cp-side-rack .cp-gem · .cp-crystal)이 그대로 낸다.
+   [rc1009b · 사용자 2026-10-09] 보유 0 의 빈 안내 글(.cp-item-none)은 은퇴 — 그 규칙 둘을 지웠다. */
 
 /* ============================================================================
    하단 젤리 판 — kit-frame-v2 그대로. 자리만 여기서 잡는다.
@@ -60778,11 +60750,15 @@ html[lang="en"] #charpanel .ci-name { font-size: calc(var(--f2-w) * .050); }
      최장 글자(advance 35px)에도 좌우 3.5px 씩 남는다.
    ▣ 범위 — 캐릭창의 두 알약(.ci-tag-v · #cp-side-rec)만. 공용 킷
      .kit-pill-v2[data-variant="soft"] 자체(기록 값 등 다른 화면)는 안 건드린다.
-   봉인(되돌리기): 이 블록을 지우면 종전 «글자에 붙는 알약»으로 돌아간다. */
+   봉인(되돌리기): 이 블록을 지우면 종전 «글자에 붙는 알약»으로 돌아간다.
+   [rc1009b · 사용자 2026-10-09 「두근두근파 … 글씨 삐져나온 거」] 한 줄 고정(nowrap) — CV-13 이 글자를
+   ×1.249 키워 안전 상자 .1126W 가 모자랐다(「두근두근파」 0.5px). min-width 는 바닥값이라 긴 글자에서만
+   알약이 글자만큼 넓어진다. */
 #charpanel .ci-tag-v,
 #charpanel #cp-side-rec {
   min-width: var(--cs-pill-w);
   padding-inline: var(--cs-pill-px);
+  white-space: nowrap;
 }
 
 /* ---- 스탯 게이지 넷 (보석 자리 포함) ------------------------------------ */
@@ -61350,8 +61326,12 @@ html[lang="ko"] #charpanel .cs-tip { word-break: keep-all; overflow-wrap: anywhe
   height: calc(var(--f2-w) * .1347 * .42);
   border-radius: calc(var(--f2-w) * .0327 * .42);
 }
+/* [rc1009b 판정 2026-10-10] 조합 카드 이름 알약은 공용 알약 규칙의 한 줄 고정(nowrap)을 받지 않는다 — en 이름 줄
+   (「Pudding Knight」+「Soda Witch」)이 카드 폭에 안 들어가는 것은 74 부터의 결함이라 이름 줄 재설계 몫이고,
+   사용자 반려(레일 배지)에 들지 않는다. 그래서 이 카드는 eb9c0be 의 줄바꿈 그대로 둔다. */
 #charpanel .cp-rec .cp-rec-who .ci-tag-v {
   min-width: 0;
+  white-space: normal;
 }
 #charpanel .cp-rec .cp-rec-why {
   margin: 0;
@@ -66024,21 +66004,17 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
    알약은 글자 크기가 키우므로 글자만 같은 비율(x1.249)로 올린다. */
 #charpanel .cp-side-rec { font-size: calc(var(--f2-w) * .0273); }
 
-/* ---- CV-14. CV-1 부수효과 막기 — 레일 빈 안내문구 잘림 ------------
+/* ---- CV-14. CV-1 부수효과 막기 — 레일 판 내용 잘림 ------------
    CV-1 이 768x1389 에서 #charpanel 의 --f2-w 를 430 -> 735 로 올렸다. 글자는
    폭에 비례해 1.71배가 되는데 레일 높이는 화면 높이(1.65배)를 따라서,
-   «아직 아이템이 없어요…» 마지막 줄이 레일 판의 overflow:hidden
-   에 잘렸다(실렌더 확인). 잘리는 일 자체를 없앱니다:
-     · 문구 크기를 이 구간에서만 .026 -> .0190 (768 에서 14.0px)
-     · 레일 판(.cp-side-body)을 세로 스크롤 가능하게 — 어떤 비율에서도 글이
+   레일 판 내용이 판의 overflow:hidden 에 잘렸다(실렌더 확인). 잘리는 일 자체를 없앱니다:
+     · 레일 판(.cp-side-body)을 세로 스크롤 가능하게 — 어떤 비율에서도 내용이
        사라지지 않는다. [0910] 스크롤을 판이 지는 이유는 칸(.cp-islot)이
        눌리면 안 되기 때문이다(랙은 flex 0 0 auto).
+   [rc1009b] 빈 안내 글은 은퇴했다 — 그 글 크기를 줄이던 미디어 블록을 같이 지웠다.
    시안이 재는 자리(390 풀블리드)는 이 블록 밖이라 무변화다. */
 #charpanel .cp-side-body { overflow-y: auto; scrollbar-width: none; }
 #charpanel .cp-side-body::-webkit-scrollbar { width: 0; height: 0; }
-@media (min-width: 700px) and (orientation: portrait) {
-  #charpanel .cp-side .cp-item-none { font-size: calc(var(--f2-w) * .0150); }
-}
 /* ==== [CV-0901] (여기까지) ==== */
 
 /* ==== [CHARBG-0902] 캐릭터 선택창 배경 = 시작 화면 배경 아트 ==============
