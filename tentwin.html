@@ -16622,9 +16622,9 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
              인라인 SVG 가 넷 다 같은 이유도 그대로다 — 표준 4크롭이 data-art="std"
              로 SVG 를 통째로 덮으므로, SVG 는 그림이 도착하기 전 한 프레임과
              ART 블록이 없는 빌드만을 위한 폴백이다. 색은 .ch-<id> 가 준다.
-             ⚠ 그리드가 다섯 → **아홉 칸**이 됐다(동료 여덟 + 없음). flex 1 1 0
-             에 max 112px 이라 한 줄로는 390px 을 넘으므로, e3-catalog 블록의
-             `#mate-pick{flex-wrap:wrap}` 한 줄이 이 그리드를 두 줄로 접는다.
+             [rc1011 · 2026-10-11] 이 줄은 이제 ⑰ 캐러셀 트랙(#mate-pick.cp-track)이라 칸 수와
+             상관없이 5칸 창 안에서 넘긴다. 옛 서술(「아홉 칸 그리드를 e3-catalog 블록의
+             `#mate-pick{flex-wrap:wrap}` 이 두 줄로 접는다」 — 그 규칙은 이미 파일에 없다)은 은퇴.
              ============================================================ -->
         <button class="char-card kit-chip-v2 ch-mukmul" data-char="mukmul" type="button" role="radio" aria-checked="false">
           <svg class="cav" viewBox="0 0 44 46" aria-hidden="true" focusable="false">
@@ -52304,6 +52304,11 @@ window.TT_SFX = {
          * 따라 움직이면 그건 끌림이 아니라 떨림으로 읽힌다. */
         if (!drag && (Math.abs(dx) < 8 || Math.abs(dx) < Math.abs(dy) * 1.4)) return;
         drag = true;
+        /* [rc1011 수정 1회차 · 지휘자 판정 2026-10-11] 펫 탭에서는 끌림 피드백을 세우지 않는다. --cp-drag 를 읽는 것은
+         * 히어로 트랙(#char-pick)뿐이라 「없음」 이 가운데면 히어로가 대신 끌렸다(펫 그림은 안 따라온다). 펫 줄에는
+         * 화살표가 보여 끌림이 없어도 「안 되는 줄」로 읽히지 않는다 — 위 14차 주석이 끌림을 넣은 이유가 화살표 없음이었다.
+         * 펫 그림을 끌리게 하는 것은 새 모션(MOTION-SPEC §3 행 먼저)이라 출시 뒤 몫. 넘길지 말지는 그대로 touchend 가 정한다. */
+        if (cpTabCur === 'pet') return;
         /* 저항: 실제 이동의 절반만, 최대 ±64px. 트랙 끝에서도 같은 값이라
          * "여기가 끝"이라는 거짓말을 하지 않는다 — cpShow 는 순환이기 때문. */
         var px = dx * .5;
@@ -61578,9 +61583,10 @@ html[lang="ko"] #charpanel .cs-tip { word-break: keep-all; overflow-wrap: anywhe
 #charpanel[data-cptab="pet"] .cp-info > .ci:not(#cp-petinfo) { display: none; }
 #charpanel[data-cptab="pet"] .cp-rack { display: none; }
 #charpanel:not([data-cptab="pet"]) .pick-row.pick-mate { display: none; }
-/* [rc1011 · 2026-10-11 은퇴] P0(0905) 펫 줄 왼쪽 정렬 땜질(justify-content: flex-start) — 넘친 가로 스크롤 줄의
-   왼쪽 끝을 scrollLeft 0 에 닿게 하던 것. 펫 줄도 ⑰ 캐러셀(창 안 트랙 이동)이 되어 넘침 자체가 없다. */
-#charpanel[data-cptab="pet"] .pick-row.pick-mate { display: flex; }
+/* [rc1011 · 2026-10-11 은퇴] P0(0905) 펫 줄 왼쪽 정렬 땜질(`#charpanel[data-cptab="pet"] .pick-row.pick-mate
+   { display: flex; justify-content: flex-start; }`) — 넘친 가로 스크롤 줄의 왼쪽 끝을 scrollLeft 0 에 닿게 하던 것.
+   펫 줄도 ⑰ 캐러셀(창 안 트랙 이동)이 되어 넘침 자체가 없다. 남았던 display:flex 도 띠 공용 규칙이 이미 주는 값이라
+   지웠다(수정 1회차 · 숨김은 바로 위 :not([data-cptab="pet"]) 규칙이 한다). */
 
 /* ---- 바닥 두 버튼 -------------------------------------------------------- */
 #charpanel .cp-foot {
