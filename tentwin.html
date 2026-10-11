@@ -32918,9 +32918,10 @@ window.TT_SFX = {
     cpStage(cpIdx);
   }
 
-  /** ★ 유일한 선택 함수. 렌더 위치 pos 를 정중앙으로 옮긴다. how = 가운데를 바꾼 길(onCenter 에 그대로 — 펫 줄만 본다). */
+  /** ★ 유일한 선택 함수. 렌더 위치 pos 를 정중앙으로 옮긴다. how = 가운데를 바꾼 길 · prev = 바뀌기 전 논리 인덱스
+      (둘 다 onCenter 에 그대로 — 펫 줄만 본다). */
   function carSelectPos(c, pos, animate, how) {
-    var n = c.ids().length;
+    var n = c.ids().length, prev = c.getIdx();
     if (c.normT) { clearTimeout(c.normT); c.normT = 0; }
     /* 이동 전, 현재 위치를 가운데 벌로 순간 정규화한다(pos - mid 는 항상 n의
        배수라 같은 방울 · 안 보인다). 그래야 pos 가 [0,3n) 밖으로 새지 않는다. */
@@ -32938,7 +32939,7 @@ window.TT_SFX = {
     c.setIdx(((pos % n) + n) % n);
     carRing(c, pos);
     carTranslate(c, pos, animate);
-    c.onCenter(how);
+    c.onCenter(how, prev);
     if (animate) {
       c.normT = setTimeout(function () {
         c.normT = 0;
@@ -32981,20 +32982,22 @@ window.TT_SFX = {
   }
   function cpSeed(i) { carSeed(CP_CAR, i); }
 
-  /** [rc1011 · 지휘자 판정 C] 펫 줄의 「가운데가 바뀌었다」. how = 'seed'(열기 — 아무것도 안 바꾼다) ·
-      'nav'(화살표 · 키 · 무대 밀기) · 'tap'(방울 탭 = 고르기 시도).
-      가운데 = 구경(cpPetView) → 정보 판 → 가진 펫(또는 「없음」)이면 곧바로 장착(setMate) · 안 가진 펫은 구경만
-      (토스트 · 실패음 없음). 탭은 안 가진 펫에도 setMate 를 불러 종전 잠김 토스트 + 실패음을 낸다.
-      소리는 한 번 넘길 때 한 번: setMate 가 장착하며 ui()(+ 목소리)를 내거나 잠김 실패음을 내면 그것으로 끝, 아니면 여기서 ui(). */
-  function cpPetCenter(how) {
+  /** [rc1011 · 지휘자 판정 C · NEEDS_CONTEXT 답 2026-10-11] 펫 줄의 「가운데가 바뀌었다」.
+      how = 'seed'(열기 — 아무것도 안 바꾼다 · 토스트 0) · 'nav'(화살표 · 키 · 무대 밀기) · 'tap'(방울 탭) — 잠긴 펫은 네 길이 같다.
+      prev = 바뀌기 전 가운데(논리 인덱스). 가운데 = 구경(cpPetView) → 정보 판 → 가진 펫(또는 「없음」)이면 곧바로 장착(setMate).
+      안 가진 펫은 장착 그대로(setMate 를 안 부른다 — 그 잠김 실패음도 안 난다)이고, 가운데가 **바뀌었을 때만** 잠김 토스트 한 번
+      (petLockText — 같은 펫에 머무르는 재탭은 다시 안 띄운다). 정보 판의 사용 줄은 74 은퇴 그대로(설명판 넘침 0).
+      소리는 한 번 넘길 때 한 번: setMate 가 장착하며 ui()(+ 목소리)를 내면 그것으로 끝, 아니면 여기서 ui(). */
+  function cpPetCenter(how, prev) {
     if (how === 'seed') return;
-    var id = CP_PET_IDS[CP_PET.getIdx()] || '';
+    var idx = CP_PET.getIdx(), id = CP_PET_IDS[idx] || '';
     var owned = !id || petOwned(id);
-    var sounded = (owned && id !== mateId()) || (!owned && how === 'tap');
+    var equip = owned && id !== mateId();
     cpPetView = id;
     syncPetInfo();
-    if (owned || how === 'tap') setMate(id);
-    if (!sounded) J.sfx.ui();
+    if (owned) setMate(id);
+    else if (idx !== prev) toast(petLockText(id));
+    if (!equip) J.sfx.ui();
   }
 
   /** [rc1011] 키 · 무대 밀기 = 지금 탭의 줄을 d 칸. 펫 탭 = 펫 줄(소리는 cpPetCenter) · 캐릭터 탭 = 캐릭터 줄(종전 그대로). */
@@ -52198,7 +52201,8 @@ window.TT_SFX = {
       if (el) setChar(el.getAttribute('data-char'));
     });
     on($('mate-pick'), 'click', function (ev) {
-      /* [rc1011] 펫 방울 탭 = 그 방울이 정중앙으로(캐릭터 줄 탭과 같은 carSelectPos) + 고르기 시도.
+      /* [rc1011] 펫 방울 탭 = 그 방울이 정중앙으로(캐릭터 줄 탭과 같은 carSelectPos) — 가진 펫이면 장착, 잠긴 펫이면
+         가운데가 바뀔 때 잠김 토스트(화살표 · 밀기 · 키와 같다 · cpPetCenter).
          charsel v2 의 「구경을 먼저 세운다」(잠긴 펫의 기술도 판에 선다)는 cpPetCenter('tap') 이 그대로 한다. */
       if (now() - cpSwipeAt < 400) return;   /* 스와이프 직후의 합성 클릭 무시(캐릭터 줄 탭과 같다) */
       var el = pickTarget(ev, this);
@@ -61705,7 +61709,8 @@ html[lang="ko"] #charpanel .cs-tip { word-break: keep-all; overflow-wrap: anywhe
 #charpanel #mate-pick .char-card[aria-checked="true"] { transform: none; }
 /* [rc1011 · 2026-10-11] 잠긴 펫 방울도 탭을 받는다. 정본 칩의 .kit-chip-v2[aria-disabled="true"]{pointer-events:none} 이
    잠긴 펫(syncMateLocks 가 aria-disabled 를 단다)의 탭을 삼켜, setMate 의 잠김 토스트가 손가락에는 한 번도 안 났다
-   (56573aa 실측: 탭 자리 elementFromPoint = #mate-pick). 캐릭터 줄의 잠긴 방울처럼 탭 = 가운데로 + 잠김 토스트.
+   (56573aa 실측: 탭 자리 elementFromPoint = #mate-pick). 캐릭터 줄의 잠긴 방울처럼 탭 = 가운데로(+ 잠김 토스트 —
+   이제 setMate 가 아니라 cpPetCenter 가 가운데가 바뀔 때 한 번 띄운다).
    생김새(불투명도 · 바탕)는 그대로다. */
 #charpanel #mate-pick .char-card[aria-disabled="true"] { pointer-events: auto; }
 #charpanel .cp-th:active,
