@@ -2950,6 +2950,8 @@ en: {
 'skin.bearbluedesc': 'Clear sky-blue fur',
 'aria.charopen': 'Heroes: choose a character',
 'aria.prevchar': 'Previous character',
+'aria.prevpet': 'Previous pet',
+'aria.nextpet': 'Next pet',
 'aria.nextchar': 'Next character',
 'aria.close': 'Close',
 'char.ten.title': 'First Prince of Tentwin',
@@ -4067,6 +4069,8 @@ ko: {
 'skin.bearbluedesc': '맑은 하늘빛 털',
 'aria.charopen': '캐릭터 선택 열기',
 'aria.prevchar': '이전 캐릭터',
+'aria.prevpet': '이전 펫',
+'aria.nextpet': '다음 펫',
 'aria.nextchar': '다음 캐릭터',
 'aria.close': '닫기',
 'char.ten.title': '텐트윈 왕국의 첫째 왕자',
@@ -5423,18 +5427,49 @@ el.appendChild(av);
 }
 }
 }
-var cpPos = 0;
-var cpNormT = 0;
-function cpBuild() {
+var CP_CAR = {
+rack: function () { return $('cp-rack'); },
+win: function () { return $('cp-win'); },
+track: function () { return $('cp-track'); },
+ids: function () { return HERO_IDS; },
+build: cpBuildChar,
+onCenter: function () { cpTail(); },
+pos: 0, normT: 0,
+getIdx: function () { return cpIdx; },
+setIdx: function (v) { cpIdx = v; }
+};
+var CP_PET_IDS = MATE_IDS.concat(['']);    /* 지금 순서 그대로 — 펫 열 + 「없음」(끝) */
+var CP_PET = {
+rack: function () {
+return (typeof document !== 'undefined' && document.querySelector)
+? document.querySelector('#charpanel .pick-row.pick-mate') : null;
+},
+win: function () {
+var r = CP_PET.rack();
+return (r && r.querySelector) ? r.querySelector('.cp-win') : null;
+},
+track: function () { return $('mate-pick'); },
+ids: function () { return CP_PET_IDS; },
+build: cpPetBuild,
+onCenter: cpPetCenter,
+pos: 0, normT: 0, i: 0,
+getIdx: function () { return CP_PET.i; },
+setIdx: function (v) { CP_PET.i = v; }
+};
+function carBuild(c) {
 if (typeof document === 'undefined') return;
-var track = $('cp-track');
+var track = c.track();
 if (!track) return;
-var n = HERO_IDS.length;
-if (track.children && track.children.length === n * 3) return;
+var ids = c.ids();
+if (track.children && track.children.length === ids.length * 3) return;
+c.build(track, ids);
+}
+function cpBuildChar(track, ids) {
+var n = ids.length;
 track.innerHTML = '';
 for (var c = 0; c < 3; c++) {
 for (var i = 0; i < n; i++) {
-var id = HERO_IDS[i];
+var id = ids[i];
 var b = document.createElement('button');
 b.type = 'button';
 b.className = 'cp-th kit-chip-v2 ch-' + id;
@@ -5450,8 +5485,22 @@ track.appendChild(b);
 }
 }
 }
-function cpApplyRing(pos) {
-var track = $('cp-track');
+function cpBuild() { carBuild(CP_CAR); }
+function cpPetBuild(track, ids) {
+var orig = [], i, k;
+for (i = 0; i < ids.length; i++) {
+var el = track.querySelector('.char-card[data-char="' + ids[i] + '"]');
+if (!el) return;
+orig.push(el);
+}
+var frag = document.createDocumentFragment();
+for (k = 0; k < 3; k++) {
+for (i = 0; i < orig.length; i++) frag.appendChild(k === 1 ? orig[i] : orig[i].cloneNode(true));
+}
+track.appendChild(frag);
+}
+function carRing(c, pos) {
+var track = c.track();
 if (!track || !track.children) return;
 for (var k = 0; k < track.children.length; k++) {
 var b = track.children[k];
@@ -5460,8 +5509,8 @@ if (k === pos) { b.classList.add('cp-center'); if (b.setAttribute) b.setAttribut
 else { b.classList.remove('cp-center'); if (b.removeAttribute) b.removeAttribute('aria-current'); }
 }
 }
-function cpTranslate(pos, animate) {
-var track = $('cp-track'), win = $('cp-win');
+function carTranslate(c, pos, animate) {
+var track = c.track(), win = c.win();
 if (!track || !win || !win.clientWidth) return;
 var b = track.children[pos];
 if (!b) return;
@@ -5488,55 +5537,75 @@ if (go) go.textContent = heroUnlocked(HERO_IDS[cpIdx]) ? t('pick.go') : t('pick.
 syncSidePanes();
 cpStage(cpIdx);
 }
-function cpSelectPos(pos, animate) {
-var n = HERO_IDS.length;
-if (cpNormT) { clearTimeout(cpNormT); cpNormT = 0; }
-if (animate && $('cp-win') && $('cp-win').clientWidth) {
-var mid = (((cpPos % n) + n) % n) + n;
-if (cpPos !== mid) {
-var d0 = pos - cpPos;
-cpPos = mid; pos = mid + d0;
-cpApplyRing(cpPos);
-cpTranslate(cpPos, false);
+function carSelectPos(c, pos, animate, how) {
+var n = c.ids().length, prev = c.getIdx();
+if (c.normT) { clearTimeout(c.normT); c.normT = 0; }
+var win = c.win();
+if (animate && win && win.clientWidth) {
+var mid = (((c.pos % n) + n) % n) + n;
+if (c.pos !== mid) {
+var d0 = pos - c.pos;
+c.pos = mid; pos = mid + d0;
+carRing(c, c.pos);
+carTranslate(c, c.pos, false);
 }
 }
-cpPos = pos;
-cpIdx = ((pos % n) + n) % n;
-cpApplyRing(pos);
-cpTranslate(pos, animate);
-cpTail();
+c.pos = pos;
+c.setIdx(((pos % n) + n) % n);
+carRing(c, pos);
+carTranslate(c, pos, animate);
+c.onCenter(how, prev);
 if (animate) {
-cpNormT = setTimeout(function () {
-cpNormT = 0;
-var mid2 = cpIdx + n;
-if (cpPos !== mid2) { cpPos = mid2; cpApplyRing(mid2); cpTranslate(mid2, false); }
+c.normT = setTimeout(function () {
+c.normT = 0;
+var mid2 = c.getIdx() + n;
+if (c.pos !== mid2) { c.pos = mid2; carRing(c, mid2); carTranslate(c, mid2, false); }
 }, 200);
 }
 }
-function cpShow(i) {
+function cpSelectPos(pos, animate) { carSelectPos(CP_CAR, pos, animate); }
+function carShow(c, i, how) {
 closeStatTip();          /* [SI-0909] 카드가 바뀌면 앞 카드의 설명은 끝난 말이다 */
-var n = HERO_IDS.length;
+var n = c.ids().length;
 var target = ((i % n) + n) % n;
-var rack = $('cp-rack'), panel = $('charpanel'), track = $('cp-track');
+var rack = c.rack(), panel = $('charpanel'), track = c.track();
 var vis = panel && !panel.hidden && rack && rack.clientWidth > 0 &&
 track && track.children && track.children.length;
-if (!vis) { cpSeed(target); return; }
-var d = target - cpIdx;
+if (!vis) { carSeed(c, target); return; }
+var d = target - c.getIdx();
 while (d > n / 2) d -= n;
 while (d < -n / 2) d += n;
-cpSelectPos(cpPos + d, true);
+carSelectPos(c, c.pos + d, true, how);
 }
-function cpSeed(i) {
-closeStatTip();          /* [SI-0909] 위 cpShow 와 같은 이유 */
-var n = HERO_IDS.length;
+function cpShow(i) { carShow(CP_CAR, i); }
+function carSeed(c, i) {
+closeStatTip();          /* [SI-0909] 위 carShow 와 같은 이유 */
+var n = c.ids().length;
 var target = ((i % n) + n) % n;
-cpBuild();
-if (cpNormT) { clearTimeout(cpNormT); cpNormT = 0; }
-cpPos = target + n;
-cpIdx = target;
-cpApplyRing(cpPos);
-cpTranslate(cpPos, false);
-cpTail();
+carBuild(c);
+if (c.normT) { clearTimeout(c.normT); c.normT = 0; }
+c.pos = target + n;
+c.setIdx(target);
+carRing(c, c.pos);
+carTranslate(c, c.pos, false);
+c.onCenter('seed');
+}
+function cpSeed(i) { carSeed(CP_CAR, i); }
+function cpPetCenter(how, prev) {
+if (how === 'seed') return;
+var idx = CP_PET.getIdx(), id = CP_PET_IDS[idx] || '';
+var owned = !id || petOwned(id);
+var equip = owned && id !== mateId();
+cpPetView = id;
+syncPetInfo();
+if (owned) setMate(id);
+else if (idx !== prev) toast(petLockText(id));
+if (!equip) J.sfx.ui();
+}
+function cpStep(d) {
+if (cpTabCur === 'pet') { carShow(CP_PET, CP_PET.getIdx() + d, 'nav'); return; }
+cpShow(cpIdx + d);
+J.sfx.ui();
 }
 function openSettings() {
 var el = $('modal-settings');
@@ -5927,6 +5996,8 @@ var root = $('charpanel');
 cpTabCur = (k === 'pet') ? 'pet' : 'char';
 if (!root || !root.setAttribute) return;
 root.setAttribute('data-cptab', cpTabCur);
+var car = cpTabCur === 'pet' ? CP_PET : CP_CAR;
+carTranslate(car, car.pos, false);
 cpPetStage();             /* W-B ③ — 탭이 곧 무대의 주인을 바꾼다 */
 syncPetInfo();            /* charsel v2 — 펫 탭의 [패시브 스킬] 박스 */
 var tabs = root.querySelectorAll ? root.querySelectorAll('.cp-tab') : null;
@@ -6038,7 +6109,6 @@ cpTxt(uk.parentNode.querySelector('.cc-k'), 'cp.sk.lock');
 fitDesc($('cp-pet-desc'));
 fitDesc(comboRow);        /* 64-fix2 ⑥ — 추천 카드도 같은 「잘림 0」: 넘치면 글자를 줄인다(펫마다 다시 잰다) */
 cpPetStage();             /* 구경 중인 펫이 무대에도 선다(없으면 히어로) */
-cpCenterAll();
 }
 function fitDesc(el) {
 if (!el || !el.classList) return;
@@ -6053,25 +6123,6 @@ function fitAllDesc() {
 if (typeof document === 'undefined' || !document.querySelectorAll) return;
 var list = document.querySelectorAll('#charpanel .ci-desc');
 for (var i = 0; i < list.length; i++) fitDesc(list[i]);
-}
-function cpCenter(wrap, el) {
-if (!wrap || !el || !wrap.clientWidth) return;
-if (wrap.scrollWidth <= wrap.clientWidth) return;
-var x = el.offsetLeft + el.offsetWidth / 2 - wrap.clientWidth / 2;
-wrap.scrollLeft = Math.max(0, Math.min(x, wrap.scrollWidth - wrap.clientWidth));
-}
-function cpCenterAll() {
-if (typeof document === 'undefined' || !document.querySelector) return;
-var mrow = document.querySelector('#charpanel .pick-row.pick-mate');
-if (mrow) {
-var pid = cpPetId();
-if (!pid) {
-mrow.scrollLeft = 0;
-} else {
-cpCenter(mrow, document.querySelector('#mate-pick .char-card[data-char="' +
-pid + '"]') || mrow.querySelector('[aria-checked="true"]'));
-}
-}
 }
 function syncSidePanes() {
 var id = HERO_IDS[cpIdx] || charId();
@@ -6088,6 +6139,7 @@ syncSidePanes();          /* 레일 — 배지 + 아이템 칸 그리드 */
 syncCharPick();
 var cur = HERO_IDS.indexOf(charId());
 cpSeed(cur < 0 ? 0 : cur);   /* ⑰ 열 때는 애니 없이 정중앙 seed(가운데 벌) */
+carSeed(CP_PET, Math.max(0, CP_PET_IDS.indexOf(mateId())));   /* [rc1011] 펫 줄도 — 지금 장착한 펫(없으면 「없음」)을 순간 배치 */
 J.sfx.ui();
 }
 function closeCharPanel() {
@@ -17121,11 +17173,12 @@ var el = pickTarget(ev, this);
 if (el) setChar(el.getAttribute('data-char'));
 });
 on($('mate-pick'), 'click', function (ev) {
+if (now() - cpSwipeAt < 400) return;   /* 스와이프 직후의 합성 클릭 무시(캐릭터 줄 탭과 같다) */
 var el = pickTarget(ev, this);
 if (!el) return;
-cpPetView = el.getAttribute('data-char') || '';
-syncPetInfo();
-setMate(cpPetView);
+var pos = Array.prototype.indexOf.call(this.children, el);
+if (pos < 0) return;
+carSelectPos(CP_PET, pos, true, 'tap');
 });
 on($('cp-item-list'), 'click', function (ev) {
 var el = ev.target;
@@ -17157,8 +17210,7 @@ if (!panel || panel.hidden) return;
 var tag = ev.target && ev.target.tagName;
 if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
 ev.preventDefault();
-cpShow(cpIdx + (ev.key === 'ArrowRight' ? 1 : -1));
-J.sfx.ui();
+cpStep(ev.key === 'ArrowRight' ? 1 : -1);   /* [rc1011] 펫 탭 = 펫 줄 · 캐릭터 탭 = 캐릭터 줄 */
 });
 on($('charpanel'), 'click', function (ev) {
 closeStatTip();
@@ -17203,8 +17255,7 @@ if (!tc) return;
 var dx = tc.clientX - sx, dy = tc.clientY - sy;
 if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 1.4) return;
 cpSwipeAt = now();
-cpShow(cpIdx + (dx < 0 ? 1 : -1));
-J.sfx.ui();
+cpStep(dx < 0 ? 1 : -1);   /* [rc1011] 펫 탭 = 펫 줄 · 캐릭터 탭 = 캐릭터 줄 */
 }, { passive: true });
 on(view, 'touchcancel', function () {
 live = false; drag = false; setDrag($('charpanel'), null);
@@ -17234,6 +17285,8 @@ cutFinishAll();
 on($('cp-skin'), 'click', openSkins);
 on($('cp-prev'), 'click', function () { cpShow(cpIdx - 1); J.sfx.ui(); });
 on($('cp-next'), 'click', function () { cpShow(cpIdx + 1); J.sfx.ui(); });
+on($('cp-pet-prev'), 'click', function () { carShow(CP_PET, CP_PET.getIdx() - 1, 'nav'); });
+on($('cp-pet-next'), 'click', function () { carShow(CP_PET, CP_PET.getIdx() + 1, 'nav'); });
 on($('sk-close'), 'click', closeSkins);
 on($('cf-yes'), 'click', function () {
 var m = $('modal-confirm');

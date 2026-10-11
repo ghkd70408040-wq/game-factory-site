@@ -2833,17 +2833,8 @@ justify-content: center;          /* ⑧ 방울 줄을 캡슐 아래 가로중�
 gap: calc(var(--f2-w) * .018);
 margin: 0;
 padding: 0 calc(var(--f2-w) * .03);
-overflow-x: auto;
-overflow-y: hidden;
-scrollbar-width: none;
--ms-overflow-style: none;
--webkit-overflow-scrolling: touch;
 }
-#charpanel .cp-rack::-webkit-scrollbar,
-#charpanel .pick-row.pick-mate::-webkit-scrollbar { width: 0; height: 0; }
-#charpanel .pick-row.pick-mate > #mate-pick {
-display: contents;                 /* 칩 열한 개가 캐러셀의 직접 자식이 된다 */
-}
+#charpanel .cp-rack::-webkit-scrollbar { width: 0; height: 0; }
 #charpanel .pick-lab { display: none; }
 #app.battle #duel-baby,
 #app.classic #classic-hud #ch-baby,
@@ -2961,7 +2952,8 @@ z-index: 6;
 #charpanel .cp-arrow-r { right: var(--cs-arw-x); }
 #charpanel .cp-arrow:active { transform: translateY(-50%) scale(.92); }
 #charpanel .cp-dots  { display: none; }
-#charpanel .cp-rack { overflow: hidden; padding: 0; }
+#charpanel .cp-rack,
+#charpanel .pick-row.pick-mate { overflow: hidden; padding: 0; }
 #charpanel .cp-win {
 position: absolute;
 left: 50%;
@@ -3000,12 +2992,14 @@ inset 0 0 0 calc(var(--f2-w) * .0040) var(--f2-chip-line),
 0 0 0 calc(var(--f2-w) * .1307 * .022) var(--f2-hi),
 0 0 calc(var(--f2-w) * .1307 * .120) calc(var(--f2-w) * .1307 * .030) var(--role-f2-hi-halo);
 }
-#charpanel #cp-track .cp-th.cp-center {
+#charpanel #cp-track .cp-th.cp-center,
+#charpanel .pick-mate #mate-pick .char-card.cp-center {
 transform: scale(1.28);
 z-index: 2;
 transition: transform .16s var(--ease);
 }
-#charpanel #cp-track .cp-th[aria-current="true"] {
+#charpanel #cp-track .cp-th[aria-current="true"],
+#charpanel .pick-mate #mate-pick .char-card[aria-current="true"] {
 --f2-cd: calc(var(--f2-w) * .1307);
 box-shadow: inset 0 0 0 var(--f2-cring) var(--f2-chip-line);
 }
@@ -3919,7 +3913,7 @@ visibility: visible;
 #charpanel[data-cptab="pet"] .cp-info > .ci:not(#cp-petinfo) { display: none; }
 #charpanel[data-cptab="pet"] .cp-rack { display: none; }
 #charpanel:not([data-cptab="pet"]) .pick-row.pick-mate { display: none; }
-#charpanel[data-cptab="pet"] .pick-row.pick-mate { display: flex; justify-content: flex-start; }
+#charpanel[data-cptab="pet"] .pick-row.pick-mate { display: flex; }
 #charpanel .cp-foot {
 position: absolute;
 left:  calc(var(--f2-w) * .0361);
@@ -3984,10 +3978,9 @@ z-index: 0;
 }
 #charpanel .cp-stage > *:not(.cp-sky) { position: relative; z-index: 1; }
 }
-#charpanel .cp-th { --f2-cd: calc(var(--f2-w) * .1307); }
-#charpanel #mate-pick .char-card { --f2-cd: calc(var(--f2-w) * .1150); }
-#charpanel .cp-th[aria-current="true"],
-#charpanel #mate-pick .char-card[aria-checked="true"] {
+#charpanel .cp-th,
+#charpanel #mate-pick .char-card { --f2-cd: calc(var(--f2-w) * .1307); }
+#charpanel .cp-th[aria-current="true"] {
 --f2-cd: calc(var(--f2-w) * .1307 * 1.334);
 box-shadow:
 inset 0 0 0 var(--f2-cring) var(--f2-chip-line),
@@ -3995,9 +3988,8 @@ inset 0 0 0 var(--f2-cring) var(--f2-chip-line),
 0 0 calc(var(--f2-cd) * .103) calc(var(--f2-cd) * .022) var(--role-f2-hi-halo),
 0 calc(var(--f2-cd) * .025) calc(var(--f2-cd) * .06) var(--role-f2-cast);
 }
-#charpanel #mate-pick .char-card[aria-checked="true"] {
---f2-cd: calc(var(--f2-w) * .1150 * 1.334);
-}
+#charpanel #mate-pick .char-card[aria-checked="true"] { transform: none; }
+#charpanel #mate-pick .char-card[aria-disabled="true"] { pointer-events: auto; }
 #charpanel .cp-th:active,
 #charpanel #mate-pick .char-card:active { transform: translateY(calc(var(--f2-cd) * .02)); }
 #screen-menu .tagline,
@@ -5623,8 +5615,7 @@ rgba(255,255,255, var(--wchip-rim-p1)),
 inset 0 0 0 var(--wchip-rim-tc) rgba(255,255,255, var(--wchip-rim-p2)),
 inset 0 0 0 var(--wchip-rim-td) rgba(255,255,255, var(--wchip-rim-p3));
 }
-#charpanel .cp-th[aria-current="true"],
-#charpanel #mate-pick .char-card[aria-checked="true"]{
+#charpanel .cp-th[aria-current="true"]{
 box-shadow:
 inset 0 0 0 var(--wchip-L3-w) color-mix(in srgb, var(--wchip-L3-line)
 calc(var(--wchip-L3-a) * 100%), transparent),
