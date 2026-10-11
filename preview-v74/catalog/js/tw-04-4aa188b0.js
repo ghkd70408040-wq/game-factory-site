@@ -17242,6 +17242,7 @@ if (!tc) return;
 var dx = tc.clientX - sx, dy = tc.clientY - sy;
 if (!drag && (Math.abs(dx) < 8 || Math.abs(dx) < Math.abs(dy) * 1.4)) return;
 drag = true;
+if (cpTabCur === 'pet') return;
 var px = dx * .5;
 if (px > 64) px = 64; else if (px < -64) px = -64;
 setDrag($('charpanel'), px);
