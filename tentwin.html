@@ -10178,7 +10178,10 @@ html.no-art-logo .logo-img  { display: none; }
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
-.cp-th[aria-current="true"] {
+/* [rc1011 · 2026-10-11] 펫 줄 가운데 방울(#mate-pick … [aria-current])도 이 규칙에서 금빛 drop-shadow 를 받는다 —
+   캐릭터 가운데 방울과 같은 값 한 곳. 바탕 · 겉선은 두 줄 모두 뒤의 #charpanel 규칙이 덮어 filter 만 남는다(실측 같음). */
+.cp-th[aria-current="true"],
+#mate-pick .char-card[aria-current="true"] {
   background: var(--prim-art-plate);
   box-shadow: inset 0 0 0 2.5px var(--mL-outline);
   filter: drop-shadow(0 0 8px rgba(255, 211, 74, .75));
@@ -16489,7 +16492,14 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
         </aside>
         <div class="pick-row pick-mate">
         <span class="pick-lab" data-i18n="pick.mate">Pet</span>
-        <div id="mate-pick" role="radiogroup" data-i18n-aria="aria.matepick" aria-label="Choose your pet">
+        <!-- [rc1011 · 사용자 2026-10-11] 펫 줄 = ⑰ 캐러셀 부품의 둘째 인스턴스. 짜임은 위 #cp-rack 과 같다:
+             [이전 화살표] [5칸 창 .cp-win > 트랙] [금테 .cp-ring] [다음 화살표] — 화살표는 같은 부품(btn-charpanel-arrow).
+             트랙은 #mate-pick 그대로다(라디오 그룹 · 클릭 위임 · syncPickGroup · syncMateLocks 가 이 이름을 본다).
+             아래 방울 열한 개(펫 열 + 「없음」)가 원본이고 cpPetBuild() 가 양옆에 한 벌씩 복제해 3벌로 짓는다(순환).
+             옛 가로 스크롤 줄(넘친 끝 방울이 잘리던 것)은 은퇴. -->
+        <button id="cp-pet-prev" data-part="btn-charpanel-arrow" data-variant="l" class="cp-arrow cp-arrow-l" type="button" data-i18n-aria="aria.prevpet" aria-label="Previous pet"><svg class="cp-arw" viewBox="0 0 94.7 100" aria-hidden="true" focusable="false"><use href="#cpArwL" xlink:href="#cpArwL"/></svg></button>
+        <div class="cp-win">
+        <div id="mate-pick" class="cp-track" role="radiogroup" data-i18n-aria="aria.matepick" aria-label="Choose your pet">
         <button class="char-card kit-chip-v2 ch-ppyak" data-char="ppyak" type="button" role="radio" aria-checked="false">
           <svg class="cav" viewBox="0 0 44 46" aria-hidden="true" focusable="false">
             <g class="cav-puff"><circle cx="10" cy="17" r="7"/><circle cx="34" cy="17" r="7"/><circle cx="8" cy="30" r="7.5"/><circle cx="36" cy="30" r="7.5"/><circle cx="22" cy="10" r="7.5"/></g>
@@ -16702,6 +16712,9 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
           <span class="cc-pass" data-i18n="mate.none.pass">No pet</span>
         </button>
         </div>
+        </div>
+        <span class="cp-ring" aria-hidden="true"></span>
+        <button id="cp-pet-next" data-part="btn-charpanel-arrow" data-variant="r" class="cp-arrow cp-arrow-r" type="button" data-i18n-aria="aria.nextpet" aria-label="Next pet"><svg class="cp-arw" viewBox="0 0 94.7 100" aria-hidden="true" focusable="false"><use href="#cpArwR" xlink:href="#cpArwR"/></svg></button>
         </div>
       </div>
       <div class="cp-card kit-frame-v2">
@@ -28651,6 +28664,8 @@ window.TT_SFX = {
       'skin.bearbluedesc': 'Clear sky-blue fur',
       'aria.charopen': 'Heroes: choose a character',
       'aria.prevchar': 'Previous character',
+      'aria.prevpet': 'Previous pet',
+      'aria.nextpet': 'Next pet',
       'aria.nextchar': 'Next character',
       'aria.close': 'Close',
       'char.ten.title': 'First Prince of Tentwin',
@@ -30013,6 +30028,8 @@ window.TT_SFX = {
       'skin.bearbluedesc': '맑은 하늘빛 털',
       'aria.charopen': '캐릭터 선택 열기',
       'aria.prevchar': '이전 캐릭터',
+      'aria.prevpet': '이전 펫',
+      'aria.nextpet': '다음 펫',
       'aria.nextchar': '다음 캐릭터',
       'aria.close': '닫기',
       'char.ten.title': '텐트윈 왕국의 첫째 왕자',
@@ -32759,28 +32776,66 @@ window.TT_SFX = {
   }
 
   /* ⑰ (0904) 중앙 픽 캐러셀 — 상태·엔진.
-     ┌ cpIdx = 논리 선택(0..n-1, 저장 선택과 분리된 "구경" 값 · 종전 의미 그대로).
-     └ cpPos = 렌더 위치(0..3n-1) — 트랙(#cp-track)에서 지금 정중앙(금테 자리)에
+     [rc1011 · 사용자 2026-10-11] 부품 하나 · 인스턴스 둘. 엔진(car*)은 인스턴스 객체 하나만 받고, 인스턴스가 자기
+     요소(rack · win · track) · 항목(ids) · 방울 짓기(build) · 「가운데가 바뀌었다」(onCenter) · 상태(pos · normT · idx)를 든다.
+       CP_CAR = 캐릭터 줄(#cp-rack · HERO_IDS · idx 는 곧 cpIdx · onCenter = cpTail) — 종전 동작 그대로.
+       CP_PET = 펫 줄(.pick-row.pick-mate · MATE_IDS + 「없음」 · onCenter = cpPetCenter).
+     ┌ idx = 논리 선택(0..n-1, 저장 선택과 분리된 "구경" 값 · 캐릭터 줄은 종전 cpIdx 의미 그대로).
+     └ pos = 렌더 위치(0..3n-1) — 트랙에서 지금 정중앙(금테 자리)에
        온 방울. 방울을 3벌 복제(prev·main·next)해 어느 방향으로 밀어도 이웃 방울이
        늘 있어 순환이 끊기지 않는다. 한 벌(n칸)은 픽셀이 동일하므로, 가운데 벌 밖으로
-       샌 cpPos 를 n의 배수만큼 순간 이동(정규화)하면 눈에 안 보인다.
-     전환 진입점은 cpSelectPos() 하나다 — 화살표·드래그·스와이프·탭·키가 모두
-     이 함수를 부른다(선택 함수 공유 · 복제 0). */
-  var cpPos = 0;
-  var cpNormT = 0;
+       샌 pos 를 n의 배수만큼 순간 이동(정규화)하면 눈에 안 보인다.
+     전환 진입점은 carSelectPos() 하나다 — 화살표·드래그·스와이프·탭·키가 모두
+     이 함수를 부른다(선택 함수 공유 · 복제 0). 옛 이름 cpBuild · cpSelectPos · cpShow · cpSeed 는
+     캐릭터 인스턴스를 부르는 얇은 겉으로 남는다(부르는 곳 그대로). */
+  var CP_CAR = {
+    rack: function () { return $('cp-rack'); },
+    win: function () { return $('cp-win'); },
+    track: function () { return $('cp-track'); },
+    ids: function () { return HERO_IDS; },
+    build: cpBuildChar,
+    onCenter: function () { cpTail(); },
+    pos: 0, normT: 0,
+    getIdx: function () { return cpIdx; },
+    setIdx: function (v) { cpIdx = v; }
+  };
+  var CP_PET_IDS = MATE_IDS.concat(['']);    /* 지금 순서 그대로 — 펫 열 + 「없음」(끝) */
+  var CP_PET = {
+    rack: function () {
+      return (typeof document !== 'undefined' && document.querySelector)
+        ? document.querySelector('#charpanel .pick-row.pick-mate') : null;
+    },
+    win: function () {
+      var r = CP_PET.rack();
+      return (r && r.querySelector) ? r.querySelector('.cp-win') : null;
+    },
+    track: function () { return $('mate-pick'); },
+    ids: function () { return CP_PET_IDS; },
+    build: cpPetBuild,
+    onCenter: cpPetCenter,
+    pos: 0, normT: 0, i: 0,
+    getIdx: function () { return CP_PET.i; },
+    setIdx: function (v) { CP_PET.i = v; }
+  };
 
-  /** 트랙을 HERO_IDS 로 짓는다(3벌 = n*3 방울). 멱등 — 이미 서 있으면 그대로 둔다.
-      applySkins() 첫 줄에서 불러, 얼굴이 채워지기 전에 방울이 서 있게 한다. */
-  function cpBuild() {
+  /** 트랙을 짓는다(3벌 = n*3 방울). 멱등 — 이미 서 있으면 그대로 둔다. */
+  function carBuild(c) {
     if (typeof document === 'undefined') return;
-    var track = $('cp-track');
+    var track = c.track();
     if (!track) return;
-    var n = HERO_IDS.length;
-    if (track.children && track.children.length === n * 3) return;
+    var ids = c.ids();
+    if (track.children && track.children.length === ids.length * 3) return;
+    c.build(track, ids);
+  }
+
+  /** 캐릭터 방울 — HERO_IDS 로 3벌을 새로 짓는다. applySkins() 첫 줄(cpBuild)에서 불러,
+      얼굴이 채워지기 전에 방울이 서 있게 한다. */
+  function cpBuildChar(track, ids) {
+    var n = ids.length;
     track.innerHTML = '';
     for (var c = 0; c < 3; c++) {
       for (var i = 0; i < n; i++) {
-        var id = HERO_IDS[i];
+        var id = ids[i];
         var b = document.createElement('button');
         b.type = 'button';
         b.className = 'cp-th kit-chip-v2 ch-' + id;
@@ -32796,10 +32851,28 @@ window.TT_SFX = {
       }
     }
   }
+  function cpBuild() { carBuild(CP_CAR); }
 
-  /** 렌더 위치 pos 방울에 중앙 표식(금테는 #cp-ring 고정 · 크기는 .cp-center scale). */
-  function cpApplyRing(pos) {
-    var track = $('cp-track');
+  /** [rc1011] 펫 방울 — 마크업의 원본 열한 개를 ids 차례로 가운데 벌에 두고 양옆 벌은 복제한다.
+      방울 안에 id 가 없어 복제해도 문서 id 중복 0. 상태(aria-checked · .locked · .cc-lock)는 복제가 그대로 들고,
+      다음 syncPickGroup('mate-pick') · syncMateLocks() 가 #mate-pick 의 방울 전부(3벌)를 같이 맞춘다. */
+  function cpPetBuild(track, ids) {
+    var orig = [], i, k;
+    for (i = 0; i < ids.length; i++) {
+      var el = track.querySelector('.char-card[data-char="' + ids[i] + '"]');
+      if (!el) return;
+      orig.push(el);
+    }
+    var frag = document.createDocumentFragment();
+    for (k = 0; k < 3; k++) {
+      for (i = 0; i < orig.length; i++) frag.appendChild(k === 1 ? orig[i] : orig[i].cloneNode(true));
+    }
+    track.appendChild(frag);
+  }
+
+  /** 렌더 위치 pos 방울에 중앙 표식(금테는 .cp-ring 고정 · 크기는 .cp-center scale). */
+  function carRing(c, pos) {
+    var track = c.track();
     if (!track || !track.children) return;
     for (var k = 0; k < track.children.length; k++) {
       var b = track.children[k];
@@ -32811,13 +32884,13 @@ window.TT_SFX = {
 
   /** pos 방울이 뷰포트 정중앙에 오도록 트랙만 translateX. scale 은 레이아웃을 안
       바꾸므로 offsetLeft 측정이 안정적이다. animate=false = 순간(정규화·열기). */
-  function cpTranslate(pos, animate) {
-    var track = $('cp-track'), win = $('cp-win');
+  function carTranslate(c, pos, animate) {
+    var track = c.track(), win = c.win();
     if (!track || !win || !win.clientWidth) return;
     var b = track.children[pos];
     if (!b) return;
-    /* 중앙 기준은 이제 가시 창(#cp-win)이다 — 트랙의 offsetParent 이고, 방울을
-       이 창의 정중앙에 실어야 금테(#cp-ring, 랙=창 정중앙)와 정확히 맞는다. */
+    /* 중앙 기준은 가시 창(.cp-win)이다 — 트랙의 offsetParent 이고, 방울을
+       이 창의 정중앙에 실어야 금테(.cp-ring, 랙=창 정중앙)와 정확히 맞는다. */
     var tx = win.clientWidth / 2 - (b.offsetLeft + b.offsetWidth / 2);
     track.style.transition = animate ? 'transform .16s var(--ease)' : 'none';
     track.style.transform = 'translateX(' + tx.toFixed(2) + 'px)';
@@ -32845,63 +32918,90 @@ window.TT_SFX = {
     cpStage(cpIdx);
   }
 
-  /** ★ 유일한 선택 함수. 렌더 위치 pos 를 정중앙으로 옮긴다. */
-  function cpSelectPos(pos, animate) {
-    var n = HERO_IDS.length;
-    if (cpNormT) { clearTimeout(cpNormT); cpNormT = 0; }
-    /* 이동 전, 현재 위치를 가운데 벌로 순간 정규화한다(cpPos - mid 는 항상 n의
+  /** ★ 유일한 선택 함수. 렌더 위치 pos 를 정중앙으로 옮긴다. how = 가운데를 바꾼 길(onCenter 에 그대로 — 펫 줄만 본다). */
+  function carSelectPos(c, pos, animate, how) {
+    var n = c.ids().length;
+    if (c.normT) { clearTimeout(c.normT); c.normT = 0; }
+    /* 이동 전, 현재 위치를 가운데 벌로 순간 정규화한다(pos - mid 는 항상 n의
        배수라 같은 방울 · 안 보인다). 그래야 pos 가 [0,3n) 밖으로 새지 않는다. */
-    if (animate && $('cp-win') && $('cp-win').clientWidth) {
-      var mid = (((cpPos % n) + n) % n) + n;
-      if (cpPos !== mid) {
-        var d0 = pos - cpPos;
-        cpPos = mid; pos = mid + d0;
-        cpApplyRing(cpPos);
-        cpTranslate(cpPos, false);
+    var win = c.win();
+    if (animate && win && win.clientWidth) {
+      var mid = (((c.pos % n) + n) % n) + n;
+      if (c.pos !== mid) {
+        var d0 = pos - c.pos;
+        c.pos = mid; pos = mid + d0;
+        carRing(c, c.pos);
+        carTranslate(c, c.pos, false);
       }
     }
-    cpPos = pos;
-    cpIdx = ((pos % n) + n) % n;
-    cpApplyRing(pos);
-    cpTranslate(pos, animate);
-    cpTail();
+    c.pos = pos;
+    c.setIdx(((pos % n) + n) % n);
+    carRing(c, pos);
+    carTranslate(c, pos, animate);
+    c.onCenter(how);
     if (animate) {
-      cpNormT = setTimeout(function () {
-        cpNormT = 0;
-        var mid2 = cpIdx + n;
-        if (cpPos !== mid2) { cpPos = mid2; cpApplyRing(mid2); cpTranslate(mid2, false); }
+      c.normT = setTimeout(function () {
+        c.normT = 0;
+        var mid2 = c.getIdx() + n;
+        if (c.pos !== mid2) { c.pos = mid2; carRing(c, mid2); carTranslate(c, mid2, false); }
       }, 200);
     }
   }
+  function cpSelectPos(pos, animate) { carSelectPos(CP_CAR, pos, animate); }
 
   /** 논리 인덱스 i 로 고른다(외부·화살표·키·스와이프의 진입점). 지금 중앙에서
-      가장 가까운 벌로 최단 순환 거리만큼 이동한다. 패널이 닫혀 있으면 순간 배치. */
-  function cpShow(i) {
+      가장 가까운 벌로 최단 순환 거리만큼 이동한다. 줄이 안 보이면(창 닫힘 · 다른 탭) 순간 배치. */
+  function carShow(c, i, how) {
     closeStatTip();          /* [SI-0909] 카드가 바뀌면 앞 카드의 설명은 끝난 말이다 */
-    var n = HERO_IDS.length;
+    var n = c.ids().length;
     var target = ((i % n) + n) % n;
-    var rack = $('cp-rack'), panel = $('charpanel'), track = $('cp-track');
+    var rack = c.rack(), panel = $('charpanel'), track = c.track();
     var vis = panel && !panel.hidden && rack && rack.clientWidth > 0 &&
               track && track.children && track.children.length;
-    if (!vis) { cpSeed(target); return; }
-    var d = target - cpIdx;
+    if (!vis) { carSeed(c, target); return; }
+    var d = target - c.getIdx();
     while (d > n / 2) d -= n;
     while (d < -n / 2) d += n;
-    cpSelectPos(cpPos + d, true);
+    carSelectPos(c, c.pos + d, true, how);
   }
+  function cpShow(i) { carShow(CP_CAR, i); }
 
   /** 순간 배치(열기·부팅). 가운데 벌에 정본을 세운다 — 애니메이션 없이. */
-  function cpSeed(i) {
-    closeStatTip();          /* [SI-0909] 위 cpShow 와 같은 이유 */
-    var n = HERO_IDS.length;
+  function carSeed(c, i) {
+    closeStatTip();          /* [SI-0909] 위 carShow 와 같은 이유 */
+    var n = c.ids().length;
     var target = ((i % n) + n) % n;
-    cpBuild();
-    if (cpNormT) { clearTimeout(cpNormT); cpNormT = 0; }
-    cpPos = target + n;
-    cpIdx = target;
-    cpApplyRing(cpPos);
-    cpTranslate(cpPos, false);
-    cpTail();
+    carBuild(c);
+    if (c.normT) { clearTimeout(c.normT); c.normT = 0; }
+    c.pos = target + n;
+    c.setIdx(target);
+    carRing(c, c.pos);
+    carTranslate(c, c.pos, false);
+    c.onCenter('seed');
+  }
+  function cpSeed(i) { carSeed(CP_CAR, i); }
+
+  /** [rc1011 · 지휘자 판정 C] 펫 줄의 「가운데가 바뀌었다」. how = 'seed'(열기 — 아무것도 안 바꾼다) ·
+      'nav'(화살표 · 키 · 무대 밀기) · 'tap'(방울 탭 = 고르기 시도).
+      가운데 = 구경(cpPetView) → 정보 판 → 가진 펫(또는 「없음」)이면 곧바로 장착(setMate) · 안 가진 펫은 구경만
+      (토스트 · 실패음 없음). 탭은 안 가진 펫에도 setMate 를 불러 종전 잠김 토스트 + 실패음을 낸다.
+      소리는 한 번 넘길 때 한 번: setMate 가 장착하며 ui()(+ 목소리)를 내거나 잠김 실패음을 내면 그것으로 끝, 아니면 여기서 ui(). */
+  function cpPetCenter(how) {
+    if (how === 'seed') return;
+    var id = CP_PET_IDS[CP_PET.getIdx()] || '';
+    var owned = !id || petOwned(id);
+    var sounded = (owned && id !== mateId()) || (!owned && how === 'tap');
+    cpPetView = id;
+    syncPetInfo();
+    if (owned || how === 'tap') setMate(id);
+    if (!sounded) J.sfx.ui();
+  }
+
+  /** [rc1011] 키 · 무대 밀기 = 지금 탭의 줄을 d 칸. 펫 탭 = 펫 줄(소리는 cpPetCenter) · 캐릭터 탭 = 캐릭터 줄(종전 그대로). */
+  function cpStep(d) {
+    if (cpTabCur === 'pet') { carShow(CP_PET, CP_PET.getIdx() + d, 'nav'); return; }
+    cpShow(cpIdx + d);
+    J.sfx.ui();
   }
 
   /* =========================================================================
@@ -33437,6 +33537,10 @@ window.TT_SFX = {
     cpTabCur = (k === 'pet') ? 'pet' : 'char';
     if (!root || !root.setAttribute) return;
     root.setAttribute('data-cptab', cpTabCur);
+    /* [rc1011] 숨어 있던 줄은 창 폭이 0 이라 가운데를 못 쟀다 — 드러난 줄을 제자리(pos)에 순간 배치로
+       다시 맞춘다(탭을 바꿔도 각 줄의 가운데는 그대로 · 이미 맞으면 같은 값). */
+    var car = cpTabCur === 'pet' ? CP_PET : CP_CAR;
+    carTranslate(car, car.pos, false);
     cpPetStage();             /* W-B ③ — 탭이 곧 무대의 주인을 바꾼다 */
     syncPetInfo();            /* charsel v2 — 펫 탭의 [패시브 스킬] 박스 */
     var tabs = root.querySelectorAll ? root.querySelectorAll('.cp-tab') : null;
@@ -33630,7 +33734,6 @@ window.TT_SFX = {
     fitDesc($('cp-pet-desc'));
     fitDesc(comboRow);        /* 64-fix2 ⑥ — 추천 카드도 같은 「잘림 0」: 넘치면 글자를 줄인다(펫마다 다시 잰다) */
     cpPetStage();             /* 구경 중인 펫이 무대에도 선다(없으면 히어로) */
-    cpCenterAll();
   }
 
   /**
@@ -33653,33 +33756,8 @@ window.TT_SFX = {
     for (var i = 0; i < list.length; i++) fitDesc(list[i]);
   }
 
-  /** 캐러셀에서 지금 것이 가운데 오게 한다. scrollLeft 만 만진다(레이아웃 0). */
-  function cpCenter(wrap, el) {
-    if (!wrap || !el || !wrap.clientWidth) return;
-    if (wrap.scrollWidth <= wrap.clientWidth) return;
-    var x = el.offsetLeft + el.offsetWidth / 2 - wrap.clientWidth / 2;
-    wrap.scrollLeft = Math.max(0, Math.min(x, wrap.scrollWidth - wrap.clientWidth));
-  }
-  function cpCenterAll() {
-    if (typeof document === 'undefined' || !document.querySelector) return;
-    /* ⑰ — 캐릭터 방울 줄(#cp-rack)의 센터링은 이제 트랙 transform(cpTranslate)이
-       전담한다. 여기서는 스크롤을 만지지 않는다(overflow:hidden 이라 무의미하고,
-       프로그램적 scrollLeft 가 transform 센터와 충돌할 여지를 없앤다). 펫 줄만 센터. */
-    var mrow = document.querySelector('#charpanel .pick-row.pick-mate');
-    if (mrow) {
-      var pid = cpPetId();
-      if (!pid) {
-        /* P0(0905) '없음'(기본값)일 때는 가운데 맞추지 않고 맨 앞으로 돌린다.
-           '없음' 카드가 목록 **끝**이라 그것을 센터에 두면 scrollLeft 가 끝까지
-           밀려 보유 펫(맨 앞 삐약·뭉치)이 왼쪽으로 사라진다. 맨 앞으로 두면
-           보유 펫이 곧바로 보인다(고른 펫이 있으면 아래 else 가 그것을 센터). */
-        mrow.scrollLeft = 0;
-      } else {
-        cpCenter(mrow, document.querySelector('#mate-pick .char-card[data-char="' +
-                 pid + '"]') || mrow.querySelector('[aria-checked="true"]'));
-      }
-    }
-  }
+  /* [rc1011 · 2026-10-11 은퇴] cpCenter() · cpCenterAll() — 펫 가로 스크롤 줄을 scrollLeft 로 가운데 맞추던 둘
+     (P0 0905 「없음」이면 맨 앞으로 갈래 포함). 펫 줄도 ⑰ 캐러셀이 되어 가운데는 carTranslate 가 정한다. */
 
   /** 레일의 내용. 배지 한 줄과 아이템 칸 그리드가 전부다.
    *
@@ -33703,6 +33781,7 @@ window.TT_SFX = {
     syncCharPick();
     var cur = HERO_IDS.indexOf(charId());
     cpSeed(cur < 0 ? 0 : cur);   /* ⑰ 열 때는 애니 없이 정중앙 seed(가운데 벌) */
+    carSeed(CP_PET, Math.max(0, CP_PET_IDS.indexOf(mateId())));   /* [rc1011] 펫 줄도 — 지금 장착한 펫(없으면 「없음」)을 순간 배치 */
     J.sfx.ui();
   }
 
@@ -52119,14 +52198,14 @@ window.TT_SFX = {
       if (el) setChar(el.getAttribute('data-char'));
     });
     on($('mate-pick'), 'click', function (ev) {
+      /* [rc1011] 펫 방울 탭 = 그 방울이 정중앙으로(캐릭터 줄 탭과 같은 carSelectPos) + 고르기 시도.
+         charsel v2 의 「구경을 먼저 세운다」(잠긴 펫의 기술도 판에 선다)는 cpPetCenter('tap') 이 그대로 한다. */
+      if (now() - cpSwipeAt < 400) return;   /* 스와이프 직후의 합성 클릭 무시(캐릭터 줄 탭과 같다) */
       var el = pickTarget(ev, this);
       if (!el) return;
-      /* charsel v2 — 탭 한 번이 **구경**이자 결정이다. 구경을 먼저 세우는 것이
-         요점: setMate 는 잠긴 펫을 거절하므로, 이 두 줄이 없으면 잠긴 펫의
-         기술은 화면 어디에도 나타날 수 없다. */
-      cpPetView = el.getAttribute('data-char') || '';
-      syncPetInfo();
-      setMate(cpPetView);
+      var pos = Array.prototype.indexOf.call(this.children, el);
+      if (pos < 0) return;
+      carSelectPos(CP_PET, pos, true, 'tap');
     });
     /* WD-2 §11.6-B — 아이템 칩. 목록을 JS 가 다시 그리므로(syncItemList) 칩마다
        리스너를 달면 갈아 끼울 때마다 새로 달아야 한다. 위임 한 줄이면 그 문제가
@@ -52176,8 +52255,7 @@ window.TT_SFX = {
       var tag = ev.target && ev.target.tagName;
       if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
       ev.preventDefault();
-      cpShow(cpIdx + (ev.key === 'ArrowRight' ? 1 : -1));
-      J.sfx.ui();
+      cpStep(ev.key === 'ArrowRight' ? 1 : -1);   /* [rc1011] 펫 탭 = 펫 줄 · 캐릭터 탭 = 캐릭터 줄 */
     });
     /* 바깥(어둠) 탭으로 닫기 — 시트 안의 탭은 .cp-frame 에서 멈춘다. */
     on($('charpanel'), 'click', function (ev) {
@@ -52237,8 +52315,7 @@ window.TT_SFX = {
         var dx = tc.clientX - sx, dy = tc.clientY - sy;
         if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 1.4) return;
         cpSwipeAt = now();
-        cpShow(cpIdx + (dx < 0 ? 1 : -1));
-        J.sfx.ui();
+        cpStep(dx < 0 ? 1 : -1);   /* [rc1011] 펫 탭 = 펫 줄 · 캐릭터 탭 = 캐릭터 줄 */
       }, { passive: true });
       /* 전화가 오거나 시스템 제스처가 끼어들면 touchend 가 안 온다. 그때 트랙이
        * 끌린 채로 굳지 않도록 취소도 같은 자리에서 되돌린다. */
@@ -52283,6 +52360,10 @@ window.TT_SFX = {
        화살표도 같은 함수를 부른다(새 선택 경로·복제 0). */
     on($('cp-prev'), 'click', function () { cpShow(cpIdx - 1); J.sfx.ui(); });
     on($('cp-next'), 'click', function () { cpShow(cpIdx + 1); J.sfx.ui(); });
+    /* [rc1011 · 사용자 2026-10-11] 펫 줄 화살표 — 같은 부품 · 같은 선택 함수(carShow → carSelectPos).
+       소리는 cpPetCenter 가 낸다(장착할 때 setMate 소리와 겹치지 않게). */
+    on($('cp-pet-prev'), 'click', function () { carShow(CP_PET, CP_PET.getIdx() - 1, 'nav'); });
+    on($('cp-pet-next'), 'click', function () { carShow(CP_PET, CP_PET.getIdx() + 1, 'nav'); });
     on($('sk-close'), 'click', closeSkins);
     /* 출시 점검 0909 ① — 확인 창의 두 버튼. X 는 data-w6x="cf-no" 로 이 [취소]
        버튼을 그대로 누르므로(§W6 위임) 배선이 하나 더 늘지 않는다.
@@ -59748,17 +59829,13 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   gap: calc(var(--f2-w) * .018);
   margin: 0;
   padding: 0 calc(var(--f2-w) * .03);
-  overflow-x: auto;
-  overflow-y: hidden;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  -webkit-overflow-scrolling: touch;
+  /* [rc1011 · 2026-10-11 은퇴] 가로 스크롤 다섯 줄(overflow-x auto · overflow-y hidden · scrollbar-width none ·
+     -ms-overflow-style none · -webkit-overflow-scrolling touch). 두 줄 모두 ⑰ 창(.cp-win)이 넘침을 자른다(아래
+     overflow:hidden) — 캐릭터 줄에는 ⑰ 부터 덮여 죽어 있었고, 펫 줄은 이 스크롤 때문에 끝 방울이 잘려 보였다. */
 }
-#charpanel .cp-rack::-webkit-scrollbar,
-#charpanel .pick-row.pick-mate::-webkit-scrollbar { width: 0; height: 0; }
-#charpanel .pick-row.pick-mate > #mate-pick {
-  display: contents;                 /* 칩 열한 개가 캐러셀의 직접 자식이 된다 */
-}
+#charpanel .cp-rack::-webkit-scrollbar { width: 0; height: 0; }
+/* [rc1011 · 2026-10-11 은퇴] 펫 줄 스크롤 막대 숨김 · `#mate-pick { display: contents }`(칩 열한 개를 띠의 직접 자식으로) —
+   #mate-pick 은 이제 펫 줄 창(.cp-win) 안의 트랙(.cp-track)이다. */
 #charpanel .pick-lab { display: none; }
 
 /* 칩 = kit-chip-v2. 초상은 --char-face / --pet-face 가 채운다. */
@@ -59955,9 +60032,12 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
 #charpanel .cp-dots  { display: none; }
 
 /* ⑰ (0904) 중앙 픽 캐러셀 — 뷰포트(#cp-rack)는 고정, 트랙(#cp-track)만 이동한다.
-   방울은 cpBuild()가 3벌 복제해 지으며(순환 무결), cpTranslate 가 고른 방울을
-   정중앙(금테 #cp-ring 자리)으로 translateX 한다. */
-#charpanel .cp-rack { overflow: hidden; padding: 0; }
+   방울은 cpBuild()가 3벌 복제해 지으며(순환 무결), carTranslate 가 고른 방울을
+   정중앙(금테 #cp-ring 자리)으로 translateX 한다.
+   [rc1011 · 2026-10-11] 펫 줄(.pick-row.pick-mate)은 같은 부품의 둘째 인스턴스 — 창 · 트랙 · 금테 · 화살표가
+   아래 같은 클래스 규칙(.cp-win · .cp-track · .cp-ring · .cp-arrow)에서 값을 받는다. */
+#charpanel .cp-rack,
+#charpanel .pick-row.pick-mate { overflow: hidden; padding: 0; }
 /* 가시 창 = 정확히 방울 5슬롯(5×.1307W + 4×gap) + 아주 작은 여유(.010W)로 5번째
    방울이 서브픽셀로 잘리지 않게. 랙 정중앙에 두고 overflow:hidden 이 6번째 방울을
    정지 상태에서 잘라 낸다(부분 방울 0 · 이동 중에만 들어옴). 창 폭(≈.784W)과 랙
@@ -59985,7 +60065,7 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   gap: calc(var(--f2-w) * .030);
   z-index: 1;
   will-change: transform;
-  /* transform·transition 은 JS(cpTranslate)가 인라인으로 — 이동할 때만 애니(160ms) */
+  /* transform·transition 은 JS(carTranslate)가 인라인으로 — 이동할 때만 애니(160ms) */
 }
 #charpanel #cp-track .cp-th { flex: 0 0 auto; }
 /* 금테는 정중앙에 고정된 오버레이가 그린다("금테 중앙 고정 · 방울이 그 안으로"). */
@@ -60004,16 +60084,22 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
     0 0 0 calc(var(--f2-w) * .1307 * .022) var(--f2-hi),
     0 0 calc(var(--f2-w) * .1307 * .120) calc(var(--f2-w) * .1307 * .030) var(--role-f2-hi-halo);
 }
-/* 정중앙 방울만 살짝 크게 — scale 은 레이아웃을 안 바꿔 offsetLeft 측정이 안정적. */
-#charpanel #cp-track .cp-th.cp-center {
+/* 정중앙 방울만 살짝 크게 — scale 은 레이아웃을 안 바꿔 offsetLeft 측정이 안정적.
+   [rc1011 · 2026-10-11] 펫 줄 방울도 같은 규칙. 펫 선택자에 .pick-mate 를 하나 더 끼운 것은 특이성 때문이다 —
+   펫 눌림 규칙(#charpanel #mate-pick .char-card:active, 2-2-0)이 뒤에 와서 같은 2-2-0 이면 가운데 방울을 누르는 동안
+   배율이 풀린다. 캐릭터 가운데 방울은 눌려도 배율 그대로라 그 동작에 맞춘다(2-3-0). */
+#charpanel #cp-track .cp-th.cp-center,
+#charpanel .pick-mate #mate-pick .char-card.cp-center {
   transform: scale(1.28);
   z-index: 2;
   transition: transform .16s var(--ease);
 }
 /* 트랙 안에서는 aria-current 의 크기 확대·금테 box-shadow 를 끈다(크기는 위 scale,
-   금테는 #cp-ring). 특이성으로 공용 규칙(#charpanel .cp-th[aria-current])만 이기고
-   펫 줄(#mate-pick)은 건드리지 않는다. */
-#charpanel #cp-track .cp-th[aria-current="true"] {
+   금테는 #cp-ring). 특이성으로 공용 규칙(#charpanel .cp-th[aria-current])만 이긴다.
+   [rc1011 · 2026-10-11] 종전 「펫 줄(#mate-pick)은 건드리지 않는다」 — 펫 줄도 이제 같은 캐러셀이라 가운데 방울
+   (aria-current)이 같은 겉선 한 줄을 받는다(금테는 펫 줄의 .cp-ring). */
+#charpanel #cp-track .cp-th[aria-current="true"],
+#charpanel .pick-mate #mate-pick .char-card[aria-current="true"] {
   --f2-cd: calc(var(--f2-w) * .1307);
   box-shadow: inset 0 0 0 var(--f2-cring) var(--f2-chip-line);
 }
@@ -61488,14 +61574,9 @@ html[lang="ko"] #charpanel .cs-tip { word-break: keep-all; overflow-wrap: anywhe
 #charpanel[data-cptab="pet"] .cp-info > .ci:not(#cp-petinfo) { display: none; }
 #charpanel[data-cptab="pet"] .cp-rack { display: none; }
 #charpanel:not([data-cptab="pet"]) .pick-row.pick-mate { display: none; }
-/* P0(0905) 펫 줄은 flex-start 로 편다. 공유 밴드 규칙(#charpanel .cp-rack,
-   .pick-row.pick-mate)은 justify-content:center 인데, 펫 카드 11장(펫 10 + 없음)이
-   밴드 폭(374px)을 넘어 넘칠 때 center 는 넘친 왼쪽 끝을 scrollLeft 로도 못 닿게
-   가둔다(실측: scrollLeft 0 에서도 삐약 x=-82). 그래서 보유 펫(맨 앞 삐약·뭉치)이
-   화면 밖으로 사라져 "펫이 전부 없어졌다"로 읽혔다. flex-start 면 왼쪽 끝이
-   scrollLeft 0 에서 닿는다(삐약 x=19). 캐릭터 랙(#cp-rack)은 transform 캐러셀이라
-   이 규칙의 대상이 아니다. */
-#charpanel[data-cptab="pet"] .pick-row.pick-mate { display: flex; justify-content: flex-start; }
+/* [rc1011 · 2026-10-11 은퇴] P0(0905) 펫 줄 왼쪽 정렬 땜질(justify-content: flex-start) — 넘친 가로 스크롤 줄의
+   왼쪽 끝을 scrollLeft 0 에 닿게 하던 것. 펫 줄도 ⑰ 캐러셀(창 안 트랙 이동)이 되어 넘침 자체가 없다. */
+#charpanel[data-cptab="pet"] .pick-row.pick-mate { display: flex; }
 
 /* ---- 바닥 두 버튼 -------------------------------------------------------- */
 #charpanel .cp-foot {
@@ -61607,10 +61688,13 @@ html[lang="ko"] #charpanel .cs-tip { word-break: keep-all; overflow-wrap: anywhe
 /* ---- 칩 4상태: 선택의 근거는 종전 그대로 aria-current / aria-checked 다 ----
    킷의 [data-active] 선언을 그 두 속성에 그대로 옮겨 적는다. JS 에 새 속성을
    찍게 하지 않는 것이 요점 — 같은 질문에 답하는 근거가 화면에 둘이 되지 않는다. */
-#charpanel .cp-th { --f2-cd: calc(var(--f2-w) * .1307); }
-#charpanel #mate-pick .char-card { --f2-cd: calc(var(--f2-w) * .1150); }
-#charpanel .cp-th[aria-current="true"],
-#charpanel #mate-pick .char-card[aria-checked="true"] {
+#charpanel .cp-th,
+#charpanel #mate-pick .char-card { --f2-cd: calc(var(--f2-w) * .1307); }
+/* [rc1011 · 2026-10-11] 펫 방울 지름 .1150W → 캐릭터 방울과 같은 .1307W(위 한 줄). 펫 aria-checked 확대(.1150 × 1.334) ·
+   금테 세 겹은 은퇴 — 펫 줄도 ⑰ 캐러셀이라 가운데 표식은 .cp-center 배율 · .cp-ring 금테가 그린다. 장착(aria-checked)은
+   방울 생김새를 바꾸지 않는다(캐릭터 줄이 저장 선택을 방울에 안 그리는 것과 같다). 옛 메뉴 카드 규칙
+   .char-card[aria-checked] 의 translateY(-2px)도 펫 줄에서는 끈다(바로 아래 — 눌림 규칙보다 앞이라 눌림은 그대로). */
+#charpanel .cp-th[aria-current="true"] {
   --f2-cd: calc(var(--f2-w) * .1307 * 1.334);
   box-shadow:
     inset 0 0 0 var(--f2-cring) var(--f2-chip-line),
@@ -61618,9 +61702,12 @@ html[lang="ko"] #charpanel .cs-tip { word-break: keep-all; overflow-wrap: anywhe
     0 0 calc(var(--f2-cd) * .103) calc(var(--f2-cd) * .022) var(--role-f2-hi-halo),
     0 calc(var(--f2-cd) * .025) calc(var(--f2-cd) * .06) var(--role-f2-cast);
 }
-#charpanel #mate-pick .char-card[aria-checked="true"] {
-  --f2-cd: calc(var(--f2-w) * .1150 * 1.334);
-}
+#charpanel #mate-pick .char-card[aria-checked="true"] { transform: none; }
+/* [rc1011 · 2026-10-11] 잠긴 펫 방울도 탭을 받는다. 정본 칩의 .kit-chip-v2[aria-disabled="true"]{pointer-events:none} 이
+   잠긴 펫(syncMateLocks 가 aria-disabled 를 단다)의 탭을 삼켜, setMate 의 잠김 토스트가 손가락에는 한 번도 안 났다
+   (56573aa 실측: 탭 자리 elementFromPoint = #mate-pick). 캐릭터 줄의 잠긴 방울처럼 탭 = 가운데로 + 잠김 토스트.
+   생김새(불투명도 · 바탕)는 그대로다. */
+#charpanel #mate-pick .char-card[aria-disabled="true"] { pointer-events: auto; }
 #charpanel .cp-th:active,
 #charpanel #mate-pick .char-card:active { transform: translateY(calc(var(--f2-cd) * .02)); }
 
@@ -64934,8 +65021,8 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
 }
 /* 선택 4상태 — **게임 고유이므로 그대로 살린다.** 정본 고리 둘을 앞에 붙이고
    노란 림·후광 세 겹을 그 뒤에 그대로 둔다(값은 한 자리도 안 바꿨다). */
-#charpanel .cp-th[aria-current="true"],
-#charpanel #mate-pick .char-card[aria-checked="true"]{
+/* [rc1011 · 2026-10-11] 펫 aria-checked 선택자는 은퇴 — 펫 줄 가운데 표식은 .cp-ring(위 「칩 4상태」 절 주석). */
+#charpanel .cp-th[aria-current="true"]{
   box-shadow:
     inset 0 0 0 var(--wchip-L3-w) color-mix(in srgb, var(--wchip-L3-line)
       calc(var(--wchip-L3-a) * 100%), transparent),
