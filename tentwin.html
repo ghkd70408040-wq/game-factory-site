@@ -1955,10 +1955,12 @@ button {
 #combo-label:empty { opacity: 0; }
 
 /* Combo counter pulse (juice hook).
-   NOTE: juice.js runtime-injects a global `.pulse` rule (screen pulse, scale 1.005)
-   into <head>, and game.js puts that same `pulse` class on #combo-label. The
-   id-scoped selector below outranks the injected one (1,1,0 > 0,1,0) so the combo
-   counter gets its own punchier pop regardless of stylesheet order. */
+   NOTE: juice.js used to runtime-inject a global `.pulse` rule (screen pulse, scale 1.005)
+   into <head>, and game.js puts that same `pulse` class on #combo-label; the id-scoped
+   selector below outranked the injected one (1,1,0 > 0,1,0). [117 / 2026-10-15] The
+   injected rule is retired (the screen pulse is now a WAAPI animation on #board-scroll),
+   so this is the only `.pulse` rule left. It belongs to the combo counter alone and is
+   unchanged. */
 .combo-pulse,
 #combo-label.pulse { animation: combopulse 380ms var(--spring); }
 @keyframes combopulse {
@@ -22821,7 +22823,9 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
      [117 · 2026-10-15] 대상 = #board-scroll(판의 보이는 틀) 하나. #app · body · #pc-bg · 위 · 아래 바에는 어떤 경로로도 transform 을 걸지 않는다
      (shakeScreen 주석과 같은 이유 — #app 에 transform 을 걸면 position:fixed 자손이 #app 을 기준으로 삼아 함께 움직인다).
      재생 = WAAPI .animate() · composite 'add': 같은 요소의 CSS 애니메이션(#app.hurry · #app.bang 의 hu-shake)과 다투지 않고 더해진다.
-     재시작 = 앞 애니메이션 cancel() 뒤 새로 짓는다(void offsetWidth 없음 — 모션 규칙 6). */
+     재시작 = 앞 애니메이션 cancel() 뒤 새로 짓는다(void offsetWidth 없음 — 모션 규칙 6).
+     히트스톱(#app.hitstop * 의 CSS 일시정지)은 WAAPI 펄스를 세우지 않는다 — 종전 #app 펄스도
+     그 규칙 밖이었다(동작 무변). */
   var PULSE_SM = 1, PULSE_MD = 2, PULSE_LG = 3;
   var PULSE_MS    = [0, 180, 240, 300];                 // 양보 창(진행 중으로 치는 시간) — 종전 그대로
   /* 117: 대상만 옮김 · 값은 옛 주입 CSS 그대로 — 토큰화는 별건 */
@@ -34332,7 +34336,8 @@ window.TT_SFX = {
     else el.classList.remove('iw-plate');
     if (el.iwT) { clearTimeout(el.iwT); el.iwT = 0; }
     /* 재생 중인 노드를 다시 쓸 때 애니메이션을 되감는 표준 수법 —
-       #combo-banner·duelHudFlash·applyPulse 가 이미 쓰는 그 한 줄이다. 이
+       #combo-banner·duelHudFlash 가 이미 쓰는 그 한 줄이다(applyPulse 는 117 · 2026-10-15 에
+       WAAPI 로 옮겨 이 줄을 뺐다). 이
        리플로우 하나를 남긴 근거: 노드는 fixed + `contain: layout style` 안에
        있어 되값이 문서 레이아웃을 건드리지 않고, 부르는 빈도가 사건당 1회
        (각성 = 게이지 한 판 · 배율 = 정수 계단 · 피니시 = 격파 1회)라 프레임
@@ -39226,12 +39231,13 @@ window.TT_SFX = {
       var ms = now();
       /* 청각 사다리가 물결의 진행을 말한다 — 강조 리듬으로 성글게. */
       if (ms - sfxAt >= HV_SFX_MS) { sfxAt = ms; J.sfx.gold(); }
-      /* 파티클은 **마지막 한 알에만**. 호출마다 J.burst 안의 pulseForCombo 가
-         `void el.offsetWidth`(#app 전체 강제 리플로우)를 밟는데, 짝지은 반복 측정에서
-         그 8회 호출이 4x CPU 드랍 10건 **전부**였다(DIAG-PAIRED.json — 클래스·점수
-         글자는 각각 0건으로 무죄가 나왔다). 그 핵 자체는 game-motion §6.2 가 이미
-         등재한 선행 결함이고 매치 연쇄 전량이 쓰는 공유 소비처라 이 파도가 고칠
-         자리가 아니다 — 피날레가 덜 밟는 쪽을 고른다.
+      /* 파티클은 **마지막 한 알에만**. 이 규칙은 그대로다. 당시 근거는 호출마다 J.burst 안의
+         pulseForCombo 가 `void el.offsetWidth`(#app 전체 강제 리플로우)를 밟는 것이었고,
+         짝지은 반복 측정에서 그 8회 호출이 4x CPU 드랍 10건 **전부**였다(DIAG-PAIRED.json —
+         클래스·점수 글자는 각각 0건으로 무죄가 나왔다).
+         [117 · 2026-10-15] 그 리플로우는 사라졌다 — 화면 펄스가 #board-scroll 위 WAAPI 로 옮겨
+         가서 void offsetWidth 를 더는 밟지 않는다. 규칙은 근거가 사라진 뒤에도 그대로 둔다
+         (재측정 전에는 풀지 않는다).
          승리 순간의 대형 파티클은 advFinish/arcFinish 가 이미 부르는 J.confetti 가
          **피날레 앞에서** 맡는다. 새 연출을 만든 것이 아니라 자리를 나눈 것이다. */
       if (k === n - 1) J.burst(pts[k].x, pts[k].y, '#ffd76a', 14, fruitOf(v));
