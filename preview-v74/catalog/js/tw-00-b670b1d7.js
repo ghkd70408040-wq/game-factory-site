@@ -3019,45 +3019,41 @@ applyPulse(PULSE_LG);
 vignette(0.9);
 feverAura(true);
 }
-var styleInjected = false;
-function injectStyle() {
-if (styleInjected) return;
-styleInjected = true;
-try {
-var d = global.document;
-if (!d || !d.head) return;
-if (d.getElementById('juice-css')) return;
-var st = d.createElement('style');
-st.id = 'juice-css';
-st.textContent =
-'@keyframes juice-screen-pulse{' +
-'0%{transform:scale(1)}38%{transform:scale(1.005)}100%{transform:scale(1)}}' +
-'.pulse{animation:juice-screen-pulse 200ms cubic-bezier(.34,1.56,.64,1)}' +
-'@keyframes juice-screen-pulse-sm{' +
-'0%{transform:scale(1)}40%{transform:scale(1.003)}100%{transform:scale(1)}}' +
-'.pulse-sm{animation:juice-screen-pulse-sm 150ms ease-out}' +
-'@keyframes juice-screen-pulse-lg{' +
-'0%{transform:scale(1) translate3d(0,0,0)}' +
-'20%{transform:scale(1.012) translate3d(-2px,1px,0)}' +
-'46%{transform:scale(1.007) translate3d(2px,-1px,0)}' +
-'72%{transform:scale(1.003) translate3d(-1px,0,0)}' +
-'100%{transform:scale(1) translate3d(0,0,0)}}' +
-'.pulse-lg{animation:juice-screen-pulse-lg 280ms cubic-bezier(.34,1.56,.64,1)}' +
-'@media (prefers-reduced-motion:reduce){' +
-'.pulse,.pulse-sm,.pulse-lg{animation:none}}';
-d.head.appendChild(st);
-} catch (e) { /* 조용히 무시 */ }
-}
 var PULSE_SM = 1, PULSE_MD = 2, PULSE_LG = 3;
-var PULSE_CLASS = ['', 'pulse-sm', 'pulse', 'pulse-lg'];
-var PULSE_MS    = [0, 180, 240, 300];
-var pulseTimer = 0, pulseTier = 0, pulseEl = null, lastLightAt = 0;
+var PULSE_MS    = [0, 180, 240, 300];                 // 양보 창(진행 중으로 치는 시간) — 종전 그대로
+var PULSE_DUR   = [0, 150, 200, 280];
+var PULSE_EASE  = ['', 'ease-out', 'cubic-bezier(.34,1.56,.64,1)', 'cubic-bezier(.34,1.56,.64,1)'];
+var PULSE_STEPS = [null,
+[[0, 'scale(1)'], [.4, 'scale(1.003)'], [1, 'scale(1)']],
+[[0, 'scale(1)'], [.38, 'scale(1.005)'], [1, 'scale(1)']],
+[[0, 'scale(1) translate3d(0,0,0)'], [.2, 'scale(1.012) translate3d(-2px,1px,0)'], [.46, 'scale(1.007) translate3d(2px,-1px,0)'],
+[.72, 'scale(1.003) translate3d(-1px,0,0)'], [1, 'scale(1) translate3d(0,0,0)']]
+];
+var PULSE_KF = (function () {
+var out = [null], t, s, f, k, i;
+for (t = PULSE_SM; t <= PULSE_LG; t++) {
+s = PULSE_STEPS[t]; f = [];
+for (i = 0; i < s.length; i++) {
+k = { offset: s[i][0], transform: s[i][1] };
+if (i < s.length - 1) k.easing = PULSE_EASE[t];
+f.push(k);
+}
+out.push(f);
+}
+return out;
+})();
+var pulseTimer = 0, pulseTier = 0, pulseAnim = null, lastLightAt = 0;
+function endPulse() {
+var a = pulseAnim;
+pulseAnim = null;
+if (a) { try { a.cancel(); } catch (e) {} }
+}
 function applyPulse(tier) {
 if (!(tier >= PULSE_SM)) return;
 if (tier > PULSE_LG) tier = PULSE_LG;
 if (tier < pulseTier) return;                 // 진행 중인 더 큰 펄스에 양보
 ensureRM();
-if (reducedMotion) return;                    // CSS 도 막지만 DOM 작업 자체를 아낀다
+if (reducedMotion) return;                    // DOM 작업 자체를 아낀다
 if (tier === PULSE_SM) {
 var t = nowMs();
 if (t - lastLightAt < 130) return;          // 소형 펄스만 스로틀
@@ -3066,29 +3062,19 @@ lastLightAt = t;
 try {
 var d = global.document;
 if (!d) return;
-injectStyle();
-var el = d.getElementById('app') || d.body;
-if (!el) return;
+var el = d.getElementById('board-scroll');
+if (!el || !el.animate) return;             // 판이 없는 화면 — 조용히 아무것도 안 한다
+var scr = el.closest ? el.closest('.screen') : null;
+if (scr && !scr.classList.contains('active')) return;   // 숨은 화면(레이아웃을 읽지 않고 가린다 — 읽기-쓰기 교차 금지)
 if (pulseTimer) { clearTimeout(pulseTimer); pulseTimer = 0; }
-if (pulseEl && pulseEl !== el) {
-try { clearPulseClasses(pulseEl); } catch (e) {}
-}
-clearPulseClasses(el);
-void el.offsetWidth;                        // 리플로우 강제 → 연타에도 애니메이션 재시작
-var cls = PULSE_CLASS[tier];
-el.classList.add(cls);
+endPulse();                                 // 앞 펄스를 끝내고 시작 — 겹쳐 쌓이지 않는다
+pulseAnim = el.animate(PULSE_KF[tier], { duration: PULSE_DUR[tier], composite: 'add' });
 pulseTier = tier;
-pulseEl = el;
 pulseTimer = setTimeout(function () {
 pulseTimer = 0; pulseTier = 0;
-try { el.classList.remove(cls); } catch (e) {}
+endPulse();
 }, PULSE_MS[tier]);
 } catch (e) { /* 조용히 무시 */ }
-}
-function clearPulseClasses(el) {
-el.classList.remove('pulse-sm');
-el.classList.remove('pulse');
-el.classList.remove('pulse-lg');
 }
 function screenPulse() { applyPulse(PULSE_MD); }
 function pulseForCombo(L) {
@@ -3207,7 +3193,6 @@ function init() {
 try {
 ensureRM();
 acquireCanvas();
-injectStyle();
 bindListeners();
 if (!ctx && global.document && global.document.readyState === 'loading') {
 global.document.addEventListener('DOMContentLoaded', function () {
