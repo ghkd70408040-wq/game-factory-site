@@ -70436,7 +70436,9 @@ html[lang="ko"] #modal-quest .qs-tab[data-qtab="epic"] .cpt-lab{
 #screen-kingdom #kd-mission-badge{ position: absolute; right: -1cqw; top: -1cqw; }
 #screen-kingdom #kd-bot-plate .mp-txt{ position: absolute; left: 50%; top: 50%; width: 92%; transform: translate(-50%, -50%); display: block; text-align: center; }
 #screen-kingdom #kd-bot-ch-k, #screen-kingdom #kd-bot-ch-n{ display: block; max-width: none; font-style: normal; font-weight: 700; color: #FFFFFF; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; --kd-sh: rgba(96, 40, 72, .7); text-shadow: 0 .3cqw 0 var(--kd-sh); }
-#screen-kingdom #kd-bot-ch-k{ font-size: 4.40cqw; letter-spacing: -.01em; }
+/* [116 · 지휘자 판정 Q2] line-height 1 이 「모험」 의 ㅎ 꼭지를 자른다(390 0.92px · 1280 약 2px) — 세로축만 풀고 가로 말줄임 자르기는 x 축 clip 으로 유지.
+   clip 을 모르는 브라우저는 이 줄을 버리고 위 공용 규칙의 overflow: hidden 으로 돌아간다. */
+#screen-kingdom #kd-bot-ch-k{ font-size: 4.40cqw; letter-spacing: -.01em; overflow: clip visible; }
 #screen-kingdom #kd-bot-ch-n{ margin-top: .55cqw; font-size: 2.90cqw; letter-spacing: -.02em; }
 /* 캐릭터·기록 라벨 — 맵 하단 바(#screen-map #map-char/#map-rec > span, :52088)의
    **같은 값을 그대로 복제**한다(새 값 0). 이 규칙이 빠져 있어 라벨이 버튼 상속 폰트
@@ -70580,7 +70582,7 @@ html[lang="en"] #kd-m-circus b{ font-size: .85em; letter-spacing: -.02em; }
   #screen-kingdom #kd-top b, #screen-kingdom #kd-top i{ text-shadow: 0 calc(var(--hub-u) * 68 * .3 / 9) 0 var(--kd-sh); }
   /* 메뉴 판 자 --f2-w = 534u — 판 폭 219 ÷ 세로 판 폭 비율 .41(41cqw ÷ 100cqw) = 534(세로와 같은 판 비율 · 모서리 .0354 × 534 ≈ 19u = S14 판
      모서리). 모서리 · 겉선 · 링 · 접지가 이 자를 따른다(지휘자 추가 2). */
-  #kd-menu{ --f2-w: calc(var(--hub-u) * 534); left: calc(var(--safe-l) + var(--hub-u) * 22); top: calc(var(--hub-u) * 113); width: calc(var(--hub-u) * 219);
+  #kd-menu{ --f2-w: calc(var(--hub-u) * 534); left: calc(var(--safe-l) + var(--hub-u) * 22); top: calc(var(--safe-t) + var(--hub-u) * 113); width: calc(var(--hub-u) * 219);
     padding: calc(var(--hub-u) * 17) calc(var(--hub-u) * 16) calc(var(--hub-u) * 22); gap: calc(var(--hub-u) * 12.5); }
   /* 단추 양옆 안여백은 세로 규칙(calc(var(--f2-ph) * .226))이 그대로 14u 가 된다(지휘자 추가 3 — 여기서 다시 주지 않는다). */
   #kd-menu .kd-mbtn.kit-pill-v2{ --f2-ph: calc(var(--hub-u) * 62); font-size: calc(var(--hub-u) * 25); }
@@ -70594,7 +70596,8 @@ html[lang="en"] #kd-m-circus b{ font-size: .85em; letter-spacing: -.02em; }
   #screen-kingdom #kd-bot{ left: calc(50% + var(--hub-u) * 44.5); right: auto; width: auto; transform: translateX(-50%);
     bottom: calc(var(--safe-b) + var(--hub-u) * 7); gap: calc(var(--hub-u) * 16); }
   /* 미션 단추 --f2-ph = 메뉴 단추 높이(62u) — 미션 배지가 상점 배지와 같은 크기 규칙을 쓴다(지휘자 추가 13). */
-  #screen-kingdom #kd-bot-mission{ --f2-ph: calc(var(--hub-u) * 62); width: calc(var(--hub-u) * 87); height: calc(var(--hub-u) * 105); }
+  /* 높이 104.4u = 87 × 240/200 그림 비율 · 세로 18.48cqw 와 같은 규칙(지휘자 판정 — 스펙 표 105 대신). */
+  #screen-kingdom #kd-bot-mission{ --f2-ph: calc(var(--hub-u) * 62); width: calc(var(--hub-u) * 87); height: calc(var(--hub-u) * 104.4); }
   #screen-kingdom #kd-bot-plate  { width: calc(var(--hub-u) * 200); height: calc(var(--hub-u) * 120); }
   #screen-kingdom #kd-bot-char   { width: calc(var(--hub-u) * 87); height: calc(var(--hub-u) * 105); }
   #screen-kingdom #kd-bot-rec    { width: calc(var(--hub-u) * 87); height: calc(var(--hub-u) * 108); }
@@ -70606,7 +70609,8 @@ html[lang="en"] #kd-m-circus b{ font-size: .85em; letter-spacing: -.02em; }
   /* 라벨 글자 · 그림자 = 세로 값 ÷ 단추 높이 18.62cqw(라벨 비 .188 의 기준) 의 비 그대로(× 단추 높이 105u). */
   #screen-kingdom #kd-bot-mission > span, #screen-kingdom #kd-bot-char > span, #screen-kingdom #kd-bot-rec > span{
     font-size: calc(var(--hub-u) * 105 * .188); text-shadow: 0 calc(var(--hub-u) * 105 * .28 / 18.62) 0 var(--kd-sh); }
-  #kd-visit{ left: 50%; top: calc(var(--hub-u) * 100); max-width: 40%; }
+  /* 위 기준점은 --safe-t 를 더한다(스펙 6.1 · 지휘자 판정 Q4 — 위 바 자식은 #kd-top 이 이미 safe-t 아래라 그대로). */
+  #kd-visit{ left: 50%; top: calc(var(--safe-t) + var(--hub-u) * 100); max-width: 40%; }
 }
 </style>
 
