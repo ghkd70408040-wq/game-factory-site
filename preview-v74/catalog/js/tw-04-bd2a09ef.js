@@ -2985,6 +2985,7 @@ en: {
 'say.star.twin': 'Got a star!',
 'say.star.jelly': 'Sparkle!',
 'kd.castle': 'Castle',
+'aria.kdmenu': 'Village menu',   /* [116] 메인 v3 왼쪽 메뉴 판(#kd-menu) 이름 */
 'kd.playground': 'Playground',
 'kd.shop': 'Shop',
 'kd.pethouse': 'Pet House',
@@ -4104,6 +4105,7 @@ ko: {
 'say.star.twin': '별 챙겼다!',
 'say.star.jelly': '반짝!',
 'kd.castle': '성',
+'aria.kdmenu': '마을 메뉴',   /* [116] 메인 v3 왼쪽 메뉴 판(#kd-menu) 이름 */
 'kd.playground': '놀이터',
 'kd.shop': '상점',
 'kd.pethouse': '펫 하우스',
@@ -4562,7 +4564,6 @@ list[i].classList.toggle('active', list[i].id === id);
 }
 syncLobbyBgmNight(isNightHour(new Date().getHours()));
 if (audioUnlocked) J.bgm.scene(id === 'screen-game' ? 'game' : 'menu');
-if (id !== 'screen-kingdom') kdIdleStop();
 }
 function openModal(id) { var m = $(id); if (m) { m.hidden = false; healHeads(m); } }
 function closeModal(id) { var m = $(id); if (m) m.hidden = true; }
@@ -6191,6 +6192,7 @@ store.charId = id;
 persist();
 syncCharPick();
 applyCharSkin();
+kdAvatarPaint();   /* [116] 메인 프로필 얼굴도 그 자리에서 */
 J.sfx.ui();
 J.sfx.voice(id, 3);
 introGate(id, null);
@@ -12679,7 +12681,7 @@ function paintCoinChip(id) { paintChipText(id, arcComma(coinBalance())); }
 function paintWallets() {
 paintCoinChip('sh-coin-v');   /* 상점 띠 코인도 큰 수 줄임(data-len 6·7 — 지휘자 판정 2026-10-06, 왕국·지도 칩과 같은 도우미) */
 setText('sh-star-v', arcComma(store.jstar | 0));
-paintCoinChip('kd-top-stars-v'); paintCoinChip('map-stars-v'); paintChipText('kd-bot-b1-v', arcComma(store.jstar | 0));
+paintCoinChip('kd-top-stars-v'); paintCoinChip('map-stars-v'); paintChipText('kd-top-star-v', arcComma(store.jstar | 0));   /* [116] 별 캡슐 = 위 바 */
 }
 function grantItemOrRefund(id, src) {
 var it = itemById(id);
@@ -14846,10 +14848,8 @@ syncMenu();
 enterKingdom();
 }
 function homeScreen() { return 'screen-kingdom'; }
-var KD_TAP_CAP = 10;        // §26.6 — 거주자 탭으로 하루에 받을 수 있는 젤리별
-var KD_TAP_JSTAR = 1;       // 한 번 탭의 보상. «캡 건 소액 반복»(패턴 ⑥)
+var KD_TAP_CAP = 10;        // 116 — 탭 보상 은퇴, 옛 저장 칸 자르기만(readStore 의 kingdom.tapToday 상한)
 var KD_VISIT_JSTAR = 3;     // §26.6 방문 보상 — 하루 1회 고정 소액
-var KD_RES_MAX = 8;         // §26.3 동시 화면 거주자 상한
 var KD_DECO_SLOTS = 12;     // §26.5 고정 12슬롯
 var KD_ZONES = [
 { id: 'z-plaza',  bldgs: ['castle', 'gate', 'playground'], cost: 0 },
@@ -14868,38 +14868,12 @@ var KD_DECO = [
 { id: 'd-pond',   zone: 'z-garden', cost: 16 }
 ];
 var KD_BUILDINGS = [
-{ id: 'castle-top', l: 50, t: 16.5, w: 20, h: 9,  chap: 1, key: 'kd.castle', hit: true, notag: true,
-go: function () { kdSoonModal(); } },
-{ id: 'castle',     l: 50, t: 32, w: 22, h: 18, chap: 1, key: 'kd.castle', hit: true, tone: 'purple', ic: 'crown',
-go: function () { kdSoonModal(); } },
-{ id: 'circus',     l: 19, t: 41, w: 33, h: 15, chap: 1, key: 'kd.circus', tone: 'mint', ic: 'star-empty', roof: 4.5,
-art: 'url("catalog/t3-bldg2-circus.webp")',
-go: function () { openTheater(); } },
-{ id: 'mission',    l: 85, t: 42, w: 26, h: 14.5, chap: 1, key: 'kd.mission', tone: 'mint', ic: 'target', roof: 18.1,
-art: 'url("catalog/t3-bldg2-mission.webp")',
-go: function () { openQuest('daily'); } },
-{ id: 'shop',       l: 21, t: 58.4, w: 33, h: 14, chap: 1, key: 'kd.shop', tone: 'orange', ic: 'coin', roof: 8.8, /* [T8-0926·65] score(톱니 테두리 오자산) -> coin(상단 캡슐 파생 원반) */
-art: 'url("catalog/t3-bldg2-shop.webp")',
-go: function () { openShopScreen('gacha'); } },
-{ id: 'post',       l: 81.7, t: 58.4, w: 33, h: 14.6, chap: 1, key: 'kd.post', tone: 'pink', ic: 'flag', roof: 5.8,
-art: 'url("catalog/t3-bldg2-post.webp")',
-go: function () { kdSoonModal(); } },
-{ id: 'pethouse',   l: 17.4, t: 77.8, w: 29, h: 15, chap: 1, key: 'kd.pethouse', tone: 'orange', ic: 'heart', roof: 11.7,
-art: 'url("catalog/t3-bldg2-pethouse.webp")',
-go: function () { kdSoonModal(); } },
-{ id: 'playground', l: 82.7, t: 78.1, w: 33, h: 15, chap: 1, key: 'kd.playground', tone: 'violet', ic: 'inf', roof: 16.3,
-art: 'url("catalog/t3-bldg2-playground.webp")',
-go: function () { openPlayground(); } }
-];
-var KD_WALKS = [
-{ l: 38, t: 50, w: 9,  h: 9,  x0: '-60%', x1: '160%', k: 1 },
-{ l: 60, t: 50, w: 9,  h: 9,  x0: '120%', x1: '-80%', k: 1.18 },
-{ l: 40, t: 67, w: 10, h: 10, x0: '-70%', x1: '110%', k: .88 },
-{ l: 58, t: 67, w: 10, h: 10, x0: '90%',  x1: '-90%', k: 1.32 },
-{ l: 50, t: 58, w: 9,  h: 9,  x0: '-80%', x1: '80%',  k: 1.05 },
-{ l: 50, t: 77, w: 10, h: 10, x0: '110%', x1: '-110%', k: .78 }, /* [KD61-FIX] 84→77: t는 상자 상단이라 84+h10=94% 가 하단 바(약 88.2%) 아래로 내려가 하반신이 먹혔다. 77 로 올려 바 위(하단 87%)에 세운다. */
-{ l: 44, t: 76, w: 9,  h: 9,  x0: '-30%', x1: '130%', k: 1.45 },
-{ l: 56, t: 44, w: 8,  h: 8,  x0: '60%',  x1: '-70%', k: .95 }
+{ id: 'castle',     chap: 1, key: 'kd.castle',     tone: 'purple', ic: 'crown',      go: function () { kdSoonModal(); } },
+{ id: 'circus',     chap: 1, key: 'kd.circus',     tone: 'mint',   ic: 'star-empty', go: function () { openTheater(); } },
+{ id: 'pethouse',   chap: 1, key: 'kd.pethouse',   tone: 'orange', ic: 'heart',      go: function () { kdSoonModal(); } },
+{ id: 'shop',       chap: 1, key: 'kd.shop',       tone: 'orange', ic: 'coin',       go: function () { openShopScreen('gacha'); } },
+{ id: 'post',       chap: 1, key: 'kd.post',       tone: 'blue',   ic: 'flag',       go: function () { kdSoonModal(); } },
+{ id: 'playground', chap: 1, key: 'kd.playground', tone: 'violet', ic: 'inf',        go: function () { openPlayground(); } }
 ];
 function kdBuilding(id) {
 for (var i = 0; i < KD_BUILDINGS.length; i++) if (KD_BUILDINGS[i].id === id) return KD_BUILDINGS[i];
@@ -14930,53 +14904,24 @@ return chapMax() >= (b.chap | 0 || 1);
 }
 function kdNeedStage(b) { return chapFirst(b.chap | 0 || 1) - 1; }
 function kdSoonModal() { openModal('modal-soon'); J.sfx.ui(); }
-function kdArtVar(id) {
-var v = '';
-try { v = getComputedStyle(document.documentElement).getPropertyValue('--ch-' + id + '-full'); } catch (e) { v = ''; }
-return (v && v.replace(/\s/g, '')) ? 'var(--ch-' + id + '-full)' : '';
-}
-function kdResidents() {
-var out = [], i;
-for (i = 0; i < HERO_IDS.length; i++) {
-if (!heroUnlocked(HERO_IDS[i])) continue;
-var ha = kdArtVar(HERO_IDS[i]);
-if (ha) out.push({ id: HERO_IDS[i], art: ha });
-}
-var pl = petIds();
-for (i = 0; i < pl.length && out.length < KD_RES_MAX; i++) {
-var pa = kdArtVar(pl[i]);
-if (pa) out.push({ id: pl[i], art: pa });
-}
-return out.slice(0, KD_RES_MAX);
-}
 function buildKingdom() {
-var wrap = $('kd-bldgs'), i, b, el;
+var wrap = $('kd-menu'), i, b, el;
 if (wrap) {
 wrap.innerHTML = '';
 for (i = 0; i < KD_BUILDINGS.length; i++) {
 b = KD_BUILDINGS[i];
 el = document.createElement('button');
 el.type = 'button';
-el.className = 'kd-bldg';
-el.id = 'kd-b-' + b.id;
+el.className = 'kd-mbtn kd-tag kit-pill-v2';
+el.id = 'kd-m-' + b.id;
 el.setAttribute('data-kd', b.id);
-el.style.setProperty('--l', b.l);
-el.style.setProperty('--t', b.t);
-el.style.setProperty('--w', b.w);
-el.style.setProperty('--h', b.h);
-if (b.art) { el.style.setProperty('--kd-art', b.art); el.classList.add('kd-has-art'); }
-if (b.roof != null) el.style.setProperty('--kd-roof', b.roof);
+el.setAttribute('data-tone', b.tone || 'purple');
 if (b.app) el.setAttribute('data-app-only', '');
 var open = kdUnlocked(b);
 if (!open) el.classList.add('is-lock');
 el.setAttribute('aria-disabled', open ? 'false' : 'true');
-if (b.hit) el.classList.add('kd-hit');
 el.setAttribute('aria-label', t(b.key));
 el.setAttribute('data-i18n-aria', b.key);
-if (!b.notag) {
-var lab = document.createElement('span');
-lab.className = 'kd-tag kit-pill-v2';
-lab.setAttribute('data-tone', b.tone || 'purple');
 var ic = document.createElement('i');
 ic.className = 'kd-tag-ic';
 ic.setAttribute('aria-hidden', 'true');
@@ -14984,65 +14929,32 @@ ic.style.setProperty('--kd-ic', 'var(--lib-glyph-' + (b.ic || 'crown') + ')');
 var tx = document.createElement('b');
 tx.setAttribute('data-i18n', b.key);
 tx.textContent = t(b.key);
-lab.appendChild(ic);
-lab.appendChild(tx);
-if (b.id === 'mission') {
-var qb = document.createElement('b');
-qb.id = 'kd-mission-badge';
-qb.className = 'badge-new';
-qb.hidden = true;
-lab.appendChild(qb);
-}
+el.appendChild(ic);
+el.appendChild(tx);
 if (b.id === 'shop') {
 var sb = document.createElement('b');
 sb.id = 'kd-shop-badge';
 sb.className = 'badge-new';
 sb.hidden = true;
-lab.appendChild(sb);
-}
-el.appendChild(lab);
+el.appendChild(sb);
 }
 wrap.appendChild(el);
 }
 try { if (window.TW && window.TW.applyPlatformGates) window.TW.applyPlatformGates(wrap); } catch (e) {}
 }
-var rw = $('kd-res');
-if (rw) {
-rw.innerHTML = '';
-var list = kdResidents();
-for (i = 0; i < list.length; i++) {
-var w = KD_WALKS[i % KD_WALKS.length];
-var res = document.createElement('button');
-res.type = 'button';
-res.className = 'kd-res';
-res.setAttribute('data-kd-res', list[i].id);
-res.setAttribute('aria-label', t('kd.res.aria'));
-res.style.setProperty('--l', w.l);
-res.style.setProperty('--t', w.t);
-res.style.setProperty('--w', w.w);
-res.style.setProperty('--h', w.h);
-res.style.setProperty('--x0', w.x0);
-res.style.setProperty('--x1', w.x1);
-res.style.setProperty('--kd-k', w.k);
-res.style.setProperty('--kd-delay', (-i * 700) + 'ms');
-var walker = document.createElement('span');
-walker.className = 'kd-walker';
-var sp = document.createElement('span');
-sp.className = 'kd-sprite';
-sp.style.setProperty('--kd-art', list[i].art);
-walker.appendChild(sp);
-res.appendChild(walker);
-rw.appendChild(res);
-}
-}
+kdAvatarPaint();
 kdSync();
+}
+function kdAvatarPaint() {
+var f = document.querySelector('#kd-top-avatar .kd-avatar-face');
+if (f) f.style.setProperty('--kd-face', 'var(--ch-' + charId() + '-face)');
 }
 function kdSync() {
 setText('kd-top-hearts-v', store.hearts | 0);
 var ht = $('kd-top-heart-t');
 if (ht) { var ms = heartNextMs(); ht.textContent = ms > 0 ? fmtHeartWait(ms) : t('adv.heartfull'); }
 paintCoinChip('kd-top-stars-v');   /* P3 결정 2 — 위 칩 = 코인 지갑(동전 그림과 값 일치) */
-paintChipText('kd-bot-b1-v', arcComma(store.jstar | 0));   /* 위 칩(코인)과 같은 쉼표 표기 + 글자 수별 줄임(5자는 종전 크기) */
+paintChipText('kd-top-star-v', arcComma(store.jstar | 0));
 setText('kd-bot-ch-n', t('map.plate' + Math.min(MAP_CHAPTERS.length, chapMax())));
 }
 function kdVisit() {
@@ -15067,19 +14979,16 @@ function enterKingdom() {
 TW_PORTAL.loadingStop();     /* Task 12 — 왕국 착지 = 로딩 끝(멱등, 최초 1회만 실제 호출) */
 TW_PORTAL.gameplayStop();    /* Task 12 — 메뉴로 들어옴 = 플레이 break(playing 플래그가 중복을 막는다) */
 buildKingdom();
-questBadges();   /* T14 I-3 — buildKingdom() 이 배지를 매번 새로(숨김) 지으므로 여기서 값을 채운다 */
-shopDots();
+questBadges();   /* T14 I-3 — 미션 배지(#kd-mission-badge) 값을 채운다 */
+shopDots();      /* 상점 배지는 buildKingdom() 이 매번 새로(숨김) 지으므로 여기서 채운다 */
 showScreen(homeScreen());
-kdPanClamp();
 kdVisit();
-kdIdleSchedule();
 v74Notice();
 if (splashDone) setTimeout(p3Notice, P3_NOTICE_DELAY);   /* P3 — 나중에 왕국으로 돌아올 때. 부팅 때(스플래시 밑)는 걸지 않는다 — splashDismiss 가 건다 */
 }
 function kdBldgTap(id) {
-var b = kdBuilding(id), el = $('kd-b-' + id);
+var b = kdBuilding(id);
 if (!b) return;
-if (el) { el.classList.remove('is-pop'); void el.offsetWidth; el.classList.add('is-pop'); }
 if (!kdUnlocked(b)) {
 toast(t('minimap.locked', { n: kdNeedStage(b) }));
 J.sfx.fail();
@@ -15088,103 +14997,6 @@ return;
 J.sfx.ui();
 b.go();
 }
-var kdHeartPool = [];
-function kdHeartMs() {
-var v = 0;
-try {
-v = parseFloat(getComputedStyle(document.documentElement)
-.getPropertyValue('--mo-kd-heart')) || 0;
-} catch (e) { v = 0; }
-return v > 0 ? v : 900;      /* 토큰을 못 읽는 환경의 안전값(multLifeMs 규약) */
-}
-function kdHeartAt(el) {
-var fx = $('kd-fx');
-if (!fx || !el) return;
-var node = null, i;
-for (i = 0; i < kdHeartPool.length; i++) {
-if (!kdHeartPool[i].classList.contains('is-on')) { node = kdHeartPool[i]; break; }
-}
-if (!node) {
-if (kdHeartPool.length >= 6) return;      /* 풀 상한 — 연타로 노드가 안 는다 */
-node = document.createElement('span');
-node.className = 'kd-heart';
-fx.appendChild(node);
-kdHeartPool.push(node);
-}
-var r = el.getBoundingClientRect(), p = fx.getBoundingClientRect();
-node.style.left = (r.left - p.left + r.width / 2) + 'px';
-node.style.top = (r.top - p.top - 8) + 'px';
-node.classList.remove('is-on');
-void node.offsetWidth;
-node.classList.add('is-on');
-var n = node;
-setTimeout(function () { n.classList.remove('is-on'); }, kdHeartMs() + 60);
-}
-function kdResTap(el) {
-if (!el) return;
-var id = el.getAttribute('data-kd-res') || '';
-var k = kdStore();
-kdHeartAt(el);
-var say = t('say.clear.' + id);
-if (say && say !== 'say.clear.' + id) toast(say);
-if ((k.tapToday | 0) >= KD_TAP_CAP) { J.sfx.ui(); return; }
-k.tapToday = (k.tapToday | 0) + 1;
-store.jstar = (store.jstar | 0) + KD_TAP_JSTAR;
-persist();
-kdSync();
-J.sfx.petBell();
-}
-var kdIdleT = 0, kdIdleN = 0;
-function kdIdleSchedule() {
-if (kdIdleT) { clearTimeout(kdIdleT); kdIdleT = 0; }
-var s = $('screen-kingdom');
-if (!s || !s.classList.contains('active')) return;
-kdIdleT = setTimeout(function () {
-kdIdleT = 0;
-var list = $('kd-res') ? $('kd-res').querySelectorAll('.kd-res') : null;
-if (list && list.length) {
-for (var i = 0; i < list.length; i++) list[i].classList.remove('is-idle');
-list[kdIdleN % list.length].classList.add('is-idle');
-kdIdleN++;
-}
-kdIdleSchedule();
-}, 4200);
-}
-function kdIdleStop() { if (kdIdleT) { clearTimeout(kdIdleT); kdIdleT = 0; } }
-var kdDrag = null, kdX = 0;
-function kdPanMin() {
-var v = $('kd-view'), l = $('kd-layer');
-if (!v || !l) return 0;
-var d = l.offsetWidth - v.offsetWidth;
-return d > 0 ? -d : 0;
-}
-function kdPanSet(x) {
-var l = $('kd-layer');
-var lo = kdPanMin();
-kdX = clamp(x, lo, 0);
-if (l) l.style.setProperty('--kx', kdX + 'px');
-}
-function kdPanClamp() { kdPanSet(kdX || kdPanMin() / 2); }
-function kdPanDown(e) {
-var v = $('kd-view');
-if (!v) return;
-kdDrag = { x: e.clientX, x0: kdX, moved: 0 };
-v.classList.add('dragging');
-}
-function kdPanMove(e) {
-if (!kdDrag) return;
-var dx = e.clientX - kdDrag.x;
-if (Math.abs(dx) > kdDrag.moved) kdDrag.moved = Math.abs(dx);
-kdPanSet(kdDrag.x0 + dx);
-}
-var kdWasDrag = false;
-function kdPanUp() {
-var v = $('kd-view');
-if (v) v.classList.remove('dragging');
-kdWasDrag = !!(kdDrag && kdDrag.moved > 12);
-kdDrag = null;
-}
-function kdAteTap() { var w = kdWasDrag; kdWasDrag = false; return w; }
 function paintNodeHearts() {
 if (!advCardN) return;
 heartsTick();
@@ -17018,15 +16830,10 @@ on($('map-back'), 'click', function () { J.sfx.ui(); leaveMap(); });
 on($('map-gear'), 'click', openSettings);
 on($('map-char'), 'click', openCharPanel);
 on($('map-rec'), 'click', function () { J.sfx.ui(); openRank('endless'); });
-on($('kd-bldgs'), 'click', function (e) {
-var b = e.target && e.target.closest ? e.target.closest('.kd-bldg') : null;
-if (!b || kdAteTap()) return;
+on($('kd-menu'), 'click', function (e) {
+var b = e.target && e.target.closest ? e.target.closest('.kd-mbtn') : null;
+if (!b) return;
 kdBldgTap(b.getAttribute('data-kd') || '');
-});
-on($('kd-res'), 'click', function (e) {
-var r = e.target && e.target.closest ? e.target.closest('.kd-res') : null;
-if (!r || kdAteTap()) return;
-kdResTap(r);
 });
 on($('pg-close'), 'click', function () { closePlayground(); J.sfx.ui(); });
 on($('pg-classic'), 'click', function () { closePlayground(); openClassicHub(); });
@@ -17035,11 +16842,8 @@ on($('kd-bot-plate'), 'click', function () { J.sfx.ui(); openMap(); });
 on($('kd-bot-char'), 'click', openCharPanel);
 on($('kd-bot-rec'), 'click', function () { J.sfx.ui(); openRank('endless'); });
 on($('kd-top-gear'), 'click', openSettings);
-var kdv = $('kd-view');
-on(kdv, 'pointerdown', kdPanDown);
-on(kdv, 'pointermove', kdPanMove);
-on(window, 'pointerup', kdPanUp);
-on(window, 'pointercancel', kdPanUp);
+on($('kd-top-avatar'), 'click', openCharPanel);
+on($('kd-bot-mission'), 'click', function () { openQuest('daily'); });   /* openQuest 가 ui 소리를 낸다 — 한 번만 */
 on($('map-ch-prev'), 'click', function () { mapGoChapter(-1); });
 on($('map-ch-next'), 'click', function () { mapGoChapter(1); });
 on($('map-chapter'), 'click', function () { openMinimap(); });
@@ -18061,8 +17865,8 @@ harvestSpec: { perTile: HARVEST_PER_TILE, lead: HV_LEAD_MS, span: HV_SPAN_MS,
 stepMin: HV_STEP_MIN, stepMax: HV_STEP_MAX,
 hold: HV_HOLD_MS, tail: HV_TAIL_MS },
 enterKingdom: enterKingdom, buildKingdom: buildKingdom, kdBldgTap: kdBldgTap,
-kdResTap: kdResTap, kdUnlocked: kdUnlocked, kdBuilding: kdBuilding,
-kdResidents: kdResidents, kdStore: kdStore, homeScreen: homeScreen,
+kdUnlocked: kdUnlocked, kdBuilding: kdBuilding,   /* [116] kdResTap · kdResidents 은퇴 */
+kdStore: kdStore, homeScreen: homeScreen,
 KD_BUILDINGS: KD_BUILDINGS, KD_ZONES: KD_ZONES, KD_DECO: KD_DECO,
 KD_TAP_CAP: KD_TAP_CAP,
 openShopScreen: openShopScreen, closeShopScreen: closeShopScreen, setShopTab: setShopTab, portalAdsOk: portalAdsOk, portalAdsSync: portalAdsSync, SHOP_ART: SHOP_ART, shopFreeCount: shopFreeCount,
