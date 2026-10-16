@@ -9594,6 +9594,8 @@ html.no-art-logo .logo-img  { display: none; }
    였다. 정의되지 않은 변수는 그 선언을 무효로 만들 뿐이라 뒤의
    `background-color: #7EC4E8` 이 살아남고, 그것이 실기기에서 보인 민무늬 파란
    띠다. 챕터 이름은 지금 --lib-chapter-plate 를 입은 #map-bot 의 명판이 맡는다.
+   [판정판 121] 그 명판(--lib-chapter-plate)도 은퇴 — 챕터 이름은 공용 아래 줄 가운데 판(#map-plate.bb-center · stage-pill_chapter 그림)의
+   #map-chapter 글자가 맡는다(<style id="hub-bars-121"> 3 절).
    ------------------------------------------------------------------------- */
 
 /* 노드는 이제 색색이다 — 단, **클리어한 노드만**.
@@ -10799,9 +10801,8 @@ html.no-art-logo .logo-img  { display: none; }
    라 상한이 없어 4~6자리가 정상이다(#map-b1 은 `advStarTotal()` = 30스테이지×3 →
    최대 90, 두 자리. 세 자리설은 호출부 없는 `advNodeCount()` 전제라 현행 빌드에선
    도달 불가). 따라서 필요한 것은 재베이크가 아니라 **비율 고정 폭(left/right %)의
-   해제 또는 숫자 축약**이다. 조각 교체는 실루엣만 고치고 폭 부족은 못 고친다. */
-#map-b1,
-#map-b2 { border-width: 10px 12px; }
+   해제 또는 숫자 축약**이다. 조각 교체는 실루엣만 고치고 폭 부족은 못 고친다.
+   [판정판 121 · 리뷰 Minor 5] 그 예외 줄(#map-b1, #map-b2 { border-width: 10px 12px })은 지웠다 — 두 칩은 은퇴(hidden)라 효과 0. 값은 커밋 0fdea16 의 이 자리. */
 
 /* 칩 안의 글리프 — 13차-b 킷 편입: 전부 도서관 스프라이트다(§4.5-1). 8차부터
    쓰던 손 SVG 무리는 "도서관에 없어서"가 근거였는데, §A 발주로 12종이 전부
@@ -11680,7 +11681,10 @@ html.no-art-logo .logo-img  { display: none; }
      (--map-lift 는 art-embed 가 굽는 값이고 지금은 0% 다. 이 식이 그 역할을
       포함해 다시 세우므로 여기서는 참조하지 않는다.) */
   /* [판정판 121 · 2026-10-17] 띠 = 공용 아래 줄(.bb) 높이(세로: --safe-b + 2.5 + 가운데 판 16.8cqw · 가로: hub-bars-121 이 무대 자로 덮어씀).
-     옛 값 clamp(48px, 13.1vh, 110px)(.hudbar 식)는 아래 줄이 판 띠(jbox--strip)였을 때의 것. */
+     옛 값 clamp(48px, 13.1vh, 110px)(.hudbar 식)는 아래 줄이 판 띠(jbox--strip)였을 때의 것.
+     ⚠ 세로(폰)에서는 레이어 높이 --map-lh = 100% 라 아래 top 식의 max 쪽(100% − 100% = 0)이 늘 이겨 위 끝 0 고정이다(D7 — 이 띠 값은 식에
+     들어가도 결과를 바꾸지 않는다). 이 식이 실제로 레이어를 들어 올리는 것은 레이어가 창보다 큰 가로 아주 넓은 창(2000×740 등 — 폭으로 덮음)
+     뿐이고, 가로의 띠 값과 세로 그림 챕터 높이(hub-bars-121 6 절)가 이 변수를 읽는다. */
   --map-bar: calc(var(--safe-b) + var(--hub-cq, 1cqw) * 19.3);
   --map-n1b: .9008;                        /* 최저 노드 아래끝 (레이어 높이의 몫, 단위 없음) — 챕터마다
                                               다르므로 buildMap() 이 덮어쓴다. 여기 값은
@@ -14970,7 +14974,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
          왼→오 = 스토리 극장 · 놀이터 · [모험] · 캐릭터 · 상점(사용자 원문 순서). 극장 · 놀이터 · 상점은 KD_BUILDINGS 의 같은 줄(data-kd)을 부른다. -->
     <footer id="kd-bot" class="bb">
       <button id="kd-bot-theater" class="bb-theater" type="button" data-kd="circus" data-i18n-aria="kd.circus" aria-label="Story Theater"><span class="bb-lab" data-i18n="kd.circus">Story Theater</span></button>
-      <button id="kd-bot-play" class="bb-play" type="button" data-kd="playground" data-i18n-aria="kd.playground" aria-label="Arcade"><span class="bb-lab" data-i18n="kd.playground">Arcade</span></button>
+      <button id="kd-bot-play" class="bb-play" type="button" data-kd="playground" data-i18n-aria="kd.playground" aria-label="Playground"><span class="bb-lab" data-i18n="kd.playground">Playground</span></button>
       <button id="kd-bot-plate" class="bb-center" type="button" data-i18n-aria="menu.adv" aria-label="Adventure"><span class="mp-txt"><b id="kd-bot-ch-k" data-i18n="menu.adv">Adventure</b><i id="kd-bot-ch-n">Chapter 1</i></span></button>
       <button id="kd-bot-char" class="bb-char" type="button" data-i18n-aria="aria.charopen" aria-label="Heroes: choose a character"><span class="bb-lab" data-i18n="pick.title">Heroes</span></button>
       <button id="kd-bot-shop" class="bb-shop" type="button" data-kd="shop" data-i18n-aria="kd.shop" aria-label="Shop"><span class="bb-lab" data-i18n="kd.shop">Shop</span><b id="kd-shop-badge" class="badge-new" hidden></b></button>
@@ -15055,7 +15059,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
       <span id="map-b1" hidden><b id="map-b1-v">0</b></span>
       <span id="map-b2" hidden><b id="map-b2-v">0</b></span>
       <button id="map-theater" class="bb-theater" type="button" data-kd="circus" data-i18n-aria="kd.circus" aria-label="Story Theater"><span class="bb-lab" data-i18n="kd.circus">Story Theater</span></button>
-      <button id="map-play" class="bb-play" type="button" data-kd="playground" data-i18n-aria="kd.playground" aria-label="Arcade"><span class="bb-lab" data-i18n="kd.playground">Arcade</span></button>
+      <button id="map-play" class="bb-play" type="button" data-kd="playground" data-i18n-aria="kd.playground" aria-label="Playground"><span class="bb-lab" data-i18n="kd.playground">Playground</span></button>
       <div id="map-plate" class="bb-center">
         <button id="map-ch-prev" data-part="btn-map-arrow" data-variant="prev" class="mp-arrow" type="button" data-i18n-aria="aria.chprev" aria-label="Previous chapter">&lsaquo;</button>
         <!-- 0910 판정판 23 — 명판 글자가 «챕터 미니맵» 의 열기 손잡이가 된다
@@ -16913,7 +16917,8 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
     </div>
     <!-- [T8-0926 · 판정판 71] 퀘스트(→미션)·기록·스토리 갤러리·제작진 네 진입은
          사용자 지시로 설정 창에서 지운다. 함수·i18n 키·모달 마크업은 그대로 둔다
-         (다른 소비처 — 미션은 왕국 「미션」 건물, 기록은 왕국 하단 바 #kd-bot-rec,
+         (다른 소비처 — 미션은 왕국 「미션」 건물, 기록은 왕국 하단 바 #kd-bot-rec
+         [판정판 121: 미션 · 기록 둘 다 지금은 위 바 오른쪽 둥근 단추 #kd-top-mission · #kd-top-rec],
          갤러리는 [T9-0926 · 판정판 69] 「스토리 극장」으로 개조되어 왕국 건물이
          openQuest/openRank/openTheater 를 각자 부른다). 제작진(#modal-credits류)
          마크업도 남기되 진입만 지운다 — 내용은 T4가 itch 페이지 CREDITS로 옮긴다.
@@ -17441,7 +17446,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
        그림 제목은 발주가 필요해 쓰지 않는다), 줄 = .mode-row(btn-picture) 의 기존
        변주 arcade(보라)·timeattack(주황) 인스턴스. 새 그림 0 · 새 값 0. -->
   <div id="modal-playground" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="pg-h"><div class="sheet jbox jbox--modal" data-part="modal-plate">
-    <h2 id="pg-h" data-i18n="pg.title">Arcade</h2>
+    <h2 id="pg-h" data-i18n="pg.title">Playground</h2>
     <button id="pg-close" class="r10-x x-btn" type="button" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
     <div class="mode-list">
       <button id="pg-classic" class="mode-row" data-part="btn-picture" data-variant="arcade" type="button">
@@ -28455,7 +28460,7 @@ window.TT_SFX = {
          두 번째 문구를 만들면 둘이 갈라진다. */
       'kd.castle': 'Castle',
       'aria.kdmenu': 'Village menu',   /* [116] 메인 v3 왼쪽 메뉴 판(#kd-menu) 이름 */
-      'kd.playground': 'Arcade',   /* [판정판 121] 'Playground' → 'Arcade' — 아래 줄 그림 단추 이름 칸(단추 폭 92%)에 줄이지 않고 든다(ko 「놀이터」 그대로) */
+      'kd.playground': 'Playground',   /* [판정판 121] 'Arcade' 로 바꿨다가 되돌림(지휘자 판정 — 놀이터 창 안 줄 pg.arcade 'Arcade' 와 겹침). 아래 줄 이름 칸은 .88 맞춤 */
       'kd.shop': 'Shop',
       'kd.pethouse': 'Pet House',
       /* [KD61-0922] 메인 화면 v2 — 서커스·미션·우체국 + 놀이터 선택 창 */
@@ -28464,7 +28469,7 @@ window.TT_SFX = {
       'kd.circus': 'Story Theater',
       'kd.mission': 'Missions',
       'kd.post': 'Post Office',
-      'pg.title': 'Arcade',   /* [판정판 121] 단추 이름(kd.playground)과 같은 낱말 */
+      'pg.title': 'Playground',
       'pg.classic': 'Classic',
       'pg.classic.d': 'Endless, Time Rush, Daily.',
       'pg.arcade': 'Arcade',
@@ -47442,11 +47447,15 @@ window.TT_SFX = {
     /* [판정판 121 · 2026-10-17] 공용 아래 줄(띠 판 없이 그림 위에 선 단추 다섯)에 노드가 가리지 않게 1 · 3 · 5 를 초원 안에서 위로만 옮겼다
        (가장 작은 이동 — 여유 가로 8u · 세로 2cqw, 실측 scratchpad/rc1017/t3/t3_nodecov.py):
          1 85.91 → 84.00 · 3 86.31 → 84.00 (세로 360×640 아래 줄 위 끝 88.0% 가 한계) · 5 84.72 → 79.70 (가로 16:9 옆 단추 위 끝 83.4% 가 한계).
-       셋 다 같은 초원 · 바위 줄 위(전/후 크롭 scratchpad/rc1017/t3/after/node-ch1-n*-*.png). 가로 자리(x)는 그대로. */
+       셋 다 같은 초원 · 바위 줄 위(전/후 크롭 scratchpad/rc1017/t3/after/node-ch1-n*-*.png). 가로 자리(x)는 그대로.
+       [수정 1회차 · 리뷰 Important 1] 바 세로 기준이 창 가장자리가 된 뒤 16:9 보다 높은 가로 창(16:10 · 4:3)에서는 레이어가 창보다 넓어져(높이 = 창)
+         3 번이 극장 단추 위로 가로로 들어온다(1280×800 · 1440×900 · 1024×768 실측). 3 84.00 → 80.50 — 세로 한 축만: 창 비 A 에서 「노드 아래끝 ≤
+         극장 위 끝 − 8u」 가 A ≤ 1.687 까지, 「노드 오른끝 ≤ 극장 왼끝 − 8u」 가 A ≥ 1.666 부터 서서 4:3 ~ 16:9 전 구간이 비어 있지 않다.
+         2 · 4 사이 초원(지그재그 순서 그대로 · 크롭 node-ch1-n3r-*.png). */
     [
       [ 7.62, 84.00, 5.20, 7.53, '--node-jelly-1'],   //  1 서쪽 숲가 초원(우체통 트레일헤드)
       [12.50, 75.92, 4.10, 6.20, '--node-jelly-2'],   //  2 숲가 둔덕 (초원 위로)
-      [18.16, 84.00, 5.20, 7.53, '--node-jelly-3'],   //  3 초원, 아래로 굽이
+      [18.16, 80.50, 5.20, 7.53, '--node-jelly-3'],   //  3 초원, 아래로 굽이
       [23.83, 74.33, 4.10, 6.20, '--node-jelly-4'],   //  4 숲 아래 오솔길
       [29.30, 79.70, 4.60, 6.90, '--node-jelly-5'],   //  5 초원 바위 옆
       [34.38, 77.12, 4.10, 6.20, '--node-jelly-1'],   //  6 캔디스톤 길 초입
@@ -48323,8 +48332,10 @@ window.TT_SFX = {
     mapShow();
   }
 
-  /** [판정판 121] 지도 세우기(지금 챕터 그대로) — openMap 의 끝 반쪽이자, 지도 아래 줄에서 연 화면(상점 · 극장 컷)을 닫고 돌아올 때(hubReturn)의 문. */
-  function mapShow() {
+  /** [판정판 121] 지도 세우기(지금 챕터 그대로) — openMap 의 끝 반쪽이자, 지도 아래 줄에서 연 화면(상점 · 극장 컷)을 닫고 돌아올 때(hubReturn)의 문.
+      keepX = 수(hubReturn — 떠날 때 hubMark 가 적은 드래그 자리)면 그 자리로 되돌리고 범위만 다시 잰다(리뷰 Minor 6 — 지금 노드로 다시 맞추지
+      않음). 없으면(openMap) 지금 노드를 가운데로. 떠날 때 적어 두는 까닭: 숨은 화면(폭 0)에서 도는 mapFit(buildMap 끝 · 창 크기 바뀜)이 mapX 를 0 으로 자른다. */
+  function mapShow(keepX) {
     buildMap();
     questBadges();   /* [판정판 121] 지도 위 바 미션 배지 · 아래 줄 상점 배지(메인과 같은 부품 · 같은 값) */
     shopDots();
@@ -48339,17 +48350,35 @@ window.TT_SFX = {
        화면 전환 경로마다 달라져, 어떤 경로에서는 폭이 아직 0 이었다.)
        그래도 남는 한 프레임짜리 경우를 위해 mapCenterCurrent 자신이 폭 0 이면
        짧게 다시 묻는다. */
-    mapCenterCurrent(0);
+    if (typeof keepX === 'number') mapKeepX(0, keepX); else mapCenterCurrent(0);
     startMapTicker();
+  }
+  /** [판정판 121] 드래그 자리 그대로 — 떠날 때의 x 를 되돌리고 범위(mapMin · mapMax)만 다시 재 자른다. 폭이 아직 0 이면 mapCenterCurrent 와
+      같이 짧게 다시 묻는다. */
+  function mapKeepX(tries, x) {
+    var l = $('map-layer');
+    if (!l) return;
+    if (!(l.offsetWidth > 0)) {
+      var k = (tries | 0) + 1;
+      if (k <= 10) later(function () { mapKeepX(k, x); }, 30);
+      return;
+    }
+    mapX = x;
+    mapVel = 0;
+    mapFit();
   }
 
   /* [판정판 121] 공용 아래 줄 화면(상점 화면 · 스토리 극장)을 연 곳 — 변수 하나. 여는 함수(openShopScreen · openTheater)가 그 순간 서 있던
      화면을 적고(지도면 'map', 그 밖은 'kingdom'), 닫기(closeShopScreen · 극장 컷 끝 theaterPick)가 hubReturn() 으로 그곳으로 간다.
-     놀이터 · 캐릭터 창은 화면을 바꾸지 않는 한 겹이라 닫으면 이미 그 자리다. */
-  var hubFrom = 'kingdom';
-  function hubMark() { var m = $('screen-map'); hubFrom = (m && m.classList && m.classList.contains('active')) ? 'map' : 'kingdom'; }
+     놀이터 · 캐릭터 창은 화면을 바꾸지 않는 한 겹이라 닫으면 이미 그 자리다. 지도에서 열면 그때의 드래그 자리(hubMapX)도 같이 적어 돌아올 때 되돌린다. */
+  var hubFrom = 'kingdom', hubMapX = 0;
+  function hubMark() {
+    var m = $('screen-map');
+    hubFrom = (m && m.classList && m.classList.contains('active')) ? 'map' : 'kingdom';
+    if (hubFrom === 'map') hubMapX = mapX;
+  }
   function hubReturn() {
-    if (hubFrom === 'map') { heartsTick(); mapShow(); }
+    if (hubFrom === 'map') { heartsTick(); mapShow(hubMapX); }
     else enterKingdom();
   }
 
@@ -48415,7 +48444,7 @@ window.TT_SFX = {
    * 여는 것 이력: 성 = 준비 중 창(T8 · 판정판 70) · 스토리 극장(T9 · 69) · 상점 = 상점 화면(P3) ·
    * 우체국 = 준비 중 창(64-fix3 ⑩) · 펫 하우스 = 준비 중 창(rc1009). */
   /* [116 · 2026-10-15] 메인 v3 — 이 표는 이제 왼쪽 메뉴 6줄이다(시안 S14 순서). 건물 칸 좌표(l/t/w/h)·지붕선·그림·
-     성 탭 자리·미션 줄은 은퇴했다(미션 = 아래 단추 줄 #kd-bot-mission). go 는 전부 이미 있던 함수.
+     성 탭 자리·미션 줄은 은퇴했다(미션 = 그때 아래 단추 줄 #kd-bot-mission — [판정판 121] 지금은 위 바 #kd-top-mission). go 는 전부 이미 있던 함수.
      [판정판 121 · 2026-10-17] 칸 둘 더:
        bar   true = 왼쪽 메뉴가 아니라 공용 아래 줄(.bb — 메인 #kd-bot · 지도 #map-bot)의 그림 단추다. 그 단추는 마크업에 서 있고 data-kd 로
              이 줄을 부른다(kdBldgTap — 잠금 판정 · 소리 · go 가 한 곳). 스토리 극장 · 놀이터 · 상점.
@@ -48601,7 +48630,8 @@ window.TT_SFX = {
   /* --- 메뉴 단추 탭 --------------------------------------------------------- */
   function kdBldgTap(id) {
     var b = kdBuilding(id);
-    if (!b) return;
+    /* [판정판 121 · 리뷰 Minor 9] 숨긴 칸(hide — 성 · 펫 하우스 · 우체국)은 어떤 길로도 안 열린다(디버그 손잡이 window.Game.kdBldgTap 포함). */
+    if (!b || b.hide) return;
     /* [116 · 2026-10-15 · 사용자 승인 ④ / 시안 S14] 칸 튀기기(is-pop · void offsetWidth) 은퇴 — 건물 칸이 없다. */
     if (!kdUnlocked(b)) {
       /* 잠금 안내는 미니맵(§14.4)이 이미 쓰는 그 문장을 그대로 읽는다 —
@@ -55016,7 +55046,7 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
    MAP_ANCHORS_CH(챕터당 10칸)로, 명판 화살표가 구판 챕터 넘김으로 돌아간다.
    걷어낸 규칙 전문은 커밋 6730977 에 그대로 남아 있다.
 
-   남긴 것은 아래 두 절뿐이다 — 상단(#map-top: 뒤로/하트/코인/설정 조각)과
+   남긴 것은 아래 두 절뿐이었다 — 상단(#map-top: 뒤로/하트/코인/설정 조각)과
    하단(#map-bot: 공통 젤리박스 띠 + 별/챕터 명판/캐릭터/기록). 위의
    #screen-map { container-type } 은 그 두 절이 쓰는 cqw 단위의 기준이라 남긴다.
    [판정판 121] 그 두 절도 은퇴(공용 위 바 · 아래 줄로) — container-type 은 공용 부품의 세로 자(--hub-cq = 1cqw)의 기준으로 남는다. */
@@ -66769,8 +66799,8 @@ var SEQ={
   character:[CHAR],
   skin:[CHAR,till(function(){return open_('modal-skin');},function(){tap('cp-skin');})],
   settings:[SET],
-  /* [T8-0926] #st-rank(설정 창 진입)가 판정판 71로 지워졌다 — 왕국 하단 바의
-     같은 목적지(#kd-bot-rec, openRank('endless'))를 대신 누른다. SET(설정 열기)
+  /* [T8-0926] #st-rank(설정 창 진입)가 판정판 71로 지워졌다 — 왕국의
+     같은 목적지(그때 하단 바 #kd-bot-rec · [판정판 121] 지금 위 바 #kd-top-rec, openRank('endless'))를 대신 누른다. SET(설정 열기)
      단계는 더 필요 없다(왕국이 이미 착지 화면이라 그 버튼이 바로 보인다). */
   /* [판정판 121] 기록 단추가 위 바 오른쪽(#kd-top-rec)으로 이사했다 — 같은 목적지. */
   records:[till(function(){return open_('modal-rank');},function(){tap('kd-top-rec');})],
@@ -69935,6 +69965,7 @@ html[lang="ko"] #modal-quest .qs-tab[data-qtab="epic"] .cpt-lab{
 /* 스펙 6.3 넘침 — 실측(scratchpad/rc1015/t2/probe_menu_fit.py, 세로 넷 × ko/en · 양옆 안여백 .226ph 뒤)으로 글자 칸(아이콘 오른끝 ~
    단추 오른끝 − .226ph)을 넘는 것은 en 「Story Theater」 하나뿐이다. 옛 처방(T14 I-7c)과 같은 꼴로 그 단추 글자만 줄인다 — .86em 은 아직
    0.5~0.65px 넘쳐 글자 칸 안에 드는 가장 큰 단계 .85em. 다른 en · ko 단추는 글자 칸 안이라 무변(가장 좁은 en Post Office · Playground 여유 3.5px). */
+/* [판정판 121] 남김 — circus · playground 는 지금 표의 bar 칸(공용 아래 줄)이라 메뉴 단추로 안 지어지지만, 메뉴 판 복구 길(D9 — 표의 bar · hide 칸을 지우면 그대로 복구)에서 다시 쓰는 맞춤이다. */
 html[lang="en"] #kd-m-circus b{ font-size: .85em; letter-spacing: -.02em; }
 
 /* [116 · 2026-10-15] 옛 데스크톱 왕국 절(가로·≥700·≥600 — 바를 --mapui 고정 배율로 못박던 것)은 은퇴 — 가로 창은 메인 v3 가로 배치가
@@ -70004,11 +70035,13 @@ html[lang="en"] #kd-m-circus b{ font-size: .85em; letter-spacing: -.02em; }
   #kd-menu .kd-mbtn.kit-pill-v2{ --f2-ph: calc(var(--hub-u) * 62); font-size: calc(var(--hub-u) * 25); }
   #kd-menu .kd-mbtn .kd-tag-ic{ width: calc(var(--hub-u) * 36); height: calc(var(--hub-u) * 36); }
   /* 스펙 6.3 넘침(가로) — 실측(scratchpad/rc1015/t3/probe_menu_fit_land.py · 가로 다섯 × ko/en)으로 글자 칸(아이콘 오른끝 ~ 단추 오른끝 − .226ph)을
-     넘는 en 단추만 줄인다(세로와 같은 꼴 · 칸에 드는 가장 큰 .01 단계). */
+     넘는 en 단추만 줄인다(세로와 같은 꼴 · 칸에 드는 가장 큰 .01 단계).
+     [판정판 121] 남김 — circus · playground 는 지금 bar 칸(공용 아래 줄)이라 안 지어지지만 메뉴 판 복구 길(D9 — 표의 bar · hide 칸을 지우면 복구)의 맞춤이다. */
   html[lang="en"] #kd-m-circus b{ font-size: .73em; }
   html[lang="en"] #kd-m-post b, html[lang="en"] #kd-m-playground b{ font-size: .92em; }
-  /* 방문 줄 — 위 바 아래 가운데(무대 위 끝 + 100u = 위 바 단추 아래끝 96u 바로 밑). 위 기준점 = 무대 위 끝과 --safe-t 중 아래쪽. */
-  #kd-visit{ left: 50%; top: calc(max(var(--stage-y), var(--safe-t)) + var(--hub-u) * 100); max-width: 40%; }
+  /* 방문 줄 — 위 바 아래 가운데(위 바 위 끝 + 100u = 위 바 단추 아래끝 96u 바로 밑). 위 기준점 = 위 바와 같은 창 위 끝 + --safe-t
+     ([판정판 121] 위 바 세로 기준이 창 가장자리가 되며 같이 옮김 — 옛: 무대 위 끝과 --safe-t 중 아래쪽). */
+  #kd-visit{ left: 50%; top: calc(var(--safe-t) + var(--hub-u) * 100); max-width: 40%; }
 }
 </style>
 
@@ -70026,7 +70059,8 @@ html[lang="en"] #kd-m-circus b{ font-size: .85em; letter-spacing: -.02em; }
      아래 줄 .bb > .bb-theater · .bb-play · .bb-center(메인 모험 판 / 지도 챕터 판) · .bb-char · .bb-shop
    자 두 개(한 규칙이 둘 중 하나를 읽는다):
      세로(폰)            --hub-cq = 1cqw(화면이 inline-size 컨테이너 → 화면 폭 1%). cqw 를 모르는 기기는 compat-p1 이 이 변수 하나만 바꾼다.
-     가로(창 가로 ≥ 세로) --stage-u(아래 0 절) — 창 가운데 16:9 무대(1280×720u) 안에 UI 를 세운다(무대 왼끝 · 윗끝 --stage-x/--stage-y 를 더함).
+     가로(창 가로 ≥ 세로) --stage-u(아래 0 절) — 창 가운데 16:9 무대(1280×720u)의 폭 안에 UI 를 세운다(무대 왼끝 --stage-x 를 더함 ·
+                         세로는 창 위 · 아래 가장자리 기준 — 아래 5 절).
    값 = 메인 v3(판정판 116 · 스펙 6.2 세로 cqw / 6.1 가로 u)의 위 바 · 아래 줄 값 + 이번 판정(오른쪽 위 = 미션 · 기록 · 설정 둥근 단추 —
      가로 한 줄 · 세로 설정 아래 기둥(간격 = 지름 × .12) / 아래 줄 다섯 — 세로 옆 13.6 · 가운데 28 · 간격 1.6cqw(합 88.8)).
    그림 비율은 상자 aspect-ratio 로 지킨다(판 200×240 · 캐릭터 200×241 · 가운데 400×240 · 둥근 단추 464×480 → 12 × 12.4).
@@ -70043,6 +70077,17 @@ html[lang="en"] #kd-m-circus b{ font-size: .85em; letter-spacing: -.02em; }
     --stage-h: calc(var(--stage-u) * 720);
     --stage-x: calc((100vw - var(--stage-w)) / 2);
     --stage-y: calc((100dvh - var(--stage-h)) / 2);
+  }
+}
+/* dvh 를 모르는 기기(iOS 15.3 · Chrome 107 아래 — 리뷰 Minor 1) — 사용자 정의 속성 값은 파싱 때 걸러지지 않아(쓰일 때 무효가 되어 자가 통째로
+   빠진다) vh 판을 바로 아래에 이어 적는 꼴로는 못 막는다 → @supports 로 감싸 dvh 를 모를 때만 vh 판이 선다(위 선언보다 뒤라 이긴다).
+   지도 레이어 높이 두 줄의 같은 대체는 6 절 뒤(그 선언보다 뒤여야 이긴다). */
+@supports not (height: 100dvh) {
+  @media (min-aspect-ratio: 1/1) {
+    :root {
+      --stage-u: min(calc(100vw / 1280), calc(100vh / 720));
+      --stage-y: calc((100vh - var(--stage-h)) / 2);
+    }
   }
 }
 
@@ -70135,7 +70180,11 @@ html[lang="en"] #kd-m-circus b{ font-size: .85em; letter-spacing: -.02em; }
   color: var(--prim-white); font-family: var(--font-display); line-height: 1; pointer-events: auto;
 }
 #app .bb > button { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+/* 눌림 — 단추 다섯 한 규칙. 지도 가운데 판(#map-plate)은 div 라 판 안의 글자 단추(#map-chapter.mp-txt — 미니맵 열기)가 눌릴 때 판째 같은 눌림
+   (리뷰 Minor 8 · 메인 #kd-bot-plate 와 같은 모습). 화살표는 제 눌림(.mp-arrow:active)만. :has 줄은 따로 둔다 — 한 선택자 목록에 묶으면 :has 를
+   모르는 기기(iOS 15.3 · Chrome 104 아래)가 규칙째 버려 단추 눌림까지 잃는다(그 기기에서 지도 판은 눌림 없음). */
 #app .bb > button:active { transform: translateY(var(--hub-press)); }
+#app .bb > .bb-center:has(> .mp-txt:active) { transform: translateY(var(--hub-press)); }
 #app .bb > .bb-theater { background-image: url("catalog/stage-btn_theater.webp"); }
 #app .bb > .bb-play    { background-image: url("catalog/stage-btn_playground.webp"); }
 #app .bb > .bb-char    { aspect-ratio: 200 / 241; background-image: url("catalog/stage-btn_chars.webp"); }
@@ -70151,15 +70200,20 @@ html[lang="en"] #kd-m-circus b{ font-size: .85em; letter-spacing: -.02em; }
   text-shadow: 0 calc(var(--bb-side) * .28 / 15.43) 0 var(--hub-sh-lab);
 }
 /* 맞춤 — 글자 칸(단추 폭 92%)을 넘는 이름만(실측 scratchpad/rc1017/t3/t3_probe.py · probe-labels.json: 글자 폭 ÷ 칸 폭은 글자 · 칸이 같은 자를 따라
-   크기와 무관하게 같다 — ko 「스토리 극장」 1.001 · en 「Story Theater」 1.475, 나머지 ≤ .72).
-   ko 극장은 116 메뉴 맞춤처럼 그 단추 글자만 칸에 드는 가장 큰 .01 단계로 줄인다(.98 — 821×462 에서 12.4px).
-   en 놀이터 이름은 「Arcade」(지휘자 판정 — 옛 「Playground」 1.124 를 줄이던 .88 줄은 은퇴, 이제 칸 안).
+   크기와 무관하게 같다 — ko 「스토리 극장」 1.001 · en 「Playground」 1.124 · en 「Story Theater」 1.475, 나머지 ≤ .72).
+   ko 극장 · en 놀이터는 116 메뉴 맞춤처럼 그 단추 글자만 칸에 드는 가장 큰 .01 단계로 줄인다(.98 · .88 — 821×462 에서 12.4 · 11.1px).
+   ([판정판 121] en 놀이터 이름을 「Arcade」 로 바꿔 .88 줄을 뺐다가 되돌렸다 — 놀이터 창 안 줄 「Arcade」 와 겹침 · 지휘자 판정. 작은 창에서 11px
+   아래(390×844 10.6px 등)는 보류 목록 「작은 창 이름 하한」.)
    en 「Story Theater」 는 줄이면 .67(821×462 에서 8.5px — 가독 하한 --text-min 11px 아래)이라 줄이지 않고 낱말 사이에서 두 줄로 접는다
    (같은 크기 · 줄 간격 .9 · 묶음 가운데를 73% → 71% — 두 줄 묶음 54~88% 가 아이콘 아래끝 51% 와 아래 굽 88% 사이). */
 html[lang="ko"] #app .bb > .bb-theater > .bb-lab { font-size: calc(var(--bb-side) * 3.5 / 15.43 * .98); }
+html[lang="en"] #app .bb > .bb-play > .bb-lab { font-size: calc(var(--bb-side) * 3.5 / 15.43 * .88); }
 html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal; word-break: keep-all; line-height: .9; }
 /* 가운데 판 글자(메인 「모험 / 챕터 n: 이름」 · 지도 「CHAPTER n / 이름」 = 미니맵 손잡이) — 판 폭 비(116 의 31.66cqw 기준 값 ÷ 31.66). */
-#app .bb-center .mp-txt { position: absolute; left: 50%; top: 50%; width: 92%; transform: translate(-50%, -50%); display: block; margin: 0; padding: 0; min-width: 0; text-align: center; }
+/* 세로 광학 보정(리뷰 Important 2 · V2) — 글자 묶음(굵은 줄 + 작은 줄, line-height 1)은 위 줄 대문자 머리가 상자 위 끝에 닿고 아래는 하강부 자리가
+   남아 잉크가 위로 치우친다(font-audit 잉크 dy: 1280×800 −1.84 · 821×462 −1.05 · 세로 390 −0.17 · 360 +1.13 — scratchpad/rc1017/t3/plate-ink-pre.log).
+   묶음 위에 판 폭 × .16/31.66 의 안여백을 둬(가운데 맞춤이라 글자가 그 절반만큼 내려간다) 메인 · 지도 한 규칙으로 맞춘다. */
+#app .bb-center .mp-txt { position: absolute; left: 50%; top: 50%; width: 92%; transform: translate(-50%, -50%); display: block; margin: 0; padding: calc(var(--bb-mid) * .16 / 31.66) 0 0; min-width: 0; text-align: center; }
 #app .bb-center .mp-txt > b, #app .bb-center .mp-txt > i {
   display: block; max-width: none; font-style: normal; font-weight: 700; color: var(--prim-white);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -70197,8 +70251,11 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
 }
 
 /* ---- 5. 가로(창 가로 ≥ 세로) — 같은 부품, 자만 무대 자(u) ------------------------------------------------------------
-   화면 = 창 전체(fixed · #app 폭 캡 · 지도 60vw 창 · 430px 배율과 무관). UI = 무대 안: 위 바는 무대 위 끝 · 아래 줄은 무대 아래 끝, 왼쪽 칸은
-   무대 왼끝 · 오른쪽 위 단추는 무대 오른끝에 매단다(각각 안전 영역과 큰 쪽). 값 = 116 스펙 6.1 표(u). */
+   화면 = 창 전체(fixed · #app 폭 캡 · 지도 60vw 창 · 430px 배율과 무관). 값 = 116 스펙 6.1 표(u).
+   가로 범위 · 크기 = 무대: 왼쪽 칸은 무대 왼끝 · 오른쪽 위 단추는 무대 오른끝(각각 안전 영역과 큰 쪽) · 아래 줄은 무대 가운데.
+   세로 기준 = 창 가장자리(지휘자 판정 2026-10-17 · 리뷰 Important 1): 위 바 = 창 위 끝 + --safe-t(칸들은 그 안 8u · 16u) · 아래 줄 = 창 아래 끝
+   − --safe-b − 7u(세로 기본 규칙의 bottom 식 그대로 · --bb-lift 만 7u). 16:9 · 더 넓은 창은 무대 높이 = 창 높이라 옛 「무대 위 · 아래 끝」 과
+   같고, 16:10 · 4:3 · 1280×1024 처럼 높은 창에서도 지도 노드(레이어 높이 = 창 높이 비례)와 바의 세로 관계가 16:9 그대로다(바가 창 끝에 붙는다). */
 @media (min-aspect-ratio: 1/1) {
   #screen-kingdom, #screen-map {
     --hub-press: calc(var(--stage-u) * 3);
@@ -70210,7 +70267,7 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
     --tb-lead: calc(var(--tb-u) * 88);
     --tb-rd: calc(var(--tb-u) * 84);
     --tb-rh: calc(var(--tb-u) * 87);
-    left: max(var(--stage-x), var(--safe-l)); right: max(var(--stage-x), var(--safe-r)); top: max(var(--stage-y), var(--safe-t));
+    left: max(var(--stage-x), var(--safe-l)); right: max(var(--stage-x), var(--safe-r)); top: var(--safe-t);
     height: calc(var(--tb-u) * 104);
   }
   #app .tb > .tb-lead  { left: calc(var(--tb-u) * 20);  top: calc(var(--tb-u) * 8); }
@@ -70227,8 +70284,7 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
     --bb-side: calc(var(--bb-u) * 87);
     --bb-mid: calc(var(--bb-u) * 200);
     --bb-gap: calc(var(--bb-u) * 16);
-    --bb-lift: calc(var(--bb-u) * 7);
-    bottom: calc(max(var(--stage-y), var(--safe-b)) + var(--bb-lift));
+    --bb-lift: calc(var(--bb-u) * 7);        /* 아래끝 = 창 아래 − --safe-b − 7u(bottom 식은 세로 기본 규칙 그대로) */
   }
   #app .tb > .tb-mission, #app .bb > .bb-shop { --f2-ph: calc(var(--stage-u) * 62); --hub-badge-o: calc(var(--stage-u) * -6); }
 }
@@ -70239,11 +70295,12 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
    아주 넓은 창(2000×740)은 폭으로 덮고(드래그 0) 기본 규칙(25-3)의 들어 올림이 최저 노드를 아래 줄 위로 올린다(창을 덮는 데까지만).
    세로 그림 챕터(6 · 8 · 9 · 10, data-ar="tall")는 덮으면 노드가 창 밖으로 흩어지므로 높이를 창에 맞추고 가운데(mapFit)에 세운다 —
    양옆은 같은 챕터 그림을 또렷하게 덮고 정적 어둡게 한 겹(--map-dim-a, 애니메이트 없음)을 얹은 #map-view 바탕(흐림 0).
-   띠 = 공용 아래 줄 높이(무대 아래 끝 + 7u + 가운데 판 120u). 노드 번호 글자(그림 높이 비)도 상자 높이를 따른다. */
+   띠 = 공용 아래 줄 높이(창 아래 끝 − --safe-b − 7u − 가운데 판 120u — 위 5 절 「세로 기준 = 창 가장자리」). 노드 번호 글자(그림 높이 비)도
+   상자 높이를 따른다. */
 @media (min-aspect-ratio: 1/1) {
   #screen-map #map-layer {
     --map-lh: max(100dvh, calc(100vw * 1272 / 2600));
-    --map-bar: calc(max(var(--stage-y), var(--safe-b)) + var(--stage-u) * 127);
+    --map-bar: calc(var(--safe-b) + var(--stage-u) * 127);
   }
   /* 세로 그림 챕터 — 창 위 끝부터 아래 줄 위(띠 + 여유)까지의 높이 · 위 끝 0. 최저 노드(그림의 85%)가 아래 줄에 안 가린다(창 높이 그대로면
      51 · 61 … 번이 가운데 판 밑으로 들어갔다 — 1280×720 실측). 아래 남는 띠는 #map-view 바탕(같은 그림 · 정적 어둡게)이 채운다. */
@@ -70263,6 +70320,31 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
     background-size: 100% 100%, cover;
   }
 }
+/* 6 절의 대체(리뷰 Minor 1) — 위 선언보다 뒤라 이긴다.
+   ① dvh 를 모르는 기기: 레이어 높이 두 줄을 vh 로(0 절 대체와 같은 까닭 — 사용자 정의 속성이라 @supports 로 감싼다).
+   ② color-mix 를 모르는 기기(iOS 16.1 · Chrome 110 아래): 바탕 선언 전체가 버려져 세로 그림 챕터 양옆이 빈 바탕이 된다 → 같은 그림 위에
+      잉크 알파 토큰 --prim-line-light(= --prim-ink 와 같은 rgb 34 27 46 · 알파 .1) 네 겹 = 1 − .9⁴ = .344(≈ --map-dim-a .35)로 어둡게 한다
+      (새 색 0 — 바뀌지 않는 정적 바탕). */
+@supports not (height: 100dvh) {
+  @media (min-aspect-ratio: 1/1) {
+    #screen-map #map-layer { --map-lh: max(100vh, calc(100vw * 1272 / 2600)); }
+    #screen-map #map-layer[data-ar="tall"] { --map-lh: calc(100vh - var(--map-bar) - var(--map-safe-gap)); }
+  }
+}
+@supports not (color: color-mix(in srgb, red, red)) {
+  @media (min-aspect-ratio: 1/1) {
+    #screen-map #map-view {
+      background-image:
+        linear-gradient(var(--prim-line-light), var(--prim-line-light)), linear-gradient(var(--prim-line-light), var(--prim-line-light)),
+        linear-gradient(var(--prim-line-light), var(--prim-line-light)), linear-gradient(var(--prim-line-light), var(--prim-line-light)),
+        var(--map-art, var(--art-map-bg));
+      background-repeat: no-repeat;
+      background-position: center center;
+      background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, cover;
+    }
+  }
+}
+</style>
 
 <style id="drops-74">
 /* ===== 74 T12 — 획득표 모달(#modal-drops) =====================================
@@ -70872,7 +70954,8 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
 #sh-tabs .sh-dot{ position: absolute; right: 1.5cqw; top: 1.2cqw; }
 
 /* 위 띠 글자 크기 = 목업 px ÷ 3.9(지휘자 판정 ③ 2026-10-06): 하트 수 18 · 타이머 10.5 · 코인 16 · 별 18 px. 자리(%)·그림자는 위 지도 규칙
-   (#map-hearts-v · #map-heart-t · #map-stars-v · #map-b1-v)에 합류한 그대로이고 크기만 여기서 덮는다 — 지도 글자(5.40/4.40/5.00/5.60)를 그대로 쓰면
+   (#map-hearts-v · #map-heart-t · #map-stars-v · #map-b1-v)에 합류해 있던 것을 [판정판 121] 지도 규칙 은퇴 때 상점 줄로 떼어 남겼다(위 상점 줄 —
+   지도 위 바는 공용 .tb 로 감) — 크기만 여기서 덮는다. 지도 글자(5.40/4.40/5.00/5.60)를 그대로 쓰면
    알약이 지도보다 작아(106 vs 130px) 타이머가 어두운 상자(알약 폭의 50.8%~91.5%)를 넘어 하트 수에 닿았다(실측). 6·7자 코인은 위 data-len 규칙. */
 #screen-shop #sh-hearts-v{ font-size: 4.62cqw; }
 #screen-shop #sh-heart-t { font-size: 2.69cqw; }
@@ -70880,7 +70963,8 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
 #screen-shop #sh-star-v  { font-size: 4.62cqw; }
 
 /* 데스크톱(가로 · ≥700 · ≥600 높이 — 왕국 데스크톱 절과 같은 조건): 상점은 모달도 패널도 아닌 왕국 가족의 전체 화면이라 기둥 폭 = 왕국 UI 기둥
-   calc(var(--mapui) * 100)(430px, #kd-bot · #map-bot 과 같다) 가운데, --f2-w 도 같은 식(지휘자 판정 ①② 2026-10-06). --mapui 는 :root 의
+   calc(var(--mapui) * 100)(430px, 그때 #kd-bot · #map-bot 과 같았다 — [판정판 121] 그 둘은 공용 아래 줄로 무대 자 --stage-u 를 쓰고, --mapui 는
+   이 상점 기둥만 읽는다 · 상점의 공용 부품 이사는 Task 4) 가운데, --f2-w 도 같은 식(지휘자 판정 ①② 2026-10-06). --mapui 는 :root 의
    (min-aspect-ratio: 1/1) and (min-width: 700px) 절에 있어 여기서 읽힌다. 기둥이 컨테이너라 cqw 가 폰 배율(4.3px)로 풀려 위 좌표가 그대로 선다 —
    전폭(#app max-width:none)으로 두면 1cqw 가 12.8px 라 띠 218px · 판 55px 가 됐다(실측). 가로 폰(<600)은 왕국 폭 캡 절(clamp)에 합류해 있다. */
 @media (min-aspect-ratio: 1/1) and (min-width: 700px) and (min-height: 600px){
