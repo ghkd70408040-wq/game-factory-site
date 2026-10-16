@@ -14336,6 +14336,10 @@ html[lang="ko"] #modal-arc .sheet-row .btn { word-break: keep-all; min-width: 0;
   --mode-b-rim:     #C2D6FF;
   --mode-b-outline: #6F6BB4;
   --mode-b-gloss:   0.770;
+  /* [판정판 121 · 2026-10-17] 하한 토큰 둘 — 무대 자(--bu)로 줄어드는 가로 화면 부품이 max(…, 이 값) 으로 읽는다.
+     touch-min = 손가락 대상 최소(애플 HIG 44pt) · text-min = 가장 작은 포털 창(821×462)에서도 읽히는 글자(스펙 Review Focus 2). */
+  --touch-min: 44px;
+  --text-min: 11px;
   /* [E73-0908 norm-cw] --cap- 계열 붕괴 — 캡슐 역할색 8슬롯. mint/pink/yellow/orange/purple/lilac 은
      위 --role-* 와 값이 같아 그리로 붕괴. 아래 넷은 그 표에 없던 값을 이름만 붙여 옮긴 것(값 신설 0):
        blue  킷 캡슐 파랑          glass 킷 유리 캡슐(불투명 두 톤) · 클래식 HUD 게이지 캡슐(.ch-g)
@@ -30766,7 +30770,7 @@ window.TT_SFX = {
         var cs = window.getComputedStyle(board);
         var v = parseFloat(cs.getPropertyValue('--board-max'));
         if (isFinite(v) && v > 0) return v;
-        /* [판정판 121] 가로 전투의 --board-max 는 무대 자 식(calc(var(--bu) * 512))이라 숫자로 안 읽힌다 —
+        /* [판정판 121] 가로 전투의 --board-max 는 무대 자 식(calc(var(--bu) * var(--bt-board-w)))이라 숫자로 안 읽힌다 —
            같은 값을 받는 #board 의 계산된 max-width(px)를 읽는다. 세로·다른 모드는 위 줄에서 이미 돌아간다. */
         var mw = parseFloat(cs.maxWidth);
         if (isFinite(mw) && mw > 0) return mw;
@@ -30841,6 +30845,11 @@ window.TT_SFX = {
     if (!isFinite(next)) next = TILE_MIN;
     next = clamp(next, TILE_MIN, TILE_MAX);
     if (isFinite(byW) && byW > 0 && next > byW) next = byW;   // never overflow width
+    /* [판정판 121 · 리뷰 I-2] 가로 전투에서 이 판의 행 수(판 시작 때 정함 — 세로에서 시작해 가로로 돌린 판)가 상자
+       높이에 안 들어가면, 그 판에 한해 칸을 TILE_MIN 아래로 내려 맨 아랫줄이 #board-scroll{overflow:hidden} 에 조용히
+       잘리지 않게 한다(바로 위 폭 예외와 같은 판단 — 덜 예쁜 칸이 잘린 줄보다 낫다). 세로는 battleStage() 가 null 이라
+       이 갈래를 안 탄다. 읽기만 하고(계산된 스타일) 쓰기 전에 끝난다. */
+    if (isFinite(byH) && byH > 0 && next > byH && battleOn() && battleStage()) next = byH;
     if (next < 12) next = 12;
     ts = next;
 
@@ -38324,13 +38333,19 @@ window.TT_SFX = {
      43 + 슬래브 padding·margin 약 20 — §18.4b 높이 예산과 시안 5호 §2). */
   var BATTLE_HUD_AR = 1536 / 500;
   var BATTLE_HUD_WAS = 63;
-  /* [판정판 121] 가로 전투 무대(1280×720 bu)와 그 안의 판 상자(512×590 bu). CSS 블록 style#battle-landscape 와
-     **같은 수**다(함께 고친다). 행 수를 정하는 순간(duelStart 앞)에는 .battle 이 아직 꺼져 있어 상자를 잴 수 없으므로
-     같은 식(bu = min(창 폭/1280, 창 높이/720))을 여기서 푼다. 조건도 CSS 와 같은 미디어쿼리 한 줄이다. */
-  var BT_STAGE_W = 1280, BT_STAGE_H = 720, BT_BOARD_W = 512, BT_BOARD_H = 590;
-  var BT_LANDSCAPE_MQ = '(min-aspect-ratio: 1/1)';
-  function battleLandscape() {
-    try { return !!(window.matchMedia && window.matchMedia(BT_LANDSCAPE_MQ).matches); } catch (e) { return false; }
+  /* [판정판 121] 가로 전투 무대 수 — **유일 출처는 CSS**(style#battle-landscape 의 가로 미디어쿼리 안 :root 의
+     --bt-stage-w · --bt-stage-h · --bt-board-w · --bt-board-h, 단위 없는 수). JS 는 읽기만 한다(boardMaxPx 가
+     --board-max 를 읽는 것과 같은 규약). 행 수를 정하는 순간(duelStart 앞)에는 .battle 이 아직 꺼져 있어 판 상자를
+     잴 수 없으므로 이 수로 같은 식(bu = min(창 폭/무대 폭, 창 높이/무대 높이))을 푼다. 창이 가로가 아니면 그 :root
+     선언이 없어 null — 「가로인가」 조건도 CSS 미디어쿼리 한 곳이 쥔다. */
+  function battleStage() {
+    try {
+      var cs = window.getComputedStyle(document.documentElement);
+      var sw = parseFloat(cs.getPropertyValue('--bt-stage-w')), sh = parseFloat(cs.getPropertyValue('--bt-stage-h'));
+      var bw = parseFloat(cs.getPropertyValue('--bt-board-w')), bh = parseFloat(cs.getPropertyValue('--bt-board-h'));
+      if (sw > 0 && sh > 0 && bw > 0 && bh > 0) return { sw: sw, sh: sh, bw: bw, bh: bh };
+    } catch (e) { /* ignore */ }
+    return null;
   }
   /**
    * 전투 판의 행 수. n(계획서의 칸 수)은 이제 **폴백**으로만 쓰인다 — 화면을
@@ -38341,12 +38356,13 @@ window.TT_SFX = {
     try {
       var area = boardArea();
       var bmax = boardMaxPx();
-      /* [판정판 121] 가로 창: 판 상자는 HUD 와 따로 선 자기 자리(무대 512×590 bu)다 — 그 상자 높이만으로 센다.
-         아래 HUD 예약 셈(#hud-row 34 · 폭/3.072)은 세로 배치의 것이라 가로에서는 쓰지 않는다. */
+      /* [판정판 121] 가로 창: 판 상자는 HUD 와 따로 선 자기 자리(무대 안 --bt-board-w × --bt-board-h bu)다 — 그 상자
+         높이만으로 센다. 아래 HUD 예약 셈(#hud-row 34 · 폭/3.072)은 세로 배치의 것이라 가로에서는 쓰지 않는다. */
       var land = false;
-      if (battleLandscape()) {
-        var bu = Math.min((window.innerWidth || 0) / BT_STAGE_W, (window.innerHeight || 0) / BT_STAGE_H);
-        if (bu > 0) { land = true; area = { w: bu * BT_BOARD_W, h: bu * BT_BOARD_H }; bmax = 0; }
+      var stg = battleStage();
+      if (stg) {
+        var bu = Math.min((window.innerWidth || 0) / stg.sw, (window.innerHeight || 0) / stg.sh);
+        if (bu > 0) { land = true; area = { w: bu * stg.bw, h: bu * stg.bh }; bmax = 0; }
       }
       var w = (bmax > 0 && area.w > bmax) ? bmax : area.w;
       /* 타일 크기는 layout() 과 **같은 식**으로 뽑는다. 두 곳이 다른 식을 쓰면
@@ -71677,17 +71693,20 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
    원인(조사 B §0·②): 세로용 HUD(폭에서 높이를 내는 cqw 그림)를 3열 격자에 통째로 얹어 상자(293px)와
    그림(388px)이 어긋났고, 메달 넷은 가로 띠 판을 세로로 늘린 상자에 섰고, 배경은 #pc-bg 흐림 확장이었다.
 
-   새 배치 = 창 가운데 16:9 무대(1280×720 bu). 자 --bu = min(창 폭/1280, 창 높이/720) — 메인 v3 의 --hub-u 와
-   같은 식(TECH-ART §1 scale = min(w/W, h/H)) · 공용 --stage-u(Task 3)가 같은 식으로 선다.
-       왼 기둥   x 24~364   악당 카드(#pc-left · y 118~708) — 악당 전신 · 이름 · Lv · 체력 막대 · 숫자 · 공격 게이지
+   새 배치 = 창 가운데 16:9 무대(--bt-stage-w × --bt-stage-h = 1280×720 bu). 자 --bu = min(창 폭/1280, 창 높이/720)
+   — 메인 v3 의 --hub-u 와 같은 식(TECH-ART §1 scale = min(w/W, h/H)) · 공용 --stage-u(Task 3)가 같은 식으로 선다.
+       왼 기둥   x 24~364   악당 카드(#pc-left · y 118~708) — 위에서부터 악당 전신(128~458) · 판(plate) 위의 이름 · Lv ·
+                            체력 막대 · 숫자 · 공격 게이지(450~539) · 토스트 자리(아래 끝 642) · 칩 줄 #hud-row(654~696)
        가운데    x 384~896  위 = 성 + 시간 캡슐 + DMG(y 4~90) · 아래 = 열매 판 상자(y 118~708 · 512×590)
-       오른 기둥 x 916~1256 영웅 카드(#pc-right · y 118~708) — 영웅 · 펫 방울 · 이름 · Lv · 체력 · 숫자 · 게이지
-                            + 그 아래 스킬 메달 넷 2×2(그림 비 718:907 그대로 · 간격 = 메달 높이의 .11)
-       일시정지  (24, 16) 지름 64
+       오른 기둥 x 916~1256 영웅 카드(#pc-right · y 118~708) — 영웅(128~348) · 펫 방울 · 판 위의 이름 · Lv · 체력 · 숫자 ·
+                            게이지(341~430) + 그 아래 스킬 메달 넷 2×2(440~694 · 그림 비 718:907 그대로 · 간격 .11H)
+       일시정지  (24, 16) 지름 64(하한 --touch-min)
    세로 자리는 브리프 기준(캡슐 10~96 · 판 108~708)에서 허용 ±10 안으로 옮긴 값이다: 캡슐 −6 · 판·카드 윗변 +10.
    이유 = 배율 띠(multBandWord)는 「캡슐 바닥 ↔ 판 윗변」 틈에만 서는데, 기준 자리에서는 그 틈이 21bu 라 글자가
    하한 14px 로 눌렸다(1280×720 실측). 옮긴 자리에서 틈 32.5bu → 22px. 판 크기는 그대로(1280×720 칸 70 · 8줄 = 581 ≤ 590).
-   좌표 표기: calc 의 «(x − 640)» · «(y − 360)» 은 무대 좌표 → 창 가운데 기준 변환(무대가 창 가운데에 선다).
+   좌표 표기: 무대 좌표 (x, y) = calc(var(--bt-x0) + var(--bu) * x) · calc(var(--bt-y0) + var(--bu) * y). --bt-x0/--bt-y0 =
+   무대 왼끝·윗끝(창 가운데 − 무대 반). 판 상자 수(--bt-board-*)와 무대 수는 가운데 :root 한 곳 — JS battleStage() 가 읽는다.
+   글자 · 손가락 하한: 무대 자로 줄어드는 글자는 max(var(--text-min), …), 일시정지는 max(var(--touch-min), …)(토큰 = tokens-semantic).
 
    HUD 는 DOM 을 옮기지 않는다(계약 ⑦-1). #duel-hud 상자는 가운데 위 띠(무대 x 265~1015 · y 4~90)로 두어
    hudFloorY()·multBandGap() 이 읽는 「HUD 아래 끝」 = 시간 캡슐 바닥이 되게 하고(계약 ⑦-5), 두 진영 조각은
@@ -71696,17 +71715,33 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
        --bt-hu = 세로 HUD 1cqw 에 해당하는 길이 = 7.5bu (체력 홈 40cqw → 300bu · 이름 2.90cqw → 21.75bu)
        --bt-cu = 가운데 시간 무리(성 + 캡슐) 1cqw = 3.4436bu (무리 높이 0.766~25.74cqw = 24.974 → 86bu)
    #duel-hud 폭 = 100 × --bt-hu = 750bu 라, 이 블록이 덮지 않은 cqw 값도 같은 자로 풀린다.
-   ⚠ 이 블록은 cqw 를 쓰지 않는다 — 컨테이너 질의 미지원 기기에서도 그대로 서고, 세로 폴백
-     (@supports not (width:1cqw), sian-hud-rebuild 끝)의 vw 값은 특이도(id 3)로 이긴다. 그래서 따로 폴백 절이 없다.
+   ⚠ 컨테이너 질의(cqw) 폴백 — 이 블록의 선언에는 cqw 가 없다. 세로 HUD 에서 cqw 로 적힌 속성 가운데 이 블록이
+     **덮는 것**(아래 값이 이기므로 cqw 미지원 기기에서도 그대로 선다 · 세로 vw 폴백 :69289~ 은 특이도 id 3 으로 진다):
+       #btn-pause 자리·크기(세로는 #topbar --dh-w = 100cqw 비율) · --hud-tick-w ·
+       .dh-track--l/r · .dh-tick(--l/--r) · .dh-orn(--fl/--fr/--ml/--mr) 의 left/top/width/height · background-size/position ·
+       .dh-num 의 top/height/font-size · #duel-foe-n left · #duel-me-n right · .dh-name · .dh-lv(+ en 이름) font-size ·
+       #duel-dmg font-size · #duel-baby left/top/width · #duel-timer left/top/width/height/--wcap-w/--wcap-h/font-size ·
+       .dh-cap left/top/width/height · .dh-plate(--top/--bot) left/top/width/height · filter · mask.
+     **덮지 않는 것**: .dh-cap 의 filter drop-shadow(0 .5cqw .5cqw) 하나 — cqw 미지원 기기에서는 캡슐 그림자만 빠진다
+     (세로와 같은 사정). 막대 채움 · 공격 게이지 · 이름 상자 · Lv 알약은 .dh-side 의 % 라 컨테이너 질의와 무관하다.
    ⚠ 세로(폰 · play.html 기둥 480×1080)는 이 미디어쿼리를 못 본다 — 한 줄도 안 바뀐다.
    ⚠ 새 움직임 0(transition·animation 없음). 판 뒤 어둡게는 정적 그라데이션 한 겹.
-   JS 짝(함께 고친다): battleRows() 가로 갈래(판 상자 512×590bu 로 행 수 — BT_STAGE_* 가 같은 수) ·
+   JS 짝: battleStage()(아래 :root 의 무대 · 판 상자 수를 읽는다) → battleRows() 가로 갈래 · layout() 가로 회전 칸 하한 예외 ·
    boardMaxPx()(--board-max calc 를 못 읽으면 #board 의 계산된 max-width).
    ============================================================================ */
 @media (min-aspect-ratio: 1/1) {
-  /* ---- 0. 자 ---------------------------------------------------------------- */
+  /* ---- 0. 무대 수(한 곳) · 자 -------------------------------------------------
+     단위 없는 수. JS battleStage() 가 getComputedStyle(documentElement) 로 읽는다(행 수를 정하는 순간엔 .battle 이
+     아직 꺼져 있어 #app.battle 에 두면 못 읽는다 → :root). 가로가 아니면 이 선언이 없다 = JS 의 「가로인가」 판정. */
+  :root {
+    --bt-stage-w: 1280; --bt-stage-h: 720;
+    --bt-board-x: 384; --bt-board-y: 118; --bt-board-w: 512; --bt-board-h: 590;
+  }
   #app.battle {
-    --bu: min(calc(100vw / 1280), calc(100dvh / 720));
+    --bu: min(calc(100vw / var(--bt-stage-w)), calc(100dvh / var(--bt-stage-h)));
+    /* 무대 왼끝 · 윗끝 — 퍼센트는 쓰는 자리에서 풀린다(left 에는 --bt-x0, top 에는 --bt-y0 만 쓴다). */
+    --bt-x0: calc(50% - var(--bu) * var(--bt-stage-w) / 2);
+    --bt-y0: calc(50% - var(--bu) * var(--bt-stage-h) / 2);
   }
 
   /* ---- 1. 화면 = 창 전체 · 배경 또렷 -----------------------------------------
@@ -71735,7 +71770,8 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
     --bt-dim-a: .30;             /* 판 뒤 어둡게 세기 — 판 가운데에서 이 값, 판 바깥으로 0 */
     background-color: var(--prim-ink);
     background-image:
-      radial-gradient(ellipse calc(var(--bu) * 430) calc(var(--bu) * 420) at 50% calc(50% + var(--bu) * 48),
+      radial-gradient(ellipse calc(var(--bu) * 430) calc(var(--bu) * 420)
+                      at 50% calc(var(--bt-y0) + var(--bu) * (var(--bt-board-y) + var(--bt-board-h) / 2)),
         color-mix(in srgb, var(--prim-ink) calc(var(--bt-dim-a) * 100%), transparent) 0%,
         color-mix(in srgb, var(--prim-ink) calc(var(--bt-dim-a) * 55%), transparent) 60%,
         transparent 100%),
@@ -71747,13 +71783,13 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
     transform: none;             /* 은퇴: scale(1.12) — 흐림 가장자리 여유였다 */
   }
 
-  /* ---- 2. 일시정지 — 무대 왼쪽 위 (24, 16) 지름 64 --------------------------- */
+  /* ---- 2. 일시정지 — 무대 왼쪽 위 (24, 16) 지름 64 · 하한 --touch-min ------------- */
   #app.battle #screen-game.active #topbar {
     position: absolute;
-    left: calc(50% + var(--bu) * (24 - 640));
-    top: calc(50% + var(--bu) * (16 - 360));
-    width: calc(var(--bu) * 64);
-    height: calc(var(--bu) * 64);
+    left: calc(var(--bt-x0) + var(--bu) * 24);
+    top: calc(var(--bt-y0) + var(--bu) * 16);
+    width: max(var(--touch-min), calc(var(--bu) * 64));
+    height: max(var(--touch-min), calc(var(--bu) * 64));
     padding: 0;
     margin: 0;
     z-index: 3;
@@ -71767,23 +71803,61 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
     aspect-ratio: auto;
   }
 
-  /* ---- 3. 전투에서 빈 두 줄(콤보 띠 · 칩 줄)은 접는다 — PC 가로(pc-landscape ⑧b)와 같은 판정을 가로 전체로 */
-  #app.battle #screen-game.active #combo-wrap,
-  #app.battle #screen-game.active #hud-row { display: none !important; }
+  /* ---- 3. 콤보 띠는 접고(전투에서 빈 레일), 칩 줄 #hud-row 는 악당 카드 아래 빈 유리에 ----------------
+     [리뷰 I-1 · 지휘자 판정] 「● ○ 다음: 텐!」(#tw-chip) · 패시브(#pv-chip)는 전투에서도 첫 매치 뒤에 서는 게임 정보다
+     (syncTwChip 은 battleOn 을 안 묻는다 — :8187 D1 재발 주석). 그래서 접지 않고 악당 카드 맨 아래(무대 x 36~352 ·
+     y 654~696)에 가운데 맞춤으로 둔다. 줄 자신은 판을 칠하지 않는다(늘어나는 판 0) — 칩만 내용 크기. 판 상자 밖이라
+     battleRows 의 예약은 0 그대로. 옛 PC 날개 유리(pc-landscape ⑧b 의 #hud-row 판 · 세로 쌓기)는 걷는다. */
+  #app.battle #screen-game.active #combo-wrap { display: none !important; }
+  #app.battle #screen-game.active #hud-row {
+    display: flex !important;    /* pc-landscape ⑧b 의 display:none !important 를 뚫는다 */
+    position: absolute;
+    left: calc(var(--bt-x0) + var(--bu) * 36);
+    top: calc(var(--bt-y0) + var(--bu) * 654);
+    width: calc(var(--bu) * 316);
+    height: max(calc(var(--text-min) * 2.6), calc(var(--bu) * 42));   /* 칩 높이 하한(아래 --chip-h)이 줄 안에 들도록 */
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: calc(var(--bu) * 8);
+    z-index: 2;
+    border-radius: 0;
+    background-color: transparent;
+    background-image: none;
+    box-shadow: none;
+  }
+  #app.battle #screen-game.active #hud-row #tw-chip,
+  #app.battle #screen-game.active #hud-row #pv-chip {
+    --chip-h: max(calc(var(--text-min) * 2.6), calc(var(--bu) * 36));
+    padding: 0 calc(var(--chip-h) * .45);
+    font-size: max(var(--text-min), calc(var(--bu) * 15));
+  }
+  /* 토스트 — [리뷰 M-2] 세로 자리(화면 아래 가운데)는 가로에서 판 7번째 줄을 덮었다. 악당 카드 아래쪽(칩 줄 위 · 아래 끝
+     무대 y 642 · 가운데 x 194)에 서고 위로 자란다. 너비는 카드 안쪽(316bu). 나타나기 움직임(opacity · transform)은 그대로. */
+  #app.battle #screen-game.active ~ #toast {
+    left: calc(var(--bt-x0) + var(--bu) * 194);
+    bottom: calc(var(--bt-y0) + var(--bu) * (var(--bt-stage-h) - 642));
+    max-width: calc(var(--bu) * 316);
+    padding: calc(var(--bu) * 9) calc(var(--bu) * 16);
+    font-size: max(var(--text-min), calc(var(--bu) * 14));
+  }
 
-  /* ---- 4. 열매 판 상자 — 가운데 x 384~896 · y 118~708 ------------------------- */
+  /* ---- 4. 열매 판 상자 — 가운데 (--bt-board-x, --bt-board-y) · --bt-board-w × --bt-board-h ------------ */
   #app.battle #screen-game.active #board-scroll {
     position: absolute;
-    left: calc(50% + var(--bu) * (384 - 640));
-    top: calc(50% + var(--bu) * (118 - 360));
-    width: calc(var(--bu) * 512);
-    height: calc(var(--bu) * 590);
+    left: calc(var(--bt-x0) + var(--bu) * var(--bt-board-x));
+    top: calc(var(--bt-y0) + var(--bu) * var(--bt-board-y));
+    width: calc(var(--bu) * var(--bt-board-w));
+    height: calc(var(--bu) * var(--bt-board-h));
     padding: 0;
     margin: 0;
     flex: none;
   }
   /* 판 폭 천장 = 상자 폭. boardMaxPx() 는 이 calc 를 숫자로 못 읽으면 #board 의 계산된 max-width 를 읽는다. */
-  #app.battle #screen-game.active #board { --board-max: calc(var(--bu) * 512); }
+  #app.battle #screen-game.active #board { --board-max: calc(var(--bu) * var(--bt-board-w)); }
 
   /* ---- 5. 두 기둥 카드 = 창 틀 젤리판(.jbox--modal 코드 젤리 — 노드 카드 · 캐릭터 선택과 같은 판) ----
      DOM 을 안 바꾸려고 판 등급 규칙(jelly-box-core 의 .jbox--modal 셋 — 변수 · ::before · ::after)에 이 두 id 를
@@ -71795,9 +71869,9 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
     display: block !important;   /* 봉인 · pc-landscape 의 전투 #pc-left 접기(display:none !important)를 뚫는다 */
     position: absolute;
     z-index: 0;
-    top: calc(50% + var(--bu) * (118 - 360));
+    top: calc(var(--bt-y0) + var(--bu) * var(--bt-board-y));    /* 카드 윗변·아랫변 = 판 상자와 한 줄 */
     width: calc(var(--bu) * 340);
-    height: calc(var(--bu) * 590);
+    height: calc(var(--bu) * var(--bt-board-h));
     margin: 0;
     background-color: transparent;
     background-image: none;
@@ -71806,14 +71880,14 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
     --jbox-radius: calc(var(--bu) * 40);
     --jbox-bw: calc(var(--bu) * 1.5);
   }
-  #app.battle #screen-game.active #pc-left[data-wide-only]  { left: calc(50% + var(--bu) * (24 - 640)); }
-  #app.battle #screen-game.active #pc-right[data-wide-only] { left: calc(50% + var(--bu) * (916 - 640)); }
+  #app.battle #screen-game.active #pc-left[data-wide-only]  { left: calc(var(--bt-x0) + var(--bu) * 24); }
+  #app.battle #screen-game.active #pc-right[data-wide-only] { left: calc(var(--bt-x0) + var(--bu) * 916); }
 
   /* ---- 6. HUD — 상자 = 가운데 위 띠, 조각 = 양 기둥 ------------------------------ */
   #app.battle #screen-game.active #duel-hud {
     position: absolute !important;   /* 세로 단계 B 의 relative !important 를 이긴다(특이도 id 3) */
-    left: calc(50% + var(--bu) * (265 - 640));
-    top: calc(50% + var(--bu) * (4 - 360));
+    left: calc(var(--bt-x0) + var(--bu) * 265);
+    top: calc(var(--bt-y0) + var(--bu) * 4);
     width: calc(var(--bu) * 750);
     height: calc(var(--bu) * 86);
     margin: 0;
@@ -71827,16 +71901,41 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
     --bt-oy: calc(var(--bu) * -4);
     /* 진영 무리 원점 = 세로 HUD 의 cqw 원점이 무대 어디에 오나.
        악당 x 0.5    = 카드 가운데 194 − 홈 가운데 25.8cqw × 7.5
-            y 354.92 = 악당 그림(330) + 발 아래 띠(26.747→32.74cqw = 44.95)를 카드(118~708) 세로 가운데에 → 발 555.53 − 26.747 × 7.5
+            y 285.54 = [리뷰 M-1] 이름 줄 윗변(22.995cqw)을 악당 그림 아래 끝(카드 위 10 + 그림 330 = 458)에 → 458 − 22.995 × 7.5
        영웅 x 506.25 = 카드 가운데 1086 − 홈 가운데 77.3cqw × 7.5
-            y 180.17 = 영웅 발(22.911cqw)을 카드 위 14 + 그림 220 = 352 에 */
+            y 176.17 = 영웅 발(22.911cqw)을 카드 위 10 + 그림 220 = 348 에 */
     --bt-fx: calc(var(--bt-ox) + var(--bu) * 0.5);
-    --bt-fy: calc(var(--bt-oy) + var(--bu) * 354.92);
+    --bt-fy: calc(var(--bt-oy) + var(--bu) * 285.54);
     --bt-mx: calc(var(--bt-ox) + var(--bu) * 506.25);
-    --bt-my: calc(var(--bt-oy) + var(--bu) * 180.17);
+    --bt-my: calc(var(--bt-oy) + var(--bu) * 176.17);
   }
-  /* 세로 HUD 의 띠 판 둘은 끈다(가로 띠 그림 — 늘리면 줄무늬, 계약 ⑦-7). 바탕은 카드 젤리판이다. */
-  #app.battle #screen-game.active #duel-hud .dh-plate { display: none; }
+  /* 6-0. 진영 판(plate) — [리뷰 M-1] 이름 · Lv · 체력 막대 · 숫자 뒤에 HUD 와 같은 재질(Mode B 면 · 알파 · 겉선 · 림 토큰)의
+     둥근 판 한 장. 세로의 띠 판 그림 둘(가로 띠 — 늘리면 줄무늬, 계약 ⑦-7)은 그림을 벗기고 이 판으로 쓴다:
+     .dh-plate--bot = 악당 판 · .dh-plate--top = 영웅 판. 크기 = 진영 무리(22.995~32.74cqw = 9.745) + 위아래 8 · 폭 324.
+     판은 그림(z 2) 위 · 홈 · 장식(z 3, DOM 뒤라 위) · 진영 상자(z 4 · 5) · 눈금 · 숫자(z 6) 아래라, 악당 그림 아래 끝 8bu(발
+     잘린 원판의 절단면)는 판이 덮는다 — 세로에서 뼈 막대가 하던 일. 이름은 그림 위가 아니라 판 위에 선다. */
+  #app.battle #screen-game.active #duel-hud .dh-plate {
+    z-index: 3;
+    width: calc(var(--bu) * 324);
+    height: calc(var(--bt-hu) * 9.745 + var(--bu) * 16);
+    border-radius: calc(var(--bu) * 22);
+    background-image: none;
+    background-color: color-mix(in srgb, var(--mode-b-face) calc(var(--mode-b-alpha) * 100%), transparent);
+    box-shadow:
+      inset 0 0 0 calc(var(--bu) * 2) var(--mode-b-outline),
+      inset 0 0 0 calc(var(--bu) * 4) var(--mode-b-rim);
+    -webkit-mask-image: none;
+            mask-image: none;
+    filter: none;
+  }
+  #app.battle #screen-game.active #duel-hud .dh-plate--bot {
+    left: calc(var(--bt-ox) + var(--bu) * 32);
+    top: calc(var(--bt-fy) + var(--bt-hu) * 22.995 - var(--bu) * 8);
+  }
+  #app.battle #screen-game.active #duel-hud .dh-plate--top {
+    left: calc(var(--bt-ox) + var(--bu) * 924);
+    top: calc(var(--bt-my) + var(--bt-hu) * 22.995 - var(--bu) * 8);
+  }
 
   /* 6-a. 가운데 시간 무리 — 세로 cqw 값 그대로 × --bt-cu, 원점 = 캡슐 왼끝(28.10) · 성 윗변(0.766) */
   #app.battle #screen-game.active #duel-hud .dh-mid {
@@ -71876,14 +71975,15 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
     height: calc(var(--bt-cu) * 8.1495);
     padding: 0;
     justify-content: flex-start;
-    font-size: calc(var(--bu) * 18);
+    font-size: max(var(--text-min), calc(var(--bu) * 18));
   }
 
-  /* 6-c. 큰 그림 둘 · 펫 방울 — 크기 = 브리프(악당 높이 330 · 영웅 220). 바닥 = 세로와 같은 앉힘점
-     (악당 발 26.747cqw 는 뼈 막대 뒤로 물리고, 영웅 발 22.911cqw 는 이름 줄 위에 얹힌다). --me-scale 은 세로와 같이 산다. */
+  /* 6-c. 큰 그림 둘 · 펫 방울 — 크기 = 브리프(악당 높이 330 · 영웅 220). 바닥 = 이름 줄 윗변(22.995cqw) 바로 위 —
+     [리뷰 M-1] 악당도 영웅처럼 그림 **아래**에 이름 · 막대가 선다(세로의 「발이 뼈 막대 뒤로 물림」 26.747cqw 는 은퇴, 발 끝
+     8bu 는 판이 덮는다). 영웅 발 22.911cqw 는 세로 그대로. --me-scale 은 세로와 같이 산다. */
   #app.battle #screen-game.active #duel-foe-av {
     left: calc(var(--bt-ox) + var(--bu) * 24);
-    top: calc(var(--bt-fy) + var(--bt-hu) * 26.747 - var(--bu) * 330);
+    top: calc(var(--bt-fy) + var(--bt-hu) * 22.995 - var(--bu) * 330);
     width: calc(var(--bu) * 340) !important;
     height: calc(var(--bu) * 330) !important;
   }
@@ -71895,7 +71995,7 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
   }
   #app.battle #screen-game.active #duel-hud #duel-baby {
     left: calc(var(--bt-ox) + var(--bu) * 1144.5);
-    top: calc(var(--bt-oy) + var(--bu) * 132);
+    top: calc(var(--bt-oy) + var(--bu) * 128);
     width: calc(var(--bt-hu) * 13);
   }
 
@@ -71912,9 +72012,9 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
     width: calc(var(--bt-hu) * 46.82);
     height: calc(var(--bt-hu) * 9.486);
   }
-  #app.battle #screen-game.active #duel-hud .dh-name { font-size: calc(var(--bt-hu) * 2.90); }
-  #app.battle #screen-game.active #duel-hud .dh-lv   { font-size: calc(var(--bt-hu) * 2.50); }
-  html[lang="en"] #app.battle #screen-game.active #duel-hud .dh-foe .dh-name { font-size: calc(var(--bt-hu) * 2.62); }
+  #app.battle #screen-game.active #duel-hud .dh-name { font-size: max(var(--text-min), calc(var(--bt-hu) * 2.90)); }
+  #app.battle #screen-game.active #duel-hud .dh-lv   { font-size: max(var(--text-min), calc(var(--bt-hu) * 2.50)); }
+  html[lang="en"] #app.battle #screen-game.active #duel-hud .dh-foe .dh-name { font-size: max(var(--text-min), calc(var(--bt-hu) * 2.62)); }
   #app.battle #screen-game.active #duel-hud .dh-track--l { left: calc(var(--bt-fx) + var(--bt-hu) * 5.8);  top: calc(var(--bt-fy) + var(--bt-hu) * 26.1); width: calc(var(--bt-hu) * 40.0); height: calc(var(--bt-hu) * 4.2); }
   #app.battle #screen-game.active #duel-hud .dh-track--r { left: calc(var(--bt-mx) + var(--bt-hu) * 60.5); top: calc(var(--bt-my) + var(--bt-hu) * 26.1); width: calc(var(--bt-hu) * 33.6); height: calc(var(--bt-hu) * 4.2); }
   #app.battle #screen-game.active #duel-hud .dh-tick    { height: calc(var(--bt-hu) * 2.47); }
@@ -71931,7 +72031,7 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
   #app.battle #screen-game.active #duel-hud .dh-orn--mr { left: calc(var(--bt-mx) + var(--bt-hu) * 91.85); width: calc(var(--bt-hu) * 5.98); background-position: calc(var(--bt-hu) * -6.27) calc(var(--bt-hu) * -0.03); }
   /* 체력 숫자 — 막대 홈 아래 띠(30.3~32.74cqw). 악당 왼쪽 · 나 오른쪽 맞춤(세로와 같은 쪽).
      나 쪽 right = 상자 폭 750 − (원점 + 91.57cqw) — 세로의 right 8.43cqw 와 같은 끝점. */
-  #app.battle #screen-game.active #duel-hud .dh-num { height: calc(var(--bt-hu) * 2.44); font-size: calc(var(--bt-hu) * 2.83); }
+  #app.battle #screen-game.active #duel-hud .dh-num { height: calc(var(--bt-hu) * 2.44); font-size: max(var(--text-min), calc(var(--bt-hu) * 2.83)); }
   #app.battle #screen-game.active #duel-hud #duel-foe-n { left: calc(var(--bt-fx) + var(--bt-hu) * 8.04); top: calc(var(--bt-fy) + var(--bt-hu) * 30.3); }
   #app.battle #screen-game.active #duel-hud #duel-me-n  { right: calc(var(--bu) * 750 - var(--bt-mx) - var(--bt-hu) * (100 - 8.43)); top: calc(var(--bt-my) + var(--bt-hu) * 30.3); }
 
@@ -71939,15 +72039,15 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
      메달 그림(718:907)은 .act::before 가 contain · 아래 맞춤으로 그리므로 상자를 그림 비 그대로 두면 늘어나는 곳이 0 이다.
      간격 .11H — 세로 이웃 .11 · 가로 이웃은 폭 기준 .11/.7916 = .139(둘 다 ≤ .15, landscape-gate 가로 maxGapRatio 와 같은 셈).
      세로용 유리 띠(::before 서리 · ::after 트레이)와 뒤집은 판(.dh-plate)은 끈다 — 바탕은 영웅 카드.
-     글자 · 배지 하한 = 821×462 에서 11px(= 17.2bu) — 명패 18bu · 배지 17.5bu. */
+     글자 · 배지 = 무대 자(명패 18bu · 배지 17.5bu)와 하한 --text-min 중 큰 쪽(844×390 에서도 11px). */
   #app.battle #screen-game.active #actionbar {
-    /* 세로 예산: 영웅 무리 바닥 425.7 + 숨 12 = 438 부터 카드 바닥 708 − 13 까지 = 2H + .11H → H = 121.5 */
-    --bt-medal-h: calc(var(--bu) * 121.5);
+    /* 세로 예산: 영웅 판 바닥 429.7 + 숨 10 = 440 부터 카드 바닥 708 − 13 까지 = 2H + .11H → H = 120.5 */
+    --bt-medal-h: calc(var(--bu) * 120.5);
     --bt-medal-w: calc(var(--bt-medal-h) * 718 / 907);
     --bt-medal-g: calc(var(--bt-medal-h) * .11);
     position: absolute;
-    left: calc(50% + var(--bu) * (1086 - 640) - var(--bt-medal-w) - var(--bt-medal-g) / 2);
-    top: calc(50% + var(--bu) * (438 - 360));
+    left: calc(var(--bt-x0) + var(--bu) * 1086 - var(--bt-medal-w) - var(--bt-medal-g) / 2);
+    top: calc(var(--bt-y0) + var(--bu) * 440);
     width: calc(var(--bt-medal-w) * 2 + var(--bt-medal-g));
     height: calc(var(--bt-medal-h) * 2 + var(--bt-medal-g));
     z-index: 1;
@@ -71979,16 +72079,16 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
   #app.battle #screen-game.active #actionbar .act .act-badge {
     top: calc(var(--bt-medal-h) * .047) !important;
     right: calc(var(--bt-medal-w) * .067) !important;
-    min-width: calc(var(--bu) * 29) !important;
-    height: calc(var(--bu) * 29) !important;
+    min-width: max(calc(var(--text-min) * 1.5), calc(var(--bu) * 29)) !important;
+    height: max(calc(var(--text-min) * 1.5), calc(var(--bu) * 29)) !important;
     padding: 0 calc(var(--bu) * 7) !important;
-    font-size: calc(var(--bu) * 17.5) !important;
+    font-size: max(var(--text-min), calc(var(--bu) * 17.5)) !important;
   }
   #app.battle #screen-game.active #actionbar .act .act-t {
     padding: 0 calc(var(--bu) * 4);
-    font-size: calc(var(--bu) * 18);
+    font-size: max(var(--text-min), calc(var(--bu) * 18));
   }
-  html[lang="en"] #app.battle #screen-game.active #actionbar .act .act-t { font-size: calc(var(--bu) * 17.5); }
+  html[lang="en"] #app.battle #screen-game.active #actionbar .act .act-t { font-size: max(var(--text-min), calc(var(--bu) * 17.5)); }
 }
 </style>
 </body>
