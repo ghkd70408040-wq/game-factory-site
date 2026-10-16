@@ -34449,19 +34449,24 @@ window.TT_SFX = {
   function multBandGap() {
     var vh = (typeof window !== 'undefined' ? (window.innerHeight || 844) : 844);
     var top = 0, i, el, r;
+    var bot = 0, br = null;
+    el = $('board') || $('board-scroll');
+    if (el && el.getBoundingClientRect) {
+      br = el.getBoundingClientRect();
+      if (br.height > 0) bot = br.top;
+    }
+    /* [판정판 121] 가로 전투에서는 HUD 조각이 판 **옆** 기둥에도 선다(#hud-row 칩 줄 = 악당 카드 아래 · 일시정지 = 왼쪽 위).
+       띠가 서는 곳은 판 **위**이므로, 가로에서는 판과 가로로 겹치지 않는 노드를 「HUD 아래 끝」 셈에서 뺀다. 세로는
+       battleStage() 가 null 이라 종전과 글자 그대로다(모든 노드가 판 위 전폭 띠). 읽기만 한다. */
+    var side = !!(br && br.width > 0 && battleOn() && battleStage());
     var ids = ['duel-hud', 'classic-hud', 'topbar', 'tb-stats', 'hud-row', 'boss-bar'];
     for (i = 0; i < ids.length; i++) {
       el = $(ids[i]);
       if (!el || el.hidden || !el.getBoundingClientRect) continue;
       r = el.getBoundingClientRect();
       if (r.width <= 0 || r.height <= 0) continue;
+      if (side && (r.right <= br.left || r.left >= br.right)) continue;
       if (r.bottom > top) top = r.bottom;
-    }
-    var bot = 0;
-    el = $('board') || $('board-scroll');
-    if (el && el.getBoundingClientRect) {
-      r = el.getBoundingClientRect();
-      if (r.height > 0) bot = r.top;
     }
     /* 판이 아직 없거나(첫 프레임) 상단을 못 읽었으면 화면 위 18% 를 띠로 본다 —
        그 자리는 어떤 국면에서도 판보다 위다. */
