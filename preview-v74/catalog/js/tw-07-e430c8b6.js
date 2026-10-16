@@ -2,7 +2,8 @@
 (function(){
 var L=("jelly-box-c,duel-title-play,sian2-ribbon,sian2-btn-pink,sian2-btn-purple,"
 +"sian2-btn-orange,sian2-btn-mint,"
-+"stage-btn_back,stage-btn_settings,stage-btn_chars,stage-btn_records,"
++"stage-btn_back,stage-btn_settings,stage-btn_chars,hud-btn-mission,hud-btn-records,"
++"stage-btn_theater,stage-btn_playground,stage-btn_shop,"
 +"stage-pill_life,stage-pill_coin,stage-pill_star,stage-pill_chapter,"
 +"stage-jelly-1,stage-jelly-2,stage-jelly-3,stage-jelly-4,stage-jelly-5,"
 +"stage-star-on,stage-star-off,"
@@ -37,8 +38,8 @@ var L=("jelly-box-c,duel-title-play,sian2-ribbon,sian2-btn-pink,sian2-btn-purple
 +"ttl-howto-en,ttl-settings-en,ttl-skin-en,ttl-pause-en,ttl-over-en,ttl-rank-en,"
 +"ch-mukmul-face,ch-tiktok-face,ch-kkultteok-face,ch-bangul-face,"
 +"ch-tiktok-full").split(",");
-var V="stage-btn_back,stage-pill_coin,stage-btn_records,stage-pill_star,stage-btn_settings";
-var VQ="?v=9";                                     /* CSS 5곳과 반드시 같은 값 */
+var V="stage-btn_back,stage-pill_coin,stage-pill_star,stage-btn_settings";
+var VQ="?v=9";                                     /* CSS 쪽 ?v= 와 반드시 같은 값 */
 var i=0,bgmQueued=0;
 function next(){
 if(i>=L.length){ if(!bgmQueued){ bgmQueued=1; warmBgm(); } return; }  /* 그림 끝 → BGM */

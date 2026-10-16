@@ -1,8 +1,15 @@
 
+// juice.js — TenTwin 게임필(주스) 레이어: WebAudio 신스 사운드 + 단일 캔버스 파티클/이펙트 오버레이. 전역은 window.Juice 하나만.
 (function (global) {
 'use strict';
 var POOL_SIZE      = 600;      // 사전 할당 파티클 수 (계약: 최대 600)
 var SFX_DEBOUNCE   = 12;       // ms — 동일 sfx 12ms 내 재호출 무시 (기본값)
+// 리뷰 4번: 절정(콤보 연타)에서 match 계열이 12ms 간격으로 겹쳐 소리가 뭉갠다.
+// match/combo 만 70ms 로 늘려 한 발 한 발이 분리되어 들리게 한다. 나머지 sfx 는 12ms 유지.
+// cheer 는 마스코트의 목소리다. 연타로 겹치면 캐릭터가 아니라 잡음이 되므로
+// 다른 SFX 보다 훨씬 긴 디바운스를 준다 — 콤보가 아무리 빨라도 한 번씩만 말한다.
+// v3 voice: 캐릭터 대사다. cheer 보다도 길게 — 한 마디가 끝나기 전에 다음이 시작하면
+// 말이 아니라 잡음이 된다. 실제 겹침 방지는 voiceBusyUntil 이 한 겹 더 맡는다.
 var SFX_DEBOUNCE_MAP = { match: 70, combo: 70, cheer: 340, voice: 300, tierUp: 300, jackpot: 240,
 spBlast: 300, petBell: 300, foeStab: 300, awakenMax: 900 };
 var MATCH_PEAK = 0.20;
@@ -13,13 +20,16 @@ var MASTER_BASE    = 0.55;     // 마스터 게인 기준값 (덕킹/음소거 �
 var RESIZE_DEBOUNCE = 120;     // ms
 var MAX_DT         = 0.05;     // s — 탭 복귀 시 폭주 방지
 var CANVAS_RETRY   = 500;      // ms — canvas 미존재 시 재획득 주기
+// 외부 폰트 금지 → 시스템 폰트 스택만 사용
 var FONT_STACK = 'ui-sans-serif, -apple-system, "Segoe UI", Roboto, ' +
 '"Helvetica Neue", Arial, "Apple Color Emoji", sans-serif';
 var DEFAULT_COLOR = '#ffd166';
+// 콘페티 팔레트 (숫자 타일 색 계열과 어울리는 파스텔-비비드)
 var CONFETTI_COLORS = [
 '#ff6b8b', '#ffd166', '#7bdff2', '#b892ff',
 '#8ce99a', '#ffa45c', '#5ad2f4', '#ff8fab'
 ];
+// 피버 앰비언트 팔레트 (따뜻한 계열 — 배경 컬러 시프트와 충돌하지 않게 저채도로 사용)
 var FEVER_COLORS = ['#ffd166', '#ff9a3c', '#ff7ab8', '#b892ff'];
 var AURA_INTERVAL   = 60;   // ms — feverAura 입자 생성 최소 간격 (계약: 레이트 제한)
 var AURA_POOL_GUARD = 90;   // 자유 슬롯이 이보다 적으면 앰비언트 생성 중단(핵심 이펙트 우선)
@@ -28,6 +38,7 @@ var CB_RAY   = [0,  0,  0,  0,  5,  7,  9, 10, 12];   // 광선(T_BEAM) — L4�
 var CB_RING  = [0,  0,  1,  2,  2,  3,  3,  4,  4];   // 충격파 링 — L2에서 등장
 var CB_EMBER = [0,  0,  1,  2,  3,  4,  6,  7,  9];   // 잔광 불티(T_SPARK soft)
 var CB_FLASH = 6;                                     // 이 콤보부터 화면 플래시 + 강셰이크
+// 합계(코어 1 포함): 20 / 25 / 29 / 33 / 35 / 38 / 42 / 45
 var COMBO_LATCH_TTL = 1400;  // ms — 매치 sfx 가 이 시간 이상 없으면 레벨 1 로 감쇠
 var SPEND_WINDOW = 80;    // ms — 슬라이딩 윈도
 var SPEND_BUDGET = 150;   // 윈도당 "정가" 파티클 수. 60% 초과분부터 요청량을 깎는다.
@@ -44,6 +55,7 @@ var T_SPARK = 'spark', T_CONFETTI = 'confetti', T_TEXT = 'text',
 T_BEAM  = 'beam',  T_SWEEP    = 'sweepline', T_RING = 'ring',
 T_DASH  = 'dash',   // 끊어진 점선 + 중앙 X (brokenLink)
 T_GUIDE = 'guide';  // 8방향 직선 안내 스포크 (lineGuide)
+// 연결 불가 안내선 색 — 처벌색(빨강)이 아닌 중성 회색. 라이트 테마에서도 보이도록 source-over 로 그린다.
 var BROKEN_COLOR = 'rgba(196,201,214,0.92)';
 var GUIDE_R_IN   = 0.70;  // 시작 안쪽 반지름 — 타일 자기 숫자를 절대 덮지 않는 거리
 var GUIDE_R_OUT  = 1.55;  // 시작 바깥 반지름
@@ -51,6 +63,7 @@ var GUIDE_TRAVEL = 0.72;  // 수명 동안 안팎이 함께 바깥으로 밀려�
 var GUIDE_PEAK   = 0.85;  // 최대 알파 — 위 실측 근거로 .55 에서 상향
 var GUIDE_WIDTH  = 2.25;  // 스포크 굵기(px) — brokenLink 점선(2.5px)보다는 가늘게
 var GUIDE_COLOR  = 'rgba(126,132,150,0.95)';
+// 8방위 단위벡터(N부터 시계방향). 프레임마다 sin/cos 을 돌리지 않으려고 표로 굳혀둔다.
 var GUIDE_DIR = [ 0, -1,  0.7071, -0.7071,  1, 0,  0.7071, 0.7071,
 0,  1, -0.7071,  0.7071, -1, 0, -0.7071, -0.7071 ];
 function clamp(v, lo, hi) { return v < lo ? lo : (v > hi ? hi : v); }
@@ -152,6 +165,7 @@ var free  = new Array(POOL_SIZE);   // 자유 인덱스 스택
 var freeN = 0;
 var seqNo = 0;                      // 재활용 대상(가장 오래된 것) 판별용
 var activeCount = 0;
+// 타입별 활성 수 — 그리기 패스를 건너뛰기 위한 카운터
 var nSpark = 0, nConfetti = 0, nText = 0, nBeam = 0, nSweep = 0, nRing = 0, nDash = 0, nGuide = 0;
 (function buildPool() {
 for (var i = 0; i < POOL_SIZE; i++) {
@@ -194,6 +208,7 @@ var p;
 if (freeN > 0) {
 p = pool[free[--freeN]];
 } else {
+// 고갈: 가장 오래된(seq 최소) 활성 파티클 재활용
 var best = -1, bestSeq = Infinity;
 for (var i = 0; i < POOL_SIZE; i++) {
 if (pool[i].active && pool[i].seq < bestSeq) { bestSeq = pool[i].seq; best = i; }
@@ -204,6 +219,7 @@ bumpType(p.type, -1);
 activeCount--;
 p.active = false;
 }
+// 필드 리셋 (재사용)
 p.type = type;  p.seq = ++seqNo;
 p.x = 0; p.y = 0; p.x2 = 0; p.y2 = 0;
 p.vx = 0; p.vy = 0;
@@ -325,6 +341,7 @@ return false;
 function resizeNow() {
 if (!canvas || !ctx) return;
 try {
+// 좌표계는 "뷰포트 CSS 픽셀" — #fx 는 position:fixed; inset:0 이므로 뷰포트와 동일
 viewW = global.innerWidth  || canvas.clientWidth  || 360;
 viewH = global.innerHeight || canvas.clientHeight || 640;
 dpr   = clamp(global.devicePixelRatio || 1, 1, 3);
@@ -372,6 +389,7 @@ if (t - lastCanvasTry > CANVAS_RETRY) { lastCanvasTry = t; acquireCanvas(); }
 return;
 }
 step(dt);
+// 활성 이펙트 0 → clearRect 후 그리기 스킵 (루프는 계속 돈다)
 if (activeCount === 0 && !vigActive()) {
 if (needsClear) { ctx.clearRect(0, 0, viewW, viewH); needsClear = false; }
 return;
@@ -392,6 +410,7 @@ if (vig.dur > 0) {
 vig.t += dt;
 if (vig.t >= vig.dur) { vig.dur = 0; vig.t = 0; vig.strength = 0; }
 }
+// 피버 앰비언트: 프레임당 최대 1개, AURA_INTERVAL(60ms) 간격으로만 방출
 if (auraOn) {
 auraAcc += dt * 1000;
 if (auraAcc >= AURA_INTERVAL) {
@@ -408,6 +427,7 @@ p.life += dt;
 if (p.life >= p.ttl) { release(p); continue; }
 var k = p.life / p.ttl;
 if (p.type === T_SPARK) {
+// 속도 감쇠(drag) + 약한 중력
 var d = Math.pow(p.drag, dt * 60);
 p.vx *= d; p.vy *= d;
 p.vy += p.grav * dt;
@@ -428,11 +448,15 @@ p.alpha = k < 0.55 ? 1 : (1 - (k - 0.55) / 0.45);
 } else if (p.type === T_BEAM) {
 p.alpha = k < 0.25 ? (k / 0.25) : (1 - (k - 0.25) / 0.75);
 } else if (p.type === T_RING) {
+// 반경은 draw에서 easeOutCubic 으로 산출 — 여기서는 알파만
 var rf = k < 0.10 ? (k / 0.10) : (1 - (k - 0.10) / 0.90);
 p.alpha = rf * rf;                           // 제곱 → 꼬리가 부드럽게 사라짐
 } else if (p.type === T_DASH) {
+// 빠르게 나타났다가 선형으로 사라짐 — 눈에 띄되 잔상은 남기지 않는다
 p.alpha = k < 0.12 ? (k / 0.12) : (1 - (k - 0.12) / 0.88);
 } else if (p.type === T_GUIDE) {
+// 훅 들어왔다가 곧장 빠지는 봉투. 최고점을 GUIDE_PEAK 로 눌러 두는 이유는
+// 이 선이 '읽히기만' 하면 되기 때문이다 — 보드 숫자보다 진해지면 안 된다.
 p.alpha = GUIDE_PEAK * (k < 0.18 ? (k / 0.18) : (1 - (k - 0.18) / 0.82));
 } else { // sweepline
 p.alpha = 1 - k * 0.35;
@@ -462,6 +486,7 @@ return FRUIT_P2D[n] || null;
   /* ==FRUITPATH:END== */
 function draw() {
 var i, p;
+// (a) 비네트 — 가장 아래, 가산 발광
 if (vigActive() && vigGrad) {
 var vk = vig.t / vig.dur;
 var va = (vk < 0.28 ? vk / 0.28 : 1 - (vk - 0.28) / 0.72) * vig.strength;
@@ -473,6 +498,7 @@ ctx.fillRect(0, 0, viewW, viewH);
 ctx.globalCompositeOperation = 'source-over';
 }
 }
+// (b) 행 스윕 바 (source-over)
 if (nSweep > 0) {
 for (i = 0; i < POOL_SIZE; i++) {
 p = pool[i];
@@ -481,6 +507,7 @@ var pr = easeOutCubic(p.life / p.ttl);
 var head = p.x + p.w * pr;
 var barW = Math.max(26, p.w * 0.20);
 ctx.fillStyle = p.color;
+// 헤드에서 뒤로 4단 트레일 (그라디언트 객체 생성 없이 알파만 감소)
 for (var s = 0; s < 4; s++) {
 var segR = head - (barW * s) / 4;
 var segL = head - (barW * (s + 1)) / 4;
@@ -492,6 +519,7 @@ ctx.fillRect(segL, p.y, segR - segL, p.h);
 }
 }
 }
+// (c) 빛줄기(beam) — 가산 발광
 if (nBeam > 0) {
 ctx.globalCompositeOperation = 'lighter';
 for (i = 0; i < POOL_SIZE; i++) {
@@ -499,6 +527,7 @@ p = pool[i];
 if (!p.active || p.delay > 0 || p.type !== T_BEAM) continue;
 var bk = p.life / p.ttl;
 ctx.strokeStyle = p.color;
+// 넓은 소프트 코어 + 얇은 하이라이트
 ctx.globalAlpha = clamp(p.alpha * 0.42, 0, 1);
 ctx.lineWidth = p.size * (1.6 - bk * 0.9);
 ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x2, p.y2); ctx.stroke();
@@ -508,6 +537,9 @@ ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x2, p.y2); ctx.stroke();
 }
 ctx.globalCompositeOperation = 'source-over';
 }
+// (c-2) 링 패스 — 하나의 패스가 두 역할을 겸한다(풀 전체 루프를 늘리지 않기 위해).
+//       p.soft === 0 : 스트로크 충격파 링 (기존)
+//       p.soft === 1 : 채워진 코어 플래시 디스크 (신규 — 폭발의 백열 중심)
 if (nRing > 0) {
 ctx.globalCompositeOperation = 'lighter';
 var rFill = '', rStroke = '';
@@ -533,6 +565,10 @@ ctx.stroke();
 }
 ctx.globalCompositeOperation = 'source-over';
 }
+// (d) 스파크 — 가산 발광.
+//     p.h === 0 : 원형 (앰비언트·스윕·콘페티 스프레이 등 기존 호출자 — 동작 불변)
+//     p.h  >  0 : 속도 벡터를 따라 뒤로 늘어진 모션 스트릭 캡슐 (폭발 파편)
+//                 길이 = 속도 × p.h (2~46px 클램프), 굵기 ∝ p.size.
 if (nSpark > 0) {
 ctx.globalCompositeOperation = 'lighter';
 var sFill = '', sStroke = '';
@@ -582,6 +618,7 @@ ctx.fill();
 }
 ctx.globalCompositeOperation = 'source-over';
 }
+// (e) 콘페티 — 회전 사각 조각. save/restore 대신 setTransform 직접 사용
 if (nConfetti > 0) {
 for (i = 0; i < POOL_SIZE; i++) {
 p = pool[i];
@@ -599,6 +636,7 @@ ctx.fillRect(-p.w * 0.5, -p.h * 0.5, p.w, p.h);
 }
 ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
+// (f) 플로트업 텍스트 — 캔버스 렌더(DOM 생성 없음)
 if (nText > 0) {
 ctx.strokeStyle = 'rgba(8,10,20,0.62)';
 for (i = 0; i < POOL_SIZE; i++) {
@@ -615,6 +653,8 @@ ctx.fillStyle = p.color;
 ctx.fillText(p.text, p.x, p.y);
 }
 }
+// (g) 연결 불가 안내 — 끊어진 점선 + 중앙 X.
+//     'lighter' 가 아닌 source-over: 라이트 테마 흰 배경에서도 보여야 한다.
 if (nDash > 0) {
 var hasDash = !!ctx.setLineDash;
 for (i = 0; i < POOL_SIZE; i++) {
@@ -622,10 +662,12 @@ p = pool[i];
 if (!p.active || p.delay > 0 || p.type !== T_DASH) continue;
 ctx.globalAlpha = clamp(p.alpha, 0, 1);
 ctx.strokeStyle = p.color;
+// 점선 구간
 if (hasDash) ctx.setLineDash([6, 5]);
 ctx.lineWidth = 2.5;
 ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x2, p.y2); ctx.stroke();
 if (hasDash) ctx.setLineDash([]);      // X 는 반드시 실선으로
+// 중앙 X
 var mx = (p.x + p.x2) * 0.5, my = (p.y + p.y2) * 0.5;
 var arm = p.size;
 ctx.lineWidth = 3;
@@ -636,6 +678,10 @@ ctx.stroke();
 }
 if (hasDash) ctx.setLineDash([]);        // 다른 패스가 점선을 물려받지 않도록 최종 초기화
 }
+// (h) 연결 규칙 안내 — 선택 타일에서 8방향으로 짧게 스치는 실선 스포크.
+//     "직선으로 이어야 한다"를 말 대신 보여준다. (g)와 같은 이유로 'lighter' 를
+//     쓰지 않는다: 크림색 라이트 테마 위에서 가산합성은 그대로 증발해 버린다.
+//     파티클 1개가 8줄 전부를 그린다(브로큰링크와 같은 규율).
 if (nGuide > 0) {
 var hasDashG = !!ctx.setLineDash;
 if (hasDashG) ctx.setLineDash([]);        // 스포크는 반드시 실선
@@ -643,6 +689,7 @@ for (i = 0; i < POOL_SIZE; i++) {
 p = pool[i];
 if (!p.active || p.delay > 0 || p.type !== T_GUIDE) continue;
 var gk = p.life / p.ttl; if (gk > 1) gk = 1;
+// amul 이 0 이면 바깥으로 밀리는 이동이 사라지고 제자리에서 명멸만 한다(모션 감소).
 var gpush = GUIDE_TRAVEL * easeOutCubic(gk) * p.amul;
 var gstep = p.size;                     // 타일 피치(px)
 var gr0 = gstep * (GUIDE_R_IN  + gpush);
@@ -661,6 +708,7 @@ ctx.stroke();                           // 8줄을 한 번의 stroke 로
 }
 ctx.globalAlpha = 1;
 }
+// 폰트 문자열 캐시 (매 프레임 문자열 생성 방지)
 var fontCache = Object.create(null);
 function fontFor(px) {
 var f = fontCache[px];
@@ -670,6 +718,7 @@ return f;
 var actx = null, master = null, limiter = null, noiseBuffer = null;
 var audioFailed = false;
 var lastSfxAt = Object.create(null);
+// 긴 라이저(feverOn)는 겹쳐 울리면 안 되므로 재생 중 여부를 따로 추적한다.
 var feverVoice     = null;   // { g: GainNode, oscs: [] } — 재생 중인 라이저
 var feverBusyUntil = 0;      // actx.currentTime 기준 종료 예정 시각
 var feverActive = false;     // 피버 진행 중? (rowClear 덕킹 / BGM 필터 판단용)
@@ -902,6 +951,7 @@ var tr = 1 + Math.floor((v - 8) / 4);
 return tr > 4 ? 4 : tr;
 }
 var VOICE_CHARS = {
+// 텐 — 중저음, 차분. /오/에서 /아/로 천천히 열린다. 비브라토 거의 없음.
 ten: {
 f0: 225, type: 'sawtooth', det: 7,          // 14차 확정: 텐텐 높음·트윈 낮음 (비숑=가벼움 / 곰=묵직)
 vow: [[540, 950, 2592], [734, 1210, 2700]], // 14차 확정: 포먼트 ×1.08 (jellyer 'ten-alt')
@@ -909,6 +959,7 @@ fg: [1.0, 0.46, 0.13],
 syl: 0.125, gap: 0.148, step: [0, 2, 5],
 vib: 3.2, vibD: 5, peak: 0.30
 },
+// 삐약 — 고음, 촐랑. /이/에 가까운 높은 F2 + 음절마다 위로 튀는 치찰 어택.
 ppyak: {
 f0: 352, type: 'sawtooth', det: 12,
 vow: [[330, 2250, 3150], [420, 2500, 3300]],
@@ -916,6 +967,7 @@ fg: [0.62, 1.0, 0.34],
 syl: 0.072, gap: 0.092, step: [0, 5, 9],
 vib: 6.5, vibD: 14, peak: 0.24
 },
+// 뭉치 — 몽글몽글. 삼각파(배음 적음) + 낮고 어두운 포먼트 + 느린 흔들림.
 mungchi: {
 f0: 268, type: 'triangle', det: 9,
 vow: [[380, 780, 2150], [430, 900, 2200]],
@@ -977,11 +1029,13 @@ for (i = 0; i < 2; i++) {
 var o = actx.createOscillator();
 o.type = C.type;
 o.frequency.setValueAtTime(Math.max(40, f0), t0);
+// 음절 안에서도 살짝 미끄러진다 — 완전히 고정된 피치는 기계음으로 들린다.
 o.frequency.exponentialRampToValueAtTime(Math.max(40, f0 * 1.035), t0 + dur * 0.9);
 try { o.detune.setValueAtTime(i === 0 ? 0 : C.det, t0); } catch (e) {}
 o.connect(glot);
 oscs.push(o);
 }
+// 비브라토: LFO → 두 오실레이터의 detune(cent). 뭉치가 가장 깊다.
 if (vibD > 0) {
 lfo = actx.createOscillator();
 lfo.type = 'sine';
@@ -995,6 +1049,7 @@ try { lfoG.connect(oscs[i].detune); } catch (e) {}
 lfo.start(t0);
 lfo.stop(t0 + dur + 0.05);
 }
+// 음절 포락선 — 말소리의 어택은 클릭이 아니라 짧은 램프다.
 var env = actx.createGain();
 env.gain.setValueAtTime(0.0001, t0);
 env.gain.linearRampToValueAtTime(Math.max(0.0002, peak), t0 + dur * 0.20);
@@ -1034,6 +1089,7 @@ var f = 520 * Math.pow(2, (v - 1) / 12);
 jellyDrop(at(), f, 0.115, 0.085, 0.66);
 },
 match: function (comboLevel) {
+// 게이트보다 먼저 래치한다 — 무음/디바운스 상황에서도 "보이는" 콤보 연출은 커져야 한다.
 setComboLatch(comboLevel);
 if (!gate('match')) return;
 if (playSfxClip('match-pop', at(), MATCH_PEAK,
@@ -1045,7 +1101,9 @@ var t0 = at();
 var drops = lv >= 7 ? 4 : (lv >= 5 ? 3 : (lv >= 3 ? 2 : 1));
 if (tr >= 2) drops++;
 if (drops > 5) drops = 5;                    // 5알 넘어가면 방울이 아니라 진창이다
+// ① 리드 방울 — 보상의 중심. 콤보와 무관하게 같은 자리, 같은 크기.
 jellyDrop(t0, JELLY_ROOT, MATCH_PEAK, 0.135 + lv * 0.004, 0.44);
+// 겹치는 방울들 — 아래로 쌓이고 조금씩 뒤에 떨어진다("여러 알"의 정체)
 for (var i = 1; i < drops; i++) {
 var df = JELLY_ROOT * Math.pow(2, JELLY_STACK[i] / 12);
 jellyDrop(t0 + 0.009 * i + rand(0, 0.007), df,
@@ -1054,6 +1112,7 @@ MATCH_PEAK * (0.40 / Math.sqrt(i)), 0.115 + i * 0.016, 0.50);
 noise(t0 + 0.003, 0.040 + lv * 0.005 + tr * 0.006,
 0.026 + lv * 0.003 + tr * 0.005,
 'bandpass', 880, 2400 + lv * 120, 0.85, 0.008);
+// ③ 표면 — 가슴에 닿는 층. 콤보·티어가 오를수록 깊어진다(커지지 않는다).
 if (lv >= 3) {
 tone('sine', 168 - lv * 5 - tr * 5, 58, t0 + 0.004, 0.085 + tr * 0.010, 0.070, 0.010);
 }
@@ -1064,8 +1123,11 @@ if (playSfxClip('combo-tier', at(), MATCH_PEAK * 0.55)) return;   // 14차: 파�
 var tr = clamp((tier | 0) || 1, 1, 4);
 var t0 = at();
 var f = JELLY_ROOT;
+// ① 밝은 벨 — 배음이 정수배가 아닌 2.76 배라 종처럼 울린다.
+//    어택 30ms: 때리지 않고 피어난다.
 tone('sine', f * 1.5, f * 1.5, t0, 0.42 + tr * 0.03, 0.062, 0.030);
 tone('sine', f * 1.5 * 2.76, f * 1.5 * 2.76, t0, 0.22, 0.016, 0.026);
+// ② 방울 아르페지오 — 상행. 티어가 높을수록 한 알씩 더 붙는다.
 var arp = [0, 4, 7, 12, 16];
 var an = Math.min(arp.length, 2 + tr);
 for (var ai = 0; ai < an; ai++) {
@@ -1073,7 +1135,9 @@ var afq = f * Math.pow(2, arp[ai] / 12);
 if (afq > 4800) continue;
 jellyDrop(t0 + 0.03 + ai * 0.052, afq, 0.055, 0.13, 0.62);
 }
+// ③ 셔머 — 하이패스 노이즈지만 어택 40ms 라 틱이 아니라 "공기"로 들린다.
 noise(t0 + 0.02, 0.34, 0.024, 'highpass', 3400, 8200, 0.6, 0.040);
+// ④ 바닥 — 젤리가 통째로 출렁이는 저역. 티어가 오를수록 깊어진다.
 tone('sine', 146 - tr * 12, 52, t0, 0.20 + tr * 0.02, 0.085, 0.014);
 },
 cheer: function (tier) {
@@ -1081,6 +1145,7 @@ if (!gate('cheer')) return;
 var k = clamp(tier | 0, 0, 3);
 var t0 = at() + (k === 0 ? 0.45 : 0.10);
 if (k === 0) {
+// 시무룩 — 두 음이 미끄러져 내려간다. 게임오버는 이미 무거우니 아주 작게.
 tone('triangle', 392.00, 349.23, t0, 0.16, 0.048, 0.008);
 tone('triangle', 293.66, 246.94, t0 + 0.15, 0.30, 0.042, 0.010);
 tone('sine', 146.83, 130.81, t0 + 0.15, 0.26, 0.020, 0.010);
@@ -1103,6 +1168,8 @@ tone('triangle', 84, 62, t0, 0.16, 0.055, 0.012);
 },
 rowClear: function () {
 if (!gate('rowClear')) return;
+// 피버 중에는 배경(라이저 잔향·BGM 오픈 필터·연타 match)이 이미 꽉 차 있어
+// B5 벨이 그 위로 찌른다 → 마스터를 -6dB 눌러 벨이 믹스 안에 앉게 한다.
 if (feverActive) duck(320);
 var t0 = at();
 noise(t0, 0.36, 0.13, 'bandpass', 420, 6400, 0.9, 0.02);
@@ -1161,11 +1228,13 @@ for (var i = 0; i < n; i++) {
 var st = C.step[Math.min(i, C.step.length - 1)];
 var sf = f0 * Math.pow(2, st / 12);
 var last = (i === n - 1);
+// 절정(티어 5+)의 마지막 음절만 위로 휜다 — 끝을 올리면 "아직 더!"로 들린다.
 var vTo = last && k >= 5 ? 1 : (last ? 1 : 0);
 voiceSyllable(t0 + i * gap, C, last && k >= 5 ? sf * 1.06 : sf,
 i === 0 ? 0 : 1, vTo, syl, peak, vibD);
 }
 var total = (n - 1) * gap + syl;
+// 절정에서만 붙는 들숨/숨소리 — 사람이 흥분했을 때 나는 그 잡음이다.
 if (k >= 5) {
 noise(t0 + total * 0.92, 0.075, 0.022, 'bandpass', 2400, 4200, 1.4, 0.012);
 }
@@ -1249,7 +1318,9 @@ try { lp.disconnect(); g.disconnect(); } catch (e) {}
 for (var k = 0; k < oscs.length; k++) { try { oscs[k].disconnect(); } catch (e) {} }
 };
 } catch (e) { feverVoice = null; }
+// 함께 차오르는 공기음 (attack 을 길게 줘서 크레셴도가 된다)
 noise(t0, dur, 0.055, 'bandpass', 400, 9000, 1.1, dur * 0.86);
+// 착지: C6 + E6 + C7 + 하이햇풍 시머
 var ct = t0 + dur;
 tone('triangle', 1046.50, 1046.50, ct, 0.50, 0.13, 0.004);
 tone('triangle', 1318.51, 1318.51, ct, 0.50, 0.09, 0.004);
@@ -1284,21 +1355,27 @@ noise(t0, 0.30, 0.050, 'bandpass', 700, 6200, 0.9, 0.030);
 tone('sine',     150, 44, t0 + 0.28, 0.36, 0.270, 0.003);
 tone('triangle',  96, 34, t0 + 0.28, 0.26, 0.115, 0.004);
 noise(t0 + 0.28, 0.09, 0.058, 'highpass', 5200, 1800, 0.7, 0.001);
+// ③ 꼬리 — D4 링잉이 킥 뒤에 남아 "큰 것"의 크기를 만든다.
 tone('sine', 293.66, 293.66, t0 + 0.30, 0.40, 0.042, 0.010);
 },
 awakenMax: function () {
 if (!gate('awakenMax')) return;
 var t0 = at();
+// ① 상행 스윕 E4 → C7. 이 신스에서 가장 긴 상행이다.
 tone('triangle', 329.63, 2093.00, t0, 0.52, 0.086, 0.026);
+// ② 완전5도 병행 — 같은 곡선을 1.5배 위에서 그린다.
 tone('sine', 494.44, 3139.50, t0, 0.52, 0.048, 0.030);
+// ③ 꼭대기의 개화 — C6·E6·G6 메이저 트라이어드(40ms 간격).
 var tri = [1046.50, 1318.51, 1567.98];
 for (var i = 0; i < 3; i++) {
 var st = t0 + 0.46 + i * 0.040;
 tone('triangle', tri[i], tri[i], st, 0.46, 0.105, 0.006);
 tone('sine', tri[i] * 2, tri[i] * 2, st, 0.28, 0.030, 0.006);
 }
+// ④ 반짝임 한 알 + 숨결. 노이즈는 아주 옅게 — 있는지 모를 정도가 맞다.
 tone('sine', 2093.00, 2093.00, t0 + 0.50, 0.30, 0.036, 0.004);
 noise(t0 + 0.44, 0.26, 0.026, 'highpass', 4200, 9000, 0.7, 0.040);
+// 꼬리 — C4 받침이 0.42s 남아 "큰 것"의 크기를 만든다(spBlast ③ 와 같은 문법).
 tone('sine', 261.63, 261.63, t0 + 0.48, 0.42, 0.038, 0.012);
 },
 petBell: function () {
@@ -1400,6 +1477,7 @@ tone('sine', chA[i] * 2, chA[i] * 2, ct, 0.40, 0.020, 0.012);
 }
 noise(ct, 0.45, 0.032, 'highpass', 3200, 8000, 0.6, 0.04);
 }
+// B / C 는 런만 — 담백
 },
 milestone: function () {
 if (!gate('milestone')) return;
@@ -1419,29 +1497,36 @@ noise(bt, 0.50, 0.035, 'highpass', 2500, 9000, 0.6, 0.06);
 jackpot: function () {
 if (!gate('jackpot')) return;
 var t0 = at();
+// ① 탱글탱글 — 감쇠하는 탄성 진동 4발
 tone('triangle',  520, 1180, t0,         0.055, 0.150, 0.002);
 tone('triangle', 1180,  760, t0 + 0.055, 0.070, 0.110, 0.002);
 tone('triangle',  760,  980, t0 + 0.125, 0.060, 0.060, 0.002);
 tone('triangle',  980,  880, t0 + 0.185, 0.075, 0.032, 0.002);
+// ② 상승 아르페지오
 var arp = [1318.51, 1661.22, 1975.53];                 // E6 - G#6 - B6
 for (var i = 0; i < 3; i++) {
 var st = t0 + 0.10 + i * 0.058;
 tone('triangle', arp[i], arp[i], st, 0.20, 0.105, 0.004);
 tone('sine', arp[i] * 2, arp[i] * 2, st, 0.12, 0.028, 0.004);
 }
+// ③ 착지 벨 + 반짝임
 var bt = t0 + 0.30;
 tone('sine', 2637.02, 2637.02, bt, 0.55, 0.085, 0.004);   // E7
 tone('sine',  659.25,  659.25, bt, 0.60, 0.050, 0.008);   // E5 받침
 noise(bt, 0.34, 0.030, 'highpass', 3600, 9000, 0.6, 0.03);
+// 저역 "툭" — 젤리가 바닥에 닿는 무게. 팡이 비워 둔 대역이라 안 부딪힌다.
 tone('sine', 150, 96, t0, 0.16, 0.075, 0.003);
 },
 hurry: function () {
 if (!soundOn || !actx || !master) return;
 var t0 = at();
+// ① 저역 임팩트
 tone('sine', 180, 52, t0, 0.42, 0.30, 0.002);
 tone('sine',  90, 44, t0, 0.55, 0.16, 0.004);
+// ② 하강하는 완전5도 (A3 → D3 / E4 → A3)
 tone('triangle', 220.00, 146.83, t0 + 0.02, 0.34, 0.115, 0.004);
 tone('triangle', 329.63, 220.00, t0 + 0.02, 0.34, 0.085, 0.004);
+// ③ 젤리 스플래시 — 넓게 열렸다 닫힌다
 noise(t0, 0.30, 0.085, 'bandpass', 2600, 420, 0.55, 0.003);
 noise(t0 + 0.16, 0.36, 0.030, 'highpass', 2400, 6200, 0.6, 0.02);
 },
@@ -1460,6 +1545,7 @@ voiceSyllable(t0 + i * gap, C, last ? sf * 0.94 : sf,
 last ? 1 : 0, last ? 0 : 1,
 last ? syl * 1.5 : syl, C.peak * 0.82 * VOICE_GAIN, 34);
 }
+// 훌쩍임 — 들숨. 짧고 높고 아주 작다.
 noise(t0 + 3 * gap + 0.04, 0.11, 0.020, 'bandpass', 1800, 3400, 1.6, 0.05);
 voiceBusyUntil = t0 + 3 * gap + syl * 1.5 + 0.10;
 },
@@ -1528,11 +1614,14 @@ if (!gate('reward')) return;
 var n = clamp(step | 0, 0, 5);
 var t0 = at();
 var f  = 1108.73 * Math.pow(2, (n * 2) / 12);        // C#6 에서 2반음씩
+// ① 어택 — 짧은 삼각 + 옥타브 사인. milestone 의 3음 아르페지오 자리다.
 tone('triangle', f, f, t0, 0.16, 0.105, 0.004);
 tone('sine', f * 2, f * 2, t0, 0.10, 0.030, 0.004);
+// ② 벨 꼬리 — 완전5도 위와 옥타브 아래 받침. "띵"의 여운은 여기서 난다.
 var bt = t0 + 0.055;
 tone('sine', f * 1.5, f * 1.5, bt, 0.46, 0.062, 0.005);
 tone('sine', f * 0.5, f * 0.5, bt, 0.40, 0.036, 0.010);
+// ③ 시머 — milestone 과 같은 고역 노이즈, 길이만 절반.
 noise(bt, 0.26, 0.022, 'highpass', 3000, 8600, 0.6, 0.03);
 }
 };
@@ -2114,11 +2203,16 @@ var BGM_CUT_FEVER  = 2200;
 var BGM_BASS_CUT   = 700;    // square 베이스 배음 상한
 var BGM_HAT_HP     = 6200;
 var BGM_HAT_BP     = 8400;
+// 킥 — 4-on-the-floor. 홀수 마디는 step14 에 16분 픽업이 붙어 통통 튄다.
 var BGM_KICK_A = [1.00, 0, 0, 0,  0.84, 0, 0, 0,     0.94, 0, 0,    0,     0.84, 0,    0,    0];
 var BGM_KICK_B = [1.00, 0, 0, 0,  0.84, 0, 0, 0,     0.94, 0, 0,    0,     0.84, 0,    0.58, 0];
+// 8마디 필(bar%8===7) — 4박째가 감긴다.
 var BGM_KICK_F = [1.00, 0, 0, 0,  0.84, 0, 0, 0,     0.90, 0, 0.50, 0,     0.70, 0,    0.70, 0];
+// 섹션 경계(16·32마디) 필 — 3박째부터 감아 "단락이 바뀐다"를 크게 알린다.
 var BGM_KICK_FF= [1.00, 0, 0, 0,  0.84, 0, 0, 0,     0.90, 0, 0.50, 0.60,  0.70, 0.58, 0.70, 0.90];
+// 하이햇 — 8분 그루브. 뒷박(2·6·10·14)을 앞박보다 세게 쳐서 리프트를 만든다.
 var BGM_HAT   = [0.55, 0, 0.88, 0,     0.50, 0, 0.88, 0.30,  0.55, 0, 0.88, 0,     0.50, 0, 0.88, 0.34];
+// 16분 고스트 — BGM_HAT 이 0 인 칸만 채운다(중복 발음 없음). 피버 또는 intensity 3 에서 열린다.
 var BGM_HAT_D = [0, 0.30, 0, 0.34,     0, 0.30, 0, 0,        0, 0.30, 0, 0.34,     0, 0.30, 0, 0];
 var BGM_SNR    = [0, 0, 0, 0,  1.00, 0, 0, 0.26,  0, 0,    0,    0,     1.00, 0,    0,    0.30];
 var BGM_SNR_F  = [0, 0, 0, 0,  1.00, 0, 0, 0.26,  0, 0,    0,    0,     0.55, 0.62, 0.72, 0.85];
@@ -2127,12 +2221,14 @@ var BGM_BASS_A  = [1, 0, 0, 1,  0, 0, 2, 0,  1, 0, 0, 3,  0, 0, 2, 0];
 var BGM_BASS_A2 = [1, 0, 0, 1,  0, 0, 2, 0,  1, 0, 2, 0,  0, 3, 0, 2];
 var BGM_BASS_B  = [1, 0, 2, 0,  0, 1, 0, 2,  1, 0, 2, 0,  0, 1, 0, 3];
 var BGM_BASS_F  = [1, 0, 0, 2,  0, 0, 3, 0,  1, 0, 0, 0,  4, 0, 3, 0];
+// 코드 스탭 — 1=2성, 2=3성. B/B' 는 step3·11 에 16분 푸시가 붙어 밀도가 올라간다.
 var BGM_STAB_PA = [0, 0, 0, 0,  0, 0, 1, 0,  0, 0, 0, 0,  0, 0, 1, 0];
 var BGM_STAB_PB = [0, 0, 0, 2,  0, 0, 1, 0,  0, 0, 0, 2,  0, 0, 1, 0];
 var BGM_BASS_R = [65.41, 49.00, 55.00, 43.65, 73.42, 82.41];      // C2  G1  A1  F1  D2  E2
 var BGM_BASS_O = [130.81, 98.00, 110.00, 87.31, 146.83, 164.81];  // C3  G2  A2  F2  D3  E3
 var BGM_BASS_5 = [98.00, 73.42, 82.41, 65.41, 110.00, 123.47];    // G2  D2  E2  C2  A2  B2
 var BGM_BASS_3 = [82.41, 61.74, 65.41, 55.00, 87.31, 98.00];      // E2  B1  C2  A1  F2  G2
+// 스탭 3성 — 공통음을 남기는 부드러운 성부 진행. 174~330Hz(3배음 ≤ 989Hz).
 var BGM_STAB_A = [196.00, 196.00, 220.00, 220.00, 220.00, 246.94];  // G3 G3 A3 A3 A3 B3
 var BGM_STAB_B = [329.63, 293.66, 329.63, 261.63, 293.66, 329.63];  // E4 D4 E4 C4 D4 E4
 var BGM_STAB_C = [261.63, 246.94, 261.63, 174.61, 174.61, 196.00];  // C4 B3 C4 F3 F3 G3
@@ -2143,17 +2239,23 @@ var BGM_CHORD = [
     /* B' */ 3, 1, 5, 2,  3, 1, 0, 1
 ];
 var BGM_MEL_HZ = [196.00, 220.00, 246.94, 261.63, 293.66, 329.63, 349.23, 392.00, 440.00];
+//                 G3      A3      B3      C4      D4      E4      F4      G4      A4
 var BGM_WAVE_SPEC = [
 [0.250, 3], [0.125, 3], [0.500, 3], [0.500, 6]
 ];
 var BGM_W_BASS = 3;
 var BGM_W_STAB = 2;
+// 마디별 리드 듀티(0=25% 콜 / 1=12.5% 응답 / 2=50% 빌드).
+// 2마디 단위 콜&리스폰스를 음높이뿐 아니라 "음색"으로도 들리게 한다.
+// B 섹션은 50% 스퀘어로 시작해 A 와 두께부터 다르게 들린다.
 var BGM_LEAD_W = [
     /* A  */ 0, 0, 1, 1,  0, 0, 1, 1,
     /* A' */ 0, 0, 1, 1,  0, 0, 1, 2,
     /* B  */ 2, 2, 0, 0,  2, 2, 0, 2,
     /* B' */ 0, 0, 1, 1,  0, 0, 2, 2
 ];
+// 피버는 배음 개수(N)를 늘리는 대신 듀티를 한 칸 좁힌다: 25→12.5%, 12.5→12.5%, 50→25%.
+// 배음이 조밀해져 확실히 밝아지지만 최고 배음 주파수는 1320Hz 그대로다.
 var BGM_LEAD_WF = [1, 1, 0];
 var BGM_MOTIF = [
     /*  0 쉼      */ [-1, -1, -1, -1,  -1, -1, -1, -1,  -1, -1, -1, -1,  -1, -1, -1, -1],
@@ -2179,6 +2281,7 @@ var BGM_MOTIF = [
     /* 20 마무리  */ [ 5, -1, -1,  7,  -1, -1,  8, -1,   7, -1, -1,  5,  -1, -1,  4, -1],
     /* 21 턴어라운드 */ [ 4, -1, -1, -1,  -1, -1, -1, -1,   2, -1,  3, -1,   4, -1,  5,  7]
 ];
+//  1·2 = 훅. 5·6, 9·10, 13·14, 29·30 마디에서 원형 그대로 돌아온다.
 var BGM_MEL_MAP = [
     /* A  */  1,  2,  3,  4,   1,  2,  5,  6,
     /* A' */  1,  2,  7,  8,   1,  2,  5,  9,
@@ -2206,6 +2309,7 @@ var BGM_CNT_MOTIF = [
     /* 17 ↔마무리 */ [-1, -1, -1, -1,   2, -1, -1, -1,  -1, -1,  0, -1,  -1, -1, -1, -1],
     /* 18 ↔턴  */ [-1, -1, -1, -1,   0, -1, -1, -1,  -1, -1, -1, -1,  -1, -1, -1, -1]
 ];
+// A 섹션(1~8마디)은 카운터 없이 리드 혼자 — 그래야 A' 에서 붙는 순간이 사건이 된다.
 var BGM_CNT_MAP = [
     /* A  */  0,  0,  0,  0,   0,  0,  0,  0,
     /* A' */  1,  2,  3,  4,   1,  2,  5,  6,
@@ -2269,6 +2373,7 @@ try {
 bgmGain = actx.createGain();
 bgmGain.gain.value = 0.0001;
 bgmGain.connect(master);
+// 톤 버스 — 킥/베이스/플럭/스탭/리드가 모두 여기를 지난다. 피버는 이 컷오프만 연다.
 bgmToneLP = actx.createBiquadFilter();
 bgmToneLP.type = 'lowpass';
 try { bgmToneLP.Q.value = 0.7; } catch (e) {}
@@ -2276,16 +2381,21 @@ bgmToneLP.frequency.value = bgmFever ? BGM_CUT_FEVER : BGM_CUT_NORMAL;
 bgmToneLP.connect(bgmGain);
 bgmKickG  = bgmMakeGain(BGM_G_KICK,  bgmToneLP);
 bgmPluckG = bgmMakeGain(BGM_G_PLUCK, bgmToneLP);
+// 게이트 파트는 전부 0 에서 태어난다 — bgmApplyMix() 가 현재 상태로 램프한다.
 bgmStabG  = bgmMakeGain(0, bgmToneLP);
 bgmCntG   = bgmMakeGain(0, bgmToneLP);
 bgmSnrG   = bgmMakeGain(0, bgmToneLP);
 bgmLeadG  = bgmMakeGain(0, bgmToneLP);
+// 베이스 전용 700Hz LP — square 배음이 SFX 본진(440Hz+)으로 새기 전에 먼저 자른다.
 bgmBassLP = actx.createBiquadFilter();
 bgmBassLP.type = 'lowpass';
 try { bgmBassLP.Q.value = 0.7; } catch (e) {}
 bgmBassLP.frequency.value = BGM_BASS_CUT;
 bgmBassLP.connect(bgmToneLP);
 bgmBassG = bgmMakeGain(BGM_G_BASS, bgmBassLP);
+// 하이햇은 톤 버스를 우회한다(1150Hz LP 를 지나면 사라지므로).
+// HP 6.2k → BP 8.4k 2단이라 스커트가 -18dB/oct: 3kHz 에서 이미 -18dB 로,
+// SFX 트랜지언트 대역(2.6~6kHz)까지 내려오지 않는다.
 bgmHatBP = actx.createBiquadFilter();
 bgmHatBP.type = 'bandpass';
 try { bgmHatBP.Q.value = 1.4; } catch (e) {}
@@ -2298,6 +2408,8 @@ bgmHatHP.frequency.value = BGM_HAT_HP;
 bgmHatHP.connect(bgmHatBP);
 bgmHatG  = bgmMakeGain(BGM_G_HAT, bgmHatHP);
 bgmHatDG = bgmMakeGain(0, bgmHatG);
+// 스네어의 "살" — 하이햇과 같은 6.2k HP → 8.4k BP 를 통과한다. 스네어 본체
+// 대역(200Hz~2kHz)을 아예 쓰지 않으므로 SFX 보호 규약이 그대로 유지된다.
 bgmSnrNG = bgmMakeGain(0, bgmHatHP);
 bgmBuildWaves();
 bgmApplyMix(0.001);      // 현재 fever/intensity 상태를 즉시 반영(램프 없이)
@@ -2494,6 +2606,8 @@ f = BGM_MEL_HZ[v];
 var wi = BGM_LEAD_W[bar];
 if (bgmFever) wi = BGM_LEAD_WF[wi];
 bgmVoice(bgmPluckG, wi, f, 0, t, 0.18, (s & 3) === 0 ? 0.92 : 1.00, 0.004);
+// 피버 카운터 리드: 한 16분 뒤 옥타브 위 사인(배음 0 → 대역을 넓히지 않고 밝기만 더한다).
+// 항상 예약하고 게이트 게인으로만 여닫는다 → 재발음 없음.
 bgmVoice(bgmLeadG, 'sine', f * 2, 0, t + bgmStepDur, 0.22, 1.00, 0.006);
 }
 v = BGM_CNT_MOTIF[BGM_CNT_MAP[bar]][s];
@@ -2506,6 +2620,8 @@ if (!bgmRunning || !actx || !bgmGain) return;
 try {
 if (!soundOn || hidden()) { bgmStop(); return; }
 var now = actx.currentTime;
+// 스톨(탭 스로틀·GC)로 뒤처졌으면 격자를 유지한 채 현재 시각 이후 첫 스텝으로 점프.
+// 지난 시각에 몰아서 예약해 한꺼번에 터지는 사고를 원천 차단한다.
 if (bgmStepTime(bgmStep) < now) {
 var k = bgmEpoch + Math.ceil((now - bgmT0) / bgmStepDur);
 if (isFinite(k) && k > bgmStep) bgmStep = k;
@@ -2513,6 +2629,8 @@ if (isFinite(k) && k > bgmStep) bgmStep = k;
 var horizon = now + BGM_HORIZON;
 var guard = 0;
 bgmBudget = BGM_MAX_VOICES;
+// 스텝을 시작하기 전에 최악치(BGM_STEP_COST)만큼 예산이 남았는지 먼저 본다 →
+// 한 스텝이 중간에 잘려 음이 빠지는 일이 없고, tick 당 노드 생성은 반드시 상한 아래다.
 while (bgmStepTime(bgmStep) < horizon &&
 guard++ < BGM_MAX_STEPS && bgmBudget >= BGM_STEP_COST) {
 bgmSchedule(bgmStep);
@@ -2753,6 +2871,7 @@ p.size = 17 + L * 0.6;
 p.ttl = 0.26;
 p.color = col;
 spendNote(1);
+// 백열 심지 — 같은 경로 위에 얇고 밝게 겹쳐 "충전" 느낌을 만든다
 var h = alloc(T_BEAM);
 if (h) {
 h.x = ax; h.y = ay; h.x2 = bx; h.y2 = by;
@@ -2761,6 +2880,7 @@ h.ttl = 0.17;
 h.color = toWhite(col, 0.70);
 spendNote(1);
 }
+// 양 끝 코어 플래시 (병합 추적에는 등록하지 않는다 — 뒤이어 올 메인 폭발을 방해하지 않게)
 var e, k;
 for (k = 0; k < 2; k++) {
 e = alloc(T_RING);
@@ -2775,6 +2895,7 @@ e.amul = 0.85;
 e.color = toWhite(col, 0.78);
 spendNote(1);
 }
+// 선을 따라 흐르는 스트릭 스파크 — 속도를 빔 축 방향으로 정렬해 "흐름"이 보이게
 var dx = bx - ax, dy = by - ay;
 var len = Math.sqrt(dx * dx + dy * dy);
 var ux = len > 0.001 ? dx / len : 1, uy = len > 0.001 ? dy / len : 0;
@@ -2806,6 +2927,7 @@ if (!p) return;
 p.x = x; p.y = y; p.w = Math.max(1, w); p.h = Math.max(1, h);
 p.ttl = 0.40;
 p.color = col;
+// 스윕 바가 지나가는 타이밍에 맞춰 스파크가 순차로 터지도록 delay 스태거
 var n = 16;
 for (var i = 0; i < n; i++) {
 var s = alloc(T_SPARK);
@@ -2827,6 +2949,7 @@ function confetti(x, y) {
 if (!canSpawn()) return;
 var cx = (x === undefined || x === null) ? viewW * 0.5 : x;
 var cy = (y === undefined || y === null) ? viewH * 0.55 : y;
+// 좌우 캐논 2문
 for (var side = 0; side < 2; side++) {
 var dir = side === 0 ? 1 : -1;
 var ox = cx + dir * -viewW * 0.30;
@@ -2903,6 +3026,7 @@ disc.color = toWhite(col, 0.22);
 spendNote(1);
 }
 }
+// 코어 플래시 — 링보다 먼저(뒤에) 깔린다
 var core = alloc(T_RING);
 if (core) {
 core.x = sx; core.y = sy;
@@ -2998,10 +3122,14 @@ function feverEnter(cx, cy) {
 var gx = (cx === undefined || cx === null || !isFinite(cx)) ? viewW * 0.5 : cx;
 var gy = (cy === undefined || cy === null || !isFinite(cy)) ? viewH * 0.5 : cy;
 var col = '#ffd166';
+// 피버 진입은 최소 콤보 7 등급의 연출로 고정한다(실제 진입 조건이 콤보 4+ 이므로 자연스럽다).
 var lv = comboLevel();
 setComboLatch(lv > 7 ? lv : 7);
+// burst 를 먼저 — 여기서 코어를 등록해야 전체 레이어 스택(광선·불티 포함)이 나온다.
+// shockwave 는 뒤이어 두 번째 코어를 겹쳐 "2단 폭발"로 읽히게 한다.
 burst(gx, gy, col, 26);
 shockwave(gx, gy, col);
+// 3단: 뒤늦게 더 크게 번지는 링 하나를 더 얹는다
 if (canSpawn()) {
 var p = alloc(T_RING);
 if (p) {
@@ -3026,9 +3154,12 @@ var PULSE_EASE  = ['', 'ease-out', 'cubic-bezier(.34,1.56,.64,1)', 'cubic-bezier
 var PULSE_STEPS = [null,
 [[0, 'scale(1)'], [.4, 'scale(1.003)'], [1, 'scale(1)']],
 [[0, 'scale(1)'], [.38, 'scale(1.005)'], [1, 'scale(1)']],
+// 고콤보 전용 상위 티어: 스케일 + 아주 짧은 좌우 흔들림(translate ≤2px)
 [[0, 'scale(1) translate3d(0,0,0)'], [.2, 'scale(1.012) translate3d(-2px,1px,0)'], [.46, 'scale(1.007) translate3d(2px,-1px,0)'],
 [.72, 'scale(1.003) translate3d(-1px,0,0)'], [1, 'scale(1) translate3d(0,0,0)']]
 ];
+// 키프레임은 한 번만 짓는다. CSS animation-timing-function 은 키프레임 구간마다 걸리지만 WAAPI 의 효과 easing 은 전체에 한 번이라,
+// 같은 곡선을 마지막 빼고 키프레임마다 둔다(옛 느낌 그대로).
 var PULSE_KF = (function () {
 var out = [null], t, s, f, k, i;
 for (t = PULSE_SM; t <= PULSE_LG; t++) {
@@ -3107,6 +3238,7 @@ nSpark = nConfetti = nText = nBeam = nSweep = nRing = nDash = nGuide = 0;
 freeN = 0;
 for (var j = 0; j < POOL_SIZE; j++) { pool[j].active = false; free[freeN++] = j; }
 vig.t = 0; vig.dur = 0; vig.strength = 0;
+// 병합 추적/지출 윈도도 함께 리셋 — 해제된 파티클을 계속 보강하려 들면 안 된다.
 for (var c = 0; c < CORE_SLOTS; c++) {
 coreRec[c].p = null; coreRec[c].ring = null;
 coreRec[c].seq = -1; coreRec[c].rseq = -1; coreRec[c].t = -1e9;
@@ -3120,12 +3252,15 @@ function setSound(on) {
 soundOn = !!on;
 try {
 if (!soundOn) {
+// 무음: 이미 만들어진 컨텍스트가 있으면 마스터를 죽인다 (새로 만들지 않음)
 if (feverVoice) stopFeverRiser(0.02);   // 재생 중인 긴 라이저부터 정리
 bgmStop();                              // BGM 도 함께 정지 (bgmWanted 는 유지)
 trkAll(function (T) { trkStop(T, 0.05); });   // 실음원 전부 (wanted 는 유지)
+// 예약된 덕킹 램프까지 취소해야 나중에 게인이 되살아나지 않는다
 forceMasterGain(0);
 if (actx && actx.state === 'running') { try { actx.suspend(); } catch (e) {} }
 } else {
+// 음소거로 시작 → 나중에 켠 경우. 토글 자체가 사용자 제스처이므로 여기서 생성 허용.
 if (!actx) createAudio();
 if (actx && actx.state === 'suspended') {
 var pr = actx.resume();

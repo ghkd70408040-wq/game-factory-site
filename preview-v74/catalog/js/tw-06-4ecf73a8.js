@@ -28,7 +28,7 @@ play:[till(function(){return open_('modal-mode');},function(){tap('btn-play');})
 character:[CHAR],
 skin:[CHAR,till(function(){return open_('modal-skin');},function(){tap('cp-skin');})],
 settings:[SET],
-records:[till(function(){return open_('modal-rank');},function(){tap('kd-bot-rec');})],
+records:[till(function(){return open_('modal-rank');},function(){tap('kd-top-rec');})],
 howto:[SET,till(function(){return open_('modal-howto');},function(){tap('st-howto');})],
 story:[till(function(){return act('screen-story');},function(){
 var g=G();if(g&&g.playCuts&&g.CUTS_OPEN){try{g.playCuts(g.CUTS_OPEN,'',null);}catch(e){}}})],

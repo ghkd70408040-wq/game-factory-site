@@ -1,4 +1,5 @@
 
+// TenTwin — game state, rules, seeded board generation, rendering and screen flow (window.Game).
 (function () {
 'use strict';
 var COLS = 7;
@@ -47,6 +48,7 @@ var PALETTE = ['#34C6E8',  /* 1 소다     */ '#8C9BF5',  /* 2 블루베리 */
 '#FFA23C',  /* 5 귤       */ '#4BD99A',  /* 6 라임     */
 '#9CE061',  /* 7 청포도   */ '#F5D84A',  /* 8 레몬     */
 '#FF7A6B']; /* 9 딸기     */
+// Combo text colour temperature: yellow -> orange -> pink.
 var COMBO_COLORS = ['#F5D84A', '#FFC63C', '#FFA23C', '#FF8A5C',
 '#FF7A6B', '#FA7FA6', '#FA8BB8', '#DE8CF2',
 '#C77CF0', '#9CA6F5', '#5CD2EE', '#7DF0C8'];
@@ -67,12 +69,14 @@ var GOLD_MULT = 3;            // gold match score multiplier
 var ICE_BREAK_SCORE = 5;      // × stage, awarded when only ice shattered
 var BOMB_KILL_SCORE = 15;     // × stage × cells destroyed by a bomb
 var BOMB_COMBO_EXTEND = 1500; // ms of extra combo window per explosion
+// Fever
 var FEVER_COMBO = 5;          // combo level that ignites fever
 var FEVER_MS = 10000;         // initial duration
 var FEVER_MAX_MS = 20000;     // remaining-time ceiling
 var FEVER_STEP_MS = 1000;     // +1s per match while fevered
 var FEVER_MULT = 2;           // all score ×2 during fever
 var FEVER_CD_MS = 8000;       // re-entry lockout: fever must stay an event
+// Time Rush
 var RUSH_MS = 90000;
 var RUSH_MATCH_MS = 2000;
 var RUSH_ROW_MS = 5000;
@@ -104,6 +108,7 @@ return clamp(pick, 0, wide) + 1;             // 1-based for display
 var MISSION_SCORE = 200;
 var MISSION_COMBO = 5;          // combo level the `combo5` mission asks for
 var MISSION_SPRINT_MS = 30000;  // rolling window for the `sprint` mission
+// Cumulative-match milestones (DESIGN 9-FUN E)
 var MILESTONES = [100, 500, 1000, 5000];
 var MILESTONE_REWARD = { 100: 5, 500: 5, 1000: 5, 5000: 5 };
 var DAILY_QUESTS = [
@@ -295,7 +300,7 @@ var DUEL_PPYAK_FREELINK_MS = 8000; // 삐약 "자유 연결" — 연결 판정 �
 var DUEL_MUKMUL_REPAINT = 5;       // 먹물이 "먹물 발사" — 같은 값으로 덮는 칸 수(§3.5)
 var DUEL_KKULTTEOK_GOLD = 2;       // 꿀떡이 "황금 열매 소환" — 골드 스탬프 수(§16-B #6)
 var DUEL_BANGUL_CLEAN = 2;         // 방울이 "거품 정화" — 지우는 방해 타일 수(§16-B #5)
-  // ==PURE:BEGIN==
+// ==PURE:BEGIN==
 function idxToRC(i) {
 return { r: (i / COLS) | 0, c: i % COLS };
 }
@@ -468,8 +473,8 @@ s = (s + 1) >>> 0;
 }
 return { cells: cells, seed: s };
 }
-  // ==PURE:END==
-  // ==EXT:BEGIN== special-tile rules. Calls PURE, never modifies it.
+// ==PURE:END==
+// ==EXT:BEGIN== special-tile rules. Calls PURE, never modifies it.
 function spOf(cells, i) {
 var c = cells[i];
 return (c && c.sp) ? c.sp : '';
@@ -485,6 +490,7 @@ function isBlocker(cells, i) {
 return isAlive(cells, i) && spOf(cells, i) === 'block';
 }
 function canMatchEx(cells, a, b) {
+// 좁히는 규칙이 먼저다: 와일드라도 블로커와는 짝이 되지 않는다.
 if (isBlocker(cells, a) || isBlocker(cells, b)) return false;
 if (canMatch(cells, a, b)) return true;
 return a !== b && isAlive(cells, a) && isAlive(cells, b) &&
@@ -624,19 +630,24 @@ bomb: rush ? (stage >= SP_STAGE_MIN)
 function applySpecials(cells, stage, mode, rng) {
 if (mode === 'daily' || typeof rng !== 'function') return cells;
 var rush = mode === 'rush';
+// Below the density gate, stage 1 still earns its single gold tile.
 if (!rush && stage < SP_STAGE_MIN) return applyStage1Gold(cells, rng);
+// 1. every living, still-plain cell is a candidate
 var live = [];
 for (var i = 0; i < cells.length; i++) {
 if (cells[i] && !cells[i].dead && !cells[i].sp) live.push(i);
 }
 if (!live.length) return cells;
+// 2. target count first, then clamp to the 12% board ceiling
 var density = Math.min(rush ? SP_DENSITY_RUSH : SP_DENSITY, SP_MAX_RATIO);
 var room = Math.floor(cells.length * SP_MAX_RATIO) - countSpecials(cells);
 var target = Math.round(live.length * density);
 if (target > room) target = room;
 if (target > live.length) target = live.length;
 if (target <= 0) return cells;
+// 3. spread them across the whole board, not just the part scanned first
 shuffleSeeded(live, rng);
+// 4. roll each chosen cell's kind against the weight table
 var allow = specialKinds(stage, mode);
 var wWild = SP_W_WILD;
 var wGold = SP_W_GOLD + (allow.ice ? 0 : SP_W_ICE);  // ice's share -> gold
@@ -743,6 +754,8 @@ var g = genBoardExt(stage, s, density, legacy);
 var cells = g.cells || [];
 var n = countPairs(cells);
 if (!loose) loose = g;
+// The generator's own floor. Below it, g.seed is the post-increment seed
+// and does not regenerate g.cells, so such a board can never be a winner.
 var floorPairs = Math.max(3, Math.floor(cells.length * 0.08));
 s = (g.seed + GB_WALK) >>> 0;         // deterministic walk, seed-derived only
 if (n < floorPairs) continue;
@@ -858,7 +871,7 @@ var dr = B.r - A.r, dc = B.c - A.c;
 var aligned = (dr === 0 || dc === 0 || Math.abs(dr) === Math.abs(dc));
 return aligned ? 'blocked' : 'notaligned';
 }
-  // ==EXT:END==
+// ==EXT:END==
 function $(id) {
 return (typeof document === 'undefined') ? null : document.getElementById(id);
 }
@@ -892,6 +905,7 @@ fitHead(el);      // [E14-0902] 제목을 갈아 쓰는 세 경로가 전부 여
 }
 var MVH_FS_MIN = .060;
 function mvhBase(h) {
+// 기본값은 CSS 가 준다(ko .128 / en .098). 인라인 값을 지우고 다시 읽는다.
 h.style.removeProperty('--mvh-fs');
 var v = parseFloat(getComputedStyle(h).getPropertyValue('--mvh-fs'));
 return (v > 0) ? v : .128;
@@ -924,6 +938,8 @@ var avail = h.clientWidth
 if (!(avail > 0)) return;                     // 창이 안 떠 있으면 잰 값이 0 이다
 var need = mvhNeed(sp);
 if (!(need > 0) || need <= avail) return;     // 짧은 제목 — 승인값 그대로
+// 글자 폭은 크기에 비례한다(자간도 em 이라 같이 준다). 한 번에 맞고,
+// 웹폰트 힌팅이 남길 수 있는 잔차만 두 번째 회전으로 닫는다.
 var k = base * (avail / need);
 for (var i = 0; i < 2 && k > MVH_FS_MIN; i++) {
 h.style.setProperty('--mvh-fs', String(Math.round(k * 1e5) / 1e5));
@@ -979,6 +995,10 @@ var el = $(id);
 if (el) headText(el, String(txt));
 }
 function noop() {}
+// window.Juice stub — every documented method resolves to a no-op if absent.
+// J.bgm is seeded here too: it is an OBJECT, not a function, so the JUICE_FNS
+// loop below cannot build it and an un-seeded J.bgm.start() would throw before
+// bindJuice() has ever run.
 var J = { sfx: {}, bgm: { start: noop, stop: noop, setFever: noop, setIntensity: noop,
 setPanic: noop, scene: noop, mainStart: noop, mainStop: noop,
 setNight: noop } };
@@ -986,12 +1006,16 @@ var JUICE_FNS = ['init', 'setSound', 'setVibrate', 'resumeAudio',
 'unlockAudio', 'burst', 'beam',
 'sweep', 'confetti', 'floatText', 'screenPulse', 'vignette',
 'vibrate', 'clear',
+// v2 additions (contract §7) — absent methods stay no-ops
 'shockwave', 'feverAura',
+// v3 additions (CONTRACT-V3 §3) — same no-op guarantee
 'brokenLink', 'feverEnter', 'duck',
 'lineGuide'];
 var JUICE_SFX = ['select', 'match', 'fail', 'rowClear', 'combo', 'deal', 'win', 'lose', 'ui',
+// v2 additions (contract §7)
 'feverOn', 'feverOff', 'bomb', 'gold', 'ice', 'mission',
 'heartbeat', 'grade', 'milestone',
+// v7: the mascot's voice. Absent juice.js -> silent mascot, nothing else.
 'cheer',
 'voice', 'tierUp',
 'jackpot',
@@ -1038,12 +1062,17 @@ uiTapPlayedSeq = uiTapSeq;
 uiSfxLastAt = nowMs;
 return rawUi.apply(null, arguments);
 };
+// Juice.bgm is an OBJECT, not a function, so it needs its own no-op shim.
+// Each method is bound and probed independently: a juice.js that ships only
+// part of the trio still contributes the part it has.
 var b = src.bgm || {};
 J.bgm = {
 start:    (typeof b.start === 'function') ? b.start.bind(b) : noop,
 stop:     (typeof b.stop === 'function') ? b.stop.bind(b) : noop,
 setFever: (typeof b.setFever === 'function') ? b.setFever.bind(b) : noop,
+// v7: layer count 0-3. An older juice.js without it keeps its single layer.
 setIntensity: (typeof b.setIntensity === 'function') ? b.setIntensity.bind(b) : noop,
+// v8: TIME RUSH last-10s tempo lift. An older juice.js simply stays at 132 BPM.
 setPanic: (typeof b.setPanic === 'function') ? b.setPanic.bind(b) : noop,
 scene:     (typeof b.scene === 'function') ? b.scene.bind(b) : noop,
 mainStart: (typeof b.mainStart === 'function') ? b.mainStart.bind(b) : noop,
@@ -1053,6 +1082,7 @@ mainInfo:  (typeof b.mainInfo === 'function') ? b.mainInfo.bind(b) : function ()
 };
 }
 bindJuice(); // pre-bind to no-ops so nothing can throw before init()
+// Tracked timers so nothing leaks between stages / screens.
 var timers = [];
 var popLive = 0;
 var popGen = 0;
@@ -1107,9 +1137,11 @@ bestClassicRush: 0,      // 클래식 타임러시 최고 점수
 classicDailyBest: null,  // 클래식 데일리 오늘 결과 (일반 dailyBest 와 별개)
 saveClassic: null,       // 클래식 전용 진행 저장 슬롯
 classicSkills: false,
+// --- v2 (contract §9). Older saves simply lack these; defaults apply. ---
 bestRush: 0,        // Time Rush high score, kept apart from `best`
 totalMatches: 0,    // lifetime matches, drives the milestone toasts
 milestones: [],     // milestone values already celebrated
+// --- v3 ---
 lastMissionId: '',  // previous stage's mission, so it is never repeated
 tutorialDone: false,// first-run tutorial seen (or skipped) at least once
 tutorialCleared: false,
@@ -1368,6 +1400,7 @@ store.bestClassicRush = o.bestClassicRush;
 }
 if (o.classicDailyBest) store.classicDailyBest = o.classicDailyBest;
 if (typeof o.classicSkills === 'boolean') store.classicSkills = o.classicSkills;
+// v2 fields — a pre-v2 save just leaves the defaults in place.
 if (typeof o.bestRush === 'number' && isFinite(o.bestRush)) store.bestRush = o.bestRush;
 if (typeof o.totalMatches === 'number' && isFinite(o.totalMatches)) {
 store.totalMatches = o.totalMatches;
@@ -1375,6 +1408,8 @@ store.totalMatches = o.totalMatches;
 if (Array.isArray(o.milestones)) {
 store.milestones = o.milestones.filter(function (m) { return typeof m === 'number'; });
 }
+// v3 field — a pre-v3 save has no mission history, '' just means
+// "nothing to avoid", which is exactly the right starting state.
 if (typeof o.lastMissionId === 'string') store.lastMissionId = o.lastMissionId;
 if (typeof o.charId === 'string') {
 if (HERO_IDS.indexOf(o.charId) >= 0) {
@@ -1388,9 +1423,16 @@ if (typeof o.mateId === 'string' &&
 (o.mateId === '' || MATE_IDS.indexOf(o.mateId) >= 0)) {
 store.mateId = o.mateId;
 }
+// Absent -> stays false -> an existing player meets the tutorial once and
+// can skip it. That is intended: the connection rule was never taught
+// (review #2), so even a returning player has not actually seen it.
 if (typeof o.tutorialDone === 'boolean') store.tutorialDone = o.tutorialDone;
 if (typeof o.tutorialCleared === 'boolean') store.tutorialCleared = o.tutorialCleared;
+// Only the three legal values are accepted; anything else (including a
+// pre-v3 save with no field at all) falls back to "follow the OS".
 if (o.theme === 'dark' || o.theme === 'light' || o.theme === '') store.theme = o.theme;
+// v4 fields — absent in every pre-v4 save, which is exactly the state of a
+// player who has not met Time Rush yet, so the defaults are the right answer.
 if (typeof o.rushSeen === 'boolean') store.rushSeen = o.rushSeen;
 if (typeof o.rushHintShown === 'boolean') store.rushHintShown = o.rushHintShown;
 if (o.ranks && typeof o.ranks === 'object') {
@@ -1705,6 +1747,7 @@ try { toast(t('toast.savefail')); } catch (e2) { /* 알림 때문에 저장 경�
 }
 function saveProgress() {
 if (!S.running) return;
+// Time Rush is a 90-second session: resuming it later would be meaningless.
 if (isRush() || S.mode === 'adv') { persist(); return; }
 store[saveSlot()] = {
 mode: S.mode, stage: S.stage, seed: S.seed,
@@ -1745,6 +1788,8 @@ return n < 0 ? 0 : n;
 }
 function sanitizeRankEntry(mode, e) {
 if (!e || typeof e !== 'object') return null;
+// The primary metric is the one the mode is ranked by; an entry without a
+// usable one cannot be placed at all and is dropped rather than guessed at.
 var sh = rankShape(mode);   // W7.5 - 이름이 아니라 모양으로 가른다
 var prim = (sh === 'daily') ? rankInt(e.timeSec) : rankInt(e.score);
 if (prim === null) return null;
@@ -1759,6 +1804,7 @@ e.score = prim;
 e.matches = rankInt(e.matches) || 0;
 } else {
 e.score = prim;
+// Stage is 1-based everywhere else in the game; 0 would render as "Stage 0".
 e.stage = rankInt(e.stage) || 1;
 }
 e.date = (typeof e.date === 'string') ? e.date : '';
@@ -1816,6 +1862,7 @@ function reconcileRanks() {
 var i, mode, raw, clean, e;
 ensureRankArrays();
 var R = store.ranks;
+// --- 1. sanitize -------------------------------------------------------
 for (i = 0; i < RANK_MODES.length; i++) {
 mode = RANK_MODES[i];
 raw = R[mode];
@@ -1847,10 +1894,12 @@ maxCombo: db.maxCombo, grade: db.grade, date: db.date
 });
 if (e) R.daily.push(e);
 }
+// --- 3. sort, then truncate to the cap --------------------------------
 for (i = 0; i < RANK_MODES.length; i++) {
 mode = RANK_MODES[i];
 R[mode] = stableRankSort(R[mode], rankCmpFor(mode)).slice(0, RANK_CAP);
 }
+// --- 4. derive the mirrors (see the section header for why not bestStage) ---
 store.best = R.endless[0] ? R.endless[0].score : 0;
 store.bestRush = R.rush[0] ? R.rush[0].score : 0;
 store.bestClassic = R.classic[0] ? R.classic[0].score : 0;
@@ -1874,6 +1923,8 @@ break;
 arr.push(e);
 reconcileRanks();
 persist();
+// Identity, not value: two entries can be genuinely identical, and only the
+// sanitizer's in-place contract can tell which one of them is ours.
 arr = store.ranks[mode];
 for (i = 0; i < arr.length; i++) if (arr[i] === e) return i + 1;
 return 0;
@@ -2265,6 +2316,7 @@ en: {
 'hurry.prince': 'Just hold on!',
 'aria.charpick': 'Choose your character',
 'pv.jelly.hit': 'JACKPOT ×{jm}!',
+// 콤보 티어 배너의 아랫줄 (윗줄 "8 COMBO!!" 는 숫자라 번역 대상이 아니다)
 'combo.tier1': 'ON FIRE!',
 'combo.tier2': 'BLAZING!',
 'combo.tier3': 'UNREAL!',
@@ -2986,7 +3038,7 @@ en: {
 'say.star.jelly': 'Sparkle!',
 'kd.castle': 'Castle',
 'aria.kdmenu': 'Village menu',   /* [116] 메인 v3 왼쪽 메뉴 판(#kd-menu) 이름 */
-'kd.playground': 'Playground',
+'kd.playground': 'Playground',   /* [판정판 121] 'Arcade' 로 바꿨다가 되돌림(지휘자 판정 — 놀이터 창 안 줄 pg.arcade 'Arcade' 와 겹침). 아래 줄 이름 칸은 .88 맞춤 */
 'kd.shop': 'Shop',
 'kd.pethouse': 'Pet House',
 'kd.circus': 'Story Theater',
@@ -3013,6 +3065,7 @@ en: {
 ko: {
 'menu.tagline': '같은 숫자, 또는 합이 10인 짝을 지우세요.',
 'menu.play': '시작하기',
+// W7.5 — 옛 값: '이어하기'. 키 이름을 남긴 이유는 en 쪽 주석 참조.
 'menu.continue': '클래식',
 'menu.daily': '데일리',
 'menu.howto': '게임 방법',
@@ -3302,6 +3355,7 @@ ko: {
 'combo.2': '멋져요!',
 'combo.3': '대박!',
 'combo.4': '미쳤다!',
+// --- v3 캐릭터 3인 (문구 길이 제약은 en 쪽 주석 참고) ---
 'char.ten.name': '텐텐 왕자',
 'char.twin.name': '트윈 왕자',
 'char.ppyak.name': '삐약',
@@ -3499,6 +3553,7 @@ ko: {
 'rank.hint.endless': '무한 모드 최고 점수 TOP 5',
 'rank.hint.rush': '타임 러시 최고 점수 TOP 5',
 'rank.hint.daily': '데일리 최단 시간 TOP 5. 데일리는 매일 판 크기가 같아서 시간으로 겨뤄요.',
+// W7.5 — 클래식 보드 셋. 행 문구를 새로 만들지 않는 이유는 en 쪽 주석 참조.
 'rank.tab.classic': '클래식',
 'rank.tab.classicrush': '클래식 러시',
 'rank.tab.classicdaily': '클래식 데일리',
@@ -4266,6 +4321,7 @@ continueUsed: false,
 adContinueUsed: false,   /* Task 12 rev1(I-7) — 광고 이어하기도 판당 1회 */
 snapshot: null,
 gridSeed: 1,
+// --- v2 ---
 addSeq: 0,               // Add counter — seeds deterministic bomb rolls
 stageStartedAt: 0,       // per-stage clock, feeds the clear grade
 stageMaxCombo: 1,        // per-stage best combo, feeds the clear grade
@@ -4283,9 +4339,11 @@ feverOn: false, feverUntil: 0, feverScore: 0, feverCdUntil: 0,
 rushEndAt: 0, addCdUntil: 0, rushBeatAt: 0,
 pausedAt: 0,             // wall clock at pause, used to shift deadlines
 howtoFromPause: false,   // (a) fix: How-to opened from the pause modal
+// --- v3 ---
 sprintTimes: [],         // match timestamps inside the `sprint` mission window
 overInfo: null,          // frozen game-over figures; see paintOverModal()
 rushStartedAt: 0,
+// --- v4 ---
 pairsLeft: 0,
 shuffles: 0,             // shuffles left this stage
 shuffleCount: 0,         // shuffles ALREADY spent — the ordinal the stream uses
@@ -4415,8 +4473,11 @@ function boardMaxPx() {
 var board = $('board');
 if (board) {
 try {
-var v = parseFloat(window.getComputedStyle(board).getPropertyValue('--board-max'));
+var cs = window.getComputedStyle(board);
+var v = parseFloat(cs.getPropertyValue('--board-max'));
 if (isFinite(v) && v > 0) return v;
+var mw = parseFloat(cs.maxWidth);
+if (isFinite(mw) && mw > 0) return mw;
 } catch (e) { /* ignore */ }
 }
 return BOARD_MAX_FALLBACK;
@@ -4439,6 +4500,7 @@ var next = Math.min(byW, byH);
 if (!isFinite(next)) next = TILE_MIN;
 next = clamp(next, TILE_MIN, TILE_MAX);
 if (isFinite(byW) && byW > 0 && next > byW) next = byW;   // never overflow width
+if (isFinite(byH) && byH > 0 && next > byH && battleOn() && battleStage()) next = byH;
 if (next < 12) next = 12;
 ts = next;
 board.style.setProperty('--ts', ts + 'px');
@@ -4447,6 +4509,8 @@ var bw = COLS * ts + (COLS - 1) * GAP;
 var bh = rows * ts + Math.max(0, rows - 1) * GAP;
 board.style.width = bw + 'px';
 board.style.height = bh + 'px';
+// Vertical centring, but only while the board is shorter than its box — a
+// taller board must still start at the top and scroll.
 var slack = Math.floor((area.h - bh) / 2);
 board.style.marginTop = (slack > 0 ? slack : 0) + 'px';
 for (var i = 0; i < tileEls.length; i++) positionTile(tileEls[i], i);
@@ -4486,6 +4550,7 @@ else span.textContent = txt;
 }
 if (el.getAttribute('data-i') !== String(i)) el.setAttribute('data-i', String(i));
 setCls(el, 'dead', !!c.dead);
+// Special-tile skin (contract §6). CSS owns every visual; we only label.
 var sp = c.sp || '';
 if (sp) {
 if (el.getAttribute('data-sp') !== sp) el.setAttribute('data-sp', sp);
@@ -4564,6 +4629,7 @@ list[i].classList.toggle('active', list[i].id === id);
 }
 syncLobbyBgmNight(isNightHour(new Date().getHours()));
 if (audioUnlocked) J.bgm.scene(id === 'screen-game' ? 'game' : 'menu');
+if (id !== 'screen-map') stopMapTicker();
 }
 function openModal(id) { var m = $(id); if (m) { m.hidden = false; healHeads(m); } }
 function closeModal(id) { var m = $(id); if (m) m.hidden = true; }
@@ -4575,6 +4641,7 @@ tutFxRaise(false);
 'modal-soon',
 'modal-playground',
 'modal-theater',
+// v4 4차-a — 모험의 두 시트도 여기 목록에 있어야 지도/메뉴로 나갈 때 남지 않는다.
 'modal-node', 'modal-adv',
 'modal-drops',
 'modal-classic',
@@ -4848,10 +4915,12 @@ function syncDynamicI18n() {
 try { syncPetInfo(); syncSidePanes(); fitAllDesc(); } catch (e) { /* 부팅 전 */ }
 var msh = $('modal-mode');
 if (msh && !msh.hidden) syncModeSheet();
+// W7.5 — 클래식 허브의 배지도 같은 규약으로 다시 그린다.
 var csh = $('modal-classic');
 if (csh && !csh.hidden) syncClassicSheet();
 var mb = $('menu-best');
 if (mb) {
+// One line, two records: endless best + Time Rush best (contract §6).
 var parts = [];
 if (store.best > 0) {
 parts.push(t('menu.best', { score: store.best, stage: store.bestStage }));
@@ -4863,6 +4932,8 @@ parts.push(t('menu.bestclassic', { score: store.bestClassic }));
 parts.push(dailyDoneToday() ? t('menu.dailydone') : t('menu.dailytodo'));
 mb.textContent = parts.join(' · ');
 }
+// The How-to's Next button doubles as the tutorial entry on the last panel,
+// so its label is state-dependent and must be re-derived after a re-translate.
 setHowto(howtoIdx);
 var tm = $('modal-tutorial');
 if (tm && !tm.hidden) {
@@ -4883,6 +4954,8 @@ paintDailyRankLine();
 }
 var rkm = $('modal-rank');
 if (rkm && !rkm.hidden) buildRankList();
+// applyI18n() has just reset over-title / over-best-label from their markup
+// keys, which are the ENDLESS wording; restore the mode-correct text.
 paintOverModal();
 var mp = $('screen-map');
 if (mp && mp.classList && mp.classList.contains('active')) buildMap();
@@ -4948,6 +5021,8 @@ syncToggleLabels();
 }
 function syncToggleLabels() {
 var bs = $('btn-sound'), bv = $('btn-vibe'), bl = $('btn-lang');
+// 아이콘은 이제 인라인 SVG 스프라이트다. textContent를 쓰면 <svg>가 통째로 날아가
+// 버튼이 빈 원이 되므로, <use>의 href만 갈아끼운다.
 setIcon(bs, store.sound ? 'sound' : 'sound-off');
 setIcon(bv, store.vibrate ? 'vibe' : 'vibe-off');
 if (bs) bs.classList.toggle('off', !store.sound);
@@ -5024,6 +5099,7 @@ if (S.combo > S.maxCombo) S.maxCombo = S.combo;
 if (S.combo > S.stageMaxCombo) S.stageMaxCombo = S.combo;
 if (S.combo > (store.comboMax | 0)) store.comboMax = S.combo;
 dqBump('combo', S.combo, true);
+// "Reach a x5 combo" — an unbroken chain, which is exactly what S.combo is.
 if (S.combo >= MISSION_COMBO) missionBump('combo5', 1);
 var label = $('combo-label');
 if (label) {
@@ -5247,8 +5323,10 @@ if (Object.prototype.hasOwnProperty.call(map, k)) sum += map[k] | 0;
 }
 return sum;
 }
+// 텐텐 왕자 — 합10 매치 보너스. 왕자 승격과 함께 +50% → +60%.
 var TEN_SUM10_MULT = 1.6;
 var TWIN_SAME_MULT = 1.6;
+// 젤리 — 매치마다 확률적으로 그 매치만 ×3.
 var JELLY_P = 0.10;
 var JELLY_MULT = 3;
 var JELLY_ALT = '#B6F24A';
@@ -6194,6 +6272,7 @@ syncCharPick();
 applyCharSkin();
 kdAvatarPaint();   /* [116] 메인 프로필 얼굴도 그 자리에서 */
 J.sfx.ui();
+// 고른 순간 그 캐릭터의 목소리를 한 번 들려준다 — 선택의 근거가 하나 더 는다.
 J.sfx.voice(id, 3);
 introGate(id, null);
 }
@@ -6486,19 +6565,21 @@ return multLifeCache;
 function multBandGap() {
 var vh = (typeof window !== 'undefined' ? (window.innerHeight || 844) : 844);
 var top = 0, i, el, r;
+var bot = 0, br = null;
+el = $('board') || $('board-scroll');
+if (el && el.getBoundingClientRect) {
+br = el.getBoundingClientRect();
+if (br.height > 0) bot = br.top;
+}
+var side = !!(br && br.width > 0 && battleOn() && battleStage());
 var ids = ['duel-hud', 'classic-hud', 'topbar', 'tb-stats', 'hud-row', 'boss-bar'];
 for (i = 0; i < ids.length; i++) {
 el = $(ids[i]);
 if (!el || el.hidden || !el.getBoundingClientRect) continue;
 r = el.getBoundingClientRect();
 if (r.width <= 0 || r.height <= 0) continue;
+if (side && (r.right <= br.left || r.left >= br.right)) continue;
 if (r.bottom > top) top = r.bottom;
-}
-var bot = 0;
-el = $('board') || $('board-scroll');
-if (el && el.getBoundingClientRect) {
-r = el.getBoundingClientRect();
-if (r.height > 0) bot = r.top;
 }
 if (!(bot > 0) || !(bot > top)) { top = vh * 0.06; bot = vh * 0.18; }
 return { top: top, bot: bot };
@@ -6743,6 +6824,7 @@ setText('skill-pct', S.skillKind
 : (full ? t('skill.ready') : (Math.floor(pct * 100) + '%')));
 }
 function cutinReset() {
+// W7.5 — 하드 티어다운도 예약을 걷는다(endCutin 과 같은 이유).
 if (cutTimer) { clearTimeout(cutTimer); cutTimer = 0; }
 S.cutOn = false;
 S.cutAt = 0;
@@ -6808,6 +6890,8 @@ cutTimer = later(function () { endCutin(false); }, cutinHoldMs());
 function endCutin(skip) {
 if (!S.cutOn) return;
 if (skip && (now() - S.cutAt) < SKILL_CUTIN_MIN_MS) return;
+// W7.5 — 두 가드를 통과해 **실제로 끝내기로 한** 뒤에 끈다. 가드 위에서
+// 끄면 너무 이른 스킵 탭이 정상 종료 타이머까지 지워 컷인이 안 걷힌다.
 if (cutTimer) { clearTimeout(cutTimer); cutTimer = 0; }
 var fn = S.cutFn;
 S.cutOn = false;
@@ -6997,7 +7081,12 @@ t('fever.off', { score: gained }), '#ffd94a');
 }
 function missionPool(stage, mode, cellCount) {
 var n = cellCount || 30;
+// combo5 / sprint / col are pure classic mechanics — no special tile has to
+// exist for them, so they are available from stage 1 and in Daily.
 var pool = ['sum10', 'same', 'rows', 'noadd', 'combo5', 'sprint'];
+// "Clear column N" is only offered once the board is at least one full row,
+// i.e. every column is actually populated. genBoard never goes below 25
+// cells, but the guard keeps the invariant local and checkable.
 if (n >= COLS) pool.push('col');
 if (mode === 'daily') return pool;                 // classic mechanics only
 var specialsExist = (mode === 'rush') || stage >= SP_STAGE_MIN;
@@ -7021,6 +7110,8 @@ if (trimmed.length) pool = trimmed;
 var r = mulberry32(((seed >>> 0) ^ 0x5BF03635) >>> 0);
 var id = pool[clamp((r() * pool.length) | 0, 0, pool.length - 1)];
 var goalFn = MISSION_GOALS[id];
+// The rng is handed on so a goal can be seeded too (MISSION_GOALS.col picks
+// which column) while staying a pure function of `seed`.
 return { id: id, goal: goalFn ? goalFn(n, r) : 5, prog: 0, done: false };
 }
 function capSpecialMission(m) {
@@ -7044,6 +7135,7 @@ var live = !!S.mission && missionsOn() && (!battleOn() || finishOn());
 if (badge && badge.hidden !== !live) badge.hidden = !live;
 if (!live) return;
 setText('mission-text', missionText(S.mission));
+// `col`'s goal is a column NUMBER, so the progress readout is a plain 0/1.
 var shownGoal = S.mission.id === 'col' ? 1 : S.mission.goal;
 setText('mission-prog', t('mission.prog', { n: S.mission.prog, goal: shownGoal }));
 if (badge && badge.classList) badge.classList.toggle('done', !!S.mission.done);
@@ -7067,6 +7159,7 @@ function missionBump(kind, n) {
 var m = S.mission;
 if (battleOn() && !finishOn()) return;   // 반려 ② — 전투에는 미션이 없다(syncMission 주석)
 if (!m || m.done || !missionsOn()) return;
+// 시간 초과된 미션은 더 이상 진행되지 않는다 (실패해도 스테이지는 계속된다).
 if (S.missionUntil < 0) return;
 if (m.id !== kind) return;
 if (m.id === 'sprint') {
@@ -7240,6 +7333,7 @@ S.hurryDone = true;
 runHurry();
 }
 function runHurry() {
+// ① 타임스톱 — pause() 와 같은 손동작, 모달만 없다.
 S.hurryOn = true;
 S.paused = true;
 S.pausedAt = now();
@@ -7280,6 +7374,7 @@ var held = S.pausedAt ? Math.max(0, now() - S.pausedAt) : 0;
 S.pausedAt = 0;
 S.paused = false;
 shiftDeadlines(held, false);
+// ④ BGM 긴장 레이어 1단. 이후 10초 패닉의 템포 상승이 그 위에 또 얹힌다.
 S.hurryLift = 1;
 syncBgmIntensity();
 }
@@ -7656,6 +7751,8 @@ S.cells = gen.cells;
 if (TW_BATTLE && (advp || isArcadeDuel())) S.cells = battleFitBoard(S.cells, gen.seed);
 S.seed = gen.seed;
 S.gridSeed = gen.seed;
+// Specials ride on top of the PURE board, from a seed-derived stream, so a
+// given seed always yields the same layout. Daily is skipped entirely.
 if (featuresOn()) {
 applySpecials(S.cells, stage, S.mode,
 mulberry32(((gen.seed >>> 0) ^ 0x1F123BB5) >>> 0));
@@ -7673,8 +7770,11 @@ S.mission = advp
 ? { id: advp.mission.id, goal: advp.mission.goal, prog: 0, done: false }
 : (missionMode()
 ? pickMission(gen.seed, S.cells.length, stage, S.mode, store.lastMissionId) : null);
+// Remembered in the store (and mirrored into the save) so the "never twice
+// in a row" rule survives a reload, not just a stage transition.
 capSpecialMission(S.mission);          /* W6.5b P0 — 있는 것보다 많이 요구 금지 */
 if (S.mission && !advp) store.lastMissionId = S.mission.id;
+// 미션 시계는 "빡!" 배너가 끝난 뒤에 시작한다 (advBeginStage). 여기서는 0.
 S.missionUntil = 0;
 S.finishUntil = 0;        /* §3 — 피니시 커서도 판마다 0 */
 S.missionMult = 1;
@@ -7692,6 +7792,8 @@ S.adds = isDaily() ? 3 : addsForStage(stage);
 S.addCdUntil = 0;
 S.hints = 3;
 S.undoLeft = 1;
+// 셔플 금지(핸디캡 축 4)는 예산을 0으로 두는 것으로 끝난다 — 버튼의 비활성화·
+// 자동 구제 경로가 이미 전부 `S.shuffles > 0` 하나만 본다.
 S.shuffles = (advp && advp.hand.noShuffle) ? 0 : SHUFFLES_PER_STAGE;
 if (isClassic()) {
 S.adds = addsForStage(stage);
@@ -7714,6 +7816,7 @@ S.running = true;
 S.paused = false;
 var board = $('board');
 if (board) board.classList.remove('grayed');
+// Board DOM is rebuilt wholesale only on a stage change.
 for (var i = 0; i < tileEls.length; i++) {
 if (tileEls[i] && tileEls[i].parentNode) tileEls[i].parentNode.removeChild(tileEls[i]);
 }
@@ -8038,6 +8141,7 @@ var keepEnd = S.rushEndAt;
 startStage(S.stage, (S.seed + 0x9E3779B1) >>> 0);
 S.rushEndAt = keepEnd;         // startStage must not reset the session clock
 toast(t('toast.rushnext'));    // after startStage: its clearTimers() would
+// otherwise cancel the toast's hide timer
 syncHud();
 }
 function restoreSave(sv) {
@@ -8057,10 +8161,13 @@ S.seed = sv.seed || 1;
 S.gridSeed = sv.gridSeed || S.seed;
 S.cells = cloneCells(sv.cells || []);
 S.addSeq = sv.addSeq || 0;
+// A pre-v4 save has neither field: it gets a full budget and a fresh ordinal,
+// which is the same state startStage() would have left it in.
 S.shuffles = typeof sv.shuffles === 'number' ? sv.shuffles : SHUFFLES_PER_STAGE;
 S.shuffleCount = typeof sv.shuffleCount === 'number' ? sv.shuffleCount : 0;
 S.stageStartedAt = Date.now();
 S.stageMaxCombo = 1;
+// Pre-v3 saves carry no mission history; '' simply means "nothing to avoid".
 if (typeof sv.lastMission === 'string' && sv.lastMission) {
 store.lastMissionId = sv.lastMission;
 }
@@ -8155,6 +8262,7 @@ clearCands();
 var list = connectCandidates(S.cells, i) || [];
 var seen = {}, k;
 for (k = 0; k < list.length; k++) seen[list[k]] = 1;
+// wild tiles match values the pure rule rejects; scan only if one exists
 var hasWild = false, j;
 for (j = 0; j < S.cells.length; j++) { if (isWild(S.cells, j)) { hasWild = true; break; } }
 if (hasWild) {
@@ -8292,6 +8400,7 @@ var va = S.cells[a].v, vb = S.cells[b].v;
 var spA = spOf(S.cells, a), spB = spOf(S.cells, b);
 var gold = spA === 'gold' || spB === 'gold';
 var specialsUsed = (spA ? 1 : 0) + (spB ? 1 : 0);
+// --- 2. ice: an iced tile spends a layer instead of dying ---------------
 var pair = [a, b];
 var dying = [], chipped = [];
 var iceFree = connFreeOn();
@@ -8306,9 +8415,11 @@ if (cell.sp === 'ice') { cell.sp = ''; cell.ice = 0; }
 dying.push(idx);
 }
 }
+// Nothing died: only ice broke. No combo, no match count — no farming.
 var iceOnly = dying.length === 0;
 var rose = iceOnly ? false : bumpCombo();
 for (var di = 0; di < dying.length; di++) S.cells[dying[di]].dead = true;
+// --- 4. bomb: a detonating tile clears its living 3×3 neighbourhood -----
 var blown = [];
 for (var bi = 0; bi < dying.length; bi++) {
 if (spOf(S.cells, dying[bi]) !== 'bomb') continue;
@@ -8348,6 +8459,7 @@ else if (mkc.mk === 'awk') mkAwk++;
 else if (mkc.mk === 'gear') mkGear.push({ id: mkc.mkItem, tier: mkc.mkTier, i: mkIdx });   /* i = 그 칸 — 획득 비행이 이 칸에서 출발한다(T11) */
 mkc.mk = ''; mkc.mkItem = ''; mkc.mkTier = '';
 }
+// --- 6. score: base × gold × fever, then the bomb bonus -----------------
 var fx = S.feverOn ? FEVER_MULT : 1;
 var noBonus = iceOnly || isClassic();
 var twPrev = S.pv ? (S.pv.twAlt | 0) : 0;
@@ -8418,6 +8530,7 @@ addRushTime(Math.round(ARC_ATK_TIME_MS * Math.max(0, gain + bombGain) / arcMax))
 }
 } else addRushTime(rushMatchMs());        // decays past 60s
 }
+// Fever ignites at combo x4 and only ever ends on its own timer.
 if (featuresOn()) {
 if (S.feverOn) extendFever();
 else if (S.combo >= FEVER_COMBO) startFever();
@@ -8477,6 +8590,7 @@ J.shockwave(mkC.x, mkC.y, '#C9AEF5');
 }
 }
 }
+// --- juice: beam -> pops -> score float ---
 J.beam(ca.x, ca.y, cb.x, cb.y, cola);
 for (var ci = 0; ci < chipped.length; ci++) {
 var che = tileEls[chipped[ci]];
@@ -8579,11 +8693,26 @@ var BATTLE_ROWS_MIN = 8, BATTLE_ROWS_MAX = 12;
 var BATTLE_HUD_RESERVE = 34;
 var BATTLE_HUD_AR = 1536 / 500;
 var BATTLE_HUD_WAS = 63;
+function battleStage() {
+try {
+var cs = window.getComputedStyle(document.documentElement);
+var sw = parseFloat(cs.getPropertyValue('--bt-stage-w')), sh = parseFloat(cs.getPropertyValue('--bt-stage-h'));
+var bw = parseFloat(cs.getPropertyValue('--bt-board-w')), bh = parseFloat(cs.getPropertyValue('--bt-board-h'));
+if (sw > 0 && sh > 0 && bw > 0 && bh > 0) return { sw: sw, sh: sh, bw: bw, bh: bh };
+} catch (e) { /* ignore */ }
+return null;
+}
 function battleRows(n) {
 var rows = 0;
 try {
 var area = boardArea();
 var bmax = boardMaxPx();
+var land = false;
+var stg = battleStage();
+if (stg) {
+var bu = Math.min((window.innerWidth || 0) / stg.sw, (window.innerHeight || 0) / stg.sh);
+if (bu > 0) { land = true; area = { w: bu * stg.bw, h: bu * stg.bh }; bmax = 0; }
+}
 var w = (bmax > 0 && area.w > bmax) ? bmax : area.w;
 var tw = clamp(Math.floor((w - GAP * (BATTLE_COLS - 1)) / BATTLE_COLS),
 TILE_MIN, TILE_MAX);
@@ -8593,6 +8722,7 @@ var reserve = hrH >= BATTLE_HUD_RESERVE ? 0 : (BATTLE_HUD_RESERVE - hrH);
 var dh = $('duel-hud');
 var dhH = (dh && dh.getBoundingClientRect) ? dh.getBoundingClientRect().height : 0;
 if (dhH <= 1) reserve += Math.max(0, area.w / BATTLE_HUD_AR - BATTLE_HUD_WAS);
+if (land) reserve = 0;
 rows = Math.floor((area.h - reserve + GAP) / (tw + GAP));
 } catch (e) { rows = 0; }
 if (!isFinite(rows) || rows <= 0) rows = Math.round((n | 0) / BATTLE_COLS);
@@ -8708,6 +8838,7 @@ return out;
 function runBattleRefill() {
 var board = $('board');
 var res = battleRefillEx(S.cells, battleRng());
+// 1) 죽은 타일의 el 제거. 팝 연출은 resolveMatch 가 이미 재생했다.
 var keep = [];
 for (var i = 0; i < tileEls.length; i++) {
 var el = tileEls[i], c = S.cells[i];
@@ -8715,6 +8846,7 @@ if (!el) continue;
 if (!c || c.dead) { if (el.parentNode) el.parentNode.removeChild(el); }
 else keep[i] = el;
 }
+// 2) 새 인덱스 -> 옛 인덱스. 기록에 없는 자리는 제자리다(battleRefill 주석).
 var srcOf = [], stackOf = [], n;
 for (n = 0; n < res.cells.length; n++) srcOf[n] = n;
 for (n = 0; n < res.moves.length; n++) srcOf[res.moves[n].to] = res.moves[n].from;
@@ -8722,6 +8854,7 @@ for (n = 0; n < res.spawns.length; n++) {
 srcOf[res.spawns[n].to] = -1;
 stackOf[res.spawns[n].to] = res.spawns[n].stack;
 }
+// 3) el 재배열 — 이동 셀은 기존 el 재사용, 스폰 셀만 새로 만든다.
 S.cells = res.cells;
 var next = new Array(S.cells.length);
 for (n = 0; n < S.cells.length; n++) {
@@ -8736,6 +8869,7 @@ if (src >= 0) srcOf[n] = n;   // el 이 없던 자리: 애니메이션 없이 �
 }
 tileEls = next;
 for (n = 0; n < S.cells.length; n++) paintTile(n);   // data-v/data-i/sp — 그리고 최종 위치
+// 4) 출발 위치를 되돌려 찍는다 (아직 .fall 이 없으므로 트랜지션 없음).
 for (n = 0; n < tileEls.length; n++) {
 var s = srcOf[n];
 if (s === n) continue;                              // 제자리 — 옮길 것이 없다
@@ -8745,6 +8879,7 @@ tileEls[n].style.transform = 'translate3d(' + (rc.c * (ts + GAP)) + 'px,' +
 (-(stackOf[n] | 0) * (ts + GAP) - ts) + 'px,0)';  // 컬럼 상단 바깥
 }
 if (board) void board.offsetWidth;                    // 리플로 강제 = 여기가 출발점
+// 5) 전원 낙하. layout() 은 index->transform 순수 함수라 이것만으로 성립한다.
 for (n = 0; n < tileEls.length; n++) tileEls[n].classList.add('fall');
 layout();
 var myFall = ++fallGen;
@@ -8763,6 +8898,7 @@ if (S.feverOn) S.feverScore += bonus;
 missionBump('rows', rows.length);
 if (isRush()) addRushTime(RUSH_ROW_MS * rows.length);
 syncHud();
+// Phase 1 — whole-row flash (DESIGN 3: "행 전체 플래시 → 좌→우 스윕 소멸").
 var FLASH_MS = 150;
 for (var f = 0; f < rows.length; f++) {
 for (var fc = 0; fc < COLS; fc++) {
@@ -8770,6 +8906,7 @@ var fe = tileEls[rows[f] * COLS + fc];
 if (fe) fe.classList.add('rowflash');
 }
 }
+// Phase 2 — left-to-right sweep dissolve, staggered per column.
 var maxDelay = 0;
 for (var k = 0; k < rows.length; k++) maxDelay = Math.max(maxDelay, (COLS - 1) * ROWGO_STAGGER);
 later(function () {
@@ -8794,6 +8931,7 @@ J.vibrate(25);
 J.floatText(window.innerWidth / 2, window.innerHeight / 2, '+' + bonus, comboColor(S.combo));
 }, FLASH_MS);
 later(function () {
+// Remove the collapsed rows from both the model and the DOM, then reindex.
 var kill = {};
 for (var q = 0; q < rows.length; q++) kill[rows[q]] = 1;
 var keptEls = [];
@@ -8874,6 +9012,7 @@ if (findAnyPairEx(S.cells) === null && !addsExhausted() && nmWarnOnce()) {
 toast(t('toast.nomoves'));
 }
 if (isClassic() && findAnyPairEx(S.cells) === null && !addsExhausted()) armDeadAuto();
+// Wilds can rescue an otherwise dead board, so the EXT scan decides.
 if (findAnyPairEx(S.cells) === null && addsExhausted()) {
 if (S.shuffles > 0) { doShuffle(true); return; }
 onGameOver('stuck'); return;
@@ -8884,6 +9023,7 @@ function doAdd() {
 if (S.busy || S.paused || !S.running) return;
 if (battleBoard()) { toast(t('toast.noadds')); J.sfx.fail(); return; }
 if (addsCd()) {
+// Unlimited, but rate-limited: Add becomes a timing decision.
 var cdLeft = S.addCdUntil - now();
 if (cdLeft > 0 && !(isClassic() && S.pairsLeft === 0)) {
 toast(t('toast.addcd', { n: Math.ceil(cdLeft / 1000) }));
@@ -8896,6 +9036,7 @@ var next = buildAddCells(S.cells);   // PURE: clones v only, never specials
 if (next.length === oldLen) { toast(t('toast.empty')); return; }
 takeSnapshot();
 S.cells = next;
+// Bombs are stamped onto the fresh tail only, from a deterministic stream.
 S.addSeq = (S.addSeq | 0) + 1;
 if (featuresOn()) {
 applyBombs(S.cells, oldLen, S.mode,
@@ -8903,6 +9044,7 @@ mulberry32(((S.seed >>> 0) + S.addSeq * 0x9E3779B1) >>> 0));
 }
 if (addsCd()) S.addCdUntil = now() + RUSH_ADD_CD;
 else if (!addsFree()) S.adds--;
+// "No Add" mission restarts rather than failing (contract §3).
 if (S.mission && S.mission.id === 'noadd' && !S.mission.done) {
 S.mission.prog = 0;
 syncMission();
@@ -8914,6 +9056,8 @@ ensureTiles();
 for (var i = 0; i < S.cells.length; i++) paintTile(i);
 layout();
 var count = S.cells.length - oldLen;
+// Per-tile step and sfx thinning: see DEAL_TOTAL_MS. A short Add still deals
+// at the full 30ms; a 100-tile Add compresses to fit the budget.
 var step = count > 0 ? Math.min(DEAL_STAGGER, DEAL_TOTAL_MS / count) : DEAL_STAGGER;
 var tickEvery = Math.max(1, Math.ceil(count / DEAL_TICKS));
 for (var k = 0; k < count; k++) {
@@ -8937,12 +9081,15 @@ S.busy = false;
 saveProgress();
 afterMove();
 }, Math.round(count * step) + 320);
+// Scroll the freshly dealt tail into view.
 var sc = $('board-scroll');
 if (sc) later(function () { sc.scrollTop = sc.scrollHeight; }, 60);
 }
 function doHint() {
 if (S.busy || S.paused || !S.running) return;
 if (S.hints <= 0) {
+// [AD PLACEHOLDER — rewarded] out of hints: a rewarded ad would refill
+// hints here. Wire the portal SDK to the .ad-reward slot and grant +2.
 toast(t('toast.nohints'));
 J.sfx.fail();
 return;
@@ -8981,11 +9128,15 @@ S.snapshot = null;
 S.undoLeft--;
 clearSelection();
 clearHints();
+// Rebuild tiles: the array length may have changed in either direction.
 for (var i = 0; i < tileEls.length; i++) {
 if (tileEls[i] && tileEls[i].parentNode) tileEls[i].parentNode.removeChild(tileEls[i]);
 }
 tileEls.length = 0;
 renderAll();
+// Undo restores a whole earlier board, so it is a board mutation — and it is
+// the one settle path that deliberately never calls afterMove() (undoing must
+// not be able to trigger a stage clear or a game over).
 recountMoves();
 badgePop('undo-badge');
 J.sfx.ui();
@@ -9401,6 +9552,7 @@ finishBlast();          /* §3 재배선 보상 — bossDefeatFx 에서 뗀 몫 
 advFinish(true, 'empty');
 return;
 }
+// Time Rush never stops for a modal — the clock is the only pacing device.
 if (isRush()) {
 if (S.score > store[bestKey()]) { store[bestKey()] = S.score; persist(); }
 rushNextBoard();
@@ -9416,6 +9568,8 @@ S.score += bonus;
 if (S.score > store[bestKey()]) store[bestKey()] = S.score;
 if (S.stage > store[bestStageKey()]) store[bestStageKey()] = S.stage;
 var clearSec = Math.max(0, Math.floor((Date.now() - S.stageStartedAt) / 1000));
+// extBoardSize(stage), not S.cells.length: by the time a stage clears the
+// board is empty, and the grade has to scale with the size it STARTED at.
 var rank = gradeFor(S.adds, S.stageMaxCombo, clearSec,
 addsForStage(S.stage), extBoardSize(S.stage));
 J.sfx.win();
@@ -9437,10 +9591,18 @@ rollupRow(list, 'clear.matches', S.matches),
 rollupRow(list, 'clear.combo', S.maxCombo),
 rollupRow(list, 'clear.adds', bonus)
 ];
+// [AD PLACEHOLDER — interstitial] shown once every 3 stages. Replace the
+// slot reveal below with the portal's interstitial SDK call before submit.
+// Task 12 — 이 슬롯 문법(모달 안 배너)은 쓰지 않는다: 실제 정책은 모달을
+// **열기 직전** SDK 전면 광고 요청이라(아래 requestMidgameAd), 이 토글은
+// 그대로 둬도 무해하다(.ad-slot 은 .ad-live 없이는 항상 display:none).
 var inter = document.querySelector('.ad-slot[data-ad-slot="interstitial"]');
 if (inter) inter.hidden = !(S.stage % 3 === 0);
 TW_PORTAL.requestMidgameAd(function () {
 openModal('modal-clear');
+// Task 12 rev1(m-9) — 등급 뱃지·점수 집계 애니메이션을 광고 뒤로. 광고
+// 앞에서 시작하면 광고가 뜨는 사이 집계·축하 연출이 화면 뒤에서 혼자
+// 끝난다(onStageClear 위쪽 대사와 같은 이유).
 showGrade(rank);
 countUp(entries, $('clear-total'), S.score, function () { celebrateGrade(rank); });
 rewardReveal('clear-reward', rewardItems({ gem: S.gainJstar }), { sheetId: 'modal-clear' });
@@ -9465,6 +9627,8 @@ recountMoves();
 if (findAnyPairEx(S.cells) !== null) return;
 }
 if (findAnyPairEx(S.cells) === null && addsExhausted()) {
+// Same escalation as afterMove(): re-deal once before declaring it over.
+// AD HOOK: a rewarded video could grant a further shuffle here.
 if (S.shuffles > 0) { doShuffle(true); return; }
 onGameOver('stuck'); return;
 }
@@ -9481,6 +9645,7 @@ if (!overSepLooked && p && p.childNodes) {
 overSepLooked = true;
 for (var i = 0; i < p.childNodes.length; i++) {
 var n = p.childNodes[i];
+// nodeType 3 === TEXT_NODE, spelled out to stay ES5-plain in old engines
 if (n && n.nodeType === 3 && n.nodeValue && n.nodeValue.indexOf('·') >= 0) {
 overSepNode = n;
 overSepText = n.nodeValue;
@@ -9506,6 +9671,7 @@ var rk = o.rank | 0;
 rl.hidden = !(rk > 0);
 rl.textContent = rk > 0 ? t('rank.overline', { n: rk }) : '';
 }
+// Idempotent in both directions: every call sets the full state, never toggles.
 var st = overStageNodes();
 if (st) {
 if (st.val.style) st.val.style.display = o.rush ? 'none' : '';
@@ -9550,6 +9716,8 @@ var overCoin = coinForRank(newRank);   /* P3 — 기록판 순위로 세 단 */
 var sameRunPaid = S.coinRunAt === S.startedAt && (S.runCoin | 0) > 0;   /* 이 판은 이미 오늘 몫을 받았다 → 차이만, 셈 안 씀(102 리뷰 반영 · 지휘자 판정) */
 if (isDaily() && coinPlayed() && !sameRunPaid && !coinCapTake('dOver', COIN_DAILY_OVER_DAY_MAX)) overCoin = 0;   /* 판정판 102 ① — 데일리 게임오버 코인은 새 판 하루 1번(끝까지 finishDaily 는 무변) */
 runCoinPay(overCoin);
+// Freeze exactly what the modal shows. Re-painting later (a language
+// toggle, say) then cannot read state that has moved on in the meantime.
 S.overInfo = {
 rush: rush,
 score: S.score,
@@ -9565,6 +9733,8 @@ later(function () {
 TW_PORTAL.requestMidgameAd(function () {
 paintContinueBtn();
 openModal('modal-over');
+// Fired with the sheet, not before it: the float text is drawn on #fx
+// above the modal, and landing it on an empty board reads as a glitch.
 celebrateRank(newRank);
 rewardReveal('over-reward', rewardItems({ gem: S.gainJstar, coin: S.gainCoin | 0 }), { sheetId: 'modal-over' });
 paintCoinX2('over');   /* P3 T9 — 방금 끝난 판의 창에만 2배 줄 */
@@ -9580,6 +9750,7 @@ function paintContinueBtn() {
 var cont = $('btn-continue');
 if (!cont) return;
 var rush = !!(S.overInfo && S.overInfo.rush);
+// Time Rush has unlimited Adds, so the "+2 Add" slot is pointless.
 cont.hidden = rush;
 if (rush) return;
 var used = !!S.continueUsed;
@@ -9693,6 +9864,10 @@ if (!classicRun) { dqBump('daily', 1); achvCheck(); }
 var rec = {
 date: todayKey(), seed: dailyKey(), n: dailyNumber(), timeSec: sec,
 matches: S.matches, maxCombo: S.maxCombo, score: S.score,
+// Grade and milestones are seed-independent, so awarding them in Daily
+// costs nothing in fairness — everyone still solves the same board.
+// Daily's board is genBoardBanded(3, dateSeed), so its size is the one
+// extBoardSize(3) reports — the same normaliser every player gets.
 grade: gradeFor(S.adds, S.maxCombo, sec, 3, extBoardSize(3)),
 grid: buildEmojiGrid(S.gridSeed)
 };
@@ -9754,6 +9929,7 @@ return SHARE_URL + '&daily=' + ((d && (d.seed || d.date)) || dailyKey());
 function shareText() {
 var d = dailyShown || dailyBestNow();   // W7.5 — 방금 끝낸 판의 칸
 if (!d) return '';
+// Language-independent by design (contract §8).
 return withShareLink('Ten Twin #' + d.n + ' ✅ ' + fmtTime(d.timeSec) + ' 🔥' + d.maxCombo + 'x' +
 (d.grade ? ' ' + d.grade : '') + '\n' + (d.grid || ''), dailyShareUrl(d));
 }
@@ -9948,6 +10124,7 @@ if (!o) return null;
 return {
 mode: (o.rush && !o.stuck) ? t('over.rush.title') : t('over.title'),
 value: String(o.score),
+// 러시에는 스테이지가 뜻이 없다 — scoreShareText 가 빼는 그 자리다.
 sub: o.rush ? '' : (t('over.stage') + ' ' + o.stage),
 num: (o.rush ? t('over.rush.best') : t('over.best')) + ' ' + o.best,
 extra: '',
@@ -10140,6 +10317,7 @@ var sel = (RANK_MODES[i] === rankMode);
 if (b.classList) b.classList.toggle('on', sel);
 b.setAttribute('aria-selected', sel ? 'true' : 'false');
 }
+// Written through t(), so applyI18n() cannot reach it — syncDynamicI18n() does.
 setText('rank-hint', t('rank.hint.' + rankMode));
 var list = $('rank-list');
 if (!list) return;
@@ -10319,11 +10497,12 @@ questAtt();
 }
 function questBadges() {
 var n = questClaimable();
-var b = $('kd-mission-badge');
-if (b) {
+['kd-mission-badge', 'map-mission-badge'].forEach(function (id) {
+var b = $(id);
+if (!b) return;
 b.textContent = n > 0 ? String(n) : '';
 b.hidden = !(n > 0);
-}
+});
 }
 function openQuest(tab) {
 questTab = (tab === 'weekly' || tab === 'epic') ? tab : 'daily';
@@ -10360,6 +10539,7 @@ J.sfx.ui();
 }
 function closeRank() {
 closeModal('modal-rank');
+// The highlight belongs to the open that followed the submit, not forever.
 clearRankFresh();
 J.sfx.ui();
 }
@@ -10370,6 +10550,7 @@ var w = window.innerWidth, h = window.innerHeight;
 var cx = w / 2, cy = h * 0.34;
 if (r === 1) {
 J.floatText(cx, cy, t('rank.new1'), '#ffe873');
+// Same three staggered bursts onStageClear uses for its own biggest moment.
 J.confetti(cx, h * 0.3);
 later(function () { J.confetti(w * 0.2, h * 0.36); }, 160);
 later(function () { J.confetti(w * 0.8, h * 0.36); }, 300);
@@ -10437,9 +10618,12 @@ if (S.duel.freeLinkUntil > 0) S.duel.freeLinkUntil += held;
 if (S.duel.tsOverlayUntil > 0) S.duel.tsOverlayUntil += held;
 if (S.duel.cycAt > 0) S.duel.cycAt += held;
 }
+// The run's age is a wall-clock field like every other one: without this
+// shift, a long pause would age the run and silently trigger the match decay.
 if (S.rushStartedAt > 0) S.rushStartedAt += held;
 if (S.addCdUntil > 0) S.addCdUntil += held;
 if (S.feverCdUntil > 0) S.feverCdUntil += held;
+// The sprint mission's rolling window is a wall-clock deadline too.
 var i;
 if (S.sprintTimes && S.sprintTimes.length) {
 for (i = 0; i < S.sprintTimes.length; i++) S.sprintTimes[i] += held;
@@ -10454,6 +10638,8 @@ rafCombo = requestAnimationFrame(comboLoop);
 }
 }
 function resume() {
+// Every wall-clock deadline is shifted by the paused span, so pausing can
+// neither drain a fever nor burn Time Rush seconds.
 var held = S.pausedAt ? Math.max(0, now() - S.pausedAt) : 0;
 S.pausedAt = 0;
 S.paused = false;
@@ -10520,6 +10706,7 @@ J.sfx.ui();
 function setHowto(i) {
 howtoIdx = clamp(i, 0, 6);    /* [E17-0903 ⑯-16] 12장 -> 7장 */
 var track = $('howto-track');
+// The track is 700% wide (7 panels), so one panel step is 100/7 % of it.
 if (track) track.style.transform = 'translate3d(' + (-howtoIdx * 100 / 7) + '%,0,0)';
 var dots = $('howto-dots');
 if (dots && dots.children) {
@@ -10540,6 +10727,7 @@ var n = tutCells.length;
 if (n <= 0) { stage.appendChild(tutBox); return; }
 var rows = Math.ceil(n / COLS);
 var cols = TUT_VIS_COLS;
+// 24 = #tut-stage's 12px horizontal padding on both sides.
 var avail = (stage.clientWidth || 300) - 24;
 var mts = clamp(Math.floor((avail - GAP * (cols - 1)) / cols), 30, 58);
 if (tutBox.style) {
@@ -10677,6 +10865,8 @@ var fx = $('fx');
 if (fx && fx.style) fx.style.zIndex = on ? '75' : '';
 }
 function finishTutorial(completed) {
+// Skipping counts too: the player was offered the lesson and declined it,
+// and forcing it again on every launch would be worse than not teaching it.
 store.tutorialDone = true;
 if (completed) store.tutorialCleared = true;
 persist();
@@ -10692,6 +10882,8 @@ tutSel = -1;
 tutDone = false;
 J.sfx.ui();
 if (tutFromHowto) {
+// Came in from the How-to's last panel: land back where they left, and let
+// closeHowto() keep owning the pause hand-back.
 tutFromHowto = false;
 setHowto(4);
 openModal('modal-howto');
@@ -10785,6 +10977,7 @@ if (n === 20) return { pct: 22, sec: 80 };    // 보스
 if (n === 25) return { pct: 28, sec: 70 };    // 소개탄: 시간단축 첫 적용
 if (n <= 29)  return { pct: 25, sec: 80 };
 if (n === 30) return { pct: 20, sec: 70 };    // 보스
+// 31+ 공식
 return {
 pct: Math.max(15, 25 - 0.2 * (n - 30)),
 sec: Math.max(60, 70 - 0.5 * (n - 30))
@@ -10796,6 +10989,7 @@ if (n % 5 !== 0) {
 var k = (n - 1) % ADV_WAVE_PERIOD;
 pct += ADV_WAVE_PCT * Math.sin(2 * Math.PI * k / ADV_WAVE_PERIOD);
 }
+// 동적 난이도 보정 (로얄매치식). 표시하지 않는다 — 알면 일부러 지게 된다.
 if ((store.advFails[String(n)] | 0) >= ADV_RELIEF_FAILS) pct += ADV_RELIEF_PCT;
 return clamp(pct, 15, 40);
 }
@@ -10815,6 +11009,7 @@ if (n === 20) { h.blk = 3; h.lock = 3; h.noShuffle = true; return h; }  // 총 6
 if (n === 25) { h.blk = 1; h.lock = 1; h.timeCut = true; return h; }    // 시간단축 소개
 if (n <= 29)  { m = 3 + ((n - 21) % 3); h.blk = Math.ceil(m / 2); h.lock = m - h.blk; return h; }
 if (n === 30) { h.blk = 4; h.lock = 4; h.noShuffle = true; h.timeCut = true; return h; }
+// 31+ : 챕터 순환 — 위 10탄 패턴을 되풀이한다. 시간단축은 이후 상시다.
 h.timeCut = true;
 var k = n % 10;
 if (k === 0) { h.blk = 4; h.lock = 4; h.noShuffle = true; return h; }
@@ -11076,8 +11271,10 @@ J.sfx.mission();
 function bossOnMatch(gain, va, vb, tw) {
 var p = S.advPlan, d = p && p.bossDef;
 if (!p || !p.boss || !d || S.bossDown) return;
+// ① 소량 데미지 — 점수 비례, 단 한 매치가 필살기를 대신할 수는 없다.
 var cap = bossUltDmg(p.n) * BOSS_CHIP_CAP;
 bossDamage(Math.min(gain * BOSS_CHIP, cap), false);
+// ② 공략 조건
 if (d.cond === 'sum10') {
 if (matchKind(va, vb) === 'sum10') S.bossProg++;
 } else if (d.cond === 'sprint') {
@@ -11152,6 +11349,7 @@ if (battleOn()) bossCondReward(); else bossArmUlt();
 S.bossSeqIdx++;
 }
 syncBoss();
+// 다음 미션은 한 박자 뒤에 — 성공 연출과 새 미션 배지가 같은 프레임에 겹치면 둘 다 안 읽힌다.
 later(function () { if (S.running) bossNextSeqMission(); }, 700);
 }
 function bossOnMissionFail() {
@@ -12561,6 +12759,7 @@ hero: bd ? bd.hero : advRecommend(goal, mission)
 }
 function heartsTick() {
 var t0 = Date.now();
+// 기기 시계가 뒤로 갔을 때(수동 변경·시간대). 미래의 기준점은 의미가 없다.
 if (store.heartAt > t0) { store.heartAt = t0; persist(); }
 if (!store.heartAt) { store.heartAt = t0; persist(); }
 if (store.hearts >= HEART_MAX) {
@@ -12682,6 +12881,7 @@ function paintWallets() {
 paintCoinChip('sh-coin-v');   /* 상점 띠 코인도 큰 수 줄임(data-len 6·7 — 지휘자 판정 2026-10-06, 왕국·지도 칩과 같은 도우미) */
 setText('sh-star-v', arcComma(store.jstar | 0));
 paintCoinChip('kd-top-stars-v'); paintCoinChip('map-stars-v'); paintChipText('kd-top-star-v', arcComma(store.jstar | 0));   /* [116] 별 캡슐 = 위 바 */
+paintChipText('map-star-v', arcComma(store.jstar | 0));   /* [판정판 121] 지도 위 바 별 캡슐(공용 위 바 — 메인과 같은 구성) */
 }
 function grantItemOrRefund(id, src) {
 var it = itemById(id);
@@ -12841,6 +13041,7 @@ if (k === 'jewel') return appGemContinue();
 return true;
 }
 function openShopScreen(tab) {
+hubMark();   /* [판정판 121] 연 곳 기억(닫기 = hubReturn) */
 heartsTick();
 p3Roll();
 portalAdsSync();
@@ -12864,7 +13065,7 @@ if (clk) clk.textContent = shopClockText();
 function closeShopScreen() {
 if (shopTick) { clearInterval(shopTick); shopTick = 0; }
 J.sfx.ui();
-enterKingdom();
+hubReturn();   /* [판정판 121] 연 곳으로(지도 아래 줄에서 열었으면 지도 · 그 밖은 메인) — 옛: enterKingdom() */
 }
 function setShopTab(tab) {
 if (tab === 'jewel') { if (shopTabOk('jewel')) openShop(); return; }
@@ -12954,8 +13155,11 @@ dots[i].textContent = n > 0 ? String(n) : '';
 dots[i].hidden = !(n > 0);
 }
 }
-var b = $('kd-shop-badge');
-if (b) { var c = shopFreeCount(); b.textContent = c > 0 ? String(c) : ''; b.hidden = !(c > 0); }
+var c = shopFreeCount();
+['kd-shop-badge', 'map-shop-badge'].forEach(function (id) {
+var b = $(id);
+if (b) { b.textContent = c > 0 ? String(c) : ''; b.hidden = !(c > 0); }
+});
 }
 var DEAL_GIFT_COIN = 100;                      /* 매일 선물 */
 var DEAL_GEAR_PRICE = { common: 300, rare: 900 };
@@ -14280,11 +14484,11 @@ var SIAN_SLOTS = [
 function sianPages() { return Math.ceil(ADV_CHAPTER / SIAN_PER); }
 var MAP_ANCHORS_CH = [
 [
-[ 7.62, 85.91, 5.20, 7.53, '--node-jelly-1'],   //  1 서쪽 숲가 초원(우체통 트레일헤드)
+[ 7.62, 84.00, 5.20, 7.53, '--node-jelly-1'],   //  1 서쪽 숲가 초원(우체통 트레일헤드)
 [12.50, 75.92, 4.10, 6.20, '--node-jelly-2'],   //  2 숲가 둔덕 (초원 위로)
-[18.16, 86.31, 5.20, 7.53, '--node-jelly-3'],   //  3 초원, 아래로 굽이
+[18.16, 80.50, 5.20, 7.53, '--node-jelly-3'],   //  3 초원, 아래로 굽이
 [23.83, 74.33, 4.10, 6.20, '--node-jelly-4'],   //  4 숲 아래 오솔길
-[29.30, 84.72, 4.60, 6.90, '--node-jelly-5'],   //  5 초원 바위 옆
+[29.30, 79.70, 4.60, 6.90, '--node-jelly-5'],   //  5 초원 바위 옆
 [34.38, 77.12, 4.10, 6.20, '--node-jelly-1'],   //  6 캔디스톤 길 초입
 [37.30, 68.73, 3.70, 5.60, '--node-jelly-2'],   //  7 캔디스톤 길
 [39.84, 61.14, 3.40, 5.15, '--node-jelly-3'],   //  8 길 S자 굽이
@@ -14336,8 +14540,8 @@ var MAP_ANCHORS_CH = [
 [74.50, 41.00, 3.00, 4.55, '--node-jelly-1'],   // 46 초코 흘러내린 사면
 [73.00, 35.00, 2.90, 4.45, '--node-jelly-2'],   // 47 동사면 중턱(되꺾음)
 [75.00, 29.50, 2.85, 4.35, '--node-jelly-3'],   // 48 능선 어깨
-[71.00, 25.50, 2.80, 4.30, '--node-jelly-4'],   // 49 정상 아래 초코 띠
-[66.50, 24.50, 2.80, 4.30, '--node-jelly-5']    // 50 두 봉우리 사이 고개 = 보스
+[71.00, 27.90, 2.80, 4.30, '--node-jelly-4'],   // 49 정상 아래 초코 띠
+[66.50, 27.90, 2.80, 4.30, '--node-jelly-5']    // 50 두 봉우리 사이 고개 = 보스
 ],
 [
 [26.38, 82.15, 18.50, 6.05, '--node-jelly-1'],  // 51 복도 입구 좌측 바닥
@@ -14546,10 +14750,15 @@ var layer = $('map-layer');
 if (layer && layer.style) {
 layer.style.setProperty('--bgz', String(ch.zoom));
 layer.style.setProperty('--bgx', ch.x);
-layer.style.setProperty('--map-n1-bottom', mapLowBottom(mapChap).toFixed(2) + '%');
+layer.style.setProperty('--map-n1b', (mapLowBottom(mapChap) / 100).toFixed(4));
 layer.style.aspectRatio = ch.ar || '2600 / 1272';
 if (ch.img) layer.style.backgroundImage = 'var(' + ch.img + ')';
 else layer.style.backgroundImage = '';
+var arp = String(ch.ar || '2600/1272').split('/');
+if ((parseFloat(arp[0]) || 1) < (parseFloat(arp[1]) || 1)) layer.setAttribute('data-ar', 'tall');
+else layer.removeAttribute('data-ar');
+var view = $('map-view');
+if (view && view.style) view.style.setProperty('--map-art', ch.img ? 'var(' + ch.img + ')' : 'var(--art-map-bg)');
 }
 var tint = $('map-tint');
 if (tint && tint.style) {
@@ -14563,6 +14772,7 @@ var lastCh = Math.min(MAP_CHAPTERS.length, chapMax());
 if (pv) pv.disabled = SIAN_MAP ? (mapChap <= 1 && mapPage <= 0) : mapChap <= 1;
 if (nx) nx.disabled = SIAN_MAP ? (mapChap >= lastCh && mapPage >= sianPages() - 1) : mapChap >= lastCh;
 paintCoinChip('map-stars-v');
+paintChipText('map-star-v', arcComma(store.jstar | 0));
 paintChipText('map-b1-v', advStarTotal() + '/' + advStarMax());   /* P3 결정 2 — 진행도는 「/최대」를 단다(별 그림에 안 걸리게 5·6·7자 단계 줄임) */
 setText('map-b2-v', store.best | 0);
 paintHearts();
@@ -14670,6 +14880,7 @@ g.appendChild(buildChapCellDom(c, !theaterUnlocked(c), false, 'aria.thcell'));
 }
 }
 function openTheater() {
+hubMark();   /* [판정판 121] 연 곳 기억 — 컷을 다 보고 돌아올 곳(theaterPick 의 hubReturn) */
 buildTheater();
 openModal('modal-theater');
 }
@@ -14687,7 +14898,7 @@ chapCellDeny('th-grid', c, t('theater.locked', { n: c }));
 return;
 }
 closeTheater();
-playCuts(theaterCutsFor(c), 'chap' + c, function () { syncMenu(); enterKingdom(); openTheater(); });
+playCuts(theaterCutsFor(c), 'chap' + c, function () { syncMenu(); hubReturn(); openTheater(); });
 }
 function mapGoChapter(d) {
 if (SIAN_MAP) {
@@ -14708,7 +14919,7 @@ J.sfx.ui();
 buildMap();
 mapCenterCurrent();
 }
-var mapX = 0, mapMin = 0, mapVel = 0, mapRaf = 0, mapPtr = -1, mapDragX = 0, mapBaseX = 0, mapLastX = 0, mapLastT = 0;
+var mapX = 0, mapMin = 0, mapMax = 0, mapVel = 0, mapRaf = 0, mapPtr = -1, mapDragX = 0, mapBaseX = 0, mapLastX = 0, mapLastT = 0;
 function mapApply() {
 var l = $('map-layer');
 if (l && l.style) l.style.setProperty('--mx', mapX.toFixed(2) + 'px');
@@ -14717,9 +14928,10 @@ function mapFit() {
 var v = $('map-view'), l = $('map-layer');
 if (!v || !l) return;
 var vw = v.clientWidth || 0, lw = l.offsetWidth || 0;
-mapMin = Math.min(0, vw - lw);
+if (lw < vw) { mapMin = mapMax = Math.round((vw - lw) / 2); }
+else { mapMin = vw - lw; mapMax = 0; }
 if (mapX < mapMin) mapX = mapMin;
-if (mapX > 0) mapX = 0;
+if (mapX > mapMax) mapX = mapMax;
 mapApply();
 }
 function mapCenterCurrent(tries) {
@@ -14747,7 +14959,7 @@ focus = (lo + hi) / 2;
 var lw = l.offsetWidth || 0, vw = v.clientWidth || 0;
 mapX = vw / 2 - (focus / 100) * lw;
 if (mapX < mapMin) mapX = mapMin;
-if (mapX > 0) mapX = 0;
+if (mapX > mapMax) mapX = mapMax;
 mapVel = 0;
 mapApply();
 }
@@ -14756,7 +14968,7 @@ mapRaf = 0;
 if (Math.abs(mapVel) < 5) { mapVel = 0; return; }
 mapX += mapVel / 60;
 if (mapX < mapMin) { mapX = mapMin; mapVel = 0; }
-if (mapX > 0) { mapX = 0; mapVel = 0; }
+if (mapX > mapMax) { mapX = mapMax; mapVel = 0; }
 mapVel *= 0.94;
 mapApply();
 if (mapVel) mapRaf = requestAnimationFrame(mapGlide);
@@ -14784,7 +14996,7 @@ var dx = x - mapDragX;
 if (Math.abs(dx) > mapMoved) mapMoved = Math.abs(dx);
 mapX = mapBaseX + dx;
 if (mapX < mapMin) mapX = mapMin;
-if (mapX > 0) mapX = 0;
+if (mapX > mapMax) mapX = mapMax;
 var tn = now(), dt = tn - mapLastT;
 if (dt > 8) { mapVel = (x - mapLastX) / dt * 1000; mapLastX = x; mapLastT = tn; }
 mapApply();
@@ -14835,11 +15047,38 @@ if (SIAN_MAP) {
 mapPage = Math.min(sianPages() - 1,
 Math.floor(((Math.max(1, store.advMax | 0) - 1) % ADV_CHAPTER) / SIAN_PER));
 }
+mapShow();
+}
+function mapShow(keepX) {
 buildMap();
+questBadges();   /* [판정판 121] 지도 위 바 미션 배지 · 아래 줄 상점 배지(메인과 같은 부품 · 같은 값) */
+shopDots();
 closeAllModals();
 showScreen('screen-map');
-mapCenterCurrent(0);
+if (typeof keepX === 'number') mapKeepX(0, keepX); else mapCenterCurrent(0);
 startMapTicker();
+}
+function mapKeepX(tries, x) {
+var l = $('map-layer');
+if (!l) return;
+if (!(l.offsetWidth > 0)) {
+var k = (tries | 0) + 1;
+if (k <= 10) later(function () { mapKeepX(k, x); }, 30);
+return;
+}
+mapX = x;
+mapVel = 0;
+mapFit();
+}
+var hubFrom = 'kingdom', hubMapX = 0;
+function hubMark() {
+var m = $('screen-map');
+hubFrom = (m && m.classList && m.classList.contains('active')) ? 'map' : 'kingdom';
+if (hubFrom === 'map') hubMapX = mapX;
+}
+function hubReturn() {
+if (hubFrom === 'map') { heartsTick(); mapShow(hubMapX); }
+else enterKingdom();
 }
 function leaveMap() {
 stopMapTicker();
@@ -14868,12 +15107,12 @@ var KD_DECO = [
 { id: 'd-pond',   zone: 'z-garden', cost: 16 }
 ];
 var KD_BUILDINGS = [
-{ id: 'castle',     chap: 1, key: 'kd.castle',     tone: 'purple', ic: 'crown',      go: function () { kdSoonModal(); } },
-{ id: 'circus',     chap: 1, key: 'kd.circus',     tone: 'mint',   ic: 'star-empty', go: function () { openTheater(); } },
-{ id: 'pethouse',   chap: 1, key: 'kd.pethouse',   tone: 'orange', ic: 'heart',      go: function () { kdSoonModal(); } },
-{ id: 'shop',       chap: 1, key: 'kd.shop',       tone: 'orange', ic: 'coin',       go: function () { openShopScreen('gacha'); } },
-{ id: 'post',       chap: 1, key: 'kd.post',       tone: 'blue',   ic: 'flag',       go: function () { kdSoonModal(); } },
-{ id: 'playground', chap: 1, key: 'kd.playground', tone: 'violet', ic: 'inf',        go: function () { openPlayground(); } }
+{ id: 'castle',     chap: 1, key: 'kd.castle',     tone: 'purple', ic: 'crown',      hide: true, go: function () { kdSoonModal(); } },
+{ id: 'circus',     chap: 1, key: 'kd.circus',     tone: 'mint',   ic: 'star-empty', bar: true,  go: function () { openTheater(); } },
+{ id: 'pethouse',   chap: 1, key: 'kd.pethouse',   tone: 'orange', ic: 'heart',      hide: true, go: function () { kdSoonModal(); } },
+{ id: 'shop',       chap: 1, key: 'kd.shop',       tone: 'orange', ic: 'coin',       bar: true,  go: function () { openShopScreen('gacha'); } },
+{ id: 'post',       chap: 1, key: 'kd.post',       tone: 'blue',   ic: 'flag',       hide: true, go: function () { kdSoonModal(); } },
+{ id: 'playground', chap: 1, key: 'kd.playground', tone: 'violet', ic: 'inf',        bar: true,  go: function () { openPlayground(); } }
 ];
 function kdBuilding(id) {
 for (var i = 0; i < KD_BUILDINGS.length; i++) if (KD_BUILDINGS[i].id === id) return KD_BUILDINGS[i];
@@ -14905,11 +15144,13 @@ return chapMax() >= (b.chap | 0 || 1);
 function kdNeedStage(b) { return chapFirst(b.chap | 0 || 1) - 1; }
 function kdSoonModal() { openModal('modal-soon'); J.sfx.ui(); }
 function buildKingdom() {
-var wrap = $('kd-menu'), i, b, el;
+var wrap = $('kd-menu'), i, b, el, n = 0;
 if (wrap) {
 wrap.innerHTML = '';
 for (i = 0; i < KD_BUILDINGS.length; i++) {
 b = KD_BUILDINGS[i];
+if (b.hide || b.bar) continue;
+n++;
 el = document.createElement('button');
 el.type = 'button';
 el.className = 'kd-mbtn kd-tag kit-pill-v2';
@@ -14931,15 +15172,9 @@ tx.setAttribute('data-i18n', b.key);
 tx.textContent = t(b.key);
 el.appendChild(ic);
 el.appendChild(tx);
-if (b.id === 'shop') {
-var sb = document.createElement('b');
-sb.id = 'kd-shop-badge';
-sb.className = 'badge-new';
-sb.hidden = true;
-el.appendChild(sb);
-}
 wrap.appendChild(el);
 }
+wrap.hidden = !n;   /* [판정판 121] 지을 단추가 없으면 판째 숨김(빈 판의 안여백만 남지 않게) */
 try { if (window.TW && window.TW.applyPlatformGates) window.TW.applyPlatformGates(wrap); } catch (e) {}
 }
 kdAvatarPaint();
@@ -14988,7 +15223,7 @@ if (splashDone) setTimeout(p3Notice, P3_NOTICE_DELAY);   /* P3 — 나중에 왕
 }
 function kdBldgTap(id) {
 var b = kdBuilding(id);
-if (!b) return;
+if (!b || b.hide) return;
 if (!kdUnlocked(b)) {
 toast(t('minimap.locked', { n: kdNeedStage(b) }));
 J.sfx.fail();
@@ -16768,6 +17003,10 @@ J.sfx.ui();
 function onResize() {
 if (resizeTimer) clearTimeout(resizeTimer);
 resizeTimer = setTimeout(function () { resizeTimer = 0; layout(); }, 120);
+// An orientationchange fires while the viewport still reports the OLD size
+// on iOS Safari, so a single debounced pass can lay out against stale
+// numbers. A second settling pass after the rotation animation fixes it;
+// layout() is idempotent, so running it twice costs one reflow.
 if (resizeSettle) clearTimeout(resizeSettle);
 resizeSettle = setTimeout(function () { resizeSettle = 0; layout(); }, 420);
 var ms = $('screen-map');
@@ -16780,6 +17019,7 @@ function wire() {
 on($('portal-acct-login'), 'click', function () {
 TW_PORTAL.requestLogin(function (u) { twApplyAccountUI(u); });
 });
+// --- menu ---
 on($('btn-play'), 'click', openModeSheet);
 on($('btn-cont'), 'click', openClassicHub);
 on($('classic-close'), 'click', function () { closeClassicHub(); J.sfx.ui(); });
@@ -16792,6 +17032,7 @@ else startClassic(false);
 on($('classic-rush'), 'click', function () {
 closeClassicHub(); J.sfx.ui();
 if (classicSkillsOn()) {
+// 스킬판 러시를 처음 누르는 것이 NEW 배지를 은퇴시킨다(W7.5 규약 그대로).
 if (!store.rushSeen) { store.rushSeen = true; persist(); }
 startRush();
 } else {
@@ -16830,6 +17071,14 @@ on($('map-back'), 'click', function () { J.sfx.ui(); leaveMap(); });
 on($('map-gear'), 'click', openSettings);
 on($('map-char'), 'click', openCharPanel);
 on($('map-rec'), 'click', function () { J.sfx.ui(); openRank('endless'); });
+on($('map-mission'), 'click', function () { openQuest('daily'); });   /* openQuest 가 ui 소리를 낸다 — 한 번만 */
+var barTap = function (e) {
+var b = e.target && e.target.closest ? e.target.closest('[data-kd]') : null;
+if (!b) return;
+kdBldgTap(b.getAttribute('data-kd') || '');
+};
+on($('kd-bot'), 'click', barTap);
+on($('map-bot'), 'click', barTap);
 on($('kd-menu'), 'click', function (e) {
 var b = e.target && e.target.closest ? e.target.closest('.kd-mbtn') : null;
 if (!b) return;
@@ -16840,10 +17089,10 @@ on($('pg-classic'), 'click', function () { closePlayground(); openClassicHub(); 
 on($('pg-arcade'), 'click', function () { closePlayground(); openModeSheet({ arcadeOnly: true }); });
 on($('kd-bot-plate'), 'click', function () { J.sfx.ui(); openMap(); });
 on($('kd-bot-char'), 'click', openCharPanel);
-on($('kd-bot-rec'), 'click', function () { J.sfx.ui(); openRank('endless'); });
+on($('kd-top-rec'), 'click', function () { J.sfx.ui(); openRank('endless'); });
 on($('kd-top-gear'), 'click', openSettings);
 on($('kd-top-avatar'), 'click', openCharPanel);
-on($('kd-bot-mission'), 'click', function () { openQuest('daily'); });   /* openQuest 가 ui 소리를 낸다 — 한 번만 */
+on($('kd-top-mission'), 'click', function () { openQuest('daily'); });   /* openQuest 가 ui 소리를 낸다 — 한 번만 */
 on($('map-ch-prev'), 'click', function () { mapGoChapter(-1); });
 on($('map-ch-next'), 'click', function () { mapGoChapter(1); });
 on($('map-chapter'), 'click', function () { openMinimap(); });
@@ -17119,17 +17368,22 @@ on($('btn-sound'), 'click', toggleSound);
 on($('btn-vibe'), 'click', toggleVibe);
 on($('btn-theme'), 'click', toggleTheme);
 on($('btn-lang'), 'click', toggleLang);
+// --- how to ---
 on($('howto-prev'), 'click', function () { setHowto(howtoIdx - 1); J.sfx.ui(); });
+// On the last panel Next has nothing to advance to (see setHowto): it is the
+// tutorial entry instead, which is also the only way back in once it is done.
 on($('howto-next'), 'click', function () {
 if (howtoIdx >= 11) { openTutorial(true); return; }  // #34: 5→6→7장 · ⑥-c: →12장
 setHowto(howtoIdx + 1);
 J.sfx.ui();
 });
 on($('howto-close'), 'click', closeHowto);
+// --- first-run tutorial ---
 on($('tut-skip'), 'click', function () { finishTutorial(tutDone); });
 on($('tut-stage'), 'pointerdown', onTutPointerDown);
 var ts0 = $('tut-stage');
 if (ts0 && ts0.style) ts0.style.touchAction = 'manipulation';
+// --- game ---
 var board = $('board');
 if (board) {
 board.style.touchAction = 'manipulation';
@@ -17142,6 +17396,7 @@ on($('btn-hint'), 'click', function () { if (battleOn()) doSpecial(); else doHin
 on($('btn-undo'), 'click', function () { if (battleOn()) doPetSkill(); else doUndo(); });
 on($('btn-shuffle'), 'click', function () { if (battleOn()) doAwaken(); else doShuffle(false); });
 on($('btn-pause'), 'click', pause);
+// --- pause modal ---
 on($('pz-sound'), 'click', toggleSound);
 on($('pz-vibe'), 'click', toggleVibe);
 on($('pz-theme'), 'click', toggleTheme);
@@ -17153,6 +17408,7 @@ if (S.mode === 'adv') { closeModal('modal-pause'); advAbandon(); return; }
 goMenu();
 });
 on($('pz-resume'), 'click', resume);
+// --- clear / over / daily ---
 on($('btn-next'), 'click', nextStage);
 on($('btn-continue'), 'click', doContinue);
 on($('btn-shop'), 'click', function () { openShopScreen('jewel'); });
@@ -17212,12 +17468,15 @@ shareCardOut('daily', shareText(), copyShare);
 });
 on($('btn-daily-menu'), 'click', goMenu);
 on($('btn-rank'), 'click', function () {
+// From the menu there is no run to be proud of yet, so nothing is fresh.
 clearRankFresh();
 openRank('endless');
 });
 on($('btn-over-rank'), 'click', function () { openRank(S.mode); });
 on($('btn-clear-rank'), 'click', function () { openRank(S.mode); });
 for (var rti = 0; rti < RANK_MODES.length; rti++) {
+// The mode is captured per iteration; a plain `var` in the loop body would
+// be shared by all three handlers and every tab would show the last one.
 (function (m) {
 on($('rank-tab-' + m), 'click', function () { setRankTab(m); });
 }(RANK_MODES[rti]));
@@ -17244,6 +17503,7 @@ questClaim(el.getAttribute('data-qtab'), el.getAttribute('data-qid'));
 on($('quest-all'), 'click', function () {
 if (questClaimAll(questTab) <= 0) { toast(t('quest.none')); J.sfx.fail(); }
 });
+// --- global ---
 on(window, 'resize', onResize);
 on(window, 'orientationchange', onResize);
 on(document, 'keydown', function (e) {
@@ -17275,6 +17535,7 @@ if ($('modal-quest') && !$('modal-quest').hidden) { closeQuest(); return; }
 if ($('modal-settings') && !$('modal-settings').hidden) { closeSettings(); return; }
 if ($('modal-soon') && !$('modal-soon').hidden) { closeModal('modal-soon'); return; }
 if ($('modal-theater') && !$('modal-theater').hidden) { closeTheater(); return; }
+// 10차 §C: 모드 시트는 메뉴 위에 떠 있는 한 겹이라 가장 먼저 닫힌다.
 if ($('modal-mode') && !$('modal-mode').hidden) { closeModeSheet(); return; }
 if ($('modal-playground') && !$('modal-playground').hidden) { closePlayground(); J.sfx.ui(); return; }
 if ($('modal-shop') && !$('modal-shop').hidden &&
@@ -17282,6 +17543,7 @@ if ($('modal-shop') && !$('modal-shop').hidden &&
 if ($('modal-odds') && !$('modal-odds').hidden) { closeOdds(); return; }   /* P3 T7 — 확률 창은 상점 화면 위의 한 겹이라 먼저 닫힌다 */
 if ($('modal-gres') && !$('modal-gres').hidden) { gresClose(); return; }   /* P3 T8 — 결과 창도 상점 화면 위의 한 겹 · 닫으면 gachaBusy 가 풀린다 */
 if ($('screen-shop') && $('screen-shop').classList.contains('active')) { closeShopScreen(); return; }   /* P3 — 상점 화면 = 왕국 위 한 겹 */
+// W7.5 — 클래식 허브도 메뉴 위의 한 겹이라 모드 시트와 같은 우선순위다.
 if ($('modal-classic') && !$('modal-classic').hidden) { closeClassicHub(); return; }
 if ($('modal-minimap') && !$('modal-minimap').hidden) { closeMinimap(); return; }
 if ($('modal-drops') && !$('modal-drops').hidden) { closeDrops(); return; }
@@ -17299,6 +17561,8 @@ return;
 }
 var msc = $('screen-map');
 if (msc && msc.classList && msc.classList.contains('active')) { leaveMap(); return; }
+// The tutorial is checked next: it can be opened from the How-to, so
+// both sheets can be in play and the topmost one owns the key.
 if ($('modal-tutorial') && !$('modal-tutorial').hidden) { finishTutorial(tutDone); return; }
 if ($('modal-howto') && !$('modal-howto').hidden) { closeHowto(); return; }
 if (S.paused) resume();
@@ -17314,12 +17578,18 @@ if (!b || b.disabled) return;
 J.sfx.ui();
 }, { passive: true });
 }
+// Single audio unlock on the very first pointer interaction.
 var UNLOCK_EVENTS = ['pointerdown', 'touchstart', 'keydown'];
 var unlock = function () {
 if (audioUnlocked) return;
 audioUnlocked = true;
 J.unlockAudio();      // 무음 1샘플 start() = 그 자리에서 컨텍스트를 연다
 J.resumeAudio();      // 구버전 juice.js 폴백(unlockAudio 가 no-op 인 경우)
+// The loop BGM (review #4) can only start after a user gesture has unlocked
+// audio. juice.js owns everything after this call — mute, tab-hide and tab-return
+// are all handled there via bgmWanted — so this is the only start() the game
+// needs, and it is deliberately never stopped: bgmStop() does NOT clear
+// bgmWanted, so a stop here would be undone by the next tab return.
 try {
 var gsc = $('screen-game');
 var inGame = !!(gsc && gsc.classList && gsc.classList.contains('active'));
@@ -17335,6 +17605,12 @@ for (var uj = 0; uj < UNLOCK_EVENTS.length; uj++) {
 document.addEventListener(UNLOCK_EVENTS[uj], unlock, { capture: true, passive: true });
 }
 }
+// A background tab freezes requestAnimationFrame, so feverLoop/comboLoop
+// stop ticking and their wall-clock deadlines can pass unnoticed — the
+// fever aura, gauge and combo label linger until the next match. Both loops
+// already settle themselves when they find an expired deadline, so kicking
+// each once on return is enough. Scoring is unaffected either way: an
+// expired fever is never counted, this only clears the stale visuals.
 if (typeof document !== 'undefined') {
 on(document, 'visibilitychange', function () {
 if (document.hidden || S.paused || !S.running) return;
@@ -17355,6 +17631,32 @@ else J.bgm.start();
 } catch (e) { /* 소리 때문에 화면 전환이 죽는 일은 없다 */ }
 }
 var splashBgmKicked = false;
+// 2026-08-20 결함B 근본수리 — 아래는 교체 전 원본 전문(보존). 본문 안에 블록
+// 주석이 들어 있어 블록 주석으로 감싸면 중첩이 깨지므로 줄주석으로 보존한다.
+//   function splashBgmNow() {
+//     if (!store.sound) return;              // 음악 OFF 존중
+//     if (splashBgmKicked) { splashAudioHook(); return; }
+//     splashBgmKicked = true;
+//     try {
+//       if (J.bgm.mainStop !== noop) J.bgm.mainStop(0);   // 헛돌던 running 을 내린다
+//       if (J.bgm.scene !== noop) J.bgm.scene('menu');    // 제스처 태스크 안의 진짜 start()
+//       else J.bgm.start();
+//     } catch (e) { /* 소리 때문에 스플래시가 안 걷히는 일은 없다 */ }
+//     try {
+//       setTimeout(function () {
+//         if (!store.sound) return;
+//         /* 0.6초 사이에 이미 판이 열렸다면 로비 곡을 되돌려 씌우지 않는다 —
+//            그 화면의 scene('game') 이 이미 옳은 판단을 했다. */
+//         var gsc = $('screen-game');
+//         if (gsc && gsc.classList && gsc.classList.contains('active')) return;
+//         try {
+//           if (J.bgm.scene !== noop) J.bgm.scene('menu');
+//           else J.bgm.start();
+//         } catch (e2) { /* 조용히 무시 — 다음 상호작용이 이어받는다 */ }
+//       }, 600);
+//     } catch (e3) { /* setTimeout 이 없는 환경은 폴백 없이 그대로 간다 */ }
+//   }
+// (원본 끝)
 function splashBgmNow() {
 if (!store.sound) return;
 if (splashBgmKicked) { splashAudioHook(); return; }
@@ -17654,6 +17956,9 @@ try { document.documentElement.setAttribute('data-tileart', '1'); } catch (e) { 
 }
 bindJuice();
 loadStore();
+// applyTheme() existed but was never called at startup, so a saved
+// store.theme was silently ignored on every reload. It must run before the
+// first paint, and before applyI18n()/syncToggleLabels() derive their labels.
 applyTheme();
 applyI18n();
 if (APP) aplTip();
@@ -17676,7 +17981,10 @@ applyHeroStats();
 syncMenu();
 syncHud();
 },
+// Daily already finished today? The menu button routes to the result screen.
 function () { enterKingdom(); },
+// review #2: the connection rule was never taught, so the tutorial is forced on
+// first run. store.tutorialDone is set by BOTH completing and skipping it.
 function () { if (!store.tutorialDone) openTutorial(false); },
 function () {
 splashBind();
@@ -17715,12 +18023,14 @@ init();
 }
 }
 window.Game = {
+// pure rules
 idxToRC: idxToRC, canMatch: canMatch,
 isReadingConnected: isReadingConnected, isLineConnected: isLineConnected,
 isConnected: isConnected, isValidPair: isValidPair,
 findAnyPair: findAnyPair, countPairs: countPairs,
 findFullDeadRows: findFullDeadRows, collapseRows: collapseRows,
 buildAddCells: buildAddCells, mulberry32: mulberry32, genBoard: genBoard,
+// EXT rules (special tiles) — exported so the layer can be unit-tested
 spOf: spOf, iceOf: iceOf, isWild: isWild, canMatchEx: canMatchEx,
 isValidPairEx: isValidPairEx, findAnyPairEx: findAnyPairEx,
 countPairsEx: countPairsEx, bombTargets: bombTargets,
@@ -17754,6 +18064,8 @@ petFreeze4s_mongle: petFreeze4s_mongle, petRowShuffle_churup: petRowShuffle_chur
 duelAtkPct: duelAtkPct, duelSpPct: duelSpPct, syncBattleActs: syncBattleActs,
 genBoardExt: genBoardExt, extRows: extRows, extBoardSize: extBoardSize,
 extFillP: extFillP,
+// v4 EXT: shuffle + blocked-path explanation, exported so both can be
+// determinism-tested outside the DOM.
 shuffleSeedFor: shuffleSeedFor, shuffleCellsEx: shuffleCellsEx,
 shuffleBoardEx: shuffleBoardEx, blockersBetween: blockersBetween,
 rejectReason: rejectReason,
@@ -17761,6 +18073,7 @@ applyStage1Gold: applyStage1Gold,
 pickMission: pickMission, missionPool: missionPool,
 missionGoals: MISSION_GOALS, gradeFor: gradeFor,
 addsForStage: addsForStage,
+// debug handles
 openTutorial: openTutorial, tutLoadStep: tutLoadStep, finishTutorial: finishTutorial,
 state: S, layout: layout, render: renderAll, boardArea: boardArea,
 syncHud: syncHud,          /* 관문 하네스가 HUD 페인트를 직접 태우는 손잡이 */
@@ -17912,6 +18225,7 @@ buildShareCard: buildShareCard, CARD_L: CARD_L,
 dailyKey: dailyKey, dailyIsReplay: dailyIsReplay, dailyShareUrl: dailyShareUrl,
 SKILL_MS: SKILL_MS, fmtSec: fmtSec,
 cutFinishAll: cutFinishAll, cutSeen: cutSeen,
+// i18n
 setLang: setLang, t: t, lang: currentLang, dict: I18N
 };
 })();

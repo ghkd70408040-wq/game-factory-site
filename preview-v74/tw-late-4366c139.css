@@ -108,7 +108,9 @@ filter:var(--jbox-filter,none) !important;
 backdrop-filter:var(--jbox-blur,none) !important;
 }
 .jbox--modal,
-[data-part="modal-plate"]{ /* 팝업/노드카드 — [0908 원칙 0] 부품 modal-plate(정본 engine §modal-plate)의 사본.
+[data-part="modal-plate"],
+#app.battle #screen-game.active #pc-left[data-wide-only],
+#app.battle #screen-game.active #pc-right[data-wide-only]{ /* 팝업/노드카드 — [0908 원칙 0] 부품 modal-plate(정본 engine §modal-plate)의 사본.
 [lineage-0908] 계보 판정: 정본 코드 젤리 .work-frame[data-part="modal"](S11 값)과는 **다른 Component** — 실루엣 IoU .883,
 jelly-box 모서리가 더 둥글고 상변이 볼록(Δ≈1.2%W), engine 은 --wf-L0-R .07w + 탭. (0908 당시) 게임 15 시트는 전부 이 이미지 변주,
 코드 젤리는 게임 소비처 0. 통합하지 않고 매니페스트 t2-plate-modal-pink.lineage 에 Shape·값 차 표를 기록했다(값 무변).
@@ -146,7 +148,9 @@ corner-shape:var(--jbox-corner);     /* 시트 자신은 배경·접지를 안 �
 --jbox-blur:none;
 }
 .jbox--modal::before,
-[data-part="modal-plate"]::before{
+[data-part="modal-plate"]::before,
+#app.battle #screen-game.active #pc-left[data-wide-only]::before,
+#app.battle #screen-game.active #pc-right[data-wide-only]::before{
 content:"";
 position:absolute;
 inset:calc(var(--jbox-bw) * -1);
@@ -192,7 +196,9 @@ inset 0 var(--jbox-band-dy) var(--jbox-band-w) var(--jbox-band-s)
 color-mix(in srgb, var(--jbox-face) calc((var(--jbox-a-rim) - var(--jbox-a-in)) * 100%), transparent);
 }
 .jbox--modal::after,
-[data-part="modal-plate"]::after{
+[data-part="modal-plate"]::after,
+#app.battle #screen-game.active #pc-left[data-wide-only]::after,
+#app.battle #screen-game.active #pc-right[data-wide-only]::after{
 content:"";
 position:absolute;
 inset:calc(var(--jbox-bw) * -1);
@@ -435,42 +441,7 @@ transform: translate(0, -3px) scale(1.05);
 /* == sian-stage-map == */
 
 #screen-map { container-type: inline-size; }
-#screen-map #map-top {
-top: var(--safe-t);
-height: 20cqw;
-display: block;
-padding: 0;
-gap: 0;
-border: 0;
-border-image: none;
-background-color: transparent;
-background-image: none;
-pointer-events: none;
-}
-#screen-map #map-top > * {
-position: absolute;
-margin: 0;
-padding: 0;
-min-width: 0;
-min-height: 0;
-border: 0;
-border-radius: 0;
-background-color: transparent;
-background-size: 100% 100%;
-background-position: center;
-background-repeat: no-repeat;
-box-shadow: none;
-color: #FFFFFF;
-font-family: var(--font-display);
-line-height: 1;
-pointer-events: auto;
-}
-#screen-map #map-back   { left: 3.76cqw;  top: 3.83cqw; width: 14.99cqw; height: 15.46cqw; background-image: url("catalog/stage-btn_back.webp?v=9"); }
-#screen-map #map-hearts { left: 21.91cqw; top: 5.51cqw; width: 33.32cqw; height: 12.60cqw; background-image: url("catalog/stage-pill_life.webp"); }
-#screen-map #map-stars  { left: 56.31cqw; top: 5.87cqw; width: 21.75cqw; height: 11.71cqw; background-image: url("catalog/stage-pill_coin.webp?v=9"); }
-#screen-map #map-gear   { left: 81.40cqw; top: 3.85cqw; width: 14.92cqw; height: 15.43cqw; background-image: url("catalog/stage-btn_settings.webp?v=9"); }
-#screen-map #map-top .hc-ico { display: none; }   /* 봉인 — 하트·코인·톱니·화살표는 조각에 그려져 있다 */
-#screen-map #map-top b, #screen-map #map-top i, #screen-shop #sh-top b, #screen-shop #sh-top i {
+#screen-shop #sh-top b, #screen-shop #sh-top i {
 position: absolute;
 transform: translate(-50%, -50%);
 font-style: normal;
@@ -478,102 +449,15 @@ font-weight: 700;
 white-space: nowrap;
 opacity: 1;
 }
-#screen-map #map-hearts-v, #screen-shop #sh-hearts-v { left: 40.7%; top: 43.3%; font-size: 5.40cqw; text-shadow: 0 .3cqw 0 rgba(176, 82, 112, .7); }
-#screen-map #map-heart-t, #screen-shop #sh-heart-t  { left: 70.0%; top: 42.8%; font-size: 4.40cqw; text-shadow: 0 .3cqw 0 rgba(150, 66, 92, .8); }
-#screen-map #map-stars-v, #screen-shop #sh-coin-v  { left: 65.7%; top: 43.6%; font-size: 5.00cqw; text-shadow: 0 .3cqw 0 rgba(196, 140, 40, .85); }
-#screen-map #map-bot {
---jbox-tint: var(--role-jbox-tint-map-bot);
---jbox-blur: var(--jbox-frost) brightness(1.06);
-height: calc(25.61cqw + var(--safe-b));
-padding: 0 0 var(--safe-b);
-pointer-events: none;
-}
-#screen-map #map-bot button { pointer-events: auto; }
-#screen-map #map-bot > * {
-top: 14.0cqw;
-right: auto;
-transform: translateY(-50%);
-margin: 0;
-padding: 0;
-min-width: 0;
-min-height: 0;
-border: 0;
-border-radius: 0;
-background-color: transparent;
-background-size: 100% 100%;
-background-position: center;
-background-repeat: no-repeat;
-box-shadow: none;
-color: #FFFFFF;
-font-family: var(--font-display);
-line-height: 1;
-}
-#screen-map #map-b2 { display: none; }   /* 봉인 — 시안 하단 띠에 점수 자리가 없다 */
-#screen-map #map-b1    { left: 2.14%;  width: 30.39%; height: 12.47cqw; background-image: url("catalog/stage-pill_star.webp?v=9"); }
-#screen-map #map-plate { left: 34.22%; width: 31.66%; height: 18.97cqw; background-image: url("catalog/stage-pill_chapter.webp"); }
-#screen-map #map-char  { left: 66.84%; width: 15.43%; height: 18.62cqw; background-image: url("catalog/stage-btn_chars.webp"); }
-#screen-map #map-rec   { left: 82.91%; width: 15.15%; height: 18.78cqw; background-image: url("catalog/stage-btn_records.webp?v=9"); }
-#screen-map #map-b1-v, #screen-shop #sh-star-v {
+#screen-shop #sh-hearts-v { left: 40.7%; top: 43.3%; font-size: 5.40cqw; text-shadow: 0 .3cqw 0 rgba(176, 82, 112, .7); }
+#screen-shop #sh-heart-t  { left: 70.0%; top: 42.8%; font-size: 4.40cqw; text-shadow: 0 .3cqw 0 rgba(150, 66, 92, .8); }
+#screen-shop #sh-coin-v   { left: 65.7%; top: 43.6%; font-size: 5.00cqw; text-shadow: 0 .3cqw 0 rgba(196, 140, 40, .85); }
+#screen-shop #sh-star-v {
 position: absolute; left: 57.7%; top: 41.7%;
 transform: translate(-50%, -50%);
 font-size: 5.60cqw; font-weight: 700;
 text-shadow: 0 .3cqw 0 rgba(196, 140, 40, .85);
 }
-#screen-map #map-plate .mp-txt {
-position: absolute; left: 50%; top: 50%;
-width: 92%;
-transform: translate(-50%, -50%);
-display: block;
-text-align: center;
-}
-#screen-map #map-ch-k, #screen-map #map-ch-n {
-display: block;
-max-width: none;
-font-style: normal;
-font-weight: 700;
-color: #FFFFFF;
-white-space: nowrap;
-overflow: hidden;
-text-overflow: ellipsis;
-text-shadow: 0 .3cqw 0 rgba(96, 40, 72, .7);
-}
-#screen-map #map-ch-k { font-size: 4.40cqw; letter-spacing: -.01em; }
-#screen-map #map-ch-n { margin-top: .55cqw; font-size: 2.90cqw; letter-spacing: -.02em; }
-#screen-map #map-plate .mp-arrow {
-position: absolute; top: 50%;
-width: 4.6cqw; height: 76%;
-padding: 0;
-border: 0;
-border-radius: 0;
-background-color: transparent;
-background-image: none;
-box-shadow: none;
-transform: translateY(-50%);
-color: #FFFFFF;
-font-size: 5cqw;
-line-height: 1;
-text-shadow: 0 .3cqw 0 rgba(96, 40, 72, .7);
-cursor: pointer;
-z-index: 2;
-}
-#screen-map #map-ch-prev { left: -1cqw; right: auto; }
-#screen-map #map-ch-next { right: -1cqw; left: auto; }
-#screen-map #map-plate .mp-arrow[disabled] { opacity: .22; cursor: default; }
-#screen-map #map-char > span, #screen-map #map-rec > span {
-position: absolute; left: 50%; top: 73%;
-width: 92%;
-transform: translate(-50%, -50%);
-font-size: 3.5cqw;
-font-weight: 700;
-letter-spacing: -.03em;
-text-align: center;
-white-space: nowrap;
-overflow: hidden;
-text-overflow: ellipsis;
-text-shadow: 0 .28cqw 0 rgba(92, 58, 78, .7);
-}
-#screen-map #map-char:active, #screen-map #map-rec:active, #screen-map #map-b1:active,
-#screen-map #map-plate .mp-arrow:active { transform: translateY(calc(-50% + 2px)); }
 
 /* == stage-jelly-nodes == */
 
@@ -1536,19 +1420,14 @@ background-image: none;
 background-repeat: no-repeat;
 background-position: center center;
 background-size: cover;
-transform: scale(1.12);
-}
-#screen-map.active ~ #pc-bg {
-background-image: var(--art-map-bg);
-filter: blur(18px) saturate(.92) brightness(.60);
 }
 #screen-game.active ~ #pc-bg {
 background-image: var(--art-menu-day-w);
-filter: blur(20px) saturate(.90) brightness(.52);
+filter: none;                /* [121] 은퇴: blur(20px) saturate(.90) brightness(.52) — 비전투 게임 화면 양옆도 또렷한 그림 */
 }
 #app.battle #screen-game.active ~ #pc-bg {
 background-image: var(--art-map-bg);
-filter: blur(20px) saturate(.95) brightness(.42);
+filter: none;                /* [121] 은퇴: blur(20px) saturate(.95) brightness(.42) — 전투 가로는 battle-landscape 가 다시 깐다(판 뒤 어둡게 포함) */
 }
 #screen-menu {
 align-items: flex-start;
@@ -1563,17 +1442,6 @@ width: 380px;
 --mbw: 380px;
 align-items: flex-start;
 }
-#screen-map {
-width: min(max(60vw, 480px), 1400px);
-max-width: none;
-margin: 0 auto;
-position: relative;
-z-index: 1;
-box-shadow:
-0 0 0 5px rgba(255, 255, 255, .55),
-0 28px 80px rgba(20, 10, 40, .45);
-}
-#screen-map #map-layer { --map-bar: calc(var(--mapui) * 25.61 + var(--safe-b)); }
 #screen-game.active {
 display: grid;
 grid-template-columns: 264px minmax(0, 520px) 264px;
@@ -4289,32 +4157,6 @@ margin: 0 auto;
 backdrop-filter: none !important;
 background-color: rgba(255,255,255,.11);
 }
-#screen-map #map-bot{
---jbox-blur: none;
---jbox-tint: transparent;
---f2-w: calc(100vw - var(--safe-l) - var(--safe-r));
-border: 0 !important;
-border-image: none !important;
-border-radius: calc(var(--f2-w) * .0626) calc(var(--f2-w) * .0626) 0 0 !important;
-background-color: rgba(198,225,247,.40) !important;
-background-image: none !important;
-box-shadow:
-0 0 var(--f2-soft-blur) var(--f2-soft-spread) rgba(143,126,156,.66),
-0 0 var(--f2-soft-tail) 0 rgba(143,126,156,.20),
-0 calc(var(--f2-w) * -.0068) calc(var(--f2-w) * .0190) rgba(120,95,125,.22),
-inset 0 0 0 calc(var(--f2-w) * .0041) rgba(255,255,255,.72),
-inset 0 calc(var(--f2-w) * .0150) 0 rgba(255,255,255,.30) !important;
-}
-#screen-map #map-bot::before{
-content: '';
-position: absolute;
-inset: 0;
-border-radius: inherit;
-background-color: rgba(255,255,255,.09);
-pointer-events: none;
-z-index: 0;
-}
-#screen-map #map-bot > *{ z-index: 1; }
 html.menu-v2 #screen-menu #btn-play.mbtn,
 html.menu-v2 #screen-menu #btn-cont.mbtn,
 html.menu-v2 #screen-menu #char-open.mbtn,
@@ -6417,34 +6259,6 @@ bottom: auto;
 left: 0;
 right: var(--cs-side);
 top: calc(var(--cs-head) + var(--cs-carh) + var(--f2-w) * .03);
-}
-#screen-map #map-top { height: calc(var(--mapui) * 20); }
-#screen-map #map-back {
-left: calc(var(--mapui) * 3.76);  top: calc(var(--mapui) * 3.83);
-width: calc(var(--mapui) * 14.99); height: calc(var(--mapui) * 15.46);
-}
-#screen-map #map-hearts {
-left: calc(var(--mapui) * 21.91); top: calc(var(--mapui) * 5.51);
-width: calc(var(--mapui) * 33.32); height: calc(var(--mapui) * 12.60);
-}
-#screen-map #map-stars {
-left: auto; right: calc(var(--mapui) * 21.94); top: calc(var(--mapui) * 5.87);
-width: calc(var(--mapui) * 21.75); height: calc(var(--mapui) * 11.71);
-}
-#screen-map #map-gear {
-left: auto; right: calc(var(--mapui) * 3.68); top: calc(var(--mapui) * 3.85);
-width: calc(var(--mapui) * 14.92); height: calc(var(--mapui) * 15.43);
-}
-#screen-map #map-hearts-v { font-size: calc(var(--mapui) * 5.40); text-shadow: 0 calc(var(--mapui) * .3) 0 rgba(176, 82, 112, .7); }
-#screen-map #map-heart-t  { font-size: calc(var(--mapui) * 4.40); text-shadow: 0 calc(var(--mapui) * .3) 0 rgba(150, 66, 92, .8); }
-#screen-map #map-stars-v  { font-size: calc(var(--mapui) * 5.00); text-shadow: 0 calc(var(--mapui) * .3) 0 rgba(196, 140, 40, .85); }
-#screen-map #map-bot {
-left: 50%; right: auto;
-width: calc(var(--mapui) * 100);
-margin-left: calc(var(--mapui) * -50);
-height: calc(var(--mapui) * 25.61 + var(--safe-b));
---f2-w: calc(var(--mapui) * 100);
-container-type: inline-size;
 }
 }
 #classic-lead {
