@@ -6274,27 +6274,8 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   border-bottom: 1px solid var(--line);
   background: var(--panel);
 }
-#map-title {
-  flex: 1 1 auto;
-  min-width: 0;
-  font-size: 17px;
-  font-weight: 800;
-  text-align: left;
-  letter-spacing: -.01em;
-}
-.map-stat {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 5px 9px;
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-  background: rgba(255, 255, 255, .07);
-  box-shadow: inset 0 0 0 1px var(--line);
-}
-#map-stars .ms-ico { color: var(--prim-c8); font-size: 14px; }
+/* [판정판 121 · Task 3] 옛 지도 머리의 #map-title · .map-stat · #map-stars .ms-ico 규칙은 지웠다 — 마크업 · JS 문자열 어디에도 그 id/class 가 없다(Grep 증명).
+   #map-top · #map-heart-t 은 요소가 있어(공용 위 바가 덮어 그린다) 남긴다. */
 #map-heart-t {
   font-size: 10.5px;
   font-weight: 700;
@@ -7315,7 +7296,6 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
     text-shadow: none;
   }
   :where(:root:not([data-theme="dark"])) #map-path { --map-rope: var(--role-map-rope-path-light); }
-  :where(:root:not([data-theme="dark"])) .map-stat { background: rgba(0, 0, 0, .05); }
   :where(:root:not([data-theme="dark"])) .mn-stars { -webkit-text-stroke-color: rgba(70, 48, 20, .85); }
   :where(:root:not([data-theme="dark"])) .node-stars,
   :where(:root:not([data-theme="dark"])) #adv-goal { background: rgba(0, 0, 0, .045); }
@@ -7335,7 +7315,6 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   text-shadow: none;
 }
 :where(:root[data-theme="light"]) #map-path { --map-rope: var(--role-map-rope-path-light); }
-:where(:root[data-theme="light"]) .map-stat { background: rgba(0, 0, 0, .05); }
 :where(:root[data-theme="light"]) .mn-stars { -webkit-text-stroke-color: rgba(70, 48, 20, .85); }
 :where(:root[data-theme="light"]) .node-stars,
 :where(:root[data-theme="light"]) #adv-goal { background: rgba(0, 0, 0, .045); }
@@ -10800,8 +10779,7 @@ html.no-art-logo .logo-img  { display: none; }
 }
 .r10-x:active { transform: scale(.92); }
 
-/* 아이콘 칩 (ui-chip.9 · slice 15 37 15 37 → ×0.5 = 8 19) */
-.hchip,
+/* 아이콘 칩 (ui-chip.9 · slice 15 37 15 37 → ×0.5 = 8 19) — [판정판 121] 목록의 .hchip 은 소비처 0 이라 뺐다(공용 위 바로 은퇴). */
 .nchip {
   border-style: solid;
   border-width: 8px 19px;
@@ -10835,11 +10813,9 @@ html.no-art-logo .logo-img  { display: none; }
 /* Task 12 rev1(I-5) — 계정 캡슐 아바타. 크기는 위 .hc-ico 를 그대로 상속(새
    원시값 0) — 이 규칙은 모양(원형·크롭)만 더한다(색상값·px 없음). */
 #portal-acct-avatar { border-radius: 50%; object-fit: cover; vertical-align: middle; margin-inline-end: .35em; }
-.hc-star  { background-image: var(--lib-star-gold); }
 .hc-heart { background-image: var(--lib-glyph-heart); }
-.hc-gear  { background-image: var(--lib-glyph-gear); }
-.hc-score { background-image: var(--lib-glyph-score); }
-.hc-back  { background-image: var(--lib-glyph-back); font-size: 0; color: transparent; }
+/* [판정판 121 · Task 3] .hc-star · .hc-gear · .hc-score · .hc-back 은 지웠다 — 위 · 아래 바 칩 안의 숨은 글리프 칸(.hc-ico span)이 공용 위 바 ·
+   아래 줄로 바뀌며 빠져 마크업 · JS 문자열 어디에도 소비처가 없다(Grep 증명). .hc-heart(판 정보 창 하트) · .hc-ico(계정 아바타)는 남는다. */
 /* ==========================================================================
    25-1. §C 메인 메뉴 — 버튼 네 개 (ART §6.8 · ROUND10-SPEC §F 실측)
    --------------------------------------------------------------------------
@@ -11901,41 +11877,8 @@ html.no-art-logo .logo-img  { display: none; }
 }
 .map-node.st-gate { cursor: default; }
 
-/* ---- 상·하단 띠 (ui-hud-bar.9 · slice 13 9 13 9) ------------------------- */
-.hudbar {
-  position: absolute;
-  left: 0;
-  right: 0;
-  z-index: 3;
-  display: flex;
-  align-items: center;
-  /* §A: 화면 높이의 13.1% 상한(원본 하단 바와 같은 비율), 최소 44pt.
-     이 높이가 곧 원본에 구워진 상단 "FINAL GOAL" 글자와 하단 UI 를 덮는 폭이다 —
-     지우는 대신 가리는 것이 §A 의 지시라, 띠가 얇아지면 글자가 삐져나온다. */
-  height: clamp(48px, 13.1vh, 110px);
-  padding: 0 8px;
-  /* [hud-unify 0910] 은퇴 — 맵 띄는 이미 코드 젬리(.jbox--strip)가 그린다.
-     이 세 줄은 그 밑에 깔려 있던 은퇴 자산(lib-hud-bar.webp) 띄였다. */
-}
-.hchip {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  min-height: 34px;
-  padding: 0 4px;
-  font-family: var(--font-display);
-  font-size: 14px;
-  color: var(--prim-art-ink);
-}
-.hchip b { font-weight: 400; }
-.hchip i { font-style: normal; font-size: 10.5px; opacity: .82; }
-.hchip-btn {
-  min-width: 44px;
-  min-height: 44px;
-  justify-content: center;
-  cursor: pointer;
-  background: none;
-}
+/* [판정판 121 · Task 3] 상·하단 띠 .hudbar 와 칩 .hchip(+ b · i) · .hchip-btn 규칙은 지웠다 — 메인 · 지도 위 · 아래 바가 공용 부품(.tb · .bb)이 되며
+   class 를 벗어 마크업 · JS 문자열 어디에도 소비처가 없다(Grep 증명). 값은 커밋 62671f5 의 이 자리. */
 /* [판정판 121 · 2026-10-17] 지도 띠 안 조각의 옛 좌표 줄(#map-top .hchip · #map-hearts margin · #map-bot > * 가운데 매달기 ·
    #map-b1/#map-b2/#map-plate/#map-char/#map-rec 의 left/right % · #map-plate 9-슬라이스 명판)은 지웠다 — 지도 위 · 아래 바는 메인과 같은
    공용 부품(.tb · .bb — <style id="hub-bars-121">)이다. 값은 커밋 63159e0 의 이 자리. */
@@ -11983,44 +11926,8 @@ html.no-art-logo .logo-img  { display: none; }
 }
 .mp-arrow[disabled] { opacity: .3; cursor: default; }
 
-/* 하단 좌·우 버튼 — STAGE SELECT / MAIN MENU 조각 (slice 31 30 35 30) */
-.mfbtn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 68%;
-  min-height: 44px;
-  /* 13차-a2 ③: 끝동(테두리) 안쪽은 이미 좁다. 여기의 4px 은 그 좁은 칸에서 다시
-     8px 을 빼앗아 가는 값이라 1px 로 줄인다. 끝동 자체가 시각적 여백이므로
-     글자가 조각에 붙어 보이지 않는다. */
-  padding: 0 1px;
-  /* 줄바꿈 금지 — 다만 이것만으로는 접힘이 넘침으로 바뀔 뿐이라, 위의 폭 확보와
-     아래 letter-spacing 이 함께 있어야 의미가 있다. 셋이 한 벌이다. */
-  white-space: nowrap;
-  letter-spacing: -.2px;
-  border-style: solid;
-  border-width: 16px 15px 18px 15px;
-  background: none;
-  color: #FFFFFF;
-  font-family: var(--font-display);
-  font-size: 10.5px;
-  line-height: 1.05;
-  text-align: center;
-  cursor: pointer;
-  text-shadow: 0 1.5px 0 rgba(110, 70, 58, .6);
-}
-.mfbtn-l { border-image: var(--lib-btn-stage-select) 24 30 27 30 fill stretch; }
-.mfbtn-r { border-image: var(--lib-btn-main-menu) 31 30 35 30 fill stretch; }
-.mfbtn:active { transform: translateY(calc(-50% + 2px)); }
-/* 13차-a2 ③: 영어는 같은 칸에 글자 수가 두 배다 — "캐릭터" 3 자 vs "Character" 9 자,
-   "기록" 2 자 vs "Records" 7 자. 폭을 영어에 맞춰 잡으면 한글일 때 조각 안이
-   휑해지므로, 칸이 아니라 **글자**를 줄인다. lang 은 game.js:3037 이 이미
-   documentElement 에 써 주고 있어 새로 붙일 훅이 없다.
-   크기는 390px 실측으로 잡았다: 표시 폰트의 대문자 라틴 자폭이 0.495em 이라
-   "Character" 9 자는 9.5px 에서 40.5px 인데 글자칸은 37.4px 뿐이다. 8.5px 로는
-   36.5px 이라 들어가긴 해도 "Records"(28.4px)가 칸 28.3px 을 0.1px 넘긴다 —
-   반올림 한 번에 다시 접히는 폭이라 여유를 두고 8px 로 내린다(34.3/26.7px). */
-html[lang="en"] .mfbtn { font-size: 8px; letter-spacing: -.15px; }
+/* [판정판 121 · Task 3] 하단 좌·우 그림 단추 .mfbtn · .mfbtn-l · .mfbtn-r · :active · en 글자 줄임 규칙은 지웠다 — 메인 · 지도 아래 줄이 공용 부품(.bb)이
+   되며 class 를 벗어 마크업 · JS 문자열 어디에도 .mfbtn 소비처가 없다(Grep 증명). 값은 커밋 62671f5 의 이 자리. */
 
 @media (prefers-reduced-motion: reduce) {
   .map-node.st-cur { animation: none; }
@@ -12365,7 +12272,7 @@ html[lang="en"] .mfbtn { font-size: 8px; letter-spacing: -.15px; }
    말줄임으로 끝나야 띠의 높이가 흔들리지 않는다(위 .mp-txt > i 참조).
    ========================================================================== */
 @media (max-width: 400px) {
-  .mfbtn { font-size: 9.5px; border-width: 14px 13px 16px 13px; }
+  /* [판정판 121] .mfbtn 줄은 지웠다(소비처 0). .mp-txt 두 줄은 요소가 있어(메인 · 지도 가운데 판 글자 — 공용 규칙이 덮는다) 남긴다. */
   .mp-txt > b { font-size: 10px; }
   .mp-txt > i { font-size: 9px; max-width: 74px; }
 }
@@ -15063,7 +14970,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
          왼→오 = 스토리 극장 · 놀이터 · [모험] · 캐릭터 · 상점(사용자 원문 순서). 극장 · 놀이터 · 상점은 KD_BUILDINGS 의 같은 줄(data-kd)을 부른다. -->
     <footer id="kd-bot" class="bb">
       <button id="kd-bot-theater" class="bb-theater" type="button" data-kd="circus" data-i18n-aria="kd.circus" aria-label="Story Theater"><span class="bb-lab" data-i18n="kd.circus">Story Theater</span></button>
-      <button id="kd-bot-play" class="bb-play" type="button" data-kd="playground" data-i18n-aria="kd.playground" aria-label="Playground"><span class="bb-lab" data-i18n="kd.playground">Playground</span></button>
+      <button id="kd-bot-play" class="bb-play" type="button" data-kd="playground" data-i18n-aria="kd.playground" aria-label="Arcade"><span class="bb-lab" data-i18n="kd.playground">Arcade</span></button>
       <button id="kd-bot-plate" class="bb-center" type="button" data-i18n-aria="menu.adv" aria-label="Adventure"><span class="mp-txt"><b id="kd-bot-ch-k" data-i18n="menu.adv">Adventure</b><i id="kd-bot-ch-n">Chapter 1</i></span></button>
       <button id="kd-bot-char" class="bb-char" type="button" data-i18n-aria="aria.charopen" aria-label="Heroes: choose a character"><span class="bb-lab" data-i18n="pick.title">Heroes</span></button>
       <button id="kd-bot-shop" class="bb-shop" type="button" data-kd="shop" data-i18n-aria="kd.shop" aria-label="Shop"><span class="bb-lab" data-i18n="kd.shop">Shop</span><b id="kd-shop-badge" class="badge-new" hidden></b></button>
@@ -15148,7 +15055,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
       <span id="map-b1" hidden><b id="map-b1-v">0</b></span>
       <span id="map-b2" hidden><b id="map-b2-v">0</b></span>
       <button id="map-theater" class="bb-theater" type="button" data-kd="circus" data-i18n-aria="kd.circus" aria-label="Story Theater"><span class="bb-lab" data-i18n="kd.circus">Story Theater</span></button>
-      <button id="map-play" class="bb-play" type="button" data-kd="playground" data-i18n-aria="kd.playground" aria-label="Playground"><span class="bb-lab" data-i18n="kd.playground">Playground</span></button>
+      <button id="map-play" class="bb-play" type="button" data-kd="playground" data-i18n-aria="kd.playground" aria-label="Arcade"><span class="bb-lab" data-i18n="kd.playground">Arcade</span></button>
       <div id="map-plate" class="bb-center">
         <button id="map-ch-prev" data-part="btn-map-arrow" data-variant="prev" class="mp-arrow" type="button" data-i18n-aria="aria.chprev" aria-label="Previous chapter">&lsaquo;</button>
         <!-- 0910 판정판 23 — 명판 글자가 «챕터 미니맵» 의 열기 손잡이가 된다
@@ -17534,7 +17441,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
        그림 제목은 발주가 필요해 쓰지 않는다), 줄 = .mode-row(btn-picture) 의 기존
        변주 arcade(보라)·timeattack(주황) 인스턴스. 새 그림 0 · 새 값 0. -->
   <div id="modal-playground" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="pg-h"><div class="sheet jbox jbox--modal" data-part="modal-plate">
-    <h2 id="pg-h" data-i18n="pg.title">Playground</h2>
+    <h2 id="pg-h" data-i18n="pg.title">Arcade</h2>
     <button id="pg-close" class="r10-x x-btn" type="button" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
     <div class="mode-list">
       <button id="pg-classic" class="mode-row" data-part="btn-picture" data-variant="arcade" type="button">
@@ -28548,7 +28455,7 @@ window.TT_SFX = {
          두 번째 문구를 만들면 둘이 갈라진다. */
       'kd.castle': 'Castle',
       'aria.kdmenu': 'Village menu',   /* [116] 메인 v3 왼쪽 메뉴 판(#kd-menu) 이름 */
-      'kd.playground': 'Playground',
+      'kd.playground': 'Arcade',   /* [판정판 121] 'Playground' → 'Arcade' — 아래 줄 그림 단추 이름 칸(단추 폭 92%)에 줄이지 않고 든다(ko 「놀이터」 그대로) */
       'kd.shop': 'Shop',
       'kd.pethouse': 'Pet House',
       /* [KD61-0922] 메인 화면 v2 — 서커스·미션·우체국 + 놀이터 선택 창 */
@@ -28557,7 +28464,7 @@ window.TT_SFX = {
       'kd.circus': 'Story Theater',
       'kd.mission': 'Missions',
       'kd.post': 'Post Office',
-      'pg.title': 'Playground',
+      'pg.title': 'Arcade',   /* [판정판 121] 단추 이름(kd.playground)과 같은 낱말 */
       'pg.classic': 'Classic',
       'pg.classic.d': 'Endless, Time Rush, Daily.',
       'pg.arcade': 'Arcade',
@@ -30873,6 +30780,9 @@ window.TT_SFX = {
        이 밤에 낮 곡을 켜지 않는다. setNight 은 값이 그대로면 아무 일도 하지 않는다. */
     syncLobbyBgmNight(isNightHour(new Date().getHours()));
     if (audioUnlocked) J.bgm.scene(id === 'screen-game' ? 'game' : 'menu');
+    /* [판정판 121] 지도 시계(1초 하트 칠하기)는 지도가 숨으면 멈춘다 — 화면 전환은 여기 한 곳뿐이라 어느 문으로 떠나도 멈춘다.
+       돌아올 때는 지도의 문(openMap · hubReturn → mapShow)이 다시 건다. */
+    if (id !== 'screen-map') stopMapTicker();
     /* [116 · 2026-10-15 · 사용자 승인 ④ / 시안 S14] 왕국 유휴 타이머(kdIdleStop) 은퇴 — 거주자가 없다. */
   }
 
@@ -45525,6 +45435,7 @@ window.TT_SFX = {
     return true;
   }
   function openShopScreen(tab) {
+    hubMark();   /* [판정판 121] 연 곳 기억(닫기 = hubReturn) */
     heartsTick();
     p3Roll();
     portalAdsSync();
@@ -45549,7 +45460,7 @@ window.TT_SFX = {
   function closeShopScreen() {
     if (shopTick) { clearInterval(shopTick); shopTick = 0; }
     J.sfx.ui();
-    enterKingdom();
+    hubReturn();   /* [판정판 121] 연 곳으로(지도 아래 줄에서 열었으면 지도 · 그 밖은 메인) — 옛: enterKingdom() */
   }
   function setShopTab(tab) {
     if (tab === 'jewel') { if (shopTabOk('jewel')) openShop(); return; }
@@ -47528,12 +47439,16 @@ window.TT_SFX = {
   var MAP_ANCHORS_CH = [
     /* 챕터 1 — 구미 포레스트 남쪽 초원에서 캔디스톤 길을 타고 언덕 마루까지.
        x 7.62~43.36 = 레이어 폭의 35.7% (폰 화면 1.58 개분). */
+    /* [판정판 121 · 2026-10-17] 공용 아래 줄(띠 판 없이 그림 위에 선 단추 다섯)에 노드가 가리지 않게 1 · 3 · 5 를 초원 안에서 위로만 옮겼다
+       (가장 작은 이동 — 여유 가로 8u · 세로 2cqw, 실측 scratchpad/rc1017/t3/t3_nodecov.py):
+         1 85.91 → 84.00 · 3 86.31 → 84.00 (세로 360×640 아래 줄 위 끝 88.0% 가 한계) · 5 84.72 → 79.70 (가로 16:9 옆 단추 위 끝 83.4% 가 한계).
+       셋 다 같은 초원 · 바위 줄 위(전/후 크롭 scratchpad/rc1017/t3/after/node-ch1-n*-*.png). 가로 자리(x)는 그대로. */
     [
-      [ 7.62, 85.91, 5.20, 7.53, '--node-jelly-1'],   //  1 서쪽 숲가 초원(우체통 트레일헤드)
+      [ 7.62, 84.00, 5.20, 7.53, '--node-jelly-1'],   //  1 서쪽 숲가 초원(우체통 트레일헤드)
       [12.50, 75.92, 4.10, 6.20, '--node-jelly-2'],   //  2 숲가 둔덕 (초원 위로)
-      [18.16, 86.31, 5.20, 7.53, '--node-jelly-3'],   //  3 초원, 아래로 굽이
+      [18.16, 84.00, 5.20, 7.53, '--node-jelly-3'],   //  3 초원, 아래로 굽이
       [23.83, 74.33, 4.10, 6.20, '--node-jelly-4'],   //  4 숲 아래 오솔길
-      [29.30, 84.72, 4.60, 6.90, '--node-jelly-5'],   //  5 초원 바위 옆
+      [29.30, 79.70, 4.60, 6.90, '--node-jelly-5'],   //  5 초원 바위 옆
       [34.38, 77.12, 4.10, 6.20, '--node-jelly-1'],   //  6 캔디스톤 길 초입
       [37.30, 68.73, 3.70, 5.60, '--node-jelly-2'],   //  7 캔디스톤 길
       [39.84, 61.14, 3.40, 5.15, '--node-jelly-3'],   //  8 길 S자 굽이
@@ -47604,6 +47519,9 @@ window.TT_SFX = {
          드래그 맵에 얹으면 피할 수 없는 모양이라 그대로 뒀다(§3).
        ⚠ 10번은 성문이 아니라 **두 봉우리 사이 고개**다 — 초콜릿으로 봉인된
          성문은 파노라마에 없다(§7 ③ 판정: 고개로 둔다). */
+    /* [판정판 121 · 2026-10-17] 9 · 10 을 아래로 옮겼다(25.50 → 27.90 · 24.50 → 27.90) — 세로 360×640 에서 41 · 42 를 지금으로 열면 화면 오른쪽 끝에
+       서는 두 노드가 공용 위 바 오른쪽 기둥(설정 · 미션 · 기록, 아래 끝 43.6cqw)에 가렸다(실측 t3_nodecov.py). 한계 = 노드 위 끝 25.6%(+ 여유 2cqw).
+       9 = 그대로 정상 아래 초코 띠 위 · 10 = 같은 두 봉우리 사이 골짜기 안 조금 아래(크롭 scratchpad/rc1017/t3/after/node-ch5-n*-*.png). */
     [
       [56.50, 57.50, 3.40, 5.20, '--node-jelly-1'],   // 41 달콤 마을 북쪽 풀밭
       [60.50, 56.00, 3.30, 5.05, '--node-jelly-2'],   // 42 초코 늪 남안
@@ -47613,8 +47531,8 @@ window.TT_SFX = {
       [74.50, 41.00, 3.00, 4.55, '--node-jelly-1'],   // 46 초코 흘러내린 사면
       [73.00, 35.00, 2.90, 4.45, '--node-jelly-2'],   // 47 동사면 중턱(되꺾음)
       [75.00, 29.50, 2.85, 4.35, '--node-jelly-3'],   // 48 능선 어깨
-      [71.00, 25.50, 2.80, 4.30, '--node-jelly-4'],   // 49 정상 아래 초코 띠
-      [66.50, 24.50, 2.80, 4.30, '--node-jelly-5']    // 50 두 봉우리 사이 고개 = 보스
+      [71.00, 27.90, 2.80, 4.30, '--node-jelly-4'],   // 49 정상 아래 초코 띠
+      [66.50, 27.90, 2.80, 4.30, '--node-jelly-5']    // 50 두 봉우리 사이 고개 = 보스
     ],
     /* 챕터 6 «크림 회랑» — 전용 그림 **art-map-ch06**(780x1688) 위. 1점 소실점
        복도라 "가로로 걷는다"가 아니라 **"안쪽으로 들어간다"**가 길이고, 원반
@@ -48165,6 +48083,7 @@ window.TT_SFX = {
   }
 
   function openTheater() {
+    hubMark();   /* [판정판 121] 연 곳 기억 — 컷을 다 보고 돌아올 곳(theaterPick 의 hubReturn) */
     buildTheater();
     openModal('modal-theater');
   }
@@ -48194,7 +48113,8 @@ window.TT_SFX = {
        않는다 — enterKingdom() 으로 왕국 화면부터 되돌린 뒤(옛 openGallery()
        콜백·maybeChapCut() 콜백과 같은 「돌아갈 화면부터 + syncMenu」 규약,
        T9-fix1 M-1) 그 위에 극장 모달을 다시 띄운다. */
-    playCuts(theaterCutsFor(c), 'chap' + c, function () { syncMenu(); enterKingdom(); openTheater(); });
+    /* [판정판 121] 돌아갈 화면 = 극장을 연 곳(hubReturn — 지도 아래 줄에서 열었으면 지도). 옛: enterKingdom() */
+    playCuts(theaterCutsFor(c), 'chap' + c, function () { syncMenu(); hubReturn(); openTheater(); });
   }
 
   /** 챕터를 한 칸 옮긴다. 열린 챕터 밖으로는 나가지 않는다. */
@@ -48400,6 +48320,11 @@ window.TT_SFX = {
       mapPage = Math.min(sianPages() - 1,
         Math.floor(((Math.max(1, store.advMax | 0) - 1) % ADV_CHAPTER) / SIAN_PER));
     }
+    mapShow();
+  }
+
+  /** [판정판 121] 지도 세우기(지금 챕터 그대로) — openMap 의 끝 반쪽이자, 지도 아래 줄에서 연 화면(상점 · 극장 컷)을 닫고 돌아올 때(hubReturn)의 문. */
+  function mapShow() {
     buildMap();
     questBadges();   /* [판정판 121] 지도 위 바 미션 배지 · 아래 줄 상점 배지(메인과 같은 부품 · 같은 값) */
     shopDots();
@@ -48416,6 +48341,16 @@ window.TT_SFX = {
        짧게 다시 묻는다. */
     mapCenterCurrent(0);
     startMapTicker();
+  }
+
+  /* [판정판 121] 공용 아래 줄 화면(상점 화면 · 스토리 극장)을 연 곳 — 변수 하나. 여는 함수(openShopScreen · openTheater)가 그 순간 서 있던
+     화면을 적고(지도면 'map', 그 밖은 'kingdom'), 닫기(closeShopScreen · 극장 컷 끝 theaterPick)가 hubReturn() 으로 그곳으로 간다.
+     놀이터 · 캐릭터 창은 화면을 바꾸지 않는 한 겹이라 닫으면 이미 그 자리다. */
+  var hubFrom = 'kingdom';
+  function hubMark() { var m = $('screen-map'); hubFrom = (m && m.classList && m.classList.contains('active')) ? 'map' : 'kingdom'; }
+  function hubReturn() {
+    if (hubFrom === 'map') { heartsTick(); mapShow(); }
+    else enterKingdom();
   }
 
   function leaveMap() {
@@ -70216,12 +70151,12 @@ html[lang="en"] #kd-m-circus b{ font-size: .85em; letter-spacing: -.02em; }
   text-shadow: 0 calc(var(--bb-side) * .28 / 15.43) 0 var(--hub-sh-lab);
 }
 /* 맞춤 — 글자 칸(단추 폭 92%)을 넘는 이름만(실측 scratchpad/rc1017/t3/t3_probe.py · probe-labels.json: 글자 폭 ÷ 칸 폭은 글자 · 칸이 같은 자를 따라
-   크기와 무관하게 같다 — ko 「스토리 극장」 1.001 · en 「Playground」 1.124 · en 「Story Theater」 1.475, 나머지 ≤ .72).
-   ko 극장 · en 놀이터는 116 메뉴 맞춤처럼 그 단추 글자만 칸에 드는 가장 큰 .01 단계로 줄인다(.98 · .88 — 821×462 에서 12.4 · 11.1px).
+   크기와 무관하게 같다 — ko 「스토리 극장」 1.001 · en 「Story Theater」 1.475, 나머지 ≤ .72).
+   ko 극장은 116 메뉴 맞춤처럼 그 단추 글자만 칸에 드는 가장 큰 .01 단계로 줄인다(.98 — 821×462 에서 12.4px).
+   en 놀이터 이름은 「Arcade」(지휘자 판정 — 옛 「Playground」 1.124 를 줄이던 .88 줄은 은퇴, 이제 칸 안).
    en 「Story Theater」 는 줄이면 .67(821×462 에서 8.5px — 가독 하한 --text-min 11px 아래)이라 줄이지 않고 낱말 사이에서 두 줄로 접는다
    (같은 크기 · 줄 간격 .9 · 묶음 가운데를 73% → 71% — 두 줄 묶음 54~88% 가 아이콘 아래끝 51% 와 아래 굽 88% 사이). */
 html[lang="ko"] #app .bb > .bb-theater > .bb-lab { font-size: calc(var(--bb-side) * 3.5 / 15.43 * .98); }
-html[lang="en"] #app .bb > .bb-play > .bb-lab { font-size: calc(var(--bb-side) * 3.5 / 15.43 * .88); }
 html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal; word-break: keep-all; line-height: .9; }
 /* 가운데 판 글자(메인 「모험 / 챕터 n: 이름」 · 지도 「CHAPTER n / 이름」 = 미니맵 손잡이) — 판 폭 비(116 의 31.66cqw 기준 값 ÷ 31.66). */
 #app .bb-center .mp-txt { position: absolute; left: 50%; top: 50%; width: 92%; transform: translate(-50%, -50%); display: block; margin: 0; padding: 0; min-width: 0; text-align: center; }
