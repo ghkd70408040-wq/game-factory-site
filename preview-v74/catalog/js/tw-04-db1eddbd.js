@@ -2110,7 +2110,7 @@ en: {
 'shop2.tab.free': 'Free',
 'shop2.tab.deco': 'Style',
 'shop2.tab.jewel': 'Jewels',
-'aria.shopback': 'Back to the kingdom',
+'aria.back': 'Back',   /* [판정판 121 Task 4] 상점 뒤로 = 연 곳으로(메인 · 지도) — 옛 aria.shopback 「Back to the kingdom」 은퇴 */
 'aria.coinplus': 'Get more coins',
 'aria.starplus': 'Get more stars',
 'aria.shoptabs': 'Shop sections',
@@ -3243,7 +3243,7 @@ ko: {
 'shop2.tab.free': '무료',
 'shop2.tab.deco': '꾸미기',
 'shop2.tab.jewel': '보석',
-'aria.shopback': '왕국으로 돌아가기',
+'aria.back': '뒤로',   /* [판정판 121 Task 4] 상점 뒤로 = 연 곳으로(메인 · 지도) — 옛 aria.shopback 「왕국으로 돌아가기」 은퇴 */
 'aria.coinplus': '코인 더 얻기',
 'aria.starplus': '별 더 얻기',
 'aria.shoptabs': '상점 칸 고르기',
@@ -12879,7 +12879,7 @@ if (el && el.getAttribute('data-len') !== String(s.length)) el.setAttribute('dat
 function paintCoinChip(id) { paintChipText(id, arcComma(coinBalance())); }
 function paintWallets() {
 paintCoinChip('sh-coin-v');   /* 상점 띠 코인도 큰 수 줄임(data-len 6·7 — 지휘자 판정 2026-10-06, 왕국·지도 칩과 같은 도우미) */
-setText('sh-star-v', arcComma(store.jstar | 0));
+paintChipText('sh-star-v', arcComma(store.jstar | 0));   /* [판정판 121 Task 4] 상점 위 바 = 공용 위 바 — 별 캡슐도 메인 · 지도처럼 data-len 단계 */
 paintCoinChip('kd-top-stars-v'); paintCoinChip('map-stars-v'); paintChipText('kd-top-star-v', arcComma(store.jstar | 0));   /* [116] 별 캡슐 = 위 바 */
 paintChipText('map-star-v', arcComma(store.jstar | 0));   /* [판정판 121] 지도 위 바 별 캡슐(공용 위 바 — 메인과 같은 구성) */
 }
@@ -13100,7 +13100,9 @@ root.setAttribute('data-art', art.join(' '));
 document.documentElement.setAttribute('data-shop-art', art.join(' '));   /* #modal-gres 용 */
 var tabs = root.querySelectorAll('.sh-tab');
 for (var i = 0; i < tabs.length; i++) {
-tabs[i].setAttribute('aria-selected', tabs[i].getAttribute('data-stab') === shopTab2 ? 'true' : 'false');
+var on = tabs[i].getAttribute('data-stab') === shopTab2;
+tabs[i].setAttribute('aria-selected', on ? 'true' : 'false');
+if (on) tabs[i].removeAttribute('data-variant'); else tabs[i].setAttribute('data-variant', 'soft');
 }
 var host = $('sh-host');
 if (host) setArt(host, '--sh-host', stdArt(SHOP_HOST[shopTab2] || 'kkultteok', 'full'), '');
@@ -17412,6 +17414,7 @@ on($('pz-resume'), 'click', resume);
 on($('btn-next'), 'click', nextStage);
 on($('btn-continue'), 'click', doContinue);
 on($('btn-shop'), 'click', function () { openShopScreen('jewel'); });
+on($('sh-gear'), 'click', openSettings);   /* [판정판 121 Task 4] 상점 위 바 = 공용 위 바 — 설정 단추(메인 #kd-top-gear · 지도 #map-gear 와 같은 함수) */
 on($('screen-shop'), 'click', function (ev) {
 var el = ev && ev.target;
 while (el && el !== this && !(el.getAttribute && (el.getAttribute('data-sh-act') || el.id === 'sh-back' ||
