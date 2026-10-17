@@ -34870,6 +34870,10 @@ window.TT_SFX = {
       el.style.setProperty('--cut-key', o.key || (CHARS[castId] || CHARS.ten).key);
       if (o.img) el.style.setProperty('--cutin-img', o.img);
       else if (el.style.removeProperty) el.style.removeProperty('--cutin-img');
+      /* [판정판 121 · Task 6 수정 2회차] 아트 슬롯 그림이 아래변이 잘린 것이면(o.cut — 악당 컷인이 FOE_ART_CUT 에서 넘긴다) 판 정보
+         포스터와 같은 data-cut → 같은 CSS 가림. 다른 컷인은 늘 끈다. */
+      var cutImg = $('cutin-img');
+      if (cutImg && cutImg.toggleAttribute) cutImg.toggleAttribute('data-cut', !!(o.img && o.cut));
       setText('cutin-name', o.shout ? t('skill.shout', { name: t(nameKey).toUpperCase() }) : t(nameKey));
       setText('cutin-sub', t(o.subKey || 'skill.sub'));
       el.hidden = false;
@@ -43823,6 +43827,7 @@ window.TT_SFX = {
          var(--bs-full) 이 그 자리에서 해석되지 않는다. 그래서 같은 매핑을
          JS 쪽에서 한 번 더 읽는다 — 표는 duelFoeFull() 하나뿐이다. */
       img: duelFoeFull(),
+      cut: !!FOE_ART_CUT[(S.duel && S.duel.def) ? S.duel.def.id : ''],   /* [수정 2회차] 아래변이 잘린 그림이면 발 가림(표는 NC_FOE_ART 곁 FOE_ART_CUT 하나) */
       sfx: function () { J.sfx.foeStab(); }
     });
   }
@@ -48762,6 +48767,11 @@ window.TT_SFX = {
      그림은 작성 시점에 어디서도 리터럴로 불리지 않아 catalog.allow.json 에 없다 — 카드가 처음 부른다). */
   var NC_FOE_ART = { grape: 'catalog/duel-demon-full-grape.webp', soda: 'catalog/duel-demon-full-soda.webp', berry: 'catalog/duel-demon-full-straw.webp',
                      mint: 'catalog/duel-demon-full-mint.webp', cocoa: 'catalog/duel-demon-full-cocoa.webp' };
+  /* [판정판 121 · Task 6 수정 2회차] 위 전신 그림 가운데 **아래변이 잘린** 것(원본 생성 그림부터 발이 잘림 — 조사 D §1 · 그림 작업 A3 보고:
+     아래 줄 불투명 포도 44.6 · 소다 45.9 · 딸기 46.5%). 박하(발바닥 6.2%) · 초코(0%)는 발까지 온전하다. 그림 파일의 사실이라 여기 한 번만
+     적고, 그 그림을 크게 세우는 자리(판 정보 창 포스터 .nc-foe-art · 악당 컷인 #cutin-img)가 data-cut 을 켜면 CSS 가 아래 12% 를 흐린다.
+     전투 HUD 의 같은 그림은 판(세로 뼈 막대 · 가로 이름 판)이 발 끝을 덮어 가림이 필요 없다. */
+  var FOE_ART_CUT = { grape: true, soda: true, berry: true };
   function setTextEl(el, s) { if (el && el.textContent !== s) el.textContent = s; }
   /** 피니시 미션 문장 = 전투가 피니시에 들어갈 때 missionText 가 내는 키와 같다(새 문구 0, 착수 전 점검 W11). */
   function ncFinishText(f) { return f ? t('finish.mission.' + f.id, { goal: f.goal | 0 }) : ''; }
@@ -48979,7 +48989,11 @@ window.TT_SFX = {
     var starBox = cardEl.querySelector('.nc-stars');
     if (starBox) starBox.setAttribute('aria-label', t('node.stars.got', { s: gotS }));
     var art = cardEl.querySelector('.nc-foe-art');
-    if (art) art.style.setProperty('background-image', 'url("' + (NC_FOE_ART[foe.id] || NC_FOE_ART.grape) + '")');
+    var artId = NC_FOE_ART[foe.id] ? foe.id : 'grape';
+    if (art) {
+      art.style.setProperty('background-image', 'url("' + NC_FOE_ART[artId] + '")');
+      art.toggleAttribute('data-cut', !!FOE_ART_CUT[artId]);   /* [수정 2회차] 아래가 잘린 그림만 발 가림 */
+    }
     setTextEl(cardEl.querySelector('.nc-foe-name'), bossName(foe));
     setTextEl(cardEl.querySelector('.nc-hp-v'), fmtNum(duelFoeHpMax(p.n)));
     var atkId = bossAtkIdOf(foe, p.n);
@@ -70585,9 +70599,14 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
   width: calc(var(--nc-u) * 156); height: calc(var(--nc-u) * 172);
   background-position: center bottom; background-size: contain; background-repeat: no-repeat;
   filter: drop-shadow(0 calc(var(--nc-u) * 3) calc(var(--nc-u) * 3) color-mix(in srgb, var(--role-f2-pill-a-ln) calc(var(--mo-mk-35) * 100%), transparent));
-  /* [판정판 121 · Task 6 · 사용자 그림 33] 포도 · 소다 · 딸기 전신은 원본 생성 그림부터 아래변에서 발이 잘려 있다(조사 D §1 —
-     아래 줄 불투명 45~47%). 포스터는 바닥에 얹어(center bottom) 그 평평한 절단면이 그대로 보였다 → 아래 12% 를 정적 가림으로
-     흐린다(애니메이트 없음). 발밑 그림자는 위 .nc-foe::before 한 겹(지휘자 판정 Q3). 가림 색은 알파만 쓰이므로 불투명 토큰. */
+}
+/* [판정판 121 · Task 6 · 사용자 그림 33] 포도 · 소다 · 딸기 전신은 원본 생성 그림부터 아래변에서 발이 잘려 있다(조사 D §1 —
+   아래 줄 불투명 45~47%). 포스터는 바닥에 얹어(center bottom) 그 평평한 절단면이 그대로 보였다 → 아래 12% 를 정적 가림으로
+   흐린다(애니메이트 없음). 발밑 그림자는 위 .nc-foe::before 한 겹(지휘자 판정 Q3). 가림 색은 알파만 쓰이므로 불투명 토큰.
+   [수정 2회차] 가림은 **아래가 잘린 그림에만**(data-cut — JS 표 FOE_ART_CUT 하나가 정한다): 박하 · 초코는 발까지 온전해 가림이 발바닥을
+   흐리게 했다. 같은 그림을 크게 세우는 악당 컷인(#cutin-img — 상자 아래 끝 = 그림 아래 끝, contain 높이 맞춤)도 같은 규칙 한 줄. */
+#modal-node .nc-foe-art[data-cut],
+#cutin .cutin-img[data-cut] {
   -webkit-mask-image: linear-gradient(to top, transparent, var(--prim-ink) 12%);
           mask-image: linear-gradient(to top, transparent, var(--prim-ink) 12%);
 }
