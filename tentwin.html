@@ -28112,6 +28112,8 @@ window.TT_SFX = {
       'drops.gift.h': 'Gift Box',
       'drops.gift.sub': 'On this stage a gift box shows up {p}% of the time. It holds gear {i}% of the time, or a pet or epic gear {x}%.',
       /* [판정판 121 · Task 8a] 획득표 다시 짜기 — drops.gear.sub · drops.gear.avg · drops.tier · drops.note 는 더는 안 읽는다(지우지 않음 · 브리프) */
+      'drops.gift.d': 'It holds gear {i}% of the time, or a pet or epic gear {x}%.',   /* [Task 8a 수정 1회차 A3c] 선물 줄 설명 = drops.gift.sub 둘째 문장 그대로 */
+      'drops.gift.p': '{p}% per round',                                            /* 선물 줄 알약 = 얼마나 자주 */
       'drops.gear.cap': '{r} in 100 fruits · {a} per round',
       'drops.note2': 'Chances are per gear fruit',
       'tile.lv': 'Lv {lv}',   /* 장비 칸(itemTile) 레벨 알약 */
@@ -29567,6 +29569,8 @@ window.TT_SFX = {
       'drops.gift.h': '선물 상자',
       'drops.gift.sub': '이 탄에 들어가면 {p}% 확률로 상자가 나와요. 열면 장비 {i}%, 펫이나 영웅 장비 {x}%예요.',
       /* [판정판 121 · Task 8a] 획득표 다시 짜기 — drops.gear.sub · drops.gear.avg · drops.tier · drops.note 는 더는 안 읽는다(지우지 않음 · 브리프) */
+      'drops.gift.d': '열면 장비 {i}%, 펫이나 영웅 장비 {x}%예요.',   /* [Task 8a 수정 1회차 A3c] 선물 줄 설명 = drops.gift.sub 둘째 문장 그대로 */
+      'drops.gift.p': '들어갈 때마다 {p}%',                          /* 선물 줄 알약 = 얼마나 자주 */
       'drops.gear.cap': '과일 100개 중 {r}개꼴 · 한 판 평균 {a}개',
       'drops.note2': '확률은 장비 과일 하나 기준이에요',
       'tile.lv': 'Lv {lv}',   /* 장비 칸(itemTile) 레벨 알약 */
@@ -49184,14 +49188,15 @@ window.TT_SFX = {
         li.className = 'nc-drop';
         li.setAttribute('data-item', r.id);
         li.setAttribute('data-tier', r.tier);
-        var ic = document.createElement('i'); ic.className = 'nc-ic'; ic.setAttribute('aria-hidden', 'true');
-        ic.style.setProperty('background-image', itemArtCss(r.id, 64)); li.appendChild(ic);
-        /* 등급 배지 = 기존 drops.tier.* (지휘자 판정 1-⑥) — 목업처럼 일반 칸에는 없다. */
-        if (r.tier !== 'common') { var tb = document.createElement('i'); tb.className = 'nc-tier'; tb.textContent = t('drops.tier.' + r.tier); li.appendChild(tb); }
+        /* [Task 8a 수정 1회차 B5] 칸 = 장비 칸 itemTile(기준 §7 「장비가 보이는 곳은 전부 이 칸 하나」 — 「전체 ›」 로 넘어간 획득표와 같은 칸).
+           등급은 칸 색 · 레벨은 칸의 Lv 알약. 옛 「희귀」 모서리 리본(.nc-tier) · 어두운 Lv 띠(.nc-lv) · 등급색 % 는 은퇴. */
+        var lv = own[r.id] | 0;
+        /* 낭독: 칸이 aria-hidden 이라 옛 리본 · Lv 띠가 읽어 주던 등급 · 레벨을 칸 라벨로 — 획득표 칸과 같은 키 조합(이름 · 등급 · 스탯 · (Lv) · 확률) */
+        li.setAttribute('aria-label', t('item.' + r.id + '.nm') + ', ' + t('drops.tier.' + r.tier) + ', ' + t('stat.k' + (STAT_KEYS.indexOf(r.stat) + 1))
+          + (lv > 0 ? ', ' + t('drops.lv', { lv: lv, max: ITEM_LV_MAX }) : '') + ', ' + t('drops.chance', { p: pctTxt(r.p) }));
+        li.appendChild(itemTile(r.id, { tier: r.tier, lv: lv, size: 64 }));
         var pc = document.createElement('b'); pc.className = 'nc-p'; pc.textContent = pctTxt(r.p) + '%'; li.appendChild(pc);
         var nm = document.createElement('span'); nm.className = 'nc-nm'; nm.textContent = t('item.' + r.id + '.nm'); li.appendChild(nm);
-        var lv = own[r.id] | 0;
-        if (lv > 0) { var lvb = document.createElement('i'); lvb.className = 'nc-lv'; lvb.textContent = t('node.lv', { lv: lv }); li.appendChild(lvb); }
         list.appendChild(li);
       });
     }
@@ -50143,33 +50148,54 @@ window.TT_SFX = {
 
   /* [판정판 121 · Task 8a] 장비 칸(등급 칸) 한 벌 — 하나의 게임 UI 기준 §7. 장비가 보이는 곳(획득표 · 장비 칸 · 가방 · 설명 카드 · 상점 장비 카드 ·
      뽑기 결과)은 전부 이 칸 하나다(8b 캐릭터 창 · 8c 상점이 이 이름 · 인자 · 상태 그대로 쓴다). 모양 · 색은 <style id="itile-8a"> 한 곳.
-       itemTile(id, o) → <span class="itile" aria-hidden="true" data-tier="common|rare|epic|none" data-state="own|eq|empty" data-slot="weapon|aux|trinket">
-         자식 i.itile-art(그림 = itemArtCss(id, o.size)) · (o.lv > 0) b.itile-lv(「Lv N」 tile.lv) · (o.eq) i.itile-eq(✓)
-       o.size  그림 파일 64 · 96 · 256 — 칸이 화면에 그려지는 크기보다 크거나 같은 것(그 밖 값 = 96)
+       itemTile(id, o) → <span class="itile" aria-hidden="true" data-tier="common|rare|epic|none" data-state="own|eq|empty|neutral" data-slot="weapon|aux|trinket">
+         자식 i.itile-art(그림) · (o.lv > 0) b.itile-lv(「Lv N」 tile.lv) · (o.eq) i.itile-eq(✓)
+       상태 넷(수정 1회차 A3a 계약):
+         own     보유 장비(기본)                 · 등급 = o.tier 또는 그 장비 등급 · data-slot = 그 장비 부위
+         eq      장착 장비(o.eq) — ✓ 표          · 〃
+         empty   빈 칸(o.empty) — data-tier none · 그림 = 그 부위 대표 그림(weapon flamescepter · aux puddingcharm · trinket windribbon)의 실루엣(CSS)
+                 부위 = o.slot 또는 id 의 부위. (중간 확인 판정 3 · 수정 1회차 B3 — flint(둥근 돌) · softcushion · turtleshield(동그라미)는 그 부위로 안 읽혔다)
+         neutral 중립 칸(o.art = 장비가 아닌 그림의 URL 문자열 — 사용 과일 메달 · 선물 상자 · 8b 펫 칸) — data-tier none · data-slot 없음 · 실루엣 아님
+       o.size  장비 그림 1x 파일 64 · 96 · 256 — 칸이 화면에 그려지는 크기보다 크거나 같은 것(그 밖 값 = 96). 2x = @256 파일(수정 1회차 B2 — itileArtSet)
        o.tier  등급(기본 = 그 장비의 등급, 장비가 없으면 none) · o.slot 부위(기본 = 그 장비의 부위)
-       o.lv    보유 레벨(0 이면 알약 없음) · o.eq 장착 표
-       o.empty 빈 칸 — data-state empty · data-tier none · 그림 = 그 부위 대표 그림(weapon flamescepter · aux turtleshield · trinket windribbon)의 실루엣(CSS)
-               (중간 확인 판정 3 — 종전 무기 flint(둥근 돌) · 보조 softcushion 은 그 부위로 안 읽혔다. 8b 가 이 매핑 그대로 쓴다)
+       o.lv    보유 레벨(0 이면 알약 없음) · o.eq 장착 표(빈 칸에는 둘 다 안 붙는다)
      칸은 그림 · 레벨 · 표만 가진다 — 이름 · 확률 · 단추 같은 글은 칸 밖 소비처가 둔다. 누르는 칸이 필요하면 소비처가 <button> 안에 넣고 라벨을 붙인다.
+     칸 폭은 소비처가 준다 · cqw 를 모르는 엔진을 위해 소비처가 칸 폭 길이 --it-w 도 준다(<style id="itile-8a"> 끝 대체 블록).
      고른 칸 = 칸의 [data-sel] 또는 감싼 요소의 [aria-selected="true"](CSS — 밝은 테 + 위 ▼). */
-  var ITILE_EMPTY_ART = { weapon: 'flamescepter', aux: 'turtleshield', trinket: 'windribbon' };
+  var ITILE_EMPTY_ART = { weapon: 'flamescepter', aux: 'puddingcharm', trinket: 'windribbon' };
+  /** 장비 칸 그림 — 1x = size 파일 · 2x = @256 파일(size 256 이면 한 장). 보통 url → -webkit-image-set → image-set 순으로 넣어 엔진이 받는 마지막 값만 남는다
+   *  (받지 못하는 값은 style 대입이 무시돼 앞 값이 남는다). 다른 소비처의 itemArtCss 는 무변 — 이 칸 안에서만(수정 1회차 B2). */
+  function itileArtSet(el, id, size) {
+    var u1 = itemArtUrl(id, size);
+    if (!u1) return;
+    el.style.backgroundImage = 'url("' + u1 + '")';
+    var u2 = size === 256 ? '' : itemArtUrl(id, 256);
+    if (!u2 || u2 === u1) return;
+    var set = 'url("' + u1 + '") 1x, url("' + u2 + '") 2x';
+    el.style.backgroundImage = '-webkit-image-set(' + set + ')';
+    el.style.backgroundImage = 'image-set(' + set + ')';
+  }
   function itemTile(id, o) {
     o = o || {};
-    var it = id ? itemById(id) : null;
-    var slot = o.slot || (it ? it.slot : '');
     var empty = !!o.empty;
+    var neutral = !empty && !!o.art;
+    var it = (id && !neutral) ? itemById(id) : null;
+    var slot = neutral ? '' : (o.slot || (it ? it.slot : ''));
     var lv = o.lv | 0;
     var size = (o.size === 64 || o.size === 256) ? o.size : 96;
     var el = document.createElement('span');
     el.className = 'itile';
     el.setAttribute('aria-hidden', 'true');
-    el.setAttribute('data-tier', empty ? 'none' : (o.tier || (it ? it.tier : 'none')));
-    el.setAttribute('data-state', empty ? 'empty' : (o.eq ? 'eq' : 'own'));
+    el.setAttribute('data-tier', (empty || neutral) ? 'none' : (o.tier || (it ? it.tier : 'none')));
+    el.setAttribute('data-state', empty ? 'empty' : (neutral ? 'neutral' : (o.eq ? 'eq' : 'own')));
     if (slot) el.setAttribute('data-slot', slot);
     var art = document.createElement('i');
     art.className = 'itile-art';
-    var artId = empty ? (ITILE_EMPTY_ART[slot] || '') : id;
-    if (artId) art.style.setProperty('background-image', itemArtCss(artId, size));
+    if (neutral) art.style.backgroundImage = 'url("' + o.art + '")';
+    else {
+      var artId = empty ? (ITILE_EMPTY_ART[slot] || '') : id;
+      if (artId) itileArtSet(art, artId, size);
+    }
     el.appendChild(art);
     if (!empty && lv > 0) {
       var b = document.createElement('b');
@@ -50634,8 +50660,8 @@ window.TT_SFX = {
        awk  각성 과일 → d.me.sp = 만땅      → #btn-hint(「각성」)         = medal-special-v3-90(규칙 창 skills.s2 짝)
        gift 선물 상자 → lib-glyph-giftbox(지휘자 판정)
      경로는 리터럴 그대로(catalog-allowlist 가 코드 안 리터럴만 찾는다 — ITEM_ART 주석과 같은 이유). */
-  var DROPS_USE_ART = { pet: 'url("catalog/medal-pet-v3-90.webp")', star: 'url("catalog/medal-awaken-v3-90.webp")',
-                        awk: 'url("catalog/medal-special-v3-90.webp")', gift: 'url("catalog/lib-glyph-giftbox.webp")' };
+  var DROPS_USE_ART = { pet: 'catalog/medal-pet-v3-90.webp', star: 'catalog/medal-awaken-v3-90.webp',
+                        awk: 'catalog/medal-special-v3-90.webp', gift: 'catalog/lib-glyph-giftbox.webp' };   /* 중립 칸 그림(itemTile o.art) */
   /** 획득표 탭 하나를 고른다 — 고른 탭 = 톤 면(변주 없음) · 나머지 = soft(상점 shopPaint 와 같은 손잡이), 그 절만 보인다(hidden). */
   function dropsTab(which) {
     var tabs = document.querySelectorAll('#modal-drops .dr-tab');
@@ -50655,10 +50681,7 @@ window.TT_SFX = {
     var li = document.createElement('li');
     li.className = 'dr-urow';
     li.setAttribute('data-use', key);
-    var tile = itemTile('', { tier: 'none' });
-    var art = tile.querySelector('.itile-art');
-    if (art) art.style.setProperty('background-image', DROPS_USE_ART[key]);
-    li.appendChild(tile);
+    li.appendChild(itemTile(null, { art: DROPS_USE_ART[key] }));   /* 중립 칸(data-state neutral · 수정 1회차 A3a — 소비처가 그림 배경을 덮어쓰던 길은 은퇴) */
     var bx = document.createElement('span'); bx.className = 'dr-ub';
     var b = document.createElement('b'); b.className = 'dr-un'; b.textContent = name; bx.appendChild(b);
     var s = document.createElement('span'); s.className = 'dr-ud'; s.textContent = desc; bx.appendChild(s);   /* 제목 + 문장 — 콜론 공식 금지(점검 W1) */
@@ -50714,8 +50737,9 @@ window.TT_SFX = {
         use.appendChild(dropsUseRow(k, t('drops.use.' + k), t('drops.use.' + k + '.d'), t('drops.use.p', { x: pctTxt(d.use[k]) })));
       });
       if (d.gift) {
-        var gr = dropsUseRow('gift', t('drops.gift.h'), t('drops.gift.sub', { p: pctTxt(d.gift.stageP), i: pctTxt(d.gift.item), x: pctTxt(d.gift.rare) }),
-                             t('drops.chance', { p: pctTxt(d.gift.stageP) }));
+        /* [수정 1회차 A3c] 다른 사용 과일 줄처럼 설명 = 무엇인지(상자 안 내용 — drops.gift.d) · 알약 = 얼마나 자주(drops.gift.p) — 같은 수가 두 번 나오던 것을 나눴다. drops.gift.sub 는 안 읽는다(지우지 않음). */
+        var gr = dropsUseRow('gift', t('drops.gift.h'), t('drops.gift.d', { i: pctTxt(d.gift.item), x: pctTxt(d.gift.rare) }),
+                             t('drops.gift.p', { p: pctTxt(d.gift.stageP) }));
         gr.id = 'dr-gift';
         var gs = gr.querySelector('.dr-ud'); if (gs) gs.id = 'dr-gift-sub';
         use.appendChild(gr);
@@ -54867,6 +54891,9 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
    다른 층 · 젤리판 v1.0 층 구조는 그대로, 바뀌는 것은 이 한 손잡이다(지휘자 판정 Q2 (b)). 전투 가로 카드 별칭(#pc-left · #pc-right · #duel-foe-box ·
    #duel-me-box)과 방(상점 판 · 캐릭창)은 .modal 밖이라 무변. 특이성 (0,2,0) 이 위 등급 규칙 (0,1,0) 을 이긴다. */
 .modal :is(.jbox--modal, [data-part="modal-plate"]){ --jbox-a-in: var(--mode-a-alpha-win); }
+/* [Task 8a 수정 1회차 A6 · 지휘자 판정] 결과 창 판 위 둘째 글자(등급 한 줄 .grade-note — 무한 클리어 「아주 좋아요.」)도 잉크 하나 — 옅은 잉크(#736A85)는 .90 판 위 3.62.
+   위계는 크기 · 굵기로 둔다(획득표 B4 와 같은 처리). 창 판 위에서만(.modal) — 두 테마 같은 값. */
+.modal .grade-note { color: var(--prim-art-ink); }
 /* [T11-0926] 모달 판 몸통 — 캐릭터 선택 판 덮개(.cp-jelly)의 층을 의사요소 두 장에 나눠 담았다(캐릭판과 같은 층 순서).
    ::before(아래) 배경 4층(위→아래): 광택 1 · 광택 2 · 유백(L2-0) · 면(L1, face-top→face @ a-in).
                   inset 그림자 3겹(위→아래): 림 2차(p2) · 림 3차(p3) · 테두리 색 띠(L1.5).
@@ -70450,6 +70477,21 @@ html[lang="ko"] #modal-quest .qs-tab[data-qtab="epic"] .cpt-lab{
 .kd-tag[data-tone="orange"]{ --kd-tag-a: var(--role-orange-face-b); --kd-tag-b: var(--role-orange-contact); --kd-tag-ink: var(--role-orange-outline); }
 .kd-tag[data-tone="pink"]  { --kd-tag-a: var(--role-pink-contact);   --kd-tag-b: var(--role-pink-outline);   --kd-tag-ink: var(--role-pink-outline); }
 .kd-tag[data-tone="blue"]  { --kd-tag-a: var(--role-blue-contact);   --kd-tag-b: var(--role-blue-outline);   --kd-tag-ink: var(--role-blue-outline); }
+/* ---- 알약 탭 상태 = 부품 한 곳(하나의 게임 UI 기준 §5 · [Task 8a 수정 1회차 M3] — 종전에는 상점 #sh-tabs 규칙 목록에 기대 살았다) ----
+   알약 탭 = .kd-tag.kit-pill-v2[role="tab"]. 소비처(상점 아래 탭 #sh-tabs · 획득표 탭 #modal-drops .dr-tabs · 8c · 8d)는 크기(--f2-ph · 글자 · 안여백 · 반지름)만 준다.
+   고른 탭(aria-selected="true") = 톤 면 + 정적 밝은 테(kit-chip-v2[data-active] 의 테 · 후광 레시피 — 캡슐 높이 비례 · 움직임 0),
+   나머지 = kit-pill-v2[data-variant="soft"](크림 면 · 잉크 글자) — soft 의 999em 반경 · 0 테두리 대신 같은 굵기 투명 테두리로 바깥 상자 크기를 고른 탭과 맞춘다.
+   값 · 선언은 상점 블록에서 옮겨 온 그대로(새 원시값 0 · 상점 탭 겉모습 무변). */
+.kd-tag.kit-pill-v2[role="tab"] > * { position: relative; z-index: 1; }   /* 판 질감층(::before · ::after) 위 — kd-tag b 와 같은 처방 */
+.kd-tag.kit-pill-v2[role="tab"][aria-selected="true"] {
+  box-shadow:
+    0 0 0 calc(var(--f2-ph) * .020) var(--f2-hi),
+    0 0 calc(var(--f2-ph) * .103) calc(var(--f2-ph) * .022) var(--role-f2-hi-halo),
+    0 0 var(--f2-soft-blur) var(--f2-soft-spread) color-mix(in srgb, var(--f2-pill-line) 66%, transparent),
+    0 0 var(--f2-soft-tail) 0 color-mix(in srgb, var(--f2-pill-line) 20%, transparent),
+    0 calc(var(--f2-ph) * .05) calc(var(--f2-ph) * .12) var(--role-f2-cast);
+}
+.kd-tag.kit-pill-v2[role="tab"][data-variant="soft"] { height: var(--f2-ph); border: calc(var(--f2-ph) * .027) solid transparent; color: var(--f2-ink); text-shadow: none; }
 /* T14 I-3 — 미션 이름표 배지. `.badge-new`(§2866) 그대로, 색만 이 알약 자기
    잉크(--kd-tag-ink, mint 톤)로 — 원래 값(--m-logo-2/--m-chip-line)은 메뉴
    화면 전용 톤이라 이 알약 위에서는 안 어울린다. 자리는 부모 flex의 gap이
@@ -70932,7 +70974,7 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
 /* ===== [판정판 121 · Task 8a] 획득표 다시 짜기 — 하나의 게임 UI 기준 §3 판 M · §5 알약 탭 · §7 장비 칸 · §9 글자 · §10 격자 =====
    사용자(원문): 「이 획득표 디자인구성들도 진짜 초등학생이만든수준 … 고급지고 일관성있게」. 옛 짜임(노드 카드 .node-info 분홍 줄 목록 · 보석 깎은 칸
    .cp-crystal · 분홍 작은 메타 줄 · 이모지 글리프)은 은퇴 — 이 모달 몫 선택자를 그 공용 목록들에서 뺐다.
-   부품: 판 = .jbox--modal 그대로 · 탭 = .kd-tag.kit-pill-v2(상점 아래 탭과 같은 판 — 고른 탭 테 · soft 테두리는 상점 규칙 목록에 이 모달을 더했다) ·
+   부품: 판 = .jbox--modal 그대로 · 탭 = .kd-tag.kit-pill-v2[role="tab"](상점 아래 탭과 같은 판 — 고른 탭 테 · soft 테두리 = 부품 규칙 「알약 탭 상태」 [수정 1회차 M3]) ·
          장비 칸 = itemTile(.itile) · 등급 칩 = .tchip(둘 다 <style id="itile-8a">) · 사용 과일 확률 = kit-pill-v2[data-variant="soft"].
    자 하나 --dr-u = 판 기준 폭의 1%(세로 = --f2-w / 100, 가로 = 6.2u — 「가로 창 한 무리」 절) — 지휘자 판정 Q6 값. 글자는 전부 max(--text-min, N × --dr-u).
    격자 간격 = 판 안 폭의 3%: 절(.dr-sec)이 inline-size 컨테이너라 3cqw = 절 폭(= 판 안 폭)의 3%. 새 원시값 0 · 움직임 0. */
@@ -70975,7 +71017,7 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
 }
 #modal-drops .dr-sec[hidden] { display: none; }
 
-/* 한 줄 설명 · 맨 아래 한 줄 = 보조(옅은 잉크) · 가운데 */
+/* 한 줄 설명 · 맨 아래 한 줄 = 보조 · 가운데. [수정 1회차 B4] 글자색 = --prim-art-ink — 옅은 잉크(--role-f2-ink)는 판 위 대비 3.99~4.41(< 4.5, smoke-windows B4 실측 4크기) */
 #modal-drops .dr-cap,
 #modal-drops .dr-note {
   margin: 0;
@@ -70983,7 +71025,7 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
   font-size: max(var(--text-min), calc(var(--dr-u) * 3));
   font-weight: 500;
   line-height: 1.35;
-  color: var(--role-f2-ink);
+  color: var(--prim-art-ink);
 }
 /* 등급 칩 셋 — 한 줄 가운데. 칩 글자 크기(라벨)는 여기서 주고 값은 칩 부품이 1.4배로 키운다. */
 #modal-drops .dr-chips {
@@ -71019,6 +71061,7 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 3cqw;
+  --it-w: calc(var(--dr-u) * 16);   /* [수정 1회차 A1] cqw 대체용 칸 폭 — 세로 4열 칸 ≈ 16 --dr-u(390 실측 61px ÷ 3.73 · 360 55px ÷ 3.45). cqw 엔진에서는 안 읽힌다 */
 }
 #modal-drops .dr-cell {
   display: flex;
@@ -71067,7 +71110,7 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
   background-color: var(--role-f2-pill);
   color: var(--prim-art-ink);
 }
-#modal-drops .dr-urow > .itile { flex: 0 0 auto; width: calc(var(--dr-u) * 14); }
+#modal-drops .dr-urow > .itile { flex: 0 0 auto; width: calc(var(--dr-u) * 14); --it-w: calc(var(--dr-u) * 14); }   /* --it-w = cqw 대체용 칸 폭(수정 1회차 A1) */
 #modal-drops .dr-ub {
   flex: 1 1 auto;
   min-width: 0;
@@ -71233,7 +71276,7 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
   margin-top: calc(var(--nc-u) * -6);         /* 목업 .who 안 간격 3 = 칸 간격 9 − 6 */
   font-family: var(--font-display); font-weight: 400;
   font-size: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 22)); line-height: 1;
-  color: var(--role-score-fill-c);
+  color: var(--prim-art-ink);   /* [Task 8a 수정 1회차 A2] 카드 제목 = 굵은 잉크(기준 §9 — 색 글자는 칩 · 리본 안에서만). 굵기 무변. 옛 값 --role-score-fill-c */
 }
 /* HP 막대 = 전투 HUD 악당 막대와 같은 색(--role-foe-track · --role-foe-fill-a~d, HUD 의 정지점 그대로) + 뼈 장식 */
 #modal-node .nc-hp {
@@ -71367,7 +71410,7 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
   padding-left: calc(var(--nc-u) * 4);
   font-family: var(--font-display); font-weight: 400;
   font-size: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 16)); line-height: 1;
-  color: var(--role-score-fill-c);
+  color: var(--prim-art-ink);   /* [Task 8a 수정 1회차 A2] 구획 제목 = 굵은 잉크(기준 §9). 굵기 무변. 옛 값 --role-score-fill-c */
 }
 #modal-node .nc-h::before {
   content: ""; flex: 0 0 auto;
@@ -71397,80 +71440,23 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
   font-size: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 11)); font-weight: 500; line-height: 1.3;
   color: var(--role-f2-ink);
 }
-/* 칸 = 등급 액자(li::before) 위에 그림(.nc-ic — 인라인 itemArtCss) · 배지(.nc-tier · .nc-lv) · 반짝이(li::after). 등급 3색 = 기존 보상 토큰. */
+/* [Task 8a 수정 1회차 B5] 칸 = 장비 칸 itemTile(<style id="itile-8a"> — 획득표와 같은 칸 · 등급 = 칸 색 · Lv = 칸 알약). 옛 등급 액자(li::before) · 그림(.nc-ic) ·
+   배지(.nc-tier 「희귀」 리본 · .nc-lv 어두운 Lv 띠) · 반짝이(li::after) · 등급색 % 는 은퇴(아래 옛 규칙 자리에 은퇴 주석).
+   칸 크기 = 열 폭(줄 = 칸 넷 + 「전체 ›」 · 4열 · 틈 8nu → 약 56nu) — 판 정보 판(가로 360u · 세로 360px) 안에 넷이 들고, 글자 하한 11px 의 Lv 알약이
+   칸 폭 안 · 칸 아래 1/3 안에 든다(smoke-drops b5 실측 — 가장 작은 821x462 에서 칸 34px). 작은 화면(≤ 760) 칸 축소(46nu)는 은퇴 — 그 크기는 하한 Lv 알약이 안 든다. */
 #modal-node .nc-drop {
-  --nc-fr: calc(var(--nc-u) * 64);
-  --nc-t1: var(--role-rw-shard-steady-1); --nc-t2: var(--role-rw-shard-steady-2); --nc-t3: var(--role-rw-shard-steady-3);
-  position: relative; isolation: isolate;
   display: flex; flex-direction: column; align-items: center; gap: calc(var(--nc-u) * 4);
   min-width: 0;
 }
-#modal-node .nc-drop[data-tier="rare"] { --nc-t1: var(--role-rw-shard-agility-1); --nc-t2: var(--role-rw-shard-agility-2); --nc-t3: var(--role-rw-shard-agility-3); }
-#modal-node .nc-drop[data-tier="epic"] { --nc-t1: var(--role-rw-item-1); --nc-t2: var(--role-rw-item-2); --nc-t3: var(--role-rw-item-3); }
-#modal-node .nc-drop::before {
-  content: ""; position: absolute; z-index: 0;
-  top: 0; left: calc(50% - var(--nc-fr) / 2);
-  width: var(--nc-fr); height: var(--nc-fr);
-  border-radius: calc(var(--nc-fr) * .2656);
-  background:
-    radial-gradient(closest-side, var(--role-menu-chip-hi-light), transparent) calc(var(--nc-fr) * .1406) calc(var(--nc-fr) * .1094) / calc(var(--nc-fr) * .25) calc(var(--nc-fr) * .125) no-repeat,
-    radial-gradient(circle at 50% 40%, var(--prim-white) 0%, var(--nc-t1) 46%, var(--nc-t2) 100%);
-  box-shadow:
-    inset 0 0 0 calc(var(--nc-fr) * .039) var(--nc-t3),
-    inset 0 0 0 calc(var(--nc-fr) * .0625) var(--role-me-orn-fb),
-    inset 0 calc(var(--nc-fr) * -.094) calc(var(--nc-fr) * .125) var(--prim-black-a07),
-    0 calc(var(--nc-fr) * .047) 0 color-mix(in srgb, var(--nc-t3) calc(var(--mo-mk-70) * 100%), var(--prim-art-ink)),
-    0 calc(var(--nc-fr) * .078) calc(var(--nc-fr) * .125) color-mix(in srgb, var(--mode-a-outline) calc(var(--mo-mk-35) * 100%), transparent);
-}
-#modal-node .nc-ic {
-  position: relative; z-index: 1; flex: 0 0 auto;
-  display: block; box-sizing: border-box;
-  width: var(--nc-fr); height: var(--nc-fr);
-  padding: calc(var(--nc-fr) * .125);
-  background-origin: content-box; background-position: center; background-size: contain; background-repeat: no-repeat;
-  filter: drop-shadow(0 calc(var(--nc-u) * 1) 0 var(--prim-white-a90)) drop-shadow(0 calc(var(--nc-u) * 2) calc(var(--nc-u) * 2) color-mix(in srgb, var(--role-f2-line) calc(var(--mo-mk-55) * 100%), transparent));
-}
-#modal-node .nc-tier,
-#modal-node .nc-lv {
-  position: absolute; z-index: 2;
-  display: inline-flex; align-items: center;
-  height: calc(var(--nc-u) * 17);
-  border-radius: calc(var(--nc-u) * 6);
-  font-style: normal; line-height: 1; white-space: nowrap;
-  color: var(--prim-white);
-}
-#modal-node .nc-tier {
-  left: calc(50% - var(--nc-fr) / 2 - var(--nc-u) * 3); top: calc(var(--nc-u) * -6);
-  padding: 0 calc(var(--nc-u) * 6);
-  font-size: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 10.5)); font-weight: 700; letter-spacing: -.02em;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--nc-t3) calc(var(--mo-mk-80) * 100%), var(--prim-white)), var(--nc-t3));
-  box-shadow: inset 0 calc(var(--nc-u) * -2) 0 var(--prim-line-light), 0 calc(var(--nc-u) * 1) calc(var(--nc-u) * 2) color-mix(in srgb, var(--role-f2-line) calc(var(--mo-mk-45) * 100%), transparent);
-}
-#modal-node .nc-lv {
-  /* 시안 .frame .lv 자리(수정 1회차 I3): 액자 오른쪽 4 · 아래 5 걸침. 글자 = node.lv 「Lv{lv}」(시안 「Lv2」) */
-  right: calc(50% - var(--nc-fr) / 2 - var(--nc-u) * 4); top: calc(var(--nc-fr) - var(--nc-u) * 12);
-  padding: 0 calc(var(--nc-u) * 5);
-  font-family: var(--font-display); font-weight: 400; font-size: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 11.5));
-  background: linear-gradient(180deg, var(--role-menu-logo-2-light), var(--mode-a-outline-chip));
-  box-shadow: 0 calc(var(--nc-u) * 1) calc(var(--nc-u) * 2) color-mix(in srgb, var(--role-f2-line) calc(var(--mo-mk-55) * 100%), transparent);
-}
-#modal-node .nc-drop[data-tier="rare"]::after,
-#modal-node .nc-drop[data-tier="epic"]::after {   /* 희귀 이상 반짝이(목업 .shine — 정지) */
-  content: ""; position: absolute; z-index: 2;
-  top: calc(var(--nc-u) * 5); right: calc(50% - var(--nc-fr) / 2 + var(--nc-u) * 4);
-  width: calc(var(--nc-u) * 13); height: calc(var(--nc-u) * 13);
-  background:
-    linear-gradient(90deg, transparent 44%, var(--prim-white) 44% 56%, transparent 56%),
-    linear-gradient(0deg, transparent 44%, var(--prim-white) 44% 56%, transparent 56%);
-  clip-path: polygon(50% 0, 58% 42%, 100% 50%, 58% 58%, 50% 100%, 42% 58%, 0 50%, 42% 42%);
-  filter: drop-shadow(0 0 calc(var(--nc-u) * 2) var(--prim-white-a90));
-}
+#modal-node .nc-drop-list { --it-w: calc(var(--nc-u) * 56); }   /* cqw 대체용 칸 폭(itile-8a 끝 블록) */
+#modal-node .nc-drop > .itile { width: 100%; margin-bottom: 6%; }   /* Lv 알약이 칸 아래로 칸 폭의 6% 걸치는 몫 */
+/* 은퇴(수정 1회차 B5): .nc-drop[data-tier] 색 변수(--nc-t1~3) · .nc-drop::before 등급 액자 · .nc-ic 그림 상자 · .nc-tier 「희귀」 모서리 리본 · .nc-lv 어두운 Lv 띠(node.lv) ·
+   .nc-drop::after 희귀 이상 반짝이 · 희귀 % 파랑(--role-blue-contact). 칸 · 등급 · Lv 는 itemTile 이 그린다. */
+/* % = 칸 아래 잉크 글자 — 획득표 .dr-p 와 같은 색 · 굵기(본문 글꼴 800 · --prim-art-ink). 크기는 판 정보 자(15nu · 하한 스위치) 그대로. */
 #modal-node .nc-p {
-  position: relative; z-index: 1;
-  font-family: var(--font-display); font-weight: 400; font-size: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 15)); line-height: 1;
+  font-weight: 800; font-size: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 15)); line-height: 1.2;
   color: var(--prim-art-ink);
 }
-#modal-node .nc-drop[data-tier="rare"] .nc-p { color: var(--role-blue-contact); }
 #modal-node .nc-nm {
   max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   font-size: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 11)); font-weight: 600; line-height: 1.1;
@@ -71528,8 +71514,7 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
   #modal-node .nc-foe-art { width: calc(var(--nc-u) * 114); height: calc(var(--nc-u) * 126); bottom: calc(var(--nc-u) * 8); }
   #modal-node .nc-foe-body { left: calc(var(--nc-u) * 116); top: calc(var(--nc-u) * 8); gap: calc(var(--nc-u) * 5); }
   #modal-node .nc-foe-name { margin-top: calc(var(--nc-u) * -2); }
-  #modal-node .nc-drop { --nc-fr: calc(var(--nc-u) * 46); }
-  #modal-node .nc-nm { display: none; }
+  #modal-node .nc-nm { display: none; }   /* [Task 8a 수정 1회차 B5] 칸 축소(--nc-fr 46nu)는 은퇴 — 칸 = 열 폭 itemTile(하한 11px Lv 알약이 46nu 칸에는 안 든다) */
   #modal-node .nc-note { display: none; }
 }
 </style>
@@ -71639,20 +71624,9 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
 #sh-tabs .sh-tab.kit-pill-v2{ --f2-ph: 15.4cqw; position: relative; flex: 1 1 0; min-width: 0; width: auto; max-width: none; height: var(--f2-ph); margin: 0;
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .3cqw; border-radius: calc(var(--f2-ph) * .232);
   padding: 0 0 calc(var(--f2-ph) * .08); font-size: 3.6cqw; cursor: pointer; -webkit-tap-highlight-color: transparent; }
-#sh-tabs .sh-tab > *,
-#modal-drops .dr-tab > *{ position: relative; z-index: 1; }   /* 판 질감층(::before · ::after) 위 — kd-tag b 와 같은 처방 · [Task 8a] 획득표 알약 탭도 같은 탭 판 */
+/* [Task 8a 수정 1회차 M3] 탭 상태(자식 z-index · 고른 탭 테 · 후광 · soft 투명 테두리)는 부품 선택자 한 곳(kingdom 블록 「알약 탭 상태」 — .kd-tag.kit-pill-v2[role="tab"])으로 올렸다.
+   여기는 상점 탭의 크기 · 자리만 남는다(겉모습 무변 — smoke-p3-t4/t5/t7 · 상점 탭 전/후 캡처). */
 #sh-tabs .sh-tab > [data-i18n]{ max-width: 100%; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-#sh-tabs .sh-tab[aria-selected="true"],
-#modal-drops .dr-tab[aria-selected="true"]{   /* [Task 8a] 획득표 알약 탭 = 같은 고른 탭 테 · 후광(기준 §5 — 한 탭 부품) */
-  box-shadow:
-    0 0 0 calc(var(--f2-ph) * .020) var(--f2-hi),
-    0 0 calc(var(--f2-ph) * .103) calc(var(--f2-ph) * .022) var(--role-f2-hi-halo),
-    0 0 var(--f2-soft-blur) var(--f2-soft-spread) color-mix(in srgb, var(--f2-pill-line) 66%, transparent),
-    0 0 var(--f2-soft-tail) 0 color-mix(in srgb, var(--f2-pill-line) 20%, transparent),
-    0 calc(var(--f2-ph) * .05) calc(var(--f2-ph) * .12) var(--role-f2-cast);
-}
-#sh-tabs .sh-tab[data-variant="soft"],
-#modal-drops .dr-tab[data-variant="soft"]{ height: var(--f2-ph); border: calc(var(--f2-ph) * .027) solid transparent; color: var(--f2-ink); text-shadow: none; }
 #sh-tabs .sh-tab:active{ transform: translateY(var(--hub-press)); }
 #sh-tabs .sh-tab-ic{ width: 9.2cqw; height: 8.2cqw; background: center / contain no-repeat; }
 #sh-tabs .sh-tab[data-stab="gacha"] .sh-tab-ic{ background-image: url("catalog/slot-ic-item.webp"); }
@@ -71849,7 +71823,8 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
    모달 자(--f2-w)는 폭 700 밑 가로 폰에서 95.7vw 를 따라가 제목 캡슐 · 요약 · 버튼이 폰의 1.5배로 커져 무대가 밀렸다 — 폭 700 이상 창이 이미 쓰는 폰 상한(폰 기준폭 × .957)에 더해 높이로도 한 번 더 누른다(--mu 는 이 자에서 나온다):
    무대 밖 부분은 약 70 mu 라 판 전체 ≈ 76.4 mu + --gres-row 가 창 높이 − 판 위아래 여백 36px − 위아래 안전 영역 안에 들 값 → mu ≤ (창 높이 − 36px − 위아래 안전 영역 − --gres-row) ÷ 76.4, 자 = × 110.8 ÷ 76.4 = × 1.4503.
    수정 1회차(리뷰 I-3): ① 식에 쓰는 길이는 아래 사용자 지정 속성 셋에 한 번씩만 적는다(같은 긴 식이 두 번 있던 것). 이 파일에는 판 폭 · 안여백 · 모달 바깥 여백을 담은 토큰이 없다 — 원래 규칙들이 글자 그대로 쓴다: 380px = 기본 모달 판 `.sheet{ max-width: 380px }` ·
-   36px = 기본 `.modal` 바깥 여백 18px 둘 · 60px = `.w6m .sheet` 좌우 안여백 30px 둘(SECTION 25 ① 판). 같은 값이니 그 규칙이 바뀌면 여기도 따라 바꾼다. ② 폰 기준폭은 토큰 --f2-phone-w 를 읽는다 — 폭 700 이상 데스크톱 미디어가 :root 에 세우는 그 값이고
+   36px = 기본 `.modal` 바깥 여백 18px 둘 · 60px = `.w6m .sheet` 좌우 안여백 30px 둘(SECTION 25 ① 판). 같은 값이니 그 규칙이 바뀌면 여기도 따라 바꾼다
+   ([Task 8a 수정 1회차 M1] 가로에서 `.modal` 위 · 아래가 18u 로 바뀌어 높이 항은 --gres-padv = 36u — 아래 가로 미디어 한 줄. 판 폭 항의 좌우 36px 은 무변). ② 폰 기준폭은 토큰 --f2-phone-w 를 읽는다 — 폭 700 이상 데스크톱 미디어가 :root 에 세우는 그 값이고
    `.modal{ --f2-w: min(95.7vw, calc(var(--f2-phone-w) * .957)) }` 이 읽는 것이다. 그 미디어 밖(폭 700 미만 — 이 블록이 막아야 하는 바로 그 자리)에서는 토큰이 정의되지 않아 같은 값 390px 를 대체값으로 둔다. ③ 뷰포트 높이는 dvh(주소창이 오르내려도 보이는 높이 —
    이 파일의 다른 100dvh 와 같은 관례). 사용자 지정 속성은 단위를 모르는 기기에서 값이 통째로 무효가 되므로 vh 를 먼저 세우고 dvh 를 아는 기기만 @supports 로 덮는다. ④ 미디어 조건 599.98px 은 같은 문턱을 쓰는 기존 규칙과 같은 값이다 — 왕국 절 끝
    `@media (min-aspect-ratio: 1/1) and (max-height: 599.98px)`(가로 폰 캡 · 상한을 599.98px 로 잡은 이유는 그 위 주석) · 상점 가로 폰 --cqw 대체(아래 끝 @supports not 블록) · 이 창의 옛 구르기 문턱 — 변수를 못 쓰는 자리라 리터럴이다.
@@ -71860,11 +71835,14 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
 @media (max-height: 599.98px){
   #modal-gres{
     --gres-vh: 100vh;
+    --gres-padv: 36px;   /* [Task 8a 수정 1회차 M1] 판 위아래 여백 = 기본 .modal 위 · 아래 안여백 18px 둘 — 가로는 아래 줄이 18u 둘로 바꾼다(D10 · gear-121 .modal) */
     --gres-sheet: min(100vw - 36px - var(--safe-l) - var(--safe-r), 380px);
     --gres-row: calc(.29333 * (var(--gres-sheet) - 60px));
-    --f2-w: min(95.7vw, calc(var(--f2-phone-w, 390px) * .957), calc((var(--gres-vh) - 36px - var(--safe-t) - var(--safe-b) - var(--gres-row)) * 1.4503));
+    --f2-w: min(95.7vw, calc(var(--f2-phone-w, 390px) * .957), calc((var(--gres-vh) - var(--gres-padv) - var(--safe-t) - var(--safe-b) - var(--gres-row)) * 1.4503));
   }
   @supports (height: 100dvh){ #modal-gres{ --gres-vh: 100dvh; } }
+  /* 가로(창 가로 ≥ 세로)는 .modal 위 · 아래 안여백이 18u(Task 8a D10)라 높이 항만 36u — 판 폭 항(좌우 안여백 18px 둘)은 무변 */
+  @media (min-aspect-ratio: 1/1){ #modal-gres{ --gres-padv: calc(var(--stage-u) * 36); } }
   /* 안여백 두 줄만 !important — `.w6m .sheet{ padding: 23px 30px 30px !important }`(특정도 0,2,0)가 이미 !important 라서 순서나 특정도만으로는 못 이긴다: 같은 !important 에 더 높은 특정도(#modal-gres .sheet — 1,1,0)로만 이긴다. 줄 간격(row-gap)은 일반 선언이다. */
   #modal-gres .sheet{ padding-top: calc(1.8 * var(--mu)) !important; padding-bottom: calc(2.4 * var(--mu)) !important; row-gap: calc(1.2 * var(--mu)); }
   #modal-gres #gres-stage{ overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; min-height: calc(var(--gres-row) + 6.4 * var(--mu)); }
@@ -72709,7 +72687,7 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
   #modal-gear .sheet,
   #modal-gear-info .sheet {
     max-width: calc(var(--stage-u) * 380);
-    max-height: min(100%, calc(var(--stage-h) + var(--stage-y) * 2 - var(--stage-u) * 36));   /* 창 높이(= 무대 높이 + 위아래 틈 — dvh 대체 포함) − 36u [Task 8a D10] */
+    max-height: 100%;   /* 상한 = .modal 위 · 아래 안여백 18u(Task 8a D10 — 위 .modal 줄) 안 = 창 높이 − 36u − 안전 영역. [수정 1회차 M2] 종전 min(100%, 창 높이 − 36u) 의 둘째 항은 늘 지는 값이라 걷었다 */
     padding: calc(var(--stage-u) * 23) calc(var(--stage-u) * 30) calc(var(--stage-u) * 30) !important;   /* .w6m .sheet 의 !important 를 같은 문법으로 덮는다 */
     gap: calc(var(--stage-u) * 10);
     --f2-w: calc(var(--stage-u) * 390 * .957);     /* 가로 모달 자(.modal --f2-w = 폰 기준폭 390 × .957)를 무대 자로 */
@@ -72747,7 +72725,7 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
     --pw: min(calc(var(--stage-u) * 620), 100%);
     --dr-u: calc(var(--stage-u) * 6.2);
   }
-  #modal-drops .dr-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  #modal-drops .dr-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); --it-w: calc(var(--dr-u) * 14.2); }   /* --it-w = cqw 대체용 칸 폭(가로 5열 칸 ≈ 14.2 --dr-u — 1280 실측 88px ÷ 6.2) */
   /* 가로 이름 = 2.8u(중간 확인 판정 2 — 5열 칸이 판 폭 비로 세로 4열보다 좁아 3.4u 면 영웅 긴 이름이 세 줄이 됐다. ko 19종 두 줄 안 · probe_names 실측) */
   #modal-drops .dr-name { font-size: max(var(--text-min), calc(var(--dr-u) * 2.8)); }
   /* 제목 캡슐 — 「56.84% + 안여백 차 62px(겉선 2 + 안 여백 60) × .5684」 · 「border-top 1 + padding-top 23」 의 안 여백 몫을 무대 자로 */
@@ -72797,7 +72775,10 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
    기준 = docs/superpowers/specs/2026-10-18-one-game-ui-standard.md §7 장비 칸 · §9 글자, 모양 기준 = 우리 게임 문법 상점 시안 「오늘의 장비」 카드의 둥근 네모 칸.
    사용자(원문): 「세상 어떤게임이 아이템 박스를 저따위로만들어」 — 보석 깎은 칸(.cp-crystal · wxtal 모서리 결정 4개)을 대신하는 한 벌.
    소비처: 획득표(8a) → 캐릭터 창 · 장비 창(8b) · 상점 장비 카드 · 뽑기 결과(8c). 이름 · 인자 · 상태 = JS itemTile 주석 그대로.
-   ▣ 자 — 칸 폭 하나. 칸(.itile)이 inline-size 컨테이너라 cqw = 칸 폭의 1% — 테 · 흰 테 · 그림 여백 · 알약 · 표가 칸 크기를 따라간다(px 리터럴 0).
+   ▣ 자 — 칸 폭 하나(px 리터럴 0). 칸은 정사각형이고 position:relative 라 자식의 자리 · 크기 · 안여백 % = 칸 폭 비다(그림 여백 · 알약 자리 · ✓ 원 · ▼).
+     % 로 못 쓰는 것(그림자 고리 두께 · 글자 크기)만 컨테이너 단위 — 칸(.itile)이 inline-size 컨테이너라 cqw = 칸 폭의 1%.
+     [수정 1회차 A1] cqw 를 모르는 엔진(iOS 15 · Chrome 105 아래)은 이 블록 끝 @supports not (width: 1cqw) 가 같은 값을 소비처가 주는 칸 폭 변수 --it-w 로 낸다
+     (소비처마다 --it-w 를 준다: 획득표 격자 · 사용 과일 줄 · 판 정보 미리보기 줄 · 시험 시트).
      칸 폭은 소비처가 준다(격자 칸 폭 · 줄의 고정 폭) — 컨테이너는 내용으로 폭이 서지 않는다.
    ▣ 층 — ::before = 면(등급 -1) + 테(등급 -3 · 칸 폭 3.5%) + 안쪽 흰 테(2.5%) + 아래 정적 그림자 하나 · 모서리 22% /
      .itile-art = 그림(안쪽 11% 여백 = 약 78% · contain) / .itile-lv = 아래 가운데 칸 밖 6% 걸친 레벨 알약 / .itile-eq = 오른쪽 위 ✓ 원 /
@@ -72806,9 +72787,13 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
      none(빈 칸 · 중립 칸) = 크림 카드 면 --role-f2-pill + 옅은 잉크 테(--prim-art-ink 와 투명의 반반 color-mix — 토큰 + 키워드만).
      흰 = --prim-white · 그림자 = --role-f2-cast(알약 접지와 같은 토큰) · ▼ = --role-f2-hi(금빛 강조 림 토큰). 새 원시값 0(알파 둘은 이 부품의 변수).
    ▣ 움직임 0 — 빈 칸 실루엣(brightness(0) · 옅게)도 정적이다. */
-.itile {
+/* none 기본 면 · 테(빈 칸 · 중립 칸 · 등급 없는 칩) — [수정 1회차 M4] 칩에도 같은 기본(없으면 data-tier 없는 칩의 테 · 면이 계산값 무효로 사라진다) */
+.itile,
+.tchip {
   --it-face: var(--role-f2-pill);
   --it-line: color-mix(in srgb, var(--prim-art-ink), transparent);
+}
+.itile {
   --itile-sil-a: .18;               /* 빈 칸 실루엣 불투명도(브리프 값) */
   container-type: inline-size;
   position: relative;
@@ -72840,7 +72825,7 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
 }
 .itile-art {
   position: absolute;
-  inset: 11cqw;
+  inset: 11%;                       /* 정사각 칸이라 위 · 아래 % (높이 비) = 좌 · 우 % (폭 비) */
   z-index: 1;
   background-position: center;
   background-size: contain;
@@ -72852,9 +72837,9 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
   position: absolute;
   z-index: 2;
   left: 50%;
-  bottom: -6cqw;
+  bottom: -6%;
   transform: translateX(-50%);
-  padding: 1.6cqw 6cqw;
+  padding: 1.6% 6%;                 /* 절대 배치 상자의 안여백 % = 담는 상자(칸) 폭 비 */
   border-radius: 999em;
   background-color: var(--it-line);
   color: var(--prim-white);
@@ -72866,13 +72851,13 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
 .itile-eq {
   position: absolute;
   z-index: 2;
-  top: -5cqw;
-  right: -5cqw;
+  top: -5%;
+  right: -5%;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: max(calc(var(--text-min) * 1.5), 26cqw);
-  height: max(calc(var(--text-min) * 1.5), 26cqw);
+  width: max(calc(var(--text-min) * 1.5), 26%);
+  height: max(calc(var(--text-min) * 1.5), 26%);
   border-radius: 50%;
   background-color: var(--it-line);
   box-shadow: 0 0 0 1.6cqw var(--prim-white);
@@ -72882,6 +72867,9 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
   font-weight: 800;
   line-height: 1;
 }
+/* [수정 1회차 M5] none 칸(빈 칸 · 중립 칸)의 Lv 알약 · ✓ 원 면 = 불투명 잉크 — 기본 면(--it-line = 잉크 반투명) 위 흰 글자는 대비가 낮다(8b 의 빈 칸 · 펫 칸 대비). */
+.itile[data-tier="none"] > .itile-lv,
+.itile[data-tier="none"] > .itile-eq { background-color: var(--prim-art-ink); }
 /* 고른 칸 = 밝은 테(흰 테 굵게 + 바깥 흰 고리) + 칸 위 가운데 ▼(금빛). 칸 자신의 [data-sel] 또는 칸을 감싼 단추 · 칸의 [aria-selected="true"](8b 몫 — 이번에는 CSS 만). */
 .itile[data-sel]::before,
 [aria-selected="true"] > .itile::before {
@@ -72897,9 +72885,9 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
   position: absolute;
   z-index: 3;
   left: 50%;
-  top: -17cqw;
-  width: 20cqw;
-  height: 12cqw;
+  top: -17%;
+  width: 20%;
+  height: 12%;
   transform: translateX(-50%);
   background-color: var(--role-f2-hi);
   clip-path: polygon(0 0, 100% 0, 50% 100%);
@@ -72924,6 +72912,33 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
 .tchip > i { font-style: normal; font-weight: 400; }
 .tchip > b { font-size: 1.4em; font-weight: 800; }
 .tchip[data-zero] { opacity: var(--tchip-zero-a); }
+
+/* ---- [수정 1회차 A1] 컨테이너 단위(cqw)를 모르는 엔진(iOS Safari 15 · Chrome 105 아래)의 대체 — 반드시 위 기본 규칙 **뒤**.
+   위 블록에서 cqw 를 쓰는 선언(그림자 고리 두께 · 글자 크기)과 획득표 격자 간격만 같은 선택자 · 같은 속성으로 다시 적는다(자리 · 크기 · 안여백은 이미 % 라 대체 불필요).
+   값 = 소비처가 주는 칸 폭 --it-w(길이) × 같은 비율 · 격자 간격 = 3 --dr-u. cqw 를 아는 엔진은 이 블록을 통째로 건너뛴다.
+   이 파일의 다른 cqw 대체 블록(상점 · 지도 · 왕국 · 결과 창 · 상점 가로 폰)과 같은 꼴. smoke-drops a1s(선언 짝 정적 대조) · a1r(이 블록을 @supports 없이 주입한 실행 단언). ---- */
+@supports not (width: 1cqw) {
+  .itile::before {
+    box-shadow:
+      inset 0 0 0 calc(var(--it-w) * .035) var(--it-line),
+      inset 0 0 0 calc(var(--it-w) * .06) var(--prim-white),
+      0 calc(var(--it-w) * .02) calc(var(--it-w) * .03) var(--role-f2-cast);
+  }
+  .itile-lv { font-size: max(var(--text-min), calc(var(--it-w) * .15)); }
+  .itile-eq {
+    box-shadow: 0 0 0 calc(var(--it-w) * .016) var(--prim-white);
+    font-size: max(var(--text-min), calc(var(--it-w) * .16));
+  }
+  .itile[data-sel]::before,
+  [aria-selected="true"] > .itile::before {
+    box-shadow:
+      inset 0 0 0 calc(var(--it-w) * .035) var(--it-line),
+      inset 0 0 0 calc(var(--it-w) * .085) var(--prim-white),
+      0 0 0 calc(var(--it-w) * .03) var(--prim-white),
+      0 calc(var(--it-w) * .02) calc(var(--it-w) * .03) var(--role-f2-cast);
+  }
+  #modal-drops .dr-grid { gap: calc(var(--dr-u) * 3); }
+}
 </style>
 </body>
 </html>
