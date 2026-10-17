@@ -15399,6 +15399,10 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
       <b id="duel-foe-skill-n"></b>
       <span id="duel-foe-skill-d"></span>
     </div>
+    <!-- [Task 6b 수정 1회차 M2] 영웅 카드의 아래 상자 판 — #duel-foe-box 와 같은 젤리 유리 판(같은 별칭 · 같은 자리 규칙의 거울). 메달 넷
+         (#actionbar, DOM 뒤라 위에 선다)이 이 판 가운데에 선다. #actionbar 자신을 판으로 별칭하지 않은 이유: 그 요소의 ::before/::after 는
+         세로 띠 판(서리 · 유리 · 트레이)의 !important 규칙 다섯 묶음이 쥐고 있어, 판 재질을 입히려면 재질 값을 !important 로 다시 적어야 한다. -->
+    <div id="duel-me-box" data-wide-only aria-hidden="true"></div>
     <!-- ============================================================
          TENNY — 숫자 짝꿍 마스코트 (오리지널 벡터. 이모지 글리프 0)
          컨셉: 게임의 규칙이 그대로 캐릭터가 된 형태다. 몸통은 타일과 같은
@@ -43259,15 +43263,20 @@ window.TT_SFX = {
     var foeAtk = bossAtkIdOf(d.def, S.advPlan ? S.advPlan.n : 0);
     setText('duel-foe-skill-n', t('boss.atk.' + foeAtk));
     setText('duel-foe-skill-d', t('boss.atk.' + foeAtk + '.d', ncAtkArgs(foeAtk)));
-    /* [판정판 121 · Task 6b P6] 이름 글자 수를 data-len 으로(칩 값과 같은 도우미) — 가로 전투의 두 이름 판이 같은 길이 단계를 쓴다. */
-    paintChipText('duel-foe-name', d.def ? bossName(d.def) : '');
+    setText('duel-foe-name', d.def ? bossName(d.def) : '');
     /* Lv 은 탄 번호다. 양쪽에 같은 값이 서는 것이 시안이고, 실제로도 이 판의
        난이도(HP·공격력·게이지 캡)를 정하는 단 하나의 수가 탄 번호다. */
     var lv = 'Lv.' + Math.max(1, S.stage | 0);
     setText('duel-foe-lv', lv);
     setText('duel-me-lv', lv);
     var cid = charId();
-    paintChipText('duel-me-name', t('char.' + cid + '.name'));
+    setText('duel-me-name', t('char.' + cid + '.name'));
+    /* [판정판 121 · Task 6b P6 · 수정 1회차 M3] 10자 이상 이름 = data-long — 가로 전투의 두 이름 판이 같은 긴 이름 규칙 하나를 쓴다
+       (글자 수를 나열하지 않아 17자 이상도 같은 처방). 세로는 이 속성을 읽는 규칙이 없다. */
+    ['duel-foe-name', 'duel-me-name'].forEach(function (id) {
+      var ne = $(id);
+      if (ne) ne.toggleAttribute('data-long', (ne.textContent || '').length >= 10);
+    });
     var me = $('duel-me-av');
     if (me) {
       setStdArt(me, cid, 'face', '--duel-me-face');
@@ -54259,12 +54268,14 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
 /* ---- 등급 3종 = 유일한 분기축 (틴트는 --jbox-tint 로 색감만 나눈다) ---- */
 /* [판정판 121] 가로 전투의 두 기둥 카드(#pc-left · #pc-right)를 이 등급에 별칭으로 편입한다 — 아래 ::before · ::after 도 같다.
    두 판은 가로 전투에서만 서므로(세로는 [data-wide-only] 봉인) 세로 화면은 무변. 자리 · 자(--jbox-w) 는 battle-landscape 절.
-   [Task 6b] 악당 카드의 아래 상자 #duel-foe-box 도 같은 판(「카드와 같은 젤리 유리 부품」) — 같은 별칭 · 같은 자. */
+   [Task 6b] 악당 카드의 아래 상자 #duel-foe-box 도 같은 판(「카드와 같은 젤리 유리 부품」) — 같은 별칭 · 같은 자.
+   [Task 6b 수정 1회차 M2] 영웅 카드의 아래 상자 판 #duel-me-box(메달 2×2 뒤)도 같은 판. */
 .jbox--modal,
 [data-part="modal-plate"],
 #app.battle #screen-game.active #pc-left[data-wide-only],
 #app.battle #screen-game.active #pc-right[data-wide-only],
-#app.battle #screen-game.active #duel-foe-box[data-wide-only]{ /* 팝업/노드카드 — [0908 원칙 0] 부품 modal-plate(정본 engine §modal-plate)의 사본.
+#app.battle #screen-game.active #duel-foe-box[data-wide-only],
+#app.battle #screen-game.active #duel-me-box[data-wide-only]{ /* 팝업/노드카드 — [0908 원칙 0] 부품 modal-plate(정본 engine §modal-plate)의 사본.
      [lineage-0908] 계보 판정: 정본 코드 젤리 .work-frame[data-part="modal"](S11 값)과는 **다른 Component** — 실루엣 IoU .883,
      jelly-box 모서리가 더 둥글고 상변이 볼록(Δ≈1.2%W), engine 은 --wf-L0-R .07w + 탭. (0908 당시) 게임 15 시트는 전부 이 이미지 변주,
      코드 젤리는 게임 소비처 0. 통합하지 않고 매니페스트 t2-plate-modal-pink.lineage 에 Shape·값 차 표를 기록했다(값 무변).
@@ -54399,7 +54410,8 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
 [data-part="modal-plate"]::before,
 #app.battle #screen-game.active #pc-left[data-wide-only]::before,
 #app.battle #screen-game.active #pc-right[data-wide-only]::before,
-#app.battle #screen-game.active #duel-foe-box[data-wide-only]::before{
+#app.battle #screen-game.active #duel-foe-box[data-wide-only]::before,
+#app.battle #screen-game.active #duel-me-box[data-wide-only]::before{
   content:"";
   position:absolute;
   inset:calc(var(--jbox-bw) * -1);
@@ -54453,7 +54465,8 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
 [data-part="modal-plate"]::after,
 #app.battle #screen-game.active #pc-left[data-wide-only]::after,
 #app.battle #screen-game.active #pc-right[data-wide-only]::after,
-#app.battle #screen-game.active #duel-foe-box[data-wide-only]::after{
+#app.battle #screen-game.active #duel-foe-box[data-wide-only]::after,
+#app.battle #screen-game.active #duel-me-box[data-wide-only]::after{
   content:"";
   position:absolute;
   inset:calc(var(--jbox-bw) * -1);
@@ -67642,11 +67655,16 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
    같은 색 · 테두리의 막대 둘을 그린 판, 그림 작업 A5). 옛 duel-btn-pause.webp(152×151)는 왼쪽 위 광택 자리에 회색 번짐이
    구워져 있었다. 이 목록이 일시정지의 유일한 규칙이다(sian-battle-hud 의 같은 값 중복은 은퇴 — 전투 · 클래식 · 아케이드 ·
    러시 · 데일리 한 그림). 자리 · 폭 · 눌림은 그대로, 높이만 새 그림 비(468/484)가 정한다(+4% — 늘림 금지 원칙 그대로).
-   옛 두 줄(되돌릴 근거): background:url("catalog/duel-btn-pause.webp") … · aspect-ratio:152/151; */
+   옛 두 줄(되돌릴 근거): background:url("catalog/duel-btn-pause.webp") … · aspect-ratio:152/151;
+   [Task 6b 수정 1회차 M5 · 지휘자 판정] 새 그림은 「뒤로」 판과 같은 캔버스(그림자 · 여백 포함)라 같은 상자에서 보이는 판이 옛 판보다
+   약 15% 작았다 → 단추(터치 상자 · 자리 · 폭 · 눌림)는 그대로 두고 **그리는 층만** 키운다: 비어 있던 ::before 에 그림을 옮기고
+   (::after 는 0909 의 44px 누르기 넓이) 폭 = 상자 폭 × 1.074 · 그림 비 468/484 · 가운데 · pointer-events none. 배율은 잉크 상자
+   실측(scratchpad/rc1017/t6/m_pause.py): 옛 152×151 잉크 152×150(꽉 참) · 새 468×484 잉크 424×442 → 폭만 맞추면 1.1038 이지만 새 판이
+   옛 판보다 세로로 길어(442/424 > 150/152) 높이가 +5.6% 가 되므로, 폭 −2.7% · 높이 +2.8% 로 둘 다 ±3% 안에 드는 1.074. */
 #app.battle #btn-pause,
 #app.classic #btn-pause,
 #app:not(.classic):not(.battle) #screen-game #topbar #btn-pause{
-  background:url("catalog/hud-btn-pause.webp") center/contain no-repeat !important;
+  background:none !important;
   box-shadow:none !important;border-radius:0 !important;
   position:absolute;
   left:calc(var(--safe-l) + 4px + 0.03785 * var(--dh-w));
@@ -67655,6 +67673,19 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
   height:auto !important;
   aspect-ratio:468/484;
   z-index:6;
+}
+#app.battle #btn-pause::before,
+#app.classic #btn-pause::before,
+#app:not(.classic):not(.battle) #screen-game #topbar #btn-pause::before{
+  content:"";
+  position:absolute;
+  left:50%; top:50%;
+  width:calc(100% * 1.074);
+  height:auto;
+  aspect-ratio:468/484;
+  transform:translate(-50%, -50%);
+  background:url("catalog/hud-btn-pause.webp") center/contain no-repeat;
+  pointer-events:none;
 }
 #app.battle #btn-pause .ic,
 #app.classic #btn-pause .ic,
@@ -71481,9 +71512,12 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
        그림 상자  x 44~344 / 936~1236 · y 128~404(300×276) — contain · 아래 가운데. 아래 8bu 는 이름 판이 덮는다(지휘자 판정 Q2:
                   포도 · 소다 · 딸기 전신은 원본부터 발이 잘려 있다 — 두 카드 같은 규칙으로 발 끝을 판 뒤로). 몸 높이 보정 --bt-art-k
        둥근 칩    지름 84 · 그림 상자 바깥 위 모서리 안쪽(악당 = 왼쪽 위 얼굴 #duel-foe-chip · 영웅 = 오른쪽 위 펫 #duel-baby)
-       이름 판    y 396~485 · 폭 324(x 32~356 / 924~1248) — 이름 · Lv · 체력 막대(악당 빨강 · 영웅 하늘) · 숫자 · 게이지
-       아래 상자  x 44~344 / 936~1236 · y 497~700(300×203) — 악당 = 젤리 유리 판 #duel-foe-box(기술 이름 + 설명 · 아래에 칩 줄
-                  #hud-row · 위에 토스트가 겹쳐 뜸) / 영웅 = 스킬 메달 넷 2×2 #actionbar(그림 비 718:907 · 간격 .11H)
+       이름 판    y 396~485 · 폭 324(x 32~356 / 924~1248) — 이름 · Lv · 체력 막대(악당 빨강 · 영웅 하늘) · 숫자 · 게이지.
+                  [수정 1회차 I1] 판 안은 같은 부품 · 같은 기하(막대 252bu 판 가운데 = 악당 68~320 · 영웅 960~1212 · 숫자 막대 왼끝 + 16.8
+                  왼쪽 맞춤), 장식만 각자(뼈 · 날개 — 그린 대로 막대 끝에)
+       아래 상자  x 44~344 / 936~1236 · y 497~700(300×203) — 두 판 = 같은 젤리 유리 판(악당 #duel-foe-box · 영웅 #duel-me-box).
+                  악당 = 기술 이름 + 설명(토스트가 떠 있는 동안 숨음) · 아래에 칩 줄 #hud-row · 위에 토스트가 겹쳐 뜸 /
+                  영웅 = 그 위 가운데 스킬 메달 넷 2×2 #actionbar(그림 비 718:907 · 간격 .11H)
    세로 자리는 브리프 기준(캡슐 10~96 · 판 108~708)에서 허용 ±10 안으로 옮긴 값이다: 캡슐 −6 · 판·카드 윗변 +10.
    이유 = 배율 띠(multBandWord)는 「캡슐 바닥 ↔ 판 윗변」 틈에만 서는데, 기준 자리에서는 그 틈이 21bu 라 글자가
    하한 14px 로 눌렸다(1280×720 실측). 옮긴 자리에서 틈 32.5bu → 22px. 판 크기는 그대로(1280×720 칸 70 · 8줄 = 581 ≤ 590).
@@ -71654,14 +71688,11 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
      별칭으로 편입했다(#app.battle #actionbar 가 .jbox--strip 에 편입된 것과 같은 문법) — 재질 값은 등급 한 곳에만 산다.
      여기서는 자리와 자(尺)만: 림·광택 자 --jbox-w 와 반경을 무대 자로 옮겨(1280×720 에서 430px · 40px = 모달 판과
      같은 값) 창이 작아지면 판 재질도 같이 준다. 옛 날개 유리(pc-landscape 날개 유리 문법)는 걷는다. */
+  /* [수정 1회차 M4] 같은 판의 자 · 바탕 일곱 줄은 한 곳 — 두 카드 · 두 아래 상자 판(5-b) 공통. 각 규칙에는 자리 · 크기 · flex 만. */
   #app.battle #screen-game.active #pc-left[data-wide-only],
-  #app.battle #screen-game.active #pc-right[data-wide-only] {
-    display: block !important;   /* 봉인 · pc-landscape 의 전투 #pc-left 접기(display:none !important)를 뚫는다 */
-    position: absolute;
-    z-index: 0;
-    top: calc(var(--bt-y0) + var(--bu) * var(--bt-board-y));    /* 카드 윗변·아랫변 = 판 상자와 한 줄 */
-    width: calc(var(--bu) * 340);
-    height: calc(var(--bu) * var(--bt-board-h));
+  #app.battle #screen-game.active #pc-right[data-wide-only],
+  #app.battle #screen-game.active #duel-foe-box[data-wide-only],
+  #app.battle #screen-game.active #duel-me-box[data-wide-only] {
     margin: 0;
     background-color: transparent;
     background-image: none;
@@ -71670,6 +71701,15 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
     --jbox-radius: calc(var(--bu) * 40);
     --jbox-bw: calc(var(--bu) * 1.5);
   }
+  #app.battle #screen-game.active #pc-left[data-wide-only],
+  #app.battle #screen-game.active #pc-right[data-wide-only] {
+    display: block !important;   /* 봉인 · pc-landscape 의 전투 #pc-left 접기(display:none !important)를 뚫는다 */
+    position: absolute;
+    z-index: 0;
+    top: calc(var(--bt-y0) + var(--bu) * var(--bt-board-y));    /* 카드 윗변·아랫변 = 판 상자와 한 줄 */
+    width: calc(var(--bu) * 340);
+    height: calc(var(--bu) * var(--bt-board-h));
+  }
   #app.battle #screen-game.active #pc-left[data-wide-only]  { left: calc(var(--bt-x0) + var(--bu) * 24); }
   #app.battle #screen-game.active #pc-right[data-wide-only] { left: calc(var(--bt-x0) + var(--bu) * 916); }
   /* 5-b. [Task 6b] 악당 카드의 아래 상자 = 카드와 같은 젤리 유리 판(위 .jbox--modal 별칭 · 같은 자 --jbox-*) — 영웅 카드의 메달
@@ -71677,27 +71717,29 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
      .nc-atk-d 의 글자 규칙 — 굵기 700 / 500 · 줄 높이 1.1 · 잉크는 아래 대비 실측으로 --ink · 지휘자 판정 Q4 크기: 이름 = 이름 판 이름 크기
      2.90cqw × 7.5 = 21.75bu · 설명 = 칩 글자 15bu, 둘 다 하한 --text-min) · 안 여백 16 · 이름↔설명 4. 아래 칩 줄 · 위 토스트는
      자기 규칙(3절)이 이 판 위에 겹쳐 세운다. 한국어는 낱말 단위로 줄을 바꾼다(저장소 문단 관례 keep-all + anywhere). */
+  /* 두 아래 상자 판(악당 #duel-foe-box · [수정 1회차 M2] 영웅 #duel-me-box — 메달 넷이 그 위 가운데) = 같은 판 · 같은 크기 · 같은 위 끝,
+     자리만 거울(x 44 / 936). 누르기는 판 아래로 통과(메달은 #actionbar 자기 요소). */
+  #app.battle #screen-game.active #duel-foe-box[data-wide-only],
+  #app.battle #screen-game.active #duel-me-box[data-wide-only] {
+    position: absolute;
+    z-index: 1;
+    top: calc(var(--bt-y0) + var(--bu) * 497);
+    width: calc(var(--bu) * 300);
+    height: calc(var(--bu) * 203);
+    box-sizing: border-box;
+    pointer-events: none;
+  }
+  #app.battle #screen-game.active #duel-me-box[data-wide-only] {
+    display: block !important;   /* 기본 절 봉인을 뚫는다 */
+    left: calc(var(--bt-x0) + var(--bu) * 936);
+  }
   #app.battle #screen-game.active #duel-foe-box[data-wide-only] {
     display: flex !important;    /* 기본 절 봉인 [data-wide-only]{display:none !important} 를 뚫는다 */
     flex-direction: column;
     align-items: flex-start;
     gap: calc(var(--bu) * 4);
-    position: absolute;
-    z-index: 1;
     left: calc(var(--bt-x0) + var(--bu) * 44);
-    top: calc(var(--bt-y0) + var(--bu) * 497);
-    width: calc(var(--bu) * 300);
-    height: calc(var(--bu) * 203);
-    margin: 0;
     padding: calc(var(--bu) * 16);
-    box-sizing: border-box;
-    background-color: transparent;
-    background-image: none;
-    box-shadow: none;
-    --jbox-w: calc(var(--bu) * 430);
-    --jbox-radius: calc(var(--bu) * 40);
-    --jbox-bw: calc(var(--bu) * 1.5);
-    pointer-events: none;
     word-break: keep-all;
     overflow-wrap: anywhere;
   }
@@ -71720,6 +71762,10 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
     color: var(--ink);
   }
   #app.battle #screen-game.active #hud-row #tw-chip #tw-next { color: var(--ink); }
+  /* [수정 1회차 M1] 토스트(#toast.show — toast() 가 붙이고 toastHide 가 뗀다)가 이 판 위쪽에 떠 있는 동안 기술 이름 · 설명을 숨긴다 —
+     겹친 두 글자가 함께 읽히지 않게. visibility 만(자리 · 판 크기 무변) · 새 움직임 0(토스트 자신의 나타나기는 그대로). */
+  #app.battle:has(> #toast.show) #screen-game.active #duel-foe-skill-n,
+  #app.battle:has(> #toast.show) #screen-game.active #duel-foe-skill-d { visibility: hidden; }
 
   /* ---- 6. HUD — 상자 = 가운데 위 띠, 조각 = 양 기둥 ------------------------------ */
   #app.battle #screen-game.active #duel-hud {
@@ -71738,14 +71784,16 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
     --bt-ox: calc(var(--bu) * -265);
     --bt-oy: calc(var(--bu) * -4);
     /* 진영 무리 원점 = 세로 HUD 의 cqw 원점이 무대 어디에 오나.
-       악당 x 0.5    = 카드 가운데 194 − 홈 가운데 25.8cqw × 7.5
        영웅 x 506.25 = 카드 가운데 1086 − 홈 가운데 77.3cqw × 7.5
+       악당 x = 영웅 원점 − 892(두 이름 판 · 두 카드의 거리 924 − 32) — [Task 6b 수정 1회차 I1 · 지휘자 판정 E] 판 안 부품(진영 상자 ·
+            체력 막대 · 눈금 · 채움 · 공격 게이지 · 이름 · Lv · 숫자)은 두 판이 **같은 기하**(영웅 쪽 지금 값)를 쓰고 원점만 다르다 —
+            「카드 자리는 거울, 판 안은 같은 부품」. 장식만 각자 그림대로(뼈 · 날개). 옛 악당 원점 0.5 = 카드 가운데 194 − 홈 가운데 25.8cqw × 7.5.
        y 231.5375(둘 다 — [Task 6b] 두 이름 판 같은 높이 선) = 이름 판 위 끝 396 + 판 안 여백 8 − 이름 줄 윗변 22.995cqw × 7.5
             (옛 값: 악당 285.54 = 그림 아래 끝 458 기준 · 영웅 176.17 = 영웅 발 348 기준 — 두 판이 109bu 어긋나 있었다) */
-    --bt-fx: calc(var(--bt-ox) + var(--bu) * 0.5);
-    --bt-fy: calc(var(--bt-oy) + var(--bu) * 231.5375);
     --bt-mx: calc(var(--bt-ox) + var(--bu) * 506.25);
     --bt-my: calc(var(--bt-oy) + var(--bu) * 231.5375);
+    --bt-fx: calc(var(--bt-mx) - var(--bu) * 892);
+    --bt-fy: var(--bt-my);
   }
   /* 6-0. 진영 판(plate) — [리뷰 M-1] 이름 · Lv · 체력 막대 · 숫자 뒤에 HUD 와 같은 재질(Mode B 면 · 알파 · 겉선 · 림 토큰)의
      둥근 판 한 장. 세로의 띠 판 그림 둘(가로 띠 — 늘리면 줄무늬, 계약 ⑦-7)은 그림을 벗기고 이 판으로 쓴다:
@@ -71847,48 +71895,66 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
     --char-thumb: var(--bs-face, var(--ch-boss-face));   /* 얼굴 = .bs-* 표(duelHudMount 가 bs-<id> 를 붙인다) — .ct-art 가 그린다 */
   }
 
-  /* 6-d. 두 진영 조각 — 세로 cqw 값 그대로, 자만 --bt-hu · 원점만 진영 무리로 */
-  #app.battle #screen-game.active #duel-hud .dh-foe {
-    left: calc(var(--bt-fx) + var(--bt-hu) * 2.06);
-    top: calc(var(--bt-fy) + var(--bt-hu) * 22.995);    /* 세로 70.54%H = 22.995cqw */
-    width: calc(var(--bt-hu) * 47.47);
+  /* 6-d. 두 진영 조각 — 세로 cqw 값 그대로, 자만 --bt-hu · 원점만 진영 무리로.
+     [Task 6b 수정 1회차 I1 · 지휘자 판정 E] 두 판 안 = 같은 부품 · 같은 기하(영웅 쪽 지금 값): 진영 상자 46.82 × 9.486cqw(원점 + 53.52) ·
+     체력 막대 홈 33.6cqw = 252bu(원점 + 60.5 — 판 가운데: 악당 무대 x 68~320 · 영웅 960~1212) · 눈금 31.14cqw(원점 + 61.72) ·
+     채움 · 공격 게이지 = 진영 상자의 17.5% · 66.5%(눈금과 같은 자리) · 이름 · Lv · 숫자 같은 자리. 악당 막대가 전보다 16% 짧아진다
+     (판정에서 받아들임 — 장식이 그린 대로 붙고 판 · 카드 밖으로 나가는 것이 없는 유일한 길). 옛 악당 값(세로 cqw): 상자 2.06 · 47.47 ·
+     홈 5.8 · 40.0 · 눈금 7.04 · 37.5 · 채움 10.5% · 79% · 뼈 4.77 · 43.54 · 숫자 8.04(옛 원점 0.5 기준). */
+  #app.battle #screen-game.active #duel-hud .dh-foe,
+  #app.battle #screen-game.active #duel-hud .dh-me {
+    width: calc(var(--bt-hu) * 46.82);
     height: calc(var(--bt-hu) * 9.486);                /* 세로 29.10%H = 9.486cqw */
+  }
+  #app.battle #screen-game.active #duel-hud .dh-foe {
+    left: calc(var(--bt-fx) + var(--bt-hu) * 53.52);
+    top: calc(var(--bt-fy) + var(--bt-hu) * 22.995);    /* 세로 70.54%H = 22.995cqw */
   }
   #app.battle #screen-game.active #duel-hud .dh-me {
     left: calc(var(--bt-mx) + var(--bt-hu) * 53.52);
     top: calc(var(--bt-my) + var(--bt-hu) * 22.995);
-    width: calc(var(--bt-hu) * 46.82);
-    height: calc(var(--bt-hu) * 9.486);
   }
+  /* 채움 · 공격 게이지 — 두 판 같은 % (세로 .dh-me 값 :68717 계열) */
+  #app.battle #screen-game.active #duel-hud .dh-side .dh-bar { left: 17.5%; top: 42%; width: 66.5%; height: 26%; }
+  #app.battle #screen-game.active #duel-hud .dh-side .dh-sub { left: 17.5%; top: 70.5%; width: 66.5%; height: 5%; }
+  /* Lv 알약 · 이름 높이 — 두 판 같은 % (기준 = 악당 판 값, 세로 .dh-foe .dh-lv · .dh-name :68660 계열) */
+  #app.battle #screen-game.active #duel-hud .dh-side .dh-lv { left: 76%; width: 17.3%; top: 3.6%; height: 32.5%; }
   #app.battle #screen-game.active #duel-hud .dh-name { font-size: max(var(--text-min), calc(var(--bt-hu) * 2.90)); }
   #app.battle #screen-game.active #duel-hud .dh-lv   { font-size: max(var(--text-min), calc(var(--bt-hu) * 2.50)); }
-  /* [Task 6b · 지휘자 판정 P6] 이름 상자 · 긴 이름 규칙 = 두 이름 판이 같은 규칙. 종전 긴 이름 처방(세로 W2.5 ④b — 상자를 광학
-     중심 27.5% 그대로 4~51% 로 넓히고 글자를 2.62cqw 로 한 급 축소)은 「en · 악당 판만」 이었고, 영웅 판은 이름 상자가 40~70%(30%)로
-     좁아 en 「Pudding Knight」 가 양쪽이 잘렸다(844×390 74 > 57px — 전부터). 가로에서는 두 판 다 악당 판 상자(10~45%)를 쓰고, 이름
-     글자 수(duelHudMount 의 paintChipText 가 적는 data-len — 상점 · 위 바 칩 값과 같은 문법) 10자 이상이면 같은 처방(4~51% · 2.62).
-     지금 이름: ko 4~6자(무접촉) · en 악당 10~13자(종전과 같은 결과) · en 영웅 Pudding Knight 14 · Soda Witch 10. 세로는 무변. */
-  #app.battle #screen-game.active #duel-hud .dh-name { left: 10%; width: 35%; }
-  #app.battle #screen-game.active #duel-hud .dh-name:is([data-len="10"], [data-len="11"], [data-len="12"], [data-len="13"],
-    [data-len="14"], [data-len="15"], [data-len="16"]) { left: 4%; width: 47%; font-size: max(var(--text-min), calc(var(--bt-hu) * 2.62)); }
-  #app.battle #screen-game.active #duel-hud .dh-track--l { left: calc(var(--bt-fx) + var(--bt-hu) * 5.8);  top: calc(var(--bt-fy) + var(--bt-hu) * 26.1); width: calc(var(--bt-hu) * 40.0); height: calc(var(--bt-hu) * 4.2); }
-  #app.battle #screen-game.active #duel-hud .dh-track--r { left: calc(var(--bt-mx) + var(--bt-hu) * 60.5); top: calc(var(--bt-my) + var(--bt-hu) * 26.1); width: calc(var(--bt-hu) * 33.6); height: calc(var(--bt-hu) * 4.2); }
-  #app.battle #screen-game.active #duel-hud .dh-tick    { height: calc(var(--bt-hu) * 2.47); }
-  #app.battle #screen-game.active #duel-hud .dh-tick--l { left: calc(var(--bt-fx) + var(--bt-hu) * 7.04);  top: calc(var(--bt-fy) + var(--bt-hu) * 26.98); width: calc(var(--bt-hu) * 37.5); }
-  #app.battle #screen-game.active #duel-hud .dh-tick--r { left: calc(var(--bt-mx) + var(--bt-hu) * 61.72); top: calc(var(--bt-my) + var(--bt-hu) * 26.98); width: calc(var(--bt-hu) * 31.14); }
+  /* [Task 6b · 지휘자 판정 P6 · 수정 1회차 I3(D1 받아들임) · M3] 이름 상자 · 긴 이름 규칙 = 두 이름 판이 같은 규칙. 종전 긴 이름 처방(세로
+     W2.5 ④b — 상자를 광학 중심 27.5% 그대로 4~51% 로 넓히고 글자를 2.62cqw 로 한 급 축소)은 「en · 악당 판만」 이었고, 영웅 판은 이름 상자가
+     40~70%(30%)로 좁아 en 「Pudding Knight」 가 양쪽이 잘렸다(844×390 74 > 57px — 전부터). 가로에서는 두 판 다 악당 판 상자(10~45% ·
+     높이 4.6% + 29.3%)를 쓰고, 이름이 10자 이상이면(duelHudMount 가 data-long 을 붙인다) 같은 처방(4~51% · 2.62). 지금 이름: ko 4~6자
+     (무접촉) · en 악당 10~13자(종전과 같은 결과) · en 영웅 Pudding Knight 14 · Soda Witch 10. 세로는 무변. */
+  #app.battle #screen-game.active #duel-hud .dh-side .dh-name { left: 10%; width: 35%; top: 4.6%; height: 29.3%; }
+  #app.battle #screen-game.active #duel-hud .dh-side .dh-name[data-long] { left: 4%; width: 47%; font-size: max(var(--text-min), calc(var(--bt-hu) * 2.62)); }
+  #app.battle #screen-game.active #duel-hud .dh-track--l,
+  #app.battle #screen-game.active #duel-hud .dh-track--r { width: calc(var(--bt-hu) * 33.6); height: calc(var(--bt-hu) * 4.2); }
+  #app.battle #screen-game.active #duel-hud .dh-track--l { left: calc(var(--bt-fx) + var(--bt-hu) * 60.5); top: calc(var(--bt-fy) + var(--bt-hu) * 26.1); }
+  #app.battle #screen-game.active #duel-hud .dh-track--r { left: calc(var(--bt-mx) + var(--bt-hu) * 60.5); top: calc(var(--bt-my) + var(--bt-hu) * 26.1); }
+  #app.battle #screen-game.active #duel-hud .dh-tick    { height: calc(var(--bt-hu) * 2.47); width: calc(var(--bt-hu) * 31.14); }
+  #app.battle #screen-game.active #duel-hud .dh-tick--l { left: calc(var(--bt-fx) + var(--bt-hu) * 61.72); top: calc(var(--bt-fy) + var(--bt-hu) * 26.98); }
+  #app.battle #screen-game.active #duel-hud .dh-tick--r { left: calc(var(--bt-mx) + var(--bt-hu) * 61.72); top: calc(var(--bt-my) + var(--bt-hu) * 26.98); }
   #app.battle #screen-game.active #duel-hud .dh-orn     { height: calc(var(--bt-hu) * 5.4); }
   #app.battle #screen-game.active #duel-hud .dh-orn--fl,
   #app.battle #screen-game.active #duel-hud .dh-orn--fr { top: calc(var(--bt-fy) + var(--bt-hu) * 25.5); background-size: calc(var(--bt-hu) * 7.87) calc(var(--bt-hu) * 5.60); }
   #app.battle #screen-game.active #duel-hud .dh-orn--ml,
   #app.battle #screen-game.active #duel-hud .dh-orn--mr { top: calc(var(--bt-my) + var(--bt-hu) * 25.5); background-size: calc(var(--bt-hu) * 12.35) calc(var(--bt-hu) * 5.53); }
-  #app.battle #screen-game.active #duel-hud .dh-orn--fl { left: calc(var(--bt-fx) + var(--bt-hu) * 4.77);  width: calc(var(--bt-hu) * 3.27); background-position: calc(var(--bt-hu) * -0.33) calc(var(--bt-hu) * -0.07); }
-  #app.battle #screen-game.active #duel-hud .dh-orn--fr { left: calc(var(--bt-fx) + var(--bt-hu) * 43.54); width: calc(var(--bt-hu) * 3.77); background-position: calc(var(--bt-hu) * -4.00) calc(var(--bt-hu) * -0.07); }
+  /* 장식은 각자 그린 대로 막대 끝에 붙는다(수정 1회차 판정 E — 붙는 방식 · 채움과의 쌓임 순서 무변): 뼈 = 막대 왼끝 − 1.03cqw(7.7bu 돌출) ·
+     오른끝 − 2.26cqw(캡 3.77 → 11.3bu 돌출), 날개 = 막대 왼끝 − 3.70 · 오른끝 − 2.25cqw(27.75bu 돌출). 채움이 장식 안쪽을 약 8bu 덮는 관계도 같다. */
+  #app.battle #screen-game.active #duel-hud .dh-orn--fl { left: calc(var(--bt-fx) + var(--bt-hu) * 59.47); width: calc(var(--bt-hu) * 3.27); background-position: calc(var(--bt-hu) * -0.33) calc(var(--bt-hu) * -0.07); }
+  #app.battle #screen-game.active #duel-hud .dh-orn--fr { left: calc(var(--bt-fx) + var(--bt-hu) * 91.84); width: calc(var(--bt-hu) * 3.77); background-position: calc(var(--bt-hu) * -4.00) calc(var(--bt-hu) * -0.07); }
   #app.battle #screen-game.active #duel-hud .dh-orn--ml { left: calc(var(--bt-mx) + var(--bt-hu) * 56.80); width: calc(var(--bt-hu) * 5.92); background-position: calc(var(--bt-hu) * -0.10) calc(var(--bt-hu) * -0.03); }
   #app.battle #screen-game.active #duel-hud .dh-orn--mr { left: calc(var(--bt-mx) + var(--bt-hu) * 91.85); width: calc(var(--bt-hu) * 5.98); background-position: calc(var(--bt-hu) * -6.27) calc(var(--bt-hu) * -0.03); }
-  /* 체력 숫자 — 막대 홈 아래 띠(30.3~32.74cqw). 악당 왼쪽 · 나 오른쪽 맞춤(세로와 같은 쪽).
-     나 쪽 right = 상자 폭 750 − (원점 + 91.57cqw) — 세로의 right 8.43cqw 와 같은 끝점. */
+  /* 체력 숫자 — 막대 홈 아래 띠(30.3~32.74cqw). [수정 1회차 판정] 두 판 같은 규칙: 막대 왼끝 + 16.8bu 에서 왼쪽 맞춤(옛 악당 숫자의
+     자리 규칙 — 옛 막대 왼끝 44 + 16.8 = 60.8). 영웅의 옛 오른쪽 맞춤(세로 right 8.43cqw 끝점)은 가로에서 은퇴.
+     [수정 1회차 I5] 숫자 사이 「/」(.dh-sl, 세로 .85em)도 글자 하한 --text-min 아래로 내려가지 않게(844×390 에서 9.77 → 11px). */
   #app.battle #screen-game.active #duel-hud .dh-num { height: calc(var(--bt-hu) * 2.44); font-size: max(var(--text-min), calc(var(--bt-hu) * 2.83)); }
-  #app.battle #screen-game.active #duel-hud #duel-foe-n { left: calc(var(--bt-fx) + var(--bt-hu) * 8.04); top: calc(var(--bt-fy) + var(--bt-hu) * 30.3); }
-  #app.battle #screen-game.active #duel-hud #duel-me-n  { right: calc(var(--bu) * 750 - var(--bt-mx) - var(--bt-hu) * (100 - 8.43)); top: calc(var(--bt-my) + var(--bt-hu) * 30.3); }
+  #app.battle #screen-game.active #duel-hud .dh-num .dh-sl { font-size: max(var(--text-min), .85em); }
+  #app.battle #screen-game.active #duel-hud #duel-foe-n,
+  #app.battle #screen-game.active #duel-hud #duel-me-n { right: auto; justify-content: flex-start; }
+  #app.battle #screen-game.active #duel-hud #duel-foe-n { left: calc(var(--bt-fx) + var(--bt-hu) * 60.5 + var(--bu) * 16.8); top: calc(var(--bt-fy) + var(--bt-hu) * 30.3); }
+  #app.battle #screen-game.active #duel-hud #duel-me-n  { left: calc(var(--bt-mx) + var(--bt-hu) * 60.5 + var(--bu) * 16.8); top: calc(var(--bt-my) + var(--bt-hu) * 30.3); }
 
   /* ---- 7. 스킬 메달 넷 = 오른 기둥 아래 2×2 ----------------------------------------
      메달 그림(718:907)은 .act::before 가 contain · 아래 맞춤으로 그리므로 상자를 그림 비 그대로 두면 늘어나는 곳이 0 이다.
