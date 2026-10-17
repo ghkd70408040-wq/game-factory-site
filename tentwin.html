@@ -27237,7 +27237,7 @@ window.TT_SFX = {
       'gear.equip': 'Equip',
       'gear.unequip': 'Unequip',
       'gear.wornby': 'Worn by {names}',
-      'item.crossnecklace.eff': 'Alternate Ten and Twin matches to fill the Awaken gauge {n}% more.',
+      'item.crossnecklace.eff': 'In battle, alternate Ten and Twin matches to fill the Awaken gauge {n}% more.',
       'item.chainbracelet.eff': 'At combo {c} or more, matches score {n}% more.',
       'item.firstcharm.eff': 'The first match of each stage scores {x}×.',
       'item.lastcharm.eff': 'With {s}s or less left, matches score {n}% more.',
@@ -28754,7 +28754,7 @@ window.TT_SFX = {
       'gear.equip': '끼기',
       'gear.unequip': '빼기',
       'gear.wornby': '{names} 착용 중',
-      'item.crossnecklace.eff': '텐과 트윈을 번갈아 맞추면 각성 게이지가 {n}% 더 차요.',
+      'item.crossnecklace.eff': '전투에서 텐과 트윈을 번갈아 맞추면 각성 게이지가 {n}% 더 차요.',
       'item.chainbracelet.eff': '콤보 {c} 이상에서 점수가 {n}% 올라요.',
       'item.firstcharm.eff': '판의 첫 매치 점수가 {x}배가 돼요.',
       'item.lastcharm.eff': '남은 시간 {s}초 이하에서 점수가 {n}% 올라요.',
@@ -65679,7 +65679,8 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
 #modal-drops .cp-gem,
 #modal-gear .cp-gem,
 #modal-gear-info .cp-gem {
-  width:  calc(var(--f2-w) * .1381);
+  --cp-gem-k: .1381;                  /* [판정판 121 · Task 5 수정 1회차 M1] 칸 폭 계수 한 곳 — 장비 설명 큰 그림(#gi-art)도 이 변수로 판 안 폭 1/2 를 푼다 */
+  width:  calc(var(--f2-w) * var(--cp-gem-k));
   height: calc(var(--f2-w) * .1356);
 }
 
@@ -72436,13 +72437,21 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
 #modal-gear-info .sk-d { color: var(--ink); }
 
 /* ---- 2. 장비 설명 창 — 큰 그림 = 판 안 폭의 1/2(판정 Q5). 판(.sheet)이 cqw 의 기준(안상자)이고, 칸 부품의 자 --f2-w 를
-   「칸 폭 계수 .1381(CV-5 · 캐릭창 · 획득표 칸) × 자 = 50cqw」 로 푼다 — 액자 · 그림 상자 · 모서리 크리스탈이 한 자로 같이 큰다.
+   「칸 폭 계수 --cp-gem-k(CV-5 칸 규칙 한 곳 · 캐릭창 · 획득표 칸) × 자 = 50cqw」 로 푼다 — 액자 · 그림 상자 · 모서리 크리스탈이 한 자로 같이 큰다.
    cqw 를 모르는 엔진은 이 줄이 무효라 보통 칸 크기로 선다(깨지지 않는다). 그림은 256 파일(paintGearInfo). ---- */
 #modal-gear-info .sheet { container-type: inline-size; }
 #gi-art { display: flex; justify-content: center; }
-#gi-art .cp-gem { --f2-w: calc(50cqw / .1381); }
+#gi-art .cp-gem { --f2-w: calc(50cqw / var(--cp-gem-k)); }
 /* [끼기]/[빼기] 는 판 안 폭 전체(지휘자 판정 — 형제 창 맨 아래 주 단추 「시작」(#node-go width 100%) · 「닫기」(.btn width 100%)와 같은 폭):
-   판(.sheet)이 세로 flex 라 기본 늘이기(align-self 기본값)가 곧 그 너비다 — 규칙을 따로 두지 않는다(smoke-gear A3i 가 판 안 폭과 같음을 단언). */
+   판(.sheet)이 세로 flex 라 기본 늘이기(align-self 기본값)가 곧 그 너비다 — 규칙을 따로 두지 않는다(smoke-gear A3i 가 판 안 폭과 같음을 단언).
+   [수정 1회차 I1 · 지휘자 판정] 높이 · 글자도 주 단추 자로 — 두 단추 모두 주 단추 높이(kit-btn-v2 기본 --f2-w × .1230)와 캐릭창 「선택 완료」(#cp-go ·
+   [E44-0903] B1 0.4089 ÷ 0.856)의 글자 비 .478. [빼기] 는 secondary 색만 다르고 크기 · 높이는 [끼기]와 같다(종전: 보조 높이 .1329 · 글자 .235 로 튀었다).
+   킷 규칙은 무접촉 — #cp-go 와 같은 「이 한 자리에서만 덮는다」. */
+#gi-act.kit-btn-v2,
+#gi-act.kit-btn-v2[data-kind="secondary"] {
+  --f2-bh: calc(var(--f2-w) * .1230);
+  font-size: calc(var(--f2-bh) * .478);
+}
 
 /* ---- 3. 가로(창 가로 ≥ 세로) — 가로 창 한 무리(판정 Q6 · 2회차 판정): 스킨 · 장비 목록 · 장비 설명 = 판 380u, 판 정보 · 획득표 = 360u, 무대 가운데(.modal 이 창 가운데에
    세우고 무대도 창 가운데다). 1280x720(1u = 1px)에서 지금 폭 그대로, 작은 창에서 같이 준다.
@@ -72517,9 +72526,9 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
   #modal-gear-info .sk-d { font-size: max(var(--text-min), calc(var(--stage-u) * 10)); }
   #modal-skin .sk-act.kit-pill-v2,
   #modal-gear .sk-act.kit-pill-v2 { font-size: max(var(--text-min), calc(var(--stage-u) * 12)); }
-  /* 단추 글자 = kit-btn-v2 의 높이 비(주 .30 · 보조 .235) 그대로 + 하한 */
-  #modal-gear-info .kit-btn-v2 { font-size: max(var(--text-min), calc(var(--f2-bh) * .30)); }
-  #modal-gear-info .kit-btn-v2[data-kind="secondary"] { font-size: max(var(--text-min), calc(var(--f2-bh) * .235)); }
+  /* 단추 글자 = 주 단추 자 .478(위 [수정 1회차 I1] — 두 단추 같은 값) + 하한 */
+  #gi-act.kit-btn-v2,
+  #gi-act.kit-btn-v2[data-kind="secondary"] { font-size: max(var(--text-min), calc(var(--f2-bh) * .478)); }
 }
 /* [리뷰 전 수정 Q10] 위 악당 칸 규칙의 작은 화면(창 높이 ≤ 760 — node-card-74 의 같은 문턱) 짝: 그 미디어의 칸 128nu · 몸통 left 116 · top 8nu 를 같은 값의 최소 높이 · 여백으로. */
 @media (min-aspect-ratio: 1/1) and (max-height: 760px) {
