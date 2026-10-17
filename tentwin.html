@@ -70662,15 +70662,15 @@ html[lang="en"] #kd-m-circus b{ font-size: .85em; letter-spacing: -.02em; }
   overflow: clip visible;   /* 「모험」 판정 Q2 와 같은 처방 — line-height 1 이 한글 위 꼭지를 자르지 않게 세로축만 푼다(clip 을 모르면 위 hidden) */
   text-shadow: 0 calc(var(--bb-side) * .28 / 15.43) 0 var(--hub-sh-lab);
 }
-/* [Task 7a 수정 1회차 I2 · 지휘자 판정] 하한 11px 로 커진 이름(en 「Playground」)이 단추 폭(360 폭에서 49px)에 들게 — 폭 ≤ 380px 세로 화면에서만 아래 줄 이름 전부에 같은 자간.
-   값 = 그 이름이 360×640 ko · en 에서 단추 안 · 말줄임 0 으로 드는 가장 작은 조임(t7a_tracking.py 실측: −.040em 은 0.08px 넘침 · −.045em 부터 0).
-   그 밖 크기 · 데스크톱은 위 기본 −.03em 그대로. */
-@media (max-width: 380px) { #app .bb > * > .bb-lab { letter-spacing: -.045em; } }
+/* [Task 7a 수정 1 · 2회차 I2 · 지휘자 판정] 하한 11px 로 커진 이름(en 「Playground」)이 단추 폭(360 폭 49px · 844×390 47px)에 들게 — 좁은 칸(폭 ≤ 380px 세로 화면 ·
+   높이 ≤ 400px 가로 작은 폰)에서만 아래 줄 이름 전부에 같은 자간 −.06em.
+   값 = 두 좁은 칸 모두에서 단추 안 · 말줄임 0 으로 드는 하나(t7a_tracking.py 실측 — 360: −.045em 부터 0 · 844×390 en: −.055em 은 0.27px 넘침, −.060em 부터 0). 그 밖 크기 · 데스크톱은 위 기본 −.03em 그대로(9509c16 값). */
+@media (max-width: 380px), (max-height: 400px) { #app .bb > * > .bb-lab { letter-spacing: -.06em; } }
 /* 맞춤 — 글자 칸(단추 폭 92% — [Task 7a] 글자 칸은 지금 100%)을 넘는 이름만(실측 scratchpad/rc1017/t3/t3_probe.py · probe-labels.json: 글자 폭 ÷ 칸 폭은 글자 · 칸이 같은 자를 따라
    크기와 무관하게 같다 — ko 「스토리 극장」 1.001 · en 「Playground」 1.124 · en 「Story Theater」 1.475, 나머지 ≤ .72).
    ko 극장 · en 놀이터는 116 메뉴 맞춤처럼 그 단추 글자만 칸에 드는 가장 큰 .01 단계로 줄인다(.98 · .88 — 821×462 에서 12.4 · 11.1px).
    ([판정판 121] en 놀이터 이름을 「Arcade」 로 바꿔 .88 줄을 뺐다가 되돌렸다 — 놀이터 창 안 줄 「Arcade」 와 겹침 · 지휘자 판정. 작은 창에서 11px
-   아래(390×844 10.6px 등)는 [Task 7a] 글자 하한 max(--text-min, 식)이 맡는다 — 하한 11px 가 된 이름이 단추 폭에 들게 폭 ≤ 380px 세로 화면에서만 아래 줄 이름 전부 자간을 −.045em 으로 좁힌다(위 @media 한 줄 — 글자 크기는 하한 그대로 · 그 밖 크기는 기본 −.03em).)
+   아래(390×844 10.6px 등)는 [Task 7a] 글자 하한 max(--text-min, 식)이 맡는다 — 하한 11px 가 된 이름이 단추 폭에 들게 좁은 칸(폭 ≤ 380px · 높이 ≤ 400px)에서만 아래 줄 이름 전부 자간을 −.06em 으로 좁힌다(위 @media 한 줄 — 글자 크기는 하한 그대로 · 그 밖 크기는 기본 −.03em).)
    en 「Story Theater」 는 줄이면 .67(821×462 에서 8.5px — 가독 하한 --text-min 11px 아래)이라 줄이지 않고 낱말 사이에서 두 줄로 접는다
    (같은 크기 · 줄 간격 .9 · 묶음 가운데를 73% → 71% — 두 줄 묶음 54~88% 가 아이콘 아래끝 51% 와 아래 굽 88% 사이). */
 html[lang="ko"] #app .bb > .bb-theater > .bb-lab { font-size: max(var(--text-min), calc(var(--bb-side) * 3.5 / 15.43 * .98)); }
