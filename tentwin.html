@@ -10441,7 +10441,7 @@ html.no-art-logo .logo-img  { display: none; }
 }
 .sk-b { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .sk-n { font-family: var(--font-display); font-size: 14px; color: var(--prim-art-ink); word-break: keep-all; text-wrap: balance; }   /* [rc1009 수정 1회차 F-3] 어절 줄바꿈 · 고른 줄(한 글자 줄 0) */
-.sk-d { font-size: max(var(--text-min), 10px); font-weight: 700; color: var(--prim-art-ink-2); word-break: keep-all; text-wrap: balance; }
+.sk-d { font-size: var(--text-min); /* [Task 7a] 옛 10px — 하한이 늘 이긴다 */ font-weight: 700; color: var(--prim-art-ink-2); word-break: keep-all; text-wrap: balance; }
 .sk-act {
   flex: 0 0 auto;
   min-width: 78px;
@@ -27788,6 +27788,18 @@ window.TT_SFX = {
       'map.plate8': 'Chapter 8: Sugar Prison',
       'map.plate9': 'Chapter 9: The Heart Room',
       'map.plate10': 'Chapter 10: The Throne',
+      /* [Task 7a 수정 1회차 I1] 아래 줄 · 지도 챕터 판 부제(#kd-bot-ch-n · #map-ch-n) 전용 — en 은 「Ch. n · 이름」 짧은 꼴(글자 하한 11px 에서도 판 폭 안에),
+         ko 는 map.plate 와 같은 문장. 미니맵 · 판 정보 이름(mmName — 「:」 앞 접두를 뗀다)은 map.plate 그대로. */
+      'map.chip1': 'Ch. 1 · Sweet Map',
+      'map.chip2': 'Ch. 2 · Pudding Range',
+      'map.chip3': 'Ch. 3 · Candy Cane Desert',
+      'map.chip4': 'Ch. 4 · Mint Hills',
+      'map.chip5': 'Ch. 5 · Cocoa Gate',
+      'map.chip6': 'Ch. 6 · Cream Corridor',
+      'map.chip7': 'Ch. 7 · Syrup Maze',
+      'map.chip8': 'Ch. 8 · Sugar Prison',
+      'map.chip9': 'Ch. 9 · The Heart Room',
+      'map.chip10': 'Ch. 10 · The Throne',
       /* --- 0910 챕터 미니맵 (DESIGN §14.10) — 챕터 이름은 위 map.plate* 재사용 */
       'minimap.title': 'Chapters',
       'minimap.locked': 'Clear stage {n} to unlock',
@@ -29257,6 +29269,16 @@ window.TT_SFX = {
       'map.plate8': '챕터 8: 설탕 감옥',
       'map.plate9': '챕터 9: 심장의 방',
       'map.plate10': '챕터 10: 왕좌',
+      'map.chip1': '챕터 1: 달콤한 지도',
+      'map.chip2': '챕터 2: 푸딩 산맥',
+      'map.chip3': '챕터 3: 캔디 케인 사막',
+      'map.chip4': '챕터 4: 박하 언덕',
+      'map.chip5': '챕터 5: 초코 관문',
+      'map.chip6': '챕터 6: 크림 회랑',
+      'map.chip7': '챕터 7: 시럽 미로',
+      'map.chip8': '챕터 8: 설탕 감옥',
+      'map.chip9': '챕터 9: 심장의 방',
+      'map.chip10': '챕터 10: 왕좌',
       /* --- 0910 챕터 미니맵 (DESIGN §14.10) — 챕터 이름은 위 map.plate* 재사용 */
       'minimap.title': '챕터',
       'minimap.locked': '{n}탄을 깨면 열려요',
@@ -48073,7 +48095,7 @@ window.TT_SFX = {
       tint.style.setProperty('--ch-tint-a', String(ch.alpha));
     }
     setText('map-ch-k', 'CHAPTER ' + mapChap);
-    setText('map-ch-n', t('map.plate' + mapChap));
+    setText('map-ch-n', t('map.chip' + mapChap));
     var pv = $('map-ch-prev'), nx = $('map-ch-next');
     var lastCh = Math.min(MAP_CHAPTERS.length, chapMax());
     if (pv) pv.disabled = SIAN_MAP ? (mapChap <= 1 && mapPage <= 0) : mapChap <= 1;
@@ -48733,9 +48755,9 @@ window.TT_SFX = {
     paintCoinChip('kd-top-stars-v');   /* P3 결정 2 — 위 칩 = 코인 지갑(동전 그림과 값 일치) */
     /* [116] 별 캡슐 = 위 바(옛 아래 띠 #kd-bot-b1). 위 칩(코인)과 같은 쉼표 표기 + 글자 수별 줄임(5자는 기본 크기) */
     paintChipText('kd-top-star-v', arcComma(store.jstar | 0));
-    /* 하단 바 — 큰 캡슐 부제 「챕터 n: 이름」(주 라벨 「모험」은 #kd-bot-ch-k 의 data-i18n=menu.adv 가 채운다).
-       100탄 완주(advMax 101 → chapMax 11)여도 마지막 장 명판 — buildMap 의 lastCh 와 같은 clamp(없으면 사전 키 map.plate11 이 그대로 찍힌다) */
-    setText('kd-bot-ch-n', t('map.plate' + Math.min(MAP_CHAPTERS.length, chapMax())));
+    /* 하단 바 — 큰 캡슐 부제 「챕터 n: 이름」 — en 은 「Ch. n · 이름」(사전 map.chip* · [Task 7a] 글자 하한 11px 에서도 판 폭 안)(주 라벨 「모험」은 #kd-bot-ch-k 의 data-i18n=menu.adv 가 채운다).
+       100탄 완주(advMax 101 → chapMax 11)여도 마지막 장 명판 — buildMap 의 lastCh 와 같은 clamp(없으면 사전 키 map.chip11 이 그대로 찍힌다) */
+    setText('kd-bot-ch-n', t('map.chip' + Math.min(MAP_CHAPTERS.length, chapMax())));
   }
 
   /* --- 방문 보상 (§26.6 「어제의 나」) ---------------------------------------
@@ -69076,11 +69098,11 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
 }
 #app.battle .dh-foe .dh-lv{
   left:76.0%;width:17.3%;top:3.6%;height:32.5%;
-  font-size:10px;font-size:max(var(--text-min), 2.50cqw);font-weight:800;
+  font-size:10px;font-size:2.50cqw;font-weight:800;
 }
 #app.battle .dh-me .dh-lv{
   left:76.8%;width:15.3%;top:1.9%;height:33.1%;
-  font-size:10px;font-size:max(var(--text-min), 2.50cqw);font-weight:800;
+  font-size:10px;font-size:2.50cqw;font-weight:800;
 }
 /* ---- W2.5 ④b 영문 보스명 잘림 수리 (2026-08-20, itch 업로드 차단 사유) --------
    증상: 영문 모드에서 "Grape Gobbler" 가 HP 바 명패에 **"rape Gobble"** 로 뜬다.
@@ -69159,14 +69181,17 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
    다시 맞춘다(padding-bottom 0.2em → 0.1em · border-box). DPR1 픽셀 줄 실측 360·390·480 × ko·en ×
    악당·주인공: 막대 마지막 어두운 줄과 위 1px · 판 안쪽 밝은 선과 아래 1px (빗금만 줄이면 위 0 · 아래 2)
    — scratchpad/release-0925/fix3/fix3b/diag-hp-f-2.json · smoke-fix3b f. */
+/* [Task 7a 수정 1회차] 체력 숫자(.dh-num) · 빗금 「/」(.dh-sl) · Lv 알약(.dh-lv)은 위 안 A · 판정판 값 그대로(2.83cqw · .85em · 2.50cqw) — 이 셋에는 하한을 걸지 않는다:
+   빗금은 숫자 크기의 .85배라 숫자가 하한으로 커지면 빗금도 따라가 smoke-fix3b f 의 잉크 줄(360 위 0)이 깨지고, Lv 알약은 상자 잘림 1.5~2.1px 이 생긴다.
+   (전투 HUD 글자는 이미 된 곳 — 지휘자 판정 2026-10-18. 360 에서 숫자 10.19 · 빗금 8.66 · Lv 9.0px, 390 에서 빗금 9.38 · Lv 9.75px 는 하한 11px 아래로 남는다 — 보고 우려). */
 #app.battle #duel-hud .dh-num{
   inset:auto;
   top:30.3cqw;height:2.44cqw;
   padding-bottom:0.1em;
-  font-size:11px;font-size:max(var(--text-min), 2.83cqw);
+  font-size:11px;font-size:2.83cqw;
   z-index:6;
 }
-#duel-hud .dh-num .dh-sl{ font-size:max(var(--text-min), .85em); }
+#duel-hud .dh-num .dh-sl{ font-size:.85em; }
 #app.battle #duel-hud #duel-foe-n{ left:8.04cqw; justify-content:flex-start; }
 #app.battle #duel-hud #duel-me-n{ right:8.43cqw; justify-content:flex-end; }
 /* 누적 데미지 — 시안에 자리가 없어 성과 큰구름 사이의 빈 하늘에 눕힌다. */
@@ -69689,7 +69714,7 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
 }
 .mm-k {
   font-family: var(--font-display);
-  font-size: max(var(--text-min), 9px);
+  font-size: var(--text-min);   /* [Task 7a] 옛 9px — 하한이 늘 이긴다 */
   letter-spacing: .5px;
   font-weight: 700;
   color: #FFE9B8;
@@ -69702,7 +69727,7 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
   color: #FFFFFF;
 }
 .mm-p {
-  font-size: max(var(--text-min), 9.5px);
+  font-size: var(--text-min);   /* [Task 7a] 옛 9.5px — 하한이 늘 이긴다 */
   font-weight: 700;
   letter-spacing: -.01em;
   color: #FFE0B0;
@@ -69950,7 +69975,7 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
   border-radius: 999px;
   background: var(--f2-pill);
   box-shadow: inset 0 0 0 1px var(--f2-pill-line);
-  font-size: max(var(--text-min), 10px);
+  font-size: var(--text-min);   /* [Task 7a] 옛 10px — 하한이 늘 이긴다 */
   font-style: normal;
   font-weight: 800;
   line-height: 1.4;
@@ -70637,15 +70662,19 @@ html[lang="en"] #kd-m-circus b{ font-size: .85em; letter-spacing: -.02em; }
   overflow: clip visible;   /* 「모험」 판정 Q2 와 같은 처방 — line-height 1 이 한글 위 꼭지를 자르지 않게 세로축만 푼다(clip 을 모르면 위 hidden) */
   text-shadow: 0 calc(var(--bb-side) * .28 / 15.43) 0 var(--hub-sh-lab);
 }
-/* 맞춤 — 글자 칸(단추 폭 92%)을 넘는 이름만(실측 scratchpad/rc1017/t3/t3_probe.py · probe-labels.json: 글자 폭 ÷ 칸 폭은 글자 · 칸이 같은 자를 따라
+/* [Task 7a 수정 1회차 I2 · 지휘자 판정] 하한 11px 로 커진 이름(en 「Playground」)이 단추 폭(360 폭에서 49px)에 들게 — 폭 ≤ 380px 세로 화면에서만 아래 줄 이름 전부에 같은 자간.
+   값 = 그 이름이 360×640 ko · en 에서 단추 안 · 말줄임 0 으로 드는 가장 작은 조임(t7a_tracking.py 실측: −.040em 은 0.08px 넘침 · −.045em 부터 0).
+   그 밖 크기 · 데스크톱은 위 기본 −.03em 그대로. */
+@media (max-width: 380px) { #app .bb > * > .bb-lab { letter-spacing: -.045em; } }
+/* 맞춤 — 글자 칸(단추 폭 92% — [Task 7a] 글자 칸은 지금 100%)을 넘는 이름만(실측 scratchpad/rc1017/t3/t3_probe.py · probe-labels.json: 글자 폭 ÷ 칸 폭은 글자 · 칸이 같은 자를 따라
    크기와 무관하게 같다 — ko 「스토리 극장」 1.001 · en 「Playground」 1.124 · en 「Story Theater」 1.475, 나머지 ≤ .72).
    ko 극장 · en 놀이터는 116 메뉴 맞춤처럼 그 단추 글자만 칸에 드는 가장 큰 .01 단계로 줄인다(.98 · .88 — 821×462 에서 12.4 · 11.1px).
    ([판정판 121] en 놀이터 이름을 「Arcade」 로 바꿔 .88 줄을 뺐다가 되돌렸다 — 놀이터 창 안 줄 「Arcade」 와 겹침 · 지휘자 판정. 작은 창에서 11px
-   아래(390×844 10.6px 등)는 [Task 7a] 글자 하한 max(--text-min, 식)이 맡는다 — 하한 11px 가 된 en 놀이터가 360×640 · 844×390 단추 폭(49 · 47px)에 안 들어 자간만 −.03em → −.06em 으로 좁혔다(글자 크기는 하한 그대로).)
+   아래(390×844 10.6px 등)는 [Task 7a] 글자 하한 max(--text-min, 식)이 맡는다 — 하한 11px 가 된 이름이 단추 폭에 들게 폭 ≤ 380px 세로 화면에서만 아래 줄 이름 전부 자간을 −.045em 으로 좁힌다(위 @media 한 줄 — 글자 크기는 하한 그대로 · 그 밖 크기는 기본 −.03em).)
    en 「Story Theater」 는 줄이면 .67(821×462 에서 8.5px — 가독 하한 --text-min 11px 아래)이라 줄이지 않고 낱말 사이에서 두 줄로 접는다
    (같은 크기 · 줄 간격 .9 · 묶음 가운데를 73% → 71% — 두 줄 묶음 54~88% 가 아이콘 아래끝 51% 와 아래 굽 88% 사이). */
 html[lang="ko"] #app .bb > .bb-theater > .bb-lab { font-size: max(var(--text-min), calc(var(--bb-side) * 3.5 / 15.43 * .98)); }
-html[lang="en"] #app .bb > .bb-play > .bb-lab { font-size: max(var(--text-min), calc(var(--bb-side) * 3.5 / 15.43 * .88)); letter-spacing: -.06em; }
+html[lang="en"] #app .bb > .bb-play > .bb-lab { font-size: max(var(--text-min), calc(var(--bb-side) * 3.5 / 15.43 * .88)); }
 html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal; word-break: keep-all; line-height: .9; }
 /* 가운데 판 글자(메인 「모험 / 챕터 n: 이름」 · 지도 「CHAPTER n / 이름」 = 미니맵 손잡이) — 판 폭 비(116 의 31.66cqw 기준 값 ÷ 31.66). */
 /* 세로 광학 보정(리뷰 Important 2 · V2) — 글자 묶음(굵은 줄 + 작은 줄, line-height 1)은 위 줄 대문자 머리가 상자 위 끝에 닿고 아래는 하강부 자리가
@@ -70895,7 +70924,7 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
   --nc-u: .37248cqw;                          /* 목업 1px = 판 안쪽 폭(cqw) × 1.149 / 308.469 = 100cqw / 268.469 */
   --nc-fs-min: var(--text-min);                /* [Task 7a · B1] 세로도 같은 글자 하한 — 아래 글자 줄이 읽는 스위치(가로 블록 gear-121 3 절의 켬 줄과 같은 값) */
   /* [판정판 121 · Task 5 리뷰 전 수정] 이 블록의 글자 크기는 전부 max(var(--nc-fs-min, 0px), calc(var(--nc-u) * N)) — 하한 스위치 --nc-fs-min 은
-     가로 블록(<style id="gear-121"> 3 절)만 --text-min 으로 켠다(세로 = 0px · 무변). */
+     가로 블록(<style id="gear-121"> 3 절)이 --text-min 으로 켠다. [Task 7a] 세로도 바로 위 한 줄이 같은 값으로 켠다(0px 는 이 판 밖에서 읽힐 때의 기본값). */
   --f2-chip-fs: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 11.5));     /* kit-pill-v2--chip/--soft 글자 기본(카드 = 핸디캡 칩) = 시안의 작은 알약 글자 11.5(.clear .tag) */
 }
 /* 안쪽 폭 = 시안(목업 셸은 옛 판 여백 42 → 22.77 @390 로 좁혀 찍었다). 판의 여백·리본은 그대로 두고(= 획득표와 같은 조각 — Task 12
