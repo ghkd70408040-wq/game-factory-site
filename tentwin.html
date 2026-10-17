@@ -13898,8 +13898,8 @@ html[lang="ko"] #modal-arc .sheet-row .btn { word-break: keep-all; min-width: 0;
    ▣ 색은 이 블록 안의 지역 변수 둘로만 산다. 전역 팔레트(--f2-*)에 새 이름을
      더하지 않는 것이 규율이다 — 한 화면의 강조색이 전역 토큰이 되면 다음 화면이
      그것을 상속받고, 그때부터 색은 아무 뜻도 없어진다. */
-#modal-node .node-info,
-#modal-drops .dr-list {
+/* [판정판 121 · Task 8a] 획득표(#modal-drops) 몫 선택자는 이 목록들에서 뺐다 — 획득표는 장비 칸 · 등급 칩 · 알약 탭 부품으로 다시 짰다(drops-74 블록). */
+#modal-node .node-info {
   --nk-pink: var(--role-nk-pink-node);
   --nk-pink-soft: var(--role-nk-pink-soft-node);
   list-style: none;
@@ -13911,13 +13911,9 @@ html[lang="ko"] #modal-arc .sheet-row .btn { word-break: keep-all; min-width: 0;
   border-radius: 13px;
   background: var(--nk-pink-soft);
 }
-#modal-node .node-info > li,
-#modal-drops .dr-row { display: flex; align-items: baseline; gap: 9px; }
+#modal-node .node-info > li { display: flex; align-items: baseline; gap: 9px; }
 #modal-node .node-info > li[hidden] { display: none; }
-#modal-node .node-info > li > b,
-#modal-drops .dr-h,
-#modal-drops .dr-meta,
-#modal-drops .dr-note {
+#modal-node .node-info > li > b {
   flex: 0 0 auto;
   min-width: 68px;
   font-family: var(--font-display);
@@ -13925,10 +13921,7 @@ html[lang="ko"] #modal-arc .sheet-row .btn { word-break: keep-all; min-width: 0;
   letter-spacing: .3px;
   color: var(--nk-pink);
 }
-#modal-node .node-info > li > i,
-#modal-drops .dr-name,
-#modal-drops .dr-p,
-#modal-drops .dr-sub {
+#modal-node .node-info > li > i {
   flex: 1 1 auto;
   min-width: 0;
   font-style: normal;
@@ -14082,6 +14075,10 @@ html[lang="ko"] #modal-arc .sheet-row .btn { word-break: keep-all; min-width: 0;
      매니페스트 modes.A face.parts.charsel_desc / alpha.parts.charsel_desc 로 등재 대상. */
   --mode-a-face-desc:  #E3D8DF;
   --mode-a-alpha-desc: .58;
+  /* [판정판 121 · Task 8a · 전 화면 감사 D5] Mode A 부품 리프 — 창 판(.modal 안 .jbox--modal) 면(Fill L1) 속 α. 판이 너무 비쳐 뒤 그림이 글자를 흐렸다.
+     값 = 측정으로 정함(지휘자 판정 Q2: 판 위 본문(잉크) 글자 대비 4.5:1 을 넘는 가장 작은 값 · .85 이상 · .94 이하) — 설정 · 미션 · 판 정보 · 일시정지 ×
+     1280x720 · 1024x960 · 390x844 훑기 표 = scratchpad/rc1017/t8a/smoke-windows-*.json(보고 표). 캐릭창 · 제목 캡슐 · 전투 카드는 --mode-a-alpha 그대로. */
+  --mode-a-alpha-win: .90;
   /* [E71-0908 norm-hud] Mode B 첫 소비처 = --hudj-*(#classic-hud .ch-fx 젤리 엔진, 72ae216부터 display:none → 렌더 0).
      [E72-0908 norm-cs] 값을 정본 theme-tentwin.css(a27e2c5, 사용자 확정 HUD lite 자산값)와 한 자도 같게 맞춘다:
      face #96A7F6(150,167,246) · rim #C2D6FF(194,214,255) · contact .200(HUD 판 drop-shadow α).
@@ -17379,22 +17376,30 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
     <p class="node-hearts"><span class="hc-heart" aria-hidden="true"></span><b id="node-hearts-v">5</b> <span data-i18n="adv.hearts">Hearts</span></p>
   </div></div>
 
-  <!-- 판정판 74 — 획득표(스펙 §D-3 · 조사 §3 「전체 ›」). 판·리본·X = 노드 카드와 같은 조각, 칸 = cpItemCell.
+  <!-- 판정판 74 — 획득표(스펙 §D-3 · 조사 §3 「전체 ›」). 판·리본·X = 노드 카드와 같은 조각.
+       [판정판 121 · Task 8a] 하나의 게임 UI 기준(docs/superpowers/specs/2026-10-18-one-game-ui-standard.md) §5 · §7 · §10 로 다시 짰다:
+       판 안 맨 위 알약 탭 한 줄(.kd-tag.kit-pill-v2 — 상점 아래 탭 · 메인 메뉴 단추와 같은 판) → 고른 절 하나만 보인다(hidden).
+       장비 과일 절 = 한 줄 설명 · 등급 칩 셋(.tchip) · (보스 판) 보스 상자 · 장비 칸 격자(itemTile — 세로 4열 · 가로 5열) · 맨 아래 한 줄.
+       사용 과일 절 = 줄 카드(중립 장비 칸 안 게이지 메달 그림 · 이름 · 한 줄 설명 · 확률 알약) — 이모지 은퇴.
        숫자는 전부 openDrops() 가 dropTableFor(n) 에서 채운다(판 추첨과 같은 표 — 마크업에 수치 0). -->
   <div id="modal-drops" class="modal r10m" hidden role="dialog" aria-modal="true" aria-labelledby="drops-title"><div class="sheet r10-panel jbox jbox--modal" data-part="modal-plate">
     <div class="r10-ribbon"><h2 id="drops-title">Stage 1 Drops</h2></div>
     <button id="drops-close" class="r10-x x-btn" type="button" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
+    <div class="dr-tabs" role="tablist" data-i18n-aria="aria.droptabs" aria-label="Drop table sections">
+      <button class="dr-tab kd-tag kit-pill-v2" id="dr-tab-gear" type="button" role="tab" aria-controls="dr-sec-gear" data-dtab="gear" data-tone="violet" aria-selected="true"><span data-i18n="drops.gear.h">Gear Fruit</span></button>
+      <button class="dr-tab kd-tag kit-pill-v2" id="dr-tab-use" type="button" role="tab" aria-controls="dr-sec-use" data-dtab="use" data-tone="mint" data-variant="soft" aria-selected="false"><span data-i18n="drops.use.h">Instant Fruits</span></button>
+    </div>
     <div class="dr-body">
-      <section class="dr-sec" data-sec="gear">
-        <h3 class="dr-h" data-i18n="drops.gear.h">Gear Fruit</h3>
-        <p id="dr-gear-sub" class="dr-sub"></p>
-        <p id="dr-tier" class="dr-sub"></p>
-        <ul id="dr-items" class="dr-list"></ul>
-        <p class="dr-note" data-i18n="drops.note">Chances are per gear fruit. Per-round averages come from test runs.</p>
+      <section id="dr-sec-gear" class="dr-sec" data-sec="gear" role="tabpanel" aria-labelledby="dr-tab-gear">
+        <p id="dr-cap" class="dr-cap"></p>
+        <p id="dr-chips" class="dr-chips"></p>
+        <div id="dr-boss" class="dr-boss" hidden><b class="dr-boss-h" data-i18n="drops.boss.h">Boss Reward</b><span id="dr-boss-sub" class="dr-boss-sub"></span></div>
+        <ul id="dr-items" class="dr-grid"></ul>
+        <p class="dr-note" data-i18n="drops.note2">Chances are per gear fruit</p>
       </section>
-      <section id="dr-boss" class="dr-sec" data-sec="boss" hidden><h3 class="dr-h" data-i18n="drops.boss.h">Boss Reward</h3><p id="dr-boss-sub" class="dr-sub"></p></section>
-      <section class="dr-sec" data-sec="use"><h3 class="dr-h" data-i18n="drops.use.h">Instant Fruits</h3><ul id="dr-use" class="dr-list"></ul></section>
-      <section id="dr-gift" class="dr-sec" data-sec="gift" hidden><h3 class="dr-h" data-i18n="drops.gift.h">Gift Box</h3><p id="dr-gift-sub" class="dr-sub"></p></section>
+      <section id="dr-sec-use" class="dr-sec" data-sec="use" role="tabpanel" aria-labelledby="dr-tab-use" hidden>
+        <ul id="dr-use" class="dr-rows"></ul>
+      </section>
     </div>
   </div></div>
 
@@ -27303,6 +27308,7 @@ window.TT_SFX = {
       'aria.coinplus': 'Get more coins',
       'aria.starplus': 'Get more stars',
       'aria.shoptabs': 'Shop sections',
+      'aria.droptabs': 'Drop table sections',   /* [판정판 121 · Task 8a] 획득표 알약 탭 줄 */
       'time.hm': '{h}h {m}m',
       /* P3 Task 5 — 특가 · 꾸미기 탭(상점 화면). 가격·한도·지급 수는 사전에 적지 않는다(카드가 상수로 채운다). */
       'deals.title': "Today's Deals",
@@ -28105,6 +28111,10 @@ window.TT_SFX = {
       'drops.use.p': '{x} in 100',
       'drops.gift.h': 'Gift Box',
       'drops.gift.sub': 'On this stage a gift box shows up {p}% of the time. It holds gear {i}% of the time, or a pet or epic gear {x}%.',
+      /* [판정판 121 · Task 8a] 획득표 다시 짜기 — drops.gear.sub · drops.gear.avg · drops.tier · drops.note 는 더는 안 읽는다(지우지 않음 · 브리프) */
+      'drops.gear.cap': '{r} in 100 fruits · {a} per round',
+      'drops.note2': 'Chances are per gear fruit',
+      'tile.lv': 'Lv {lv}',   /* 장비 칸(itemTile) 레벨 알약 */
       /* W3 — 기술이 "숫자 멈춤"으로 승격되면서 문구도 두 사실을 다 말한다:
          시계도 멈추고 악당 게이지도 멈춘다. 하나만 말하면 나머지 하나는
          플레이어가 영영 모르는 효과가 된다. */
@@ -28820,6 +28830,7 @@ window.TT_SFX = {
       'aria.coinplus': '코인 더 얻기',
       'aria.starplus': '별 더 얻기',
       'aria.shoptabs': '상점 칸 고르기',
+      'aria.droptabs': '획득표 구분',   /* [판정판 121 · Task 8a] 획득표 알약 탭 줄 */
       'time.hm': '{h}시간 {m}분',
       /* P3 Task 5 — 특가 · 꾸미기 탭(상점 화면). 가격·한도·지급 수는 사전에 적지 않는다(카드가 상수로 채운다). */
       'deals.title': '오늘의 특가',
@@ -29555,6 +29566,10 @@ window.TT_SFX = {
       'drops.use.p': '100개 중 {x}개꼴',
       'drops.gift.h': '선물 상자',
       'drops.gift.sub': '이 탄에 들어가면 {p}% 확률로 상자가 나와요. 열면 장비 {i}%, 펫이나 영웅 장비 {x}%예요.',
+      /* [판정판 121 · Task 8a] 획득표 다시 짜기 — drops.gear.sub · drops.gear.avg · drops.tier · drops.note 는 더는 안 읽는다(지우지 않음 · 브리프) */
+      'drops.gear.cap': '과일 100개 중 {r}개꼴 · 한 판 평균 {a}개',
+      'drops.note2': '확률은 장비 과일 하나 기준이에요',
+      'tile.lv': 'Lv {lv}',   /* 장비 칸(itemTile) 레벨 알약 */
       /* W3 — 기술이 "숫자 멈춤"으로 승격되면서 문구도 두 사실을 다 말한다:
          시계도 멈추고 악당 게이지도 멈춘다. 하나만 말하면 나머지 하나는
          플레이어가 영영 모르는 효과가 된다. */
@@ -50126,6 +50141,51 @@ window.TT_SFX = {
     return u ? ('url("' + u + '")') : 'none';
   }
 
+  /* [판정판 121 · Task 8a] 장비 칸(등급 칸) 한 벌 — 하나의 게임 UI 기준 §7. 장비가 보이는 곳(획득표 · 장비 칸 · 가방 · 설명 카드 · 상점 장비 카드 ·
+     뽑기 결과)은 전부 이 칸 하나다(8b 캐릭터 창 · 8c 상점이 이 이름 · 인자 · 상태 그대로 쓴다). 모양 · 색은 <style id="itile-8a"> 한 곳.
+       itemTile(id, o) → <span class="itile" aria-hidden="true" data-tier="common|rare|epic|none" data-state="own|eq|empty" data-slot="weapon|aux|trinket">
+         자식 i.itile-art(그림 = itemArtCss(id, o.size)) · (o.lv > 0) b.itile-lv(「Lv N」 tile.lv) · (o.eq) i.itile-eq(✓)
+       o.size  그림 파일 64 · 96 · 256 — 칸이 화면에 그려지는 크기보다 크거나 같은 것(그 밖 값 = 96)
+       o.tier  등급(기본 = 그 장비의 등급, 장비가 없으면 none) · o.slot 부위(기본 = 그 장비의 부위)
+       o.lv    보유 레벨(0 이면 알약 없음) · o.eq 장착 표
+       o.empty 빈 칸 — data-state empty · data-tier none · 그림 = 그 부위 대표 그림(weapon flamescepter · aux turtleshield · trinket windribbon)의 실루엣(CSS)
+               (중간 확인 판정 3 — 종전 무기 flint(둥근 돌) · 보조 softcushion 은 그 부위로 안 읽혔다. 8b 가 이 매핑 그대로 쓴다)
+     칸은 그림 · 레벨 · 표만 가진다 — 이름 · 확률 · 단추 같은 글은 칸 밖 소비처가 둔다. 누르는 칸이 필요하면 소비처가 <button> 안에 넣고 라벨을 붙인다.
+     고른 칸 = 칸의 [data-sel] 또는 감싼 요소의 [aria-selected="true"](CSS — 밝은 테 + 위 ▼). */
+  var ITILE_EMPTY_ART = { weapon: 'flamescepter', aux: 'turtleshield', trinket: 'windribbon' };
+  function itemTile(id, o) {
+    o = o || {};
+    var it = id ? itemById(id) : null;
+    var slot = o.slot || (it ? it.slot : '');
+    var empty = !!o.empty;
+    var lv = o.lv | 0;
+    var size = (o.size === 64 || o.size === 256) ? o.size : 96;
+    var el = document.createElement('span');
+    el.className = 'itile';
+    el.setAttribute('aria-hidden', 'true');
+    el.setAttribute('data-tier', empty ? 'none' : (o.tier || (it ? it.tier : 'none')));
+    el.setAttribute('data-state', empty ? 'empty' : (o.eq ? 'eq' : 'own'));
+    if (slot) el.setAttribute('data-slot', slot);
+    var art = document.createElement('i');
+    art.className = 'itile-art';
+    var artId = empty ? (ITILE_EMPTY_ART[slot] || '') : id;
+    if (artId) art.style.setProperty('background-image', itemArtCss(artId, size));
+    el.appendChild(art);
+    if (!empty && lv > 0) {
+      var b = document.createElement('b');
+      b.className = 'itile-lv';
+      b.textContent = t('tile.lv', { lv: lv });
+      el.appendChild(b);
+    }
+    if (!empty && o.eq) {
+      var q = document.createElement('i');
+      q.className = 'itile-eq';
+      q.textContent = '✓';
+      el.appendChild(q);
+    }
+    return el;
+  }
+
   /** 그 장비가 막대에 더하는 점수 = 희귀도(일반 1 · 희귀 2 · 영웅 3) + ⌊Lv/4⌋(Lv4·8·12 에 +1) — 수치안 §4-1. */
   function itemEffOf(id, lv) {
     var it = itemById(id);
@@ -50567,34 +50627,82 @@ window.TT_SFX = {
   var dropsN = 0;
   /** 확률 → 글자(소수 한 자리까지, 끝 0 없음). 0.36 → "36" · 0.0333 → "3.3". 카드(Task 13)도 이것을 쓴다. */
   function pctTxt(p) { return String(Math.round((+p || 0) * 1000) / 10); }
+  /* [판정판 121 · Task 8a] 사용 과일 줄의 그림 = 그 과일이 채우는 전투 게이지 단추의 메달 그림(지휘자 판정 Q1 (a)) — 판 위 특수 과일은 카탈로그 그림이 없다
+     (보통 과일 + 이모지 배지). 매핑은 판 처리 코드(resolveMatch 의 mk 소비)와 단추 짝(syncBattleActs · 규칙 창 skills.s2~s4 메달)에서 왔다:
+       pet  펫 과일  → d.petLeft +1         → #btn-undo(펫소환)          = medal-pet-v3-90
+       star 스킬 과일 → store.gauge = 만땅   → #btn-shuffle(「스킬」)      = medal-awaken-v3-90(파일 이름은 옛 이름 — 규칙 창 skills.s3 짝)
+       awk  각성 과일 → d.me.sp = 만땅      → #btn-hint(「각성」)         = medal-special-v3-90(규칙 창 skills.s2 짝)
+       gift 선물 상자 → lib-glyph-giftbox(지휘자 판정)
+     경로는 리터럴 그대로(catalog-allowlist 가 코드 안 리터럴만 찾는다 — ITEM_ART 주석과 같은 이유). */
+  var DROPS_USE_ART = { pet: 'url("catalog/medal-pet-v3-90.webp")', star: 'url("catalog/medal-awaken-v3-90.webp")',
+                        awk: 'url("catalog/medal-special-v3-90.webp")', gift: 'url("catalog/lib-glyph-giftbox.webp")' };
+  /** 획득표 탭 하나를 고른다 — 고른 탭 = 톤 면(변주 없음) · 나머지 = soft(상점 shopPaint 와 같은 손잡이), 그 절만 보인다(hidden). */
+  function dropsTab(which) {
+    var tabs = document.querySelectorAll('#modal-drops .dr-tab');
+    for (var i = 0; i < tabs.length; i++) {
+      var on = tabs[i].getAttribute('data-dtab') === which;
+      tabs[i].setAttribute('aria-selected', on ? 'true' : 'false');
+      if (on) tabs[i].removeAttribute('data-variant'); else tabs[i].setAttribute('data-variant', 'soft');
+    }
+    var g = $('dr-sec-gear'), u = $('dr-sec-use');
+    if (g) g.hidden = which !== 'gear';
+    if (u) u.hidden = which !== 'use';
+    var body = document.querySelector('#modal-drops .dr-body');
+    if (body) body.scrollTop = 0;
+  }
+  /** 사용 과일 절의 줄 카드 하나 — [중립 장비 칸 안 메달 그림] [이름 / 한 줄 설명 / 확률 알약 — 위에서 아래로](중간 확인 판정 1 (a) — 모든 크기 같은 짜임). */
+  function dropsUseRow(key, name, desc, pill) {
+    var li = document.createElement('li');
+    li.className = 'dr-urow';
+    li.setAttribute('data-use', key);
+    var tile = itemTile('', { tier: 'none' });
+    var art = tile.querySelector('.itile-art');
+    if (art) art.style.setProperty('background-image', DROPS_USE_ART[key]);
+    li.appendChild(tile);
+    var bx = document.createElement('span'); bx.className = 'dr-ub';
+    var b = document.createElement('b'); b.className = 'dr-un'; b.textContent = name; bx.appendChild(b);
+    var s = document.createElement('span'); s.className = 'dr-ud'; s.textContent = desc; bx.appendChild(s);   /* 제목 + 문장 — 콜론 공식 금지(점검 W1) */
+    var p = document.createElement('span'); p.className = 'dr-up kit-pill-v2'; p.setAttribute('data-variant', 'soft'); p.textContent = pill; bx.appendChild(p);   /* 확률 알약 = 크림 알약 부품(soft 변주) — 설명 아래 */
+    li.appendChild(bx);
+    li.setAttribute('aria-label', name + ', ' + desc + ', ' + pill);
+    return li;
+  }
   function openDrops(n) {
     var d = dropTableFor(n), own = (store.items && store.items.own) || {}, i;
     dropsN = n;
     setText('drops-title', t('drops.title', { n: n }));
-    setText('dr-gear-sub', t('drops.gear.sub', { r: pctTxt(d.rate) }) + ' ' + t('drops.gear.avg', { a: d.avg }));
-    setText('dr-tier', t('drops.tier', { c: pctTxt(d.tiers.common), r: pctTxt(d.tiers.rare), e: pctTxt(d.tiers.epic) }));
+    setText('dr-cap', t('drops.gear.cap', { r: pctTxt(d.rate), a: d.avg }));
+    /* 등급 칩 셋 — 값 = dropTableFor(n).tiers(판 추첨과 같은 표). 0% 칩 = data-zero(옅게). */
+    var chips = $('dr-chips');
+    if (chips) {
+      chips.innerHTML = '';
+      for (i = 0; i < GEAR_TIERS.length; i++) {
+        var tr = GEAR_TIERS[i], c = document.createElement('span');
+        c.className = 'tchip';
+        c.setAttribute('data-tier', tr);
+        if (!(d.tiers[tr] > 0)) c.setAttribute('data-zero', '');
+        var cl = document.createElement('i'); cl.textContent = t('drops.tier.' + tr); c.appendChild(cl);
+        var cv = document.createElement('b'); cv.textContent = t('drops.chance', { p: pctTxt(d.tiers[tr]) }); c.appendChild(cv);
+        chips.appendChild(c);
+      }
+    }
+    var bs = $('dr-boss');
+    if (bs) { bs.hidden = !d.boss; if (d.boss) setText('dr-boss-sub', t('drops.boss.sub', { r: pctTxt(d.boss.rare), e: pctTxt(d.boss.epic) })); }
     var ul = $('dr-items');
     if (ul) {
       ul.innerHTML = '';
       var rows = d.items.slice().sort(function (a, b) { return (GEAR_TIERS.indexOf(b.tier) - GEAR_TIERS.indexOf(a.tier)) || (b.p - a.p); });
       for (i = 0; i < rows.length; i++) {
-        var r = rows[i], it = itemById(r.id), lv = own[r.id] | 0, nm = t('item.' + r.id + '.nm');
+        var r = rows[i], lv = own[r.id] | 0, nm = t('item.' + r.id + '.nm');
         var li = document.createElement('li');
-        li.className = 'dr-row';
+        li.className = 'dr-cell';
         li.setAttribute('data-item', r.id);
         li.setAttribute('data-tier', r.tier);
-        /* 낭독: 칸이 aria-hidden 이라 보유 · 레벨을 못 읽는다 — 줄에 이름 · 등급 · (보유면 레벨) · 확률을 쉼표로 이은 라벨(기존 키 조합 — 새 키 0, 수정 1회차 M4) */
-        li.setAttribute('aria-label', nm + ', ' + t('drops.tier.' + r.tier) + (lv > 0 ? ', ' + t('drops.lv', { lv: lv, max: ITEM_LV_MAX }) : '') + ', ' + t('drops.chance', { p: pctTxt(r.p) }));
-        /* 획득표 칸은 보기 전용 — cpItemCell 의 'own' 은 <button aria-pressed> 라 누를 곳 없는 포커스가 생긴다.
-           늘 'empty'(<span aria-hidden>)로 만들고 보유면 data-state 만 own 으로 바꿔 모양을 맞춘다(착수 전 점검 W19). */
-        var cell = cpItemCell('empty', it.slot, '', lv > 0 ? t('drops.lv', { lv: lv, max: ITEM_LV_MAX }) : '', r.id, r.tier, nm);
-        if (lv > 0) cell.setAttribute('data-state', 'own');
-        var ic = cell.querySelector('.cp-cr-ic');
-        if (ic) ic.style.setProperty('background-image', itemArtCss(r.id, 64));
-        li.appendChild(cell);
+        /* 낭독: 칸이 aria-hidden 이라 보유 · 레벨을 못 읽는다 — 칸에 이름 · 등급 · 스탯 · (보유면 레벨) · 확률을 쉼표로 이은 라벨(기존 키 조합 — 칸에서 뺀 분홍 줄의 등급 · 스탯도 여기 남는다) */
+        li.setAttribute('aria-label', nm + ', ' + t('drops.tier.' + r.tier) + ', ' + t('stat.k' + (STAT_KEYS.indexOf(r.stat) + 1))
+          + (lv > 0 ? ', ' + t('drops.lv', { lv: lv, max: ITEM_LV_MAX }) : '') + ', ' + t('drops.chance', { p: pctTxt(r.p) }));
+        li.appendChild(itemTile(r.id, { tier: r.tier, lv: lv, size: 96 }));
         var b = document.createElement('b'); b.className = 'dr-name'; b.textContent = nm; li.appendChild(b);
-        var m = document.createElement('i'); m.className = 'dr-meta';
-        m.textContent = t('drops.tier.' + r.tier) + ' · ' + t('stat.k' + (STAT_KEYS.indexOf(r.stat) + 1)); li.appendChild(m);
         var pc = document.createElement('span'); pc.className = 'dr-p'; pc.textContent = t('drops.chance', { p: pctTxt(r.p) }); li.appendChild(pc);
         ul.appendChild(li);
       }
@@ -50602,22 +50710,18 @@ window.TT_SFX = {
     var use = $('dr-use');
     if (use) {
       use.innerHTML = '';
-      [['pet', '🐾'], ['star', '⭐'], ['awk', '⚡']].forEach(function (u) {
-        var li = document.createElement('li');
-        li.className = 'dr-row dr-use';
-        li.setAttribute('data-use', u[0]);
-        var g = document.createElement('i'); g.className = 'dr-glyph'; g.setAttribute('aria-hidden', 'true'); g.textContent = u[1]; li.appendChild(g);
-        var b = document.createElement('b'); b.className = 'dr-name'; b.textContent = t('drops.use.' + u[0]); li.appendChild(b);
-        var m = document.createElement('i'); m.className = 'dr-meta'; m.textContent = t('drops.use.' + u[0] + '.d'); li.appendChild(m);   /* 제목 + 문장 — 콜론 공식 금지(점검 W1) */
-        var pc = document.createElement('span'); pc.className = 'dr-p'; pc.textContent = t('drops.use.p', { x: pctTxt(d.use[u[0]]) }); li.appendChild(pc);
-        li.setAttribute('aria-label', t('drops.use.' + u[0]) + ', ' + t('drops.use.' + u[0] + '.d') + ', ' + t('drops.use.p', { x: pctTxt(d.use[u[0]]) }));
-        use.appendChild(li);
+      ['pet', 'star', 'awk'].forEach(function (k) {
+        use.appendChild(dropsUseRow(k, t('drops.use.' + k), t('drops.use.' + k + '.d'), t('drops.use.p', { x: pctTxt(d.use[k]) })));
       });
+      if (d.gift) {
+        var gr = dropsUseRow('gift', t('drops.gift.h'), t('drops.gift.sub', { p: pctTxt(d.gift.stageP), i: pctTxt(d.gift.item), x: pctTxt(d.gift.rare) }),
+                             t('drops.chance', { p: pctTxt(d.gift.stageP) }));
+        gr.id = 'dr-gift';
+        var gs = gr.querySelector('.dr-ud'); if (gs) gs.id = 'dr-gift-sub';
+        use.appendChild(gr);
+      }
     }
-    var bs = $('dr-boss');
-    if (bs) { bs.hidden = !d.boss; if (d.boss) setText('dr-boss-sub', t('drops.boss.sub', { r: pctTxt(d.boss.rare), e: pctTxt(d.boss.epic) })); }
-    var gf = $('dr-gift');
-    if (gf) { gf.hidden = !d.gift; if (d.gift) setText('dr-gift-sub', t('drops.gift.sub', { p: pctTxt(d.gift.stageP), i: pctTxt(d.gift.item), x: pctTxt(d.gift.rare) })); }
+    dropsTab('gear');   /* 창을 다시 열면 장비 과일로 돌아온다 */
     openModal('modal-drops');
     J.sfx.ui();
   }
@@ -52084,6 +52188,13 @@ window.TT_SFX = {
     on($('unlock-go'), 'click', closeUnlock);
     on($('node-close'), 'click', function () { closeModal('modal-node'); J.sfx.ui(); });
     on($('drops-close'), 'click', closeDrops);   /* 74 T12 */
+    /* [판정판 121 · Task 8a] 획득표 알약 탭 — 고른 탭의 절 하나만 보인다(dropsTab) */
+    on(document.querySelector('#modal-drops .dr-tabs'), 'click', function (ev) {
+      var b = ev && ev.target && ev.target.closest ? ev.target.closest('.dr-tab') : null;
+      if (!b || b.getAttribute('aria-selected') === 'true') return;
+      dropsTab(b.getAttribute('data-dtab'));
+      J.sfx.ui();
+    });
     on(document.querySelector('#modal-node .nc-info'), 'click', ncInfoToggle);   /* 74 T13 — ⓘ 시간 종료 판정 + 별 조건 */
     on(document.querySelector('#modal-node .nc-swap'), 'click', function () { openCharPanel(); });   /* 74 T13 — ⇄ 캐릭터 창 */
     (function () {   /* 74 T13 수정 2회차 N1 — 구획 넘침 표시(ncBodyMore) 배선 */
@@ -53875,6 +53986,7 @@ window.TT_SFX = {
     /* [판정판 121 · Task 5] 장비 목록 · 설명 창 손잡이(smoke-gear · 가로 관문 gear 줄이 821x462 · 844x390 에서 연다 — 게임 코드는 이 문을 안 거친다) */
     openGear: openGear, closeGear: closeGear, openGearInfo: openGearInfo, closeGearInfo: closeGearInfo,
     itemArtUrl: itemArtUrl, itemArtCss: itemArtCss, ITEM_ART: ITEM_ART, itemSrcOf: itemSrcOf, ITEM_SRC: ITEM_SRC,
+    itemTile: itemTile, dropsTab: dropsTab,   /* [판정판 121 · Task 8a] 장비 칸 시트(t8a/sheet) · 획득표 탭 손잡이 — 게임 코드는 이 문을 안 거친다 */
     petOwned: petOwned, grantPet: grantPet, petCondBump: petCondBump,
     /* 74 — 파밍 기계 손잡이(smoke-v74-t9 · Task 10 하네스). 게임 코드는 이 중 무엇도 window.Game 을 거쳐 부르지 않는다. */
     dropTableFor: dropTableFor, gearRoll: gearRoll, gearRollFrom: gearRollFrom, gearBossRoll: gearBossRoll,
@@ -54751,6 +54863,10 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
      옛 값: --jbox-blur:var(--modal-glass);  (= blur(0px) saturate(1.06)) */
   --jbox-blur:none;
 }
+/* [판정판 121 · Task 8a · 전 화면 감사 D5] 창 판(.modal 안 판)만 면(Fill L1) 속 α 를 창 리프 --mode-a-alpha-win 으로 — 층 순서(Shape → Fill → Stroke → Effect) ·
+   다른 층 · 젤리판 v1.0 층 구조는 그대로, 바뀌는 것은 이 한 손잡이다(지휘자 판정 Q2 (b)). 전투 가로 카드 별칭(#pc-left · #pc-right · #duel-foe-box ·
+   #duel-me-box)과 방(상점 판 · 캐릭창)은 .modal 밖이라 무변. 특이성 (0,2,0) 이 위 등급 규칙 (0,1,0) 을 이긴다. */
+.modal :is(.jbox--modal, [data-part="modal-plate"]){ --jbox-a-in: var(--mode-a-alpha-win); }
 /* [T11-0926] 모달 판 몸통 — 캐릭터 선택 판 덮개(.cp-jelly)의 층을 의사요소 두 장에 나눠 담았다(캐릭판과 같은 층 순서).
    ::before(아래) 배경 4층(위→아래): 광택 1 · 광택 2 · 유백(L2-0) · 면(L1, face-top→face @ a-in).
                   inset 그림자 3겹(위→아래): 림 2차(p2) · 림 3차(p3) · 테두리 색 띠(L1.5).
@@ -61582,17 +61698,11 @@ body:has(.modal:not([hidden])) #screen-menu .mbtn-lab{
   opacity: 0;
 }
 
-/* C안(블러 강, 0904) — 모달이 열리면 뒤 화면만 blur(6px). 모달은 #screen-* 밖 형제라 흐려지지 않는다.
-   기존 스크림·backdrop-filter는 무접촉. :has() 미지원 엔진은 선상무변. */
-#screen-menu, #screen-map, #screen-game { transition: filter 160ms var(--ease); }
-body:has(.modal:not([hidden])) #screen-menu,
-body:has(.modal:not([hidden])) #screen-map,
-/* ⑲(0904) — 결과 모달(#modal-clear·#modal-adv·#modal-over)이 열리면 뒤 게임
-   화면도 6px 블러. 반려 사유(뒤 보드 타일이 판 너머로 비쳐 별·점수·문구가 안
-   읽힘)의 절반은 여기서 갚는다(나머지 절반은 .result-card). 보드 애니메이션이
-   filter 위에서 계속 돌지만 rAF 측정 참고치 정상(보고 참조). 모달이 닫히면
-   `:has()` 조건이 풀려 filter 는 자동으로 none 으로 복귀(160ms) → 보드 입력 정상. */
-body:has(.modal:not([hidden])) #screen-game { filter: blur(6px); }
+/* [판정판 121 · Task 8a · 전 화면 감사 D4] 은퇴: C안(블러 강, 0904) — 모달이 열리면 뒤 화면(#screen-menu · #screen-map · #screen-game)만 blur(6px)
+   + 그 filter 전환 160ms. 전투 · 지도 위 창만 뒤가 뭉개져 마을 위 창(선명)과 갈렸다(사용자 9번 「배경화면은 완전 블러처리돼서 감성도안살고」).
+   이제 모든 창의 뒤 막은 .modal 한 곳(W2.5/W7.5 사용자 판정 값 — 옅은 보라 막 .12 + blur(1px))뿐이다. filter 애니메이트는 모션 규칙 위반이기도 했다.
+   판 너머로 뒤가 비쳐 글자가 안 읽히던 몫(옛 ⑲ 사유)은 창 판 면 불투명도(D5 — --mode-a-alpha-win)가 맡는다.
+   옛 값: #screen-menu, #screen-map, #screen-game { transition: filter 160ms } · body:has(.modal:not([hidden])) #screen-menu/#screen-map/#screen-game { filter: blur(6px) } */
 
 /* ---- 1. 판 = kit-frame-v2 ------------------------------------------------ */
 /* 킷 의사요소는 위에서 흡수했으므로 끈다(스크롤 상자 안에서 흘러 올라가는 층). */
@@ -67013,8 +67123,7 @@ html[lang="en"] #modal-arc.is-arcdmg .sheet > h2{ --ttl:url("catalog/ttl-arcdmg-
 #modal-node .r10-ribbon,
 #modal-drops .r10-ribbon     { margin-bottom: 0; }
 #modal-node .node-chips:empty { display: none; }   /* 빈 칩 줄이 먹던 한 칸 */
-#modal-node .node-info,
-#modal-drops .dr-list      { margin: 0; }
+#modal-node .node-info      { margin: 0; }
 #modal-node .node-stars     { margin: 0; }
 #modal-node .nrow           { min-height: 48px; }
 /* 하트 줄 — 시작 버튼의 접지(3px)·드롭(7/16px) 밖으로. 격자 8 + 8 = 16 */
@@ -70817,44 +70926,162 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
 
 <style id="drops-74">
 /* ===== 74 T12 — 획득표 모달(#modal-drops) =====================================
-   스펙 §D-3 「노드 카드와 같은 조각」. 새로 그리지 않고 **원래 규칙의 선택자 목록에 #modal-drops 범위 선택자를 더해** 쓴다(선언 복사 0 · 새 px 리터럴 0 — 넓힌 자리 표는 DESIGN §27.11):
-     · 판 · 리본 · X · 제목 레터링 = 노드 카드(#modal-node) 규칙 · 목록 상자 · 줄 글자 = 노드 카드 .node-info 규칙(상자 · li · b · i)
-     · 칸(.cp-crystal.cp-gem.cp-islot) · 값 알약 = 캐릭터 창(#charpanel) 규칙 · 스크롤 구획 = 기록 창 #modal-rank #rank-list 규칙
-   이 블록이 새로 정하는 것은 줄 배치(grid) · 칸이 캐릭터 창 밖에서 읽는 토큰 다섯의 이름 연결 · 등급 겉선 색(기존 보상 토큰)과, 넓힌 규칙을 이 모달에 맞추는 한두 줄뿐이다. */
+   스펙 §D-3 「노드 카드와 같은 조각」 — 판 · 리본 · X · 제목 레터링 = 노드 카드(#modal-node) 규칙 · 스크롤 구획 = 기록 창 #modal-rank #rank-list 규칙(선택자 목록에 더한 것 그대로).
+   [판정판 121 · Task 8a] 판 안 짜임은 아래 절로 다시 짰다(옛 .node-info 줄 목록 · .cp-crystal 칸 · 분홍 메타 줄 · 이모지 은퇴). */
 
-/* ---- 목록만 스크롤 — flex · min-height · overflow · 스크롤바는 #modal-rank #rank-list 규칙에 더한 선택자가 낸다. 판 · 리본 · X 는 이 상자 밖이라 고정 -----------
-   여기는 이 상자 고유의 것: 구역을 세로로 쌓고(간격 = 판의 세로 리듬 그대로 — gap: inherit), 한글 낱말 중간에서 안 끊는다(이 파일의 관례 word-break: keep-all). */
+/* ===== [판정판 121 · Task 8a] 획득표 다시 짜기 — 하나의 게임 UI 기준 §3 판 M · §5 알약 탭 · §7 장비 칸 · §9 글자 · §10 격자 =====
+   사용자(원문): 「이 획득표 디자인구성들도 진짜 초등학생이만든수준 … 고급지고 일관성있게」. 옛 짜임(노드 카드 .node-info 분홍 줄 목록 · 보석 깎은 칸
+   .cp-crystal · 분홍 작은 메타 줄 · 이모지 글리프)은 은퇴 — 이 모달 몫 선택자를 그 공용 목록들에서 뺐다.
+   부품: 판 = .jbox--modal 그대로 · 탭 = .kd-tag.kit-pill-v2(상점 아래 탭과 같은 판 — 고른 탭 테 · soft 테두리는 상점 규칙 목록에 이 모달을 더했다) ·
+         장비 칸 = itemTile(.itile) · 등급 칩 = .tchip(둘 다 <style id="itile-8a">) · 사용 과일 확률 = kit-pill-v2[data-variant="soft"].
+   자 하나 --dr-u = 판 기준 폭의 1%(세로 = --f2-w / 100, 가로 = 6.2u — 「가로 창 한 무리」 절) — 지휘자 판정 Q6 값. 글자는 전부 max(--text-min, N × --dr-u).
+   격자 간격 = 판 안 폭의 3%: 절(.dr-sec)이 inline-size 컨테이너라 3cqw = 절 폭(= 판 안 폭)의 3%. 새 원시값 0 · 움직임 0. */
+#modal-drops .sheet { --dr-u: calc(var(--f2-w) / 100); }
+
+/* ---- 탭 한 줄 — 판 안 맨 위(구르지 않는다 — 스크롤 상자 .dr-body 밖) · 가운데 · 간격. 크기 = 탭 높이 10 · 글자 4.2(--dr-u). ---- */
+#modal-drops .dr-tabs {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: calc(var(--dr-u) * 2);
+  margin: 0;
+}
+#modal-drops .dr-tab.kit-pill-v2 {
+  --f2-ph: calc(var(--dr-u) * 10);
+  flex: 0 1 auto;
+  min-width: calc(var(--dr-u) * 30);
+  max-width: none;
+  height: var(--f2-ph);
+  margin: 0;
+  padding: 0 calc(var(--f2-ph) * .42) calc(var(--f2-ph) * .08);   /* .kd-tag 의 면 가운데 맞춤(아래 .08ph) 그대로 */
+  border-radius: calc(var(--f2-ph) * .232);                         /* 실루엣 = 메인 메뉴 단추 · 상점 탭(soft 변주의 999em 을 덮는다) */
+  font-size: max(var(--text-min), calc(var(--dr-u) * 4.2));
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ---- 절 — 고른 탭의 절 하나만 보인다(hidden). 한국어는 낱말 단위로 줄을 바꾼다. ---- */
 #modal-drops .dr-body {
-  --nk-pink: var(--role-nk-pink-node);   /* 구역 제목(.dr-h)은 목록 밖이라 넓힌 .node-info 상자 규칙의 변수를 못 받는다 — 같은 토큰을 같은 이름으로 잇는다 */
   display: flex;
   flex-direction: column;
-  gap: inherit;
   word-break: keep-all;
 }
 #modal-drops .dr-body > .dr-sec { flex: 0 0 auto; }
-#modal-drops .dr-sec { display: flex; flex-direction: column; gap: inherit; }
+#modal-drops .dr-sec {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--dr-u) * 2.6);   /* 3 이면 1280x720 장비 탭(2탄)이 판 안에서 2px 구른다(smoke-drops info 실측) — 중간 확인 판정 2 「스크롤 없이 들어가면 좋다」 */
+}
 #modal-drops .dr-sec[hidden] { display: none; }
 
-/* ---- 글자 — 모양은 노드 카드 .node-info 줄 규칙(라벨 li > b · 값 li > i)에 더한 선택자가 낸다 ---------------------------------------
-   라벨 모양 = .dr-h · .dr-meta · .dr-note(크기만) / 값 모양 = .dr-name · .dr-p · .dr-sub. 아래는 그 규칙이 이 모달에 안 맞는 곳만 덮는다. */
-#modal-drops .dr-h,
-#modal-drops .dr-sub,
-#modal-drops .dr-note { margin: 0; }
-#modal-drops .dr-h,
-#modal-drops .dr-meta,
-#modal-drops .dr-note { min-width: 0; }   /* li > b 규칙의 최소 폭(라벨 칸)은 grid 칸 · 문장에 맞지 않는다 */
-#modal-drops .dr-note {                   /* 주석 문장은 라벨 줄의 글자 크기만 받는다 */
-  font-family: inherit;
-  font-weight: normal;
-  letter-spacing: normal;
+/* 한 줄 설명 · 맨 아래 한 줄 = 보조(옅은 잉크) · 가운데 */
+#modal-drops .dr-cap,
+#modal-drops .dr-note {
+  margin: 0;
+  text-align: center;
+  font-size: max(var(--text-min), calc(var(--dr-u) * 3));
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--role-f2-ink);
+}
+/* 등급 칩 셋 — 한 줄 가운데. 칩 글자 크기(라벨)는 여기서 주고 값은 칩 부품이 1.4배로 키운다. */
+#modal-drops .dr-chips {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: calc(var(--dr-u) * 2);
+  font-size: max(var(--text-min), calc(var(--dr-u) * 3.2));
+}
+/* 보스 상자 = 크림 카드(상점 특가 카드 면 · 테 토큰) 안 제목 + 한 줄 */
+#modal-drops .dr-boss {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--dr-u) * 1);
+  padding: calc(var(--dr-u) * 2.6) calc(var(--dr-u) * 3);
+  border: calc(var(--dr-u) * .4) solid var(--role-f2-pill-line);
+  border-radius: calc(var(--dr-u) * 4.6);
+  background-color: var(--role-f2-pill);
+  text-align: center;
+  color: var(--prim-art-ink);
+}
+#modal-drops .dr-boss[hidden] { display: none; }
+#modal-drops .dr-boss-h { font-size: max(var(--text-min), calc(var(--dr-u) * 3.6)); font-weight: 800; line-height: 1.2; }
+#modal-drops .dr-boss-sub { font-size: max(var(--text-min), calc(var(--dr-u) * 3)); line-height: 1.35; color: var(--role-f2-ink); }
+
+/* ---- 장비 격자 — 세로 4열 · 가로 5열(가로 절에서 덮는다), 간격 = 판 안 폭의 3%. 칸 = [장비 칸][이름 두 줄 고정][확률] ---- */
+#modal-drops .dr-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 3cqw;
+}
+#modal-drops .dr-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  min-width: 0;
+  text-align: center;
+}
+/* 칸 아래 = 레벨 알약이 칸 폭의 6% 걸치는 몫(세로 여백 % = 담는 상자 폭 = 칸 폭 비) + 이름과의 틈 1.2 --dr-u. 이름 ↔ 확률은 틈 없이 붙는다(판정 2). */
+#modal-drops .dr-cell > .itile { width: 100%; margin-bottom: calc(6% + var(--dr-u) * 1.2); }
+/* 이름 = 카드 제목(굵은 잉크) · 높이는 내용만큼(확률이 이름 바로 아래에 붙는다 — 중간 확인 판정 2: 두 줄 고정 높이 은퇴) · 말줄임 없음.
+   같은 행의 칸은 격자 행이 위 끝을 맞추고, 행 높이는 그 행의 가장 긴 칸이 정한다(en 긴 이름 세 줄은 그 행만 높아진다 — 판정 2). */
+#modal-drops .dr-name {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);   /* 글자 칸 최소 폭 0 — 한 줄보다 긴 낱말도 칸 안에서 접힌다(flex 의 익명 항목은 최소 폭이 낱말 폭이라 칸 밖으로 넘쳤다) */
+  font-size: max(var(--text-min), calc(var(--dr-u) * 3.4));
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--prim-art-ink);
+  overflow-wrap: break-word;
+}
+#modal-drops .dr-p {
+  font-size: max(var(--text-min), calc(var(--dr-u) * 4));
+  font-weight: 800;
+  line-height: 1.3;   /* 1 · 1.2 면 글자 상자(어센트 · 디센트)가 칸 아래로 1~2px 넘친다(smoke-drops d10 실측 — en 글꼴이 더 깊다) */
   color: var(--prim-art-ink);
 }
 
-/* ---- 줄: [칸 · 두 줄] [이름 / 메타] [확률] ------------------------------------------
-   칸이 두 줄을 먹고(grid-row 1 / 3), 이름 · 메타가 가운데 두 줄, 확률이 오른쪽. 칸 크기는 캐릭터 창 칸 규칙(.cp-gem)이 낸다. 가로 간격 · 줄 상자는 넓힌 .node-info li 규칙이 낸다.
-   칸이 캐릭터 창 밖에서 읽는 토큰 다섯은 #charpanel 에만 선언돼 있어(--f2-item-* · --f2-ink · --f2-tab-on) 같은 이름으로 같은 토큰을 잇는다(새 값 0). */
+/* ---- 사용 과일 줄 카드 = 크림 카드 줄 하나에 [중립 장비 칸 안 메달 그림][이름(굵게) / 한 줄 설명(옅게) / 확률 알약 — 위에서 아래로]
+   (중간 확인 판정 1 (a): 알약을 설명 옆에 두면 폰에서 설명이 3~4줄로 접혔다 — 모든 크기 같은 짜임) ---- */
+#modal-drops .dr-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--dr-u) * 2.4);
+}
+#modal-drops .dr-urow {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--dr-u) * 3);
+  padding: calc(var(--dr-u) * 2.4) calc(var(--dr-u) * 3);
+  border: calc(var(--dr-u) * .4) solid var(--role-f2-pill-line);
+  border-radius: calc(var(--dr-u) * 4.6);
+  background-color: var(--role-f2-pill);
+  color: var(--prim-art-ink);
+}
+#modal-drops .dr-urow > .itile { flex: 0 0 auto; width: calc(var(--dr-u) * 14); }
+#modal-drops .dr-ub {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--dr-u) * .8);
+  text-align: left;
+}
+#modal-drops .dr-un { font-size: max(var(--text-min), calc(var(--dr-u) * 3.8)); font-weight: 800; line-height: 1.2; }
+#modal-drops .dr-ud { font-size: max(var(--text-min), calc(var(--dr-u) * 3)); line-height: 1.35; color: var(--role-f2-ink); }
+#modal-drops .dr-up.kit-pill-v2 { --f2-bh: calc(var(--dr-u) * 7.4); align-self: flex-start; margin-top: calc(var(--dr-u) * .6); white-space: nowrap; }   /* soft 변주 글자 = 높이 × .46 = 3.4 --dr-u */
+
+/* ---- 장비 두 창(목록 줄 · 설명 그림 상자)의 칸 토큰 · 등급 액자 — Task 5 가 획득표와 나눠 쓰던 규칙. 획득표 몫만 뺐다(값 무변). ---- */
 /* [판정판 121 · Task 5] 토큰 다섯 줄을 장비 두 창(목록 줄 · 설명 그림 상자)과 나눠 쓰려고 이 규칙의 토큰 몫만 선택자 목록으로 뺐다(값 무변 · 복사 0). */
-#modal-drops .dr-row,
 #modal-gear .gear-row,
 #gi-art {
   --f2-ink: var(--role-f2-ink-charsel);
@@ -70863,41 +71090,13 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
   --f2-item-line: var(--role-f2-item-line-charsel);
   --f2-item-on: var(--role-f2-item-on-charsel);
 }
-#modal-drops .dr-row {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  grid-template-rows: auto auto;
-  row-gap: 0;   /* 넓힌 li 규칙의 gap 은 가로(칸 ↔ 글자)만 쓴다 */
-  align-items: center;
-}
-#modal-drops .dr-row .cp-islot { grid-column: 1; grid-row: 1 / 3; }
-#modal-drops .dr-name { grid-column: 2; grid-row: 1; align-self: end; overflow-wrap: anywhere; }
-#modal-drops .dr-meta { grid-column: 2; grid-row: 2; align-self: start; font-style: normal; font-weight: bolder; overflow-wrap: anywhere; }   /* 메타는 i 라 라벨 b 의 UA 굵기를 명시한다 */
-#modal-drops .dr-p { grid-column: 3; grid-row: 1 / 3; text-align: right; }
-/* 사용 과일 줄 = 제목 + 문장 두 줄(점검 W1). 글리프 크기 = 칸 부품 글자 크기의 비율(.cp-gem 의 font-size 와 같은 .0500 × --f2-w). */
-#modal-drops .dr-use .dr-glyph {
-  grid-column: 1;
-  grid-row: 1 / 3;
-  font-style: normal;
-  font-size: calc(var(--f2-w) * .0500);
-  line-height: 1;
-}
-
-/* ---- 등급 액자 · 상태 면 ---------------------------------------------------------
-   칸 그림은 openDrops 가 인라인으로 깐다(itemArtCss — 도착 전에는 칸 종류의 실루엣). 그림 상자 크기·맞춤(center/contain)은 넓힌 .cp-cr-ic 규칙이 낸다.
-   액자 = 캐릭터 창 장착 칸(eq) 규칙을 칸 전부에 입힌 것(링 선언 그대로) 위에 색만 등급 토큰으로 갈아 끼운다.
-   면: 보유(own) = 캐릭터 창 own 면(넓힌 own 규칙 — 특이도가 넓힌 eq 규칙보다 높아 그대로 이긴다). 미보유(empty)만 넓힌 eq 규칙이 장착 면을 씌우므로
-   칸 틀 재질 규칙(#charpanel .cp-crystal 의 --wslot-face)과 같은 토큰으로 되돌린다 — 그 규칙의 기본 면이 바뀌면 이 줄도 같이 바꾼다. */
-#modal-drops .dr-row .cp-islot[data-state="empty"],
+/* 등급 액자 · 상태 면 — 장비 두 창(8b 가 itemTile 로 옮기며 걷는다). 미보유(empty) 면은 칸 틀 재질 규칙(#charpanel .cp-crystal 의 --wslot-face)과 같은 토큰. */
 #modal-gear .gear-row .cp-islot[data-state="empty"] { --wslot-face: var(--role-wslot-face-crystal); }
 /* [판정판 121 · Task 5] 등급 액자 색 = 획득표와 같은 세 토큰(장비 목록 줄 · 설명 창 그림 상자 — 판정 Q5 「같은 부품 · 같은 등급색」). */
-#modal-drops .dr-row[data-tier="common"] .cp-islot,
 #modal-gear .gear-row[data-tier="common"] .cp-islot,
 #gi-art[data-tier="common"] .cp-islot { --wslot-L3-line: var(--role-rw-shard-steady-3); }
-#modal-drops .dr-row[data-tier="rare"] .cp-islot,
 #modal-gear .gear-row[data-tier="rare"] .cp-islot,
 #gi-art[data-tier="rare"] .cp-islot { --wslot-L3-line: var(--role-rw-shard-agility-3); }
-#modal-drops .dr-row[data-tier="epic"] .cp-islot,
 #modal-gear .gear-row[data-tier="epic"] .cp-islot,
 #gi-art[data-tier="epic"] .cp-islot { --wslot-L3-line: var(--role-rw-item-3); }
 </style>
@@ -71440,9 +71639,11 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
 #sh-tabs .sh-tab.kit-pill-v2{ --f2-ph: 15.4cqw; position: relative; flex: 1 1 0; min-width: 0; width: auto; max-width: none; height: var(--f2-ph); margin: 0;
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .3cqw; border-radius: calc(var(--f2-ph) * .232);
   padding: 0 0 calc(var(--f2-ph) * .08); font-size: 3.6cqw; cursor: pointer; -webkit-tap-highlight-color: transparent; }
-#sh-tabs .sh-tab > *{ position: relative; z-index: 1; }   /* 판 질감층(::before · ::after) 위 — kd-tag b 와 같은 처방 */
+#sh-tabs .sh-tab > *,
+#modal-drops .dr-tab > *{ position: relative; z-index: 1; }   /* 판 질감층(::before · ::after) 위 — kd-tag b 와 같은 처방 · [Task 8a] 획득표 알약 탭도 같은 탭 판 */
 #sh-tabs .sh-tab > [data-i18n]{ max-width: 100%; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-#sh-tabs .sh-tab[aria-selected="true"]{
+#sh-tabs .sh-tab[aria-selected="true"],
+#modal-drops .dr-tab[aria-selected="true"]{   /* [Task 8a] 획득표 알약 탭 = 같은 고른 탭 테 · 후광(기준 §5 — 한 탭 부품) */
   box-shadow:
     0 0 0 calc(var(--f2-ph) * .020) var(--f2-hi),
     0 0 calc(var(--f2-ph) * .103) calc(var(--f2-ph) * .022) var(--role-f2-hi-halo),
@@ -71450,7 +71651,8 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
     0 0 var(--f2-soft-tail) 0 color-mix(in srgb, var(--f2-pill-line) 20%, transparent),
     0 calc(var(--f2-ph) * .05) calc(var(--f2-ph) * .12) var(--role-f2-cast);
 }
-#sh-tabs .sh-tab[data-variant="soft"]{ height: var(--f2-ph); border: calc(var(--f2-ph) * .027) solid transparent; color: var(--f2-ink); text-shadow: none; }
+#sh-tabs .sh-tab[data-variant="soft"],
+#modal-drops .dr-tab[data-variant="soft"]{ height: var(--f2-ph); border: calc(var(--f2-ph) * .027) solid transparent; color: var(--f2-ink); text-shadow: none; }
 #sh-tabs .sh-tab:active{ transform: translateY(var(--hub-press)); }
 #sh-tabs .sh-tab-ic{ width: 9.2cqw; height: 8.2cqw; background: center / contain no-repeat; }
 #sh-tabs .sh-tab[data-stab="gacha"] .sh-tab-ic{ background-image: url("catalog/slot-ic-item.webp"); }
@@ -72490,16 +72692,24 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
   font-size: calc(var(--f2-bh) * .478);
 }
 
-/* ---- 3. 가로(창 가로 ≥ 세로) — 가로 창 한 무리(판정 Q6 · 2회차 판정): 스킨 · 장비 목록 · 장비 설명 = 판 380u, 판 정보 · 획득표 = 360u, 무대 가운데(.modal 이 창 가운데에
+/* ---- 3. 가로(창 가로 ≥ 세로) — 가로 창 한 무리(판정 Q6 · 2회차 판정): 스킨 · 장비 목록 · 장비 설명 = 판 380u, 판 정보 = 360u([Task 8a] 획득표 = M 620u), 무대 가운데(.modal 이 창 가운데에
    세우고 무대도 창 가운데다). 1280x720(1u = 1px)에서 지금 폭 그대로, 작은 창에서 같이 준다.
    판 자 --jbox-w · 반경 · 겉선 = 전투 가로 카드 · 상점 가로 판(R3)과 같은 무대 자 식. 안쪽 값은 세로 px 값과 같은 수의 u, 글자는 max(--text-min, N u)
    (821x462 ≥ 11px — 판정 R4). 높이 = 내용 · 무대 높이 안(위아래 18u — .modal 안여백 18 과 같은 수) · 넘치면 목록만 판 안에서 구른다. ---- */
 @media (min-aspect-ratio: 1/1) {
+  /* [판정판 121 · Task 8a · 전 화면 감사 D10] 판 높이 상한 = **창 높이** − 위아래 18u(종전: 16:9 무대 높이 − 36u — 1024x960 · 1280x1024 같은 높은 가로 창에서
+     창 · 방이 16:9 띠 안에만 섰다). 공용 한 곳 = 모든 창의 바깥 상자(.modal) 위 · 아래 안여백을 18px → 18u 로(px 리터럴 은퇴) — 그러면 각 판의 기본 상한
+     (.sheet max-height:100%)이 곧 창 높이 − 36u 다. 폭 자는 u 그대로 · 좌우 안여백 18px 무변 · 전투 무대(판 칸 기하)는 무접촉.
+     1280x720(1u = 1px)은 무변 · 821x462 는 판이 13px 더 길어질 수 있고(18px → 11.5px) · 1920x1080 은 18px 짧아진다(18px → 27px). */
+  .modal {
+    padding-top: calc(var(--safe-t) + var(--stage-u) * 18);
+    padding-bottom: calc(var(--safe-b) + var(--stage-u) * 18);
+  }
   #modal-skin .sheet,
   #modal-gear .sheet,
   #modal-gear-info .sheet {
     max-width: calc(var(--stage-u) * 380);
-    max-height: min(100%, calc(var(--stage-h) - var(--stage-u) * 36));
+    max-height: min(100%, calc(var(--stage-h) + var(--stage-y) * 2 - var(--stage-u) * 36));   /* 창 높이(= 무대 높이 + 위아래 틈 — dvh 대체 포함) − 36u [Task 8a D10] */
     padding: calc(var(--stage-u) * 23) calc(var(--stage-u) * 30) calc(var(--stage-u) * 30) !important;   /* .w6m .sheet 의 !important 를 같은 문법으로 덮는다 */
     gap: calc(var(--stage-u) * 10);
     --f2-w: calc(var(--stage-u) * 390 * .957);     /* 가로 모달 자(.modal --f2-w = 폰 기준폭 390 × .957)를 무대 자로 */
@@ -72531,6 +72741,15 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
     --jbox-radius: calc(var(--stage-u) * 40);
     --jbox-bw: calc(var(--stage-u) * 1.5);
   }
+  /* [판정판 121 · Task 8a] 획득표만 이 무리에서 판 M 으로 뺀다(하나의 게임 UI 기준 §3 — 획득표 = M = 620u) · 판 정보 창은 360u 그대로.
+     획득표 자 --dr-u = 판 폭 620u 의 1% = 6.2u(세로 = --f2-w / 100 — drops-74) · 장비 격자 5열(기준 §10). */
+  #modal-drops .sheet {
+    --pw: min(calc(var(--stage-u) * 620), 100%);
+    --dr-u: calc(var(--stage-u) * 6.2);
+  }
+  #modal-drops .dr-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  /* 가로 이름 = 2.8u(중간 확인 판정 2 — 5열 칸이 판 폭 비로 세로 4열보다 좁아 3.4u 면 영웅 긴 이름이 세 줄이 됐다. ko 19종 두 줄 안 · probe_names 실측) */
+  #modal-drops .dr-name { font-size: max(var(--text-min), calc(var(--dr-u) * 2.8)); }
   /* 제목 캡슐 — 「56.84% + 안여백 차 62px(겉선 2 + 안 여백 60) × .5684」 · 「border-top 1 + padding-top 23」 의 안 여백 몫을 무대 자로 */
   #modal-skin .sheet > h2,
   #modal-gear .sheet > h2,
@@ -72572,6 +72791,139 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
   #modal-node .nc-foe { min-height: calc(var(--nc-u) * 128); }
   #modal-node .nc-foe-body { margin-left: calc(var(--nc-u) * 116); padding-top: calc(var(--nc-u) * 8); }
 }
+</style>
+<style id="itile-8a">
+/* ===== [판정판 121 · 2026-10-18 · Task 8a] 기준 부품 둘 — 장비 칸(itemTile → .itile) · 등급 칩(.tchip) =========================================
+   기준 = docs/superpowers/specs/2026-10-18-one-game-ui-standard.md §7 장비 칸 · §9 글자, 모양 기준 = 우리 게임 문법 상점 시안 「오늘의 장비」 카드의 둥근 네모 칸.
+   사용자(원문): 「세상 어떤게임이 아이템 박스를 저따위로만들어」 — 보석 깎은 칸(.cp-crystal · wxtal 모서리 결정 4개)을 대신하는 한 벌.
+   소비처: 획득표(8a) → 캐릭터 창 · 장비 창(8b) · 상점 장비 카드 · 뽑기 결과(8c). 이름 · 인자 · 상태 = JS itemTile 주석 그대로.
+   ▣ 자 — 칸 폭 하나. 칸(.itile)이 inline-size 컨테이너라 cqw = 칸 폭의 1% — 테 · 흰 테 · 그림 여백 · 알약 · 표가 칸 크기를 따라간다(px 리터럴 0).
+     칸 폭은 소비처가 준다(격자 칸 폭 · 줄의 고정 폭) — 컨테이너는 내용으로 폭이 서지 않는다.
+   ▣ 층 — ::before = 면(등급 -1) + 테(등급 -3 · 칸 폭 3.5%) + 안쪽 흰 테(2.5%) + 아래 정적 그림자 하나 · 모서리 22% /
+     .itile-art = 그림(안쪽 11% 여백 = 약 78% · contain) / .itile-lv = 아래 가운데 칸 밖 6% 걸친 레벨 알약 / .itile-eq = 오른쪽 위 ✓ 원 /
+     ::after = 고른 칸의 ▼(칸 위 가운데).
+   ▣ 색 — 등급 = 기존 보상 토큰: 일반 --role-rw-shard-steady · 희귀 --role-rw-shard-agility · 영웅 --role-rw-item(-1 면 · -3 테).
+     none(빈 칸 · 중립 칸) = 크림 카드 면 --role-f2-pill + 옅은 잉크 테(--prim-art-ink 와 투명의 반반 color-mix — 토큰 + 키워드만).
+     흰 = --prim-white · 그림자 = --role-f2-cast(알약 접지와 같은 토큰) · ▼ = --role-f2-hi(금빛 강조 림 토큰). 새 원시값 0(알파 둘은 이 부품의 변수).
+   ▣ 움직임 0 — 빈 칸 실루엣(brightness(0) · 옅게)도 정적이다. */
+.itile {
+  --it-face: var(--role-f2-pill);
+  --it-line: color-mix(in srgb, var(--prim-art-ink), transparent);
+  --itile-sil-a: .18;               /* 빈 칸 실루엣 불투명도(브리프 값) */
+  container-type: inline-size;
+  position: relative;
+  isolation: isolate;
+  display: block;
+  box-sizing: border-box;
+  aspect-ratio: 1;
+}
+.itile[data-tier="common"],
+.tchip[data-tier="common"] { --it-face: var(--role-rw-shard-steady-1);  --it-line: var(--role-rw-shard-steady-3); }
+.itile[data-tier="rare"],
+.tchip[data-tier="rare"]   { --it-face: var(--role-rw-shard-agility-1); --it-line: var(--role-rw-shard-agility-3); }
+.itile[data-tier="epic"],
+.tchip[data-tier="epic"]   { --it-face: var(--role-rw-item-1);          --it-line: var(--role-rw-item-3); }
+/* 테 · 흰 테는 border 가 아니라 안쪽 그림자 고리 둘이다 — border 굵기는 엔진이 정수 px 로 내려 깎아(55px 칸에서 3.5% = 1.93 → 1px, smoke-drops d8 실측)
+   작은 칸에서 테가 반으로 얇아졌다. 그림자 고리는 깎이지 않는다. 위 고리(테 0 ~ 3.5%)가 아래 고리(흰 0 ~ 6% = 테 안쪽 2.5%) 위에 그려진다. */
+.itile::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: 22%;
+  background-color: var(--it-face);
+  box-shadow:
+    inset 0 0 0 3.5cqw var(--it-line),
+    inset 0 0 0 6cqw var(--prim-white),
+    0 2cqw 3cqw var(--role-f2-cast);
+  pointer-events: none;
+}
+.itile-art {
+  position: absolute;
+  inset: 11cqw;
+  z-index: 1;
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+.itile[data-state="empty"] .itile-art { filter: brightness(0); opacity: var(--itile-sil-a); }
+.itile-lv {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  bottom: -6cqw;
+  transform: translateX(-50%);
+  padding: 1.6cqw 6cqw;
+  border-radius: 999em;
+  background-color: var(--it-line);
+  color: var(--prim-white);
+  font-size: max(var(--text-min), 15cqw);
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+}
+.itile-eq {
+  position: absolute;
+  z-index: 2;
+  top: -5cqw;
+  right: -5cqw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: max(calc(var(--text-min) * 1.5), 26cqw);
+  height: max(calc(var(--text-min) * 1.5), 26cqw);
+  border-radius: 50%;
+  background-color: var(--it-line);
+  box-shadow: 0 0 0 1.6cqw var(--prim-white);
+  color: var(--prim-white);
+  font-style: normal;
+  font-size: max(var(--text-min), 16cqw);
+  font-weight: 800;
+  line-height: 1;
+}
+/* 고른 칸 = 밝은 테(흰 테 굵게 + 바깥 흰 고리) + 칸 위 가운데 ▼(금빛). 칸 자신의 [data-sel] 또는 칸을 감싼 단추 · 칸의 [aria-selected="true"](8b 몫 — 이번에는 CSS 만). */
+.itile[data-sel]::before,
+[aria-selected="true"] > .itile::before {
+  box-shadow:
+    inset 0 0 0 3.5cqw var(--it-line),
+    inset 0 0 0 8.5cqw var(--prim-white),
+    0 0 0 3cqw var(--prim-white),
+    0 2cqw 3cqw var(--role-f2-cast);
+}
+.itile[data-sel]::after,
+[aria-selected="true"] > .itile::after {
+  content: "";
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  top: -17cqw;
+  width: 20cqw;
+  height: 12cqw;
+  transform: translateX(-50%);
+  background-color: var(--role-f2-hi);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  pointer-events: none;
+}
+
+/* ---- 등급 칩 = 알약 하나 [라벨(잉크 · 보통 굵기)][값(굵게 · 라벨의 1.4배)] · 면 = 등급 -1 · 테 = 등급 -3 · 0% = data-zero(옅게).
+   글자 크기는 소비처가 칩(또는 칩 줄)에 준다 — 칩 안 길이는 전부 em(그 글자 크기 비). ---- */
+.tchip {
+  --tchip-zero-a: .55;              /* 0% 칩 불투명도(브리프 값) */
+  display: inline-flex;
+  align-items: baseline;
+  gap: .35em;
+  padding: .3em .8em;
+  border: .12em solid var(--it-line);
+  border-radius: 999em;
+  background-color: var(--it-face);
+  color: var(--prim-art-ink);
+  line-height: 1.15;
+  white-space: nowrap;
+}
+.tchip > i { font-style: normal; font-weight: 400; }
+.tchip > b { font-size: 1.4em; font-weight: 800; }
+.tchip[data-zero] { opacity: var(--tchip-zero-a); }
 </style>
 </body>
 </html>
