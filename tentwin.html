@@ -59633,6 +59633,10 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
    중간 회색으로 뭉개 **배경(푸른 유리)에 물들지 않는 균일한 회색**을 만든다
    (brightness(0) 만 쓰면 유리색이 배어 남색으로 어두워졌다 — 사용자 시안은 옅은
    회색 실루엣). brightness 로 밝기·opacity 로 부드러움을 맞춘다. */
+/* [판정판 121 · Task 5 리뷰 전 수정 2] 빈 부위 실루엣 세 자리(캐릭창 빈 칸 · 장비 목록 「빼기」 줄 · 「비어 있음」 줄)도 같은 레시피 —
+   옅은 컬러 실루엣이 진짜 장비를 낀 것처럼 읽혔다. 낀 장비 그림 · 획득표 그림은 이 목록 밖(그대로). 정적 filter · 움직임 0. */
+#charpanel .cp-side-rack .cp-islot[data-state="empty"] > .cp-cr-ic,
+#modal-gear .gear-row[data-act] .cp-cr-ic,
 #charpanel .cp-th.locked .ct-art { opacity: .6; filter: grayscale(1) contrast(0) brightness(1.15); }
 #charpanel #mate-pick .char-card.locked .cav,
 #charpanel .cp-th.locked .cav { filter: grayscale(1) brightness(0) opacity(.32); }
@@ -70881,7 +70885,9 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
   row-gap: calc(var(--f2-w) * .0241);         /* 줄 간격 = 목업 .mk gap 9 @390(공유 규칙의 8 은 그대로 — 이 판만 덮는다) */
   container-type: inline-size;
   --nc-u: .37248cqw;                          /* 목업 1px = 판 안쪽 폭(cqw) × 1.149 / 308.469 = 100cqw / 268.469 */
-  --f2-chip-fs: calc(var(--nc-u) * 11.5);     /* kit-pill-v2--chip/--soft 글자 기본(카드 = 핸디캡 칩) = 시안의 작은 알약 글자 11.5(.clear .tag) */
+  /* [판정판 121 · Task 5 리뷰 전 수정] 이 블록의 글자 크기는 전부 max(var(--nc-fs-min, 0px), calc(var(--nc-u) * N)) — 하한 스위치 --nc-fs-min 은
+     가로 블록(<style id="gear-121"> 3 절)만 --text-min 으로 켠다(세로 = 0px · 무변). */
+  --f2-chip-fs: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 11.5));     /* kit-pill-v2--chip/--soft 글자 기본(카드 = 핸디캡 칩) = 시안의 작은 알약 글자 11.5(.clear .tag) */
 }
 /* 안쪽 폭 = 시안(목업 셸은 옛 판 여백 42 → 22.77 @390 로 좁혀 찍었다). 판의 여백·리본은 그대로 두고(= 획득표와 같은 조각 — Task 12
    t12k 가 계산값 일치를 단언, 시안의 리본 폭 ≈ 201 도 그대로다) 카드 줄(.nc-body 구획)과 시작 버튼만 양옆으로 판 안쪽 폭의 7.45% 씩 넓힌다:
@@ -70918,7 +70924,7 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
   display: flex; align-items: center; justify-content: center;
   gap: calc(var(--nc-u) * 8);
   height: calc(var(--nc-u) * 20);
-  font-size: calc(var(--nc-u) * 13);
+  font-size: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 13));
   font-weight: 600;
   color: var(--role-f2-ink);
 }
@@ -70983,13 +70989,13 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
   display: flex; flex-direction: column; gap: calc(var(--nc-u) * 9);
 }
 #modal-node .nc-foe-k {
-  font-size: calc(var(--nc-u) * 11); font-weight: 700; letter-spacing: .02em; line-height: 1.2;
+  font-size: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 11)); font-weight: 700; letter-spacing: .02em; line-height: 1.2;
   color: var(--role-f2-ink);
 }
 #modal-node .nc-foe-name {
   margin-top: calc(var(--nc-u) * -6);         /* 목업 .who 안 간격 3 = 칸 간격 9 − 6 */
   font-family: var(--font-display); font-weight: 400;
-  font-size: calc(var(--nc-u) * 22); line-height: 1;
+  font-size: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 22)); line-height: 1;
   color: var(--role-score-fill-c);
 }
 /* HP 막대 = 전투 HUD 악당 막대와 같은 색(--role-foe-track · --role-foe-fill-a~d, HUD 의 정지점 그대로) + 뼈 장식 */
@@ -71000,7 +71006,7 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
   margin: 0 calc(var(--nc-u) * -4);
   padding: 0 calc(var(--nc-u) * 13);
   font-family: var(--font-display); font-weight: 400;
-  font-size: calc(var(--nc-u) * 13.5); line-height: 1;
+  font-size: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 13.5)); line-height: 1;
   color: var(--prim-white);
   text-shadow:
     0 calc(var(--nc-u) * 1) 0 var(--role-foe-fill-d), calc(var(--nc-u) * 1) 0 0 var(--role-foe-fill-d),
@@ -71032,7 +71038,7 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
 }
 #modal-node .nc-hp-k,
 #modal-node .nc-hp-v { position: relative; z-index: 1; }
-#modal-node .nc-hp-k { font-size: calc(var(--nc-u) * 10.5); }
+#modal-node .nc-hp-k { font-size: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 10.5)); }
 #modal-node .nc-hp::before,
 #modal-node .nc-hp::after {                   /* 뼈 장식 = duel-orn-bone 의 왼쪽 반 · 오른쪽 반 */
   content: ""; position: absolute; z-index: 2;
@@ -71055,8 +71061,8 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
   margin: 0;
   padding: calc(var(--nc-u) * 4) calc(var(--nc-u) * 12);
 }
-#modal-node .nc-atk-n { position: relative; font-weight: 700; font-size: calc(var(--nc-u) * 13.5); line-height: 1.1; }   /* 두 줄 = 시안 .skill-t b · i(줄 높이 1.1) */
-#modal-node .nc-atk-d { position: relative; font-weight: 500; font-size: calc(var(--nc-u) * 11); line-height: 1.1; color: var(--role-f2-ink); }
+#modal-node .nc-atk-n { position: relative; font-weight: 700; font-size: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 13.5)); line-height: 1.1; }   /* 두 줄 = 시안 .skill-t b · i(줄 높이 1.1) */
+#modal-node .nc-atk-d { position: relative; font-weight: 500; font-size: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 11)); line-height: 1.1; color: var(--role-f2-ink); }
 
 /* ---- ③ 클리어 1줄 = 크림 알약(목업 .clear — --role-f2-pill-soft · 겉선 --role-f2-pill-soft-e · 높이 44 · 모서리 14) + 시계 + ⓘ ---- */
 #modal-node .nc-clear {
@@ -71084,7 +71090,7 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
   position: relative; flex: 1 1 0; min-width: 0;
   margin: 0; padding: calc(var(--nc-u) * 6) 0;
   font-family: var(--font-display); font-weight: 400;
-  font-size: calc(var(--nc-u) * 18); line-height: 1.1;
+  font-size: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 18)); line-height: 1.1;
   color: var(--prim-art-ink);
 }
 #modal-node .nc-info {
@@ -71094,7 +71100,7 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
   /* 광학 정렬(테크아트 11 — 눈대중 아님): font-audit 잉크 중심 실측 dy −1.71px @480(= −1.73u) → 글자를 1.73u 내린다
      (가운데 맞춤 상자에서 위 여백 P 는 글자를 P/2 내린다 → P = 3.46u). */
   margin: 0; padding: calc(var(--nc-u) * 3.46) 0 0; border: 0; border-radius: 50%;
-  font-family: var(--font-display); font-weight: 400; font-size: calc(var(--nc-u) * 13); line-height: 1;
+  font-family: var(--font-display); font-weight: 400; font-size: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 13)); line-height: 1;
   color: var(--role-f2-ink);
   background: color-mix(in srgb, var(--prim-white) calc(var(--mo-mk-80) * 100%), transparent);
   box-shadow: inset 0 0 0 calc(var(--nc-u) * 1.2) var(--role-f2-pill-line);
@@ -71106,7 +71112,7 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
 #modal-node .nc-clear-more {
   position: relative; flex: 0 0 100%;
   margin: 0; padding: 0 0 calc(var(--nc-u) * 8) calc(var(--nc-u) * 34);
-  font-size: calc(var(--nc-u) * 11); font-weight: 500; line-height: 1.35;
+  font-size: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 11)); font-weight: 500; line-height: 1.35;
   color: var(--role-f2-ink);
   white-space: pre-line;                      /* 시간 판정 · ★ · ★★ · ★★★ 를 줄마다(옛 카드의 별 3줄처럼) */
 }
@@ -71123,7 +71129,7 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
   min-width: 0; min-height: calc(var(--nc-u) * 26);
   padding-left: calc(var(--nc-u) * 4);
   font-family: var(--font-display); font-weight: 400;
-  font-size: calc(var(--nc-u) * 16); line-height: 1;
+  font-size: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 16)); line-height: 1;
   color: var(--role-score-fill-c);
 }
 #modal-node .nc-h::before {
@@ -71137,7 +71143,7 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
   display: inline-flex; align-items: center;
   margin: 0 calc(var(--nc-u) * 2) 0 0;
   padding: 0 calc(var(--nc-u) * 9) 0 calc(var(--nc-u) * 10);
-  font-size: calc(var(--nc-u) * 12.5); color: var(--role-lt-ink-node-mv2);   /* 알약 자기 글자 = 시안 .pill.more 12.5 · 자주 */
+  font-size: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 12.5)); color: var(--role-lt-ink-node-mv2);   /* 알약 자기 글자 = 시안 .pill.more 12.5 · 자주 */
   white-space: nowrap;
   cursor: pointer;
 }
@@ -71151,7 +71157,7 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
   grid-column: 1 / -1; grid-row: 3;
   margin: calc(var(--nc-u) * 7) 0 0;
   text-align: center;
-  font-size: calc(var(--nc-u) * 11); font-weight: 500; line-height: 1.3;
+  font-size: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 11)); font-weight: 500; line-height: 1.3;
   color: var(--role-f2-ink);
 }
 /* 칸 = 등급 액자(li::before) 위에 그림(.nc-ic — 인라인 itemArtCss) · 배지(.nc-tier · .nc-lv) · 반짝이(li::after). 등급 3색 = 기존 보상 토큰. */
@@ -71199,7 +71205,7 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
 #modal-node .nc-tier {
   left: calc(50% - var(--nc-fr) / 2 - var(--nc-u) * 3); top: calc(var(--nc-u) * -6);
   padding: 0 calc(var(--nc-u) * 6);
-  font-size: calc(var(--nc-u) * 10.5); font-weight: 700; letter-spacing: -.02em;
+  font-size: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 10.5)); font-weight: 700; letter-spacing: -.02em;
   background: linear-gradient(180deg, color-mix(in srgb, var(--nc-t3) calc(var(--mo-mk-80) * 100%), var(--prim-white)), var(--nc-t3));
   box-shadow: inset 0 calc(var(--nc-u) * -2) 0 var(--prim-line-light), 0 calc(var(--nc-u) * 1) calc(var(--nc-u) * 2) color-mix(in srgb, var(--role-f2-line) calc(var(--mo-mk-45) * 100%), transparent);
 }
@@ -71207,7 +71213,7 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
   /* 시안 .frame .lv 자리(수정 1회차 I3): 액자 오른쪽 4 · 아래 5 걸침. 글자 = node.lv 「Lv{lv}」(시안 「Lv2」) */
   right: calc(50% - var(--nc-fr) / 2 - var(--nc-u) * 4); top: calc(var(--nc-fr) - var(--nc-u) * 12);
   padding: 0 calc(var(--nc-u) * 5);
-  font-family: var(--font-display); font-weight: 400; font-size: calc(var(--nc-u) * 11.5);
+  font-family: var(--font-display); font-weight: 400; font-size: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 11.5));
   background: linear-gradient(180deg, var(--role-menu-logo-2-light), var(--mode-a-outline-chip));
   box-shadow: 0 calc(var(--nc-u) * 1) calc(var(--nc-u) * 2) color-mix(in srgb, var(--role-f2-line) calc(var(--mo-mk-55) * 100%), transparent);
 }
@@ -71224,13 +71230,13 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
 }
 #modal-node .nc-p {
   position: relative; z-index: 1;
-  font-family: var(--font-display); font-weight: 400; font-size: calc(var(--nc-u) * 15); line-height: 1;
+  font-family: var(--font-display); font-weight: 400; font-size: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 15)); line-height: 1;
   color: var(--prim-art-ink);
 }
 #modal-node .nc-drop[data-tier="rare"] .nc-p { color: var(--role-blue-contact); }
 #modal-node .nc-nm {
   max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  font-size: calc(var(--nc-u) * 11); font-weight: 600; line-height: 1.1;
+  font-size: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 11)); font-weight: 600; line-height: 1.1;
   color: var(--role-f2-ink);
 }
 
@@ -71249,7 +71255,7 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
   display: inline-flex; align-items: center;
   height: calc(var(--nc-u) * 16); padding: 0 calc(var(--nc-u) * 5);
   border-radius: calc(var(--nc-u) * 6);
-  font-style: normal; font-size: calc(var(--nc-u) * 10); font-weight: 700; line-height: 1; white-space: nowrap;
+  font-style: normal; font-size: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 10)); font-weight: 700; line-height: 1; white-space: nowrap;
   color: var(--prim-white);
   background: linear-gradient(180deg, var(--role-hd-c-3), var(--role-mint-contact));
   box-shadow: 0 calc(var(--nc-u) * 1) calc(var(--nc-u) * 2) color-mix(in srgb, var(--role-primary-outline-r) calc(var(--mo-mk-35) * 100%), transparent), inset 0 calc(var(--nc-u) * -1.5) 0 var(--prim-line-light);
@@ -71258,10 +71264,10 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
 #modal-node .nc-mem-t { display: flex; flex-direction: column; gap: calc(var(--nc-u) * 4); min-width: 0; line-height: 1; }
 #modal-node .nc-mem-nm {
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  font-family: var(--font-display); font-weight: 400; font-size: calc(var(--nc-u) * 15);
+  font-family: var(--font-display); font-weight: 400; font-size: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 15));
   color: var(--prim-art-ink);
 }
-#modal-node .nc-mem-k { font-style: normal; font-size: calc(var(--nc-u) * 11); font-weight: 600; color: var(--role-f2-ink); white-space: nowrap; }
+#modal-node .nc-mem-k { font-style: normal; font-size: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 11)); font-weight: 600; color: var(--role-f2-ink); white-space: nowrap; }
 #modal-node .nc-swap {                       /* 목업 .swap — 36 × 36 */
   --f2-ph: calc(var(--nc-u) * 36);
   flex: 0 0 auto;
@@ -71269,7 +71275,7 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
   width: var(--f2-ph);
   /* 광학 정렬: font-audit 잉크 중심 실측 dy −1.11px @480(= −1.12u) → 위 여백 2.25u(글자 1.12u 내림) */
   margin: 0 0 0 auto; padding: calc(var(--nc-u) * 2.25) 0 0;
-  font-family: var(--font-display); font-weight: 400; font-size: calc(var(--nc-u) * 18); line-height: 1;   /* 알약 자기 글자 = 시안 .swap */
+  font-family: var(--font-display); font-weight: 400; font-size: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 18)); line-height: 1;   /* 알약 자기 글자 = 시안 .swap */
   color: var(--role-lt-ink-node-mv2);
   cursor: pointer;
 }
@@ -72458,6 +72464,20 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
   }
   /* 판 정보 창 · 획득표 = 같은 r10m 판(지휘자 판정 — 획득표가 판 정보 위에서 열리므로 작은 창에서 두 크기가 어긋나지 않게).
      판 정보 창 안 단위 --nc-u(.37248cqw)는 판 안쪽 폭에서 나오는 구조 그대로라 판과 같이 준다. */
+  /* [리뷰 전 수정 1 · 지휘자 판정 우려1-A] 판 정보 창 글자 하한 스위치 — 판이 360u 로 줄면 --nc-u 글자(21줄 + 칩 --f2-chip-fs)가 같이 줄어
+     821x462 에서 6px 까지 내려갔다. 그 규칙들은 max(var(--nc-fs-min, 0px), calc(var(--nc-u) * N)) 이라 세로는 0px(무변), 가로만 --text-min(11px)이 바닥이다.
+     1280x720 에서는 그 아래였던 세 자리(10.19 · 10.70)만 11px 로 오른다. */
+  #modal-node .sheet { --nc-fs-min: var(--text-min); }
+  /* [리뷰 전 수정 Q10 · 지휘자 판정 A] 악당 칸 = 높이 내용(최소 = 지금 고정 높이 178nu — 아래 760 문턱에서는 128nu). 글자 하한으로 821x462 · 844x390 에서
+     기술 설명이 칸 아래로 16~35px 넘쳐 다음 줄에 가려졌다(t5/nodediff/zoom-foe-821-after.png). 몸통(absolute left 156 · right 9 · top 16nu)을 흐름 안으로
+     옮기고 자리는 같은 값의 여백으로(margin 좌 · 우 · padding 위) — 내용이 칸보다 작으면 칸 · 몸통 · 그림 자리 무변. 그림은 칸 아래끝 닻 그대로라
+     칸이 길어지면 늘어난 만큼 위 여백이 된다. */
+  #modal-node .nc-foe { height: auto; min-height: calc(var(--nc-u) * 178); }
+  #modal-node .nc-foe-body {
+    position: relative; left: auto; right: auto; top: auto;
+    margin: 0 calc(var(--nc-u) * 9) 0 calc(var(--nc-u) * 156);
+    padding-top: calc(var(--nc-u) * 16);
+  }
   #modal-node .sheet,
   #modal-drops .sheet {
     --pw: min(calc(var(--stage-u) * 360), 100%);   /* .r10m .sheet 의 min(360px, 100%) 를 무대 자로 — 안쪽 리듬(.04 · .07 · .06 --pw)이 같이 준다 */
@@ -72500,6 +72520,11 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
   /* 단추 글자 = kit-btn-v2 의 높이 비(주 .30 · 보조 .235) 그대로 + 하한 */
   #modal-gear-info .kit-btn-v2 { font-size: max(var(--text-min), calc(var(--f2-bh) * .30)); }
   #modal-gear-info .kit-btn-v2[data-kind="secondary"] { font-size: max(var(--text-min), calc(var(--f2-bh) * .235)); }
+}
+/* [리뷰 전 수정 Q10] 위 악당 칸 규칙의 작은 화면(창 높이 ≤ 760 — node-card-74 의 같은 문턱) 짝: 그 미디어의 칸 128nu · 몸통 left 116 · top 8nu 를 같은 값의 최소 높이 · 여백으로. */
+@media (min-aspect-ratio: 1/1) and (max-height: 760px) {
+  #modal-node .nc-foe { min-height: calc(var(--nc-u) * 128); }
+  #modal-node .nc-foe-body { margin-left: calc(var(--nc-u) * 116); padding-top: calc(var(--nc-u) * 8); }
 }
 </style>
 </body>
