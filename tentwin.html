@@ -4514,6 +4514,9 @@ html[lang="ko"] #btn-howto { letter-spacing: 0; }
    subset does not cover and, with synthesis off, at the wrong weight. */
 html[lang="ko"] .btn-sub { font-family: var(--font); }
 
+/* [Task 7a · B7] 한국어 낱말 가운데 줄바꿈 방지 — 몸 전체 keep-all, 짝은 anywhere 대신 break-word(anywhere 는 최소 내용 폭 min-content 를 바꿔 줄 · 칸 폭이 흔들리고, break-word 는 한 줄보다 긴 낱말만 끊어 폭 계산을 안 바꾼다 — 지휘자 판정). */
+html[lang="ko"] body { word-break: keep-all; overflow-wrap: break-word; }
+
 /* ============================================================
    17. RANKING BOARD  (v5 E-1)
 
@@ -10438,7 +10441,7 @@ html.no-art-logo .logo-img  { display: none; }
 }
 .sk-b { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .sk-n { font-family: var(--font-display); font-size: 14px; color: var(--prim-art-ink); word-break: keep-all; text-wrap: balance; }   /* [rc1009 수정 1회차 F-3] 어절 줄바꿈 · 고른 줄(한 글자 줄 0) */
-.sk-d { font-size: 10px; font-weight: 700; color: var(--prim-art-ink-2); word-break: keep-all; text-wrap: balance; }
+.sk-d { font-size: max(var(--text-min), 10px); font-weight: 700; color: var(--prim-art-ink-2); word-break: keep-all; text-wrap: balance; }
 .sk-act {
   flex: 0 0 auto;
   min-width: 78px;
@@ -14089,7 +14092,9 @@ html[lang="ko"] #modal-arc .sheet-row .btn { word-break: keep-all; min-width: 0;
   --mode-b-outline: #6F6BB4;
   --mode-b-gloss:   0.770;
   /* [판정판 121 · 2026-10-17] 하한 토큰 둘 — 무대 자(--bu)로 줄어드는 가로 화면 부품이 max(…, 이 값) 으로 읽는다.
-     touch-min = 손가락 대상 최소(애플 HIG 44pt) · text-min = 가장 작은 포털 창(821×462)에서도 읽히는 글자(스펙 Review Focus 2). */
+     touch-min = 손가락 대상 최소(애플 HIG 44pt) · text-min = 가장 작은 포털 창(821×462)에서도 읽히는 글자(스펙 Review Focus 2).
+     [Task 7a] 하한은 가로만이 아니라 세로(폰)도 같다 — 비례로 줄어드는 글자 크기 선언은 max(var(--text-min), 식)이라 보이는 글자는 11px 아래로 안 내려간다
+     (시험 = tools/measure/landscape-gate.py 의 minText). */
   --touch-min: 44px;
   --text-min: 11px;
   /* [E73-0908 norm-cw] --cap- 계열 붕괴 — 캡슐 역할색 8슬롯. mint/pink/yellow/orange/purple/lilac 은
@@ -58889,7 +58894,7 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   /* 실측 156.57 x 97.65 -> 폭은 높이의 1.60 배 */
   min-width: calc(var(--f2-bh) * 1.60);
   padding: 0 calc(var(--f2-bh) * .12);
-  font-size: calc(var(--f2-bh) * .235);
+  font-size: max(var(--text-min), calc(var(--f2-bh) * .235));
   /* 좌상 스페큘러가 실측상 조금 더 크고 안쪽(cx .144 cy .151) */
   --f2-sp1-x: 15%; --f2-sp1-y: 16%; --f2-sp1-w: 11%; --f2-sp1-h: 13%;
   --f2-sp2-x: 26%; --f2-sp2-y: 11%; --f2-sp2-w: 4%;  --f2-sp2-h: 6%;
@@ -59042,7 +59047,7 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   background: var(--f2-pill-soft);
   color: var(--f2-ink, #6B5F6E);
   font-weight: 800;
-  font-size: calc(var(--f2-bh) * .46);
+  font-size: max(var(--text-min), calc(var(--f2-bh) * .46));
   /* 바깥 꼬리 = 실측 5 px = .144 H */
   box-shadow:
     0 0 calc(var(--f2-bh) * .144) calc(var(--f2-bh) * .02)
@@ -60563,7 +60568,7 @@ html[lang="en"] #charpanel .ci-name { font-size: calc(var(--f2-w) * .050); }
   padding: 0;
 }
 #charpanel .ci-tag-k {
-  font-size: calc(var(--f2-w) * .030);
+  font-size: max(var(--text-min), calc(var(--f2-w) * .030));
   font-weight: 800;
   color: var(--f2-ink);
   background: none;
@@ -60638,7 +60643,7 @@ html[lang="en"] #charpanel .ci-name { font-size: calc(var(--f2-w) * .050); }
 }
 #charpanel .cs-k {
   flex: 0 0 calc(var(--f2-w) * .180);
-  font-size: calc(var(--f2-w) * .030);
+  font-size: max(var(--text-min), calc(var(--f2-w) * .030));
   font-weight: 900;
   text-align: right;
   white-space: nowrap;   /* 라벨은 한 줄(판정판 74 · R .180 실측, 지휘자 판정 Q1) — 칸이 모자라면 */
@@ -60704,7 +60709,7 @@ html[lang="en"] #charpanel .ci-name { font-size: calc(var(--f2-w) * .050); }
   background: var(--f2-pill-soft);
   color: var(--f2-ink);
   font-family: inherit;
-  font-size: calc(var(--f2-w) * .0235);
+  font-size: max(var(--text-min), calc(var(--f2-w) * .0235));
   font-weight: 900;
   line-height: 1;
   text-shadow: none;
@@ -60793,7 +60798,7 @@ html[lang="en"] #charpanel .ci-name { font-size: calc(var(--f2-w) * .050); }
   box-shadow: inset 0 0 0 calc(var(--f2-w) * .0027) var(--f2-pill-line);
   color: var(--f2-ink);
   font-family: var(--font-display);
-  font-size: calc(var(--f2-w) * .0250);
+  font-size: max(var(--text-min), calc(var(--f2-w) * .0250));
   font-style: normal;
   font-weight: 900;
   line-height: calc(var(--f2-w) * .0375);
@@ -61124,7 +61129,7 @@ html[lang="ko"] #charpanel .cs-tip { word-break: keep-all; overflow-wrap: anywhe
     color-mix(in srgb, var(--cs-desc-box) calc(var(--cs-desc-a) * 100%), transparent),
     color-mix(in srgb, var(--cs-desc-box-2) calc(var(--cs-desc-a) * 100%), transparent));
   overflow: hidden;
-  font-size: calc(var(--f2-w) * .0285);
+  font-size: max(var(--text-min), calc(var(--f2-w) * .0285));
   line-height: 1.30;
   color: var(--f2-ink);
 }
@@ -61149,7 +61154,7 @@ html[lang="ko"] #charpanel .cs-tip { word-break: keep-all; overflow-wrap: anywhe
 }
 #charpanel .cp-rec .cp-rec-k {
   margin: 0;
-  font-size: calc(var(--f2-w) * .030);
+  font-size: max(var(--text-min), calc(var(--f2-w) * .030));
   font-weight: 800;
   line-height: 1.15;
 }
@@ -61182,7 +61187,7 @@ html[lang="ko"] #charpanel .cs-tip { word-break: keep-all; overflow-wrap: anywhe
 #charpanel .ci-desc .cc-head {
   flex: 0 0 auto;
   margin: 0;
-  font-size: calc(var(--f2-w) * .030);
+  font-size: max(var(--text-min), calc(var(--f2-w) * .030));
   font-weight: 900;
   text-align: center;
   letter-spacing: -.02em;
@@ -61205,7 +61210,7 @@ html[lang="ko"] #charpanel .cs-tip { word-break: keep-all; overflow-wrap: anywhe
   gap: calc(var(--f2-w) * .012);
   margin: 0;
   min-width: 0;
-  font-size: calc(var(--f2-w) * .0300);
+  font-size: max(var(--text-min), calc(var(--f2-w) * .0300));
   font-weight: 900;
   color: var(--f2-ink);
 }
@@ -61238,8 +61243,8 @@ html[lang="ko"] #charpanel .cs-tip { word-break: keep-all; overflow-wrap: anywhe
 }
 /* [E40-0903] 대역 SVG 는 남겨 두고 숨기기만 한다(봉인: display: block). */
 #charpanel .ci-desc .cc-ic svg { width: 86%; height: 86%; display: none; }
-#charpanel .ci-desc.cp-tight .cc-name   { font-size: calc(var(--f2-w) * .0276); }
-#charpanel .ci-desc.cp-tight-2 .cc-name { font-size: calc(var(--f2-w) * .0254); }
+#charpanel .ci-desc.cp-tight .cc-name   { font-size: max(var(--text-min), calc(var(--f2-w) * .0276)); }
+#charpanel .ci-desc.cp-tight-2 .cc-name { font-size: max(var(--text-min), calc(var(--f2-w) * .0254)); }
 
 #charpanel .ci-desc .cc-tip { display: none; }
 #charpanel .ci-desc .cc-line {
@@ -61251,7 +61256,7 @@ html[lang="ko"] #charpanel .cs-tip { word-break: keep-all; overflow-wrap: anywhe
 #charpanel .ci-desc .cc-k {
   display: inline;
   flex: none;
-  font-size: calc(var(--f2-w) * .0275);
+  font-size: max(var(--text-min), calc(var(--f2-w) * .0275));
   font-weight: 900;
   color: var(--role-f2-btn2-line);
   background: none;
@@ -61263,7 +61268,7 @@ html[lang="ko"] #charpanel .cs-tip { word-break: keep-all; overflow-wrap: anywhe
 #charpanel .ci-desc .cc-pass,
 #charpanel .ci-desc .cc-ult {
   display: inline;
-  font-size: calc(var(--f2-w) * .0285);
+  font-size: max(var(--text-min), calc(var(--f2-w) * .0285));
   font-weight: 700;
   color: var(--f2-ink);
   word-break: keep-all;
@@ -61271,8 +61276,8 @@ html[lang="ko"] #charpanel .cs-tip { word-break: keep-all; overflow-wrap: anywhe
 }
 /* 잘림 0 — 넘치면 상자가 아니라 **글자**가 줄어든다.
    .cp-tight 는 measurePetFit() 이 실측(scrollHeight>clientHeight)으로 단다. */
-#charpanel .ci-desc.cp-tight   { font-size: calc(var(--f2-w) * .0258); line-height: 1.24; }
-#charpanel .ci-desc.cp-tight-2 { font-size: calc(var(--f2-w) * .0234); line-height: 1.20; }
+#charpanel .ci-desc.cp-tight   { font-size: max(var(--text-min), calc(var(--f2-w) * .0258)); line-height: 1.24; }
+#charpanel .ci-desc.cp-tight-2 { font-size: max(var(--text-min), calc(var(--f2-w) * .0234)); line-height: 1.20; }
 #charpanel .ci-desc.cp-tight   .cc-pass,
 #charpanel .ci-desc.cp-tight   .cc-ult,
 #charpanel .ci-desc.cp-tight   .cc-k { font-size: inherit; }
@@ -64871,7 +64876,7 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
   background: color-mix(in srgb, var(--f2-tab-on) 82%, transparent);
   box-shadow: inset 0 0 0 calc(var(--f2-w) * .0022)
     color-mix(in srgb, #6B5A69 36.3%, transparent);
-  font-size: calc(var(--f2-w) * .0230);
+  font-size: max(var(--text-min), calc(var(--f2-w) * .0230));
   font-weight: 900;
   line-height: 1.45;
   color: var(--f2-ink);
@@ -65830,7 +65835,7 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
 /* ---- CV-13. 캐릭터창 «전략가» 배지 크기 --------------------------
    fffae90b: 배지 94x40 = .1130W x .0481W. 착수 전 .0905W x .0454W (가로 25% 작다).
    알약은 글자 크기가 키우므로 글자만 같은 비율(x1.249)로 올린다. */
-#charpanel .cp-side-rec { font-size: calc(var(--f2-w) * .0273); }
+#charpanel .cp-side-rec { font-size: max(var(--text-min), calc(var(--f2-w) * .0273)); }
 
 /* ---- CV-14. CV-1 부수효과 막기 — 레일 판 내용 잘림 ------------
    CV-1 이 768x1389 에서 #charpanel 의 --f2-w 를 430 -> 735 로 올렸다. 글자는
@@ -69063,19 +69068,19 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
    깎고, 명패 밖 민무늬 림까지 상자를 조금 넓혔다. 넘치면 종전대로 말줄임. */
 #app.battle .dh-foe .dh-name{
   left:10.0%;width:35.0%;top:4.6%;height:29.3%;
-  font-size:11px;font-size:2.90cqw;font-weight:800;
+  font-size:11px;font-size:max(var(--text-min), 2.90cqw);font-weight:800;
 }
 #app.battle .dh-me .dh-name{
   left:40.0%;width:30.0%;top:1.9%;height:33.1%;
-  font-size:11px;font-size:2.90cqw;font-weight:800;
+  font-size:11px;font-size:max(var(--text-min), 2.90cqw);font-weight:800;
 }
 #app.battle .dh-foe .dh-lv{
   left:76.0%;width:17.3%;top:3.6%;height:32.5%;
-  font-size:10px;font-size:2.50cqw;font-weight:800;
+  font-size:10px;font-size:max(var(--text-min), 2.50cqw);font-weight:800;
 }
 #app.battle .dh-me .dh-lv{
   left:76.8%;width:15.3%;top:1.9%;height:33.1%;
-  font-size:10px;font-size:2.50cqw;font-weight:800;
+  font-size:10px;font-size:max(var(--text-min), 2.50cqw);font-weight:800;
 }
 /* ---- W2.5 ④b 영문 보스명 잘림 수리 (2026-08-20, itch 업로드 차단 사유) --------
    증상: 영문 모드에서 "Grape Gobbler" 가 HP 바 명패에 **"rape Gobble"** 로 뜬다.
@@ -69101,7 +69106,7 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
    `html[lang="ko"] .act-t` 가 쓰는 것과 같은 로케일 분기 문법이다. */
 html[lang="en"] #app.battle .dh-foe .dh-name{
   left:4.0%;width:47.0%;
-  font-size:10px;font-size:2.62cqw;
+  font-size:10px;font-size:max(var(--text-min), 2.62cqw);
 }
 /* 게이지. .dh-fill 은 여전히 scaleX(var(--hp)) 다 — syncDuel 이 쓰는 그 변수고,
    레이아웃을 건드리지 않는 이유(§18.4b)도 그대로다. 바뀐 것은 **상자의 자리**
@@ -69158,10 +69163,10 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
   inset:auto;
   top:30.3cqw;height:2.44cqw;
   padding-bottom:0.1em;
-  font-size:11px;font-size:2.83cqw;
+  font-size:11px;font-size:max(var(--text-min), 2.83cqw);
   z-index:6;
 }
-#duel-hud .dh-num .dh-sl{ font-size:.85em; }
+#duel-hud .dh-num .dh-sl{ font-size:max(var(--text-min), .85em); }
 #app.battle #duel-hud #duel-foe-n{ left:8.04cqw; justify-content:flex-start; }
 #app.battle #duel-hud #duel-me-n{ right:8.43cqw; justify-content:flex-end; }
 /* 누적 데미지 — 시안에 자리가 없어 성과 큰구름 사이의 빈 하늘에 눕힌다. */
@@ -69173,7 +69178,7 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
   box-sizing:border-box;padding-right:3px;  /* 그림자 3px 를 상자 안에 — 글자 우끝(280.8px)은 padding 으로 고정 */
   display:flex;align-items:center;justify-content:flex-end;
   margin:0;
-  font-size:10px;font-size:2.44cqw;
+  font-size:10px;font-size:max(var(--text-min), 2.44cqw);
   color:#FFFFFF !important;
   text-shadow:0 1px 2px rgba(var(--prim-ink-plum-rgb),.85),0 0 3px rgba(var(--prim-ink-plum-rgb),.55) !important;
   z-index:3;
@@ -69684,7 +69689,7 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
 }
 .mm-k {
   font-family: var(--font-display);
-  font-size: 9px;
+  font-size: max(var(--text-min), 9px);
   letter-spacing: .5px;
   font-weight: 700;
   color: #FFE9B8;
@@ -69697,7 +69702,7 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
   color: #FFFFFF;
 }
 .mm-p {
-  font-size: 9.5px;
+  font-size: max(var(--text-min), 9.5px);
   font-weight: 700;
   letter-spacing: -.01em;
   color: #FFE0B0;
@@ -69945,7 +69950,7 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
   border-radius: 999px;
   background: var(--f2-pill);
   box-shadow: inset 0 0 0 1px var(--f2-pill-line);
-  font-size: 10px;
+  font-size: max(var(--text-min), 10px);
   font-style: normal;
   font-weight: 800;
   line-height: 1.4;
@@ -70063,7 +70068,7 @@ html[lang="ko"] #modal-quest .qs-tab[data-qtab="epic"] .cpt-lab{
   box-shadow:inset 0 0 0 calc(var(--f2-w) * .0027)
     color-mix(in srgb, var(--f2-line) 42%, transparent);
   font-family:var(--font-display);
-  font-size:calc(var(--f2-w) * .0280);
+  font-size:max(var(--text-min), calc(var(--f2-w) * .0280));
   color:var(--f2-ink);
 }
 #modal-quest .qs-day[data-on="1"]{
@@ -70124,7 +70129,7 @@ html[lang="ko"] #modal-quest .qs-tab[data-qtab="epic"] .cpt-lab{
   box-shadow:inset 0 0 0 calc(var(--f2-w) * .0022)
     color-mix(in srgb, var(--f2-line) 48%, transparent);
   font-family:var(--font-display);
-  font-size:calc(var(--f2-w) * .0230);
+  font-size:max(var(--text-min), calc(var(--f2-w) * .0230));
   font-weight:900;
   line-height:1.5;
   color:var(--f2-ink);
@@ -70133,7 +70138,7 @@ html[lang="ko"] #modal-quest .qs-tab[data-qtab="epic"] .cpt-lab{
 #modal-quest .qs-t{
   margin:0 0 calc(var(--f2-w) * .0090);
   font-family:var(--font-display);
-  font-size:calc(var(--f2-w) * .0300);
+  font-size:max(var(--text-min), calc(var(--f2-w) * .0300));
   line-height:1.25;
   color:var(--f2-ink);
   overflow:hidden;
@@ -70150,7 +70155,7 @@ html[lang="ko"] #modal-quest .qs-tab[data-qtab="epic"] .cpt-lab{
   z-index:3;
   transform:translate(-50%, -50%);
   font-family:var(--font-display);
-  font-size:calc(var(--f2-w) * .0230);
+  font-size:max(var(--text-min), calc(var(--f2-w) * .0230));
   font-variant-numeric:tabular-nums;
   /* 게이지 위 글자 — 빈 게이지(연분홍)에서 흰 글자는 읽히지 않는다(실캡처).
      잉크 토큰 + 흰 후광으로 채운 구간·빈 구간 양쪽에서 같은 대비를 낸다. */
@@ -70163,7 +70168,7 @@ html[lang="ko"] #modal-quest .qs-tab[data-qtab="epic"] .cpt-lab{
   min-width:calc(var(--f2-w) * .1750);
   min-height:calc(var(--f2-w) * .0850);
   padding:0 calc(var(--f2-w) * .0240);
-  font-size:calc(var(--f2-w) * .0300);
+  font-size:max(var(--text-min), calc(var(--f2-w) * .0300));
   line-height:calc(var(--f2-w) * .0850);
 }
 #modal-quest .qs-get[disabled]{ cursor:default; }
@@ -70177,7 +70182,7 @@ html[lang="ko"] #modal-quest .qs-tab[data-qtab="epic"] .cpt-lab{
   min-width:calc(var(--f2-w) * .2700);
   min-height:calc(var(--f2-w) * .0850);
   padding:0 calc(var(--f2-w) * .0240);
-  font-size:calc(var(--f2-w) * .0300);
+  font-size:max(var(--text-min), calc(var(--f2-w) * .0300));
   line-height:calc(var(--f2-w) * .0850);
 }
 #modal-quest .qs-all[disabled]{ cursor:default; }
@@ -70586,10 +70591,10 @@ html[lang="en"] #kd-m-circus b{ font-size: .85em; letter-spacing: -.02em; }
 #app .tb > .tb-coin > b  { left: 65.7%; top: 43.6%; font-size: calc(var(--tb-ch) * .427);  --tb-sh: var(--hub-sh-gold); }
 #app .tb > .tb-star > b  { left: 57.7%; top: 41.7%; font-size: calc(var(--tb-ch) * .449);  --tb-sh: var(--hub-sh-gold); }
 /* 글자 수 단계(paintChipText 의 data-len) — 코인 6자 .3501 · 7자 .2477 · 별 6자 .3705 · 7자 .2807(116 값 · 캡슐 높이 비). */
-#app .tb > .tb-coin > b[data-len="6"] { font-size: calc(var(--tb-ch) * .3501); }
-#app .tb > .tb-coin > b[data-len="7"] { font-size: calc(var(--tb-ch) * .2477); }
-#app .tb > .tb-star > b[data-len="6"] { font-size: calc(var(--tb-ch) * .3705); }
-#app .tb > .tb-star > b[data-len="7"] { font-size: calc(var(--tb-ch) * .2807); }
+#app .tb > .tb-coin > b[data-len="6"] { font-size: max(var(--text-min), calc(var(--tb-ch) * .3501)); }
+#app .tb > .tb-coin > b[data-len="7"] { font-size: max(var(--text-min), calc(var(--tb-ch) * .2477)); }
+#app .tb > .tb-star > b[data-len="6"] { font-size: max(var(--text-min), calc(var(--tb-ch) * .3705)); }
+#app .tb > .tb-star > b[data-len="7"] { font-size: max(var(--text-min), calc(var(--tb-ch) * .2807)); }
 
 /* ---- 3. 아래 줄(.bb) — 세로 값(cqw) -----------------------------------------------------------------------------------
    왼→오 = 스토리 극장 · 놀이터 · 가운데 판 · 캐릭터 · 상점. 가운데 정렬 · 아래끝 맞춤 · 띠 판 없음(메인 v3). 폭만 정하고 높이는 그림 비율. */
@@ -70622,10 +70627,12 @@ html[lang="en"] #kd-m-circus b{ font-size: .85em; letter-spacing: -.02em; }
 #app .bb > .bb-shop    { background-image: url("catalog/stage-btn_shop.webp"); }
 #app .bb > .bb-center  { width: var(--bb-mid); aspect-ratio: 400 / 240; background-image: url("catalog/stage-pill_chapter.webp"); }
 /* 이름 글자 — 판에 굽지 않고 글자로(언어 토글 생존). 모든 단추 같은 규칙: 단추 폭 × 3.5/15.43(116 의 3.5cqw ÷ 15.43cqw) · 그림자 .28/15.43 ·
-   자리 = 단추 높이 73%(아이콘 아래 · 굽 위). 긴 이름은 아래 「맞춤」 줄이 그 단추 글자만 줄인다(116 메뉴 맞춤과 같은 꼴). */
+   자리 = 단추 높이 73%(아이콘 아래 · 굽 위). 긴 이름은 아래 「맞춤」 줄이 그 단추 글자만 줄인다(116 메뉴 맞춤과 같은 꼴).
+   [Task 7a · B1] 글자 하한: 글자 크기는 max(var(--text-min), 식)(아래 맞춤 줄 둘 포함)이고, 하한으로 커진 이름(ko 극장 · en 놀이터 …)이 단추 폭 안에 들게
+   글자 상자 폭만 92% → 100% 로 넓혔다(상자는 안 보이고 글자는 가운데 그대로 — 말줄임이 새로 서지 않게). */
 #app .bb > * > .bb-lab {
-  position: absolute; left: 50%; top: 73%; width: 92%; transform: translate(-50%, -50%);
-  font-size: calc(var(--bb-side) * 3.5 / 15.43); font-weight: 700; letter-spacing: -.03em; text-align: center;
+  position: absolute; left: 50%; top: 73%; width: 100%; transform: translate(-50%, -50%);
+  font-size: max(var(--text-min), calc(var(--bb-side) * 3.5 / 15.43)); font-weight: 700; letter-spacing: -.03em; text-align: center;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   overflow: clip visible;   /* 「모험」 판정 Q2 와 같은 처방 — line-height 1 이 한글 위 꼭지를 자르지 않게 세로축만 푼다(clip 을 모르면 위 hidden) */
   text-shadow: 0 calc(var(--bb-side) * .28 / 15.43) 0 var(--hub-sh-lab);
@@ -70634,11 +70641,11 @@ html[lang="en"] #kd-m-circus b{ font-size: .85em; letter-spacing: -.02em; }
    크기와 무관하게 같다 — ko 「스토리 극장」 1.001 · en 「Playground」 1.124 · en 「Story Theater」 1.475, 나머지 ≤ .72).
    ko 극장 · en 놀이터는 116 메뉴 맞춤처럼 그 단추 글자만 칸에 드는 가장 큰 .01 단계로 줄인다(.98 · .88 — 821×462 에서 12.4 · 11.1px).
    ([판정판 121] en 놀이터 이름을 「Arcade」 로 바꿔 .88 줄을 뺐다가 되돌렸다 — 놀이터 창 안 줄 「Arcade」 와 겹침 · 지휘자 판정. 작은 창에서 11px
-   아래(390×844 10.6px 등)는 보류 목록 「작은 창 이름 하한」.)
+   아래(390×844 10.6px 등)는 [Task 7a] 글자 하한 max(--text-min, 식)이 맡는다 — 하한 11px 가 된 en 놀이터가 360×640 · 844×390 단추 폭(49 · 47px)에 안 들어 자간만 −.03em → −.06em 으로 좁혔다(글자 크기는 하한 그대로).)
    en 「Story Theater」 는 줄이면 .67(821×462 에서 8.5px — 가독 하한 --text-min 11px 아래)이라 줄이지 않고 낱말 사이에서 두 줄로 접는다
    (같은 크기 · 줄 간격 .9 · 묶음 가운데를 73% → 71% — 두 줄 묶음 54~88% 가 아이콘 아래끝 51% 와 아래 굽 88% 사이). */
-html[lang="ko"] #app .bb > .bb-theater > .bb-lab { font-size: calc(var(--bb-side) * 3.5 / 15.43 * .98); }
-html[lang="en"] #app .bb > .bb-play > .bb-lab { font-size: calc(var(--bb-side) * 3.5 / 15.43 * .88); }
+html[lang="ko"] #app .bb > .bb-theater > .bb-lab { font-size: max(var(--text-min), calc(var(--bb-side) * 3.5 / 15.43 * .98)); }
+html[lang="en"] #app .bb > .bb-play > .bb-lab { font-size: max(var(--text-min), calc(var(--bb-side) * 3.5 / 15.43 * .88)); letter-spacing: -.06em; }
 html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal; word-break: keep-all; line-height: .9; }
 /* 가운데 판 글자(메인 「모험 / 챕터 n: 이름」 · 지도 「CHAPTER n / 이름」 = 미니맵 손잡이) — 판 폭 비(116 의 31.66cqw 기준 값 ÷ 31.66). */
 /* 세로 광학 보정(리뷰 Important 2 · V2) — 글자 묶음(굵은 줄 + 작은 줄, line-height 1)은 위 줄 대문자 머리가 상자 위 끝에 닿고 아래는 하강부 자리가
@@ -70653,7 +70660,7 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
 /* [116 · 지휘자 판정 Q2] line-height 1 이 「모험」 의 ㅎ 꼭지를 자른다 — 세로축만 풀고 가로 말줄임 자르기는 x 축 clip 으로 유지.
    clip 을 모르는 브라우저는 이 줄을 버리고 위 규칙의 overflow: hidden 으로 돌아간다. */
 #app .bb-center .mp-txt > b { font-size: calc(var(--bb-mid) * 4.40 / 31.66); letter-spacing: -.01em; overflow: clip visible; }
-#app .bb-center .mp-txt > i { margin-top: calc(var(--bb-mid) * .55 / 31.66); font-size: calc(var(--bb-mid) * 2.90 / 31.66); letter-spacing: -.02em; }
+#app .bb-center .mp-txt > i { margin-top: calc(var(--bb-mid) * .55 / 31.66); font-size: max(var(--text-min), calc(var(--bb-mid) * 2.90 / 31.66)); letter-spacing: -.02em; }
 /* 챕터 넘김 화살표(지도 판만) — 판 양 끝(판 폭 × 4.6/31.66 · 글자 5/31.66 · 바깥으로 1/31.66). 눌리는 상자 44px 은 .mp-arrow::after 그대로. */
 #app .bb-center .mp-arrow {
   position: absolute; top: 50%; width: calc(var(--bb-mid) * 4.6 / 31.66); height: 76%;
@@ -70676,7 +70683,7 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
   text-shadow: none;
   background: var(--mL-rim);
   box-shadow: inset 0 0 0 calc(var(--f2-ph) * .046) var(--mL-outline);
-  font-size: calc(var(--f2-ph) * .29);
+  font-size: max(var(--text-min), calc(var(--f2-ph) * .29));
   padding: calc(var(--f2-ph) * .064) calc(var(--f2-ph) * .148) calc(var(--f2-ph) * .028) calc(var(--f2-ph) * .158);
   border-radius: calc(var(--f2-ph) * .153);
 }
@@ -70739,7 +70746,7 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
      51 · 61 … 번이 가운데 판 밑으로 들어갔다 — 1280×720 실측). 아래 남는 띠는 #map-view 바탕(같은 그림 · 정적 어둡게)이 채운다. */
   #screen-map #map-layer[data-ar="tall"] { --map-lh: calc(100dvh - var(--map-bar) - var(--map-safe-gap)); top: 0; }
   #screen-map #map-path .mn-num {
-    font-size: calc(var(--h, 5) * .44 * var(--map-lh) / 100);
+    font-size: max(var(--text-min), calc(var(--h, 5) * .44 * var(--map-lh) / 100));
     -webkit-text-stroke-width: calc(var(--h, 5) * .0396 * var(--map-lh) / 100);
   }
   #screen-map #map-view {
@@ -70886,6 +70893,7 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
   row-gap: calc(var(--f2-w) * .0241);         /* 줄 간격 = 목업 .mk gap 9 @390(공유 규칙의 8 은 그대로 — 이 판만 덮는다) */
   container-type: inline-size;
   --nc-u: .37248cqw;                          /* 목업 1px = 판 안쪽 폭(cqw) × 1.149 / 308.469 = 100cqw / 268.469 */
+  --nc-fs-min: var(--text-min);                /* [Task 7a · B1] 세로도 같은 글자 하한 — 아래 글자 줄이 읽는 스위치(가로 블록 gear-121 3 절의 켬 줄과 같은 값) */
   /* [판정판 121 · Task 5 리뷰 전 수정] 이 블록의 글자 크기는 전부 max(var(--nc-fs-min, 0px), calc(var(--nc-u) * N)) — 하한 스위치 --nc-fs-min 은
      가로 블록(<style id="gear-121"> 3 절)만 --text-min 으로 켠다(세로 = 0px · 무변). */
   --f2-chip-fs: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 11.5));     /* kit-pill-v2--chip/--soft 글자 기본(카드 = 핸디캡 칩) = 시안의 작은 알약 글자 11.5(.clear .tag) */
@@ -71454,13 +71462,13 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
 #sh-body .shop-card[data-tier="common"] .shop-ic{ border-radius: calc(3.6 * var(--cqw)); border: calc(.8 * var(--cqw)) solid var(--role-rw-shard-steady-3); background-color: var(--role-rw-shard-steady-1); }
 #sh-body .shop-card[data-tier="rare"]   .shop-ic{ border-radius: calc(3.6 * var(--cqw)); border: calc(.8 * var(--cqw)) solid var(--role-rw-shard-agility-3); background-color: var(--role-rw-shard-agility-1); }
 #sh-body .shop-card .shop-badge{ position: absolute; left: calc(1.5 * var(--cqw)); top: calc(-2 * var(--cqw)); font-style: normal;
-  padding: calc(.4 * var(--cqw)) calc(2 * var(--cqw)); border-radius: 999em; font-size: calc(3 * var(--cqw)); font-weight: 800; line-height: 1.3;
+  padding: calc(.4 * var(--cqw)) calc(2 * var(--cqw)); border-radius: 999em; font-size: max(var(--text-min), calc(3 * var(--cqw))); font-weight: 800; line-height: 1.3;
   background: var(--role-pink-face-b); color: var(--prim-white); }
 /* 지급 수(×100 · ×5)는 목업 B2 처럼 그림 상자(.shop-icbox) 오른쪽 아래에 겹쳐 앉힌다 — 흐름에 두면 두 줄 카드가 판(450px)에 안 들어가고, 카드 위 끝 기준 고정 높이에 두면 제목이 두 줄로 접힐 때(영어) 그림과 어긋난다 */
 #sh-body .shop-icbox{ position: relative; display: flex; }
 #sh-body .shop-card .shop-qty{ position: absolute; right: calc(-1.1 * var(--cqw)); bottom: calc(-.5 * var(--cqw)); font-size: calc(4.2 * var(--cqw)); font-weight: 800; line-height: 1;
   paint-order: stroke fill; -webkit-text-stroke: calc(.5 * var(--cqw)) var(--prim-white); }
-#sh-body .shop-card .shop-cd{ font-size: calc(3 * var(--cqw)); color: var(--role-f2-ink); }
+#sh-body .shop-card .shop-cd{ font-size: max(var(--text-min), calc(3 * var(--cqw))); color: var(--role-f2-ink); }
 /* min-height · padding 의 !important: .cta-jelly 가 둘을 !important 로 주어서(중요도가 선택자 특정도보다 먼저) 같은 !important 로만 덮인다 — 빼 보면(좌우 18px 이 이겨) 390 에서도 「무료 받기」가 「무료 받 / 기」 로 꺾인다(시험 t5f1) */
 #sh-body .sh-btn{ min-height: 0 !important; padding: 0 calc(1 * var(--cqw)) !important; width: 100%; height: calc(10.8 * var(--cqw)); margin-top: auto; font-size: calc(4.2 * var(--cqw)); }
 #sh-body .sh-btn[data-price="coin"], #modal-gres #gres-again[data-price="coin"]{ --btn-face-a: var(--role-yellow-face-a); --btn-face-b: var(--role-yellow-face-b); --btn-outline: var(--role-yellow-outline); --btn-contact: var(--role-yellow-contact); }
@@ -71471,12 +71479,12 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
 #sh-body .sh-btn-ic{ width: calc(4.6 * var(--cqw)); height: calc(4.6 * var(--cqw)); margin-right: calc(.8 * var(--cqw)); background: center / contain no-repeat; }
 #sh-body .sh-btn-ic--coin, #modal-gres .sh-btn-ic--coin{ background-image: var(--lib-glyph-coin); }   /* P3 T8 수정 1회차 — 결과 창 [10회 더] 그림도 같은 조각(I-7) */
 #sh-body .sh-btn-ic--star, #modal-gres .sh-btn-ic--star{ background-image: var(--lib-star-gold); }
-#sh-body .sh-fine{ margin: calc(2.6 * var(--cqw)) 0 0; font-size: calc(3 * var(--cqw)); line-height: 1.5; text-align: center; color: var(--role-f2-ink); }
+#sh-body .sh-fine{ margin: calc(2.6 * var(--cqw)) 0 0; font-size: max(var(--text-min), calc(3 * var(--cqw))); line-height: 1.5; text-align: center; color: var(--role-f2-ink); }
 #sh-body .sh-fine + .sh-fine{ margin-top: 0; }
 /* 말풍선(특가) — 목업 B2: 상인 오른쪽 · 안 = 한 줄 인사 + 남은 시간 알약(kit-pill-v2[soft] 119 x 23px · 글 13px). 좌표는 무대(#sh-stage) 안, 위 + 안전 영역(판 위 끝과 같은 규칙). */
 #sh-bubble{ box-sizing: border-box; left: calc(43.6 * var(--cqw)); top: calc(26.7 * var(--cqw) + var(--safe-t)); width: calc(50.3 * var(--cqw)); padding: calc(2 * var(--cqw)) calc(2.8 * var(--cqw)); border-radius: calc(4.1 * var(--cqw));
   background: var(--prim-white); border: calc(.4 * var(--cqw)) solid var(--role-f2-pill-line); color: var(--prim-art-ink); font-size: calc(3.4 * var(--cqw)); }
-#sh-bubble > .kit-pill-v2{ display: flex; width: max-content; margin-top: calc(1.2 * var(--cqw)); --f2-bh: calc(5.9 * var(--cqw)); font-size: calc(3.3 * var(--cqw)); }
+#sh-bubble > .kit-pill-v2{ display: flex; width: max-content; margin-top: calc(1.2 * var(--cqw)); --f2-bh: calc(5.9 * var(--cqw)); font-size: max(var(--text-min), calc(3.3 * var(--cqw))); }
 #screen-shop[data-stab="deals"] #sh-host{ left: calc(6 * var(--cqw)); right: auto; }
 /* 특가 판의 스크롤 상자는 머리 알약(판 직속, 위 걸침) 밑부터 — 첫 카드 자리는 머리가 상자 안에 있던 때와 같다(판 위 끝 + 4.5cqw + 안쪽 여백 2.5cqw = 7cqw). 상자가 판 위로 나가지 않는다(리뷰 I-1). */
 #screen-shop[data-stab="deals"] #sh-body{ top: calc(4.5 * var(--cqw)); padding-top: calc(2.5 * var(--cqw)); }   /* 안쪽 여백 = 「희귀」 표가 카드 위로 걸친 만큼(상자 위 끝에서 안 잘림) */
@@ -71491,18 +71499,18 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
    목업과 같은 줄 안 칸 비율(이름 · 확률 · 칩)이 서려면 1 단위 = 292 ÷ 86.7 = 3.368px — 즉 373.2 ÷ 3.368 = 110.8. 320 폭에서는 --f2-w 가 306.2px 라 1 단위 2.76px 로, 1280 데스크톱에서는 --f2-w 가
    폰 폭 390 의 95.7% 로 고정돼 3.368px 그대로다(판이 커져도 글자가 안 커진다). 한 창 안의 치수는 --mu 하나로 쓴다 — 퀘스트 창의 --f2-w × k 값도 같은 비례(k × 110.8)라 N × --mu 로 옮겼다. */
 #sh-scene .gc-kinds{ position: absolute; left: 0; right: 0; top: 13.2%; display: flex; justify-content: center; gap: calc(1.5 * var(--cqw)); z-index: 6; }
-#sh-scene .gc-kind{ --f2-bh: calc(7.18 * var(--cqw)); padding: 0 calc(3 * var(--cqw)); font-size: calc(3.2 * var(--cqw)); white-space: nowrap; }
+#sh-scene .gc-kind{ --f2-bh: calc(7.18 * var(--cqw)); padding: 0 calc(3 * var(--cqw)); font-size: max(var(--text-min), calc(3.2 * var(--cqw))); white-space: nowrap; }
 #sh-scene .gc-title{ position: absolute; left: 50%; top: 20.8%; transform: translateX(-50%); z-index: 6;
   --f2-bh: calc(11.28 * var(--cqw)); padding: 0 calc(5.64 * var(--cqw)); font-family: var(--font-display); font-weight: 400; font-size: calc(6.2 * var(--cqw)); line-height: 1; white-space: nowrap; }
 #sh-scene .gc-sub{ position: absolute; left: 50%; top: 87.6%; transform: translateX(-50%); z-index: 6;
   --f2-bh: calc(6.67 * var(--cqw)); width: max-content; max-width: calc(94 * var(--cqw)); height: auto; min-height: var(--f2-bh); padding-top: calc(.8 * var(--cqw)); padding-bottom: calc(.8 * var(--cqw)); text-align: center; line-height: 1.25;
-  font-size: calc(3.2 * var(--cqw));
+  font-size: max(var(--text-min), calc(3.2 * var(--cqw)));
   /* [판정판 121 Task 4 수정 2회차] 줄이 접힐 때 한국어 낱말 가운데서 안 끊기게(「없어|요」 반려) — 파일의 한국어 줄바꿈 규칙 keep-all · 줄 길이 고르게(balance — 모르는 기기는 무시) */
   word-break: keep-all; text-wrap: balance; }
 /* 말풍선(뽑기) — 목업 B1: 기계 오른쪽 · 상인 위(왼쪽 250px · 위 238px) · 글 11.5px 굵게. 특가 말풍선(위 규칙)의 자리·크기만 덮는다. */
 #screen-shop[data-stab="gacha"] #sh-bubble,
 #screen-shop[data-stab="deco"] #sh-bubble{ left: calc(64.1 * var(--cqw)); top: 47.6%; width: max-content; max-width: calc(34 * var(--cqw));
-  padding: calc(1.5 * var(--cqw)) calc(2.3 * var(--cqw)); border-radius: calc(3.6 * var(--cqw)); font-size: calc(3 * var(--cqw)); font-weight: 700; line-height: 1.3; word-break: keep-all; text-wrap: balance; }
+  padding: calc(1.5 * var(--cqw)) calc(2.3 * var(--cqw)); border-radius: calc(3.6 * var(--cqw)); font-size: max(var(--text-min), calc(3 * var(--cqw))); font-weight: 700; line-height: 1.3; word-break: keep-all; text-wrap: balance; }
 /* 임시 기계(발주 ② 전) — 규칙 기하만: 유리 돔 원 + 역할색 몸통 + 손잡이. 색 = 캡슐 역할(아이템 민트 · 황금 노랑 · 친구 분홍). 크기 = 무대 높이 57% · 목업 비율 224:285. */
 #sh-scene .gm-ph{ position: absolute; left: 50%; top: 30%; height: 57%; width: auto; aspect-ratio: 224 / 285; transform: translateX(-50%); z-index: 3;
   --gm-a: var(--role-mint-face-a); --gm-b: var(--role-mint-face-b); --gm-o: var(--role-mint-outline); }
@@ -71533,8 +71541,8 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
 /* 판 윗테두리와 버튼 줄 사이 틈 — 목업 B1: 판 위 끝 478px · 버튼 위 끝 496px = 18px ÷ 3.9 = 4.6cqw. #sh-body 의 위 안쪽(3cqw)에 1.6cqw 를 더한다 */
 #screen-shop[data-stab="gacha"] #sh-body,
 #screen-shop[data-stab="deco"] #sh-body{ padding-top: calc(1.6 * var(--cqw)); }
-#sh-body .gc-oddhd{ display: flex; justify-content: space-between; align-items: center; margin: calc(3.6 * var(--cqw)) 0 calc(1.5 * var(--cqw)); font-size: calc(3.2 * var(--cqw)); color: var(--prim-art-ink); }
-#sh-body .gc-oddlink{ --f2-bh: calc(5.64 * var(--cqw)); padding: 0 calc(2.6 * var(--cqw)); font-size: calc(3.2 * var(--cqw)); white-space: nowrap; }
+#sh-body .gc-oddhd{ display: flex; justify-content: space-between; align-items: center; margin: calc(3.6 * var(--cqw)) 0 calc(1.5 * var(--cqw)); font-size: max(var(--text-min), calc(3.2 * var(--cqw))); color: var(--prim-art-ink); }
+#sh-body .gc-oddlink{ --f2-bh: calc(5.64 * var(--cqw)); padding: 0 calc(2.6 * var(--cqw)); font-size: max(var(--text-min), calc(3.2 * var(--cqw))); white-space: nowrap; }
 #sh-body .gc-og{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: calc(1.5 * var(--cqw)); }
 #sh-body .gc-oc{ display: flex; align-items: center; gap: calc(1.5 * var(--cqw)); height: calc(12.8 * var(--cqw)); padding: 0 calc(1.5 * var(--cqw)); border-radius: calc(3.6 * var(--cqw)); box-sizing: border-box;
   background: var(--role-f2-pill); border: calc(.3 * var(--cqw)) solid var(--role-f2-pill-line); }
@@ -71546,8 +71554,8 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
 /* [rc1009 수정 1회차 F-2] 이름 = 말줄임 없이 최대 두 줄 · 어절 단위 줄바꿈(keep-all). 이름 상자는 칸(.gc-oc)의 오른쪽 안쪽 여백(같은 1.5cqw)까지 쓴다 —
    한 어절이 이름 칸보다 넓은 en 「Honeybee」 가 상자 안에 든다(지휘자 판정 a). 넓힘은 이름 상자 span 의 음수 margin-right(위 규칙) — 한 줄에 들던
    이름은 상자 폭 · 글자 자리 · 가장자리 숨김(overflow hidden, 말줄임 없음)이 옛 그대로라 픽셀 0(I-1 실측). */
-#sh-body .gc-oc b{ display: block; font-size: calc(3.1 * var(--cqw)); color: var(--prim-art-ink); word-break: keep-all; overflow: hidden; }
-#sh-body .gc-oc em{ display: block; font-style: normal; font-weight: 800; font-size: calc(3.2 * var(--cqw)); color: var(--role-rw-shard-steady-3); }
+#sh-body .gc-oc b{ display: block; font-size: max(var(--text-min), calc(3.1 * var(--cqw))); color: var(--prim-art-ink); word-break: keep-all; overflow: hidden; }
+#sh-body .gc-oc em{ display: block; font-style: normal; font-weight: 800; font-size: max(var(--text-min), calc(3.2 * var(--cqw))); color: var(--role-rw-shard-steady-3); }
 #sh-body .gc-oc[data-tier="rare"] em{ color: var(--role-rw-shard-agility-3); }
 #sh-body .gc-oc[data-tier="epic"] em{ color: var(--role-rw-item-3); }
 #sh-body .gc-tiers .gc-tr{ display: flex; align-items: center; gap: calc(2 * var(--cqw)); padding: calc(1.2 * var(--cqw)) 0; font-size: calc(3.4 * var(--cqw)); color: var(--prim-art-ink); }
@@ -71683,7 +71691,7 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
    ▶ 는 글자가 아니라 CSS 삼각형(border) — 글꼴에 의존하지 않는다. .fr-play 는 상점 판(제목 알약)과 결과 창 버튼(코인 두 배)이 함께 써서 길이를 글자 크기(em)로
    준다: 상점에서는 제목 글자 5.6 단위의 2.4 · 1.5 · 1.2 와 같은 값이고, cqw 가 없는 결과 창에서도 버튼 글자를 따라 크기가 선다. */
 #sh-scene .fr-title{ position: absolute; left: calc(5.6 * var(--cqw)); top: calc(24.6 * var(--cqw)); z-index: 6; }   /* 자리만 — 치수 · 글꼴 · 그림자는 JS 가 함께 다는 .sh-head(머리 알약 인스턴스, 위 [P3-T5]) */
-#sh-scene .fr-reset{ position: absolute; left: calc(5.6 * var(--cqw)); top: calc(39.5 * var(--cqw)); font-size: calc(3.1 * var(--cqw)); z-index: 6; gap: .3em; }   /* 알약은 flex 라 글 뒤 공백이 접힌다 — 글과 시계 사이는 gap 으로 */
+#sh-scene .fr-reset{ position: absolute; left: calc(5.6 * var(--cqw)); top: calc(39.5 * var(--cqw)); font-size: max(var(--text-min), calc(3.1 * var(--cqw))); z-index: 6; gap: .3em; }   /* 알약은 flex 라 글 뒤 공백이 접힌다 — 글과 시계 사이는 gap 으로 */
 .fr-play{ display: inline-block; width: 0; height: 0; margin-right: .214em; vertical-align: middle;
   border-left: .429em solid currentColor; border-top: .268em solid transparent; border-bottom: .268em solid transparent; }
 #sh-body .fr-list{ display: flex; flex-direction: column; gap: calc(1.8 * var(--cqw)); }
@@ -71773,7 +71781,7 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
 /* [P3-B10] 상점 하단 탭 점 = 분홍 원(묶음 B B10 · 지휘자 판정 2026-10-07 · 시안 B1 · B2 의 채운 알림 점): 배경 --role-pink-face-b · 글자 --prim-white(상점 카드 .shop-badge 와 같은 쌍 — 새 색 0)
    지름 4.42cqw(390 에서 17.2px = 왕국 상점 이름표 배지 높이 17.25) · 글자 2.69(기존 상점 글자 단계 가운데 390 에서 9.5px 에 가장 가까운 것 · 10.5px) → DESIGN §28.14 */
 #sh-tabs .sh-dot{ display: flex; align-items: center; justify-content: center; box-sizing: border-box; width: calc(4.42 * var(--cqw)); height: calc(4.42 * var(--cqw)); padding: 0;
-  border-radius: 50%; background: var(--role-pink-face-b); color: var(--prim-white); box-shadow: none; font-size: calc(2.69 * var(--cqw)); line-height: 1; letter-spacing: 0; }
+  border-radius: 50%; background: var(--role-pink-face-b); color: var(--prim-white); box-shadow: none; font-size: max(var(--text-min), calc(2.69 * var(--cqw))); line-height: 1; letter-spacing: 0; }
 
 /* [P3-B13] 묶음 B 13b-B — 결과 창 「코인 두 배」 · 「그냥 받기」 글자는 낱말 단위로만 접힌다(320 폭에서 「그냥 받 / 기」 로 낱말 한가운데서 꺾였다) — 한 줄에 안 들면 공백에서 두 줄 */
 .coin-x2 .btn{ word-break: keep-all; }
@@ -71824,7 +71832,7 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
   #app #screen-shop #sh-body .sh-fine{ color: var(--ink); }
   /* 탭 점 배지 [수정 1회차 · 리뷰 I4]: 글자 = 메인 · 지도 상점 단추 배지의 가로 글자(.29 × 62u = 18u — 821×462 에서 11.5px) · 지름 = B10 비(4.42 : 2.69) → 29.6u ·
      자리(−6u = −1 × --cqw)는 위 규칙 그대로. */
-  #app #screen-shop #sh-tabs .sh-dot{ font-size: calc(var(--stage-u) * 18); width: calc(var(--stage-u) * 29.6); height: calc(var(--stage-u) * 29.6); }
+  #app #screen-shop #sh-tabs .sh-dot{ font-size: max(var(--text-min), calc(var(--stage-u) * 18)); width: calc(var(--stage-u) * 29.6); height: calc(var(--stage-u) * 29.6); }
   #app #screen-shop #sh-host{ width: calc(28.7 * var(--cqw)); height: calc(38.5 * var(--cqw)); }
   #app #screen-shop:not([data-stab="deals"]) #sh-host{ right: calc(2 * var(--cqw)); }
   #app #screen-shop:not([data-stab="free"]) #sh-host{ bottom: calc(2 * var(--cqw)); }
