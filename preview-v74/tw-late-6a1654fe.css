@@ -69,19 +69,6 @@ color:#FFFFFF !important;
 @media (max-height:659px){
 #app.battle #actionbar .act{height:70px !important;}
 }
-#app.battle #btn-pause{
-background:url("catalog/duel-btn-pause.webp") center/contain no-repeat !important;
-box-shadow:none !important;border-radius:0 !important;
-position:absolute;
-left:calc(var(--safe-l) + 4px + 0.03785 * var(--dh-w));
-top:calc(0.03913 * var(--dh-w));
-width:calc(0.0963 * var(--dh-w)) !important;
-height:auto !important;
-aspect-ratio:152/151;
-z-index:6;
-}
-#app.battle #btn-pause .ic{display:none !important;}
-#app.battle #btn-pause:active{transform:scale(.92);}
 
 /* == jelly-box-core == */
 
@@ -110,7 +97,9 @@ backdrop-filter:var(--jbox-blur,none) !important;
 .jbox--modal,
 [data-part="modal-plate"],
 #app.battle #screen-game.active #pc-left[data-wide-only],
-#app.battle #screen-game.active #pc-right[data-wide-only]{ /* 팝업/노드카드 — [0908 원칙 0] 부품 modal-plate(정본 engine §modal-plate)의 사본.
+#app.battle #screen-game.active #pc-right[data-wide-only],
+#app.battle #screen-game.active #duel-foe-box[data-wide-only],
+#app.battle #screen-game.active #duel-me-box[data-wide-only]{ /* 팝업/노드카드 — [0908 원칙 0] 부품 modal-plate(정본 engine §modal-plate)의 사본.
 [lineage-0908] 계보 판정: 정본 코드 젤리 .work-frame[data-part="modal"](S11 값)과는 **다른 Component** — 실루엣 IoU .883,
 jelly-box 모서리가 더 둥글고 상변이 볼록(Δ≈1.2%W), engine 은 --wf-L0-R .07w + 탭. (0908 당시) 게임 15 시트는 전부 이 이미지 변주,
 코드 젤리는 게임 소비처 0. 통합하지 않고 매니페스트 t2-plate-modal-pink.lineage 에 Shape·값 차 표를 기록했다(값 무변).
@@ -150,7 +139,9 @@ corner-shape:var(--jbox-corner);     /* 시트 자신은 배경·접지를 안 �
 .jbox--modal::before,
 [data-part="modal-plate"]::before,
 #app.battle #screen-game.active #pc-left[data-wide-only]::before,
-#app.battle #screen-game.active #pc-right[data-wide-only]::before{
+#app.battle #screen-game.active #pc-right[data-wide-only]::before,
+#app.battle #screen-game.active #duel-foe-box[data-wide-only]::before,
+#app.battle #screen-game.active #duel-me-box[data-wide-only]::before{
 content:"";
 position:absolute;
 inset:calc(var(--jbox-bw) * -1);
@@ -198,7 +189,9 @@ color-mix(in srgb, var(--jbox-face) calc((var(--jbox-a-rim) - var(--jbox-a-in)) 
 .jbox--modal::after,
 [data-part="modal-plate"]::after,
 #app.battle #screen-game.active #pc-left[data-wide-only]::after,
-#app.battle #screen-game.active #pc-right[data-wide-only]::after{
+#app.battle #screen-game.active #pc-right[data-wide-only]::after,
+#app.battle #screen-game.active #duel-foe-box[data-wide-only]::after,
+#app.battle #screen-game.active #duel-me-box[data-wide-only]::after{
 content:"";
 position:absolute;
 inset:calc(var(--jbox-bw) * -1);
@@ -549,6 +542,7 @@ background-image:var(--mate-mungchi-img,none);
 --art-map-ch09:url("catalog/art-map-ch09.webp");     /* ch9  심장의 방 (780x1688) */
 --art-map-ch10:url("catalog/art-map-ch10.webp");     /* ch10 왕좌     (780x1688) */
 --ch-boss-face-mint:url("catalog/ch-boss-face-mint.webp");
+--ch-boss-face-cocoa:url("catalog/ch-boss-face-cocoa.webp");   /* [판정판 121 · Task 6] .bs-cocoa 의 얼굴(종전 포도 얼굴 빌림) */
 --ch-pudding-portrait:url("catalog/ch-pudding-portrait.webp");
 --ch-pudding-full:url("catalog/ch-pudding-full.webp");
 --ch-pudding-face:url("catalog/ch-pudding-face.webp");
@@ -2688,6 +2682,7 @@ padding: 0 calc(var(--f2-w) * .03);
 #charpanel .cp-rack::-webkit-scrollbar { width: 0; height: 0; }
 #charpanel .pick-lab { display: none; }
 #app.battle #duel-baby,
+#app.battle #duel-foe-chip,        /* [판정판 121 · Task 6b] 가로 전투 악당 얼굴 방울 = 펫 방울과 같은 부품(별칭) */
 #app.classic #classic-hud #ch-baby,
 #charpanel .cp-th,
 #charpanel #mate-pick .char-card {
@@ -2700,6 +2695,7 @@ overflow: visible;
 scroll-snap-align: center;
 }
 #app.battle #duel-baby .ct-art,
+#app.battle #duel-foe-chip .ct-art,
 #app.classic #classic-hud #ch-baby .ct-art,
 #charpanel .cp-th .ct-art,
 #charpanel #mate-pick .char-card .cc-art {
@@ -5364,6 +5360,7 @@ curve to 42.3077% 4.8110% with 38.9231% 6.7319% / 39.6320% 4.8110%,
 close); }
 }
 #app.battle #duel-baby,
+#app.battle #duel-foe-chip,        /* [판정판 121 · Task 6b] 악당 얼굴 방울 — 같은 재질 한 벌(별칭) */
 #app.classic #classic-hud #ch-baby,
 #charpanel .cp-th,
 #charpanel #mate-pick .char-card{
@@ -6758,15 +6755,28 @@ container-type: inline-size;
 #app.battle #btn-pause,
 #app.classic #btn-pause,
 #app:not(.classic):not(.battle) #screen-game #topbar #btn-pause{
-background:url("catalog/duel-btn-pause.webp") center/contain no-repeat !important;
+background:none !important;
 box-shadow:none !important;border-radius:0 !important;
 position:absolute;
 left:calc(var(--safe-l) + 4px + 0.03785 * var(--dh-w));
 top:calc(0.03913 * var(--dh-w));
 width:calc(0.0963 * var(--dh-w)) !important;
 height:auto !important;
-aspect-ratio:152/151;
+aspect-ratio:468/484;
 z-index:6;
+}
+#app.battle #btn-pause::before,
+#app.classic #btn-pause::before,
+#app:not(.classic):not(.battle) #screen-game #topbar #btn-pause::before{
+content:"";
+position:absolute;
+left:50%; top:50%;
+width:calc(100% * 1.074);
+height:auto;
+aspect-ratio:468/484;
+transform:translate(-50%, -50%);
+background:url("catalog/hud-btn-pause.webp") center/contain no-repeat;
+pointer-events:none;
 }
 #app.battle #btn-pause .ic,
 #app.classic #btn-pause .ic,
@@ -6997,13 +7007,15 @@ transform:var(--me-flip,none);
 filter:drop-shadow(0 2px 4px rgba(40,70,100,.30));
 z-index:2;
 }
-#app.battle #duel-baby{
+#app.battle #duel-baby,
+#app.battle #duel-foe-chip{          /* [판정판 121 · Task 6b] 악당 얼굴 방울(가로 전용) — 정원 · 자 · 쌓임 같은 값, 자리는 battle-landscape 절 */
 left:84.8cqw;top:1.6cqw;
 width:13cqw;aspect-ratio:1;height:auto;
 --f2-ref-w: min(100vw, 480px);
 z-index:3;
 }
-#app.battle #duel-hud #duel-baby{
+#app.battle #duel-hud #duel-baby,
+#app.battle #duel-hud #duel-foe-chip{
 --wchip-L3-line:var(--mode-b-outline);
 --wchip-glow-c:var(--mode-b-glow-bubble);
 box-shadow:

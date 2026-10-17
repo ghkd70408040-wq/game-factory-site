@@ -6872,6 +6872,8 @@ setStdArt(art, castId, 'full', '--slot-std');   /* 14차 수리 8 (§26-3b) */
 el.style.setProperty('--cut-key', o.key || (CHARS[castId] || CHARS.ten).key);
 if (o.img) el.style.setProperty('--cutin-img', o.img);
 else if (el.style.removeProperty) el.style.removeProperty('--cutin-img');
+var cutImg = $('cutin-img');
+if (cutImg && cutImg.toggleAttribute) cutImg.toggleAttribute('data-cut', !!(o.img && o.cut));
 setText('cutin-name', o.shout ? t('skill.shout', { name: t(nameKey).toUpperCase() }) : t(nameKey));
 setText('cutin-sub', t(o.subKey || 'skill.sub'));
 el.hidden = false;
@@ -11715,12 +11717,21 @@ if (hud.classList) hud.classList.remove('fhit', 'mhit', 'big', 'tell', 'down');
 d.hud = null;                      // 캐시 초기화 — 첫 틱이 여섯 칸을 다 쓴다
 var av = $('duel-foe-av');
 if (av) av.className = 'dh-av boss-av bs-' + (d.def ? d.def.id : 'grape');
+var foeChip = $('duel-foe-chip');
+if (foeChip) foeChip.className = 'dh-foe-chip cp-th kit-chip-v2 bs-' + (d.def ? d.def.id : 'grape');
+var foeAtk = bossAtkIdOf(d.def, S.advPlan ? S.advPlan.n : 0);
+setText('duel-foe-skill-n', t('boss.atk.' + foeAtk));
+setText('duel-foe-skill-d', t('boss.atk.' + foeAtk + '.d', ncAtkArgs(foeAtk)));
 setText('duel-foe-name', d.def ? bossName(d.def) : '');
 var lv = 'Lv.' + Math.max(1, S.stage | 0);
 setText('duel-foe-lv', lv);
 setText('duel-me-lv', lv);
 var cid = charId();
 setText('duel-me-name', t('char.' + cid + '.name'));
+['duel-foe-name', 'duel-me-name'].forEach(function (id) {
+var ne = $(id);
+if (ne) ne.toggleAttribute('data-long', (ne.textContent || '').length >= 10);
+});
 var me = $('duel-me-av');
 if (me) {
 setStdArt(me, cid, 'face', '--duel-me-face');
@@ -12037,7 +12048,7 @@ d.foe.atk = 0;
 duelHitMe(d.foe.hit);
 toast(t('duel.hit', { n: d.foe.hit }));
 }
-var FOE_FULL = { grape: 'grape', soda: 'soda', berry: 'straw' };
+var FOE_FULL = { grape: 'grape', soda: 'soda', berry: 'straw', mint: 'mint', cocoa: 'cocoa' };
 function duelFoeFull() {
 var d = S.duel, id = (d && d.def) ? d.def.id : '';
 var k = FOE_FULL[id];
@@ -12056,6 +12067,7 @@ noAv: true,
 voice: '',                                        // 악당에게는 보이스 세트가 없다
 vig: 0.62,
 img: duelFoeFull(),
+cut: !!FOE_ART_CUT[(S.duel && S.duel.def) ? S.duel.def.id : ''],   /* [수정 2회차] 아래변이 잘린 그림이면 발 가림(표는 NC_FOE_ART 곁 FOE_ART_CUT 하나) */
 sfx: function () { J.sfx.foeStab(); }
 });
 }
@@ -15280,6 +15292,7 @@ J.sfx.fail();
 }
 var NC_FOE_ART = { grape: 'catalog/duel-demon-full-grape.webp', soda: 'catalog/duel-demon-full-soda.webp', berry: 'catalog/duel-demon-full-straw.webp',
 mint: 'catalog/duel-demon-full-mint.webp', cocoa: 'catalog/duel-demon-full-cocoa.webp' };
+var FOE_ART_CUT = { grape: true, soda: true, berry: true };
 function setTextEl(el, s) { if (el && el.textContent !== s) el.textContent = s; }
 function ncFinishText(f) { return f ? t('finish.mission.' + f.id, { goal: f.goal | 0 }) : ''; }
 function ncAtkArgs(id) {
@@ -15438,7 +15451,11 @@ for (var si = 0; si < starEls.length; si++) starEls[si].classList.toggle('on', s
 var starBox = cardEl.querySelector('.nc-stars');
 if (starBox) starBox.setAttribute('aria-label', t('node.stars.got', { s: gotS }));
 var art = cardEl.querySelector('.nc-foe-art');
-if (art) art.style.setProperty('background-image', 'url("' + (NC_FOE_ART[foe.id] || NC_FOE_ART.grape) + '")');
+var artId = NC_FOE_ART[foe.id] ? foe.id : 'grape';
+if (art) {
+art.style.setProperty('background-image', 'url("' + NC_FOE_ART[artId] + '")');
+art.toggleAttribute('data-cut', !!FOE_ART_CUT[artId]);   /* [수정 2회차] 아래가 잘린 그림만 발 가림 */
+}
 setTextEl(cardEl.querySelector('.nc-foe-name'), bossName(foe));
 setTextEl(cardEl.querySelector('.nc-hp-v'), fmtNum(duelFoeHpMax(p.n)));
 var atkId = bossAtkIdOf(foe, p.n);
