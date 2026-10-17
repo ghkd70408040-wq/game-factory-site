@@ -251,7 +251,9 @@ text-shadow:0 2px 0 rgba(110,70,58,.55);
 .w6m .sheet #btn-menu,
 .w6m .sheet #btn-daily-menu{ border-style:solid; border-width:16px 20px 19px 20px; border-image:var(--lib-btn-purple) 31 39 37 39 fill stretch; }
 버튼 조각 봉인 끝 */
-.r10-x[data-w6x]{
+.r10-x[data-w6x],
+#modal-gear .r10-x,
+#modal-gear-info .r10-x{   /* [판정판 121 · Task 5] 장비 두 창의 ✕ 는 자기 id 단추(data-w6x 없음) — 같은 열 창 자리를 받는다 */
 top:2px;
 right:2px;
 color:#FFFFFF;
@@ -2368,7 +2370,8 @@ color-mix(in srgb, var(--role-f2-pill-soft-e) 74%, transparent),
 .kit-pill-v2[data-variant="soft"][data-press]{
 transform: translateY(calc(var(--f2-bh) * .04));
 }
-.kit-pill-v2[data-variant="soft"][disabled]{ opacity:.55; }
+.kit-pill-v2[data-variant="soft"][disabled],
+.gear-row .sk-act.kit-pill-v2{ opacity:.55; }   /* [판정판 121 · Task 5] 장비 목록 「착용 중」 = 스킨 시트 「착용 중」과 같은 변주(단추 줄 안이라 disabled 대신 자리로 잡는다) */
 .kit-chip-v2{
 --f2-cd:   calc(var(--f2-w) * .1307);       /* 96.04 / 735 */
 --f2-cring:calc(var(--f2-w) * .00405);      /*  2.98 / 735 */
@@ -2740,6 +2743,8 @@ white-space: nowrap;
 border: 0;
 }
 #charpanel #mate-pick .char-card.locked::after,
+#charpanel .cp-side-rack .cp-islot[data-state="empty"] > .cp-cr-ic,
+#modal-gear .gear-row[data-act] .cp-cr-ic,
 #charpanel .cp-th.locked .ct-art { opacity: .6; filter: grayscale(1) contrast(0) brightness(1.15); }
 #charpanel #mate-pick .char-card.locked .cav,
 #charpanel .cp-th.locked .cav { filter: grayscale(1) brightness(0) opacity(.32); }
@@ -2879,7 +2884,9 @@ color-mix(in srgb, var(--f2-box) calc(var(--cps-body-a) * 100%), transparent),
 color-mix(in srgb, var(--f2-box-2) calc(var(--cps-body-a) * 100%), transparent));
 }
 #charpanel .cp-crystal,
-#modal-drops .cp-crystal {
+#modal-drops .cp-crystal,
+#modal-gear .cp-crystal,
+#modal-gear-info .cp-crystal {   /* [판정판 121 · Task 5] 장비 두 창의 그림 칸 = 획득표와 같은 칸 부품(선택자만 더함) */
 position: relative;
 box-sizing: border-box;
 flex: 0 0 auto;
@@ -4713,6 +4720,8 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
 #modal-daily .sheet > h2,
 #modal-odds .sheet > h2,
 #modal-gres .sheet > h2,
+#modal-gear .sheet > h2,
+#modal-gear-info .sheet > h2,
 #modal-clear .sheet > h2,
 #modal-rank .sheet > h2,
 #modal-minimap .r10-ribbon,
@@ -4855,6 +4864,8 @@ calc((var(--wcap-a-rim) - var(--wcap-a-in)) * 100%), transparent);
 #modal-daily .sheet > h2,
 #modal-odds .sheet > h2,
 #modal-gres .sheet > h2,
+#modal-gear .sheet > h2,
+#modal-gear-info .sheet > h2,
 #modal-clear .sheet > h2,
 #modal-rank .sheet > h2,
 #modal-minimap .r10-ribbon,
@@ -4896,6 +4907,8 @@ close);
 #modal-daily .sheet > h2::before,
 #modal-odds .sheet > h2::before,
 #modal-gres .sheet > h2::before,
+#modal-gear .sheet > h2::before,
+#modal-gear-info .sheet > h2::before,
 #modal-clear .sheet > h2::before,
 #modal-rank .sheet > h2::before,
 #modal-minimap .r10-ribbon::before,
@@ -5444,7 +5457,9 @@ rgba(255,255,255, var(--wchip-rim-a)),
 0 calc(var(--f2-cd) * .025) calc(var(--f2-cd) * .06) var(--role-f2-cast);
 }
 #charpanel .cp-crystal,
-#modal-drops .cp-crystal{
+#modal-drops .cp-crystal,
+#modal-gear .cp-crystal,
+#modal-gear-info .cp-crystal{
 --wslot-w: 100%;
 --wslot-L3-w:    calc(var(--f2-ref-w) * 0.00400);
 --wslot-L3-line: var(--mode-a-outline-chip-base);
@@ -5484,7 +5499,9 @@ padding-right: calc(var(--f2-w) * .0090);
 z-index: 2;
 }
 #charpanel .cp-side-rack .cp-gem,
-#modal-drops .cp-gem{
+#modal-drops .cp-gem,
+#modal-gear .cp-gem,
+#modal-gear-info .cp-gem{
 flex: 0 0 auto;
 flex-direction: column;
 gap: calc(var(--f2-w) * .0020);
@@ -5510,7 +5527,9 @@ color: var(--f2-ink);
 #charpanel .cp-side-rack .cp-gem-n[hidden],
 #modal-drops .cp-gem-n[hidden]{ display: none; }
 #charpanel .cp-side-rack .cp-crystal > .cp-cr-ic,
-#modal-drops .cp-crystal > .cp-cr-ic {
+#modal-drops .cp-crystal > .cp-cr-ic,
+#modal-gear .cp-crystal > .cp-cr-ic,
+#modal-gear-info .cp-crystal > .cp-cr-ic {
 flex: 0 0 auto;
 display: block;
 font-size: 0;
@@ -5537,17 +5556,22 @@ line-height: 1;
 width: calc(var(--f2-w) * .0640);
 height: calc(var(--f2-w) * .0640);
 }
-#charpanel .cp-side-rack .cp-islot[data-state="empty"],
-#modal-drops .dr-row .cp-islot {
+#modal-drops .dr-row .cp-islot,
+#modal-gear .gear-row .cp-islot,
+#gi-art .cp-islot {
 cursor: default;
 pointer-events: none;
 }
 #charpanel .cp-side-rack .cp-islot[data-state="own"],
-#modal-drops .dr-row .cp-islot[data-state="own"] {
+#modal-drops .dr-row .cp-islot[data-state="own"],
+#modal-gear .gear-row .cp-islot[data-state="own"],
+#gi-art .cp-islot[data-state="own"] {
 --wslot-face: var(--f2-item-face);
 }
 #charpanel .cp-side-rack .cp-islot[data-state="eq"],
-#modal-drops .dr-row .cp-islot {
+#modal-drops .dr-row .cp-islot,
+#modal-gear .gear-row .cp-islot,
+#gi-art .cp-islot {
 --wslot-face: var(--f2-item-on);
 --wslot-L3-line: var(--f2-item-line);
 --wslot-a-in: .929;
@@ -5571,7 +5595,9 @@ calc(var(--wslot-L3-a) * 100%), transparent),
 .wf-cap{ --wcap-L3-line: var(--mode-a-outline); --wcap-face: var(--mode-a-face); --wcap-face-top: var(--role-wcap-face-top-modal-title-node); --wcap-face-y: 100%; --wcap-rim-c: var(--mode-a-rim); }
 .wf-chip{ --wchip-L3-line: var(--mode-a-outline-chip); }
 #charpanel .cp-crystal,
-#modal-drops .cp-crystal{ --wslot-L3-line: var(--role-wslot-L3-line-crystal); }
+#modal-drops .cp-crystal,
+#modal-gear .cp-crystal,
+#modal-gear-info .cp-crystal{ --wslot-L3-line: var(--role-wslot-L3-line-crystal); }
 #charpanel .cp-fx > .cp-jelly,
 #charpanel .cp-fx > .cp-gnd{
 --cpj-tab-h:  calc(var(--cpj-w) * .07005);
@@ -5902,8 +5928,11 @@ margin-inline: auto;
 #charpanel { --cs-side: calc(var(--f2-w) * .2730); }
 #charpanel .cp-side-rack { gap: calc(var(--f2-w) * .0213); }
 #charpanel .cp-side-rack .cp-gem,
-#modal-drops .cp-gem {
-width:  calc(var(--f2-w) * .1381);
+#modal-drops .cp-gem,
+#modal-gear .cp-gem,
+#modal-gear-info .cp-gem {
+--cp-gem-k: .1381;                  /* [판정판 121 · Task 5 수정 1회차 M1] 칸 폭 계수 한 곳 — 장비 설명 큰 그림(#gi-art)도 이 변수로 판 안 폭 1/2 를 푼다 */
+width:  calc(var(--f2-w) * var(--cp-gem-k));
 height: calc(var(--f2-w) * .1356);
 }
 #modal-tutorial #tut-stage { width: auto; }
@@ -6002,6 +6031,8 @@ calc(var(--f2-w) * .0956) !important;
 #modal-daily .sheet > h2,
 #modal-odds .sheet > h2,
 #modal-gres .sheet > h2,
+#modal-gear .sheet > h2,
+#modal-gear-info .sheet > h2,
 #modal-clear .sheet > h2,
 #modal-rank .sheet > h2,
 #modal-minimap .r10-ribbon,
@@ -6032,6 +6063,8 @@ text-shadow:0 1px 0 rgba(255,255,255,.9), 0 2px 4px rgba(120,110,150,.35);
 #modal-daily .sheet > h2,
 #modal-odds .sheet > h2,
 #modal-gres .sheet > h2,
+#modal-gear .sheet > h2,
+#modal-gear-info .sheet > h2,
 #modal-clear .sheet > h2,
 #modal-rank .sheet > h2,
 #modal-minimap .r10-ribbon,
@@ -6074,6 +6107,8 @@ calc((var(--wcap-a-rim) - var(--wcap-a-in)) * 100%), transparent);
 #modal-daily .sheet > h2,
 #modal-odds .sheet > h2,
 #modal-gres .sheet > h2,
+#modal-gear .sheet > h2,
+#modal-gear-info .sheet > h2,
 #modal-clear .sheet > h2,
 #modal-rank .sheet > h2{
 --wcap-w: calc(56.84% + 35.2408px);      /* .sheet.jbox--modal — 안여백 차 62px 고정 */

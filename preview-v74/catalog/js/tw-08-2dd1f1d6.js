@@ -19,6 +19,8 @@ try { b.click(); } catch (e) { return false; }
 return true;
 }
 var SELF_BACK = [
+['modal-gear-info', 'gi-close'],
+['modal-gear',     'gear-close'],
 ['modal-skin',     'sk-close'],
 ['modal-settings', 'st-close'],
 ['modal-over',     'btn-menu'],
