@@ -71451,6 +71451,12 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
 }
 #modal-node .nc-drop-list { --it-w: calc(var(--nc-u) * 56); }   /* cqw 대체용 칸 폭(itile-8a 끝 블록) */
 #modal-node .nc-drop > .itile { width: 100%; margin-bottom: 6%; }   /* Lv 알약이 칸 아래로 칸 폭의 6% 걸치는 몫 */
+/* [Task 8a 수정 1회차 보충 2 F3 · 지휘자 판정 (a)] 세로 배치만 칸 상한 = --it-w(56nu) — 열 폭 칸(390x844 에서 66px)이 장비 줄을 99 → 108px 로 키워
+   en 30 · 50 · 100탄(핸디캡 칩 줄)에서 구획이 1~8px 넘쳤다(옛 smoke-v74-t13 t13f · 점검 C9 「390x844 넘침 0」). 세로/가로 가름 = 판 정보 창의 가로 무리가
+   쓰는 조건(@media (min-aspect-ratio: 1/1) — gear-121 3 절)의 반대 그대로(새 기준값 0). 가로 배치 칸 폭은 무변(열 폭). 칸은 .nc-drop 가운데(align-items center). */
+@media not all and (min-aspect-ratio: 1/1) {
+  #modal-node .nc-drop > .itile { width: min(100%, var(--it-w)); }
+}
 /* 은퇴(수정 1회차 B5): .nc-drop[data-tier] 색 변수(--nc-t1~3) · .nc-drop::before 등급 액자 · .nc-ic 그림 상자 · .nc-tier 「희귀」 모서리 리본 · .nc-lv 어두운 Lv 띠(node.lv) ·
    .nc-drop::after 희귀 이상 반짝이 · 희귀 % 파랑(--role-blue-contact). 칸 · 등급 · Lv 는 itemTile 이 그린다. */
 /* % = 칸 아래 잉크 글자 — 획득표 .dr-p 와 같은 색 · 굵기(본문 글꼴 800 · --prim-art-ink). 크기는 판 정보 자(15nu · 하한 스위치) 그대로. */
