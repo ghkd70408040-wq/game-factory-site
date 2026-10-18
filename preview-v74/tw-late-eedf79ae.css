@@ -254,8 +254,7 @@ text-shadow:0 2px 0 rgba(110,70,58,.55);
 .w6m .sheet #btn-daily-menu{ border-style:solid; border-width:16px 20px 19px 20px; border-image:var(--lib-btn-purple) 31 39 37 39 fill stretch; }
 버튼 조각 봉인 끝 */
 .r10-x[data-w6x],
-#modal-gear .r10-x,
-#modal-gear-info .r10-x{   /* [판정판 121 · Task 5] 장비 두 창의 ✕ 는 자기 id 단추(data-w6x 없음) — 같은 열 창 자리를 받는다 */
+#modal-gear-info .r10-x{   /* [판정판 121 · Task 5] 장비 설명 창의 ✕ 는 자기 id 단추(data-w6x 없음) — 같은 열 창 자리를 받는다([Task 8b] 장비 목록 창은 은퇴) */
 top:2px;
 right:2px;
 color:#FFFFFF;
@@ -2372,8 +2371,7 @@ color-mix(in srgb, var(--role-f2-pill-soft-e) 74%, transparent),
 .kit-pill-v2[data-variant="soft"][data-press]{
 transform: translateY(calc(var(--f2-bh) * .04));
 }
-.kit-pill-v2[data-variant="soft"][disabled],
-.gear-row .sk-act.kit-pill-v2{ opacity:.55; }   /* [판정판 121 · Task 5] 장비 목록 「착용 중」 = 스킨 시트 「착용 중」과 같은 변주(단추 줄 안이라 disabled 대신 자리로 잡는다) */
+.kit-pill-v2[data-variant="soft"][disabled]{ opacity:.55; }   /* [Task 8b 수정 1회차 M1] 장비 목록 줄(.gear-row 「착용 중」) 선택자는 목록 창과 함께 은퇴 */
 .kit-chip-v2{
 --f2-cd:   calc(var(--f2-w) * .1307);       /* 96.04 / 735 */
 --f2-cring:calc(var(--f2-w) * .00405);      /*  2.98 / 735 */
@@ -2745,8 +2743,6 @@ white-space: nowrap;
 border: 0;
 }
 #charpanel #mate-pick .char-card.locked::after,
-#charpanel .cp-side-rack .cp-islot[data-state="empty"] > .cp-cr-ic,
-#modal-gear .gear-row[data-act] .cp-cr-ic,
 #charpanel .cp-th.locked .ct-art { opacity: .6; filter: grayscale(1) contrast(0) brightness(1.15); }
 #charpanel #mate-pick .char-card.locked .cav,
 #charpanel .cp-th.locked .cav { filter: grayscale(1) brightness(0) opacity(.32); }
@@ -2772,8 +2768,7 @@ font-size: calc(var(--f2-w) * .038);
 font-weight: 900;
 color: #FFF2C8;
 }
-#charpanel .cp-view,
-#charpanel .cp-petart {
+#charpanel .cp-view {
 position: absolute;
 left: 0;
 right: var(--cs-side);
@@ -2857,71 +2852,6 @@ transition: transform .16s var(--ease);
 --f2-cd: calc(var(--f2-w) * .1307);
 box-shadow: inset 0 0 0 var(--f2-cring) var(--f2-chip-line);
 }
-#charpanel .cp-side {
-position: absolute;
-right: 0;
-top: calc(var(--cs-head) + var(--cs-carh) + var(--f2-w) * .06);
-bottom: calc(var(--cs-card) + var(--f2-w) * .03 + var(--cs-gap8));
-width: var(--cs-side);
-z-index: 5;
-display: flex;
-flex-direction: row;
-align-items: stretch;
-gap: calc(var(--f2-w) * .008);
-}
-#charpanel .cp-side-rec {
-position: absolute;
-right: 0;
-top: calc(var(--f2-w) * -.075);
-z-index: 3;
-}
-#charpanel .cp-side-body {
-flex: 1 1 auto;
-min-width: 0;
-position: relative;
-border-radius: calc(var(--f2-w) * .0354);
---cps-body-a: .425;
-background: linear-gradient(180deg,
-color-mix(in srgb, var(--f2-box) calc(var(--cps-body-a) * 100%), transparent),
-color-mix(in srgb, var(--f2-box-2) calc(var(--cps-body-a) * 100%), transparent));
-}
-#charpanel .cp-crystal,
-#modal-drops .cp-crystal,
-#modal-gear .cp-crystal,
-#modal-gear-info .cp-crystal {   /* [판정판 121 · Task 5] 장비 두 창의 그림 칸 = 획득표와 같은 칸 부품(선택자만 더함) */
-position: relative;
-box-sizing: border-box;
-flex: 0 0 auto;
-display: flex;
-align-items: center;
-justify-content: center;
-width: 100%;
-aspect-ratio: 1 / 1;
-padding: 0;
-border: 0;
-border-radius: calc(var(--f2-w) * .022);
-background: linear-gradient(160deg, rgba(255,255,255,.72), rgba(226,214,240,.55));
-box-shadow:
-inset 0 0 0 calc(var(--f2-w) * .0041) rgba(255,255,255,.85),
-inset 0 0 0 calc(var(--f2-w) * .007) rgba(150,124,168,.55),
-0 calc(var(--f2-w) * .004) calc(var(--f2-w) * .010) var(--role-f2-cast);
-color: var(--f2-ink);
-font-size: calc(var(--f2-w) * .055);
-cursor: pointer;
--webkit-tap-highlight-color: transparent;
-}
-#charpanel .cp-crystal::before,
-#charpanel .cp-crystal::after {
-content: "";
-position: absolute;
-width: calc(var(--f2-w) * .026);
-height: calc(var(--f2-w) * .040);
-background: linear-gradient(180deg, #F3E6FB, #C7A8E4);
-clip-path: polygon(50% 0, 100% 34%, 50% 100%, 0 34%);
-pointer-events: none;
-}
-#charpanel .cp-crystal::before { left: calc(var(--f2-w) * -.010); top: calc(var(--f2-w) * -.014); }
-#charpanel .cp-crystal::after  { right: calc(var(--f2-w) * -.010); bottom: calc(var(--f2-w) * -.014); }
 #charpanel .cp-card {
 position: absolute;
 left: calc(var(--safe-l) + 8px);
@@ -2946,303 +2876,6 @@ overflow: visible;
 margin: 0;
 border: 0;
 background: none;
-}
-#charpanel .cp-card > .cp-fx {
-position: absolute;
-inset: calc(var(--f2-bd) * -1);
-z-index: 0;
-pointer-events: none;
-container-type: size;
-}
-#charpanel .cp-fx > .cp-gnd { display: none; }
-#charpanel .cp-fx > .cp-gnd,
-#charpanel .cp-fx > .cp-jelly {
-position: absolute;
-inset: 0;
-pointer-events: none;
---cpj-w: 100cqw;
---cpj-h: calc(100cqw * .4952);
---cpj-L0-R:  calc(var(--cpj-h) * .240);
---cpj-L0-bx: calc(var(--cpj-h) * .0020);
---cpj-L0-by: calc(var(--cpj-h) * .0012);
---cpj-R:   min(var(--cpj-L0-R), calc(100cqh * .28));
---cpj-C1X: calc(var(--cpj-R) * .209445);
---cpj-C1Y: calc(var(--cpj-R) * .127039);
---cpj-C2X: calc(var(--cpj-R) * .110601);
---cpj-C2Y: calc(var(--cpj-R) * .209445);
---cpj-c1x: .209445;  --cpj-c1y: .127039;
---cpj-c2x: .110601;  --cpj-c2y: .209445;  --cpj-cq: .4477;
---cpj-R3: max(0px, calc(var(--cpj-R) - var(--cpj-L3-w)));
---cpj-C1X3: calc(var(--cpj-R3) * var(--cpj-c1x));
---cpj-C1Y3: calc(var(--cpj-R3) * var(--cpj-c1y));
---cpj-C2X3: calc(var(--cpj-R3) * var(--cpj-c2x));
---cpj-C2Y3: calc(var(--cpj-R3) * var(--cpj-c2y));
---cpj-Rt3: max(0px, calc(var(--cpj-Rt) - var(--cpj-L3-w)));
---cpj-Rtk3: calc(var(--cpj-Rt3) * var(--cpj-cq));
---cpj-tab-r3: max(0px, calc(var(--cpj-tab-r) - var(--cpj-L3-w)));
---cpj-tab-rk3: calc(var(--cpj-tab-r3) * var(--cpj-cq));
---cpj-tab-f3: max(0px, min(calc(var(--cpj-tab-f) + var(--cpj-L3-w)), calc((var(--cpj-t2a) - var(--cpj-t1b)) / 2 - var(--cpj-L3-w))));
---cpj-tab-fk3: calc(var(--cpj-tab-f3) * var(--cpj-cq));
---cpj-tab-fs3: calc(var(--cpj-tab-fs) + var(--cpj-L3-w));
---cpj-tab-fsk3: calc(var(--cpj-tab-fs3) * var(--cpj-cq));
---cpj-Ra: max(0px, calc(var(--cpj-R) - var(--cpj-rim-in)));
---cpj-C1Xa: calc(var(--cpj-Ra) * var(--cpj-c1x));
---cpj-C1Ya: calc(var(--cpj-Ra) * var(--cpj-c1y));
---cpj-C2Xa: calc(var(--cpj-Ra) * var(--cpj-c2x));
---cpj-C2Ya: calc(var(--cpj-Ra) * var(--cpj-c2y));
---cpj-Rta: max(0px, calc(var(--cpj-Rt) - var(--cpj-rim-in)));
---cpj-Rtka: calc(var(--cpj-Rta) * var(--cpj-cq));
---cpj-tab-ra: max(0px, calc(var(--cpj-tab-r) - var(--cpj-rim-in)));
---cpj-tab-rka: calc(var(--cpj-tab-ra) * var(--cpj-cq));
---cpj-tab-fa: max(0px, min(calc(var(--cpj-tab-f) + var(--cpj-rim-in)), calc((var(--cpj-t2a) - var(--cpj-t1b)) / 2 - var(--cpj-rim-in))));
---cpj-tab-fka: calc(var(--cpj-tab-fa) * var(--cpj-cq));
---cpj-tab-fsa: calc(var(--cpj-tab-fs) + var(--cpj-rim-in));
---cpj-tab-fska: calc(var(--cpj-tab-fsa) * var(--cpj-cq));
---cpj-Rb: max(0px, calc(var(--cpj-R) - calc(var(--cpj-rim-in) + var(--cpj-rim-w))));
---cpj-C1Xb: calc(var(--cpj-Rb) * var(--cpj-c1x));
---cpj-C1Yb: calc(var(--cpj-Rb) * var(--cpj-c1y));
---cpj-C2Xb: calc(var(--cpj-Rb) * var(--cpj-c2x));
---cpj-C2Yb: calc(var(--cpj-Rb) * var(--cpj-c2y));
---cpj-Rtb: max(0px, calc(var(--cpj-Rt) - calc(var(--cpj-rim-in) + var(--cpj-rim-w))));
---cpj-Rtkb: calc(var(--cpj-Rtb) * var(--cpj-cq));
---cpj-tab-rb: max(0px, calc(var(--cpj-tab-r) - calc(var(--cpj-rim-in) + var(--cpj-rim-w))));
---cpj-tab-rkb: calc(var(--cpj-tab-rb) * var(--cpj-cq));
---cpj-tab-fb: max(0px, min(calc(var(--cpj-tab-f) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))), calc((var(--cpj-t2a) - var(--cpj-t1b)) / 2 - calc(var(--cpj-rim-in) + var(--cpj-rim-w)))));
---cpj-tab-fkb: calc(var(--cpj-tab-fb) * var(--cpj-cq));
---cpj-tab-fsb: calc(var(--cpj-tab-fs) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)));
---cpj-tab-fskb: calc(var(--cpj-tab-fsb) * var(--cpj-cq));
---cpj-KH:  calc(var(--cpj-L0-bx) * 8.29727);
---cpj-KV:  calc(var(--cpj-L0-by) * 9.53043);
---cpj-OX:  calc(var(--cpj-L0-bx) * 1.333333);
---cpj-OY:  calc(var(--cpj-L0-by) * 1.333333);
---cpj-X0:  var(--cpj-L0-by);
---cpj-X1:  calc(100% - var(--cpj-L0-by));
---cpj-Y0:  var(--cpj-L0-bx);
---cpj-Y1:  calc(100% - var(--cpj-L0-bx));
---cpj-face: var(--mode-a-face); --cpj-face-top: var(--role-cpj-face-top-charsel); --cpj-face-y: 100%; --cpj-rim-c: var(--mode-a-rim);
---cpj-a-fill: 0;
---cpj-a-in: .490;
---cpj-a-rim: 1.000;
---cpj-band:   96.0%;   /* [은퇴] 옛 타원 정지점 — 되돌림 근거로만 남긴다 */
---cpj-band-w:  calc(var(--cpj-w) * .0070);   /* 띠 번짐 — 안으로 사그라지는 길이 */
---cpj-band-s:  calc(var(--cpj-w) * .0161);   /* 띠 퍼짐 — 림에 붙는 진한 몫 */
---cpj-band-dy: 0px;   /* 위 변 면제 자리 — 시안 대조 결과 **0 유지**.
-정본 hud 시안(hud-I)의 넓은판은 위 변이 화면 밖이라 잴 것이 없고(위 α .000),
-0 이 아닌 값은 아래 변의 띠를 그만큼 깊게 만들어 시안 아래 변 단면과 어긋난다. */
---cpj-haze: 0;
---cpj-haze-y: 14.0%;
---cpj-milk-a: .050;
---cpj-rim-in: calc(var(--f2-ref-w) * 0.00315);
---cpj-rim-w: calc(var(--f2-ref-w) * 0.00350);
---cpj-rim-a: 0.9800;
---cpj-rim-blur: calc(var(--f2-ref-w) * 0.00160);
---cpj-rim-w2: calc(var(--f2-ref-w) * 0.01094);
---cpj-rim-w3: calc(var(--f2-ref-w) * 0.01290);
---cpj-rim-k2: 0.424;
---cpj-rim-k3: 0.093;
---cpj-rim-tc: calc(var(--cpj-rim-in) + var(--cpj-rim-w) + var(--cpj-rim-w2));
---cpj-rim-td: calc(var(--cpj-rim-tc) + var(--cpj-rim-w3));
---cpj-rim-p3: calc(var(--cpj-rim-a) * var(--cpj-rim-k3));
---cpj-rim-p2: calc(1 - (1 - var(--cpj-rim-a) * var(--cpj-rim-k2)) / (1 - var(--cpj-rim-a) * var(--cpj-rim-k3)));
---cpj-rim-p1: calc(1 - (1 - var(--cpj-rim-a)) / (1 - var(--cpj-rim-a) * var(--cpj-rim-k2)));
---cpj-gl-a: var(--mode-a-gloss);
---cpj-gl1-w: 12.7%;  --cpj-gl1-h: 6.6%;
---cpj-gl1-px: 2.95%;  --cpj-gl1-py: 1.3%;
---cpj-gl2-w: 5.1%;  --cpj-gl2-h: 2.0%;
---cpj-gl2-px: 19.45%; --cpj-gl2-py: 1.7%;
---cpj-gnd-a: var(--mode-a-contact);
---cpj-gnd-y: calc(var(--cpj-w) * .01125);
---cpj-gnd-b: calc(var(--cpj-w) * .01125);
---cpj-L3-w: calc(var(--f2-ref-w) * 0.00400);
---cpj-L3-line: var(--mode-a-outline);   /* [E32-0903] 실측 (159,136,150) L3-a .70 역산 · 복구 #955579 */
---cpj-L3-a: .700;
---cpj-fill-c: var(--role-cpj-fill-c-charsel);   /* ⑤ a-fill 0 이라 무효지만 봉인값으로 되돌림 */
-}
-#charpanel .cp-card > .cp-tabs,
-#charpanel .cp-card > .cp-body { position: relative; z-index: 1; }
-#charpanel .cp-card::before,
-#charpanel .cp-card::after { content: none; }
-#charpanel .cp-fx > .cp-gnd {
-background: rgba(24, 12, 28, var(--cpj-gnd-a));
-border-radius: var(--f2-r);            /* shape() 폴백 */
-transform: translateY(var(--cpj-gnd-y));
-filter: blur(var(--cpj-gnd-b));
-}
-#charpanel .cp-fx > .cp-jelly { border-radius: var(--f2-r); }   /* shape() 폴백 */
-#charpanel .cp-fx > .cp-jelly {
-background-color: transparent;
-background-image:
-radial-gradient(closest-side,
-rgba(255,255,255, calc(var(--cpj-gl-a) * 1.00)) 0%,
-rgba(255,255,255, calc(var(--cpj-gl-a) *  .72)) 52%,
-rgba(255,255,255, 0) 100%),
-radial-gradient(closest-side,
-rgba(255,255,255, calc(var(--cpj-gl-a) * 1.00)) 0%,
-rgba(255,255,255, calc(var(--cpj-gl-a) *  .72)) 52%,
-rgba(255,255,255, 0) 100%),
-radial-gradient(farthest-side at 50% 50%,
-rgba(255,255,255, calc(var(--cpj-milk-a) * 1.00)) 0%,
-rgba(255,255,255, calc(var(--cpj-milk-a) *  .85)) 55%,
-rgba(255,255,255, calc(var(--cpj-milk-a) *  .25)) 88%,
-rgba(255,255,255, calc(var(--cpj-milk-a) *  .25)) 100%,
-rgba(255,255,255, calc(var(--cpj-milk-a) *  .25)) 141%),
-linear-gradient(to bottom,
-color-mix(in srgb, var(--cpj-face) calc(var(--cpj-haze) * 100%), transparent) 0%,
-color-mix(in srgb, var(--cpj-face) 0%, transparent) var(--cpj-haze-y)),
-linear-gradient(to bottom,
-color-mix(in srgb, var(--cpj-face-top) calc(var(--cpj-a-in) * 100%), transparent) 0%,
-color-mix(in srgb, var(--cpj-face) calc(var(--cpj-a-in) * 100%), transparent) var(--cpj-face-y),
-color-mix(in srgb, var(--cpj-face) calc(var(--cpj-a-in) * 100%), transparent) 100%),
-linear-gradient(color-mix(in srgb, var(--cpj-fill-c)
-calc(var(--cpj-a-fill) * 100%), transparent) 0 0);
-background-position:
-var(--cpj-gl1-px) var(--cpj-gl1-py),
-var(--cpj-gl2-px) var(--cpj-gl2-py),
-0 0, 0 0, 0 0, 0 0;
-background-size:
-var(--cpj-gl1-w) var(--cpj-gl1-h),
-var(--cpj-gl2-w) var(--cpj-gl2-h),
-100% 100%, 100% 100%, 100% 100%, 100% 100%;
-background-repeat: no-repeat;
-box-shadow:
-inset 0 0 0 var(--cpj-L3-w) color-mix(in srgb, var(--cpj-L3-line)
-calc(var(--cpj-L3-a) * 100%), transparent),
-inset 0 0 0 calc(var(--cpj-rim-in) + var(--cpj-rim-w))
-rgba(255,255,255, var(--cpj-rim-a)),
-inset 0 var(--cpj-band-dy) var(--cpj-band-w) var(--cpj-band-s) color-mix(in srgb, var(--cpj-face)
-calc((var(--cpj-a-rim) - var(--cpj-a-in)) * 100%), transparent);
-}
-@supports (clip-path: shape(from 0px 0px, close)) {
-#charpanel .cp-fx > .cp-gnd {
-border-radius: 0;
-clip-path: shape(from calc(var(--cpj-X0) + 0px + var(--cpj-R)) calc(var(--cpj-Y0) + 0px),
-curve to calc(var(--cpj-X1) - 0px - var(--cpj-R)) calc(var(--cpj-Y0) + 0px) with calc(var(--cpj-X0) + 0px + var(--cpj-R) + var(--cpj-KH)) calc(var(--cpj-Y0) + 0px - var(--cpj-OX)) / calc(var(--cpj-X1) - 0px - var(--cpj-R) - var(--cpj-KH)) calc(var(--cpj-Y0) + 0px - var(--cpj-OX)),
-curve to calc(var(--cpj-X1) - 0px) calc(var(--cpj-Y0) + 0px + var(--cpj-R)) with calc(var(--cpj-X1) - 0px - var(--cpj-C1X)) calc(var(--cpj-Y0) + 0px + var(--cpj-C1Y)) / calc(var(--cpj-X1) - 0px - var(--cpj-C2X)) calc(var(--cpj-Y0) + 0px + var(--cpj-C2Y)),
-curve to calc(var(--cpj-X1) - 0px) calc(var(--cpj-Y1) - 0px - var(--cpj-R)) with calc(var(--cpj-X1) - 0px + var(--cpj-OY)) calc(var(--cpj-Y0) + 0px + var(--cpj-R) + var(--cpj-KV)) / calc(var(--cpj-X1) - 0px + var(--cpj-OY)) calc(var(--cpj-Y1) - 0px - var(--cpj-R) - var(--cpj-KV)),
-curve to calc(var(--cpj-X1) - 0px - var(--cpj-R)) calc(var(--cpj-Y1) - 0px) with calc(var(--cpj-X1) - 0px - var(--cpj-C2X)) calc(var(--cpj-Y1) - 0px - var(--cpj-C2Y)) / calc(var(--cpj-X1) - 0px - var(--cpj-C1X)) calc(var(--cpj-Y1) - 0px - var(--cpj-C1Y)),
-curve to calc(var(--cpj-X0) + 0px + var(--cpj-R)) calc(var(--cpj-Y1) - 0px) with calc(var(--cpj-X1) - 0px - var(--cpj-R) - var(--cpj-KH)) calc(var(--cpj-Y1) - 0px + var(--cpj-OX)) / calc(var(--cpj-X0) + 0px + var(--cpj-R) + var(--cpj-KH)) calc(var(--cpj-Y1) - 0px + var(--cpj-OX)),
-curve to calc(var(--cpj-X0) + 0px) calc(var(--cpj-Y1) - 0px - var(--cpj-R)) with calc(var(--cpj-X0) + 0px + var(--cpj-C1X)) calc(var(--cpj-Y1) - 0px - var(--cpj-C1Y)) / calc(var(--cpj-X0) + 0px + var(--cpj-C2X)) calc(var(--cpj-Y1) - 0px - var(--cpj-C2Y)),
-curve to calc(var(--cpj-X0) + 0px) calc(var(--cpj-Y0) + 0px + var(--cpj-R)) with calc(var(--cpj-X0) + 0px - var(--cpj-OY)) calc(var(--cpj-Y1) - 0px - var(--cpj-R) - var(--cpj-KV)) / calc(var(--cpj-X0) + 0px - var(--cpj-OY)) calc(var(--cpj-Y0) + 0px + var(--cpj-R) + var(--cpj-KV)),
-curve to calc(var(--cpj-X0) + 0px + var(--cpj-R)) calc(var(--cpj-Y0) + 0px) with calc(var(--cpj-X0) + 0px + var(--cpj-C2X)) calc(var(--cpj-Y0) + 0px + var(--cpj-C2Y)) / calc(var(--cpj-X0) + 0px + var(--cpj-C1X)) calc(var(--cpj-Y0) + 0px + var(--cpj-C1Y)),
-close);
-}
-#charpanel .cp-fx > .cp-jelly {
-border-radius: var(--cpj-R);
-box-shadow:
-inset 0 0 0 var(--cpj-rim-tc) color-mix(in srgb, var(--cpj-rim-c)
-calc(var(--cpj-rim-p2) * 100%), transparent),
-inset 0 0 0 var(--cpj-rim-td) color-mix(in srgb, var(--cpj-rim-c)
-calc(var(--cpj-rim-p3) * 100%), transparent),
-inset 0 var(--cpj-band-dy) var(--cpj-band-w) var(--cpj-band-s)
-color-mix(in srgb, var(--cpj-face)
-calc((var(--cpj-a-rim) - var(--cpj-a-in)) * 100%), transparent);
-clip-path: shape(from calc(var(--cpj-X0) + 0px + var(--cpj-R)) calc(var(--cpj-Y0) + 0px),
-curve to calc(var(--cpj-X1) - 0px - var(--cpj-R)) calc(var(--cpj-Y0) + 0px) with calc(var(--cpj-X0) + 0px + var(--cpj-R) + var(--cpj-KH)) calc(var(--cpj-Y0) + 0px - var(--cpj-OX)) / calc(var(--cpj-X1) - 0px - var(--cpj-R) - var(--cpj-KH)) calc(var(--cpj-Y0) + 0px - var(--cpj-OX)),
-curve to calc(var(--cpj-X1) - 0px) calc(var(--cpj-Y0) + 0px + var(--cpj-R)) with calc(var(--cpj-X1) - 0px - var(--cpj-C1X)) calc(var(--cpj-Y0) + 0px + var(--cpj-C1Y)) / calc(var(--cpj-X1) - 0px - var(--cpj-C2X)) calc(var(--cpj-Y0) + 0px + var(--cpj-C2Y)),
-curve to calc(var(--cpj-X1) - 0px) calc(var(--cpj-Y1) - 0px - var(--cpj-R)) with calc(var(--cpj-X1) - 0px + var(--cpj-OY)) calc(var(--cpj-Y0) + 0px + var(--cpj-R) + var(--cpj-KV)) / calc(var(--cpj-X1) - 0px + var(--cpj-OY)) calc(var(--cpj-Y1) - 0px - var(--cpj-R) - var(--cpj-KV)),
-curve to calc(var(--cpj-X1) - 0px - var(--cpj-R)) calc(var(--cpj-Y1) - 0px) with calc(var(--cpj-X1) - 0px - var(--cpj-C2X)) calc(var(--cpj-Y1) - 0px - var(--cpj-C2Y)) / calc(var(--cpj-X1) - 0px - var(--cpj-C1X)) calc(var(--cpj-Y1) - 0px - var(--cpj-C1Y)),
-curve to calc(var(--cpj-X0) + 0px + var(--cpj-R)) calc(var(--cpj-Y1) - 0px) with calc(var(--cpj-X1) - 0px - var(--cpj-R) - var(--cpj-KH)) calc(var(--cpj-Y1) - 0px + var(--cpj-OX)) / calc(var(--cpj-X0) + 0px + var(--cpj-R) + var(--cpj-KH)) calc(var(--cpj-Y1) - 0px + var(--cpj-OX)),
-curve to calc(var(--cpj-X0) + 0px) calc(var(--cpj-Y1) - 0px - var(--cpj-R)) with calc(var(--cpj-X0) + 0px + var(--cpj-C1X)) calc(var(--cpj-Y1) - 0px - var(--cpj-C1Y)) / calc(var(--cpj-X0) + 0px + var(--cpj-C2X)) calc(var(--cpj-Y1) - 0px - var(--cpj-C2Y)),
-curve to calc(var(--cpj-X0) + 0px) calc(var(--cpj-Y0) + 0px + var(--cpj-R)) with calc(var(--cpj-X0) + 0px - var(--cpj-OY)) calc(var(--cpj-Y1) - 0px - var(--cpj-R) - var(--cpj-KV)) / calc(var(--cpj-X0) + 0px - var(--cpj-OY)) calc(var(--cpj-Y0) + 0px + var(--cpj-R) + var(--cpj-KV)),
-curve to calc(var(--cpj-X0) + 0px + var(--cpj-R)) calc(var(--cpj-Y0) + 0px) with calc(var(--cpj-X0) + 0px + var(--cpj-C2X)) calc(var(--cpj-Y0) + 0px + var(--cpj-C2Y)) / calc(var(--cpj-X0) + 0px + var(--cpj-C1X)) calc(var(--cpj-Y0) + 0px + var(--cpj-C1Y)),
-close);
-}
-#charpanel .cp-fx > .cp-jelly::before {
-content: "";
-position: absolute; inset: 0;
-z-index: 1;
-pointer-events: none;
-background: color-mix(in srgb, var(--cpj-rim-c) calc(var(--cpj-rim-p1) * 100%), transparent);
-filter: blur(var(--cpj-rim-blur));
-clip-path: shape(evenodd from calc(var(--cpj-X0) + var(--cpj-rim-in) + var(--cpj-Ra)) calc(var(--cpj-Y0) + var(--cpj-rim-in)),
-curve to calc(var(--cpj-X1) - var(--cpj-rim-in) - var(--cpj-Ra)) calc(var(--cpj-Y0) + var(--cpj-rim-in)) with calc(var(--cpj-X0) + var(--cpj-rim-in) + var(--cpj-Ra) + var(--cpj-KH)) calc(var(--cpj-Y0) + var(--cpj-rim-in) - var(--cpj-OX)) / calc(var(--cpj-X1) - var(--cpj-rim-in) - var(--cpj-Ra) - var(--cpj-KH)) calc(var(--cpj-Y0) + var(--cpj-rim-in) - var(--cpj-OX)),
-curve to calc(var(--cpj-X1) - var(--cpj-rim-in)) calc(var(--cpj-Y0) + var(--cpj-rim-in) + var(--cpj-Ra)) with calc(var(--cpj-X1) - var(--cpj-rim-in) - var(--cpj-C1Xa)) calc(var(--cpj-Y0) + var(--cpj-rim-in) + var(--cpj-C1Ya)) / calc(var(--cpj-X1) - var(--cpj-rim-in) - var(--cpj-C2Xa)) calc(var(--cpj-Y0) + var(--cpj-rim-in) + var(--cpj-C2Ya)),
-curve to calc(var(--cpj-X1) - var(--cpj-rim-in)) calc(var(--cpj-Y1) - var(--cpj-rim-in) - var(--cpj-Ra)) with calc(var(--cpj-X1) - var(--cpj-rim-in) + var(--cpj-OY)) calc(var(--cpj-Y0) + var(--cpj-rim-in) + var(--cpj-Ra) + var(--cpj-KV)) / calc(var(--cpj-X1) - var(--cpj-rim-in) + var(--cpj-OY)) calc(var(--cpj-Y1) - var(--cpj-rim-in) - var(--cpj-Ra) - var(--cpj-KV)),
-curve to calc(var(--cpj-X1) - var(--cpj-rim-in) - var(--cpj-Ra)) calc(var(--cpj-Y1) - var(--cpj-rim-in)) with calc(var(--cpj-X1) - var(--cpj-rim-in) - var(--cpj-C2Xa)) calc(var(--cpj-Y1) - var(--cpj-rim-in) - var(--cpj-C2Ya)) / calc(var(--cpj-X1) - var(--cpj-rim-in) - var(--cpj-C1Xa)) calc(var(--cpj-Y1) - var(--cpj-rim-in) - var(--cpj-C1Ya)),
-curve to calc(var(--cpj-X0) + var(--cpj-rim-in) + var(--cpj-Ra)) calc(var(--cpj-Y1) - var(--cpj-rim-in)) with calc(var(--cpj-X1) - var(--cpj-rim-in) - var(--cpj-Ra) - var(--cpj-KH)) calc(var(--cpj-Y1) - var(--cpj-rim-in) + var(--cpj-OX)) / calc(var(--cpj-X0) + var(--cpj-rim-in) + var(--cpj-Ra) + var(--cpj-KH)) calc(var(--cpj-Y1) - var(--cpj-rim-in) + var(--cpj-OX)),
-curve to calc(var(--cpj-X0) + var(--cpj-rim-in)) calc(var(--cpj-Y1) - var(--cpj-rim-in) - var(--cpj-Ra)) with calc(var(--cpj-X0) + var(--cpj-rim-in) + var(--cpj-C1Xa)) calc(var(--cpj-Y1) - var(--cpj-rim-in) - var(--cpj-C1Ya)) / calc(var(--cpj-X0) + var(--cpj-rim-in) + var(--cpj-C2Xa)) calc(var(--cpj-Y1) - var(--cpj-rim-in) - var(--cpj-C2Ya)),
-curve to calc(var(--cpj-X0) + var(--cpj-rim-in)) calc(var(--cpj-Y0) + var(--cpj-rim-in) + var(--cpj-Ra)) with calc(var(--cpj-X0) + var(--cpj-rim-in) - var(--cpj-OY)) calc(var(--cpj-Y1) - var(--cpj-rim-in) - var(--cpj-Ra) - var(--cpj-KV)) / calc(var(--cpj-X0) + var(--cpj-rim-in) - var(--cpj-OY)) calc(var(--cpj-Y0) + var(--cpj-rim-in) + var(--cpj-Ra) + var(--cpj-KV)),
-curve to calc(var(--cpj-X0) + var(--cpj-rim-in) + var(--cpj-Ra)) calc(var(--cpj-Y0) + var(--cpj-rim-in)) with calc(var(--cpj-X0) + var(--cpj-rim-in) + var(--cpj-C2Xa)) calc(var(--cpj-Y0) + var(--cpj-rim-in) + var(--cpj-C2Ya)) / calc(var(--cpj-X0) + var(--cpj-rim-in) + var(--cpj-C1Xa)) calc(var(--cpj-Y0) + var(--cpj-rim-in) + var(--cpj-C1Ya)),
-close,
-move to calc(var(--cpj-X0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)) + var(--cpj-Rb)) calc(var(--cpj-Y0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))),
-curve to calc(var(--cpj-X1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w)) - var(--cpj-Rb)) calc(var(--cpj-Y0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) with calc(var(--cpj-X0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)) + var(--cpj-Rb) + var(--cpj-KH)) calc(var(--cpj-Y0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)) - var(--cpj-OX)) / calc(var(--cpj-X1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w)) - var(--cpj-Rb) - var(--cpj-KH)) calc(var(--cpj-Y0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)) - var(--cpj-OX)),
-curve to calc(var(--cpj-X1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w))) calc(var(--cpj-Y0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)) + var(--cpj-Rb)) with calc(var(--cpj-X1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w)) - var(--cpj-C1Xb)) calc(var(--cpj-Y0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)) + var(--cpj-C1Yb)) / calc(var(--cpj-X1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w)) - var(--cpj-C2Xb)) calc(var(--cpj-Y0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)) + var(--cpj-C2Yb)),
-curve to calc(var(--cpj-X1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w))) calc(var(--cpj-Y1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w)) - var(--cpj-Rb)) with calc(var(--cpj-X1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w)) + var(--cpj-OY)) calc(var(--cpj-Y0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)) + var(--cpj-Rb) + var(--cpj-KV)) / calc(var(--cpj-X1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w)) + var(--cpj-OY)) calc(var(--cpj-Y1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w)) - var(--cpj-Rb) - var(--cpj-KV)),
-curve to calc(var(--cpj-X1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w)) - var(--cpj-Rb)) calc(var(--cpj-Y1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w))) with calc(var(--cpj-X1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w)) - var(--cpj-C2Xb)) calc(var(--cpj-Y1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w)) - var(--cpj-C2Yb)) / calc(var(--cpj-X1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w)) - var(--cpj-C1Xb)) calc(var(--cpj-Y1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w)) - var(--cpj-C1Yb)),
-curve to calc(var(--cpj-X0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)) + var(--cpj-Rb)) calc(var(--cpj-Y1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w))) with calc(var(--cpj-X1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w)) - var(--cpj-Rb) - var(--cpj-KH)) calc(var(--cpj-Y1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w)) + var(--cpj-OX)) / calc(var(--cpj-X0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)) + var(--cpj-Rb) + var(--cpj-KH)) calc(var(--cpj-Y1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w)) + var(--cpj-OX)),
-curve to calc(var(--cpj-X0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) calc(var(--cpj-Y1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w)) - var(--cpj-Rb)) with calc(var(--cpj-X0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)) + var(--cpj-C1Xb)) calc(var(--cpj-Y1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w)) - var(--cpj-C1Yb)) / calc(var(--cpj-X0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)) + var(--cpj-C2Xb)) calc(var(--cpj-Y1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w)) - var(--cpj-C2Yb)),
-curve to calc(var(--cpj-X0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) calc(var(--cpj-Y0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)) + var(--cpj-Rb)) with calc(var(--cpj-X0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)) - var(--cpj-OY)) calc(var(--cpj-Y1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w)) - var(--cpj-Rb) - var(--cpj-KV)) / calc(var(--cpj-X0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)) - var(--cpj-OY)) calc(var(--cpj-Y0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)) + var(--cpj-Rb) + var(--cpj-KV)),
-curve to calc(var(--cpj-X0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)) + var(--cpj-Rb)) calc(var(--cpj-Y0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) with calc(var(--cpj-X0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)) + var(--cpj-C2Xb)) calc(var(--cpj-Y0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)) + var(--cpj-C2Yb)) / calc(var(--cpj-X0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)) + var(--cpj-C1Xb)) calc(var(--cpj-Y0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)) + var(--cpj-C1Yb)),
-close);
-}
-#charpanel .cp-fx > .cp-jelly::after {
-content: "";
-position: absolute; inset: 0;
-z-index: 2;
-pointer-events: none;
-background: color-mix(in srgb, var(--cpj-L3-line)
-calc(var(--cpj-L3-a) * 100%), transparent);
-clip-path: shape(evenodd from calc(var(--cpj-X0) + 0px + var(--cpj-R)) calc(var(--cpj-Y0) + 0px),
-curve to calc(var(--cpj-X1) - 0px - var(--cpj-R)) calc(var(--cpj-Y0) + 0px) with calc(var(--cpj-X0) + 0px + var(--cpj-R) + var(--cpj-KH)) calc(var(--cpj-Y0) + 0px - var(--cpj-OX)) / calc(var(--cpj-X1) - 0px - var(--cpj-R) - var(--cpj-KH)) calc(var(--cpj-Y0) + 0px - var(--cpj-OX)),
-curve to calc(var(--cpj-X1) - 0px) calc(var(--cpj-Y0) + 0px + var(--cpj-R)) with calc(var(--cpj-X1) - 0px - var(--cpj-C1X)) calc(var(--cpj-Y0) + 0px + var(--cpj-C1Y)) / calc(var(--cpj-X1) - 0px - var(--cpj-C2X)) calc(var(--cpj-Y0) + 0px + var(--cpj-C2Y)),
-curve to calc(var(--cpj-X1) - 0px) calc(var(--cpj-Y1) - 0px - var(--cpj-R)) with calc(var(--cpj-X1) - 0px + var(--cpj-OY)) calc(var(--cpj-Y0) + 0px + var(--cpj-R) + var(--cpj-KV)) / calc(var(--cpj-X1) - 0px + var(--cpj-OY)) calc(var(--cpj-Y1) - 0px - var(--cpj-R) - var(--cpj-KV)),
-curve to calc(var(--cpj-X1) - 0px - var(--cpj-R)) calc(var(--cpj-Y1) - 0px) with calc(var(--cpj-X1) - 0px - var(--cpj-C2X)) calc(var(--cpj-Y1) - 0px - var(--cpj-C2Y)) / calc(var(--cpj-X1) - 0px - var(--cpj-C1X)) calc(var(--cpj-Y1) - 0px - var(--cpj-C1Y)),
-curve to calc(var(--cpj-X0) + 0px + var(--cpj-R)) calc(var(--cpj-Y1) - 0px) with calc(var(--cpj-X1) - 0px - var(--cpj-R) - var(--cpj-KH)) calc(var(--cpj-Y1) - 0px + var(--cpj-OX)) / calc(var(--cpj-X0) + 0px + var(--cpj-R) + var(--cpj-KH)) calc(var(--cpj-Y1) - 0px + var(--cpj-OX)),
-curve to calc(var(--cpj-X0) + 0px) calc(var(--cpj-Y1) - 0px - var(--cpj-R)) with calc(var(--cpj-X0) + 0px + var(--cpj-C1X)) calc(var(--cpj-Y1) - 0px - var(--cpj-C1Y)) / calc(var(--cpj-X0) + 0px + var(--cpj-C2X)) calc(var(--cpj-Y1) - 0px - var(--cpj-C2Y)),
-curve to calc(var(--cpj-X0) + 0px) calc(var(--cpj-Y0) + 0px + var(--cpj-R)) with calc(var(--cpj-X0) + 0px - var(--cpj-OY)) calc(var(--cpj-Y1) - 0px - var(--cpj-R) - var(--cpj-KV)) / calc(var(--cpj-X0) + 0px - var(--cpj-OY)) calc(var(--cpj-Y0) + 0px + var(--cpj-R) + var(--cpj-KV)),
-curve to calc(var(--cpj-X0) + 0px + var(--cpj-R)) calc(var(--cpj-Y0) + 0px) with calc(var(--cpj-X0) + 0px + var(--cpj-C2X)) calc(var(--cpj-Y0) + 0px + var(--cpj-C2Y)) / calc(var(--cpj-X0) + 0px + var(--cpj-C1X)) calc(var(--cpj-Y0) + 0px + var(--cpj-C1Y)),
-close,
-move to calc(var(--cpj-X0) + var(--cpj-L3-w) + var(--cpj-R3)) calc(var(--cpj-Y0) + var(--cpj-L3-w)),
-curve to calc(var(--cpj-X1) - var(--cpj-L3-w) - var(--cpj-R3)) calc(var(--cpj-Y0) + var(--cpj-L3-w)) with calc(var(--cpj-X0) + var(--cpj-L3-w) + var(--cpj-R3) + var(--cpj-KH)) calc(var(--cpj-Y0) + var(--cpj-L3-w) - var(--cpj-OX)) / calc(var(--cpj-X1) - var(--cpj-L3-w) - var(--cpj-R3) - var(--cpj-KH)) calc(var(--cpj-Y0) + var(--cpj-L3-w) - var(--cpj-OX)),
-curve to calc(var(--cpj-X1) - var(--cpj-L3-w)) calc(var(--cpj-Y0) + var(--cpj-L3-w) + var(--cpj-R3)) with calc(var(--cpj-X1) - var(--cpj-L3-w) - var(--cpj-C1X3)) calc(var(--cpj-Y0) + var(--cpj-L3-w) + var(--cpj-C1Y3)) / calc(var(--cpj-X1) - var(--cpj-L3-w) - var(--cpj-C2X3)) calc(var(--cpj-Y0) + var(--cpj-L3-w) + var(--cpj-C2Y3)),
-curve to calc(var(--cpj-X1) - var(--cpj-L3-w)) calc(var(--cpj-Y1) - var(--cpj-L3-w) - var(--cpj-R3)) with calc(var(--cpj-X1) - var(--cpj-L3-w) + var(--cpj-OY)) calc(var(--cpj-Y0) + var(--cpj-L3-w) + var(--cpj-R3) + var(--cpj-KV)) / calc(var(--cpj-X1) - var(--cpj-L3-w) + var(--cpj-OY)) calc(var(--cpj-Y1) - var(--cpj-L3-w) - var(--cpj-R3) - var(--cpj-KV)),
-curve to calc(var(--cpj-X1) - var(--cpj-L3-w) - var(--cpj-R3)) calc(var(--cpj-Y1) - var(--cpj-L3-w)) with calc(var(--cpj-X1) - var(--cpj-L3-w) - var(--cpj-C2X3)) calc(var(--cpj-Y1) - var(--cpj-L3-w) - var(--cpj-C2Y3)) / calc(var(--cpj-X1) - var(--cpj-L3-w) - var(--cpj-C1X3)) calc(var(--cpj-Y1) - var(--cpj-L3-w) - var(--cpj-C1Y3)),
-curve to calc(var(--cpj-X0) + var(--cpj-L3-w) + var(--cpj-R3)) calc(var(--cpj-Y1) - var(--cpj-L3-w)) with calc(var(--cpj-X1) - var(--cpj-L3-w) - var(--cpj-R3) - var(--cpj-KH)) calc(var(--cpj-Y1) - var(--cpj-L3-w) + var(--cpj-OX)) / calc(var(--cpj-X0) + var(--cpj-L3-w) + var(--cpj-R3) + var(--cpj-KH)) calc(var(--cpj-Y1) - var(--cpj-L3-w) + var(--cpj-OX)),
-curve to calc(var(--cpj-X0) + var(--cpj-L3-w)) calc(var(--cpj-Y1) - var(--cpj-L3-w) - var(--cpj-R3)) with calc(var(--cpj-X0) + var(--cpj-L3-w) + var(--cpj-C1X3)) calc(var(--cpj-Y1) - var(--cpj-L3-w) - var(--cpj-C1Y3)) / calc(var(--cpj-X0) + var(--cpj-L3-w) + var(--cpj-C2X3)) calc(var(--cpj-Y1) - var(--cpj-L3-w) - var(--cpj-C2Y3)),
-curve to calc(var(--cpj-X0) + var(--cpj-L3-w)) calc(var(--cpj-Y0) + var(--cpj-L3-w) + var(--cpj-R3)) with calc(var(--cpj-X0) + var(--cpj-L3-w) - var(--cpj-OY)) calc(var(--cpj-Y1) - var(--cpj-L3-w) - var(--cpj-R3) - var(--cpj-KV)) / calc(var(--cpj-X0) + var(--cpj-L3-w) - var(--cpj-OY)) calc(var(--cpj-Y0) + var(--cpj-L3-w) + var(--cpj-R3) + var(--cpj-KV)),
-curve to calc(var(--cpj-X0) + var(--cpj-L3-w) + var(--cpj-R3)) calc(var(--cpj-Y0) + var(--cpj-L3-w)) with calc(var(--cpj-X0) + var(--cpj-L3-w) + var(--cpj-C2X3)) calc(var(--cpj-Y0) + var(--cpj-L3-w) + var(--cpj-C2Y3)) / calc(var(--cpj-X0) + var(--cpj-L3-w) + var(--cpj-C1X3)) calc(var(--cpj-Y0) + var(--cpj-L3-w) + var(--cpj-C1Y3)),
-close);
-}
-}
-#charpanel .cp-tab {
-font-family: inherit;
-cursor: pointer;
--webkit-tap-highlight-color: transparent;
-padding: 0;
-color: var(--f2-ink);
-min-width: 0;
-}
-#charpanel .cp-tab::before { z-index: 0; }
-#charpanel .cp-tab > * { position: relative; z-index: 2; }
-#charpanel .cp-tab { gap: calc(var(--f2-w) * .012); }
-#charpanel .cpt-ic {
-width: calc(var(--f2-w) * .0400);
-height: calc(var(--f2-w) * .0400);
-flex: 0 0 auto;
-display: block;
-}
-#charpanel .cpt-lab { min-width: 0; }
-#charpanel .cp-tab[aria-selected="true"] {
-background:
-radial-gradient(closest-side, rgba(255,255,255,.24), rgba(255,255,255,0))
-9.2% 20.8% / 24% 28% no-repeat,
-var(--f2-tab-on);
-z-index: 4;
-margin-bottom: calc(var(--f2-bd) * -1);
-height: calc(var(--f2-w) * .0748 + var(--f2-bd));
-box-shadow:
-0 0 var(--f2-soft-blur) var(--f2-soft-spread)
-color-mix(in srgb, var(--f2-line) 66%, transparent),
-0 0 var(--f2-soft-tail) 0 color-mix(in srgb, var(--f2-line) 20%, transparent),
-0 calc(var(--f2-w) * .0084) 0 0 var(--f2-tab-on);
-}
-#charpanel .cp-tab[aria-selected="true"]::before {
-bottom: calc(var(--f2-bd) - var(--f2-bdp) - var(--f2-fillet-fw) * 3);
-}
-#charpanel .cp-tab[aria-selected="true"]::after {
-bottom: calc(var(--f2-rim) * -2);
-border-bottom-left-radius: 0;
-border-bottom-right-radius: 0;
 }
 #charpanel .cp-body {
 position: relative;
@@ -3352,8 +2985,7 @@ background: var(--f2-pill-soft);
 color: var(--f2-ink);
 text-shadow: none;
 }
-#charpanel .ci-tag-v,
-#charpanel #cp-side-rec {
+#charpanel .ci-tag-v {   /* [Task 8b] 레일 배지(#cp-side-rec)는 레일과 함께 은퇴 */
 min-width: var(--cs-pill-w);
 padding-inline: var(--cs-pill-px);
 white-space: nowrap;
@@ -3817,21 +3449,6 @@ box-sizing: border-box;
 }
 @media (max-height: 640px) {
 #charpanel { --f2-w: min(88vw, 430px); --cs-body: calc(var(--f2-w) * .62); }
-}
-@media (min-aspect-ratio: 1/1) and (min-width: 700px) {
-#charpanel { --f2-w: min(calc(var(--app-max) * .88), 430px); }
-#charpanel .cp-frame {
-left: 0; right: 0;
-max-width: var(--app-max);
-margin-inline: auto;
-}
-#charpanel .cp-sky {
-position: fixed;
-inset: 0;
-border-radius: 0;
-z-index: 0;
-}
-#charpanel .cp-stage > *:not(.cp-sky) { position: relative; z-index: 1; }
 }
 #charpanel .cp-th,
 #charpanel #mate-pick .char-card { --f2-cd: calc(var(--f2-w) * .1307); }
@@ -4718,7 +4335,6 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
 #modal-daily .sheet > h2,
 #modal-odds .sheet > h2,
 #modal-gres .sheet > h2,
-#modal-gear .sheet > h2,
 #modal-gear-info .sheet > h2,
 #modal-clear .sheet > h2,
 #modal-rank .sheet > h2,
@@ -4862,7 +4478,6 @@ calc((var(--wcap-a-rim) - var(--wcap-a-in)) * 100%), transparent);
 #modal-daily .sheet > h2,
 #modal-odds .sheet > h2,
 #modal-gres .sheet > h2,
-#modal-gear .sheet > h2,
 #modal-gear-info .sheet > h2,
 #modal-clear .sheet > h2,
 #modal-rank .sheet > h2,
@@ -4905,7 +4520,6 @@ close);
 #modal-daily .sheet > h2::before,
 #modal-odds .sheet > h2::before,
 #modal-gres .sheet > h2::before,
-#modal-gear .sheet > h2::before,
 #modal-gear-info .sheet > h2::before,
 #modal-clear .sheet > h2::before,
 #modal-rank .sheet > h2::before,
@@ -5454,443 +5068,10 @@ rgba(255,255,255, var(--wchip-rim-a)),
 0 0 calc(var(--f2-cd) * .103) calc(var(--f2-cd) * .022) var(--role-f2-hi-halo),
 0 calc(var(--f2-cd) * .025) calc(var(--f2-cd) * .06) var(--role-f2-cast);
 }
-#charpanel .cp-crystal,
-#modal-drops .cp-crystal,
-#modal-gear .cp-crystal,
-#modal-gear-info .cp-crystal{
---wslot-w: 100%;
---wslot-L3-w:    calc(var(--f2-ref-w) * 0.00400);
---wslot-L3-line: var(--mode-a-outline-chip-base);
---wslot-L3-a:    .363;
---wslot-a-in:    .929;
---wslot-face:    var(--role-wslot-face-crystal);
-border-radius: 21%;                            /* 정본 --wf-L0-R 0.2100 */
-background-color: transparent;
-background-image: linear-gradient(color-mix(in srgb, var(--wslot-face)
-calc(var(--wslot-a-in) * 100%), transparent) 0 0);
-box-shadow:
-inset 0 0 0 var(--wslot-L3-w) color-mix(in srgb, var(--wslot-L3-line)
-calc(var(--wslot-L3-a) * 100%), transparent);
-}
-#charpanel .cp-side-body{
-display: flex;
-flex-direction: column;
-align-items: stretch;
-}
-#charpanel .cp-side-rec{
-top: calc(var(--f2-w) * .0240);
-right: auto;
-left: 50%;
-translate: -50% 0;
-}
-#charpanel .cp-side-rack{
-position: relative;
-flex: 0 0 auto;
-display: flex;
-flex-direction: column;
-align-items: center;
-margin-top: var(--cs-side-rec);
-padding: calc(var(--f2-w) * .1034 - var(--cs-side-rec)) 0 0;
-gap: calc(var(--f2-w) * .0348);
-padding-left: calc(var(--f2-w) * .0090);
-padding-right: calc(var(--f2-w) * .0090);
-z-index: 2;
-}
-#charpanel .cp-side-rack .cp-gem,
-#modal-drops .cp-gem,
-#modal-gear .cp-gem,
-#modal-gear-info .cp-gem{
-flex: 0 0 auto;
-flex-direction: column;
-gap: calc(var(--f2-w) * .0020);
-width: calc(var(--f2-w) * .1118);
-height: calc(var(--f2-w) * .1094);
-aspect-ratio: auto;
-font-size: calc(var(--f2-w) * .0500);
-}
-#charpanel .cp-side-rack .cp-gem-n,
-#modal-drops .cp-gem-n{
-display: block;
-min-width: calc(var(--f2-w) * .0300);
-padding: 0 calc(var(--f2-w) * .0060);
-border-radius: 999px;
-background: color-mix(in srgb, var(--f2-tab-on) 82%, transparent);
-box-shadow: inset 0 0 0 calc(var(--f2-w) * .0022)
-color-mix(in srgb, #6B5A69 36.3%, transparent);
-font-size: max(var(--text-min), calc(var(--f2-w) * .0230));
-font-weight: 900;
-line-height: 1.45;
-color: var(--f2-ink);
-}
-#charpanel .cp-side-rack .cp-gem-n[hidden],
-#modal-drops .cp-gem-n[hidden]{ display: none; }
-#charpanel .cp-side-rack .cp-crystal > .cp-cr-ic,
-#modal-drops .cp-crystal > .cp-cr-ic,
-#modal-gear .cp-crystal > .cp-cr-ic,
-#modal-gear-info .cp-crystal > .cp-cr-ic {
-flex: 0 0 auto;
-display: block;
-font-size: 0;
-color: transparent;
-text-shadow: none;
-background: center/contain no-repeat;
-width: calc(var(--f2-w) * .0995);
-height: calc(var(--f2-w) * .0995);
-}
-#charpanel .cp-side-rack .cp-islot[data-slot="weapon"]  > .cp-cr-ic { background-image: url("catalog/slot-ic-skill.webp"); }
-#charpanel .cp-side-rack .cp-islot[data-slot="aux"]     > .cp-cr-ic { background-image: url("catalog/slot-ic-skin.webp"); }
-#charpanel .cp-side-rack .cp-islot[data-slot="trinket"] > .cp-cr-ic { background-image: url("catalog/slot-ic-item.webp"); }
-#charpanel .cp-side-rack .cp-islot[data-state="own"] > .cp-cr-ic,
-#charpanel .cp-side-rack .cp-islot[data-state="eq"]  > .cp-cr-ic {
-width: auto;
-height: auto;
-background-image: none;
-font-size: inherit;
-color: var(--f2-ink);
-line-height: 1;
-}
-#charpanel .cp-side-rack .cp-islot[data-state="own"] > .cp-cr-ic[data-art],
-#charpanel .cp-side-rack .cp-islot[data-state="eq"]  > .cp-cr-ic[data-art] {
-width: calc(var(--f2-w) * .0640);
-height: calc(var(--f2-w) * .0640);
-}
-#modal-drops .dr-row .cp-islot,
-#modal-gear .gear-row .cp-islot,
-#gi-art .cp-islot {
-cursor: default;
-pointer-events: none;
-}
-#charpanel .cp-side-rack .cp-islot[data-state="own"],
-#modal-drops .dr-row .cp-islot[data-state="own"],
-#modal-gear .gear-row .cp-islot[data-state="own"],
-#gi-art .cp-islot[data-state="own"] {
---wslot-face: var(--f2-item-face);
-}
-#charpanel .cp-side-rack .cp-islot[data-state="eq"],
-#modal-drops .dr-row .cp-islot,
-#modal-gear .gear-row .cp-islot,
-#gi-art .cp-islot {
---wslot-face: var(--f2-item-on);
---wslot-L3-line: var(--f2-item-line);
---wslot-a-in: .929;
---wslot-L3-a: .560;
-box-shadow:
-inset 0 0 0 var(--wslot-L3-w) color-mix(in srgb, var(--wslot-L3-line)
-calc(var(--wslot-L3-a) * 100%), transparent),
-0 0 calc(var(--f2-w) * .014) var(--role-f2-hi-halo);
-}
-#charpanel .cp-side-rack .cp-islot[data-slot="weapon"],
-#charpanel .cp-side-rack .cp-islot[data-slot="aux"],
-#charpanel .cp-side-rack .cp-islot[data-slot="trinket"] {
---safe-x: 13.98%;
---safe-y: 12.63%;
---safe-w: 72.04%;
---safe-h: 74.04%;
-}
-#charpanel .cp-fx > .cp-jelly{ --cpj-L3-line: var(--mode-a-outline); }   /* [E32-0903] 실측 · 복구 #955579 */
 #classic-hud .ch-fx > .ch-jelly,
 #app.classic #classic-hud .ch-fx > .ch-jelly{ --hudj-L3-line: var(--mode-b-outline); --hudj-face: var(--mode-b-face); --hudj-face-top: var(--mode-b-face); --hudj-face-y: 100%; --hudj-rim-c: var(--mode-b-rim); }
 .wf-cap{ --wcap-L3-line: var(--mode-a-outline); --wcap-face: var(--mode-a-face); --wcap-face-top: var(--role-wcap-face-top-modal-title-node); --wcap-face-y: 100%; --wcap-rim-c: var(--mode-a-rim); }
 .wf-chip{ --wchip-L3-line: var(--mode-a-outline-chip); }
-#charpanel .cp-crystal,
-#modal-drops .cp-crystal,
-#modal-gear .cp-crystal,
-#modal-gear-info .cp-crystal{ --wslot-L3-line: var(--role-wslot-L3-line-crystal); }
-#charpanel .cp-fx > .cp-jelly,
-#charpanel .cp-fx > .cp-gnd{
---cpj-tab-h:  calc(var(--cpj-w) * .07005);
---cpj-tab-r:  calc(var(--cpj-w) * .03377);
---cpj-tab-f:  calc(var(--cpj-w) * .00493);
---cpj-tab-fs: calc(var(--cpj-w) * .01008);
---cpj-tab-rk:  calc(var(--cpj-tab-r) * .4477);
---cpj-tab-fk:  calc(var(--cpj-tab-f) * .4477);
---cpj-tab-fsk: calc(var(--cpj-tab-fs) * .4477);
---cpj-t1a:  calc(var(--cpj-w) * .05039);
---cpj-t1b:  calc(var(--cpj-w) * .49628);
---cpj-t2a:  calc(var(--cpj-w) * .50559);
---cpj-t2b:  calc(var(--cpj-w) * .95183);
---cpj-t1at: var(--cpj-t1a);
---cpj-t1bt: var(--cpj-t1b);
---cpj-t2at: var(--cpj-t2a);
---cpj-t2bt: var(--cpj-t2b);
---cpj-Rt:  calc(var(--cpj-w) * .02400);
---cpj-Rtk: calc(var(--cpj-Rt) * .4477);
-}
-@supports (clip-path: shape(from 0px 0px, close)) {
-#charpanel .cp-fx > .cp-jelly{ clip-path: shape(from calc(calc(var(--cpj-X0) + 0px) + var(--cpj-Rt)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)),
-line to calc(calc(var(--cpj-t1a) + 0px) - var(--cpj-tab-fs)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)),
-curve to calc(calc(var(--cpj-t1a) + 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) - var(--cpj-tab-fs)) with calc(calc(var(--cpj-t1a) + 0px) - var(--cpj-tab-fsk)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)) / calc(calc(var(--cpj-t1a) + 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) - var(--cpj-tab-fsk)),
-line to calc(calc(var(--cpj-t1at) + 0px)) calc(calc(var(--cpj-Y0) + 0px) + var(--cpj-tab-r)),
-curve to calc(calc(var(--cpj-t1at) + 0px) + var(--cpj-tab-r)) calc(calc(var(--cpj-Y0) + 0px)) with calc(calc(var(--cpj-t1at) + 0px)) calc(calc(var(--cpj-Y0) + 0px) + var(--cpj-tab-rk)) / calc(calc(var(--cpj-t1at) + 0px) + var(--cpj-tab-rk)) calc(calc(var(--cpj-Y0) + 0px)),
-line to calc(calc(var(--cpj-t1bt) - 0px) - var(--cpj-tab-r)) calc(calc(var(--cpj-Y0) + 0px)),
-curve to calc(calc(var(--cpj-t1bt) - 0px)) calc(calc(var(--cpj-Y0) + 0px) + var(--cpj-tab-r)) with calc(calc(var(--cpj-t1bt) - 0px) - var(--cpj-tab-rk)) calc(calc(var(--cpj-Y0) + 0px)) / calc(calc(var(--cpj-t1bt) - 0px)) calc(calc(var(--cpj-Y0) + 0px) + var(--cpj-tab-rk)),
-line to calc(calc(var(--cpj-t1b) - 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) - var(--cpj-tab-f)),
-curve to calc(calc(var(--cpj-t1b) - 0px) + var(--cpj-tab-f)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)) with calc(calc(var(--cpj-t1b) - 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) - var(--cpj-tab-fk)) / calc(calc(var(--cpj-t1b) - 0px) + var(--cpj-tab-fk)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)),
-line to calc(calc(var(--cpj-t2a) + 0px) - var(--cpj-tab-f)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)),
-curve to calc(calc(var(--cpj-t2a) + 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) - var(--cpj-tab-f)) with calc(calc(var(--cpj-t2a) + 0px) - var(--cpj-tab-fk)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)) / calc(calc(var(--cpj-t2a) + 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) - var(--cpj-tab-fk)),
-line to calc(calc(var(--cpj-t2at) + 0px)) calc(calc(var(--cpj-Y0) + 0px) + var(--cpj-tab-r)),
-curve to calc(calc(var(--cpj-t2at) + 0px) + var(--cpj-tab-r)) calc(calc(var(--cpj-Y0) + 0px)) with calc(calc(var(--cpj-t2at) + 0px)) calc(calc(var(--cpj-Y0) + 0px) + var(--cpj-tab-rk)) / calc(calc(var(--cpj-t2at) + 0px) + var(--cpj-tab-rk)) calc(calc(var(--cpj-Y0) + 0px)),
-line to calc(calc(var(--cpj-t2bt) - 0px) - var(--cpj-tab-r)) calc(calc(var(--cpj-Y0) + 0px)),
-curve to calc(calc(var(--cpj-t2bt) - 0px)) calc(calc(var(--cpj-Y0) + 0px) + var(--cpj-tab-r)) with calc(calc(var(--cpj-t2bt) - 0px) - var(--cpj-tab-rk)) calc(calc(var(--cpj-Y0) + 0px)) / calc(calc(var(--cpj-t2bt) - 0px)) calc(calc(var(--cpj-Y0) + 0px) + var(--cpj-tab-rk)),
-line to calc(calc(var(--cpj-t2b) - 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) - var(--cpj-tab-fs)),
-curve to calc(calc(var(--cpj-t2b) - 0px) + var(--cpj-tab-fs)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)) with calc(calc(var(--cpj-t2b) - 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) - var(--cpj-tab-fsk)) / calc(calc(var(--cpj-t2b) - 0px) + var(--cpj-tab-fsk)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)),
-line to calc(calc(var(--cpj-X1) - 0px) - var(--cpj-Rt)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)),
-curve to calc(calc(var(--cpj-X1) - 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) + var(--cpj-Rt)) with calc(calc(var(--cpj-X1) - 0px) - var(--cpj-Rtk)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)) / calc(calc(var(--cpj-X1) - 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) + var(--cpj-Rtk)),
-curve to calc(calc(var(--cpj-X1) - 0px)) calc(var(--cpj-Y1) - 0px - var(--cpj-R)) with calc(var(--cpj-X1) - 0px + var(--cpj-OY)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) + var(--cpj-Rt) + var(--cpj-KV)) / calc(var(--cpj-X1) - 0px + var(--cpj-OY)) calc(var(--cpj-Y1) - 0px - var(--cpj-R) - var(--cpj-KV)),
-curve to calc(var(--cpj-X1) - 0px - var(--cpj-R)) calc(var(--cpj-Y1) - 0px) with calc(var(--cpj-X1) - 0px - var(--cpj-C2X)) calc(var(--cpj-Y1) - 0px - var(--cpj-C2Y)) / calc(var(--cpj-X1) - 0px - var(--cpj-C1X)) calc(var(--cpj-Y1) - 0px - var(--cpj-C1Y)),
-curve to calc(var(--cpj-X0) + 0px + var(--cpj-R)) calc(var(--cpj-Y1) - 0px) with calc(var(--cpj-X1) - 0px - var(--cpj-R) - var(--cpj-KH)) calc(var(--cpj-Y1) - 0px + var(--cpj-OX)) / calc(var(--cpj-X0) + 0px + var(--cpj-R) + var(--cpj-KH)) calc(var(--cpj-Y1) - 0px + var(--cpj-OX)),
-curve to calc(var(--cpj-X0) + 0px) calc(var(--cpj-Y1) - 0px - var(--cpj-R)) with calc(var(--cpj-X0) + 0px + var(--cpj-C1X)) calc(var(--cpj-Y1) - 0px - var(--cpj-C1Y)) / calc(var(--cpj-X0) + 0px + var(--cpj-C2X)) calc(var(--cpj-Y1) - 0px - var(--cpj-C2Y)),
-curve to calc(calc(var(--cpj-X0) + 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) + var(--cpj-Rt)) with calc(var(--cpj-X0) + 0px - var(--cpj-OY)) calc(var(--cpj-Y1) - 0px - var(--cpj-R) - var(--cpj-KV)) / calc(var(--cpj-X0) + 0px - var(--cpj-OY)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) + var(--cpj-Rt) + var(--cpj-KV)),
-curve to calc(calc(var(--cpj-X0) + 0px) + var(--cpj-Rt)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)) with calc(calc(var(--cpj-X0) + 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) + var(--cpj-Rtk)) / calc(calc(var(--cpj-X0) + 0px) + var(--cpj-Rtk)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)),
-close); }
-#charpanel .cp-fx > .cp-gnd{ clip-path: shape(from calc(calc(var(--cpj-X0) + 0px) + var(--cpj-Rt)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)),
-line to calc(calc(var(--cpj-t1a) + 0px) - var(--cpj-tab-fs)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)),
-curve to calc(calc(var(--cpj-t1a) + 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) - var(--cpj-tab-fs)) with calc(calc(var(--cpj-t1a) + 0px) - var(--cpj-tab-fsk)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)) / calc(calc(var(--cpj-t1a) + 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) - var(--cpj-tab-fsk)),
-line to calc(calc(var(--cpj-t1at) + 0px)) calc(calc(var(--cpj-Y0) + 0px) + var(--cpj-tab-r)),
-curve to calc(calc(var(--cpj-t1at) + 0px) + var(--cpj-tab-r)) calc(calc(var(--cpj-Y0) + 0px)) with calc(calc(var(--cpj-t1at) + 0px)) calc(calc(var(--cpj-Y0) + 0px) + var(--cpj-tab-rk)) / calc(calc(var(--cpj-t1at) + 0px) + var(--cpj-tab-rk)) calc(calc(var(--cpj-Y0) + 0px)),
-line to calc(calc(var(--cpj-t1bt) - 0px) - var(--cpj-tab-r)) calc(calc(var(--cpj-Y0) + 0px)),
-curve to calc(calc(var(--cpj-t1bt) - 0px)) calc(calc(var(--cpj-Y0) + 0px) + var(--cpj-tab-r)) with calc(calc(var(--cpj-t1bt) - 0px) - var(--cpj-tab-rk)) calc(calc(var(--cpj-Y0) + 0px)) / calc(calc(var(--cpj-t1bt) - 0px)) calc(calc(var(--cpj-Y0) + 0px) + var(--cpj-tab-rk)),
-line to calc(calc(var(--cpj-t1b) - 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) - var(--cpj-tab-f)),
-curve to calc(calc(var(--cpj-t1b) - 0px) + var(--cpj-tab-f)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)) with calc(calc(var(--cpj-t1b) - 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) - var(--cpj-tab-fk)) / calc(calc(var(--cpj-t1b) - 0px) + var(--cpj-tab-fk)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)),
-line to calc(calc(var(--cpj-t2a) + 0px) - var(--cpj-tab-f)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)),
-curve to calc(calc(var(--cpj-t2a) + 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) - var(--cpj-tab-f)) with calc(calc(var(--cpj-t2a) + 0px) - var(--cpj-tab-fk)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)) / calc(calc(var(--cpj-t2a) + 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) - var(--cpj-tab-fk)),
-line to calc(calc(var(--cpj-t2at) + 0px)) calc(calc(var(--cpj-Y0) + 0px) + var(--cpj-tab-r)),
-curve to calc(calc(var(--cpj-t2at) + 0px) + var(--cpj-tab-r)) calc(calc(var(--cpj-Y0) + 0px)) with calc(calc(var(--cpj-t2at) + 0px)) calc(calc(var(--cpj-Y0) + 0px) + var(--cpj-tab-rk)) / calc(calc(var(--cpj-t2at) + 0px) + var(--cpj-tab-rk)) calc(calc(var(--cpj-Y0) + 0px)),
-line to calc(calc(var(--cpj-t2bt) - 0px) - var(--cpj-tab-r)) calc(calc(var(--cpj-Y0) + 0px)),
-curve to calc(calc(var(--cpj-t2bt) - 0px)) calc(calc(var(--cpj-Y0) + 0px) + var(--cpj-tab-r)) with calc(calc(var(--cpj-t2bt) - 0px) - var(--cpj-tab-rk)) calc(calc(var(--cpj-Y0) + 0px)) / calc(calc(var(--cpj-t2bt) - 0px)) calc(calc(var(--cpj-Y0) + 0px) + var(--cpj-tab-rk)),
-line to calc(calc(var(--cpj-t2b) - 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) - var(--cpj-tab-fs)),
-curve to calc(calc(var(--cpj-t2b) - 0px) + var(--cpj-tab-fs)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)) with calc(calc(var(--cpj-t2b) - 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) - var(--cpj-tab-fsk)) / calc(calc(var(--cpj-t2b) - 0px) + var(--cpj-tab-fsk)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)),
-line to calc(calc(var(--cpj-X1) - 0px) - var(--cpj-Rt)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)),
-curve to calc(calc(var(--cpj-X1) - 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) + var(--cpj-Rt)) with calc(calc(var(--cpj-X1) - 0px) - var(--cpj-Rtk)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)) / calc(calc(var(--cpj-X1) - 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) + var(--cpj-Rtk)),
-curve to calc(calc(var(--cpj-X1) - 0px)) calc(var(--cpj-Y1) - 0px - var(--cpj-R)) with calc(var(--cpj-X1) - 0px + var(--cpj-OY)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) + var(--cpj-Rt) + var(--cpj-KV)) / calc(var(--cpj-X1) - 0px + var(--cpj-OY)) calc(var(--cpj-Y1) - 0px - var(--cpj-R) - var(--cpj-KV)),
-curve to calc(var(--cpj-X1) - 0px - var(--cpj-R)) calc(var(--cpj-Y1) - 0px) with calc(var(--cpj-X1) - 0px - var(--cpj-C2X)) calc(var(--cpj-Y1) - 0px - var(--cpj-C2Y)) / calc(var(--cpj-X1) - 0px - var(--cpj-C1X)) calc(var(--cpj-Y1) - 0px - var(--cpj-C1Y)),
-curve to calc(var(--cpj-X0) + 0px + var(--cpj-R)) calc(var(--cpj-Y1) - 0px) with calc(var(--cpj-X1) - 0px - var(--cpj-R) - var(--cpj-KH)) calc(var(--cpj-Y1) - 0px + var(--cpj-OX)) / calc(var(--cpj-X0) + 0px + var(--cpj-R) + var(--cpj-KH)) calc(var(--cpj-Y1) - 0px + var(--cpj-OX)),
-curve to calc(var(--cpj-X0) + 0px) calc(var(--cpj-Y1) - 0px - var(--cpj-R)) with calc(var(--cpj-X0) + 0px + var(--cpj-C1X)) calc(var(--cpj-Y1) - 0px - var(--cpj-C1Y)) / calc(var(--cpj-X0) + 0px + var(--cpj-C2X)) calc(var(--cpj-Y1) - 0px - var(--cpj-C2Y)),
-curve to calc(calc(var(--cpj-X0) + 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) + var(--cpj-Rt)) with calc(var(--cpj-X0) + 0px - var(--cpj-OY)) calc(var(--cpj-Y1) - 0px - var(--cpj-R) - var(--cpj-KV)) / calc(var(--cpj-X0) + 0px - var(--cpj-OY)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) + var(--cpj-Rt) + var(--cpj-KV)),
-curve to calc(calc(var(--cpj-X0) + 0px) + var(--cpj-Rt)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)) with calc(calc(var(--cpj-X0) + 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) + var(--cpj-Rtk)) / calc(calc(var(--cpj-X0) + 0px) + var(--cpj-Rtk)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)),
-close); }
-#charpanel .cp-fx > .cp-jelly::before{ clip-path: shape(evenodd from calc(calc(var(--cpj-X0) + var(--cpj-rim-in)) + var(--cpj-Rta)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-rim-in))),
-line to calc(calc(var(--cpj-t1a) + var(--cpj-rim-in)) - var(--cpj-tab-fsa)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-rim-in))),
-curve to calc(calc(var(--cpj-t1a) + var(--cpj-rim-in))) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-rim-in)) - var(--cpj-tab-fsa)) with calc(calc(var(--cpj-t1a) + var(--cpj-rim-in)) - var(--cpj-tab-fska)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-rim-in))) / calc(calc(var(--cpj-t1a) + var(--cpj-rim-in))) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-rim-in)) - var(--cpj-tab-fska)),
-line to calc(calc(var(--cpj-t1at) + var(--cpj-rim-in))) calc(calc(var(--cpj-Y0) + var(--cpj-rim-in)) + var(--cpj-tab-ra)),
-curve to calc(calc(var(--cpj-t1at) + var(--cpj-rim-in)) + var(--cpj-tab-ra)) calc(calc(var(--cpj-Y0) + var(--cpj-rim-in))) with calc(calc(var(--cpj-t1at) + var(--cpj-rim-in))) calc(calc(var(--cpj-Y0) + var(--cpj-rim-in)) + var(--cpj-tab-rka)) / calc(calc(var(--cpj-t1at) + var(--cpj-rim-in)) + var(--cpj-tab-rka)) calc(calc(var(--cpj-Y0) + var(--cpj-rim-in))),
-line to calc(min(calc(var(--cpj-t1bt) - var(--cpj-rim-in)), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2)) - var(--cpj-tab-ra)) calc(calc(var(--cpj-Y0) + var(--cpj-rim-in))),
-curve to calc(min(calc(var(--cpj-t1bt) - var(--cpj-rim-in)), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2))) calc(calc(var(--cpj-Y0) + var(--cpj-rim-in)) + var(--cpj-tab-ra)) with calc(min(calc(var(--cpj-t1bt) - var(--cpj-rim-in)), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2)) - var(--cpj-tab-rka)) calc(calc(var(--cpj-Y0) + var(--cpj-rim-in))) / calc(min(calc(var(--cpj-t1bt) - var(--cpj-rim-in)), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2))) calc(calc(var(--cpj-Y0) + var(--cpj-rim-in)) + var(--cpj-tab-rka)),
-line to calc(min(calc(var(--cpj-t1b) - var(--cpj-rim-in)), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2))) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-rim-in)) - var(--cpj-tab-fa)),
-curve to calc(min(calc(var(--cpj-t1b) - var(--cpj-rim-in)), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2)) + var(--cpj-tab-fa)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-rim-in))) with calc(min(calc(var(--cpj-t1b) - var(--cpj-rim-in)), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2))) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-rim-in)) - var(--cpj-tab-fka)) / calc(min(calc(var(--cpj-t1b) - var(--cpj-rim-in)), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2)) + var(--cpj-tab-fka)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-rim-in))),
-line to calc(max(calc(var(--cpj-t2a) + var(--cpj-rim-in)), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2)) - var(--cpj-tab-fa)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-rim-in))),
-curve to calc(max(calc(var(--cpj-t2a) + var(--cpj-rim-in)), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2))) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-rim-in)) - var(--cpj-tab-fa)) with calc(max(calc(var(--cpj-t2a) + var(--cpj-rim-in)), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2)) - var(--cpj-tab-fka)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-rim-in))) / calc(max(calc(var(--cpj-t2a) + var(--cpj-rim-in)), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2))) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-rim-in)) - var(--cpj-tab-fka)),
-line to calc(max(calc(var(--cpj-t2at) + var(--cpj-rim-in)), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2))) calc(calc(var(--cpj-Y0) + var(--cpj-rim-in)) + var(--cpj-tab-ra)),
-curve to calc(max(calc(var(--cpj-t2at) + var(--cpj-rim-in)), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2)) + var(--cpj-tab-ra)) calc(calc(var(--cpj-Y0) + var(--cpj-rim-in))) with calc(max(calc(var(--cpj-t2at) + var(--cpj-rim-in)), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2))) calc(calc(var(--cpj-Y0) + var(--cpj-rim-in)) + var(--cpj-tab-rka)) / calc(max(calc(var(--cpj-t2at) + var(--cpj-rim-in)), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2)) + var(--cpj-tab-rka)) calc(calc(var(--cpj-Y0) + var(--cpj-rim-in))),
-line to calc(calc(var(--cpj-t2bt) - var(--cpj-rim-in)) - var(--cpj-tab-ra)) calc(calc(var(--cpj-Y0) + var(--cpj-rim-in))),
-curve to calc(calc(var(--cpj-t2bt) - var(--cpj-rim-in))) calc(calc(var(--cpj-Y0) + var(--cpj-rim-in)) + var(--cpj-tab-ra)) with calc(calc(var(--cpj-t2bt) - var(--cpj-rim-in)) - var(--cpj-tab-rka)) calc(calc(var(--cpj-Y0) + var(--cpj-rim-in))) / calc(calc(var(--cpj-t2bt) - var(--cpj-rim-in))) calc(calc(var(--cpj-Y0) + var(--cpj-rim-in)) + var(--cpj-tab-rka)),
-line to calc(calc(var(--cpj-t2b) - var(--cpj-rim-in))) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-rim-in)) - var(--cpj-tab-fsa)),
-curve to calc(calc(var(--cpj-t2b) - var(--cpj-rim-in)) + var(--cpj-tab-fsa)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-rim-in))) with calc(calc(var(--cpj-t2b) - var(--cpj-rim-in))) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-rim-in)) - var(--cpj-tab-fska)) / calc(calc(var(--cpj-t2b) - var(--cpj-rim-in)) + var(--cpj-tab-fska)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-rim-in))),
-line to calc(calc(var(--cpj-X1) - var(--cpj-rim-in)) - var(--cpj-Rta)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-rim-in))),
-curve to calc(calc(var(--cpj-X1) - var(--cpj-rim-in))) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-rim-in)) + var(--cpj-Rta)) with calc(calc(var(--cpj-X1) - var(--cpj-rim-in)) - var(--cpj-Rtka)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-rim-in))) / calc(calc(var(--cpj-X1) - var(--cpj-rim-in))) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-rim-in)) + var(--cpj-Rtka)),
-curve to calc(calc(var(--cpj-X1) - var(--cpj-rim-in))) calc(var(--cpj-Y1) - var(--cpj-rim-in) - var(--cpj-Ra)) with calc(var(--cpj-X1) - var(--cpj-rim-in) + var(--cpj-OY)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-rim-in)) + var(--cpj-Rta) + var(--cpj-KV)) / calc(var(--cpj-X1) - var(--cpj-rim-in) + var(--cpj-OY)) calc(var(--cpj-Y1) - var(--cpj-rim-in) - var(--cpj-Ra) - var(--cpj-KV)),
-curve to calc(var(--cpj-X1) - var(--cpj-rim-in) - var(--cpj-Ra)) calc(var(--cpj-Y1) - var(--cpj-rim-in)) with calc(var(--cpj-X1) - var(--cpj-rim-in) - var(--cpj-C2Xa)) calc(var(--cpj-Y1) - var(--cpj-rim-in) - var(--cpj-C2Ya)) / calc(var(--cpj-X1) - var(--cpj-rim-in) - var(--cpj-C1Xa)) calc(var(--cpj-Y1) - var(--cpj-rim-in) - var(--cpj-C1Ya)),
-curve to calc(var(--cpj-X0) + var(--cpj-rim-in) + var(--cpj-Ra)) calc(var(--cpj-Y1) - var(--cpj-rim-in)) with calc(var(--cpj-X1) - var(--cpj-rim-in) - var(--cpj-Ra) - var(--cpj-KH)) calc(var(--cpj-Y1) - var(--cpj-rim-in) + var(--cpj-OX)) / calc(var(--cpj-X0) + var(--cpj-rim-in) + var(--cpj-Ra) + var(--cpj-KH)) calc(var(--cpj-Y1) - var(--cpj-rim-in) + var(--cpj-OX)),
-curve to calc(var(--cpj-X0) + var(--cpj-rim-in)) calc(var(--cpj-Y1) - var(--cpj-rim-in) - var(--cpj-Ra)) with calc(var(--cpj-X0) + var(--cpj-rim-in) + var(--cpj-C1Xa)) calc(var(--cpj-Y1) - var(--cpj-rim-in) - var(--cpj-C1Ya)) / calc(var(--cpj-X0) + var(--cpj-rim-in) + var(--cpj-C2Xa)) calc(var(--cpj-Y1) - var(--cpj-rim-in) - var(--cpj-C2Ya)),
-curve to calc(calc(var(--cpj-X0) + var(--cpj-rim-in))) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-rim-in)) + var(--cpj-Rta)) with calc(var(--cpj-X0) + var(--cpj-rim-in) - var(--cpj-OY)) calc(var(--cpj-Y1) - var(--cpj-rim-in) - var(--cpj-Ra) - var(--cpj-KV)) / calc(var(--cpj-X0) + var(--cpj-rim-in) - var(--cpj-OY)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-rim-in)) + var(--cpj-Rta) + var(--cpj-KV)),
-curve to calc(calc(var(--cpj-X0) + var(--cpj-rim-in)) + var(--cpj-Rta)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-rim-in))) with calc(calc(var(--cpj-X0) + var(--cpj-rim-in))) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-rim-in)) + var(--cpj-Rtka)) / calc(calc(var(--cpj-X0) + var(--cpj-rim-in)) + var(--cpj-Rtka)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-rim-in))),
-close,
-move to calc(calc(var(--cpj-X0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) + var(--cpj-Rtb)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)))),
-line to calc(calc(var(--cpj-t1a) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) - var(--cpj-tab-fsb)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)))),
-curve to calc(calc(var(--cpj-t1a) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)))) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) - var(--cpj-tab-fsb)) with calc(calc(var(--cpj-t1a) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) - var(--cpj-tab-fskb)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)))) / calc(calc(var(--cpj-t1a) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)))) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) - var(--cpj-tab-fskb)),
-line to calc(calc(var(--cpj-t1at) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)))) calc(calc(var(--cpj-Y0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) + var(--cpj-tab-rb)),
-curve to calc(calc(var(--cpj-t1at) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) + var(--cpj-tab-rb)) calc(calc(var(--cpj-Y0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)))) with calc(calc(var(--cpj-t1at) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)))) calc(calc(var(--cpj-Y0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) + var(--cpj-tab-rkb)) / calc(calc(var(--cpj-t1at) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) + var(--cpj-tab-rkb)) calc(calc(var(--cpj-Y0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)))),
-line to calc(min(calc(var(--cpj-t1bt) - calc(var(--cpj-rim-in) + var(--cpj-rim-w))), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2)) - var(--cpj-tab-rb)) calc(calc(var(--cpj-Y0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)))),
-curve to calc(min(calc(var(--cpj-t1bt) - calc(var(--cpj-rim-in) + var(--cpj-rim-w))), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2))) calc(calc(var(--cpj-Y0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) + var(--cpj-tab-rb)) with calc(min(calc(var(--cpj-t1bt) - calc(var(--cpj-rim-in) + var(--cpj-rim-w))), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2)) - var(--cpj-tab-rkb)) calc(calc(var(--cpj-Y0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)))) / calc(min(calc(var(--cpj-t1bt) - calc(var(--cpj-rim-in) + var(--cpj-rim-w))), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2))) calc(calc(var(--cpj-Y0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) + var(--cpj-tab-rkb)),
-line to calc(min(calc(var(--cpj-t1b) - calc(var(--cpj-rim-in) + var(--cpj-rim-w))), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2))) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) - var(--cpj-tab-fb)),
-curve to calc(min(calc(var(--cpj-t1b) - calc(var(--cpj-rim-in) + var(--cpj-rim-w))), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2)) + var(--cpj-tab-fb)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)))) with calc(min(calc(var(--cpj-t1b) - calc(var(--cpj-rim-in) + var(--cpj-rim-w))), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2))) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) - var(--cpj-tab-fkb)) / calc(min(calc(var(--cpj-t1b) - calc(var(--cpj-rim-in) + var(--cpj-rim-w))), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2)) + var(--cpj-tab-fkb)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)))),
-line to calc(max(calc(var(--cpj-t2a) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2)) - var(--cpj-tab-fb)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)))),
-curve to calc(max(calc(var(--cpj-t2a) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2))) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) - var(--cpj-tab-fb)) with calc(max(calc(var(--cpj-t2a) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2)) - var(--cpj-tab-fkb)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)))) / calc(max(calc(var(--cpj-t2a) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2))) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) - var(--cpj-tab-fkb)),
-line to calc(max(calc(var(--cpj-t2at) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2))) calc(calc(var(--cpj-Y0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) + var(--cpj-tab-rb)),
-curve to calc(max(calc(var(--cpj-t2at) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2)) + var(--cpj-tab-rb)) calc(calc(var(--cpj-Y0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)))) with calc(max(calc(var(--cpj-t2at) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2))) calc(calc(var(--cpj-Y0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) + var(--cpj-tab-rkb)) / calc(max(calc(var(--cpj-t2at) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2)) + var(--cpj-tab-rkb)) calc(calc(var(--cpj-Y0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)))),
-line to calc(calc(var(--cpj-t2bt) - calc(var(--cpj-rim-in) + var(--cpj-rim-w))) - var(--cpj-tab-rb)) calc(calc(var(--cpj-Y0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)))),
-curve to calc(calc(var(--cpj-t2bt) - calc(var(--cpj-rim-in) + var(--cpj-rim-w)))) calc(calc(var(--cpj-Y0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) + var(--cpj-tab-rb)) with calc(calc(var(--cpj-t2bt) - calc(var(--cpj-rim-in) + var(--cpj-rim-w))) - var(--cpj-tab-rkb)) calc(calc(var(--cpj-Y0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)))) / calc(calc(var(--cpj-t2bt) - calc(var(--cpj-rim-in) + var(--cpj-rim-w)))) calc(calc(var(--cpj-Y0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) + var(--cpj-tab-rkb)),
-line to calc(calc(var(--cpj-t2b) - calc(var(--cpj-rim-in) + var(--cpj-rim-w)))) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) - var(--cpj-tab-fsb)),
-curve to calc(calc(var(--cpj-t2b) - calc(var(--cpj-rim-in) + var(--cpj-rim-w))) + var(--cpj-tab-fsb)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)))) with calc(calc(var(--cpj-t2b) - calc(var(--cpj-rim-in) + var(--cpj-rim-w)))) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) - var(--cpj-tab-fskb)) / calc(calc(var(--cpj-t2b) - calc(var(--cpj-rim-in) + var(--cpj-rim-w))) + var(--cpj-tab-fskb)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)))),
-line to calc(calc(var(--cpj-X1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w))) - var(--cpj-Rtb)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)))),
-curve to calc(calc(var(--cpj-X1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w)))) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) + var(--cpj-Rtb)) with calc(calc(var(--cpj-X1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w))) - var(--cpj-Rtkb)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)))) / calc(calc(var(--cpj-X1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w)))) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) + var(--cpj-Rtkb)),
-curve to calc(calc(var(--cpj-X1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w)))) calc(var(--cpj-Y1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w)) - var(--cpj-Rb)) with calc(var(--cpj-X1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w)) + var(--cpj-OY)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) + var(--cpj-Rtb) + var(--cpj-KV)) / calc(var(--cpj-X1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w)) + var(--cpj-OY)) calc(var(--cpj-Y1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w)) - var(--cpj-Rb) - var(--cpj-KV)),
-curve to calc(var(--cpj-X1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w)) - var(--cpj-Rb)) calc(var(--cpj-Y1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w))) with calc(var(--cpj-X1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w)) - var(--cpj-C2Xb)) calc(var(--cpj-Y1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w)) - var(--cpj-C2Yb)) / calc(var(--cpj-X1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w)) - var(--cpj-C1Xb)) calc(var(--cpj-Y1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w)) - var(--cpj-C1Yb)),
-curve to calc(var(--cpj-X0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)) + var(--cpj-Rb)) calc(var(--cpj-Y1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w))) with calc(var(--cpj-X1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w)) - var(--cpj-Rb) - var(--cpj-KH)) calc(var(--cpj-Y1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w)) + var(--cpj-OX)) / calc(var(--cpj-X0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)) + var(--cpj-Rb) + var(--cpj-KH)) calc(var(--cpj-Y1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w)) + var(--cpj-OX)),
-curve to calc(var(--cpj-X0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) calc(var(--cpj-Y1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w)) - var(--cpj-Rb)) with calc(var(--cpj-X0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)) + var(--cpj-C1Xb)) calc(var(--cpj-Y1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w)) - var(--cpj-C1Yb)) / calc(var(--cpj-X0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)) + var(--cpj-C2Xb)) calc(var(--cpj-Y1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w)) - var(--cpj-C2Yb)),
-curve to calc(calc(var(--cpj-X0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)))) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) + var(--cpj-Rtb)) with calc(var(--cpj-X0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)) - var(--cpj-OY)) calc(var(--cpj-Y1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w)) - var(--cpj-Rb) - var(--cpj-KV)) / calc(var(--cpj-X0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)) - var(--cpj-OY)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) + var(--cpj-Rtb) + var(--cpj-KV)),
-curve to calc(calc(var(--cpj-X0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) + var(--cpj-Rtb)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)))) with calc(calc(var(--cpj-X0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)))) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) + var(--cpj-Rtkb)) / calc(calc(var(--cpj-X0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) + var(--cpj-Rtkb)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)))),
-close); }
-#charpanel .cp-fx > .cp-jelly::after{ clip-path: shape(evenodd from calc(calc(var(--cpj-X0) + 0px) + var(--cpj-Rt)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)),
-line to calc(calc(var(--cpj-t1a) + 0px) - var(--cpj-tab-fs)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)),
-curve to calc(calc(var(--cpj-t1a) + 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) - var(--cpj-tab-fs)) with calc(calc(var(--cpj-t1a) + 0px) - var(--cpj-tab-fsk)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)) / calc(calc(var(--cpj-t1a) + 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) - var(--cpj-tab-fsk)),
-line to calc(calc(var(--cpj-t1at) + 0px)) calc(calc(var(--cpj-Y0) + 0px) + var(--cpj-tab-r)),
-curve to calc(calc(var(--cpj-t1at) + 0px) + var(--cpj-tab-r)) calc(calc(var(--cpj-Y0) + 0px)) with calc(calc(var(--cpj-t1at) + 0px)) calc(calc(var(--cpj-Y0) + 0px) + var(--cpj-tab-rk)) / calc(calc(var(--cpj-t1at) + 0px) + var(--cpj-tab-rk)) calc(calc(var(--cpj-Y0) + 0px)),
-line to calc(calc(var(--cpj-t1bt) - 0px) - var(--cpj-tab-r)) calc(calc(var(--cpj-Y0) + 0px)),
-curve to calc(calc(var(--cpj-t1bt) - 0px)) calc(calc(var(--cpj-Y0) + 0px) + var(--cpj-tab-r)) with calc(calc(var(--cpj-t1bt) - 0px) - var(--cpj-tab-rk)) calc(calc(var(--cpj-Y0) + 0px)) / calc(calc(var(--cpj-t1bt) - 0px)) calc(calc(var(--cpj-Y0) + 0px) + var(--cpj-tab-rk)),
-line to calc(calc(var(--cpj-t1b) - 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) - var(--cpj-tab-f)),
-curve to calc(calc(var(--cpj-t1b) - 0px) + var(--cpj-tab-f)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)) with calc(calc(var(--cpj-t1b) - 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) - var(--cpj-tab-fk)) / calc(calc(var(--cpj-t1b) - 0px) + var(--cpj-tab-fk)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)),
-line to calc(calc(var(--cpj-t2a) + 0px) - var(--cpj-tab-f)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)),
-curve to calc(calc(var(--cpj-t2a) + 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) - var(--cpj-tab-f)) with calc(calc(var(--cpj-t2a) + 0px) - var(--cpj-tab-fk)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)) / calc(calc(var(--cpj-t2a) + 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) - var(--cpj-tab-fk)),
-line to calc(calc(var(--cpj-t2at) + 0px)) calc(calc(var(--cpj-Y0) + 0px) + var(--cpj-tab-r)),
-curve to calc(calc(var(--cpj-t2at) + 0px) + var(--cpj-tab-r)) calc(calc(var(--cpj-Y0) + 0px)) with calc(calc(var(--cpj-t2at) + 0px)) calc(calc(var(--cpj-Y0) + 0px) + var(--cpj-tab-rk)) / calc(calc(var(--cpj-t2at) + 0px) + var(--cpj-tab-rk)) calc(calc(var(--cpj-Y0) + 0px)),
-line to calc(calc(var(--cpj-t2bt) - 0px) - var(--cpj-tab-r)) calc(calc(var(--cpj-Y0) + 0px)),
-curve to calc(calc(var(--cpj-t2bt) - 0px)) calc(calc(var(--cpj-Y0) + 0px) + var(--cpj-tab-r)) with calc(calc(var(--cpj-t2bt) - 0px) - var(--cpj-tab-rk)) calc(calc(var(--cpj-Y0) + 0px)) / calc(calc(var(--cpj-t2bt) - 0px)) calc(calc(var(--cpj-Y0) + 0px) + var(--cpj-tab-rk)),
-line to calc(calc(var(--cpj-t2b) - 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) - var(--cpj-tab-fs)),
-curve to calc(calc(var(--cpj-t2b) - 0px) + var(--cpj-tab-fs)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)) with calc(calc(var(--cpj-t2b) - 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) - var(--cpj-tab-fsk)) / calc(calc(var(--cpj-t2b) - 0px) + var(--cpj-tab-fsk)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)),
-line to calc(calc(var(--cpj-X1) - 0px) - var(--cpj-Rt)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)),
-curve to calc(calc(var(--cpj-X1) - 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) + var(--cpj-Rt)) with calc(calc(var(--cpj-X1) - 0px) - var(--cpj-Rtk)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)) / calc(calc(var(--cpj-X1) - 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) + var(--cpj-Rtk)),
-curve to calc(calc(var(--cpj-X1) - 0px)) calc(var(--cpj-Y1) - 0px - var(--cpj-R)) with calc(var(--cpj-X1) - 0px + var(--cpj-OY)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) + var(--cpj-Rt) + var(--cpj-KV)) / calc(var(--cpj-X1) - 0px + var(--cpj-OY)) calc(var(--cpj-Y1) - 0px - var(--cpj-R) - var(--cpj-KV)),
-curve to calc(var(--cpj-X1) - 0px - var(--cpj-R)) calc(var(--cpj-Y1) - 0px) with calc(var(--cpj-X1) - 0px - var(--cpj-C2X)) calc(var(--cpj-Y1) - 0px - var(--cpj-C2Y)) / calc(var(--cpj-X1) - 0px - var(--cpj-C1X)) calc(var(--cpj-Y1) - 0px - var(--cpj-C1Y)),
-curve to calc(var(--cpj-X0) + 0px + var(--cpj-R)) calc(var(--cpj-Y1) - 0px) with calc(var(--cpj-X1) - 0px - var(--cpj-R) - var(--cpj-KH)) calc(var(--cpj-Y1) - 0px + var(--cpj-OX)) / calc(var(--cpj-X0) + 0px + var(--cpj-R) + var(--cpj-KH)) calc(var(--cpj-Y1) - 0px + var(--cpj-OX)),
-curve to calc(var(--cpj-X0) + 0px) calc(var(--cpj-Y1) - 0px - var(--cpj-R)) with calc(var(--cpj-X0) + 0px + var(--cpj-C1X)) calc(var(--cpj-Y1) - 0px - var(--cpj-C1Y)) / calc(var(--cpj-X0) + 0px + var(--cpj-C2X)) calc(var(--cpj-Y1) - 0px - var(--cpj-C2Y)),
-curve to calc(calc(var(--cpj-X0) + 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) + var(--cpj-Rt)) with calc(var(--cpj-X0) + 0px - var(--cpj-OY)) calc(var(--cpj-Y1) - 0px - var(--cpj-R) - var(--cpj-KV)) / calc(var(--cpj-X0) + 0px - var(--cpj-OY)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) + var(--cpj-Rt) + var(--cpj-KV)),
-curve to calc(calc(var(--cpj-X0) + 0px) + var(--cpj-Rt)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)) with calc(calc(var(--cpj-X0) + 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) + var(--cpj-Rtk)) / calc(calc(var(--cpj-X0) + 0px) + var(--cpj-Rtk)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)),
-close,
-move to calc(calc(var(--cpj-X0) + var(--cpj-L3-w)) + var(--cpj-Rt3)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-L3-w))),
-line to calc(calc(var(--cpj-t1a) + var(--cpj-L3-w)) - var(--cpj-tab-fs3)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-L3-w))),
-curve to calc(calc(var(--cpj-t1a) + var(--cpj-L3-w))) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-L3-w)) - var(--cpj-tab-fs3)) with calc(calc(var(--cpj-t1a) + var(--cpj-L3-w)) - var(--cpj-tab-fsk3)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-L3-w))) / calc(calc(var(--cpj-t1a) + var(--cpj-L3-w))) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-L3-w)) - var(--cpj-tab-fsk3)),
-line to calc(calc(var(--cpj-t1at) + var(--cpj-L3-w))) calc(calc(var(--cpj-Y0) + var(--cpj-L3-w)) + var(--cpj-tab-r3)),
-curve to calc(calc(var(--cpj-t1at) + var(--cpj-L3-w)) + var(--cpj-tab-r3)) calc(calc(var(--cpj-Y0) + var(--cpj-L3-w))) with calc(calc(var(--cpj-t1at) + var(--cpj-L3-w))) calc(calc(var(--cpj-Y0) + var(--cpj-L3-w)) + var(--cpj-tab-rk3)) / calc(calc(var(--cpj-t1at) + var(--cpj-L3-w)) + var(--cpj-tab-rk3)) calc(calc(var(--cpj-Y0) + var(--cpj-L3-w))),
-line to calc(min(calc(var(--cpj-t1bt) - var(--cpj-L3-w)), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2)) - var(--cpj-tab-r3)) calc(calc(var(--cpj-Y0) + var(--cpj-L3-w))),
-curve to calc(min(calc(var(--cpj-t1bt) - var(--cpj-L3-w)), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2))) calc(calc(var(--cpj-Y0) + var(--cpj-L3-w)) + var(--cpj-tab-r3)) with calc(min(calc(var(--cpj-t1bt) - var(--cpj-L3-w)), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2)) - var(--cpj-tab-rk3)) calc(calc(var(--cpj-Y0) + var(--cpj-L3-w))) / calc(min(calc(var(--cpj-t1bt) - var(--cpj-L3-w)), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2))) calc(calc(var(--cpj-Y0) + var(--cpj-L3-w)) + var(--cpj-tab-rk3)),
-line to calc(min(calc(var(--cpj-t1b) - var(--cpj-L3-w)), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2))) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-L3-w)) - var(--cpj-tab-f3)),
-curve to calc(min(calc(var(--cpj-t1b) - var(--cpj-L3-w)), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2)) + var(--cpj-tab-f3)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-L3-w))) with calc(min(calc(var(--cpj-t1b) - var(--cpj-L3-w)), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2))) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-L3-w)) - var(--cpj-tab-fk3)) / calc(min(calc(var(--cpj-t1b) - var(--cpj-L3-w)), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2)) + var(--cpj-tab-fk3)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-L3-w))),
-line to calc(max(calc(var(--cpj-t2a) + var(--cpj-L3-w)), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2)) - var(--cpj-tab-f3)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-L3-w))),
-curve to calc(max(calc(var(--cpj-t2a) + var(--cpj-L3-w)), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2))) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-L3-w)) - var(--cpj-tab-f3)) with calc(max(calc(var(--cpj-t2a) + var(--cpj-L3-w)), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2)) - var(--cpj-tab-fk3)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-L3-w))) / calc(max(calc(var(--cpj-t2a) + var(--cpj-L3-w)), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2))) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-L3-w)) - var(--cpj-tab-fk3)),
-line to calc(max(calc(var(--cpj-t2at) + var(--cpj-L3-w)), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2))) calc(calc(var(--cpj-Y0) + var(--cpj-L3-w)) + var(--cpj-tab-r3)),
-curve to calc(max(calc(var(--cpj-t2at) + var(--cpj-L3-w)), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2)) + var(--cpj-tab-r3)) calc(calc(var(--cpj-Y0) + var(--cpj-L3-w))) with calc(max(calc(var(--cpj-t2at) + var(--cpj-L3-w)), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2))) calc(calc(var(--cpj-Y0) + var(--cpj-L3-w)) + var(--cpj-tab-rk3)) / calc(max(calc(var(--cpj-t2at) + var(--cpj-L3-w)), calc((var(--cpj-t1b) + var(--cpj-t2a)) / 2)) + var(--cpj-tab-rk3)) calc(calc(var(--cpj-Y0) + var(--cpj-L3-w))),
-line to calc(calc(var(--cpj-t2bt) - var(--cpj-L3-w)) - var(--cpj-tab-r3)) calc(calc(var(--cpj-Y0) + var(--cpj-L3-w))),
-curve to calc(calc(var(--cpj-t2bt) - var(--cpj-L3-w))) calc(calc(var(--cpj-Y0) + var(--cpj-L3-w)) + var(--cpj-tab-r3)) with calc(calc(var(--cpj-t2bt) - var(--cpj-L3-w)) - var(--cpj-tab-rk3)) calc(calc(var(--cpj-Y0) + var(--cpj-L3-w))) / calc(calc(var(--cpj-t2bt) - var(--cpj-L3-w))) calc(calc(var(--cpj-Y0) + var(--cpj-L3-w)) + var(--cpj-tab-rk3)),
-line to calc(calc(var(--cpj-t2b) - var(--cpj-L3-w))) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-L3-w)) - var(--cpj-tab-fs3)),
-curve to calc(calc(var(--cpj-t2b) - var(--cpj-L3-w)) + var(--cpj-tab-fs3)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-L3-w))) with calc(calc(var(--cpj-t2b) - var(--cpj-L3-w))) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-L3-w)) - var(--cpj-tab-fsk3)) / calc(calc(var(--cpj-t2b) - var(--cpj-L3-w)) + var(--cpj-tab-fsk3)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-L3-w))),
-line to calc(calc(var(--cpj-X1) - var(--cpj-L3-w)) - var(--cpj-Rt3)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-L3-w))),
-curve to calc(calc(var(--cpj-X1) - var(--cpj-L3-w))) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-L3-w)) + var(--cpj-Rt3)) with calc(calc(var(--cpj-X1) - var(--cpj-L3-w)) - var(--cpj-Rtk3)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-L3-w))) / calc(calc(var(--cpj-X1) - var(--cpj-L3-w))) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-L3-w)) + var(--cpj-Rtk3)),
-curve to calc(calc(var(--cpj-X1) - var(--cpj-L3-w))) calc(var(--cpj-Y1) - var(--cpj-L3-w) - var(--cpj-R3)) with calc(var(--cpj-X1) - var(--cpj-L3-w) + var(--cpj-OY)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-L3-w)) + var(--cpj-Rt3) + var(--cpj-KV)) / calc(var(--cpj-X1) - var(--cpj-L3-w) + var(--cpj-OY)) calc(var(--cpj-Y1) - var(--cpj-L3-w) - var(--cpj-R3) - var(--cpj-KV)),
-curve to calc(var(--cpj-X1) - var(--cpj-L3-w) - var(--cpj-R3)) calc(var(--cpj-Y1) - var(--cpj-L3-w)) with calc(var(--cpj-X1) - var(--cpj-L3-w) - var(--cpj-C2X3)) calc(var(--cpj-Y1) - var(--cpj-L3-w) - var(--cpj-C2Y3)) / calc(var(--cpj-X1) - var(--cpj-L3-w) - var(--cpj-C1X3)) calc(var(--cpj-Y1) - var(--cpj-L3-w) - var(--cpj-C1Y3)),
-curve to calc(var(--cpj-X0) + var(--cpj-L3-w) + var(--cpj-R3)) calc(var(--cpj-Y1) - var(--cpj-L3-w)) with calc(var(--cpj-X1) - var(--cpj-L3-w) - var(--cpj-R3) - var(--cpj-KH)) calc(var(--cpj-Y1) - var(--cpj-L3-w) + var(--cpj-OX)) / calc(var(--cpj-X0) + var(--cpj-L3-w) + var(--cpj-R3) + var(--cpj-KH)) calc(var(--cpj-Y1) - var(--cpj-L3-w) + var(--cpj-OX)),
-curve to calc(var(--cpj-X0) + var(--cpj-L3-w)) calc(var(--cpj-Y1) - var(--cpj-L3-w) - var(--cpj-R3)) with calc(var(--cpj-X0) + var(--cpj-L3-w) + var(--cpj-C1X3)) calc(var(--cpj-Y1) - var(--cpj-L3-w) - var(--cpj-C1Y3)) / calc(var(--cpj-X0) + var(--cpj-L3-w) + var(--cpj-C2X3)) calc(var(--cpj-Y1) - var(--cpj-L3-w) - var(--cpj-C2Y3)),
-curve to calc(calc(var(--cpj-X0) + var(--cpj-L3-w))) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-L3-w)) + var(--cpj-Rt3)) with calc(var(--cpj-X0) + var(--cpj-L3-w) - var(--cpj-OY)) calc(var(--cpj-Y1) - var(--cpj-L3-w) - var(--cpj-R3) - var(--cpj-KV)) / calc(var(--cpj-X0) + var(--cpj-L3-w) - var(--cpj-OY)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-L3-w)) + var(--cpj-Rt3) + var(--cpj-KV)),
-curve to calc(calc(var(--cpj-X0) + var(--cpj-L3-w)) + var(--cpj-Rt3)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-L3-w))) with calc(calc(var(--cpj-X0) + var(--cpj-L3-w))) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-L3-w)) + var(--cpj-Rtk3)) / calc(calc(var(--cpj-X0) + var(--cpj-L3-w)) + var(--cpj-Rtk3)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-L3-w))),
-close); }
-}
-#charpanel .cp-card > .cp-tabs{
-position: relative;
-display: block;
-height: 0;
-padding: 7.005% 0 0;
-margin: calc(var(--f2-bd) * -2) calc(var(--f2-bd) * -2) 0;
-gap: 0;
-border: 0;
-background: none;
-overflow: visible;
-}
-#charpanel .cp-card > .cp-tabs > .cp-tab{
-position: absolute;
-top: 0; bottom: 0;
-display: flex;
-align-items: center;
-justify-content: center;
-height: auto;
-min-width: 0;
-padding: 0;
-margin: 0;
-border: 0;
-border-radius: 0;
-background: none;
-box-shadow: none;
-overflow: visible;
-}
-#charpanel .cp-card > .cp-tabs > .cp-tab[data-cptab="char"]{ left: 5.039%; right: 50.372%; }
-#charpanel .cp-card > .cp-tabs > .cp-tab[data-cptab="pet"] { left: 50.559%; right: 4.817%; }
-#charpanel .cp-card > .cp-tabs > .cp-tab[aria-selected="true"]::before,
-#charpanel .cp-card > .cp-tabs > .cp-tab[aria-selected="true"]::after{ content: none; }
-#charpanel .cp-card > .cp-tabs > .cp-tab::before{
-content: none;
-position: absolute; inset: 0; z-index: 0;
-height: auto; width: auto; min-height: 0;
-pointer-events: none;
-border-radius: 7.59% 7.59% 0 0 / 48.21% 48.21% 0 0;
-box-shadow: none;
-background: none;
-}
-#charpanel .cp-card > .cp-tabs > .cp-tab::after{
-content: "";
-position: absolute; left: 0; right: 0; bottom: 0; top: auto; z-index: 1;
-box-shadow: none; border-radius: 0;
-height: 5.33%;
-min-height: 1px;
-pointer-events: none;
-background: color-mix(in srgb, #AC98AA 74.5%, transparent);
-}
-#charpanel .cp-card > .cp-tabs > .cp-tab[aria-selected="false"]{
-background: color-mix(in srgb, #A8788E 30%, transparent);
-border-radius: 7.59% 7.59% 0 0 / 48.21% 48.21% 0 0;
-}
-#charpanel .cp-fx > .cp-jelly{
---cpj-a-in: var(--mode-a-alpha);
---cpj-rim-w: calc(var(--f2-ref-w) * 0.00350);
---cpj-rim-a: 0.9800;
---cpj-L3-w: calc(var(--f2-ref-w) * 0.00400);
---cpj-L3-a: .7450;
---cpj-L3-blur: 0px;
---cpj-band-w:  calc(var(--cpj-w) * .00991);
---cpj-band-s:  calc(var(--cpj-w) * .0161);
---cpj-milk-a: .0222;
-}
-#charpanel .cp-card > .cp-tabs{
-margin: calc(var(--f2-bd) * -1 + .099%) calc(var(--f2-bd) * -1) var(--cs-gap8);
-padding: calc(7.005% + var(--f2-bd) * .1401) 0 0;
-}
-#charpanel .cp-card > .cp-body{ border-top: 0; box-shadow: none; }
-.wxtal-set,
-.wxtal-crown{
-pointer-events: none;
--webkit-user-select: none;
-user-select: none;
-}
-.wxtal-set{
-position: absolute;
-inset: 0;
-display: block;
-overflow: visible;
-z-index: 3;
-}
-.wxtal{
-position: absolute;
-display: block;
-overflow: visible;
-width:  var(--wxtal-w, 38%);
-height: var(--wxtal-h, 31%);
-}
-.wxtal--tl{ left: var(--wxtal-xo, -14%); top: var(--wxtal-yt, -6%); }
-.wxtal--tr{ left: var(--wxtal-xi,  76%); top: var(--wxtal-yt, -6%); transform: scaleX(-1); }
-.wxtal--bl{ left: var(--wxtal-xo, -14%); top: var(--wxtal-yb, 75%); transform: scaleY(-1); }
-.wxtal--br{ left: var(--wxtal-xi,  76%); top: var(--wxtal-yb, 75%); transform: scale(-1,-1); }
-.wxtal-set--ref{
---wxtal-xo: -4.1%;
---wxtal-xi: 67.3%;
---wxtal-yt: -3.6%;
---wxtal-yb: 65.8%;
---wxtal-w:  37.8%;
---wxtal-h:  37.8%;
-}
-.wxtal-crown{
-position: absolute;
-left: 50%;
-top: 0;
-width: var(--wxtal-crown-w, 52.3%);
-height: auto;
-overflow: visible;
-transform: translate(-50%, -77.2%);
-z-index: 3;
-}
-.wxtal-line{ fill: none; stroke: #A38FAC; stroke-width: 7.0; stroke-linejoin: round; }
-.wxtal-rim { fill: none; stroke: #FFFFFF; stroke-width: 2.2; stroke-linejoin: round; opacity: .45; }
-.wxtal-kline{ fill: none; stroke: #9C86A6; stroke-width: 2.5; stroke-linejoin: round; }
-.wxtal-krim { fill: none; stroke: #FFFFFF; stroke-width: .9; stroke-linejoin: round; opacity: .5; }
-#charpanel .cp-crystal::before,
-#charpanel .cp-crystal::after{ content: none; }
 @media (min-width: 700px) and (orientation: portrait) {
 :root      { --h2-w: min(95.7vw, 593px); }   /* 620 x .957 */
 #charpanel { --f2-w: 95.7vw; }               /* 패널은 뷰포트 전폭이다 */
@@ -5923,16 +5104,6 @@ min-height: calc(var(--f2-w) * .1578);
 margin-inline: auto;
 }
 #modal-mode .mode-list { gap: calc(var(--f2-w) * .0120); }
-#charpanel { --cs-side: calc(var(--f2-w) * .2730); }
-#charpanel .cp-side-rack { gap: calc(var(--f2-w) * .0213); }
-#charpanel .cp-side-rack .cp-gem,
-#modal-drops .cp-gem,
-#modal-gear .cp-gem,
-#modal-gear-info .cp-gem {
---cp-gem-k: .1381;                  /* [판정판 121 · Task 5 수정 1회차 M1] 칸 폭 계수 한 곳 — 장비 설명 큰 그림(#gi-art)도 이 변수로 판 안 폭 1/2 를 푼다 */
-width:  calc(var(--f2-w) * var(--cp-gem-k));
-height: calc(var(--f2-w) * .1356);
-}
 #modal-tutorial #tut-stage { width: auto; }
 #charpanel { --cs-head: calc(var(--f2-w) * .1796); }
 #charpanel .cp-head h2 {
@@ -6011,9 +5182,6 @@ padding: calc(var(--f2-w) * .0210) calc(var(--f2-w) * .0804)
 calc(var(--f2-w) * .0956) !important;
 }
 #modal-tutorial .mv2-sheet > h2 { margin-top: 0; }
-#charpanel .cp-side-rec { font-size: max(var(--text-min), calc(var(--f2-w) * .0273)); }
-#charpanel .cp-side-body { overflow-y: auto; scrollbar-width: none; }
-#charpanel .cp-side-body::-webkit-scrollbar { width: 0; height: 0; }
 #charpanel .cp-sky { background-image: var(--art-menu-day); }
 @media (min-aspect-ratio: 1/1) and (min-width: 700px) {
 #charpanel .cp-sky { background-image: var(--art-menu-day-w); }
@@ -6029,7 +5197,6 @@ calc(var(--f2-w) * .0956) !important;
 #modal-daily .sheet > h2,
 #modal-odds .sheet > h2,
 #modal-gres .sheet > h2,
-#modal-gear .sheet > h2,
 #modal-gear-info .sheet > h2,
 #modal-clear .sheet > h2,
 #modal-rank .sheet > h2,
@@ -6061,7 +5228,6 @@ text-shadow:0 1px 0 rgba(255,255,255,.9), 0 2px 4px rgba(120,110,150,.35);
 #modal-daily .sheet > h2,
 #modal-odds .sheet > h2,
 #modal-gres .sheet > h2,
-#modal-gear .sheet > h2,
 #modal-gear-info .sheet > h2,
 #modal-clear .sheet > h2,
 #modal-rank .sheet > h2,
@@ -6105,7 +5271,6 @@ calc((var(--wcap-a-rim) - var(--wcap-a-in)) * 100%), transparent);
 #modal-daily .sheet > h2,
 #modal-odds .sheet > h2,
 #modal-gres .sheet > h2,
-#modal-gear .sheet > h2,
 #modal-gear-info .sheet > h2,
 #modal-clear .sheet > h2,
 #modal-rank .sheet > h2{
@@ -6245,33 +5410,6 @@ border-radius: 30px;
 .sheet { max-width: 380px; }
 .modal { --f2-w: min(95.7vw, calc(var(--f2-phone-w) * .957)); }
 #screen-menu .menu-stack { width: 340px; --mbw: 340px; }
-#charpanel .cp-stage,
-#charpanel .cp-card {
-left: 50%;
-right: auto;
-width: 414px;
-margin-left: -207px;
-}
-#charpanel .cp-stage > .cp-head,
-#charpanel .cp-stage > .cp-rack,
-#charpanel .cp-stage > .pick-row,
-#charpanel .cp-stage > .cp-view,
-#charpanel .cp-stage > .cp-petart,
-#charpanel .cp-stage > .cp-side { position: absolute; }
-#charpanel { --f2-w: min(calc(var(--app-max) * .88), 411px); }
-#charpanel .cp-head { left: 0; right: 0; width: auto; height: var(--cs-head); }
-#charpanel #cp-close { right: 0; }
-#charpanel .cp-rack {
-left: 0; right: 0;
-top: calc(var(--cs-head) + var(--f2-w) * .022);
-bottom: auto;
-}
-#charpanel .cp-view,
-#charpanel .cp-petart {
-left: 0;
-right: var(--cs-side);
-top: calc(var(--cs-head) + var(--cs-carh) + var(--f2-w) * .03);
-}
 }
 #classic-lead {
 margin: 2px 0 10px;

@@ -2022,7 +2022,7 @@ en: {
 'char.bangul.passname': 'Bubble Wave',
 'char.sseokssak.passname': 'Clean Sweep',
 'char.banjjak.passname': 'Spark Charge',
-'cp.sk.head': '[Skill]',
+'cp.sk.head': 'Skill',   /* [판정판 121 · Task 8b · 지휘자 판정] 괄호 머리글 「[Skill]」 → 카드 제목 꼴(굵은 잉크 — 규격 §9 위계) */
 'cp.sk.skill': 'Skill',
 'cp.sk.none': 'Going solo. No pet skill this run.',
 'cp.pet.empty': 'Pick a pet and their skill shows up here. {free} are with you from the very first round.',
@@ -2079,7 +2079,7 @@ en: {
 'item.puddingcharm.fl': 'A piece the Pudding Knight handed over, saying he did not need it.',
 'item.soon': 'Coming soon',
 'gear.slot.weapon': 'Weapon',
-'gear.slot.aux': 'Gear',
+'gear.slot.aux': 'Guard',
 'gear.slot.trinket': 'Charm',
 'gear.title.list': 'Gear List',
 'gear.title.info': 'Gear Info',
@@ -2088,7 +2088,13 @@ en: {
 'gear.empty.hint': 'No gear for this slot yet. Clear stages to find some.',
 'gear.equip': 'Equip',
 'gear.unequip': 'Unequip',
-'gear.wornby': 'Worn by {names}',
+'gear.wornby': 'Also equipped by {names}',
+'cp.tab.gear': 'Gear',
+'gear.auto': 'Auto Equip',
+'gear.auto.done': 'Equipped your best gear',
+'gear.auto.same': 'Already wearing your best gear',
+'gear.bag.none': 'Collect gear fruits on adventures',
+'gear.cmp.k': 'Equipped now',
 'item.crossnecklace.eff': 'In battle, alternate Ten and Twin matches to fill the Awaken gauge {n}% more.',
 'item.chainbracelet.eff': 'At combo {c} or more, matches score {n}% more.',
 'item.firstcharm.eff': 'The first match of each stage scores {x}×.',
@@ -3187,7 +3193,7 @@ ko: {
 'char.bangul.passname': '거품 파도',
 'char.sseokssak.passname': '싹쓸이',
 'char.banjjak.passname': '번쩍 충전',
-'cp.sk.head': '[스킬]',
+'cp.sk.head': '스킬',   /* [판정판 121 · Task 8b · 지휘자 판정] 괄호 머리글 「[스킬]」 → 카드 제목 꼴(굵은 잉크 — 규격 §9 위계) */
 'cp.sk.skill': '스킬',
 'cp.sk.none': '혼자 가요. 이번 판에는 펫 스킬이 없어요.',
 'cp.pet.empty': '펫을 고르면 여기에 스킬이 나와요. {free}는 처음부터 함께예요.',
@@ -3251,9 +3257,15 @@ ko: {
 'gear.on': '착용 중',
 'gear.empty': '비어 있음',
 'gear.empty.hint': '아직 이 부위 장비가 없어요. 판을 깨면 나와요.',
-'gear.equip': '끼기',
-'gear.unequip': '빼기',
-'gear.wornby': '{names} 착용 중',
+'gear.equip': '장착',
+'gear.unequip': '해제',
+'gear.wornby': '{names}도 장착 중이에요',
+'cp.tab.gear': '장비',
+'gear.auto': '자동 장착',
+'gear.auto.done': '가장 좋은 장비를 꼈어요',
+'gear.auto.same': '이미 가장 좋은 장비예요',
+'gear.bag.none': '모험에서 장비 과일을 모아요',
+'gear.cmp.k': '지금 낀 장비',
 'item.crossnecklace.eff': '전투에서 텐과 트윈을 번갈아 맞추면 각성 게이지가 {n}% 더 차요.',
 'item.chainbracelet.eff': '콤보 {c} 이상에서 점수가 {n}% 올라요.',
 'item.firstcharm.eff': '판의 첫 매치 점수가 {x}배가 돼요.',
@@ -4697,7 +4709,13 @@ if (id !== 'screen-map') stopMapTicker();
 }
 var WIN_SEL = '.modal, #charpanel';
 function winInert(el, on) { try { if ('inert' in el) el.inert = !!on; } catch (e) { /* 옛 엔진: 숨김만 */ } }
-function winLift(el) { if (el && el.hasAttribute('data-under')) { el.removeAttribute('data-under'); winInert(el, false); } }
+function winLift(el) {
+if (el && el.hasAttribute('data-under')) {
+el.removeAttribute('data-under');
+winInert(el, false);
+if (el.id === 'charpanel' && typeof cpGiInert === 'function') cpGiInert();
+}
+}
 function winShow(el) {
 if (!el) return;
 var fresh = el.hidden || el.hasAttribute('data-under');
@@ -4740,9 +4758,11 @@ tutFxRaise(false);
 'modal-classic',
 'modal-arc',
 'modal-confirm',
-'modal-gear-info', 'modal-gear']
+'modal-gear-info']
 .forEach(closeModal);
 winReset();   /* [판정판 121 · Task 5] 목록 밖 창(캐릭창 · 설정 · 스킨 · 보석 창)에 남은 깔림 표식까지 걷는다 */
+gearInfoId = '';   /* [Task 8b] 설명 카드가 위 목록에서 걷혔다 — 보던 장비 · 캐릭창 「카드가 기둥에 붙음」 표식도 함께(closeGearInfo 를 안 거치는 길) */
+if ($('charpanel')) { $('charpanel').removeAttribute('data-gi'); cpGiInert(); }   /* 수정 1회차 M5 — 세로 카드가 걸어 둔 방 inert 도 함께 푼다 */
 dropsN = 0;   /* 획득표가 위 목록에서 걷혔다 — 열린 탄 표식도 함께 0(closeDrops 를 안 거치는 길) */
 }
 var confirmPending = null;
@@ -6165,25 +6185,21 @@ var cpTabCur = 'char';
 function cpTab(k) {
 closeStatTip();          /* [SI-0909] 탭이 바뀌면 카드가 통째로 바뀐다 */
 var root = $('charpanel');
-cpTabCur = (k === 'pet') ? 'pet' : 'char';
+cpTabCur = (k === 'pet' || k === 'gear') ? k : 'char';
 if (!root || !root.setAttribute) return;
 root.setAttribute('data-cptab', cpTabCur);
 var car = cpTabCur === 'pet' ? CP_PET : CP_CAR;
 carTranslate(car, car.pos, false);
-cpPetStage();             /* W-B ③ — 탭이 곧 무대의 주인을 바꾼다 */
 syncPetInfo();            /* charsel v2 — 펫 탭의 [패시브 스킬] 박스 */
 var tabs = root.querySelectorAll ? root.querySelectorAll('.cp-tab') : null;
-if (!tabs) return;
+if (tabs) {
 for (var i = 0; i < tabs.length; i++) {
-tabs[i].setAttribute('aria-selected',
-tabs[i].getAttribute('data-cptab') === cpTabCur ? 'true' : 'false');
+var on = tabs[i].getAttribute('data-cptab') === cpTabCur;
+tabs[i].setAttribute('aria-selected', on ? 'true' : 'false');
+if (on) tabs[i].removeAttribute('data-variant'); else tabs[i].setAttribute('data-variant', 'soft');
 }
 }
-function cpPetStage() {
-var el = $('charpanel');
-var art = el && el.querySelector ? el.querySelector('.cp-petart') : null;
-if (!art) return;
-setStdArt(art, cpTabCur === 'pet' ? cpPetId() : '', 'full', '--pet-full');
+syncItemList();           /* 고른 칸(▼)이 탭을 따른다(장비 탭 = 가방 부위 칸 · 펫 탭 = 펫 칸) */
 }
 var cpPetView = null;      /* null = 지금 고른 펫(mateId) 을 본다 */
 function cpTxt(el, key, txt) {
@@ -6280,16 +6296,20 @@ cpTxt(uk.parentNode.querySelector('.cc-k'), 'cp.sk.lock');
 }
 fitDesc($('cp-pet-desc'));
 fitDesc(comboRow);        /* 64-fix2 ⑥ — 추천 카드도 같은 「잘림 0」: 넘치면 글자를 줄인다(펫마다 다시 잰다) */
-cpPetStage();             /* 구경 중인 펫이 무대에도 선다(없으면 히어로) */
 }
 function fitDesc(el) {
 if (!el || !el.classList) return;
 el.classList.remove('cp-tight', 'cp-tight-2');
-if (el.scrollHeight <= el.clientHeight) return;
+if (!descOver(el)) return;
 el.classList.add('cp-tight');
-if (el.scrollHeight <= el.clientHeight) return;
+if (!descOver(el)) return;
 el.classList.remove('cp-tight');
 el.classList.add('cp-tight-2');
+}
+function descOver(el) {
+if (el.scrollHeight > el.clientHeight) return true;
+var mh = parseFloat(getComputedStyle(el).minHeight) || 0;
+return mh > 0 && el.getBoundingClientRect().height > mh + 0.5;
 }
 function fitAllDesc() {
 if (typeof document === 'undefined' || !document.querySelectorAll) return;
@@ -6297,8 +6317,6 @@ var list = document.querySelectorAll('#charpanel .ci-desc');
 for (var i = 0; i < list.length; i++) fitDesc(list[i]);
 }
 function syncSidePanes() {
-var id = HERO_IDS[cpIdx] || charId();
-cpTxt($('cp-side-rec'), 'char.' + id + '.tag');
 syncItemList();
 }
 function openCharPanel() {
@@ -6306,8 +6324,8 @@ var el = $('charpanel');
 if (!el) return;
 winShow(el);              /* [판정판 121 · Task 5] 겹친 창 규칙 — 판 정보 창(⇄)에서 열면 그 창을 깐다 */
 cpPetView = null;        /* 열 때마다 "구경"은 지금 고른 펫에서 시작한다 */
-cpTab(cpTabCur);          /* W4 — 세션 안에서 마지막으로 보던 탭으로 연다 */
-syncSidePanes();          /* 레일 — 배지 + 아이템 칸 그리드 */
+cpTab(cpTabCur === 'gear' && cpWide() ? 'char' : cpTabCur);
+syncSidePanes();          /* 장비 칸 4 · 가방 */
 syncCharPick();
 var cur = HERO_IDS.indexOf(charId());
 cpSeed(cur < 0 ? 0 : cur);   /* ⑰ 열 때는 애니 없이 정중앙 seed(가운데 벌) */
@@ -6316,6 +6334,7 @@ J.sfx.ui();
 }
 function closeCharPanel() {
 closeStatTip();          /* [SI-0909] 닫힌 패널에 열린 말풍선을 남기지 않는다 */
+if ($('modal-gear-info') && !$('modal-gear-info').hidden) closeGearInfo(true);   /* [Task 8b] 가로 기둥에 붙은 설명 카드도 함께 */
 winHide($('charpanel'));  /* [판정판 121 · Task 5] 깔았던 창(판 정보 등)을 되살린다 — 아래 openNodeCard 보다 먼저 */
 syncCharSummary();
 J.sfx.ui();
@@ -6377,8 +6396,7 @@ if (v === mateId()) return;
 store.mateId = v;
 cpPetView = null;         /* 고른 순간 구경도 그것으로 맞춘다 */
 persist();
-syncCharPick();
-cpPetStage();             /* W-B ③ — 고른 동료가 곧바로 무대에 선다 */
+syncCharPick();           /* 펫 칸(syncItemList)도 여기서 새 펫 얼굴로 — [Task 8b] 펫 무대(cpPetStage)는 은퇴 */
 applyCharSkin();
 J.sfx.ui();
 if (v) J.sfx.voice(v, 3);
@@ -16059,7 +16077,7 @@ el.setAttribute('data-state', empty ? 'empty' : (neutral ? 'neutral' : (o.eq ? '
 if (slot) el.setAttribute('data-slot', slot);
 var art = document.createElement('i');
 art.className = 'itile-art';
-if (neutral) art.style.backgroundImage = 'url("' + o.art + '")';
+if (neutral || (empty && o.art)) art.style.backgroundImage = 'url("' + o.art + '")';   /* [Task 8b] 빈 칸 + o.art = 그 그림의 실루엣(펫 칸 — 지휘자 판정 1) */
 else {
 var artId = empty ? (ITILE_EMPTY_ART[slot] || '') : id;
 if (artId) itileArtSet(art, artId, size);
@@ -16076,6 +16094,13 @@ var q = document.createElement('i');
 q.className = 'itile-eq';
 q.textContent = '✓';
 el.appendChild(q);
+}
+if (o.sel) {
+el.setAttribute('data-sel', '');
+var sv = document.createElement('i');
+sv.className = 'itile-sel';
+sv.setAttribute('aria-hidden', 'true');
+el.appendChild(sv);
 }
 return el;
 }
@@ -16872,42 +16897,16 @@ cards[i].removeAttribute('aria-label');
 }
 }
 }
-var CP_XTAL_SET =
-'<span class="wxtal-set wxtal-set--ref" aria-hidden="true">' +
-'<svg class="wxtal wxtal--tl" viewBox="0 0 100 100" preserveAspectRatio="none"><use href="#wxtalGem" xlink:href="#wxtalGem"/></svg>' +
-'<svg class="wxtal wxtal--tr" viewBox="0 0 100 100" preserveAspectRatio="none"><use href="#wxtalGem" xlink:href="#wxtalGem"/></svg>' +
-'<svg class="wxtal wxtal--bl" viewBox="0 0 100 100" preserveAspectRatio="none"><use href="#wxtalGem" xlink:href="#wxtalGem"/></svg>' +
-'<svg class="wxtal wxtal--br" viewBox="0 0 100 100" preserveAspectRatio="none"><use href="#wxtalGem" xlink:href="#wxtalGem"/></svg>' +
-'</span>';
-function cpItemCell(state, slot, ico, val, id, tier, label, tap) {
-var btn = !!tap || state !== 'empty';
-var b = document.createElement(btn ? 'button' : 'span');
-b.className = 'cp-crystal cp-gem cp-islot';
-b.setAttribute('data-state', state);
-b.setAttribute('data-slot', slot);
-if (!btn) {
-b.setAttribute('aria-hidden', 'true');
-} else {
-b.type = 'button';
-if (id) b.setAttribute('data-item', id);
-if (tier) b.setAttribute('data-tier', tier);
-b.setAttribute('aria-haspopup', 'dialog');
-b.setAttribute('aria-label', label);
-}
-var ic = document.createElement('span');
-ic.className = 'cp-cr-ic';
-ic.setAttribute('aria-hidden', 'true');
-if (id && ITEM_ART[id]) { ic.textContent = ''; ic.setAttribute('data-art', ''); ic.style.setProperty('background-image', itemArtCss(id, 64)); } else { ic.textContent = ico; }
-b.appendChild(ic);
-if (val) {
-var vb = document.createElement('b');
-vb.className = 'cp-gem-n';
-vb.setAttribute('aria-hidden', 'true');
-vb.textContent = val;
-b.appendChild(vb);
-}
-b.insertAdjacentHTML('beforeend', CP_XTAL_SET);
-return b;
+var CP_SLOTS = ['weapon', 'aux', 'trinket', 'pet'];
+var cpBagSlot = 'weapon';
+var PET_FACE_ART = {
+ppyak: 'catalog/ch-ppyak-face.webp', mungchi: 'catalog/ch-mungchi-face.webp', mongle: 'catalog/ch-mongle-face.webp',
+churup: 'catalog/ch-churup-face.webp', mukmul: 'catalog/ch-mukmul-face.webp', tiktok: 'catalog/ch-tiktok-face.webp',
+kkultteok: 'catalog/ch-kkultteok-face.webp', bangul: 'catalog/ch-bangul-face.webp', sseokssak: 'catalog/ch-sseokssak-face.webp',
+banjjak: 'catalog/ch-banjjak-face.webp'
+};
+function cpWide() {
+try { return !!(window.matchMedia && window.matchMedia('(min-aspect-ratio: 1/1)').matches); } catch (e) { return false; }
 }
 function cpItemCharId() {
 var el = $('charpanel');
@@ -16922,54 +16921,234 @@ if (it && it.slot === slot && it.enabled !== false && (own[it.id] | 0) > 0) retu
 }
 return '';
 }
+function gearBagList(slot) {
+var own = (store.items && store.items.own) || {}, out = [];
+for (var i = 0; i < ITEM_POOL.length; i++) {
+var it = ITEM_POOL[i], lv = own[it.id] | 0;
+if (it.enabled === false || it.slot !== slot || lv <= 0) continue;
+out.push({ it: it, lv: lv, i: i });
+}
+out.sort(function (a, b) { return (ITEM_TIER_EFF[b.it.tier] - ITEM_TIER_EFF[a.it.tier]) || (b.lv - a.lv) || (a.i - b.i); });
+return out;
+}
+function gearWornIds(id, cid) {
+var ids = [];
+for (var i = 0; i < HERO_IDS.length; i++) {
+if (HERO_IDS[i] !== cid && itemsEq(HERO_IDS[i]).indexOf(id) >= 0) ids.push(HERO_IDS[i]);
+}
+return ids;
+}
+function gearWornBy(id, cid) {
+var ids = gearWornIds(id, cid), names = [];
+for (var i = 0; i < ids.length; i++) names.push(t('char.' + ids[i] + '.name'));
+return names.join(' · ');
+}
+function gearAria(id, cid) {
+var it = itemById(id), own = (store.items && store.items.own) || {}, who = gearWornBy(id, cid);
+if (!it) return '';
+return t('item.' + id + '.nm') + ', ' + t('drops.tier.' + it.tier) + ', ' + t('drops.lv', { lv: own[id] | 0, max: ITEM_LV_MAX })
++ (itemsEq(cid).indexOf(id) >= 0 ? ', ' + t('gear.on') : '') + (who ? ', ' + t('gear.wornby', { names: who }) : '');
+}
+function cpSlotSel() {
+if (cpTabCur === 'pet') return 'pet';
+if (cpTabCur === 'gear' || cpWide()) return cpBagSlot;
+return '';
+}
 function syncItemList() {
-var wrap = $('cp-item-list');
-if (!wrap) return;
-var cid = cpItemCharId(), own = (store.items && store.items.own) || {};
+var cid = cpItemCharId(), own = (store.items && store.items.own) || {}, sel = cpSlotSel(), s;
+var wrap = $('cp-slots');
+if (wrap) {
 wrap.innerHTML = '';
-for (var s = 0; s < ITEM_SLOTS.length; s++) {
-var slot = ITEM_SLOTS[s], id = gearSlotItem(cid, slot), sn = t('gear.slot.' + slot);
+for (s = 0; s < CP_SLOTS.length; s++) {
+var slot = CP_SLOTS[s], b = document.createElement('button'), tile, sn, lab;
+b.type = 'button';
+b.className = 'cp-slot';
+b.setAttribute('data-slot', slot);
+var on1 = slot === sel;                    /* 고른 칸 = 바깥 밝은 테 + ▼(itemTile o.sel — 2차 판정 4) */
+if (slot === 'pet') {
+var mid = mateId();
+sn = t('pick.mate');
+tile = mid ? itemTile(null, { art: PET_FACE_ART[mid] || '', sel: on1 }) : itemTile(null, { empty: true, slot: 'pet', art: PET_FACE_ART[MATE_IDS[0]], sel: on1 });
+lab = sn + ', ' + t(mid ? ('char.' + mid + '.name') : 'mate.none.name');
+} else {
+var id = gearSlotItem(cid, slot);
+sn = t('gear.slot.' + slot);
 if (id) {
-var it = itemById(id), lv = own[id] | 0;
-wrap.appendChild(cpItemCell('eq', slot, it.ico, it.kind === 'stat' ? ('+' + itemEffOf(id, lv)) : '',
-id, it.tier, sn + ' · ' + t('item.' + id + '.nm'), true));
+tile = itemTile(id, { lv: own[id] | 0, size: 96, sel: on1 });
+b.setAttribute('data-item', id);
+lab = sn + ', ' + gearAria(id, cid);
 } else {
-wrap.appendChild(cpItemCell('empty', slot, '', t('gear.empty'), '', '', sn + ' · ' + t('gear.empty'), true));
+tile = itemTile(null, { empty: true, slot: slot, size: 96, sel: on1 });   /* 부위 실루엣 — 「비어 있음」 글자 0(규격 §7) */
+lab = sn;
 }
 }
+if (on1) b.setAttribute('aria-current', 'true');
+b.appendChild(tile);
+var nm = document.createElement('span');
+nm.className = 'cp-slot-n';
+nm.textContent = sn;
+b.appendChild(nm);
+b.setAttribute('aria-label', lab);
+wrap.appendChild(b);
 }
-function toggleItem(id) {
-var it = itemById(id);
-if (!it) return;
-var own = (store.items && store.items.own) || {};
-if (!(own[id] | 0)) return;
-var cid = cpItemCharId(), eq = itemsEq(cid).slice(), at = eq.indexOf(id), j;
-if (at >= 0) {
-eq.splice(at, 1);
-} else {
-for (j = eq.length - 1; j >= 0; j--) {
-var e = itemById(eq[j]);
-if (e && e.slot === it.slot) eq.splice(j, 1);
 }
-eq.push(id);
-if (eq.length > ITEM_SLOTS.length) eq.shift();
-dqBump('item', 1);            /* 판정판 50 — 「아이템 장착」 축(끼울 때만) */
+var pills = $('cp-bag-slots');
+if (pills) {
+pills.innerHTML = '';
+for (s = 0; s < ITEM_SLOTS.length; s++) {
+var ps = ITEM_SLOTS[s], on = ps === cpBagSlot, p = document.createElement('button');
+p.type = 'button';
+p.className = 'cp-bag-slot kd-tag kit-pill-v2';
+p.setAttribute('role', 'tab');
+p.setAttribute('data-slot', ps);
+p.setAttribute('data-tone', 'violet');
+p.setAttribute('aria-selected', on ? 'true' : 'false');
+if (!on) p.setAttribute('data-variant', 'soft');
+var pnum = '(' + gearBagList(ps).length + ')';
+var pl = document.createElement('span'); pl.textContent = t('gear.slot.' + ps); p.appendChild(pl);
+var pn = document.createElement('b'); pn.className = 'cp-bag-n'; pn.textContent = pnum; p.appendChild(pn);
+p.setAttribute('aria-label', t('gear.slot.' + ps) + pnum);   /* 낭독 = 부위 + 개수 — 좁은 줄에서 개수 글자를 빼도 그대로(2차 판정 6) */
+pills.appendChild(p);
 }
+}
+var grid = $('cp-bag-grid'), none = $('cp-bag-none');
+if (grid) {
+var list = gearBagList(cpBagSlot);
+grid.innerHTML = '';
+grid.setAttribute('data-slot', cpBagSlot);
+if (!list.length) {
+var li0 = document.createElement('li');
+li0.className = 'cp-bag-cell cp-bag-empty';
+li0.appendChild(itemTile(null, { empty: true, slot: cpBagSlot, size: 96 }));
+grid.appendChild(li0);
+}
+for (s = 0; s < list.length; s++) {
+var gi = list[s].it.id, mine = itemsEq(cid).indexOf(gi) >= 0, wids = gearWornIds(gi, cid);
+var li = document.createElement('li');
+li.className = 'cp-bag-li';
+var cb = document.createElement('button');
+cb.type = 'button';
+cb.className = 'cp-bag-cell';
+cb.setAttribute('data-item', gi);
+cb.setAttribute('aria-haspopup', 'dialog');
+cb.setAttribute('aria-label', gearAria(gi, cid));
+cb.appendChild(itemTile(gi, { lv: list[s].lv, eq: mine, size: 96 }));
+if (wids.length) {
+var who = document.createElement('i');
+who.className = 'cp-bag-who';
+who.setAttribute('aria-hidden', 'true');
+who.setAttribute('data-char', wids[0]);
+setStdArt(who, wids[0], 'face', '--who-face');
+cb.appendChild(who);
+}
+li.appendChild(cb);
+grid.appendChild(li);
+}
+if (none) none.hidden = list.length > 0;
+}
+if (gearInfoId) paintGearInfo();   /* 설명 카드가 떠 있으면(가로 기둥) 같은 상태로 다시 칠한다 */
+cpBagHeadFit();
+cpBagFill();
+cpBagRing();
+cpMoreAll();                       /* 격자를 다시 지었고 구경 캐릭터 · 탭이 바뀌었을 수 있다 — 아래 흐림 표시를 다시 잰다 */
+}
+function cpBagFill() {
+var grid = $('cp-bag-grid');
+if (!grid || !grid.querySelectorAll) return;
+var old = grid.querySelectorAll('.cp-bag-frame'), kids = grid.children, n = 0, first = null, i;
+for (i = 0; i < kids.length; i++) if (!kids[i].classList.contains('cp-bag-frame')) { n++; if (!first) first = kids[i]; }
+var wide = cpWide(), cols = wide ? 3 : 4, rows = 1;
+var bag = $('cp-bag'), head = bag && bag.querySelector('.cp-bag-head'), note = $('cp-bag-none');
+if (bag && head && note && first && bag.clientHeight > 0) {
+var u = (parseFloat(getComputedStyle(grid).columnGap) || 0) / 3, fr = first.getBoundingClientRect();
+var need = head.getBoundingClientRect().height + 2 * u + (2.4 * u + fr.height + 3 * u) + 2 * u + (parseFloat(getComputedStyle(note).fontSize) || 0) * 1.35 + 2 * u;
+var tight = need > bag.clientHeight;
+if (tight) { bag.setAttribute('data-tight', ''); bag.style.setProperty('--cb-ring', (fr.width * 0.08) + 'px'); }
+else { bag.removeAttribute('data-tight'); bag.style.removeProperty('--cb-ring'); }
+}
+var gh = n ? grid.clientHeight : 0;
+if (gh > 0 && first) {
+var cs = getComputedStyle(grid), ch = first.getBoundingClientRect().height;
+var pad = (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0), gap = parseFloat(cs.rowGap) || 0;
+if (ch > 0) rows = Math.max(rows, Math.floor((gh - pad + gap) / (ch + gap)));
+}
+for (i = 0; i < old.length; i++) grid.removeChild(old[i]);
+if (!n) return;
+var want = Math.max(cols * rows, Math.ceil(n / cols) * cols);
+for (i = n; i < want; i++) {
+var li = document.createElement('li');
+li.className = 'cp-bag-li cp-bag-frame';
+li.setAttribute('aria-hidden', 'true');
+li.appendChild(itemTile(null, { empty: true }));   /* 빈 칸(부위 없음 = 그림 없음) — 테 · 면은 CSS(.cp-bag-frame) */
+grid.appendChild(li);
+}
+}
+function cpBagHeadFit() {
+var row = $('cp-bag-slots'), head = row && row.parentNode;
+if (!row || !row.removeAttribute || !head || !head.removeAttribute) return;
+var over = function () { return row.scrollWidth > row.clientWidth + 0.5; };
+row.removeAttribute('data-compact');
+head.removeAttribute('data-wrap');
+if (!row.clientWidth || !over()) return;
+row.setAttribute('data-compact', '');
+if (!over()) return;
+head.setAttribute('data-wrap', '');
+row.removeAttribute('data-compact');
+if (over()) row.setAttribute('data-compact', '');
+}
+function cpBagRing() {
+var cells = document.querySelectorAll ? document.querySelectorAll('#cp-bag-grid .cp-bag-cell') : [];
+for (var i = 0; i < cells.length; i++) {
+var tl = cells[i].querySelector('.itile');
+if (!tl) continue;
+if (gearInfoId && cells[i].getAttribute('data-item') === gearInfoId) tl.setAttribute('data-ring', '');
+else tl.removeAttribute('data-ring');
+}
+}
+function gearEqCommit(cid, eq) {
 store.items.eq[cid] = eq;
 persist();
 syncItemList();
 applyHeroStats();          /* 막대가 곧바로 새 실효값을 그린다 */
 J.sfx.ui();
 }
-var gearSlotCur = '';   /* 목록 창이 보여 주는 부위 */
-var gearInfoId = '';    /* 설명 창이 보여 주는 장비 */
-function gearWornBy(id, cid) {
-var names = [];
-for (var i = 0; i < HERO_IDS.length; i++) {
-if (HERO_IDS[i] !== cid && itemsEq(HERO_IDS[i]).indexOf(id) >= 0) names.push(t('char.' + HERO_IDS[i] + '.name'));
+function toggleItem(id) {
+var it = itemById(id);
+if (!it) return;
+var own = (store.items && store.items.own) || {};
+if (!(own[id] | 0)) return;
+var cid = cpItemCharId(), eq = itemsEq(cid).slice(), at = eq.indexOf(id);
+if (at >= 0) {
+eq.splice(at, 1);
+} else {
+gearEqPut(eq, id);
+dqBump('item', 1);            /* 판정판 50 — 「아이템 장착」 축(끼울 때만) */
 }
-return names.join(' · ');
+gearEqCommit(cid, eq);
 }
+function gearEqPut(eq, id) {
+var it = itemById(id), j;
+for (j = eq.length - 1; j >= 0; j--) {
+var e = itemById(eq[j]);
+if (e && it && e.slot === it.slot) eq.splice(j, 1);
+}
+eq.push(id);
+while (eq.length > ITEM_SLOTS.length) eq.shift();
+return eq;
+}
+function gearAutoEquip() {
+var cid = cpItemCharId(), eq = itemsEq(cid).slice(), changed = 0, s;
+for (s = 0; s < ITEM_SLOTS.length; s++) {
+var slot = ITEM_SLOTS[s], best = gearBagList(slot)[0];
+if (!best || gearSlotItem(cid, slot) === best.it.id) continue;
+gearEqPut(eq, best.it.id);    /* toggleItem 과 같은 끼우기 · 장착 수 가드(M9) */
+changed++;
+}
+if (changed) { dqBump('item', changed); gearEqCommit(cid, eq); }
+else J.sfx.ui();
+toast(t(changed ? 'gear.auto.done' : 'gear.auto.same'));
+}
+var gearInfoId = '';    /* 설명 카드가 보여 주는 장비 */
 function itemEffParams(id) {
 if (id === 'chainbracelet') return { c: String(ITEM_CHAIN_COMBO), n: String(Math.round((ITEM_CHAIN_MULT - 1) * 100)) };
 if (id === 'firstcharm') return { x: String(ITEM_FIRST_MULT) };
@@ -16984,134 +17163,161 @@ if (it.kind !== 'stat') return [t('item.' + id + '.eff', itemEffParams(id))];
 var i = STAT_KEYS.indexOf(it.stat), n = statPctText(it.stat, itemEffOf(id, lv), 1);
 return statTipLines(i, '+' + n + '%', n);
 }
-function gearCell(slot, id, tier, size) {
-var cell = cpItemCell('empty', slot, '', '', '', '', '');
-if (id) cell.setAttribute('data-state', 'own');
-var ic = cell.querySelector('.cp-cr-ic');
-if (ic) {
-ic.textContent = '';
-ic.setAttribute('data-art', '');
-ic.style.setProperty('background-image', id ? itemArtCss(id, size) : ('url("' + (ITEM_ART_SIL[slot] || ITEM_ART_SIL.trinket) + '")'));
-}
-return cell;
-}
-function gearRow(act, slot, id, tier, name, lines, onTxt) {
-var row = document.createElement(act === 'none' ? 'div' : 'button');
-if (act !== 'none') row.type = 'button';
-row.className = 'gear-row sk-item kit-box-v2';
-if (act) row.setAttribute('data-act', act);
-if (id) { row.setAttribute('data-item', id); row.setAttribute('data-tier', tier); }
-row.appendChild(gearCell(slot, id, tier, 64));
-var body = document.createElement('span');
-body.className = 'sk-b';
-var n = document.createElement('b');
-n.className = 'sk-n';
-n.textContent = name;
-body.appendChild(n);
-for (var i = 0; i < lines.length; i++) {
-if (!lines[i][1]) continue;
-var d = document.createElement('span');
-d.className = 'sk-d ' + lines[i][0];
-d.textContent = lines[i][1];
-body.appendChild(d);
-}
-row.appendChild(body);
-if (onTxt) {
-var p = document.createElement('span');
-p.className = 'sk-act kit-pill-v2';
-p.setAttribute('data-variant', 'soft');
-p.textContent = onTxt;
-row.appendChild(p);
-}
-return row;
-}
-function paintGearList() {
-var wrap = $('gear-list');
-if (!wrap) return;
-var slot = gearSlotCur, cid = cpItemCharId(), cur = gearSlotItem(cid, slot), own = (store.items && store.items.own) || {};
-wrap.innerHTML = '';
-if (cur) wrap.appendChild(gearRow('off', slot, '', '', t('gear.unequip'), [], ''));
-var n = 0;
-for (var i = 0; i < ITEM_POOL.length; i++) {
-var it = ITEM_POOL[i], lv = own[it.id] | 0;
-if (it.enabled === false || it.slot !== slot || lv <= 0) continue;
-var mine = itemsEq(cid).indexOf(it.id) >= 0, who = mine ? '' : gearWornBy(it.id, cid);
-var lvTxt = t('drops.lv', { lv: lv, max: ITEM_LV_MAX }) + (it.kind === 'stat' ? ' · +' + itemEffOf(it.id, lv) : '');
-wrap.appendChild(gearRow('', slot, it.id, it.tier, t('item.' + it.id + '.nm'),
-[['gear-lv', lvTxt], ['gear-who', who ? t('gear.wornby', { names: who }) : '']],
-mine ? t('gear.on') : ''));
-n++;
-}
-if (!n) wrap.appendChild(gearRow('none', slot, '', '', t('gear.empty'), [['gear-hint', t('gear.empty.hint')]], ''));
-}
-function openGear(slot) {
-if (ITEM_SLOTS.indexOf(slot) < 0) return;
-gearSlotCur = slot;
-paintGearList();
-openModal('modal-gear');
-var sc = $('gear-list');
-if (sc) sc.scrollTop = 0;
-J.sfx.ui();
-}
-function closeGear(quiet) {
-gearSlotCur = '';
-closeModal('modal-gear');
-if (!quiet) J.sfx.ui();
+function gearEffShort(id, lv) {
+var it = itemById(id);
+if (!it) return '';
+if (it.kind !== 'stat') return t('item.' + id + '.eff', itemEffParams(id));
+return t('stat.k' + (STAT_KEYS.indexOf(it.stat) + 1)) + ' +' + itemEffOf(id, lv);
 }
 function paintGearInfo() {
 var id = gearInfoId, it = itemById(id);
 if (!it) return;
-var own = (store.items && store.items.own) || {}, lv = own[id] | 0, on = itemsEq(cpItemCharId()).indexOf(id) >= 0;
+var cid = cpItemCharId(), own = (store.items && store.items.own) || {}, lv = own[id] | 0, on = itemsEq(cid).indexOf(id) >= 0;
 var art = $('gi-art');
 if (art) {
 art.innerHTML = '';
-art.setAttribute('data-tier', it.tier);
-art.appendChild(gearCell(it.slot, id, it.tier, 256));
+art.appendChild(itemTile(id, { lv: lv, eq: on, size: 256 }));   /* 큰 장비 칸(판 안 폭 36% — CSS) */
 }
 setText('gi-name', t('item.' + id + '.nm'));
-setText('gi-meta', t('drops.tier.' + it.tier) + ' · ' + t('gear.slot.' + it.slot) + ' · ' + t('drops.lv', { lv: lv, max: ITEM_LV_MAX }));
-var eff = $('gi-eff');
+var chip = $('gi-chip');
+if (chip) {
+chip.setAttribute('data-tier', it.tier);
+var ci = chip.firstElementChild || chip.appendChild(document.createElement('i'));
+ci.textContent = t('drops.tier.' + it.tier);
+}
+setText('gi-meta', t('gear.slot.' + it.slot) + ' · ' + t('drops.lv', { lv: lv, max: ITEM_LV_MAX }));
+var eff = $('gi-eff'), effd = $('gi-effd'), lines = gearEffLines(id, lv);
 if (eff) {
 eff.innerHTML = '';
-var lines = gearEffLines(id, lv);
-for (var i = 0; i < lines.length; i++) {
-var head = lines.length > 1 && i === 0;
-var e = document.createElement(head ? 'b' : 'span');
-e.className = head ? 'sk-n' : 'sk-d';
-e.textContent = lines[i];
-eff.appendChild(e);
+eff.setAttribute('data-kind', it.kind === 'stat' ? 'stat' : 'act');
+if (it.kind === 'stat') {
+var ek = document.createElement('span'); ek.className = 'gi-eff-k'; ek.textContent = t('stat.k' + (STAT_KEYS.indexOf(it.stat) + 1)); eff.appendChild(ek);
+var ev = document.createElement('b'); ev.className = 'gi-eff-v'; ev.textContent = '+' + itemEffOf(id, lv); eff.appendChild(ev);
+} else {
+eff.textContent = lines[0] || '';
+}
+}
+if (effd) { effd.textContent = it.kind === 'stat' ? (lines[1] || '') : ''; effd.hidden = it.kind !== 'stat'; }
+var cmp = $('gi-cmp'), cur = gearSlotItem(cid, it.slot);
+if (cmp) {
+cmp.hidden = !(cur && cur !== id);
+var ca = $('gi-cmp-art'), cv = $('gi-cmp-v');
+if (ca) ca.innerHTML = '';
+if (cv) cv.innerHTML = '';
+if (!cmp.hidden) {
+var c = itemById(cur), clv = own[cur] | 0;
+if (ca) ca.appendChild(itemTile(cur, { lv: clv, size: 64 }));
+if (cv) {
+var cn = document.createElement('b'); cn.className = 'gi-cmp-n'; cn.textContent = t('item.' + cur + '.nm'); cv.appendChild(cn);
+var ce = document.createElement('span'); ce.className = 'gi-cmp-e'; ce.textContent = gearEffShort(cur, clv); cv.appendChild(ce);
+if (c && c.kind === 'stat' && it.kind === 'stat' && c.stat === it.stat) {
+var d = itemEffOf(id, lv) - itemEffOf(cur, clv);
+if (d) {
+var cd = document.createElement('b'); cd.className = 'gi-cmp-d';
+cd.setAttribute('data-dir', d > 0 ? 'up' : 'down');
+cd.textContent = (d > 0 ? '▲' : '▼') + Math.abs(d);
+cv.appendChild(cd);
+}
+}
+}
 }
 }
 setText('gi-fl', t('item.' + id + '.fl'));
+var who = $('gi-who'), wb = gearWornBy(id, cid);
+if (who) { who.textContent = wb ? t('gear.wornby', { names: wb }) : ''; who.hidden = !wb; }
 var b = $('gi-act');
 if (b) {
 b.textContent = t(on ? 'gear.unequip' : 'gear.equip');
 b.setAttribute('data-kind', on ? 'secondary' : 'primary');
 }
+gearInfoFit();
+}
+function gearInfoFit() {
+var m = $('modal-gear-info'), sh = m && m.querySelector('.sheet');
+if (!sh || m.hidden) return;
+sh.classList.remove('gi-tight');
+if (sh.scrollHeight > sh.clientHeight + 4) sh.classList.add('gi-tight');
+}
+function cpMore(el) {
+if (!el) return;
+var more = el.scrollHeight - el.clientHeight - Math.ceil(el.scrollTop) > 0;
+if (more) { if (!el.hasAttribute('data-more')) el.setAttribute('data-more', ''); }
+else if (el.hasAttribute('data-more')) el.removeAttribute('data-more');
+}
+function cpMoreAll() {
+if (typeof document === 'undefined' || !document.querySelectorAll) return;
+var els = document.querySelectorAll('#charpanel .cp-info > .ci, #cp-bag-grid');
+for (var i = 0; i < els.length; i++) cpMore(els[i]);
 }
 function openGearInfo(id) {
 var own = (store.items && store.items.own) || {};
 if (!itemById(id) || (own[id] | 0) <= 0) return;
 gearInfoId = id;
 paintGearInfo();
+var m = $('modal-gear-info'), cp = $('charpanel');
+if (cp && !cp.hidden && m) {
+m.hidden = false;
+winLift(m);
+healHeads(m);
+cp.setAttribute('data-gi', '');
+cpGiInert();
+} else {
 openModal('modal-gear-info');
+}
+gearInfoFit();
+cpBagRing();
 J.sfx.ui();
 }
 function closeGearInfo(quiet) {
 gearInfoId = '';
 closeModal('modal-gear-info');
+var cp = $('charpanel');
+if (cp) cp.removeAttribute('data-gi');
+cpGiInert();
+cpBagRing();
 if (!quiet) J.sfx.ui();
 }
-function gearDone() { closeGearInfo(true); closeGear(true); }
+function cpGiDocked() {
+var cp = $('charpanel');
+return !!(cp && cp.hasAttribute('data-gi') && cpWide());
+}
+function cpGiInert() {
+var cp = $('charpanel');
+if (!cp || cp.hasAttribute('data-under')) return;
+winInert(cp, cp.hasAttribute('data-gi') && !cpWide());
+}
 function gearAct() {
 if (!gearInfoId) return;
+var docked = cpGiDocked();
 toggleItem(gearInfoId);
-gearDone();
+if (!docked) closeGearInfo(true);
 }
-function gearUnequip(slot) {
+function cpSlotTap(slot) {
+if (slot === 'pet') {
+if (gearInfoId) closeGearInfo(true);
+cpTab('pet');
+J.sfx.ui();
+return;
+}
+if (ITEM_SLOTS.indexOf(slot) < 0) return;
+cpBagSlot = slot;
 var id = gearSlotItem(cpItemCharId(), slot);
-if (id) toggleItem(id);
-gearDone();
+if (!cpWide()) cpTab('gear');
+else if (cpTabCur === 'pet') cpTab('char');
+else syncItemList();
+var gr = $('cp-bag-grid');
+if (gr) gr.scrollTop = 0;
+if (id) { openGearInfo(id); return; }
+if (gearInfoId) closeGearInfo(true);
+J.sfx.ui();
+}
+function cpBagSlotTap(slot) {
+if (ITEM_SLOTS.indexOf(slot) < 0 || slot === cpBagSlot) return;
+cpBagSlot = slot;
+syncItemList();
+var gr = $('cp-bag-grid');
+if (gr) gr.scrollTop = 0;
+J.sfx.ui();
 }
 var pairPCache = null;
 function pairTypeP() {
@@ -17585,26 +17791,44 @@ var pos = Array.prototype.indexOf.call(this.children, el);
 if (pos < 0) return;
 carSelectPos(CP_PET, pos, true, 'tap');
 });
-on($('cp-item-list'), 'click', function (ev) {
-var el = ev.target;
-while (el && el !== this && !(el.getAttribute && el.getAttribute('data-slot'))) {
-el = el.parentNode;
+function cpPick(ev, root, cls) {
+var el = ev && ev.target;
+while (el && el !== root && !(el.classList && el.classList.contains(cls))) el = el.parentNode;
+return (el && el !== root) ? el : null;
 }
-if (!el || el === this) return;
-openGear(el.getAttribute('data-slot'));
+on($('cp-slots'), 'click', function (ev) {
+var el = cpPick(ev, this, 'cp-slot');
+if (el) cpSlotTap(el.getAttribute('data-slot'));
 });
-on($('gear-list'), 'click', function (ev) {
-var el = ev.target;
-while (el && el !== this && !(el.classList && el.classList.contains('gear-row'))) el = el.parentNode;
-if (!el || el === this) return;
-if (el.getAttribute('data-act') === 'off') { gearUnequip(gearSlotCur); return; }
-var id = el.getAttribute('data-item');
+on($('cp-bag-slots'), 'click', function (ev) {
+var el = cpPick(ev, this, 'cp-bag-slot');
+if (el) cpBagSlotTap(el.getAttribute('data-slot'));
+});
+on($('cp-bag-grid'), 'click', function (ev) {
+var el = cpPick(ev, this, 'cp-bag-cell');
+var id = el && el.getAttribute('data-item');
 if (id) openGearInfo(id);
 });
-on($('gear-close'), 'click', function () { closeGear(); });
+on($('cp-auto'), 'click', gearAutoEquip);
+(function () {
+var mq = (typeof window !== 'undefined' && window.matchMedia) ? window.matchMedia('(min-aspect-ratio: 1/1)') : null;
+if (!mq) return;
+var f = function () { cpGiInert(); gearInfoFit(); };
+if (mq.addEventListener) mq.addEventListener('change', f); else if (mq.addListener) mq.addListener(f);
+})();
+(function () {
+var els = document.querySelectorAll('#charpanel .cp-info > .ci, #cp-bag-grid');
+var ro = (typeof ResizeObserver === 'function') ? new ResizeObserver(function (en) {
+for (var k = 0; k < en.length; k++) if (en[k].target && en[k].target.id === 'cp-bag-grid') { cpBagHeadFit(); cpBagFill(); break; }   /* 가방이 보이게 되거나 크기가 바뀌면 머리 줄 개수 글자 · 빈 틀 줄 수를 다시 */
+cpMoreAll();
+}) : null;
+for (var i = 0; i < els.length; i++) (function (el) {
+on(el, 'scroll', function () { cpMore(el); });
+if (ro) { ro.observe(el); for (var c = 0; c < el.children.length; c++) ro.observe(el.children[c]); }
+})(els[i]);
+})();
 on($('gi-close'), 'click', function () { closeGearInfo(); });
 on($('gi-act'), 'click', gearAct);
-on($('modal-gear'), 'click', function (ev) { if (ev && ev.target === this) closeGear(); });
 on($('modal-gear-info'), 'click', function (ev) { if (ev && ev.target === this) closeGearInfo(); });
 on($('char-open'), 'click', openCharPanel);
 on($('cp-close'), 'click', closeCharPanel);
@@ -17625,6 +17849,8 @@ if (!ev || (ev.key !== 'ArrowLeft' && ev.key !== 'ArrowRight')) return;
 if (ev.altKey || ev.ctrlKey || ev.metaKey) return;
 var panel = $('charpanel');
 if (!panel || panel.hidden || panel.hasAttribute('data-under')) return;
+var gim = $('modal-gear-info');
+if (gim && !gim.hidden && !cpGiDocked()) return;
 var tag = ev.target && ev.target.tagName;
 if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
 ev.preventDefault();
@@ -17888,8 +18114,8 @@ if ($('charget') && !$('charget').hidden) { charGetEnd(); return; }
 if ($('modal-confirm') && !$('modal-confirm').hidden) { closeConfirm(); return; }
 var cpEsc = $('charpanel');
 if (cpEsc && !cpEsc.hidden && cpEsc.getClientRects && cpEsc.getClientRects().length) {
-if ($('modal-gear-info') && !$('modal-gear-info').hidden) { closeGearInfo(); return; }
-if ($('modal-gear') && !$('modal-gear').hidden) { closeGear(); return; }
+var giEsc = $('modal-gear-info');
+if (giEsc && !giEsc.hidden && !giEsc.hasAttribute('data-under')) { closeGearInfo(); return; }
 if ($('modal-invite') && !$('modal-invite').hidden) { closeInvite(); return; }
 if ($('modal-skin') && !$('modal-skin').hidden) { closeSkins(); return; }
 if (statTipOpen) { closeStatTip(); J.sfx.ui(); return; }
@@ -18517,7 +18743,8 @@ openGachaRoll: openGachaRoll, isGachaStage: isGachaStage,
 itemById: itemById, itemEffOf: itemEffOf, itemStatBonus: itemStatBonus,
 itemScoreMult: itemScoreMult, itemOn: itemOn, ITEM_POOL: ITEM_POOL,
 grantItem: grantItem, toggleItem: toggleItem, syncItemList: syncItemList,
-openGear: openGear, closeGear: closeGear, openGearInfo: openGearInfo, closeGearInfo: closeGearInfo,
+openGearInfo: openGearInfo, closeGearInfo: closeGearInfo, gearAutoEquip: gearAutoEquip, cpSlotTap: cpSlotTap, cpBagSlotTap: cpBagSlotTap,
+gearBagList: gearBagList,
 itemArtUrl: itemArtUrl, itemArtCss: itemArtCss, ITEM_ART: ITEM_ART, itemSrcOf: itemSrcOf, ITEM_SRC: ITEM_SRC,
 itemTile: itemTile, dropsTab: dropsTab,   /* [판정판 121 · Task 8a] 장비 칸 시트(t8a/sheet) · 획득표 탭 손잡이 — 게임 코드는 이 문을 안 거친다 */
 petOwned: petOwned, grantPet: grantPet, petCondBump: petCondBump,
