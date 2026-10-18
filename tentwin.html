@@ -16874,8 +16874,10 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
        창 틀(.modal.w6m > .sheet.jbox.jbox--modal · 제목 캡슐 · ✕ 자기 id 단추)은 그대로, 안을 참고 그림 문법으로 바꿨다:
          윗줄 = 큰 장비 칸(itemTile 256 · 판 안 폭 36%) + [이름(굵은 잉크) / 등급 칩(.tchip) / 부위 · Lv a/12]
          효과 = 스탯형 「스탯 이름 + 큰 수 +N」(itemEffOf) + 그 뜻 한 줄(stat.d) · 행동형 = 효과 문장(item.<id>.eff)
+         분위기 한 줄(굵기 400) — 장비 자기 줄(이름 · 효과 · 뜻 · 분위기)은 붙어 있다
          비교 줄 = 같은 부위에 다른 장비를 끼고 있으면 「지금 낀 장비」 작은 칸 + 이름 + 효과(같은 스탯이면 ▲/▼ 차이)
-         분위기 한 줄(옅게) · 「○○도 장착 중이에요」(다른 캐릭터가 낄 때) · [장착](주)/[해제](보조).
+         「○○도 장착 중이에요」(다른 캐릭터가 낄 때) · [장착](주)/[해제](보조) — 고르는 데 쓰는 줄은 단추 곁에.
+       [수정 1회차 E1] 차례 = 윗줄 → 효과 → 뜻 → 분위기 → 비교 → ○○도 → 단추(마크업 차례 — 낭독 차례도 같다 · 옛: 분위기가 비교 줄 아래라 낀 장비 설명으로 읽혔다).
        가로(창 가로 ≥ 세로): 막 없이 캐릭창 왼쪽 기둥 자리에 붙어 정보 판을 덮는다(누름은 판 밖으로 통과 · Esc · ✕ = 정보 판으로).
        내용은 JS(paintGearInfo)가 t() 로 채운다. -->
   <div id="modal-gear-info" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="gi-h"><div class="sheet jbox jbox--modal" data-part="modal-plate">
@@ -16891,12 +16893,12 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
     </div>
     <p id="gi-eff" class="gi-eff"></p>
     <p id="gi-effd" class="gi-effd"></p>
+    <p id="gi-fl" class="gi-fl"></p>
     <div id="gi-cmp" class="gi-cmp" hidden>
       <span class="gi-cmp-k" data-i18n="gear.cmp.k">Equipped now</span>
       <span id="gi-cmp-art" class="gi-cmp-art"></span>
       <span id="gi-cmp-v" class="gi-cmp-v"></span>
     </div>
-    <p id="gi-fl" class="gi-fl"></p>
     <p id="gi-who" class="gi-who" hidden></p>
     <button id="gi-act" class="kit-btn-v2" data-kind="primary" type="button"></button>
   </div></div>
@@ -27126,7 +27128,8 @@ window.TT_SFX = {
          ({c} ITEM_CHAIN_COMBO · {n} · {x} · {s} — itemEffParams). 부위 이름 en = 브리프 값 그대로. */
       'gear.slot.weapon': 'Weapon',
       /* [판정판 121 · Task 8b · 지휘자 판정 6] 'Gear' → 'Guard' — 캐릭창 「장비」 탭 en(cp.tab.gear = Gear)과 겹쳐서. 보조 넷(softcushion · puddingarmor ·
-         turtleshield · puddingcharm)이 전부 방어 · 꾸준함 장비다. 이 키를 읽는 다른 곳(획득표 · 판 정보 등)도 같이 바뀐다. */
+         turtleshield · puddingcharm)이 전부 방어 · 꾸준함 장비다. 이 키(gear.slot.*)를 읽는 곳은 캐릭터 방 칸 이름 · 가방 부위 알약 · 설명 카드 메타뿐이다
+         (획득표 · 판 정보는 안 읽는다 — 수정 1회차 M2). */
       'gear.slot.aux': 'Guard',
       'gear.slot.trinket': 'Charm',
       'gear.title.list': 'Gear List',
@@ -30845,7 +30848,14 @@ window.TT_SFX = {
      토스트 · 컷인 · 튜토리얼 말풍선은 창이 아니라 이 규칙 밖이다. */
   var WIN_SEL = '.modal, #charpanel';
   function winInert(el, on) { try { if ('inert' in el) el.inert = !!on; } catch (e) { /* 옛 엔진: 숨김만 */ } }
-  function winLift(el) { if (el && el.hasAttribute('data-under')) { el.removeAttribute('data-under'); winInert(el, false); } }
+  function winLift(el) {
+    if (el && el.hasAttribute('data-under')) {
+      el.removeAttribute('data-under');
+      winInert(el, false);
+      /* [Task 8b 수정 1회차 M5] 캐릭터 방은 세로 설명 카드가 떠 있으면 되살아나도 inert 그대로(막 아래 방) */
+      if (el.id === 'charpanel' && typeof cpGiInert === 'function') cpGiInert();
+    }
+  }
   /** 창 하나를 연다. 숨어 있었거나 깔려 있었을 때만 그 순간 보이는 다른 창을 깐다(이미 맨 위에 서 있던 창을 다시 열면 무변). */
   function winShow(el) {
     if (!el) return;
@@ -30925,7 +30935,7 @@ window.TT_SFX = {
       .forEach(closeModal);
     winReset();   /* [판정판 121 · Task 5] 목록 밖 창(캐릭창 · 설정 · 스킨 · 보석 창)에 남은 깔림 표식까지 걷는다 */
     gearInfoId = '';   /* [Task 8b] 설명 카드가 위 목록에서 걷혔다 — 보던 장비 · 캐릭창 「카드가 기둥에 붙음」 표식도 함께(closeGearInfo 를 안 거치는 길) */
-    if ($('charpanel')) $('charpanel').removeAttribute('data-gi');
+    if ($('charpanel')) { $('charpanel').removeAttribute('data-gi'); cpGiInert(); }   /* 수정 1회차 M5 — 세로 카드가 걸어 둔 방 inert 도 함께 푼다 */
     dropsN = 0;   /* 획득표가 위 목록에서 걷혔다 — 열린 탄 표식도 함께 0(closeDrops 를 안 거치는 길) */
   }
 
@@ -33588,7 +33598,8 @@ window.TT_SFX = {
     el.classList.remove('cp-tight');
     el.classList.add('cp-tight-2');
   }
-  /** [Task 8b] 세로 캐릭창은 정보 장(.ci)이 구르고 [스킬] · 추천 상자는 높이 = 내용(최소 = 종전 높이)으로 늘어난다(잘림 0 — 지휘자 판정 7).
+  /** [수정 1회차 M7] fitDesc · descOver 는 재며 맞추는 함수라 쓰기 → 읽기가 남는다(단계 둘까지) — 창 열기 · 탭 · 언어 · 크기 변화에서만 불린다(움직임 중에는 안 불린다).
+   *  [Task 8b] 세로 캐릭창은 정보 장(.ci)이 구르고 [스킬] · 추천 상자는 높이 = 내용(최소 = 종전 높이)으로 늘어난다(잘림 0 — 지휘자 판정 7).
    *  「늘리기 전에 글자를 줄인다」(위 요구 3)는 그대로 — 넘침 = 내용이 상자를 넘거나(종전) 상자가 최소 높이보다 커졌는가(늘어난 만큼이 넘침).
    *  가로 정보 판은 최소 높이 0(남는 높이를 채운다)이라 둘째 조건이 안 걸린다. */
   function descOver(el) {
@@ -50059,7 +50070,8 @@ window.TT_SFX = {
        o.lv    보유 레벨(0 이면 알약 없음) · o.eq 장착 표(빈 칸에는 둘 다 안 붙는다)
      칸은 그림 · 레벨 · 표만 가진다 — 이름 · 확률 · 단추 같은 글은 칸 밖 소비처가 둔다. 누르는 칸이 필요하면 소비처가 <button> 안에 넣고 라벨을 붙인다.
      칸 폭은 소비처가 준다 · cqw 를 모르는 엔진을 위해 소비처가 칸 폭 길이 --it-w 도 준다(<style id="itile-8a"> 끝 대체 블록).
-     고른 칸 = o.sel(칸에 [data-sel] + ▼ 요소 .itile-sel — 8b 2차 판정 4) 또는 감싼 요소의 [aria-selected="true"](CSS — 바깥 밝은 테 + 위 굵은 ▼) ·
+     고른 칸(바깥 밝은 테 + ▼) = itemTile 의 o.sel(칸 안 ▼ 요소 .itile-sel + 테 표 [data-sel] — 둘 다 o.sel 이 단다 · 손으로 [data-sel] 만 달지 않는다)
+     또는 감싼 요소의 [aria-selected="true"](CSS — 같은 테 + ::after ▼). [Task 8b 수정 1회차 M3 — 계약 하나]
      칸의 [data-ring] = 바깥 밝은 테만(8b 가방 — 설명 카드에 뜬 칸). */
   var ITILE_EMPTY_ART = { weapon: 'flamescepter', aux: 'puddingcharm', trinket: 'windribbon' };
   /** 장비 칸 그림 — 1x = size 파일 · 2x = @256 파일(size 256 이면 한 장). 보통 url → -webkit-image-set → image-set 순으로 넣어 엔진이 받는 마지막 값만 남는다
@@ -50555,7 +50567,7 @@ window.TT_SFX = {
   function gearBossRoll(n, rng) { var d = dropTableFor(n); return d.boss ? gearRollFrom(d.boss, d.statP, rng) : null; }
 
   /* 판정판 74 — 획득표 모달. 숫자는 전부 dropTableFor(n) — 판 추첨과 같은 표라 카드의 확률과 판의 확률이 갈라질 수 없다
-     (스펙 §D-3 「숫자 출처 1개」). 새 부품 0: 판·리본·X 는 노드 카드 조각, 칸은 cpItemCell, Lv 는 그 값 알약. */
+     (스펙 §D-3 「숫자 출처 1개」). 새 부품 0: 판·리본·X 는 노드 카드 조각, 칸은 itemTile(8a 칸 한 벌 — 옛 cpItemCell 은 8b 에서 은퇴), Lv 는 그 칸의 Lv 알약. */
   var dropsN = 0;
   /** 확률 → 글자(소수 한 자리까지, 끝 0 없음). 0.36 → "36" · 0.0333 → "3.3". 카드(Task 13)도 이것을 쓴다. */
   function pctTxt(p) { return String(Math.round((+p || 0) * 1000) / 10); }
@@ -51408,23 +51420,37 @@ window.TT_SFX = {
   }
 
   /** [중간 확인 판정 ③] 가방 빈 칸 틀 — 참고 관례 「빈 칸도 칸 틀은 그대로」. 장비 칸 뒤를 같은 모양 · 크기의 빈 틀(옅은 테 · 그림 없음 ·
-   *  누를 수 없음 · aria-hidden)이 채운다. 양 = 열 수(세로 4 · 가로 3) × 구르지 않고 보이는 줄 수(세로는 최소 2줄) — 장비가 그보다 많으면
-   *  격자가 구르고 빈 틀은 마지막 줄만 채운다. 보이는 줄 수는 격자 상자를 재서 구한다(읽기 한 묶음 → 쓰기). 숨은 격자(세로 캐릭터 탭)는
-   *  최소 줄로 채우고, 보이게 되면 크기 관찰(ResizeObserver)이 다시 부른다. */
+   *  누를 수 없음 · aria-hidden)이 채운다. 양 = 열 수(세로 4 · 가로 3) × 온전히 보이는 줄 수(최소 1줄 — 세로 · 가로 같다) — 빈 틀 때문에 격자가
+   *  구르는 일은 없다. 장비가 보이는 칸보다 많을 때만 격자가 구르고(아래 흐림) 빈 틀은 마지막 줄만 채운다.
+   *  [수정 1회차 E2] 옛 「세로 최소 2줄」 은 격자 높이(390 ≈ 1.5줄 · 360 ≈ 1줄)보다 많은 빈 틀을 만들어 빈 줄이 걸치고 「아래 더 있음」 흐림이 거짓으로 켜졌다.
+   *  보이는 줄 수는 격자 상자를 재서 구한다(읽기 한 묶음 → 쓰기). 숨은 격자(세로 캐릭터 탭)는 1줄로 채우고, 보이게 되면 크기 관찰(ResizeObserver)이 다시 부른다.
+   *  [수정 1회차 Q9 (d)] 빈 틀 줄 수를 세기 **전에** 빠듯한 가방 박자([data-tight] · --cb-ring)를 정한다 — 판단식은 보통 박자 상수(u = 격자 column-gap ÷ 3)로 셈하고
+   *  (머리 줄 + 2u + 2.4u + 칸 + 3u + 2u + 안내 줄(글자 × 1.35) + 2u > 판 높이), 지금 켜짐 · 꺼짐의 잰 여백 · 틈은 안 쓴다(켜고 끌 때 왔다 갔다 하지 않게) · 장비 수와 무관.
+   *  그래서 읽기 → 쓰기(박자) → 읽기(그 박자의 격자 높이) → 쓰기(빈 틀) 두 단계다(창 열기 · 탭 · 크기 변화에서만 불린다 — 움직임 중 아님). */
   function cpBagFill() {
     var grid = $('cp-bag-grid');
     if (!grid || !grid.querySelectorAll) return;
-    var old = grid.querySelectorAll('.cp-bag-frame'), i;
-    for (i = 0; i < old.length; i++) grid.removeChild(old[i]);
-    var n = grid.children.length;
-    if (!n) return;
-    var wide = cpWide(), cols = wide ? 3 : 4, rows = wide ? 1 : 2;
-    var gh = grid.clientHeight, first = grid.children[0];
+    /* [수정 1회차 M7] 다 읽고 → 다 쓰기(모션 규칙 5) — 격자 높이 · 첫 칸 높이는 빈 틀과 무관하다(격자는 남는 높이를 채우는 상자 · 칸 크기는 열 폭) */
+    var old = grid.querySelectorAll('.cp-bag-frame'), kids = grid.children, n = 0, first = null, i;
+    for (i = 0; i < kids.length; i++) if (!kids[i].classList.contains('cp-bag-frame')) { n++; if (!first) first = kids[i]; }
+    var wide = cpWide(), cols = wide ? 3 : 4, rows = 1;
+    /* 빠듯한 가방 박자 — 읽기 한 묶음 → 쓰기(속성 · 길이) */
+    var bag = $('cp-bag'), head = bag && bag.querySelector('.cp-bag-head'), note = $('cp-bag-none');
+    if (bag && head && note && first && bag.clientHeight > 0) {
+      var u = (parseFloat(getComputedStyle(grid).columnGap) || 0) / 3, fr = first.getBoundingClientRect();
+      var need = head.getBoundingClientRect().height + 2 * u + (2.4 * u + fr.height + 3 * u) + 2 * u + (parseFloat(getComputedStyle(note).fontSize) || 0) * 1.35 + 2 * u;
+      var tight = need > bag.clientHeight;
+      if (tight) { bag.setAttribute('data-tight', ''); bag.style.setProperty('--cb-ring', (fr.width * 0.08) + 'px'); }
+      else { bag.removeAttribute('data-tight'); bag.style.removeProperty('--cb-ring'); }
+    }
+    var gh = n ? grid.clientHeight : 0;
     if (gh > 0 && first) {
       var cs = getComputedStyle(grid), ch = first.getBoundingClientRect().height;
       var pad = (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0), gap = parseFloat(cs.rowGap) || 0;
       if (ch > 0) rows = Math.max(rows, Math.floor((gh - pad + gap) / (ch + gap)));
     }
+    for (i = 0; i < old.length; i++) grid.removeChild(old[i]);
+    if (!n) return;
     var want = Math.max(cols * rows, Math.ceil(n / cols) * cols);
     for (i = n; i < want; i++) {
       var li = document.createElement('li');
@@ -51438,7 +51464,8 @@ window.TT_SFX = {
    *  ① 개수 「(n)」 까지 한 줄에 들어가면 그대로 → ② 안 들어가면 개수를 뺀다([data-compact] — 낭독 라벨에는 개수 그대로) → ③ 그래도 안 들어가면
    *  줄을 넘긴다([data-wrap] — 알약 줄 한 줄 · 「자동 장착」 다음 줄 오른쪽)고, 넘긴 알약 줄에 개수까지 들어가면 개수를 되살린다.
    *  재는 것 = 알약 줄(.cp-bag-slots)의 내용 폭 > 상자 폭. 숨은 줄(세로 캐릭터 · 펫 탭)은 폭 0 이라 그대로 두고, 보이게 되면 크기 관찰이 다시 부른다.
-   *  상태를 바꿀 때마다 한 번 잰다(fitDesc 와 같은 꼴 — 창 열기 · 탭 · 크기 변화 때만 불리고 움직임 중에는 안 불린다). */
+   *  상태를 바꿀 때마다 한 번 잰다(fitDesc 와 같은 꼴 — 재며 맞추는 함수라 쓰기 → 읽기가 남는다 · 수정 1회차 M7: 창 열기 · 탭 · 크기 변화에서만 불린다 —
+   *  움직임(애니메이션) 중에는 안 불린다). */
   function cpBagHeadFit() {
     var row = $('cp-bag-slots'), head = row && row.parentNode;
     if (!row || !row.removeAttribute || !head || !head.removeAttribute) return;
@@ -51483,34 +51510,37 @@ window.TT_SFX = {
     if (!(own[id] | 0)) return;
     /* [CS37-0910] 장착도 **칸이 그리고 있는 그 캐릭터**에 적용한다 — 그리는 쪽과
        고치는 쪽이 다른 캐릭터를 보면 누른 칸과 켜지는 칸이 어긋난다. */
-    var cid = cpItemCharId(), eq = itemsEq(cid).slice(), at = eq.indexOf(id), j;
+    var cid = cpItemCharId(), eq = itemsEq(cid).slice(), at = eq.indexOf(id);
     if (at >= 0) {
       eq.splice(at, 1);
     } else {
-      for (j = eq.length - 1; j >= 0; j--) {
-        var e = itemById(eq[j]);
-        if (e && e.slot === it.slot) eq.splice(j, 1);
-      }
-      eq.push(id);
-      if (eq.length > ITEM_SLOTS.length) eq.shift();
+      gearEqPut(eq, id);
       dqBump('item', 1);            /* 판정판 50 — 「아이템 장착」 축(끼울 때만) */
     }
     gearEqCommit(cid, eq);
+  }
+  /** 장착 목록 eq 에 장비 하나를 끼운다 — 같은 부위 것을 빼고 넣은 뒤 장착 수 가드(부위 수 넘으면 앞에서부터 뺀다 — 옛 저장의 부위를 모르는 id 가
+   *  섞여도 넘지 않게). toggleItem · gearAutoEquip 이 같이 쓴다([Task 8b 수정 1회차 M9] 가드 한 곳 · 종전 toggleItem 안의 한 번 빼기를 「넘는 동안」 으로). */
+  function gearEqPut(eq, id) {
+    var it = itemById(id), j;
+    for (j = eq.length - 1; j >= 0; j--) {
+      var e = itemById(eq[j]);
+      if (e && it && e.slot === it.slot) eq.splice(j, 1);
+    }
+    eq.push(id);
+    while (eq.length > ITEM_SLOTS.length) eq.shift();
+    return eq;
   }
 
   /** [판정판 121 · Task 8b] 자동 장착 — 구경 중 캐릭터의 부위마다 보유 장비 중 등급 높은 것 → 레벨 높은 것 → ITEM_POOL 순 첫째를 낀다
    *  (가방 순서 gearBagList 의 첫 칸). 이미 그것이면 그대로. 저장 · 칸 · 막대는 toggleItem 과 같은 길(gearEqCommit). 결과 토스트 한 줄.
    *  「아이템 장착」 축(dqBump)은 새로 낀 부위 수만큼(toggleItem 의 「끼울 때 1」 과 같은 셈). */
   function gearAutoEquip() {
-    var cid = cpItemCharId(), eq = itemsEq(cid).slice(), changed = 0, s, j;
+    var cid = cpItemCharId(), eq = itemsEq(cid).slice(), changed = 0, s;
     for (s = 0; s < ITEM_SLOTS.length; s++) {
       var slot = ITEM_SLOTS[s], best = gearBagList(slot)[0];
       if (!best || gearSlotItem(cid, slot) === best.it.id) continue;
-      for (j = eq.length - 1; j >= 0; j--) {
-        var e = itemById(eq[j]);
-        if (e && e.slot === slot) eq.splice(j, 1);
-      }
-      eq.push(best.it.id);
+      gearEqPut(eq, best.it.id);    /* toggleItem 과 같은 끼우기 · 장착 수 가드(M9) */
       changed++;
     }
     if (changed) { dqBump('item', changed); gearEqCommit(cid, eq); }
@@ -51647,11 +51677,14 @@ window.TT_SFX = {
     var m = $('modal-gear-info'), cp = $('charpanel');
     if (cp && !cp.hidden && m) {
       /* 캐릭터 방 위의 카드 — 겹친 창 규칙(winShow)을 안 탄다: 방은 창이 아니라 화면이라 카드 아래에 그대로 보여야 한다
-         ([중간 확인 판정 ⑤] 규격 §1 — 세로 = 옅은 막 아래 방이 보이고 · 가로 = 막 없이 왼쪽 기둥에 붙는다(판 밖 누름 통과)) */
+         ([중간 확인 판정 ⑤] 규격 §1 — 세로 = 옅은 막 아래 방이 보이고 · 가로 = 막 없이 왼쪽 기둥에 붙는다(판 밖 누름 통과)).
+         [수정 1회차 M6] data-gi = 「방 위에 카드가 떠 있다」(방향과 무관). 붙었나(가로)는 그때그때 cpWide() — CSS 는 가로 미디어 안의 [data-gi] 만 붙인다.
+         [수정 1회차 M5] 세로(막 아래 방)일 때 방은 inert(data-under 는 안 단다 — 보이게) — cpGiInert. */
       m.hidden = false;
       winLift(m);
       healHeads(m);
-      if (cpWide()) cp.setAttribute('data-gi', ''); else cp.removeAttribute('data-gi');
+      cp.setAttribute('data-gi', '');
+      cpGiInert();
     } else {
       openModal('modal-gear-info');
     }
@@ -51664,17 +51697,30 @@ window.TT_SFX = {
     closeModal('modal-gear-info');
     var cp = $('charpanel');
     if (cp) cp.removeAttribute('data-gi');
+    cpGiInert();
     cpBagRing();
     if (!quiet) J.sfx.ui();
   }
+  /** 지금 기둥에 붙은 카드인가 — 방 위 카드(data-gi) + 가로(그때그때 — 수정 1회차 M6: 열린 채 창을 돌려도 맞는 쪽). */
+  function cpGiDocked() {
+    var cp = $('charpanel');
+    return !!(cp && cp.hasAttribute('data-gi') && cpWide());
+  }
+  /** [수정 1회차 M5] 세로 카드가 떠 있는 동안 막 아래 캐릭터 방 = inert(키보드 Tab · Enter 가 뒤 단추에 안 닿는다 · 보이기는 그대로).
+   *  가로(붙은 카드 = 방의 일부) · 카드 없음 = 풀림. 방이 다른 창에 깔렸으면(data-under) 그 창이 정한다(winShow · winLift). 창을 돌리면 다시 부른다. */
+  function cpGiInert() {
+    var cp = $('charpanel');
+    if (!cp || cp.hasAttribute('data-under')) return;
+    winInert(cp, cp.hasAttribute('data-gi') && !cpWide());
+  }
 
-  /** [장착]/[해제] — toggleItem(저장 · 칸 · 막대 · 소리) 뒤 세로는 카드가 닫혀 캐릭창으로 · 가로(기둥에 붙은 카드)는 그대로 두고 단추만 바뀐다(지휘자 판정 3). */
+  /** [장착]/[해제] — toggleItem(저장 · 칸 · 막대 · 소리 — syncItemList 가 떠 있는 카드도 다시 칠한다) 뒤 세로는 카드가 닫혀 캐릭창으로 ·
+   *  가로(기둥에 붙은 카드)는 그대로 두고 단추만 바뀐다(지휘자 판정 3). */
   function gearAct() {
     if (!gearInfoId) return;
-    var cp = $('charpanel'), docked = !!(cp && cp.hasAttribute('data-gi'));
+    var docked = cpGiDocked();
     toggleItem(gearInfoId);
-    if (docked) paintGearInfo();
-    else closeGearInfo(true);
+    if (!docked) closeGearInfo(true);
   }
 
   /** 캐릭터 옆 장비 칸 누름(브리프 2 · 지휘자 판정 4 · 5) — 장비 칸 = 장비 탭(세로) · 가방이 그 부위로 · 그 칸이 고른 칸(▼) · 낀 장비면 설명 카드 /
@@ -51689,9 +51735,10 @@ window.TT_SFX = {
     if (ITEM_SLOTS.indexOf(slot) < 0) return;
     cpBagSlot = slot;
     var id = gearSlotItem(cpItemCharId(), slot);
+    /* cpTab 이 끝에서 syncItemList 를 부른다 — 탭을 바꾸지 않을 때만 따로 부른다(수정 1회차 M7 — 격자 다시 짓기 한 번) */
     if (!cpWide()) cpTab('gear');
     else if (cpTabCur === 'pet') cpTab('char');
-    syncItemList();
+    else syncItemList();
     var gr = $('cp-bag-grid');
     if (gr) gr.scrollTop = 0;
     if (id) { openGearInfo(id); return; }
@@ -52449,6 +52496,13 @@ window.TT_SFX = {
       if (id) openGearInfo(id);
     });
     on($('cp-auto'), 'click', gearAutoEquip);
+    /* [Task 8b 수정 1회차 M6] 카드가 떠 있는 채 창 방향이 바뀌면(가로 ↔ 세로) 방 inert · 카드 맞춤을 다시 정한다 — 붙었나는 cpGiDocked 가 그때그때 잰다 */
+    (function () {
+      var mq = (typeof window !== 'undefined' && window.matchMedia) ? window.matchMedia('(min-aspect-ratio: 1/1)') : null;
+      if (!mq) return;
+      var f = function () { cpGiInert(); gearInfoFit(); };
+      if (mq.addEventListener) mq.addEventListener('change', f); else if (mq.addListener) mq.addListener(f);
+    })();
     /* 구르는 본문(정보 장 다섯 + 펫 · 가방 격자) — 굴리면 · 크기가 바뀌면(창 · 탭 · 글꼴 적재) 아래 흐림 표시를 다시 잰다(cpMore) */
     (function () {
       var els = document.querySelectorAll('#charpanel .cp-info > .ci, #cp-bag-grid');
@@ -52501,9 +52555,9 @@ window.TT_SFX = {
       /* [판정판 121 · Task 5] 장비 창 · 스킨 시트 밑에 깔린 동안(data-under)은 넘기지 않는다 — 구경 캐릭터가 바뀌면 끼기가 다른 캐릭터에 걸린다. */
       if (!panel || panel.hidden || panel.hasAttribute('data-under')) return;
       /* [Task 8b] 폰 설명 카드는 캐릭창을 깔지 않고(data-under 없이 막 아래에 보인다 — 중간 확인 판정 ⑤) 떠 있다 — 그동안도 같은 이유로 안 넘긴다.
-         가로에서 기둥에 붙은 카드(data-gi)는 방의 일부라 넘기면 카드가 새 캐릭터 기준으로 다시 칠해진다(syncItemList → paintGearInfo). */
+         가로에서 기둥에 붙은 카드(cpGiDocked — 지금 방향으로 잰다 · 수정 1회차 M6)는 방의 일부라 넘기면 카드가 새 캐릭터 기준으로 다시 칠해진다(syncItemList → paintGearInfo). */
       var gim = $('modal-gear-info');
-      if (gim && !gim.hidden && !panel.hasAttribute('data-gi')) return;
+      if (gim && !gim.hidden && !cpGiDocked()) return;
       var tag = ev.target && ev.target.tagName;
       if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
       ev.preventDefault();
@@ -52896,7 +52950,9 @@ window.TT_SFX = {
         if (cpEsc && !cpEsc.hidden && cpEsc.getClientRects && cpEsc.getClientRects().length) {
           /* [판정판 121 · Task 5 → Task 8b] ⓪ 장비 설명 카드(z74 — 세로는 패널을 깔고 · 가로는 왼쪽 기둥에 붙는다) — 패널에서 태어난 한 겹.
              패널이 그 밑에 깔려 있어도(data-under · visibility) hidden 이 아니고 상자도 있으므로 이 가지로 들어온다. 장비 목록 창(z73)은 은퇴. */
-          if ($('modal-gear-info') && !$('modal-gear-info').hidden) { closeGearInfo(); return; }
+          /* [수정 1회차 I1] 다른 창에 깔린(data-under — 겹친 창 규칙으로 숨은) 카드는 건너뛴다: 가로에서 카드가 붙은 채 [스킨]을 열면 스킨이 맨 위 */
+          var giEsc = $('modal-gear-info');
+          if (giEsc && !giEsc.hidden && !giEsc.hasAttribute('data-under')) { closeGearInfo(); return; }
           /* [INV-0911] ⓪ 초대 창은 스킨 시트와 같은 겹(패널 위의 한 장)이다.
              둘이 동시에 뜰 수 없으므로 순서는 자유이고, 스킨 앞에 둔 것은
              이 파도가 만든 것을 먼저 읽게 하려는 편의뿐이다. */
@@ -59351,8 +59407,7 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
 .kit-pill-v2[data-variant="soft"][data-press]{
   transform: translateY(calc(var(--f2-bh) * .04));
 }
-.kit-pill-v2[data-variant="soft"][disabled],
-.gear-row .sk-act.kit-pill-v2{ opacity:.55; }   /* [판정판 121 · Task 5] 장비 목록 「착용 중」 = 스킨 시트 「착용 중」과 같은 변주(단추 줄 안이라 disabled 대신 자리로 잡는다) */
+.kit-pill-v2[data-variant="soft"][disabled]{ opacity:.55; }   /* [Task 8b 수정 1회차 M1] 장비 목록 줄(.gear-row 「착용 중」) 선택자는 목록 창과 함께 은퇴 */
 
 /* ============================================================
    4. .kit-chip-v2 — 캐러셀 원형 칩. [data-active]
@@ -66224,7 +66279,9 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
      `position: fixed` 이라 offsetParent 가 **항상 null** 이다. 그래서 캐릭터 패널
      분기가 한 번도 안 돌았고(실클릭 smoke 실측: 선택창에서 뒤로가기 = 앱 종료),
      getClientRects().length 로 바꾸면 fixed 도 같은 질문에 바르게 답한다. */
-  function vis(el) { return !!(el && !el.hidden && el.getClientRects().length); }
+  /* [Task 8b 수정 1회차 I1] 다른 창 아래 깔린 창(data-under — 겹친 창 규칙 · visibility 로 숨음) 안의 단추는 상자가 있어도 「안 보임」 —
+     뒤로가기가 숨은 창의 ✕ 를 먼저 누르지 않게(가로 붙은 카드 위 스킨). */
+  function vis(el) { return !!(el && !el.hidden && el.getClientRects().length && !(el.closest && el.closest('[data-under]'))); }
   function isOpen(id) { var e = d.getElementById(id); return !!(e && !e.hidden); }
 
   /** 이미 있는 버튼을 그대로 누른다. 안 보이면 아무 일도 안 하고 false. */
@@ -66272,6 +66329,7 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
   function selfBack() {
     for (var i = 0; i < SELF_BACK.length; i++) {
       if (!isOpen(SELF_BACK[i][0])) continue;
+      if (d.getElementById(SELF_BACK[i][0]).hasAttribute('data-under')) continue;   /* [수정 1회차 I1] 깔린 창은 건너뛴다 — 맨 위 한 겹부터 */
       if (SELF_BACK[i][1] && tap(SELF_BACK[i][1])) return true;
       var G = window.Game;
       if (G && G.menu) { G.menu(); return true; }
@@ -71234,9 +71292,10 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
 <style id="gear-121">
 /* ===== [판정판 121 · 2026-10-17 Task 5] 겹친 창 규칙 + 장비 목록 · 설명 창 ==================================================
    사용자 6번(그림 31 · 39 — 판 정보 위 획득표가 비치고 ✕ 둘) · 13번(그림 37 · 41 — 장비 교체 · 설명 창 없음). 스펙 §7 · §8 · 지휘자 판정 R1~R5 · Q1~Q8.
-   JS 짝: winShow · winHide · winReset(openModal 곁 — 겹친 창) · openGear · paintGearList · openGearInfo · paintGearInfo · gearAct(toggleItem 곁).
-   부품은 전부 있던 것이다 — 창 틀 · 제목 캡슐 · ✕ = 스킨 시트(.w6m) · 줄 = 스킨 시트 줄 문법 · 그림 칸 = 획득표 칸(cpItemCell, 그 규칙들의 선택자 목록에
-   두 창을 더했다) · 단추 = kit-btn-v2. 이 블록은 그 부품에 없는 것만 적는다. 새 원시값 0(색 · 알파 0, 길이는 가로 = 무대 자 u · 세로 = cqw) · 움직임 0. */
+   JS 짝: winShow · winHide · winReset(openModal 곁 — 겹친 창) · openGearInfo · paintGearInfo · gearAct(toggleItem 곁).
+   [Task 8b 수정 1회차 M2] 장비 목록 창(openGear · paintGearList)과 옛 칸(cpItemCell)은 8b 에서 은퇴 — 이 블록에 남은 것은 겹친 창 규칙 · 설명 카드 틀 몫뿐이고,
+   카드 안 짜임 · 칸은 <style id="charroom-8b"> · itemTile(<style id="itile-8a">). 부품은 전부 있던 것이다 — 창 틀 · 제목 캡슐 · ✕ = 스킨 시트(.w6m) ·
+   단추 = kit-btn-v2. 이 블록은 그 부품에 없는 것만 적는다. 새 원시값 0(색 · 알파 0, 길이는 가로 = 무대 자 u · 세로 = cqw) · 움직임 0. */
 
 /* ---- 0. 겹친 창 — 깔린 창(data-under)은 숨는다. 자손까지 거는 이유: 캐릭창 정보 카드(.cp-info > .ci · #cp-petinfo)가
    visibility:visible 을 스스로 선언해 부모만 숨기면 비친다(실측 · 판정 R1). hidden 은 그대로라 Esc · 뒤로가기 판정 무변. ---- */
@@ -71714,20 +71773,23 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
   gap: calc(var(--cb-u) * 2);
   padding: 0 calc(var(--cb-u) * 3.61);
 }
-/* [2차 판정 6] 머리 줄 = 알약 안 좌우 여백 ≥ 그 글자 .5em · 알약(+ 자동 장착) 사이 ≥ 4u(가로 무대 자 · 세로는 --stage-u 가 없어 0 — 판 자 틈이 그대로).
+/* [2차 판정 6] 머리 줄 = 알약 안 좌우 여백 ≥ 그 글자 .5em · 알약(+ 자동 장착) 사이 ≥ 4u = --cr-gap4.
+   [수정 1회차 판정 I2 · 단위 답] 4u = 가로 무대 자 4u · 세로 = 판 자 --cb-u × 1.072(390x844 → 4.00px · 360x640(낮은 창 판 88vw) → 3.40px — 가방의 다른 길이와 같은 단위).
+   대상 셋 = 머리 줄 사이 · 알약 사이 · 넘긴 줄 사이(각자 판 자 틈과 큰 쪽).
    알약은 줄지 않는다(글자가 테에 닿던 844x390 결함) — 줄에 안 들어가면 JS(cpBagHeadFit)가 [data-compact] 를 달아 개수 「(n)」 를 뺀다(낭독 라벨에는 개수 그대로). */
+#charpanel .cp-bag { --cr-gap4: calc(var(--cb-u) * 1.072); }
 #charpanel .cp-bag-head {
   flex: 0 0 auto;
   display: flex;
   align-items: center;
-  gap: max(calc(var(--stage-u, 0px) * 4), calc(var(--cb-u) * 1.6));
+  gap: max(var(--cr-gap4), calc(var(--cb-u) * 1.6));
 }
 #charpanel .cp-bag-slots {
   flex: 1 1 auto;
   min-width: 0;
   display: flex;
   align-items: center;
-  gap: max(calc(var(--stage-u, 0px) * 4), calc(var(--cb-u) * 1.2));
+  gap: max(var(--cr-gap4), calc(var(--cb-u) * 1.2));
 }
 #charpanel .cp-bag-slot.kit-pill-v2 {
   --f2-ph: calc(var(--cb-u) * 7.4);
@@ -71749,7 +71811,7 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
    줄 사이 = 알약 사이와 같은 틈. 넘긴 뒤 알약 줄에 개수까지 들어가면 개수를 되살린다(cpBagHeadFit). */
 #charpanel .cp-bag-head[data-wrap] {
   flex-wrap: wrap;
-  row-gap: max(calc(var(--stage-u, 0px) * 4), calc(var(--cb-u) * 1.6));
+  row-gap: max(var(--cr-gap4), calc(var(--cb-u) * 1.6));
 }
 #charpanel .cp-bag-head[data-wrap] > .cp-bag-slots { flex: 1 0 100%; }
 #charpanel .cp-bag-head[data-wrap] > #cp-auto { margin-left: auto; }
@@ -71818,8 +71880,15 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
   color: var(--prim-art-ink);
 }
 #charpanel .cp-bag-none[hidden] { display: none; }
+/* [수정 1회차 Q9 (d) 빠듯한 가방 박자] 보통 박자(틈 2u · 격자 위 2.4u · 아래 3u · 안내 줄 아래 2u)로 장비 0 을 놓으면 첫 줄이 온전히 안 들어가는 판(360x640 등)에서만 —
+   세로 간격 셋(머리 줄 ↔ 격자 · 격자 ↔ 안내 줄 · 안내 줄 아래)을 같은 비율로 1.4u 로 줄이고 격자 위 · 아래 안 여백을 칸 폭 8%(고른 칸 바깥 테 몫 · cpBagFill 이 잰 값 --cb-ring)로.
+   켜고 끄기 = cpBagFill(판 높이로 · 장비 수와 무관). 칸 크기 · 판 높이 · 좌우 여백 · 칸 사이 틈 · 글자는 그대로. */
+#charpanel .cp-bag[data-tight] { gap: calc(var(--cb-u) * 1.4); }
+#charpanel .cp-bag[data-tight] .cp-bag-grid { padding-top: var(--cb-ring); padding-bottom: var(--cb-ring); }
+#charpanel .cp-bag[data-tight] .cp-bag-none { margin-bottom: calc(var(--cb-u) * 1.4); }
 
-/* ---- 3. 설명 카드(#modal-gear-info) 안 — 윗줄(큰 칸 36% + 이름 · 등급 칩 · 부위 · Lv) · 효과 · 뜻 한 줄 · 비교 줄 · 분위기 · ○○도 · 단추 ---- */
+/* ---- 3. 설명 카드(#modal-gear-info) 안 — 윗줄(큰 칸 36% + 이름 · 등급 칩 · 부위 · Lv) · 효과 · 뜻 한 줄 · 분위기 · 비교 줄 · ○○도 · 단추
+   ([수정 1회차 E1] 장비 자기 줄(이름 · 효과 · 뜻 · 분위기)이 붙고 고르는 데 쓰는 줄(비교 · ○○도)은 단추 곁 — 마크업 차례로) ---- */
 #modal-gear-info .sheet { --gi-u: calc(var(--f2-w) / 100); text-align: left; }
 #modal-gear-info .gi-top {
   display: grid;
@@ -72150,6 +72219,7 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
     top: calc(var(--cr-top) + var(--stage-u) * 18);
     bottom: calc(var(--cr-bot) + var(--stage-u) * 10);
     --f2-w: calc(var(--stage-u) * 380);
+    --cr-gap4: calc(var(--stage-u) * 4);                      /* 가로 4u = 무대 자(수정 1회차 I2 — 세로는 위 .cp-bag 의 창 폭 비) */
     padding: 0 calc(var(--stage-u) * 16);
   }
   #charpanel .cp-bag-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); --it-w: calc(var(--cb-u) * 26); }
@@ -72198,9 +72268,7 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
   #modal-gear-info .gi-eff,
   #modal-gear-info .gi-effd,
   #modal-gear-info .gi-fl { font-size: var(--crp-fs-desc); }
-  /* 분위기 = 스킬 설명 글자 · 옅은 잉크만 다르다. 옅은 잉크 = 판 위 옅은 글의 선례(판 정보 .nc-note · --role-f2-ink — 8a D5 4.77) —
-     --prim-art-ink-2(#8A6553)는 이 판 위 대비 3.88 이라 D5(≥ 4.5 · 판정 9) 미달 */
-  #modal-gear-info .gi-fl { color: var(--role-f2-ink); }
+  /* 분위기 = 스킬 설명 글자 · 잉크(--prim-art-ink · 세로와 같음) — 위계는 굵기로만(분위기 400 · 효과 800 · 뜻 700). 옅은 잉크를 안 쓰는 까닭: --prim-art-ink-2 3.88 · --role-f2-ink 4.48 로 이 판 위 4.5 미달이고 판 면은 건드리지 않는다(수정 1회차 Q6) */
   #modal-gear-info #gi-chip { font-size: var(--crp-fs-pill); }
   /* 카드가 떠 있는 동안 정보 판은 숨는다(장 .ci 가 visibility:visible 을 스스로 선언해 visibility 로는 비친다 — 탭은 자리 유지 · 정보는 상자째) */
   #charpanel[data-gi] .cp-card > .cp-tabs { visibility: hidden; }
