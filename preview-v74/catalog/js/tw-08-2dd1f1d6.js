@@ -10,7 +10,7 @@ history.pushState({ tw: SENTINEL }, '');
 }
 } catch (e) { /* 사파리 사생활 모드 등: 뒤로가기는 원래대로 동작한다 */ }
 }
-function vis(el) { return !!(el && !el.hidden && el.getClientRects().length && !(el.closest && el.closest('[data-under]'))); }
+function vis(el) { return !!(el && !el.hidden && el.getClientRects().length); }
 function isOpen(id) { var e = d.getElementById(id); return !!(e && !e.hidden); }
 function tap(id) {
 var b = d.getElementById(id);
@@ -20,6 +20,7 @@ return true;
 }
 var SELF_BACK = [
 ['modal-gear-info', 'gi-close'],
+['modal-gear',     'gear-close'],
 ['modal-skin',     'sk-close'],
 ['modal-settings', 'st-close'],
 ['modal-over',     'btn-menu'],
@@ -34,7 +35,6 @@ return false;
 function selfBack() {
 for (var i = 0; i < SELF_BACK.length; i++) {
 if (!isOpen(SELF_BACK[i][0])) continue;
-if (d.getElementById(SELF_BACK[i][0]).hasAttribute('data-under')) continue;   /* [수정 1회차 I1] 깔린 창은 건너뛴다 — 맨 위 한 겹부터 */
 if (SELF_BACK[i][1] && tap(SELF_BACK[i][1])) return true;
 var G = window.Game;
 if (G && G.menu) { G.menu(); return true; }
