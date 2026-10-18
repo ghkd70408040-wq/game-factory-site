@@ -136,6 +136,8 @@ corner-shape:var(--jbox-corner);     /* 시트 자신은 배경·접지를 안 �
 --jbox-tint:var(--modal-tint);
 --jbox-blur:none;
 }
+.modal :is(.jbox--modal, [data-part="modal-plate"]){ --jbox-a-in: var(--mode-a-alpha-win); }
+.modal .grade-note { color: var(--prim-art-ink); }
 .jbox--modal::before,
 [data-part="modal-plate"]::before,
 #app.battle #screen-game.active #pc-left[data-wide-only]::before,
@@ -2233,7 +2235,7 @@ min-width: calc(var(--f2-bh) * 5.68);
 --f2-cl: var(--role-f2-btn2-line);
 min-width: calc(var(--f2-bh) * 1.60);
 padding: 0 calc(var(--f2-bh) * .12);
-font-size: calc(var(--f2-bh) * .235);
+font-size: max(var(--text-min), calc(var(--f2-bh) * .235));
 --f2-sp1-x: 15%; --f2-sp1-y: 16%; --f2-sp1-w: 11%; --f2-sp1-h: 13%;
 --f2-sp2-x: 26%; --f2-sp2-y: 11%; --f2-sp2-w: 4%;  --f2-sp2-h: 6%;
 --f2-sp3-x: 9%;  --f2-sp3-y: 33%; --f2-sp3-w: 4%;  --f2-sp3-h: 5%;
@@ -2348,7 +2350,7 @@ border-radius: 999em;                       /* 완전 알약 r = H/2 */
 background: var(--f2-pill-soft);
 color: var(--f2-ink, #6B5F6E);
 font-weight: 800;
-font-size: calc(var(--f2-bh) * .46);
+font-size: max(var(--text-min), calc(var(--f2-bh) * .46));
 box-shadow:
 0 0 calc(var(--f2-bh) * .144) calc(var(--f2-bh) * .02)
 color-mix(in srgb, var(--role-f2-pill-soft-e) 74%, transparent);
@@ -3337,7 +3339,7 @@ border: 0;
 padding: 0;
 }
 #charpanel .ci-tag-k {
-font-size: calc(var(--f2-w) * .030);
+font-size: max(var(--text-min), calc(var(--f2-w) * .030));
 font-weight: 800;
 color: var(--f2-ink);
 background: none;
@@ -3374,7 +3376,7 @@ gap: calc(var(--f2-w) * .020);
 }
 #charpanel .cs-k {
 flex: 0 0 calc(var(--f2-w) * .180);
-font-size: calc(var(--f2-w) * .030);
+font-size: max(var(--text-min), calc(var(--f2-w) * .030));
 font-weight: 900;
 text-align: right;
 white-space: nowrap;   /* 라벨은 한 줄(판정판 74 · R .180 실측, 지휘자 판정 Q1) — 칸이 모자라면 */
@@ -3419,7 +3421,7 @@ border-radius: 999px;
 background: var(--f2-pill-soft);
 color: var(--f2-ink);
 font-family: inherit;
-font-size: calc(var(--f2-w) * .0235);
+font-size: max(var(--text-min), calc(var(--f2-w) * .0235));
 font-weight: 900;
 line-height: 1;
 text-shadow: none;
@@ -3462,7 +3464,7 @@ background: var(--f2-pill-soft);
 box-shadow: inset 0 0 0 calc(var(--f2-w) * .0027) var(--f2-pill-line);
 color: var(--f2-ink);
 font-family: var(--font-display);
-font-size: calc(var(--f2-w) * .0250);
+font-size: max(var(--text-min), calc(var(--f2-w) * .0250));
 font-style: normal;
 font-weight: 900;
 line-height: calc(var(--f2-w) * .0375);
@@ -3633,7 +3635,7 @@ background: linear-gradient(180deg,
 color-mix(in srgb, var(--cs-desc-box) calc(var(--cs-desc-a) * 100%), transparent),
 color-mix(in srgb, var(--cs-desc-box-2) calc(var(--cs-desc-a) * 100%), transparent));
 overflow: hidden;
-font-size: calc(var(--f2-w) * .0285);
+font-size: max(var(--text-min), calc(var(--f2-w) * .0285));
 line-height: 1.30;
 color: var(--f2-ink);
 }
@@ -3648,7 +3650,7 @@ gap: calc(var(--f2-w) * .008);
 }
 #charpanel .cp-rec .cp-rec-k {
 margin: 0;
-font-size: calc(var(--f2-w) * .030);
+font-size: max(var(--text-min), calc(var(--f2-w) * .030));
 font-weight: 800;
 line-height: 1.15;
 }
@@ -3678,7 +3680,7 @@ overflow-wrap: anywhere;
 #charpanel .ci-desc .cc-head {
 flex: 0 0 auto;
 margin: 0;
-font-size: calc(var(--f2-w) * .030);
+font-size: max(var(--text-min), calc(var(--f2-w) * .030));
 font-weight: 900;
 text-align: center;
 letter-spacing: -.02em;
@@ -3691,7 +3693,7 @@ align-items: center;
 gap: calc(var(--f2-w) * .012);
 margin: 0;
 min-width: 0;
-font-size: calc(var(--f2-w) * .0300);
+font-size: max(var(--text-min), calc(var(--f2-w) * .0300));
 font-weight: 900;
 color: var(--f2-ink);
 }
@@ -3716,8 +3718,8 @@ linear-gradient(160deg, #EFE6EC 0%, #D8C0BC 100%);
 box-shadow: 0 0 0 calc(var(--f2-w) * .0040) rgba(255,255,255,.55);
 }
 #charpanel .ci-desc .cc-ic svg { width: 86%; height: 86%; display: none; }
-#charpanel .ci-desc.cp-tight .cc-name   { font-size: calc(var(--f2-w) * .0276); }
-#charpanel .ci-desc.cp-tight-2 .cc-name { font-size: calc(var(--f2-w) * .0254); }
+#charpanel .ci-desc.cp-tight .cc-name   { font-size: max(var(--text-min), calc(var(--f2-w) * .0276)); }
+#charpanel .ci-desc.cp-tight-2 .cc-name { font-size: max(var(--text-min), calc(var(--f2-w) * .0254)); }
 #charpanel .ci-desc .cc-tip { display: none; }
 #charpanel .ci-desc .cc-line {
 display: block;
@@ -3728,7 +3730,7 @@ min-width: 0;
 #charpanel .ci-desc .cc-k {
 display: inline;
 flex: none;
-font-size: calc(var(--f2-w) * .0275);
+font-size: max(var(--text-min), calc(var(--f2-w) * .0275));
 font-weight: 900;
 color: var(--role-f2-btn2-line);
 background: none;
@@ -3740,14 +3742,14 @@ margin-right: calc(var(--f2-w) * .012);
 #charpanel .ci-desc .cc-pass,
 #charpanel .ci-desc .cc-ult {
 display: inline;
-font-size: calc(var(--f2-w) * .0285);
+font-size: max(var(--text-min), calc(var(--f2-w) * .0285));
 font-weight: 700;
 color: var(--f2-ink);
 word-break: keep-all;
 overflow-wrap: anywhere;
 }
-#charpanel .ci-desc.cp-tight   { font-size: calc(var(--f2-w) * .0258); line-height: 1.24; }
-#charpanel .ci-desc.cp-tight-2 { font-size: calc(var(--f2-w) * .0234); line-height: 1.20; }
+#charpanel .ci-desc.cp-tight   { font-size: max(var(--text-min), calc(var(--f2-w) * .0258)); line-height: 1.24; }
+#charpanel .ci-desc.cp-tight-2 { font-size: max(var(--text-min), calc(var(--f2-w) * .0234)); line-height: 1.20; }
 #charpanel .ci-desc.cp-tight   .cc-pass,
 #charpanel .ci-desc.cp-tight   .cc-ult,
 #charpanel .ci-desc.cp-tight   .cc-k { font-size: inherit; }
@@ -3855,10 +3857,6 @@ body:has(.modal:not([hidden])) #screen-menu .mbtn,
 body:has(.modal:not([hidden])) #screen-menu .mbtn-lab{
 opacity: 0;
 }
-#screen-menu, #screen-map, #screen-game { transition: filter 160ms var(--ease); }
-body:has(.modal:not([hidden])) #screen-menu,
-body:has(.modal:not([hidden])) #screen-map,
-body:has(.modal:not([hidden])) #screen-game { filter: blur(6px); }
 @media (max-height: 700px) {
 }
 @supports (clip-path: shape(from 0px 0px, close)) {
@@ -5519,7 +5517,7 @@ border-radius: 999px;
 background: color-mix(in srgb, var(--f2-tab-on) 82%, transparent);
 box-shadow: inset 0 0 0 calc(var(--f2-w) * .0022)
 color-mix(in srgb, #6B5A69 36.3%, transparent);
-font-size: calc(var(--f2-w) * .0230);
+font-size: max(var(--text-min), calc(var(--f2-w) * .0230));
 font-weight: 900;
 line-height: 1.45;
 color: var(--f2-ink);
@@ -6013,7 +6011,7 @@ padding: calc(var(--f2-w) * .0210) calc(var(--f2-w) * .0804)
 calc(var(--f2-w) * .0956) !important;
 }
 #modal-tutorial .mv2-sheet > h2 { margin-top: 0; }
-#charpanel .cp-side-rec { font-size: calc(var(--f2-w) * .0273); }
+#charpanel .cp-side-rec { font-size: max(var(--text-min), calc(var(--f2-w) * .0273)); }
 #charpanel .cp-side-body { overflow-y: auto; scrollbar-width: none; }
 #charpanel .cp-side-body::-webkit-scrollbar { width: 0; height: 0; }
 #charpanel .cp-sky { background-image: var(--art-menu-day); }
@@ -6491,8 +6489,7 @@ text-shadow: 0 1px 0 rgba(79, 58, 92, .70);
 #modal-node .r10-ribbon,
 #modal-drops .r10-ribbon     { margin-bottom: 0; }
 #modal-node .node-chips:empty { display: none; }   /* 빈 칩 줄이 먹던 한 칸 */
-#modal-node .node-info,
-#modal-drops .dr-list      { margin: 0; }
+#modal-node .node-info      { margin: 0; }
 #modal-node .node-stars     { margin: 0; }
 #modal-node .nrow           { min-height: 48px; }
 #modal-node .node-hearts    { margin-top: 8px; }
@@ -7181,11 +7178,11 @@ z-index:3;
 }
 #app.battle .dh-foe .dh-name{
 left:10.0%;width:35.0%;top:4.6%;height:29.3%;
-font-size:11px;font-size:2.90cqw;font-weight:800;
+font-size:11px;font-size:max(var(--text-min), 2.90cqw);font-weight:800;
 }
 #app.battle .dh-me .dh-name{
 left:40.0%;width:30.0%;top:1.9%;height:33.1%;
-font-size:11px;font-size:2.90cqw;font-weight:800;
+font-size:11px;font-size:max(var(--text-min), 2.90cqw);font-weight:800;
 }
 #app.battle .dh-foe .dh-lv{
 left:76.0%;width:17.3%;top:3.6%;height:32.5%;
@@ -7197,7 +7194,7 @@ font-size:10px;font-size:2.50cqw;font-weight:800;
 }
 html[lang="en"] #app.battle .dh-foe .dh-name{
 left:4.0%;width:47.0%;
-font-size:10px;font-size:2.62cqw;
+font-size:10px;font-size:max(var(--text-min), 2.62cqw);
 }
 #app.battle .dh-bar{
 position:absolute;
@@ -7235,7 +7232,7 @@ left:46.4%;top:0;width:calc(25.6% + 3px);height:15%;
 box-sizing:border-box;padding-right:3px;  /* 그림자 3px 를 상자 안에 — 글자 우끝(280.8px)은 padding 으로 고정 */
 display:flex;align-items:center;justify-content:flex-end;
 margin:0;
-font-size:10px;font-size:2.44cqw;
+font-size:10px;font-size:max(var(--text-min), 2.44cqw);
 color:#FFFFFF !important;
 text-shadow:0 1px 2px rgba(var(--prim-ink-plum-rgb),.85),0 0 3px rgba(var(--prim-ink-plum-rgb),.55) !important;
 z-index:3;

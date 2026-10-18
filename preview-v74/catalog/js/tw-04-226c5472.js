@@ -2130,6 +2130,7 @@ en: {
 'aria.coinplus': 'Get more coins',
 'aria.starplus': 'Get more stars',
 'aria.shoptabs': 'Shop sections',
+'aria.droptabs': 'Drop table sections',   /* [판정판 121 · Task 8a] 획득표 알약 탭 줄 */
 'time.hm': '{h}h {m}m',
 'deals.title': "Today's Deals",
 'deals.hi': "Welcome! Here are today's deals.",
@@ -2477,6 +2478,16 @@ en: {
 'map.plate8': 'Chapter 8: Sugar Prison',
 'map.plate9': 'Chapter 9: The Heart Room',
 'map.plate10': 'Chapter 10: The Throne',
+'map.chip1': 'Ch. 1 · Sweet Map',
+'map.chip2': 'Ch. 2 · Pudding Range',
+'map.chip3': 'Ch. 3 · Candy Cane Desert',
+'map.chip4': 'Ch. 4 · Mint Hills',
+'map.chip5': 'Ch. 5 · Cocoa Gate',
+'map.chip6': 'Ch. 6 · Cream Corridor',
+'map.chip7': 'Ch. 7 · Syrup Maze',
+'map.chip8': 'Ch. 8 · Sugar Prison',
+'map.chip9': 'Ch. 9 · The Heart Room',
+'map.chip10': 'Ch. 10 · The Throne',
 'minimap.title': 'Chapters',
 'minimap.locked': 'Clear stage {n} to unlock',
 'minimap.sum': '{s} stars · {c}/10 chapters open',
@@ -2712,6 +2723,11 @@ en: {
 'drops.use.p': '{x} in 100',
 'drops.gift.h': 'Gift Box',
 'drops.gift.sub': 'On this stage a gift box shows up {p}% of the time. It holds gear {i}% of the time, or a pet or epic gear {x}%.',
+'drops.gift.d': 'It holds gear {i}% of the time, or a pet or epic gear {x}%.',   /* [Task 8a 수정 1회차 A3c] 선물 줄 설명 = drops.gift.sub 둘째 문장 그대로 */
+'drops.gift.p': '{p}% per round',                                            /* 선물 줄 알약 = 얼마나 자주 */
+'drops.gear.cap': '{r} in 100 fruits · {a} per round',
+'drops.note2': 'Chances are per gear fruit',
+'tile.lv': 'Lv {lv}',   /* 장비 칸(itemTile) 레벨 알약 */
 'duel.petshield': 'Squishy Shield! Clock and villain gauge frozen for {n}s',
 'skill.sub.sp': 'AWAKENING',
 'skill.sub.pet': 'PET',
@@ -3279,6 +3295,7 @@ ko: {
 'aria.coinplus': '코인 더 얻기',
 'aria.starplus': '별 더 얻기',
 'aria.shoptabs': '상점 칸 고르기',
+'aria.droptabs': '획득표 구분',   /* [판정판 121 · Task 8a] 획득표 알약 탭 줄 */
 'time.hm': '{h}시간 {m}분',
 'deals.title': '오늘의 특가',
 'deals.hi': '어서 와요! 오늘의 특가예요.',
@@ -3621,6 +3638,16 @@ ko: {
 'map.plate8': '챕터 8: 설탕 감옥',
 'map.plate9': '챕터 9: 심장의 방',
 'map.plate10': '챕터 10: 왕좌',
+'map.chip1': '챕터 1: 달콤한 지도',
+'map.chip2': '챕터 2: 푸딩 산맥',
+'map.chip3': '챕터 3: 캔디 케인 사막',
+'map.chip4': '챕터 4: 박하 언덕',
+'map.chip5': '챕터 5: 초코 관문',
+'map.chip6': '챕터 6: 크림 회랑',
+'map.chip7': '챕터 7: 시럽 미로',
+'map.chip8': '챕터 8: 설탕 감옥',
+'map.chip9': '챕터 9: 심장의 방',
+'map.chip10': '챕터 10: 왕좌',
 'minimap.title': '챕터',
 'minimap.locked': '{n}탄을 깨면 열려요',
 'minimap.sum': '별 {s} · 열린 챕터 {c}/10',
@@ -3856,6 +3883,11 @@ ko: {
 'drops.use.p': '100개 중 {x}개꼴',
 'drops.gift.h': '선물 상자',
 'drops.gift.sub': '이 탄에 들어가면 {p}% 확률로 상자가 나와요. 열면 장비 {i}%, 펫이나 영웅 장비 {x}%예요.',
+'drops.gift.d': '열면 장비 {i}%, 펫이나 영웅 장비 {x}%예요.',   /* [Task 8a 수정 1회차 A3c] 선물 줄 설명 = drops.gift.sub 둘째 문장 그대로 */
+'drops.gift.p': '들어갈 때마다 {p}%',                          /* 선물 줄 알약 = 얼마나 자주 */
+'drops.gear.cap': '과일 100개 중 {r}개꼴 · 한 판 평균 {a}개',
+'drops.note2': '확률은 장비 과일 하나 기준이에요',
+'tile.lv': 'Lv {lv}',   /* 장비 칸(itemTile) 레벨 알약 */
 'duel.petshield': '말랑 방패! {n}초 동안 시계도 악당 게이지도 멈춰요',
 'skill.sub.sp': '각성',
 'skill.sub.pet': '펫 스킬',
@@ -14839,7 +14871,7 @@ tint.style.setProperty('--ch-tint', ch.tint || 'transparent');
 tint.style.setProperty('--ch-tint-a', String(ch.alpha));
 }
 setText('map-ch-k', 'CHAPTER ' + mapChap);
-setText('map-ch-n', t('map.plate' + mapChap));
+setText('map-ch-n', t('map.chip' + mapChap));
 var pv = $('map-ch-prev'), nx = $('map-ch-next');
 var lastCh = Math.min(MAP_CHAPTERS.length, chapMax());
 if (pv) pv.disabled = SIAN_MAP ? (mapChap <= 1 && mapPage <= 0) : mapChap <= 1;
@@ -15263,7 +15295,7 @@ var ht = $('kd-top-heart-t');
 if (ht) { var ms = heartNextMs(); ht.textContent = ms > 0 ? fmtHeartWait(ms) : t('adv.heartfull'); }
 paintCoinChip('kd-top-stars-v');   /* P3 결정 2 — 위 칩 = 코인 지갑(동전 그림과 값 일치) */
 paintChipText('kd-top-star-v', arcComma(store.jstar | 0));
-setText('kd-bot-ch-n', t('map.plate' + Math.min(MAP_CHAPTERS.length, chapMax())));
+setText('kd-bot-ch-n', t('map.chip' + Math.min(MAP_CHAPTERS.length, chapMax())));
 }
 function kdVisit() {
 var k = kdStore(), line = $('kd-visit');
@@ -15551,13 +15583,12 @@ var li = document.createElement('li');
 li.className = 'nc-drop';
 li.setAttribute('data-item', r.id);
 li.setAttribute('data-tier', r.tier);
-var ic = document.createElement('i'); ic.className = 'nc-ic'; ic.setAttribute('aria-hidden', 'true');
-ic.style.setProperty('background-image', itemArtCss(r.id, 64)); li.appendChild(ic);
-if (r.tier !== 'common') { var tb = document.createElement('i'); tb.className = 'nc-tier'; tb.textContent = t('drops.tier.' + r.tier); li.appendChild(tb); }
+var lv = own[r.id] | 0;
+li.setAttribute('aria-label', t('item.' + r.id + '.nm') + ', ' + t('drops.tier.' + r.tier) + ', ' + t('stat.k' + (STAT_KEYS.indexOf(r.stat) + 1))
++ (lv > 0 ? ', ' + t('drops.lv', { lv: lv, max: ITEM_LV_MAX }) : '') + ', ' + t('drops.chance', { p: pctTxt(r.p) }));
+li.appendChild(itemTile(r.id, { tier: r.tier, lv: lv, size: 64 }));
 var pc = document.createElement('b'); pc.className = 'nc-p'; pc.textContent = pctTxt(r.p) + '%'; li.appendChild(pc);
 var nm = document.createElement('span'); nm.className = 'nc-nm'; nm.textContent = t('item.' + r.id + '.nm'); li.appendChild(nm);
-var lv = own[r.id] | 0;
-if (lv > 0) { var lvb = document.createElement('i'); lvb.className = 'nc-lv'; lvb.textContent = t('node.lv', { lv: lv }); li.appendChild(lvb); }
 list.appendChild(li);
 });
 }
@@ -16001,6 +16032,53 @@ function itemArtCss(id, size) {
 var u = itemArtUrl(id, size);
 return u ? ('url("' + u + '")') : 'none';
 }
+var ITILE_EMPTY_ART = { weapon: 'flamescepter', aux: 'puddingcharm', trinket: 'windribbon' };
+function itileArtSet(el, id, size) {
+var u1 = itemArtUrl(id, size);
+if (!u1) return;
+el.style.backgroundImage = 'url("' + u1 + '")';
+var u2 = size === 256 ? '' : itemArtUrl(id, 256);
+if (!u2 || u2 === u1) return;
+var set = 'url("' + u1 + '") 1x, url("' + u2 + '") 2x';
+el.style.backgroundImage = '-webkit-image-set(' + set + ')';
+el.style.backgroundImage = 'image-set(' + set + ')';
+}
+function itemTile(id, o) {
+o = o || {};
+var empty = !!o.empty;
+var neutral = !empty && !!o.art;
+var it = (id && !neutral) ? itemById(id) : null;
+var slot = neutral ? '' : (o.slot || (it ? it.slot : ''));
+var lv = o.lv | 0;
+var size = (o.size === 64 || o.size === 256) ? o.size : 96;
+var el = document.createElement('span');
+el.className = 'itile';
+el.setAttribute('aria-hidden', 'true');
+el.setAttribute('data-tier', (empty || neutral) ? 'none' : (o.tier || (it ? it.tier : 'none')));
+el.setAttribute('data-state', empty ? 'empty' : (neutral ? 'neutral' : (o.eq ? 'eq' : 'own')));
+if (slot) el.setAttribute('data-slot', slot);
+var art = document.createElement('i');
+art.className = 'itile-art';
+if (neutral) art.style.backgroundImage = 'url("' + o.art + '")';
+else {
+var artId = empty ? (ITILE_EMPTY_ART[slot] || '') : id;
+if (artId) itileArtSet(art, artId, size);
+}
+el.appendChild(art);
+if (!empty && lv > 0) {
+var b = document.createElement('b');
+b.className = 'itile-lv';
+b.textContent = t('tile.lv', { lv: lv });
+el.appendChild(b);
+}
+if (!empty && o.eq) {
+var q = document.createElement('i');
+q.className = 'itile-eq';
+q.textContent = '✓';
+el.appendChild(q);
+}
+return el;
+}
 function itemEffOf(id, lv) {
 var it = itemById(id);
 if (!it) return 0;
@@ -16350,31 +16428,68 @@ function gearRoll(n, rng) { var d = dropTableFor(n); return gearRollFrom(d.tiers
 function gearBossRoll(n, rng) { var d = dropTableFor(n); return d.boss ? gearRollFrom(d.boss, d.statP, rng) : null; }
 var dropsN = 0;
 function pctTxt(p) { return String(Math.round((+p || 0) * 1000) / 10); }
+var DROPS_USE_ART = { pet: 'catalog/medal-pet-v3-90.webp', star: 'catalog/medal-awaken-v3-90.webp',
+awk: 'catalog/medal-special-v3-90.webp', gift: 'catalog/lib-glyph-giftbox.webp' };   /* 중립 칸 그림(itemTile o.art) */
+function dropsTab(which) {
+var tabs = document.querySelectorAll('#modal-drops .dr-tab');
+for (var i = 0; i < tabs.length; i++) {
+var on = tabs[i].getAttribute('data-dtab') === which;
+tabs[i].setAttribute('aria-selected', on ? 'true' : 'false');
+if (on) tabs[i].removeAttribute('data-variant'); else tabs[i].setAttribute('data-variant', 'soft');
+}
+var g = $('dr-sec-gear'), u = $('dr-sec-use');
+if (g) g.hidden = which !== 'gear';
+if (u) u.hidden = which !== 'use';
+var body = document.querySelector('#modal-drops .dr-body');
+if (body) body.scrollTop = 0;
+}
+function dropsUseRow(key, name, desc, pill) {
+var li = document.createElement('li');
+li.className = 'dr-urow';
+li.setAttribute('data-use', key);
+li.appendChild(itemTile(null, { art: DROPS_USE_ART[key] }));   /* 중립 칸(data-state neutral · 수정 1회차 A3a — 소비처가 그림 배경을 덮어쓰던 길은 은퇴) */
+var bx = document.createElement('span'); bx.className = 'dr-ub';
+var b = document.createElement('b'); b.className = 'dr-un'; b.textContent = name; bx.appendChild(b);
+var s = document.createElement('span'); s.className = 'dr-ud'; s.textContent = desc; bx.appendChild(s);   /* 제목 + 문장 — 콜론 공식 금지(점검 W1) */
+var p = document.createElement('span'); p.className = 'dr-up kit-pill-v2'; p.setAttribute('data-variant', 'soft'); p.textContent = pill; bx.appendChild(p);   /* 확률 알약 = 크림 알약 부품(soft 변주) — 설명 아래 */
+li.appendChild(bx);
+li.setAttribute('aria-label', name + ', ' + desc + ', ' + pill);
+return li;
+}
 function openDrops(n) {
 var d = dropTableFor(n), own = (store.items && store.items.own) || {}, i;
 dropsN = n;
 setText('drops-title', t('drops.title', { n: n }));
-setText('dr-gear-sub', t('drops.gear.sub', { r: pctTxt(d.rate) }) + ' ' + t('drops.gear.avg', { a: d.avg }));
-setText('dr-tier', t('drops.tier', { c: pctTxt(d.tiers.common), r: pctTxt(d.tiers.rare), e: pctTxt(d.tiers.epic) }));
+setText('dr-cap', t('drops.gear.cap', { r: pctTxt(d.rate), a: d.avg }));
+var chips = $('dr-chips');
+if (chips) {
+chips.innerHTML = '';
+for (i = 0; i < GEAR_TIERS.length; i++) {
+var tr = GEAR_TIERS[i], c = document.createElement('span');
+c.className = 'tchip';
+c.setAttribute('data-tier', tr);
+if (!(d.tiers[tr] > 0)) c.setAttribute('data-zero', '');
+var cl = document.createElement('i'); cl.textContent = t('drops.tier.' + tr); c.appendChild(cl);
+var cv = document.createElement('b'); cv.textContent = t('drops.chance', { p: pctTxt(d.tiers[tr]) }); c.appendChild(cv);
+chips.appendChild(c);
+}
+}
+var bs = $('dr-boss');
+if (bs) { bs.hidden = !d.boss; if (d.boss) setText('dr-boss-sub', t('drops.boss.sub', { r: pctTxt(d.boss.rare), e: pctTxt(d.boss.epic) })); }
 var ul = $('dr-items');
 if (ul) {
 ul.innerHTML = '';
 var rows = d.items.slice().sort(function (a, b) { return (GEAR_TIERS.indexOf(b.tier) - GEAR_TIERS.indexOf(a.tier)) || (b.p - a.p); });
 for (i = 0; i < rows.length; i++) {
-var r = rows[i], it = itemById(r.id), lv = own[r.id] | 0, nm = t('item.' + r.id + '.nm');
+var r = rows[i], lv = own[r.id] | 0, nm = t('item.' + r.id + '.nm');
 var li = document.createElement('li');
-li.className = 'dr-row';
+li.className = 'dr-cell';
 li.setAttribute('data-item', r.id);
 li.setAttribute('data-tier', r.tier);
-li.setAttribute('aria-label', nm + ', ' + t('drops.tier.' + r.tier) + (lv > 0 ? ', ' + t('drops.lv', { lv: lv, max: ITEM_LV_MAX }) : '') + ', ' + t('drops.chance', { p: pctTxt(r.p) }));
-var cell = cpItemCell('empty', it.slot, '', lv > 0 ? t('drops.lv', { lv: lv, max: ITEM_LV_MAX }) : '', r.id, r.tier, nm);
-if (lv > 0) cell.setAttribute('data-state', 'own');
-var ic = cell.querySelector('.cp-cr-ic');
-if (ic) ic.style.setProperty('background-image', itemArtCss(r.id, 64));
-li.appendChild(cell);
+li.setAttribute('aria-label', nm + ', ' + t('drops.tier.' + r.tier) + ', ' + t('stat.k' + (STAT_KEYS.indexOf(r.stat) + 1))
++ (lv > 0 ? ', ' + t('drops.lv', { lv: lv, max: ITEM_LV_MAX }) : '') + ', ' + t('drops.chance', { p: pctTxt(r.p) }));
+li.appendChild(itemTile(r.id, { tier: r.tier, lv: lv, size: 96 }));
 var b = document.createElement('b'); b.className = 'dr-name'; b.textContent = nm; li.appendChild(b);
-var m = document.createElement('i'); m.className = 'dr-meta';
-m.textContent = t('drops.tier.' + r.tier) + ' · ' + t('stat.k' + (STAT_KEYS.indexOf(r.stat) + 1)); li.appendChild(m);
 var pc = document.createElement('span'); pc.className = 'dr-p'; pc.textContent = t('drops.chance', { p: pctTxt(r.p) }); li.appendChild(pc);
 ul.appendChild(li);
 }
@@ -16382,22 +16497,18 @@ ul.appendChild(li);
 var use = $('dr-use');
 if (use) {
 use.innerHTML = '';
-[['pet', '🐾'], ['star', '⭐'], ['awk', '⚡']].forEach(function (u) {
-var li = document.createElement('li');
-li.className = 'dr-row dr-use';
-li.setAttribute('data-use', u[0]);
-var g = document.createElement('i'); g.className = 'dr-glyph'; g.setAttribute('aria-hidden', 'true'); g.textContent = u[1]; li.appendChild(g);
-var b = document.createElement('b'); b.className = 'dr-name'; b.textContent = t('drops.use.' + u[0]); li.appendChild(b);
-var m = document.createElement('i'); m.className = 'dr-meta'; m.textContent = t('drops.use.' + u[0] + '.d'); li.appendChild(m);   /* 제목 + 문장 — 콜론 공식 금지(점검 W1) */
-var pc = document.createElement('span'); pc.className = 'dr-p'; pc.textContent = t('drops.use.p', { x: pctTxt(d.use[u[0]]) }); li.appendChild(pc);
-li.setAttribute('aria-label', t('drops.use.' + u[0]) + ', ' + t('drops.use.' + u[0] + '.d') + ', ' + t('drops.use.p', { x: pctTxt(d.use[u[0]]) }));
-use.appendChild(li);
+['pet', 'star', 'awk'].forEach(function (k) {
+use.appendChild(dropsUseRow(k, t('drops.use.' + k), t('drops.use.' + k + '.d'), t('drops.use.p', { x: pctTxt(d.use[k]) })));
 });
+if (d.gift) {
+var gr = dropsUseRow('gift', t('drops.gift.h'), t('drops.gift.d', { i: pctTxt(d.gift.item), x: pctTxt(d.gift.rare) }),
+t('drops.gift.p', { p: pctTxt(d.gift.stageP) }));
+gr.id = 'dr-gift';
+var gs = gr.querySelector('.dr-ud'); if (gs) gs.id = 'dr-gift-sub';
+use.appendChild(gr);
 }
-var bs = $('dr-boss');
-if (bs) { bs.hidden = !d.boss; if (d.boss) setText('dr-boss-sub', t('drops.boss.sub', { r: pctTxt(d.boss.rare), e: pctTxt(d.boss.epic) })); }
-var gf = $('dr-gift');
-if (gf) { gf.hidden = !d.gift; if (d.gift) setText('dr-gift-sub', t('drops.gift.sub', { p: pctTxt(d.gift.stageP), i: pctTxt(d.gift.item), x: pctTxt(d.gift.rare) })); }
+}
+dropsTab('gear');   /* 창을 다시 열면 장비 과일로 돌아온다 */
 openModal('modal-drops');
 J.sfx.ui();
 }
@@ -17385,6 +17496,12 @@ on($('charintro'), 'click', function () { cinNext(); });
 on($('unlock-go'), 'click', closeUnlock);
 on($('node-close'), 'click', function () { closeModal('modal-node'); J.sfx.ui(); });
 on($('drops-close'), 'click', closeDrops);   /* 74 T12 */
+on(document.querySelector('#modal-drops .dr-tabs'), 'click', function (ev) {
+var b = ev && ev.target && ev.target.closest ? ev.target.closest('.dr-tab') : null;
+if (!b || b.getAttribute('aria-selected') === 'true') return;
+dropsTab(b.getAttribute('data-dtab'));
+J.sfx.ui();
+});
 on(document.querySelector('#modal-node .nc-info'), 'click', ncInfoToggle);   /* 74 T13 — ⓘ 시간 종료 판정 + 별 조건 */
 on(document.querySelector('#modal-node .nc-swap'), 'click', function () { openCharPanel(); });   /* 74 T13 — ⇄ 캐릭터 창 */
 (function () {   /* 74 T13 수정 2회차 N1 — 구획 넘침 표시(ncBodyMore) 배선 */
@@ -18402,6 +18519,7 @@ itemScoreMult: itemScoreMult, itemOn: itemOn, ITEM_POOL: ITEM_POOL,
 grantItem: grantItem, toggleItem: toggleItem, syncItemList: syncItemList,
 openGear: openGear, closeGear: closeGear, openGearInfo: openGearInfo, closeGearInfo: closeGearInfo,
 itemArtUrl: itemArtUrl, itemArtCss: itemArtCss, ITEM_ART: ITEM_ART, itemSrcOf: itemSrcOf, ITEM_SRC: ITEM_SRC,
+itemTile: itemTile, dropsTab: dropsTab,   /* [판정판 121 · Task 8a] 장비 칸 시트(t8a/sheet) · 획득표 탭 손잡이 — 게임 코드는 이 문을 안 거친다 */
 petOwned: petOwned, grantPet: grantPet, petCondBump: petCondBump,
 dropTableFor: dropTableFor, gearRoll: gearRoll, gearRollFrom: gearRollFrom, gearBossRoll: gearBossRoll,
 harvestGear: harvestGear, gearPopFx: gearPopFx, MK_AWK_RATE: MK_AWK_RATE, GEAR_RATE_CH: GEAR_RATE_CH,
