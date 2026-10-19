@@ -38,8 +38,8 @@ var L=("jelly-box-c,duel-title-play,sian2-ribbon,sian2-btn-pink,sian2-btn-purple
 +"ttl-howto-en,ttl-settings-en,ttl-skin-en,ttl-pause-en,ttl-over-en,ttl-rank-en,"
 +"ch-mukmul-face,ch-tiktok-face,ch-kkultteok-face,ch-bangul-face,"
 +"ch-tiktok-full").split(",");
-var V="stage-btn_back,stage-pill_coin,stage-pill_star,stage-btn_settings";
-var VQ="?v=9";                                     /* CSS 쪽 ?v= 와 반드시 같은 값 */
+var V="stage-btn_back,stage-pill_coin,stage-pill_star,stage-btn_settings,stage-pill_chapter,stage-btn_chars,hud-btn-pause,lib-badge-a,lib-badge-b,lib-badge-c,lib-badge-s";
+var VQ="?v=11";                                     /* CSS 쪽 ?v= 와 반드시 같은 값 */
 var i=0,bgmQueued=0;
 function next(){
 if(i>=L.length){ if(!bgmQueued){ bgmQueued=1; warmBgm(); } return; }  /* 그림 끝 → BGM */
