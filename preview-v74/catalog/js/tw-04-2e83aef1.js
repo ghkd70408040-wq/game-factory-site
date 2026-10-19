@@ -4717,7 +4717,7 @@ if (!el) return;
 var fresh = el.hidden || el.hasAttribute('data-under');
 el.hidden = false;
 winLift(el);
-if (!fresh || !el.id) return;
+if (fresh && el.id) {
 var ws = document.querySelectorAll(WIN_SEL);
 for (var i = 0; i < ws.length; i++) {
 var w = ws[i];
@@ -4726,17 +4726,22 @@ w.setAttribute('data-under', el.id);
 winInert(w, true);
 }
 }
+gearRoomInert();
+}
 function winHide(el) {
 if (!el) return;
 el.hidden = true;
 winLift(el);
-if (!el.id) return;
+if (el.id) {
 var ws = document.querySelectorAll('[data-under="' + el.id + '"]');
 for (var i = 0; i < ws.length; i++) winLift(ws[i]);
+}
+gearRoomInert();
 }
 function winReset() {
 var ws = document.querySelectorAll('[data-under]');
 for (var i = 0; i < ws.length; i++) winLift(ws[i]);
+gearRoomInert();
 }
 function openModal(id) { var m = $(id); if (m) { winShow(m); healHeads(m); } }
 function closeModal(id) { winHide($(id)); }
@@ -4756,9 +4761,8 @@ tutFxRaise(false);
 'modal-confirm',
 'modal-gear-info', 'modal-gear']
 .forEach(closeModal);
-winReset();   /* [판정판 121 · Task 5] 목록 밖 창(캐릭창 · 설정 · 스킨 · 보석 창)에 남은 깔림 표식까지 걷는다 */
+winReset();   /* [판정판 121 · Task 5] 목록 밖 창(캐릭창 · 설정 · 스킨 · 보석 창)에 남은 깔림 표식까지 걷는다 · [Task 8b2 F5] 끝에서 방 inert 도 다시 센다 */
 gearInfoId = '';
-gearRoomInert();   /* [Task 8b2] 두 창이 걷혔다 — 방 inert 도 푼다(방은 깔림 표식이 아니라 inert 만 받는다) */
 dropsN = 0;   /* 획득표가 위 목록에서 걷혔다 — 열린 탄 표식도 함께 0(closeDrops 를 안 거치는 길) */
 }
 var confirmPending = null;
@@ -17189,17 +17193,17 @@ else if (el.hasAttribute('data-more')) el.removeAttribute('data-more');
 }
 function gearRoomInert() {
 var cp = $('charpanel');
-if (!cp || cp.hasAttribute('data-under')) return;
+if (!cp || cp.hidden || cp.hasAttribute('data-under')) return;
 var g = $('modal-gear'), gi = $('modal-gear-info');
-winInert(cp, !cp.hidden && !!((g && !g.hidden) || (gi && !gi.hidden)));
+var up = function (m) { return !!m && !m.hidden && !m.hasAttribute('data-under'); };
+winInert(cp, up(g) || up(gi));
 }
 function openGear(slot) {
 var m = $('modal-gear');
 if (!m) return;
 if (ITEM_SLOTS.indexOf(slot) >= 0) gearSlotCur = slot;
-winShow(m, $('charpanel'));
+winShow(m, $('charpanel'));      /* 방 inert = winShow 끝의 gearRoomInert(수정 1회차 F5 — 주인 하나) */
 healHeads(m);
-gearRoomInert();
 gearPaint();
 var gr = $('gm-grid');
 if (gr) gr.scrollTop = 0;
@@ -17207,8 +17211,7 @@ J.sfx.ui();
 }
 function closeGear(quiet) {
 if (gearInfoId) closeGearInfo(true);
-closeModal('modal-gear');
-gearRoomInert();
+closeModal('modal-gear');        /* winHide 끝에서 방 inert 를 다시 센다 */
 if (!quiet) J.sfx.ui();
 }
 function gearSlotTap(slot) {
@@ -17227,9 +17230,9 @@ if (!best || gearSlotItem(cid, slot) === best.it.id) continue;
 gearEqPut(eq, best.it.id);    /* toggleItem 과 같은 끼우기 · 장착 수 가드(M9) */
 changed++;
 }
-if (changed) { dqBump('item', changed); gearEqCommit(cid, eq); }
-else J.sfx.ui();
 toast(t(changed ? 'gear.auto.done' : 'gear.auto.same'));
+if (changed) { gearEqCommit(cid, eq); dqBump('item', changed); }
+else J.sfx.ui();
 }
 function paintGearInfo() {
 var id = gearInfoId, it = itemById(id);
@@ -17307,9 +17310,8 @@ if (!itemById(id) || (own[id] | 0) <= 0) return;
 var m = $('modal-gear-info');
 if (!m) return;
 gearInfoId = id;
-winShow(m, $('charpanel'));
+winShow(m, $('charpanel'));      /* 방 inert = winShow 끝의 gearRoomInert(수정 1회차 F5) */
 healHeads(m);
-gearRoomInert();
 paintGearInfo();
 var main = m.querySelector('.gi-main');
 if (main) { main.scrollTop = 0; gearMore(main); }
@@ -17317,8 +17319,7 @@ J.sfx.ui();
 }
 function closeGearInfo(quiet) {
 gearInfoId = '';
-closeModal('modal-gear-info');
-gearRoomInert();
+closeModal('modal-gear-info');   /* winHide 끝에서 방 inert 를 다시 센다 */
 if (!quiet) J.sfx.ui();
 }
 function gearAct() {
@@ -17858,7 +17859,8 @@ on(document, 'keydown', function (ev) {
 if (!ev || (ev.key !== 'ArrowLeft' && ev.key !== 'ArrowRight')) return;
 if (ev.altKey || ev.ctrlKey || ev.metaKey) return;
 var panel = $('charpanel');
-if (!panel || panel.hidden || panel.hasAttribute('data-under') || panel.inert) return;
+var gw = $('modal-gear'), gwi = $('modal-gear-info');
+if (!panel || panel.hidden || panel.hasAttribute('data-under') || (gw && !gw.hidden) || (gwi && !gwi.hidden)) return;
 var tag = ev.target && ev.target.tagName;
 if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
 ev.preventDefault();
