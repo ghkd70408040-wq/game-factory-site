@@ -887,7 +887,7 @@ try { u.setAttribute("href", "#ic-" + name); } catch (e) { /* ignore */ }
 function isCapsuleHead(el) {
 try {
 return !!(el && el.matches &&
-el.matches('.modal-v2 .mv2-sheet > h2, .modal-v2 .mv2-head > h2, #modal-node .r10-ribbon > h2, #modal-drops .r10-ribbon > h2, #modal-clear .sheet > h2, #modal-adv:not(.is-advfinish) .sheet > h2'));
+el.matches('.modal-v2 .mv2-sheet > h2, .modal-v2 .mv2-head > h2, #modal-node .r10-ribbon > h2, #modal-drops .r10-ribbon > h2, #modal-clear .sheet > h2, #modal-adv:not(.is-advfinish) .sheet > h2, #modal-gear #gear-h, #modal-gear-info #gi-h'));   /* [Task 8b2] 장비 두 창 제목 = CSS 레터링(지휘자 판정 2-4) */
 } catch (e) { return false; }
 }
 function headText(el, s) {
@@ -954,7 +954,7 @@ h.style.setProperty('--mvh-fs', String(Math.round(k * 1e5) / 1e5));
 }
 function fitHeads(root) {
 var list = (root || document).querySelectorAll(
-'.modal-v2 .mv2-sheet > h2, .modal-v2 .mv2-head > h2, #modal-node .r10-ribbon > h2, #modal-drops .r10-ribbon > h2, #modal-clear .sheet > h2, #modal-adv:not(.is-advfinish) .sheet > h2');
+'.modal-v2 .mv2-sheet > h2, .modal-v2 .mv2-head > h2, #modal-node .r10-ribbon > h2, #modal-drops .r10-ribbon > h2, #modal-clear .sheet > h2, #modal-adv:not(.is-advfinish) .sheet > h2, #modal-gear #gear-h, #modal-gear-info #gi-h');   /* [Task 8b2] 레터링 제목 셋째 목록 — isCapsuleHead · healHeads 와 같은 줄 */
 for (var i = 0; i < list.length; i++) fitHead(list[i]);
 }
 try {
@@ -981,7 +981,7 @@ document.fonts.ready.then(function () { fitHeads(document); });
 } catch (e) { /* 재보기는 부가 기능이다 — 실패해도 제목은 CSS 기본값으로 선다 */ }
 function healHeads(root) {
 var list = (root || document).querySelectorAll(
-'.modal-v2 .mv2-sheet > h2, .modal-v2 .mv2-head > h2, #modal-node .r10-ribbon > h2, #modal-drops .r10-ribbon > h2, #modal-clear .sheet > h2, #modal-adv:not(.is-advfinish) .sheet > h2');
+'.modal-v2 .mv2-sheet > h2, .modal-v2 .mv2-head > h2, #modal-node .r10-ribbon > h2, #modal-drops .r10-ribbon > h2, #modal-clear .sheet > h2, #modal-adv:not(.is-advfinish) .sheet > h2, #modal-gear #gear-h, #modal-gear-info #gi-h');
 for (var i = 0; i < list.length; i++) {
 var h = list[i];
 if (h.firstElementChild && h.firstElementChild.className === 'mvh-title'
@@ -2079,7 +2079,7 @@ en: {
 'item.puddingcharm.fl': 'A piece the Pudding Knight handed over, saying he did not need it.',
 'item.soon': 'Coming soon',
 'gear.slot.weapon': 'Weapon',
-'gear.slot.aux': 'Gear',
+'gear.slot.aux': 'Guard',
 'gear.slot.trinket': 'Charm',
 'gear.title.list': 'Gear List',
 'gear.title.info': 'Gear Info',
@@ -2088,7 +2088,14 @@ en: {
 'gear.empty.hint': 'No gear for this slot yet. Clear stages to find some.',
 'gear.equip': 'Equip',
 'gear.unequip': 'Unequip',
-'gear.wornby': 'Worn by {names}',
+'gear.wornby': 'Also equipped by {names}',
+'gear.title': 'Gear',
+'gear.done': 'Done',
+'gear.auto': 'Auto Equip',
+'gear.auto.done': 'Equipped your best gear',
+'gear.auto.same': 'Already wearing your best gear',
+'gear.bag.none': 'Collect gear fruits on adventures',
+'gear.cmp.k': 'Equipped now',
 'item.crossnecklace.eff': 'In battle, alternate Ten and Twin matches to fill the Awaken gauge {n}% more.',
 'item.chainbracelet.eff': 'At combo {c} or more, matches score {n}% more.',
 'item.firstcharm.eff': 'The first match of each stage scores {x}×.',
@@ -3251,9 +3258,16 @@ ko: {
 'gear.on': '착용 중',
 'gear.empty': '비어 있음',
 'gear.empty.hint': '아직 이 부위 장비가 없어요. 판을 깨면 나와요.',
-'gear.equip': '끼기',
-'gear.unequip': '빼기',
-'gear.wornby': '{names} 착용 중',
+'gear.equip': '장착',
+'gear.unequip': '해제',
+'gear.wornby': '{names}도 장착 중이에요',
+'gear.title': '장비',
+'gear.done': '완료',
+'gear.auto': '자동 장착',
+'gear.auto.done': '가장 좋은 장비를 꼈어요',
+'gear.auto.same': '이미 가장 좋은 장비예요',
+'gear.bag.none': '모험에서 장비 과일을 모아요',
+'gear.cmp.k': '지금 낀 장비',
 'item.crossnecklace.eff': '전투에서 텐과 트윈을 번갈아 맞추면 각성 게이지가 {n}% 더 차요.',
 'item.chainbracelet.eff': '콤보 {c} 이상에서 점수가 {n}% 올라요.',
 'item.firstcharm.eff': '판의 첫 매치 점수가 {x}배가 돼요.',
@@ -4698,7 +4712,7 @@ if (id !== 'screen-map') stopMapTicker();
 var WIN_SEL = '.modal, #charpanel';
 function winInert(el, on) { try { if ('inert' in el) el.inert = !!on; } catch (e) { /* 옛 엔진: 숨김만 */ } }
 function winLift(el) { if (el && el.hasAttribute('data-under')) { el.removeAttribute('data-under'); winInert(el, false); } }
-function winShow(el) {
+function winShow(el, keep) {
 if (!el) return;
 var fresh = el.hidden || el.hasAttribute('data-under');
 el.hidden = false;
@@ -4707,7 +4721,7 @@ if (!fresh || !el.id) return;
 var ws = document.querySelectorAll(WIN_SEL);
 for (var i = 0; i < ws.length; i++) {
 var w = ws[i];
-if (w === el || w.hidden || w.hasAttribute('data-under')) continue;
+if (w === el || w === keep || w.hidden || w.hasAttribute('data-under')) continue;
 w.setAttribute('data-under', el.id);
 winInert(w, true);
 }
@@ -4743,6 +4757,8 @@ tutFxRaise(false);
 'modal-gear-info', 'modal-gear']
 .forEach(closeModal);
 winReset();   /* [판정판 121 · Task 5] 목록 밖 창(캐릭창 · 설정 · 스킨 · 보석 창)에 남은 깔림 표식까지 걷는다 */
+gearInfoId = '';
+gearRoomInert();   /* [Task 8b2] 두 창이 걷혔다 — 방 inert 도 푼다(방은 깔림 표식이 아니라 inert 만 받는다) */
 dropsN = 0;   /* 획득표가 위 목록에서 걷혔다 — 열린 탄 표식도 함께 0(closeDrops 를 안 거치는 길) */
 }
 var confirmPending = null;
@@ -16077,6 +16093,13 @@ q.className = 'itile-eq';
 q.textContent = '✓';
 el.appendChild(q);
 }
+if (o.sel) {
+el.setAttribute('data-sel', '');
+var sv = document.createElement('i');
+sv.className = 'itile-sel';
+sv.setAttribute('aria-hidden', 'true');
+el.appendChild(sv);
+}
 return el;
 }
 function itemEffOf(id, lv) {
@@ -16938,37 +16961,67 @@ wrap.appendChild(cpItemCell('empty', slot, '', t('gear.empty'), '', '', sn + ' �
 }
 }
 }
+function gearEqCommit(cid, eq) {
+store.items.eq[cid] = eq;
+persist();
+syncItemList();            /* 방 오른쪽 장비 줄 */
+gearPaint();               /* 장비 창이 떠 있으면 낀 장비 줄 · 탭 개수 · 가방 ✓ 를 같은 상태로 */
+applyHeroStats();          /* 막대가 곧바로 새 실효값을 그린다 */
+J.sfx.ui();
+}
 function toggleItem(id) {
 var it = itemById(id);
 if (!it) return;
 var own = (store.items && store.items.own) || {};
 if (!(own[id] | 0)) return;
-var cid = cpItemCharId(), eq = itemsEq(cid).slice(), at = eq.indexOf(id), j;
+var cid = cpItemCharId(), eq = itemsEq(cid).slice(), at = eq.indexOf(id);
 if (at >= 0) {
 eq.splice(at, 1);
 } else {
-for (j = eq.length - 1; j >= 0; j--) {
-var e = itemById(eq[j]);
-if (e && e.slot === it.slot) eq.splice(j, 1);
-}
-eq.push(id);
-if (eq.length > ITEM_SLOTS.length) eq.shift();
+gearEqPut(eq, id);
 dqBump('item', 1);            /* 판정판 50 — 「아이템 장착」 축(끼울 때만) */
 }
-store.items.eq[cid] = eq;
-persist();
-syncItemList();
-applyHeroStats();          /* 막대가 곧바로 새 실효값을 그린다 */
-J.sfx.ui();
+gearEqCommit(cid, eq);
 }
-var gearSlotCur = '';   /* 목록 창이 보여 주는 부위 */
-var gearInfoId = '';    /* 설명 창이 보여 주는 장비 */
-function gearWornBy(id, cid) {
-var names = [];
+function gearEqPut(eq, id) {
+var it = itemById(id), j;
+for (j = eq.length - 1; j >= 0; j--) {
+var e = itemById(eq[j]);
+if (e && it && e.slot === it.slot) eq.splice(j, 1);
+}
+eq.push(id);
+while (eq.length > ITEM_SLOTS.length) eq.shift();
+return eq;
+}
+var gearSlotCur = 'weapon';   /* 장비 창이 보여 주는 부위 — 탭 · 낀 장비 줄 ▼ 가 늘 같이 가리킨다 */
+var gearInfoId = '';          /* 정보 카드가 보여 주는 장비 */
+function gearBagList(slot) {
+var own = (store.items && store.items.own) || {}, out = [];
+for (var i = 0; i < ITEM_POOL.length; i++) {
+var it = ITEM_POOL[i], lv = own[it.id] | 0;
+if (it.enabled === false || it.slot !== slot || lv <= 0) continue;
+out.push({ it: it, lv: lv, i: i });
+}
+out.sort(function (a, b) { return (ITEM_TIER_EFF[b.it.tier] - ITEM_TIER_EFF[a.it.tier]) || (b.lv - a.lv) || (a.i - b.i); });
+return out;
+}
+function gearWornIds(id, cid) {
+var ids = [];
 for (var i = 0; i < HERO_IDS.length; i++) {
-if (HERO_IDS[i] !== cid && itemsEq(HERO_IDS[i]).indexOf(id) >= 0) names.push(t('char.' + HERO_IDS[i] + '.name'));
+if (HERO_IDS[i] !== cid && itemsEq(HERO_IDS[i]).indexOf(id) >= 0) ids.push(HERO_IDS[i]);
 }
+return ids;
+}
+function gearWornBy(id, cid) {
+var ids = gearWornIds(id, cid), names = [];
+for (var i = 0; i < ids.length; i++) names.push(t('char.' + ids[i] + '.name'));
 return names.join(' · ');
+}
+function gearAria(id, cid) {
+var it = itemById(id), own = (store.items && store.items.own) || {}, who = gearWornBy(id, cid);
+if (!it) return '';
+return t('item.' + id + '.nm') + ', ' + t('drops.tier.' + it.tier) + ', ' + t('drops.lv', { lv: own[id] | 0, max: ITEM_LV_MAX })
++ (itemsEq(cid).indexOf(id) >= 0 ? ', ' + t('gear.on') : '') + (who ? ', ' + t('gear.wornby', { names: who }) : '');
 }
 function itemEffParams(id) {
 if (id === 'chainbracelet') return { c: String(ITEM_CHAIN_COMBO), n: String(Math.round((ITEM_CHAIN_MULT - 1) * 100)) };
@@ -16984,134 +17037,294 @@ if (it.kind !== 'stat') return [t('item.' + id + '.eff', itemEffParams(id))];
 var i = STAT_KEYS.indexOf(it.stat), n = statPctText(it.stat, itemEffOf(id, lv), 1);
 return statTipLines(i, '+' + n + '%', n);
 }
-function gearCell(slot, id, tier, size) {
-var cell = cpItemCell('empty', slot, '', '', '', '', '');
-if (id) cell.setAttribute('data-state', 'own');
-var ic = cell.querySelector('.cp-cr-ic');
-if (ic) {
-ic.textContent = '';
-ic.setAttribute('data-art', '');
-ic.style.setProperty('background-image', id ? itemArtCss(id, size) : ('url("' + (ITEM_ART_SIL[slot] || ITEM_ART_SIL.trinket) + '")'));
+function gearEffShort(id, lv) {
+var it = itemById(id);
+if (!it) return '';
+if (it.kind !== 'stat') return t('item.' + id + '.eff', itemEffParams(id));
+return t('stat.k' + (STAT_KEYS.indexOf(it.stat) + 1)) + ' +' + itemEffOf(id, lv);
 }
-return cell;
-}
-function gearRow(act, slot, id, tier, name, lines, onTxt) {
-var row = document.createElement(act === 'none' ? 'div' : 'button');
-if (act !== 'none') row.type = 'button';
-row.className = 'gear-row sk-item kit-box-v2';
-if (act) row.setAttribute('data-act', act);
-if (id) { row.setAttribute('data-item', id); row.setAttribute('data-tier', tier); }
-row.appendChild(gearCell(slot, id, tier, 64));
-var body = document.createElement('span');
-body.className = 'sk-b';
-var n = document.createElement('b');
-n.className = 'sk-n';
-n.textContent = name;
-body.appendChild(n);
-for (var i = 0; i < lines.length; i++) {
-if (!lines[i][1]) continue;
-var d = document.createElement('span');
-d.className = 'sk-d ' + lines[i][0];
-d.textContent = lines[i][1];
-body.appendChild(d);
-}
-row.appendChild(body);
-if (onTxt) {
-var p = document.createElement('span');
-p.className = 'sk-act kit-pill-v2';
-p.setAttribute('data-variant', 'soft');
-p.textContent = onTxt;
-row.appendChild(p);
-}
-return row;
-}
-function paintGearList() {
-var wrap = $('gear-list');
-if (!wrap) return;
-var slot = gearSlotCur, cid = cpItemCharId(), cur = gearSlotItem(cid, slot), own = (store.items && store.items.own) || {};
+function gearPaint() {
+var m = $('modal-gear');
+if (!m || m.hidden) return;
+var cid = cpItemCharId(), own = (store.items && store.items.own) || {}, s;
+var wrap = $('gm-slots');
+if (wrap) {
 wrap.innerHTML = '';
-if (cur) wrap.appendChild(gearRow('off', slot, '', '', t('gear.unequip'), [], ''));
-var n = 0;
-for (var i = 0; i < ITEM_POOL.length; i++) {
-var it = ITEM_POOL[i], lv = own[it.id] | 0;
-if (it.enabled === false || it.slot !== slot || lv <= 0) continue;
-var mine = itemsEq(cid).indexOf(it.id) >= 0, who = mine ? '' : gearWornBy(it.id, cid);
-var lvTxt = t('drops.lv', { lv: lv, max: ITEM_LV_MAX }) + (it.kind === 'stat' ? ' · +' + itemEffOf(it.id, lv) : '');
-wrap.appendChild(gearRow('', slot, it.id, it.tier, t('item.' + it.id + '.nm'),
-[['gear-lv', lvTxt], ['gear-who', who ? t('gear.wornby', { names: who }) : '']],
-mine ? t('gear.on') : ''));
-n++;
+for (s = 0; s < ITEM_SLOTS.length; s++) {
+var slot = ITEM_SLOTS[s], on = slot === gearSlotCur, id = gearSlotItem(cid, slot), sn = t('gear.slot.' + slot);
+var b = document.createElement('button');
+b.type = 'button';
+b.className = 'gm-slot';
+b.setAttribute('data-slot', slot);
+if (on) b.setAttribute('aria-current', 'true');
+if (id) b.setAttribute('data-item', id);
+b.appendChild(id ? itemTile(id, { lv: own[id] | 0, size: 96, sel: on }) : itemTile(null, { empty: true, slot: slot, size: 96, sel: on }));
+var nm = document.createElement('span');
+nm.className = 'gm-slot-n ci-tag-v kit-pill-v2';      /* 부위 이름표 = 방 「전략가」 알약(soft) */
+nm.setAttribute('data-variant', 'soft');
+nm.textContent = sn;
+b.appendChild(nm);
+b.setAttribute('aria-label', id ? sn + ', ' + gearAria(id, cid) : sn);
+wrap.appendChild(b);
 }
-if (!n) wrap.appendChild(gearRow('none', slot, '', '', t('gear.empty'), [['gear-hint', t('gear.empty.hint')]], ''));
+}
+var tabs = $('gm-tabs');
+if (tabs && tabs.querySelectorAll) {
+var tb = tabs.querySelectorAll('.cp-tab');
+for (s = 0; s < tb.length; s++) {
+var ts = tb[s].getAttribute('data-gmtab'), cnt = '(' + gearBagList(ts).length + ')';
+tb[s].setAttribute('aria-selected', ts === gearSlotCur ? 'true' : 'false');
+var nb = tb[s].querySelector('.gm-n');
+if (nb) nb.textContent = cnt;
+var ic = tb[s].querySelector('.gm-ic');
+if (ic && !ic.hasAttribute('data-art') && ITILE_EMPTY_ART[ts]) {
+var mu = 'url("' + itemArtUrl(ITILE_EMPTY_ART[ts], 64) + '")';
+ic.style.setProperty('-webkit-mask-image', mu);
+ic.style.setProperty('mask-image', mu);
+ic.setAttribute('data-art', '');
+}
+tb[s].setAttribute('aria-label', t('gear.slot.' + ts) + cnt);   /* 낭독 = 부위 + 개수 — 좁은 탭에서 개수 글자를 빼도 그대로(8b 2차 판정 6) */
+}
+}
+var grid = $('gm-grid'), none = $('gm-none');
+if (grid) {
+var list = gearBagList(gearSlotCur);
+grid.innerHTML = '';
+grid.setAttribute('data-slot', gearSlotCur);
+if (!list.length) {
+var li0 = document.createElement('li');
+li0.className = 'gm-cell gm-empty';
+li0.appendChild(itemTile(null, { empty: true, slot: gearSlotCur, size: 96 }));
+grid.appendChild(li0);
+}
+for (s = 0; s < list.length; s++) {
+var gi = list[s].it.id, mine = itemsEq(cid).indexOf(gi) >= 0, wids = gearWornIds(gi, cid);
+var li = document.createElement('li');
+li.className = 'gm-li';
+var cb = document.createElement('button');
+cb.type = 'button';
+cb.className = 'gm-cell';
+cb.setAttribute('data-item', gi);
+cb.setAttribute('aria-haspopup', 'dialog');
+cb.setAttribute('aria-label', gearAria(gi, cid));
+cb.appendChild(itemTile(gi, { lv: list[s].lv, eq: mine, size: 96 }));
+if (wids.length) {
+var who = document.createElement('i');
+who.className = 'gm-who';
+who.setAttribute('aria-hidden', 'true');
+who.setAttribute('data-char', wids[0]);
+setStdArt(who, wids[0], 'face', '--who-face');
+cb.appendChild(who);
+}
+li.appendChild(cb);
+grid.appendChild(li);
+}
+if (none) none.hidden = list.length > 0;
+}
+gearLayout();
+}
+function gearLayout() {
+gearTabFit();
+gearBagFill();
+gearMore($('gm-grid'));
+}
+function gearTabFit() {
+var tabs = $('gm-tabs');
+if (!tabs || !tabs.querySelectorAll || !tabs.removeAttribute) return;
+tabs.removeAttribute('data-compact');
+var tb = tabs.querySelectorAll('.cp-tab'), over = false, s, k;
+for (s = 0; s < tb.length && !over; s++) {
+var cw = tb[s].clientWidth;
+if (!cw) return;                                  /* 숨은 창 — 보이게 되면 다시 부른다 */
+var cs = getComputedStyle(tb[s]), gap = parseFloat(cs.columnGap) || 0, fs = parseFloat(cs.fontSize) || 0, w = 0, n = 0;
+for (k = 0; k < tb[s].children.length; k++) {
+var r = tb[s].children[k].getBoundingClientRect();
+if (r.width > 0) { w += r.width; n++; }
+}
+if (n > 1) w += gap * (n - 1);
+if (w + fs > cw + 0.5) over = true;               /* 좌우 여백 .5em 씩 = 글자 1em */
+}
+if (over) tabs.setAttribute('data-compact', '');
+}
+function gearBagFill() {
+var m = $('modal-gear'), grid = $('gm-grid');
+if (!m || m.hidden || !grid || !grid.querySelectorAll) return;
+var stack = m.querySelector('.gm-stack'), bag = $('gm-bag'), note = $('gm-none');
+var head = m.querySelector('.cp-head'), slots = $('gm-slots'), card = m.querySelector('.cp-card'), band = $('gm-tabs');
+var old = grid.querySelectorAll('.gm-frame'), kids = grid.children, n = 0, first = null, i;
+for (i = 0; i < kids.length; i++) if (!kids[i].classList.contains('gm-frame')) { n++; if (!first) first = kids[i]; }
+if (!first || !stack || !bag || !head || !slots || !card || !band) return;
+var fr = first.getBoundingClientRect();
+if (!fr.width) return;                              /* 숨은 창 — 보이게 되면 다시 부른다 */
+stack.style.setProperty('--gm-tile', fr.width + 'px');
+var wasRow = stack.hasAttribute('data-head-row');
+if (wasRow) stack.removeAttribute('data-head-row');
+var u = (parseFloat(getComputedStyle(grid).columnGap) || 0) / 3, tile = fr.height, ring = fr.width * 0.08;
+var noteH = note ? (parseFloat(getComputedStyle(note).fontSize) || 0) * 1.35 : 0;
+var ms = getComputedStyle(m), mh = m.clientHeight - (parseFloat(ms.paddingTop) || 0) - (parseFloat(ms.paddingBottom) || 0);
+var headH = head.getBoundingClientRect().height;                          /* 두 줄 짜임 머리 상자 = 캡슐 바깥 상자 */
+var gapN = parseFloat(getComputedStyle(band).marginBottom) || 0;          /* --cs-gap8 = 무리 틈(① · ②) */
+var cardFix = card.getBoundingClientRect().height - bag.getBoundingClientRect().height;   /* 탭 띠 · 단추 줄 몫(박자 무관) */
+var avail = mh - headH - slots.getBoundingClientRect().height - 2 * gapN - cardFix;
+var step = ((2.4 * u + tile + 3 * u) + 2 * u + noteH + 2 * u <= avail) ? 1
+: ((ring + tile + ring) + 1.4 * u + noteH + 1.4 * u <= avail) ? 2 : 3;
+if (step >= 2) { bag.setAttribute('data-tight', ''); bag.style.setProperty('--cb-ring', ring + 'px'); }
+else { bag.removeAttribute('data-tight'); bag.style.removeProperty('--cb-ring'); }
+if (step === 3) stack.setAttribute('data-head-row', ''); else stack.removeAttribute('data-head-row');
+for (i = 0; i < old.length; i++) grid.removeChild(old[i]);
+var cols = 4, want = Math.max(cols, Math.ceil(n / cols) * cols);
+for (i = n; i < want; i++) {
+var li = document.createElement('li');
+li.className = 'gm-li gm-frame';
+li.setAttribute('aria-hidden', 'true');
+li.appendChild(itemTile(null, { empty: true }));   /* 빈 칸(부위 없음 = 그림 없음) — 테 · 면은 CSS(.gm-frame) */
+grid.appendChild(li);
+}
+}
+function gearMore(el) {
+if (!el || !el.hasAttribute) return;
+var more = el.scrollHeight - el.clientHeight - Math.ceil(el.scrollTop) > 0;
+if (more) { if (!el.hasAttribute('data-more')) el.setAttribute('data-more', ''); }
+else if (el.hasAttribute('data-more')) el.removeAttribute('data-more');
+}
+function gearRoomInert() {
+var cp = $('charpanel');
+if (!cp || cp.hasAttribute('data-under')) return;
+var g = $('modal-gear'), gi = $('modal-gear-info');
+winInert(cp, !cp.hidden && !!((g && !g.hidden) || (gi && !gi.hidden)));
 }
 function openGear(slot) {
-if (ITEM_SLOTS.indexOf(slot) < 0) return;
-gearSlotCur = slot;
-paintGearList();
-openModal('modal-gear');
-var sc = $('gear-list');
-if (sc) sc.scrollTop = 0;
+var m = $('modal-gear');
+if (!m) return;
+if (ITEM_SLOTS.indexOf(slot) >= 0) gearSlotCur = slot;
+winShow(m, $('charpanel'));
+healHeads(m);
+gearRoomInert();
+gearPaint();
+var gr = $('gm-grid');
+if (gr) gr.scrollTop = 0;
 J.sfx.ui();
 }
 function closeGear(quiet) {
-gearSlotCur = '';
+if (gearInfoId) closeGearInfo(true);
 closeModal('modal-gear');
+gearRoomInert();
 if (!quiet) J.sfx.ui();
+}
+function gearSlotTap(slot) {
+if (ITEM_SLOTS.indexOf(slot) < 0 || slot === gearSlotCur) return;
+gearSlotCur = slot;
+gearPaint();
+var gr = $('gm-grid');
+if (gr) { gr.scrollTop = 0; gearMore(gr); }
+J.sfx.ui();
+}
+function gearAutoEquip() {
+var cid = cpItemCharId(), eq = itemsEq(cid).slice(), changed = 0, s;
+for (s = 0; s < ITEM_SLOTS.length; s++) {
+var slot = ITEM_SLOTS[s], best = gearBagList(slot)[0];
+if (!best || gearSlotItem(cid, slot) === best.it.id) continue;
+gearEqPut(eq, best.it.id);    /* toggleItem 과 같은 끼우기 · 장착 수 가드(M9) */
+changed++;
+}
+if (changed) { dqBump('item', changed); gearEqCommit(cid, eq); }
+else J.sfx.ui();
+toast(t(changed ? 'gear.auto.done' : 'gear.auto.same'));
 }
 function paintGearInfo() {
 var id = gearInfoId, it = itemById(id);
 if (!it) return;
-var own = (store.items && store.items.own) || {}, lv = own[id] | 0, on = itemsEq(cpItemCharId()).indexOf(id) >= 0;
+var cid = cpItemCharId(), own = (store.items && store.items.own) || {}, lv = own[id] | 0, on = itemsEq(cid).indexOf(id) >= 0;
 var art = $('gi-art');
 if (art) {
 art.innerHTML = '';
-art.setAttribute('data-tier', it.tier);
-art.appendChild(gearCell(it.slot, id, it.tier, 256));
+art.appendChild(itemTile(id, { lv: lv, eq: on, size: 256 }));   /* 큰 장비 칸(판 안 폭 36% — CSS) */
 }
 setText('gi-name', t('item.' + id + '.nm'));
-setText('gi-meta', t('drops.tier.' + it.tier) + ' · ' + t('gear.slot.' + it.slot) + ' · ' + t('drops.lv', { lv: lv, max: ITEM_LV_MAX }));
-var eff = $('gi-eff');
+var chip = $('gi-chip');
+if (chip) {
+chip.setAttribute('data-tier', it.tier);
+var ci = chip.firstElementChild || chip.appendChild(document.createElement('i'));
+ci.textContent = t('drops.tier.' + it.tier);
+}
+setText('gi-meta', t('gear.slot.' + it.slot) + ' · ' + t('drops.lv', { lv: lv, max: ITEM_LV_MAX }));
+var eff = $('gi-eff'), effd = $('gi-effd'), lines = gearEffLines(id, lv);
 if (eff) {
 eff.innerHTML = '';
-var lines = gearEffLines(id, lv);
-for (var i = 0; i < lines.length; i++) {
-var head = lines.length > 1 && i === 0;
-var e = document.createElement(head ? 'b' : 'span');
-e.className = head ? 'sk-n' : 'sk-d';
-e.textContent = lines[i];
-eff.appendChild(e);
+eff.setAttribute('data-kind', it.kind === 'stat' ? 'stat' : 'act');
+if (it.kind === 'stat') {
+var ek = document.createElement('span'); ek.className = 'gi-eff-k'; ek.textContent = t('stat.k' + (STAT_KEYS.indexOf(it.stat) + 1)); eff.appendChild(ek);
+var ev = document.createElement('b'); ev.className = 'gi-eff-v'; ev.textContent = '+' + itemEffOf(id, lv); eff.appendChild(ev);
+} else {
+eff.textContent = lines[0] || '';
 }
 }
+if (effd) { effd.textContent = it.kind === 'stat' ? (lines[1] || '') : ''; effd.hidden = it.kind !== 'stat'; }
 setText('gi-fl', t('item.' + id + '.fl'));
+var cmp = $('gi-cmp'), cur = gearSlotItem(cid, it.slot);
+if (cmp) {
+cmp.hidden = !(cur && cur !== id);
+var ca = $('gi-cmp-art'), cv = $('gi-cmp-v');
+if (ca) ca.innerHTML = '';
+if (cv) cv.innerHTML = '';
+if (!cmp.hidden) {
+var c = itemById(cur), clv = own[cur] | 0;
+if (ca) ca.appendChild(itemTile(cur, { lv: clv, size: 64 }));
+if (cv) {
+var cn = document.createElement('b'); cn.className = 'gi-cmp-n'; cn.textContent = t('item.' + cur + '.nm'); cv.appendChild(cn);
+var ce = document.createElement('span'); ce.className = 'gi-cmp-e'; ce.textContent = gearEffShort(cur, clv); cv.appendChild(ce);
+if (c && c.kind === 'stat' && it.kind === 'stat' && c.stat === it.stat) {
+var d = itemEffOf(id, lv) - itemEffOf(cur, clv);
+if (d) {
+var cd = document.createElement('b'); cd.className = 'gi-cmp-d';
+cd.setAttribute('data-dir', d > 0 ? 'up' : 'down');
+cd.textContent = (d > 0 ? '▲' : '▼') + Math.abs(d);
+cv.appendChild(cd);
+}
+}
+}
+}
+}
+var who = $('gi-who'), wb = gearWornBy(id, cid);
+if (who) { who.textContent = wb ? t('gear.wornby', { names: wb }) : ''; who.hidden = !wb; }
 var b = $('gi-act');
 if (b) {
 b.textContent = t(on ? 'gear.unequip' : 'gear.equip');
 b.setAttribute('data-kind', on ? 'secondary' : 'primary');
 }
+gearInfoFit();
+}
+function gearInfoFit() {
+var m = $('modal-gear-info'), card = m && m.querySelector('.cp-card'), main = m && m.querySelector('.gi-main');
+if (!card || !main || m.hidden) return;
+card.classList.remove('gi-tight');
+if (main.scrollHeight > main.clientHeight + 4) card.classList.add('gi-tight');
+gearMore(main);
 }
 function openGearInfo(id) {
 var own = (store.items && store.items.own) || {};
 if (!itemById(id) || (own[id] | 0) <= 0) return;
+var m = $('modal-gear-info');
+if (!m) return;
 gearInfoId = id;
+winShow(m, $('charpanel'));
+healHeads(m);
+gearRoomInert();
 paintGearInfo();
-openModal('modal-gear-info');
+var main = m.querySelector('.gi-main');
+if (main) { main.scrollTop = 0; gearMore(main); }
 J.sfx.ui();
 }
 function closeGearInfo(quiet) {
 gearInfoId = '';
 closeModal('modal-gear-info');
+gearRoomInert();
 if (!quiet) J.sfx.ui();
 }
-function gearDone() { closeGearInfo(true); closeGear(true); }
 function gearAct() {
 if (!gearInfoId) return;
 toggleItem(gearInfoId);
-gearDone();
-}
-function gearUnequip(slot) {
-var id = gearSlotItem(cpItemCharId(), slot);
-if (id) toggleItem(id);
-gearDone();
+closeGearInfo(true);
 }
 var pairPCache = null;
 function pairTypeP() {
@@ -17593,19 +17806,40 @@ el = el.parentNode;
 if (!el || el === this) return;
 openGear(el.getAttribute('data-slot'));
 });
-on($('gear-list'), 'click', function (ev) {
-var el = ev.target;
-while (el && el !== this && !(el.classList && el.classList.contains('gear-row'))) el = el.parentNode;
-if (!el || el === this) return;
-if (el.getAttribute('data-act') === 'off') { gearUnequip(gearSlotCur); return; }
-var id = el.getAttribute('data-item');
+function gearPick(ev, root, cls) {
+var el = ev && ev.target;
+while (el && el !== root && !(el.classList && el.classList.contains(cls))) el = el.parentNode;
+return (el && el !== root) ? el : null;
+}
+on($('gm-slots'), 'click', function (ev) {
+var el = gearPick(ev, this, 'gm-slot');
+if (el) gearSlotTap(el.getAttribute('data-slot'));
+});
+on($('gm-tabs'), 'click', function (ev) {
+var el = gearPick(ev, this, 'cp-tab');
+if (el) gearSlotTap(el.getAttribute('data-gmtab'));
+});
+on($('gm-grid'), 'click', function (ev) {
+var el = gearPick(ev, this, 'gm-cell');
+var id = el && el.getAttribute('data-item');
 if (id) openGearInfo(id);
 });
+on($('gm-auto'), 'click', gearAutoEquip);
+on($('gm-done'), 'click', function () { closeGear(); });
 on($('gear-close'), 'click', function () { closeGear(); });
 on($('gi-close'), 'click', function () { closeGearInfo(); });
 on($('gi-act'), 'click', gearAct);
 on($('modal-gear'), 'click', function (ev) { if (ev && ev.target === this) closeGear(); });
 on($('modal-gear-info'), 'click', function (ev) { if (ev && ev.target === this) closeGearInfo(); });
+on($('gm-grid'), 'scroll', function () { gearMore(this); });
+(function () {
+var gim = $('modal-gear-info'), main = gim && gim.querySelector ? gim.querySelector('.gi-main') : null;
+if (main) on(main, 'scroll', function () { gearMore(this); });
+if (typeof ResizeObserver !== 'function') return;
+var ro = new ResizeObserver(function () { gearLayout(); gearInfoFit(); });
+if ($('modal-gear')) ro.observe($('modal-gear'));
+if (gim) ro.observe(gim);
+})();
 on($('char-open'), 'click', openCharPanel);
 on($('cp-close'), 'click', closeCharPanel);
 on($('cp-go'), 'click', cpConfirm);
@@ -17624,7 +17858,7 @@ on(document, 'keydown', function (ev) {
 if (!ev || (ev.key !== 'ArrowLeft' && ev.key !== 'ArrowRight')) return;
 if (ev.altKey || ev.ctrlKey || ev.metaKey) return;
 var panel = $('charpanel');
-if (!panel || panel.hidden || panel.hasAttribute('data-under')) return;
+if (!panel || panel.hidden || panel.hasAttribute('data-under') || panel.inert) return;
 var tag = ev.target && ev.target.tagName;
 if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
 ev.preventDefault();
@@ -18518,6 +18752,7 @@ itemById: itemById, itemEffOf: itemEffOf, itemStatBonus: itemStatBonus,
 itemScoreMult: itemScoreMult, itemOn: itemOn, ITEM_POOL: ITEM_POOL,
 grantItem: grantItem, toggleItem: toggleItem, syncItemList: syncItemList,
 openGear: openGear, closeGear: closeGear, openGearInfo: openGearInfo, closeGearInfo: closeGearInfo,
+gearSlotTap: gearSlotTap, gearAutoEquip: gearAutoEquip,
 itemArtUrl: itemArtUrl, itemArtCss: itemArtCss, ITEM_ART: ITEM_ART, itemSrcOf: itemSrcOf, ITEM_SRC: ITEM_SRC,
 itemTile: itemTile, dropsTab: dropsTab,   /* [판정판 121 · Task 8a] 장비 칸 시트(t8a/sheet) · 획득표 탭 손잡이 — 게임 코드는 이 문을 안 거친다 */
 petOwned: petOwned, grantPet: grantPet, petCondBump: petCondBump,
