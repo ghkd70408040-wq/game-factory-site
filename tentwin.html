@@ -6574,13 +6574,7 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   background: rgba(255, 255, 255, .05);
   box-shadow: inset 0 0 0 1px var(--line);
 }
-.node-wait {
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 1.4;
-  color: var(--t9);
-  word-break: keep-all;
-}
+/* [판정판 122 수정 1회차 F6] 옛 .node-wait 글자 규칙(13px · 700 · --t9)은 은퇴 — 대기 단추는 #node-wait 킷 단추라 자기 규칙(node-card-74)이 읽는다. */
 /* [hidden] 이 .btn 의 display:block 에 지지 않게. 시트 안 버튼은 JS 가 숨긴다. */
 .sheet .btn[hidden] { display: none; }
 
@@ -11611,7 +11605,6 @@ html.no-art-logo .logo-img  { display: none; }
 }
 .ncta-cost .hc-heart { display: block; width: 15px; height: 15px; background: var(--lib-glyph-heart) center/contain no-repeat; }
 .node-got { position: absolute; top: 6px; left: 10px; font-size: 13px; color: var(--prim-art-gold-e); }
-.node-wait { margin: 0; font-size: 12.5px; color: var(--prim-art-ribbon-2); }
 
 /* 모드 시트의 줄 */
 .mode-list { display: flex; flex-direction: column; gap: 8px; }
@@ -17281,7 +17274,8 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
        v4 4차-a — 노드 미션 카드 (V3 §4·§5).
        "읽고 기대하게" 만드는 장치라, 시작 버튼보다 위에 **목표 · 미션 · 방해 ·
        추천 캐릭터 · 별 조건**이 전부 먼저 온다. 하트가 0이면 #node-go 가
-       숨고 #node-wait(회복 대기 안내)와 #node-ad(광고 자리)가 대신 나온다.
+       숨고 같은 자리(맨 아래 줄 .nc-act)에 **둘 중 하나**가 대신 선다: 광고가 되면(포털 + 광고 가능) #node-ad(광고 자리),
+       그 밖이면 #node-wait(회색 대기 단추 · 회복 대기 안내) [판정판 122].
        game.js openNodeCard() 가 내용의 단독 소유자.
        ============================================================ -->
   <div id="modal-node" class="modal r10m" hidden role="dialog" aria-modal="true" aria-labelledby="node-title"><div class="sheet r10-panel jbox jbox--modal" data-part="modal-plate">
@@ -17426,7 +17420,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
       <span class="nc-mem" data-mem="pet" role="group"><span class="nc-face" data-char-role="pet"><i class="nc-rec" data-i18n="node.recmark" hidden>Pick</i></span><span class="nc-mem-t"><b class="nc-mem-nm"></b><i class="nc-mem-k" data-i18n="pick.mate">Pet</i></span></span>
       <button class="nc-swap kit-pill-v2 kit-pill-v2--chip" type="button" data-i18n-aria="node.swap.aria" aria-label="Change hero or pet">&#8644;</button>
     </div>
-    <button id="node-wait" class="node-wait kit-btn-v2" type="button" aria-disabled="true" hidden></button>
+    <button id="node-wait" class="kit-btn-v2" type="button" aria-disabled="true" hidden></button>
     <!-- AD SLOT: rewarded. 포털 SDK 가 붙기 전까지는 자리와 안내만 있다. -->
     <button id="node-ad" class="btn btn-secondary" data-i18n="adv.ad" hidden>Get a heart (coming soon)</button>
     <!-- ⑤ 대형 PLAY — 파란 CTA 조각. data-i18n 을 버튼이 아니라 안쪽 라벨에 단
@@ -49057,7 +49051,8 @@ window.TT_SFX = {
       setTextEl(root.querySelector('[data-mem="pet"] .nc-mem-nm'), t('char.' + mid + '.name'));
     }
     pet.querySelector('.nc-rec').hidden = !mid || (advPetRecommend(p) !== mid);
-    /* [판정판 122 ④] 편성 칩은 얼굴만 보인다(이름 · 역할 .nc-mem-t 는 화면에서 뺐다) — 이름 · 역할은 얼굴(.nc-mem)의 낭독 라벨로. 문구는 .nc-mem-nm · .nc-mem-k 그대로. */
+    /* [판정판 122 ④] 편성 칩은 얼굴만 보인다(이름 · 역할 .nc-mem-t 는 화면에서 뺐다) — 이름 · 역할은 얼굴(.nc-mem)의 낭독 라벨로. 문구는 .nc-mem-nm · .nc-mem-k 그대로.
+       role="group"(마크업) = 역할 없는 span 에는 aria-label 을 못 다는 ARIA 규칙 때문이고, img 가 아니라 group 이라 안의 「추천」 표 낭독도 산다 · 구분자 「, 」 는 장비 칸 라벨의 기존 관례(지휘자 추인 — 수정 1회차 F2). */
     var mems = root.querySelectorAll('.nc-mem');
     for (var mi = 0; mi < mems.length; mi++) {
       var mnm = mems[mi].querySelector('.nc-mem-nm'), mk = mems[mi].querySelector('.nc-mem-k');
@@ -59485,14 +59480,19 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   pointer-events: none;
   opacity: .78;
 }
-.kit-btn-v2[disabled]::after{
+/* [판정판 122 수정 1회차 F1] 못 누름 층(띠 · 림 · 발광 약화 · 좌상 반짝이 약화)을 [aria-disabled="true"] 에도 건다 — 위 회색 토큰 · 불투명도 규칙은 두 속성에 다 걸리는데
+   층만 [disabled] 에 걸려, aria 로 못 누르게 한 단추(하트 0 대기 단추 #node-wait)가 회색 면 위에 누를 수 있는 단추 세기의 림 · 반짝이를 그렸다.
+   원본 tentwin/ref-v2/kit-btn-v2.css 도 같은 두 선택자를 고쳤다(소비처: 지금 aria-disabled 를 다는 .kit-btn-v2 는 #node-wait 하나 — 보고 표). */
+.kit-btn-v2[disabled]::after,
+.kit-btn-v2[aria-disabled="true"]::after{
   box-shadow:
     inset 0 calc(var(--f2-bband) * -1) 0 rgba(0,0,0,.22),
     inset 0 0 0 var(--f2-brim) rgba(255,255,255,.30),
     inset 0 calc(var(--f2-bglow) * -1) 0 rgba(255,255,255,.22),
     inset 0 calc(var(--f2-bvig) * -.30) var(--f2-bvig) rgba(60,44,66,.09);
 }
-.kit-btn-v2[disabled]::before{ opacity: .22; }
+.kit-btn-v2[disabled]::before,
+.kit-btn-v2[aria-disabled="true"]::before{ opacity: .22; }
 
 /* --- 강조 --------------------------------------------------------- */
 /*  강조 표시의 유일한 실측 근거는 선택 칩의 노란 림이다.
@@ -67773,7 +67773,7 @@ html[lang="en"] #modal-arc.is-arcdmg .sheet > h2{ --ttl:url("catalog/ttl-arcdmg-
   height: var(--nc-act-h);
   padding: 0 18px;
   border: 0 !important; border-image: none !important; border-width: 0 !important;
-  border-radius: 999px;
+  border-radius: var(--nc-act-r);   /* [판정판 122 수정 1회차 F1] 완전 알약 = 줄(.nc-act) 변수 하나 — 하트 0 대기 단추(#node-wait)도 같은 값을 읽는다 */
   background-color: transparent;
   background-image:
     radial-gradient(closest-side, rgba(255,240,253,.951) 0%, rgba(255,240,253,.55) 55%, rgba(255,240,253,0) 100%),
@@ -71873,6 +71873,7 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
    같은 높이 · 같은 폭 규칙(남은 폭 전부)이다. 높이 = 편성 칩과 같은 max(52px, 52nu). */
 #modal-node .nc-act {
   --nc-act-h: max(52px, calc(var(--nc-u) * 52));   /* 줄 높이 하나 — 편성 칩 · 시작 · 광고 · 대기 알약이 읽는다([판정판 122 ⑦] 바닥 = 지금 px, 폰 390 은 nu = 1 이라 무변) */
+  --nc-act-r: 999px;                                /* 시작 · 대기 단추의 모서리 = 완전 알약 하나([수정 1회차 F1] 시작 work-btn-core 의 반경 · 대기 단추의 킷 반경 --f2-br 이 같은 값을 읽는다) */
   display: flex; align-items: center; gap: calc(var(--nc-u) * 8);
   margin: 0 -7.45%;
 }
@@ -71887,16 +71888,20 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
   display: flex; align-items: center; justify-content: center; text-align: center;
   padding: 0 calc(var(--nc-u) * 12);
 }
-/* 하트 0 — #node-wait = 게임의 못 누름 단추 그대로(.kit-btn-v2[aria-disabled="true"] — 킷 비활성 규칙의 회색 토큰 · 띠 · 테 · 누를 수 없음. 기준 §8 「못 누름 = 회색」).
-   킷 단추 높이 --f2-bh 만 줄 높이로 맞춘다. 대기 문구(adv.heartwait)는 읽어야 하는 안내라 이 단추에만 두 가지를 덮는다: 글자색 = 잉크 · 불투명도 1
-   (킷 비활성의 옅은 흰 글자 + opacity .78 은 「누를 수 없음」 표시용이라 안내 글자가 판 위에서 안 읽힌다 — 대비 ≥ 4.5 는 smoke-node122 가 잰다). */
+/* 하트 0 — #node-wait = 게임의 못 누름 단추 그대로(.kit-btn-v2[aria-disabled="true"] — 킷 비활성 규칙의 회색 토큰 · 띠 · 테 · 반짝이 약화 · 누를 수 없음.
+   기준 §8 「못 누름 = 회색」 · 지휘자 판정 Q2). 모서리는 시작 단추와 같은 완전 알약이다 — 킷 반경 --f2-br(.287 높이)을 시작이 읽는 변수(--nc-act-r)로 덮는다
+   (킷의 안쪽 반경 --f2-bri · 질감층은 같은 --f2-br 에서 파생돼 같이 따라온다). 킷 단추 높이 --f2-bh 는 줄 높이(--nc-act-h)로 맞춘다.
+   대기 문구(adv.heartwait)는 읽어야 하는 안내라 이 단추에만 두 가지를 덮는다(지휘자 추인 — 수정 1회차 F2): 글자색 · 불투명도.
+   · 글자색 --prim-ink: 판정 값 --prim-art-ink 는 킷 회색 면 위 대비 4.39~4.45(< 4.5)라 본문 잉크로 — 읽힘 기준이 토큰 이름보다 앞선다(smoke-node122 I2 최악 7.76).
+   · opacity: initial = 1(초깃값): 킷 비활성의 .78 을 걷는다. 숫자 1 을 쓰면 css-primitives 숫자 리터럴이 하나 늘어 initial 로 쓴다(계산값 1). */
 #modal-node .nc-act > #node-wait {
   --f2-bh: var(--nc-act-h);
+  --f2-br: var(--nc-act-r);
   font-family: var(--font-display); font-weight: 400;
   font-size: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 13)); line-height: 1.15;
   word-break: keep-all;
-  color: var(--prim-ink);   /* 킷 회색 면 위 글자 대비: 갈색 잉크(--prim-art-ink)는 4.39~4.45 (< 4.5, smoke-node122 I2) → 본문 잉크 --prim-ink */
-  opacity: initial;         /* = 1 — 킷 비활성의 .78 을 걷는다(원시 숫자 리터럴을 새로 늘리지 않으려 initial) */
+  color: var(--prim-ink);
+  opacity: initial;
 }
 /* 판 안 스크롤 구획(수정 1회차 — ⓘ 를 펼친 작은 창 = 「카드 안 스크롤」): 평소엔 제 높이(스크롤 0), 판(max-height 100%)을 넘으면 이 구획만
    구른다. 선언은 #rank-list · .dr-body 처방과 같다 — 그 공유 규칙 목록은 Task 12 몫이라 고치지 않고 노드 카드 전용으로 둔다.
@@ -71988,7 +71993,7 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
           mask-image: linear-gradient(to top, transparent, var(--prim-ink) 12%);
 }
 /* 몸통은 흐름 안(세로 · 가로 한 규칙 — 옛 가로 Q10 배치를 모든 창으로). 자리 = 그림 오른쪽(왼쪽 여백 116nu) · 위 14nu · 오른쪽 9nu. 아래 여백 9nu 는 펼친 기술 설명이
-   포스터 아래변에 붙지 않게 하는 몫(접힘에서는 내용이 128nu 보다 낮아 안 보인다 — 오른쪽 여백과 같은 값). 그림은 포스터 아래끝 닻이라 포스터가 자라면 늘어난 만큼 위 여백이 된다. */
+   포스터 아래변에 붙지 않게 하는 몫(시안 줄 사이 9 와 같은 값 — 시안은 펼친 상태를 그리지 않았다. 지휘자 추인 — 수정 1회차 F2. 접힘에서는 내용이 128nu 보다 낮아 안 보인다). 그림은 포스터 아래끝 닻이라 포스터가 자라면 늘어난 만큼 위 여백이 된다. */
 #modal-node .nc-foe-body {
   position: relative;
   margin: 0 calc(var(--nc-u) * 9) 0 calc(var(--nc-u) * 116);
@@ -72215,13 +72220,7 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
   box-shadow: 0 calc(var(--nc-u) * 1) calc(var(--nc-u) * 2) color-mix(in srgb, var(--role-primary-outline-r) calc(var(--mo-mk-35) * 100%), transparent), inset 0 calc(var(--nc-u) * -1.5) 0 var(--prim-line-light);
 }
 #modal-node .nc-rec[hidden] { display: none; }
-#modal-node .nc-mem-t { display: none; }   /* [판정판 122 ④] 이름 · 역할은 화면에서 뺀다 — 얼굴(.nc-mem)의 낭독 라벨이 대신한다(ncTeam). 아래 .nc-mem-nm · .nc-mem-k 글자 규칙은 보이지 않는다. */
-#modal-node .nc-mem-nm {
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  font-family: var(--font-display); font-weight: 400; font-size: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 15));
-  color: var(--prim-art-ink);
-}
-#modal-node .nc-mem-k { font-style: normal; font-size: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 11)); font-weight: 600; color: var(--role-f2-ink); white-space: nowrap; }
+#modal-node .nc-mem-t { display: none; }   /* [판정판 122 ④] 이름 · 역할은 화면에서 뺀다 — 얼굴(.nc-mem)의 낭독 라벨이 대신한다(ncTeam 이 .nc-mem-nm · .nc-mem-k 의 글을 읽어 라벨로). 옛 .nc-mem-nm · .nc-mem-k 글자 규칙은 은퇴(수정 1회차 F6 — 보이지 않는 요소). */
 #modal-node .nc-swap {                       /* 목업 .swap — 36 × 36 */
   --f2-ph: calc(var(--nc-u) * 36);
   flex: 0 0 auto;
@@ -73049,7 +73048,8 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
   #app.battle #screen-game.active #pc-right[data-wide-only] { left: calc(var(--bt-x0) + var(--bu) * 916); }
   /* 5-b. [Task 6b] 악당 카드의 아래 상자 = 카드와 같은 젤리 유리 판(위 .jbox--modal 별칭 · 같은 자 --jbox-*) — 영웅 카드의 메달
      상자(#actionbar)와 같은 크기 · 같은 위 끝(x 44~344 · y 497~700). 안: 위 = 기술 이름 + 한 줄 설명(판 정보 창 .nc-atk-n /
-     .nc-atk-d 의 글자 규칙 — 굵기 700 / 500 · 줄 높이 1.1 · 잉크는 아래 대비 실측으로 --ink · 지휘자 판정 Q4 크기: 이름 = 이름 판 이름 크기
+     .nc-atk-d 의 글자 규칙을 옮긴 시점의 값 — 굵기 700 / 500 · 줄 높이 1.1 · 잉크는 아래 대비 실측으로 --ink. [판정판 122] 판 정보 창의 .nc-atk-d 는 그 뒤 칩 밖
+     접힌 줄(굵기 400 · 잉크 --prim-art-ink)로 바뀌었다 — 이 상자는 자기 값이라 무변 · 지휘자 판정 Q4 크기: 이름 = 이름 판 이름 크기
      2.90cqw × 7.5 = 21.75bu · 설명 = 칩 글자 15bu, 둘 다 하한 --text-min) · 안 여백 16 · 이름↔설명 4. 아래 칩 줄 · 위 토스트는
      자기 규칙(3절)이 이 판 위에 겹쳐 세운다. 한국어는 낱말 단위로 줄을 바꾼다(저장소 문단 관례 keep-all + anywhere). */
   /* 두 아래 상자 판(악당 #duel-foe-box · [수정 1회차 M2] 영웅 #duel-me-box — 메달 넷이 그 위 가운데) = 같은 판 · 같은 크기 · 같은 위 끝,
