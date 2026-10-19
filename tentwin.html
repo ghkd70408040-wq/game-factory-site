@@ -58033,6 +58033,10 @@ html[lang="en"] #app-intro .api-logo{
     grid-row: 1;
     /* 오른쪽 62px 은 #hero-slot 자리였다. 슬롯이 좌 날개로 갔으므로 회수. */
     padding-right: calc(var(--safe-r) + 16px);
+    /* [판정판 127] 가로 클러스터에서 일시정지 단추가 앉는 자리 — 상단바 왼쪽 위 모서리에서 (x, y). 아래 상단바 padding 과 클래식 단추 자리(바로 아래
+       #app.classic … #btn-pause)가 이 두 수 하나를 같이 읽는다(두 곳에 같은 수를 따로 적어 한쪽이 다른 규칙에 가려져도 눈치채지 못하던 것을 막는다). */
+    --pc-pause-x: 12px;
+    --pc-pause-y: 6px;
   }
   /* 🚨 W10 ② — 세로에서 일시정지는 유리판 폭의 9.63% 로 시안 자리에 박히지만
      (:6646·:35970), 가로에서는 그 셈이 성립하지 않는다: 상단바는 1/4 열을 통째로
@@ -58043,7 +58047,7 @@ html[lang="en"] #app-intro .api-logo{
      받는다 — 안 그러면 클래식 가로에서 --dh-w 셈이 그대로 살아 버튼이 커진다. */
   #app.battle #screen-game.active #topbar,
   #app.classic #screen-game.active #topbar {
-    padding: calc(var(--safe-t) + 6px) calc(var(--safe-r) + 16px) 2px calc(var(--safe-l) + 12px);
+    padding: calc(var(--safe-t) + var(--pc-pause-y)) calc(var(--safe-r) + 16px) 2px calc(var(--safe-l) + var(--pc-pause-x));
   }
   /* [hud-unify 0910] 아케이드·러시·데일리도 같은 버튼을 쓰게 됐으므로 이 가로
      예외를 함께 받는다 — 안 그러면 1200px 화면에서 9.63% 가 115px 버튼이 된다
@@ -58055,6 +58059,19 @@ html[lang="en"] #app-intro .api-logo{
     left: auto; top: auto;
     width: 40px !important; height: 40px !important;
     aspect-ratio: auto;
+  }
+  /* [판정판 127 · 2026-10-19 · 사용자 「전체적으로 … 저급해 보이는 것들 전부 제대로」 안의 결함] 클래식 가로 — 일시정지 단추가 위로 20px 잘리던 것.
+     원인(실측 1280x720 · 1920x1080 · 2000x740 · 클래식의 세 종목 아케이드 · 타임러시 · 데일리 전부): 위 상단바 padding 규칙(6px · 12px)은 클래식에서 한 번도 먹지 않았다.
+     클래식 상단바는 판을 접으려고 `#app.classic #topbar{height:0 !important; padding:0 !important}`(<style id="kit-v2"> 클래식 HUD 절 「#topbar 를 접고」)로
+     높이 0 · 패딩 0 이고 !important 라 여기 padding 이 진다. 그러면 위 규칙이 흐름에 되돌려 놓은 단추(40px)는 높이 0 인 flex 줄(align-items:center)의
+     자식이라 줄 가운데 y=0 에 걸려 상자 top −20 이 된다(세로 폰은 단추가 absolute 라 무관). 클래식이 아닌 아케이드 · 타임러시 · 데일리는 접지 않은 상단바라
+     같은 흐름 규칙이 바르게 먹는다(상자 top 10). 수리: 접은 상단바(높이 0 — 판 · 보드 자리는 그대로)는 두고 클래식 단추만 흐름 밖(absolute)에 놓는다. 자리는 위
+     padding 규칙이 적으려던 그 두 수(--pc-pause-x · --pc-pause-y)를 그대로 읽는다. 상단바가 position:relative 라 기준 상자는 상단바 왼쪽 위 모서리다.
+     전투(.battle)는 아래 battle-landscape 절이 자기 자리를 갖고 있어 이 줄과 무관하다. */
+  #app.classic #screen-game.active #btn-pause {
+    position: absolute;
+    left: calc(var(--safe-l) + var(--pc-pause-x));
+    top: calc(var(--safe-t) + var(--pc-pause-y));
   }
   #screen-game.active #tb-stats {
     max-width: 660px;
