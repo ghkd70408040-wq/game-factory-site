@@ -58037,7 +58037,8 @@ html[lang="en"] #app-intro .api-logo{
     /* 오른쪽 62px 은 #hero-slot 자리였다. 슬롯이 좌 날개로 갔으므로 회수. */
     padding-right: calc(var(--safe-r) + 16px);
     /* [판정판 127] 가로 클러스터에서 일시정지 단추가 앉는 자리 — 상단바 왼쪽 위 모서리에서 (x, y). 아래 상단바 padding 과 클래식 단추 자리(바로 아래
-       #app.classic … #btn-pause)가 이 두 수를 같이 읽는다(두 곳에 같은 수를 따로 적어 한쪽이 다른 규칙에 가려져도 눈치채지 못하던 것을 막는다).
+       #app.classic … #btn-pause)가 이 두 수를 같이 읽는다. 렌더되는 소비처는 클래식 단추 규칙 하나뿐이다 — 상단바 padding 규칙은 클래식(kit-v2 의
+       `#app.classic #topbar{padding:0 !important}`)과 전투(아래 battle-landscape 의 `#app.battle … #topbar{padding:0}`) 둘 다에서 가려진 죽은 줄이라 값만 같이 읽는다(렌더 무변).
        x = 12px: 옛 padding 규칙의 12px 그대로(아케이드 · 타임러시 · 데일리 단추 x 와 같다).
        y = 카드 윗선: 줄 간격 변수(--pc-row-gap)를 읽는다 — 클래식은 접은 상단바 줄(높이 0) 바로 아래 왼쪽 카드가 서므로 카드 윗선 = 줄 간격(실측 10).
        옛 padding 규칙의 6px 은 이 자리에 못 쓴다(단추 윗변이 카드 윗선보다 4px 위로 걸친다 — 지휘자 판정 2026-10-19). */
@@ -58051,6 +58052,8 @@ html[lang="en"] #app-intro .api-logo{
      흐름 배치를 그대로 쓴다 — 세로 수리 전과 픽셀이 같다. */
   /* [0908 ②] 클래식이 같은 정지 버튼 규칙을 쓰게 됐으므로 이 가로 예외도 함께
      받는다 — 안 그러면 클래식 가로에서 --dh-w 셈이 그대로 살아 버튼이 커진다. */
+  /* [판정판 127] 이 padding 은 클래식(kit-v2 의 padding:0 !important)과 전투(battle-landscape 의 padding:0) 둘 다에서 가려진 줄 — 렌더 무변.
+     변수(--pc-pause-x · --pc-pause-y)를 읽는 것은 옛 padding 이 적으려던 자리 값을 한 곳에 남기려는 값 근거일 뿐이다. */
   #app.battle #screen-game.active #topbar,
   #app.classic #screen-game.active #topbar {
     padding: calc(var(--safe-t) + var(--pc-pause-y)) calc(var(--safe-r) + 16px) 2px calc(var(--safe-l) + var(--pc-pause-x));
