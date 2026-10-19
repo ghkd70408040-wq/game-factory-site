@@ -1426,7 +1426,8 @@ display: grid;
 grid-template-columns: 264px minmax(0, 520px) 264px;
 grid-template-rows: auto auto auto auto auto 1fr;
 column-gap: 28px;
-row-gap: 10px;
+--pc-row-gap: 10px;
+row-gap: var(--pc-row-gap);
 width: 100%;
 max-width: 1104px;
 margin: 0 auto;
@@ -1440,10 +1441,12 @@ background-image: none;
 grid-column: 1 / 4;
 grid-row: 1;
 padding-right: calc(var(--safe-r) + 16px);
+--pc-pause-x: 12px;
+--pc-pause-y: var(--pc-row-gap);
 }
 #app.battle #screen-game.active #topbar,
 #app.classic #screen-game.active #topbar {
-padding: calc(var(--safe-t) + 6px) calc(var(--safe-r) + 16px) 2px calc(var(--safe-l) + 12px);
+padding: calc(var(--safe-t) + var(--pc-pause-y)) calc(var(--safe-r) + 16px) 2px calc(var(--safe-l) + var(--pc-pause-x));
 }
 #app.battle #screen-game.active #btn-pause,
 #app.classic #screen-game.active #btn-pause,
@@ -1452,6 +1455,11 @@ position: relative;
 left: auto; top: auto;
 width: 40px !important; height: 40px !important;
 aspect-ratio: auto;
+}
+#app.classic #screen-game.active #btn-pause {
+position: absolute;
+left: calc(var(--safe-l) + var(--pc-pause-x));
+top: calc(var(--safe-t) + var(--pc-pause-y));
 }
 #screen-game.active #tb-stats {
 max-width: 660px;
