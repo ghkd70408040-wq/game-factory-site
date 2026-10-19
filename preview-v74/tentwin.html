@@ -1873,8 +1873,8 @@ align-items: center;
 justify-content: center;
 padding: calc(var(--safe-t) + 18px) calc(var(--safe-r) + 18px) calc(var(--safe-b) + 18px) calc(var(--safe-l) + 18px);
 background-color: rgba(88, 64, 112, .12);
--webkit-backdrop-filter: blur(1px) saturate(1.04);
-backdrop-filter: blur(1px) saturate(1.04);
+-webkit-backdrop-filter: blur(4px) saturate(1.04);
+backdrop-filter: blur(4px) saturate(1.04);
 animation: fadein 200ms var(--ease);
 }
 .modal[hidden] { display: none; }
@@ -8892,7 +8892,6 @@ filter: drop-shadow(0 0 10px rgba(102, 240, 159, .40));
 --mode-a-contact: 0.324;
 --mode-a-face-desc:  #E3D8DF;
 --mode-a-alpha-desc: .58;
---mode-a-alpha-win: .90;
 --mode-b-face:    #96A7F6;
 --mode-b-alpha:   0.550;
 --mode-b-rim:     #C2D6FF;
@@ -9114,8 +9113,6 @@ filter: drop-shadow(0 0 10px rgba(102, 240, 159, .40));
 --role-modal-tint: rgba(247,216,230,.0234);
 --role-modal-ring: #8E5A72;
 --role-modal-ring-w: 0;
---role-gear-veil: color-mix(in srgb, var(--mode-a-rim) 35%, transparent);
---role-gear-veil-blur: 10px;
 --role-menu1-crt-menu1-play: #FEA4BE;
 --role-menu1-cl-menu1-play: #F8AAC5;
 --role-menu1-clb-menu1-play: #F797B2;
@@ -9266,7 +9263,7 @@ filter: drop-shadow(0 0 10px rgba(102, 240, 159, .40));
 <link rel="preload" as="image" href="catalog/jelly-box-c.webp">
 <link rel="preload" as="image" href="catalog/duel-title-play.webp">
 <!-- ==RELEASE:BEGIN== 출시 메타 (scratchpad/release-0908/apply-head.py 가 생성·교체, 본문 무접촉) -->
-<meta name="build" content="4439727-20261019-2023">
+<meta name="build" content="1995945-20261019-2305">
 <meta name="application-name" content="텐트윈 젤리팡 월드">
 <meta name="description" lang="ko" content="숫자 젤리를 골라 10을 만들어 터뜨리는 퍼즐이에요. 모험·아케이드·데일리·타임 러시·클래식을 즐겨요. Ten Twin Jelly Pang World: pick number jellies that equal or sum to 10.">
 <link rel="manifest" href="tentwin.webmanifest">
@@ -9320,7 +9317,7 @@ navigator.serviceWorker.register('sw.js',{scope:'./'}).catch(function(e){console
 })}
 </script>
 <!-- ==RELEASE:END== -->
-<link rel="preload" as="style" href="tw-late-2e357fbd.css">
+<link rel="preload" as="style" href="tw-late-c23321d9.css">
 </head>
 <body>
 <!-- ============================================================
@@ -11267,7 +11264,8 @@ background-size:cover 로 축소한다. 그림 파일이 없는 챕터는
 칸은 buildMinimap() 이 만든다 — 마크업에 챕터 10줄을 박아 두면
 MAP_CHAPTERS 가 늘 때 두 자리를 고쳐야 한다.
 ============================================================ -->
-<div id="modal-minimap" class="modal r10m" hidden role="dialog" aria-modal="true" aria-labelledby="mm-h"><div class="sheet r10-panel jbox jbox--modal" data-part="modal-plate">
+<div id="modal-minimap" class="modal r10m" hidden role="dialog" aria-modal="true" aria-labelledby="mm-h"><div class="sheet r10-panel jbox jbox--modal mframe" data-part="modal-plate">
+<div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
 <div class="r10-ribbon"><h2 id="mm-h" data-i18n="minimap.title">Chapters</h2></div>
 <button id="mm-close" class="r10-x x-btn" type="button" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
 <div id="mm-grid" class="mm-grid"></div>
@@ -11282,12 +11280,14 @@ MAP_CHAPTERS 가 늘 때 두 자리를 고쳐야 한다.
 아니라 그 챕터 스토리를 본 기록 cutSeen('chap'+c) — buildTheater()/
 theaterPick() 참조(챕터 미니맵 함수들 옆). 요약 줄(#mm-sum류)은 두지
 않는다(브리프 범위 = 카드 격자뿐). -->
-<div id="modal-theater" class="modal r10m" hidden role="dialog" aria-modal="true" aria-labelledby="th-h"><div class="sheet r10-panel jbox jbox--modal" data-part="modal-plate">
+<div id="modal-theater" class="modal r10m" hidden role="dialog" aria-modal="true" aria-labelledby="th-h"><div class="sheet r10-panel jbox jbox--modal mframe" data-part="modal-plate">
+<div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
 <div class="r10-ribbon"><h2 id="th-h" data-i18n="theater.title">Story Theater</h2></div>
 <button id="th-close" class="r10-x x-btn" type="button" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
 <div id="th-grid" class="mm-grid"></div>
 </div></div>
-<div id="modal-howto" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="howto-h"><div class="sheet jbox jbox--modal" data-part="modal-plate">
+<div id="modal-howto" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="howto-h"><div class="sheet jbox jbox--modal mframe" data-part="modal-plate">
+<div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
 <h2 id="howto-h" data-i18n="howto.title">How to play</h2>
 <button class="r10-x x-btn" type="button" data-w6x="howto-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
 <div id="howto-viewport"><div id="howto-track">
@@ -11442,7 +11442,8 @@ medal-<역할>-v3 파생 아이콘(medal-<역할>-v3-90.webp · 레시피 tools/
 <!-- First-run interactive tutorial (3 taps). game.js injects the mini board into
 #tut-stage and writes #tut-text through t(); the markup stays text-free so a
 missing i18n key can never leave an English string on a Korean screen. -->
-<div id="modal-tutorial" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="tut-h"><div class="sheet jbox jbox--modal" data-part="modal-plate">
+<div id="modal-tutorial" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="tut-h"><div class="sheet jbox jbox--modal mframe" data-part="modal-plate">
+<div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
 <h2 id="tut-h" data-i18n="howto.title">How to play</h2>
 <button class="r10-x x-btn" type="button" data-w6x="tut-skip" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
 <div id="tut-stage"></div>
@@ -11461,7 +11462,8 @@ missing i18n key can never leave an English string on a Korean screen. -->
 끄려고 메뉴까지 나갔다 오게 만들 이유가 없고, 두 화면은 같은 toggleSound()
 하나를 부르므로 상태가 갈라질 여지도 없다.
 ============================================================ -->
-<div id="modal-settings" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="set-h"><div class="sheet jbox jbox--modal" data-part="modal-plate">
+<div id="modal-settings" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="set-h"><div class="sheet jbox jbox--modal mframe" data-part="modal-plate">
+<div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
 <h2 id="set-h" data-i18n="settings.title">Settings</h2>
 <button class="r10-x x-btn" type="button" data-w6x="st-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
 <!-- Task 12 — 계정 줄. 포털 밖(TW_PORTAL.env!=='crazygames')이면 이 div 는
@@ -11499,7 +11501,8 @@ openQuest/openRank/openTheater 를 각자 부른다). 제작진(#modal-credits�
 세운다: 판 = `.sheet.jbox.jbox--modal[data-part=modal-plate]`(다른 12창과
 한 글자도 다르지 않다), X = 같은 `.r10-x.x-btn[data-w6x]`(기존 위임이
 그대로 받는다), 버튼 = 같은 `.btn.btn-primary`. 새 부품 0 · 새 값 0. -->
-<div id="modal-soon" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="soon-h"><div class="sheet jbox jbox--modal" data-part="modal-plate">
+<div id="modal-soon" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="soon-h"><div class="sheet jbox jbox--modal mframe" data-part="modal-plate">
+<div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
 <h2 id="soon-h" data-i18n="soon.title">Coming Soon</h2>
 <button class="r10-x x-btn" type="button" data-w6x="soon-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
 <p class="cut-line" data-i18n="soon.body">Under construction. Check back after the next update!</p>
@@ -11511,7 +11514,8 @@ openQuest/openRank/openTheater 를 각자 부른다). 제작진(#modal-credits�
 대신 열릴 때마다 t() 로 새로 짓고, 언어 전환도 다시 짓는다(applyI18n 이
 건드릴 노드가 아예 없으므로 5차의 되돌림 함정이 원리적으로 없다).
 ============================================================ -->
-<div id="modal-skin" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="sk-h"><div class="sheet jbox jbox--modal" data-part="modal-plate">
+<div id="modal-skin" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="sk-h"><div class="sheet jbox jbox--modal mframe" data-part="modal-plate">
+<div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
 <h2 id="sk-h" data-i18n="skin.title">Skins</h2>
 <button class="r10-x x-btn" type="button" data-w6x="sk-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
 <div id="sk-list" class="sk-list"></div>
@@ -11539,7 +11543,7 @@ scratchpad/rc1017/t8b2/mkclip_tabs.py), 설명 카드 = 탭 없는 기본 실루
 </div>
 <div id="gm-slots" class="gm-slots" role="group" data-i18n-aria="aria.loadout" aria-label="Loadout"></div>
 </div>
-<div class="cp-card kit-frame-v2">
+<div class="cp-card kit-frame-v2 mframe" data-tabs="3">
 <div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
 <div id="gm-tabs" class="cp-tabs kit-frame-v2__tabs" role="tablist" data-i18n-aria="gear.title" aria-label="Gear">
 <button class="cp-tab kit-tab-v2" type="button" role="tab" data-gmtab="weapon" aria-selected="true"><i class="cpt-ic gm-ic" aria-hidden="true"></i><span class="cpt-lab" data-i18n="gear.slot.weapon">Weapon</span><b class="gm-n"></b></button>
@@ -11567,14 +11571,14 @@ scratchpad/rc1017/t8b2/mkclip_tabs.py), 설명 카드 = 탭 없는 기본 실루
 <h2 id="gi-h" data-i18n="gear.title.info">Gear Info</h2>
 <button id="gi-close" class="icon-btn x-btn" type="button" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
 </div>
-<div class="cp-card kit-frame-v2">
+<div class="cp-card kit-frame-v2 mframe">
 <div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
 <div class="cp-body kit-frame-v2__body">
 <div class="gi-main">
 <div class="gi-top">
 <div id="gi-art" class="gi-art"></div>
 <div class="gi-id">
-<b id="gi-name" class="gi-name"></b>
+<span class="gi-plate kit-slot-v2 kit-slot-v2--name"><b id="gi-name" class="gi-name"></b></span>
 <span id="gi-chip" class="tchip"><i></i></span>
 <span id="gi-meta" class="gi-meta"></span>
 </div>
@@ -11607,7 +11611,8 @@ scratchpad/rc1017/t8b2/mkclip_tabs.py), 설명 카드 = 탭 없는 기본 실루
 문장은 마크업에 굳히지 않는다(#modal-confirm 규약) — 이름·배지·비용·진행은
 전부 syncInvite() 가 t() 로 채운다. data-i18n 이 붙은 것은 **고정 문구**
 (제목·두 버튼·「다음 초대까지」 라벨)뿐이라 언어 전환이 값을 안 지운다. -->
-<div id="modal-invite" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="iv-h"><div class="sheet jbox jbox--modal" data-part="modal-plate">
+<div id="modal-invite" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="iv-h"><div class="sheet jbox jbox--modal mframe" data-part="modal-plate">
+<div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
 <h2 id="iv-h" data-i18n="invite.title">Invite</h2>
 <button class="r10-x x-btn" type="button" data-w6x="iv-no" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
 <div class="ci-id">
@@ -11683,7 +11688,8 @@ scratchpad/rc1017/t8b2/mkclip_tabs.py), 설명 카드 = 탭 없는 기본 실루
 비활성이고, `getDigitalGoodsService` 가 없으면 `#shop-pay` 묶음이
 통째로 숨는다(§20.8 ①). SDK 호출은 **한 줄도 없다**.
 ============================================================ -->
-<div id="modal-shop" class="modal r10m" data-app-only hidden role="dialog" aria-modal="true" aria-labelledby="shop-h"><div class="sheet r10-panel jbox jbox--modal" data-part="modal-plate">
+<div id="modal-shop" class="modal r10m" data-app-only hidden role="dialog" aria-modal="true" aria-labelledby="shop-h"><div class="sheet r10-panel jbox jbox--modal mframe" data-part="modal-plate">
+<div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
 <div class="r10-ribbon"><h2 id="shop-h" data-i18n="shop.title">Shop</h2></div>
 <button id="shop-close" class="r10-x x-btn" type="button" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
 <!-- 상단 고정 잔액 칩 2개(§20.4). ★ 는 **읽기만** 한다 — 젤리별을 현금으로
@@ -11722,14 +11728,16 @@ scratchpad/rc1017/t8b2/mkclip_tabs.py), 설명 카드 = 탭 없는 기본 실루
 물러서는 행동(.btn-ghost)이 그 위. #modal-pause 가 [howto][restart]
 [menu·ghost][resume·primary] 로 같은 순서다.
 ============================================================ -->
-<div id="modal-confirm" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="cf-h" aria-describedby="cf-msg"><div class="sheet jbox jbox--modal" data-part="modal-plate">
+<div id="modal-confirm" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="cf-h" aria-describedby="cf-msg"><div class="sheet jbox jbox--modal mframe" data-part="modal-plate">
+<div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
 <h2 id="cf-h" data-i18n="confirm.title">Confirm</h2>
 <button class="r10-x x-btn" type="button" data-w6x="cf-no" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
 <p id="cf-msg"></p>
 <button id="cf-no" class="btn btn-ghost" type="button" data-i18n="confirm.no">Cancel</button>
 <button id="cf-yes" class="btn btn-primary" type="button" data-i18n="confirm.yes">Buy</button>
 </div></div>
-<div id="modal-pause" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="pause-h"><div class="sheet jbox jbox--modal" data-part="modal-plate">
+<div id="modal-pause" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="pause-h"><div class="sheet jbox jbox--modal mframe" data-part="modal-plate">
+<div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
 <h2 id="pause-h" data-i18n="pause.title">Paused</h2>
 <button class="r10-x x-btn" type="button" data-w6x="pz-resume" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
 <!-- ============================================================
@@ -11756,7 +11764,8 @@ W6 (사용자 지시) — "동일 구성요소는 반드시 동일 에셋/문법
 <button id="pz-menu" data-part="btn-modal" data-variant="purple" class="btn btn-ghost" data-i18n-aria="aria.pzMenu" data-i18n="pause.menu" aria-label="Back to main menu">Main menu</button>
 <button id="pz-resume" data-part="btn-modal" data-variant="primary" class="btn btn-primary" data-i18n-aria="aria.pzResume" data-i18n="pause.resume" aria-label="Resume game">Resume</button>
 </div></div>
-<div id="modal-clear" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="clear-title"><div class="sheet jbox jbox--modal" data-part="modal-plate">
+<div id="modal-clear" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="clear-title"><div class="sheet jbox jbox--modal mframe" data-part="modal-plate">
+<div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
 <!-- v4 C-3: the stage number as the hero of the sheet — the N탄 signal the
 tester named as the reason she kept playing Royal Match. aria-hidden
 because #clear-title already says the same thing to a screen reader. -->
@@ -11798,7 +11807,8 @@ v4 4차-a — 노드 미션 카드 (V3 §4·§5).
 그 밖이면 #node-wait(회색 대기 단추 · 회복 대기 안내) [판정판 122].
 game.js openNodeCard() 가 내용의 단독 소유자.
 ============================================================ -->
-<div id="modal-node" class="modal r10m" hidden role="dialog" aria-modal="true" aria-labelledby="node-title"><div class="sheet r10-panel jbox jbox--modal" data-part="modal-plate">
+<div id="modal-node" class="modal r10m" hidden role="dialog" aria-modal="true" aria-labelledby="node-title"><div class="sheet r10-panel jbox jbox--modal mframe" data-part="modal-plate">
+<div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
 <!-- [E16-0903 · 판정 3(분리)] 껍데기·판 기하는 **배포본**, 내용물은 유지.
 배포본 15159 의 `.modal r10m` + `.sheet r10-panel jbox jbox--modal` +
 `.r10-ribbon` 을 그대로 쓰고, 사용자 승인 노드카드 재기획(B1~B9)의
@@ -11955,7 +11965,8 @@ node-hp-v·node-rec-v·node.foehp·node.rec 은 이 카드 전용). -->
 장비 과일 절 = 한 줄 설명 · 등급 칩 셋(.tchip) · (보스 판) 보스 상자 · 장비 칸 격자(itemTile — 세로 4열 · 가로 5열) · 맨 아래 한 줄.
 사용 과일 절 = 줄 카드(중립 장비 칸 안 게이지 메달 그림 · 이름 · 한 줄 설명 · 확률 알약) — 이모지 은퇴.
 숫자는 전부 openDrops() 가 dropTableFor(n) 에서 채운다(판 추첨과 같은 표 — 마크업에 수치 0). -->
-<div id="modal-drops" class="modal r10m" hidden role="dialog" aria-modal="true" aria-labelledby="drops-title"><div class="sheet r10-panel jbox jbox--modal" data-part="modal-plate">
+<div id="modal-drops" class="modal r10m" hidden role="dialog" aria-modal="true" aria-labelledby="drops-title"><div class="sheet r10-panel jbox jbox--modal mframe" data-part="modal-plate">
+<div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
 <div class="r10-ribbon"><h2 id="drops-title">Stage 1 Drops</h2></div>
 <button id="drops-close" class="r10-x x-btn" type="button" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
 <div class="dr-tabs" role="tablist" data-i18n-aria="aria.droptabs" aria-label="Drop table sections">
@@ -11984,7 +11995,8 @@ node-hp-v·node-rec-v·node.foehp·node.rec 은 이 카드 전용). -->
 오늘 완료 여부는 메뉴가 아니라 **여기** 있다: 그 사실이 쓸모 있는 순간은
 "오늘 데일리를 할까"를 고르는 이 화면 하나뿐이다.
 ============================================================ -->
-<div id="modal-mode" class="modal r10m" hidden role="dialog" aria-modal="true" aria-labelledby="mode-h"><div class="sheet r10-panel jbox jbox--modal" data-part="modal-plate">
+<div id="modal-mode" class="modal r10m" hidden role="dialog" aria-modal="true" aria-labelledby="mode-h"><div class="sheet r10-panel jbox jbox--modal mframe" data-part="modal-plate">
+<div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
 <div class="r10-ribbon"><h2 id="mode-h" data-i18n="mode.title">Play</h2></div>
 <button id="mode-close" class="r10-x x-btn" type="button" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
 <div class="mode-list">
@@ -12036,7 +12048,8 @@ id="sian-play-sprites"> 가 행마다 base64 웹피를 깔고 .mode-t/.nchip/.mo
 으로 두면 그림 규칙이 한 줄도 닿지 않고 공용 기본 CSS(.mode-row/.mode-t)가
 그대로 살아 **코드 텍스트 라벨**이 보인다. 색은 아래 전용 블록이 준다.
 세 줄은 모험이 없다 — 클래식은 순수 실력 종목만 모으는 자리다. -->
-<div id="modal-classic" class="modal r10m" hidden role="dialog" aria-modal="true" aria-labelledby="classic-h"><div class="sheet r10-panel jbox jbox--modal" data-part="modal-plate">
+<div id="modal-classic" class="modal r10m" hidden role="dialog" aria-modal="true" aria-labelledby="classic-h"><div class="sheet r10-panel jbox jbox--modal mframe" data-part="modal-plate">
+<div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
 <div class="r10-ribbon"><h2 id="classic-h" data-i18n="classic.title">Classic</h2></div>
 <button id="classic-close" class="r10-x x-btn" type="button" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
 <p id="classic-lead" data-i18n="classic.lead">No skills, no items, no passives. Clear the board for the next one. Stuck ends the run, Rush ends at 90s, Daily is one board a day.</p>
@@ -12081,7 +12094,8 @@ ON        : endless · rush         · daily           (스킬판)
 판 = 젤리 모달 판, 제목 = .w6m 의 글자 제목(퀘스트 판과 같은 문법 — 리본
 그림 제목은 발주가 필요해 쓰지 않는다), 줄 = .mode-row(btn-picture) 의 기존
 변주 arcade(보라)·timeattack(주황) 인스턴스. 새 그림 0 · 새 값 0. -->
-<div id="modal-playground" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="pg-h"><div class="sheet jbox jbox--modal" data-part="modal-plate">
+<div id="modal-playground" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="pg-h"><div class="sheet jbox jbox--modal mframe" data-part="modal-plate">
+<div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
 <h2 id="pg-h" data-i18n="pg.title">Playground</h2>
 <button id="pg-close" class="r10-x x-btn" type="button" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
 <div class="mode-list">
@@ -12098,7 +12112,8 @@ ON        : endless · rush         · daily           (스킬판)
 <!-- v4 4차-a — 모험 스테이지 결과. 성공/실패가 같은 시트를 쓰고 .lost 클래스가
 색과 별 줄의 유무를 가른다: 두 시트를 따로 두면 버튼 위치가 미묘하게
 어긋나 "다시 도전"을 누르려다 "지도로"를 누르는 사고가 난다. -->
-<div id="modal-adv" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="adv-title"><div class="sheet jbox jbox--modal" data-part="modal-plate">
+<div id="modal-adv" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="adv-title"><div class="sheet jbox jbox--modal mframe" data-part="modal-plate">
+<div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
 <h2 id="adv-title">Stage 1 clear!</h2>
 <!-- W-C §10 루트 리빌. 순서가 사양 그대로다: 파편(현재는 🐾⭐ 특수과일
 수확분) → 코인/젤리별 → **별 3슬롯**(아래 #adv-stars 가 그 슬롯이고,
@@ -12136,7 +12151,8 @@ id 는 한 글자도 안 바뀌므로 paintAdvSheet/countUp 배선 무접촉. --
 <button id="adv-again" data-part="btn-modal" data-variant="pink" class="btn btn-primary" data-n="1" data-i18n="adv.next">Next stage</button>
 <button id="adv-map" data-part="btn-modal" data-variant="lilac" class="btn btn-ghost" data-i18n="adv.map">Map</button>
 </div></div>
-<div id="modal-over" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="over-title"><div class="sheet jbox jbox--modal" data-part="modal-plate">
+<div id="modal-over" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="over-title"><div class="sheet jbox jbox--modal mframe" data-part="modal-plate">
+<div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
 <h2 id="over-title" data-i18n="over.title">Out of moves</h2>
 <!-- P3 T2 수정 2회차 — 중간 구획(.over-body = 결과 카드 · 순위 줄 · 보상 줄). 평소(창 높이 720 초과)에는 display:contents 라 상자가 없고
 아래 형제들이 종전처럼 시트의 직접 자식으로 놓인다. 작은 폰(높이 720 이하 · 포털은 코인 2배 줄이 서므로 790 이하)에서만 이 구획이 시트 안에서 구르고
@@ -12191,7 +12207,8 @@ land?" is the question in the player's head before "leave". -->
 쓰고, 숫자 크기만 전용 규칙 하나로 키웠다.
 ▣ 본문은 전부 paintArcSheet() 가 t() 로 칠한다. 그래서 data-i18n 이 없다
 (있으면 applyI18n 이 값을 지운다 — #over-title 과 같은 규약). -->
-<div id="modal-arc" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="arc-title"><div class="sheet jbox jbox--modal" data-part="modal-plate">
+<div id="modal-arc" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="arc-title"><div class="sheet jbox jbox--modal mframe" data-part="modal-plate">
+<div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
 <h2 id="arc-title">Arcade</h2>
 <!-- P3 T9 — 중간 구획(.res-body = 기록 · 보상 · 코인 2배 줄 · 카드 미리보기). 평소에는 display:contents 라 상자가 없고 형제들이 종전처럼 시트의 직접 자식으로 놓인다.
 작은 폰에서만 이 구획이 시트 안에서 구르고 버튼 줄은 굴림 밖에 선다 — 게임오버 · 데일리와 같은 공용 클래스 한 벌(shop-p3 의 [P3-T9] 블록). -->
@@ -12222,7 +12239,8 @@ land?" is the question in the player's head before "leave". -->
 <button id="arc-menu" class="btn btn-ghost" data-i18n="arc.menu">Main menu</button>
 </div>
 </div></div>
-<div id="modal-daily" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="daily-title"><div class="sheet jbox jbox--modal" data-part="modal-plate">
+<div id="modal-daily" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="daily-title"><div class="sheet jbox jbox--modal mframe" data-part="modal-plate">
+<div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
 <h2 id="daily-title">Daily #1</h2>
 <!-- P3 T9 수정 1회차 — 중간 구획(.res-body = 기록 · 보상 · 코인 2배 줄 · 순위 · 격자 · 카드 미리보기). 게임오버 · 아케이드와 공용 클래스 한 벌(shop-p3 의 [P3-T9] 블록). 평소에는 display:contents. -->
 <div class="res-body">
@@ -12253,7 +12271,8 @@ rather than replacing them: every entry point is a detour, and closing the
 board has to put the player back exactly where they were. game.js builds
 #rank-list with createElement — always five children, filled or empty — the
 moment the sheet opens, and never between opens. -->
-<div id="modal-rank" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="rank-h"><div class="sheet jbox jbox--modal" data-part="modal-plate">
+<div id="modal-rank" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="rank-h"><div class="sheet jbox jbox--modal mframe" data-part="modal-plate">
+<div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
 <h2 id="rank-h" data-i18n="rank.title">Records</h2>
 <button class="r10-x x-btn" type="button" data-w6x="rank-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
 <div id="rank-tabs" role="tablist" data-i18n-aria="aria.rankTab" aria-label="Pick which records to show">
@@ -12283,14 +12302,19 @@ aria-selected 로 낸다 — 새 상태 어휘를 만들지 않는다.
 ⚠ 탭은 **판 위**에 선다. 참고 화면은 아래에 붙어 있지만 우리 탭 부품
 (.kit-tab-v2)은 윗변만 둥글고 스페큘러가 좌상단인 «상단 탭»이라, 아래에
 뒤집어 붙이면 광원이 뒤집힌다(부품 계약 위반). 자리보다 부품을 지켰다. -->
-<div id="modal-quest" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="quest-h"><div class="sheet jbox jbox--modal" data-part="modal-plate">
+<!-- [판정판 129 · Task 129 · 지휘자 판정 Q5] 판 내용을 통째로 바꾸는 탭(일일 · 주간 · 에픽) = 판 윗변에 구운 탭 셋(방 · 장비 창과 한 생성기 · 한 훅 .mframe[data-tabs]).
+짜임 = 장비 창과 같다: 바깥 .sheet(.mf-tabhost)는 그리지 않는 틀 — 제목 캡슐 + ✕ 가 판 위에 서고, 그 아래 탭 달린 젤리 판(.cp-card.mframe) = 탭 → 본문(.cp-body). -->
+<div id="modal-quest" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="quest-h"><div class="sheet jbox jbox--modal mf-tabhost" data-part="modal-plate">
 <h2 id="quest-h" data-i18n="quest.title">Missions</h2>
 <button class="r10-x x-btn" type="button" data-w6x="quest-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
-<div id="quest-tabs" class="kit-frame-v2__tabs qs-tabs" role="tablist" data-i18n-aria="aria.questTab" aria-label="Mission type">
-<button class="kit-tab-v2 qs-tab" type="button" role="tab" data-qtab="daily" data-active aria-selected="true"><span class="cpt-lab" data-i18n="quest.tab.daily">Daily</span></button>
-<button class="kit-tab-v2 qs-tab" type="button" role="tab" data-qtab="weekly" aria-selected="false"><span class="cpt-lab" data-i18n="quest.tab.weekly">Weekly</span></button>
-<button class="kit-tab-v2 qs-tab" type="button" role="tab" data-qtab="epic" aria-selected="false"><span class="cpt-lab" data-i18n="quest.tab.epic">Epic</span></button>
+<div class="cp-card kit-frame-v2 mframe" data-tabs="3">
+<div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
+<div id="quest-tabs" class="cp-tabs kit-frame-v2__tabs qs-tabs" role="tablist" data-i18n-aria="aria.questTab" aria-label="Mission type">
+<button class="cp-tab kit-tab-v2 qs-tab" type="button" role="tab" data-qtab="daily" data-active aria-selected="true"><span class="cpt-lab" data-i18n="quest.tab.daily">Daily</span></button>
+<button class="cp-tab kit-tab-v2 qs-tab" type="button" role="tab" data-qtab="weekly" aria-selected="false"><span class="cpt-lab" data-i18n="quest.tab.weekly">Weekly</span></button>
+<button class="cp-tab kit-tab-v2 qs-tab" type="button" role="tab" data-qtab="epic" aria-selected="false"><span class="cpt-lab" data-i18n="quest.tab.epic">Epic</span></button>
 </div>
+<div class="cp-body">
 <!-- 출석 7일 — 새 저장 칸 0. store.streak · store.streakClaimed(§21④)만 읽는다. -->
 <div id="quest-att" class="qs-att" role="list" aria-label="Attendance"></div>
 <div id="quest-list" class="qs-list"></div>
@@ -12298,19 +12322,28 @@ aria-selected 로 낸다 — 새 상태 어휘를 만들지 않는다.
 <button id="quest-all" class="rank-tab qs-all" type="button" aria-selected="false" data-i18n="quest.claimall">Claim all</button>
 </div>
 <button id="quest-close" data-part="btn-modal" data-variant="primary" class="btn btn-primary" data-i18n-aria="aria.close" data-i18n="rank.close" aria-label="Close">Close</button>
+</div>
+</div>
 </div></div>
 <!-- [P3-ODDS] 확률 정보(게임 안 자율 공시, 스펙 §2·§4-b · 목업 mock-P-odds.png). 판 = 정본 모달 판 인스턴스,
 탭 = 킷 탭(.kit-tab-v2 — #modal-quest 와 같은 문법). 숫자는 전부 gachaTable 한 출처에서 온다. -->
-<div id="modal-odds" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="odds-h"><div class="sheet jbox jbox--modal" data-part="modal-plate">
+<!-- [판정판 129 · Task 129 · 지휘자 판정 Q5] 캡슐 갈래 탭(아이템 · 황금 · 친구 — 판 내용을 통째로 바꾼다) = 판 윗변에 구운 탭 셋 · 짜임은 위 미션 창과 같다.
+꾸미기 캡슐 갈래(oddsPaint 가 탭 줄을 hidden)에서는 판이 탭 없는 기본 실루엣으로 선다(실루엣 규칙이 :has(> .cp-tabs[hidden]) 를 뺀다). -->
+<div id="modal-odds" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="odds-h"><div class="sheet jbox jbox--modal mf-tabhost" data-part="modal-plate">
 <h2 id="odds-h" data-i18n="odds.title">Odds</h2>
 <button class="r10-x x-btn" type="button" data-w6x="odds-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
-<div id="odds-tabs" class="kit-frame-v2__tabs qs-tabs" role="tablist" data-i18n-aria="odds.title" aria-label="Odds">
-<button class="kit-tab-v2 qs-tab od-tab" type="button" role="tab" data-otab="item" data-active aria-selected="true"><span class="cpt-lab" data-i18n="gacha.item">Item Capsule</span></button>
-<button class="kit-tab-v2 qs-tab od-tab" type="button" role="tab" data-otab="gold" aria-selected="false"><span class="cpt-lab" data-i18n="gacha.gold">Golden Capsule</span></button>
-<button class="kit-tab-v2 qs-tab od-tab" type="button" role="tab" data-otab="friend" aria-selected="false"><span class="cpt-lab" data-i18n="gacha.friend">Friend Capsule</span></button>
+<div class="cp-card kit-frame-v2 mframe" data-tabs="3">
+<div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
+<div id="odds-tabs" class="cp-tabs kit-frame-v2__tabs qs-tabs" role="tablist" data-i18n-aria="odds.title" aria-label="Odds">
+<button class="cp-tab kit-tab-v2 qs-tab od-tab" type="button" role="tab" data-otab="item" data-active aria-selected="true"><span class="cpt-lab" data-i18n="gacha.item">Item Capsule</span></button>
+<button class="cp-tab kit-tab-v2 qs-tab od-tab" type="button" role="tab" data-otab="gold" aria-selected="false"><span class="cpt-lab" data-i18n="gacha.gold">Golden Capsule</span></button>
+<button class="cp-tab kit-tab-v2 qs-tab od-tab" type="button" role="tab" data-otab="friend" aria-selected="false"><span class="cpt-lab" data-i18n="gacha.friend">Friend Capsule</span></button>
 </div>
+<div class="cp-body">
 <div id="odds-body" class="od-body"></div>
 <button id="odds-close" data-part="btn-modal" data-variant="primary" class="btn btn-primary" type="button" data-i18n="rank.close">Close</button>
+</div>
+</div>
 </div></div>
 <!-- [P3-GRES] 뽑기 결과(목업 mock-R1-item10.png — **판 없음**). 카드 = 등급 액자(코드) + 장비 그림(itemArtCss).
 결과는 **이미 저장된 뒤**에만 이 창이 열린다(gachaBuy 가 persist 를 끝낸 값) — 연출은 보여 주기만 한다.
@@ -12411,7 +12444,7 @@ game.js **앞**이어야 한다 — 부팅 직후 나는 소리까지 클립으�
 이 파일을 빼고 빌드해도 게임은 돈다 — 그때는 모든 슬롯이 기존 신스다. -->
 <script defer src="catalog/js/tw-02-7ea6fa41.js"></script>
 <script defer src="catalog/js/tw-03-06721556.js"></script>
-<script defer src="catalog/js/tw-04-bde93e1e.js"></script>
+<script defer src="catalog/js/tw-04-bd93274a.js"></script>
 <!-- ==FRUITDEF:BEGIN== generated by tools/fruit-tiles.js — do not edit by hand -->
 <!-- 열매 실루엣 클립 패스 9종 (DESIGN-V4 §5.8). clipPathUnits="objectBoundingBox"
 라 좌표가 0..1 이고, 타일 크기(--ts)가 어떤 값이든 같은 모양이 나온다.
@@ -12489,7 +12522,7 @@ width/height 0 + aria-hidden: 레이아웃·접근성 트리에 아무것도 더
 
 
 
-<link rel="stylesheet" href="tw-late-2e357fbd.css">
+<link rel="stylesheet" href="tw-late-c23321d9.css">
 <style id="compat-p1">
 @supports not (width: 1cqw) {
 #app.classic #classic-hud { --cqw: min(1vw, calc(var(--app-max) / 100)); height: calc(38.5 * var(--cqw)); }
@@ -12502,17 +12535,12 @@ width/height 0 + aria-hidden: 레이아웃·접근성 트리에 아무것도 더
 #app.battle #screen-game #topbar, #app.classic #screen-game #topbar { --cqw: min(1vw, calc(var(--app-max) / 100)); --dh-w: calc(100 * var(--cqw) - var(--safe-l) - var(--safe-r) - 8px); }
 }
 @supports not (color: color-mix(in srgb, red 10%, blue)) {
-#charpanel .cp-fx > .cp-jelly,
-#modal-gear .cp-fx > .cp-jelly,
-#modal-gear-info .cp-fx > .cp-jelly { background-image: none; box-shadow: inset 0 0 0 var(--cpj-L3-w) var(--cpj-L3-line); }
-#charpanel .cp-fx > .cp-jelly::before,
-#modal-gear .cp-fx > .cp-jelly::before,
-#modal-gear-info .cp-fx > .cp-jelly::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background: var(--cpj-face); opacity: var(--cpj-a-in); pointer-events: none; }
+:is(#charpanel, .mframe) .cp-fx > .cp-jelly { background-image: none; box-shadow: inset 0 0 0 var(--cpj-L3-w) var(--cpj-L3-line); }
+:is(#charpanel, .mframe) .cp-fx > .cp-jelly::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background: var(--cpj-face); opacity: var(--cpj-a-in); pointer-events: none; }
 #charpanel .cp-side-body { background: var(--f2-box); }
 #charpanel .ci-desc,
 #modal-gear-info .ci-desc { background: var(--cs-desc-box); }
-#charpanel .cp-card > .cp-tabs > .cp-tab::after,
-#modal-gear .cp-card > .cp-tabs > .cp-tab::after { background: #AC98AA; }
+:is(#charpanel .cp-card, .cp-card.mframe[data-tabs]) > .cp-tabs > .cp-tab::after { background: #AC98AA; }
 #charpanel .cp-side-rack .cp-gem-n,
 #modal-drops .cp-gem-n { background: var(--f2-tab-on); box-shadow: inset 0 0 0 calc(var(--f2-w) * .0022) #6B5A69; }
 #app.classic #ch-cap.wf-cap { background-image: none; background-color: var(--wcap-face); box-shadow: inset 0 0 0 var(--wcap-L3-w) var(--wcap-L3-line); border-radius: calc(var(--wcap-h) * .5); }
@@ -14736,12 +14764,6 @@ inset 0 0 0 calc(var(--it-w) * .06) var(--prim-white),
 padding-left: calc(var(--safe-l) + var(--cs-card-edge));     /* 판 좌우 = 방 정보 카드 좌우 닻(같은 변수) */
 padding-right: calc(var(--safe-r) + var(--cs-card-edge));
 }
-#charpanel:not([hidden]) ~ #modal-gear,
-#charpanel:not([hidden]) ~ #modal-gear-info {
-background-color: var(--role-gear-veil);
--webkit-backdrop-filter: blur(var(--role-gear-veil-blur)) saturate(1.04);
-backdrop-filter: blur(var(--role-gear-veil-blur)) saturate(1.04);
-}
 #modal-gear .gm-stack,
 #modal-gear-info .gm-stack {
 --cb-u: calc(var(--f2-w) / 100);
@@ -14958,11 +14980,17 @@ align-items: flex-start;
 gap: calc(var(--gi-u) * 1.6);
 min-width: 0;
 }
+#modal-gear-info .gi-plate {
+align-self: stretch;
+height: auto;
+min-height: calc(var(--f2-w) * .1088);
+}
 #modal-gear-info .gi-name {
 font-size: max(var(--text-min), calc(var(--gi-u) * 6));
 font-weight: 900;
 line-height: 1.15;
 color: var(--prim-art-ink);
+text-align: center;
 word-break: keep-all;
 overflow-wrap: anywhere;
 }
@@ -15026,6 +15054,35 @@ overflow-wrap: anywhere;
 #modal-gear-info .gi-cmp-n { font-weight: 900; }
 #modal-gear-info .gi-cmp-e { font-weight: 700; }
 #modal-gear-info .gi-cmp-d { font-weight: 900; }
+</style>
+<style id="modal-frame-129">
+#app .sheet.mframe > .cp-fx { z-index: -1; }
+.sheet.mframe { --f2-bd: var(--jbox-bw); --f2-r: var(--jbox-radius); }
+.jbox--modal:is(.mframe, .mf-tabhost)::before,
+.jbox--modal:is(.mframe, .mf-tabhost)::after { content: none; }
+.w6m .sheet.mf-tabhost { padding-left: 0 !important; padding-right: 0 !important; padding-bottom: 0 !important; }
+#app .w6m .sheet.mf-tabhost > h2 { --wcap-w: calc(56.84% + 1.1368px); }
+#app .sheet.mf-tabhost > .cp-card.mframe {
+width: auto;
+display: flex;
+flex-direction: column;
+flex: 0 1 auto;
+min-height: 0;
+gap: inherit;
+}
+#app .sheet.mf-tabhost > .cp-card.mframe > .cp-tabs { flex: 0 0 auto; margin-bottom: 0; }
+#app .modal .mframe :is(.sk-d, .ci-tag-k, .sk-bal > span, .sh-fine, .qs-t, .rank-meta, .sub-score, .rank-line),
+#app .modal .mframe .rank-row:nth-child(n+4) .rank-pos,
+#modal-arc.modal :is(#arc-best, #arc-when) { color: var(--prim-art-ink); }   /* 아케이드 결과 기록 줄 · 시각 줄(id 규칙 #8A5A06 · #7A6154 를 같은 특이 겹으로 넘는다) */
+#app .sheet.mf-tabhost > .cp-card.mframe > .cp-body {
+flex: 0 1 auto;
+min-height: 0;
+height: auto;
+display: flex;
+flex-direction: column;
+gap: inherit;
+padding: 0 var(--w6m-pad-x) var(--w6m-pad-b);
+}
 </style>
 </body>
 </html>

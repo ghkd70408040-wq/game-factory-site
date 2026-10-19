@@ -887,7 +887,7 @@ try { u.setAttribute("href", "#ic-" + name); } catch (e) { /* ignore */ }
 function isCapsuleHead(el) {
 try {
 return !!(el && el.matches &&
-el.matches('.modal-v2 .mv2-sheet > h2, .modal-v2 .mv2-head > h2, #modal-node .r10-ribbon > h2, #modal-drops .r10-ribbon > h2, #modal-clear .sheet > h2, #modal-adv:not(.is-advfinish) .sheet > h2, #modal-gear #gear-h, #modal-gear-info #gi-h'));   /* [Task 8b2] 장비 두 창 제목 = CSS 레터링(지휘자 판정 2-4) */
+el.matches('.modal-v2 .mv2-sheet > h2, .modal-v2 .mv2-head > h2, #modal-node .r10-ribbon > h2, #modal-drops .r10-ribbon > h2, #modal-clear .sheet > h2, #modal-adv:not(.is-advfinish) .sheet > h2, #modal-gear #gear-h, #modal-gear-info #gi-h, #modal-minimap .r10-ribbon > h2, #modal-theater .r10-ribbon > h2, #modal-quest .sheet > h2, #modal-soon .sheet > h2, #modal-invite .sheet > h2, #modal-confirm .sheet > h2, #modal-playground .sheet > h2, #modal-odds .sheet > h2, #modal-daily .sheet > h2, #modal-shop .r10-ribbon > h2'));   /* [Task 8b2] 장비 두 창 제목 = CSS 레터링(지휘자 판정 2-4) · [Task 129] 챕터 · 스토리 극장 제목도 */
 } catch (e) { return false; }
 }
 function headText(el, s) {
@@ -954,7 +954,7 @@ h.style.setProperty('--mvh-fs', String(Math.round(k * 1e5) / 1e5));
 }
 function fitHeads(root) {
 var list = (root || document).querySelectorAll(
-'.modal-v2 .mv2-sheet > h2, .modal-v2 .mv2-head > h2, #modal-node .r10-ribbon > h2, #modal-drops .r10-ribbon > h2, #modal-clear .sheet > h2, #modal-adv:not(.is-advfinish) .sheet > h2, #modal-gear #gear-h, #modal-gear-info #gi-h');   /* [Task 8b2] 레터링 제목 셋째 목록 — isCapsuleHead · healHeads 와 같은 줄 */
+'.modal-v2 .mv2-sheet > h2, .modal-v2 .mv2-head > h2, #modal-node .r10-ribbon > h2, #modal-drops .r10-ribbon > h2, #modal-clear .sheet > h2, #modal-adv:not(.is-advfinish) .sheet > h2, #modal-gear #gear-h, #modal-gear-info #gi-h, #modal-minimap .r10-ribbon > h2, #modal-theater .r10-ribbon > h2, #modal-quest .sheet > h2, #modal-soon .sheet > h2, #modal-invite .sheet > h2, #modal-confirm .sheet > h2, #modal-playground .sheet > h2, #modal-odds .sheet > h2, #modal-daily .sheet > h2, #modal-shop .r10-ribbon > h2');   /* [Task 8b2] 레터링 제목 셋째 목록 — isCapsuleHead · healHeads 와 같은 줄 */
 for (var i = 0; i < list.length; i++) fitHead(list[i]);
 }
 try {
@@ -981,7 +981,7 @@ document.fonts.ready.then(function () { fitHeads(document); });
 } catch (e) { /* 재보기는 부가 기능이다 — 실패해도 제목은 CSS 기본값으로 선다 */ }
 function healHeads(root) {
 var list = (root || document).querySelectorAll(
-'.modal-v2 .mv2-sheet > h2, .modal-v2 .mv2-head > h2, #modal-node .r10-ribbon > h2, #modal-drops .r10-ribbon > h2, #modal-clear .sheet > h2, #modal-adv:not(.is-advfinish) .sheet > h2, #modal-gear #gear-h, #modal-gear-info #gi-h');
+'.modal-v2 .mv2-sheet > h2, .modal-v2 .mv2-head > h2, #modal-node .r10-ribbon > h2, #modal-drops .r10-ribbon > h2, #modal-clear .sheet > h2, #modal-adv:not(.is-advfinish) .sheet > h2, #modal-gear #gear-h, #modal-gear-info #gi-h, #modal-minimap .r10-ribbon > h2, #modal-theater .r10-ribbon > h2, #modal-quest .sheet > h2, #modal-soon .sheet > h2, #modal-invite .sheet > h2, #modal-confirm .sheet > h2, #modal-playground .sheet > h2, #modal-odds .sheet > h2, #modal-daily .sheet > h2, #modal-shop .r10-ribbon > h2');
 for (var i = 0; i < list.length; i++) {
 var h = list[i];
 if (h.firstElementChild && h.firstElementChild.className === 'mvh-title'

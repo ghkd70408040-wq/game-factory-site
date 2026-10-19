@@ -136,7 +136,6 @@ corner-shape:var(--jbox-corner);     /* 시트 자신은 배경·접지를 안 �
 --jbox-tint:var(--modal-tint);
 --jbox-blur:none;
 }
-.modal :is(.jbox--modal, [data-part="modal-plate"]){ --jbox-a-in: var(--mode-a-alpha-win); }
 .modal .grade-note { color: var(--prim-art-ink); }
 .jbox--modal::before,
 [data-part="modal-plate"]::before,
@@ -221,7 +220,8 @@ color-mix(in srgb, var(--jbox-rim-c) calc(var(--jbox-rim-p1) * 100%), transparen
 }
 .w6m .sheet{
 position:relative !important;  /* .r10-x 의 좌표계. .r10-panel 이 주던 것을 대신한다 */
-padding:23px 30px 30px !important;
+--w6m-pad-t:23px; --w6m-pad-x:30px; --w6m-pad-b:30px;
+padding:var(--w6m-pad-t) var(--w6m-pad-x) var(--w6m-pad-b) !important;
 overflow:visible !important;   /* 리본이 판 위로 걸쳐 나가야 한다 */
 }
 #modal-over .sheet > h2,
@@ -2579,7 +2579,6 @@ box-shadow: inset 0 0 0 var(--f2-gbd) var(--role-f2-btn-off-ln);
 --cs-tabs:  calc(var(--f2-w) * .1047);   /* 탭 줄(인셋 .0299 + 탭 .0748) */
 --cs-card:  calc(var(--cs-body) + var(--cs-tabs) + var(--f2-w) * .0082);
 --cs-side:  calc(var(--f2-w) * .245);    /* 우측 세로 탭 레일 폭 */
---cs-gap8: calc(var(--f2-w) * .0214);
 --cs-side-rec: calc(var(--f2-w) * .0715 + var(--cs-gap8));
 --cs-arw-w: calc(var(--f2-w) * .0706);
 --cs-arw-h: calc(var(--f2-w) * .0706 / .947);
@@ -2591,6 +2590,7 @@ box-shadow: inset 0 0 0 var(--f2-gbd) var(--role-f2-btn-off-ln);
 --cs-foot-x: calc(var(--f2-w) * .0361);
 --cs-foot-b: calc(var(--f2-w) * .030);
 }
+:is(#charpanel, #modal-gear, #modal-gear-info, .cp-card.mframe[data-tabs]) { --cs-gap8: calc(var(--f2-w) * .0214); }
 #charpanel {
 display: block;
 padding: 0;
@@ -2955,9 +2955,7 @@ max-width: none;
 height: var(--cs-card);
 z-index: 8;
 }
-#charpanel .cp-card,
-#modal-gear .cp-card,
-#modal-gear-info .cp-card {
+:is(#charpanel .cp-card, .cp-card.mframe) {
 display: block;
 margin: 0;
 padding: 0;
@@ -2969,30 +2967,21 @@ box-shadow: none;
 color: var(--f2-ink);
 overflow: visible;
 }
-#charpanel .cp-tabs,
-#modal-gear .cp-tabs {
+:is(#charpanel, .mframe[data-tabs]) .cp-tabs {   /* [Task 129] 탭 판 훅 = .mframe[data-tabs] (장비 창 · 미션 · 확률) — 특이성 = 방 선택자 */
 margin: 0;
 border: 0;
 background: none;
 }
-#charpanel .cp-card > .cp-fx,
-#modal-gear .cp-card > .cp-fx,
-#modal-gear-info .cp-card > .cp-fx {
+:is(#charpanel .cp-card, .mframe) > .cp-fx {
 position: absolute;
 inset: calc(var(--f2-bd) * -1);
 z-index: 0;
 pointer-events: none;
 container-type: size;
 }
-#charpanel .cp-fx > .cp-gnd,
-#modal-gear .cp-fx > .cp-gnd,
-#modal-gear-info .cp-fx > .cp-gnd { display: none; }
-#charpanel .cp-fx > .cp-gnd,
-#charpanel .cp-fx > .cp-jelly,
-#modal-gear .cp-fx > .cp-gnd,
-#modal-gear .cp-fx > .cp-jelly,
-#modal-gear-info .cp-fx > .cp-gnd,
-#modal-gear-info .cp-fx > .cp-jelly {
+:is(#charpanel, .mframe) .cp-fx > .cp-gnd { display: none; }
+:is(#charpanel, .mframe) .cp-fx > .cp-gnd,
+:is(#charpanel, .mframe) .cp-fx > .cp-jelly {
 position: absolute;
 inset: 0;
 pointer-events: none;
@@ -3094,31 +3083,17 @@ pointer-events: none;
 --cpj-L3-a: .700;
 --cpj-fill-c: var(--role-cpj-fill-c-charsel);   /* ⑤ a-fill 0 이라 무효지만 봉인값으로 되돌림 */
 }
-#charpanel .cp-card > .cp-tabs,
-#charpanel .cp-card > .cp-body,
-#modal-gear .cp-card > .cp-tabs,
-#modal-gear .cp-card > .cp-body,
-#modal-gear-info .cp-card > .cp-body { position: relative; z-index: 1; }
-#charpanel .cp-card::before,
-#charpanel .cp-card::after,
-#modal-gear .cp-card::before,
-#modal-gear .cp-card::after,
-#modal-gear-info .cp-card::before,
-#modal-gear-info .cp-card::after { content: none; }
-#charpanel .cp-fx > .cp-gnd,
-#modal-gear .cp-fx > .cp-gnd,
-#modal-gear-info .cp-fx > .cp-gnd {
+:is(#charpanel .cp-card, .cp-card.mframe) > :is(.cp-tabs, .cp-body) { position: relative; z-index: 1; }
+:is(#charpanel .cp-card, .cp-card.mframe)::before,
+:is(#charpanel .cp-card, .cp-card.mframe)::after { content: none; }
+:is(#charpanel, .mframe) .cp-fx > .cp-gnd {
 background: rgba(24, 12, 28, var(--cpj-gnd-a));
 border-radius: var(--f2-r);            /* shape() 폴백 */
 transform: translateY(var(--cpj-gnd-y));
 filter: blur(var(--cpj-gnd-b));
 }
-#charpanel .cp-fx > .cp-jelly,
-#modal-gear .cp-fx > .cp-jelly,
-#modal-gear-info .cp-fx > .cp-jelly { border-radius: var(--f2-r); }   /* shape() 폴백 */
-#charpanel .cp-fx > .cp-jelly,
-#modal-gear .cp-fx > .cp-jelly,
-#modal-gear-info .cp-fx > .cp-jelly {
+:is(#charpanel, .mframe) .cp-fx > .cp-jelly { border-radius: var(--f2-r); }   /* shape() 폴백 */
+:is(#charpanel, .mframe) .cp-fx > .cp-jelly {
 background-color: transparent;
 background-image:
 radial-gradient(closest-side,
@@ -3162,9 +3137,7 @@ inset 0 var(--cpj-band-dy) var(--cpj-band-w) var(--cpj-band-s) color-mix(in srgb
 calc((var(--cpj-a-rim) - var(--cpj-a-in)) * 100%), transparent);
 }
 @supports (clip-path: shape(from 0px 0px, close)) {
-#charpanel .cp-fx > .cp-gnd,
-#modal-gear .cp-fx > .cp-gnd,
-#modal-gear-info .cp-fx > .cp-gnd {
+:is(#charpanel, .mframe) .cp-fx > .cp-gnd {
 border-radius: 0;
 clip-path: shape(from calc(var(--cpj-X0) + 0px + var(--cpj-R)) calc(var(--cpj-Y0) + 0px),
 curve to calc(var(--cpj-X1) - 0px - var(--cpj-R)) calc(var(--cpj-Y0) + 0px) with calc(var(--cpj-X0) + 0px + var(--cpj-R) + var(--cpj-KH)) calc(var(--cpj-Y0) + 0px - var(--cpj-OX)) / calc(var(--cpj-X1) - 0px - var(--cpj-R) - var(--cpj-KH)) calc(var(--cpj-Y0) + 0px - var(--cpj-OX)),
@@ -3177,9 +3150,7 @@ curve to calc(var(--cpj-X0) + 0px) calc(var(--cpj-Y0) + 0px + var(--cpj-R)) with
 curve to calc(var(--cpj-X0) + 0px + var(--cpj-R)) calc(var(--cpj-Y0) + 0px) with calc(var(--cpj-X0) + 0px + var(--cpj-C2X)) calc(var(--cpj-Y0) + 0px + var(--cpj-C2Y)) / calc(var(--cpj-X0) + 0px + var(--cpj-C1X)) calc(var(--cpj-Y0) + 0px + var(--cpj-C1Y)),
 close);
 }
-#charpanel .cp-fx > .cp-jelly,
-#modal-gear .cp-fx > .cp-jelly,
-#modal-gear-info .cp-fx > .cp-jelly {
+:is(#charpanel, .mframe) .cp-fx > .cp-jelly {
 border-radius: var(--cpj-R);
 box-shadow:
 inset 0 0 0 var(--cpj-rim-tc) color-mix(in srgb, var(--cpj-rim-c)
@@ -3200,9 +3171,7 @@ curve to calc(var(--cpj-X0) + 0px) calc(var(--cpj-Y0) + 0px + var(--cpj-R)) with
 curve to calc(var(--cpj-X0) + 0px + var(--cpj-R)) calc(var(--cpj-Y0) + 0px) with calc(var(--cpj-X0) + 0px + var(--cpj-C2X)) calc(var(--cpj-Y0) + 0px + var(--cpj-C2Y)) / calc(var(--cpj-X0) + 0px + var(--cpj-C1X)) calc(var(--cpj-Y0) + 0px + var(--cpj-C1Y)),
 close);
 }
-#charpanel .cp-fx > .cp-jelly::before,
-#modal-gear .cp-fx > .cp-jelly::before,
-#modal-gear-info .cp-fx > .cp-jelly::before {
+:is(#charpanel, .mframe) .cp-fx > .cp-jelly::before {
 content: "";
 position: absolute; inset: 0;
 z-index: 1;
@@ -3230,9 +3199,7 @@ curve to calc(var(--cpj-X0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) calc(v
 curve to calc(var(--cpj-X0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)) + var(--cpj-Rb)) calc(var(--cpj-Y0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) with calc(var(--cpj-X0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)) + var(--cpj-C2Xb)) calc(var(--cpj-Y0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)) + var(--cpj-C2Yb)) / calc(var(--cpj-X0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)) + var(--cpj-C1Xb)) calc(var(--cpj-Y0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)) + var(--cpj-C1Yb)),
 close);
 }
-#charpanel .cp-fx > .cp-jelly::after,
-#modal-gear .cp-fx > .cp-jelly::after,
-#modal-gear-info .cp-fx > .cp-jelly::after {
+:is(#charpanel, .mframe) .cp-fx > .cp-jelly::after {
 content: "";
 position: absolute; inset: 0;
 z-index: 2;
@@ -3261,8 +3228,7 @@ curve to calc(var(--cpj-X0) + var(--cpj-L3-w) + var(--cpj-R3)) calc(var(--cpj-Y0
 close);
 }
 }
-#charpanel .cp-tab,
-#modal-gear .cp-tab {
+:is(#charpanel, .mframe[data-tabs]) .cp-tab {
 font-family: inherit;
 cursor: pointer;
 -webkit-tap-highlight-color: transparent;
@@ -3270,23 +3236,17 @@ padding: 0;
 color: var(--f2-ink);
 min-width: 0;
 }
-#charpanel .cp-tab::before,
-#modal-gear .cp-tab::before { z-index: 0; }
-#charpanel .cp-tab > *,
-#modal-gear .cp-tab > * { position: relative; z-index: 2; }
-#charpanel .cp-tab,
-#modal-gear .cp-tab { gap: calc(var(--f2-w) * .012); }
-#charpanel .cpt-ic,
-#modal-gear .cpt-ic {
+:is(#charpanel, .mframe[data-tabs]) .cp-tab::before { z-index: 0; }
+:is(#charpanel, .mframe[data-tabs]) .cp-tab > * { position: relative; z-index: 2; }
+:is(#charpanel, .mframe[data-tabs]) .cp-tab { gap: calc(var(--f2-w) * .012); }
+:is(#charpanel, .mframe[data-tabs]) .cpt-ic {
 width: calc(var(--f2-w) * .0400);
 height: calc(var(--f2-w) * .0400);
 flex: 0 0 auto;
 display: block;
 }
-#charpanel .cpt-lab,
-#modal-gear .cpt-lab { min-width: 0; }
-#charpanel .cp-tab[aria-selected="true"],
-#modal-gear .cp-tab[aria-selected="true"] {
+:is(#charpanel, .mframe[data-tabs]) .cpt-lab { min-width: 0; }
+:is(#charpanel, .mframe[data-tabs]) .cp-tab[aria-selected="true"] {
 background:
 radial-gradient(closest-side, rgba(255,255,255,.24), rgba(255,255,255,0))
 9.2% 20.8% / 24% 28% no-repeat,
@@ -3300,20 +3260,16 @@ color-mix(in srgb, var(--f2-line) 66%, transparent),
 0 0 var(--f2-soft-tail) 0 color-mix(in srgb, var(--f2-line) 20%, transparent),
 0 calc(var(--f2-w) * .0084) 0 0 var(--f2-tab-on);
 }
-#charpanel .cp-tab[aria-selected="true"]::before,
-#modal-gear .cp-tab[aria-selected="true"]::before {
+:is(#charpanel, .mframe[data-tabs]) .cp-tab[aria-selected="true"]::before {
 bottom: calc(var(--f2-bd) - var(--f2-bdp) - var(--f2-fillet-fw) * 3);
 }
-#charpanel .cp-tab[aria-selected="true"]::after,
-#modal-gear .cp-tab[aria-selected="true"]::after {
+:is(#charpanel, .mframe[data-tabs]) .cp-tab[aria-selected="true"]::after {
 bottom: calc(var(--f2-rim) * -2);
 border-bottom-left-radius: 0;
 border-bottom-right-radius: 0;
 }
 #charpanel .cp-body { height: var(--cs-body); }
-#charpanel .cp-body,
-#modal-gear .cp-body,
-#modal-gear-info .cp-body {
+:is(#charpanel, .mframe) .cp-body {
 position: relative;
 overflow: hidden;
 border-radius: 0 0 calc(var(--f2-r) - var(--f2-bd)) calc(var(--f2-r) - var(--f2-bd));
@@ -3372,6 +3328,8 @@ left: calc(var(--f2-w) * .1469 + var(--cs-gap8));
 top:  calc(var(--f2-w) * .0122);         /* .0299 - .0177 */
 width: calc(var(--f2-w) * .3837);
 height: calc(var(--f2-w) * .1088);
+}
+:is(#charpanel .ci-plate, #modal-gear-info .gi-plate) {
 display: flex;
 align-items: center;
 justify-content: center;                   /* ③ 이름 알약 안 수평 중앙 */
@@ -3960,8 +3918,18 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
 #modal-drops .r10-ribbon > h2 > .mvh-title,
 #modal-clear .sheet > h2 > .mvh-title,
 #modal-adv:not(.is-advfinish) .sheet > h2 > .mvh-title,
+#modal-quest .sheet > h2 > .mvh-title,
+#modal-soon .sheet > h2 > .mvh-title,
+#modal-invite .sheet > h2 > .mvh-title,
+#modal-confirm .sheet > h2 > .mvh-title,
+#modal-playground .sheet > h2 > .mvh-title,
+#modal-odds .sheet > h2 > .mvh-title,
+#modal-daily .sheet > h2 > .mvh-title,
+#modal-shop .r10-ribbon > h2 > .mvh-title,
 #modal-gear #gear-h > .mvh-title,
-#modal-gear-info #gi-h > .mvh-title {
+#modal-gear-info #gi-h > .mvh-title,
+#modal-minimap .r10-ribbon > h2 > .mvh-title,
+#modal-theater .r10-ribbon > h2 > .mvh-title {
 --lt-plum-w:  .0429em;   /* 자두 테 = 2.99%Hc */
 --lt-white-w: .0269em;   /* 흰 테   = 1.87%Hc  (착수 전 0 — 아예 없었다) */
 --lt-ink:    var(--role-lt-ink-node-mv2);    /* 시안 두 이미지에서 침식한 심의 평균 */
@@ -4013,8 +3981,18 @@ drop-shadow(0 .028em .026em var(--lt-drop));
 #modal-drops .r10-ribbon > h2 > .mvh-title,
 #modal-clear .sheet > h2 > .mvh-title,
 #modal-adv:not(.is-advfinish) .sheet > h2 > .mvh-title,
+#modal-quest .sheet > h2 > .mvh-title,
+#modal-soon .sheet > h2 > .mvh-title,
+#modal-invite .sheet > h2 > .mvh-title,
+#modal-confirm .sheet > h2 > .mvh-title,
+#modal-playground .sheet > h2 > .mvh-title,
+#modal-odds .sheet > h2 > .mvh-title,
+#modal-daily .sheet > h2 > .mvh-title,
+#modal-shop .r10-ribbon > h2 > .mvh-title,
 #modal-gear #gear-h > .mvh-title,
-#modal-gear-info #gi-h > .mvh-title {
+#modal-gear-info #gi-h > .mvh-title,
+#modal-minimap .r10-ribbon > h2 > .mvh-title,
+#modal-theater .r10-ribbon > h2 > .mvh-title {
 background-image: none;
 color: #FFFFFF;
 -webkit-text-fill-color: #FFFFFF;
@@ -4813,6 +4791,11 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
 #modal-gres .sheet > h2,
 #modal-clear .sheet > h2,
 #modal-rank .sheet > h2,
+#modal-quest .sheet > h2,
+#modal-soon .sheet > h2,
+#modal-invite .sheet > h2,
+#modal-confirm .sheet > h2,
+#modal-playground .sheet > h2,
 #modal-minimap .r10-ribbon,
 #modal-theater .r10-ribbon,
 #modal-node .r10-ribbon,
@@ -4957,6 +4940,11 @@ calc((var(--wcap-a-rim) - var(--wcap-a-in)) * 100%), transparent);
 #modal-gres .sheet > h2,
 #modal-clear .sheet > h2,
 #modal-rank .sheet > h2,
+#modal-quest .sheet > h2,
+#modal-soon .sheet > h2,
+#modal-invite .sheet > h2,
+#modal-confirm .sheet > h2,
+#modal-playground .sheet > h2,
 #modal-minimap .r10-ribbon,
 #modal-theater .r10-ribbon,
 #modal-node .r10-ribbon,
@@ -5000,6 +4988,11 @@ close);
 #modal-gres .sheet > h2::before,
 #modal-clear .sheet > h2::before,
 #modal-rank .sheet > h2::before,
+#modal-quest .sheet > h2::before,
+#modal-soon .sheet > h2::before,
+#modal-invite .sheet > h2::before,
+#modal-confirm .sheet > h2::before,
+#modal-playground .sheet > h2::before,
 #modal-minimap .r10-ribbon::before,
 #modal-theater .r10-ribbon::before,
 #modal-node .r10-ribbon::before,
@@ -5672,9 +5665,7 @@ calc(var(--wslot-L3-a) * 100%), transparent),
 --safe-w: 72.04%;
 --safe-h: 74.04%;
 }
-#charpanel .cp-fx > .cp-jelly,
-#modal-gear .cp-fx > .cp-jelly,
-#modal-gear-info .cp-fx > .cp-jelly{ --cpj-L3-line: var(--mode-a-outline); }   /* [E32-0903] 실측 · 복구 #955579 */
+:is(#charpanel, .mframe) .cp-fx > .cp-jelly{ --cpj-L3-line: var(--mode-a-outline); }   /* [E32-0903] 실측 · 복구 #955579 */
 #classic-hud .ch-fx > .ch-jelly,
 #app.classic #classic-hud .ch-fx > .ch-jelly{ --hudj-L3-line: var(--mode-b-outline); --hudj-face: var(--mode-b-face); --hudj-face-top: var(--mode-b-face); --hudj-face-y: 100%; --hudj-rim-c: var(--mode-b-rim); }
 .wf-cap{ --wcap-L3-line: var(--mode-a-outline); --wcap-face: var(--mode-a-face); --wcap-face-top: var(--role-wcap-face-top-modal-title-node); --wcap-face-y: 100%; --wcap-rim-c: var(--mode-a-rim); }
@@ -5682,10 +5673,8 @@ calc(var(--wslot-L3-a) * 100%), transparent),
 #charpanel .cp-crystal,
 #modal-drops .cp-crystal,
 #modal-gear .itile[data-state="empty"]{ --wslot-L3-line: var(--role-wslot-L3-line-crystal); }
-#charpanel .cp-fx > .cp-jelly,
-#charpanel .cp-fx > .cp-gnd,
-#modal-gear .cp-fx > .cp-jelly,
-#modal-gear .cp-fx > .cp-gnd{
+:is(#charpanel, .mframe[data-tabs]) .cp-fx > .cp-jelly,
+:is(#charpanel, .mframe[data-tabs]) .cp-fx > .cp-gnd{
 --cpj-tab-h:  calc(var(--cpj-w) * .07005);
 --cpj-tab-r:  calc(var(--cpj-w) * .03377);
 --cpj-tab-f:  calc(var(--cpj-w) * .00493);
@@ -5704,7 +5693,7 @@ calc(var(--wslot-L3-a) * 100%), transparent),
 --cpj-Rt:  calc(var(--cpj-w) * .02400);
 --cpj-Rtk: calc(var(--cpj-Rt) * .4477);
 }
-#modal-gear .cp-fx > .cp-jelly{
+:is(#modal-gear, .mframe[data-tabs="3"]) .cp-fx > .cp-jelly{
 --cpj-gn: calc(var(--cpj-t2a) - var(--cpj-t1b));
 --cpj-gw: calc((var(--cpj-t2b) - var(--cpj-t1a) - var(--cpj-gn) * 2) / 3);
 --cpj-g1a: var(--cpj-t1a);
@@ -5879,7 +5868,7 @@ curve to calc(calc(var(--cpj-X0) + var(--cpj-L3-w)) + var(--cpj-Rt3)) calc(calc(
 close); }
 }
 @supports (clip-path: shape(from 0px 0px, close)) {
-#modal-gear .cp-fx > .cp-jelly{ clip-path: shape(from calc(calc(var(--cpj-X0) + 0px) + var(--cpj-Rt)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)),
+:is(#modal-gear, .mframe[data-tabs="3"]:not(:has(> .cp-tabs[hidden]))) .cp-fx > .cp-jelly{ clip-path: shape(from calc(calc(var(--cpj-X0) + 0px) + var(--cpj-Rt)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)),
 line to calc(calc(var(--cpj-g1a) + 0px) - var(--cpj-tab-fs)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)),
 curve to calc(calc(var(--cpj-g1a) + 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) - var(--cpj-tab-fs)) with calc(calc(var(--cpj-g1a) + 0px) - var(--cpj-tab-fsk)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)) / calc(calc(var(--cpj-g1a) + 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) - var(--cpj-tab-fsk)),
 line to calc(calc(var(--cpj-g1at) + 0px)) calc(calc(var(--cpj-Y0) + 0px) + var(--cpj-tab-r)),
@@ -5913,7 +5902,7 @@ curve to calc(var(--cpj-X0) + 0px) calc(var(--cpj-Y1) - 0px - var(--cpj-R)) with
 curve to calc(calc(var(--cpj-X0) + 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) + var(--cpj-Rt)) with calc(var(--cpj-X0) + 0px - var(--cpj-OY)) calc(var(--cpj-Y1) - 0px - var(--cpj-R) - var(--cpj-KV)) / calc(var(--cpj-X0) + 0px - var(--cpj-OY)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) + var(--cpj-Rt) + var(--cpj-KV)),
 curve to calc(calc(var(--cpj-X0) + 0px) + var(--cpj-Rt)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)) with calc(calc(var(--cpj-X0) + 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) + var(--cpj-Rtk)) / calc(calc(var(--cpj-X0) + 0px) + var(--cpj-Rtk)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)),
 close); }
-#modal-gear .cp-fx > .cp-jelly::before{ clip-path: shape(evenodd from calc(calc(var(--cpj-X0) + var(--cpj-rim-in)) + var(--cpj-Rta)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-rim-in))),
+:is(#modal-gear, .mframe[data-tabs="3"]:not(:has(> .cp-tabs[hidden]))) .cp-fx > .cp-jelly::before{ clip-path: shape(evenodd from calc(calc(var(--cpj-X0) + var(--cpj-rim-in)) + var(--cpj-Rta)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-rim-in))),
 line to calc(calc(var(--cpj-g1a) + var(--cpj-rim-in)) - var(--cpj-tab-fsa)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-rim-in))),
 curve to calc(calc(var(--cpj-g1a) + var(--cpj-rim-in))) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-rim-in)) - var(--cpj-tab-fsa)) with calc(calc(var(--cpj-g1a) + var(--cpj-rim-in)) - var(--cpj-tab-fska)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-rim-in))) / calc(calc(var(--cpj-g1a) + var(--cpj-rim-in))) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-rim-in)) - var(--cpj-tab-fska)),
 line to calc(calc(var(--cpj-g1at) + var(--cpj-rim-in))) calc(calc(var(--cpj-Y0) + var(--cpj-rim-in)) + var(--cpj-tab-ra)),
@@ -5981,7 +5970,7 @@ curve to calc(var(--cpj-X0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) calc(v
 curve to calc(calc(var(--cpj-X0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)))) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) + var(--cpj-Rtb)) with calc(var(--cpj-X0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)) - var(--cpj-OY)) calc(var(--cpj-Y1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w)) - var(--cpj-Rb) - var(--cpj-KV)) / calc(var(--cpj-X0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)) - var(--cpj-OY)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) + var(--cpj-Rtb) + var(--cpj-KV)),
 curve to calc(calc(var(--cpj-X0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) + var(--cpj-Rtb)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)))) with calc(calc(var(--cpj-X0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)))) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) + var(--cpj-Rtkb)) / calc(calc(var(--cpj-X0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) + var(--cpj-Rtkb)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)))),
 close); }
-#modal-gear .cp-fx > .cp-jelly::after{ clip-path: shape(evenodd from calc(calc(var(--cpj-X0) + 0px) + var(--cpj-Rt)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)),
+:is(#modal-gear, .mframe[data-tabs="3"]:not(:has(> .cp-tabs[hidden]))) .cp-fx > .cp-jelly::after{ clip-path: shape(evenodd from calc(calc(var(--cpj-X0) + 0px) + var(--cpj-Rt)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)),
 line to calc(calc(var(--cpj-g1a) + 0px) - var(--cpj-tab-fs)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)),
 curve to calc(calc(var(--cpj-g1a) + 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) - var(--cpj-tab-fs)) with calc(calc(var(--cpj-g1a) + 0px) - var(--cpj-tab-fsk)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)) / calc(calc(var(--cpj-g1a) + 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) - var(--cpj-tab-fsk)),
 line to calc(calc(var(--cpj-g1at) + 0px)) calc(calc(var(--cpj-Y0) + 0px) + var(--cpj-tab-r)),
@@ -6050,8 +6039,7 @@ curve to calc(calc(var(--cpj-X0) + var(--cpj-L3-w))) calc(calc(var(--cpj-Y0) + v
 curve to calc(calc(var(--cpj-X0) + var(--cpj-L3-w)) + var(--cpj-Rt3)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-L3-w))) with calc(calc(var(--cpj-X0) + var(--cpj-L3-w))) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-L3-w)) + var(--cpj-Rtk3)) / calc(calc(var(--cpj-X0) + var(--cpj-L3-w)) + var(--cpj-Rtk3)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-L3-w))),
 close); }
 }
-#charpanel .cp-card > .cp-tabs,
-#modal-gear .cp-card > .cp-tabs{
+:is(#charpanel .cp-card, .cp-card.mframe[data-tabs]) > .cp-tabs{
 position: relative;
 display: block;
 height: 0;
@@ -6062,8 +6050,7 @@ border: 0;
 background: none;
 overflow: visible;
 }
-#charpanel .cp-card > .cp-tabs > .cp-tab,
-#modal-gear .cp-card > .cp-tabs > .cp-tab{
+:is(#charpanel .cp-card, .cp-card.mframe[data-tabs]) > .cp-tabs > .cp-tab{
 position: absolute;
 top: 0; bottom: 0;
 display: flex;
@@ -6081,15 +6068,12 @@ overflow: visible;
 }
 #charpanel .cp-card > .cp-tabs > .cp-tab[data-cptab="char"]{ left: 5.039%; right: 50.372%; }
 #charpanel .cp-card > .cp-tabs > .cp-tab[data-cptab="pet"] { left: 50.559%; right: 4.817%; }
-#modal-gear .cp-card > .cp-tabs > .cp-tab[data-gmtab="weapon"]  { left: 5.039%;  right: 65.534%; }
-#modal-gear .cp-card > .cp-tabs > .cp-tab[data-gmtab="aux"]     { left: 35.397%; right: 35.175%; }
-#modal-gear .cp-card > .cp-tabs > .cp-tab[data-gmtab="trinket"] { left: 65.756%; right: 4.817%; }
-#charpanel .cp-card > .cp-tabs > .cp-tab[aria-selected="true"]::before,
-#charpanel .cp-card > .cp-tabs > .cp-tab[aria-selected="true"]::after,
-#modal-gear .cp-card > .cp-tabs > .cp-tab[aria-selected="true"]::before,
-#modal-gear .cp-card > .cp-tabs > .cp-tab[aria-selected="true"]::after{ content: none; }
-#charpanel .cp-card > .cp-tabs > .cp-tab::before,
-#modal-gear .cp-card > .cp-tabs > .cp-tab::before{
+:is(#modal-gear .cp-card, .cp-card.mframe[data-tabs="3"]) > .cp-tabs > .cp-tab:nth-child(1) { left: 5.039%;  right: 65.534%; }
+:is(#modal-gear .cp-card, .cp-card.mframe[data-tabs="3"]) > .cp-tabs > .cp-tab:nth-child(2) { left: 35.397%; right: 35.175%; }
+:is(#modal-gear .cp-card, .cp-card.mframe[data-tabs="3"]) > .cp-tabs > .cp-tab:nth-child(3) { left: 65.756%; right: 4.817%; }
+:is(#charpanel .cp-card, .cp-card.mframe[data-tabs]) > .cp-tabs > .cp-tab[aria-selected="true"]::before,
+:is(#charpanel .cp-card, .cp-card.mframe[data-tabs]) > .cp-tabs > .cp-tab[aria-selected="true"]::after{ content: none; }
+:is(#charpanel .cp-card, .cp-card.mframe[data-tabs]) > .cp-tabs > .cp-tab::before{
 content: none;
 position: absolute; inset: 0; z-index: 0;
 height: auto; width: auto; min-height: 0;
@@ -6098,8 +6082,7 @@ border-radius: 7.59% 7.59% 0 0 / 48.21% 48.21% 0 0;
 box-shadow: none;
 background: none;
 }
-#charpanel .cp-card > .cp-tabs > .cp-tab::after,
-#modal-gear .cp-card > .cp-tabs > .cp-tab::after{
+:is(#charpanel .cp-card, .cp-card.mframe[data-tabs]) > .cp-tabs > .cp-tab::after{
 content: "";
 position: absolute; left: 0; right: 0; bottom: 0; top: auto; z-index: 1;
 box-shadow: none; border-radius: 0;
@@ -6108,15 +6091,12 @@ min-height: 1px;
 pointer-events: none;
 background: color-mix(in srgb, #AC98AA 74.5%, transparent);
 }
-#charpanel .cp-card > .cp-tabs > .cp-tab[aria-selected="false"],
-#modal-gear .cp-card > .cp-tabs > .cp-tab[aria-selected="false"]{
+:is(#charpanel .cp-card, .cp-card.mframe[data-tabs]) > .cp-tabs > .cp-tab[aria-selected="false"]{
 background: color-mix(in srgb, #A8788E 30%, transparent);
 border-radius: 7.59% 7.59% 0 0 / 48.21% 48.21% 0 0;
 }
-#modal-gear .cp-card > .cp-tabs > .cp-tab[aria-selected="false"]{ border-radius: 11.476% 11.476% 0 0 / 48.21% 48.21% 0 0; }
-#charpanel .cp-fx > .cp-jelly,
-#modal-gear .cp-fx > .cp-jelly,
-#modal-gear-info .cp-fx > .cp-jelly{
+:is(#modal-gear .cp-card, .cp-card.mframe[data-tabs="3"]) > .cp-tabs > .cp-tab[aria-selected="false"]{ border-radius: 11.476% 11.476% 0 0 / 48.21% 48.21% 0 0; }
+:is(#charpanel, .mframe) .cp-fx > .cp-jelly{
 --cpj-a-in: var(--mode-a-alpha);
 --cpj-rim-w: calc(var(--f2-ref-w) * 0.00350);
 --cpj-rim-a: 0.9800;
@@ -6127,14 +6107,11 @@ border-radius: 7.59% 7.59% 0 0 / 48.21% 48.21% 0 0;
 --cpj-band-s:  calc(var(--cpj-w) * .0161);
 --cpj-milk-a: .0222;
 }
-#charpanel .cp-card > .cp-tabs,
-#modal-gear .cp-card > .cp-tabs{
+:is(#charpanel .cp-card, .cp-card.mframe[data-tabs]) > .cp-tabs{
 margin: calc(var(--f2-bd) * -1 + .099%) calc(var(--f2-bd) * -1) var(--cs-gap8);
 padding: calc(7.005% + var(--f2-bd) * .1401) 0 0;
 }
-#charpanel .cp-card > .cp-body,
-#modal-gear .cp-card > .cp-body,
-#modal-gear-info .cp-card > .cp-body{ border-top: 0; box-shadow: none; }
+:is(#charpanel .cp-card, .cp-card.mframe) > .cp-body{ border-top: 0; box-shadow: none; }
 .wxtal-set,
 .wxtal-crown{
 pointer-events: none;
@@ -6331,6 +6308,11 @@ calc(var(--f2-w) * .0956) !important;
 #modal-gres .sheet > h2,
 #modal-clear .sheet > h2,
 #modal-rank .sheet > h2,
+#modal-quest .sheet > h2,
+#modal-soon .sheet > h2,
+#modal-invite .sheet > h2,
+#modal-confirm .sheet > h2,
+#modal-playground .sheet > h2,
 #modal-minimap .r10-ribbon,
 #modal-theater .r10-ribbon,
 #modal-node .r10-ribbon,
@@ -6363,6 +6345,11 @@ text-shadow:0 1px 0 rgba(255,255,255,.9), 0 2px 4px rgba(120,110,150,.35);
 #modal-gres .sheet > h2,
 #modal-clear .sheet > h2,
 #modal-rank .sheet > h2,
+#modal-quest .sheet > h2,
+#modal-soon .sheet > h2,
+#modal-invite .sheet > h2,
+#modal-confirm .sheet > h2,
+#modal-playground .sheet > h2,
 #modal-minimap .r10-ribbon,
 #modal-theater .r10-ribbon,
 #modal-node .r10-ribbon,
@@ -6406,7 +6393,12 @@ calc((var(--wcap-a-rim) - var(--wcap-a-in)) * 100%), transparent);
 #modal-odds .sheet > h2,
 #modal-gres .sheet > h2,
 #modal-clear .sheet > h2,
-#modal-rank .sheet > h2{
+#modal-rank .sheet > h2,
+#modal-quest .sheet > h2,
+#modal-soon .sheet > h2,
+#modal-invite .sheet > h2,
+#modal-confirm .sheet > h2,
+#modal-playground .sheet > h2{
 --wcap-w: calc(56.84% + 35.2408px);      /* .sheet.jbox--modal — 안여백 차 62px 고정 */
 --wcap-panT: 24px;                        /* border-top 1 + padding-top 23 */
 }
@@ -6455,8 +6447,15 @@ html[lang="ko"] #modal-mode[data-arcade-only] .r10-ribbon{ --ttl:url("catalog/tt
 html[lang="en"] #modal-mode[data-arcade-only] .r10-ribbon{ --ttl:url("catalog/ttl-arc-en.webp"); }
 #modal-clear .sheet > h2,
 #modal-adv:not(.is-advfinish) .sheet > h2,
+#modal-quest .sheet > h2,
+#modal-soon .sheet > h2,
+#modal-invite .sheet > h2,
+#modal-confirm .sheet > h2,
+#modal-playground .sheet > h2,
+#modal-odds .sheet > h2,
+#modal-daily .sheet > h2,
 #modal-gear #gear-h,
-#modal-gear-info #gi-h {   /* [Task 8b2 · 지휘자 판정 2-4] 장비 두 창 제목 = 같은 레터링 · 같은 캡슐 높이 비(아래 ② 채움비 .695) */
+#modal-gear-info #gi-h {   /* [Task 129] 평글씨였던 창 제목 일곱도 같은 레터링 크기 · [Task 8b2 · 지휘자 판정 2-4] 장비 두 창 제목 = 같은 레터링 · 같은 캡슐 높이 비(아래 ② 채움비 .695) */
 --mvh-fs: .80;
 --mvh-fs-min: .42;
 font-size: calc(var(--wcap-h) * var(--mvh-fs));
@@ -6669,7 +6668,10 @@ box-shadow: none;
 
 #modal-node .node-seal { display: none !important; }
 #modal-node .r10-ribbon > h2,
-#modal-drops .r10-ribbon > h2 {
+#modal-drops .r10-ribbon > h2,
+#modal-minimap .r10-ribbon > h2,
+#modal-theater .r10-ribbon > h2,
+#modal-shop .r10-ribbon > h2 {   /* [Task 129] 챕터 · 스토리 극장 · 앱 상점 제목 = 같은 리본 레터링 문법 */
 --mvh-fs: .80;
 --mvh-fs-min: .42;
 font-size: calc(var(--wcap-h) * var(--mvh-fs));
@@ -6873,7 +6875,10 @@ z-index: 2;
 /* == node-title-fit == */
 
 #modal-node .r10-ribbon > h2,
-#modal-drops .r10-ribbon > h2 {
+#modal-drops .r10-ribbon > h2,
+#modal-minimap .r10-ribbon > h2,
+#modal-theater .r10-ribbon > h2,
+#modal-shop .r10-ribbon > h2 {
 display: flex;
 align-items: center;
 justify-content: center;
@@ -6883,16 +6888,35 @@ justify-content: center;
 #modal-shop .r10-ribbon > h2,
 #modal-clear .sheet > h2,
 #modal-adv:not(.is-advfinish) .sheet > h2,
+#modal-quest .sheet > h2,
+#modal-soon .sheet > h2,
+#modal-invite .sheet > h2,
+#modal-confirm .sheet > h2,
+#modal-playground .sheet > h2,
+#modal-odds .sheet > h2,
+#modal-daily .sheet > h2,
 #modal-gear #gear-h,
-#modal-gear-info #gi-h {   /* [Task 8b2] 장비 두 창 제목도 레터링 소비처 — 같은 채움비 */
+#modal-gear-info #gi-h,   /* [Task 8b2] 장비 두 창 제목도 레터링 소비처 — 같은 채움비 */
+#modal-minimap .r10-ribbon > h2,
+#modal-theater .r10-ribbon > h2 {   /* [Task 129] 챕터 · 스토리 극장 제목도 */
 --mvh-fs: .695;
 }
 #modal-node .r10-ribbon > h2 > .mvh-title,
 #modal-drops .r10-ribbon > h2 > .mvh-title,
 #modal-clear .sheet > h2 > .mvh-title,
 #modal-adv:not(.is-advfinish) .sheet > h2 > .mvh-title,
+#modal-quest .sheet > h2 > .mvh-title,
+#modal-soon .sheet > h2 > .mvh-title,
+#modal-invite .sheet > h2 > .mvh-title,
+#modal-confirm .sheet > h2 > .mvh-title,
+#modal-playground .sheet > h2 > .mvh-title,
+#modal-odds .sheet > h2 > .mvh-title,
+#modal-daily .sheet > h2 > .mvh-title,
+#modal-shop .r10-ribbon > h2 > .mvh-title,
 #modal-gear #gear-h > .mvh-title,
-#modal-gear-info #gi-h > .mvh-title {
+#modal-gear-info #gi-h > .mvh-title,
+#modal-minimap .r10-ribbon > h2 > .mvh-title,
+#modal-theater .r10-ribbon > h2 > .mvh-title {
 --lt-optical-y: .0781em;
 top: var(--lt-optical-y);
 }
