@@ -2626,6 +2626,7 @@ en: {
 'node.clear.boss': 'Knock it down, then {mis} within {fsec}s',
 'node.clear.timeout': 'When time runs out, the higher remaining HP share wins. A tie goes to you.',
 'node.info.aria': 'How the clock works',
+'node.atk.info.aria': 'Show skill details',
 'node.drops': 'Gear from this stage',
 'node.drops.all': 'All {k} ›',
 'node.recmark': 'Pick',
@@ -3793,6 +3794,7 @@ ko: {
 'node.clear.boss': '쓰러뜨리고 {fsec}초 안에 {mis}',
 'node.clear.timeout': '시간이 끝나면 남은 체력 비율로 승부해요. 같으면 내가 이겨요.',
 'node.info.aria': '시간 규칙 보기',
+'node.atk.info.aria': '악당 기술 설명 보기',
 'node.drops': '이 판에서 나오는 장비',
 'node.drops.all': '전체 {k}종 ›',
 'node.recmark': '추천',
@@ -15360,15 +15362,14 @@ b.go();
 function paintNodeHearts() {
 if (!advCardN) return;
 heartsTick();
-setText('node-hearts-v', store.hearts);
-var empty = store.hearts <= 0;
+var empty = store.hearts <= 0;   /* [판정판 122 ⑤] 하트 줄(.node-hearts · #node-hearts-v)은 뺐다 — 하트 수는 위 바 · 시작 단추의 ♥1 */
 var go = $('node-go'), wait = $('node-wait'), ad = $('node-ad');
+var nodeAdOk = TW_PORTAL.env === 'crazygames' && TW_PORTAL.canReward() && adCapLeft('heart') > 0;
 if (go) go.hidden = empty;
 if (wait) {
-wait.hidden = !empty;
-if (empty) wait.textContent = t('adv.heartwait', { t: fmtHeartWait(heartNextMs()) });
+wait.hidden = !(empty && !nodeAdOk);
+if (!wait.hidden) wait.textContent = t('adv.heartwait', { t: fmtHeartWait(heartNextMs()) });
 }
-var nodeAdOk = TW_PORTAL.env === 'crazygames' && TW_PORTAL.canReward() && adCapLeft('heart') > 0;
 if (ad) ad.hidden = !(empty && nodeAdOk);
 if (ad && empty && nodeAdOk) twSyncAdHeartLabel(ad);
 }
@@ -15442,6 +15443,11 @@ setStdArt(pet, mid, 'face', '--slot-std');
 setTextEl(root.querySelector('[data-mem="pet"] .nc-mem-nm'), t('char.' + mid + '.name'));
 }
 pet.querySelector('.nc-rec').hidden = !mid || (advPetRecommend(p) !== mid);
+var mems = root.querySelectorAll('.nc-mem');
+for (var mi = 0; mi < mems.length; mi++) {
+var mnm = mems[mi].querySelector('.nc-mem-nm'), mk = mems[mi].querySelector('.nc-mem-k');
+mems[mi].setAttribute('aria-label', (mnm ? mnm.textContent : '') + ', ' + (mk ? mk.textContent : ''));
+}
 }
 function ncBodyMore() {
 var b = document.querySelector('#modal-node .nc-body');
@@ -15451,7 +15457,7 @@ if (more) { if (!b.hasAttribute('data-more')) b.setAttribute('data-more', ''); }
 else if (b.hasAttribute('data-more')) b.removeAttribute('data-more');
 }
 function ncInfoToggle(ev) {
-var b = ev && ev.currentTarget, more = b && b.parentNode.querySelector('.nc-clear-more');
+var b = ev && ev.currentTarget, cid = b && b.getAttribute('aria-controls'), more = cid && document.getElementById(cid);
 if (!more) return;
 more.hidden = !more.hidden;
 b.setAttribute('aria-expanded', more.hidden ? 'false' : 'true');
@@ -15571,7 +15577,9 @@ setTextEl(cardEl.querySelector('.nc-foe-name'), bossName(foe));
 setTextEl(cardEl.querySelector('.nc-hp-v'), fmtNum(duelFoeHpMax(p.n)));
 var atkId = bossAtkIdOf(foe, p.n);
 setTextEl(cardEl.querySelector('.nc-atk-n'), t('boss.atk.' + atkId));
-setTextEl(cardEl.querySelector('.nc-atk-d'), t('boss.atk.' + atkId + '.d', ncAtkArgs(atkId)));
+var atkMore = cardEl.querySelector('.nc-atk-d');   /* [판정판 122 ②] 설명 = 칩 바로 아래 접힌 줄 — 다시 열면 접힌다(아래 ⓘ aria-expanded 되돌림과 짝) */
+setTextEl(atkMore, t('boss.atk.' + atkId + '.d', ncAtkArgs(atkId)));
+if (atkMore) atkMore.hidden = true;
 var fin = p.boss ? bossFinishOf(p.n) : null;
 setTextEl(cardEl.querySelector('.nc-clear-t'), fin
 ? t('node.clear.boss', { fsec: fmtSec(DUEL_FINISH_MS), mis: ncFinishText(fin) })
@@ -15593,8 +15601,8 @@ handRow.appendChild(hc);
 });
 handRow.hidden = !hbits.length;
 }
-var infoB = cardEl.querySelector('.nc-info');
-if (infoB) infoB.setAttribute('aria-expanded', 'false');
+var infoBs = cardEl.querySelectorAll('.nc-info');   /* [판정판 122 ②] ⓘ 둘(악당 기술 · 클리어 줄) */
+for (var ibi = 0; ibi < infoBs.length; ibi++) infoBs[ibi].setAttribute('aria-expanded', 'false');
 var dt = dropTableFor(p.n), own = (store.items && store.items.own) || {}, list = cardEl.querySelector('.nc-drop-list');
 if (list) {
 list.innerHTML = '';
@@ -15608,13 +15616,11 @@ li.setAttribute('aria-label', t('item.' + r.id + '.nm') + ', ' + t('drops.tier.'
 + (lv > 0 ? ', ' + t('drops.lv', { lv: lv, max: ITEM_LV_MAX }) : '') + ', ' + t('drops.chance', { p: pctTxt(r.p) }));
 li.appendChild(itemTile(r.id, { tier: r.tier, lv: lv, size: 64 }));
 var pc = document.createElement('b'); pc.className = 'nc-p'; pc.textContent = pctTxt(r.p) + '%'; li.appendChild(pc);
-var nm = document.createElement('span'); nm.className = 'nc-nm'; nm.textContent = t('item.' + r.id + '.nm'); li.appendChild(nm);
 list.appendChild(li);
 });
 }
 var all = cardEl.querySelector('.nc-all');
 if (all) { setTextEl(all, t('node.drops.all', { k: dt.items.length })); all.onclick = function () { openDrops(p.n); }; }
-setTextEl(cardEl.querySelector('.nc-note'), t('drops.note') + ' ' + t('drops.gear.avg', { a: dt.avg }));
 ncTeam(p);
 paintNodeHearts();
 openModal('modal-node');
@@ -17716,7 +17722,8 @@ if (!b || b.getAttribute('aria-selected') === 'true') return;
 dropsTab(b.getAttribute('data-dtab'));
 J.sfx.ui();
 });
-on(document.querySelector('#modal-node .nc-info'), 'click', ncInfoToggle);   /* 74 T13 — ⓘ 시간 종료 판정 + 별 조건 */
+var ncInfoBs = document.querySelectorAll('#modal-node .nc-info');   /* 74 T13 — ⓘ 시간 종료 판정 + 별 조건 · [판정판 122 ②] 악당 기술 칩 ⓘ 도 같은 함수 */
+for (var nib = 0; nib < ncInfoBs.length; nib++) on(ncInfoBs[nib], 'click', ncInfoToggle);
 on(document.querySelector('#modal-node .nc-swap'), 'click', function () { openCharPanel(); });   /* 74 T13 — ⇄ 캐릭터 창 */
 (function () {   /* 74 T13 수정 2회차 N1 — 구획 넘침 표시(ncBodyMore) 배선 */
 var nb = document.querySelector('#modal-node .nc-body');

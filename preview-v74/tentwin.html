@@ -4192,21 +4192,6 @@ word-break: keep-all;
 background: rgba(255, 255, 255, .05);
 box-shadow: inset 0 0 0 1px var(--line);
 }
-.node-hearts {
-display: flex;
-align-items: center;
-justify-content: center;
-gap: 5px;
-font-size: 13px;
-font-weight: 700;
-}
-.node-wait {
-font-size: 13px;
-font-weight: 700;
-line-height: 1.4;
-color: var(--t9);
-word-break: keep-all;
-}
 .sheet .btn[hidden] { display: none; }
 .adv-stars {
 font-size: 40px;
@@ -7457,10 +7442,7 @@ font-size: 14px;
 opacity: .95;
 }
 .ncta-cost .hc-heart { display: block; width: 15px; height: 15px; background: var(--lib-glyph-heart) center/contain no-repeat; }
-.node-hearts { display: flex; align-items: center; gap: 6px; margin: 0; font-size: 12px; color: var(--prim-art-ink); }
-.node-hearts .hc-heart { width: 15px; height: 15px; background: var(--lib-glyph-heart) center/contain no-repeat; }
 .node-got { position: absolute; top: 6px; left: 10px; font-size: 13px; color: var(--prim-art-gold-e); }
-.node-wait { margin: 0; font-size: 12.5px; color: var(--prim-art-ribbon-2); }
 .mode-list { display: flex; flex-direction: column; gap: 8px; }
 .mode-row {
 display: flex;
@@ -9284,7 +9266,7 @@ filter: drop-shadow(0 0 10px rgba(102, 240, 159, .40));
 <link rel="preload" as="image" href="catalog/jelly-box-c.webp">
 <link rel="preload" as="image" href="catalog/duel-title-play.webp">
 <!-- ==RELEASE:BEGIN== 출시 메타 (scratchpad/release-0908/apply-head.py 가 생성·교체, 본문 무접촉) -->
-<meta name="build" content="a2b043c-20261019-1023">
+<meta name="build" content="a54385c-20261019-1350">
 <meta name="application-name" content="텐트윈 젤리팡 월드">
 <meta name="description" lang="ko" content="숫자 젤리를 골라 10을 만들어 터뜨리는 퍼즐이에요. 모험·아케이드·데일리·타임 러시·클래식을 즐겨요. Ten Twin Jelly Pang World: pick number jellies that equal or sum to 10.">
 <link rel="manifest" href="tentwin.webmanifest">
@@ -9338,7 +9320,7 @@ navigator.serviceWorker.register('sw.js',{scope:'./'}).catch(function(e){console
 })}
 </script>
 <!-- ==RELEASE:END== -->
-<link rel="preload" as="style" href="tw-late-cda9bd92.css">
+<link rel="preload" as="style" href="tw-late-1cefd76e.css">
 </head>
 <body>
 <!-- ============================================================
@@ -11812,7 +11794,8 @@ the primary action stays the last thing under the thumb. -->
 v4 4차-a — 노드 미션 카드 (V3 §4·§5).
 "읽고 기대하게" 만드는 장치라, 시작 버튼보다 위에 **목표 · 미션 · 방해 ·
 추천 캐릭터 · 별 조건**이 전부 먼저 온다. 하트가 0이면 #node-go 가
-숨고 #node-wait(회복 대기 안내)와 #node-ad(광고 자리)가 대신 나온다.
+숨고 같은 자리(맨 아래 줄 .nc-act)에 **둘 중 하나**가 대신 선다: 광고가 되면(포털 + 광고 가능) #node-ad(광고 자리),
+그 밖이면 #node-wait(회색 대기 단추 · 회복 대기 안내) [판정판 122].
 game.js openNodeCard() 가 내용의 단독 소유자.
 ============================================================ -->
 <div id="modal-node" class="modal r10m" hidden role="dialog" aria-modal="true" aria-labelledby="node-title"><div class="sheet r10-panel jbox jbox--modal" data-part="modal-plate">
@@ -11829,24 +11812,25 @@ game.js openNodeCard() 가 내용의 단독 소유자.
 줄 순서 = 목업: 리본 밑 챕터·별 → 악당 포스터 → 클리어 1줄 → 나오는 장비 4칸 → 편성 한 줄 → 시작.
 값은 전부 openNodeCard() 가 판과 같은 함수에서 채운다(카드가 새로 계산하는 수 0, 조사 §5). 스모크·비교 촬영은 data-role 로 찾는다.
 옛 줄은 지우지 않고 아래 .nc-legacy 안으로 옮겼다 — openNodeCard() 가 계속 채우지만 앞면엔 안 보인다(데이터·판정 규칙 유지). -->
-<!-- 수정 1회차 — 카드 줄 여섯은 판 안 스크롤 구획 하나(.nc-body)에 든다: 평소에는 제 높이 그대로(스크롤 0), ⓘ 를 펼쳐
-작은 창을 넘으면 이 구획만 구른다(#rank-list · .dr-body 와 같은 「판 안 스크롤」 처방 — 리본 · X · 시작 버튼 · 하트 줄은 고정). -->
+<!-- 수정 1회차 — 카드 줄(챕터 · 악당 · 클리어 · 핸디캡 · 장비)은 판 안 스크롤 구획 하나(.nc-body)에 든다: 평소에는 제 높이 그대로(스크롤 0), ⓘ 를 펼쳐
+작은 창을 넘으면 이 구획만 구른다(#rank-list · .dr-body 와 같은 「판 안 스크롤」 처방 — 리본 · X · 맨 아래 줄(.nc-act = 편성 칩 + 시작 — [판정판 122])은 고정). -->
 <div class="nc-body">
 <div class="nc-sub" data-role="sub"><span class="nc-chap"></span><span class="nc-stars" role="img"><i></i><i></i><i></i></span></div>
 <div class="nc-foe" data-role="foe">
 <span class="nc-foe-art" aria-hidden="true"></span>
 <div class="nc-foe-body">
-<span class="nc-foe-k" data-i18n="node.foe.label">Opponent</span>
 <b class="nc-foe-name"></b>
 <div class="nc-hp"><i class="nc-hp-bar" aria-hidden="true"></i><small class="nc-hp-k" data-i18n="node.hp.label">HP</small><span class="nc-hp-v"></span></div>
-<p class="nc-atk kit-pill-v2 kit-pill-v2--chip"><b class="nc-atk-n"></b><span class="nc-atk-d"></span></p>
+<!-- 판정판 122 ② — 악당 기술 칩 = 이름 한 줄 + ⓘ(클리어 줄 .nc-info 와 같은 단추 · 같은 함수 ncInfoToggle). 설명(.nc-atk-d)은 칩 바로 아래 접힌 줄이다. -->
+<p class="nc-atk kit-pill-v2 kit-pill-v2--chip"><b class="nc-atk-n"></b><button class="nc-info" type="button" data-i18n-aria="node.atk.info.aria" aria-label="Show skill details" aria-expanded="false" aria-controls="nc-atk-more">i</button></p>
+<p class="nc-atk-d" id="nc-atk-more" hidden></p>
 </div>
 </div>
 <div class="nc-clear kit-pill-v2 kit-pill-v2--soft" data-role="clear">
 <i class="nc-clock" aria-hidden="true"></i>
 <p class="nc-clear-t"></p>
-<button class="nc-info" type="button" data-i18n-aria="node.info.aria" aria-label="How the clock works" aria-expanded="false">i</button>
-<p class="nc-clear-more" hidden></p>
+<button class="nc-info" type="button" data-i18n-aria="node.info.aria" aria-label="How the clock works" aria-expanded="false" aria-controls="nc-clear-more">i</button>
+<p class="nc-clear-more" id="nc-clear-more" hidden></p>
 </div>
 <!-- 수정 1회차 I2 — 판 규칙(핸디캡: 블로커 · 잠금 · 셔플 금지 · 시간 단축)은 시작 전에 보인다. 클리어 줄 바로 아래 작은 칩 줄,
 핸디캡이 있는 탄만(advHandBits — 기존 키). 칩 = kit-pill-v2--chip 인스턴스, openNodeCard() 가 채운다. -->
@@ -11855,12 +11839,6 @@ game.js openNodeCard() 가 내용의 단독 소유자.
 <b class="nc-h" data-i18n="node.drops">Gear from this stage</b>
 <ul class="nc-drop-list"></ul>
 <button class="nc-all kit-pill-v2 kit-pill-v2--chip" type="button"></button>
-<p class="nc-note"></p>
-</div>
-<div class="nc-team" data-role="team">
-<span class="nc-mem" data-mem="hero"><span class="nc-face" data-char-role="hero"><i class="nc-rec" data-i18n="node.recmark" hidden>Pick</i></span><span class="nc-mem-t"><b class="nc-mem-nm"></b><i class="nc-mem-k" data-i18n="pick.hero">Hero</i></span></span>
-<span class="nc-mem" data-mem="pet"><span class="nc-face" data-char-role="pet"><i class="nc-rec" data-i18n="node.recmark" hidden>Pick</i></span><span class="nc-mem-t"><b class="nc-mem-nm"></b><i class="nc-mem-k" data-i18n="pick.mate">Pet</i></span></span>
-<button class="nc-swap kit-pill-v2 kit-pill-v2--chip" type="button" data-i18n-aria="node.swap.aria" aria-label="Change hero or pet">&#8644;</button>
 </div>
 </div><!-- /.nc-body -->
 <div class="nc-legacy" hidden>
@@ -11954,14 +11932,22 @@ node-hp-v·node-rec-v·node.foehp·node.rec 은 이 카드 전용). -->
 <div id="node-mates" class="node-mates" role="radiogroup" data-i18n-aria="aria.matepick" aria-label="Choose your pet"></div>
 </div>
 </div><!-- /.nc-legacy -->
-<p id="node-wait" class="node-wait" hidden></p>
+<!-- 판정판 122 ④ ⑤ — 맨 아래 한 줄(구르지 않는다 — 기준 §3): [편성 칩][시작]. 하트 줄(.node-hearts)은 뺐다 — 하트 수는 위 바와 시작 단추의 ♥1 이 보인다.
+하트 0 이면 시작 자리에 #node-ad(포털 + 광고 가능) 또는 회색 대기 알약 #node-wait(§8 — 누를 수 없음)가 선다. paintNodeHearts() 가 셋 중 하나만 보인다. -->
+<div class="nc-act" data-role="act">
+<div class="nc-team" data-role="team">
+<span class="nc-mem" data-mem="hero" role="group"><span class="nc-face" data-char-role="hero"><i class="nc-rec" data-i18n="node.recmark" hidden>Pick</i></span><span class="nc-mem-t"><b class="nc-mem-nm"></b><i class="nc-mem-k" data-i18n="pick.hero">Hero</i></span></span>
+<span class="nc-mem" data-mem="pet" role="group"><span class="nc-face" data-char-role="pet"><i class="nc-rec" data-i18n="node.recmark" hidden>Pick</i></span><span class="nc-mem-t"><b class="nc-mem-nm"></b><i class="nc-mem-k" data-i18n="pick.mate">Pet</i></span></span>
+<button class="nc-swap kit-pill-v2 kit-pill-v2--chip" type="button" data-i18n-aria="node.swap.aria" aria-label="Change hero or pet">&#8644;</button>
+</div>
+<button id="node-wait" class="kit-btn-v2" type="button" aria-disabled="true" hidden></button>
 <!-- AD SLOT: rewarded. 포털 SDK 가 붙기 전까지는 자리와 안내만 있다. -->
 <button id="node-ad" class="btn btn-secondary" data-i18n="adv.ad" hidden>Get a heart (coming soon)</button>
 <!-- ⑤ 대형 PLAY — 파란 CTA 조각. data-i18n 을 버튼이 아니라 안쪽 라벨에 단
 이유는 applyI18n() 이 textContent 로 쓰기 때문이다: 버튼에 달면 언어를
 바꿀 때마다 하트 소모 표시가 통째로 지워진다(5차의 되돌림 함정). -->
 <button id="node-go" data-part="btn-modal" data-variant="primary" class="ncta" type="button" data-n="1" data-role="start"><span class="ncta-lab" data-i18n="adv.go">Start</span><span class="ncta-cost" aria-hidden="true"><i class="hc-heart"></i>1</span></button>
-<p class="node-hearts"><span class="hc-heart" aria-hidden="true"></span><b id="node-hearts-v">5</b> <span data-i18n="adv.hearts">Hearts</span></p>
+</div>
 </div></div>
 <!-- 판정판 74 — 획득표(스펙 §D-3 · 조사 §3 「전체 ›」). 판·리본·X = 노드 카드와 같은 조각.
 [판정판 121 · Task 8a] 하나의 게임 UI 기준(docs/superpowers/specs/2026-10-18-one-game-ui-standard.md) §5 · §7 · §10 로 다시 짰다:
@@ -12425,7 +12411,7 @@ game.js **앞**이어야 한다 — 부팅 직후 나는 소리까지 클립으�
 이 파일을 빼고 빌드해도 게임은 돈다 — 그때는 모든 슬롯이 기존 신스다. -->
 <script defer src="catalog/js/tw-02-7ea6fa41.js"></script>
 <script defer src="catalog/js/tw-03-06721556.js"></script>
-<script defer src="catalog/js/tw-04-2e83aef1.js"></script>
+<script defer src="catalog/js/tw-04-bde93e1e.js"></script>
 <!-- ==FRUITDEF:BEGIN== generated by tools/fruit-tiles.js — do not edit by hand -->
 <!-- 열매 실루엣 클립 패스 9종 (DESIGN-V4 §5.8). clipPathUnits="objectBoundingBox"
 라 좌표가 0..1 이고, 타일 크기(--ts)가 어떤 값이든 같은 모양이 나온다.
@@ -12503,7 +12489,7 @@ width/height 0 + aria-hidden: 레이아웃·접근성 트리에 아무것도 더
 
 
 
-<link rel="stylesheet" href="tw-late-cda9bd92.css">
+<link rel="stylesheet" href="tw-late-1cefd76e.css">
 <style id="compat-p1">
 @supports not (width: 1cqw) {
 #app.classic #classic-hud { --cqw: min(1vw, calc(var(--app-max) / 100)); height: calc(38.5 * var(--cqw)); }
@@ -13489,10 +13475,30 @@ container-type: inline-size;
 --nc-fs-min: var(--text-min);                /* [Task 7a · B1] 세로도 같은 글자 하한 — 아래 글자 줄이 읽는 스위치(가로 블록 gear-121 3 절의 켬 줄과 같은 값) */
 --f2-chip-fs: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 11.5));     /* kit-pill-v2--chip/--soft 글자 기본(카드 = 핸디캡 칩) = 시안의 작은 알약 글자 11.5(.clear .tag) */
 }
-#modal-node .sheet.r10-panel > #node-go.ncta {
-margin-left: -7.45%;
-margin-right: -7.45%;
-width: auto;                                 /* 종전 width:100% → 넓힌 여백만큼 늘어나게 */
+#modal-node .nc-act {
+--nc-act-h: max(52px, calc(var(--nc-u) * 52));   /* 줄 높이 하나 — 편성 칩 · 시작 · 광고 · 대기 알약이 읽는다([판정판 122 ⑦] 바닥 = 지금 px, 폰 390 은 nu = 1 이라 무변) */
+--nc-act-r: 999px;                                /* 시작 · 대기 단추의 모서리 = 완전 알약 하나([수정 1회차 F1] 시작 work-btn-core 의 반경 · 대기 단추의 킷 반경 --f2-br 이 같은 값을 읽는다) */
+display: flex; align-items: center; gap: calc(var(--nc-u) * 8);
+margin: 0 -7.45%;
+}
+#modal-node .nc-act > #node-go.ncta,
+#modal-node .nc-act > #node-ad,
+#modal-node .nc-act > #node-wait {
+flex: 1 1 auto; width: auto; min-width: 0; margin: 0;   /* 시작의 높이 · 접지는 work-btn-core 블록(#node-go) · 광고 · 대기 단추는 아래에서 같은 높이(--nc-act-h) */
+}
+#modal-node .nc-act > #node-ad {
+height: var(--nc-act-h);
+display: flex; align-items: center; justify-content: center; text-align: center;
+padding: 0 calc(var(--nc-u) * 12);
+}
+#modal-node .nc-act > #node-wait {
+--f2-bh: var(--nc-act-h);
+--f2-br: var(--nc-act-r);
+font-family: var(--font-display); font-weight: 400;
+font-size: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 13)); line-height: 1.15;
+word-break: keep-all;
+color: var(--prim-ink);
+opacity: initial;
 }
 #modal-node .sheet.r10-panel > .nc-body {
 --nc-gap: calc(var(--nc-u) * 9);
@@ -13540,22 +13546,22 @@ inset 0 calc(var(--nc-u) * -4) calc(var(--nc-u) * 6) color-mix(in srgb, var(--ro
 0 calc(var(--nc-u) * 1) 0 var(--prim-white-a55);
 }
 #modal-node .nc-foe {
-height: calc(var(--nc-u) * 178);
+height: auto; min-height: calc(var(--nc-u) * 128);   /* 접힘 = 128nu(시안 A) · ⓘ 로 기술 설명을 펼치거나 글자 하한으로 내용이 커지면 포스터가 자란다([판정판 122] 지휘자 답 Q1 · Q4) */
 background:
 radial-gradient(ellipse 58% 70% at 26% 62%, color-mix(in srgb, var(--role-hv2-hp-lo-c1) calc(var(--mo-mk-45) * 100%), transparent) 0%, var(--role-nk-pink-soft-node) 55%, transparent 80%),
 linear-gradient(180deg, var(--prim-white-a55), color-mix(in srgb, var(--role-ms-mungchi-shell-light) calc(var(--mo-mk-35) * 100%), transparent));
 }
 #modal-node .nc-foe::before {                 /* 발밑 그림자(목업 .floor) */
 content: ""; position: absolute;
-left: calc(var(--nc-u) * 12); width: calc(var(--nc-u) * 128);
-bottom: calc(var(--nc-u) * 10); height: calc(var(--nc-u) * 18);
+left: calc(var(--nc-u) * 9); width: calc(var(--nc-u) * 96);
+bottom: calc(var(--nc-u) * 6); height: calc(var(--nc-u) * 13);
 border-radius: 50%;
 background: radial-gradient(closest-side, color-mix(in srgb, var(--role-f2-pill-a-ln) calc(var(--mo-mk-45) * 100%), transparent), transparent);
 }
 #modal-node .nc-foe-art {
 position: absolute;
-left: calc(var(--nc-u) * -4); bottom: calc(var(--nc-u) * 12);
-width: calc(var(--nc-u) * 156); height: calc(var(--nc-u) * 172);
+left: calc(var(--nc-u) * -4); bottom: calc(var(--nc-u) * 8);
+width: calc(var(--nc-u) * 114); height: calc(var(--nc-u) * 126);
 background-position: center bottom; background-size: contain; background-repeat: no-repeat;
 filter: drop-shadow(0 calc(var(--nc-u) * 3) calc(var(--nc-u) * 3) color-mix(in srgb, var(--role-f2-pill-a-ln) calc(var(--mo-mk-35) * 100%), transparent));
 }
@@ -13565,13 +13571,10 @@ filter: drop-shadow(0 calc(var(--nc-u) * 3) calc(var(--nc-u) * 3) color-mix(in s
 mask-image: linear-gradient(to top, transparent, var(--prim-ink) 12%);
 }
 #modal-node .nc-foe-body {
-position: absolute;
-left: calc(var(--nc-u) * 156); right: calc(var(--nc-u) * 9); top: calc(var(--nc-u) * 16);
-display: flex; flex-direction: column; gap: calc(var(--nc-u) * 9);
-}
-#modal-node .nc-foe-k {
-font-size: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 11)); font-weight: 700; letter-spacing: .02em; line-height: 1.2;
-color: var(--role-f2-ink);
+position: relative;
+margin: 0 calc(var(--nc-u) * 9) 0 calc(var(--nc-u) * 116);
+padding: calc(var(--nc-u) * 14) 0 calc(var(--nc-u) * 9);
+display: flex; flex-direction: column; gap: calc(var(--nc-u) * 7);
 }
 #modal-node .nc-foe-name {
 margin-top: calc(var(--nc-u) * -6);         /* 목업 .who 안 간격 3 = 칸 간격 9 − 6 */
@@ -13632,13 +13635,15 @@ filter: drop-shadow(0 calc(var(--nc-u) * 1) calc(var(--nc-u) * 1) color-mix(in s
 #modal-node .nc-hp::after { right: 0; background-position: 100% 0; }
 #modal-node .nc-atk {
 --f2-ph: calc(var(--nc-u) * 38);
-display: flex; flex-direction: column; justify-content: center; align-items: flex-start;
-height: auto; min-height: var(--f2-ph);
+display: flex; flex-direction: row; justify-content: center; align-items: center;
+gap: calc(var(--nc-u) * 6);
+height: auto; min-height: calc(var(--nc-u) * 30);
 margin: 0;
-padding: calc(var(--nc-u) * 4) calc(var(--nc-u) * 12);
+padding: 0 calc(var(--nc-u) * 5) 0 calc(var(--nc-u) * 12);
 }
+#modal-node .nc-atk .nc-info { margin-left: auto; }
 #modal-node .nc-atk-n { position: relative; font-weight: 700; font-size: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 13.5)); line-height: 1.1; }   /* 두 줄 = 시안 .skill-t b · i(줄 높이 1.1) */
-#modal-node .nc-atk-d { position: relative; font-weight: 500; font-size: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 11)); line-height: 1.1; color: var(--role-f2-ink); }
+#modal-node .nc-atk-d { position: relative; margin: 0; font-weight: 400; font-size: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 11)); line-height: 1.1; color: var(--prim-art-ink); }
 #modal-node .nc-clear {
 --f2-ph: calc(var(--nc-u) * 44);
 display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start;
@@ -13722,13 +13727,6 @@ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: calc(var(-
 margin: calc(var(--nc-u) * 9) 0 0; padding: 0 calc(var(--nc-u) * 2);
 list-style: none;
 }
-#modal-node .nc-note {
-grid-column: 1 / -1; grid-row: 3;
-margin: calc(var(--nc-u) * 7) 0 0;
-text-align: center;
-font-size: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 11)); font-weight: 500; line-height: 1.3;
-color: var(--role-f2-ink);
-}
 #modal-node .nc-drop {
 display: flex; flex-direction: column; align-items: center; gap: calc(var(--nc-u) * 4);
 min-width: 0;
@@ -13739,19 +13737,19 @@ min-width: 0;
 font-weight: 800; font-size: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 15)); line-height: 1.2;
 color: var(--prim-art-ink);
 }
-#modal-node .nc-nm {
-max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-font-size: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 11)); font-weight: 600; line-height: 1.1;
-color: var(--role-f2-ink);
-}
 #modal-node .nc-team {
-display: flex; align-items: center; gap: calc(var(--nc-u) * 12);
-height: calc(var(--nc-u) * 64);
-padding: 0 calc(var(--nc-u) * 8);
+flex: 0 0 auto;
+display: flex; align-items: center; gap: calc(var(--nc-u) * 6);
+height: var(--nc-act-h);
+padding: 0 calc(var(--nc-u) * 7);
 }
 #modal-node .nc-mem { display: flex; align-items: center; gap: calc(var(--nc-u) * 7); min-width: 0; }
 #modal-node .nc-mem[hidden] { display: none; }
 #modal-node .nc-face { overflow: visible; }   /* 「추천」 표가 목업처럼 캡슐 모서리 밖으로 걸친다(그림은 background 라 모서리에서 잘린다) */
+#modal-node .nc-act .nc-face {
+flex: 0 0 max(48px, calc(var(--nc-u) * 48)); width: max(48px, calc(var(--nc-u) * 48)); height: max(48px, calc(var(--nc-u) * 48));
+border-radius: max(12px, calc(var(--nc-u) * 12));
+}
 #modal-node .nc-rec {
 position: absolute; z-index: 3;
 right: calc(var(--nc-u) * -7); top: calc(var(--nc-u) * -7);
@@ -13764,32 +13762,20 @@ background: linear-gradient(180deg, var(--role-hd-c-3), var(--role-mint-contact)
 box-shadow: 0 calc(var(--nc-u) * 1) calc(var(--nc-u) * 2) color-mix(in srgb, var(--role-primary-outline-r) calc(var(--mo-mk-35) * 100%), transparent), inset 0 calc(var(--nc-u) * -1.5) 0 var(--prim-line-light);
 }
 #modal-node .nc-rec[hidden] { display: none; }
-#modal-node .nc-mem-t { display: flex; flex-direction: column; gap: calc(var(--nc-u) * 4); min-width: 0; line-height: 1; }
-#modal-node .nc-mem-nm {
-overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-font-family: var(--font-display); font-weight: 400; font-size: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 15));
-color: var(--prim-art-ink);
-}
-#modal-node .nc-mem-k { font-style: normal; font-size: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 11)); font-weight: 600; color: var(--role-f2-ink); white-space: nowrap; }
+#modal-node .nc-mem-t { display: none; }   /* [판정판 122 ④] 이름 · 역할은 화면에서 뺀다 — 얼굴(.nc-mem)의 낭독 라벨이 대신한다(ncTeam 이 .nc-mem-nm · .nc-mem-k 의 글을 읽어 라벨로). 옛 .nc-mem-nm · .nc-mem-k 글자 규칙은 은퇴(수정 1회차 F6 — 보이지 않는 요소). */
 #modal-node .nc-swap {                       /* 목업 .swap — 36 × 36 */
 --f2-ph: calc(var(--nc-u) * 36);
 flex: 0 0 auto;
 display: inline-flex; align-items: center; justify-content: center;
 width: var(--f2-ph);
-margin: 0 0 0 auto; padding: calc(var(--nc-u) * 2.25) 0 0;
+margin: 0; padding: calc(var(--nc-u) * 2.25) 0 0;   /* [판정판 122 ④] ⇄ 는 칩 안 오른쪽 — 칩이 줄어들지 않아 자동 여백(auto) 필요 없음 */
 font-family: var(--font-display); font-weight: 400; font-size: max(var(--nc-fs-min, 0px), calc(var(--nc-u) * 18)); line-height: 1;   /* 알약 자기 글자 = 시안 .swap */
 color: var(--role-lt-ink-node-mv2);
 cursor: pointer;
 }
 @media (max-height: 760px) {
 #modal-node .sheet.r10-panel > .nc-body { --nc-gap: calc(var(--nc-u) * 6); }
-#modal-node .nc-foe { height: calc(var(--nc-u) * 128); }
-#modal-node .nc-foe::before { left: calc(var(--nc-u) * 9); width: calc(var(--nc-u) * 96); bottom: calc(var(--nc-u) * 6); height: calc(var(--nc-u) * 13); }
-#modal-node .nc-foe-art { width: calc(var(--nc-u) * 114); height: calc(var(--nc-u) * 126); bottom: calc(var(--nc-u) * 8); }
-#modal-node .nc-foe-body { left: calc(var(--nc-u) * 116); top: calc(var(--nc-u) * 8); gap: calc(var(--nc-u) * 5); }
 #modal-node .nc-foe-name { margin-top: calc(var(--nc-u) * -2); }
-#modal-node .nc-nm { display: none; }   /* [Task 8a 수정 1회차 B5] 칸 축소(--nc-fr 46nu)는 은퇴 — 칸 = 열 폭 itemTile(하한 11px Lv 알약이 46nu 칸에는 안 든다) */
-#modal-node .nc-note { display: none; }
 }
 </style>
 <style id="shop-p3">
@@ -14566,12 +14552,6 @@ gap: calc(var(--stage-u) * 10);
 --jbox-bw: calc(var(--stage-u) * 1.5);
 }
 #modal-node .sheet { --nc-fs-min: var(--text-min); }
-#modal-node .nc-foe { height: auto; min-height: calc(var(--nc-u) * 178); }
-#modal-node .nc-foe-body {
-position: relative; left: auto; right: auto; top: auto;
-margin: 0 calc(var(--nc-u) * 9) 0 calc(var(--nc-u) * 156);
-padding-top: calc(var(--nc-u) * 16);
-}
 #modal-node .sheet,
 #modal-drops .sheet {
 --pw: min(calc(var(--stage-u) * 360), 100%);   /* .r10m .sheet 의 min(360px, 100%) 를 무대 자로 — 안쪽 리듬(.04 · .07 · .06 --pw)이 같이 준다 */
@@ -14605,10 +14585,6 @@ padding: calc(var(--stage-u) * 8) calc(var(--stage-u) * 10);
 #modal-skin .sk-n { font-size: max(var(--text-min), calc(var(--stage-u) * 14)); }
 #modal-skin .sk-d { font-size: max(var(--text-min), calc(var(--stage-u) * 10)); }
 #modal-skin .sk-act.kit-pill-v2 { font-size: max(var(--text-min), calc(var(--stage-u) * 12)); }
-}
-@media (min-aspect-ratio: 1/1) and (max-height: 760px) {
-#modal-node .nc-foe { min-height: calc(var(--nc-u) * 128); }
-#modal-node .nc-foe-body { margin-left: calc(var(--nc-u) * 116); padding-top: calc(var(--nc-u) * 8); }
 }
 </style>
 <style id="itile-8a">

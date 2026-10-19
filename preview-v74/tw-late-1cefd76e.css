@@ -2273,14 +2273,16 @@ cursor: default;
 pointer-events: none;
 opacity: .78;
 }
-.kit-btn-v2[disabled]::after{
+.kit-btn-v2[disabled]::after,
+.kit-btn-v2[aria-disabled="true"]::after{
 box-shadow:
 inset 0 calc(var(--f2-bband) * -1) 0 rgba(0,0,0,.22),
 inset 0 0 0 var(--f2-brim) rgba(255,255,255,.30),
 inset 0 calc(var(--f2-bglow) * -1) 0 rgba(255,255,255,.22),
 inset 0 calc(var(--f2-bvig) * -.30) var(--f2-bvig) rgba(60,44,66,.09);
 }
-.kit-btn-v2[disabled]::before{ opacity: .22; }
+.kit-btn-v2[disabled]::before,
+.kit-btn-v2[aria-disabled="true"]::before{ opacity: .22; }
 .kit-btn-v2[data-active],
 .kit-pill-v2[data-variant="header"][data-active]{
 box-shadow:
@@ -6731,13 +6733,13 @@ background: var(--slot-std, none) center / contain no-repeat;
 --btn-outline-w: var(--role-outline-w);
 position: relative;
 box-sizing: border-box;
-display: flex; align-items: center; justify-content: center; gap: 8px;
+display: flex; align-items: center; justify-content: center; gap: calc(var(--nc-u) * 8);   /* [판정판 122 ⑦] 시작 안 사이 8nu */
 width: 100%;
 min-height: 52px;
-height: calc(var(--pw) * .16);
+height: var(--nc-act-h);
 padding: 0 18px;
 border: 0 !important; border-image: none !important; border-width: 0 !important;
-border-radius: 999px;
+border-radius: var(--nc-act-r);   /* [판정판 122 수정 1회차 F1] 완전 알약 = 줄(.nc-act) 변수 하나 — 하트 0 대기 단추(#node-wait)도 같은 값을 읽는다 */
 background-color: transparent;
 background-image:
 radial-gradient(closest-side, rgba(255,240,253,.951) 0%, rgba(255,240,253,.55) 55%, rgba(255,240,253,0) 100%),
@@ -6748,10 +6750,10 @@ linear-gradient(90deg, var(--btn-face-a) 0%, var(--btn-face-b) 100%);
 background-position: 6.62% 15.15%, 15.04% 13.37%, 50% 6.60%, 0 0, 0 0;
 background-size: 6.4% 16.5%, 3.02% 10.99%, 74.2% 2.5%, 100% 100%, 100% 100%;
 background-repeat: no-repeat;
-box-shadow:
-0 3px 0 var(--btn-outline),
-0 7px 16px rgba(83,28,40,.22),
-inset 0 -6px 0 var(--btn-contact);
+box-shadow:   /* [판정판 122 ⑦] 세 겹도 창 자(nu) — 바닥은 지금 px(3 · 7/16 · 안쪽 −6) */
+0 max(3px, calc(var(--nc-u) * 3)) 0 var(--btn-outline),
+0 max(7px, calc(var(--nc-u) * 7)) max(16px, calc(var(--nc-u) * 16)) rgba(83,28,40,.22),
+inset 0 min(-6px, calc(var(--nc-u) * -6)) 0 var(--btn-contact);
 color: #FFFFFF;
 font-family: var(--font-display);
 }
@@ -6774,14 +6776,15 @@ opacity: .70;
 #modal-node #node-go.ncta:active { transform: translateY(2px); }
 #modal-node #node-go .ncta-lab {
 position: relative; z-index: 1;
-color: #FFFFFF; font-size: 23.1px; line-height: 1.15;
+color: #FFFFFF; font-size: max(23.1px, calc(var(--nc-u) * 23.1)); line-height: 1.15;   /* [판정판 122 ⑦] 창 자(nu) · 바닥 = 지금 px */
 text-shadow: 0 1.5px 0 rgba(79, 58, 92, .70);
 }
 #modal-node #node-go .ncta-cost {
 position: relative; z-index: 1;
-color: #FFFFFF; opacity: 1; font-size: 15px;
+color: #FFFFFF; opacity: 1; font-size: max(15px, calc(var(--nc-u) * 15));   /* [판정판 122 ⑦] ♥ 비용 글자 · 아래 ♥ 그림 같은 값 */
 text-shadow: 0 1px 0 rgba(79, 58, 92, .70);
 }
+#modal-node #node-go .ncta-cost .hc-heart { width: max(15px, calc(var(--nc-u) * 15)); height: max(15px, calc(var(--nc-u) * 15)); }
 
 /* == node-modal-slot == */
 
@@ -6793,7 +6796,6 @@ text-shadow: 0 1px 0 rgba(79, 58, 92, .70);
 #modal-node .node-info      { margin: 0; }
 #modal-node .node-stars     { margin: 0; }
 #modal-node .nrow           { min-height: 48px; }
-#modal-node .node-hearts    { margin-top: 8px; }
 #modal-node #node-got       { top: 16px; left: 40px; }
 #modal-node .nrow-hero .nthumb {
 flex-direction: row;
@@ -6859,7 +6861,6 @@ z-index: 2;
 #modal-node .node-info > li > .ni-pet-av { --cap-art: var(--slot-std, none); }
 #modal-node .node-info > li#node-i-pet { align-items: center; gap: 8px; }
 #modal-node .node-stars  { font-size: 13px; }
-#modal-node .node-hearts { font-size: 13px; }
 
 /* == node-title-fit == */
 
