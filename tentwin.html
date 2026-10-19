@@ -3172,9 +3172,13 @@ button {
      색도 함께 옮긴다 — 남보라 rgba(26,14,38) 은 판의 새 색상각(300°)과 어긋나
      경계에서 색이 꺾였다. rgba(88,64,112) 은 같은 보라 계열의 밝은 쪽이다.
      옛 값: background-color rgba(26,14,38,.28) · blur(2.5px) saturate(1.06). */
+  /* [판정판 129 · Task 129 · 지휘자 판정 Q1 = 막 B] 모든 창(장비 두 창 포함 — 8b2 의 밝은 서리 막 은퇴)이 이 막 하나를 쓴다.
+     흐림 1px → 4px: 투명 · 맑은 젤리 판(방 정보 카드 재질) 너머로 뒤 화면 UI(장비 창 뒤 방 제목 · ✕ · 단추)가 그대로 비쳐 창이 두 겹으로 어지러웠다
+     (Task 5 「✕ 둘」 반려와 같은 꼴). 4px 는 뒤 색 · 모양은 맑게 살리고 글자 · 세부만 흐린다(8px 는 옛 서리 막 느낌). α .12 · 색은 그대로.
+     정적 값이다 — 막이 뜰 때 움직이는 것은 아래 fadein(opacity)뿐이다. 옛 값: blur(1px). */
   background-color: rgba(88, 64, 112, .12);
-  -webkit-backdrop-filter: blur(1px) saturate(1.04);
-  backdrop-filter: blur(1px) saturate(1.04);
+  -webkit-backdrop-filter: blur(4px) saturate(1.04);
+  backdrop-filter: blur(4px) saturate(1.04);
   animation: fadein 200ms var(--ease);
 }
 .modal[hidden] { display: none; }
@@ -14057,10 +14061,8 @@ html[lang="ko"] #modal-arc .sheet-row .btn { word-break: keep-all; min-width: 0;
      매니페스트 modes.A face.parts.charsel_desc / alpha.parts.charsel_desc 로 등재 대상. */
   --mode-a-face-desc:  #E3D8DF;
   --mode-a-alpha-desc: .58;
-  /* [판정판 121 · Task 8a · 전 화면 감사 D5] Mode A 부품 리프 — 창 판(.modal 안 .jbox--modal) 면(Fill L1) 속 α. 판이 너무 비쳐 뒤 그림이 글자를 흐렸다.
-     값 = 측정으로 정함(지휘자 판정 Q2: 판 위 본문(잉크) 글자 대비 4.5:1 을 넘는 가장 작은 값 · .85 이상 · .94 이하) — 설정 · 미션 · 판 정보 · 일시정지 ×
-     1280x720 · 1024x960 · 390x844 훑기 표 = scratchpad/rc1017/t8a/smoke-windows-*.json(보고 표). 캐릭창 · 제목 캡슐 · 전투 카드는 --mode-a-alpha 그대로. */
-  --mode-a-alpha-win: .90;
+  /* [판정판 129 · Task 129] Task 8a D5 의 창 판 면 α 리프 --mode-a-alpha-win(.90)은 은퇴 — 사용자 10-19 「너무 어둡고 … 투명도나 질감이 누락」 ·
+     모든 창 판 = 캐릭터 방 정보 카드 재질(면 α = --mode-a-alpha). 판 위 글자 읽힘은 방이 하는 방식(이름 상자 · 안 상자 · 막 B)이 맡는다. */
   /* [E71-0908 norm-hud] Mode B 첫 소비처 = --hudj-*(#classic-hud .ch-fx 젤리 엔진, 72ae216부터 display:none → 렌더 0).
      [E72-0908 norm-cs] 값을 정본 theme-tentwin.css(a27e2c5, 사용자 확정 HUD lite 자산값)와 한 자도 같게 맞춘다:
      face #96A7F6(150,167,246) · rim #C2D6FF(194,214,255) · contact .200(HUD 판 drop-shadow α).
@@ -14420,14 +14422,8 @@ html[lang="ko"] #modal-arc .sheet-row .btn { word-break: keep-all; min-width: 0;
      되살리려면 -w 를 1.5px 로 되돌린다(그 한 자리뿐 — .jbox--modal 의 링 항은 지우지 않았다). */
   --role-modal-ring: #8E5A72;
   --role-modal-ring-w: 0;
-  /* [판정판 121 · Task 8b2 · 지휘자 판정 2-1] 장비 창 · 장비 정보 카드가 캐릭터 방 위에 뜰 때만의 막 — 방은 뒤에 보이되 글자 · 단추가 젤리 판 너머로 읽히지 않게
-     (사용자 10-19 지시 '그 예쁜디자인 위에'). 뒤 흐림 1px → 10px.
-     [지휘자 답 6 Q-E] 색 = 젤리 판 림 광 색(--mode-a-rim · 판 테두리 밝은 띠의 색 — 흰 쪽 밝은 색) · 알파 .35 — 옛 값(창 막 보라 rgba(88,64,112) · .30)은
-     반투명 판 뒤를 어둡게 눌러 정보 카드 잉크 글자 대비가 3.13 ~ 4.37 로 떨어졌다. .35/.45/.55 중 두 창 판 위 잉크 글자가 10크기 × ko/en 모두 ≥ 4.5 인 가장 낮은 값
-     (최저 5.26 · scratchpad/rc1017/t8b2/probe_veil.py). 판 면 · 글자 · 흐림은 그대로다.
-     움직이지 않는 값이다(막은 뜰 때 opacity 만 움직인다 — filter 애니메이트 0). 소비처 = <style id="gear-modal-8b2"> 막 규칙 하나. */
-  --role-gear-veil: color-mix(in srgb, var(--mode-a-rim) 35%, transparent);
-  --role-gear-veil-blur: 10px;
+  /* [판정판 129 · Task 129] 8b2 의 장비 두 창 밝은 막 토큰 둘(--role-gear-veil = 림 광 색 35% · --role-gear-veil-blur 10px)은 은퇴 —
+     사용자 10-19 「투명하고 맑은 거야」(하얗게 씻는 서리 막 금지). 모든 창이 같은 막 하나(.modal)를 쓴다. */
 
 
   /* [E76-0908 norm-rest · 그룹 C] 남은 접두의 원시색을 이름만 이관 — 값 신설 0, 값 동일은 기존 토큰 붕괴.
@@ -16713,7 +16709,8 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
        칸은 buildMinimap() 이 만든다 — 마크업에 챕터 10줄을 박아 두면
        MAP_CHAPTERS 가 늘 때 두 자리를 고쳐야 한다.
        ============================================================ -->
-  <div id="modal-minimap" class="modal r10m" hidden role="dialog" aria-modal="true" aria-labelledby="mm-h"><div class="sheet r10-panel jbox jbox--modal" data-part="modal-plate">
+  <div id="modal-minimap" class="modal r10m" hidden role="dialog" aria-modal="true" aria-labelledby="mm-h"><div class="sheet r10-panel jbox jbox--modal mframe" data-part="modal-plate">
+    <div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
     <div class="r10-ribbon"><h2 id="mm-h" data-i18n="minimap.title">Chapters</h2></div>
     <button id="mm-close" class="r10-x x-btn" type="button" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
     <div id="mm-grid" class="mm-grid"></div>
@@ -16729,13 +16726,15 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
        아니라 그 챕터 스토리를 본 기록 cutSeen('chap'+c) — buildTheater()/
        theaterPick() 참조(챕터 미니맵 함수들 옆). 요약 줄(#mm-sum류)은 두지
        않는다(브리프 범위 = 카드 격자뿐). -->
-  <div id="modal-theater" class="modal r10m" hidden role="dialog" aria-modal="true" aria-labelledby="th-h"><div class="sheet r10-panel jbox jbox--modal" data-part="modal-plate">
+  <div id="modal-theater" class="modal r10m" hidden role="dialog" aria-modal="true" aria-labelledby="th-h"><div class="sheet r10-panel jbox jbox--modal mframe" data-part="modal-plate">
+    <div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
     <div class="r10-ribbon"><h2 id="th-h" data-i18n="theater.title">Story Theater</h2></div>
     <button id="th-close" class="r10-x x-btn" type="button" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
     <div id="th-grid" class="mm-grid"></div>
   </div></div>
 
-  <div id="modal-howto" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="howto-h"><div class="sheet jbox jbox--modal" data-part="modal-plate">
+  <div id="modal-howto" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="howto-h"><div class="sheet jbox jbox--modal mframe" data-part="modal-plate">
+    <div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
     <h2 id="howto-h" data-i18n="howto.title">How to play</h2>
     <button class="r10-x x-btn" type="button" data-w6x="howto-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
     <div id="howto-viewport"><div id="howto-track">
@@ -16900,7 +16899,8 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
   <!-- First-run interactive tutorial (3 taps). game.js injects the mini board into
        #tut-stage and writes #tut-text through t(); the markup stays text-free so a
        missing i18n key can never leave an English string on a Korean screen. -->
-  <div id="modal-tutorial" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="tut-h"><div class="sheet jbox jbox--modal" data-part="modal-plate">
+  <div id="modal-tutorial" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="tut-h"><div class="sheet jbox jbox--modal mframe" data-part="modal-plate">
+    <div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
     <h2 id="tut-h" data-i18n="howto.title">How to play</h2>
     <button class="r10-x x-btn" type="button" data-w6x="tut-skip" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
     <div id="tut-stage"></div>
@@ -16922,7 +16922,8 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
        끄려고 메뉴까지 나갔다 오게 만들 이유가 없고, 두 화면은 같은 toggleSound()
        하나를 부르므로 상태가 갈라질 여지도 없다.
        ============================================================ -->
-  <div id="modal-settings" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="set-h"><div class="sheet jbox jbox--modal" data-part="modal-plate">
+  <div id="modal-settings" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="set-h"><div class="sheet jbox jbox--modal mframe" data-part="modal-plate">
+    <div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
     <h2 id="set-h" data-i18n="settings.title">Settings</h2>
     <button class="r10-x x-btn" type="button" data-w6x="st-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
     <!-- Task 12 — 계정 줄. 포털 밖(TW_PORTAL.env!=='crazygames')이면 이 div 는
@@ -16961,7 +16962,8 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
        세운다: 판 = `.sheet.jbox.jbox--modal[data-part=modal-plate]`(다른 12창과
        한 글자도 다르지 않다), X = 같은 `.r10-x.x-btn[data-w6x]`(기존 위임이
        그대로 받는다), 버튼 = 같은 `.btn.btn-primary`. 새 부품 0 · 새 값 0. -->
-  <div id="modal-soon" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="soon-h"><div class="sheet jbox jbox--modal" data-part="modal-plate">
+  <div id="modal-soon" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="soon-h"><div class="sheet jbox jbox--modal mframe" data-part="modal-plate">
+    <div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
     <h2 id="soon-h" data-i18n="soon.title">Coming Soon</h2>
     <button class="r10-x x-btn" type="button" data-w6x="soon-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
     <p class="cut-line" data-i18n="soon.body">Under construction. Check back after the next update!</p>
@@ -16974,7 +16976,8 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
        대신 열릴 때마다 t() 로 새로 짓고, 언어 전환도 다시 짓는다(applyI18n 이
        건드릴 노드가 아예 없으므로 5차의 되돌림 함정이 원리적으로 없다).
        ============================================================ -->
-  <div id="modal-skin" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="sk-h"><div class="sheet jbox jbox--modal" data-part="modal-plate">
+  <div id="modal-skin" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="sk-h"><div class="sheet jbox jbox--modal mframe" data-part="modal-plate">
+    <div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
     <h2 id="sk-h" data-i18n="skin.title">Skins</h2>
     <button class="r10-x x-btn" type="button" data-w6x="sk-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
     <div id="sk-list" class="sk-list"></div>
@@ -17003,7 +17006,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
         </div>
         <div id="gm-slots" class="gm-slots" role="group" data-i18n-aria="aria.loadout" aria-label="Loadout"></div>
       </div>
-      <div class="cp-card kit-frame-v2">
+      <div class="cp-card kit-frame-v2 mframe" data-tabs="3">
         <div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
         <div id="gm-tabs" class="cp-tabs kit-frame-v2__tabs" role="tablist" data-i18n-aria="gear.title" aria-label="Gear">
           <button class="cp-tab kit-tab-v2" type="button" role="tab" data-gmtab="weapon" aria-selected="true"><i class="cpt-ic gm-ic" aria-hidden="true"></i><span class="cpt-lab" data-i18n="gear.slot.weapon">Weapon</span><b class="gm-n"></b></button>
@@ -17031,14 +17034,14 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
         <h2 id="gi-h" data-i18n="gear.title.info">Gear Info</h2>
         <button id="gi-close" class="icon-btn x-btn" type="button" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
       </div>
-      <div class="cp-card kit-frame-v2">
+      <div class="cp-card kit-frame-v2 mframe">
         <div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
         <div class="cp-body kit-frame-v2__body">
           <div class="gi-main">
             <div class="gi-top">
               <div id="gi-art" class="gi-art"></div>
               <div class="gi-id">
-                <b id="gi-name" class="gi-name"></b>
+                <span class="gi-plate kit-slot-v2 kit-slot-v2--name"><b id="gi-name" class="gi-name"></b></span>
                 <span id="gi-chip" class="tchip"><i></i></span>
                 <span id="gi-meta" class="gi-meta"></span>
               </div>
@@ -17073,7 +17076,8 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
        문장은 마크업에 굳히지 않는다(#modal-confirm 규약) — 이름·배지·비용·진행은
        전부 syncInvite() 가 t() 로 채운다. data-i18n 이 붙은 것은 **고정 문구**
        (제목·두 버튼·「다음 초대까지」 라벨)뿐이라 언어 전환이 값을 안 지운다. -->
-  <div id="modal-invite" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="iv-h"><div class="sheet jbox jbox--modal" data-part="modal-plate">
+  <div id="modal-invite" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="iv-h"><div class="sheet jbox jbox--modal mframe" data-part="modal-plate">
+    <div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
     <h2 id="iv-h" data-i18n="invite.title">Invite</h2>
     <button class="r10-x x-btn" type="button" data-w6x="iv-no" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
     <div class="ci-id">
@@ -17155,7 +17159,8 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
        비활성이고, `getDigitalGoodsService` 가 없으면 `#shop-pay` 묶음이
        통째로 숨는다(§20.8 ①). SDK 호출은 **한 줄도 없다**.
        ============================================================ -->
-  <div id="modal-shop" class="modal r10m" data-app-only hidden role="dialog" aria-modal="true" aria-labelledby="shop-h"><div class="sheet r10-panel jbox jbox--modal" data-part="modal-plate">
+  <div id="modal-shop" class="modal r10m" data-app-only hidden role="dialog" aria-modal="true" aria-labelledby="shop-h"><div class="sheet r10-panel jbox jbox--modal mframe" data-part="modal-plate">
+    <div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
     <div class="r10-ribbon"><h2 id="shop-h" data-i18n="shop.title">Shop</h2></div>
     <button id="shop-close" class="r10-x x-btn" type="button" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
     <!-- 상단 고정 잔액 칩 2개(§20.4). ★ 는 **읽기만** 한다 — 젤리별을 현금으로
@@ -17199,7 +17204,8 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
        물러서는 행동(.btn-ghost)이 그 위. #modal-pause 가 [howto][restart]
        [menu·ghost][resume·primary] 로 같은 순서다.
        ============================================================ -->
-  <div id="modal-confirm" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="cf-h" aria-describedby="cf-msg"><div class="sheet jbox jbox--modal" data-part="modal-plate">
+  <div id="modal-confirm" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="cf-h" aria-describedby="cf-msg"><div class="sheet jbox jbox--modal mframe" data-part="modal-plate">
+    <div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
     <h2 id="cf-h" data-i18n="confirm.title">Confirm</h2>
     <button class="r10-x x-btn" type="button" data-w6x="cf-no" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
     <p id="cf-msg"></p>
@@ -17207,7 +17213,8 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
     <button id="cf-yes" class="btn btn-primary" type="button" data-i18n="confirm.yes">Buy</button>
   </div></div>
 
-  <div id="modal-pause" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="pause-h"><div class="sheet jbox jbox--modal" data-part="modal-plate">
+  <div id="modal-pause" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="pause-h"><div class="sheet jbox jbox--modal mframe" data-part="modal-plate">
+    <div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
     <h2 id="pause-h" data-i18n="pause.title">Paused</h2>
     <button class="r10-x x-btn" type="button" data-w6x="pz-resume" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
     <!-- ============================================================
@@ -17235,7 +17242,8 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
     <button id="pz-resume" data-part="btn-modal" data-variant="primary" class="btn btn-primary" data-i18n-aria="aria.pzResume" data-i18n="pause.resume" aria-label="Resume game">Resume</button>
   </div></div>
 
-  <div id="modal-clear" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="clear-title"><div class="sheet jbox jbox--modal" data-part="modal-plate">
+  <div id="modal-clear" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="clear-title"><div class="sheet jbox jbox--modal mframe" data-part="modal-plate">
+    <div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
     <!-- v4 C-3: the stage number as the hero of the sheet — the N탄 signal the
          tester named as the reason she kept playing Royal Match. aria-hidden
          because #clear-title already says the same thing to a screen reader. -->
@@ -17278,7 +17286,8 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
        그 밖이면 #node-wait(회색 대기 단추 · 회복 대기 안내) [판정판 122].
        game.js openNodeCard() 가 내용의 단독 소유자.
        ============================================================ -->
-  <div id="modal-node" class="modal r10m" hidden role="dialog" aria-modal="true" aria-labelledby="node-title"><div class="sheet r10-panel jbox jbox--modal" data-part="modal-plate">
+  <div id="modal-node" class="modal r10m" hidden role="dialog" aria-modal="true" aria-labelledby="node-title"><div class="sheet r10-panel jbox jbox--modal mframe" data-part="modal-plate">
+    <div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
     <!-- [E16-0903 · 판정 3(분리)] 껍데기·판 기하는 **배포본**, 내용물은 유지.
          배포본 15159 의 `.modal r10m` + `.sheet r10-panel jbox jbox--modal` +
          `.r10-ribbon` 을 그대로 쓰고, 사용자 승인 노드카드 재기획(B1~B9)의
@@ -17436,7 +17445,8 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
        장비 과일 절 = 한 줄 설명 · 등급 칩 셋(.tchip) · (보스 판) 보스 상자 · 장비 칸 격자(itemTile — 세로 4열 · 가로 5열) · 맨 아래 한 줄.
        사용 과일 절 = 줄 카드(중립 장비 칸 안 게이지 메달 그림 · 이름 · 한 줄 설명 · 확률 알약) — 이모지 은퇴.
        숫자는 전부 openDrops() 가 dropTableFor(n) 에서 채운다(판 추첨과 같은 표 — 마크업에 수치 0). -->
-  <div id="modal-drops" class="modal r10m" hidden role="dialog" aria-modal="true" aria-labelledby="drops-title"><div class="sheet r10-panel jbox jbox--modal" data-part="modal-plate">
+  <div id="modal-drops" class="modal r10m" hidden role="dialog" aria-modal="true" aria-labelledby="drops-title"><div class="sheet r10-panel jbox jbox--modal mframe" data-part="modal-plate">
+    <div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
     <div class="r10-ribbon"><h2 id="drops-title">Stage 1 Drops</h2></div>
     <button id="drops-close" class="r10-x x-btn" type="button" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
     <div class="dr-tabs" role="tablist" data-i18n-aria="aria.droptabs" aria-label="Drop table sections">
@@ -17468,7 +17478,8 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
        오늘 완료 여부는 메뉴가 아니라 **여기** 있다: 그 사실이 쓸모 있는 순간은
        "오늘 데일리를 할까"를 고르는 이 화면 하나뿐이다.
        ============================================================ -->
-  <div id="modal-mode" class="modal r10m" hidden role="dialog" aria-modal="true" aria-labelledby="mode-h"><div class="sheet r10-panel jbox jbox--modal" data-part="modal-plate">
+  <div id="modal-mode" class="modal r10m" hidden role="dialog" aria-modal="true" aria-labelledby="mode-h"><div class="sheet r10-panel jbox jbox--modal mframe" data-part="modal-plate">
+    <div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
     <div class="r10-ribbon"><h2 id="mode-h" data-i18n="mode.title">Play</h2></div>
     <button id="mode-close" class="r10-x x-btn" type="button" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
     <div class="mode-list">
@@ -17520,7 +17531,8 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
        으로 두면 그림 규칙이 한 줄도 닿지 않고 공용 기본 CSS(.mode-row/.mode-t)가
        그대로 살아 **코드 텍스트 라벨**이 보인다. 색은 아래 전용 블록이 준다.
        세 줄은 모험이 없다 — 클래식은 순수 실력 종목만 모으는 자리다. -->
-  <div id="modal-classic" class="modal r10m" hidden role="dialog" aria-modal="true" aria-labelledby="classic-h"><div class="sheet r10-panel jbox jbox--modal" data-part="modal-plate">
+  <div id="modal-classic" class="modal r10m" hidden role="dialog" aria-modal="true" aria-labelledby="classic-h"><div class="sheet r10-panel jbox jbox--modal mframe" data-part="modal-plate">
+    <div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
     <div class="r10-ribbon"><h2 id="classic-h" data-i18n="classic.title">Classic</h2></div>
     <button id="classic-close" class="r10-x x-btn" type="button" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
     <p id="classic-lead" data-i18n="classic.lead">No skills, no items, no passives. Clear the board for the next one. Stuck ends the run, Rush ends at 90s, Daily is one board a day.</p>
@@ -17566,7 +17578,8 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
        판 = 젤리 모달 판, 제목 = .w6m 의 글자 제목(퀘스트 판과 같은 문법 — 리본
        그림 제목은 발주가 필요해 쓰지 않는다), 줄 = .mode-row(btn-picture) 의 기존
        변주 arcade(보라)·timeattack(주황) 인스턴스. 새 그림 0 · 새 값 0. -->
-  <div id="modal-playground" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="pg-h"><div class="sheet jbox jbox--modal" data-part="modal-plate">
+  <div id="modal-playground" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="pg-h"><div class="sheet jbox jbox--modal mframe" data-part="modal-plate">
+    <div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
     <h2 id="pg-h" data-i18n="pg.title">Playground</h2>
     <button id="pg-close" class="r10-x x-btn" type="button" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
     <div class="mode-list">
@@ -17584,7 +17597,8 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
   <!-- v4 4차-a — 모험 스테이지 결과. 성공/실패가 같은 시트를 쓰고 .lost 클래스가
        색과 별 줄의 유무를 가른다: 두 시트를 따로 두면 버튼 위치가 미묘하게
        어긋나 "다시 도전"을 누르려다 "지도로"를 누르는 사고가 난다. -->
-  <div id="modal-adv" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="adv-title"><div class="sheet jbox jbox--modal" data-part="modal-plate">
+  <div id="modal-adv" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="adv-title"><div class="sheet jbox jbox--modal mframe" data-part="modal-plate">
+    <div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
     <h2 id="adv-title">Stage 1 clear!</h2>
     <!-- W-C §10 루트 리빌. 순서가 사양 그대로다: 파편(현재는 🐾⭐ 특수과일
          수확분) → 코인/젤리별 → **별 3슬롯**(아래 #adv-stars 가 그 슬롯이고,
@@ -17623,7 +17637,8 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
     <button id="adv-map" data-part="btn-modal" data-variant="lilac" class="btn btn-ghost" data-i18n="adv.map">Map</button>
   </div></div>
 
-  <div id="modal-over" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="over-title"><div class="sheet jbox jbox--modal" data-part="modal-plate">
+  <div id="modal-over" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="over-title"><div class="sheet jbox jbox--modal mframe" data-part="modal-plate">
+    <div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
     <h2 id="over-title" data-i18n="over.title">Out of moves</h2>
     <!-- P3 T2 수정 2회차 — 중간 구획(.over-body = 결과 카드 · 순위 줄 · 보상 줄). 평소(창 높이 720 초과)에는 display:contents 라 상자가 없고
          아래 형제들이 종전처럼 시트의 직접 자식으로 놓인다. 작은 폰(높이 720 이하 · 포털은 코인 2배 줄이 서므로 790 이하)에서만 이 구획이 시트 안에서 구르고
@@ -17679,7 +17694,8 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
          쓰고, 숫자 크기만 전용 규칙 하나로 키웠다.
        ▣ 본문은 전부 paintArcSheet() 가 t() 로 칠한다. 그래서 data-i18n 이 없다
          (있으면 applyI18n 이 값을 지운다 — #over-title 과 같은 규약). -->
-  <div id="modal-arc" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="arc-title"><div class="sheet jbox jbox--modal" data-part="modal-plate">
+  <div id="modal-arc" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="arc-title"><div class="sheet jbox jbox--modal mframe" data-part="modal-plate">
+    <div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
     <h2 id="arc-title">Arcade</h2>
     <!-- P3 T9 — 중간 구획(.res-body = 기록 · 보상 · 코인 2배 줄 · 카드 미리보기). 평소에는 display:contents 라 상자가 없고 형제들이 종전처럼 시트의 직접 자식으로 놓인다.
          작은 폰에서만 이 구획이 시트 안에서 구르고 버튼 줄은 굴림 밖에 선다 — 게임오버 · 데일리와 같은 공용 클래스 한 벌(shop-p3 의 [P3-T9] 블록). -->
@@ -17711,7 +17727,8 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
     </div>
   </div></div>
 
-  <div id="modal-daily" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="daily-title"><div class="sheet jbox jbox--modal" data-part="modal-plate">
+  <div id="modal-daily" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="daily-title"><div class="sheet jbox jbox--modal mframe" data-part="modal-plate">
+    <div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
     <h2 id="daily-title">Daily #1</h2>
     <!-- P3 T9 수정 1회차 — 중간 구획(.res-body = 기록 · 보상 · 코인 2배 줄 · 순위 · 격자 · 카드 미리보기). 게임오버 · 아케이드와 공용 클래스 한 벌(shop-p3 의 [P3-T9] 블록). 평소에는 display:contents. -->
     <div class="res-body">
@@ -17743,7 +17760,8 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
        board has to put the player back exactly where they were. game.js builds
        #rank-list with createElement — always five children, filled or empty — the
        moment the sheet opens, and never between opens. -->
-  <div id="modal-rank" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="rank-h"><div class="sheet jbox jbox--modal" data-part="modal-plate">
+  <div id="modal-rank" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="rank-h"><div class="sheet jbox jbox--modal mframe" data-part="modal-plate">
+    <div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
     <h2 id="rank-h" data-i18n="rank.title">Records</h2>
     <button class="r10-x x-btn" type="button" data-w6x="rank-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
     <div id="rank-tabs" role="tablist" data-i18n-aria="aria.rankTab" aria-label="Pick which records to show">
@@ -17774,35 +17792,49 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
        ⚠ 탭은 **판 위**에 선다. 참고 화면은 아래에 붙어 있지만 우리 탭 부품
        (.kit-tab-v2)은 윗변만 둥글고 스페큘러가 좌상단인 «상단 탭»이라, 아래에
        뒤집어 붙이면 광원이 뒤집힌다(부품 계약 위반). 자리보다 부품을 지켰다. -->
-  <div id="modal-quest" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="quest-h"><div class="sheet jbox jbox--modal" data-part="modal-plate">
+  <!-- [판정판 129 · Task 129 · 지휘자 판정 Q5] 판 내용을 통째로 바꾸는 탭(일일 · 주간 · 에픽) = 판 윗변에 구운 탭 셋(방 · 장비 창과 한 생성기 · 한 훅 .mframe[data-tabs]).
+       짜임 = 장비 창과 같다: 바깥 .sheet(.mf-tabhost)는 그리지 않는 틀 — 제목 캡슐 + ✕ 가 판 위에 서고, 그 아래 탭 달린 젤리 판(.cp-card.mframe) = 탭 → 본문(.cp-body). -->
+  <div id="modal-quest" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="quest-h"><div class="sheet jbox jbox--modal mf-tabhost" data-part="modal-plate">
     <h2 id="quest-h" data-i18n="quest.title">Missions</h2>
     <button class="r10-x x-btn" type="button" data-w6x="quest-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
-    <div id="quest-tabs" class="kit-frame-v2__tabs qs-tabs" role="tablist" data-i18n-aria="aria.questTab" aria-label="Mission type">
-      <button class="kit-tab-v2 qs-tab" type="button" role="tab" data-qtab="daily" data-active aria-selected="true"><span class="cpt-lab" data-i18n="quest.tab.daily">Daily</span></button>
-      <button class="kit-tab-v2 qs-tab" type="button" role="tab" data-qtab="weekly" aria-selected="false"><span class="cpt-lab" data-i18n="quest.tab.weekly">Weekly</span></button>
-      <button class="kit-tab-v2 qs-tab" type="button" role="tab" data-qtab="epic" aria-selected="false"><span class="cpt-lab" data-i18n="quest.tab.epic">Epic</span></button>
+    <div class="cp-card kit-frame-v2 mframe" data-tabs="3">
+      <div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
+      <div id="quest-tabs" class="cp-tabs kit-frame-v2__tabs qs-tabs" role="tablist" data-i18n-aria="aria.questTab" aria-label="Mission type">
+        <button class="cp-tab kit-tab-v2 qs-tab" type="button" role="tab" data-qtab="daily" data-active aria-selected="true"><span class="cpt-lab" data-i18n="quest.tab.daily">Daily</span></button>
+        <button class="cp-tab kit-tab-v2 qs-tab" type="button" role="tab" data-qtab="weekly" aria-selected="false"><span class="cpt-lab" data-i18n="quest.tab.weekly">Weekly</span></button>
+        <button class="cp-tab kit-tab-v2 qs-tab" type="button" role="tab" data-qtab="epic" aria-selected="false"><span class="cpt-lab" data-i18n="quest.tab.epic">Epic</span></button>
+      </div>
+      <div class="cp-body">
+        <!-- 출석 7일 — 새 저장 칸 0. store.streak · store.streakClaimed(§21④)만 읽는다. -->
+        <div id="quest-att" class="qs-att" role="list" aria-label="Attendance"></div>
+        <div id="quest-list" class="qs-list"></div>
+        <div class="qs-foot">
+          <button id="quest-all" class="rank-tab qs-all" type="button" aria-selected="false" data-i18n="quest.claimall">Claim all</button>
+        </div>
+        <button id="quest-close" data-part="btn-modal" data-variant="primary" class="btn btn-primary" data-i18n-aria="aria.close" data-i18n="rank.close" aria-label="Close">Close</button>
+      </div>
     </div>
-    <!-- 출석 7일 — 새 저장 칸 0. store.streak · store.streakClaimed(§21④)만 읽는다. -->
-    <div id="quest-att" class="qs-att" role="list" aria-label="Attendance"></div>
-    <div id="quest-list" class="qs-list"></div>
-    <div class="qs-foot">
-      <button id="quest-all" class="rank-tab qs-all" type="button" aria-selected="false" data-i18n="quest.claimall">Claim all</button>
-    </div>
-    <button id="quest-close" data-part="btn-modal" data-variant="primary" class="btn btn-primary" data-i18n-aria="aria.close" data-i18n="rank.close" aria-label="Close">Close</button>
   </div></div>
 
   <!-- [P3-ODDS] 확률 정보(게임 안 자율 공시, 스펙 §2·§4-b · 목업 mock-P-odds.png). 판 = 정본 모달 판 인스턴스,
        탭 = 킷 탭(.kit-tab-v2 — #modal-quest 와 같은 문법). 숫자는 전부 gachaTable 한 출처에서 온다. -->
-  <div id="modal-odds" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="odds-h"><div class="sheet jbox jbox--modal" data-part="modal-plate">
+  <!-- [판정판 129 · Task 129 · 지휘자 판정 Q5] 캡슐 갈래 탭(아이템 · 황금 · 친구 — 판 내용을 통째로 바꾼다) = 판 윗변에 구운 탭 셋 · 짜임은 위 미션 창과 같다.
+       꾸미기 캡슐 갈래(oddsPaint 가 탭 줄을 hidden)에서는 판이 탭 없는 기본 실루엣으로 선다(실루엣 규칙이 :has(> .cp-tabs[hidden]) 를 뺀다). -->
+  <div id="modal-odds" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="odds-h"><div class="sheet jbox jbox--modal mf-tabhost" data-part="modal-plate">
     <h2 id="odds-h" data-i18n="odds.title">Odds</h2>
     <button class="r10-x x-btn" type="button" data-w6x="odds-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
-    <div id="odds-tabs" class="kit-frame-v2__tabs qs-tabs" role="tablist" data-i18n-aria="odds.title" aria-label="Odds">
-      <button class="kit-tab-v2 qs-tab od-tab" type="button" role="tab" data-otab="item" data-active aria-selected="true"><span class="cpt-lab" data-i18n="gacha.item">Item Capsule</span></button>
-      <button class="kit-tab-v2 qs-tab od-tab" type="button" role="tab" data-otab="gold" aria-selected="false"><span class="cpt-lab" data-i18n="gacha.gold">Golden Capsule</span></button>
-      <button class="kit-tab-v2 qs-tab od-tab" type="button" role="tab" data-otab="friend" aria-selected="false"><span class="cpt-lab" data-i18n="gacha.friend">Friend Capsule</span></button>
+    <div class="cp-card kit-frame-v2 mframe" data-tabs="3">
+      <div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
+      <div id="odds-tabs" class="cp-tabs kit-frame-v2__tabs qs-tabs" role="tablist" data-i18n-aria="odds.title" aria-label="Odds">
+        <button class="cp-tab kit-tab-v2 qs-tab od-tab" type="button" role="tab" data-otab="item" data-active aria-selected="true"><span class="cpt-lab" data-i18n="gacha.item">Item Capsule</span></button>
+        <button class="cp-tab kit-tab-v2 qs-tab od-tab" type="button" role="tab" data-otab="gold" aria-selected="false"><span class="cpt-lab" data-i18n="gacha.gold">Golden Capsule</span></button>
+        <button class="cp-tab kit-tab-v2 qs-tab od-tab" type="button" role="tab" data-otab="friend" aria-selected="false"><span class="cpt-lab" data-i18n="gacha.friend">Friend Capsule</span></button>
+      </div>
+      <div class="cp-body">
+        <div id="odds-body" class="od-body"></div>
+        <button id="odds-close" data-part="btn-modal" data-variant="primary" class="btn btn-primary" type="button" data-i18n="rank.close">Close</button>
+      </div>
     </div>
-    <div id="odds-body" class="od-body"></div>
-    <button id="odds-close" data-part="btn-modal" data-variant="primary" class="btn btn-primary" type="button" data-i18n="rank.close">Close</button>
   </div></div>
 
   <!-- [P3-GRES] 뽑기 결과(목업 mock-R1-item10.png — **판 없음**). 카드 = 등급 액자(코드) + 장비 그림(itemArtCss).
@@ -25099,7 +25131,7 @@ window.TT_SFX = {
   function isCapsuleHead(el) {
     try {
       return !!(el && el.matches &&
-        el.matches('.modal-v2 .mv2-sheet > h2, .modal-v2 .mv2-head > h2, #modal-node .r10-ribbon > h2, #modal-drops .r10-ribbon > h2, #modal-clear .sheet > h2, #modal-adv:not(.is-advfinish) .sheet > h2, #modal-gear #gear-h, #modal-gear-info #gi-h'));   /* [Task 8b2] 장비 두 창 제목 = CSS 레터링(지휘자 판정 2-4) */
+        el.matches('.modal-v2 .mv2-sheet > h2, .modal-v2 .mv2-head > h2, #modal-node .r10-ribbon > h2, #modal-drops .r10-ribbon > h2, #modal-clear .sheet > h2, #modal-adv:not(.is-advfinish) .sheet > h2, #modal-gear #gear-h, #modal-gear-info #gi-h, #modal-minimap .r10-ribbon > h2, #modal-theater .r10-ribbon > h2, #modal-quest .sheet > h2, #modal-soon .sheet > h2, #modal-invite .sheet > h2, #modal-confirm .sheet > h2, #modal-playground .sheet > h2, #modal-odds .sheet > h2, #modal-daily .sheet > h2, #modal-shop .r10-ribbon > h2'));   /* [Task 8b2] 장비 두 창 제목 = CSS 레터링(지휘자 판정 2-4) · [Task 129] 챕터 · 스토리 극장 제목도 */
     } catch (e) { return false; }
   }
   function headText(el, s) {
@@ -25187,7 +25219,7 @@ window.TT_SFX = {
   }
   function fitHeads(root) {
     var list = (root || document).querySelectorAll(
-      '.modal-v2 .mv2-sheet > h2, .modal-v2 .mv2-head > h2, #modal-node .r10-ribbon > h2, #modal-drops .r10-ribbon > h2, #modal-clear .sheet > h2, #modal-adv:not(.is-advfinish) .sheet > h2, #modal-gear #gear-h, #modal-gear-info #gi-h');   /* [Task 8b2] 레터링 제목 셋째 목록 — isCapsuleHead · healHeads 와 같은 줄 */
+      '.modal-v2 .mv2-sheet > h2, .modal-v2 .mv2-head > h2, #modal-node .r10-ribbon > h2, #modal-drops .r10-ribbon > h2, #modal-clear .sheet > h2, #modal-adv:not(.is-advfinish) .sheet > h2, #modal-gear #gear-h, #modal-gear-info #gi-h, #modal-minimap .r10-ribbon > h2, #modal-theater .r10-ribbon > h2, #modal-quest .sheet > h2, #modal-soon .sheet > h2, #modal-invite .sheet > h2, #modal-confirm .sheet > h2, #modal-playground .sheet > h2, #modal-odds .sheet > h2, #modal-daily .sheet > h2, #modal-shop .r10-ribbon > h2');   /* [Task 8b2] 레터링 제목 셋째 목록 — isCapsuleHead · healHeads 와 같은 줄 */
     for (var i = 0; i < list.length; i++) fitHead(list[i]);
   }
   try {
@@ -25224,7 +25256,7 @@ window.TT_SFX = {
   /** 창이 열릴 때 한 번 더 — 내가 못 찾은 쓰기 경로가 있어도 여기서 되살아난다. */
   function healHeads(root) {
     var list = (root || document).querySelectorAll(
-      '.modal-v2 .mv2-sheet > h2, .modal-v2 .mv2-head > h2, #modal-node .r10-ribbon > h2, #modal-drops .r10-ribbon > h2, #modal-clear .sheet > h2, #modal-adv:not(.is-advfinish) .sheet > h2, #modal-gear #gear-h, #modal-gear-info #gi-h');
+      '.modal-v2 .mv2-sheet > h2, .modal-v2 .mv2-head > h2, #modal-node .r10-ribbon > h2, #modal-drops .r10-ribbon > h2, #modal-clear .sheet > h2, #modal-adv:not(.is-advfinish) .sheet > h2, #modal-gear #gear-h, #modal-gear-info #gi-h, #modal-minimap .r10-ribbon > h2, #modal-theater .r10-ribbon > h2, #modal-quest .sheet > h2, #modal-soon .sheet > h2, #modal-invite .sheet > h2, #modal-confirm .sheet > h2, #modal-playground .sheet > h2, #modal-odds .sheet > h2, #modal-daily .sheet > h2, #modal-shop .r10-ribbon > h2');
     for (var i = 0; i < list.length; i++) {
       var h = list[i];
       if (h.firstElementChild && h.firstElementChild.className === 'mvh-title'
@@ -55256,10 +55288,9 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
      옛 값: --jbox-blur:var(--modal-glass);  (= blur(0px) saturate(1.06)) */
   --jbox-blur:none;
 }
-/* [판정판 121 · Task 8a · 전 화면 감사 D5] 창 판(.modal 안 판)만 면(Fill L1) 속 α 를 창 리프 --mode-a-alpha-win 으로 — 층 순서(Shape → Fill → Stroke → Effect) ·
-   다른 층 · 젤리판 v1.0 층 구조는 그대로, 바뀌는 것은 이 한 손잡이다(지휘자 판정 Q2 (b)). 전투 가로 카드 별칭(#pc-left · #pc-right · #duel-foe-box ·
-   #duel-me-box)과 방(상점 판 · 캐릭창)은 .modal 밖이라 무변. 특이성 (0,2,0) 이 위 등급 규칙 (0,1,0) 을 이긴다. */
-.modal :is(.jbox--modal, [data-part="modal-plate"]){ --jbox-a-in: var(--mode-a-alpha-win); }
+/* [판정판 129 · Task 129] 옛 줄 「.modal :is(.jbox--modal, [data-part=modal-plate]){ --jbox-a-in: var(--mode-a-alpha-win) }」(Task 8a D5 — 창 판 면 α .90)은 은퇴 —
+   모든 창 판이 모달 틀(.mframe = 캐릭터 방 정보 카드 재질 · <style id="modal-frame-129">)을 입어 이 등급의 ::before · ::after 를 그리지 않는다.
+   이 등급 그림은 상점 화면 판(#sh-plate — 8c 몫) · 전투 가로 카드 별칭이 계속 쓴다(값 무변). */
 /* [Task 8a 수정 1회차 A6 · 지휘자 판정] 결과 창 판 위 둘째 글자(등급 한 줄 .grade-note — 무한 클리어 「아주 좋아요.」)도 잉크 하나 — 옅은 잉크(#736A85)는 .90 판 위 3.62.
    위계는 크기 · 굵기로 둔다(획득표 B4 와 같은 처리). 창 판 위에서만(.modal) — 두 테마 같은 값. */
 .modal .grade-note { color: var(--prim-art-ink); }
@@ -55415,7 +55446,9 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
    범위가 새어 나갈 곳도 없다. */
 .w6m .sheet{
   position:relative !important;  /* .r10-x 의 좌표계. .r10-panel 이 주던 것을 대신한다 */
-  padding:23px 30px 30px !important;
+  /* [판정판 129 · Task 129] 안여백 세 값을 이름으로 — 탭 창(.mf-tabhost — 미션 · 확률)은 바깥 틀 대신 안쪽 탭 판 본문(.cp-body)이 같은 좌우 · 아래 값을 읽는다(값 무변) */
+  --w6m-pad-t:23px; --w6m-pad-x:30px; --w6m-pad-b:30px;
+  padding:var(--w6m-pad-t) var(--w6m-pad-x) var(--w6m-pad-b) !important;
   overflow:visible !important;   /* 리본이 판 위로 걸쳐 나가야 한다 */
 }
 
@@ -59948,7 +59981,6 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
      (원시 px 리터럴 0). 근거 단위: 390 폭에서 --f2-w = 373.6px (실측).
        --cs-gap8   .0214 x 373.6 = 8.00px  = 8 x 1   ← 이 파도의 기본 틈
      아래 나머지는 그 틈이나 시안 실측에서 파생된 자리값이다. */
-  --cs-gap8: calc(var(--f2-w) * .0214);
 
   /* ② 사이드바 맨 윗줄 = 추천 배지 한 칸. 배지 top .0240W + 배지 높이 .0475W
      (= kit-pill-v2[data-variant=soft] 의 --f2-bh) + 틈 8px.
@@ -59991,6 +60023,9 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   --cs-foot-x: calc(var(--f2-w) * .0361);
   --cs-foot-b: calc(var(--f2-w) * .030);
 }
+/* [판정판 129 · Task 129] 배치 틈 자 --cs-gap8(방 토큰 묶음의 그 한 줄 — 식 무변)을 탭 판(.cp-card.mframe[data-tabs] — 미션 · 확률)도 함께 받는다.
+   방 탭 띠 아래 틈(:is(#charpanel .cp-card, …) > .cp-tabs 의 margin-bottom)이 읽는다. 특이성 = #charpanel 이라 방 · 장비 두 창 계산값 무변. */
+:is(#charpanel, #modal-gear, #modal-gear-info, .cp-card.mframe[data-tabs]) { --cs-gap8: calc(var(--f2-w) * .0214); }
 #charpanel {
   display: block;
   padding: 0;
@@ -60533,10 +60568,9 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   height: var(--cs-card);
   z-index: 8;
 }
-/* [Task 8b2] 판 재질 = 방 정보 카드와 장비 두 창이 이 규칙 하나를 함께 쓴다(자리 · 높이는 위 방 규칙 · 창은 gear-modal-8b2 블록) */
-#charpanel .cp-card,
-#modal-gear .cp-card,
-#modal-gear-info .cp-card {
+/* [Task 8b2] 판 재질 = 방 정보 카드와 장비 두 창이 이 규칙 하나를 함께 쓴다(자리 · 높이는 위 방 규칙 · 창은 gear-modal-8b2 블록)
+   [판정판 129 · Task 129] 판 상자(.cp-card)를 쓰는 모든 창(장비 두 창 · 탭 창 — 미션 · 확률) = 훅 .cp-card.mframe 하나. 특이성 = 방 선택자(값 · 계산 무변). */
+:is(#charpanel .cp-card, .cp-card.mframe) {
   display: block;
   margin: 0;
   padding: 0;
@@ -60554,8 +60588,7 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   color: var(--f2-ink);
   overflow: visible;
 }
-#charpanel .cp-tabs,
-#modal-gear .cp-tabs {
+:is(#charpanel, .mframe[data-tabs]) .cp-tabs {   /* [Task 129] 탭 판 훅 = .mframe[data-tabs] (장비 창 · 미션 · 확률) — 특이성 = 방 선택자 */
   margin: 0;
   border: 0;
   background: none;
@@ -60610,9 +60643,9 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
      값을 역산했다:  1 - (1 - f)(1 - .300) = .425  ->  f = .179.
      실측으로 확인한다(뒤 바꿔보기: 무대를 껐다 켰을 때 판 안이 오늘만큼 바뀌나).
    ------------------------------------------------------------------------- */
-#charpanel .cp-card > .cp-fx,
-#modal-gear .cp-card > .cp-fx,
-#modal-gear-info .cp-card > .cp-fx {
+/* [판정판 129 · Task 129] 판 재질 공용 훅 = 방 정보 카드(#charpanel .cp-card) 또는 모달 틀 클래스 .mframe(장비 두 창의 판 · 창 판 .sheet).
+   :is() 의 특이성은 가장 센 인자(#charpanel …)라 방 · 장비 두 창의 계산값이 종전 선택자와 한 자리도 안 바뀐다(값 복사 0 · 이 절의 층 전부 같은 손잡이). */
+:is(#charpanel .cp-card, .mframe) > .cp-fx {
   position: absolute;
   inset: calc(var(--f2-bd) * -1);
   z-index: 0;
@@ -60632,15 +60665,9 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   filter: drop-shadow(0 calc(var(--f2-w) * .01125) calc(var(--f2-w) * .02250)
                         rgba(24, 12, 28, .324)); */
 }
-#charpanel .cp-fx > .cp-gnd,
-#modal-gear .cp-fx > .cp-gnd,
-#modal-gear-info .cp-fx > .cp-gnd { display: none; }
-#charpanel .cp-fx > .cp-gnd,
-#charpanel .cp-fx > .cp-jelly,
-#modal-gear .cp-fx > .cp-gnd,
-#modal-gear .cp-fx > .cp-jelly,
-#modal-gear-info .cp-fx > .cp-gnd,
-#modal-gear-info .cp-fx > .cp-jelly {
+:is(#charpanel, .mframe) .cp-fx > .cp-gnd { display: none; }
+:is(#charpanel, .mframe) .cp-fx > .cp-gnd,
+:is(#charpanel, .mframe) .cp-fx > .cp-jelly {
   position: absolute;
   inset: 0;
   pointer-events: none;
@@ -60792,33 +60819,19 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   --cpj-fill-c: var(--role-cpj-fill-c-charsel);   /* ⑤ a-fill 0 이라 무효지만 봉인값으로 되돌림 */
 }
 /* 탭과 본체는 언제나 덮개 위. 오늘의 겹침 순서 그대로다. */
-#charpanel .cp-card > .cp-tabs,
-#charpanel .cp-card > .cp-body,
-#modal-gear .cp-card > .cp-tabs,
-#modal-gear .cp-card > .cp-body,
-#modal-gear-info .cp-card > .cp-body { position: relative; z-index: 1; }
+:is(#charpanel .cp-card, .cp-card.mframe) > :is(.cp-tabs, .cp-body) { position: relative; z-index: 1; }
 /* 킷의 질감 의사요소는 덮개가 대신한다 — 두 벌이 겹치면 테두리가 두 줄이 된다. */
-#charpanel .cp-card::before,
-#charpanel .cp-card::after,
-#modal-gear .cp-card::before,
-#modal-gear .cp-card::after,
-#modal-gear-info .cp-card::before,
-#modal-gear-info .cp-card::after { content: none; }
+:is(#charpanel .cp-card, .cp-card.mframe)::before,
+:is(#charpanel .cp-card, .cp-card.mframe)::after { content: none; }
 
-#charpanel .cp-fx > .cp-gnd,
-#modal-gear .cp-fx > .cp-gnd,
-#modal-gear-info .cp-fx > .cp-gnd {
+:is(#charpanel, .mframe) .cp-fx > .cp-gnd {
   background: rgba(24, 12, 28, var(--cpj-gnd-a));
   border-radius: var(--f2-r);            /* shape() 폴백 */
   transform: translateY(var(--cpj-gnd-y));
   filter: blur(var(--cpj-gnd-b));
 }
-#charpanel .cp-fx > .cp-jelly,
-#modal-gear .cp-fx > .cp-jelly,
-#modal-gear-info .cp-fx > .cp-jelly { border-radius: var(--f2-r); }   /* shape() 폴백 */
-#charpanel .cp-fx > .cp-jelly,
-#modal-gear .cp-fx > .cp-jelly,
-#modal-gear-info .cp-fx > .cp-jelly {
+:is(#charpanel, .mframe) .cp-fx > .cp-jelly { border-radius: var(--f2-r); }   /* shape() 폴백 */
+:is(#charpanel, .mframe) .cp-fx > .cp-jelly {
   /* 수리 0831 — backdrop-filter 는 정본에 없다(kit-frame-v2 가 금지한다). */
   background-color: transparent;
   background-image:
@@ -60867,9 +60880,7 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
 }
 
 @supports (clip-path: shape(from 0px 0px, close)) {
-  #charpanel .cp-fx > .cp-gnd,
-  #modal-gear .cp-fx > .cp-gnd,
-  #modal-gear-info .cp-fx > .cp-gnd {
+  :is(#charpanel, .mframe) .cp-fx > .cp-gnd {
     border-radius: 0;
     clip-path: shape(from calc(var(--cpj-X0) + 0px + var(--cpj-R)) calc(var(--cpj-Y0) + 0px),
       curve to calc(var(--cpj-X1) - 0px - var(--cpj-R)) calc(var(--cpj-Y0) + 0px) with calc(var(--cpj-X0) + 0px + var(--cpj-R) + var(--cpj-KH)) calc(var(--cpj-Y0) + 0px - var(--cpj-OX)) / calc(var(--cpj-X1) - 0px - var(--cpj-R) - var(--cpj-KH)) calc(var(--cpj-Y0) + 0px - var(--cpj-OX)),
@@ -60882,9 +60893,7 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
       curve to calc(var(--cpj-X0) + 0px + var(--cpj-R)) calc(var(--cpj-Y0) + 0px) with calc(var(--cpj-X0) + 0px + var(--cpj-C2X)) calc(var(--cpj-Y0) + 0px + var(--cpj-C2Y)) / calc(var(--cpj-X0) + 0px + var(--cpj-C1X)) calc(var(--cpj-Y0) + 0px + var(--cpj-C1Y)),
       close);
   }
-  #charpanel .cp-fx > .cp-jelly,
-  #modal-gear .cp-fx > .cp-jelly,
-  #modal-gear-info .cp-fx > .cp-jelly {
+  :is(#charpanel, .mframe) .cp-fx > .cp-jelly {
     /* [P0-0901 · 확장] 반지름을 0 으로 안 죽인다 — [L1.5-2] 띠(inset 그림자)가
        코너를 돌아야 하기 때문이다. 클립(shape)이 바깥 경계를 정확히 다시 자르므로
        겉모양(실루엣) 변화는 0 이다. */
@@ -60908,9 +60917,7 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
       curve to calc(var(--cpj-X0) + 0px + var(--cpj-R)) calc(var(--cpj-Y0) + 0px) with calc(var(--cpj-X0) + 0px + var(--cpj-C2X)) calc(var(--cpj-Y0) + 0px + var(--cpj-C2Y)) / calc(var(--cpj-X0) + 0px + var(--cpj-C1X)) calc(var(--cpj-Y0) + 0px + var(--cpj-C1Y)),
       close);
   }
-  #charpanel .cp-fx > .cp-jelly::before,
-  #modal-gear .cp-fx > .cp-jelly::before,
-  #modal-gear-info .cp-fx > .cp-jelly::before {
+  :is(#charpanel, .mframe) .cp-fx > .cp-jelly::before {
     content: "";
     position: absolute; inset: 0;
     z-index: 1;
@@ -60938,9 +60945,7 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
       curve to calc(var(--cpj-X0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)) + var(--cpj-Rb)) calc(var(--cpj-Y0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) with calc(var(--cpj-X0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)) + var(--cpj-C2Xb)) calc(var(--cpj-Y0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)) + var(--cpj-C2Yb)) / calc(var(--cpj-X0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)) + var(--cpj-C1Xb)) calc(var(--cpj-Y0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)) + var(--cpj-C1Yb)),
       close);
   }
-  #charpanel .cp-fx > .cp-jelly::after,
-  #modal-gear .cp-fx > .cp-jelly::after,
-  #modal-gear-info .cp-fx > .cp-jelly::after {
+  :is(#charpanel, .mframe) .cp-fx > .cp-jelly::after {
     content: "";
     position: absolute; inset: 0;
     z-index: 2;
@@ -60969,8 +60974,7 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
       close);
   }
 }
-#charpanel .cp-tab,
-#modal-gear .cp-tab {
+:is(#charpanel, .mframe[data-tabs]) .cp-tab {
   font-family: inherit;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
@@ -60978,10 +60982,8 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   color: var(--f2-ink);
   min-width: 0;
 }
-#charpanel .cp-tab::before,
-#modal-gear .cp-tab::before { z-index: 0; }
-#charpanel .cp-tab > *,
-#modal-gear .cp-tab > * { position: relative; z-index: 2; }
+:is(#charpanel, .mframe[data-tabs]) .cp-tab::before { z-index: 0; }
+:is(#charpanel, .mframe[data-tabs]) .cp-tab > * { position: relative; z-index: 2; }
 
 /* ---- ④ (0901) 탭 라벨 아이콘 — 시안 요소 1·2 원문 이식 --------------------
    출처(정본, 읽기만 함): tentwin/ref-v2/work-charsel-content.js ICON.cat / ICON.paw
@@ -60999,22 +61001,18 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
    라벨을 <span class="cpt-lab"> 로 감싸고 data-i18n 을 그 span 으로 옮겼다:
    applyI18n() -> headText() 가 `el.textContent = s` 라 버튼에 직접 걸려 있으면
    아이콘이 매 번역마다 지워진다. 근거·키·문구는 하나도 안 바뀌었다. */
-#charpanel .cp-tab,
-#modal-gear .cp-tab { gap: calc(var(--f2-w) * .012); }
-#charpanel .cpt-ic,
-#modal-gear .cpt-ic {
+:is(#charpanel, .mframe[data-tabs]) .cp-tab { gap: calc(var(--f2-w) * .012); }
+:is(#charpanel, .mframe[data-tabs]) .cpt-ic {
   width: calc(var(--f2-w) * .0400);
   height: calc(var(--f2-w) * .0400);
   flex: 0 0 auto;
   display: block;
 }
-#charpanel .cpt-lab,
-#modal-gear .cpt-lab { min-width: 0; }
+:is(#charpanel, .mframe[data-tabs]) .cpt-lab { min-width: 0; }
 /* 탭 4상태. 근거는 종전 그대로 **aria-selected** 다 — cpTab() 이 이미 쓰는 그
    속성이고, kit-tab-v2 의 [data-active] 선언을 여기에 옮겨 적기만 한다.
    JS 에 새 속성을 찍게 하지 않는다(같은 질문에 답하는 근거를 둘로 만들지 않는다). */
-#charpanel .cp-tab[aria-selected="true"],
-#modal-gear .cp-tab[aria-selected="true"] {
+:is(#charpanel, .mframe[data-tabs]) .cp-tab[aria-selected="true"] {
   background:
     radial-gradient(closest-side, rgba(255,255,255,.24), rgba(255,255,255,0))
       9.2% 20.8% / 24% 28% no-repeat,
@@ -61057,21 +61055,17 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
     0 0 var(--f2-soft-tail) 0 color-mix(in srgb, var(--f2-line) 20%, transparent),
     0 calc(var(--f2-w) * .0084) 0 0 var(--f2-tab-on);
 }
-#charpanel .cp-tab[aria-selected="true"]::before,
-#modal-gear .cp-tab[aria-selected="true"]::before {
+:is(#charpanel, .mframe[data-tabs]) .cp-tab[aria-selected="true"]::before {
   bottom: calc(var(--f2-bd) - var(--f2-bdp) - var(--f2-fillet-fw) * 3);
 }
-#charpanel .cp-tab[aria-selected="true"]::after,
-#modal-gear .cp-tab[aria-selected="true"]::after {
+:is(#charpanel, .mframe[data-tabs]) .cp-tab[aria-selected="true"]::after {
   bottom: calc(var(--f2-rim) * -2);
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
 }
 
 #charpanel .cp-body { height: var(--cs-body); }
-#charpanel .cp-body,
-#modal-gear .cp-body,
-#modal-gear-info .cp-body {
+:is(#charpanel, .mframe) .cp-body {
   position: relative;
   overflow: hidden;
   border-radius: 0 0 calc(var(--f2-r) - var(--f2-bd)) calc(var(--f2-r) - var(--f2-bd));
@@ -61145,6 +61139,10 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
   top:  calc(var(--f2-w) * .0122);         /* .0299 - .0177 */
   width: calc(var(--f2-w) * .3837);
   height: calc(var(--f2-w) * .1088);
+}
+/* [판정판 129 · Task 129 · 지휘자 판정 Q3] 이름 상자(방 「텐텐 왕자」 상자 = .kit-slot-v2--name 판)의 상자 몫 — 장비 정보 카드 이름 줄(.gi-plate)도 이 규칙 하나를 함께 쓴다
+   (자리 · 폭은 위 방 규칙 · 창 쪽은 gear-modal-8b2 · 특이성 = 방 선택자라 방 계산값 무변). */
+:is(#charpanel .ci-plate, #modal-gear-info .gi-plate) {
   display: flex;
   align-items: center;
   justify-content: center;                   /* ③ 이름 알약 안 수평 중앙 */
@@ -62216,8 +62214,8 @@ body:has(.modal:not([hidden])) #screen-menu .mbtn-lab{
 
 /* [판정판 121 · Task 8a · 전 화면 감사 D4] 은퇴: C안(블러 강, 0904) — 모달이 열리면 뒤 화면(#screen-menu · #screen-map · #screen-game)만 blur(6px)
    + 그 filter 전환 160ms. 전투 · 지도 위 창만 뒤가 뭉개져 마을 위 창(선명)과 갈렸다(사용자 9번 「배경화면은 완전 블러처리돼서 감성도안살고」).
-   이제 모든 창의 뒤 막은 .modal 한 곳(W2.5/W7.5 사용자 판정 값 — 옅은 보라 막 .12 + blur(1px))뿐이다. filter 애니메이트는 모션 규칙 위반이기도 했다.
-   판 너머로 뒤가 비쳐 글자가 안 읽히던 몫(옛 ⑲ 사유)은 창 판 면 불투명도(D5 — --mode-a-alpha-win)가 맡는다.
+   이제 모든 창의 뒤 막은 .modal 한 곳(W2.5/W7.5 사용자 판정 값 — 옅은 보라 막 .12 + blur(1px) → [Task 129] 막 B blur(4px))뿐이다. filter 애니메이트는 모션 규칙 위반이기도 했다.
+   판 너머로 뒤가 비쳐 글자가 안 읽히던 몫(옛 ⑲ 사유)은 [Task 129] 막 B 의 흐림 · 방 이름 상자 · 안 상자가 맡는다(옛 D5 판 면 불투명도 리프는 은퇴).
    옛 값: #screen-menu, #screen-map, #screen-game { transition: filter 160ms } · body:has(.modal:not([hidden])) #screen-menu/#screen-map/#screen-game { filter: blur(6px) } */
 
 /* ---- 1. 판 = kit-frame-v2 ------------------------------------------------ */
@@ -62412,9 +62410,21 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
 #modal-drops .r10-ribbon > h2 > .mvh-title,
 #modal-clear .sheet > h2 > .mvh-title,
 #modal-adv:not(.is-advfinish) .sheet > h2 > .mvh-title,
+/* [판정판 129 · Task 129] 평글씨였던 제목 여덟(미션 · 준비 중 · 초대 · 확인 · 놀이터 · 확률 · 데일리 · 앱 상점) — 그림 글씨 ttl-* 에 없는 낱말이라 CSS 레터링 */
+#modal-quest .sheet > h2 > .mvh-title,
+#modal-soon .sheet > h2 > .mvh-title,
+#modal-invite .sheet > h2 > .mvh-title,
+#modal-confirm .sheet > h2 > .mvh-title,
+#modal-playground .sheet > h2 > .mvh-title,
+#modal-odds .sheet > h2 > .mvh-title,
+#modal-daily .sheet > h2 > .mvh-title,
+#modal-shop .r10-ribbon > h2 > .mvh-title,
 /* [판정판 121 · Task 8b2 · 지휘자 판정 2-4] 장비 창 · 장비 정보 카드 제목(방 제목 캡슐 안 — 그림 글씨 ttl-* 에 없는 낱말이라 CSS 레터링) */
 #modal-gear #gear-h > .mvh-title,
-#modal-gear-info #gi-h > .mvh-title {
+#modal-gear-info #gi-h > .mvh-title,
+/* [판정판 129 · Task 129] 챕터 · 스토리 극장 제목(평글씨였다 — 그림 글씨 ttl-* 에 없는 낱말이라 CSS 레터링) */
+#modal-minimap .r10-ribbon > h2 > .mvh-title,
+#modal-theater .r10-ribbon > h2 > .mvh-title {
   /* [E14-0902] 정본 work-lettering.css 동기. 위 주석의 「paint-order 가 테를
      채움 아래로 내리므로 바깥 절반만 보인다」는 **틀렸다** — 채움이 transparent
      라 -webkit-text-stroke 는 폭 전체가 보인다(.060em 이 렌더에서 6.25px
@@ -62484,8 +62494,18 @@ html[lang="en"] .modal-v2 .mv2-head  > h2 { --mvh-fs: .098; }
   #modal-drops .r10-ribbon > h2 > .mvh-title,
   #modal-clear .sheet > h2 > .mvh-title,
   #modal-adv:not(.is-advfinish) .sheet > h2 > .mvh-title,
+  #modal-quest .sheet > h2 > .mvh-title,
+  #modal-soon .sheet > h2 > .mvh-title,
+  #modal-invite .sheet > h2 > .mvh-title,
+  #modal-confirm .sheet > h2 > .mvh-title,
+  #modal-playground .sheet > h2 > .mvh-title,
+  #modal-odds .sheet > h2 > .mvh-title,
+  #modal-daily .sheet > h2 > .mvh-title,
+  #modal-shop .r10-ribbon > h2 > .mvh-title,
   #modal-gear #gear-h > .mvh-title,
-  #modal-gear-info #gi-h > .mvh-title {
+  #modal-gear-info #gi-h > .mvh-title,
+  #modal-minimap .r10-ribbon > h2 > .mvh-title,
+  #modal-theater .r10-ribbon > h2 > .mvh-title {
     background-image: none;
     color: #FFFFFF;
     -webkit-text-fill-color: #FFFFFF;
@@ -64140,6 +64160,11 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
 #modal-gres .sheet > h2,
 #modal-clear .sheet > h2,
 #modal-rank .sheet > h2,
+#modal-quest .sheet > h2,
+#modal-soon .sheet > h2,
+#modal-invite .sheet > h2,
+#modal-confirm .sheet > h2,
+#modal-playground .sheet > h2,
 #modal-minimap .r10-ribbon,
 #modal-theater .r10-ribbon,
 #modal-node .r10-ribbon,
@@ -64390,6 +64415,11 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
   #modal-gres .sheet > h2,
   #modal-clear .sheet > h2,
   #modal-rank .sheet > h2,
+  #modal-quest .sheet > h2,
+  #modal-soon .sheet > h2,
+  #modal-invite .sheet > h2,
+  #modal-confirm .sheet > h2,
+  #modal-playground .sheet > h2,
   #modal-minimap .r10-ribbon,
   #modal-theater .r10-ribbon,
   #modal-node .r10-ribbon,
@@ -64434,6 +64464,11 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
   #modal-gres .sheet > h2::before,
   #modal-clear .sheet > h2::before,
   #modal-rank .sheet > h2::before,
+  #modal-quest .sheet > h2::before,
+  #modal-soon .sheet > h2::before,
+  #modal-invite .sheet > h2::before,
+  #modal-confirm .sheet > h2::before,
+  #modal-playground .sheet > h2::before,
   #modal-minimap .r10-ribbon::before,
   #modal-theater .r10-ribbon::before,
   #modal-node .r10-ribbon::before,
@@ -65683,9 +65718,7 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
         푸른 회청     : 전투/클래식 HUD · 날개판 · 타이머 캡슐  (사용자 반려 2)
       제목 캡슐(.mvh)은 자두 #9B4697 그대로다 - 그 시안(81f987cb)이 자두다.
    --------------------------------------------------------------------------- */
-#charpanel .cp-fx > .cp-jelly,
-#modal-gear .cp-fx > .cp-jelly,
-#modal-gear-info .cp-fx > .cp-jelly{ --cpj-L3-line: var(--mode-a-outline); }   /* [E32-0903] 실측 · 복구 #955579 */
+:is(#charpanel, .mframe) .cp-fx > .cp-jelly{ --cpj-L3-line: var(--mode-a-outline); }   /* [E32-0903] 실측 · 복구 #955579 */
 
 
 #classic-hud .ch-fx > .ch-jelly,
@@ -65725,10 +65758,8 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
 
    ⚠ 탭 4상태(aria-selected)·클릭 위임(#cp-tabs)·i18n 은 한 글자도 안 건드렸다.
    --------------------------------------------------------------------------- */
-#charpanel .cp-fx > .cp-jelly,
-#charpanel .cp-fx > .cp-gnd,
-#modal-gear .cp-fx > .cp-jelly,
-#modal-gear .cp-fx > .cp-gnd{
+:is(#charpanel, .mframe[data-tabs]) .cp-fx > .cp-jelly,
+:is(#charpanel, .mframe[data-tabs]) .cp-fx > .cp-gnd{
   --cpj-tab-h:  calc(var(--cpj-w) * .07005);
   --cpj-tab-r:  calc(var(--cpj-w) * .03377);
   --cpj-tab-f:  calc(var(--cpj-w) * .00493);
@@ -65767,7 +65798,7 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
      노치 .00931W · 탭 폭 (.95183 − .05039 − 2 × .00931) / 3 = .294273W
      g1 .05039 → .344663 · g2 .353973 → .648247 · g3 .657557 → .95183 (W = 판 폭 100cqw)
    경로는 아래 @supports 의 방 경로 셋과 한 생성기에서 나온다(scratchpad/rc1017/t8b2/mkclip_tabs.py — N=2 = 방 경로 그대로(항등 단언) · N=3 = 장비 창). */
-#modal-gear .cp-fx > .cp-jelly{
+:is(#modal-gear, .mframe[data-tabs="3"]) .cp-fx > .cp-jelly{
   --cpj-gn: calc(var(--cpj-t2a) - var(--cpj-t1b));
   --cpj-gw: calc((var(--cpj-t2b) - var(--cpj-t1a) - var(--cpj-gn) * 2) / 3);
   --cpj-g1a: var(--cpj-t1a);
@@ -65947,7 +65978,7 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
    노치 오른 필렛 + 다음 탭 왼쪽 위 모서리」 한 벌뿐이고, 탭 위치 변수만 --cpj-g1a … --cpj-g3b(위 #modal-gear 규칙)로 바뀐다.
    반지름 · 필렛 · 높이 · 들여쓰기(0 · 림 · 림+림폭 · 겉선) 식과 나머지 변(오른변 · 아래 · 왼변)은 방 경로와 한 글자도 같다. 손으로 고치지 말고 생성기로. */
 @supports (clip-path: shape(from 0px 0px, close)) {
-  #modal-gear .cp-fx > .cp-jelly{ clip-path: shape(from calc(calc(var(--cpj-X0) + 0px) + var(--cpj-Rt)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)),
+  :is(#modal-gear, .mframe[data-tabs="3"]:not(:has(> .cp-tabs[hidden]))) .cp-fx > .cp-jelly{ clip-path: shape(from calc(calc(var(--cpj-X0) + 0px) + var(--cpj-Rt)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)),
       line to calc(calc(var(--cpj-g1a) + 0px) - var(--cpj-tab-fs)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)),
       curve to calc(calc(var(--cpj-g1a) + 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) - var(--cpj-tab-fs)) with calc(calc(var(--cpj-g1a) + 0px) - var(--cpj-tab-fsk)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)) / calc(calc(var(--cpj-g1a) + 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) - var(--cpj-tab-fsk)),
       line to calc(calc(var(--cpj-g1at) + 0px)) calc(calc(var(--cpj-Y0) + 0px) + var(--cpj-tab-r)),
@@ -65981,7 +66012,7 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
       curve to calc(calc(var(--cpj-X0) + 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) + var(--cpj-Rt)) with calc(var(--cpj-X0) + 0px - var(--cpj-OY)) calc(var(--cpj-Y1) - 0px - var(--cpj-R) - var(--cpj-KV)) / calc(var(--cpj-X0) + 0px - var(--cpj-OY)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) + var(--cpj-Rt) + var(--cpj-KV)),
       curve to calc(calc(var(--cpj-X0) + 0px) + var(--cpj-Rt)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)) with calc(calc(var(--cpj-X0) + 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) + var(--cpj-Rtk)) / calc(calc(var(--cpj-X0) + 0px) + var(--cpj-Rtk)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)),
       close); }
-  #modal-gear .cp-fx > .cp-jelly::before{ clip-path: shape(evenodd from calc(calc(var(--cpj-X0) + var(--cpj-rim-in)) + var(--cpj-Rta)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-rim-in))),
+  :is(#modal-gear, .mframe[data-tabs="3"]:not(:has(> .cp-tabs[hidden]))) .cp-fx > .cp-jelly::before{ clip-path: shape(evenodd from calc(calc(var(--cpj-X0) + var(--cpj-rim-in)) + var(--cpj-Rta)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-rim-in))),
       line to calc(calc(var(--cpj-g1a) + var(--cpj-rim-in)) - var(--cpj-tab-fsa)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-rim-in))),
       curve to calc(calc(var(--cpj-g1a) + var(--cpj-rim-in))) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-rim-in)) - var(--cpj-tab-fsa)) with calc(calc(var(--cpj-g1a) + var(--cpj-rim-in)) - var(--cpj-tab-fska)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-rim-in))) / calc(calc(var(--cpj-g1a) + var(--cpj-rim-in))) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + var(--cpj-rim-in)) - var(--cpj-tab-fska)),
       line to calc(calc(var(--cpj-g1at) + var(--cpj-rim-in))) calc(calc(var(--cpj-Y0) + var(--cpj-rim-in)) + var(--cpj-tab-ra)),
@@ -66049,7 +66080,7 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
       curve to calc(calc(var(--cpj-X0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)))) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) + var(--cpj-Rtb)) with calc(var(--cpj-X0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)) - var(--cpj-OY)) calc(var(--cpj-Y1) - calc(var(--cpj-rim-in) + var(--cpj-rim-w)) - var(--cpj-Rb) - var(--cpj-KV)) / calc(var(--cpj-X0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)) - var(--cpj-OY)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) + var(--cpj-Rtb) + var(--cpj-KV)),
       curve to calc(calc(var(--cpj-X0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) + var(--cpj-Rtb)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)))) with calc(calc(var(--cpj-X0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)))) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) + var(--cpj-Rtkb)) / calc(calc(var(--cpj-X0) + calc(var(--cpj-rim-in) + var(--cpj-rim-w))) + var(--cpj-Rtkb)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + calc(var(--cpj-rim-in) + var(--cpj-rim-w)))),
       close); }
-  #modal-gear .cp-fx > .cp-jelly::after{ clip-path: shape(evenodd from calc(calc(var(--cpj-X0) + 0px) + var(--cpj-Rt)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)),
+  :is(#modal-gear, .mframe[data-tabs="3"]:not(:has(> .cp-tabs[hidden]))) .cp-fx > .cp-jelly::after{ clip-path: shape(evenodd from calc(calc(var(--cpj-X0) + 0px) + var(--cpj-Rt)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)),
       line to calc(calc(var(--cpj-g1a) + 0px) - var(--cpj-tab-fs)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)),
       curve to calc(calc(var(--cpj-g1a) + 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) - var(--cpj-tab-fs)) with calc(calc(var(--cpj-g1a) + 0px) - var(--cpj-tab-fsk)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px)) / calc(calc(var(--cpj-g1a) + 0px)) calc(calc(var(--cpj-Y0) + var(--cpj-tab-h) + 0px) - var(--cpj-tab-fsk)),
       line to calc(calc(var(--cpj-g1at) + 0px)) calc(calc(var(--cpj-Y0) + 0px) + var(--cpj-tab-r)),
@@ -66122,8 +66153,7 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
    .cp-fx 가 카드 테두리 밖으로 --f2-bd 만큼 나가 있으므로 띠도 같은 만큼
    좌우·위로 물려 판 상자에 정확히 앉힌다. 띠 높이는 `padding-top` 백분율이
    **담는 상자의 폭**에 걸리는 성질을 써서 7.005%W 로 잡는다. */
-#charpanel .cp-card > .cp-tabs,
-#modal-gear .cp-card > .cp-tabs{
+:is(#charpanel .cp-card, .cp-card.mframe[data-tabs]) > .cp-tabs{
   position: relative;
   display: block;
   height: 0;
@@ -66134,8 +66164,7 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
   background: none;
   overflow: visible;
 }
-#charpanel .cp-card > .cp-tabs > .cp-tab,
-#modal-gear .cp-card > .cp-tabs > .cp-tab{
+:is(#charpanel .cp-card, .cp-card.mframe[data-tabs]) > .cp-tabs > .cp-tab{
   position: absolute;
   top: 0; bottom: 0;
   display: flex;
@@ -66157,14 +66186,12 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
 #charpanel .cp-card > .cp-tabs > .cp-tab[data-cptab="pet"] { left: 50.559%; right: 4.817%; }
 /* [Task 8b2] 장비 창 탭 셋 — 위 #modal-gear 실루엣 변수(--cpj-g1a … g3b)와 **같은 수**(탭 폭 29.427% · 노치 .931% · 바깥 끝 5.039 / 4.817 — 방과 같다).
    g1 5.039 → 34.466 · g2 35.397 → 64.825 · g3 65.756 → 95.183(right = 100 − 끝). 둘을 따로 고치면 실루엣과 탭 상자가 어긋난다. */
-#modal-gear .cp-card > .cp-tabs > .cp-tab[data-gmtab="weapon"]  { left: 5.039%;  right: 65.534%; }
-#modal-gear .cp-card > .cp-tabs > .cp-tab[data-gmtab="aux"]     { left: 35.397%; right: 35.175%; }
-#modal-gear .cp-card > .cp-tabs > .cp-tab[data-gmtab="trinket"] { left: 65.756%; right: 4.817%; }
+:is(#modal-gear .cp-card, .cp-card.mframe[data-tabs="3"]) > .cp-tabs > .cp-tab:nth-child(1) { left: 5.039%;  right: 65.534%; }
+:is(#modal-gear .cp-card, .cp-card.mframe[data-tabs="3"]) > .cp-tabs > .cp-tab:nth-child(2) { left: 35.397%; right: 35.175%; }
+:is(#modal-gear .cp-card, .cp-card.mframe[data-tabs="3"]) > .cp-tabs > .cp-tab:nth-child(3) { left: 65.756%; right: 4.817%; }
 /* 활성 탭 - 그림이 **없다**. 판과 한 덩어리이므로 그릴 것이 없는 것이 맞다. */
-#charpanel .cp-card > .cp-tabs > .cp-tab[aria-selected="true"]::before,
-#charpanel .cp-card > .cp-tabs > .cp-tab[aria-selected="true"]::after,
-#modal-gear .cp-card > .cp-tabs > .cp-tab[aria-selected="true"]::before,
-#modal-gear .cp-card > .cp-tabs > .cp-tab[aria-selected="true"]::after{ content: none; }
+:is(#charpanel .cp-card, .cp-card.mframe[data-tabs]) > .cp-tabs > .cp-tab[aria-selected="true"]::before,
+:is(#charpanel .cp-card, .cp-card.mframe[data-tabs]) > .cp-tabs > .cp-tab[aria-selected="true"]::after{ content: none; }
 /* 비활성 탭 - 자기 속색 + 아래 변 겉선.
    자기 속색 : 시안 (215,195,199) 대 몸통 (239,235,232) -> #A8788E 35% (정본 fit)
    아래 변   : 정본 --wf-L3-w 0.373%W · --wf-L3-a .745 · 선색 #AC98AA 그대로.
@@ -66189,8 +66216,7 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
      min-height:0 · pointer-events:none · box-shadow:none
      border-radius:7.59% 7.59% 0 0 / 48.21% 48.21% 0 0
      background:color-mix(in srgb, #A8788E 35%, transparent) */
-#charpanel .cp-card > .cp-tabs > .cp-tab::before,
-#modal-gear .cp-card > .cp-tabs > .cp-tab::before{
+:is(#charpanel .cp-card, .cp-card.mframe[data-tabs]) > .cp-tabs > .cp-tab::before{
   content: none;
   position: absolute; inset: 0; z-index: 0;
   /* [E15-0903 · 사용자 반려 16①] 킷 `.kit-tab-v2::before` 의 `height` 가
@@ -66203,8 +66229,7 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
   box-shadow: none;
   background: none;
 }
-#charpanel .cp-card > .cp-tabs > .cp-tab::after,
-#modal-gear .cp-card > .cp-tabs > .cp-tab::after{
+:is(#charpanel .cp-card, .cp-card.mframe[data-tabs]) > .cp-tabs > .cp-tab::after{
   content: "";
   /* ⚠ 킷 `.kit-tab-v2::after` 는 inset:0 + **흰 inset 그림자**(윗빛)를 갖는다.
      top 을 안 지우면 top:0 + height 가 이겨 이 띠가 탭 **위**에 서고,
@@ -66230,13 +66255,12 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
    ▣ 반지름은 옛 ::before 와 같은 수다(탭 상자 기준 7.59% / 48.21%).
    ▣ 활성 탭에는 이 규칙이 안 걸린다 -> 속색이 판 그대로 = **활성 구간 윗변 선 0**.
    봉인: #A8788E 35%. */
-#charpanel .cp-card > .cp-tabs > .cp-tab[aria-selected="false"],
-#modal-gear .cp-card > .cp-tabs > .cp-tab[aria-selected="false"]{
+:is(#charpanel .cp-card, .cp-card.mframe[data-tabs]) > .cp-tabs > .cp-tab[aria-selected="false"]{
   background: color-mix(in srgb, #A8788E 30%, transparent);
   border-radius: 7.59% 7.59% 0 0 / 48.21% 48.21% 0 0;
 }
 /* [Task 8b2] 장비 창 탭 셋 — 같은 반지름(실루엣 탭 반지름 3.377%W)을 탭 상자 기준으로 다시 적은 수: 3.377 / 29.427 = 11.476%(가로) · 세로 48.21% 그대로 */
-#modal-gear .cp-card > .cp-tabs > .cp-tab[aria-selected="false"]{ border-radius: 11.476% 11.476% 0 0 / 48.21% 48.21% 0 0; }
+:is(#modal-gear .cp-card, .cp-card.mframe[data-tabs="3"]) > .cp-tabs > .cp-tab[aria-selected="false"]{ border-radius: 11.476% 11.476% 0 0 / 48.21% 48.21% 0 0; }
 
 /* ---------------------------------------------------------------------------
    ③ 캐릭터판 **재질**을 정본과 동기 (사용자: 「젤리판 작업판이 기준」)
@@ -66251,9 +66275,7 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
      --wf-band-w 0.00991W --wf-band-s 0.0161W
    (자리·실루엣·값 배선은 안 건드린다. 색·두께·알파뿐이다.)
    --------------------------------------------------------------------------- */
-#charpanel .cp-fx > .cp-jelly,
-#modal-gear .cp-fx > .cp-jelly,
-#modal-gear-info .cp-fx > .cp-jelly{
+:is(#charpanel, .mframe) .cp-fx > .cp-jelly{
   /* [E15-0903 · 사용자 반려 7·11 「선 굵기 안 맞아 · 테두리 얇게」]
      ⑭ 의 「전역 상수」가 이 자리를 **모달에서 잰 값**으로 덮어써 있었다.
      캐릭터판 자기 실측값은 바로 위 주석이 적어 둔 것이다 —
@@ -66292,8 +66314,7 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
    만큼 밖으로 나가 있고, 실루엣의 탭 위 변은 판 상자 위에서 Y0(=--cpj-L0-bx
    = 0.099%W) 만큼 내려온 자리다. 띠 높이는 정본 --wf-tab-h 7.005%W 이고,
    담는 상자(카드 내용 폭)가 판보다 2*--f2-bd 좁으므로 그만큼 키워 적는다. */
-#charpanel .cp-card > .cp-tabs,
-#modal-gear .cp-card > .cp-tabs{
+:is(#charpanel .cp-card, .cp-card.mframe[data-tabs]) > .cp-tabs{
   /* C (0909) 관문 overlap 카테고리탭바 ↔ 카드본체 (390 폭 4px² · 간격 -0.01px).
      탭 띠는 `height:0 + padding-top:%` 로 서 있어 밑변이 본체 윗변과 **정확히**
      맞닿고, 그 자리에서 서브픽셀이 어느 쪽으로 떨어지느냐에 따라 교차가 생겼다
@@ -66308,9 +66329,7 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
 }
 /* 킷의 몸통 구분선 폐기 — 정본에는 **활성 탭 밑동에 선이 없다**(시안 실측).
    그 선이 있으면 활성 탭이 판에서 떨어져 보인다(사용자 반려 3의 그림). */
-#charpanel .cp-card > .cp-body,
-#modal-gear .cp-card > .cp-body,
-#modal-gear-info .cp-card > .cp-body{ border-top: 0; box-shadow: none; }
+:is(#charpanel .cp-card, .cp-card.mframe) > .cp-body{ border-top: 0; box-shadow: none; }
 
 /* ---------------------------------------------------------------------------
    ④ 모달 판 겉선 **두께·진하기·번짐**을 정본과 동기 (사용자 반려 1의 나머지 반)
@@ -66803,6 +66822,11 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
 #modal-gres .sheet > h2,
 #modal-clear .sheet > h2,
 #modal-rank .sheet > h2,
+#modal-quest .sheet > h2,
+#modal-soon .sheet > h2,
+#modal-invite .sheet > h2,
+#modal-confirm .sheet > h2,
+#modal-playground .sheet > h2,
 #modal-minimap .r10-ribbon,
 #modal-theater .r10-ribbon,
 #modal-node .r10-ribbon,
@@ -67079,6 +67103,11 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
 #modal-gres .sheet > h2,
 #modal-clear .sheet > h2,
 #modal-rank .sheet > h2,
+#modal-quest .sheet > h2,
+#modal-soon .sheet > h2,
+#modal-invite .sheet > h2,
+#modal-confirm .sheet > h2,
+#modal-playground .sheet > h2,
 #modal-minimap .r10-ribbon,
 #modal-theater .r10-ribbon,
 #modal-node .r10-ribbon,
@@ -67148,7 +67177,12 @@ html[lang="en"] #pg-arcade .bp-text > i{ --bp-d-fs:.0330; letter-spacing:-.01em;
 #modal-odds .sheet > h2,
 #modal-gres .sheet > h2,
 #modal-clear .sheet > h2,
-#modal-rank .sheet > h2{
+#modal-rank .sheet > h2,
+#modal-quest .sheet > h2,
+#modal-soon .sheet > h2,
+#modal-invite .sheet > h2,
+#modal-confirm .sheet > h2,
+#modal-playground .sheet > h2{
   --wcap-w: calc(56.84% + 35.2408px);      /* .sheet.jbox--modal — 안여백 차 62px 고정 */
   --wcap-panT: 24px;                        /* border-top 1 + padding-top 23 */
 }
@@ -67296,8 +67330,15 @@ html[lang="en"] #modal-mode[data-arcade-only] .r10-ribbon{ --ttl:url("catalog/tt
      · howto·settings·skin·pause·rank·play·classic·chars 는 애초에 선택자 밖. */
 #modal-clear .sheet > h2,
 #modal-adv:not(.is-advfinish) .sheet > h2,
+#modal-quest .sheet > h2,
+#modal-soon .sheet > h2,
+#modal-invite .sheet > h2,
+#modal-confirm .sheet > h2,
+#modal-playground .sheet > h2,
+#modal-odds .sheet > h2,
+#modal-daily .sheet > h2,
 #modal-gear #gear-h,
-#modal-gear-info #gi-h {   /* [Task 8b2 · 지휘자 판정 2-4] 장비 두 창 제목 = 같은 레터링 · 같은 캡슐 높이 비(아래 ② 채움비 .695) */
+#modal-gear-info #gi-h {   /* [Task 129] 평글씨였던 창 제목 일곱도 같은 레터링 크기 · [Task 8b2 · 지휘자 판정 2-4] 장비 두 창 제목 = 같은 레터링 · 같은 캡슐 높이 비(아래 ② 채움비 .695) */
   --mvh-fs: .80;
   --mvh-fs-min: .42;
   font-size: calc(var(--wcap-h) * var(--mvh-fs));
@@ -67695,7 +67736,10 @@ html[lang="en"] #modal-arc.is-arcdmg .sheet > h2{ --ttl:url("catalog/ttl-arcdmg-
    fitHead 가 --mvh-fs 를 줄여 폭 우선으로 맞춘다(비율 유지). --wcap-h 는
    .r10-ribbon 이 이미 갖고 있어 h2 가 상속한다. */
 #modal-node .r10-ribbon > h2,
-#modal-drops .r10-ribbon > h2 {
+#modal-drops .r10-ribbon > h2,
+#modal-minimap .r10-ribbon > h2,
+#modal-theater .r10-ribbon > h2,
+#modal-shop .r10-ribbon > h2 {   /* [Task 129] 챕터 · 스토리 극장 · 앱 상점 제목 = 같은 리본 레터링 문법 */
   --mvh-fs: .80;
   --mvh-fs-min: .42;
   font-size: calc(var(--wcap-h) * var(--mvh-fs));
@@ -68018,7 +68062,10 @@ html[lang="en"] #modal-arc.is-arcdmg .sheet > h2{ --ttl:url("catalog/ttl-arcdmg-
 
 /* ① 노드 제목만 다르던 정렬 문법을 정본(클리어·모험 h2)과 같게 — 상자 중심차 0 */
 #modal-node .r10-ribbon > h2,
-#modal-drops .r10-ribbon > h2 {
+#modal-drops .r10-ribbon > h2,
+#modal-minimap .r10-ribbon > h2,
+#modal-theater .r10-ribbon > h2,
+#modal-shop .r10-ribbon > h2 {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -68031,8 +68078,17 @@ html[lang="en"] #modal-arc.is-arcdmg .sheet > h2{ --ttl:url("catalog/ttl-arcdmg-
 #modal-shop .r10-ribbon > h2,
 #modal-clear .sheet > h2,
 #modal-adv:not(.is-advfinish) .sheet > h2,
+#modal-quest .sheet > h2,
+#modal-soon .sheet > h2,
+#modal-invite .sheet > h2,
+#modal-confirm .sheet > h2,
+#modal-playground .sheet > h2,
+#modal-odds .sheet > h2,
+#modal-daily .sheet > h2,
 #modal-gear #gear-h,
-#modal-gear-info #gi-h {   /* [Task 8b2] 장비 두 창 제목도 레터링 소비처 — 같은 채움비 */
+#modal-gear-info #gi-h,   /* [Task 8b2] 장비 두 창 제목도 레터링 소비처 — 같은 채움비 */
+#modal-minimap .r10-ribbon > h2,
+#modal-theater .r10-ribbon > h2 {   /* [Task 129] 챕터 · 스토리 극장 제목도 */
   --mvh-fs: .695;
 }
 
@@ -68045,8 +68101,18 @@ html[lang="en"] #modal-arc.is-arcdmg .sheet > h2{ --ttl:url("catalog/ttl-arcdmg-
 #modal-drops .r10-ribbon > h2 > .mvh-title,
 #modal-clear .sheet > h2 > .mvh-title,
 #modal-adv:not(.is-advfinish) .sheet > h2 > .mvh-title,
+#modal-quest .sheet > h2 > .mvh-title,
+#modal-soon .sheet > h2 > .mvh-title,
+#modal-invite .sheet > h2 > .mvh-title,
+#modal-confirm .sheet > h2 > .mvh-title,
+#modal-playground .sheet > h2 > .mvh-title,
+#modal-odds .sheet > h2 > .mvh-title,
+#modal-daily .sheet > h2 > .mvh-title,
+#modal-shop .r10-ribbon > h2 > .mvh-title,
 #modal-gear #gear-h > .mvh-title,
-#modal-gear-info #gi-h > .mvh-title {
+#modal-gear-info #gi-h > .mvh-title,
+#modal-minimap .r10-ribbon > h2 > .mvh-title,
+#modal-theater .r10-ribbon > h2 > .mvh-title {
   --lt-optical-y: .0781em;
   top: var(--lt-optical-y);
 }
@@ -70486,17 +70552,12 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
 @supports not (color: color-mix(in srgb, red 10%, blue)) {
   /* 캐릭창 판 3종 — 채움이 color-mix 로만 정의돼 판이 투명해지고 글자가 배경 위에 맨몸으로 놓이던 것.
      젤리 판: ::before 로 face 색 + a-in 투명도(정본 토큰). 겉선은 L3 선색(투명도 없이). */
-  #charpanel .cp-fx > .cp-jelly,
-  #modal-gear .cp-fx > .cp-jelly,
-  #modal-gear-info .cp-fx > .cp-jelly { background-image: none; box-shadow: inset 0 0 0 var(--cpj-L3-w) var(--cpj-L3-line); }
-  #charpanel .cp-fx > .cp-jelly::before,
-  #modal-gear .cp-fx > .cp-jelly::before,
-  #modal-gear-info .cp-fx > .cp-jelly::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background: var(--cpj-face); opacity: var(--cpj-a-in); pointer-events: none; }
+  :is(#charpanel, .mframe) .cp-fx > .cp-jelly { background-image: none; box-shadow: inset 0 0 0 var(--cpj-L3-w) var(--cpj-L3-line); }
+  :is(#charpanel, .mframe) .cp-fx > .cp-jelly::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background: var(--cpj-face); opacity: var(--cpj-a-in); pointer-events: none; }
   #charpanel .cp-side-body { background: var(--f2-box); }
   #charpanel .ci-desc,
   #modal-gear-info .ci-desc { background: var(--cs-desc-box); }
-  #charpanel .cp-card > .cp-tabs > .cp-tab::after,
-  #modal-gear .cp-card > .cp-tabs > .cp-tab::after { background: #AC98AA; }
+  :is(#charpanel .cp-card, .cp-card.mframe[data-tabs]) > .cp-tabs > .cp-tab::after { background: #AC98AA; }
   #charpanel .cp-side-rack .cp-gem-n,
   #modal-drops .cp-gem-n { background: var(--f2-tab-on); box-shadow: inset 0 0 0 calc(var(--f2-w) * .0022) #6B5A69; }
   /* 클래식 시간·점수 캡슐 — 채움(color-mix) 이 통째로 무효가 되던 것. face 토큰 단색. */
@@ -73673,14 +73734,8 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
   padding-left: calc(var(--safe-l) + var(--cs-card-edge));     /* 판 좌우 = 방 정보 카드 좌우 닻(같은 변수) */
   padding-right: calc(var(--safe-r) + var(--cs-card-edge));
 }
-/* 막 — [지휘자 판정 2-1 · 답 6 Q-E] 두 창이 캐릭터 방 위에 뜰 때만(방이 열려 있는 동안 — 방과 두 창은 같은 부모의 형제) 밝은 막(젤리 판 림 광 색) · 많이 흐리게.
-   값 = tokens-semantic 의 --role-gear-veil · --role-gear-veil-blur(까닭은 그 곁 주석). 정적 값 — 막이 뜰 때 움직이는 것은 .modal 의 opacity 뿐이다. */
-#charpanel:not([hidden]) ~ #modal-gear,
-#charpanel:not([hidden]) ~ #modal-gear-info {
-  background-color: var(--role-gear-veil);
-  -webkit-backdrop-filter: blur(var(--role-gear-veil-blur)) saturate(1.04);
-          backdrop-filter: blur(var(--role-gear-veil-blur)) saturate(1.04);
-}
+/* 막 — [판정판 129 · Task 129] 8b2 의 밝은 서리 막(방 위에서만 · --role-gear-veil 림 광 색 35% + 흐림 10px · 지휘자 판정 2-1 · 답 6 Q-E)은 은퇴 —
+   사용자 10-19 「투명하고 맑은 거야」: 두 창도 모든 창과 같은 막 하나(.modal — 9. MODALS)를 쓴다. */
 #modal-gear .gm-stack,
 #modal-gear-info .gm-stack {
   --cb-u: calc(var(--f2-w) / 100);
@@ -73925,11 +73980,20 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
   gap: calc(var(--gi-u) * 1.6);
   min-width: 0;
 }
+/* [판정판 129 · Task 129 · 지휘자 판정 Q3] 이름 줄 = 방 이름 상자(.kit-slot-v2--name 판 · 상자 몫은 kit-v2 의 방 .ci-plate 규칙을 함께 쓴다) — 투명해진 판 너머 방 그림 위에서
+   이름 글자 대비가 3.91(PC) 로 떨어졌다. 창 쪽 자리만: 줄 폭 전부(열 정렬 flex-start 를 이 줄만 늘임) · 긴 이름(「황금 네잎클로버」 en 「Golden Four-Leaf Clover」)은
+   두 줄까지 상자가 따라 자란다(높이 = 방 이름 상자 높이 그대로를 하한으로 — 킷 --name 의 같은 식). 글자는 상자 가운데(방 이름과 같은 꼴). */
+#modal-gear-info .gi-plate {
+  align-self: stretch;
+  height: auto;
+  min-height: calc(var(--f2-w) * .1088);
+}
 #modal-gear-info .gi-name {
   font-size: max(var(--text-min), calc(var(--gi-u) * 6));
   font-weight: 900;
   line-height: 1.15;
   color: var(--prim-art-ink);
+  text-align: center;
   word-break: keep-all;
   overflow-wrap: anywhere;
 }
@@ -73995,6 +74059,61 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
 #modal-gear-info .gi-cmp-n { font-weight: 900; }
 #modal-gear-info .gi-cmp-e { font-weight: 700; }
 #modal-gear-info .gi-cmp-d { font-weight: 900; }
+</style>
+<style id="modal-frame-129">
+/* ===== [판정판 129 · 2026-10-19 · Task 129] 모달 틀 — 모든 창 판 = 캐릭터 방 정보 카드 재질(투명 · 맑음) =====================================
+   사용자(10-19): 「지금 만들어진 젤리 모달창판들이 전부 너무 어둡고 … 투명도나 질감이 누락돼서그래」 · 「내가 원한건 이정도의 투명하고 맑은 거야 모달판들 통일된
+   공통된 디자인을 지금 이걸 기반으로 잡아서 업데이트해줘」(캐릭터 방 그림).
+   훅 하나 = 클래스 .mframe(판 상자) + 첫 자식 젤리 층 .cp-fx > .cp-gnd + .cp-jelly(방 마크업 그대로).
+     · 탭 없는 창(설정 · 극장 · 챕터 · 결과 창 …) = 창 판 .sheet.mframe — 방 기본 실루엣(장비 정보 카드와 같은 경로).
+     · 판 상자(.cp-card.mframe) 창 = 장비 창 · 장비 정보 카드 · 탭 창(미션 · 확률). 탭이 판 내용을 통째로 바꾸면 .cp-card.mframe[data-tabs="N"] =
+       판 윗변에 구운 탭(방 · 장비 창과 한 생성기 mkclip_tabs) — 바깥 .sheet(.mf-tabhost)는 그리지 않는 틀(제목 캡슐 + ✕)이고 그 아래 탭 판이 선다(장비 창과 같은 짜임).
+     재질 · 탭 규칙은 <style id="kit-v2"> 의 방 규칙 하나(:is(#charpanel …, .mframe …) — 특이성 = 방 선택자)라 값 복사 0 · 방 화소 무변.
+   막 = .modal 한 규칙(9. MODALS · 막 B) — 8b2 의 장비 두 창 밝은 막은 은퇴.
+   이 블록은 창 판에만 있는 자리만 적는다(새 원시값 0 · 움직임 0). */
+/* ① 젤리 층은 판 안 내용(제목 · ✕ · 줄 · 단추) 뒤 — 창 판은 .jbox--modal 이 isolation:isolate 라 -1 이 판 상자 밖으로 안 샌다
+   (옛 .jbox--modal::before 와 같은 자리). 판 상자(.cp-card) 창은 방처럼 내용 쪽을 z 1 로 올리는 짜임이라 이 줄이 안 걸린다. */
+#app .sheet.mframe > .cp-fx { z-index: -1; }
+/* ② 방 젤리 층이 읽는 판 상자 자 둘 — 방 카드는 .kit-frame-v2 가 준다(--f2-bd = 판 테두리 폭 · --f2-r = 판 반경 · shape() 못 읽는 기기의 폴백 모서리).
+   창 판은 kit-frame-v2 가 아니므로 같은 뜻의 자기 값(판 투명 테두리 --jbox-bw · 판 반경 --jbox-radius)을 잇는다 — 젤리 층이 판 테두리 상자를 덮는다(옛 ::before 와 같은 inset). */
+.sheet.mframe { --f2-bd: var(--jbox-bw); --f2-r: var(--jbox-radius); }
+/* ③ 옛 창 판 그림(.jbox--modal ::before · ::after — 방 재질의 --jbox-* 사본)은 틀을 입은 창(판 · 탭 창 바깥 틀)에서 끈다.
+   이 등급 그림을 계속 쓰는 것 = 상점 화면 판(#sh-plate — 8c 몫) · 전투 가로 카드 별칭뿐. */
+.jbox--modal:is(.mframe, .mf-tabhost)::before,
+.jbox--modal:is(.mframe, .mf-tabhost)::after { content: none; }
+
+/* ④ 탭 창(.mf-tabhost — 미션 · 확률) 짜임 = 장비 창과 같다: 바깥 틀은 좌우 · 아래 안여백 0(탭 판이 틀 폭 전부) · 제목 캡슐 + ✕ 는 판 위에 선다.
+   판 안 본문(.cp-body)이 옛 틀 안여백(.w6m .sheet 의 --w6m-pad-x · --w6m-pad-b)과 틀의 줄 간격(gap — 상속)을 그대로 받는다 — 안 내용 자리 무변.
+   구르는 것 = 종전 그대로 목록(#quest-list · .od-body)뿐(틀 → 판 → 본문이 세로 flex · min-height 0 사슬). */
+.w6m .sheet.mf-tabhost { padding-left: 0 !important; padding-right: 0 !important; padding-bottom: 0 !important; }
+/* 제목 캡슐 폭 = 틀 겉폭 × .5684(A1) — 안여백이 0 이 되어 안상자 차가 테두리 2px 뿐이다(K = .5684 × 2px — 「판 계열 변주」 표의 같은 식). */
+#app .w6m .sheet.mf-tabhost > h2 { --wcap-w: calc(56.84% + 1.1368px); }
+#app .sheet.mf-tabhost > .cp-card.mframe {
+  width: auto;
+  display: flex;
+  flex-direction: column;
+  flex: 0 1 auto;
+  min-height: 0;
+  gap: inherit;
+}
+/* 탭 띠 ↔ 본문 틈 = 틀의 줄 간격(판의 gap — 종전 탭 줄 ↔ 출석 줄 간격 그대로). 방 띠의 아래 틈(--cs-gap8 — 서브픽셀 겹침 막이)은 gap 이 대신 맡는다. */
+#app .sheet.mf-tabhost > .cp-card.mframe > .cp-tabs { flex: 0 0 auto; margin-bottom: 0; }
+/* ⑤ 판 위 작은 글자 = 가장 진한 잉크 토큰(--prim-art-ink) — 방 정보 카드가 하는 방식(판을 덜 투명하게 만들지 않는다 · 지휘자 판정 Q3).
+   투명해진 판 너머 뒤 그림 위에서 옅은 잉크 · 금색 글자(옛 판 면 α .90 에서만 읽히던 값)가 크기별 문턱(작은 글자 4.5) 아래로 떨어진 자리만 —
+   스킨 설명 · 초대 「추천」 · 잔액 줄 이름 · 확률 아래 안내 · 미션 이름 · 기록 아케이드 설명 · 4위 아래 순위 · 결과 창 보조 줄 · 기록 줄.
+   1 ~ 3위 순위 칸(.rank-pos — 메달 그림 위 투명 글자)은 건드리지 않는다. 숫자 = smoke-modalframe f5 표(보고). */
+#app .modal .mframe :is(.sk-d, .ci-tag-k, .sk-bal > span, .sh-fine, .qs-t, .rank-meta, .sub-score, .rank-line),
+#app .modal .mframe .rank-row:nth-child(n+4) .rank-pos,
+#modal-arc.modal :is(#arc-best, #arc-when) { color: var(--prim-art-ink); }   /* 아케이드 결과 기록 줄 · 시각 줄(id 규칙 #8A5A06 · #7A6154 를 같은 특이 겹으로 넘는다) */
+#app .sheet.mf-tabhost > .cp-card.mframe > .cp-body {
+  flex: 0 1 auto;
+  min-height: 0;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  gap: inherit;
+  padding: 0 var(--w6m-pad-x) var(--w6m-pad-b);
+}
 </style>
 </body>
 </html>
