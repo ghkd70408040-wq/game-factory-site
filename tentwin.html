@@ -31027,34 +31027,40 @@ window.TT_SFX = {
   function winInert(el, on) { try { if ('inert' in el) el.inert = !!on; } catch (e) { /* 옛 엔진: 숨김만 */ } }
   function winLift(el) { if (el && el.hasAttribute('data-under')) { el.removeAttribute('data-under'); winInert(el, false); } }
   /** 창 하나를 연다. 숨어 있었거나 깔려 있었을 때만 그 순간 보이는 다른 창을 깐다(이미 맨 위에 서 있던 창을 다시 열면 무변).
-   *  [판정판 121 · Task 8b2] keep = 깔지 않을 창 하나 — 장비 창 · 장비 정보 카드는 캐릭터 방(화면)을 깔지 않는다(흐린 막 아래 그대로 · inert 는 gearRoomInert). */
+   *  [판정판 121 · Task 8b2] keep = 깔지 않을 창 하나 — 장비 창 · 장비 정보 카드는 캐릭터 방(화면)을 깔지 않는다(흐린 막 아래 그대로 · inert 는 gearRoomInert).
+   *  [수정 1회차 F5] 겹이 바뀌는 끝(winShow · winHide · winReset) 셋 다 방 inert 불변식을 다시 계산한다(gearRoomInert — 주인 하나). */
   function winShow(el, keep) {
     if (!el) return;
     var fresh = el.hidden || el.hasAttribute('data-under');
     el.hidden = false;
     winLift(el);
-    if (!fresh || !el.id) return;
-    var ws = document.querySelectorAll(WIN_SEL);
-    for (var i = 0; i < ws.length; i++) {
-      var w = ws[i];
-      if (w === el || w === keep || w.hidden || w.hasAttribute('data-under')) continue;
-      w.setAttribute('data-under', el.id);
-      winInert(w, true);
+    if (fresh && el.id) {
+      var ws = document.querySelectorAll(WIN_SEL);
+      for (var i = 0; i < ws.length; i++) {
+        var w = ws[i];
+        if (w === el || w === keep || w.hidden || w.hasAttribute('data-under')) continue;
+        w.setAttribute('data-under', el.id);
+        winInert(w, true);
+      }
     }
+    gearRoomInert();
   }
   /** 창 하나를 닫는다. 자기가 깔았던 창만 되살린다. */
   function winHide(el) {
     if (!el) return;
     el.hidden = true;
     winLift(el);
-    if (!el.id) return;
-    var ws = document.querySelectorAll('[data-under="' + el.id + '"]');
-    for (var i = 0; i < ws.length; i++) winLift(ws[i]);
+    if (el.id) {
+      var ws = document.querySelectorAll('[data-under="' + el.id + '"]');
+      for (var i = 0; i < ws.length; i++) winLift(ws[i]);
+    }
+    gearRoomInert();
   }
   /** 전부 걷을 때(closeAllModals) — 깔린 표식이 하나도 남지 않게. */
   function winReset() {
     var ws = document.querySelectorAll('[data-under]');
     for (var i = 0; i < ws.length; i++) winLift(ws[i]);
+    gearRoomInert();
   }
   function openModal(id) { var m = $(id); if (m) { winShow(m); healHeads(m); } }
   function closeModal(id) { winHide($(id)); }
@@ -31104,9 +31110,8 @@ window.TT_SFX = {
      /* [판정판 121 · Task 5 → 8b2] 장비 정보 카드 · 장비 창 — 캐릭터 방 위의 두 겹. 화면이 통째로 바뀔 때 남지 않게. */
      'modal-gear-info', 'modal-gear']
       .forEach(closeModal);
-    winReset();   /* [판정판 121 · Task 5] 목록 밖 창(캐릭창 · 설정 · 스킨 · 보석 창)에 남은 깔림 표식까지 걷는다 */
+    winReset();   /* [판정판 121 · Task 5] 목록 밖 창(캐릭창 · 설정 · 스킨 · 보석 창)에 남은 깔림 표식까지 걷는다 · [Task 8b2 F5] 끝에서 방 inert 도 다시 센다 */
     gearInfoId = '';
-    gearRoomInert();   /* [Task 8b2] 두 창이 걷혔다 — 방 inert 도 푼다(방은 깔림 표식이 아니라 inert 만 받는다) */
     dropsN = 0;   /* 획득표가 위 목록에서 걷혔다 — 열린 탄 표식도 함께 0(closeDrops 를 안 거치는 길) */
   }
 
@@ -51792,11 +51797,15 @@ window.TT_SFX = {
 
   /** 방 inert — 장비 창 · 카드가 떠 있는 동안 흐린 막 아래 방은 키보드 · 누름이 안 닿는다(보이기는 그대로 — 8b 수정 1회차 M5).
    *  방이 다른 창에 깔렸으면(data-under) 그 창이 정한다(winShow · winLift). 창 둘이 다 닫히면 풀린다. */
+  /* [수정 1회차 F5] 불변식 — 방이 보이고 깔리지 않았을 때: inert ⇔ 장비 창 또는 정보 카드가 「떠 있고(hidden 아님) 다른 창에 깔리지 않음」.
+     방이 깔렸으면(data-under) 그 창 규칙(winShow · winLift)이 정한다 · 방이 숨었으면 다시 열 때(winShow 끝) 다시 센다.
+     부르는 곳 = winShow · winHide · winReset 의 끝 하나(겹이 바뀌는 모든 길 — 셋째 창이 장비 창 위에 떴다 닫혀도 다시 선다). */
   function gearRoomInert() {
     var cp = $('charpanel');
-    if (!cp || cp.hasAttribute('data-under')) return;
+    if (!cp || cp.hidden || cp.hasAttribute('data-under')) return;
     var g = $('modal-gear'), gi = $('modal-gear-info');
-    winInert(cp, !cp.hidden && !!((g && !g.hidden) || (gi && !gi.hidden)));
+    var up = function (m) { return !!m && !m.hidden && !m.hasAttribute('data-under'); };
+    winInert(cp, up(g) || up(gi));
   }
 
   /** 장비 창 열기 — 방 오른쪽 장비 줄 칸(부위)에서. 방은 깔지 않는다(화면 — 흐린 막 아래 그대로 · winShow keep). */
@@ -51804,9 +51813,8 @@ window.TT_SFX = {
     var m = $('modal-gear');
     if (!m) return;
     if (ITEM_SLOTS.indexOf(slot) >= 0) gearSlotCur = slot;
-    winShow(m, $('charpanel'));
+    winShow(m, $('charpanel'));      /* 방 inert = winShow 끝의 gearRoomInert(수정 1회차 F5 — 주인 하나) */
     healHeads(m);
-    gearRoomInert();
     gearPaint();
     var gr = $('gm-grid');
     if (gr) gr.scrollTop = 0;
@@ -51814,8 +51822,7 @@ window.TT_SFX = {
   }
   function closeGear(quiet) {
     if (gearInfoId) closeGearInfo(true);
-    closeModal('modal-gear');
-    gearRoomInert();
+    closeModal('modal-gear');        /* winHide 끝에서 방 inert 를 다시 센다 */
     if (!quiet) J.sfx.ui();
   }
   /** 부위 고르기 — 탭 · 낀 장비 줄 칸이 같이 부른다(둘이 늘 같은 부위를 가리킨다) · 가방이 그 부위 장비로. */
@@ -51838,9 +51845,11 @@ window.TT_SFX = {
       gearEqPut(eq, best.it.id);    /* toggleItem 과 같은 끼우기 · 장착 수 가드(M9) */
       changed++;
     }
-    if (changed) { dqBump('item', changed); gearEqCommit(cid, eq); }
-    else J.sfx.ui();
+    /* [수정 1회차 F8] 토스트는 줄을 서지 않는다(toast — 새 것이 바로 덮는다) — 장비 토스트를 먼저 띄우고 퀘스트 축(dqBump)을 뒤에 불러,
+       「아이템 장착」 퀘스트가 이 판에 끝나면 그 「받을 수 있어요」 토스트가 남는다(8b 차례는 장비 토스트가 퀘스트 토스트를 덮었다). */
     toast(t(changed ? 'gear.auto.done' : 'gear.auto.same'));
+    if (changed) { gearEqCommit(cid, eq); dqBump('item', changed); }
+    else J.sfx.ui();
   }
 
   function paintGearInfo() {
@@ -51924,9 +51933,8 @@ window.TT_SFX = {
     var m = $('modal-gear-info');
     if (!m) return;
     gearInfoId = id;
-    winShow(m, $('charpanel'));
+    winShow(m, $('charpanel'));      /* 방 inert = winShow 끝의 gearRoomInert(수정 1회차 F5) */
     healHeads(m);
-    gearRoomInert();
     paintGearInfo();
     var main = m.querySelector('.gi-main');
     if (main) { main.scrollTop = 0; gearMore(main); }
@@ -51934,8 +51942,7 @@ window.TT_SFX = {
   }
   function closeGearInfo(quiet) {
     gearInfoId = '';
-    closeModal('modal-gear-info');
-    gearRoomInert();
+    closeModal('modal-gear-info');   /* winHide 끝에서 방 inert 를 다시 센다 */
     if (!quiet) J.sfx.ui();
   }
 
@@ -52747,8 +52754,10 @@ window.TT_SFX = {
       if (ev.altKey || ev.ctrlKey || ev.metaKey) return;
       var panel = $('charpanel');
       /* [판정판 121 · Task 5] 장비 창 · 스킨 시트 밑에 깔린 동안(data-under)은 넘기지 않는다 — 구경 캐릭터가 바뀌면 끼기가 다른 캐릭터에 걸린다.
-         [Task 8b2] 장비 창 · 장비 정보 카드는 방을 깔지 않고 inert 로만 막는다(gearRoomInert) — inert 인 동안도 넘기지 않는다(smoke-gear A8). */
-      if (!panel || panel.hidden || panel.hasAttribute('data-under') || panel.inert) return;
+         [Task 8b2 · 수정 1회차 F4] 장비 창 · 장비 정보 카드는 방을 깔지 않는다 — 두 창이 떠 있는 동안(hidden 아님)도 넘기지 않는다(smoke-gear A8).
+         inert 를 보지 않고 창 열림을 직접 본다(inert 를 모르는 엔진에서도 같은 막음). */
+      var gw = $('modal-gear'), gwi = $('modal-gear-info');
+      if (!panel || panel.hidden || panel.hasAttribute('data-under') || (gw && !gw.hidden) || (gwi && !gwi.hidden)) return;
       var tag = ev.target && ev.target.tagName;
       if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
       ev.preventDefault();
@@ -61953,6 +61962,9 @@ html[lang="ko"] #charpanel .cs-tip { word-break: keep-all; overflow-wrap: anywhe
        0.4089 ÷ 0.856 = 0.478  →  font-size = --f2-bh x .478   전 .30 (비 0.2569)
      #cp-skin 은 «라벨 + 잔액» 2행이라 단일행 CTA 의 자가 안 맞고 시안 표본도 없다 —
      안 건드렸다. 롤백: 아래 font-size 한 줄을 지운다. */
+  /* [Task 8b2 수정 1회차 F7] 높이도 이 한 자리 — kit-btn-v2 기본(주버튼) 값 그대로라 #cp-go · #gm-done(늘 primary)은 계산값 무변.
+     [해제](#gi-act secondary)가 보조 높이(.1329)로 튀지 않게 종류와 무관하게 묶는다(옛 #gi-act 덮개의 몫 — 그 덮개는 은퇴). */
+  --f2-bh: calc(var(--f2-w) * .1230);
   font-size: calc(var(--f2-bh) * .478);
   flex: 1 1 auto;
   min-height: 0;
@@ -73330,15 +73342,9 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
 
 /* ---- 1b · 1c · 2 의 장비 목록 줄(.gear-who · .sk-d) · 설명 창 큰 그림(#gi-art .cp-gem 50cqw) 규칙은 [판정판 121 · 2026-10-19 · Task 8b2] 은퇴 —
    두 창은 방 정보 카드 판 · 탭 · 단추 · 상자를 입고(<style id="kit-v2"> 의 방 규칙 선택자에 두 창을 더했다) 안 짜임은 <style id="gear-modal-8b2">. ---- */
-/* [장착]/[해제](옛 [끼기]/[빼기]) 는 판 안 폭 전체 — [Task 8b2] 방 바닥 단추 줄(.cp-foot)의 주 단추(.cp-go — flex 1)라 그 줄 폭이다.
-   [수정 1회차 I1 · 지휘자 판정] 높이 · 글자도 주 단추 자로 — 두 단추 모두 주 단추 높이(kit-btn-v2 기본 --f2-w × .1230)와 캐릭창 「선택 완료」(#cp-go ·
-   [E44-0903] B1 0.4089 ÷ 0.856)의 글자 비 .478. [빼기] 는 secondary 색만 다르고 크기 · 높이는 [끼기]와 같다(종전: 보조 높이 .1329 · 글자 .235 로 튀었다).
-   킷 규칙은 무접촉 — #cp-go 와 같은 「이 한 자리에서만 덮는다」. */
-#gi-act.kit-btn-v2,
-#gi-act.kit-btn-v2[data-kind="secondary"] {
-  --f2-bh: calc(var(--f2-w) * .1230);
-  font-size: calc(var(--f2-bh) * .478);
-}
+/* [장착]/[해제](옛 [끼기]/[빼기]) — [Task 8b2] 방 바닥 단추 줄(.cp-foot)의 주 단추(.cp-go — flex 1)라 그 줄 폭이다.
+   [수정 1회차 F7] 높이 · 글자도 .cp-go 공유 규칙(방 「선택 완료」 · 장비 창 [완료]와 같은 값) 하나에서만 온다 — 옛 Task 5 판의
+   「#gi-act.kit-btn-v2 { --f2-bh · font-size }」 덮개(세로 · 가로 둘)는 은퇴. [해제]는 secondary 색만 다르고 크기는 [장착]과 같다(.cp-go 공유 규칙이 --f2-bh 까지 정한다). */
 
 /* ---- 3. 가로(창 가로 ≥ 세로) — 가로 창 한 무리(판정 Q6 · 2회차 판정): 스킨 · 장비 목록 · 장비 설명 = 판 380u, 판 정보 = 360u([Task 8a] 획득표 = M 620u), 무대 가운데(.modal 이 창 가운데에
    세우고 무대도 창 가운데다). 1280x720(1u = 1px)에서 지금 폭 그대로, 작은 창에서 같이 준다.
@@ -73418,9 +73424,7 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
   #modal-skin .sk-n { font-size: max(var(--text-min), calc(var(--stage-u) * 14)); }
   #modal-skin .sk-d { font-size: max(var(--text-min), calc(var(--stage-u) * 10)); }
   #modal-skin .sk-act.kit-pill-v2 { font-size: max(var(--text-min), calc(var(--stage-u) * 12)); }
-  /* 단추 글자 = 주 단추 자 .478(위 [수정 1회차 I1] — 두 단추 같은 값) + 하한 */
-  #gi-act.kit-btn-v2,
-  #gi-act.kit-btn-v2[data-kind="secondary"] { font-size: max(var(--text-min), calc(var(--f2-bh) * .478)); }
+  /* [Task 8b2 수정 1회차 F7] [장착]/[해제] 글자 덮개 은퇴 — 크기는 .cp-go 공유 규칙에서만 온다 */
 }
 /* [리뷰 전 수정 Q10] 위 악당 칸 규칙의 작은 화면(창 높이 ≤ 760 — node-card-74 의 같은 문턱) 짝: 그 미디어의 칸 128nu · 몸통 left 116 · top 8nu 를 같은 값의 최소 높이 · 여백으로. */
 @media (min-aspect-ratio: 1/1) and (max-height: 760px) {
