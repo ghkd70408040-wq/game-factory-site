@@ -19,11 +19,9 @@ background-size:contain;
 transition:opacity 160ms var(--ease),filter 160ms var(--ease);
 pointer-events:none;
 }
-#app.battle #btn-add.act::before    {background-image:url("catalog/medal-attack-ko@3x.webp");}
 #app.battle #btn-hint.act::before   {background-image:url("catalog/medal-special-ko@3x.webp");}
 #app.battle #btn-undo.act::before   {background-image:url("catalog/medal-pet-ko@3x.webp");}
 #app.battle #btn-shuffle.act::before{background-image:url("catalog/medal-awaken-ko@3x.webp");}
-html[lang="en"] #app.battle #btn-add.act::before    {background-image:url("catalog/medal-attack-en@3x.webp");}
 html[lang="en"] #app.battle #btn-hint.act::before   {background-image:url("catalog/medal-special-en@3x.webp");}
 html[lang="en"] #app.battle #btn-undo.act::before   {background-image:url("catalog/medal-pet-en@3x.webp");}
 html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catalog/medal-awaken-en@3x.webp");}
@@ -1400,14 +1398,6 @@ background-repeat: no-repeat;
 background-position: center center;
 background-size: cover;
 }
-#screen-game.active ~ #pc-bg {
-background-image: var(--art-menu-day-w);
-filter: none;                /* [121] 은퇴: blur(20px) saturate(.90) brightness(.52) — 비전투 게임 화면 양옆도 또렷한 그림 */
-}
-#app.battle #screen-game.active ~ #pc-bg {
-background-image: var(--art-map-bg);
-filter: none;                /* [121] 은퇴: blur(20px) saturate(.95) brightness(.42) — 전투 가로는 battle-landscape 가 다시 깐다(판 뒤 어둡게 포함) */
-}
 #screen-menu {
 align-items: flex-start;
 padding-left: max(7vw, 84px);
@@ -1421,181 +1411,6 @@ width: 380px;
 --mbw: 380px;
 align-items: flex-start;
 }
-#screen-game.active {
-display: grid;
-grid-template-columns: 264px minmax(0, 520px) 264px;
-grid-template-rows: auto auto auto auto auto 1fr;
-column-gap: 28px;
---pc-row-gap: 10px;
-row-gap: var(--pc-row-gap);
-width: 100%;
-max-width: 1104px;
-margin: 0 auto;
-height: 100dvh;
-max-height: 100dvh;
-}
-#app.battle #screen-game.active {
-background-image: none;
-}
-#screen-game.active #topbar {
-grid-column: 1 / 4;
-grid-row: 1;
-padding-right: calc(var(--safe-r) + 16px);
---pc-pause-x: 12px;
---pc-pause-y: var(--pc-row-gap);
-}
-#app.battle #screen-game.active #topbar,
-#app.classic #screen-game.active #topbar {
-padding: calc(var(--safe-t) + var(--pc-pause-y)) calc(var(--safe-r) + 16px) 2px calc(var(--safe-l) + var(--pc-pause-x));
-}
-#app.battle #screen-game.active #btn-pause,
-#app.classic #screen-game.active #btn-pause,
-#app:not(.classic):not(.battle) #screen-game.active #topbar #btn-pause {
-position: relative;
-left: auto; top: auto;
-width: 40px !important; height: 40px !important;
-aspect-ratio: auto;
-}
-#app.classic #screen-game.active #btn-pause {
-position: absolute;
-left: calc(var(--safe-l) + var(--pc-pause-x));
-top: calc(var(--safe-t) + var(--pc-pause-y));
-}
-#screen-game.active #tb-stats {
-max-width: 660px;
-margin: 0 auto;
-}
-#screen-game.active #pc-left[data-wide-only],
-#screen-game.active #pc-right[data-wide-only] {
-display: block !important;   /* 기본 절 [data-wide-only]{display:none !important} 를 뚫는다 */
-position: relative;
-z-index: 0;
-}
-#screen-game.active #pc-left[data-wide-only] {
-grid-column: 1;
-grid-row: 2;
-height: 200px;
-}
-#screen-game.active #pc-right[data-wide-only] {
-grid-column: 3;
-grid-row: 2 / 7;
-align-self: start;
-height: 378px;
-}
-#app.battle #screen-game.active #pc-left[data-wide-only] { display: none !important; }
-#app.battle #screen-game.active #combo-wrap,
-#app.battle #screen-game.active #hud-row { display: none !important; }
-#screen-game.active #pc-left[data-wide-only],
-#screen-game.active #pc-right[data-wide-only],
-#screen-game.active #combo-wrap,
-#screen-game.active #hud-row,
-#screen-game.active #boss-bar {
-border-radius: 18px;
-background-color: rgba(255, 255, 255, .10);
-background-image: linear-gradient(180deg,
-rgba(255, 255, 255, .16) 0%,
-rgba(255, 255, 255, .05) 100%);
-box-shadow:
-inset 0 0 0 1.5px rgba(255, 255, 255, .28),
-0 10px 26px rgba(16, 8, 32, .30);
-}
-#screen-game.active #hero-slot {
-position: relative;
-z-index: 1;
-top: auto;
-right: auto;
-grid-column: 1;
-grid-row: 2;
-justify-self: center;
-align-self: center;
-transform: scale(2.6);
-}
-#screen-game.active #combo-wrap {
-grid-column: 1;
-grid-row: 3;
-position: relative;
-z-index: 1;
-align-self: start;
-height: auto;
-min-height: 58px;
-padding: 16px 16px 20px;
-}
-#screen-game.active #fever-bar {
-left: 16px;
-right: 16px;
-bottom: 8px;
-}
-#screen-game.active #hud-row {
-grid-column: 1;
-grid-row: 4;
-position: relative;
-z-index: 1;
-align-self: start;
-flex-direction: column;
-align-items: stretch;
-gap: 8px;
-min-height: 58px;
-padding: 14px 16px;
-}
-#screen-game.active #boss-bar {
-grid-column: 1;
-grid-row: 5;
-position: relative;
-z-index: 1;
-align-self: start;
-margin: 0;
-padding: 14px 16px;
-}
-#screen-game.active #board { --board-max: 520px; }
-#screen-game.active #board-scroll {
-grid-column: 2;
-grid-row: 2 / 7;
-min-height: 0;
-padding-left: 0;
-padding-right: 0;
-}
-#screen-game.active #actionbar {
-grid-column: 3;
-grid-row: 2 / 7;
-align-self: start;
-position: relative;
-z-index: 1;
-flex-direction: column;
-justify-content: flex-start;
-gap: 14px;
-padding: 16px;
-background-color: transparent;
-background-image: none;
-border-top: 0;
-border-style: none;
-border-width: 0;
-border-image-source: none;
-}
-#screen-game.active #actionbar .act {
-flex: 0 0 auto;
-width: 100%;
-min-height: 76px;
-}
-#app.battle #screen-game.active #actionbar {
-gap: 10px !important;
-padding: 16px !important;
-border-style: none !important;
-border-width: 0 !important;
-border-image-source: none !important;
-background-color: transparent !important;
-background-image: none !important;
-}
-#app.battle #screen-game.active #actionbar .act { height: 94px !important; }
-#app.battle #screen-game.active #duel-hud {
-grid-column: 1 / 4;
-grid-row: 2;
-}
-#app.battle #screen-game.active #board-scroll,
-#app.battle #screen-game.active #pc-right[data-wide-only],
-#app.battle #screen-game.active #actionbar {
-grid-row: 3 / 7;
-}
-#app.battle #screen-game.active #pc-right[data-wide-only] { height: 438px; }
 }
 
 /* == we-wave == */
@@ -7706,42 +7521,3 @@ padding: 0 calc(1.00 * var(--cqw));
 #app:not(.classic):not(.battle) #screen-game #tb-stats .stat-v{ font-size: calc(2.80 * var(--cqw)); }
 }
 }   /* @media 세로 끝 */
-@media (min-aspect-ratio: 1/1) and (min-width: 900px){
-#app:not(.classic):not(.battle) #screen-game.active #topbar{
-border-image-source: none;
-border-style: none;
-border-width: 0;
-background: none;
-position: relative;
-}
-#app:not(.classic):not(.battle) #screen-game.active #topbar > [data-part="hud-plate"][data-variant="top"]{
-display: block;
-position: absolute;
-inset: 0;
-left: 0; top: 0; width: auto; height: auto;
-z-index: 0;
-pointer-events: none;
-background-image: var(--hud-plate-top);
-background-repeat: no-repeat;
-background-size: 100% 100%;
-filter: none;
-}
-#app:not(.classic):not(.battle) #screen-game.active #topbar > #tb-stats{ position: relative; z-index: 2; }
-#app:not(.classic):not(.battle) #screen-game #tb-stats .stat{
---wcap-w: 200px;                 /* 모양비 계산에만 쓰인다 — 폭은 격자가 정한다 */
---wcap-h: 22px;
---wcap-face: var(--mode-b-face);
---wcap-face-top: var(--role-wcap-face-top-classic-cap);
---wcap-a-in: .657;
---wcap-L3-line: var(--mode-b-outline);
---wcap-rim-c: var(--mode-b-rim);
---wcap-glow-c: var(--mode-b-glow-bubble);
-width: auto;
-height: 22px;
-align-items: center;
-justify-content: space-between;
-padding: 0 8px;
-border-radius: 11px;
-overflow: visible;
-}
-}

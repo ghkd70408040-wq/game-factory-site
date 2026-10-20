@@ -7,8 +7,8 @@ var L=("jelly-box-c,duel-title-play,sian2-ribbon,sian2-btn-pink,sian2-btn-purple
 +"stage-pill_life,stage-pill_coin,stage-pill_star,stage-pill_chapter,"
 +"stage-jelly-1,stage-jelly-2,stage-jelly-3,stage-jelly-4,stage-jelly-5,"
 +"stage-star-on,stage-star-off,"
-+"medal-attack-ko@3x,medal-special-ko@3x,medal-pet-ko@3x,medal-awaken-ko@3x,"
-+"hud-btn-pause,"           /* 3단계: duel-hpbar-bone·-wing 은 참조 0 · [판정판 121 Task 6b] 일시정지 그림 duel-btn-pause → hud-btn-pause */
++"medal-special-ko@3x,medal-pet-ko@3x,medal-awaken-ko@3x,"
++"hud-btn-pause,"         /* 3단계: duel-hpbar-bone·-wing 은 참조 0 · [판정판 121 Task 6b] 일시정지 그림 duel-btn-pause → hud-btn-pause */
 +"duel-castle-hd,duel-demon-full,"   /* 3단계: duel-cloud-big/-baby 는 참조 0 */
 +"tmr-0,tmr-1,tmr-2,tmr-3,tmr-4,tmr-5,tmr-6,tmr-7,tmr-8,tmr-9,tmr-colon,"
 +"cut-free-1,cut-free-2,"

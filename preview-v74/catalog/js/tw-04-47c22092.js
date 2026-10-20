@@ -4582,7 +4582,7 @@ var next = Math.min(byW, byH);
 if (!isFinite(next)) next = TILE_MIN;
 next = clamp(next, TILE_MIN, TILE_MAX);
 if (isFinite(byW) && byW > 0 && next > byW) next = byW;   // never overflow width
-if (isFinite(byH) && byH > 0 && next > byH && battleStage()) next = byH;
+if (isFinite(byH) && byH > 0 && next > byH && battleOn() && battleStage()) next = byH;
 if (next < 12) next = 12;
 ts = next;
 board.style.setProperty('--ts', ts + 'px');
@@ -11943,7 +11943,13 @@ dhVar(c, 'mr', 'duel-me-fill', '--hp', m.hpMax > 0 ? Math.max(0, m.hp) / m.hpMax
 dhVar(c, 'fa', 'duel-foe-atk', '--atk', f.atkMax > 0 ? Math.min(1, f.atk / f.atkMax) : 0);
 var mr = m.atkMax > 0 ? Math.min(1, m.atk / m.atkMax) : 0;
 dhVar(c, 'ma', 'duel-me-atk', '--atk', mr);
-dhText(c, 'mp', 'duel-me-atkpct', duelAtkPct() + '%');
+var mpct = duelAtkPct();
+if (c.mp !== mpct) {
+c.mp = mpct;
+setText('duel-me-atkpct', mpct + '%');
+var mrow = $('duel-me-atkrow');
+if (mrow) mrow.setAttribute('aria-valuenow', String(mpct));
+}
 var tier = mr >= 1 ? '3' : mr >= 0.66 ? '2' : mr >= 0.33 ? '1' : '0';
 if (c.mt !== tier) {
 c.mt = tier;
@@ -12019,17 +12025,22 @@ duelHitMe(DUEL_ME_HP);
 }, 900);
 }
 var meCastOffT = 0;
+var meFxMs = null;
+function meFxTimes() {
+if (!meFxMs) meFxMs = { cast: invCssMs('--mo-cast-life', 700), d2: invCssMs('--dur-2', 260) };
+return meFxMs;
+}
 function meCastFx(btn) {
 if (!battleOn()) return;
 var av = $('duel-me-av');
 if (av && av.classList) {
-var life = invCssMs('--mo-cast-life', 700);
+var life = meFxTimes().cast;
 if (meCastOffT) { clearTimeout(meCastOffT); meCastOffT = 0; }
 var on = function () { av.classList.add('cast'); meCastOffT = setTimeout(function () { meCastOffT = 0; av.classList.remove('cast'); }, life); };
 if (av.classList.contains('cast')) { av.classList.remove('cast'); requestAnimationFrame(on); } else on();
 }
 if (btn && btn.classList) {
-var pop = invCssMs('--dur-2', 260);
+var pop = meFxTimes().d2;
 if (btn.__popT) { clearTimeout(btn.__popT); btn.__popT = 0; }
 var onB = function () { btn.classList.add('halo-pop'); btn.__popT = setTimeout(function () { btn.__popT = 0; btn.classList.remove('halo-pop'); }, pop); };
 if (btn.classList.contains('halo-pop')) { btn.classList.remove('halo-pop'); requestAnimationFrame(onB); } else onB();
@@ -12040,7 +12051,7 @@ function meHitFx() {
 if (!battleOn()) return;
 var av = $('duel-me-av');
 if (!av || !av.classList) return;
-var life = invCssMs('--dur-2', 260);
+var life = meFxTimes().d2;
 if (meHitOffT) { clearTimeout(meHitOffT); meHitOffT = 0; }
 var on = function () { av.classList.add('hit'); meHitOffT = setTimeout(function () { meHitOffT = 0; av.classList.remove('hit'); }, life); };
 if (av.classList.contains('hit')) { av.classList.remove('hit'); requestAnimationFrame(on); } else on();
