@@ -72534,6 +72534,11 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
   #app #screen-shop #sh-body{ --sh-ck: calc(var(--stage-u) * 5.75); padding-top: calc(2.8 * var(--sh-ck)); }   /* 위 안여백 = 카드 자로(「희귀」 · 「확률」 걸침이 카드와 함께 큰다) */
   #app #screen-shop #sh-body .sh-grid{ --cqw: var(--sh-ck); grid-template-columns: repeat(3, calc(38 * var(--cqw))); justify-content: center; gap: calc(3 * var(--cqw)); }
   #app #screen-shop #sh-body .sh-grid[data-cols="1"]{ grid-template-columns: minmax(0, calc(120 * var(--cqw))); }   /* 1열 가로 카드(shopFitCards)도 격자 폭 안 */
+  /* [수정 1회차 덧붙임 · 지휘자 2026-10-20 눈 확인] 가로 캡슐 카드(뽑기 · 꾸미기 — 3열) 키를 줄여 1280×720 · 1920×1080 · 2000×740 에서 카드 단추 줄(무료 + [한 번 | 10회])까지
+     판 본문 안에 굴림 없이 든다(그 전: 맨 아래 단추가 본문 아래 끝을 38u 넘었다 — probe_fold). 새 모양 0 · 작은 값만: 기계 그림 키 20 → 14 카드 자(비 570/448 그대로) ·
+     카드 안 줄 사이 1.2 → .8 · 아래 안여백 2.6 → 1.8(위 안여백은 그대로 — 카드 위 끝에 걸친 「확률」 알약 아래와 제목 사이). 합 −48u. 낮은 창(821×462 · 844×390)은 지금처럼 굴러도 된다. */
+  #app #screen-shop #sh-body .sh-grid:not([data-cols="1"]) > .shop-card[data-kind]{ gap: calc(.8 * var(--cqw)); padding-bottom: calc(1.8 * var(--cqw)); }
+  #app #screen-shop #sh-body .sh-grid:not([data-cols="1"]) > .shop-card[data-kind] .shop-ic{ width: calc(11 * var(--cqw)); height: calc(14 * var(--cqw)); }
   /* 머리줄 · 작은 글씨 = 격자 폭(120 --sh-ck) 안 — 판 가장자리까지 벌어지지 않게 */
   #app #screen-shop #sh-body > :is(.sh-hrow, .sh-fine){ max-width: calc(120 * var(--sh-ck)); margin-left: auto; margin-right: auto; }
   /* 탭 점 배지 [Task 4 수정 1회차 · 리뷰 I4]: 글자 = 메인 · 지도 상점 단추 배지의 가로 글자(18u — 821×462 에서 11.5px) · 지름 = B10 비(4.42 : 2.69) → 29.6u. */
