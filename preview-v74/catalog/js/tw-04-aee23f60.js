@@ -5067,7 +5067,6 @@ tutSyncSkip();
 syncTwChip();
 var ct = $('clear-title');
 if (ct) headText(ct, t('clear.title', { stage: S.stage }));
-setText('clear-stage-hero', S.stage);
 var cm = $('modal-clear');
 if (cm && !cm.hidden) paintNextPreview();
 var d = dailyBestNow();   // W7.5 — 열려 있는 시트가 말하고 있는 그 판
@@ -9706,7 +9705,6 @@ if (isDaily()) { finishDaily(); return; }
 dropProgress();
 persist();
 setText('clear-title', t('clear.title', { stage: S.stage }));
-setText('clear-stage-hero', S.stage);
 paintNextPreview();
 var list = $('clear-rollup');
 if (list) list.innerHTML = '';
@@ -13925,6 +13923,19 @@ portalAdsSync();
 var show = portalAdsOk() && adCapLeft('x2') > 0 && (S.gainCoin | 0) > 0 && S.x2Done !== S.x2Token;
 var rows = document.querySelectorAll('.coin-x2');
 for (var i = 0; i < rows.length; i++) rows[i].hidden = !(show && rows[i].getAttribute('data-sheet') === S.x2Sheet);
+cx2Fit();
+}
+function cx2Fit() {
+if (typeof document === 'undefined') return;
+var rows = document.querySelectorAll('.coin-x2');
+for (var i = 0; i < rows.length; i++) {
+var r = rows[i];
+r.removeAttribute('data-stack');
+if (r.hidden || !r.offsetWidth) continue;
+var bs = r.querySelectorAll('.mf-btn'), over = false;
+for (var j = 0; j < bs.length && !over; j++) over = bs[j].scrollWidth > bs[j].clientWidth + 1 || bs[j].scrollHeight > bs[j].clientHeight + 1;
+if (over) r.setAttribute('data-stack', '');
+}
 }
 function coinX2Click(ev) {
 var el = ev.target && ev.target.closest ? ev.target.closest('.cx2-yes, .cx2-no') : null;
@@ -17861,6 +17872,7 @@ btn.hidden = true;
 });
 });
 var cx2 = document.querySelectorAll('.coin-x2'); for (var cxi = 0; cxi < cx2.length; cxi++) on(cx2[cxi], 'click', coinX2Click);
+on(window, 'resize', cx2Fit);   /* [Task 8d 수정 1회차 I1] 2배 줄 나란히/쌓기는 폭 · 방향에 달려 있다 */
 on($('adv-map'), 'click', function () {
 closeModal('modal-adv');
 J.sfx.ui();
@@ -18113,7 +18125,14 @@ on($('sh-avatar'), 'click', openCharPanel);
 on($('sh-rec'), 'click', function () { J.sfx.ui(); openRank('endless'); });
 on($('sh-mission'), 'click', function () { openQuest('daily'); });   /* openQuest 가 ui 소리를 낸다 — 한 번만 */
 on(window, 'resize', function () { if (shopActive()) shopFitCards(); });
-var mmRefit = function () { ['mm-grid', 'th-grid'].forEach(function (id) { var g = $(id), m = g && g.closest ? g.closest('.modal') : null; if (m && !m.hidden) mmFitCols(g); }); };
+var mmRefitRaf = 0;
+var mmRefit = function () {
+if (mmRefitRaf) return;
+mmRefitRaf = requestAnimationFrame(function () {
+mmRefitRaf = 0;
+['mm-grid', 'th-grid'].forEach(function (id) { var g = $(id), m = g && g.closest ? g.closest('.modal') : null; if (m && !m.hidden) mmFitCols(g); });
+});
+};
 on(window, 'resize', mmRefit);
 try { if (document.fonts && document.fonts.ready) document.fonts.ready.then(mmRefit); } catch (e) {}
 try { if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { if (shopActive()) shopFitCards(); }); } catch (e) {}
