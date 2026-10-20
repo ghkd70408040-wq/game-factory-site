@@ -984,9 +984,11 @@ button {
 }
 /* 전투 HUD — 그림 실루엣을 따르는 빛. 각성이 폭주(mg/mg2)를 이기는 것은
    의도다: 폭주는 몇십 초를 가는 상태이고 각성은 7~10초짜리 사건이라, 겹치는
-   순간에 말해야 하는 것은 방금 일어난 쪽이다. */
-#app.battle.skill #duel-hud .dh-av-me      { animation: awk-av-glow 1.15s ease-in-out infinite; }
-#app.battle.skill-full #duel-hud .dh-av-me { animation: awk-av-glow 2.3s  ease-in-out infinite; }
+   순간에 말해야 하는 것은 방금 일어난 쪽이다.
+   [판정판 130 · Task 8e 수정 1 · I1] 이 빛은 값(변수 --dh-av-awk)으로만 둔다 — 같은 그림 상자의 숨쉬기 · 시전 · 맞음(<style id="play-8e"> 3절)이
+   자기 움직임 목록 맨 앞에 이 값을 같이 싣는다(animation 은 한 속성이라 한 규칙이 다 써야 둘 다 돈다). 값 · 특이도 싸움 0. */
+#app.battle.skill #duel-hud .dh-av-me      { --dh-av-awk: awk-av-glow 1.15s ease-in-out infinite; }
+#app.battle.skill-full #duel-hud .dh-av-me { --dh-av-awk: awk-av-glow 2.3s  ease-in-out infinite; }
 /* 폭주 — 값(반경·색·α)은 0901 원문 그대로 옮기고 기법만 box-shadow → drop-shadow. */
 #app.mg  #duel-hud .dh-av-me { filter: var(--dh-av-me-drop) drop-shadow(0 0 14px rgba(255, 150, 40, .55)); }
 #app.mg2 #duel-hud .dh-av-me { filter: var(--dh-av-me-drop) drop-shadow(0 0 20px rgba(255, 90, 30, .65)); }
@@ -8136,7 +8138,8 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
 /* 전투에서 자리를 비우는 둘. **숨김이지 삭제가 아니다**: .battle 은 battleOn()
    계보만 켜므로 TW_BATTLE=false 면 영영 안 켜지고, 세 모드는 이 줄을 지나지
    않는다. 시간은 #duel-timer 가, 점수는 .dh-dmg 가 대신 말한다 — 같은 사실이
-   화면에 두 번 서면 어느 쪽이 나를 죽이는지가 흐려진다(syncRushHud 의 규율). */
+   화면에 두 번 서면 어느 쪽이 나를 죽이는지가 흐려진다(syncRushHud 의 규율).
+   [판정판 130] .dh-dmg(점수 칸)는 은퇴했다 — 전투 화면은 점수를 따로 세우지 않는다(체력 · 공격 게이지 · 시간이 말한다). */
 #app.battle #tb-stats { display: none; }
 #app.battle #rush-timer { display: none; }
 /* 🚨 W6.5b ⑥ — 전투에서 `#hud-row` 의 34px 예약은 **영원히 빈 자리**다.
@@ -15304,7 +15307,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
       <!-- [판정판 130 · Task 8e] 공격 게이지 줄(시안 3 「ref-battle-gemini3-gauge」 그대로) — 영웅 체력 숫자(#duel-me-n) 자리에 [칼][공격][막대][%].
            채움 = me.atk / me.atkMax(syncDuel 의 --atk — 은퇴한 얇은 게이지와 같은 id · 같은 변수) · 「%」 = duelAtkPct(). 폰 세로 HUD · PC 가로 이름판 같은 부품.
            체력 숫자 #duel-me-n 은 숨긴다(값은 계속 쓴다 — syncDuel 무변). [판정판 130] 가운데 위 「성 + DMG」(#duel-dmg, 2026-08-19 ec10516 임시 HUD)는 은퇴. -->
-      <div id="duel-me-atkrow" class="dh-atkrow" aria-hidden="true"><i class="dh-atk-ic"></i><span class="dh-atk-t" data-i18n="act.attack">공격</span><span class="dh-atk-bar"><i id="duel-me-atk" class="dh-atk-fill"></i></span><b id="duel-me-atkpct" class="dh-atk-pct">0%</b></div>
+      <div id="duel-me-atkrow" class="dh-atkrow" role="progressbar" aria-labelledby="duel-me-atk-t" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i class="dh-atk-ic" aria-hidden="true"></i><span id="duel-me-atk-t" class="dh-atk-t" data-i18n="act.attack">공격</span><span class="dh-atk-bar" aria-hidden="true"><i id="duel-me-atk" class="dh-atk-fill"></i></span><b id="duel-me-atkpct" class="dh-atk-pct" aria-hidden="true">0%</b></div>
     </div>
     <!-- v2 HUD strip. Collapses to 0px when both children are [hidden] (no vertical
          padding of its own), so classic Endless / Daily keep the v1 board height. -->
@@ -27766,6 +27769,7 @@ window.TT_SFX = {
          **무엇인가 / 어떻게 차는가 / 쓰면 무슨 일이 일어나는가**.
          낱말은 하단 버튼 라벨(act.attack·act.special·act.pet·act.awaken)과
          미충전 토스트(duel.atkstat·duel.spstat·skill.notyet)와 **똑같이** 맞춘다 —
+         ([판정판 130] 공격 단추 · duel.atkstat 은퇴 — 첫 줄 「공격」 은 이름판 게이지 줄(act.attack 글자)과 낱말을 맞춘다. 단추는 셋)
          카드에서 "각성", 버튼에서 "awaken", 토스트에서 "게이지"라고 부르면 셋이
          같은 것인 줄 모른다. EN·KO 키 순서도 같게 유지한다. */
       'skills.title': 'Three buttons in battle',
@@ -29268,6 +29272,7 @@ window.TT_SFX = {
          **무엇인가 / 어떻게 차는가 / 쓰면 무슨 일이 일어나는가**.
          낱말은 하단 버튼 라벨(act.attack·act.special·act.pet·act.awaken)과
          미충전 토스트(duel.atkstat·duel.spstat·skill.notyet)와 **똑같이** 맞춘다 —
+         ([판정판 130] 공격 단추 · duel.atkstat 은퇴 — 첫 줄 「공격」 은 이름판 게이지 줄(act.attack 글자)과 낱말을 맞춘다. 단추는 셋)
          카드에서 "각성", 버튼에서 "awaken", 토스트에서 "게이지"라고 부르면 셋이
          같은 것인 줄 모른다. EN·KO 키 순서도 같게 유지한다. */
       'skills.title': '전투의 세 단추',
@@ -30830,9 +30835,10 @@ window.TT_SFX = {
        높이에 안 들어가면, 그 판에 한해 칸을 TILE_MIN 아래로 내려 맨 아랫줄이 #board-scroll{overflow:hidden} 에 조용히
        잘리지 않게 한다(바로 위 폭 예외와 같은 판단 — 덜 예쁜 칸이 잘린 줄보다 낫다). 세로는 battleStage() 가 null 이라
        이 갈래를 안 탄다. 읽기만 하고(계산된 스타일) 쓰기 전에 끝난다. */
-    /* [판정판 130 · 지휘자 답 Q7] 가로 창(battleStage() 가 서는 창)에서는 전투 밖 판 갈래도 같은 무대 판 상자 — 판은 굴리지 않고 상자 안에 다
-       들어오게 칸을 줄인다(844×390 클래식 10줄 = 상자 320px 에서 칸 29px). 세로 · 폰은 종전대로(TILE_MIN 하한 · 넘치면 판이 구른다). */
-    if (isFinite(byH) && byH > 0 && next > byH && battleStage()) next = byH;
+    /* [판정판 130 · Task 8e 수정 1 · I6 — 지휘자 판정] 전투 밖 판 갈래(클래식 · 아케이드 · 타임러시 · 데일리)는 가로 무대 판 상자에서도 칸 하한 =
+       TILE_MIN(폰과 같다) — 「추가」 로 줄이 늘어 상자에 안 들면 판 상자 안에서 굴러간다(#board-scroll 세로 스크롤 — play-8e 7절).
+       전투는 줄이 늘지 않으므로 위 [121] 예외(이 판에 한해 칸을 줄여 상자 안 · clip) 그대로다. 옛(8e 첫 커밋 34bef29): 모든 갈래에 이 예외. */
+    if (isFinite(byH) && byH > 0 && next > byH && battleOn() && battleStage()) next = byH;
     if (next < 12) next = 12;
     ts = next;
 
@@ -43687,7 +43693,14 @@ window.TT_SFX = {
        영웅 그림 상자의 단계(data-atk-tier 0~3, 구간 <.33 · <.66 · <1 · =1 — 브리프 그대로). 단계가 바뀔 때만 쓴다(dhText 와 같은 규율). */
     var mr = m.atkMax > 0 ? Math.min(1, m.atk / m.atkMax) : 0;
     dhVar(c, 'ma', 'duel-me-atk', '--atk', mr);
-    dhText(c, 'mp', 'duel-me-atkpct', duelAtkPct() + '%');
+    var mpct = duelAtkPct();
+    if (c.mp !== mpct) {
+      /* [수정 1 · M6] 화면 낭독기 — 게이지 줄은 role="progressbar"(이름 = 「공격」 글자 · aria-labelledby). 값이 바뀔 때만 글자 · 값 둘을 쓴다. */
+      c.mp = mpct;
+      setText('duel-me-atkpct', mpct + '%');
+      var mrow = $('duel-me-atkrow');
+      if (mrow) mrow.setAttribute('aria-valuenow', String(mpct));
+    }
     var tier = mr >= 1 ? '3' : mr >= 0.66 ? '2' : mr >= 0.33 ? '1' : '0';
     if (c.mt !== tier) {
       c.mt = tier;
@@ -43816,12 +43829,6 @@ window.TT_SFX = {
     }, 900);
   }
 
-  /**
-   * 내 자동 공격. duelTick 이 meArm && !S.busy && !fxBusy() 인 순간에만 부른다 —
-   * 리필 착지 → 공격 빔 → 데미지 숫자의 순서를 그 가드 하나가 보장한다.
-   * 초과분은 버리지 않고 이월한다: 자동 발동에서 캡 낭비는 실력이 아니라
-   * 타이밍 운이 되기 때문이다(이월분이 또 만땅이면 다음 조용한 틱에 재발동).
-   */
   /* [판정판 130 · Task 8e] 영웅 「시전」 연출 — 공격 순간(duelMeAttack) · 스킬 · 각성 · 펫소환을 실제로 쓴 순간에 같은 한 벌
      (시안 채택표 ref-battle-gemini 「공격 · 스킬 순간의 캐릭터 효과(마법 띠 · 별빛)」 · 사용자 「공격하거나 스킬을 쓸때 저런 효과연출」).
      JS 가 하는 일은 클래스 둘을 켜고 끄는 것뿐이다: 영웅 그림 상자 #duel-me-av.cast(내딛기 · 마법 띠 · 지팡이 쪽 별빛 — 형제
@@ -43829,18 +43836,25 @@ window.TT_SFX = {
      --mo-cast-life · --dur-2 토큰). 이미 켜져 있으면 끄고 다음 프레임에 다시 켠다(재시작 — void offsetWidth 금지 규칙 6).
      끄는 시각도 같은 토큰(invCssMs) — 리터럴 지속시간 0. 판 진행 중 DOM 생성 0. 전투가 아니면 아무것도 안 한다(모험 비전투 · 다른 모드 무변). */
   var meCastOffT = 0;
+  /* [수정 1 · M9] 시간 토큰(--mo-cast-life · --dur-2)은 처음 한 번만 읽는다 — invCssMs 는 getComputedStyle(documentElement)라 부를 때마다
+     스타일 재계산을 부를 수 있다. 토큰은 :root 고정 값이라 판 중에 안 바뀐다(움직임 줄이기 설정은 CSS 쪽 정적 대체가 맡는다). */
+  var meFxMs = null;
+  function meFxTimes() {
+    if (!meFxMs) meFxMs = { cast: invCssMs('--mo-cast-life', 700), d2: invCssMs('--dur-2', 260) };
+    return meFxMs;
+  }
   function meCastFx(btn) {
     if (!battleOn()) return;
     var av = $('duel-me-av');
     if (av && av.classList) {
-      var life = invCssMs('--mo-cast-life', 700);
+      var life = meFxTimes().cast;
       if (meCastOffT) { clearTimeout(meCastOffT); meCastOffT = 0; }
       var on = function () { av.classList.add('cast'); meCastOffT = setTimeout(function () { meCastOffT = 0; av.classList.remove('cast'); }, life); };
       if (av.classList.contains('cast')) { av.classList.remove('cast'); requestAnimationFrame(on); } else on();
     }
     if (btn && btn.classList) {
       /* 단추마다 자기 타이머(btn.__popT) — 두 단추를 잇달아 눌러도 서로의 끄기를 지우지 않는다. */
-      var pop = invCssMs('--dur-2', 260);
+      var pop = meFxTimes().d2;
       if (btn.__popT) { clearTimeout(btn.__popT); btn.__popT = 0; }
       var onB = function () { btn.classList.add('halo-pop'); btn.__popT = setTimeout(function () { btn.__popT = 0; btn.classList.remove('halo-pop'); }, pop); };
       if (btn.classList.contains('halo-pop')) { btn.classList.remove('halo-pop'); requestAnimationFrame(onB); } else onB();
@@ -43854,12 +43868,18 @@ window.TT_SFX = {
     if (!battleOn()) return;
     var av = $('duel-me-av');
     if (!av || !av.classList) return;
-    var life = invCssMs('--dur-2', 260);
+    var life = meFxTimes().d2;
     if (meHitOffT) { clearTimeout(meHitOffT); meHitOffT = 0; }
     var on = function () { av.classList.add('hit'); meHitOffT = setTimeout(function () { meHitOffT = 0; av.classList.remove('hit'); }, life); };
     if (av.classList.contains('hit')) { av.classList.remove('hit'); requestAnimationFrame(on); } else on();
   }
 
+  /**
+   * 내 자동 공격. duelTick 이 meArm && !S.busy && !fxBusy() 인 순간에만 부른다 —
+   * 리필 착지 → 공격 빔 → 데미지 숫자의 순서를 그 가드 하나가 보장한다.
+   * 초과분은 버리지 않고 이월한다: 자동 발동에서 캡 낭비는 실력이 아니라
+   * 타이밍 운이 되기 때문이다(이월분이 또 만땅이면 다음 조용한 틱에 재발동).
+   */
   function duelMeAttack() {
     var d = S.duel;
     if (!d || d.down) return;
@@ -53037,7 +53057,9 @@ window.TT_SFX = {
        이 자리는 `#app.battle #btn-add` 에 이미 깔려 있는 **공격 메달 그림**과
        기능(duelAtkInfo 게이지 안내)이 다시 일치한다 — 직전 파도의 "메달처럼
        생겼는데 줄이 추가되는 버튼" 타협이 여기서 해소된다.
-       나머지 셋은 battleOn() 그대로다 — 그림과 기능이 함께 전투 스킬이 된다. */
+       나머지 셋은 battleOn() 그대로다 — 그림과 기능이 함께 전투 스킬이 된다.
+       [판정판 130] 위 첫 단락은 이력이다 — 전투 #btn-add 는 은퇴(숨김 · 클릭 무시)했고 공격 메달 그림 · duelAtkInfo 안내도 함께 은퇴했다.
+       공격 게이지는 이름판 게이지 줄이 상시로 말하고, 다 차면 저절로 공격한다. */
     on($('btn-add'), 'click', function () { if (battleBoard()) return; doAdd(); });   /* [판정판 130] 전투에서는 단추가 은퇴(숨김) — 판 규약상 추가도 막힌다 */
     on($('btn-hint'), 'click', function () { if (battleOn()) doSpecial(); else doHint(); });
     on($('btn-undo'), 'click', function () { if (battleOn()) doPetSkill(); else doUndo(); });
@@ -54815,12 +54837,13 @@ window.TT_SFX = {
    품질은 64x64 타일최대 ΔE00 ≤ 3.0 관문이 골랐다(scratchpad/medal-0831).
    비율(0.7916)이 원판과 같아 background-size:contain · position:center bottom 은
    한 줄도 안 바뀐다 — 앛는 자리가 산술로 동일하다.
-   원판 8장은 catalog 에 그대로 남는다 — 되돌리기는 이름에서 "@3x" 삭제다. */
-#app.battle #btn-add.act::before    {background-image:url("catalog/medal-attack-ko@3x.webp");}
+   원판 8장은 catalog 에 그대로 남는다 — 되돌리기는 이름에서 "@3x" 삭제다.
+   [판정판 130 · Task 8e 수정 1 · I8] 공격 메달 두 줄(ko · en — medal-attack-ko@3x · -en@3x)은 은퇴: 전투 공격 단추(#btn-add)는 play-8e 1절에서
+   은퇴(display:none · 공격은 이름판 게이지 줄이 저절로)라 그림이 그려질 자리가 없다. 참조 0 → 배포 목록(catalog-allowlist)에서 두 장이 빠진다
+   (그림 예산 A2 차감 −42,016 B). 칼 아이콘은 언어 무관 원판 medal-attack-v3-90 을 쓴다. */
 #app.battle #btn-hint.act::before   {background-image:url("catalog/medal-special-ko@3x.webp");}
 #app.battle #btn-undo.act::before   {background-image:url("catalog/medal-pet-ko@3x.webp");}
 #app.battle #btn-shuffle.act::before{background-image:url("catalog/medal-awaken-ko@3x.webp");}
-html[lang="en"] #app.battle #btn-add.act::before    {background-image:url("catalog/medal-attack-en@3x.webp");}
 html[lang="en"] #app.battle #btn-hint.act::before   {background-image:url("catalog/medal-special-en@3x.webp");}
 html[lang="en"] #app.battle #btn-undo.act::before   {background-image:url("catalog/medal-pet-en@3x.webp");}
 html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catalog/medal-awaken-en@3x.webp");}
@@ -58021,18 +58044,8 @@ html[lang="en"] #app-intro .api-logo{
     /* [판정판 121 · 2026-10-17] 흐림 은퇴(사용자 「배경화면은 완전 블러처리돼서 감성도안살고」) — 흐림 가장자리 여유로 키워 두던
        transform: scale(1.12) 도 은퇴(이유가 없어졌다). 화면 배경은 그 화면의 또렷한 그림이다. */
   }
-  /* 메뉴는 자기 ::before 가 --art-menu-day-w 를 full-bleed 로 이미 깐다.
-     그래서 메뉴에서는 #pc-bg 가 배경을 그리지 않는다(빈 판 = 부수효과 0).
-     [판정판 121] 지도도 이제 창 전체(공용 hub-bars-121 · 그림 cover)라 #pc-bg 가 그리지 않는다 — 옛 지도 흐림 확장
-     (art-map-bg + blur(18px) saturate(.92) brightness(.60)) 은퇴. */
-  #screen-game.active ~ #pc-bg {
-    background-image: var(--art-menu-day-w);
-    filter: none;                /* [121] 은퇴: blur(20px) saturate(.90) brightness(.52) — 비전투 게임 화면 양옆도 또렷한 그림 */
-  }
-  #app.battle #screen-game.active ~ #pc-bg {
-    background-image: var(--art-map-bg);
-    filter: none;                /* [121] 은퇴: blur(20px) saturate(.95) brightness(.42) — 전투 가로는 battle-landscape 가 다시 깐다(판 뒤 어둡게 포함) */
-  }
+  /* [판정판 130 · Task 8e 수정 1 · I8] 게임 화면(#screen-game.active ~ #pc-bg)의 배경 두 줄(비전투 = 메뉴 낮 그림 · 전투 = 지도 그림)은 은퇴 —
+     가로 게임 화면은 모든 갈래가 battle-landscape 1절의 #pc-bg 한 장(판 뒤 어둡게 + 지도 그림)을 쓴다. 옛 값은 커밋 34bef29 의 이 자리. */
 
   /* ============================================================
      1. 메뉴 — 31-pc-design-menu.png
@@ -58066,289 +58079,13 @@ html[lang="en"] #app-intro .api-logo{
      흰 테 box-shadow · --map-bar = --mapui × 25.61)은 커밋 63159e0 의 이 절. */
 
   /* ============================================================
-     3. 인게임 — 31-pc-design-game.png / 4. 전투 — 31-pc-design-battle.png
+     3. 인게임 · 4. 전투 — [판정판 130 · Task 8e 수정 1 · I8] 은퇴
      ============================================================
-     한 그리드가 두 화면을 다 든다. 6행 고정 템플릿:
-
-       row1  상단바            (3열 span)
-       row2  캐릭터 카드(#pc-left)  |  전투에서는 #duel-hud (3열 span)
-       row3  콤보·피버         (#combo-wrap)
-       row4  미션·목표         (#hud-row)
-       row5  보스 상태         (#boss-bar)
-       row6  1fr 채움
-
-     row2 를 #pc-left 와 #duel-hud 가 나눠 쓰는 것이 요점이다 — 둘은 절대
-     공존하지 않는다(#duel-hud 는 비전투에서 [hidden], #pc-left 는 전투에서
-     #app.battle 이 접는다. 후자는 이미 있던 `#app.battle #hero-slot{display:none}`
-     과 같은 판정이다).
-
-     **DOM 을 옮기지 않는다.** 날개는 grid-area 배치로만 만든다: 세로로
-     돌아갈 때 되돌릴 이동이 없으므로 matchMedia 리스너도, 양방향 재부착도,
-     JS 롤백 밸브도 필요 없다. 겹침은 z-index 로 못 박는다(판 0 / 알맹이 1).
-
-     보드는 cqw 가 아니라 JS px 계산(layout()/boardMaxPx())이라 --board-max
-     한 값만 #board 에 얹으면 되고, resize 리스너가 이미 재계산을 물고 있다. */
-  #screen-game.active {
-    display: grid;
-    /* 중앙 열만 minmax 로 접힌다 — 900~1104px 구간에서 가로 넘침 0. */
-    grid-template-columns: 264px minmax(0, 520px) 264px;
-    grid-template-rows: auto auto auto auto auto 1fr;
-    column-gap: 28px;
-    /* [판정판 127] 줄 간격을 변수로 올렸다(값 10px 그대로) — 클래식은 상단바 줄이 높이 0 이라 왼쪽 카드(#pc-left · 2행)의 윗선이 곧 이 간격이고,
-       일시정지 단추 윗선(--pc-pause-y)이 같은 변수를 읽어 「카드 윗선 = 단추 윗선」 이 한 곳에서 나온다. */
-    --pc-row-gap: 10px;
-    row-gap: var(--pc-row-gap);
-    /* 264 + 28 + 520 + 28 + 264 = 1104 (설계 문서의 "1100" 은 합산 오차). */
-    width: 100%;
-    max-width: 1104px;
-    margin: 0 auto;
-    height: 100dvh;
-    max-height: 100dvh;
-  }
-  /* 전투 배경은 #pc-bg 가 full-bleed 로 든다 — 1104px 클러스터에만 깔리면
-     좌우 날개가 맨살이 된다. 기존 규칙의 그림만 끄고 그라데이션 스크림도
-     함께 내린다(단축 금지 → 롱핸드). */
-  #app.battle #screen-game.active {
-    background-image: none;
-  }
-
-  #screen-game.active #topbar {
-    grid-column: 1 / 4;
-    grid-row: 1;
-    /* 오른쪽 62px 은 #hero-slot 자리였다. 슬롯이 좌 날개로 갔으므로 회수. */
-    padding-right: calc(var(--safe-r) + 16px);
-    /* [판정판 127] 가로 클러스터에서 일시정지 단추가 앉는 자리 — 상단바 왼쪽 위 모서리에서 (x, y). 아래 상단바 padding 과 클래식 단추 자리(바로 아래
-       #app.classic … #btn-pause)가 이 두 수를 같이 읽는다. 렌더되는 소비처는 클래식 단추 규칙 하나뿐이다 — 상단바 padding 규칙은 클래식(kit-v2 의
-       `#app.classic #topbar{padding:0 !important}`)과 전투(아래 battle-landscape 의 `#app.battle … #topbar{padding:0}`) 둘 다에서 가려진 죽은 줄이라 값만 같이 읽는다(렌더 무변).
-       x = 12px: 옛 padding 규칙의 12px 그대로(아케이드 · 타임러시 · 데일리 단추 x 와 같다).
-       y = 카드 윗선: 줄 간격 변수(--pc-row-gap)를 읽는다 — 클래식은 접은 상단바 줄(높이 0) 바로 아래 왼쪽 카드가 서므로 카드 윗선 = 줄 간격(실측 10).
-       옛 padding 규칙의 6px 은 이 자리에 못 쓴다(단추 윗변이 카드 윗선보다 4px 위로 걸친다 — 지휘자 판정 2026-10-19). */
-    --pc-pause-x: 12px;
-    --pc-pause-y: var(--pc-row-gap);
-  }
-  /* 🚨 W10 ② — 세로에서 일시정지는 유리판 폭의 9.63% 로 시안 자리에 박히지만
-     (:6646·:35970), 가로에서는 그 셈이 성립하지 않는다: 상단바는 1/4 열을 통째로
-     쓰는데 유리판은 max-width:860px 로 **가운데 고정**이라 둘의 폭이 다르고,
-     1200px 화면에서 9.63% 는 115px 짜리 버튼이 된다. 가로에서는 W9 까지의
-     흐름 배치를 그대로 쓴다 — 세로 수리 전과 픽셀이 같다. */
-  /* [0908 ②] 클래식이 같은 정지 버튼 규칙을 쓰게 됐으므로 이 가로 예외도 함께
-     받는다 — 안 그러면 클래식 가로에서 --dh-w 셈이 그대로 살아 버튼이 커진다. */
-  /* [판정판 127] 이 padding 은 클래식(kit-v2 의 padding:0 !important)과 전투(battle-landscape 의 padding:0) 둘 다에서 가려진 줄 — 렌더 무변.
-     변수(--pc-pause-x · --pc-pause-y)를 읽는 것은 옛 padding 이 적으려던 자리 값을 한 곳에 남기려는 값 근거일 뿐이다. */
-  #app.battle #screen-game.active #topbar,
-  #app.classic #screen-game.active #topbar {
-    padding: calc(var(--safe-t) + var(--pc-pause-y)) calc(var(--safe-r) + 16px) 2px calc(var(--safe-l) + var(--pc-pause-x));
-  }
-  /* [hud-unify 0910] 아케이드·러시·데일리도 같은 버튼을 쓰게 됐으므로 이 가로
-     예외를 함께 받는다 — 안 그러면 1200px 화면에서 9.63% 가 115px 버튼이 된다
-     (바로 위 W10 ② 주석의 그 함정). */
-  #app.battle #screen-game.active #btn-pause,
-  #app.classic #screen-game.active #btn-pause,
-  #app:not(.classic):not(.battle) #screen-game.active #topbar #btn-pause {
-    position: relative;
-    left: auto; top: auto;
-    width: 40px !important; height: 40px !important;
-    aspect-ratio: auto;
-  }
-  /* [판정판 127 · 2026-10-19 · 사용자 「전체적으로 … 저급해 보이는 것들 전부 제대로」 안의 결함] 클래식 가로 — 일시정지 단추가 위로 20px 잘리던 것.
-     원인(실측 1280x720 · 1920x1080 · 2000x740 · 클래식의 세 종목 아케이드 · 타임러시 · 데일리 전부): 위 상단바 padding 규칙(옛 6px · 12px)은 클래식에서 한 번도 먹지 않았다.
-     클래식 상단바는 판을 접으려고 `#app.classic #topbar{height:0 !important; padding:0 !important}`(<style id="kit-v2"> 클래식 HUD 절 「#topbar 를 접고」)로
-     높이 0 · 패딩 0 이고 !important 라 여기 padding 이 진다. 그러면 위 규칙이 흐름에 되돌려 놓은 단추(40px)는 높이 0 인 flex 줄(align-items:center)의
-     자식이라 줄 가운데 y=0 에 걸려 상자 top −20 이 된다(세로 폰은 단추가 absolute 라 무관). 클래식이 아닌 아케이드 · 타임러시 · 데일리는 접지 않은 상단바라
-     같은 흐름 규칙이 바르게 먹는다(상자 top 10). 수리: 접은 상단바(높이 0 — 판 · 보드 자리는 그대로)는 두고 클래식 단추만 흐름 밖(absolute)에 놓는다. 자리는 위
-     두 변수(--pc-pause-x = 12px · --pc-pause-y = 카드 윗선 = 줄 간격)를 읽는다 — 위 padding 규칙도 같은 변수를 읽는다. 상단바가 position:relative 라 기준 상자는 상단바 왼쪽 위 모서리다.
-     전투(.battle)는 아래 battle-landscape 절이 자기 자리를 갖고 있어 이 줄과 무관하다. */
-  #app.classic #screen-game.active #btn-pause {
-    position: absolute;
-    left: calc(var(--safe-l) + var(--pc-pause-x));
-    top: calc(var(--safe-t) + var(--pc-pause-y));
-  }
-  #screen-game.active #tb-stats {
-    max-width: 660px;
-    margin: 0 auto;
-  }
-
-  /* ---- 3-a. 날개 판 (#pc-left / #pc-right) -------------------------------
-     #pc-left 는 캐릭터 카드 그 자체이고(비전투 row2), #pc-right 는 액션·메달
-     넷이 앉는 세로 프레임이다. 둘 다 z-index:0 — 알맹이(z:1)가 언제나 위. */
-  #screen-game.active #pc-left[data-wide-only],
-  #screen-game.active #pc-right[data-wide-only] {
-    display: block !important;   /* 기본 절 [data-wide-only]{display:none !important} 를 뚫는다 */
-    position: relative;
-    z-index: 0;
-  }
-  #screen-game.active #pc-left[data-wide-only] {
-    grid-column: 1;
-    grid-row: 2;
-    height: 200px;
-  }
-  /* 우 날개 판은 액션 넷을 **감싸는 만큼만** 높다(시안과 같은 비율). 높이를
-     실수로 쓴 것이 아니라 아래 두 줄에서 계산된 값이다:
-       비전투  4 x 76(.act) + 3 x 14(gap) + 32(padding) = 378
-       전투    4 x 94(메달)  + 3 x 10(gap) + 32(padding) = 438
-     span 안에 1fr 행(row6)이 들어 있으므로, 이 높이는 위쪽 자동 행들을
-     밀지 않는다 — 남는 몫은 전부 1fr 이 흡수한다. */
-  #screen-game.active #pc-right[data-wide-only] {
-    grid-column: 3;
-    grid-row: 2 / 7;
-    align-self: start;
-    height: 378px;
-  }
-  /* 전투에는 캐릭터 카드가 없다(#app.battle #hero-slot{display:none} 과 짝). */
-  #app.battle #screen-game.active #pc-left[data-wide-only] { display: none !important; }
-
-  /* ✅ 0901 ⑧b — 전투 좌측의 **빈 유리 상자 두 개**를 접는다.
-     row3(#combo-wrap)·row4(#hud-row)는 보드 옆 날개로 올라와 있는데, 전투에서는
-     둘 다 내용이 없다 — #hud-row 는 :6739 주석이 밝힌 대로 「영원히 빈 자리」
-     (미션·목표 칩이 전투에서 접힌다)이고, #combo-wrap 은 전투가 콤보가 아니라
-     빈 레일만 남는다. 그래서 1280x800 실측에서 「내용 없는 유리판 두 장」으로
-     보였다(증거 scratchpad/pc-0901/PC-battle-before.png).
-     바로 위 #pc-left 줄과 **같은 문법·같은 판정**이며, 미디어쿼리 안이라
-     세로(폰·태블릿)는 한 줄도 보지 못한다. 비전투 PC 도 그대로다. */
-  #app.battle #screen-game.active #combo-wrap,
-  #app.battle #screen-game.active #hud-row { display: none !important; }
-
-  /* 날개 유리 문법 — 판 넷이 같은 레시피를 쓴다(새 아트 0). */
-  #screen-game.active #pc-left[data-wide-only],
-  #screen-game.active #pc-right[data-wide-only],
-  #screen-game.active #combo-wrap,
-  #screen-game.active #hud-row,
-  #screen-game.active #boss-bar {
-    border-radius: 18px;
-    background-color: rgba(255, 255, 255, .10);
-    background-image: linear-gradient(180deg,
-                        rgba(255, 255, 255, .16) 0%,
-                        rgba(255, 255, 255, .05) 100%);
-    box-shadow:
-      inset 0 0 0 1.5px rgba(255, 255, 255, .28),
-      0 10px 26px rgba(16, 8, 32, .30);
-  }
-
-  /* ---- 3-b. 좌 날개 알맹이 ----------------------------------------------- */
-  /* 캐릭터: 슬롯을 44px 그대로 두고 2.6배로 확대한다. 안쪽 .hs-ring / #mascot
-     은 inset:0 절대배치라 슬롯을 늘리면 링만 타원으로 늘어난다 — 늘리지 않고
-     scale 로 키우는 것이 무손상 경로다(44 x 2.6 = 114.4px). */
-  #screen-game.active #hero-slot {
-    position: relative;
-    z-index: 1;
-    top: auto;
-    right: auto;
-    grid-column: 1;
-    grid-row: 2;
-    justify-self: center;
-    align-self: center;
-    transform: scale(2.6);
-  }
-  #screen-game.active #combo-wrap {
-    grid-column: 1;
-    grid-row: 3;
-    position: relative;
-    z-index: 1;
-    align-self: start;
-    height: auto;
-    min-height: 58px;
-    padding: 16px 16px 20px;
-  }
-  #screen-game.active #fever-bar {
-    left: 16px;
-    right: 16px;
-    bottom: 8px;
-  }
-  #screen-game.active #hud-row {
-    grid-column: 1;
-    grid-row: 4;
-    position: relative;
-    z-index: 1;
-    align-self: start;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
-    min-height: 58px;
-    padding: 14px 16px;
-  }
-  #screen-game.active #boss-bar {
-    grid-column: 1;
-    grid-row: 5;
-    position: relative;
-    z-index: 1;
-    align-self: start;
-    margin: 0;
-    padding: 14px 16px;
-  }
-
-  /* ---- 3-c. 보드 ---------------------------------------------------------
-     --board-max 를 #board 자신에게 얹는다. boardMaxPx() 가 읽는 곳이 정확히
-     여기이고(getComputedStyle(#board)), #board 의 max-width 도 같은 값을
-     본다 — 한 줄이 JS 와 CSS 두 소비자를 동시에 만족시킨다.
-     520px / 7열 / GAP 3 → floor((520 - 18) / 7) = 71px. */
-  #screen-game.active #board { --board-max: 520px; }
-  #screen-game.active #board-scroll {
-    grid-column: 2;
-    grid-row: 2 / 7;
-    min-height: 0;
-    padding-left: 0;
-    padding-right: 0;
-  }
-
-  /* ---- 3-d. 우 날개 = 액션 4종 세로 --------------------------------------
-     #actionbar 를 통째로 3열로 옮겨 재사용한다. 버튼 DOM·배지·상태 클래스
-     (.off/.urge)와 전투 메달 표피는 한 글자도 안 바뀐다. */
-  #screen-game.active #actionbar {
-    grid-column: 3;
-    grid-row: 2 / 7;
-    align-self: start;
-    position: relative;
-    z-index: 1;
-    flex-direction: column;
-    justify-content: flex-start;
-    gap: 14px;
-    padding: 16px;
-    /* 판 그리기는 #pc-right 한 장이 맡는다. 액션바 자신의 9-슬라이스 띠
-       (--lib-hud-bar / .jbox--strip)는 **가로 띠**로 구워진 그림이라 세로로
-       늘리면 줄무늬가 된다 — 그래서 이 화면에서만 벗긴다(원 규칙은 그대로 산다). */
-    background-color: transparent;
-    background-image: none;
-    border-top: 0;
-    border-style: none;
-    border-width: 0;
-    border-image-source: none;
-  }
-  #screen-game.active #actionbar .act {
-    flex: 0 0 auto;
-    width: 100%;
-    min-height: 76px;
-  }
-  /* 전투 메달: 기존 규칙이 gap/padding 을 !important 로 잠가 두었으므로
-     같은 무게로 맞선다(특이도는 이쪽이 위다). 메달 높이 94px 은 그대로 둔다. */
-  #app.battle #screen-game.active #actionbar {
-    gap: 10px !important;
-    padding: 16px !important;
-    border-style: none !important;
-    border-width: 0 !important;
-    border-image-source: none !important;
-    background-color: transparent !important;
-    background-image: none !important;
-  }
-  /* 메달 높이를 94px 로 못 박는다. 기존 규칙은 @media(max-height:739/659) 에서
-     80/70 으로 줄지만, 그러면 위 #pc-right 의 438px 계산이 어긋난다. PC 분기의
-     세로 예산은 항상 넉넉하므로(1280x800 기준 보드 열 452px) 94 로 고정한다. */
-  #app.battle #screen-game.active #actionbar .act { height: 94px !important; }
-
-  /* ---- 4. 전투 전용 재배치 ------------------------------------------------ */
-  /* HUD 는 상단 유지 + 폭만 캡. container-type:inline-size 는 그대로 둔다 —
-     폭을 860 으로 묶으면 안쪽 %·cqw 좌표계(아바타·HP바·타이머 유리)가
-     무손상으로 함께 축소된다. aspect 1536/500 → 높이 279.9px. */
-  #app.battle #screen-game.active #duel-hud {
-    grid-column: 1 / 4;
-    grid-row: 2;
-  }
-  /* 메달을 하단에서 우 날개로 빼면 세로 예산 111px 이 보드로 돌아온다. */
-  #app.battle #screen-game.active #board-scroll,
-  #app.battle #screen-game.active #pc-right[data-wide-only],
-  #app.battle #screen-game.active #actionbar {
-    grid-row: 3 / 7;
-  }
-  #app.battle #screen-game.active #pc-right[data-wide-only] { height: 438px; }
+     가로 게임 화면은 모든 갈래(전투 · 클래식 · 아케이드 · 타임러시 · 데일리)가 battle-landscape · play-8e 의 무대 짜임(1280×720 자 ·
+     판 상자 · 두 기둥 카드 · 두 두루마리)을 쓴다. 옛 3열 격자(264 | 520 | 264) · 날개 판(#pc-left · #pc-right 유리 · 높이 200/378/438) ·
+     초상 반지 확대(#hero-slot scale 2.6) · 오른쪽 「+ 추가」 세로 단추 판(#actionbar 3열) · 콤보 · 칩 줄 · 보스 날개 · 날개 유리 문법은
+     그 짜임에 모두 덮여 렌더에 닿지 않던 줄이라 지웠다(지운 전 · 후 계산된 스타일 차이 0 — scratchpad/rc1017/t8e/fix1/styldiff.py).
+     옛 값은 커밋 34bef29 의 이 절. */
 }
 </style>
 
@@ -68233,8 +67970,9 @@ var L=("jelly-box-c,duel-title-play,sian2-ribbon,sian2-btn-pink,sian2-btn-purple
       /* W6.5b — 메달 v3(언어별 명패 합성본)으로 교체. 구판 넉 장은 파일로 남지만
    화면 참조가 0 이라 데울 이유가 없다. 현재 언어 넉 장만 데운다(en 은 그때 받는다).
       +"duel-medal-attack,duel-medal-special,duel-medal-pet,duel-medal-awaken," */
-      +"medal-attack-ko@3x,medal-special-ko@3x,medal-pet-ko@3x,medal-awaken-ko@3x,"
-      +"hud-btn-pause,"           /* 3단계: duel-hpbar-bone·-wing 은 참조 0 · [판정판 121 Task 6b] 일시정지 그림 duel-btn-pause → hud-btn-pause */
+      /* [판정판 130 · Task 8e 수정 1 · I8] medal-attack-ko@3x 는 뺐다 — 전투 공격 단추 은퇴로 그림 참조 0(데우면 쓰지 않을 20,676 B 를 받는다). */
+      +"medal-special-ko@3x,medal-pet-ko@3x,medal-awaken-ko@3x,"
+      +"hud-btn-pause,"         /* 3단계: duel-hpbar-bone·-wing 은 참조 0 · [판정판 121 Task 6b] 일시정지 그림 duel-btn-pause → hud-btn-pause */
       +"duel-castle-hd,duel-demon-full,"   /* 3단계: duel-cloud-big/-baby 는 참조 0 */
 /* W4 — 타이머 젤리 숫자 글리프 11장(172x209 공통 캔버스). 전투에 들어서는 순간
    네 자리가 동시에 뜨므로 전투 조각들과 같은 묶음 끝에 둔다. 못 데워도 무해하다
@@ -68848,7 +68586,8 @@ else window.addEventListener("load",function(){ loaded=1; maybe(); armSafety(); 
 /* 전투에서 자리를 비우는 둘. **숨김이지 삭제가 아니다**: .battle 은 battleOn()
    계보만 켜므로 TW_BATTLE=false 면 영영 안 켜지고, 세 모드는 이 줄을 지나지
    않는다. 시간은 #duel-timer 가, 점수는 .dh-dmg 가 대신 말한다 — 같은 사실이
-   화면에 두 번 서면 어느 쪽이 나를 죽이는지가 흐려진다(syncRushHud 의 규율). */
+   화면에 두 번 서면 어느 쪽이 나를 죽이는지가 흐려진다(syncRushHud 의 규율).
+   [판정판 130] .dh-dmg(점수 칸)는 은퇴했다 — 전투 화면은 점수를 따로 세우지 않는다(체력 · 공격 게이지 · 시간이 말한다). */
 #app.battle #tb-stats { display: none; }
 /* ---- 실기기 반려 ①④ (0819) — 배경 원화 · 상단 이중 HUD 정리 -----------------
    ① "인게임 배경이 검정이다."
@@ -70094,7 +69833,8 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
    — scratchpad/release-0925/fix3/fix3b/diag-hp-f-2.json · smoke-fix3b f. */
 /* [Task 7a 수정 1회차] 체력 숫자(.dh-num) · 빗금 「/」(.dh-sl) · Lv 알약(.dh-lv)은 위 안 A · 판정판 값 그대로(2.83cqw · .85em · 2.50cqw) — 이 셋에는 하한을 걸지 않는다:
    빗금은 숫자 크기의 .85배라 숫자가 하한으로 커지면 빗금도 따라가 smoke-fix3b f 의 잉크 줄(360 위 0)이 깨지고, Lv 알약은 상자 잘림 1.5~2.1px 이 생긴다.
-   (전투 HUD 글자는 이미 된 곳 — 지휘자 판정 2026-10-18. 360 에서 숫자 10.19 · 빗금 8.66 · Lv 9.0px, 390 에서 빗금 9.38 · Lv 9.75px 는 하한 11px 아래로 남는다 — 보고 우려). */
+   (전투 HUD 글자는 이미 된 곳 — 지휘자 판정 2026-10-18. 360 에서 숫자 10.19 · 빗금 8.66 · Lv 9.0px, 390 에서 빗금 9.38 · Lv 9.75px 는 하한 11px 아래로 남는다 — 보고 우려).
+   [판정판 130 · Task 8e] 위 예외는 해소됐다 — Lv 알약(.dh-lv)은 은퇴, 숫자 · 빗금은 이름판 띠를 .8cqw 넓혀 하한(--text-min)을 건다(play-8e 2절 · 세로 아래 판 9조각). */
 #app.battle #duel-hud .dh-num{
   inset:auto;
   top:30.3cqw;height:2.44cqw;
@@ -70435,58 +70175,10 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
 
 }   /* @media 세로 끝 */
 
-/* ---- 9. 가로(데스크톱) ---------------------------------------------------
-   상단바가 1104px 그리드 행이라 판을 cqw 로 앉히면 213px 이 된다(§pc-landscape
-   의 W10 ② 가 정지 버튼에서 이미 밝힌 그 함정). 그래서 가로에서는
-     · 판  = 흐름 상자에 깔리는 **띠 한 겹**(같은 자산, 상자에 맞춰 늘어난다)
-     · 버튼 = 위 pc-landscape 예외가 battle·classic 과 같은 줄에서 40px 로 되돌린다
-     · 칸  = 같은 capsule 부품, 다만 22px 행 높이에 맞춘 알약 비율
-   세 모드가 세로와 **같은 부품·같은 색**을 쓰되 자리만 그 화면의 것이다. */
-@media (min-aspect-ratio: 1/1) and (min-width: 900px){
-  #app:not(.classic):not(.battle) #screen-game.active #topbar{
-    border-image-source: none;
-    border-style: none;
-    border-width: 0;
-    background: none;
-    position: relative;
-  }
-  /* 판은 **같은 노드·같은 자산**이다 — 세로에서는 시안 비율(19.30cqw)로 서고,
-     가로에서는 상단바 상자에 맞춰 늘어난다. 서리유리 판이라 세로로 펴져도
-     형상이 안 바뀐다(:47010 glass-band-v2 절이 같은 판정을 이미 적었다).
-     노드를 지우지 않는 것이 요점이다: 레이아웃 관문이 네 뷰포트에서 같은
-     상자를 재고, 「가로에선 판이 없다」는 구멍이 안 생긴다. */
-  #app:not(.classic):not(.battle) #screen-game.active #topbar > [data-part="hud-plate"][data-variant="top"]{
-    display: block;
-    position: absolute;
-    inset: 0;
-    left: 0; top: 0; width: auto; height: auto;
-    z-index: 0;
-    pointer-events: none;
-    background-image: var(--hud-plate-top);
-    background-repeat: no-repeat;
-    background-size: 100% 100%;
-    filter: none;
-  }
-  /* 절대배치 판이 정적 형제 위에 칠해지지 않도록 알맹이를 한 층 올린다. */
-  #app:not(.classic):not(.battle) #screen-game.active #topbar > #tb-stats{ position: relative; z-index: 2; }
-  #app:not(.classic):not(.battle) #screen-game #tb-stats .stat{
-    --wcap-w: 200px;                 /* 모양비 계산에만 쓰인다 — 폭은 격자가 정한다 */
-    --wcap-h: 22px;
-    --wcap-face: var(--mode-b-face);
-    --wcap-face-top: var(--role-wcap-face-top-classic-cap);
-    --wcap-a-in: .657;
-    --wcap-L3-line: var(--mode-b-outline);
-    --wcap-rim-c: var(--mode-b-rim);
-    --wcap-glow-c: var(--mode-b-glow-bubble);
-    width: auto;
-    height: 22px;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 8px;
-    border-radius: 11px;
-    overflow: visible;
-  }
-}
+/* ---- 9. 가로(데스크톱) — [판정판 130 · Task 8e 수정 1 · I8] 은퇴 ------------------------------------------------
+   가로(창 가로 ≥ 세로) 판 화면은 아케이드 · 타임러시 · 데일리도 전투와 같은 무대 짜임이다(<style id="play-8e"> 8절 — 일시정지 (24,16) ·
+   왼쪽 카드 점수판 · 가운데 위 시계). 이 절의 상단바 띠 판 · 흐름 상자 · 22px 알약(--wcap-w 200px · --wcap-h 22px)은 그 짜임에 덮였거나
+   무대 자를 안 따르는 값이라 지웠다. 옛 값은 커밋 34bef29 의 이 절. */
 </style>
 <style id="compat-p1">
 /* [E60-0908 기기 폴백 P1] 컨테이너 단위(cqw)·color-mix()·shape() 를 모르는 기기(iOS 15.x / Chrome 104 급) 폴백.
@@ -72901,7 +72593,8 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
        그림 상자  x 44~344 / 936~1236 · y 128~404(300×276) — contain · 아래 가운데. 아래 8bu 는 이름 판이 덮는다(지휘자 판정 Q2:
                   포도 · 소다 · 딸기 전신은 원본부터 발이 잘려 있다 — 두 카드 같은 규칙으로 발 끝을 판 뒤로). 몸 높이 보정 --bt-art-k
        둥근 칩    지름 84 · 그림 상자 바깥 위 모서리 안쪽(악당 = 왼쪽 위 얼굴 #duel-foe-chip · 영웅 = 오른쪽 위 펫 #duel-baby)
-       이름 판    y 396~485 · 폭 324(x 32~356 / 924~1248) — 이름 · Lv · 체력 막대(악당 빨강 · 영웅 하늘) · 숫자 · 게이지.
+       이름 판    y 396~485 · 폭 324(x 32~356 / 924~1248) — 이름 · 체력 막대(악당 빨강 · 영웅 하늘) · 숫자(영웅 = 공격 게이지 줄) · 게이지
+                  ([판정판 130] Lv 칸은 은퇴).
                   [수정 1회차 I1] 판 안은 같은 부품 · 같은 기하(막대 252bu 판 가운데 = 악당 68~320 · 영웅 960~1212 · 숫자 막대 왼끝 + 16.8
                   왼쪽 맞춤), 장식만 각자(뼈 · 날개 — 그린 대로 막대 끝에)
        아래 상자  x 44~344 / 936~1236 · y 497~700(300×203) — 두 판 = 같은 젤리 유리 판(악당 #duel-foe-box · 영웅 #duel-me-box).
@@ -72929,7 +72622,7 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
        #duel-baby left/top/width · #duel-timer left/top/width/height/--wcap-w/--wcap-h/font-size ·
        .dh-cap left/top/width/height · .dh-plate(--top/--bot) left/top/width/height · filter · mask.
      **덮지 않는 것**: .dh-cap 의 filter drop-shadow(0 .5cqw .5cqw) 하나 — cqw 미지원 기기에서는 캡슐 그림자만 빠진다
-     (세로와 같은 사정). 막대 채움 · 공격 게이지 · 이름 상자 · Lv 알약은 .dh-side 의 % 라 컨테이너 질의와 무관하다.
+     (세로와 같은 사정). 막대 채움 · 공격 게이지 · 이름 상자는 .dh-side 의 % 라 컨테이너 질의와 무관하다([판정판 130] Lv 알약은 은퇴).
    ⚠ 세로(폰 · play.html 기둥 480×1080)는 이 미디어쿼리를 못 본다 — 한 줄도 안 바뀐다.
    ⚠ 새 움직임 0(transition·animation 없음). 판 뒤 어둡게는 정적 그라데이션 한 겹.
    JS 짝: battleStage()(아래 :root 의 무대 · 판 상자 수를 읽는다) → battleRows() 가로 갈래 · layout() 가로 회전 칸 하한 예외 ·
@@ -73188,7 +72881,7 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
     --bt-fx: calc(var(--bt-mx) - var(--bu) * 892);
     --bt-fy: var(--bt-my);
   }
-  /* 6-0. 진영 판(plate) — [리뷰 M-1] 이름 · Lv · 체력 막대 · 숫자 뒤에 HUD 와 같은 재질(Mode B 면 · 알파 · 겉선 · 림 토큰)의
+  /* 6-0. 진영 판(plate) — [리뷰 M-1] 이름 · 체력 막대 · 숫자([판정판 130] Lv 은퇴 · 영웅 숫자 자리 = 공격 게이지 줄) 뒤에 HUD 와 같은 재질(Mode B 면 · 알파 · 겉선 · 림 토큰)의
      둥근 판 한 장. 세로의 띠 판 그림 둘(가로 띠 — 늘리면 줄무늬, 계약 ⑦-7)은 그림을 벗기고 이 판으로 쓴다:
      .dh-plate--bot = 악당 판 · .dh-plate--top = 영웅 판. 크기 = 진영 무리(22.995~32.74cqw = 9.745) + 위아래 8 · 폭 324.
      판은 그림(z 2) 위 · 홈 · 장식(z 3, DOM 뒤라 위) · 진영 상자(z 4 · 5) · 눈금 · 숫자(z 6) 아래라, 악당 그림 아래 끝 8bu(발
@@ -73347,16 +73040,20 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
     /* [Task 6b] 상자 = 영웅 카드 아래 상자(x 936~1236 · y 497~700 · 300×203) — 악당 아래 판 #duel-foe-box 와 같은 크기 · 같은 위 끝.
        메달 2×2 는 그 안 가운데: 2H + .11H = 203 → H = 96.21(간격 비 .11H 그대로). 메달 그림 폭 W = H × 718/907.
        터치 상자 폭은 max(--touch-min, W)(지휘자 판정 P5) — 844×390 에서 그림 폭 41.3px 라 그림 비로는 44 가 안 된다. 그림은 그대로
-       (::before contain · 아래 가운데). 옛 값: H 120.5 · 위 끝 440 · 상자 = 메달 묶음 크기. */
-    --bt-medal-h: calc(var(--bu) * 203 / 2.11);
+       (::before contain · 아래 가운데). 옛 값: H 120.5 · 위 끝 440 · 상자 = 메달 묶음 크기.
+       [판정판 130 · Task 8e 수정 1 · I4 — 지휘자 판정] 상자 = 두루마리 판(#duel-me-box)의 **글자 안전 상자**(play-8e 5절 ⑤ 여백 위 34 · 오른쪽 46 ·
+       아래 34 · 왼쪽 43 → x 979~1190 · y 531~666 · 211×135). 두 줄: 2H + .11H = 135 → H = 63.98(위 막대 · 아래 끝을 안 덮는다).
+       터치 상자 폭 하한(--touch-min)은 굵은 포인터(터치)에서만 — PC(가는 포인터)는 그림 폭 그대로 줄여서 넣는다(아래 @media (pointer: coarse)).
+       옛 값(Task 6b · 8e): 상자 = 두루마리 겉 상자 300×203 · H = 203/2.11 = 96.21 · 하한 늘 max(--touch-min, W). */
+    --bt-medal-h: calc(var(--bu) * 135 / 2.11);
     --bt-medal-w: calc(var(--bt-medal-h) * 718 / 907);
     --bt-medal-g: calc(var(--bt-medal-h) * .11);
-    --bt-medal-tw: max(var(--touch-min), var(--bt-medal-w));
+    --bt-medal-tw: var(--bt-medal-w);
     position: absolute;
-    left: calc(var(--bt-x0) + var(--bu) * 936);
-    top: calc(var(--bt-y0) + var(--bu) * 497);
-    width: calc(var(--bu) * 300);
-    height: calc(var(--bu) * 203);
+    left: calc(var(--bt-x0) + var(--bu) * 979);
+    top: calc(var(--bt-y0) + var(--bu) * 531);
+    width: calc(var(--bu) * 211);
+    height: calc(var(--bu) * 135);
     z-index: 1;
     display: grid;
     grid-template-columns: var(--bt-medal-tw) var(--bt-medal-tw);
@@ -73416,10 +73113,15 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
    reduced-motion = 움직임 0 + 단계별 정적 빛(6절). 새 색 0 — 전부 기존 토큰(공격 게이지 분홍 --prim-art-pink → 주황 --role-me-atk-b · 홈 --role-foe-track ·
    금 --prim-art-gold 계 · 맞음 빨강 --role-foe-fill-a). 7 · 8절 = 판 화면(클래식 · 아케이드 · 타임러시 · 데일리) PC 짜임 — 지휘자 답 2026-10-20.
    상태 전이표 = docs/MOTION-SPEC.md §3 27~30행.
+   [수정 1 · M4] 선택자 앞머리 `:is(#app.battle, #app:not(.battle))` 는 뜻으로는 「모든 갈래의 #app」 이다 — `#app` 하나로 쓰지 않는 것은
+   특이도를 전투 규칙(#app.battle = 1,1,0)과 같게 맞춰 옛 규칙과의 순위를 바꾸지 않으려는 것뿐이다(battle-landscape · 이 블록 공통).
    ============================================================================ */
 :root {
   /* 시전 연출(공격 순간 · 스킬 사용) 한 번의 수명. 진입 80ms(내딛기) · 복귀 160ms(돌아오기) — 키프레임 %는 이 셋의 비율(80/700 = 11.43% ·
-     (700−160)/700 = 77.14%). JS meCastFx 가 같은 토큰으로 클래스를 끈다(invCssMs). */
+     (700−160)/700 = 77.14%). JS meCastFx 가 같은 토큰으로 클래스를 끈다(invCssMs).
+     [수정 1 · M3] --mo-cast-in · --mo-cast-out 은 CSS 가 직접 읽지 않는 **값 근거**다(@keyframes 의 % 는 변수를 못 받는다) — 셋 중 하나를 바꾸면
+     아래 키프레임 다섯(b8e-step · 폰 b8e-step-t · b8e-trail-l · b8e-trail-r · b8e-burst)의 11.43% · 77.14% 를 함께 바꾼다. smoke-battle-up b17 이 이 식과
+     키프레임 % 를 대조한다(어긋나면 FAIL). */
   --mo-cast-life: 700ms;
   --mo-cast-in: 80ms;
   --mo-cast-out: 160ms;
@@ -73461,16 +73163,18 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
   color: var(--prim-ink);
   text-shadow: 0 0 .25em var(--prim-white), 0 .06em 0 var(--prim-white-a90);
 }
-/* 칼 = 지금 공격 단추 그림(medal-attack — ba 의 그림)을 작게 다시 쓴다: 둥근 창으로 칼 부분만(그림 360×455 의 칼 가운데 182,210 · 폭 200). */
+/* 칼 = 공격 메달 그림을 작게 다시 쓴다: 둥근 창으로 칼 부분만. [수정 1 · M8 · I8] 그림 = 언어 무관 원판 아이콘 medal-attack-v3-90(69×90 ·
+   명패 글자 없음 — 규칙 카드 첫 줄과 같은 파일)이라 ko · en 같은 그림이 규약대로다. 옛: medal-attack-ko@3x(ko 명패 판 — 전투 공격 단추 은퇴로
+   이 칼 하나만 남아 en 에서도 ko 그림을 읽던 것). 칼 가운데(35, 46 / 69×90) → 창 가운데: 위치 52% 52% · 크기 180%. */
 #app.battle #duel-hud #duel-me-atkrow .dh-atk-ic {
   flex: 0 0 auto;
   height: 100%;
   aspect-ratio: 1;
   border-radius: 50%;
-  background-image: url("catalog/medal-attack-ko@3x.webp");
+  background-image: url("catalog/medal-attack-v3-90.webp");
   background-repeat: no-repeat;
   background-size: 180% auto;
-  background-position: 51% 43%;
+  background-position: 52% 52%;
   box-shadow: 0 0 0 .18cqw var(--prim-white-a90);
 }
 #app.battle #duel-hud #duel-me-atkrow .dh-atk-t {
@@ -73508,7 +73212,10 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
   font-variant-numeric: tabular-nums;
 }
 /* ⑥ 악당 체력 숫자 — 띠 높이 + .8 · 숫자 · 빗금 둘 다 하한 11px(빗금 .85em 이 하한 아래로 내려가지 않게). 잉크 가운데 올림(padding .1em)은 그대로. */
-#app.battle #duel-hud .dh-num { height: calc((2.44 + var(--b8e-dy)) * 1cqw); font-size: max(var(--text-min), 2.83cqw); }
+/* [수정 1 · I2 회귀 smoke-fix2 f2-3] 숫자 상자는 띠보다 .12cqw 덜 넓힌다(--b8e-ny .68): 480 폭에서 상자 아래 끝(30.3 + 3.24 = 33.54cqw)이 HUD 상자
+   아래 끝(칩 줄 위 끝 33.44cqw)을 .5px 넘어 빈 칩 줄 상자에 닿았다. 잉크는 그대로 띠 안(위 · 아래 ≥1px — fix2 f2-5 · fix3b f). */
+#app.battle #duel-hud { --b8e-ny: .68; }
+#app.battle #duel-hud .dh-num { height: calc((2.44 + var(--b8e-ny)) * 1cqw); font-size: max(var(--text-min), 2.83cqw); }
 #app.battle #duel-hud .dh-num .dh-sl { font-size: max(var(--text-min), .85em); }
 @media not all and (min-aspect-ratio: 1/1) {
   /* 세로 아래 판 = 9조각(위 200 · 아래 70 그림 px, 좌우 0) — 가운데 9px 면 줄만 늘어난다. 폭 비(99.35cqw / 1683) 그대로라 위 · 아래 조각은 무변형. */
@@ -73558,8 +73265,10 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
 }
 #app.battle #duel-hud #duel-me-fx { z-index: 7; }
 #app.battle #duel-hud #duel-me-fx > i { position: absolute; display: block; pointer-events: none; }
-/* 단계 0~3 숨쉬기 — translate 는 transform 과 따로 합성된다(그림 상자의 --me-flip transform 무접촉). */
-#app.battle #duel-hud #duel-me-av[data-atk-tier] { animation: b8e-breathe var(--dur-amb) ease-in-out infinite alternate; }
+/* 단계 0~3 숨쉬기 — translate 는 transform 과 따로 합성된다(그림 상자의 --me-flip transform 무접촉).
+   [수정 1 · I1] 목록 맨 앞 = 옛 각성 · 만땅 대기 초상 빛(--dh-av-awk · @keyframes awk-av-glow 절 — 판정판 14 「만땅 대기」 신호 · 반려 안 된 부품). 상태가 아니면 none.
+   숨쉬기 · 시전 · 맞음 세 규칙이 같은 값을 맨 앞에 싣는다 — 셋 중 무엇이 서도 초상 빛은 끊기지 않는다. */
+#app.battle #duel-hud #duel-me-av { animation: var(--dh-av-awk, none), b8e-breathe var(--dur-amb) ease-in-out infinite alternate; }
 @keyframes b8e-breathe { from { translate: 0 0; } to { translate: 0 -1%; } }
 /* 단계 1 — 옅은 빛 원 맥동 · 단계 2 · 3 — 강한 빛 */
 #app.battle #duel-hud #duel-me-av[data-atk-tier="1"] ~ #duel-me-glow {
@@ -73600,7 +73309,7 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
 #app.battle #duel-hud #duel-me-fx .mfx-spark--2 { animation-delay: calc(var(--dur-amb) * -1) !important; }
 @keyframes b8e-orbit { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 /* 시전(.cast — JS meCastFx 가 --mo-cast-life 동안 켠다): 내딛기 · 마법 띠 · 지팡이 쪽 별빛 */
-#app.battle #duel-hud #duel-me-av.cast { animation: b8e-step var(--mo-cast-life) var(--ease-out) 1; }
+#app.battle #duel-hud #duel-me-av.cast { animation: var(--dh-av-awk, none), b8e-step var(--mo-cast-life) var(--ease-out) 1; }
 @keyframes b8e-step {
   0%     { translate: 0 0; scale: 1; }
   11.43% { translate: -6% 0; scale: 1.06; }
@@ -73652,7 +73361,7 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
 }
 /* [지휘자 답 Q4 · 채택표 「(말로)」 「맞으면 움찔 + 빨간 번쩍」] 맞은 순간(.hit — JS meHitFx, --dur-2): 그림이 악당 반대쪽으로 움찔(rotate · translate)
    + 그림 상자 위 빨간 번쩍(#duel-me-fx::before opacity). 숨쉬기 · 시전보다 뒤(같은 특이도 — 뒤 규칙이 이긴다). 색 = 악당 체력 채움 토큰(빨강). */
-#app.battle #duel-hud #duel-me-av.hit { animation: b8e-flinch var(--dur-2) var(--ease-out) 1; }
+#app.battle #duel-hud #duel-me-av.hit { animation: var(--dh-av-awk, none), b8e-flinch var(--dur-2) var(--ease-out) 1; }
 @keyframes b8e-flinch {
   0%   { rotate: 0deg;  translate: 0 0; }
   30%  { rotate: 5deg;  translate: 4% 0; }
@@ -73748,7 +73457,31 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
 /* 폰(세로)은 별빛 수를 가로의 절반으로(채택표 「폰은 별빛 수를 줄인다」) — 그림 상자 둘레 2 → 1 · 후광 2 → 1. */
 @media not all and (min-aspect-ratio: 1/1) {
   #app.battle #duel-hud #duel-me-fx .mfx-spark--2,
-  #app.battle #actionbar .act .act-halo .ah-spark--2 { display: none !important; }
+  #app.battle #actionbar .act .act-halo .ah-spark--2,
+  #app.battle #duel-hud #duel-me-fx .mfx-trail--r { display: none !important; }   /* [수정 1 · I3] 시전 마법 띠도 폰은 하나(왼쪽 — 악당 쪽으로 휘감는 띠) */
+  /* [수정 1 · I3 — 채택표 「연쇄 구간 FPS 를 CPU 4배 감속에서 재서 통과해야 넣는다」] 폰은 끝없이 도는 효과 넷(숨쉬기 · 빛 원 맥동 ·
+     별빛 공전 · 후광 빛줄기 회전/반짝임)을 정적 대체로 둔다(움직임 줄이기 6절과 같은 모양 — 단계별 빛 · 별 · 빛줄기는 보인다).
+     한 번씩 도는 시전 · 맞음 · 후광 퍼짐은 그대로(공격 · 스킬 순간 효과). 옛 초상 빛(awk-av-glow — 반려 안 된 부품)은 그대로 돈다.
+     실측(390x844@2 · CPU 4× · 연쇄 20초 · 판 번갈아 5회 중앙값) = 보고 task-8e-report.md 수정 1회차 I3 표. PC 는 무변. */
+  #app.battle #duel-hud #duel-me-av { animation: var(--dh-av-awk, none); }
+  /* 시전 내딛기 = 옆걸음만(scale 1.06 빼기) — 실측: 빛(filter)이 도는 그림 상자를 키웠다 줄이면 매 프레임 다시 그려 50ms 넘는 프레임이 는다
+     (같은 조건 3회 44 · 37 · 48 → 옆걸음만 39 · 25 · 25 — fix1/perf-i3split2.json). 키프레임 % 는 b8e-step 과 같다(M3 — b17 대조). */
+  #app.battle #duel-hud #duel-me-av.cast { animation: var(--dh-av-awk, none), b8e-step-t var(--mo-cast-life) var(--ease-out) 1; }
+  @keyframes b8e-step-t {
+    0%     { translate: 0 0; }
+    11.43% { translate: -6% 0; }
+    77.14% { translate: -6% 0; }
+    100%   { translate: 0 0; }
+  }
+  #app.battle #duel-hud #duel-me-av[data-atk-tier="1"] ~ #duel-me-glow { animation: none; opacity: var(--mo-mk-45); }
+  #app.battle #duel-hud #duel-me-av[data-atk-tier="2"] ~ #duel-me-glow,
+  #app.battle #duel-hud #duel-me-av[data-atk-tier="3"] ~ #duel-me-glow { animation: none; opacity: var(--mo-mk-90); }
+  #app.battle #duel-hud #duel-me-av[data-atk-tier="2"] ~ #duel-me-fx .mfx-spark,
+  #app.battle #duel-hud #duel-me-av[data-atk-tier="3"] ~ #duel-me-fx .mfx-spark { animation: none; }
+  #app.battle #actionbar .act.urge .act-halo .ah-rays,
+  #app.battle #actionbar .act.primed .act-halo .ah-rays,
+  #app.battle #actionbar .act.urge .act-halo .ah-spark { animation: none; }
+  #app.battle #actionbar .act.urge .act-halo .ah-spark { opacity: var(--mo-mk-100); }
 }
 
 /* ---- 5. 가로(PC) — 자리 · 자(--bu · --bt-hu)만. 무대 수는 battle-landscape 그대로 -------------------------- */
@@ -73822,9 +73555,8 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
     top: calc(var(--bt-y0) + var(--bu) * 531);
     max-width: calc(var(--bu) * 211);
   }
-  /* 영웅 단추 = 두루마리 판 안(지휘자 답 Q3 · Q5 — 시안 크기에 가깝게 · 갈래끼리 같은 크기). 상자 = 두루마리(x 936~1236 · y 497~700 · 300×203),
-     메달 = battle-landscape 7절 값 그대로(높이 = 203 / 2.11 = 96.2bu · 폭 ×718/907 · 사이 .11H · 2열). 두루마리 글자 안전 상자(211×135)에 두 줄을
-     넣으면 메달이 63bu 로 줄어(한 줄 85 보다 작다) 판 상자 전체 높이를 쓴다 — 메달 머리 · 배지가 두루마리 위 막대에 살짝 걸친다.
+  /* 영웅 단추 = 두루마리 판의 글자 안전 상자 안(지휘자 답 Q3 · Q5 「안전 상자가 허락하는 최대」 · 수정 1 I4 판정). 상자 = x 979~1190 · y 531~666(211×135),
+     메달 = battle-landscape 7절 값 그대로(높이 = 135 / 2.11 = 64.0bu · 폭 ×718/907 · 사이 .11H · 2열 · 터치 폭 하한은 굵은 포인터만).
      넷 = 2×2 · 셋(전투) = 위 둘 + 아래 하나 가운데(스킬 메달이 두 칸에 걸쳐 가운데). */
   #app.battle #screen-game.active #actionbar #btn-shuffle { grid-column: 1 / -1; justify-self: center; }
   #app.battle #screen-game.active #actionbar .act .act-halo {
@@ -73920,27 +73652,36 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
     width: calc(var(--bu) * 84);
     z-index: 4;
   }
-  /* 정보 카드 — 알약 둘 + 홈 둘(카드 안 x 44~344). 알약 키 · 글자 · 아이콘은 #classic-hud 의 cqw(= 7.5bu)로 그대로 커진다. */
+  /* 정보 카드 = 점수판(수정 1 · M12 — 지휘자 판정 「알약 그대로 키워 카드 위에서 두루마리 위까지 고르게」). 카드 안 x 44~344 · 세로 146~487
+     (두루마리 위 끝 497 − 10). 묶음 셋 = [알약 64 + 사이 14 + 홈 14] × 2 + 콤보 홈 50 = 234 → 남는 107 을 두 사이에 고르게(53.5):
+       알약 왼 146~210 · 홈 224~238 / 알약 오른 292~356 · 홈 370~384 / 콤보 437~487. 새 모양 0 — 같은 알약 · 홈 부품, 키 · 글자만 무대 자로 키운다
+       (세로 cqw 값 알약 6.9 · 이름표 2.85 · 숫자 4.2 · 아이콘 3.8cqw = 51.75 · 21.4 · 31.5 · 28.5bu → 64 · 24 · 40 · 34bu). */
   #app.classic #screen-game.active #classic-hud .ch-g {
+    --f2-ph: calc(var(--bu) * 64);
     left: calc(var(--bt-ox) + var(--bu) * 44);
     width: calc(var(--bu) * 300);
     right: auto;
+    gap: calc(var(--bu) * 9);
+    padding: 0 calc(var(--bu) * 18);
   }
+  #app.classic #screen-game.active #classic-hud .ch-g::after { font-size: max(var(--text-min), calc(var(--bu) * 24)); }
+  #app.classic #screen-game.active #classic-hud .ch-g b { font-size: max(var(--text-min), calc(var(--bu) * 40)); }
+  #app.classic #screen-game.active #classic-hud .ch-g .ch-i { width: calc(var(--bu) * 34); height: calc(var(--bu) * 34); }
   #app.classic #screen-game.active #classic-hud #ch-l { top: calc(var(--bt-oy) + var(--bu) * 146); }
-  #app.classic #screen-game.active #classic-hud #ch-r { top: calc(var(--bt-oy) + var(--bu) * 254); }
+  #app.classic #screen-game.active #classic-hud #ch-r { top: calc(var(--bt-oy) + var(--bu) * 292); }
   #app.classic #screen-game.active #classic-hud #ch-tl,
   #app.classic #screen-game.active #classic-hud #ch-tr {
     --f2-gh: calc(var(--bu) * 14);
     left: calc(var(--bt-ox) + var(--bu) * 56);
     width: calc(var(--bu) * 276);
   }
-  #app.classic #screen-game.active #classic-hud #ch-tl { top: calc(var(--bt-oy) + var(--bu) * 210); }
-  #app.classic #screen-game.active #classic-hud #ch-tr { top: calc(var(--bt-oy) + var(--bu) * 318); }
-  /* 콤보 홈 = 정보 카드 안 두 알약 아래(무대 y 362~412) */
+  #app.classic #screen-game.active #classic-hud #ch-tl { top: calc(var(--bt-oy) + var(--bu) * 224); }
+  #app.classic #screen-game.active #classic-hud #ch-tr { top: calc(var(--bt-oy) + var(--bu) * 370); }
+  /* 콤보 홈 = 점수판 맨 아래(무대 y 437~487 — 두루마리 위 끝 497 바로 위). 스킬 켬 세 갈래도 같은 자리(8절 스탯 알약 묶음 아래). */
   #app:not(.battle) #screen-game.active #combo-wrap {
     position: absolute;
     left: calc(var(--bt-x0) + var(--bu) * 56);
-    top: calc(var(--bt-y0) + var(--bu) * 362);
+    top: calc(var(--bt-y0) + var(--bu) * 437);
     width: calc(var(--bu) * 276);
     height: calc(var(--bu) * 50);
     min-height: 0;
@@ -73972,7 +73713,37 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
     white-space: normal;
     word-break: keep-all;
   }
-  #app:not(.battle) #screen-game.active #hud-row #mission-badge .mb-ico { width: max(var(--text-min), calc(var(--bu) * 18)); height: max(var(--text-min), calc(var(--bu) * 18)); }
+  #app:not(.battle) #screen-game.active #hud-row #mission-badge .mb-ico { width: max(var(--text-min), calc(var(--bu) * 18)); height: max(var(--text-min), calc(var(--bu) * 18)); flex: none; }
+  /* [수정 1 · I5] 미션 문장 = 말줄임 없이 두루마리 안에서 접는다(세로 기본 #mission-text 의 한 줄 · ellipsis 는 폰 칩 줄 몫이라 가로만 푼다).
+     칩 안 = 글 흐름(아이콘 · 문장 · 진행 숫자가 한 문단 — flex 한 줄이면 문장 칸이 아이콘 · 숫자 몫만큼 좁아져 작은 창 · en 에서 세 줄이 됐다):
+     문장은 칩 폭을 다 쓰고, 진행 숫자는 문장 끝을 따라간다(모자라면 다음 줄). 줄 수 = 문장 두 줄까지 — 가장 긴 문장(ko · en · 목표 두 자리)도
+     안전 상자 폭(211)에서 두 줄 안(시험 smoke-play-pc m1). 한 줄이면 칩 가운데(align-content). 새 모양 0 — 같은 칩 판. */
+  #app:not(.battle) #screen-game.active #hud-row #mission-badge:not([hidden]) {
+    display: block;
+    align-content: center;
+    text-align: left;
+    line-height: 1.2;
+  }
+  #app:not(.battle) #screen-game.active #hud-row #mission-badge .mb-ico {
+    display: inline-block;
+    vertical-align: -.15em;
+    margin-right: calc(var(--bu) * 8);
+  }
+  #app:not(.battle) #screen-game.active #hud-row #mission-badge #mission-text {
+    display: inline;
+    font-size: inherit;              /* 칩 글자 = 무대 자 max(--text-min, 17bu) — 세로 기본의 ko 12px 고정은 가로에서 무대를 안 따랐다 */
+    min-width: 0;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+  }
+  #app:not(.battle) #screen-game.active #hud-row #mission-badge #mission-prog {
+    display: inline-block;
+    margin-left: calc(var(--bu) * 8);
+    white-space: nowrap;
+  }
   #app:not(.battle) #screen-game.active #duel-foe-skill-n,
   #app:not(.battle) #screen-game.active #duel-foe-skill-d { display: none; }
   /* 캐릭터 카드 — 그림 상자(전투 #duel-me-av 가로 값 그대로 · 영웅 표준 전신 위 10% 투명 → k = 1200/1080) · 이름판 */
@@ -74008,18 +73779,19 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
     white-space: nowrap;
     text-shadow: 0 .06em 0 var(--role-blue-outline), 0 -.06em 0 var(--role-blue-outline), .06em 0 0 var(--role-blue-outline), -.06em 0 0 var(--role-blue-outline), 0 .12em .25em var(--role-blue-outline);
   }
-  /* 단추 = 오른쪽 두루마리 판 안 — 전투 메달과 같은 칸(높이 203/2.11 · 폭 ×718/907 · 터치 폭 하한 · 사이 .11H · 2열, 갈래끼리 같은 크기 —
-     지휘자 답 Q3 · Q5). 단추 넷(아케이드 · 타임러시 · 데일리) = 2×2 · 하나(클래식 「추가」) = 가운데 한 칸. 단추 그림은 각 갈래 자기 것(유리 네모) 그대로. */
+  /* 단추 = 오른쪽 두루마리 판의 글자 안전 상자 안 — 전투 메달과 같은 칸(battle-landscape 7절 · 수정 1 I4: 상자 211×135 · 높이 135/2.11 ·
+     폭 ×718/907 · 사이 .11H · 2열 · 터치 폭 하한은 굵은 포인터만, 갈래끼리 같은 크기 — 지휘자 답 Q3 · Q5). 단추 넷(아케이드 · 타임러시 · 데일리) = 2×2 ·
+     하나(클래식 「추가」) = 가운데 한 칸. 단추 그림은 각 갈래 자기 것(유리 네모) 그대로. */
   #app:not(.battle) #screen-game.active #actionbar {
-    --bt-medal-h: calc(var(--bu) * 203 / 2.11);
+    --bt-medal-h: calc(var(--bu) * 135 / 2.11);
     --bt-medal-w: calc(var(--bt-medal-h) * 718 / 907);
     --bt-medal-g: calc(var(--bt-medal-h) * .11);
-    --bt-medal-tw: max(var(--touch-min), var(--bt-medal-w));
+    --bt-medal-tw: var(--bt-medal-w);
     position: absolute;
-    left: calc(var(--bt-x0) + var(--bu) * 936);
-    top: calc(var(--bt-y0) + var(--bu) * 497);
-    width: calc(var(--bu) * 300);
-    height: calc(var(--bu) * 203);
+    left: calc(var(--bt-x0) + var(--bu) * 979);
+    top: calc(var(--bt-y0) + var(--bu) * 531);
+    width: calc(var(--bu) * 211);
+    height: calc(var(--bu) * 135);
     z-index: 2;
     display: grid;
     grid-template-columns: repeat(2, var(--bt-medal-tw));
@@ -74031,6 +73803,10 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
     margin: 0;
   }
   #app.classic #screen-game.active #actionbar { grid-template-columns: var(--bt-medal-tw); }
+  /* 굵은 포인터(터치 — 가로 폰 · 태블릿)만 터치 상자 폭 하한(지휘자 판정 P5 그대로). 두 줄 높이는 그대로라 안전 상자 안이다(폭은 211 에 2×44 + 사이가 넉넉히 든다). */
+  @media (pointer: coarse) {
+    :is(#app.battle, #app:not(.battle)) #screen-game.active #actionbar { --bt-medal-tw: max(var(--touch-min), var(--bt-medal-w)); }
+  }
   #app:not(.battle) #screen-game.active #actionbar .act {
     flex: none;
     width: var(--bt-medal-tw);
@@ -74060,18 +73836,21 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
      타임러시 시계 #rush-timer = 가운데 위(전투 · 클래식 시간 캡슐 자리 · 폭 220). 상단바 판(.dh-plate--top)은 카드가 판이라 안 그린다.
    세로(폰)는 이 미디어쿼리 밖이라 무변. */
 @media (min-aspect-ratio: 1/1) {
+  /* 상단바 상자 = 무대 전체(1280×720 bu · 원점 = 무대 왼끝 · 윗끝) — 안의 일시정지 · 스탯 알약이 무대 좌표 그대로 선다(수정 1 · M5 자기 기준점).
+     판 위에 겹치는 투명 상자라 pointer-events 를 끄고, 누르는 것(일시정지)만 다시 켠다. 판 · 무늬 · 그림자 0. */
   #app:not(.battle):not(.classic) #screen-game.active #topbar {
     position: absolute !important;
-    left: calc(var(--bt-x0) + var(--bu) * 24);
-    top: calc(var(--bt-y0) + var(--bu) * 16);
-    width: max(var(--touch-min), calc(var(--bu) * 64)) !important;
-    height: max(var(--touch-min), calc(var(--bu) * 64)) !important;
+    left: var(--bt-x0);
+    top: var(--bt-y0);
+    width: calc(var(--bu) * var(--bt-stage-w)) !important;
+    height: calc(var(--bu) * var(--bt-stage-h)) !important;
     min-height: 0 !important;
     padding: 0 !important;
     margin: 0 !important;
     display: block !important;
     overflow: visible !important;
     z-index: 3;
+    pointer-events: none;
     border-image-source: none !important;
     background-color: transparent !important;
     background-image: none !important;
@@ -74080,43 +73859,65 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
   #app:not(.battle):not(.classic) #screen-game.active #topbar > .dh-plate { display: none !important; }
   #app:not(.battle):not(.classic) #screen-game.active #topbar #btn-pause {
     position: absolute;
-    left: 0;
-    top: 0;
-    width: 100% !important;
-    height: 100% !important;
+    left: calc(var(--bu) * 24);
+    top: calc(var(--bu) * 16);
+    width: max(var(--touch-min), calc(var(--bu) * 64)) !important;
+    height: max(var(--touch-min), calc(var(--bu) * 64)) !important;
     aspect-ratio: auto;
+    pointer-events: auto;
   }
-  /* 스탯 알약 = 정보 카드 안(카드 안 x 44~344 · 위 끝 146) — 상단바 상자(무대 24,16) 기준 자리 */
+  /* 스탯 알약 = 정보 카드 점수판(수정 1 · M12 — 클래식 7절과 같은 판단). 한 줄 하나씩 · 알약 폭 300(클래식 알약과 같다) · 세로 146~423 에
+     위 · 아래 끝을 붙이고 사이를 고르게(align-content: space-between) — 그 아래 콤보 홈 437~487 · 두루마리 497.
+     키 = 넷이면 56 · 다섯(데일리 시간 칸이 서면)이면 48. 글자 = 이름표 20 · 숫자 34bu(옛 17 · 26). 새 모양 0 — 같은 캡슐 부품(.stat). */
   #app:not(.battle):not(.classic) #screen-game.active #tb-stats {
     position: absolute !important;
-    left: calc(var(--bu) * 20);
-    top: calc(var(--bu) * 130);
+    left: calc(var(--bu) * 44);
+    top: calc(var(--bu) * 146);
     width: calc(var(--bu) * 300) !important;
+    height: calc(var(--bu) * 277);
     max-width: none !important;
     margin: 0 !important;
     padding: 0 !important;
     display: grid !important;
-    /* 칸 = 캡슐 부품(.stat — --wcap-w/h 를 --tbs-cell/caph 에서 읽는다) — 카드 안 2열 · 칸 144×52 bu */
-    --tbs-cell: calc(var(--bu) * 144);
-    --tbs-caph: calc(var(--bu) * 52);
-    grid-template-columns: var(--tbs-cell) var(--tbs-cell) !important;
+    /* 칸 = 캡슐 부품(.stat — --wcap-w/h 를 --tbs-cell/caph 에서 읽는다) */
+    --tbs-cell: calc(var(--bu) * 300);
+    --tbs-caph: calc(var(--bu) * 56);
+    grid-template-columns: var(--tbs-cell) !important;
     grid-template-rows: none !important;
     grid-auto-rows: var(--tbs-caph) !important;
-    gap: calc(var(--bu) * 12) !important;
+    align-content: space-between;
+    gap: 0 !important;
   }
+  #app:not(.battle):not(.classic) #screen-game.active #tb-stats:has(> #stat-timer:not([hidden])) { --tbs-caph: calc(var(--bu) * 48); }
+  /* 알약 = 세로 상단바와 같은 캡슐 부품 · 같은 Mode B 값(세로 5절 — 그 절은 세로 미디어 안이라 가로는 여기서 같은 값을 건다).
+     크기만 점수판 칸(--tbs-cell × --tbs-caph). 옛 가로 9절(22px 납작 알약)은 은퇴. */
   #app:not(.battle):not(.classic) #screen-game.active #tb-stats > .stat {
+    --wcap-w: var(--tbs-cell);
+    --wcap-h: var(--tbs-caph);
+    --wcap-face: var(--mode-b-face);
+    --wcap-face-top: var(--role-wcap-face-top-classic-cap);
+    --wcap-a-in: .657;
+    --wcap-L3-line: var(--mode-b-outline);
+    --wcap-rim-c: var(--mode-b-rim);
+    --wcap-glow-c: var(--mode-b-glow-bubble);
+    height: var(--wcap-h);
+    border-radius: calc(var(--wcap-h) * .5);
+    align-items: center;
+    justify-content: space-between;
+    overflow: visible;
     min-width: 0 !important;
-    padding: 0 calc(var(--bu) * 14) !important;
+    padding: 0 calc(var(--bu) * 22) !important;
     grid-column: auto !important;
     grid-row: auto !important;
   }
-  #app:not(.battle):not(.classic) #screen-game.active #tb-stats .stat-k { font-size: max(var(--text-min), calc(var(--bu) * 17)) !important; }
-  #app:not(.battle):not(.classic) #screen-game.active #tb-stats .stat-v { font-size: max(var(--text-min), calc(var(--bu) * 26)) !important; }
-  /* 타임러시 시계 = 가운데 위(무대 x 530~750 · y 14~78). #hud-row(칩 줄 — 왼쪽 두루마리, 무대 87 · 531) 기준 자리 */
+  #app:not(.battle):not(.classic) #screen-game.active #tb-stats .stat-k { font-size: max(var(--text-min), calc(var(--bu) * 20)) !important; }
+  #app:not(.battle):not(.classic) #screen-game.active #tb-stats .stat-v { font-size: max(var(--text-min), calc(var(--bu) * 34)) !important; }
+  /* 타임러시 시계 = 가운데 위(무대 x 530~750 · y 14~78). 자기 기준점 = 무대 원점(수정 1 · M5): fixed — 담는 상자가 창이고, 창 = 화면 상자
+     (#screen-game.active 가 fixed · inset 0)라 무대 식(--bt-x0 · --bt-y0 의 50% = 창 폭 · 높이의 반)이 그대로 맞는다. 옛: #hud-row 원점(87, 531) 기준 음수 top. */
   #app:not(.battle):not(.classic) #screen-game.active #hud-row #rush-timer {
-    position: absolute !important;
-    left: calc(var(--bu) * (640 - 87 - 110));
-    top: calc(var(--bu) * (14 - 531));
+    position: fixed !important;
+    left: calc(var(--bt-x0) + var(--bu) * 530);
+    top: calc(var(--bt-y0) + var(--bu) * 14);
     width: calc(var(--bu) * 220);
     height: calc(var(--bu) * 64);
     margin: 0;
@@ -74135,7 +73936,8 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
 
 /* ---- 6. reduced-motion — 움직임 0 · 단계별 정적 빛만(MOTION-SPEC §7 — 끄기가 아니라 정적 대체) ----------------------- */
 @media (prefers-reduced-motion: reduce) {
-  #app.battle #duel-hud #duel-me-av[data-atk-tier],
+  /* 초상 빛(각성 · 만땅 대기)은 awk-av-glow 절의 옛 reduced-motion 정적 빛(filter 두 겹)이 그대로 맡는다 — 여기서는 움직임만 끈다. */
+  #app.battle #duel-hud #duel-me-av,
   #app.battle #duel-hud #duel-me-av.cast,
   #app.battle #duel-hud #duel-me-av.hit { animation: none; }
   /* 맞음 = 움직임 없이 빨간 빛만 정적으로(.hit 동안) */
