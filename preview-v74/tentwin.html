@@ -2053,7 +2053,7 @@ color: var(--prim-ink);
 .share-thumb{
 box-sizing: content-box;
 display: block;
-width: 104px;
+width: var(--res-thumb-w, 104px);
 aspect-ratio: 1080 / 1350;
 height: auto;
 margin: 2px auto 10px;
@@ -5083,7 +5083,7 @@ cursor: pointer;
 #charget.go .cut-txt > * { animation: none; opacity: 1; transform: none; }
 #charget.go .cg-stats .kit-gauge-v2__fill { animation: none; transform: none; }
 }
-#modal-invite { --f2-w: min(76vw, 320px); }
+#modal-invite :is(.ci-id, .ci-tag, .cc-stats, #iv-why, .sk-bal, #iv-prog) { --f2-w: min(76vw, 320px); }
 #charget      { --f2-w: min(84vw, 340px); }
 #modal-invite .ci-id { gap: calc(var(--f2-w) * .030); justify-content: center; }
 #modal-invite .ci-chip {
@@ -9212,7 +9212,7 @@ filter: drop-shadow(0 0 10px rgba(102, 240, 159, .40));
 <link rel="preload" as="image" href="catalog/jelly-box-c.webp">
 <link rel="preload" as="image" href="catalog/duel-title-play.webp">
 <!-- ==RELEASE:BEGIN== 출시 메타 (scratchpad/release-0908/apply-head.py 가 생성·교체, 본문 무접촉) -->
-<meta name="build" content="a84a1aa-20261021-0014">
+<meta name="build" content="be095cc-20261021-0355">
 <meta name="application-name" content="텐트윈 젤리팡 월드">
 <meta name="description" lang="ko" content="숫자 젤리를 골라 10을 만들어 터뜨리는 퍼즐이에요. 모험·아케이드·데일리·타임 러시·클래식을 즐겨요. Ten Twin Jelly Pang World: pick number jellies that equal or sum to 10.">
 <link rel="manifest" href="tentwin.webmanifest">
@@ -12112,7 +12112,7 @@ id 는 한 글자도 안 바뀌므로 paintAdvSheet/countUp 배선 무접촉. --
 런타임 라벨과 갈라진다.
 ⚠ 진 판에서 언어를 바꾸면 applyI18n 이 이 자리를 adv.next 로 되돌린다. 설정창은
 결과창 위에서 못 열리므로 지금 경로에서는 도달 불가다. -->
-<div class="mf-foot"><button id="adv-again" class="mf-btn kit-btn-v2" data-kind="primary" type="button" data-n="1" data-i18n="adv.next">Next stage</button><button id="adv-map" class="mf-btn kit-btn-v2" data-kind="secondary" type="button" data-i18n="adv.map">Map</button></div>
+<div class="mf-foot" data-fit><button id="adv-again" class="mf-btn kit-btn-v2" data-kind="primary" type="button" data-n="1" data-i18n="adv.next">Next stage</button><button id="adv-map" class="mf-btn kit-btn-v2" data-kind="secondary" type="button" data-i18n="adv.map">Map</button></div>
 </div></div>
 <div id="modal-over" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="over-title"><div class="sheet jbox jbox--modal mframe" data-part="modal-plate">
 <div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
@@ -12151,7 +12151,7 @@ the portal rewarded-ad wrapper replaces this div and adds .ad-live. -->
 <div class="ad-slot ad-reward" data-ad-slot="rewarded">Ad</div>
 <!-- [Task 8d D8] 단추 다섯(넷 색) → 쌓는 줄 [주 = 지금 쓸 수 있는 쪽(이어하기 또는 다시하기)][보조 메인 메뉴] + 작은 soft 알약 줄(다시하기(이어하기가 주일 때) · 내 기록 · 공유).
 주는 paintContinueBtn 한 곳이 고른다 — 다시하기 기능은 어느 때나 한 번 누름 거리에 남는다(주 또는 알약). -->
-<div class="mf-foot"><button id="btn-continue" class="mf-btn kit-btn-v2" data-kind="primary" type="button" data-i18n-aria="aria.continue" data-i18n="over.continue" aria-label="Continue this board with two more adds">Continue (1 free)</button><button id="btn-retry" class="mf-btn kit-btn-v2" data-kind="primary" type="button" data-i18n-aria="aria.retry" data-i18n="over.retry" aria-label="Retry" hidden>Retry</button><button id="btn-menu" class="mf-btn kit-btn-v2" data-kind="secondary" type="button" data-i18n-aria="aria.overMenu" data-i18n="over.menu" aria-label="Back to main menu">Main menu</button></div>
+<div class="mf-foot" data-fit><button id="btn-continue" class="mf-btn kit-btn-v2" data-kind="primary" type="button" data-i18n-aria="aria.continue" data-i18n="over.continue" aria-label="Continue this board with two more adds">Continue (1 free)</button><button id="btn-retry" class="mf-btn kit-btn-v2" data-kind="primary" type="button" data-i18n-aria="aria.retry" data-i18n="over.retry" aria-label="Retry" hidden>Retry</button><button id="btn-menu" class="mf-btn kit-btn-v2" data-kind="secondary" type="button" data-i18n-aria="aria.overMenu" data-i18n="over.menu" aria-label="Back to main menu">Main menu</button></div>
 <div class="mf-side"><button id="btn-over-retry" class="mf-soft kit-pill-v2" data-variant="soft" type="button" data-i18n-aria="aria.retry" aria-label="Retry"><span data-i18n="over.retry">Retry</span><i class="mf-hit" aria-hidden="true"></i></button><button id="btn-over-rank" class="mf-soft kit-pill-v2" data-variant="soft" type="button" data-i18n-aria="aria.rank" aria-label="Records"><span data-i18n="rank.open">Records</span><i class="mf-hit" aria-hidden="true"></i></button><button id="btn-over-share" class="mf-soft kit-pill-v2" data-variant="soft" type="button" data-i18n-aria="aria.overShare" aria-label="Share your score"><span data-i18n="over.share">Share</span><i class="mf-hit" aria-hidden="true"></i></button></div>
 </div></div>
 <!-- ===== 아케이드 대전 결과 ==============================================
@@ -12192,7 +12192,7 @@ the portal rewarded-ad wrapper replaces this div and adds .ad-live. -->
 <img id="arc-card-thumb" class="share-thumb" alt="" aria-hidden="true" hidden>
 </div><!-- /.res-body -->
 <!-- [Task 8d D8] 결과 창 한 틀 — 쌓는 줄 [주 다시하기][보조 메인 메뉴] + 작은 soft 알약(공유) -->
-<div class="mf-foot"><button id="arc-again" class="mf-btn kit-btn-v2" data-kind="primary" type="button" data-i18n="arc.again">Retry</button><button id="arc-menu" class="mf-btn kit-btn-v2" data-kind="secondary" type="button" data-i18n="arc.menu">Main menu</button></div>
+<div class="mf-foot" data-fit><button id="arc-again" class="mf-btn kit-btn-v2" data-kind="primary" type="button" data-i18n="arc.again">Retry</button><button id="arc-menu" class="mf-btn kit-btn-v2" data-kind="secondary" type="button" data-i18n="arc.menu">Main menu</button></div>
 <div class="mf-side"><button id="arc-share" class="mf-soft kit-pill-v2" data-variant="soft" type="button" data-i18n-aria="aria.arcShare" aria-label="Share your record"><span data-i18n="arc.share">Share</span><i class="mf-hit" aria-hidden="true"></i></button></div>
 </div></div>
 <div id="modal-daily" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="daily-title"><div class="sheet jbox jbox--modal mframe" data-part="modal-plate">
@@ -12410,7 +12410,7 @@ game.js **앞**이어야 한다 — 부팅 직후 나는 소리까지 클립으�
 이 파일을 빼고 빌드해도 게임은 돈다 — 그때는 모든 슬롯이 기존 신스다. -->
 <script defer src="catalog/js/tw-02-7ea6fa41.js"></script>
 <script defer src="catalog/js/tw-03-06721556.js"></script>
-<script defer src="catalog/js/tw-04-aee23f60.js"></script>
+<script defer src="catalog/js/tw-04-cb5dafbf.js"></script>
 <!-- ==FRUITDEF:BEGIN== generated by tools/fruit-tiles.js — do not edit by hand -->
 <!-- 열매 실루엣 클립 패스 9종 (DESIGN-V4 §5.8). clipPathUnits="objectBoundingBox"
 라 좌표가 0..1 이고, 타일 크기(--ts)가 어떤 값이든 같은 모양이 나온다.
@@ -12935,7 +12935,6 @@ min-width:calc(var(--f2-w) * .1750);
 min-height:calc(var(--f2-w) * .0850);
 padding:0 calc(var(--f2-w) * .0240);
 font-size:max(var(--text-min), calc(var(--f2-w) * .0300));
-line-height:calc(var(--f2-w) * .0850);
 }
 #modal-quest .qs-get[disabled]{ cursor:default; }
 #modal-quest .qs-foot{
@@ -15177,35 +15176,54 @@ inset 0 0 0 calc(var(--bu) * 4) var(--mode-b-rim);
 padding-top: calc(var(--safe-t) + var(--stage-u) * 18);
 padding-bottom: calc(var(--safe-b) + var(--stage-u) * 18);
 }
-#modal-skin .sheet {   /* [Task 8b2] 장비 두 창(.sheet 없음 — 방 정보 카드 판)은 이 무리에서 뺐다 · 판 폭 = 방 판 폭(--cs-card-w) */
+#modal-skin .sheet,
+#modal-quest .sheet, #modal-rank .sheet, #modal-settings .sheet, #modal-playground .sheet, #modal-howto .sheet, #modal-tutorial .sheet,
+#modal-soon .sheet, #modal-invite .sheet, #modal-confirm .sheet, #modal-pause .sheet, #modal-clear .sheet, #modal-adv .sheet,
+#modal-over .sheet, #modal-arc .sheet, #modal-daily .sheet {   /* [Task 8b2] 장비 두 창(.sheet 없음 — 방 정보 카드 판)은 이 무리에서 뺐다 · 판 폭 = 방 판 폭(--cs-card-w) */
 max-width: calc(var(--stage-u) * 380);
 max-height: 100%;   /* 상한 = .modal 위 · 아래 안여백 18u(Task 8a D10 — 위 .modal 줄) 안 = 창 높이 − 36u − 안전 영역. [수정 1회차 M2] 종전 min(100%, 창 높이 − 36u) 의 둘째 항은 늘 지는 값이라 걷었다 */
-padding: calc(var(--stage-u) * 23) calc(var(--stage-u) * 30) calc(var(--stage-u) * 30) !important;   /* .w6m .sheet 의 !important 를 같은 문법으로 덮는다 */
+--w6m-pad-t: calc(var(--stage-u) * 23);
+--w6m-pad-x: calc(var(--stage-u) * 30);
+--w6m-pad-b: calc(var(--stage-u) * 30);
 gap: calc(var(--stage-u) * 10);
---f2-w: calc(var(--stage-u) * 390 * .957);     /* 가로 모달 자(.modal --f2-w = 폰 기준폭 390 × .957)를 무대 자로 */
---f2-ref-w: calc(var(--stage-u) * 430);        /* 겉선 자(가로 :root 430)를 무대 자로 — 제목 캡슐 높이(--wcap-h) · 칸 겉선이 읽는다 */
 --jbox-w: calc(var(--stage-u) * 430);
 --jbox-radius: calc(var(--stage-u) * 40);
 --jbox-bw: calc(var(--stage-u) * 1.5);
 }
+#modal-skin .sheet,
+#modal-quest .sheet, #modal-rank .sheet, #modal-settings .sheet, #modal-playground .sheet, #modal-howto .sheet, #modal-tutorial .sheet,
+#modal-soon .sheet, #modal-invite .sheet, #modal-confirm .sheet, #modal-pause .sheet, #modal-clear .sheet, #modal-adv .sheet,
+#modal-over .sheet, #modal-arc .sheet, #modal-daily .sheet,
+#modal-mode .sheet, #modal-classic .sheet, #modal-minimap .sheet, #modal-theater .sheet {
+--f2-w: calc(var(--stage-u) * 390 * .957);     /* 가로 모달 자(.modal --f2-w = 폰 기준폭 390 × .957)를 무대 자로 */
+--f2-ref-w: calc(var(--stage-u) * 430);        /* 겉선 자(가로 :root 430)를 무대 자로 — 제목 캡슐 높이(--wcap-h) · 칸 겉선이 읽는다 */
+}
 #modal-node .sheet { --nc-fs-min: var(--text-min); }
 #modal-node .sheet,
-#modal-drops .sheet {
+#modal-drops .sheet,
+#modal-mode .sheet, #modal-classic .sheet, #modal-minimap .sheet, #modal-theater .sheet {   /* [Task 8d · 7b] 남은 r10m 창(플레이 · 클래식 · 챕터 · 극장)도 같은 판 자 무리 */
 --pw: min(calc(var(--stage-u) * 360), 100%);   /* .r10m .sheet 의 min(360px, 100%) 를 무대 자로 — 안쪽 리듬(.04 · .07 · .06 --pw)이 같이 준다 */
 --jbox-w: calc(var(--stage-u) * 430);
 --jbox-radius: calc(var(--stage-u) * 40);
 --jbox-bw: calc(var(--stage-u) * 1.5);
 }
-#modal-drops .sheet {
+#modal-drops .sheet,
+#modal-minimap .sheet, #modal-theater .sheet {   /* [Task 8d D6 · 지휘자 답 5] 챕터 카드 격자도 판 M(열 수는 mmFitCols 가 잰다) */
 --pw: min(calc(var(--stage-u) * 620), 100%);
 --dr-u: calc(var(--stage-u) * 6.2);
 }
 #modal-drops .dr-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); --it-w: calc(var(--dr-u) * 14.2); }   /* --it-w = cqw 대체용 칸 폭(가로 5열 칸 ≈ 14.2 --dr-u — 1280 실측 88px ÷ 6.2) */
 #modal-drops .dr-name { font-size: max(var(--text-min), calc(var(--dr-u) * 2.8)); }
-#modal-skin .sheet > h2 {
+#modal-skin .sheet > h2,
+#modal-quest .sheet > h2, #modal-rank .sheet > h2, #modal-settings .sheet > h2, #modal-playground .sheet > h2, #modal-howto .sheet > h2,
+#modal-soon .sheet > h2, #modal-invite .sheet > h2, #modal-confirm .sheet > h2, #modal-pause .sheet > h2, #modal-clear .sheet > h2, #modal-adv .sheet > h2,
+#modal-over .sheet > h2, #modal-arc .sheet > h2, #modal-daily .sheet > h2 {   /* [Task 8d · 7b] 같은 무리 창 간판(튜토리얼은 --f2-w 식 캡슐이라 위 --f2-w 로 같이 준다 · 탭 창은 Task 129 의 탭 틀 캡슐 폭이 이긴다) */
 --wcap-w: calc(56.84% + (2px + var(--stage-u) * 60) * .5684);
 --wcap-panT: calc(1px + var(--stage-u) * 23);
 margin: calc(var(--wcap-h) * .13 - var(--wcap-panT)) auto calc(var(--stage-u) * 6);
+}
+#modal-skin .sheet > h2, #modal-rank .sheet > h2, #modal-settings .sheet > h2, #modal-howto .sheet > h2, #modal-pause .sheet > h2,
+#modal-over .sheet > h2, #modal-arc .sheet > h2, #modal-adv.is-advfinish .sheet > h2 {
 font-size: max(var(--text-min), calc(var(--stage-u) * 18));
 }
 #modal-skin .sk-list {
@@ -15727,8 +15745,9 @@ padding: 0 var(--w6m-pad-x) var(--w6m-pad-b);
 #app .modal .mf-btn { min-width: 0; }
 #app .modal :is(.mf-btn, .mf-soft, .mf-foot, .mf-side)[hidden] { display: none; }   /* 포털 전용 2배 줄(.coin-x2.mf-foot)도 숨으면 숨는다 */
 #app .modal :is(.mf-btn, .mf-soft) { word-break: keep-all; }
-#app #modal-invite .mf-foot { --f2-w: 95.7vw; }
-@media (min-aspect-ratio: 1/1) and (min-width: 700px) { #app #modal-invite .mf-foot { --f2-w: min(95.7vw, calc(var(--f2-phone-w) * .957)); } }
+@media (min-aspect-ratio: 1/1) {
+#app #modal-invite :is(.ci-id, .ci-tag, .cc-stats, #iv-why, .sk-bal, #iv-prog) { --f2-w: calc(var(--stage-u) * 320); }
+}
 #app .modal .mf-side {
 flex: 0 0 auto;
 display: flex;
@@ -15845,17 +15864,116 @@ color: var(--prim-art-ink);
 #app .bb-center .mp-txt > i[data-two] { white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.05; }
 #app .bb-center .mp-txt > i[data-two] > .mp-chk { display: block; font-size: inherit; font-weight: 600; line-height: 1; }
 #app .bb-center .mp-txt > i[data-two] > .mp-chn { display: block; white-space: nowrap; line-height: 1.05; }
-@media (min-aspect-ratio: 1/1) {
-#app :is(#modal-minimap, #modal-theater) .sheet {
---pw: min(calc(var(--stage-u) * 620), 100%);
---jbox-w: calc(var(--stage-u) * 430);
---jbox-radius: calc(var(--stage-u) * 40);
---jbox-bw: calc(var(--stage-u) * 1.5);
-}
-}
 #app :is(#mm-grid, #th-grid)[data-cols="5"] { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 #app :is(#mm-grid, #th-grid)[data-cols="4"] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 #app :is(#mm-grid, #th-grid)[data-cols="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (min-aspect-ratio: 1/1) {
+.x-btn,
+#charpanel #cp-close.x-btn {
+width: max(var(--touch-min), calc(var(--stage-u) * 44)) !important;
+height: max(var(--touch-min), calc(var(--stage-u) * 44)) !important;
+min-width: max(var(--touch-min), calc(var(--stage-u) * 44)) !important;
+min-height: max(var(--touch-min), calc(var(--stage-u) * 44)) !important;
+}
+}
+#app .modal .mf-foot[data-row] { flex-direction: row-reverse; }
+#app .modal .mf-foot[data-row] > .mf-btn { flex: 1 1 0; }
+@media (min-aspect-ratio: 1/1) {
+#app .modal.w6m .sheet,
+#app :is(#modal-mode, #modal-classic, #modal-minimap, #modal-theater) .sheet { font-size: calc(var(--stage-u) * 16); }
+#app :is(#modal-mode, #modal-classic, #modal-minimap, #modal-theater) .sheet.r10-panel {
+padding: calc(var(--stage-u) * 17) calc(var(--pw) * .07 + var(--stage-u) * 17) calc(var(--pw) * .06 + var(--stage-u) * 17);
+}
+#app :is(#modal-minimap, #modal-theater) .sheet { gap: calc(var(--stage-u) * 10); }
+#app :is(#modal-mode, #modal-classic, #modal-minimap, #modal-theater) .r10-ribbon {
+--wcap-w: calc(66.09225% + var(--stage-u) * 23.7935);
+--wcap-panT: calc(1px + var(--stage-u) * 17);
+margin: calc(var(--wcap-h) * .13 - var(--wcap-panT)) auto calc(var(--stage-u) * 6);
+font-size: max(var(--text-min), calc(var(--stage-u) * 18));
+}
+#app #mm-grid, #app #th-grid { gap: calc(var(--stage-u) * 8); }
+#app .modal .cp-tab > .cpt-lab { font-size: max(var(--text-min), 1em); }
+#app .modal .mode-list [data-part="btn-picture"] .bp-text > b { font-size: max(var(--text-min), calc(var(--bp-w) * var(--bp-t-fs))); }
+#app .modal .mode-list [data-part="btn-picture"] .bp-text > i { font-size: max(var(--text-min), calc(var(--bp-w) * var(--bp-d-fs))); }
+#app .modal .mode-list [data-part="btn-picture"] .bp-badge { font-size: max(var(--text-min), calc(var(--bp-w) * var(--bp-badge-fs))); }
+#app :is(#mm-grid, #th-grid) :is(.mm-k, .mm-p) { font-size: max(var(--text-min), calc(var(--stage-u) * 11)); }   /* 「CHAPTER n」 · 별 줄(세로 = 글자 하한 11px) */
+#app #modal-minimap #mm-sum { font-size: max(var(--text-min), calc(var(--stage-u) * 11.5)); }
+#app .modal .set-list { gap: calc(var(--stage-u) * 8); margin: calc(var(--stage-u) * 2) 0 calc(var(--stage-u) * 10); }
+#app .modal .set-row { gap: calc(var(--stage-u) * 10); padding: calc(var(--stage-u) * 8) calc(var(--stage-u) * 10) calc(var(--stage-u) * 8) calc(var(--stage-u) * 14); }
+#app .modal .set-k { font-size: max(var(--text-min), calc(var(--stage-u) * 15)); }
+#app .modal .set-tg:not(.kit-pill-v2) {   /* 토글만 — 포털 계정 알약(#portal-acct-name · .set-tg.kit-pill-v2 soft)은 자기 킷 자 그대로 */
+font-size: max(var(--text-min), calc(var(--stage-u) * 15.9));
+min-width: calc(var(--stage-u) * 92);
+min-height: calc(var(--stage-u) * 36);
+padding: 0 calc(var(--stage-u) * 16) !important;
+}
+#app #modal-classic #classic-lead { font-size: max(var(--text-min), calc(var(--stage-u) * 12.5)); margin: calc(var(--stage-u) * 2) 0 calc(var(--stage-u) * 10); }
+#app .modal .mode-list { gap: calc(var(--stage-u) * 2); }
+#app .modal .mode-row { gap: calc(var(--stage-u) * 10); }
+#app :is(#modal-playground, #modal-classic) .mode-row { padding: calc(var(--stage-u) * 9) calc(var(--stage-u) * 12); }
+#app #modal-rank #rank-hint { font-size: max(var(--text-min), calc(var(--stage-u) * 12)); margin-bottom: calc(var(--stage-u) * 4); }
+html[lang="ko"] #app #modal-rank #rank-hint { font-size: max(var(--text-min), calc(var(--stage-u) * 12.5)); }
+#app #modal-rank #rank-list { gap: calc(var(--stage-u) * 8); }
+#app #modal-rank .rank-pos { flex-basis: calc(var(--stage-u) * 30); }
+#app #modal-rank .rank-row:not(:nth-child(-n+3)) .rank-pos { font-size: max(var(--text-min), calc(var(--stage-u) * 15)); }   /* 4위부터 숫자(1~3위는 메달 — 글자 0 그대로) */
+#app #modal-rank .rank-row:nth-child(-n+3) .rank-pos { height: calc(var(--stage-u) * 22); }
+#app #modal-rank .rank-main { font-size: max(var(--text-min), calc(var(--stage-u) * 19)); }
+#app #modal-rank .rank-empty .rank-main { font-size: max(var(--text-min), calc(var(--stage-u) * 13)); }
+#app #modal-rank .rank-arc-row .rank-main { font-size: max(var(--text-min), calc(var(--stage-u) * 17)); }
+#app #modal-rank .rank-arc-row .rank-main .arc-v { margin-left: calc(var(--stage-u) * 10); }
+#app #modal-rank .rank-meta { font-size: max(var(--text-min), calc(var(--stage-u) * 11)); }
+html[lang="ko"] #app #modal-rank .rank-meta { font-size: max(var(--text-min), calc(var(--stage-u) * 11.5)); }
+#app #modal-rank .rank-arc-row .rank-meta { margin-top: calc(var(--stage-u) * 2); }
+#app #modal-rank .rank-arc { margin-top: calc(var(--stage-u) * 12); }
+#app #modal-rank .rank-arc-h { font-size: max(var(--text-min), calc(var(--stage-u) * 14)); margin-bottom: calc(var(--stage-u) * 6); }
+#app #modal-howto .howto-panel { gap: calc(var(--stage-u) * 12); padding: calc(var(--stage-u) * 4) calc(var(--stage-u) * 6) calc(var(--stage-u) * 2); }
+#app #modal-howto .howto-art { padding: calc(var(--stage-u) * 12) calc(var(--stage-u) * 8); }
+#app #modal-howto .howto-art.rules-card { padding: calc(var(--stage-u) * 14) calc(var(--stage-u) * 14) calc(var(--stage-u) * 12); }
+#app #modal-howto .ht-tilegrid { gap: calc(var(--stage-u) * 7.48); padding: calc(var(--stage-u) * 4) calc(var(--stage-u) * 2); }
+#app #modal-howto .ht-tile { max-width: calc(var(--stage-u) * 62); }
+#app #modal-howto .ht-tile > b { font-size: max(var(--text-min), calc(var(--stage-u) * 26)); }
+#app #modal-howto .rules-title { font-size: max(var(--text-min), calc(var(--stage-u) * 15)); margin-bottom: calc(var(--stage-u) * 10); }
+#app #modal-howto .rules-list { gap: calc(var(--stage-u) * 9); }
+#app #modal-howto .rules-list > li { font-size: max(var(--text-min), calc(var(--stage-u) * 13)); gap: calc(var(--stage-u) * 9); }
+#app #modal-howto .rules-num { font-size: max(var(--text-min), calc(var(--stage-u) * 11)); flex-basis: calc(var(--stage-u) * 18); height: calc(var(--stage-u) * 18); line-height: calc(var(--stage-u) * 18); margin-top: calc(var(--stage-u) * 1); }
+#app #modal-howto .rules-list li > .rules-medal { width: calc(var(--stage-u) * 30); height: calc(var(--stage-u) * 30); margin-top: calc(var(--stage-u) * -1); }
+#app #modal-howto .rules-note { font-size: max(var(--text-min), calc(var(--stage-u) * 12)); padding-top: calc(var(--stage-u) * 9); margin-top: calc(var(--stage-u) * 11); }
+#app #modal-howto .howto-panel > p { font-size: max(var(--text-min), calc(var(--stage-u) * 13.5)); margin: calc(var(--stage-u) * 4) calc(var(--stage-u) * 6) 0; }   /* min-height 은 #modal-howto 규칙의 0 그대로 */
+#app #modal-howto #howto-dots { gap: calc(var(--stage-u) * 7); margin: calc(var(--stage-u) * 2) 0 calc(var(--stage-u) * 6); }
+#app #modal-tutorial #tut-text { font-size: max(var(--text-min), calc(var(--f2-w) * .0506)); }   /* 튜토리얼 안내 글(.0506W) — 844×390 에서 10.2px 로 내려가 하한만 더함 */
+#app #modal-tutorial #tut-stage .tile > span { font-size: max(var(--text-min), calc(var(--stage-u) * 27.84)); line-height: calc(var(--stage-u) * 27.84); }
+#app #modal-soon .cut-line { font-size: max(var(--text-min), calc(var(--stage-u) * 15)); }
+#app #modal-confirm #cf-msg { font-size: max(var(--text-min), calc(var(--stage-u) * 16)); }
+#app #modal-invite .ci-tag { margin-top: calc(var(--stage-u) * 8); gap: calc(var(--stage-u) * 6); }
+#app #modal-invite .ci-name { font-size: max(var(--text-min), calc(var(--stage-u) * 17)); }
+#app #modal-invite #iv-why { font-size: max(var(--text-min), calc(var(--stage-u) * 12.5)); margin-top: calc(var(--stage-u) * 8); }
+#app #modal-invite .sk-bal { font-size: max(var(--text-min), calc(var(--stage-u) * 12)); margin-bottom: calc(var(--stage-u) * 10); gap: calc(var(--stage-u) * 8); }
+#app #modal-invite .sk-bal-v { font-size: max(var(--text-min), calc(var(--stage-u) * 15)); gap: calc(var(--stage-u) * 4); }
+#app .modal .result-card { padding: calc(var(--stage-u) * 12) calc(var(--stage-u) * 14) calc(var(--stage-u) * 14); margin: calc(var(--stage-u) * 4) 0 calc(var(--stage-u) * 10); }
+#app #modal-clear #clear-grade { gap: calc(var(--stage-u) * 6); margin: calc(var(--stage-u) * 2) 0; }
+#app #modal-clear .grade-note { font-size: max(var(--text-min), calc(var(--stage-u) * 13)); }
+#app #modal-clear #clear-rollup { gap: calc(var(--stage-u) * 6); margin: calc(var(--stage-u) * 4) 0; }
+#app #modal-clear #clear-rollup li { font-size: max(var(--text-min), calc(var(--stage-u) * 14)); padding: calc(var(--stage-u) * 9) calc(var(--stage-u) * 14); }
+#app #modal-clear #clear-rollup li b { font-size: max(var(--text-min), calc(var(--stage-u) * 16)); }
+#app #modal-clear .rollup-total { font-size: max(var(--text-min), calc(var(--stage-u) * 15)); margin-top: calc(var(--stage-u) * 2); }
+#app #modal-clear #clear-total { font-size: calc(var(--stage-u) * 26); margin-left: calc(var(--stage-u) * 6); }
+#app #modal-clear #clear-next-preview { font-size: max(var(--text-min), calc(var(--stage-u) * 13)); padding: calc(var(--stage-u) * 7) calc(var(--stage-u) * 14); margin: calc(var(--stage-u) * 4) auto calc(var(--stage-u) * 2); }
+#app .modal .big-score { font-size: max(var(--text-min), calc(var(--stage-u) * 15)); }
+#app :is(#modal-adv, #modal-over) .big-score b { font-size: calc(var(--stage-u) * 52); }
+#app #modal-arc .big-score { margin: calc(var(--stage-u) * 2) 0 calc(var(--stage-u) * 6); }
+#app #modal-arc .big-score > b { font-size: calc(var(--stage-u) * 86); }
+#app #modal-adv #adv-stars { font-size: calc(var(--stage-u) * 40); letter-spacing: calc(var(--stage-u) * 2); }
+#app .modal :is(.sub-score, .rank-line, .adv-hearts) { font-size: max(var(--text-min), calc(var(--stage-u) * 13)); }
+#app .modal .sub-score { margin-bottom: calc(var(--stage-u) * 4); }
+#app .modal .rank-line { margin: calc(var(--stage-u) * 2) 0; }
+#app #modal-arc #arc-dir { font-size: max(var(--text-min), calc(var(--stage-u) * 15)); }
+#app #modal-arc :is(#arc-kos, #arc-who) { font-size: max(var(--text-min), calc(var(--stage-u) * 13.5)); }
+#app #modal-arc #arc-when { font-size: max(var(--text-min), calc(var(--stage-u) * 12)); }
+#app .modal .share-thumb { width: var(--res-thumb-w, calc(var(--stage-u) * 104)); margin: calc(var(--stage-u) * 2) auto calc(var(--stage-u) * 10); }   /* 줄인 폭(resFit — 덧붙임 C)이 있으면 그것 */
+#app #modal-daily #daily-stats { font-size: max(var(--text-min), calc(var(--stage-u) * 14)); }
+#app #modal-daily #daily-reward { margin: calc(var(--stage-u) * 10) 0 calc(var(--stage-u) * 4); gap: calc(var(--stage-u) * 6); }
+#app #modal-daily #daily-grid { font-size: max(var(--text-min), calc(var(--stage-u) * 17)); padding: calc(var(--stage-u) * 14) calc(var(--stage-u) * 10); margin: calc(var(--stage-u) * 6) 0; }
+}
 </style>
 </body>
 </html>
