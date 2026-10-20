@@ -9263,7 +9263,7 @@ filter: drop-shadow(0 0 10px rgba(102, 240, 159, .40));
 <link rel="preload" as="image" href="catalog/jelly-box-c.webp">
 <link rel="preload" as="image" href="catalog/duel-title-play.webp">
 <!-- ==RELEASE:BEGIN== 출시 메타 (scratchpad/release-0908/apply-head.py 가 생성·교체, 본문 무접촉) -->
-<meta name="build" content="1995945-20261019-2305">
+<meta name="build" content="5018227-20261020-0026">
 <meta name="application-name" content="텐트윈 젤리팡 월드">
 <meta name="description" lang="ko" content="숫자 젤리를 골라 10을 만들어 터뜨리는 퍼즐이에요. 모험·아케이드·데일리·타임 러시·클래식을 즐겨요. Ten Twin Jelly Pang World: pick number jellies that equal or sum to 10.">
 <link rel="manifest" href="tentwin.webmanifest">
@@ -9317,7 +9317,7 @@ navigator.serviceWorker.register('sw.js',{scope:'./'}).catch(function(e){console
 })}
 </script>
 <!-- ==RELEASE:END== -->
-<link rel="preload" as="style" href="tw-late-c23321d9.css">
+<link rel="preload" as="style" href="tw-late-751dc310.css">
 </head>
 <body>
 <!-- ============================================================
@@ -9858,6 +9858,12 @@ duel-castle-hd.webp(202×188) 하나이고 새 조각을 굽지 않는다.
 <i class="dh-tick dh-tick--r" aria-hidden="true"></i>
 <span id="duel-foe-av" class="dh-av boss-av bs-grape" data-slot="av-foe" data-overhang="art" aria-hidden="true"></span>
 <span id="duel-me-av" class="dh-av dh-av-me" data-slot="av-me" data-overhang="art" aria-hidden="true"></span>
+<!-- [판정판 130 · Task 8e] 영웅 그림 상자의 효과 두 겹(시안 채택표 「게이지 단계별 캐릭터 움직임 · 공격 · 스킬 순간 마법 띠」).
+둘 다 #duel-me-av 뒤 형제라 `#duel-me-av[data-atk-tier] ~ …` · `#duel-me-av.cast ~ …` 로 그림 상자의 상태를 읽는다(JS 쓰기 0).
+#duel-me-glow = 몸 뒤 빛 원(z 가 그림보다 아래) · #duel-me-fx = 별빛 · 마법 띠 · 지팡이 쪽 별빛 터짐(그림 위).
+자리 = 그림 상자와 같은 식(CSS 「play-8e」 2절) · 누르기 통과(pointer-events none). 세로 HUD · 가로 카드 같은 부품. -->
+<i id="duel-me-glow" class="dh-me-glow" aria-hidden="true"></i>
+<span id="duel-me-fx" class="dh-me-fx" aria-hidden="true"><i class="mfx-spark mfx-spark--1"></i><i class="mfx-spark mfx-spark--2"></i><i class="mfx-trail mfx-trail--l"></i><i class="mfx-trail mfx-trail--r"></i><i class="mfx-burst"></i></span>
 <!-- 펫 방울 = 캐릭창 랙 방울 부품 재사용(원형 젤리 kit-chip-v2 + .ct-art 얼굴).
 8/19 남색 임시 스킨은 은퇴했다(아래 §펫방울 주석). -->
 <span id="duel-baby" class="dh-baby cp-th kit-chip-v2" data-slot="pet-bubble" aria-hidden="true"><i class="ct-art" aria-hidden="true"></i></span>
@@ -9872,15 +9878,16 @@ duel-castle-hd.webp(202×188) 하나이고 새 조각을 굽지 않는다.
 <span class="dh-castle" aria-hidden="true">&#127984;</span>
 <div id="duel-timer" class="wf-cap" data-part="capsule" data-variant="code" role="timer">0:00</div>
 </div>
+<!-- [판정판 130 · Task 8e] 이름판 옆 「Lv.」 칸 둘(#duel-foe-lv · #duel-me-lv — 2026-08-19 임시 HUD 집안) 은퇴 — 사용자 「저런건 우리 기획에없었어 … 제거해」.
+영웅 쪽 얇은 공격 게이지(.dh-sub > #duel-me-atk)도 은퇴 — 그 자리는 체력 숫자 자리의 「공격 게이지 줄」(#duel-me-atkrow · 아래)이 받는다(같은 id 의 채움). -->
 <div class="dh-side dh-foe" data-slot="side-foe">
-<b id="duel-foe-name" class="dh-name"></b><span id="duel-foe-lv" class="dh-lv">Lv.1</span>
+<b id="duel-foe-name" class="dh-name"></b>
 <div class="dh-bar"><i id="duel-foe-fill" class="dh-fill"></i></div>
 <div class="dh-sub"><i id="duel-foe-atk" class="dh-subfill"></i></div>
 </div>
 <div class="dh-side dh-me" data-slot="side-me">
-<b id="duel-me-name" class="dh-name"></b><span id="duel-me-lv" class="dh-lv">Lv.1</span>
+<b id="duel-me-name" class="dh-name"></b>
 <div class="dh-bar"><i id="duel-me-fill" class="dh-fill"></i></div>
-<div class="dh-sub"><i id="duel-me-atk" class="dh-subfill"></i></div>
 </div>
 <!-- 64-fix2 ② (사용자 반려 2026-09-27 「숫자가 게이지 바에 가려져서 지저분」) — 체력
 숫자는 막대 **밖**, 막대 바로 아래 빈 띠에 선다. .dh-bar·.dh-side 는 overflow:hidden
@@ -9888,7 +9895,10 @@ duel-castle-hd.webp(202×188) 하나이고 새 조각을 굽지 않는다.
 자리·크기 근거는 CSS 「64-fix2 ②」 절(#app.battle #duel-hud .dh-num). -->
 <span id="duel-foe-n" class="dh-num"><span class="dh-hp">0 <span class="dh-sl">/</span> 0</span></span>
 <span id="duel-me-n" class="dh-num"><span class="dh-hp">0 <span class="dh-sl">/</span> 0</span></span>
-<span id="duel-dmg" class="dh-dmg" data-slot="dmg"></span>
+<!-- [판정판 130 · Task 8e] 공격 게이지 줄(시안 3 「ref-battle-gemini3-gauge」 그대로) — 영웅 체력 숫자(#duel-me-n) 자리에 [칼][공격][막대][%].
+채움 = me.atk / me.atkMax(syncDuel 의 --atk — 은퇴한 얇은 게이지와 같은 id · 같은 변수) · 「%」 = duelAtkPct(). 폰 세로 HUD · PC 가로 이름판 같은 부품.
+체력 숫자 #duel-me-n 은 숨긴다(값은 계속 쓴다 — syncDuel 무변). [판정판 130] 가운데 위 「성 + DMG」(#duel-dmg, 2026-08-19 ec10516 임시 HUD)는 은퇴. -->
+<div id="duel-me-atkrow" class="dh-atkrow" aria-hidden="true"><i class="dh-atk-ic"></i><span class="dh-atk-t" data-i18n="act.attack">공격</span><span class="dh-atk-bar"><i id="duel-me-atk" class="dh-atk-fill"></i></span><b id="duel-me-atkpct" class="dh-atk-pct">0%</b></div>
 </div>
 <!-- v2 HUD strip. Collapses to 0px when both children are [hidden] (no vertical
 padding of its own), so classic Endless / Daily keep the v1 board height. -->
@@ -9978,8 +9988,14 @@ v4 5차 §4 — 보스 체력바.
 규칙 옆)으로 존재하지 않는 것과 같고, <style id="pc-landscape"> 가 가로
 분기에서만 그 봉인을 뚫어 켠다(64-fix2 ④ — 전에는 hidden 을 뚫었다).
 스타일 블록을 지우면 이 둘도 함께 사라진다(롤백 밸브 단일). -->
-<div id="pc-left" data-wide-only aria-hidden="true"></div>
-<div id="pc-right" data-wide-only aria-hidden="true"></div>
+<!-- [판정판 130 · Task 8e] 두 기둥 카드는 클래식 PC 에서도 전투 카드와 같은 젤리 판이다 — 판 등급 클래스(.jbox--modal, jelly-box-core 의 변수 ·
+::before · ::after)를 마크업으로 입힌다(전투는 그 규칙의 #app.battle 별칭으로 이미 같은 판 — 겹쳐도 같은 규칙 한 벌). 세로는 [data-wide-only] 봉인. -->
+<div id="pc-left" class="jbox--modal" data-wide-only aria-hidden="true"></div>
+<div id="pc-right" class="jbox--modal" data-wide-only aria-hidden="true"></div>
+<!-- [판정판 130 · Task 8e] 판 화면(클래식) PC 가로 왼쪽 「캐릭터」 카드 — 전투 영웅 카드와 같은 부품: 그림 상자(전신 · contain 아래 가운데) + 이름판.
+값은 playHeroSync()(syncHud 가 전투 밖에서 부른다)가 쓴다. 세로에서는 [data-wide-only] 봉인으로 없는 것과 같다(폰 짜임 무변). -->
+<span id="play-hero-av" data-wide-only aria-hidden="true"></span>
+<div id="play-hero-plate" data-wide-only aria-hidden="true"><b id="play-hero-name"></b></div>
 <!-- [판정판 121 · Task 6b] 가로 전투 악당 카드의 아래 상자 — 영웅 카드 아래 상자(메달 2×2 #actionbar)와 같은 크기 · 같은 높이 선.
 카드와 같은 젤리 유리 판(.jbox--modal 별칭, battle-landscape 절). 위 = 이 판 악당의 기술 이름 + 한 줄 설명(판 정보 창
 .nc-atk-n/.nc-atk-d 와 같은 문구 키 boss.atk.* · 같은 수 — duelHudMount 가 채운다). 칩 줄 #hud-row · 토스트는 자기 요소
@@ -10402,11 +10418,14 @@ lib-hud-bar.webp 를 쓰고 있었다(정본 판을 입은 클래식·전투에�
 <footer id="actionbar" data-part="hud" data-variant="actionbar">
 <i class="dh-plate dh-plate--top" data-part="hud-plate" data-variant="top" data-flip="y" aria-hidden="true"></i>
 <button id="btn-add" data-part="btn-medal" data-variant="attack" class="act" data-i18n-aria="aria.add" aria-label="Add remaining numbers to the board"><span class="act-ico"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-add"/></svg></span><span class="act-t" data-i18n="act.add">Add</span><span id="add-badge" class="act-badge">5</span></button>
-<button id="btn-hint" data-part="btn-medal" data-variant="special" class="act" data-i18n-aria="aria.hint" aria-label="Show a hint"><span class="act-ico"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-hint"/></svg></span><span class="act-t" data-i18n="act.hint">Hint</span><span id="hint-badge" class="act-badge">3</span></button>
-<button id="btn-undo" data-part="btn-medal" data-variant="pet" class="act" data-i18n-aria="aria.undo" aria-label="Undo last match"><span class="act-ico"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-undo"/></svg></span><span class="act-t" data-i18n="act.undo">Undo</span><span id="undo-badge" class="act-badge">1</span></button>
+<!-- [판정판 130 · Task 8e] 전투 스킬 단추 셋(각성 · 펫소환 · 스킬)의 후광(.act-halo — 시안 2 · 3 「스킬 단추 후광 연출」): 금 고리 + 은은한 빛 상시 ·
+.urge(쓸 수 있음)일 때만 도는 빛줄기(.ah-rays) + 별빛(.ah-spark) · 쓴 순간 커지며 사라짐(.halo-pop). 코드로만(CSS 「play-8e」 4절).
+전투가 아니면 display:none(다른 모드 단추 무변). 공격 단추(btn-add)는 전투에서 은퇴라 후광이 없다. -->
+<button id="btn-hint" data-part="btn-medal" data-variant="special" class="act" data-i18n-aria="aria.hint" aria-label="Show a hint"><i class="act-halo" aria-hidden="true"><i class="ah-rays"></i><i class="ah-spark ah-spark--1"></i><i class="ah-spark ah-spark--2"></i></i><span class="act-ico"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-hint"/></svg></span><span class="act-t" data-i18n="act.hint">Hint</span><span id="hint-badge" class="act-badge">3</span></button>
+<button id="btn-undo" data-part="btn-medal" data-variant="pet" class="act" data-i18n-aria="aria.undo" aria-label="Undo last match"><i class="act-halo" aria-hidden="true"><i class="ah-rays"></i><i class="ah-spark ah-spark--1"></i><i class="ah-spark ah-spark--2"></i></i><span class="act-ico"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-undo"/></svg></span><span class="act-t" data-i18n="act.undo">Undo</span><span id="undo-badge" class="act-badge">1</span></button>
 <!-- v4 A-2: re-deal the living tiles when the board is locked. The bar now
 holds FOUR .act buttons; .act is `flex:1 1 0`, so they simply share the row. -->
-<button id="btn-shuffle" data-part="btn-medal" data-variant="awaken" class="act" data-i18n-aria="aria.shuffle" aria-label="Shuffle the board"><span class="act-ico"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-shuffle"/></svg></span><span class="act-t" data-i18n="act.shuffle">Shuffle</span><span id="shuffle-badge" class="act-badge">1</span></button>
+<button id="btn-shuffle" data-part="btn-medal" data-variant="awaken" class="act" data-i18n-aria="aria.shuffle" aria-label="Shuffle the board"><i class="act-halo" aria-hidden="true"><i class="ah-rays"></i><i class="ah-spark ah-spark--1"></i><i class="ah-spark ah-spark--2"></i></i><span class="act-ico"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-shuffle"/></svg></span><span class="act-t" data-i18n="act.shuffle">Shuffle</span><span id="shuffle-badge" class="act-badge">1</span></button>
 </footer>
 </section>
 <!-- W9 PC 와이드 배경판. 세 스크린보다 **뒤**에 놓아야 일반 형제
@@ -11419,12 +11438,12 @@ KIT-STANDARD §8-3 에서 **반려**이고 ui-nameplate 는 소비처 0 인 고�
 집 규약대로 EN 문안이고, 두 언어는 i18n 표에만 산다. -->
 <div class="howto-panel">
 <div class="howto-art rules-card">
-<h3 class="rules-title" data-i18n="skills.title">Four buttons in battle</h3>
+<h3 class="rules-title" data-i18n="skills.title">Three buttons in battle</h3>
 <!-- ⑱-b 번호 원판 → 전투 메달(하단 4버튼과 같은 그림). [64-fix3d M-2] 글자 없는 원판
 medal-<역할>-v3 파생 아이콘(medal-<역할>-v3-90.webp · 레시피 tools/build/derive-rules-medals.py).
 각 설명 줄이 자기 메달을 이고 서서 그림↔글 1:1. -->
 <ol class="rules-list">
-<li><i class="rules-medal" aria-hidden="true" style="--mi:url('catalog/medal-attack-v3-90.webp')"></i><span data-i18n-html="skills.s1"><b>Attack</b> fills with every point you score and fires on its own when full.</span></li>
+<li><i class="rules-medal" aria-hidden="true" style="--mi:url('catalog/medal-attack-v3-90.webp')"></i><span data-i18n-html="skills.s1"><b>Attack</b> fills on your hero's name plate and fires on its own when full.</span></li>
 <li><i class="rules-medal" aria-hidden="true" style="--mi:url('catalog/medal-special-v3-90.webp')"></i><span data-i18n-html="skills.s2"><b>Awakening</b> fills only when you <b>alternate</b> sum-10 and same-number matches. Tap it to score <b>×2</b> for 8s.</span></li>
 <li><i class="rules-medal" aria-hidden="true" style="--mi:url('catalog/medal-awaken-v3-90.webp')"></i><span data-i18n-html="skills.s3"><b>Skill</b> fills with every match, faster at higher combos. Tap it to fire your hero's own skill.</span></li>
 <li><i class="rules-medal" aria-hidden="true" style="--mi:url('catalog/medal-pet-v3-90.webp')"></i><span data-i18n-html="skills.s4"><b>Pet</b> uses your chosen pet's skill. Each round starts with 2 uses, plus one per pet fruit you pop (up to 4).</span></li>
@@ -12444,7 +12463,7 @@ game.js **앞**이어야 한다 — 부팅 직후 나는 소리까지 클립으�
 이 파일을 빼고 빌드해도 게임은 돈다 — 그때는 모든 슬롯이 기존 신스다. -->
 <script defer src="catalog/js/tw-02-7ea6fa41.js"></script>
 <script defer src="catalog/js/tw-03-06721556.js"></script>
-<script defer src="catalog/js/tw-04-bd93274a.js"></script>
+<script defer src="catalog/js/tw-04-06e406c6.js"></script>
 <!-- ==FRUITDEF:BEGIN== generated by tools/fruit-tiles.js — do not edit by hand -->
 <!-- 열매 실루엣 클립 패스 9종 (DESIGN-V4 §5.8). clipPathUnits="objectBoundingBox"
 라 좌표가 0..1 이고, 타일 크기(--ts)가 어떤 값이든 같은 모양이 나온다.
@@ -12522,7 +12541,7 @@ width/height 0 + aria-hidden: 레이아웃·접근성 트리에 아무것도 더
 
 
 
-<link rel="stylesheet" href="tw-late-c23321d9.css">
+<link rel="stylesheet" href="tw-late-751dc310.css">
 <style id="compat-p1">
 @supports not (width: 1cqw) {
 #app.classic #classic-hud { --cqw: min(1vw, calc(var(--app-max) / 100)); height: calc(38.5 * var(--cqw)); }
@@ -14197,12 +14216,13 @@ background: repeating-linear-gradient(90deg, var(--prim-art-pink) 0 calc(7.18 * 
 --bt-stage-w: 1280; --bt-stage-h: 720;
 --bt-board-x: 384; --bt-board-y: 118; --bt-board-w: 512; --bt-board-h: 590;
 }
-#app.battle {
+#app.battle,
+#app:not(.battle) {
 --bu: var(--stage-u);
 --bt-x0: calc(50% - var(--bu) * var(--bt-stage-w) / 2);
 --bt-y0: calc(50% - var(--bu) * var(--bt-stage-h) / 2);
 }
-#app.battle #screen-game.active {
+:is(#app.battle, #app:not(.battle)) #screen-game.active {
 display: block;
 position: fixed;
 inset: 0;
@@ -14213,8 +14233,8 @@ max-height: none;
 margin: 0;
 background-image: none;      /* 그림은 #pc-bg 한 장이 창 전체에 깐다(세로 스크림+그림 :8237 을 끈다) */
 }
-#app.battle:has(> #screen-game.active) { max-width: none; }
-#app.battle #screen-game.active ~ #pc-bg[data-wide-only] {
+:is(#app.battle, #app:not(.battle)):has(> #screen-game.active) { max-width: none; }
+:is(#app.battle, #app:not(.battle)) #screen-game.active ~ #pc-bg[data-wide-only] {
 display: block !important;   /* 기본 절 봉인 [data-wide-only]{display:none !important} 를 뚫는다(가로 폰 844×390 포함) */
 position: fixed;
 inset: 0;
@@ -14254,7 +14274,7 @@ height: 100% !important;
 aspect-ratio: auto;
 }
 #app.battle #screen-game.active #combo-wrap { display: none !important; }
-#app.battle #screen-game.active #hud-row {
+:is(#app.battle, #app:not(.battle)) #screen-game.active #hud-row {
 display: flex !important;    /* pc-landscape ⑧b 의 display:none !important 를 뚫는다 */
 position: absolute;
 left: calc(var(--bt-x0) + var(--bu) * 60);
@@ -14275,13 +14295,13 @@ background-color: transparent;
 background-image: none;
 box-shadow: none;
 }
-#app.battle #screen-game.active #hud-row #tw-chip,
-#app.battle #screen-game.active #hud-row #pv-chip {
+:is(#app.battle, #app:not(.battle)) #screen-game.active #hud-row #tw-chip,
+:is(#app.battle, #app:not(.battle)) #screen-game.active #hud-row #pv-chip {
 --chip-h: max(calc(var(--text-min) * 2.6), calc(var(--bu) * 36));
 padding: 0 calc(var(--chip-h) * .45);
 font-size: max(var(--text-min), calc(var(--bu) * 15));
 }
-#app.battle #screen-game.active ~ #toast {
+:is(#app.battle, #app:not(.battle)) #screen-game.active ~ #toast {
 left: calc(var(--bt-x0) + var(--bu) * 194);
 top: calc(var(--bt-y0) + var(--bu) * 509);
 bottom: auto;
@@ -14289,7 +14309,7 @@ max-width: calc(var(--bu) * 268);
 padding: calc(var(--bu) * 9) calc(var(--bu) * 16);
 font-size: max(var(--text-min), calc(var(--bu) * 14));
 }
-#app.battle #screen-game.active #board-scroll {
+:is(#app.battle, #app:not(.battle)) #screen-game.active #board-scroll {
 position: absolute;
 left: calc(var(--bt-x0) + var(--bu) * var(--bt-board-x));
 top: calc(var(--bt-y0) + var(--bu) * var(--bt-board-y));
@@ -14299,11 +14319,11 @@ padding: 0;
 margin: 0;
 flex: none;
 }
-#app.battle #screen-game.active #board { --board-max: calc(var(--bu) * var(--bt-board-w)); }
-#app.battle #screen-game.active #pc-left[data-wide-only],
-#app.battle #screen-game.active #pc-right[data-wide-only],
-#app.battle #screen-game.active #duel-foe-box[data-wide-only],
-#app.battle #screen-game.active #duel-me-box[data-wide-only] {
+:is(#app.battle, #app:not(.battle)) #screen-game.active #board { --board-max: calc(var(--bu) * var(--bt-board-w)); }
+:is(#app.battle, #app:not(.battle)) #screen-game.active #pc-left[data-wide-only],
+:is(#app.battle, #app:not(.battle)) #screen-game.active #pc-right[data-wide-only],
+:is(#app.battle, #app:not(.battle)) #screen-game.active #duel-foe-box[data-wide-only],
+:is(#app.battle, #app:not(.battle)) #screen-game.active #duel-me-box[data-wide-only] {
 margin: 0;
 background-color: transparent;
 background-image: none;
@@ -14312,8 +14332,8 @@ box-shadow: none;
 --jbox-radius: calc(var(--bu) * 40);
 --jbox-bw: calc(var(--bu) * 1.5);
 }
-#app.battle #screen-game.active #pc-left[data-wide-only],
-#app.battle #screen-game.active #pc-right[data-wide-only] {
+:is(#app.battle, #app:not(.battle)) #screen-game.active #pc-left[data-wide-only],
+:is(#app.battle, #app:not(.battle)) #screen-game.active #pc-right[data-wide-only] {
 display: block !important;   /* 봉인 · pc-landscape 의 전투 #pc-left 접기(display:none !important)를 뚫는다 */
 position: absolute;
 z-index: 0;
@@ -14321,10 +14341,10 @@ top: calc(var(--bt-y0) + var(--bu) * var(--bt-board-y));    /* 카드 윗변·�
 width: calc(var(--bu) * 340);
 height: calc(var(--bu) * var(--bt-board-h));
 }
-#app.battle #screen-game.active #pc-left[data-wide-only]  { left: calc(var(--bt-x0) + var(--bu) * 24); }
-#app.battle #screen-game.active #pc-right[data-wide-only] { left: calc(var(--bt-x0) + var(--bu) * 916); }
-#app.battle #screen-game.active #duel-foe-box[data-wide-only],
-#app.battle #screen-game.active #duel-me-box[data-wide-only] {
+:is(#app.battle, #app:not(.battle)) #screen-game.active #pc-left[data-wide-only]  { left: calc(var(--bt-x0) + var(--bu) * 24); }
+:is(#app.battle, #app:not(.battle)) #screen-game.active #pc-right[data-wide-only] { left: calc(var(--bt-x0) + var(--bu) * 916); }
+:is(#app.battle, #app:not(.battle)) #screen-game.active #duel-foe-box[data-wide-only],
+:is(#app.battle, #app:not(.battle)) #screen-game.active #duel-me-box[data-wide-only] {
 position: absolute;
 z-index: 1;
 top: calc(var(--bt-y0) + var(--bu) * 497);
@@ -14333,11 +14353,11 @@ height: calc(var(--bu) * 203);
 box-sizing: border-box;
 pointer-events: none;
 }
-#app.battle #screen-game.active #duel-me-box[data-wide-only] {
+:is(#app.battle, #app:not(.battle)) #screen-game.active #duel-me-box[data-wide-only] {
 display: block !important;   /* 기본 절 봉인을 뚫는다 */
 left: calc(var(--bt-x0) + var(--bu) * 936);
 }
-#app.battle #screen-game.active #duel-foe-box[data-wide-only] {
+:is(#app.battle, #app:not(.battle)) #screen-game.active #duel-foe-box[data-wide-only] {
 display: flex !important;    /* 기본 절 봉인 [data-wide-only]{display:none !important} 를 뚫는다 */
 flex-direction: column;
 align-items: flex-start;
@@ -14361,7 +14381,7 @@ font-size: max(var(--text-min), calc(var(--bu) * 15));
 line-height: 1.1;
 color: var(--ink);
 }
-#app.battle #screen-game.active #hud-row #tw-chip #tw-next { color: var(--ink); }
+:is(#app.battle, #app:not(.battle)) #screen-game.active #hud-row #tw-chip #tw-next { color: var(--ink); }
 #app.battle:has(> #toast.show) #screen-game.active #duel-foe-skill-n,
 #app.battle:has(> #toast.show) #screen-game.active #duel-foe-skill-d { visibility: hidden; }
 #app.battle #screen-game.active #duel-hud {
@@ -14383,7 +14403,8 @@ pointer-events: none;
 --bt-fx: calc(var(--bt-mx) - var(--bu) * 892);
 --bt-fy: var(--bt-my);
 }
-#app.battle #screen-game.active #duel-hud .dh-plate {
+#app.battle #screen-game.active #duel-hud .dh-plate,
+#app:not(.battle) #screen-game.active #play-hero-plate[data-wide-only] {   /* [판정판 130] 클래식 캐릭터 카드 이름판 = 같은 판 재질(높이 · 자리는 「play-8e」 7절) */
 z-index: 3;
 width: calc(var(--bu) * 324);
 height: calc(var(--bt-hu) * 9.745 + var(--bu) * 16);
@@ -14433,15 +14454,6 @@ top: 0;
 width: calc(var(--bt-cu) * 8.90) !important;
 height: calc(var(--bt-cu) * 8.1495) !important;   /* 세로 25%H = 8.1495cqw */
 }
-#app.battle #screen-game.active #duel-dmg {
-left: calc(var(--bt-ox) + var(--bu) * 664);
-top: 0;
-width: calc(var(--bu) * 232);
-height: calc(var(--bt-cu) * 8.1495);
-padding: 0;
-justify-content: flex-start;
-font-size: max(var(--text-min), calc(var(--bu) * 18));
-}
 #app.battle #screen-game.active #duel-foe-av,
 #app.battle #screen-game.active #duel-me-av {
 top: calc(var(--bt-oy) + var(--bu) * 128);
@@ -14479,9 +14491,7 @@ top: calc(var(--bt-my) + var(--bt-hu) * 22.995);
 }
 #app.battle #screen-game.active #duel-hud .dh-side .dh-bar { left: 17.5%; top: 42%; width: 66.5%; height: 26%; }
 #app.battle #screen-game.active #duel-hud .dh-side .dh-sub { left: 17.5%; top: 70.5%; width: 66.5%; height: 5%; }
-#app.battle #screen-game.active #duel-hud .dh-side .dh-lv { left: 76%; width: 17.3%; top: 3.6%; height: 32.5%; }
 #app.battle #screen-game.active #duel-hud .dh-name { font-size: max(var(--text-min), calc(var(--bt-hu) * 2.90)); }
-#app.battle #screen-game.active #duel-hud .dh-lv   { font-size: max(var(--text-min), calc(var(--bt-hu) * 2.50)); }
 #app.battle #screen-game.active #duel-hud .dh-side .dh-name { left: 10%; width: 35%; top: 4.6%; height: 29.3%; }
 #app.battle #screen-game.active #duel-hud .dh-side .dh-name[data-long] { left: 4%; width: 47%; font-size: max(var(--text-min), calc(var(--bt-hu) * 2.62)); }
 #app.battle #screen-game.active #duel-hud .dh-track--l,
@@ -14557,6 +14567,643 @@ padding: 0 calc(var(--bu) * 4);
 font-size: max(var(--text-min), calc(var(--bu) * 18));
 }
 html[lang="en"] #app.battle #screen-game.active #actionbar .act .act-t { font-size: max(var(--text-min), calc(var(--bu) * 17.5)); }
+}
+</style>
+<style id="play-8e">
+:root {
+--mo-cast-life: 700ms;
+--mo-cast-in: 80ms;
+--mo-cast-out: 160ms;
+}
+#app.battle #actionbar #btn-add { display: none !important; }
+#app.battle #duel-hud #duel-me-n { display: none !important; }
+#app.battle #board-scroll { overflow: hidden; overflow: clip; }
+.act-halo { display: none; }
+#app.battle #duel-hud { --b8e-dy: .8; }
+#app.battle #duel-hud #duel-me-atkrow {
+position: absolute;
+display: flex;
+align-items: center;
+gap: .9cqw;
+left: 57.6cqw;
+top: 30.3cqw;
+width: 34.0cqw;                       /* 오른끝 91.6 = 옛 체력 숫자 오른끝(날개 장식 안쪽) */
+height: calc((2.44 + var(--b8e-dy)) * 1cqw);
+z-index: 6;
+pointer-events: none;
+white-space: nowrap;
+font-weight: 800;
+line-height: 1;
+color: var(--prim-ink);
+text-shadow: 0 0 .25em var(--prim-white), 0 .06em 0 var(--prim-white-a90);
+}
+#app.battle #duel-hud #duel-me-atkrow .dh-atk-ic {
+flex: 0 0 auto;
+height: 100%;
+aspect-ratio: 1;
+border-radius: 50%;
+background-image: url("catalog/medal-attack-ko@3x.webp");
+background-repeat: no-repeat;
+background-size: 180% auto;
+background-position: 51% 43%;
+box-shadow: 0 0 0 .18cqw var(--prim-white-a90);
+}
+#app.battle #duel-hud #duel-me-atkrow .dh-atk-t {
+flex: 0 0 auto;
+font-family: var(--font);
+font-size: max(var(--text-min), 2.83cqw);
+}
+#app.battle #duel-hud #duel-me-atkrow .dh-atk-bar {
+position: relative;
+flex: 1 1 auto;
+min-width: 0;
+height: 42%;
+border-radius: 999px;
+overflow: hidden;
+background-color: var(--role-foe-track);
+box-shadow: inset 0 0 0 .15cqw var(--prim-white-a62);
+}
+#app.battle #duel-hud #duel-me-atkrow .dh-atk-fill {
+position: absolute;
+inset: 0;
+display: block;
+border-radius: inherit;
+transform-origin: 0 50%;
+transform: scaleX(var(--atk, 0));
+background-image: linear-gradient(90deg, var(--prim-art-pink), var(--role-me-atk-b));
+transition: transform var(--dur-2) linear;
+}
+#app.battle #duel-hud #duel-me-atkrow .dh-atk-pct {
+flex: 0 0 auto;
+min-width: 2.9em;
+text-align: right;
+font-family: var(--font-latin);
+font-size: max(var(--text-min), 2.83cqw);
+font-variant-numeric: tabular-nums;
+}
+#app.battle #duel-hud .dh-num { height: calc((2.44 + var(--b8e-dy)) * 1cqw); font-size: max(var(--text-min), 2.83cqw); }
+#app.battle #duel-hud .dh-num .dh-sl { font-size: max(var(--text-min), .85em); }
+@media not all and (min-aspect-ratio: 1/1) {
+#app.battle #duel-hud [data-part="hud-plate"][data-variant="bottom"] {
+--b8e-pk: calc(99.35cqw / 1683);
+height: calc((16.47 + var(--b8e-dy)) * 1cqw);
+background-image: none;
+border-style: solid;
+border-color: transparent;
+border-width: 0;
+border-image-source: var(--hud-plate-bottom);
+border-image-slice: 200 0 70 0 fill;
+border-image-width: calc(var(--b8e-pk) * 200) 0 calc(var(--b8e-pk) * 70) 0;
+border-image-repeat: stretch;
+}
+}
+#app.battle #duel-hud #duel-me-glow,
+#app.battle #duel-hud #duel-me-fx {
+position: absolute;
+display: block;
+left: 68.67%;
+top: calc(70.28% - 68.90%);
+width: 21%;
+height: 68.90%;
+pointer-events: none;
+}
+#app.battle #duel-hud #duel-me-glow {
+z-index: 1;
+border-radius: 50%;
+background-image: radial-gradient(closest-side,
+color-mix(in srgb, var(--prim-art-pink) calc(var(--mo-mk-90) * 100%), transparent) 0%,
+color-mix(in srgb, var(--prim-art-pink) calc(var(--mo-mk-80) * 100%), transparent) 55%,
+color-mix(in srgb, var(--role-me-atk-b) calc(var(--mo-mk-45) * 100%), transparent) 78%,
+transparent 100%);
+opacity: var(--mo-mk-0);
+transform: scale(1.22);
+}
+#app.battle #duel-hud #duel-me-fx { z-index: 7; }
+#app.battle #duel-hud #duel-me-fx > i { position: absolute; display: block; pointer-events: none; }
+#app.battle #duel-hud #duel-me-av[data-atk-tier] { animation: b8e-breathe var(--dur-amb) ease-in-out infinite alternate; }
+@keyframes b8e-breathe { from { translate: 0 0; } to { translate: 0 -1%; } }
+#app.battle #duel-hud #duel-me-av[data-atk-tier="1"] ~ #duel-me-glow {
+--b8e-glo: var(--mo-mk-35); --b8e-ghi: var(--mo-mk-55);
+animation: b8e-glow var(--dur-amb) ease-in-out infinite alternate;
+}
+#app.battle #duel-hud #duel-me-av[data-atk-tier="2"] ~ #duel-me-glow,
+#app.battle #duel-hud #duel-me-av[data-atk-tier="3"] ~ #duel-me-glow {
+--b8e-glo: var(--mo-mk-70); --b8e-ghi: var(--mo-mk-100);
+animation: b8e-glow var(--dur-amb) ease-in-out infinite alternate;
+}
+@keyframes b8e-glow {
+from { opacity: var(--b8e-glo); transform: scale(1.22); }
+to   { opacity: var(--b8e-ghi); transform: scale(1.36); }
+}
+#app.battle #duel-hud #duel-me-fx .mfx-spark { inset: 0; opacity: var(--mo-mk-0); }
+#app.battle #duel-hud #duel-me-fx .mfx-spark::before {
+content: "";
+position: absolute;
+left: 50%;
+top: -2%;
+width: 16%;
+aspect-ratio: 1;
+margin-left: -8%;
+background-image:
+radial-gradient(closest-side, var(--prim-white) 0 22%, var(--prim-white-a0) 100%),
+linear-gradient(90deg, transparent 44%, var(--prim-white) 44% 56%, transparent 56%),
+linear-gradient(0deg, transparent 44%, var(--prim-white) 44% 56%, transparent 56%);
+-webkit-mask-image: radial-gradient(closest-side, var(--prim-white) 30%, transparent 100%);
+mask-image: radial-gradient(closest-side, var(--prim-white) 30%, transparent 100%);
+}
+#app.battle #duel-hud #duel-me-av[data-atk-tier="2"] ~ #duel-me-fx .mfx-spark,
+#app.battle #duel-hud #duel-me-av[data-atk-tier="3"] ~ #duel-me-fx .mfx-spark {
+opacity: var(--mo-mk-100);
+animation: b8e-orbit calc(var(--dur-amb) * 2) linear infinite;
+}
+#app.battle #duel-hud #duel-me-fx .mfx-spark--2 { animation-delay: calc(var(--dur-amb) * -1) !important; }
+@keyframes b8e-orbit { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+#app.battle #duel-hud #duel-me-av.cast { animation: b8e-step var(--mo-cast-life) var(--ease-out) 1; }
+@keyframes b8e-step {
+0%     { translate: 0 0; scale: 1; }
+11.43% { translate: -6% 0; scale: 1.06; }
+77.14% { translate: -6% 0; scale: 1.06; }
+100%   { translate: 0 0; scale: 1; }
+}
+#app.battle #duel-hud #duel-me-fx .mfx-trail {
+inset: -6% -16%;
+opacity: var(--mo-mk-0);
+background-repeat: no-repeat;
+background-size: contain;
+background-position: center;
+}
+#app.battle #duel-hud #duel-me-fx .mfx-trail--l { background-image: url("catalog/duel-trail-l.webp"); }
+#app.battle #duel-hud #duel-me-fx .mfx-trail--r { background-image: url("catalog/duel-trail-r.webp"); }
+#app.battle #duel-hud #duel-me-av.cast ~ #duel-me-fx .mfx-trail--l { animation: b8e-trail-l var(--mo-cast-life) var(--ease-out) 1 both; }
+#app.battle #duel-hud #duel-me-av.cast ~ #duel-me-fx .mfx-trail--r { animation: b8e-trail-r var(--mo-cast-life) var(--ease-out) 1 both; }
+@keyframes b8e-trail-l {
+0%     { opacity: var(--mo-mk-0);   transform: rotate(-40deg) scale(.86); }
+11.43% { opacity: var(--mo-mk-100); }
+77.14% { opacity: var(--mo-mk-90);  transform: rotate(12deg) scale(1); }
+100%   { opacity: var(--mo-mk-0);   transform: rotate(24deg) scale(1.04); }
+}
+@keyframes b8e-trail-r {
+0%     { opacity: var(--mo-mk-0);   transform: rotate(40deg) scale(.86); }
+11.43% { opacity: var(--mo-mk-100); }
+77.14% { opacity: var(--mo-mk-90);  transform: rotate(-12deg) scale(1); }
+100%   { opacity: var(--mo-mk-0);   transform: rotate(-24deg) scale(1.04); }
+}
+#app.battle #duel-hud #duel-me-fx .mfx-burst {
+left: 2%;
+top: 22%;
+width: 34%;
+aspect-ratio: 1;
+opacity: var(--mo-mk-0);
+background-image:
+radial-gradient(closest-side, var(--prim-white) 0 18%, color-mix(in srgb, var(--role-rw-star-2) calc(var(--mo-mk-90) * 100%), transparent) 40%, var(--prim-white-a0) 100%),
+linear-gradient(90deg, transparent 46%, var(--prim-white) 46% 54%, transparent 54%),
+linear-gradient(0deg, transparent 46%, var(--prim-white) 46% 54%, transparent 54%);
+-webkit-mask-image: radial-gradient(closest-side, var(--prim-white) 35%, transparent 100%);
+mask-image: radial-gradient(closest-side, var(--prim-white) 35%, transparent 100%);
+}
+#app.battle #duel-hud #duel-me-av.cast ~ #duel-me-fx .mfx-burst { animation: b8e-burst var(--mo-cast-life) var(--ease-out) 1 both; }
+@keyframes b8e-burst {
+0%     { opacity: var(--mo-mk-0);   transform: scale(.2) rotate(0deg); }
+11.43% { opacity: var(--mo-mk-100); transform: scale(1.25) rotate(20deg); }
+45%    { opacity: var(--mo-mk-80);  transform: scale(.9) rotate(45deg); }
+100%   { opacity: var(--mo-mk-0);   transform: scale(.6) rotate(70deg); }
+}
+#app.battle #duel-hud #duel-me-av.hit { animation: b8e-flinch var(--dur-2) var(--ease-out) 1; }
+@keyframes b8e-flinch {
+0%   { rotate: 0deg;  translate: 0 0; }
+30%  { rotate: 5deg;  translate: 4% 0; }
+65%  { rotate: -2deg; translate: -1% 0; }
+100% { rotate: 0deg;  translate: 0 0; }
+}
+#app.battle #duel-hud #duel-me-fx::before {
+content: "";
+position: absolute;
+inset: 0;
+opacity: var(--mo-mk-0);
+pointer-events: none;
+background-image: radial-gradient(closest-side, color-mix(in srgb, var(--role-foe-fill-a) calc(var(--mo-mk-60) * 100%), transparent) 0%, transparent 100%);
+}
+#app.battle #duel-hud #duel-me-av.hit ~ #duel-me-fx::before { animation: b8e-hitflash var(--dur-2) var(--ease-out) 1 both; }
+@keyframes b8e-hitflash {
+0%   { opacity: var(--mo-mk-0); }
+30%  { opacity: var(--mo-mk-100); }
+100% { opacity: var(--mo-mk-0); }
+}
+#app.battle #actionbar .act .act-halo {
+--ah-h: calc(var(--medal-h) + var(--medal-up));
+--ah-top: calc(0px - var(--medal-up));
+--ah-d: calc(var(--ah-h) * .92);
+display: block;
+position: absolute;
+left: 50%;
+top: calc(var(--ah-top) + var(--ah-h) * .44);
+width: var(--ah-d);
+height: var(--ah-d);
+margin: calc(var(--ah-d) / -2) 0 0 calc(var(--ah-d) / -2);
+z-index: -1;
+pointer-events: none;
+border-radius: 50%;
+background-image:
+radial-gradient(closest-side, transparent 74%, var(--prim-art-gold) 78%, var(--prim-art-gold-e) 86%, transparent 91%),
+radial-gradient(closest-side, color-mix(in srgb, var(--role-rw-star-2) calc(var(--mo-mk-55) * 100%), transparent) 55%, transparent 100%);
+}
+#app.battle #actionbar .act .act-halo .ah-rays {
+position: absolute;
+inset: -22%;
+display: none;
+border-radius: 50%;
+background-image: repeating-conic-gradient(from 0deg, color-mix(in srgb, var(--role-rw-star-2) calc(var(--mo-mk-90) * 100%), transparent) 0deg 7deg, transparent 7deg 30deg);
+-webkit-mask-image: radial-gradient(closest-side, transparent 38%, var(--prim-white) 58%, transparent 100%);
+mask-image: radial-gradient(closest-side, transparent 38%, var(--prim-white) 58%, transparent 100%);
+}
+#app.battle #actionbar .act.urge .act-halo .ah-rays {
+display: block;
+opacity: var(--mo-mk-100);
+animation: b8e-spin calc(var(--dur-amb) * 4) linear infinite;
+}
+#app.battle #actionbar .act.primed .act-halo .ah-rays {
+display: block;
+opacity: var(--mo-mk-35);
+animation: b8e-spin calc(var(--dur-amb) * 4) linear infinite;
+}
+@keyframes b8e-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+#app.battle #actionbar .act .act-halo .ah-spark {
+position: absolute;
+display: none;
+width: 22%;
+aspect-ratio: 1;
+background-image:
+radial-gradient(closest-side, var(--prim-white) 0 22%, var(--prim-white-a0) 100%),
+linear-gradient(90deg, transparent 44%, var(--prim-white) 44% 56%, transparent 56%),
+linear-gradient(0deg, transparent 44%, var(--prim-white) 44% 56%, transparent 56%);
+-webkit-mask-image: radial-gradient(closest-side, var(--prim-white) 30%, transparent 100%);
+mask-image: radial-gradient(closest-side, var(--prim-white) 30%, transparent 100%);
+}
+#app.battle #actionbar .act .act-halo .ah-spark--1 { left: 0; top: 4%; }
+#app.battle #actionbar .act .act-halo .ah-spark--2 { right: -4%; top: 58%; }
+#app.battle #actionbar .act.urge .act-halo .ah-spark {
+display: block;
+animation: b8e-twinkle var(--dur-amb) ease-in-out infinite alternate;
+}
+#app.battle #actionbar .act.urge .act-halo .ah-spark--2 { animation-delay: calc(var(--dur-amb) / -2); }
+@keyframes b8e-twinkle {
+from { opacity: var(--mo-mk-35); transform: scale(.7) rotate(0deg); }
+to   { opacity: var(--mo-mk-100); transform: scale(1.1) rotate(45deg); }
+}
+#app.battle #actionbar .act.halo-pop .act-halo { animation: b8e-halo-pop var(--dur-2) var(--ease-out) 1 both; }
+@keyframes b8e-halo-pop {
+from { transform: scale(1);   opacity: var(--mo-mk-100); }
+to   { transform: scale(1.4); opacity: var(--mo-mk-0); }
+}
+@media not all and (min-aspect-ratio: 1/1) {
+#app.battle #duel-hud #duel-me-fx .mfx-spark--2,
+#app.battle #actionbar .act .act-halo .ah-spark--2 { display: none !important; }
+}
+@media (min-aspect-ratio: 1/1) {
+#app.battle #screen-game.active #duel-hud #duel-me-atkrow {
+left: calc(var(--bt-mx) + var(--bt-hu) * 57.6);
+top: calc(var(--bt-my) + var(--bt-hu) * 30.3);
+width: calc(var(--bt-hu) * 34.0);
+height: calc(var(--bt-hu) * (2.44 + var(--b8e-dy)));
+gap: calc(var(--bt-hu) * .9);
+}
+#app.battle #screen-game.active #duel-hud #duel-me-atkrow .dh-atk-t,
+#app.battle #screen-game.active #duel-hud #duel-me-atkrow .dh-atk-pct { font-size: max(var(--text-min), calc(var(--bt-hu) * 2.83)); }
+#app.battle #screen-game.active #duel-hud #duel-me-atkrow .dh-atk-ic { box-shadow: 0 0 0 calc(var(--bt-hu) * .18) var(--prim-white-a90); }
+#app.battle #screen-game.active #duel-hud #duel-me-atkrow .dh-atk-bar { box-shadow: inset 0 0 0 calc(var(--bt-hu) * .15) var(--prim-white-a62); }
+#app.battle #screen-game.active #duel-hud .dh-num { height: calc(var(--bt-hu) * (2.44 + var(--b8e-dy))); }
+#app.battle #screen-game.active #duel-hud .dh-plate { height: calc(var(--bt-hu) * (9.745 + var(--b8e-dy)) + var(--bu) * 16); }
+#app.battle #screen-game.active #duel-hud #duel-me-glow,
+#app.battle #screen-game.active #duel-hud #duel-me-fx {
+left: calc(var(--bt-ox) + var(--bu) * 936);
+top: calc(var(--bt-oy) + var(--bu) * 128);
+width: calc(var(--bu) * 300);
+height: calc(var(--bu) * 276);
+}
+#app.battle #screen-game.active #duel-hud #duel-me-glow {
+left: calc(var(--bt-ox) + var(--bu) * 966);
+width: calc(var(--bu) * 240);
+}
+:is(#app.battle, #app:not(.battle)) #screen-game.active #duel-foe-box[data-wide-only],
+:is(#app.battle, #app:not(.battle)) #screen-game.active #duel-me-box[data-wide-only] {
+--scr-k: calc(var(--bu) * 203 / 566);
+border-style: solid;
+border-color: transparent;
+border-width: 0;
+border-image-source: url("catalog/duel-scroll-plate.webp") !important;
+border-image-slice: 50 111 48 108 fill;
+border-image-width: calc(var(--scr-k) * 50) calc(var(--scr-k) * 111) calc(var(--scr-k) * 48) calc(var(--scr-k) * 108);
+border-image-repeat: stretch;
+}
+:is(#app.battle, #app:not(.battle)) #screen-game.active #duel-foe-box[data-wide-only]::before,
+:is(#app.battle, #app:not(.battle)) #screen-game.active #duel-me-box[data-wide-only]::before,
+:is(#app.battle, #app:not(.battle)) #screen-game.active #duel-foe-box[data-wide-only]::after,
+:is(#app.battle, #app:not(.battle)) #screen-game.active #duel-me-box[data-wide-only]::after { content: none; }
+:is(#app.battle, #app:not(.battle)) #screen-game.active #duel-foe-box[data-wide-only] {
+padding: calc(var(--bu) * 34) calc(var(--bu) * 46) calc(var(--bu) * 34) calc(var(--bu) * 43);
+}
+:is(#app.battle, #app:not(.battle)) #screen-game.active #hud-row {
+left: calc(var(--bt-x0) + var(--bu) * 87);
+bottom: calc(var(--bt-y0) + var(--bu) * (var(--bt-stage-h) - 666));
+width: calc(var(--bu) * 211);
+height: auto;
+max-height: calc(var(--bu) * 135);
+flex-wrap: wrap;
+align-content: flex-end;
+row-gap: calc(var(--bu) * 6);
+}
+:is(#app.battle, #app:not(.battle)) #screen-game.active ~ #toast {
+left: calc(var(--bt-x0) + var(--bu) * 192.5);
+top: calc(var(--bt-y0) + var(--bu) * 531);
+max-width: calc(var(--bu) * 211);
+}
+#app.battle #screen-game.active #actionbar #btn-shuffle { grid-column: 1 / -1; justify-self: center; }
+#app.battle #screen-game.active #actionbar .act .act-halo {
+--ah-h: var(--bt-medal-h);
+--ah-top: 0px;
+--ah-d: calc(var(--ah-h) * .98);
+}
+}
+@media (min-aspect-ratio: 1/1) {
+#app.classic #screen-game.active #topbar {
+position: absolute !important;
+left: calc(var(--bt-x0) + var(--bu) * 24);
+top: calc(var(--bt-y0) + var(--bu) * 16);
+width: max(var(--touch-min), calc(var(--bu) * 64));
+height: max(var(--touch-min), calc(var(--bu) * 64)) !important;
+min-height: 0 !important;
+padding: 0 !important;
+margin: 0 !important;
+z-index: 3;
+}
+#app.classic #screen-game.active #btn-pause {
+position: absolute;
+left: 0;
+top: 0;
+width: 100% !important;
+height: 100% !important;
+aspect-ratio: auto;
+}
+#app:not(.battle) #screen-game.active #hero-slot { display: none !important; }
+#app.classic #screen-game.active #classic-hud {
+position: absolute !important;
+left: calc(var(--bt-x0) + var(--bu) * 265);
+top: calc(var(--bt-y0) + var(--bu) * 4);
+width: calc(var(--bu) * 750);
+height: calc(var(--bu) * 86) !important;
+min-height: 0 !important;
+margin: 0 !important;
+border-width: 0 !important;
+z-index: 1;
+pointer-events: none;
+--bt-cu: calc(var(--bu) * 3.4436);
+--bt-ox: calc(var(--bu) * -265);
+--bt-oy: calc(var(--bu) * -4);
+}
+#app.classic #screen-game.active #classic-hud .dh-plate,
+#app.classic #screen-game.active #classic-hud .ch-fx { display: none !important; }
+#app.classic #screen-game.active #classic-hud .dh-cap {
+left: calc(50% - var(--bt-cu) * 22.05);
+top: calc(var(--bt-cu) * (8.09 - 0.766));
+width: calc(var(--bt-cu) * 44.10);
+height: calc(var(--bt-cu) * 17.65);
+}
+#app.classic #screen-game.active #classic-hud #ch-cap {
+left: calc(50% - var(--bt-cu) * 22.05 + var(--bt-cu) * (29.0 - 28.10));
+top: calc(var(--bt-cu) * (8.4 - 0.766));
+width: calc(var(--bt-cu) * 42.3) !important;
+height: calc(var(--bt-cu) * 15.7);
+--wcap-w: calc(var(--bt-cu) * 42.3);
+--wcap-h: calc(var(--bt-cu) * 15.7);
+font-size: calc(var(--bt-cu) * 14.3) !important;
+}
+#app.classic #screen-game.active #classic-hud #ch-castle {
+left: calc(50% - var(--bt-cu) * 22.05 + var(--bt-cu) * (45.93 - 28.10));
+top: 0;
+width: calc(var(--bt-cu) * 8.90);
+height: calc(var(--bt-cu) * 8.1495);
+}
+#app.classic #screen-game.active #classic-hud #ch-tc {
+--f2-gh: calc(var(--bu) * 12);
+left: calc(50% - var(--bu) * 160);
+top: calc(var(--bu) * 90);
+width: calc(var(--bu) * 320);
+}
+#app.classic #screen-game.active #classic-hud #ch-baby {
+position: absolute;
+left: calc(var(--bt-ox) + var(--bu) * 1152);
+top: calc(var(--bt-oy) + var(--bu) * 128);
+width: calc(var(--bu) * 84);
+z-index: 4;
+}
+#app.classic #screen-game.active #classic-hud .ch-g {
+left: calc(var(--bt-ox) + var(--bu) * 44);
+width: calc(var(--bu) * 300);
+right: auto;
+}
+#app.classic #screen-game.active #classic-hud #ch-l { top: calc(var(--bt-oy) + var(--bu) * 146); }
+#app.classic #screen-game.active #classic-hud #ch-r { top: calc(var(--bt-oy) + var(--bu) * 254); }
+#app.classic #screen-game.active #classic-hud #ch-tl,
+#app.classic #screen-game.active #classic-hud #ch-tr {
+--f2-gh: calc(var(--bu) * 14);
+left: calc(var(--bt-ox) + var(--bu) * 56);
+width: calc(var(--bu) * 276);
+}
+#app.classic #screen-game.active #classic-hud #ch-tl { top: calc(var(--bt-oy) + var(--bu) * 210); }
+#app.classic #screen-game.active #classic-hud #ch-tr { top: calc(var(--bt-oy) + var(--bu) * 318); }
+#app:not(.battle) #screen-game.active #combo-wrap {
+position: absolute;
+left: calc(var(--bt-x0) + var(--bu) * 56);
+top: calc(var(--bt-y0) + var(--bu) * 362);
+width: calc(var(--bu) * 276);
+height: calc(var(--bu) * 50);
+min-height: 0;
+margin: 0;
+padding: 0;
+z-index: 2;
+border-radius: 0;
+background-color: transparent;
+background-image: none;
+box-shadow: none;
+}
+#app:not(.battle) #screen-game.active #hud-row {
+top: calc(var(--bt-y0) + var(--bu) * 531);
+bottom: auto;
+height: calc(var(--bu) * 135);
+flex-direction: column;
+}
+#app:not(.battle) #screen-game.active #hud-row #mission-badge {
+--chip-h: max(calc(var(--text-min) * 2.6), calc(var(--bu) * 40));
+flex: 0 0 auto;
+width: auto;
+max-width: 100%;
+height: auto;
+min-height: var(--chip-h);
+padding: calc(var(--bu) * 8) calc(var(--bu) * 16);
+gap: calc(var(--bu) * 8);
+font-size: max(var(--text-min), calc(var(--bu) * 17));
+white-space: normal;
+word-break: keep-all;
+}
+#app:not(.battle) #screen-game.active #hud-row #mission-badge .mb-ico { width: max(var(--text-min), calc(var(--bu) * 18)); height: max(var(--text-min), calc(var(--bu) * 18)); }
+#app:not(.battle) #screen-game.active #duel-foe-skill-n,
+#app:not(.battle) #screen-game.active #duel-foe-skill-d { display: none; }
+#app:not(.battle) #screen-game.active #play-hero-av[data-wide-only] {
+display: block !important;
+position: absolute;
+left: calc(var(--bt-x0) + var(--bu) * 936);
+top: calc(var(--bt-y0) + var(--bu) * 128);
+width: calc(var(--bu) * 300);
+height: calc(var(--bu) * 276);
+z-index: 2;
+pointer-events: none;
+background-image: var(--me-full, none);
+background-repeat: no-repeat;
+background-size: auto calc(1200 / 1080 * 100%);
+background-position: center bottom;
+}
+#app:not(.battle) #screen-game.active #play-hero-plate[data-wide-only] {
+display: flex !important;
+position: absolute;
+align-items: center;
+justify-content: center;
+left: calc(var(--bt-x0) + var(--bu) * 924);
+top: calc(var(--bt-y0) + var(--bu) * 396);
+height: calc(var(--bu) * 56);
+pointer-events: none;
+}
+#app:not(.battle) #screen-game.active #play-hero-name {
+font-weight: 800;
+font-size: max(var(--text-min), calc(var(--bu) * 21.75));
+line-height: 1;
+color: var(--prim-white);
+white-space: nowrap;
+text-shadow: 0 .06em 0 var(--role-blue-outline), 0 -.06em 0 var(--role-blue-outline), .06em 0 0 var(--role-blue-outline), -.06em 0 0 var(--role-blue-outline), 0 .12em .25em var(--role-blue-outline);
+}
+#app:not(.battle) #screen-game.active #actionbar {
+--bt-medal-h: calc(var(--bu) * 203 / 2.11);
+--bt-medal-w: calc(var(--bt-medal-h) * 718 / 907);
+--bt-medal-g: calc(var(--bt-medal-h) * .11);
+--bt-medal-tw: max(var(--touch-min), var(--bt-medal-w));
+position: absolute;
+left: calc(var(--bt-x0) + var(--bu) * 936);
+top: calc(var(--bt-y0) + var(--bu) * 497);
+width: calc(var(--bu) * 300);
+height: calc(var(--bu) * 203);
+z-index: 2;
+display: grid;
+grid-template-columns: repeat(2, var(--bt-medal-tw));
+grid-auto-rows: var(--bt-medal-h);
+justify-content: center;
+align-content: center;
+gap: var(--bt-medal-g);
+padding: 0;
+margin: 0;
+}
+#app.classic #screen-game.active #actionbar { grid-template-columns: var(--bt-medal-tw); }
+#app:not(.battle) #screen-game.active #actionbar .act {
+flex: none;
+width: var(--bt-medal-tw);
+height: var(--bt-medal-h);
+min-height: 0;
+}
+#app:not(.battle) #screen-game.active #actionbar {
+border-style: none !important;
+border-width: 0 !important;
+border-image-source: none !important;
+background-color: transparent !important;
+background-image: none !important;
+box-shadow: none !important;
+filter: none !important;
+-webkit-backdrop-filter: none !important;
+backdrop-filter: none !important;
+}
+#app:not(.battle) #screen-game.active #actionbar::before,
+#app:not(.battle) #screen-game.active #actionbar::after,
+#app:not(.battle) #screen-game.active #actionbar > .dh-plate { display: none !important; }
+}
+@media (min-aspect-ratio: 1/1) {
+#app:not(.battle):not(.classic) #screen-game.active #topbar {
+position: absolute !important;
+left: calc(var(--bt-x0) + var(--bu) * 24);
+top: calc(var(--bt-y0) + var(--bu) * 16);
+width: max(var(--touch-min), calc(var(--bu) * 64)) !important;
+height: max(var(--touch-min), calc(var(--bu) * 64)) !important;
+min-height: 0 !important;
+padding: 0 !important;
+margin: 0 !important;
+display: block !important;
+overflow: visible !important;
+z-index: 3;
+border-image-source: none !important;
+background-color: transparent !important;
+background-image: none !important;
+box-shadow: none !important;
+}
+#app:not(.battle):not(.classic) #screen-game.active #topbar > .dh-plate { display: none !important; }
+#app:not(.battle):not(.classic) #screen-game.active #topbar #btn-pause {
+position: absolute;
+left: 0;
+top: 0;
+width: 100% !important;
+height: 100% !important;
+aspect-ratio: auto;
+}
+#app:not(.battle):not(.classic) #screen-game.active #tb-stats {
+position: absolute !important;
+left: calc(var(--bu) * 20);
+top: calc(var(--bu) * 130);
+width: calc(var(--bu) * 300) !important;
+max-width: none !important;
+margin: 0 !important;
+padding: 0 !important;
+display: grid !important;
+--tbs-cell: calc(var(--bu) * 144);
+--tbs-caph: calc(var(--bu) * 52);
+grid-template-columns: var(--tbs-cell) var(--tbs-cell) !important;
+grid-template-rows: none !important;
+grid-auto-rows: var(--tbs-caph) !important;
+gap: calc(var(--bu) * 12) !important;
+}
+#app:not(.battle):not(.classic) #screen-game.active #tb-stats > .stat {
+min-width: 0 !important;
+padding: 0 calc(var(--bu) * 14) !important;
+grid-column: auto !important;
+grid-row: auto !important;
+}
+#app:not(.battle):not(.classic) #screen-game.active #tb-stats .stat-k { font-size: max(var(--text-min), calc(var(--bu) * 17)) !important; }
+#app:not(.battle):not(.classic) #screen-game.active #tb-stats .stat-v { font-size: max(var(--text-min), calc(var(--bu) * 26)) !important; }
+#app:not(.battle):not(.classic) #screen-game.active #hud-row #rush-timer {
+position: absolute !important;
+left: calc(var(--bu) * (640 - 87 - 110));
+top: calc(var(--bu) * (14 - 531));
+width: calc(var(--bu) * 220);
+height: calc(var(--bu) * 64);
+margin: 0;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: max(var(--text-min), calc(var(--bu) * 34));
+border-radius: 999px;
+background-color: color-mix(in srgb, var(--mode-b-face) calc(var(--mode-b-alpha) * 100%), transparent);
+box-shadow:
+inset 0 0 0 calc(var(--bu) * 2) var(--mode-b-outline),
+inset 0 0 0 calc(var(--bu) * 4) var(--mode-b-rim);
+}
+}
+@media (prefers-reduced-motion: reduce) {
+#app.battle #duel-hud #duel-me-av[data-atk-tier],
+#app.battle #duel-hud #duel-me-av.cast,
+#app.battle #duel-hud #duel-me-av.hit { animation: none; }
+#app.battle #duel-hud #duel-me-av.hit ~ #duel-me-fx::before { animation: none; opacity: var(--mo-mk-60); }
+#app.battle #duel-hud #duel-me-av[data-atk-tier="1"] ~ #duel-me-glow { animation: none; opacity: var(--mo-mk-45); }
+#app.battle #duel-hud #duel-me-av[data-atk-tier="2"] ~ #duel-me-glow,
+#app.battle #duel-hud #duel-me-av[data-atk-tier="3"] ~ #duel-me-glow { animation: none; opacity: var(--mo-mk-90); }
+#app.battle #duel-hud #duel-me-fx > i { animation: none !important; opacity: var(--mo-mk-0) !important; }
+#app.battle #actionbar .act .act-halo,
+#app.battle #actionbar .act .act-halo .ah-rays,
+#app.battle #actionbar .act .act-halo .ah-spark { animation: none !important; }
+#app.battle #actionbar .act.urge .act-halo .ah-spark { opacity: var(--mo-mk-100); }
 }
 </style>
 <style id="gear-121">

@@ -7004,11 +7004,8 @@ white-space: nowrap;
 overflow: hidden;
 text-overflow: ellipsis;
 }
-.dh-lv { flex: 0 0 auto; font: 800 9px/1 var(--font-latin); }
 .dh-foe .dh-name { color: #FFE4E9; }
-.dh-foe .dh-lv   { color: #FFB4A6; }
 .dh-me  .dh-name { color: #204464; }
-.dh-me  .dh-lv   { color: #2C6E96; }
 .dh-bar {
 position: relative;
 height: 13px;
@@ -7039,7 +7036,6 @@ white-space: nowrap;
 #duel-foe-n { color: #FFF1F1; text-shadow: 0 1px 2px rgba(0, 0, 0, .85); }   /* 64-fix2 ② — 숫자가 .dh-foe 밖(#duel-hud 직계)으로 나가 id 로 받는다 */
 #duel-me-n  { color: #16374E; text-shadow: 0 1px 1px rgba(255, 255, 255, .70); }
 .dh-sub { height: 2px; margin-top: 2px; border-radius: 1px; overflow: hidden; background: rgba(0, 0, 0, .34); }
-.dh-me .dh-sub { background: rgba(34, 74, 108, .26); }
 .dh-subfill {
 display: block;
 height: 100%;
@@ -7048,17 +7044,6 @@ transform: scaleX(var(--atk, 0));
 transition: transform 200ms linear;
 }
 .dh-foe .dh-subfill { background-image: var(--duel-foe-atk); }
-.dh-me  .dh-subfill { background-image: var(--duel-me-atk); }
-.dh-dmg {
-display: block;
-margin-top: 2px;
-font: 800 9px/1.2 var(--font-latin);
-color: #2C6E96;
-text-align: right;
-white-space: nowrap;
-overflow: hidden;
-text-overflow: ellipsis;
-}
 .dh-mid { flex: 0 0 auto; width: 92px; display: flex; flex-direction: column; align-items: center; }
 .dh-castle {
 display: block;
@@ -7224,16 +7209,11 @@ background:linear-gradient(180deg,rgba(255,255,255,.42),rgba(255,255,255,0));
 pointer-events:none;
 }
 #app.battle .dh-foe .dh-name{color:#FED7EA !important;text-shadow:0 1px 2px rgba(66,11,53,.92);}
-#app.battle .dh-foe .dh-lv  {color:#FFC2DE !important;text-shadow:0 1px 2px rgba(66,11,53,.92);}
 #app.battle #duel-foe-n {color:#FFF1F6 !important;text-shadow:0 1px 2px rgba(40,0,16,.95);}
 #app.battle .dh-me .dh-name{color:#FFFFFF !important;
 text-shadow:0 1px 0 rgba(43,71,99,.95),0 -1px 0 rgba(43,71,99,.80),
 1px 0 0 rgba(43,71,99,.80),-1px 0 0 rgba(43,71,99,.80),0 2px 4px rgba(43,71,99,.55);}
-#app.battle .dh-me .dh-lv  {color:#F2FBFF !important;
-text-shadow:0 1px 0 rgba(43,71,99,.95),0 -1px 0 rgba(43,71,99,.80),
-1px 0 0 rgba(43,71,99,.80),-1px 0 0 rgba(43,71,99,.80);}
 #app.battle #duel-me-n {color:#16374E !important;text-shadow:0 1px 1px rgba(255,255,255,.80);}
-#app.battle .dh-me .dh-dmg {color:#255C82 !important;text-shadow:0 1px 1px rgba(255,255,255,.72);}
 
 /* == jelly-box-core == */
 
@@ -7487,27 +7467,8 @@ z-index:4;
 #app.battle .dh-me::after{background-image:none;}  /* 장식은 이제 별도 요소(.dh-orn--ml/mr) */
 #app.battle .dh-foe .dh-bar,
 #app.battle .dh-me  .dh-bar{ background:transparent !important; box-shadow:none !important; }
-#app.battle .dh-side::before{
-content:"";position:absolute;
-top:3.6%;height:32.5%;
-left:76.0%;width:17.3%;
-margin:0;
-border-radius:24% 24% 34% 34% / 34% 34% 48% 48%;
-background-image:none;
-pointer-events:none;
-z-index:1;
-}
-#app.battle .dh-foe::before{
-background-color:rgba(124,58,116,.90);
-box-shadow:inset 0 0 0 1px rgba(200,154,200,.55),inset 0 2px 4px rgba(255,214,246,.22);
-}
-#app.battle .dh-me::before{
-left:76.8%;width:15.3%;top:1.9%;height:33.1%;
-background-color:rgba(226,238,250,.38);
-box-shadow:inset 0 0 0 1px rgba(255,255,255,.60),inset 0 2px 4px rgba(255,255,255,.34);
-}
-#app.battle #duel-hud .dh-name,
-#app.battle #duel-hud .dh-lv{
+#app.battle .dh-side::before{ content:none; }
+#app.battle #duel-hud .dh-name{
 position:absolute;
 display:flex;align-items:center;justify-content:center;
 margin:0;
@@ -7521,14 +7482,6 @@ font-size:11px;font-size:max(var(--text-min), 2.90cqw);font-weight:800;
 #app.battle .dh-me .dh-name{
 left:40.0%;width:30.0%;top:1.9%;height:33.1%;
 font-size:11px;font-size:max(var(--text-min), 2.90cqw);font-weight:800;
-}
-#app.battle .dh-foe .dh-lv{
-left:76.0%;width:17.3%;top:3.6%;height:32.5%;
-font-size:10px;font-size:2.50cqw;font-weight:800;
-}
-#app.battle .dh-me .dh-lv{
-left:76.8%;width:15.3%;top:1.9%;height:33.1%;
-font-size:10px;font-size:2.50cqw;font-weight:800;
 }
 html[lang="en"] #app.battle .dh-foe .dh-name{
 left:4.0%;width:47.0%;
@@ -7552,7 +7505,6 @@ overflow:hidden;
 z-index:3;
 }
 #app.battle .dh-foe .dh-sub{left:10.5%;top:70.5%;width:79.0%;height:5%;}
-#app.battle .dh-me  .dh-sub{left:17.5%;top:70.5%;width:66.5%;height:5%;}
 #app.battle .dh-fill::after{border-radius:999px 999px 0 0;}
 #app.battle #duel-hud .dh-num{
 inset:auto;
@@ -7564,17 +7516,6 @@ z-index:6;
 #duel-hud .dh-num .dh-sl{ font-size:.85em; }
 #app.battle #duel-hud #duel-foe-n{ left:8.04cqw; justify-content:flex-start; }
 #app.battle #duel-hud #duel-me-n{ right:8.43cqw; justify-content:flex-end; }
-#app.battle #duel-dmg{
-position:absolute;
-left:46.4%;top:0;width:calc(25.6% + 3px);height:15%;
-box-sizing:border-box;padding-right:3px;  /* 그림자 3px 를 상자 안에 — 글자 우끝(280.8px)은 padding 으로 고정 */
-display:flex;align-items:center;justify-content:flex-end;
-margin:0;
-font-size:10px;font-size:max(var(--text-min), 2.44cqw);
-color:#FFFFFF !important;
-text-shadow:0 1px 2px rgba(var(--prim-ink-plum-rgb),.85),0 0 3px rgba(var(--prim-ink-plum-rgb),.55) !important;
-z-index:3;
-}
 #app.chill #board::after {
 content: "";
 position: absolute;

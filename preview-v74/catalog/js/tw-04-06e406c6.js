@@ -2410,8 +2410,8 @@ en: {
 'rules.r2': 'Joined by a <b>straight path</b> across, down, or diagonally.',
 'rules.r3': 'Or the <b>end</b> of a row to the <b>start</b> of the next.',
 'rules.note': 'Either way, nothing may be left standing in between.',
-'skills.title': 'Four buttons in battle',
-'skills.s1': '<b>Attack</b> fills with every point you score and fires on its own when full.',
+'skills.title': 'Three buttons in battle',
+'skills.s1': '<b>Attack</b> fills on your hero\'s name plate and fires on its own when full.',
 'skills.s2': '<b>Awakening</b> fills only when you <b>alternate</b> sum-10 and same-number matches. Tap it to score <b>×{am}</b> for {awk}s.',
 'skills.s3': "<b>Skill</b> fills with every match, faster at higher combos. Tap it to fire your hero's own skill.",
 'skills.s4': '<b>Pet</b> uses your chosen pet\'s skill. Each round starts with {pu} uses, plus one per pet fruit you pop (up to {pmax}).',
@@ -2690,11 +2690,9 @@ en: {
 'act.awk.left': '{n}s',
 'act.pet': 'Pet',
 'act.awaken': 'Skill',
-'aria.attack': 'Attack gauge status',
 'aria.special': 'Awaken. Every point you earn is ×{am} for {awk}s.',
 'aria.pet': 'Use your pet skill',
 'aria.awaken': 'Skill',
-'duel.atkstat': 'Attack {n}%. It fills with every point you score, and fires on its own when full.',
 'duel.spstat': 'Awakening {n}%. Alternate sum-10 and same-number matches to fill it.',
 'duel.spgo': 'Awakened! Every point you earn is ×{am} for {awk}s',
 'duel.awkon': 'Awakening is on. {n}s left.',
@@ -3577,8 +3575,8 @@ ko: {
 'rules.r2': '가로·세로·대각선 <b>곧은 길</b>로 이어질 것',
 'rules.r3': '또는 줄 <b>끝</b>에서 다음 줄 <b>첫 칸</b>으로',
 'rules.note': '어느 쪽이든 사이에 타일이 남아 있으면 안 돼.',
-'skills.title': '전투의 네 버튼',
-'skills.s1': '<b>공격</b> 게이지는 점수를 낼수록 차고, 다 차면 저절로 공격해요.',
+'skills.title': '전투의 세 단추',
+'skills.s1': '<b>공격</b> 게이지는 캐릭터 이름판에서 차고, 다 차면 저절로 공격해요.',
 'skills.s2': '<b>각성</b> 게이지는 합이 10인 짝과 같은 숫자 짝을 <b>번갈아</b> 맞출 때만 차요. 누르면 {awk}초 동안 점수가 <b>{am}배</b>예요.',
 'skills.s3': '<b>스킬</b> 게이지는 매치마다, 콤보가 높을수록 빨리 차요. 누르면 캐릭터 스킬을 써요.',
 'skills.s4': '<b>펫소환</b>은 고른 펫 스킬을 써요. 판마다 {pu}번으로 시작해 펫 과일을 터뜨릴 때마다 늘어요(최대 {pmax}번).',
@@ -3858,11 +3856,9 @@ ko: {
 'act.awk.left': '{n}초',
 'act.pet': '펫소환',
 'act.awaken': '스킬',
-'aria.attack': '공격 게이지 상태',
 'aria.special': '각성. {awk}초 동안 얻는 점수가 {am}배가 돼요.',
 'aria.pet': '펫 스킬 사용',
 'aria.awaken': '스킬',
-'duel.atkstat': '공격 {n}%. 점수를 낼수록 차고, 다 차면 저절로 나가요.',
 'duel.spstat': '각성 게이지 {n}%예요. 합이 10인 짝과 같은 숫자 짝을 번갈아 맞추면 차요.',
 'duel.spgo': '각성! {awk}초 동안 얻는 점수가 {am}배예요',
 'duel.awkon': '각성 중이에요. {n}초 남았어요.',
@@ -4580,7 +4576,7 @@ var next = Math.min(byW, byH);
 if (!isFinite(next)) next = TILE_MIN;
 next = clamp(next, TILE_MIN, TILE_MAX);
 if (isFinite(byW) && byW > 0 && next > byW) next = byW;   // never overflow width
-if (isFinite(byH) && byH > 0 && next > byH && battleOn() && battleStage()) next = byH;
+if (isFinite(byH) && byH > 0 && next > byH && battleStage()) next = byH;
 if (next < 12) next = 12;
 ts = next;
 board.style.setProperty('--ts', ts + 'px');
@@ -4962,6 +4958,20 @@ setBarPct('ch-tl', lp);
 setBarPct('ch-tc', cp);
 setBarPct('ch-tr', rp);
 }
+var playHeroKey = '';
+function playHeroSync() {
+var cid = charId();
+var nm = t('char.' + cid + '.name');     /* 언어를 바꾸면(setLang → syncHud) 이름도 바뀌어야 해서 열쇠에 넣는다 */
+if (cid + '|' + nm === playHeroKey) return;
+playHeroKey = cid + '|' + nm;
+var av = $('play-hero-av');
+if (av && av.style) {
+var full = stdArt(cid, 'full');
+if (full) av.style.setProperty('--me-full', full);
+else av.style.removeProperty('--me-full');
+}
+setText('play-hero-name', nm);
+}
 function setKey(el, txt) {
 if (!el || el.getAttribute('data-k') === txt) return;
 el.setAttribute('data-k', txt);
@@ -4980,6 +4990,7 @@ fill.setAttribute('data-p', next);
 function syncHud() {
 syncClassicSkin();
 syncClassicHud();
+if (!battleOn()) playHeroSync();   /* [판정판 130] 판 화면 PC 캐릭터 카드(전투 밖 갈래 전부 — 바뀔 때만 쓴다) */
 setText('stage-val', isDaily() ? ('#' + dailyNumber()) : S.stage);
 var ss = $('stat-stage');
 if (ss) {
@@ -7041,6 +7052,7 @@ return;
 }
 store.gauge = 0;
 persist();
+meCastFx($('btn-shuffle'));     /* [판정판 130] 전투에서만 낸다(함수 안에서 battleOn 확인) — 영웅 시전 연출 + 단추 후광 퍼짐 */
 castSkill(charId(), true);
 }
 function castSkill(id, selfHit) {
@@ -11837,9 +11849,6 @@ var foeAtk = bossAtkIdOf(d.def, S.advPlan ? S.advPlan.n : 0);
 setText('duel-foe-skill-n', t('boss.atk.' + foeAtk));
 setText('duel-foe-skill-d', t('boss.atk.' + foeAtk + '.d', ncAtkArgs(foeAtk)));
 setText('duel-foe-name', d.def ? bossName(d.def) : '');
-var lv = 'Lv.' + Math.max(1, S.stage | 0);
-setText('duel-foe-lv', lv);
-setText('duel-me-lv', lv);
 var cid = charId();
 setText('duel-me-name', t('char.' + cid + '.name'));
 ['duel-foe-name', 'duel-me-name'].forEach(function (id) {
@@ -11926,15 +11935,17 @@ var f = d.foe, m = d.me;
 dhVar(c, 'fr', 'duel-foe-fill', '--hp', f.hpMax > 0 ? Math.max(0, f.hp) / f.hpMax : 0);
 dhVar(c, 'mr', 'duel-me-fill', '--hp', m.hpMax > 0 ? Math.max(0, m.hp) / m.hpMax : 0);
 dhVar(c, 'fa', 'duel-foe-atk', '--atk', f.atkMax > 0 ? Math.min(1, f.atk / f.atkMax) : 0);
-dhVar(c, 'ma', 'duel-me-atk', '--atk', m.atkMax > 0 ? Math.min(1, m.atk / m.atkMax) : 0);
+var mr = m.atkMax > 0 ? Math.min(1, m.atk / m.atkMax) : 0;
+dhVar(c, 'ma', 'duel-me-atk', '--atk', mr);
+dhText(c, 'mp', 'duel-me-atkpct', duelAtkPct() + '%');
+var tier = mr >= 1 ? '3' : mr >= 0.66 ? '2' : mr >= 0.33 ? '1' : '0';
+if (c.mt !== tier) {
+c.mt = tier;
+var mav = $('duel-me-av');
+if (mav) mav.setAttribute('data-atk-tier', tier);
+}
 dhHp(c, 'fn', 'duel-foe-n', Math.max(0, Math.ceil(f.hp)), f.hpMax);
 dhHp(c, 'mn', 'duel-me-n', Math.max(0, Math.ceil(m.hp)), m.hpMax);
-dhText(c, 'dm', 'duel-dmg', 'DMG ' + (d.dmg | 0) + bossCondSuffix());
-}
-function bossCondSuffix() {
-var p = S.advPlan, d = p && p.bossDef;
-if (!(S.mode === 'adv' && p && p.boss && d)) return '';
-return '  \u25C6 ' + Math.min(S.bossProg | 0, d.need) + '/' + d.need;
 }
 function duelFoeAt() {
 var w = typeof window !== 'undefined' ? window.innerWidth : 360;
@@ -12001,10 +12012,38 @@ duelHitMe(DUEL_ME_HP);
 }, { cls: 'cut-scripted', subKey: 'story.s50.taunt', voice: 'jelly' });
 }, 900);
 }
+var meCastOffT = 0;
+function meCastFx(btn) {
+if (!battleOn()) return;
+var av = $('duel-me-av');
+if (av && av.classList) {
+var life = invCssMs('--mo-cast-life', 700);
+if (meCastOffT) { clearTimeout(meCastOffT); meCastOffT = 0; }
+var on = function () { av.classList.add('cast'); meCastOffT = setTimeout(function () { meCastOffT = 0; av.classList.remove('cast'); }, life); };
+if (av.classList.contains('cast')) { av.classList.remove('cast'); requestAnimationFrame(on); } else on();
+}
+if (btn && btn.classList) {
+var pop = invCssMs('--dur-2', 260);
+if (btn.__popT) { clearTimeout(btn.__popT); btn.__popT = 0; }
+var onB = function () { btn.classList.add('halo-pop'); btn.__popT = setTimeout(function () { btn.__popT = 0; btn.classList.remove('halo-pop'); }, pop); };
+if (btn.classList.contains('halo-pop')) { btn.classList.remove('halo-pop'); requestAnimationFrame(onB); } else onB();
+}
+}
+var meHitOffT = 0;
+function meHitFx() {
+if (!battleOn()) return;
+var av = $('duel-me-av');
+if (!av || !av.classList) return;
+var life = invCssMs('--dur-2', 260);
+if (meHitOffT) { clearTimeout(meHitOffT); meHitOffT = 0; }
+var on = function () { av.classList.add('hit'); meHitOffT = setTimeout(function () { meHitOffT = 0; av.classList.remove('hit'); }, life); };
+if (av.classList.contains('hit')) { av.classList.remove('hit'); requestAnimationFrame(on); } else on();
+}
 function duelMeAttack() {
 var d = S.duel;
 if (!d || d.down) return;
 var me = d.me;
+meCastFx(null);
 me.atk -= me.atkMax;
 if (me.atk < 0) me.atk = 0;
 if (typeof window !== 'undefined') {
@@ -12101,6 +12140,7 @@ return;
 d.me.hp = Math.max(0, d.me.hp - n);
 S.hitTaken = true;
 duelHudFlash('mhit', false);
+meHitFx();                       /* [판정판 130 · 지휘자 답 Q4] 영웅 그림 움찔 + 빨간 번쩍(채택표 「(말로)」 줄) */
 setAppClass('duel-hurt', true);
 later(function () { setAppClass('duel-hurt', false); }, 420);
 J.screenPulse();
@@ -12400,11 +12440,6 @@ return Math.min(100, Math.floor(d.me.sp / d.me.spMax * 100));
 function duelGaugePct() {
 return Math.floor(clamp(store.gauge, 0, SKILL_MAX) / SKILL_MAX * 100);
 }
-function duelAtkInfo() {
-if (!S.duel) return;
-toast(t('duel.atkstat', { n: duelAtkPct() }));
-J.sfx.ui();
-}
 var AWAKEN_MS = 8000;
 var AWAKEN_SCORE_MULT = 2;
 function awakenOn() {
@@ -12454,6 +12489,7 @@ J.sfx.fail();
 return;
 }
 d.me.sp = 0;
+meCastFx($('btn-hint'));            /* [판정판 130] 실제로 쓴 순간에만 — 미만땅 토스트 길에서는 안 낸다 */
 syncHud();
 syncDuel();
 runCutin(charId(), 'skill.sp.name', function () { awakenStart(); },
@@ -12468,6 +12504,7 @@ if (!mid) { toast(t('duel.petnone')); J.sfx.fail(); return; }
 if ((d.petLeft | 0) <= 0) { toast(t('duel.petout')); J.sfx.fail(); return; }
 d.petLeft = (d.petLeft | 0) - 1;
 dqBump('pet', 1);               /* 판정판 50 — 「펫 소환」 축 */
+meCastFx($('btn-undo'));        /* [판정판 130] 영웅 시전 연출 + 단추 후광 퍼짐(실제로 쓴 순간) */
 duelPetFx();
 badgePop('undo-badge');
 syncHud();
@@ -12841,7 +12878,6 @@ if (!d) return;
 var spFull = d.me.sp >= d.me.spMax;
 var gFull = gaugeFull() && !S.skillKind;
 var petOk = (d.petLeft | 0) > 0 && !!mateId();
-setText('add-badge', duelAtkPct() + '%');
 var awk = awakenOn();
 setText('hint-badge', awk ? awakenBadgeText() : (duelSpPct() + '%'));
 setText('undo-badge', d.petLeft | 0);
@@ -12855,7 +12891,6 @@ setCls(bsh, 'urge', gFull);
 setCls(bsh, 'primed', gaugeFull() && !!S.skillKind);
 }
 setAppClass('skill-full', gFull);
-setActLabel(ba, 'act.attack', 'aria.attack');
 setActLabel(bh, 'act.special', 'aria.special');
 setActLabel(bu, 'act.pet', 'aria.pet');
 setActLabel(bsh, 'act.awaken', 'aria.awaken');
@@ -14202,9 +14237,16 @@ return S.advCleared >= p.goal.need;
 function syncAdvGoal() {
 var el = $('adv-goal');
 if (!el) return;
-var live = S.mode === 'adv' && !!S.advPlan && !S.advPlan.boss && !battleOn();
+var bossDuel = S.mode === 'adv' && !!S.advPlan && !!S.advPlan.boss && !!S.advPlan.bossDef && battleOn();
+var live = bossDuel || (S.mode === 'adv' && !!S.advPlan && !S.advPlan.boss && !battleOn());
 if (el.hidden !== !live) el.hidden = !live;
 if (!live) return;
+if (bossDuel) {
+var bd = S.advPlan.bossDef, bn = Math.min(S.bossProg | 0, bd.need);
+setText('adv-goal-t', t('boss.prog', { c: bossCondText(bd), n: bn, goal: bd.need }));
+if (el.classList) el.classList.toggle('done', bn >= bd.need);
+return;
+}
 var p = S.advPlan, txt;
 if (p.goal.type === 'digit') {
 txt = t('adv.hud.digit', { d: p.goal.digit, n: Math.min(S.advDigit, p.goal.need), goal: p.goal.need });
@@ -17999,7 +18041,7 @@ on(board, 'pointerdown', onBoardPointerDown);
 on(board, 'dblclick', function (e) { if (e && e.preventDefault) e.preventDefault(); });
 on(board, 'contextmenu', function (e) { if (e && e.preventDefault) e.preventDefault(); });
 }
-on($('btn-add'), 'click', function () { if (battleBoard()) duelAtkInfo(); else doAdd(); });
+on($('btn-add'), 'click', function () { if (battleBoard()) return; doAdd(); });   /* [판정판 130] 전투에서는 단추가 은퇴(숨김) — 판 규약상 추가도 막힌다 */
 on($('btn-hint'), 'click', function () { if (battleOn()) doSpecial(); else doHint(); });
 on($('btn-undo'), 'click', function () { if (battleOn()) doPetSkill(); else doUndo(); });
 on($('btn-shuffle'), 'click', function () { if (battleOn()) doAwaken(); else doShuffle(false); });
@@ -18660,7 +18702,7 @@ duelOnMatch: duelOnMatch, duelInit: duelInit, duelTimeoutWin: duelTimeoutWin,
 duelAtkMax: duelAtkMax, duelFoeHpMax: duelFoeHpMax, duelFoeHit: duelFoeHit,
 duelNeedHits: duelNeedHits, arcFoeHpMax: arcFoeHpMax,
 foeDriver: foeDriver,
-duelAtkInfo: duelAtkInfo, doSpecial: doSpecial, doPetSkill: doPetSkill,
+doSpecial: doSpecial, doPetSkill: doPetSkill,
 doAwaken: doAwaken, petPeck: petPeck, petShield: petShield,
 awakenOn: awakenOn, awakenMult: awakenMult, awakenStart: awakenStart, awakenLeftMs: awakenLeftMs,
 AWAKEN_MS: AWAKEN_MS, get lastGain() { return lastGainRec; },
