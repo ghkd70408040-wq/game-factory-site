@@ -8892,6 +8892,11 @@ filter: drop-shadow(0 0 10px rgba(102, 240, 159, .40));
 --mode-a-contact: 0.324;
 --mode-a-face-desc:  #E3D8DF;
 --mode-a-alpha-desc: .58;
+--mode-a-rim-in-k: .00315; --mode-a-rim-w-k: .00350; --mode-a-rim-a: .98;
+--mode-a-rim-w2-k: .01094; --mode-a-rim-w3-k: .01290; --mode-a-rim-k2: .424; --mode-a-rim-k3: .093;
+--mode-a-L3-w-k: .00400; --mode-a-L3-a: .745; --mode-a-milk-a: .0222;
+--mode-a-band-w-k: .00991; --mode-a-band-s-k: .0161;
+--mode-a-under-head-a: 0;
 --mode-b-face:    #96A7F6;
 --mode-b-alpha:   0.550;
 --mode-b-rim:     #C2D6FF;
@@ -9263,7 +9268,7 @@ filter: drop-shadow(0 0 10px rgba(102, 240, 159, .40));
 <link rel="preload" as="image" href="catalog/jelly-box-c.webp">
 <link rel="preload" as="image" href="catalog/duel-title-play.webp">
 <!-- ==RELEASE:BEGIN== 출시 메타 (scratchpad/release-0908/apply-head.py 가 생성·교체, 본문 무접촉) -->
-<meta name="build" content="5018227-20261020-0026">
+<meta name="build" content="3c248bd-20261020-1059">
 <meta name="application-name" content="텐트윈 젤리팡 월드">
 <meta name="description" lang="ko" content="숫자 젤리를 골라 10을 만들어 터뜨리는 퍼즐이에요. 모험·아케이드·데일리·타임 러시·클래식을 즐겨요. Ten Twin Jelly Pang World: pick number jellies that equal or sum to 10.">
 <link rel="manifest" href="tentwin.webmanifest">
@@ -9317,7 +9322,7 @@ navigator.serviceWorker.register('sw.js',{scope:'./'}).catch(function(e){console
 })}
 </script>
 <!-- ==RELEASE:END== -->
-<link rel="preload" as="style" href="tw-late-751dc310.css">
+<link rel="preload" as="style" href="tw-late-3e88a444.css">
 </head>
 <body>
 <!-- ============================================================
@@ -12290,26 +12295,29 @@ rather than replacing them: every entry point is a detour, and closing the
 board has to put the player back exactly where they were. game.js builds
 #rank-list with createElement — always five children, filled or empty — the
 moment the sheet opens, and never between opens. -->
-<div id="modal-rank" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="rank-h"><div class="sheet jbox jbox--modal mframe" data-part="modal-plate">
-<div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
+<!-- [Task 129 수정 1회차 I3 · 지휘자 판정 (c)] 기록 갈래 탭 여섯(판 내용 = 그 모드의 TOP5 를 통째로 바꾼다) = 같은 구운 탭으로 두 줄(셋씩) — 미션 · 확률과 같은 짜임
+(바깥 .sheet = 그리지 않는 틀(.mf-tabhost) · 제목 캡슐 + ✕ · 그 아래 탭 판 .cp-card.mframe[data-tabs="3"][data-rows="2"] = 탭 → 본문(.cp-body)).
+앞 줄 = 일반(무한 · 타임 러시 · 데일리) · 뒷 줄 = 클래식 셋 — 고른 탭의 줄이 판에 붙는 앞 칸으로 온다(CSS :has(aria-selected) · JS 무변: wire() 의
+RANK_MODES 루프 · buildRankList 가 id 로 찾고 aria-selected 를 찍는다). 옛 젤리 알약(.rank-tab) 두 줄 접기는 은퇴. -->
+<div id="modal-rank" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="rank-h"><div class="sheet jbox jbox--modal mf-tabhost">
 <h2 id="rank-h" data-i18n="rank.title">Records</h2>
 <button class="r10-x x-btn" type="button" data-w6x="rank-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
-<div id="rank-tabs" role="tablist" data-i18n-aria="aria.rankTab" aria-label="Pick which records to show">
-<button id="rank-tab-endless" class="rank-tab" role="tab" aria-selected="true" data-i18n="rank.tab.endless">Endless</button>
-<button id="rank-tab-rush" class="rank-tab" role="tab" aria-selected="false" data-i18n="rank.tab.rush">Time Rush</button>
-<button id="rank-tab-daily" class="rank-tab" role="tab" aria-selected="false" data-i18n="rank.tab.daily">Daily</button>
-<!-- W7.5 클래식 — 일반 셋과 **같은 문법의 다른 보드**다. 탭이 여섯이 되면서
-#rank-tabs 가 두 줄로 접히도록 CSS 에 flex-wrap 을 세웠고(.rank-tab 의
-flex-basis 가 그 접힘을 강제한다), 앞 세 개 / 뒤 세 개가 한 줄씩 서서
-"일반 | 클래식" 의 구분이 배치만으로 읽힌다. 배선은 wire() 의
-RANK_MODES 루프가 이미 하고 있어 한 줄도 더 붙지 않는다. -->
-<button id="rank-tab-classic" class="rank-tab" role="tab" aria-selected="false" data-i18n="rank.tab.classic">Classic</button>
-<button id="rank-tab-classic-rush" class="rank-tab" role="tab" aria-selected="false" data-i18n="rank.tab.classicrush">Classic Rush</button>
-<button id="rank-tab-classic-daily" class="rank-tab" role="tab" aria-selected="false" data-i18n="rank.tab.classicdaily">Classic Daily</button>
+<div class="cp-card kit-frame-v2 mframe" data-tabs="3" data-rows="2" data-part="modal-plate">
+<div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
+<div id="rank-tabs" class="cp-tabs kit-frame-v2__tabs" role="tablist" data-i18n-aria="aria.rankTab" aria-label="Pick which records to show">
+<button id="rank-tab-endless" class="cp-tab kit-tab-v2" type="button" role="tab" aria-selected="true"><span class="cpt-lab" data-i18n="rank.tab.endless">Endless</span></button>
+<button id="rank-tab-rush" class="cp-tab kit-tab-v2" type="button" role="tab" aria-selected="false"><span class="cpt-lab" data-i18n="rank.tab.rush">Time Rush</span></button>
+<button id="rank-tab-daily" class="cp-tab kit-tab-v2" type="button" role="tab" aria-selected="false"><span class="cpt-lab" data-i18n="rank.tab.daily">Daily</span></button>
+<button id="rank-tab-classic" class="cp-tab kit-tab-v2" type="button" role="tab" aria-selected="false"><span class="cpt-lab" data-i18n="rank.tab.classic">Classic</span></button>
+<button id="rank-tab-classic-rush" class="cp-tab kit-tab-v2" type="button" role="tab" aria-selected="false"><span class="cpt-lab" data-i18n="rank.tab.classicrush">Classic Rush</span></button>
+<button id="rank-tab-classic-daily" class="cp-tab kit-tab-v2" type="button" role="tab" aria-selected="false"><span class="cpt-lab" data-i18n="rank.tab.classicdaily">Classic Daily</span></button>
 </div>
+<div class="cp-body">
 <p id="rank-hint"></p>
 <div id="rank-list"></div>
 <button id="rank-close" data-part="btn-modal" data-variant="primary" class="btn btn-primary" data-i18n-aria="aria.rankClose" data-i18n="rank.close" aria-label="Close records">Close</button>
+</div>
+</div>
 </div></div>
 <!-- ===== 퀘스트 · 출석 (판정판 50 · 2026-09-11) =====================
 판은 **정본 모달 판 인스턴스**다 — `.sheet.jbox.jbox--modal[data-part=
@@ -12323,10 +12331,11 @@ aria-selected 로 낸다 — 새 상태 어휘를 만들지 않는다.
 뒤집어 붙이면 광원이 뒤집힌다(부품 계약 위반). 자리보다 부품을 지켰다. -->
 <!-- [판정판 129 · Task 129 · 지휘자 판정 Q5] 판 내용을 통째로 바꾸는 탭(일일 · 주간 · 에픽) = 판 윗변에 구운 탭 셋(방 · 장비 창과 한 생성기 · 한 훅 .mframe[data-tabs]).
 짜임 = 장비 창과 같다: 바깥 .sheet(.mf-tabhost)는 그리지 않는 틀 — 제목 캡슐 + ✕ 가 판 위에 서고, 그 아래 탭 달린 젤리 판(.cp-card.mframe) = 탭 → 본문(.cp-body). -->
-<div id="modal-quest" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="quest-h"><div class="sheet jbox jbox--modal mf-tabhost" data-part="modal-plate">
+<div id="modal-quest" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="quest-h"><div class="sheet jbox jbox--modal mf-tabhost">
 <h2 id="quest-h" data-i18n="quest.title">Missions</h2>
 <button class="r10-x x-btn" type="button" data-w6x="quest-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
-<div class="cp-card kit-frame-v2 mframe" data-tabs="3">
+<!-- [Task 129 수정 1회차 M7] data-part="modal-plate"(판을 찾는 도구의 손잡이) = 보이는 판(안쪽 탭 판) — 바깥 틀은 그리지 않는다 -->
+<div class="cp-card kit-frame-v2 mframe" data-tabs="3" data-part="modal-plate">
 <div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
 <div id="quest-tabs" class="cp-tabs kit-frame-v2__tabs qs-tabs" role="tablist" data-i18n-aria="aria.questTab" aria-label="Mission type">
 <button class="cp-tab kit-tab-v2 qs-tab" type="button" role="tab" data-qtab="daily" data-active aria-selected="true"><span class="cpt-lab" data-i18n="quest.tab.daily">Daily</span></button>
@@ -12348,15 +12357,18 @@ aria-selected 로 낸다 — 새 상태 어휘를 만들지 않는다.
 탭 = 킷 탭(.kit-tab-v2 — #modal-quest 와 같은 문법). 숫자는 전부 gachaTable 한 출처에서 온다. -->
 <!-- [판정판 129 · Task 129 · 지휘자 판정 Q5] 캡슐 갈래 탭(아이템 · 황금 · 친구 — 판 내용을 통째로 바꾼다) = 판 윗변에 구운 탭 셋 · 짜임은 위 미션 창과 같다.
 꾸미기 캡슐 갈래(oddsPaint 가 탭 줄을 hidden)에서는 판이 탭 없는 기본 실루엣으로 선다(실루엣 규칙이 :has(> .cp-tabs[hidden]) 를 뺀다). -->
-<div id="modal-odds" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="odds-h"><div class="sheet jbox jbox--modal mf-tabhost" data-part="modal-plate">
+<div id="modal-odds" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="odds-h"><div class="sheet jbox jbox--modal mf-tabhost">
 <h2 id="odds-h" data-i18n="odds.title">Odds</h2>
 <button class="r10-x x-btn" type="button" data-w6x="odds-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
-<div class="cp-card kit-frame-v2 mframe" data-tabs="3">
+<!-- [Task 129 수정 1회차 M7] data-part="modal-plate" = 보이는 판(안쪽 탭 판) -->
+<div class="cp-card kit-frame-v2 mframe" data-tabs="3" data-part="modal-plate">
 <div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
 <div id="odds-tabs" class="cp-tabs kit-frame-v2__tabs qs-tabs" role="tablist" data-i18n-aria="odds.title" aria-label="Odds">
-<button class="cp-tab kit-tab-v2 qs-tab od-tab" type="button" role="tab" data-otab="item" data-active aria-selected="true"><span class="cpt-lab" data-i18n="gacha.item">Item Capsule</span></button>
-<button class="cp-tab kit-tab-v2 qs-tab od-tab" type="button" role="tab" data-otab="gold" aria-selected="false"><span class="cpt-lab" data-i18n="gacha.gold">Golden Capsule</span></button>
-<button class="cp-tab kit-tab-v2 qs-tab od-tab" type="button" role="tab" data-otab="friend" aria-selected="false"><span class="cpt-lab" data-i18n="gacha.friend">Friend Capsule</span></button>
+<!-- [Task 129 수정 1회차 I1] 탭 라벨 = 방 탭과 같은 킷 글자 크기(.0435W) — en 「Golden Capsule」 · 「Friend Capsule」 이 탭 폭(29.4%W)에서 두 줄로 접혀
+탭 전용 짧은 문구 odds.tab.*(en Item · Golden · Friend — 창 제목 · 본문 절 머리가 「캡슐」 을 말한다 · ko 는 종전 그대로 「○○ 캡슐」)를 쓴다. -->
+<button class="cp-tab kit-tab-v2 qs-tab od-tab" type="button" role="tab" data-otab="item" data-active aria-selected="true"><span class="cpt-lab" data-i18n="odds.tab.item">Item</span></button>
+<button class="cp-tab kit-tab-v2 qs-tab od-tab" type="button" role="tab" data-otab="gold" aria-selected="false"><span class="cpt-lab" data-i18n="odds.tab.gold">Golden</span></button>
+<button class="cp-tab kit-tab-v2 qs-tab od-tab" type="button" role="tab" data-otab="friend" aria-selected="false"><span class="cpt-lab" data-i18n="odds.tab.friend">Friend</span></button>
 </div>
 <div class="cp-body">
 <div id="odds-body" class="od-body"></div>
@@ -12463,7 +12475,7 @@ game.js **앞**이어야 한다 — 부팅 직후 나는 소리까지 클립으�
 이 파일을 빼고 빌드해도 게임은 돈다 — 그때는 모든 슬롯이 기존 신스다. -->
 <script defer src="catalog/js/tw-02-7ea6fa41.js"></script>
 <script defer src="catalog/js/tw-03-06721556.js"></script>
-<script defer src="catalog/js/tw-04-06e406c6.js"></script>
+<script defer src="catalog/js/tw-04-bdaba827.js"></script>
 <!-- ==FRUITDEF:BEGIN== generated by tools/fruit-tiles.js — do not edit by hand -->
 <!-- 열매 실루엣 클립 패스 9종 (DESIGN-V4 §5.8). clipPathUnits="objectBoundingBox"
 라 좌표가 0..1 이고, 타일 크기(--ts)가 어떤 값이든 같은 모양이 나온다.
@@ -12541,7 +12553,7 @@ width/height 0 + aria-hidden: 레이아웃·접근성 트리에 아무것도 더
 
 
 
-<link rel="stylesheet" href="tw-late-751dc310.css">
+<link rel="stylesheet" href="tw-late-3e88a444.css">
 <style id="compat-p1">
 @supports not (width: 1cqw) {
 #app.classic #classic-hud { --cqw: min(1vw, calc(var(--app-max) / 100)); height: calc(38.5 * var(--cqw)); }
@@ -12884,20 +12896,6 @@ overflow-x:hidden;
 scrollbar-width:none;
 }
 #modal-quest #quest-list::-webkit-scrollbar{ width:0; height:0; }
-#modal-quest .qs-tabs{ margin:calc(var(--f2-w) * .0180) 0 0; }
-#modal-quest .qs-tab::before{ content:none; }
-#modal-quest .qs-tab{
-font-family:var(--font-display);
-font-size:calc(var(--f2-w) * .0330);
-color:var(--f2-ink);
-}
-#modal-quest .qs-tab .cpt-lab{
-min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
-}
-html[lang="ko"] #modal-quest .qs-tab[data-qtab="epic"] .cpt-lab{
---qs-epic-dy: calc(var(--f2-w) * .0030);
-padding-top: var(--qs-epic-dy);
-}
 #modal-quest .qs-att{
 display:flex;
 gap:calc(var(--f2-w) * .0090);
@@ -13988,10 +13986,6 @@ border: calc(.5 * var(--cqw)) solid var(--role-rw-shard-steady-3); box-sizing: b
 #modal-odds, #modal-gres{ --mu: calc(var(--f2-w) / 110.8); }
 #modal-odds .sheet{ display: flex; flex-direction: column; }
 #modal-odds .sheet > h2, #modal-odds #odds-tabs, #modal-odds #odds-close{ flex: 0 0 auto; }
-#modal-odds .qs-tabs{ margin: calc(1.99 * var(--mu)) 0 0; }
-#modal-odds .qs-tab::before{ content: none; }
-#modal-odds .qs-tab{ font-family: var(--font-display); font-size: calc(3.66 * var(--mu)); color: var(--f2-ink); }
-#modal-odds .qs-tab .cpt-lab{ min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 #modal-odds .od-body{ flex: 0 1 auto; min-height: 0; margin: calc(1.99 * var(--mu)) 0 0; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
 #modal-odds .od-body::-webkit-scrollbar{ width: 0; height: 0; }
 #modal-odds .od-sec{ margin: 0 0 calc(2.6 * var(--mu)); padding: calc(2.6 * var(--mu)) calc(3.1 * var(--mu)); border-radius: calc(4.6 * var(--mu)); background: var(--role-f2-pill); border: calc(.3 * var(--mu)) solid var(--role-f2-pill-line); }
@@ -15630,7 +15624,7 @@ min-width: 0;
 #modal-gear-info .gi-plate {
 align-self: stretch;
 height: auto;
-min-height: calc(var(--f2-w) * .1088);
+min-height: var(--cs-name-h);           /* [수정 1회차 M5] 방 이름 상자 높이와 같은 변수 하나(사본 0) */
 }
 #modal-gear-info .gi-name {
 font-size: max(var(--text-min), calc(var(--gi-u) * 6));
@@ -15704,11 +15698,11 @@ overflow-wrap: anywhere;
 </style>
 <style id="modal-frame-129">
 #app .sheet.mframe > .cp-fx { z-index: -1; }
-.sheet.mframe { --f2-bd: var(--jbox-bw); --f2-r: var(--jbox-radius); }
+.sheet.mframe > .cp-fx { --f2-bd: var(--jbox-bw); --f2-r: var(--jbox-radius); }
 .jbox--modal:is(.mframe, .mf-tabhost)::before,
 .jbox--modal:is(.mframe, .mf-tabhost)::after { content: none; }
 .w6m .sheet.mf-tabhost { padding-left: 0 !important; padding-right: 0 !important; padding-bottom: 0 !important; }
-#app .w6m .sheet.mf-tabhost > h2 { --wcap-w: calc(56.84% + 1.1368px); }
+#app .w6m .sheet.mf-tabhost > h2 { --wcap-w: calc(56.84% + var(--jbox-bw) * 2 * .5684); }
 #app .sheet.mf-tabhost > .cp-card.mframe {
 width: auto;
 display: flex;
@@ -15718,9 +15712,8 @@ min-height: 0;
 gap: inherit;
 }
 #app .sheet.mf-tabhost > .cp-card.mframe > .cp-tabs { flex: 0 0 auto; margin-bottom: 0; }
-#app .modal .mframe :is(.sk-d, .ci-tag-k, .sk-bal > span, .sh-fine, .qs-t, .rank-meta, .sub-score, .rank-line),
-#app .modal .mframe .rank-row:nth-child(n+4) .rank-pos,
-#modal-arc.modal :is(#arc-best, #arc-when) { color: var(--prim-art-ink); }   /* 아케이드 결과 기록 줄 · 시각 줄(id 규칙 #8A5A06 · #7A6154 를 같은 특이 겹으로 넘는다) */
+#app .modal .mframe :is(.sk-d, .ci-tag-k, .sk-bal > span, .sh-fine, .qs-t, .rank-meta),
+#app .modal .mframe .rank-row:nth-child(n+4) .rank-pos { color: var(--prim-art-ink); }
 #app .sheet.mf-tabhost > .cp-card.mframe > .cp-body {
 flex: 0 1 auto;
 min-height: 0;
@@ -15730,6 +15723,30 @@ flex-direction: column;
 gap: inherit;
 padding: 0 var(--w6m-pad-x) var(--w6m-pad-b);
 }
+.w6m .sheet.mf-tabhost { container-type: inline-size; }
+#app .sheet.mf-tabhost > .cp-card.mframe[data-tabs] > .cp-tabs { --f2-w: 100cqw; }
+#app .mframe[data-rows="2"] .cp-fx > :is(.cp-jelly, .cp-gnd) { --cpj-tab-h: calc(var(--cpj-w) * .07005 * 2); }
+#app .cp-card.mframe[data-rows="2"] > .cp-tabs { padding-top: calc((7.005% + var(--f2-bd) * .1401) * 2); }
+#app .cp-card.mframe[data-rows="2"] > .cp-tabs > .cp-tab:nth-child(4) { left: 5.039%;  right: 65.534%; }
+#app .cp-card.mframe[data-rows="2"] > .cp-tabs > .cp-tab:nth-child(5) { left: 35.397%; right: 35.175%; }
+#app .cp-card.mframe[data-rows="2"] > .cp-tabs > .cp-tab:nth-child(6) { left: 65.756%; right: 4.817%; }
+#app .cp-card.mframe[data-rows="2"] > .cp-tabs > .cp-tab:nth-child(-n+3),
+#app .cp-card.mframe[data-rows="2"] > .cp-tabs:has(> .cp-tab:nth-child(n+4)[aria-selected="true"]) > .cp-tab:nth-child(n+4) { top: 50%; bottom: 0; }
+#app .cp-card.mframe[data-rows="2"] > .cp-tabs > .cp-tab:nth-child(n+4),
+#app .cp-card.mframe[data-rows="2"] > .cp-tabs:has(> .cp-tab:nth-child(n+4)[aria-selected="true"]) > .cp-tab:nth-child(-n+3) { top: 0; bottom: 50%; }
+#charpanel:has(~ :is(#modal-gear, #modal-gear-info):not([hidden])) :is(#cp-h, #cp-close) { opacity: var(--mode-a-under-head-a); }
+#app .modal { --mf-halo: 0 0 .06em var(--prim-white-a97), 0 0 .16em var(--prim-white-a90), 0 0 .32em var(--prim-white-a62); }
+#app #modal-drops :is(.dr-name, .dr-p, .dr-cap, .dr-note, .dr-ud),
+#app #modal-arc :is(#arc-best, #arc-when, .sub-score),
+#app #modal-gear-info :is(.gi-meta, .gi-fl),
+#app #modal-node .nc-chap,
+#app #modal-rank .rank-meta,
+#app #modal-minimap .mm-sum { text-shadow: var(--mf-halo); }
+#modal-arc.modal #arc-when { color: var(--prim-art-ink); }
+#app .modal { --mf-halo-gold: .07em 0 0 var(--prim-white-a97), -.07em 0 0 var(--prim-white-a97), 0 .07em 0 var(--prim-white-a97), 0 -.07em 0 var(--prim-white-a97),
+.05em .05em 0 var(--prim-white-a97), -.05em .05em 0 var(--prim-white-a97), .05em -.05em 0 var(--prim-white-a97), -.05em -.05em 0 var(--prim-white-a97),
+0 0 .25em var(--prim-white-a97), 0 0 .5em var(--prim-white-a97), 0 0 .9em var(--prim-white-a90); }
+#app #modal-arc #arc-best { text-shadow: var(--mf-halo-gold); }
 </style>
 </body>
 </html>

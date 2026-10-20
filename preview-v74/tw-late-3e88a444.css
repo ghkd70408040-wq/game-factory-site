@@ -116,11 +116,11 @@ corner-shape:var(--jbox-corner);     /* 시트 자신은 배경·접지를 안 �
 --jbox-face: var(--mode-a-face); --jbox-face-top: var(--role-cpj-face-top-charsel); --jbox-face-y: 100%;
 --jbox-rim-c: var(--mode-a-rim);
 --jbox-a-in: var(--mode-a-alpha); --jbox-a-rim: 1.000;
---jbox-band-w: calc(var(--jbox-w) * .00991); --jbox-band-s: calc(var(--jbox-w) * .0161); --jbox-band-dy: 0px;
---jbox-milk-a: .0222;
---jbox-rim-in: calc(var(--jbox-w) * 0.00315); --jbox-rim-w: calc(var(--jbox-w) * 0.00350); --jbox-rim-a: 0.9800;
---jbox-rim-w2: calc(var(--jbox-w) * 0.01094); --jbox-rim-w3: calc(var(--jbox-w) * 0.01290);
---jbox-rim-k2: 0.424; --jbox-rim-k3: 0.093;
+--jbox-band-w: calc(var(--jbox-w) * var(--mode-a-band-w-k)); --jbox-band-s: calc(var(--jbox-w) * var(--mode-a-band-s-k)); --jbox-band-dy: 0px;
+--jbox-milk-a: var(--mode-a-milk-a);
+--jbox-rim-in: calc(var(--jbox-w) * var(--mode-a-rim-in-k)); --jbox-rim-w: calc(var(--jbox-w) * var(--mode-a-rim-w-k)); --jbox-rim-a: var(--mode-a-rim-a);
+--jbox-rim-w2: calc(var(--jbox-w) * var(--mode-a-rim-w2-k)); --jbox-rim-w3: calc(var(--jbox-w) * var(--mode-a-rim-w3-k));
+--jbox-rim-k2: var(--mode-a-rim-k2); --jbox-rim-k3: var(--mode-a-rim-k3);
 --jbox-rim-tc: calc(var(--jbox-rim-in) + var(--jbox-rim-w) + var(--jbox-rim-w2));
 --jbox-rim-td: calc(var(--jbox-rim-tc) + var(--jbox-rim-w3));
 --jbox-rim-p3: calc(var(--jbox-rim-a) * var(--jbox-rim-k3));
@@ -131,7 +131,7 @@ corner-shape:var(--jbox-corner);     /* 시트 자신은 배경·접지를 안 �
 --jbox-gl1-px: calc(var(--jbox-w) * .0248); --jbox-gl1-py: calc(var(--jbox-w) * .0090);
 --jbox-gl2-w: calc(var(--jbox-w) * .0490); --jbox-gl2-h: calc(var(--jbox-w) * .0148);
 --jbox-gl2-px: calc(var(--jbox-w) * .1775); --jbox-gl2-py: calc(var(--jbox-w) * .0124);
---jbox-L3-w: calc(var(--jbox-w) * 0.00400); --jbox-L3-line: var(--mode-a-outline); --jbox-L3-a: .7450;
+--jbox-L3-w: calc(var(--jbox-w) * var(--mode-a-L3-w-k)); --jbox-L3-line: var(--mode-a-outline); --jbox-L3-a: var(--mode-a-L3-a);
 --jbox-shadow:none;
 --jbox-tint:var(--modal-tint);
 --jbox-blur:none;
@@ -2550,10 +2550,6 @@ box-shadow: inset 0 0 0 var(--f2-gbd) var(--role-f2-btn-off-ln);
 #modal-gear-info {
 --f2-w: min(95.7vw, 430px);
 --f2-alpha: .425;
---f2-base:     var(--role-cpj-fill-c-charsel);
---f2-line:     var(--role-f2-line-charsel);
---f2-tab-on:   var(--role-f2-tab-on-charsel);
---f2-tab-off:  var(--role-f2-tab-off-charsel);
 --f2-slot:     var(--role-f2-slot-charsel);
 --f2-arrow-1: var(--prim-white-a97);
 --f2-arrow-2: var(--role-f2-arrow-2-charsel);
@@ -2572,7 +2568,6 @@ box-shadow: inset 0 0 0 var(--f2-gbd) var(--role-f2-btn-off-ln);
 --cs-desc-a:     var(--f2-desc-a);
 --f2-pill:     color-mix(in srgb, var(--role-f2-pill-charsel) 80%, transparent);
 --f2-pill-line:var(--role-f2-pill-line-charsel);
---f2-ink:      var(--role-f2-ink-charsel);
 --cs-head:  calc(var(--f2-w) * .1524);   /* 헤더 알약 높이 = kit-pill-v2 */
 --cs-carh:  calc(var(--f2-w) * .1965);   /* 캐러셀 줄 = 선택 칩 지름 + 여유 */
 --cs-body:  calc(var(--f2-w) * .66);     /* 판 본체 */
@@ -2591,6 +2586,14 @@ box-shadow: inset 0 0 0 var(--f2-gbd) var(--role-f2-btn-off-ln);
 --cs-foot-b: calc(var(--f2-w) * .030);
 }
 :is(#charpanel, #modal-gear, #modal-gear-info, .cp-card.mframe[data-tabs]) { --cs-gap8: calc(var(--f2-w) * .0214); }
+:is(#charpanel, #modal-gear, #modal-gear-info, .cp-card.mframe) {
+--f2-base:     var(--role-cpj-fill-c-charsel);
+--f2-line:     var(--role-f2-line-charsel);
+--f2-tab-on:   var(--role-f2-tab-on-charsel);
+--f2-tab-off:  var(--role-f2-tab-off-charsel);
+--f2-ink:      var(--role-f2-ink-charsel);
+}
+#charpanel, #modal-gear, #modal-gear-info { --cs-name-h: calc(var(--f2-w) * .1088); }
 #charpanel {
 display: block;
 padding: 0;
@@ -3057,14 +3060,14 @@ pointer-events: none;
 --cpj-haze: 0;
 --cpj-haze-y: 14.0%;
 --cpj-milk-a: .050;
---cpj-rim-in: calc(var(--f2-ref-w) * 0.00315);
---cpj-rim-w: calc(var(--f2-ref-w) * 0.00350);
---cpj-rim-a: 0.9800;
+--cpj-rim-in: calc(var(--f2-ref-w) * var(--mode-a-rim-in-k));
+--cpj-rim-w: calc(var(--f2-ref-w) * var(--mode-a-rim-w-k));
+--cpj-rim-a: var(--mode-a-rim-a);
 --cpj-rim-blur: calc(var(--f2-ref-w) * 0.00160);
---cpj-rim-w2: calc(var(--f2-ref-w) * 0.01094);
---cpj-rim-w3: calc(var(--f2-ref-w) * 0.01290);
---cpj-rim-k2: 0.424;
---cpj-rim-k3: 0.093;
+--cpj-rim-w2: calc(var(--f2-ref-w) * var(--mode-a-rim-w2-k));
+--cpj-rim-w3: calc(var(--f2-ref-w) * var(--mode-a-rim-w3-k));
+--cpj-rim-k2: var(--mode-a-rim-k2);
+--cpj-rim-k3: var(--mode-a-rim-k3);
 --cpj-rim-tc: calc(var(--cpj-rim-in) + var(--cpj-rim-w) + var(--cpj-rim-w2));
 --cpj-rim-td: calc(var(--cpj-rim-tc) + var(--cpj-rim-w3));
 --cpj-rim-p3: calc(var(--cpj-rim-a) * var(--cpj-rim-k3));
@@ -3078,7 +3081,7 @@ pointer-events: none;
 --cpj-gnd-a: var(--mode-a-contact);
 --cpj-gnd-y: calc(var(--cpj-w) * .01125);
 --cpj-gnd-b: calc(var(--cpj-w) * .01125);
---cpj-L3-w: calc(var(--f2-ref-w) * 0.00400);
+--cpj-L3-w: calc(var(--f2-ref-w) * var(--mode-a-L3-w-k));
 --cpj-L3-line: var(--mode-a-outline);   /* [E32-0903] 실측 (159,136,150) L3-a .70 역산 · 복구 #955579 */
 --cpj-L3-a: .700;
 --cpj-fill-c: var(--role-cpj-fill-c-charsel);   /* ⑤ a-fill 0 이라 무효지만 봉인값으로 되돌림 */
@@ -3327,7 +3330,7 @@ position: absolute;
 left: calc(var(--f2-w) * .1469 + var(--cs-gap8));
 top:  calc(var(--f2-w) * .0122);         /* .0299 - .0177 */
 width: calc(var(--f2-w) * .3837);
-height: calc(var(--f2-w) * .1088);
+height: var(--cs-name-h);
 }
 :is(#charpanel .ci-plate, #modal-gear-info .gi-plate) {
 display: flex;
@@ -6098,14 +6101,19 @@ border-radius: 7.59% 7.59% 0 0 / 48.21% 48.21% 0 0;
 :is(#modal-gear .cp-card, .cp-card.mframe[data-tabs="3"]) > .cp-tabs > .cp-tab[aria-selected="false"]{ border-radius: 11.476% 11.476% 0 0 / 48.21% 48.21% 0 0; }
 :is(#charpanel, .mframe) .cp-fx > .cp-jelly{
 --cpj-a-in: var(--mode-a-alpha);
---cpj-rim-w: calc(var(--f2-ref-w) * 0.00350);
---cpj-rim-a: 0.9800;
---cpj-L3-w: calc(var(--f2-ref-w) * 0.00400);
---cpj-L3-a: .7450;
+--cpj-rim-in: calc(var(--f2-ref-w) * var(--mode-a-rim-in-k));
+--cpj-rim-w: calc(var(--f2-ref-w) * var(--mode-a-rim-w-k));
+--cpj-rim-a: var(--mode-a-rim-a);
+--cpj-rim-w2: calc(var(--f2-ref-w) * var(--mode-a-rim-w2-k));
+--cpj-rim-w3: calc(var(--f2-ref-w) * var(--mode-a-rim-w3-k));
+--cpj-rim-k2: var(--mode-a-rim-k2);
+--cpj-rim-k3: var(--mode-a-rim-k3);
+--cpj-L3-w: calc(var(--f2-ref-w) * var(--mode-a-L3-w-k));
+--cpj-L3-a: var(--mode-a-L3-a);
 --cpj-L3-blur: 0px;
---cpj-band-w:  calc(var(--cpj-w) * .00991);
---cpj-band-s:  calc(var(--cpj-w) * .0161);
---cpj-milk-a: .0222;
+--cpj-band-w:  calc(var(--cpj-w) * var(--mode-a-band-w-k));
+--cpj-band-s:  calc(var(--cpj-w) * var(--mode-a-band-s-k));
+--cpj-milk-a: var(--mode-a-milk-a);
 }
 :is(#charpanel .cp-card, .cp-card.mframe[data-tabs]) > .cp-tabs{
 margin: calc(var(--f2-bd) * -1 + .099%) calc(var(--f2-bd) * -1) var(--cs-gap8);
