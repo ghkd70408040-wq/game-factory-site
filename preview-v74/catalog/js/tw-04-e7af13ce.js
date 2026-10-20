@@ -887,7 +887,7 @@ try { u.setAttribute("href", "#ic-" + name); } catch (e) { /* ignore */ }
 function isCapsuleHead(el) {
 try {
 return !!(el && el.matches &&
-el.matches('.modal-v2 .mv2-sheet > h2, .modal-v2 .mv2-head > h2, #modal-node .r10-ribbon > h2, #modal-drops .r10-ribbon > h2, #modal-clear .sheet > h2, #modal-adv:not(.is-advfinish) .sheet > h2, #modal-gear #gear-h, #modal-gear-info #gi-h, #modal-minimap .r10-ribbon > h2, #modal-theater .r10-ribbon > h2, #modal-quest .sheet > h2, #modal-soon .sheet > h2, #modal-invite .sheet > h2, #modal-confirm .sheet > h2, #modal-playground .sheet > h2, #modal-odds .sheet > h2, #modal-daily .sheet > h2, #modal-shop .r10-ribbon > h2'));   /* [Task 8b2] 장비 두 창 제목 = CSS 레터링(지휘자 판정 2-4) · [Task 129] 챕터 · 스토리 극장 제목도 */
+el.matches('.modal-v2 .mv2-sheet > h2, .modal-v2 .mv2-head > h2, #modal-node .r10-ribbon > h2, #modal-drops .r10-ribbon > h2, #sh-sign > h2, #modal-clear .sheet > h2, #modal-adv:not(.is-advfinish) .sheet > h2, #modal-gear #gear-h, #modal-gear-info #gi-h, #modal-minimap .r10-ribbon > h2, #modal-theater .r10-ribbon > h2, #modal-quest .sheet > h2, #modal-soon .sheet > h2, #modal-invite .sheet > h2, #modal-confirm .sheet > h2, #modal-playground .sheet > h2, #modal-odds .sheet > h2, #modal-daily .sheet > h2, #modal-shop .r10-ribbon > h2'));   /* [Task 8b2] 장비 두 창 제목 = CSS 레터링(지휘자 판정 2-4) · [Task 129] 챕터 · 스토리 극장 제목도 */
 } catch (e) { return false; }
 }
 function headText(el, s) {
@@ -954,7 +954,7 @@ h.style.setProperty('--mvh-fs', String(Math.round(k * 1e5) / 1e5));
 }
 function fitHeads(root) {
 var list = (root || document).querySelectorAll(
-'.modal-v2 .mv2-sheet > h2, .modal-v2 .mv2-head > h2, #modal-node .r10-ribbon > h2, #modal-drops .r10-ribbon > h2, #modal-clear .sheet > h2, #modal-adv:not(.is-advfinish) .sheet > h2, #modal-gear #gear-h, #modal-gear-info #gi-h, #modal-minimap .r10-ribbon > h2, #modal-theater .r10-ribbon > h2, #modal-quest .sheet > h2, #modal-soon .sheet > h2, #modal-invite .sheet > h2, #modal-confirm .sheet > h2, #modal-playground .sheet > h2, #modal-odds .sheet > h2, #modal-daily .sheet > h2, #modal-shop .r10-ribbon > h2');   /* [Task 8b2] 레터링 제목 셋째 목록 — isCapsuleHead · healHeads 와 같은 줄 */
+'.modal-v2 .mv2-sheet > h2, .modal-v2 .mv2-head > h2, #modal-node .r10-ribbon > h2, #modal-drops .r10-ribbon > h2, #sh-sign > h2, #modal-clear .sheet > h2, #modal-adv:not(.is-advfinish) .sheet > h2, #modal-gear #gear-h, #modal-gear-info #gi-h, #modal-minimap .r10-ribbon > h2, #modal-theater .r10-ribbon > h2, #modal-quest .sheet > h2, #modal-soon .sheet > h2, #modal-invite .sheet > h2, #modal-confirm .sheet > h2, #modal-playground .sheet > h2, #modal-odds .sheet > h2, #modal-daily .sheet > h2, #modal-shop .r10-ribbon > h2');   /* [Task 8b2] 레터링 제목 셋째 목록 — isCapsuleHead · healHeads 와 같은 줄 */
 for (var i = 0; i < list.length; i++) fitHead(list[i]);
 }
 try {
@@ -981,7 +981,7 @@ document.fonts.ready.then(function () { fitHeads(document); });
 } catch (e) { /* 재보기는 부가 기능이다 — 실패해도 제목은 CSS 기본값으로 선다 */ }
 function healHeads(root) {
 var list = (root || document).querySelectorAll(
-'.modal-v2 .mv2-sheet > h2, .modal-v2 .mv2-head > h2, #modal-node .r10-ribbon > h2, #modal-drops .r10-ribbon > h2, #modal-clear .sheet > h2, #modal-adv:not(.is-advfinish) .sheet > h2, #modal-gear #gear-h, #modal-gear-info #gi-h, #modal-minimap .r10-ribbon > h2, #modal-theater .r10-ribbon > h2, #modal-quest .sheet > h2, #modal-soon .sheet > h2, #modal-invite .sheet > h2, #modal-confirm .sheet > h2, #modal-playground .sheet > h2, #modal-odds .sheet > h2, #modal-daily .sheet > h2, #modal-shop .r10-ribbon > h2');
+'.modal-v2 .mv2-sheet > h2, .modal-v2 .mv2-head > h2, #modal-node .r10-ribbon > h2, #modal-drops .r10-ribbon > h2, #sh-sign > h2, #modal-clear .sheet > h2, #modal-adv:not(.is-advfinish) .sheet > h2, #modal-gear #gear-h, #modal-gear-info #gi-h, #modal-minimap .r10-ribbon > h2, #modal-theater .r10-ribbon > h2, #modal-quest .sheet > h2, #modal-soon .sheet > h2, #modal-invite .sheet > h2, #modal-confirm .sheet > h2, #modal-playground .sheet > h2, #modal-odds .sheet > h2, #modal-daily .sheet > h2, #modal-shop .r10-ribbon > h2');
 for (var i = 0; i < list.length; i++) {
 var h = list[i];
 if (h.firstElementChild && h.firstElementChild.className === 'mvh-title'
@@ -2133,6 +2133,12 @@ en: {
 'shop2.tab.free': 'Free',
 'shop2.tab.deco': 'Style',
 'shop2.tab.jewel': 'Jewels',
+'shop2.sign': 'Shop',
+'gacha.odds.s': 'Odds',
+'gacha.btn1': 'Once',
+'gacha.btn10': '×{n}',
+'gacha.friend.have': 'Friends {have}/{all}',
+'gacha.skin.have': 'Skins {have}/{all}',
 'aria.back': 'Back',   /* [판정판 121 Task 4] 상점 뒤로 = 연 곳으로(메인 · 지도) — 옛 aria.shopback 「Back to the kingdom」 은퇴 */
 'aria.coinplus': 'Get more coins',
 'aria.starplus': 'Get more stars',
@@ -3307,6 +3313,12 @@ ko: {
 'shop2.tab.free': '무료',
 'shop2.tab.deco': '꾸미기',
 'shop2.tab.jewel': '보석',
+'shop2.sign': '상점',
+'gacha.odds.s': '확률',
+'gacha.btn1': '한 번',
+'gacha.btn10': '{n}회',
+'gacha.friend.have': '가진 친구 {have}/{all}',
+'gacha.skin.have': '가진 스킨 {have}/{all}',
 'aria.back': '뒤로',   /* [판정판 121 Task 4] 상점 뒤로 = 연 곳으로(메인 · 지도) — 옛 aria.shopback 「왕국으로 돌아가기」 은퇴 */
 'aria.coinplus': '코인 더 얻기',
 'aria.starplus': '별 더 얻기',
@@ -10631,7 +10643,7 @@ questAtt();
 }
 function questBadges() {
 var n = questClaimable();
-['kd-mission-badge', 'map-mission-badge'].forEach(function (id) {
+['kd-mission-badge', 'map-mission-badge', 'sh-mission-badge'].forEach(function (id) {   /* [Task 8c] 상점 위 바도 같은 미션 단추 */
 var b = $(id);
 if (!b) return;
 b.textContent = n > 0 ? String(n) : '';
@@ -13201,8 +13213,7 @@ persist();
 return true;
 }
 var SHOP_TABS = ['gacha', 'deals', 'free', 'deco', 'jewel'];
-var SHOP_HOST = { gacha: 'banjjak', deals: 'kkultteok', free: 'tiktok', deco: 'mongle' };   /* 목업 B1·B2·B3 의 상인 */
-var SHOP_ART = { bg: 1, machine: 1, capsule: 1, coin: 1, tabs: 1, host: 0 };   /* P3 T12 · host 0 = 상인 포즈 미발주(DESIGN §28.11) */
+var SHOP_ART = { bg: 1, machine: 1, capsule: 1, coin: 1, tabs: 1 };   /* P3 T12 · [Task 8c] host(상인) 은퇴 */
 var SHOP_PAINT = { gacha: function () {}, deals: function () {}, free: function () {}, deco: function () {} };
 var SHOP_DOTS = { gacha: function () { return 0; }, deals: function () { return 0; }, free: function () { return 0; } };
 var SHOP_ACTS = {};
@@ -13226,6 +13237,8 @@ portalAdsSync();
 var want = (tab === 'jewel') ? 'gacha' : tab;
 shopTab2 = shopTabOk(want) ? want : 'gacha';
 showScreen('screen-shop');
+kdAvatarPaint();   /* [Task 8c] 위 바 = 메인과 같은 구성 — 얼굴 · 미션 배지도 메인과 같은 함수가 칠한다(지도에서 열어도) */
+questBadges();
 shopPaint();
 if (shopTick) clearInterval(shopTick);
 shopTick = setInterval(shopTickFn, 1000);
@@ -13282,10 +13295,6 @@ var on = tabs[i].getAttribute('data-stab') === shopTab2;
 tabs[i].setAttribute('aria-selected', on ? 'true' : 'false');
 if (on) tabs[i].removeAttribute('data-variant'); else tabs[i].setAttribute('data-variant', 'soft');
 }
-var host = $('sh-host');
-if (host) setArt(host, '--sh-host', stdArt(SHOP_HOST[shopTab2] || 'kkultteok', 'full'), '');
-var bub = $('sh-bubble');
-if (bub) { bub.hidden = true; bub.textContent = ''; }
 var panel = $('sh-body');
 if (panel) panel.setAttribute('aria-labelledby', 'sh-tab-' + shopTab2);   /* 수정 1회차 M-3 — 판(tabpanel)의 이름 = 선택된 탭 */
 paintShopTab(shopTab2, true);   /* 전체 다시 그리기 = 탭 하나 다시 그리기 + 스크롤 처음으로(열기·탭 전환) — 수정 1회차 M-2 */
@@ -13295,14 +13304,11 @@ var root = $('screen-shop');
 if (!root) return;
 tab = tab || shopTab2;
 if (tab !== shopTab2) { setShopTab(tab); return; }
-var body = $('sh-body'), scene = $('sh-scene');
+var body = $('sh-body');
 var keep = (body && !resetScroll) ? body.scrollTop : 0;
-if (scene) scene.innerHTML = '';          /* 무대 위 탭 전용 장식(뽑기 기계 등) — 탭 함수가 채운다 */
-var plateEl = $('sh-plate');              /* 판 직속 머리(.sh-phead — 판 위 끝에 걸친 알약, 스크롤 상자 밖). 탭 함수가 다시 단다(P3 T5 수정 1회차 I-1) */
-if (plateEl) { var olds = plateEl.querySelectorAll('.sh-phead'); for (var oi = olds.length - 1; oi >= 0; oi--) plateEl.removeChild(olds[oi]); }
 if (body) {
 body.innerHTML = '';
-(SHOP_PAINT[tab] || SHOP_PAINT.gacha)(body, scene);
+(SHOP_PAINT[tab] || SHOP_PAINT.gacha)(body);
 if (keep) body.scrollTop = keep;
 }
 paintWallets();
@@ -13310,6 +13316,7 @@ paintShopHearts();
 shopDots();
 applyI18n(root);
 try { if (window.TW && window.TW.applyPlatformGates) window.TW.applyPlatformGates(root); } catch (e) {}
+shopFitCards();   /* [Task 8c] 글이 3열 카드에 안 들면 그 탭만 1열 가로 카드 */
 }
 function shopAct2(a, el) {
 var i = a.indexOf(':'), name = i < 0 ? a : a.slice(0, i), arg = i < 0 ? '' : a.slice(i + 1);
@@ -13384,43 +13391,87 @@ store.deals.b[k] = (store.deals.b[k] | 0) + 1;
 persist();
 return { ok: true, got: got };
 }
+function shopBtn(o) {
+var b = document.createElement('button');
+b.type = 'button';
+b.className = 'cta-jelly sh-btn';
+b.setAttribute('data-price', o.price || 'ok');
+var ic = function () { var ci = document.createElement('i'); ci.className = 'sh-btn-ic sh-btn-ic--' + o.coinIc; ci.setAttribute('aria-hidden', 'true'); b.appendChild(ci); };
+if (o.amt) { b.appendChild(document.createTextNode(o.label)); if (o.coinIc) ic(); b.appendChild(document.createTextNode(o.amt)); }
+else { if (o.coinIc) ic(); b.appendChild(document.createTextNode(o.label)); }
+if (o.portal) b.setAttribute('data-portal-only', '');
+if (o.dis) b.disabled = true; else if (o.act) b.setAttribute('data-sh-act', o.act);
+return b;
+}
 function shopCard2(o) {
 var card = document.createElement('div');
 card.className = 'shop-card';
 card.setAttribute('data-part', 'shop-card');
 card.setAttribute('data-layout', o.layout || 'grid');
 if (o.tier) card.setAttribute('data-tier', o.tier);
-var hd = document.createElement('b'); hd.className = 'shop-cn'; hd.textContent = o.title; card.appendChild(hd);
+var cb = document.createElement('span'); cb.className = 'shop-cbody';
+var hd = document.createElement('b'); hd.className = 'shop-cn'; hd.textContent = o.title; cb.appendChild(hd);
 if (o.badge) { var bd = document.createElement('em'); bd.className = 'shop-badge'; bd.textContent = o.badge; card.appendChild(bd); }
+if (o.odds) {
+var od = document.createElement('button'); od.type = 'button'; od.className = 'kit-pill-v2 sh-odds'; od.setAttribute('data-variant', 'soft');
+od.setAttribute('data-sh-act', o.odds); od.textContent = t('gacha.odds.s'); card.appendChild(od);
+}
 var box = document.createElement('span'); box.className = 'shop-icbox';   /* 그림 + 지급 수 — 지급 수는 그림 상자 오른쪽 아래에 붙는다(제목이 두 줄로 접혀도 같은 자리, 리뷰 M-4) */
+if (o.tile) box.appendChild(o.tile);
+else {
 var ic = document.createElement('i'); ic.className = 'shop-ic ' + (o.ic || ''); ic.setAttribute('aria-hidden', 'true');
 if (o.icCss) ic.style.setProperty('background-image', o.icCss);
 box.appendChild(ic);
+}
 if (o.qty) { var q = document.createElement('span'); q.className = 'shop-qty'; q.textContent = o.qty; box.appendChild(q); }
 card.appendChild(box);
-if (o.sub) { var sb = document.createElement('span'); sb.className = 'shop-cd'; sb.textContent = o.sub; card.appendChild(sb); }
-var b = document.createElement('button');
-b.type = 'button';
-b.className = 'cta-jelly sh-btn';
-b.setAttribute('data-price', o.price || 'ok');
-if (o.coinIc) { var ci = document.createElement('i'); ci.className = 'sh-btn-ic sh-btn-ic--' + o.coinIc; ci.setAttribute('aria-hidden', 'true'); b.appendChild(ci); }
-b.appendChild(document.createTextNode(o.label));
-if (o.dis) b.disabled = true; else if (o.act) b.setAttribute('data-sh-act', o.act);
-card.appendChild(b);
+if (o.sub) { var sb = document.createElement('span'); sb.className = 'shop-cd'; sb.textContent = o.sub; cb.appendChild(sb); }
+if (o.prog) { var pg = document.createElement('span'); pg.className = 'kit-pill-v2 sh-prog'; pg.setAttribute('data-variant', 'soft'); pg.textContent = o.prog; cb.appendChild(pg); }
+var list = o.btns || [o], bw = document.createElement('span');
+bw.className = 'sh-btns';
+for (var i = 0; i < list.length; i++) bw.appendChild(shopBtn(list[i]));
+cb.appendChild(bw);
+card.appendChild(cb);
 return card;
 }
-SHOP_PAINT.deals = function (body) {
-var bub = $('sh-bubble');
-if (bub) {
-bub.innerHTML = '';
-var p = document.createElement('span'); p.textContent = t('deals.hi'); bub.appendChild(p);
-var clk = document.createElement('b'); clk.id = 'sh-clock'; clk.className = 'kit-pill-v2'; clk.setAttribute('data-variant', 'soft');
-clk.textContent = shopClockText(); bub.appendChild(clk);
-bub.hidden = false;
+function shopTextOver(el) {
+var r = el.getBoundingClientRect();
+if (!(r.width > 0)) return false;
+var cs = getComputedStyle(el), rg = document.createRange();
+rg.selectNodeContents(el);
+var need = rg.getBoundingClientRect().width;
+var room = r.width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - parseFloat(cs.borderLeftWidth) - parseFloat(cs.borderRightWidth);
+return need > room + 0.5;
 }
-var head = document.createElement('div'); head.className = 'kit-pill-v2 sh-head sh-phead'; head.setAttribute('data-variant', 'header');
-head.textContent = t('deals.title');
-var plateEl = $('sh-plate'); if (plateEl) plateEl.appendChild(head);
+function shopFitCards() {
+var body = $('sh-body');
+if (!body || !shopActive()) return;
+var grids = body.querySelectorAll('.sh-grid');
+for (var i = 0; i < grids.length; i++) {
+var g = grids[i];
+if (g.getAttribute('data-cols')) g.removeAttribute('data-cols');   /* 3열에서 다시 잰다 */
+var els = g.querySelectorAll('.sh-btn, .sh-prog'), over = false;
+for (var j = 0; j < els.length && !over; j++) over = shopTextOver(els[j]);
+if (over) g.setAttribute('data-cols', '1');
+}
+}
+function shopHead(body, title, pill, playIc) {
+var row = document.createElement('div'); row.className = 'sh-hrow';
+var h = document.createElement('b'); h.className = 'sh-htitle';
+if (playIc) { var pl = document.createElement('i'); pl.className = 'fr-play'; pl.setAttribute('aria-hidden', 'true'); h.appendChild(pl); }
+h.appendChild(document.createTextNode(title)); row.appendChild(h);
+if (pill) row.appendChild(pill);
+body.appendChild(row);
+return row;
+}
+function shopClockPill(pre) {
+var p = document.createElement('span'); p.className = 'kit-pill-v2 sh-clockpill'; p.setAttribute('data-variant', 'soft');
+if (pre) { var s = document.createElement('span'); s.textContent = pre; p.appendChild(s); }
+var clk = document.createElement('b'); clk.id = 'sh-clock'; clk.textContent = shopClockText(); p.appendChild(clk);
+return p;
+}
+SHOP_PAINT.deals = function (body) {
+shopHead(body, t('deals.title'), shopClockPill());
 var grid = document.createElement('div'); grid.className = 'sh-grid'; body.appendChild(grid);
 var lim = function (k) { return (store.deals.b[k] | 0) + '/' + P3_DEAL_CAP[k]; };
 var money = function (k, n) { return dealLeft(k) > 0 ? { label: arcComma(n), coinIc: 'coin', price: 'coin', act: 'deal:' + k }
@@ -13429,9 +13480,9 @@ var gC = dealGearOf('common'), gR = dealGearOf('rare');
 var cards = [
 Object.assign({ title: t('deals.gift'), ic: 'shop-ic-coin', qty: '×' + DEAL_GIFT_COIN, sub: t('deals.gift.d') },
 dealLeft('gift') > 0 ? { label: t('deals.claim'), price: 'free', act: 'deal:gift' } : { label: t('deals.done'), price: 'ok', dis: true }),
-Object.assign({ title: t('deals.gear'), tier: 'common', icCss: itemArtCss(gC, 96), sub: t('deals.sure', { name: t('item.' + gC + '.nm') }) },
+Object.assign({ title: t('deals.gear'), tier: 'common', tile: itemTile(gC, { tier: 'common', size: 96 }), sub: t('deals.sure', { name: t('item.' + gC + '.nm') }) },
 (store.items.own[gC] | 0) >= ITEM_LV_MAX ? { label: t('deals.maxed'), price: 'ok', dis: true } : money('gearC', DEAL_GEAR_PRICE.common)),
-Object.assign({ title: t('deals.gear'), tier: 'rare', badge: t('drops.tier.rare'), icCss: itemArtCss(gR, 96), sub: t('deals.sure', { name: t('item.' + gR + '.nm') }) },
+Object.assign({ title: t('deals.gear'), tier: 'rare', badge: t('drops.tier.rare'), tile: itemTile(gR, { tier: 'rare', size: 96 }), sub: t('deals.sure', { name: t('item.' + gR + '.nm') }) },
 (store.items.own[gR] | 0) >= ITEM_LV_MAX ? { label: t('deals.maxed'), price: 'ok', dis: true } : money('gearR', DEAL_GEAR_PRICE.rare)),
 Object.assign({ title: t('deals.heart1'), ic: 'shop-ic-heart', sub: lim('heart1') }, money('heart1', DEAL_HEART1)),
 Object.assign({ title: t('deals.trade'), ic: 'shop-ic-jstar-1', qty: '×' + DEAL_TRADE.star, sub: lim('trade') }, money('trade', DEAL_TRADE.coin)),
@@ -13457,11 +13508,15 @@ J.sfx.fail();
 }
 paintShopTab(shopTab2);   /* 구매 뒤 = 이 탭만 다시(스크롤 자리 유지 · 띠·점·번역을 같이 맞춘다) — 처음으로 돌리는 전체 다시 그리기는 열기·탭 전환만 */
 };
-SHOP_PAINT.deco = function (body, scene) { paintCapsule(body, scene, 'skin', false); };
+SHOP_PAINT.deco = function (body) {   /* [Task 8c] 꾸미기 캡슐 카드 하나 — 뽑기 탭과 같은 카드 · 같은 격자 */
+var grid = document.createElement('div'); grid.className = 'sh-grid'; body.appendChild(grid);
+grid.appendChild(capsuleCard('skin'));
+shopFine(body, t('gacha.skin.note'));
+};
 var gachaKind = 'item', gachaBusy = false;
 function pctText(p, digits) { var k = Math.pow(10, digits); return (Math.round(p * Math.pow(10, digits + 2) * (1 + Number.EPSILON)) / k).toFixed(digits) + '%'; }
 function gachaKindSet(k) {
-if (GACHA_TAB_KINDS.indexOf(k) < 0) return;   /* 뽑기 탭 알약 셋만 — 꾸미기 캡슐은 꾸미기 탭이 그린다 */
+if (GACHA_TAB_KINDS.indexOf(k) < 0) return;   /* [Task 8c] 종류 알약은 은퇴(캡슐 카드 셋이 늘 함께 선다) — 이 함수는 옛 시험 · 도구 호환 API(종류 기억 + 뽑기 탭 다시 그리기)로만 남는다 */
 gachaKind = k;
 if (shopTab2 === 'gacha' && shopActive()) paintShopTab(shopTab2, true);   /* 종류가 바뀌면 판 내용이 통째로 바뀐다 → 스크롤도 처음으로 */
 }
@@ -13662,95 +13717,29 @@ if (kind === 'item' && adRowOk('item')) return { label: t('gacha.ad'), price: 'a
 if (kind === 'friend' && adRowOk('friend')) return { label: t('gacha.ad.week'), price: 'ad', coinIc: 'play', act: 'ad:friend', portal: true };
 return null;
 }
-function gachaBtn(o) {
-var b = document.createElement('button');
-b.type = 'button';
-b.className = 'cta-jelly sh-btn';
-b.setAttribute('data-price', o.price);
-if (o.coinIc) { var ci = document.createElement('i'); ci.className = 'sh-btn-ic sh-btn-ic--' + o.coinIc; ci.setAttribute('aria-hidden', 'true'); b.appendChild(ci); }
-b.appendChild(document.createTextNode(o.label));
-if (o.portal) b.setAttribute('data-portal-only', '');
-if (o.dis) b.disabled = true; else b.setAttribute('data-sh-act', o.act);
-return b;
-}
 function capLeft(kind) { return kind === 'friend' || kind === 'skin'; }
 function capRowArt(kind, id) { return kind === 'skin' ? skinThumbCss(id) : (kind === 'friend' ? stdArt(id, 'thumb') : itemArtCss(id, 64)); }
 function capRowName(kind, id) { return kind === 'skin' ? skinNameOf(id) : (kind === 'friend' ? t('char.' + id + '.name') : t('item.' + id + '.nm')); }
-function capSubText(kind, tb) {
-if (kind === 'friend') return tb.left ? t('gacha.friend.left', { have: tb.all - tb.left, all: tb.all, left: tb.left }) : t('gacha.friend.all');
-if (kind === 'skin') return tb.left ? t('gacha.skin.left', { have: tb.all - tb.left, all: tb.all, left: tb.left }) : t(skinEmptyKey(tb));
-return t('gacha.pity', { n: tb.pity, max: tb.pityAt });
+function capsuleCard(kind) {
+var tb = gachaTable(kind), lf = capLeft(kind), dis = lf && tb.left <= 0;
+var cur = GACHA_CUR[kind] === 'coin' ? 'coin' : 'star';
+var fb = dis ? null : gachaFreeBtn(kind), btns = [];
+if (fb) btns.push(fb);
+if (!fb || !/:first$/.test(fb.act)) btns.push({ label: t('gacha.btn1'), amt: arcComma(tb.price), coinIc: cur, price: dis ? 'ok' : cur, act: 'gbuy:' + kind + ':1:' + cur, dis: dis });   /* 닫힌 단추는 특가 탭처럼 「ok」(연보라) */
+if (kind === 'item') btns.push({ label: t('gacha.btn10', { n: GACHA_TEN }), amt: arcComma(tb.ten), coinIc: 'coin', price: 'coin', act: 'gbuy:item:' + GACHA_TEN + ':coin' });
+var sub = dis ? t(kind === 'friend' ? 'gacha.friend.all' : skinEmptyKey(tb)) : t('gacha.' + kind + '.d');
+var prog = lf ? t('gacha.' + kind + '.have', { have: tb.all - tb.left, all: tb.all }) : t('gacha.pity', { n: tb.pity, max: tb.pityAt });
+var card = shopCard2({ title: t('gacha.' + kind), ic: 'shop-ic-machine-' + kind, sub: sub, prog: prog, odds: 'godds:' + kind, btns: btns });
+card.setAttribute('data-kind', kind);
+return card;
 }
-function paintCapsule(body, scene, kind, pills) {
-var tb = gachaTable(kind), i, lf = capLeft(kind);
-if (scene) {
-if (pills) {
-var pl = document.createElement('div'); pl.className = 'gc-kinds';
-for (i = 0; i < GACHA_TAB_KINDS.length; i++) {
-var pk = document.createElement('button'); pk.type = 'button'; pk.className = 'kit-pill-v2 gc-kind';
-pk.setAttribute('data-variant', GACHA_TAB_KINDS[i] === kind ? 'header' : 'soft');
-pk.setAttribute('data-kind', GACHA_TAB_KINDS[i]); pk.setAttribute('data-sh-act', 'gkind:' + GACHA_TAB_KINDS[i]);
-pk.textContent = t('gacha.' + GACHA_TAB_KINDS[i]); pl.appendChild(pk);
-}
-scene.appendChild(pl);
-}
-var rb = document.createElement('div'); rb.className = 'kit-pill-v2 gc-title'; rb.setAttribute('data-variant', 'header');
-rb.textContent = t('gacha.' + kind); scene.appendChild(rb);
-var m = document.createElement('div'); m.className = 'gm-ph'; m.setAttribute('data-kind', kind);
-m.innerHTML = '<i class="gm-dome"></i><i class="gm-body"></i><i class="gm-knob"></i><i class="gm-slot"></i>';
-if (lf) {
-for (i = 0; i < tb.rows.length && i < 9; i++) {
-var face = document.createElement('i'); face.className = 'gm-face'; face.setAttribute('data-tier', tb.rows[i].tier);
-face.style.setProperty('--gm-x', (15 + (i % 3) * 24) + '%');
-face.style.setProperty('--gm-y', (12 + Math.floor(i / 3) * 17) + '%');
-setArt(face, '--gm-face', capRowArt(kind, tb.rows[i].id), '');
-m.appendChild(face);
-}
-if (tb.rows.length) m.setAttribute('data-rows', String(Math.ceil(Math.min(tb.rows.length, 9) / 3)));   /* 줄 수 — DESIGN §28.11 */
-}
-scene.appendChild(m);
-var sub = document.createElement('div'); sub.className = 'kit-pill-v2 gc-sub'; sub.setAttribute('data-variant', 'soft'); sub.id = 'gc-pity';
-sub.textContent = capSubText(kind, tb);
-scene.appendChild(sub);
-}
-var bub = $('sh-bubble');
-if (bub) { bub.textContent = t('gacha.' + kind + '.d'); bub.hidden = false; }
-var row = document.createElement('div'); row.className = 'gc-btns'; body.appendChild(row);
-var dis = (lf && tb.left <= 0);
-var fb = dis ? null : gachaFreeBtn(kind);
-if (fb) row.appendChild(gachaBtn(fb));
-var ic = GACHA_CUR[kind] === 'coin' ? 'coin' : 'star', pr = GACHA_CUR[kind] === 'coin' ? 'coin' : 'star';
-row.appendChild(gachaBtn({ label: t('gacha.one') + ' ' + arcComma(tb.price), coinIc: ic, price: dis ? 'ok' : pr, act: 'gbuy:' + kind + ':1:' + pr, dis: dis }));   /* 닫힌 버튼은 특가 탭처럼 「ok」(연보라) */
-if (kind === 'item') row.appendChild(gachaBtn({ label: t('gacha.ten', { n: GACHA_TEN }) + ' ' + arcComma(tb.ten), coinIc: 'coin', price: 'coin', act: 'gbuy:item:' + GACHA_TEN + ':coin' }));
-var hd = document.createElement('div'); hd.className = 'gc-oddhd';
-var hs = document.createElement('span'); hs.textContent = t(kind === 'friend' ? 'gacha.chance.now' : (kind === 'skin' ? 'gacha.skin.now' : 'odds.tier')); hd.appendChild(hs);
-var link = document.createElement('button'); link.type = 'button'; link.className = 'kit-pill-v2 gc-oddlink'; link.setAttribute('data-variant', 'soft');
-link.setAttribute('data-sh-act', 'godds:' + kind); link.textContent = t('gacha.odds'); hd.appendChild(link);
-body.appendChild(hd);
-var og = document.createElement('div'); og.id = 'gc-odds'; og.className = lf ? 'gc-og' : 'gc-tiers'; body.appendChild(og);
-if (lf) {
-for (i = 0; i < tb.rows.length; i++) {
-var oc = document.createElement('div'); oc.className = 'gc-oc'; oc.setAttribute('data-id', tb.rows[i].id); oc.setAttribute('data-tier', tb.rows[i].tier);
-var fi = document.createElement('i'); setArt(fi, '--gm-face', capRowArt(kind, tb.rows[i].id), ''); oc.appendChild(fi);
-var sp = document.createElement('span');
-var nb = document.createElement('b'); nb.textContent = capRowName(kind, tb.rows[i].id); sp.appendChild(nb);
-var pe = document.createElement('em'); pe.textContent = pctText(tb.rows[i].p, 2); sp.appendChild(pe);
-oc.appendChild(sp); og.appendChild(oc);
-}
-} else {
-for (i = 0; i < tb.tiers.length; i++) {
-var tr = document.createElement('div'); tr.className = 'gc-tr'; tr.setAttribute('data-tier', tb.tiers[i].tier);
-var chip = document.createElement('b'); chip.className = 'gc-chip'; chip.textContent = t('drops.tier.' + tb.tiers[i].tier); tr.appendChild(chip);
-var mid = document.createElement('span'); mid.textContent = t('odds.tier.row', { n: tb.tiers[i].n, each: pctText(tb.tiers[i].each, 3) }); tr.appendChild(mid);
-var tot = document.createElement('em'); tot.textContent = pctText(tb.tiers[i].p, 3); tr.appendChild(tot);
-og.appendChild(tr);
-}
-}
-var fine = document.createElement('p'); fine.className = 'sh-fine';
-fine.textContent = kind === 'friend' ? t('gacha.friend.note') : (kind === 'skin' ? t('gacha.skin.note') : t('odds.foot1'));
-body.appendChild(fine);
-}
-SHOP_PAINT.gacha = function (body, scene) { paintCapsule(body, scene, gachaKind, true); };
+function shopFine(body, s) { var p = document.createElement('p'); p.className = 'sh-fine'; p.textContent = s; body.appendChild(p); return p; }
+SHOP_PAINT.gacha = function (body) {
+var grid = document.createElement('div'); grid.className = 'sh-grid'; body.appendChild(grid);
+for (var i = 0; i < GACHA_TAB_KINDS.length; i++) grid.appendChild(capsuleCard(GACHA_TAB_KINDS[i]));
+shopFine(body, t('odds.foot1'));
+shopFine(body, t('gacha.friend.note'));
+};
 SHOP_DOTS.gacha = function () {
 p3Ensure();   /* 새 설치는 store.gacha 가 아직 없다 — 왕국 배지가 먼저 이 함수를 부른다 */
 var g = store.gacha, n = 0;
@@ -13759,7 +13748,6 @@ if (!g.firstFriend && gachaTable('friend').left > 0) n++;
 if (g.freeDay !== todayKey()) n++;
 return n;
 };
-SHOP_ACTS.gkind = function (k) { gachaKindSet(k); J.sfx.ui(); };
 SHOP_ACTS.gbuy = function (arg) { var p = arg.split(':'); gachaRun(p[0], parseInt(p[1], 10) || 1, p[2]); };
 SHOP_ACTS.godds = function (k) { openOdds(k); };
 var oddsKind = 'item';
@@ -13894,17 +13882,9 @@ if (res) gachaPlay(res, after);
 else if (after) after(true);
 });
 }
-SHOP_PAINT.free = function (body, scene) {
-if (scene) {
-var tt = document.createElement('div'); tt.className = 'kit-pill-v2 sh-head fr-title'; tt.setAttribute('data-variant', 'header');
-var pl = document.createElement('i'); pl.className = 'fr-play'; pl.setAttribute('aria-hidden', 'true'); tt.appendChild(pl);
-tt.appendChild(document.createTextNode(t('free.title'))); scene.appendChild(tt);
-var rs = document.createElement('div'); rs.className = 'kit-pill-v2 fr-reset'; rs.setAttribute('data-variant', 'soft');
-rs.appendChild(document.createTextNode(t('free.reset') + ' '));
-var clk = document.createElement('b'); clk.id = 'sh-clock'; clk.textContent = shopClockText(); rs.appendChild(clk);
-scene.appendChild(rs);
-}
-var list = document.createElement('div'); list.className = 'fr-list'; list.setAttribute('data-portal-only', ''); body.appendChild(list);
+SHOP_PAINT.free = function (body) {
+shopHead(body, t('free.title'), shopClockPill(t('free.reset')), true).setAttribute('data-portal-only', '');
+var list = document.createElement('div'); list.className = 'sh-grid fr-list'; list.setAttribute('data-portal-only', ''); body.appendChild(list);
 var IC = { coin: 'shop-ic-coin', item: 'shop-ic-machine-item', star: 'shop-ic-star', heart: 'shop-ic-heart', friend: 'shop-ic-machine-friend' };
 for (var i = 0; i < P3_AD_ROWS.length; i++) {
 var id = P3_AD_ROWS[i], left = adCapLeft(id), cap = P3_AD_CAP[id], okNow = adRowOk(id), sub;
@@ -13913,13 +13893,13 @@ else if (id === 'friend' && gachaTable('friend').left <= 0) sub = t('free.friend
 else if (id === 'friend') sub = t('free.left.week', { n: left, m: cap });
 else sub = t('free.left.day', { n: left, m: cap });
 var title = t('free.' + id, { n: id === 'coin' ? P3_AD_COIN : P3_AD_STAR });
-var card = shopCard2({ layout: 'row', title: title, ic: IC[id], sub: sub, coinIc: okNow ? 'play' : '',
+var card = shopCard2({ title: title, ic: IC[id], sub: sub, coinIc: okNow ? 'play' : '',
 label: okNow ? t('free.get') : ((id === 'heart' && (store.hearts | 0) >= HEART_MAX && left > 0) ? t('adv.heartfull') : t('free.tomorrow')),   /* 하트 가득 = 「MAX」(특가 탭과 같은 낱말) · 「내일 다시」 는 상한을 다 쓴 경우만 */
 price: okNow ? 'ad' : 'ok', dis: !okNow, act: 'ad:' + id });
 card.setAttribute('data-ad', id);
 list.appendChild(card);
 }
-var used = store.adCaps.n.x2 | 0, x2 = shopCard2({ layout: 'row', title: t('free.x2'), ic: 'shop-ic-coin-3',
+var used = store.adCaps.n.x2 | 0, x2 = shopCard2({ title: t('free.x2'), ic: 'shop-ic-coin-3',
 sub: t('free.x2.d', { n: used, m: P3_AD_CAP.x2 }), label: used < P3_AD_CAP.x2 ? t('free.x2.where') : t('free.tomorrow'), price: 'ok', dis: true });
 x2.setAttribute('data-ad', 'x2');
 list.appendChild(x2);
@@ -15367,8 +15347,8 @@ kdAvatarPaint();
 kdSync();
 }
 function kdAvatarPaint() {
-var f = document.querySelector('#kd-top-avatar .kd-avatar-face');
-if (f) f.style.setProperty('--kd-face', 'var(--ch-' + charId() + '-face)');
+var fs = document.querySelectorAll('#kd-top-avatar .kd-avatar-face, #sh-avatar .kd-avatar-face');
+for (var i = 0; i < fs.length; i++) fs[i].style.setProperty('--kd-face', 'var(--ch-' + charId() + '-face)');
 }
 function kdSync() {
 setText('kd-top-hearts-v', store.hearts | 0);
@@ -18079,14 +18059,18 @@ on($('pz-resume'), 'click', resume);
 on($('btn-next'), 'click', nextStage);
 on($('btn-continue'), 'click', doContinue);
 on($('btn-shop'), 'click', function () { openShopScreen('jewel'); });
-on($('sh-gear'), 'click', openSettings);   /* [판정판 121 Task 4] 상점 위 바 = 공용 위 바 — 설정 단추(메인 #kd-top-gear · 지도 #map-gear 와 같은 함수) */
+on($('sh-gear'), 'click', openSettings);
+on($('sh-avatar'), 'click', openCharPanel);
+on($('sh-rec'), 'click', function () { J.sfx.ui(); openRank('endless'); });
+on($('sh-mission'), 'click', function () { openQuest('daily'); });   /* openQuest 가 ui 소리를 낸다 — 한 번만 */
+on(window, 'resize', function () { if (shopActive()) shopFitCards(); });
+try { if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { if (shopActive()) shopFitCards(); }); } catch (e) {}
 on($('screen-shop'), 'click', function (ev) {
 var el = ev && ev.target;
-while (el && el !== this && !(el.getAttribute && (el.getAttribute('data-sh-act') || el.id === 'sh-back' ||
-el.id === 'sh-coin-plus' || el.id === 'sh-star-plus' || (el.classList && el.classList.contains('sh-tab'))))) el = el.parentNode;
+while (el && el !== this && !(el.getAttribute && (el.getAttribute('data-sh-act') || el.id === 'sh-close' ||
+(el.classList && el.classList.contains('sh-tab'))))) el = el.parentNode;
 if (!el || el === this || !el.getAttribute) return;
-if (el.id === 'sh-back') { closeShopScreen(); return; }
-if (el.id === 'sh-coin-plus' || el.id === 'sh-star-plus') { setShopTab(portalAdsOk() ? 'free' : 'deals'); return; }
+if (el.id === 'sh-close') { closeShopScreen(); return; }
 if (el.classList && el.classList.contains('sh-tab')) { setShopTab(el.getAttribute('data-stab')); return; }
 if (!el.disabled) shopAct2(el.getAttribute('data-sh-act'), el);
 });

@@ -1873,8 +1873,8 @@ align-items: center;
 justify-content: center;
 padding: calc(var(--safe-t) + 18px) calc(var(--safe-r) + 18px) calc(var(--safe-b) + 18px) calc(var(--safe-l) + 18px);
 background-color: rgba(88, 64, 112, .12);
--webkit-backdrop-filter: blur(4px) saturate(1.04);
-backdrop-filter: blur(4px) saturate(1.04);
+-webkit-backdrop-filter: var(--mode-a-veil-blur);   /* [Task 8c] 값 = 리프 --mode-a-veil-blur(blur(4px) saturate(1.04) — 무변) · 상점 판 면 뒤 흐림이 함께 읽는다 */
+backdrop-filter: var(--mode-a-veil-blur);
 animation: fadein 200ms var(--ease);
 }
 .modal[hidden] { display: none; }
@@ -8897,6 +8897,7 @@ filter: drop-shadow(0 0 10px rgba(102, 240, 159, .40));
 --mode-a-L3-w-k: .00400; --mode-a-L3-a: .745; --mode-a-milk-a: .0222;
 --mode-a-band-w-k: .00991; --mode-a-band-s-k: .0161;
 --mode-a-under-head-a: 0;
+--mode-a-veil-blur: blur(4px) saturate(1.04);
 --mode-b-face:    #96A7F6;
 --mode-b-alpha:   0.550;
 --mode-b-rim:     #C2D6FF;
@@ -9268,7 +9269,7 @@ filter: drop-shadow(0 0 10px rgba(102, 240, 159, .40));
 <link rel="preload" as="image" href="catalog/jelly-box-c.webp">
 <link rel="preload" as="image" href="catalog/duel-title-play.webp">
 <!-- ==RELEASE:BEGIN== 출시 메타 (scratchpad/release-0908/apply-head.py 가 생성·교체, 본문 무접촉) -->
-<meta name="build" content="a0d6e34-20261020-1433">
+<meta name="build" content="cae38ac-20261020-1712">
 <meta name="application-name" content="텐트윈 젤리팡 월드">
 <meta name="description" lang="ko" content="숫자 젤리를 골라 10을 만들어 터뜨리는 퍼즐이에요. 모험·아케이드·데일리·타임 러시·클래식을 즐겨요. Ten Twin Jelly Pang World: pick number jellies that equal or sum to 10.">
 <link rel="manifest" href="tentwin.webmanifest">
@@ -9322,7 +9323,7 @@ navigator.serviceWorker.register('sw.js',{scope:'./'}).catch(function(e){console
 })}
 </script>
 <!-- ==RELEASE:END== -->
-<link rel="preload" as="style" href="tw-late-6101a410.css">
+<link rel="preload" as="style" href="tw-late-485257c8.css">
 </head>
 <body>
 <!-- ============================================================
@@ -9607,35 +9608,32 @@ navigator.serviceWorker.register('sw.js',{scope:'./'}).catch(function(e){console
 [판정판 121 · 2026-10-17 Task 4] 위 띠 → 공용 위 바(.tb) · 아래 띠 → 젤리 캡슐 탭 줄(흐림 띠 없음) · 가로 = 창 전체 사탕 가게 그림 위 무대 배치.
 ============================================================ -->
 <section id="screen-shop" class="screen" data-stab="gacha" data-i18n-aria="shop2.title" aria-label="Shop">
-<!-- [판정판 121 · 2026-10-17 Task 4] 위 바 = 공용 위 바 부품(.tb · 역할 class) — 메인 #kd-top · 지도 #map-top 과 같은 class · 같은 규칙
-(<style id="hub-bars-121">). [뒤로][하트][코인 +][별 +] … [설정] — 미션 · 기록 없음. 뒤로 = 연 곳으로(hubReturn — 이름 「뒤로」).
-+ 둘은 자기 캡슐 안의 단추(오른쪽 아래 모서리의 작은 민트 젤리 원 — 지휘자 판정 Q4 · 규칙은 상점 스타일 블록 shop-p3). -->
+<!-- [Task 8c · 하나의 게임 UI 기준 §1 방 · 사용자 시안 상점.jpg] 상점 = 방: 공용 위 바(메인 #kd-top 과 같은 구성 · 같은 class — [얼굴][하트][코인][별] … [미션][기록][설정]) +
+배경 그림(창 전체 · 흐림 0) + 가운데 판 하나(Task 129 공통 모달 틀 .mframe = 캐릭터 방 정보 카드 재질) + 판 위 간판(무지개 장식 그림 + 사탕 글씨) + 판 오른쪽 위 ✕.
+판 안 = 맨 위 알약 탭 한 줄(.kd-tag.kit-pill-v2[role="tab"] — 옛 아래 띠 탭을 옮김) → 본문(카드 격자 · 넘치면 본문만 구른다).
+은퇴: 뒤로 화살표(#sh-back) · 코인 · 별 + 단추 · 장면(#sh-stage · #sh-awning · #sh-scene · #sh-host · #sh-bubble). 뒤로 가는 길 = 판 ✕(hubReturn). -->
 <header id="sh-top" class="tb">
-<button id="sh-back" class="tb-lead tb-back" type="button" data-i18n-aria="aria.back" aria-label="Back"></button>
+<button id="sh-avatar" class="tb-lead kd-avatar" type="button" data-i18n-aria="aria.charopen" aria-label="Heroes: choose a character"><span class="kd-avatar-face" aria-hidden="true"></span></button>
 <span class="tb-heart" id="sh-hearts"><b id="sh-hearts-v">5</b><i id="sh-heart-t"></i></span>
-<span class="tb-coin" id="sh-coin"><b id="sh-coin-v">0</b><button id="sh-coin-plus" class="sh-plus" type="button" data-i18n-aria="aria.coinplus" aria-label="Get more coins"><i class="sh-plus-face kd-tag kit-pill-v2" data-tone="mint" aria-hidden="true">+</i></button></span>
-<span class="tb-star" id="sh-star"><b id="sh-star-v">0</b><button id="sh-star-plus" class="sh-plus" type="button" data-i18n-aria="aria.starplus" aria-label="Get more stars"><i class="sh-plus-face kd-tag kit-pill-v2" data-tone="mint" aria-hidden="true">+</i></button></span>
+<span class="tb-coin" id="sh-coin"><b id="sh-coin-v">0</b></span>
+<span class="tb-star" id="sh-star"><b id="sh-star-v">0</b></span>
+<button id="sh-mission" class="tb-mission" type="button" data-i18n-aria="kd.mission" aria-label="Missions"><b id="sh-mission-badge" class="badge-new" hidden></b></button>
+<button id="sh-rec" class="tb-rec" type="button" data-i18n-aria="aria.rank" aria-label="Records"></button>
 <button id="sh-gear" class="tb-gear" type="button" data-i18n-aria="aria.settings" aria-label="Settings"></button>
 </header>
-<div id="sh-stage">
-<div id="sh-awning" aria-hidden="true"></div>
-<div id="sh-scene"></div>
-<div id="sh-host" aria-hidden="true"></div>
-<p id="sh-bubble" hidden></p>
-</div>
-<div id="sh-plate" class="jbox jbox--modal" data-part="modal-plate">
-<div id="sh-body" role="tabpanel" aria-labelledby="sh-tab-gacha"></div>
-</div>
-<!-- [Task 4] 아래 탭 = 게임 젤리 캡슐(메인 v3 메뉴 단추 kd-mbtn 의 .kd-tag.kit-pill-v2 판 · data-tone 색 · 아이콘 · 글자 규칙 — 지휘자 판정 Q2 · Q3).
-고른 탭 = 톤 면 + 정적 밝은 테, 나머지 = kit-pill-v2[data-variant="soft"](크림 · 잉크 글자) — shopPaint 가 고른 탭에 맞춰 data-variant 를 붙이고 뗀다.
-옛 흐림 띠(.jbox--strip) · 노랑 알약(.rank-tab) 은퇴. -->
-<footer id="sh-tabs" role="tablist" data-i18n-aria="aria.shoptabs" aria-label="Shop sections">
+<div id="sh-plate" class="jbox jbox--modal mframe" data-part="modal-plate">
+<div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
+<div id="sh-sign"><h2 id="sh-h" data-i18n="shop2.sign">Shop</h2></div>
+<button id="sh-close" class="r10-x x-btn" type="button" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
+<div id="sh-tabs" role="tablist" data-i18n-aria="aria.shoptabs" aria-label="Shop sections">
 <button class="sh-tab kd-tag kit-pill-v2" id="sh-tab-gacha" type="button" role="tab" aria-controls="sh-body" data-stab="gacha" data-tone="orange" aria-selected="true"><i class="sh-tab-ic" aria-hidden="true"></i><span data-i18n="shop2.tab.gacha">Capsules</span><b class="badge-new sh-dot" hidden></b></button>
 <button class="sh-tab kd-tag kit-pill-v2" id="sh-tab-deals" type="button" role="tab" aria-controls="sh-body" data-stab="deals" data-tone="mint" data-variant="soft" aria-selected="false"><i class="sh-tab-ic" aria-hidden="true"></i><span data-i18n="shop2.tab.deals">Deals</span><b class="badge-new sh-dot" hidden></b></button>
 <button class="sh-tab kd-tag kit-pill-v2" id="sh-tab-free" type="button" role="tab" aria-controls="sh-body" data-stab="free" data-tone="blue" data-variant="soft" data-portal-only aria-selected="false"><i class="sh-tab-ic" aria-hidden="true"></i><span data-i18n="shop2.tab.free">Free</span><b class="badge-new sh-dot" hidden></b></button>
 <button class="sh-tab kd-tag kit-pill-v2" id="sh-tab-deco" type="button" role="tab" aria-controls="sh-body" data-stab="deco" data-tone="violet" data-variant="soft" aria-selected="false"><i class="sh-tab-ic" aria-hidden="true"></i><span data-i18n="shop2.tab.deco">Style</span></button>
 <button class="sh-tab kd-tag kit-pill-v2" id="sh-tab-jewel" type="button" role="tab" aria-controls="sh-body" data-stab="jewel" data-tone="purple" data-variant="soft" data-app-only aria-selected="false"><i class="sh-tab-ic" aria-hidden="true"></i><span data-i18n="shop2.tab.jewel">Jewels</span></button>
-</footer>
+</div>
+<div id="sh-body" role="tabpanel" aria-labelledby="sh-tab-gacha"></div>
+</div>
 </section>
 <!-- ============================================================
 ===== 스테이지 맵 (v4 10차 §A · ART §6.7 · ROUND10-SPEC §A) =====
@@ -12475,7 +12473,7 @@ game.js **앞**이어야 한다 — 부팅 직후 나는 소리까지 클립으�
 이 파일을 빼고 빌드해도 게임은 돈다 — 그때는 모든 슬롯이 기존 신스다. -->
 <script defer src="catalog/js/tw-02-7ea6fa41.js"></script>
 <script defer src="catalog/js/tw-03-06721556.js"></script>
-<script defer src="catalog/js/tw-04-47c22092.js"></script>
+<script defer src="catalog/js/tw-04-e7af13ce.js"></script>
 <!-- ==FRUITDEF:BEGIN== generated by tools/fruit-tiles.js — do not edit by hand -->
 <!-- 열매 실루엣 클립 패스 9종 (DESIGN-V4 §5.8). clipPathUnits="objectBoundingBox"
 라 좌표가 0..1 이고, 타일 크기(--ts)가 어떤 값이든 같은 모양이 나온다.
@@ -12553,7 +12551,7 @@ width/height 0 + aria-hidden: 레이아웃·접근성 트리에 아무것도 더
 
 
 
-<link rel="stylesheet" href="tw-late-6101a410.css">
+<link rel="stylesheet" href="tw-late-485257c8.css">
 <style id="compat-p1">
 @supports not (width: 1cqw) {
 #app.classic #classic-hud { --cqw: min(1vw, calc(var(--app-max) / 100)); height: calc(38.5 * var(--cqw)); }
@@ -13841,145 +13839,125 @@ padding: 0;
 overflow: hidden;
 container-type: inline-size;
 background: var(--prim-bg-light);
+--cqw: 1cqw;
 }
-#screen-shop > *{ --f2-w: 100cqw; }
 html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
-#sh-top .sh-plus{
---sh-plus-hit-h: calc(var(--tb-ch) * 1.6);
-position: absolute; right: calc(var(--tb-ch) * -.125); bottom: calc(var(--tb-ch) * -.125); width: calc(var(--tb-ch) * 1.6); height: var(--sh-plus-hit-h);
-margin: 0; padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none;
-cursor: pointer; -webkit-tap-highlight-color: transparent; pointer-events: auto;
+#sh-plate{
+--sh-pw: calc(var(--cqw) * 95.7);
+--f2-w: var(--sh-pw);                    /* 킷 부품의 자 = 판 폭(판 안 알약 · 단추의 기본 비율이 판을 따른다) */
+--sh-gap: calc(var(--cqw) * 4.6);
+--sh-sign-w: calc(var(--sh-pw) * .33);
+--sh-sign-h: calc(var(--sh-sign-w) * .6141);
+--sh-top: calc(var(--safe-t) + var(--cqw) * 47);
+position: absolute; z-index: 4;
+left: calc(50% - var(--sh-pw) / 2); right: auto; width: var(--sh-pw);
+top: var(--sh-top); bottom: auto; height: auto;
+max-height: calc(100% - var(--sh-top) - var(--safe-b) - var(--sh-gap));
+box-sizing: border-box;
+display: flex; flex-direction: column;
+padding: calc(var(--sh-sign-h) * .20) calc(var(--cqw) * 3.5) calc(var(--cqw) * 3);
 }
-#sh-top .sh-plus > .sh-plus-face.kit-pill-v2{
---f2-ph: calc(var(--tb-ch) * .45);
-position: absolute; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center;
-width: var(--f2-ph); height: var(--f2-ph); max-width: none; padding: 0 0 calc(var(--f2-ph) * .08); border-radius: 50%;
-font-size: calc(var(--f2-ph) * .8); font-weight: 800; font-style: normal; line-height: 1;
+#sh-plate.mframe > .cp-fx{ z-index: -1; --f2-bd: var(--jbox-bw); --f2-r: var(--jbox-radius); }
+#sh-plate{ --jbox-blur: var(--mode-a-veil-blur); }
+#sh-sign{
+position: absolute; z-index: 3; left: 50%; top: calc(var(--sh-sign-h) * -.80);
+width: var(--sh-sign-w); height: var(--sh-sign-h); margin: 0 0 0 calc(var(--sh-sign-w) / -2);
+background: url("catalog/shop-sign.webp") center / 100% 100% no-repeat;
+pointer-events: none;
 }
-#sh-stage{ position: absolute; left: 0; right: 0; top: 0; height: calc(min(128.2cqw, 60%) + var(--safe-t)); overflow: hidden;
-background: linear-gradient(180deg, var(--prim-bg-light), var(--prim-art-pink-2)); }   /* 높이 + 안전 위 — 판 위 끝이 그만큼 내려가도 무대 끝과의 겹침(22px)이 같다(수정 1회차 I-2) */
-#screen-shop[data-stab="deals"] #sh-stage{ height: calc(min(76.9cqw, 40%) + var(--safe-t)); }
-#screen-shop[data-stab="free"]  #sh-stage{ height: calc(min(64.1cqw, 34%) + var(--safe-t)); }
-#sh-awning{ position: absolute; left: -2.6cqw; right: -2.6cqw; top: 0; height: 16.4cqw;
-background: repeating-linear-gradient(90deg, var(--prim-art-pink) 0 7.18cqw, var(--prim-white) 7.18cqw 14.36cqw); }
-#screen-shop[data-stab="free"] #sh-awning{
-background: repeating-linear-gradient(90deg, var(--role-mint-face-a) 0 7.18cqw, var(--prim-white) 7.18cqw 14.36cqw); }
-#sh-scene{ position: absolute; inset: 0; }
-#sh-host{ position: absolute; right: 2cqw; bottom: 2cqw; width: 28.7cqw; height: 38.5cqw;
-background: var(--sh-host, none) center bottom / contain no-repeat; }
-#sh-bubble{ position: absolute; z-index: 5; margin: 0; }
-#sh-plate{ position: absolute; left: 2.56cqw; right: 2.56cqw; bottom: calc(22.6cqw + var(--safe-b)); top: calc(min(122.6cqw, 57%) + var(--safe-t)); z-index: 4; }   /* 안전 영역 위·아래(수정 1회차 I-2) */
-#screen-shop[data-stab="deals"] #sh-plate{ top: calc(min(72.3cqw, 36%) + var(--safe-t)); }
-#screen-shop[data-stab="free"]  #sh-plate{ top: calc(min(57.9cqw, 30%) + var(--safe-t)); }
-#sh-body{ position: absolute; inset: 3cqw 3.5cqw; overflow-y: auto; overscroll-behavior: contain; }
-#sh-tabs{ position: absolute; left: 2.05cqw; right: 2.05cqw; bottom: calc(2.05cqw + var(--safe-b)); height: 19cqw; z-index: 6;   /* 홈 인디케이터 위(왕국 #kd-bot 과 같은 토큰 — 수정 1회차 I-2) */
-display: flex; gap: 1.54cqw; padding: 1.8cqw; box-sizing: border-box; }
-#sh-tabs .sh-tab.kit-pill-v2{ --f2-ph: 15.4cqw; position: relative; flex: 1 1 0; min-width: 0; width: auto; max-width: none; height: var(--f2-ph); margin: 0;
-display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .3cqw; border-radius: calc(var(--f2-ph) * .232);
-padding: 0 0 calc(var(--f2-ph) * .08); font-size: 3.6cqw; cursor: pointer; -webkit-tap-highlight-color: transparent; }
-#sh-tabs .sh-tab > [data-i18n]{ max-width: 100%; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#sh-sign > h2{
+--mvh-fs: .9;
+position: absolute; left: 23.2%; right: 24.05%; top: 44.6%; bottom: 5.5%;
+display: flex; align-items: center; justify-content: center;
+margin: 0; padding: 0; min-width: 0; max-width: none;
+font-size: calc(var(--sh-sign-h) * .499 * var(--mvh-fs)); line-height: 1;
+}
+#sh-tabs{
+position: relative; flex: 0 0 auto;
+display: flex; align-items: center; gap: calc(var(--cqw) * 2);
+margin: 0 calc(var(--cqw) * -3.5); padding: calc(var(--cqw) * 1.2) calc(var(--cqw) * 3.5);
+overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scrollbar-width: none;
+}
+#sh-tabs::-webkit-scrollbar{ width: 0; height: 0; }
+#sh-tabs::before, #sh-tabs::after{ content: ""; flex: 1 0 0; }
+#sh-tabs .sh-tab.kit-pill-v2{
+--f2-ph: calc(var(--cqw) * 9.6);
+--f2-pill: var(--f2-tab-on); --f2-pill-soft: var(--f2-tab-off); --f2-pill-line: var(--f2-line); --kd-tag-ink: var(--f2-line);
+position: relative; flex: 0 0 auto; min-width: calc(var(--f2-ph) * 2.6); width: auto; max-width: none; height: var(--f2-ph); margin: 0;
+display: inline-flex; flex-direction: row; align-items: center; justify-content: center; gap: calc(var(--f2-ph) * .16);
+padding: 0 calc(var(--f2-ph) * .42) calc(var(--f2-ph) * .08); border-radius: calc(var(--f2-ph) * .232);
+font-size: max(var(--text-min), calc(var(--f2-ph) * .42)); color: var(--f2-ink); text-shadow: none;
+cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+#sh-tabs .sh-tab > [data-i18n]{ font-weight: 700; white-space: nowrap; }
+#sh-tabs .sh-tab[aria-selected="false"] > [data-i18n]{ text-shadow: var(--mf-halo); }
 #sh-tabs .sh-tab:active{ transform: translateY(var(--hub-press)); }
-#sh-tabs .sh-tab-ic{ width: 9.2cqw; height: 8.2cqw; background: center / contain no-repeat; }
+#sh-tabs .sh-tab-ic{ flex: 0 0 auto; width: calc(var(--f2-ph) * .56); height: calc(var(--f2-ph) * .56); background: center / contain no-repeat; }
 #sh-tabs .sh-tab[data-stab="gacha"] .sh-tab-ic{ background-image: url("catalog/slot-ic-item.webp"); }
 #sh-tabs .sh-tab[data-stab="deals"] .sh-tab-ic{ background-image: url("catalog/t3-bldg2-shop.webp"); }
 #sh-tabs .sh-tab[data-stab="free"]  .sh-tab-ic{ background-image: url("catalog/shop-ic-bundle-1.webp"); }
 #sh-tabs .sh-tab[data-stab="deco"]  .sh-tab-ic{ background-image: url("catalog/slot-ic-skin.webp"); }
 #sh-tabs .sh-tab[data-stab="jewel"] .sh-tab-ic{ background-image: url("catalog/shop-ic-jewel.webp"); }
 #sh-tabs .sh-dot{ position: absolute; right: calc(-1 * var(--cqw)); top: calc(-1 * var(--cqw)); z-index: 2; }
-#screen-shop{ --cqw: 1cqw; }
-#screen-shop .sh-head{ display: flex; width: max-content; margin: 0 auto calc(2.6 * var(--cqw)); padding: 0 calc(6.67 * var(--cqw));
---f2-bh: calc(11.28 * var(--cqw)); font-family: var(--font-display); font-weight: 400; font-size: calc(5.6 * var(--cqw)); line-height: 1;
-text-shadow: 0 calc(.385 * var(--cqw)) 0 var(--role-f2-pill-a-ln); }
-#sh-plate > .sh-phead{ position: absolute; z-index: 2; left: 0; right: 0; top: calc(-6.9 * var(--cqw)); margin: 0 auto; }
+#sh-body{
+position: relative; flex: 0 1 auto; min-height: 0;
+margin: calc(var(--cqw) * .4) calc(var(--cqw) * -1) 0; padding: calc(var(--cqw) * 2.8) calc(var(--cqw) * 1) calc(var(--cqw) * .6);
+overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none;
+word-break: keep-all;
+}
+#sh-body::-webkit-scrollbar{ width: 0; height: 0; }
+#sh-body .sh-hrow{ display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: calc(var(--cqw) * 1.5) calc(var(--cqw) * 2); margin: 0 0 calc(var(--cqw) * 3); }
+#sh-body .sh-htitle{ display: flex; align-items: center; min-width: 0; font-family: var(--font-display); font-weight: 400; font-size: max(var(--text-min), calc(var(--cqw) * 4.6)); line-height: 1.1;
+color: var(--prim-art-ink); text-shadow: var(--mf-halo); }
+#sh-body .sh-clockpill{ --f2-bh: calc(var(--cqw) * 6.4); gap: .3em; max-width: 100%; height: auto; min-height: var(--f2-bh); text-align: center; line-height: 1.2;
+font-size: max(var(--text-min), calc(var(--cqw) * 3.1)); }
 #sh-body .sh-grid{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: calc(2.05 * var(--cqw)); }
 #sh-body .shop-card[data-layout="grid"]{ position: relative; display: flex; flex-direction: column; align-items: center; gap: calc(1.2 * var(--cqw));
 min-height: calc(46 * var(--cqw)); padding: calc(2.6 * var(--cqw)) calc(1.8 * var(--cqw)); border-radius: calc(4.6 * var(--cqw)); box-sizing: border-box;
-background: var(--role-f2-pill); border: calc(.4 * var(--cqw)) solid var(--role-f2-pill-line); color: var(--prim-art-ink); }
-#sh-body .shop-card .shop-cn{ font-size: calc(3.6 * var(--cqw)); }
+background: var(--role-f2-pill); border: calc(.4 * var(--cqw)) solid var(--role-f2-pill-line); color: var(--prim-art-ink); text-align: center; }
+#sh-body .shop-card .shop-cn{ font-size: max(var(--text-min), calc(3.6 * var(--cqw))); line-height: 1.2; }
+#sh-body .shop-card .shop-cbody{ display: contents; }
+#sh-body .shop-card .shop-cn{ order: -1; }
+#sh-body .sh-grid[data-cols="1"]{ grid-template-columns: minmax(0, 1fr); }
+#sh-body .sh-grid[data-cols="1"] > .shop-card{ flex-direction: row; align-items: center; gap: calc(3 * var(--cqw)); min-height: 0; text-align: left; }
+#sh-body .sh-grid[data-cols="1"] > .shop-card > .shop-icbox{ flex: 0 0 auto; }
+#sh-body .sh-grid[data-cols="1"] > .shop-card > .shop-cbody{ display: flex; flex-direction: column; align-items: flex-start; gap: calc(1.2 * var(--cqw)); flex: 1 1 auto; min-width: 0; }
+#sh-body .sh-grid[data-cols="1"] > .shop-card .sh-btns{ margin-top: calc(.6 * var(--cqw)); }
 #sh-body .shop-card .shop-ic{ width: calc(18 * var(--cqw)); height: calc(18 * var(--cqw)); background: center / contain no-repeat; }
 #sh-body .shop-card .shop-ic.shop-ic-coin{ background-image: var(--lib-glyph-coin); }
 #sh-body .shop-card .shop-ic.shop-ic-heart{ background-image: url("catalog/shop-ic-heart.webp"); }
 #sh-body .shop-card .shop-ic.shop-ic-jstar-1{ background-image: url("catalog/shop-ic-jstar-1.webp"); }
-#sh-body .shop-card[data-tier="common"] .shop-ic{ border-radius: calc(3.6 * var(--cqw)); border: calc(.8 * var(--cqw)) solid var(--role-rw-shard-steady-3); background-color: var(--role-rw-shard-steady-1); }
-#sh-body .shop-card[data-tier="rare"]   .shop-ic{ border-radius: calc(3.6 * var(--cqw)); border: calc(.8 * var(--cqw)) solid var(--role-rw-shard-agility-3); background-color: var(--role-rw-shard-agility-1); }
+#sh-body .shop-icbox > .itile{ width: calc(18 * var(--cqw)); --it-w: calc(18 * var(--cqw)); }
+#sh-body .shop-card[data-kind] .shop-ic{ width: calc(15.7 * var(--cqw)); height: calc(20 * var(--cqw)); }
 #sh-body .shop-card .shop-badge{ position: absolute; left: calc(1.5 * var(--cqw)); top: calc(-2 * var(--cqw)); font-style: normal;
 padding: calc(.4 * var(--cqw)) calc(2 * var(--cqw)); border-radius: 999em; font-size: max(var(--text-min), calc(3 * var(--cqw))); font-weight: 800; line-height: 1.3;
 background: var(--role-pink-face-b); color: var(--prim-white); }
 #sh-body .shop-icbox{ position: relative; display: flex; }
-#sh-body .shop-card .shop-qty{ position: absolute; right: calc(-1.1 * var(--cqw)); bottom: calc(-.5 * var(--cqw)); font-size: calc(4.2 * var(--cqw)); font-weight: 800; line-height: 1;
+#sh-body .shop-card .shop-qty{ position: absolute; right: calc(-1.1 * var(--cqw)); bottom: calc(-.5 * var(--cqw)); font-size: max(var(--text-min), calc(4.2 * var(--cqw))); font-weight: 800; line-height: 1;
 paint-order: stroke fill; -webkit-text-stroke: calc(.5 * var(--cqw)) var(--prim-white); }
-#sh-body .shop-card .shop-cd{ font-size: max(var(--text-min), calc(3 * var(--cqw))); color: var(--role-f2-ink); }
-#sh-body .sh-btn{ min-height: 0 !important; padding: 0 calc(1 * var(--cqw)) !important; width: 100%; height: calc(10.8 * var(--cqw)); margin-top: auto; font-size: calc(4.2 * var(--cqw)); }
-#sh-body .sh-btn[data-price="coin"], #modal-gres #gres-again[data-price="coin"]{ --btn-face-a: var(--role-yellow-face-a); --btn-face-b: var(--role-yellow-face-b); --btn-outline: var(--role-yellow-outline); --btn-contact: var(--role-yellow-contact); }
-#sh-body .sh-btn[data-price="star"], #modal-gres #gres-again[data-price="star"]{ --btn-face-a: var(--role-pink-face-a); --btn-face-b: var(--role-pink-face-b); --btn-outline: var(--role-pink-outline); --btn-contact: var(--role-pink-contact); }
+#sh-body .shop-card .shop-cd{ font-size: max(var(--text-min), calc(3 * var(--cqw))); line-height: 1.3; color: var(--role-f2-ink); }
+#sh-body .shop-card .sh-prog{ --f2-bh: calc(5.6 * var(--cqw)); max-width: 100%; box-sizing: border-box; padding: 0 .5em;
+font-size: max(var(--text-min), calc(2.9 * var(--cqw))); letter-spacing: -.02em; white-space: nowrap; }
+#sh-body .shop-card .sh-odds{ position: absolute; right: calc(1.2 * var(--cqw)); top: calc(-2.6 * var(--cqw)); z-index: 1;
+--f2-bh: calc(5.2 * var(--cqw)); padding: 0 calc(var(--f2-bh) * .5); font-size: max(var(--text-min), calc(2.8 * var(--cqw))); white-space: nowrap; cursor: pointer; }
+#sh-body .shop-card .sh-btns{ display: flex; flex-direction: column; gap: calc(1.4 * var(--cqw)); width: 100%; margin-top: auto; }
+#sh-body .sh-btn{ min-height: 0 !important; padding: 0 calc(1 * var(--cqw)) !important; width: 100%; height: calc(10.4 * var(--cqw)); margin: 0; gap: calc(.8 * var(--cqw)); font-size: max(var(--text-min), calc(4.2 * var(--cqw))); white-space: nowrap; }
+#sh-body .shop-card[data-kind] .sh-btn{ font-size: max(var(--text-min), calc(3.4 * var(--cqw))); }
+#sh-body .shop-card[data-kind] .sh-btn{ gap: calc(.5 * var(--cqw)); }
+#sh-body .shop-card[data-kind] .sh-btn-ic{ width: calc(3.8 * var(--cqw)); height: calc(3.8 * var(--cqw)); }
+#sh-body .sh-btn:is([data-price="coin"], [data-price="star"]), #modal-gres #gres-again:is([data-price="coin"], [data-price="star"]){ --btn-face-a: var(--role-yellow-face-a); --btn-face-b: var(--role-yellow-face-b); --btn-outline: var(--role-yellow-outline); --btn-contact: var(--role-yellow-contact); }
 #sh-body .sh-btn[data-price="free"],
 #sh-body .sh-btn[data-price="ad"]{ --btn-face-a: var(--role-mint-face-a); --btn-face-b: var(--role-mint-face-b); --btn-outline: var(--role-mint-outline); --btn-contact: var(--role-mint-contact); }
 #sh-body .sh-btn[data-price="ok"], #modal-gres #gres-again[data-price="ok"]{ --btn-face-a: var(--role-lilac-face-a); --btn-face-b: var(--role-lilac-face-b); --btn-outline: var(--role-lilac-outline); --btn-contact: var(--role-lilac-contact); }
-#sh-body .sh-btn-ic{ width: calc(4.6 * var(--cqw)); height: calc(4.6 * var(--cqw)); margin-right: calc(.8 * var(--cqw)); background: center / contain no-repeat; }
+#sh-body .sh-btn-ic{ flex: none; width: calc(4.6 * var(--cqw)); height: calc(4.6 * var(--cqw)); margin: 0; background: center / contain no-repeat; }
 #sh-body .sh-btn-ic--coin, #modal-gres .sh-btn-ic--coin{ background-image: var(--lib-glyph-coin); }   /* P3 T8 수정 1회차 — 결과 창 [10회 더] 그림도 같은 조각(I-7) */
 #sh-body .sh-btn-ic--star, #modal-gres .sh-btn-ic--star{ background-image: var(--lib-star-gold); }
-#sh-body .sh-fine{ margin: calc(2.6 * var(--cqw)) 0 0; font-size: max(var(--text-min), calc(3 * var(--cqw))); line-height: 1.5; text-align: center; color: var(--role-f2-ink); }
+#sh-body .sh-fine{ margin: calc(2.6 * var(--cqw)) 0 0; font-size: max(var(--text-min), calc(3 * var(--cqw))); line-height: 1.5; text-align: center;
+color: var(--prim-art-ink); text-shadow: var(--mf-halo); }
 #sh-body .sh-fine + .sh-fine{ margin-top: 0; }
-#sh-bubble{ box-sizing: border-box; left: calc(43.6 * var(--cqw)); top: calc(26.7 * var(--cqw) + var(--safe-t)); width: calc(50.3 * var(--cqw)); padding: calc(2 * var(--cqw)) calc(2.8 * var(--cqw)); border-radius: calc(4.1 * var(--cqw));
-background: var(--prim-white); border: calc(.4 * var(--cqw)) solid var(--role-f2-pill-line); color: var(--prim-art-ink); font-size: calc(3.4 * var(--cqw)); }
-#sh-bubble > .kit-pill-v2{ display: flex; width: max-content; margin-top: calc(1.2 * var(--cqw)); --f2-bh: calc(5.9 * var(--cqw)); font-size: max(var(--text-min), calc(3.3 * var(--cqw))); }
-#screen-shop[data-stab="deals"] #sh-host{ left: calc(6 * var(--cqw)); right: auto; }
-#screen-shop[data-stab="deals"] #sh-body{ top: calc(4.5 * var(--cqw)); padding-top: calc(2.5 * var(--cqw)); }   /* 안쪽 여백 = 「희귀」 표가 카드 위로 걸친 만큼(상자 위 끝에서 안 잘림) */
-#sh-scene .gc-kinds{ position: absolute; left: 0; right: 0; top: 13.2%; display: flex; justify-content: center; gap: calc(1.5 * var(--cqw)); z-index: 6; }
-#sh-scene .gc-kind{ --f2-bh: calc(7.18 * var(--cqw)); padding: 0 calc(3 * var(--cqw)); font-size: max(var(--text-min), calc(3.2 * var(--cqw))); white-space: nowrap; }
-#sh-scene .gc-title{ position: absolute; left: 50%; top: 20.8%; transform: translateX(-50%); z-index: 6;
---f2-bh: calc(11.28 * var(--cqw)); padding: 0 calc(5.64 * var(--cqw)); font-family: var(--font-display); font-weight: 400; font-size: calc(6.2 * var(--cqw)); line-height: 1; white-space: nowrap; }
-#sh-scene .gc-sub{ position: absolute; left: 50%; top: 87.6%; transform: translateX(-50%); z-index: 6;
---f2-bh: calc(6.67 * var(--cqw)); width: max-content; max-width: calc(94 * var(--cqw)); height: auto; min-height: var(--f2-bh); padding-top: calc(.8 * var(--cqw)); padding-bottom: calc(.8 * var(--cqw)); text-align: center; line-height: 1.25;
-font-size: max(var(--text-min), calc(3.2 * var(--cqw)));
-word-break: keep-all; text-wrap: balance; }
-#screen-shop[data-stab="gacha"] #sh-bubble,
-#screen-shop[data-stab="deco"] #sh-bubble{ left: calc(64.1 * var(--cqw)); top: 47.6%; width: max-content; max-width: calc(34 * var(--cqw));
-padding: calc(1.5 * var(--cqw)) calc(2.3 * var(--cqw)); border-radius: calc(3.6 * var(--cqw)); font-size: max(var(--text-min), calc(3 * var(--cqw))); font-weight: 700; line-height: 1.3; word-break: keep-all; text-wrap: balance; }
-#sh-scene .gm-ph{ position: absolute; left: 50%; top: 30%; height: 57%; width: auto; aspect-ratio: 224 / 285; transform: translateX(-50%); z-index: 3;
---gm-a: var(--role-mint-face-a); --gm-b: var(--role-mint-face-b); --gm-o: var(--role-mint-outline); }
-#sh-scene .gm-ph[data-kind="gold"]{ --gm-a: var(--role-yellow-face-a); --gm-b: var(--role-yellow-face-b); --gm-o: var(--role-yellow-outline); }
-#sh-scene .gm-ph[data-kind="friend"],
-#sh-scene .gm-ph[data-kind="skin"]{ --gm-a: var(--role-pink-face-a); --gm-b: var(--role-pink-face-b); --gm-o: var(--role-pink-outline); }
-#sh-scene .gm-dome{ position: absolute; left: 3%; top: 0; width: 94%; aspect-ratio: 1; border-radius: 50%;
-background: radial-gradient(circle at 38% 30%, var(--role-glass-face-a), var(--role-glass-face-b)); border: calc(.9 * var(--cqw)) solid var(--role-glass-outline); }
-#sh-scene .gm-body{ position: absolute; left: 0; right: 0; bottom: 0; height: 44%; border-radius: calc(6 * var(--cqw));
-background: linear-gradient(180deg, var(--gm-a), var(--gm-b)); border: calc(.9 * var(--cqw)) solid var(--gm-o); }
-#sh-scene .gm-knob{ position: absolute; left: 36%; bottom: 17%; width: 28%; aspect-ratio: 1; border-radius: 50%;
-background: var(--prim-white); border: calc(.9 * var(--cqw)) solid var(--gm-o); }
-#sh-scene .gm-slot{ position: absolute; left: 30%; bottom: 3%; width: 40%; height: 9%; border-radius: calc(3 * var(--cqw)); background: var(--prim-art-ink); }
-#sh-scene .gm-face{ position: absolute; width: 17%; aspect-ratio: 1; border-radius: 50%; z-index: 1; left: var(--gm-x, 15%); top: var(--gm-y, 12%);
-background: var(--prim-white) var(--gm-face, none) center / 112% no-repeat; border: calc(.6 * var(--cqw)) solid var(--role-rw-shard-steady-3); }
-#sh-scene .gm-face[data-tier="rare"]{ border-color: var(--role-rw-shard-agility-3); }
-#sh-scene .gm-face[data-tier="epic"]{ border-color: var(--role-rw-item-3); }
-#screen-shop[data-art~="machine"] #sh-scene .gm-dome,
-#screen-shop[data-art~="machine"] #sh-scene .gm-body,
-#screen-shop[data-art~="machine"] #sh-scene .gm-knob,
-#screen-shop[data-art~="machine"] #sh-scene .gm-slot{ display: none; }
-#sh-body .gc-btns{ display: flex; gap: calc(2.05 * var(--cqw)); }
-#sh-body .gc-btns .sh-btn{ flex: 1 1 0; min-width: 0; height: calc(12.3 * var(--cqw)); margin-top: 0; line-height: 1.1; }
-#sh-body .gc-btns .sh-btn-ic{ flex: none; }
-#screen-shop[data-stab="gacha"] #sh-body,
-#screen-shop[data-stab="deco"] #sh-body{ padding-top: calc(1.6 * var(--cqw)); }
-#sh-body .gc-oddhd{ display: flex; justify-content: space-between; align-items: center; margin: calc(3.6 * var(--cqw)) 0 calc(1.5 * var(--cqw)); font-size: max(var(--text-min), calc(3.2 * var(--cqw))); color: var(--prim-art-ink); }
-#sh-body .gc-oddlink{ --f2-bh: calc(5.64 * var(--cqw)); padding: 0 calc(2.6 * var(--cqw)); font-size: max(var(--text-min), calc(3.2 * var(--cqw))); white-space: nowrap; }
-#sh-body .gc-og{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: calc(1.5 * var(--cqw)); }
-#sh-body .gc-oc{ display: flex; align-items: center; gap: calc(1.5 * var(--cqw)); height: calc(12.8 * var(--cqw)); padding: 0 calc(1.5 * var(--cqw)); border-radius: calc(3.6 * var(--cqw)); box-sizing: border-box;
-background: var(--role-f2-pill); border: calc(.3 * var(--cqw)) solid var(--role-f2-pill-line); }
-#sh-body .gc-oc i{ flex: none; width: calc(9.2 * var(--cqw)); height: calc(9.2 * var(--cqw)); border-radius: 50%; background: var(--prim-white) var(--gm-face, none) center / 112% no-repeat;
-border: calc(.5 * var(--cqw)) solid var(--role-rw-shard-steady-3); box-sizing: border-box; }
-#sh-body .gc-oc[data-tier="rare"] i{ border-color: var(--role-rw-shard-agility-3); }
-#sh-body .gc-oc[data-tier="epic"] i{ border-color: var(--role-rw-item-3); }
-#sh-body .gc-oc span{ min-width: 0; margin-right: calc(-1.5 * var(--cqw)); }   /* [rc1009 수정 1회차 F-2] 이름 상자 = 칸 오른쪽 안쪽 여백(같은 1.5cqw)까지 */
-#sh-body .gc-oc b{ display: block; font-size: max(var(--text-min), calc(3.1 * var(--cqw))); color: var(--prim-art-ink); word-break: keep-all; overflow: hidden; }
-#sh-body .gc-oc em{ display: block; font-style: normal; font-weight: 800; font-size: max(var(--text-min), calc(3.2 * var(--cqw))); color: var(--role-rw-shard-steady-3); }
-#sh-body .gc-oc[data-tier="rare"] em{ color: var(--role-rw-shard-agility-3); }
-#sh-body .gc-oc[data-tier="epic"] em{ color: var(--role-rw-item-3); }
-#sh-body .gc-tiers .gc-tr{ display: flex; align-items: center; gap: calc(2 * var(--cqw)); padding: calc(1.2 * var(--cqw)) 0; font-size: calc(3.4 * var(--cqw)); color: var(--prim-art-ink); }
 #odds-body .od-tier{ display: flex; align-items: center; gap: calc(2 * var(--mu)); padding: calc(1.2 * var(--mu)) 0; font-size: calc(3.4 * var(--mu)); color: var(--prim-art-ink); }
-#sh-body .gc-tiers .gc-tr em, #odds-body .od-tier .od-p{ margin-left: auto; font-style: normal; font-weight: 800; }
+#odds-body .od-tier .od-p{ margin-left: auto; font-style: normal; font-weight: 800; }
 .gc-chip{ display: inline-block; text-align: center; font-style: normal; color: var(--prim-white); background: var(--role-rw-shard-steady-3); }
-#sh-body .gc-chip{ min-width: calc(11 * var(--cqw)); padding: calc(.6 * var(--cqw)) calc(2 * var(--cqw)); border-radius: calc(3 * var(--cqw)); }
 #modal-odds .gc-chip, #modal-gres .gc-chip{ min-width: calc(11 * var(--mu)); padding: calc(.6 * var(--mu)) calc(2 * var(--mu)); border-radius: calc(3 * var(--mu)); }   /* P3 T8 — 결과 창 요약 칩도 같은 N(판정 Q3) */
 [data-tier="rare"] > .gc-chip{ background: var(--role-rw-shard-agility-3); }
 [data-tier="epic"] > .gc-chip{ background: var(--role-rw-item-3); }
@@ -14059,28 +14037,17 @@ color: var(--prim-white); background: var(--prim-art-ink); border-radius: calc(2
 #modal-gres #gres-cap[data-tier="epic"] .gres-top{ background: var(--role-rw-item-2); }
 #modal-gres .gres-bot{ bottom: 0; border-radius: 0 0 calc(15 * var(--mu)) calc(15 * var(--mu)); background: var(--prim-white); border: calc(.8 * var(--mu)) solid var(--prim-art-ink); }
 #modal-gres .sheet-row .btn{ flex: 1 1 0; font-size: calc(4.2 * var(--mu)); }
+#modal-gres #gres-again{ padding-left: calc(1 * var(--mu)) !important; padding-right: calc(1 * var(--mu)) !important; gap: calc(.8 * var(--mu)); white-space: nowrap; }
 #modal-gres .sh-btn-ic{ width: calc(4.6 * var(--mu)); height: calc(4.6 * var(--mu)); flex: none; background-position: center; background-size: contain; background-repeat: no-repeat; }   /* 그림은 위 T5 .sh-btn-ic--coin/--star 줄에 이었다(I-7). 긴 이름만 — 줄임 background: 는 같은 특정도의 그 이음 줄을 뒤에서 지운다 */
 @media (prefers-reduced-motion: reduce){ #modal-gres #gres-cap{ display: none; } }
-#sh-scene .fr-title{ position: absolute; left: calc(5.6 * var(--cqw)); top: calc(24.6 * var(--cqw)); z-index: 6; }   /* 자리만 — 치수 · 글꼴 · 그림자는 JS 가 함께 다는 .sh-head(머리 알약 인스턴스, 위 [P3-T5]) */
-#sh-scene .fr-reset{ position: absolute; left: calc(5.6 * var(--cqw)); top: calc(39.5 * var(--cqw)); font-size: max(var(--text-min), calc(3.1 * var(--cqw))); z-index: 6; gap: .3em; }   /* 알약은 flex 라 글 뒤 공백이 접힌다 — 글과 시계 사이는 gap 으로 */
 .fr-play{ display: inline-block; width: 0; height: 0; margin-right: .214em; vertical-align: middle;
 border-left: .429em solid currentColor; border-top: .268em solid transparent; border-bottom: .268em solid transparent; }
-#sh-body .fr-list{ display: flex; flex-direction: column; gap: calc(1.8 * var(--cqw)); }
 #sh-body .sh-btn-ic--play{ width: 0; height: 0; background: none; border-left: calc(2.4 * var(--cqw)) solid currentColor;
 border-top: calc(1.5 * var(--cqw)) solid transparent; border-bottom: calc(1.5 * var(--cqw)) solid transparent; }
-#sh-body .shop-card[data-layout="row"]{ display: grid; grid-template-columns: calc(13.3 * var(--cqw)) 1fr calc(26.7 * var(--cqw)); grid-template-rows: auto auto; align-items: center;
-column-gap: calc(2.6 * var(--cqw)); min-height: calc(17.4 * var(--cqw)); padding: calc(1.5 * var(--cqw)) calc(2.6 * var(--cqw)) calc(1.5 * var(--cqw)) calc(2 * var(--cqw)); border-radius: calc(4.6 * var(--cqw)); box-sizing: border-box;
-background: var(--role-f2-pill); border: calc(.4 * var(--cqw)) solid var(--role-f2-pill-line); color: var(--prim-art-ink); }
-#sh-body .shop-card[data-layout="row"] .shop-icbox{ grid-row: 1 / 3; grid-column: 1; }
-#sh-body .shop-card[data-layout="row"] .shop-ic{ width: calc(13.3 * var(--cqw)); height: calc(13.3 * var(--cqw)); }
-#sh-body .shop-card[data-layout="row"] .shop-cn{ grid-column: 2; font-size: calc(3.9 * var(--cqw)); align-self: end; }
-#sh-body .shop-card[data-layout="row"] .shop-cd{ grid-column: 2; align-self: start; }
-#sh-body .shop-card[data-layout="row"] .sh-btn{ grid-row: 1 / 3; grid-column: 3; margin: 0; }
 #sh-body .shop-card .shop-ic.shop-ic-star{ background-image: var(--lib-star-gold); }
 #sh-body .shop-card .shop-ic.shop-ic-coin-3{ background-image: var(--lib-glyph-coin); }
 #sh-body .shop-card .shop-ic.shop-ic-machine-item{ background-image: url("catalog/slot-ic-item.webp"); }
-#sh-body .shop-card .shop-ic.shop-ic-machine-friend{ background-image: url("catalog/slot-ic-skin.webp"); }
-#screen-shop[data-stab="free"] #sh-host{ right: calc(2 * var(--cqw)); top: calc(22.6 * var(--cqw)); bottom: auto; }
+#sh-body .shop-card .shop-ic:is(.shop-ic-machine-friend, .shop-ic-machine-skin, .shop-ic-machine-gold){ background-image: url("catalog/slot-ic-skin.webp"); }
 .coin-x2[hidden]{ display: none; }
 .res-body { display: contents; }
 @media (max-height: 790px) {
@@ -14107,24 +14074,15 @@ mask-image: linear-gradient(180deg, var(--prim-white) 85%, transparent);
 @media not all and (max-height: 720px) {
 html:not([data-portal="cg"]) .res-body { display: contents; }
 }
-#screen-shop[data-art~="bg"] #sh-stage{ background: url("catalog/t3-shop-interior.webp") center calc(-16.41 * var(--cqw)) / cover no-repeat; }
-#screen-shop[data-art~="bg"] #sh-awning{ display: none; }
-#screen-shop[data-art~="machine"] #sh-scene .gm-ph{ background: url("catalog/t4-gacha-machine-mint.webp") center / contain no-repeat; }
-#screen-shop[data-art~="machine"] #sh-scene .gm-ph[data-kind="gold"]{ background-image: url("catalog/t4-gacha-machine-gold.webp"); }
-#screen-shop[data-art~="machine"] #sh-scene .gm-ph[data-kind="friend"],
-#screen-shop[data-art~="machine"] #sh-scene .gm-ph[data-kind="skin"]{ background-image: url("catalog/t4-gacha-machine-pink.webp"); }
-#screen-shop[data-art~="machine"] #sh-scene .gm-face{ width: 9.4%; left: calc(27.8% + var(--gm-x, 15%) * .4464); top: calc(14.46% + var(--gm-y, 12%) * .5056); }
-#screen-shop[data-art~="machine"] #sh-scene .gm-ph[data-rows="2"] .gm-face{ top: calc(14.46% + var(--gm-y, 12%) * .5056 + 2.544%); }
-#screen-shop[data-art~="machine"] #sh-scene .gm-ph[data-rows="1"] .gm-face{ top: calc(14.46% + var(--gm-y, 12%) * .5056 + 6.842%); }
-#screen-shop[data-art~="machine"][data-stab="gacha"] #sh-bubble,
-#screen-shop[data-art~="machine"][data-stab="deco"] #sh-bubble{ left: calc(65.5 * var(--cqw)); max-width: calc(32.5 * var(--cqw)); }
+#screen-shop[data-art~="bg"]{ background: var(--prim-bg-light) url("catalog/t3-shop-interior.webp") center top / cover no-repeat; }
 #screen-shop[data-art~="tabs"] #sh-tabs .sh-tab[data-stab="gacha"] .sh-tab-ic{ background-image: url("catalog/tab-ic-gacha.webp"); }
 #screen-shop[data-art~="tabs"] #sh-tabs .sh-tab[data-stab="free"]  .sh-tab-ic{ background-image: url("catalog/tab-ic-free.webp"); }
 #screen-shop[data-art~="coin"] #sh-body .shop-ic.shop-ic-coin{ background-image: url("catalog/shop-ic-coin-2.webp"); }
 #screen-shop[data-art~="coin"] #sh-body .shop-card[data-ad="coin"] .shop-ic{ background-image: url("catalog/shop-ic-coin-1.webp"); }
 #screen-shop[data-art~="coin"] #sh-body .shop-ic.shop-ic-coin-3{ background-image: url("catalog/shop-ic-coin-3.webp"); }
 #screen-shop[data-art~="machine"] #sh-body .shop-ic.shop-ic-machine-item{ background-image: url("catalog/t4-gacha-machine-mint.webp"); }
-#screen-shop[data-art~="machine"] #sh-body .shop-ic.shop-ic-machine-friend{ background-image: url("catalog/t4-gacha-machine-pink.webp"); }
+#screen-shop[data-art~="machine"] #sh-body .shop-ic.shop-ic-machine-gold{ background-image: url("catalog/t4-gacha-machine-gold.webp"); }
+#screen-shop[data-art~="machine"] #sh-body .shop-ic:is(.shop-ic-machine-friend, .shop-ic-machine-skin){ background-image: url("catalog/t4-gacha-machine-pink.webp"); }
 html[data-shop-art~="capsule"] #modal-gres #gres-cap .gres-top,
 html[data-shop-art~="capsule"] #modal-gres #gres-cap .gres-bot{ border: 0; border-radius: 0; background: url("catalog/t4-gacha-capsule-closed.webp") center top / 100% 200% no-repeat; }
 html[data-shop-art~="capsule"] #modal-gres #gres-cap .gres-bot{ background-position: center bottom; }
@@ -14136,72 +14094,45 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
 border-radius: 50%; background: var(--role-pink-face-b); color: var(--prim-white); box-shadow: none; font-size: max(var(--text-min), calc(2.69 * var(--cqw))); line-height: 1; letter-spacing: 0; }
 .coin-x2 .btn{ word-break: keep-all; }
 @media (min-aspect-ratio: 1/1) {
-#app #screen-shop{ --cqw: calc(var(--stage-u) * 6); }
+#app #screen-shop{ --cqw: calc(var(--stage-u) * 5); }
 #app #screen-shop[data-art~="bg"]{ background: var(--prim-bg-light) url("catalog/t3-shop-interior-w.webp") center 62% / cover no-repeat; }
-#app #screen-shop > *{ --f2-w: calc(100 * var(--cqw)); }
-#app #screen-shop #sh-top .sh-plus{ --sh-plus-hit-h: calc(var(--tb-ch) * 1.2); }
-#app #screen-shop #sh-stage{
---sh-line: calc(100vh * .62 - var(--stage-y) - var(--stage-u) * 112);
-left: calc(var(--stage-x) + var(--stage-u) * 40); right: auto; width: calc(var(--stage-u) * 600);
-top: calc(var(--stage-y) + var(--stage-u) * 112); height: calc(var(--stage-u) * 488); background: none;
-}
 #app #screen-shop #sh-plate{
-left: calc(var(--stage-x) + var(--stage-u) * 660); right: auto; width: calc(var(--stage-u) * 580);
-top: calc(var(--stage-y) + var(--stage-u) * 112); bottom: auto; height: auto; max-height: calc(var(--stage-u) * 488);
-display: flex; flex-direction: column;
+--sh-pw: calc(var(--stage-u) * 900);
+--f2-ref-w: calc(var(--stage-u) * 430);   /* 판 재질 자(림 · 겉선 — 가로 :root 430)를 무대 자로 — 창 판 · 방과 같은 식 */
+--sh-gap: calc(var(--stage-u) * 18);
+--sh-top: calc(var(--safe-t) + var(--stage-u) * 90 + var(--sh-sign-h) * .80);
 --jbox-w: calc(var(--stage-u) * 430);
 --jbox-radius: calc(var(--stage-u) * 40);
 --jbox-bw: calc(var(--stage-u) * 1.5);
 }
-#app #screen-shop #sh-body{ position: relative; inset: auto; flex: 0 1 auto; min-height: 0; margin: calc(3 * var(--cqw)) calc(3.5 * var(--cqw)); }
-#app #screen-shop[data-stab="deals"] #sh-body{ margin-top: calc(4.5 * var(--cqw)); }
-#app #screen-shop #sh-body .sh-fine{ color: var(--ink); }
+#app #screen-shop #sh-body{ --sh-ck: calc(var(--stage-u) * 5.75); padding-top: calc(2.8 * var(--sh-ck)); }   /* 위 안여백 = 카드 자로(「희귀」 · 「확률」 걸침이 카드와 함께 큰다) */
+#app #screen-shop #sh-body .sh-grid{ --cqw: var(--sh-ck); grid-template-columns: repeat(3, calc(38 * var(--cqw))); justify-content: center; gap: calc(3 * var(--cqw)); }
+#app #screen-shop #sh-body .sh-grid[data-cols="1"]{ grid-template-columns: minmax(0, calc(120 * var(--cqw))); }   /* 1열 가로 카드(shopFitCards)도 격자 폭 안 */
+#app #screen-shop #sh-body > :is(.sh-hrow, .sh-fine){ max-width: calc(120 * var(--sh-ck)); margin-left: auto; margin-right: auto; }
 #app #screen-shop #sh-tabs .sh-dot{ font-size: max(var(--text-min), calc(var(--stage-u) * 18)); width: calc(var(--stage-u) * 29.6); height: calc(var(--stage-u) * 29.6); }
-#app #screen-shop #sh-host{ width: calc(28.7 * var(--cqw)); height: calc(38.5 * var(--cqw)); }
-#app #screen-shop:not([data-stab="deals"]) #sh-host{ right: calc(2 * var(--cqw)); }
-#app #screen-shop:not([data-stab="free"]) #sh-host{ bottom: calc(2 * var(--cqw)); }
-#app #screen-shop #sh-bubble{ top: calc(26.7 * var(--cqw)); }
-#app #screen-shop:is([data-stab="gacha"], [data-stab="deco"]) #sh-bubble{ top: calc(var(--cqw) * (7.18 + 2.56 + 11.28 + 2.56)); }
-#app #screen-shop #sh-scene .gc-kinds{ top: 0; }
-#app #screen-shop #sh-scene .gc-title{ top: calc(var(--cqw) * (7.18 + 2.56)); }
-#app #screen-shop #sh-scene{ --sh-mx: 50%; }
-#app #screen-shop #sh-scene .gm-ph{ left: var(--sh-mx); top: calc(var(--sh-line) - var(--cqw) * 36); height: calc(var(--cqw) * 40); }
-#app #screen-shop #sh-scene .gc-sub{ left: var(--sh-mx); top: calc(var(--sh-line) + var(--cqw) * 4);
-max-width: calc(2 * (100% - var(--sh-mx) - (2 + 28.7 + 1) * var(--cqw))); white-space: normal; }
-#app #screen-shop #sh-tabs{
-left: max(var(--stage-x), var(--safe-l)); right: max(var(--stage-x), var(--safe-r)); bottom: calc(var(--safe-b) + var(--stage-u) * 7);
-height: calc(var(--stage-u) * 62); padding: 0; gap: calc(var(--stage-u) * 16); justify-content: center;
 }
-#app #screen-shop #sh-tabs .sh-tab.kit-pill-v2{
---f2-ph: calc(var(--stage-u) * 62); flex: 0 0 auto; width: calc(var(--stage-u) * 187);
-flex-direction: row; justify-content: flex-start; gap: calc(var(--f2-ph) * .16);
-padding: 0 calc(var(--f2-ph) * .226) calc(var(--f2-ph) * .08); font-size: calc(var(--stage-u) * 25);
+@media (min-aspect-ratio: 1/1) and (min-height: 600px) {
+#app :is(#modal-odds, #modal-gres) { --shm-u: max(1px, var(--stage-u)); --f2-w: calc(var(--shm-u) * 390 * .957); }
+#app :is(#modal-odds, #modal-gres) .sheet {
+max-width: calc(var(--shm-u) * 380);
+--w6m-pad-t: calc(var(--shm-u) * 23);
+--w6m-pad-x: calc(var(--shm-u) * 30);
+--w6m-pad-b: calc(var(--shm-u) * 30);
+gap: calc(var(--shm-u) * 10);
+--f2-ref-w: calc(var(--shm-u) * 430);
+--jbox-w: calc(var(--shm-u) * 430);
+--jbox-radius: calc(var(--shm-u) * 40);
+--jbox-bw: calc(var(--shm-u) * 1.5);
 }
-#app #screen-shop #sh-tabs .sh-tab-ic{ flex: 0 0 auto; width: calc(var(--stage-u) * 36); height: calc(var(--stage-u) * 36); }
-#app #screen-shop #sh-tabs .sh-tab > [data-i18n]{ flex: 1 1 auto; min-width: 0; text-align: center; }
-}
-@supports (height: 100dvh) {
-@media (min-aspect-ratio: 1/1) {
-#app #screen-shop #sh-stage{ --sh-line: calc(100dvh * .62 - var(--stage-y) - var(--stage-u) * 112); }
-}
+#app :is(#modal-odds, #modal-gres) .sheet > h2 { --wcap-panT: calc(1px + var(--shm-u) * 23); margin-bottom: calc(var(--shm-u) * 6); }
+#app #modal-gres .sheet > h2 { --wcap-w: calc(56.84% + (2px + var(--shm-u) * 60) * .5684); font-size: calc(var(--shm-u) * 18); }
+#app #modal-gres .sheet-row { gap: calc(var(--shm-u) * 10); }
+#app :is(#modal-odds, #modal-gres) .sheet .btn { min-height: calc(var(--shm-u) * 52) !important; padding-top: calc(var(--shm-u) * 6) !important; padding-bottom: calc(var(--shm-u) * 6) !important; }
+#app #modal-odds .sheet .btn, #app #modal-gres #gres-ok { padding-left: calc(var(--shm-u) * 18) !important; padding-right: calc(var(--shm-u) * 18) !important; gap: calc(var(--shm-u) * 6); }
+#app #modal-odds .sheet .btn { font-size: calc(var(--shm-u) * 23.1); }
 }
 @supports not (width: 1cqw) {
 #screen-shop { --cqw: min(1vw, calc(var(--app-max) / 100)); }
-#screen-shop > * { --f2-w: calc(100 * var(--cqw)); }
-#sh-stage { height: calc(min(calc(128.2 * var(--cqw)), 60%) + var(--safe-t)); }
-#screen-shop[data-stab="deals"] #sh-stage { height: calc(min(calc(76.9 * var(--cqw)), 40%) + var(--safe-t)); }
-#screen-shop[data-stab="free"] #sh-stage { height: calc(min(calc(64.1 * var(--cqw)), 34%) + var(--safe-t)); }
-#sh-awning { left: calc(-2.6 * var(--cqw)); right: calc(-2.6 * var(--cqw)); height: calc(16.4 * var(--cqw));
-background: repeating-linear-gradient(90deg, var(--prim-art-pink) 0 calc(7.18 * var(--cqw)), var(--prim-white) calc(7.18 * var(--cqw)) calc(14.36 * var(--cqw))); }
-#screen-shop[data-stab="free"] #sh-awning { background: repeating-linear-gradient(90deg, var(--role-mint-face-a) 0 calc(7.18 * var(--cqw)), var(--prim-white) calc(7.18 * var(--cqw)) calc(14.36 * var(--cqw))); }
-#sh-host { right: calc(2 * var(--cqw)); bottom: calc(2 * var(--cqw)); width: calc(28.7 * var(--cqw)); height: calc(38.5 * var(--cqw)); }
-#sh-plate { left: calc(2.56 * var(--cqw)); right: calc(2.56 * var(--cqw)); bottom: calc(22.6 * var(--cqw) + var(--safe-b)); top: calc(min(calc(122.6 * var(--cqw)), 57%) + var(--safe-t)); }
-#screen-shop[data-stab="deals"] #sh-plate { top: calc(min(calc(72.3 * var(--cqw)), 36%) + var(--safe-t)); }
-#screen-shop[data-stab="free"] #sh-plate { top: calc(min(calc(57.9 * var(--cqw)), 30%) + var(--safe-t)); }
-#sh-body { inset: calc(3 * var(--cqw)) calc(3.5 * var(--cqw)); }
-#sh-tabs { left: calc(2.05 * var(--cqw)); right: calc(2.05 * var(--cqw)); bottom: calc(2.05 * var(--cqw) + var(--safe-b)); height: calc(19 * var(--cqw)); gap: calc(1.54 * var(--cqw)); padding: calc(1.8 * var(--cqw)); }
-#sh-tabs .sh-tab.kit-pill-v2 { --f2-ph: calc(15.4 * var(--cqw)); gap: calc(.3 * var(--cqw)); font-size: calc(3.6 * var(--cqw)); }
-#sh-tabs .sh-tab-ic { width: calc(9.2 * var(--cqw)); height: calc(8.2 * var(--cqw)); }
 }
 </style>
 <style id="battle-landscape">
@@ -15843,7 +15774,7 @@ padding: 0 var(--w6m-pad-x) var(--w6m-pad-b);
 #app .cp-card.mframe[data-rows="2"] > .cp-tabs > .cp-tab:nth-child(n+4),
 #app .cp-card.mframe[data-rows="2"] > .cp-tabs:has(> .cp-tab:nth-child(n+4)[aria-selected="true"]) > .cp-tab:nth-child(-n+3) { top: 0; bottom: 50%; }
 #charpanel:has(~ :is(#modal-gear, #modal-gear-info):not([hidden])) :is(#cp-h, #cp-close) { opacity: var(--mode-a-under-head-a); }
-#app .modal { --mf-halo: 0 0 .06em var(--prim-white-a97), 0 0 .16em var(--prim-white-a90), 0 0 .32em var(--prim-white-a62); }
+#app :is(.modal, #screen-shop) { --mf-halo: 0 0 .06em var(--prim-white-a97), 0 0 .16em var(--prim-white-a90), 0 0 .32em var(--prim-white-a62); }
 #app #modal-drops :is(.dr-name, .dr-p, .dr-cap, .dr-note, .dr-ud),
 #app #modal-arc :is(#arc-best, #arc-when, .sub-score),
 #app #modal-gear-info :is(.gi-meta, .gi-fl),
