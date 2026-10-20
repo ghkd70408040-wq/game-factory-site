@@ -2139,14 +2139,10 @@ en: {
 'gacha.btn10': '×{n}',
 'gacha.friend.have': 'Friends {have}/{all}',
 'gacha.skin.have': 'Skins {have}/{all}',
-'aria.back': 'Back',   /* [판정판 121 Task 4] 상점 뒤로 = 연 곳으로(메인 · 지도) — 옛 aria.shopback 「Back to the kingdom」 은퇴 */
-'aria.coinplus': 'Get more coins',
-'aria.starplus': 'Get more stars',
 'aria.shoptabs': 'Shop sections',
 'aria.droptabs': 'Drop table sections',   /* [판정판 121 · Task 8a] 획득표 알약 탭 줄 */
 'time.hm': '{h}h {m}m',
 'deals.title': "Today's Deals",
-'deals.hi': "Welcome! Here are today's deals.",
 'deals.gift': 'Daily Gift',
 'deals.gift.d': 'Once a day',
 'deals.gear': "Today's Gear",
@@ -2169,25 +2165,18 @@ en: {
 'gacha.item.d': 'Any gear can come out!',
 'gacha.gold.d': 'Only rare and epic gear!',
 'gacha.friend.d': 'Only new friends!',
-'gacha.one': 'Pull once',
-'gacha.ten': 'Pull ×{n}',
 'gacha.free.first': 'First pull free',
 'gacha.free.daily': 'Free pull today',
-'gacha.odds': 'See odds ›',
 'gacha.pity': 'Epic guarantee {n}/{max}',
-'gacha.friend.left': 'You have {have}/{all}. One of the {left} left will come.',
 'gacha.friend.all': 'You have every friend. It opens again when a new friend arrives.',
 'gacha.friend.note': 'Bosses and goals also bring friends.',
-'gacha.chance.now': 'Odds now (friends left)',
 'gacha.nostar': 'You need {n} more stars.',
 'gacha.used': 'Already used today.',
 'gacha.skin': 'Style Capsule',
 'gacha.skin.d': "Only skins you don't have yet!",
-'gacha.skin.left': 'You have {have}/{all}. One of the {left} left will come.',
 'gacha.skin.all': 'You have every skin. It opens again when a new skin arrives.',
 'gacha.skin.none': 'No skins to get right now. New friends or skins will open it.',
 'gacha.skin.note': 'Put on your skins from Skins on the character screen.',
-'gacha.skin.now': 'Odds now (skins left)',
 'odds.title': 'Odds',
 'odds.tab.item': 'Item',
 'odds.tab.gold': 'Golden',
@@ -3319,14 +3308,10 @@ ko: {
 'gacha.btn10': '{n}회',
 'gacha.friend.have': '가진 친구 {have}/{all}',
 'gacha.skin.have': '가진 스킨 {have}/{all}',
-'aria.back': '뒤로',   /* [판정판 121 Task 4] 상점 뒤로 = 연 곳으로(메인 · 지도) — 옛 aria.shopback 「왕국으로 돌아가기」 은퇴 */
-'aria.coinplus': '코인 더 얻기',
-'aria.starplus': '별 더 얻기',
 'aria.shoptabs': '상점 칸 고르기',
 'aria.droptabs': '획득표 구분',   /* [판정판 121 · Task 8a] 획득표 알약 탭 줄 */
 'time.hm': '{h}시간 {m}분',
 'deals.title': '오늘의 특가',
-'deals.hi': '어서 와요! 오늘의 특가예요.',
 'deals.gift': '매일 선물',
 'deals.gift.d': '하루 한 번',
 'deals.gear': '오늘의 장비',
@@ -3349,25 +3334,18 @@ ko: {
 'gacha.item.d': '모든 장비가 나올 수 있어요!',
 'gacha.gold.d': '희귀와 영웅 장비만 나와요!',
 'gacha.friend.d': '새 친구만 나와요!',
-'gacha.one': '한 번 뽑기',
-'gacha.ten': '{n}회 뽑기',
 'gacha.free.first': '처음 한 번 무료',
 'gacha.free.daily': '오늘 무료 뽑기',
-'gacha.odds': '확률 보기 ›',
 'gacha.pity': '영웅 천장 {n}/{max}',
-'gacha.friend.left': '가진 친구 {have}/{all}, 남은 {left}명 중 한 명이 와요',
 'gacha.friend.all': '친구를 모두 모았어요. 새 친구가 오면 다시 열려요.',
 'gacha.friend.note': '보스와 조건으로도 친구를 만나요.',
-'gacha.chance.now': '지금 확률 (남은 친구 기준)',
 'gacha.nostar': '별이 {n}개 부족해요.',
 'gacha.used': '오늘은 이미 썼어요.',
 'gacha.skin': '꾸미기 캡슐',
 'gacha.skin.d': '아직 없는 스킨만 나와요!',
-'gacha.skin.left': '가진 스킨 {have}/{all}, 남은 {left}개 중 하나가 나와요',
 'gacha.skin.all': '스킨을 모두 모았어요. 새 스킨이 오면 다시 열려요.',
 'gacha.skin.none': '지금은 뽑을 스킨이 없어요. 새 친구나 새 스킨이 오면 열려요.',
 'gacha.skin.note': '뽑은 스킨은 캐릭터 화면의 스킨에서 입혀요.',
-'gacha.skin.now': '지금 확률 (남은 스킨 기준)',
 'odds.title': '확률 정보',
 'odds.tab.item': '아이템 캡슐',
 'odds.tab.gold': '황금 캡슐',
@@ -13427,9 +13405,12 @@ if (o.qty) { var q = document.createElement('span'); q.className = 'shop-qty'; q
 card.appendChild(box);
 if (o.sub) { var sb = document.createElement('span'); sb.className = 'shop-cd'; sb.textContent = o.sub; cb.appendChild(sb); }
 if (o.prog) { var pg = document.createElement('span'); pg.className = 'kit-pill-v2 sh-prog'; pg.setAttribute('data-variant', 'soft'); pg.textContent = o.prog; cb.appendChild(pg); }
-var list = o.btns || [o], bw = document.createElement('span');
+var list = o.btns || [o], bw = document.createElement('span'), pr = null;
 bw.className = 'sh-btns';
-for (var i = 0; i < list.length; i++) bw.appendChild(shopBtn(list[i]));
+for (var i = 0; i < list.length; i++) {
+if (list[i].pair) { if (!pr) { pr = document.createElement('span'); pr.className = 'sh-pair'; bw.appendChild(pr); } pr.appendChild(shopBtn(list[i])); }
+else bw.appendChild(shopBtn(list[i]));
+}
 cb.appendChild(bw);
 card.appendChild(cb);
 return card;
@@ -13443,6 +13424,15 @@ var need = rg.getBoundingClientRect().width;
 var room = r.width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - parseFloat(cs.borderLeftWidth) - parseFloat(cs.borderRightWidth);
 return need > room + 0.5;
 }
+function shopFitPairs(g) {
+var ps = g.querySelectorAll('.sh-pair'), k, j;
+for (k = 0; k < ps.length; k++) ps[k].removeAttribute('data-stack');
+for (k = 0; k < ps.length; k++) {
+var bs = ps[k].querySelectorAll('.sh-btn'), over = false;
+for (j = 0; j < bs.length && !over; j++) over = shopTextOver(bs[j]);
+if (over) ps[k].setAttribute('data-stack', '1');
+}
+}
 function shopFitCards() {
 var body = $('sh-body');
 if (!body || !shopActive()) return;
@@ -13450,9 +13440,10 @@ var grids = body.querySelectorAll('.sh-grid');
 for (var i = 0; i < grids.length; i++) {
 var g = grids[i];
 if (g.getAttribute('data-cols')) g.removeAttribute('data-cols');   /* 3열에서 다시 잰다 */
+shopFitPairs(g);   /* 나란히 → 안 들면 쌓기 */
 var els = g.querySelectorAll('.sh-btn, .sh-prog'), over = false;
 for (var j = 0; j < els.length && !over; j++) over = shopTextOver(els[j]);
-if (over) g.setAttribute('data-cols', '1');
+if (over) { g.setAttribute('data-cols', '1'); shopFitPairs(g); }   /* 1열 가로 카드에서 나란히를 다시 잰다 */
 }
 }
 function shopHead(body, title, pill, playIc) {
@@ -13725,8 +13716,8 @@ var tb = gachaTable(kind), lf = capLeft(kind), dis = lf && tb.left <= 0;
 var cur = GACHA_CUR[kind] === 'coin' ? 'coin' : 'star';
 var fb = dis ? null : gachaFreeBtn(kind), btns = [];
 if (fb) btns.push(fb);
-if (!fb || !/:first$/.test(fb.act)) btns.push({ label: t('gacha.btn1'), amt: arcComma(tb.price), coinIc: cur, price: dis ? 'ok' : cur, act: 'gbuy:' + kind + ':1:' + cur, dis: dis });   /* 닫힌 단추는 특가 탭처럼 「ok」(연보라) */
-if (kind === 'item') btns.push({ label: t('gacha.btn10', { n: GACHA_TEN }), amt: arcComma(tb.ten), coinIc: 'coin', price: 'coin', act: 'gbuy:item:' + GACHA_TEN + ':coin' });
+btns.push({ label: t('gacha.btn1'), amt: arcComma(tb.price), coinIc: cur, price: dis ? 'ok' : cur, act: 'gbuy:' + kind + ':1:' + cur, dis: dis, pair: kind === 'item' });   /* 닫힌 단추는 특가 탭처럼 「ok」(연보라) */
+if (kind === 'item') btns.push({ label: t('gacha.btn10', { n: GACHA_TEN }), amt: arcComma(tb.ten), coinIc: 'coin', price: 'coin', act: 'gbuy:item:' + GACHA_TEN + ':coin', pair: true });
 var sub = dis ? t(kind === 'friend' ? 'gacha.friend.all' : skinEmptyKey(tb)) : t('gacha.' + kind + '.d');
 var prog = lf ? t('gacha.' + kind + '.have', { have: tb.all - tb.left, all: tb.all }) : t('gacha.pity', { n: tb.pity, max: tb.pityAt });
 var card = shopCard2({ title: t('gacha.' + kind), ic: 'shop-ic-machine-' + kind, sub: sub, prog: prog, odds: 'godds:' + kind, btns: btns });
