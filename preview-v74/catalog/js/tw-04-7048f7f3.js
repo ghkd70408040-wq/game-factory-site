@@ -3700,7 +3700,7 @@ ko: {
 'arc.nobest': '첫 기록!',
 'arc.new': '신기록!',
 'arc.again': '다시하기',
-'arc.menu': '메인메뉴',
+'arc.menu': '메인 메뉴',
 'arc.share': '공유하기',
 'aria.arcShare': '결과 카드 이미지와 함께 아케이드 기록 공유하기',
 'rank.arc.title': '아케이드 대전',
@@ -7683,7 +7683,7 @@ case 'awaken': return store.awkTotal | 0;
 }
 return 0;
 }
-function achvCheck() {
+function achvCheck(inWin) {
 if (!store.achv || typeof store.achv !== 'object') store.achv = {};
 var got = 0, i, a;
 for (i = 0; i < ACHV.length; i++) {
@@ -7692,7 +7692,7 @@ if (store.achv[a.id]) continue;
 if (achvAxis(a.ax) < achvGoal(a)) continue;
 store.achv[a.id] = { date: todayKey(), claimed: 0 };
 if (!got) {
-toast(t('quest.ready', { n: t('ach.' + a.id, { n: achvGoal(a) }) }));
+if (!inWin) toast(t('quest.ready', { n: t('ach.' + a.id, { n: achvGoal(a) }) }));
 J.sfx.milestone();
 J.vibrate(35);
 if (typeof window !== 'undefined') {
@@ -9874,11 +9874,16 @@ function paintContinueBtn() {
 var cont = $('btn-continue');
 if (!cont) return;
 var rush = !!(S.overInfo && S.overInfo.rush);
-// Time Rush has unlimited Adds, so the "+2 Add" slot is pointless.
-cont.hidden = rush;
-if (rush) return;
 var used = !!S.continueUsed;
 var gem  = used && appGemContinue();
+var adCan = used && !gem && !S.adContinueUsed && TW_PORTAL.env === 'crazygames' && TW_PORTAL.canReward();
+var contOk = !rush && (!used || gem || adCan);
+cont.hidden = !contOk;
+var rb = $('btn-retry'), rs = $('btn-over-retry');
+if (rb) rb.hidden = contOk;
+if (rs) rs.hidden = !contOk;
+// Time Rush has unlimited Adds, so the "+2 Add" slot is pointless.
+if (rush) return;
 var ad   = used && !gem && !S.adContinueUsed && TW_PORTAL.env === 'crazygames' && TW_PORTAL.canReward();
 cont.disabled = used && !gem && !ad;
 if (gem) cont.setAttribute('data-app-only', 'gem-continue');
@@ -10527,7 +10532,8 @@ mid.appendChild(ttl);
 mid.appendChild(bar);
 var btn = document.createElement('button');
 btn.type = 'button';
-btn.className = 'rank-tab qs-get';
+btn.className = 'kit-btn-v2 qs-get';
+btn.setAttribute('data-kind', 'secondary');
 btn.setAttribute('data-qtab', tab);
 btn.setAttribute('data-qid', id);
 btn.setAttribute('aria-selected', (done && !claimed) ? 'true' : 'false');
@@ -10537,6 +10543,16 @@ row.appendChild(rw);
 row.appendChild(mid);
 row.appendChild(btn);
 return row;
+}
+function questReadyName() {
+var q = questsEnsure(), i, e, r;
+for (i = 0; i < q.daily.list.length; i++) { e = q.daily.list[i]; if (e.done && !e.claimed) return questText(e, 'daily'); }
+for (i = 0; i < q.weekly.list.length; i++) { e = q.weekly.list[i]; if (e.done && !e.claimed) return questText(e, 'weekly'); }
+for (i = 0; i < ACHV.length; i++) {
+r = store.achv && store.achv[ACHV[i].id];
+if (r && !r.claimed) return t('ach.' + ACHV[i].id, { n: achvGoal(ACHV[i]) });
+}
+return '';
 }
 function questAtt() {
 var host = $('quest-att');
@@ -10617,6 +10633,9 @@ can = rows.length;
 all.setAttribute('aria-selected', can > 0 ? 'true' : 'false');
 all.disabled = !can;
 }
+var note = $('quest-note'), rn = questReadyName();
+if (note) note.hidden = !rn;
+setText('quest-note-t', rn ? t('quest.ready', { n: rn }) : '');
 questAtt();
 }
 function questBadges() {
@@ -10631,8 +10650,9 @@ b.hidden = !(n > 0);
 function openQuest(tab) {
 questTab = (tab === 'weekly' || tab === 'epic') ? tab : 'daily';
 questsEnsure();
-achvCheck();
+achvCheck(true);
 questPaint();
+if (toastText && toastText.indexOf(t('quest.ready', { n: '' })) === 0) toastHide();
 openModal('modal-quest');
 J.sfx.ui();
 }
@@ -10950,10 +10970,8 @@ var b = $('tut-skip');
 if (!b) return;
 if (tutDone) {
 b.textContent = t('howto.close');
-if (b.classList) { b.classList.remove('btn-ghost'); b.classList.add('btn-primary'); }
 } else {
 b.textContent = t('tut.skip');
-if (b.classList) { b.classList.remove('btn-primary'); b.classList.add('btn-ghost'); }
 }
 }
 function tutLoadStep(i) {
@@ -14583,7 +14601,6 @@ advAdBtn.disabled = false;
 var again = $('adv-again');
 if (again) {
 again.textContent = win ? t('adv.next') : t('adv.retry');
-if (again.classList) again.classList.toggle('cta-jelly', !win);
 again.setAttribute('data-n', String(win ? p.n + 1 : p.n));
 }
 }
@@ -14923,7 +14940,7 @@ tint.style.setProperty('--ch-tint', ch.tint || 'transparent');
 tint.style.setProperty('--ch-tint-a', String(ch.alpha));
 }
 setText('map-ch-k', 'CHAPTER ' + mapChap);
-setText('map-ch-n', t('map.chip' + mapChap));
+setText('map-ch-n', mmName(mapChap));
 var pv = $('map-ch-prev'), nx = $('map-ch-next');
 var lastCh = Math.min(MAP_CHAPTERS.length, chapMax());
 if (pv) pv.disabled = SIAN_MAP ? (mapChap <= 1 && mapPage <= 0) : mapChap <= 1;
@@ -14950,6 +14967,27 @@ var s = t('map.plate' + c) || '';
 var i = s.indexOf(':');
 return i >= 0 ? s.slice(i + 1).replace(/^\s+/, '') : s;
 }
+function setChipText(id, s) {
+var el = $(id);
+if (!el) return;
+s = String(s || '');
+var i = s.indexOf(' · ');
+if (i < 0) {
+if (el.hasAttribute('data-two')) { el.removeAttribute('data-two'); el.textContent = ''; }
+setText(id, s);
+return;
+}
+var k = el.querySelector('.mp-chk'), n = el.querySelector('.mp-chn');
+if (!k || !n) {
+el.textContent = '';
+k = document.createElement('small'); k.className = 'mp-chk';
+n = document.createElement('span'); n.className = 'mp-chn';
+el.appendChild(k); el.appendChild(n);
+}
+el.setAttribute('data-two', '');
+if (k.textContent !== s.slice(0, i)) k.textContent = s.slice(0, i);
+if (n.textContent !== s.slice(i + 3)) n.textContent = s.slice(i + 3);
+}
 function buildChapCellDom(c, locked, current, ariaKey) {
 var b = document.createElement('button');
 b.type = 'button';
@@ -14962,10 +15000,10 @@ if (locked) b.setAttribute('aria-disabled', 'true');
 if (current) b.setAttribute('aria-current', 'true');
 b.setAttribute('aria-label', locked ? t('aria.mmlock', { c: c })
 : t(ariaKey, { c: c, s: st, d: dn }));
-var veil = document.createElement('span');
-veil.className = 'mm-veil';
-veil.setAttribute('aria-hidden', 'true');
-b.appendChild(veil);
+var th = document.createElement('span');
+th.className = 'mm-thumb';
+th.setAttribute('aria-hidden', 'true');
+b.appendChild(th);
 var k = document.createElement('b');
 k.className = 'mm-k';
 k.textContent = 'CHAPTER ' + c;
@@ -14976,14 +15014,17 @@ nm.textContent = mmName(c);
 b.appendChild(nm);
 var p = document.createElement('span');
 p.className = 'mm-p';
-p.textContent = '\u2605 ' + st + '/' + (ADV_CHAPTER * 3)
-+ ' \u00B7 \u2714 ' + dn + '/' + ADV_CHAPTER;
+var ps = document.createElement('i'), pd = document.createElement('i');
+ps.textContent = '\u2605 ' + st + '/' + (ADV_CHAPTER * 3);
+pd.textContent = '\u2714 ' + dn + '/' + ADV_CHAPTER;
+p.appendChild(ps);
+p.appendChild(pd);
 b.appendChild(p);
 if (locked) {
 var lk = document.createElement('span');
 lk.className = 'mm-lock';
 lk.setAttribute('aria-hidden', 'true');
-b.appendChild(lk);
+b.appendChild(lk);   /* 칸의 직속 자식(썸네일 밖) — 썸네일의 흑백 필터가 자물쇠에 번지지 않게. 자리는 썸네일 오른쪽 위(CSS) */
 }
 return b;
 }
@@ -15012,6 +15053,22 @@ setText('mm-sum', t('minimap.sum', { s: advStarTotal(), c: last }));
 function openMinimap() {
 buildMinimap();
 openModal('modal-minimap');
+mmFitCols($('mm-grid'));   /* [Task 8d] 열 수는 보이는 격자에서 잰다 */
+}
+function mmFitCols(g) {
+if (!g || !g.children || !g.children.length || !g.offsetWidth || typeof window === 'undefined' || !window.matchMedia) return;
+var max = window.matchMedia('(min-aspect-ratio: 1/1)').matches ? 5 : 2;
+for (var n = max; n >= 2; n--) {
+g.setAttribute('data-cols', String(n));
+if (!mmCellsOver(g)) return;
+}
+}
+function mmCellsOver(g) {
+var els = g.querySelectorAll('.mm-k, .mm-n, .mm-p');
+for (var i = 0; i < els.length; i++) {
+if (els[i].scrollWidth > els[i].clientWidth + 1 || els[i].scrollHeight > els[i].clientHeight + 1) return true;
+}
+return false;
 }
 function closeMinimap() { closeModal('modal-minimap'); }
 function mmPick(c) {
@@ -15040,6 +15097,7 @@ function openTheater() {
 hubMark();   /* [판정판 121] 연 곳 기억 — 컷을 다 보고 돌아올 곳(theaterPick 의 hubReturn) */
 buildTheater();
 openModal('modal-theater');
+mmFitCols($('th-grid'));   /* [Task 8d] 열 수는 보이는 격자에서 잰다 */
 }
 function closeTheater() { closeModal('modal-theater'); }
 function theaterCutsFor(c) {
@@ -15347,7 +15405,7 @@ var ht = $('kd-top-heart-t');
 if (ht) { var ms = heartNextMs(); ht.textContent = ms > 0 ? fmtHeartWait(ms) : t('adv.heartfull'); }
 paintCoinChip('kd-top-stars-v');   /* P3 결정 2 — 위 칩 = 코인 지갑(동전 그림과 값 일치) */
 paintChipText('kd-top-star-v', arcComma(store.jstar | 0));
-setText('kd-bot-ch-n', t('map.chip' + Math.min(MAP_CHAPTERS.length, chapMax())));
+setChipText('kd-bot-ch-n', t('map.chip' + Math.min(MAP_CHAPTERS.length, chapMax())));   /* [Task 8d] en 두 줄 */
 }
 function kdVisit() {
 var k = kdStore(), line = $('kd-visit');
@@ -17787,7 +17845,7 @@ n = n.parentNode;
 }
 if (!x) return;
 var tgt = $(x.getAttribute('data-w6x'));
-if (tgt) tgt.click();
+if (tgt && tgt !== x) tgt.click();
 });
 on($('node-go'), 'click', function () {
 advStart(parseInt(this.getAttribute('data-n'), 10) | 0);
@@ -18055,6 +18113,9 @@ on($('sh-avatar'), 'click', openCharPanel);
 on($('sh-rec'), 'click', function () { J.sfx.ui(); openRank('endless'); });
 on($('sh-mission'), 'click', function () { openQuest('daily'); });   /* openQuest 가 ui 소리를 낸다 — 한 번만 */
 on(window, 'resize', function () { if (shopActive()) shopFitCards(); });
+var mmRefit = function () { ['mm-grid', 'th-grid'].forEach(function (id) { var g = $(id), m = g && g.closest ? g.closest('.modal') : null; if (m && !m.hidden) mmFitCols(g); }); };
+on(window, 'resize', mmRefit);
+try { if (document.fonts && document.fonts.ready) document.fonts.ready.then(mmRefit); } catch (e) {}
 try { if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { if (shopActive()) shopFitCards(); }); } catch (e) {}
 on($('screen-shop'), 'click', function (ev) {
 var el = ev && ev.target;
@@ -18094,6 +18155,7 @@ if (!el || el === this || !el.getAttribute || el.disabled) return;
 shopAct(el.getAttribute('data-shop-act'));
 });
 paintShopBalance();
+on($('btn-over-retry'), 'click', function () { var rb = $('btn-retry'); if (rb) rb.click(); });
 on($('btn-retry'), 'click', function () {
 closeModal('modal-over');
 J.sfx.ui();

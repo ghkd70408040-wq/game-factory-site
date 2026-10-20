@@ -4222,8 +4222,7 @@ gap: 6px;
 .reward-reveal[hidden] { display: none; }
 #modal-adv .sheet > h2,
 #modal-adv .result-card,
-#modal-adv #adv-again,
-#modal-adv #adv-map { flex: 0 0 auto; }
+#modal-adv .mf-foot { flex: 0 0 auto; }   /* [Task 8d D8] 단추 둘(#adv-again · #adv-map)은 단추 줄(.mf-foot) 안 — 줄이 줄지 않는다 */
 #modal-adv #adv-reward {
 --rw-bleed: 24px;
 flex: 0 1 auto;
@@ -5176,7 +5175,6 @@ color: var(--f2-ink);
 #modal-invite #iv-why { margin: 8px 0 0; text-align: center; font-size: 12.5px; }
 #modal-invite #iv-prog-row[hidden],
 #modal-invite #iv-prog[hidden] { display: none; }
-#modal-invite #iv-yes[disabled] { filter: grayscale(.85) brightness(.92); opacity: .72; cursor: not-allowed; }
 #charget .cg-name { color: #fff; }
 #cutin.cut-foe .cut-dim {
 background-image: radial-gradient(circle at 50% 50%, rgba(54, 4, 16, .60) 0%, rgba(26, 2, 8, .93) 100%);
@@ -6606,7 +6604,8 @@ color: #FFF3DC;
 .cp-info .ci.locked .ci-name,
 .cp-info .ci.locked .cc-stats,
 .cp-info .ci.locked .ci-desc { opacity: 0; visibility: hidden; }
-.cp-info .ci.locked .ci-chip { filter: grayscale(1) brightness(.7); }
+.cp-info .ci.locked .ci-chip,
+.mm-cell.is-lock .mm-thumb { filter: grayscale(1) brightness(.7); }   /* [Task 8d D6 · 지휘자 답 4] 잠긴 챕터 카드 썸네일 = 이 잠김 흑백 규칙(그림 모양이 남는 회색) + 자물쇠 */
 .cp-rack {
 position: absolute;
 right: 3px;
@@ -6772,7 +6771,6 @@ background: linear-gradient(180deg, var(--role-mint-face-a) 0%, var(--role-mint-
 box-shadow: inset 0 2px 0 rgba(255, 255, 255, .34), 0 0 0 2.5px var(--mL-outline), 0 3px 0 #2E937A;
 }
 .sk-act[disabled] { opacity: .5; cursor: not-allowed; }
-#btn-continue[disabled] { opacity: .45; cursor: default; pointer-events: none; }
 #modal-skin .sk-act.kit-pill-v2{   /* [Task 8b2] 장비 목록 줄(#modal-gear .sk-act)은 창과 함께 은퇴 */
 min-width: 0;
 min-height: 0;
@@ -7720,14 +7718,6 @@ pointer-events: none;
 }
 .cut-skip {
 pointer-events: auto;
-min-width: 64px;
-min-height: 44px;
-padding: 0 14px;
-border: 0;
-border-radius: 22px;
-background: rgba(20, 12, 22, .55);
-color: #FFF1D8;
-font: 800 13px/1 var(--font-latin);
 cursor: pointer;
 }
 #cut-bar {
@@ -7737,10 +7727,6 @@ right: 12px;
 bottom: calc(var(--safe-b) + 34px);
 z-index: 3;
 min-height: 84px;
-padding: 2px 8px;
-border-style: solid;
-border-width: 17px;
-border-image: var(--lib-panel-cream) 33 fill stretch;
 }
 .cut-who {
 margin: 0 0 2px;
@@ -9269,7 +9255,7 @@ filter: drop-shadow(0 0 10px rgba(102, 240, 159, .40));
 <link rel="preload" as="image" href="catalog/jelly-box-c.webp">
 <link rel="preload" as="image" href="catalog/duel-title-play.webp">
 <!-- ==RELEASE:BEGIN== 출시 메타 (scratchpad/release-0908/apply-head.py 가 생성·교체, 본문 무접촉) -->
-<meta name="build" content="057285e-20261020-1932">
+<meta name="build" content="9fe0551-20261020-2226">
 <meta name="application-name" content="텐트윈 젤리팡 월드">
 <meta name="description" lang="ko" content="숫자 젤리를 골라 10을 만들어 터뜨리는 퍼즐이에요. 모험·아케이드·데일리·타임 러시·클래식을 즐겨요. Ten Twin Jelly Pang World: pick number jellies that equal or sum to 10.">
 <link rel="manifest" href="tentwin.webmanifest">
@@ -9323,7 +9309,7 @@ navigator.serviceWorker.register('sw.js',{scope:'./'}).catch(function(e){console
 })}
 </script>
 <!-- ==RELEASE:END== -->
-<link rel="preload" as="style" href="tw-late-485257c8.css">
+<link rel="preload" as="style" href="tw-late-d21b79a9.css">
 </head>
 <body>
 <!-- ============================================================
@@ -9712,12 +9698,15 @@ CUTS 표에서 img 한 칸만 바뀐다 — 뷰어 코드는 손대지 않는다
 · 건너뛰기      = 지금 컷 사슬 한 벌         (뒤로가기와 같은 뜻)
 · 전부 건너뛰기 = 온보딩 사슬 전부(A + 출정)
 「전부 건너뛰기」는 사슬 위에서만 뜬다(hidden 토글, cutSyncSkipAll). -->
+<!-- [판정판 121 · Task 8d D7] 건너뛰기 둘 = 작은 soft 알약(옛 검은 알약) · 대사 판 = 창 판과 같은 젤리 판(.mframe 훅 + 젤리 층 — Task 129 모달 틀) ·
+말하는 이 = 판 왼쪽 위 작은 이름 알약(데이터에 이름이 없는 컷은 :empty 로 숨는다). id · 배선 무변. -->
 <div class="cut-skips">
-<button id="cut-skipall" class="cut-skip" type="button" hidden data-i18n="story.skipall" data-i18n-aria="aria.cutskipall" aria-label="Skip the whole story">Skip all</button>
-<button id="cut-skip" class="cut-skip" type="button" data-i18n="story.skip" data-i18n-aria="aria.cutskip" aria-label="Skip the story">Skip</button>
+<button id="cut-skipall" class="cut-skip kit-pill-v2" data-variant="soft" type="button" hidden data-i18n="story.skipall" data-i18n-aria="aria.cutskipall" aria-label="Skip the whole story">Skip all</button>
+<button id="cut-skip" class="cut-skip kit-pill-v2" data-variant="soft" type="button" data-i18n="story.skip" data-i18n-aria="aria.cutskip" aria-label="Skip the story">Skip</button>
 </div>
-<div id="cut-bar" role="status" aria-live="polite">
-<p id="cut-who" class="cut-who"></p>
+<div id="cut-bar" class="jbox--modal mframe" role="status" aria-live="polite">
+<div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
+<p id="cut-who" class="cut-who kit-pill-v2" data-variant="soft"></p>
 <p id="cut-line" class="cut-line"></p>
 <span id="cut-more" class="cut-more" aria-hidden="true">&#9654;</span>
 </div>
@@ -11458,8 +11447,8 @@ medal-<역할>-v3 파생 아이콘(medal-<역할>-v3-90.webp · 레시피 tools/
 <!-- #34: 6번째 점 = 맨 앞에 들어온 규칙 요약 카드.
 7번째 점 = 맨 뒤에 붙은 전투 기술 카드. setHowto() 가 인덱스로 켠다. -->
 <div id="howto-dots"><i class="dot on"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i></div>
-<div class="sheet-row"><button id="howto-prev" data-part="btn-modal" data-variant="lilac" class="btn btn-ghost" data-i18n-aria="aria.howtoPrev" data-i18n="howto.prev" aria-label="Previous panel">Prev</button><button id="howto-next" data-part="btn-modal" data-variant="lilac" class="btn btn-ghost" data-i18n-aria="aria.howtoNext" data-i18n="howto.next" aria-label="Next panel">Next</button></div>
-<button id="howto-close" data-part="btn-modal" data-variant="primary" class="btn btn-primary" data-i18n-aria="aria.howtoClose" data-i18n="howto.close" aria-label="Close how to play">Got it</button>
+<div class="mf-foot mf-pair"><button id="howto-prev" class="mf-btn kit-btn-v2" data-kind="secondary" type="button" data-i18n-aria="aria.howtoPrev" data-i18n="howto.prev" aria-label="Previous panel">Prev</button><button id="howto-next" class="mf-btn kit-btn-v2" data-kind="secondary" type="button" data-i18n-aria="aria.howtoNext" data-i18n="howto.next" aria-label="Next panel">Next</button></div>
+<div class="mf-foot"><button id="howto-close" class="mf-btn kit-btn-v2" data-kind="primary" type="button" data-i18n-aria="aria.howtoClose" data-i18n="howto.close" aria-label="Close how to play">Got it</button></div>
 </div></div>
 <!-- First-run interactive tutorial (3 taps). game.js injects the mini board into
 #tut-stage and writes #tut-text through t(); the markup stays text-free so a
@@ -11471,7 +11460,7 @@ missing i18n key can never leave an English string on a Korean screen. -->
 <div id="tut-stage"></div>
 <p id="tut-text"></p>
 <div id="tut-dots"><i class="dot on"></i><i class="dot"></i><i class="dot"></i></div>
-<button id="tut-skip" data-part="btn-modal" data-variant="magenta" class="btn btn-ghost" data-i18n-aria="aria.tutSkip" data-i18n="tut.skip" aria-label="Skip the tutorial">Skip</button>
+<div class="mf-foot"><button id="tut-skip" class="mf-btn kit-btn-v2" data-kind="primary" type="button" data-i18n-aria="aria.tutSkip" data-i18n="tut.skip" aria-label="Skip the tutorial">Skip</button></div>
 </div></div>
 <!-- ============================================================
 9차 §설정 창 (사용자 반려: 메뉴 하단 아이콘 줄 폐기)
@@ -11487,7 +11476,7 @@ missing i18n key can never leave an English string on a Korean screen. -->
 <div id="modal-settings" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="set-h"><div class="sheet jbox jbox--modal mframe" data-part="modal-plate">
 <div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
 <h2 id="set-h" data-i18n="settings.title">Settings</h2>
-<button class="r10-x x-btn" type="button" data-w6x="st-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
+<button id="st-close" class="r10-x x-btn" type="button" data-w6x="st-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
 <!-- Task 12 — 계정 줄. 포털 밖(TW_PORTAL.env!=='crazygames')이면 이 div 는
 hidden 그대로다(픽셀 0). 이름 표시는 기존 젤리 캡슐 인스턴스(kit-pill-v2)
 재사용 — 새 재질 0. rev1(I-5) — 아바타 img 추가: 크기는 기존
@@ -11513,8 +11502,8 @@ object-fit 는 #portal-acct-avatar 전용 규칙(색상·px 없음). alt 빈 값
 openQuest/openRank/openTheater 를 각자 부른다). 제작진(#modal-credits류)
 마크업도 남기되 진입만 지운다 — 내용은 T4가 itch 페이지 CREDITS로 옮긴다.
 남는 순서: 소리·진동·테마·언어 · 게임 방법 · 닫기. -->
-<button id="st-howto" data-part="btn-modal" data-variant="lilac" class="btn btn-ghost" type="button" data-i18n-aria="aria.howto" data-i18n="menu.howto" aria-label="How to play">How to play</button>
-<button id="st-close" data-part="btn-modal" data-variant="primary" class="btn btn-primary" type="button" data-i18n="settings.close">Close</button>
+<!-- [판정판 121 · Task 8d D2 · D3] 「닫기」 단추 은퇴 — ✕ 하나(id st-close 를 ✕ 가 물려받아 배선 · 뒤로 사슬 그대로). 곁 결정 「게임 방법」 = 킷 보조 단추. -->
+<div class="mf-foot"><button id="st-howto" class="mf-btn kit-btn-v2" data-kind="secondary" type="button" data-i18n-aria="aria.howto" data-i18n="menu.howto" aria-label="How to play">How to play</button></div>
 </div></div>
 <!-- ============================================================
 [T8-0926 · 판정판 70] 「준비 중」 모달 — 성 전용([64-fix3 ⑩] 펫 하우스 → 우체국). 기존 범용
@@ -11526,9 +11515,9 @@ openQuest/openRank/openTheater 를 각자 부른다). 제작진(#modal-credits�
 <div id="modal-soon" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="soon-h"><div class="sheet jbox jbox--modal mframe" data-part="modal-plate">
 <div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
 <h2 id="soon-h" data-i18n="soon.title">Coming Soon</h2>
-<button class="r10-x x-btn" type="button" data-w6x="soon-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
+<button id="soon-close" class="r10-x x-btn" type="button" data-w6x="soon-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
 <p class="cut-line" data-i18n="soon.body">Under construction. Check back after the next update!</p>
-<button id="soon-close" data-part="btn-modal" data-variant="primary" class="btn btn-primary" type="button" data-i18n="settings.close">Close</button>
+<!-- [Task 8d D2 · D12] 「닫기」 단추 은퇴 — ✕ 하나(id soon-close 를 ✕ 가 물려받음). -->
 </div></div>
 <!-- ============================================================
 9차 §9 스킨 시트. 목록은 **JS 가 짓는다** — 스킨은 마크업이 아니라 데이터고
@@ -11539,9 +11528,9 @@ openQuest/openRank/openTheater 를 각자 부른다). 제작진(#modal-credits�
 <div id="modal-skin" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="sk-h"><div class="sheet jbox jbox--modal mframe" data-part="modal-plate">
 <div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
 <h2 id="sk-h" data-i18n="skin.title">Skins</h2>
-<button class="r10-x x-btn" type="button" data-w6x="sk-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
+<button id="sk-close" class="r10-x x-btn" type="button" data-w6x="sk-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
 <div id="sk-list" class="sk-list"></div>
-<button id="sk-close" data-part="btn-modal" data-variant="primary" class="btn btn-primary" type="button" data-i18n="settings.close">Close</button>
+<!-- [Task 8d D2 · 지휘자 답 3] 「닫기」 단추 은퇴 — ✕ 하나(id sk-close 를 ✕ 가 물려받아 배선 · 뒤로 사슬 그대로). -->
 </div></div>
 <!-- ============================================================
 [판정판 121 · 2026-10-19 · Task 8b2] 장비 창(#modal-gear) · 장비 정보 카드(#modal-gear-info) — 캐릭터 방(z72) 위의 두 겹(z73 · z74).
@@ -11654,8 +11643,7 @@ scratchpad/rc1017/t8b2/mkclip_tabs.py), 설명 카드 = 탭 없는 기본 실루
 0/0 게이지는 아무것도 말하지 않는다(DESIGN §23.2 ⓑ). -->
 <p id="iv-prog-row" class="sk-bal"><span id="iv-prog-k" data-i18n="invite.next">To the next invite</span><b class="sk-bal-v"><i class="gem-ic" aria-hidden="true">&#9733;</i><span id="iv-prog-v">0/0</span></b></p>
 <i id="iv-prog" class="cs-bar kit-gauge-v2" aria-hidden="true"><i class="kit-gauge-v2__gem" aria-hidden="true"></i><i class="kit-gauge-v2__fill"><i class="kit-gauge-v2__cap" data-side="l"></i><i class="kit-gauge-v2__cap" data-side="r"></i></i></i>
-<button id="iv-no" data-part="btn-modal" data-variant="lilac" class="btn btn-ghost" type="button" data-i18n="confirm.no">Cancel</button>
-<button id="iv-yes" data-part="btn-modal" data-variant="primary" class="btn btn-primary" type="button" data-i18n="invite.go">Invite</button>
+<div class="mf-foot mf-pair"><button id="iv-no" class="mf-btn kit-btn-v2" data-kind="secondary" type="button" data-i18n="confirm.no">Cancel</button><button id="iv-yes" class="mf-btn kit-btn-v2" data-kind="primary" type="button" data-i18n="invite.go">Invite</button></div>
 </div></div>
 <!-- ==[INV-0911]:HTML:END== -->
 <!-- ==[INV-0911]:HTML:BEGIN== 획득 연출 · 자기소개 (DESIGN §23.3·§23.4)
@@ -11755,8 +11743,7 @@ scratchpad/rc1017/t8b2/mkclip_tabs.py), 설명 카드 = 탭 없는 기본 실루
 <h2 id="cf-h" data-i18n="confirm.title">Confirm</h2>
 <button class="r10-x x-btn" type="button" data-w6x="cf-no" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
 <p id="cf-msg"></p>
-<button id="cf-no" class="btn btn-ghost" type="button" data-i18n="confirm.no">Cancel</button>
-<button id="cf-yes" class="btn btn-primary" type="button" data-i18n="confirm.yes">Buy</button>
+<div class="mf-foot mf-pair"><button id="cf-no" class="mf-btn kit-btn-v2" data-kind="secondary" type="button" data-i18n="confirm.no">Cancel</button><button id="cf-yes" class="mf-btn kit-btn-v2" data-kind="primary" type="button" data-i18n="confirm.yes">Buy</button></div>
 </div></div>
 <div id="modal-pause" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="pause-h"><div class="sheet jbox jbox--modal mframe" data-part="modal-plate">
 <div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
@@ -11781,17 +11768,15 @@ W6 (사용자 지시) — "동일 구성요소는 반드시 동일 에셋/문법
 <div class="set-row"><span class="set-k" data-i18n="settings.theme">Theme</span><button id="pz-theme" class="set-tg" type="button" data-i18n-aria="aria.pzTheme" aria-label="Change theme">Dark</button></div>
 <div class="set-row"><span class="set-k" data-i18n="settings.lang">Language</span><button id="pz-lang" class="set-tg" type="button" data-i18n-aria="aria.pzLang" aria-label="Change language">English</button></div>
 </div>
-<button id="pz-howto" data-part="btn-modal" data-variant="lilac" class="btn btn-ghost" data-i18n-aria="aria.pzHowto" data-i18n="pause.howto" aria-label="How to play">How to play</button>
-<button id="pz-restart" data-part="btn-modal" data-variant="yellow" class="btn btn-secondary" data-i18n-aria="aria.pzRestart" data-i18n="pause.restart" aria-label="Restart this stage">Restart stage</button>
-<button id="pz-menu" data-part="btn-modal" data-variant="purple" class="btn btn-ghost" data-i18n-aria="aria.pzMenu" data-i18n="pause.menu" aria-label="Back to main menu">Main menu</button>
-<button id="pz-resume" data-part="btn-modal" data-variant="primary" class="btn btn-primary" data-i18n-aria="aria.pzResume" data-i18n="pause.resume" aria-label="Resume game">Resume</button>
+<!-- [Task 8d D3] 곁 결정 셋(게임 방법 · 단계 다시하기 · 나가기) = 킷 보조 · 한 가지 결정(계속하기) = 킷 주 단추 — 쌓는 줄(.mf-foot) · 주 먼저 -->
+<div class="mf-foot"><button id="pz-resume" class="mf-btn kit-btn-v2" data-kind="primary" type="button" data-i18n-aria="aria.pzResume" data-i18n="pause.resume" aria-label="Resume game">Resume</button><button id="pz-howto" class="mf-btn kit-btn-v2" data-kind="secondary" type="button" data-i18n-aria="aria.pzHowto" data-i18n="pause.howto" aria-label="How to play">How to play</button><button id="pz-restart" class="mf-btn kit-btn-v2" data-kind="secondary" type="button" data-i18n-aria="aria.pzRestart" data-i18n="pause.restart" aria-label="Restart this stage">Restart stage</button><button id="pz-menu" class="mf-btn kit-btn-v2" data-kind="secondary" type="button" data-i18n-aria="aria.pzMenu" data-i18n="pause.menu" aria-label="Back to main menu">Main menu</button></div>
 </div></div>
 <div id="modal-clear" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="clear-title"><div class="sheet jbox jbox--modal mframe" data-part="modal-plate">
 <div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
 <!-- v4 C-3: the stage number as the hero of the sheet — the N탄 signal the
 tester named as the reason she kept playing Royal Match. aria-hidden
 because #clear-title already says the same thing to a screen reader. -->
-<div id="clear-stage-hero" aria-hidden="true">1</div>
+<!-- [Task 8d D8] 제목 뒤 큰 「n」 장식(#clear-stage-hero) 은퇴 — 결과 창 한 틀(간판 + 핵심 수 하나). 단계 수는 간판 「n단계 클리어!」 가 말한다. -->
 <h2 id="clear-title">Stage 1 clear!</h2>
 <!-- Grade slot. game.js injects e.g. `<span class="grade s">S</span><span class="grade-note">…</span>`.
 Hides itself while empty, so a mode without grading needs no extra toggling. -->
@@ -11818,8 +11803,8 @@ portal SDK call goes here and adds .ad-live alongside clearing [hidden]. -->
 <!-- v5 E-1: a LOOK at the board, never a submission — a cleared stage is not
 the end of an endless run (see onStageClear). Directly above #btn-next so
 the primary action stays the last thing under the thumb. -->
-<button id="btn-clear-rank" data-part="btn-modal" data-variant="lilac" class="btn btn-ghost" data-i18n-aria="aria.rank" data-i18n="rank.open" aria-label="Records">Records</button>
-<button id="btn-next" data-part="btn-modal" data-variant="pink" class="btn btn-primary" data-i18n-aria="aria.next" data-i18n="clear.next" aria-label="Go to next stage">Next stage</button>
+<div class="mf-foot"><button id="btn-next" class="mf-btn kit-btn-v2" data-kind="primary" type="button" data-i18n-aria="aria.next" data-i18n="clear.next" aria-label="Go to next stage">Next stage</button></div>
+<div class="mf-side"><button id="btn-clear-rank" class="mf-soft kit-pill-v2" data-variant="soft" type="button" data-i18n-aria="aria.rank" data-i18n="rank.open" aria-label="Records">Records</button></div>
 </div></div>
 <!-- ============================================================
 v4 4차-a — 노드 미션 카드 (V3 §4·§5).
@@ -12141,9 +12126,9 @@ ON        : endless · rush         · daily           (스킬판)
 수확분) → 코인/젤리별 → **별 3슬롯**(아래 #adv-stars 가 그 슬롯이고,
 리빌이 픽을 하나씩 점등한다). 그래서 리스트가 별보다 위에 앉는다. -->
 <ul id="adv-reward" class="reward-reveal" aria-live="polite" hidden></ul>
-<div class="sheet-row coin-x2" data-sheet="adv" data-portal-only hidden>
-<button class="btn btn-secondary cx2-yes" type="button"><i class="fr-play" aria-hidden="true"></i><span data-i18n="coin.x2">Double coins</span></button>
-<button class="btn btn-secondary cx2-no" type="button" data-i18n="coin.x2.no">Just take</button>
+<div class="coin-x2 mf-foot mf-pair" data-sheet="adv" data-portal-only hidden>   <!-- [Task 8d · 지휘자 답 8] 포털 전용 2배 줄 = 킷 보조(광고 보고 2배) + soft 알약(그냥 받기) -->
+<button class="mf-btn kit-btn-v2 cx2-yes" data-kind="secondary" type="button"><i class="fr-play" aria-hidden="true"></i><span data-i18n="coin.x2">Double coins</span></button>
+<button class="mf-soft kit-pill-v2 cx2-no" data-variant="soft" type="button" data-i18n="coin.x2.no">Just take</button>
 </div>
 <!-- ⑲ 안쪽 젤리 카드: 별·점수·안내 두 줄을 판 위 맨글자에서 카드 위로.
 id 는 한 글자도 안 바뀌므로 paintAdvSheet/countUp 배선 무접촉. -->
@@ -12159,7 +12144,7 @@ id 는 한 글자도 안 바뀌므로 paintAdvSheet/countUp 배선 무접촉. --
 <!-- Task 12 rev1(I-6) — 결과 시트 쪽 rewarded 하트 진입점(#node-ad 와 같은
 부품 .btn.btn-secondary, 같은 i18n 키). 하트 0·포털·canReward() 일
 때만 paintAdvSheet 가 연다 — 그 밖은 늘 hidden(픽셀 0). -->
-<button id="adv-ad" class="btn btn-secondary" type="button" data-i18n="portal.watchad.heart" hidden>Watch an ad for +1 heart</button>
+<button id="adv-ad" class="mf-btn kit-btn-v2" data-kind="secondary" type="button" data-i18n="portal.watchad.heart" hidden>Watch an ad for +1 heart</button>
 </div>
 <!-- [G-0903] 정적 라벨이 ko 회차에서도 영문 「Next stage」로 떴다(REPAIR-LOG 45절 3항
 곁다리 발견). 값은 advResult 가 t('adv.next') / t('adv.retry') 로 넣지만, 결과창이
@@ -12170,8 +12155,7 @@ id 는 한 글자도 안 바뀌므로 paintAdvSheet/countUp 배선 무접촉. --
 런타임 라벨과 갈라진다.
 ⚠ 진 판에서 언어를 바꾸면 applyI18n 이 이 자리를 adv.next 로 되돌린다. 설정창은
 결과창 위에서 못 열리므로 지금 경로에서는 도달 불가다. -->
-<button id="adv-again" data-part="btn-modal" data-variant="pink" class="btn btn-primary" data-n="1" data-i18n="adv.next">Next stage</button>
-<button id="adv-map" data-part="btn-modal" data-variant="lilac" class="btn btn-ghost" data-i18n="adv.map">Map</button>
+<div class="mf-foot"><button id="adv-again" class="mf-btn kit-btn-v2" data-kind="primary" type="button" data-n="1" data-i18n="adv.next">Next stage</button><button id="adv-map" class="mf-btn kit-btn-v2" data-kind="secondary" type="button" data-i18n="adv.map">Map</button></div>
 </div></div>
 <div id="modal-over" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="over-title"><div class="sheet jbox jbox--modal mframe" data-part="modal-plate">
 <div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
@@ -12200,23 +12184,18 @@ every language switch, exactly like #over-title and #over-best-label. -->
 것은 벌어 놓은 것이다(수확은 판 중에 확정된다). 다만 **획득이 있을 때만**
 열린다 — 빈 리스트를 띄우면 "0을 얻었다"를 축하하는 꼴이 된다. -->
 <ul id="over-reward" class="reward-reveal" aria-live="polite" hidden></ul>
-<div class="sheet-row coin-x2" data-sheet="over" data-portal-only hidden>
-<button class="btn btn-secondary cx2-yes" type="button"><i class="fr-play" aria-hidden="true"></i><span data-i18n="coin.x2">Double coins</span></button>
-<button class="btn btn-secondary cx2-no" type="button" data-i18n="coin.x2.no">Just take</button>
+<div class="coin-x2 mf-foot mf-pair" data-sheet="over" data-portal-only hidden>   <!-- [Task 8d · 지휘자 답 8] 포털 전용 2배 줄 = 킷 보조(광고 보고 2배) + soft 알약(그냥 받기) -->
+<button class="mf-btn kit-btn-v2 cx2-yes" data-kind="secondary" type="button"><i class="fr-play" aria-hidden="true"></i><span data-i18n="coin.x2">Double coins</span></button>
+<button class="mf-soft kit-pill-v2 cx2-no" data-variant="soft" type="button" data-i18n="coin.x2.no">Just take</button>
 </div>
 </div><!-- /.over-body -->
 <!-- AD SLOT: rewarded video, grants +2 Add to continue. Hidden by default;
 the portal rewarded-ad wrapper replaces this div and adds .ad-live. -->
 <div class="ad-slot ad-reward" data-ad-slot="rewarded">Ad</div>
-<button id="btn-continue" data-part="btn-modal" data-variant="pink" class="btn btn-primary" data-i18n-aria="aria.continue" data-i18n="over.continue" aria-label="Continue this board with two more adds">Continue (1 free)</button>
-<div class="sheet-row">
-<button id="btn-retry" data-part="btn-modal" data-variant="orange" class="btn btn-secondary" data-i18n-aria="aria.retry" data-i18n="over.retry" aria-label="Retry">Retry</button>
-<button id="btn-over-share" data-part="btn-modal" data-variant="lilac" class="btn btn-ghost" data-i18n-aria="aria.overShare" data-i18n="over.share" aria-label="Share your score">Share</button>
-</div>
-<!-- v5 E-1: directly above #btn-menu — the run just ended, so "where did that
-land?" is the question in the player's head before "leave". -->
-<button id="btn-over-rank" data-part="btn-modal" data-variant="lilac" class="btn btn-ghost" data-i18n-aria="aria.rank" data-i18n="rank.open" aria-label="Records">Records</button>
-<button id="btn-menu" data-part="btn-modal" data-variant="purple" class="btn btn-ghost" data-i18n-aria="aria.overMenu" data-i18n="over.menu" aria-label="Back to main menu">Main menu</button>
+<!-- [Task 8d D8] 단추 다섯(넷 색) → 쌓는 줄 [주 = 지금 쓸 수 있는 쪽(이어하기 또는 다시하기)][보조 메인 메뉴] + 작은 soft 알약 줄(다시하기(이어하기가 주일 때) · 내 기록 · 공유).
+주는 paintContinueBtn 한 곳이 고른다 — 다시하기 기능은 어느 때나 한 번 누름 거리에 남는다(주 또는 알약). -->
+<div class="mf-foot"><button id="btn-continue" class="mf-btn kit-btn-v2" data-kind="primary" type="button" data-i18n-aria="aria.continue" data-i18n="over.continue" aria-label="Continue this board with two more adds">Continue (1 free)</button><button id="btn-retry" class="mf-btn kit-btn-v2" data-kind="primary" type="button" data-i18n-aria="aria.retry" data-i18n="over.retry" aria-label="Retry" hidden>Retry</button><button id="btn-menu" class="mf-btn kit-btn-v2" data-kind="secondary" type="button" data-i18n-aria="aria.overMenu" data-i18n="over.menu" aria-label="Back to main menu">Main menu</button></div>
+<div class="mf-side"><button id="btn-over-retry" class="mf-soft kit-pill-v2" data-variant="soft" type="button" data-i18n-aria="aria.retry" data-i18n="over.retry" aria-label="Retry">Retry</button><button id="btn-over-rank" class="mf-soft kit-pill-v2" data-variant="soft" type="button" data-i18n-aria="aria.rank" data-i18n="rank.open" aria-label="Records">Records</button><button id="btn-over-share" class="mf-soft kit-pill-v2" data-variant="soft" type="button" data-i18n-aria="aria.overShare" data-i18n="over.share" aria-label="Share your score">Share</button></div>
 </div></div>
 <!-- ===== 아케이드 대전 결과 ==============================================
 ▣ 이 시트의 유일한 요구: **390×844 한 장을 찍으면 승부가 판정돼야 한다.**
@@ -12249,17 +12228,15 @@ land?" is the question in the player's head before "leave". -->
 「#modal-over 의 시트 문법을 그대로 쓴다」에서 카드 상자만 빠져 있다)
 공유 버튼 바로 위, 줄 순서의 맨 끝에 놓는다. -->
 <ul id="arc-reward" class="reward-reveal" aria-live="polite" hidden></ul>
-<div class="sheet-row coin-x2" data-sheet="arc" data-portal-only hidden>
-<button class="btn btn-secondary cx2-yes" type="button"><i class="fr-play" aria-hidden="true"></i><span data-i18n="coin.x2">Double coins</span></button>
-<button class="btn btn-secondary cx2-no" type="button" data-i18n="coin.x2.no">Just take</button>
+<div class="coin-x2 mf-foot mf-pair" data-sheet="arc" data-portal-only hidden>   <!-- [Task 8d · 지휘자 답 8] 포털 전용 2배 줄 = 킷 보조(광고 보고 2배) + soft 알약(그냥 받기) -->
+<button class="mf-btn kit-btn-v2 cx2-yes" data-kind="secondary" type="button"><i class="fr-play" aria-hidden="true"></i><span data-i18n="coin.x2">Double coins</span></button>
+<button class="mf-soft kit-pill-v2 cx2-no" data-variant="soft" type="button" data-i18n="coin.x2.no">Just take</button>
 </div>
 <img id="arc-card-thumb" class="share-thumb" alt="" aria-hidden="true" hidden>
 </div><!-- /.res-body -->
-<div class="sheet-row">
-<button id="arc-again" class="btn btn-primary" data-i18n="arc.again">Retry</button>
-<button id="arc-share" class="btn btn-ghost" data-i18n-aria="aria.arcShare" data-i18n="arc.share" aria-label="Share your record">Share</button>
-<button id="arc-menu" class="btn btn-ghost" data-i18n="arc.menu">Main menu</button>
-</div>
+<!-- [Task 8d D8] 결과 창 한 틀 — 쌓는 줄 [주 다시하기][보조 메인 메뉴] + 작은 soft 알약(공유) -->
+<div class="mf-foot"><button id="arc-again" class="mf-btn kit-btn-v2" data-kind="primary" type="button" data-i18n="arc.again">Retry</button><button id="arc-menu" class="mf-btn kit-btn-v2" data-kind="secondary" type="button" data-i18n="arc.menu">Main menu</button></div>
+<div class="mf-side"><button id="arc-share" class="mf-soft kit-pill-v2" data-variant="soft" type="button" data-i18n-aria="aria.arcShare" data-i18n="arc.share" aria-label="Share your record">Share</button></div>
 </div></div>
 <div id="modal-daily" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="daily-title"><div class="sheet jbox jbox--modal mframe" data-part="modal-plate">
 <div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
@@ -12271,9 +12248,9 @@ land?" is the question in the player's head before "leave". -->
 그대로 받는다(새 그림 0 · 새 CSS 0). 획득이 0 이면 rewardReveal 이
 아무것도 열지 않으므로 평소의 데일리 결과창은 픽셀 하나 안 바뀐다. -->
 <ul id="daily-reward" class="reward-reveal" aria-live="polite" hidden></ul>
-<div class="sheet-row coin-x2" data-sheet="daily" data-portal-only hidden>
-<button class="btn btn-secondary cx2-yes" type="button"><i class="fr-play" aria-hidden="true"></i><span data-i18n="coin.x2">Double coins</span></button>
-<button class="btn btn-secondary cx2-no" type="button" data-i18n="coin.x2.no">Just take</button>
+<div class="coin-x2 mf-foot mf-pair" data-sheet="daily" data-portal-only hidden>   <!-- [Task 8d · 지휘자 답 8] 포털 전용 2배 줄 = 킷 보조(광고 보고 2배) + soft 알약(그냥 받기) -->
+<button class="mf-btn kit-btn-v2 cx2-yes" data-kind="secondary" type="button"><i class="fr-play" aria-hidden="true"></i><span data-i18n="coin.x2">Double coins</span></button>
+<button class="mf-soft kit-pill-v2 cx2-no" data-variant="soft" type="button" data-i18n="coin.x2.no">Just take</button>
 </div>
 <!-- v5 E-1: daily's twin of #over-rank-line. showDailyResult() owns it and
 syncDynamicI18n() re-paints it, so a language toggle cannot revert it. -->
@@ -12284,8 +12261,9 @@ syncDynamicI18n() re-paints it, so a language toggle cannot revert it. -->
 카드가 그 격자를 다시 그리지 않으므로 둘은 서로 다른 것을 보여 준다. -->
 <img id="daily-card-thumb" class="share-thumb" alt="" aria-hidden="true" hidden>
 </div><!-- /.res-body -->
-<button id="btn-share" data-part="btn-modal" data-variant="yellow" class="btn btn-primary" data-i18n-aria="aria.share" data-i18n="daily.share" aria-label="Share your daily result with a result card image">Share</button>
-<button id="btn-daily-menu" data-part="btn-modal" data-variant="purple" class="btn btn-ghost" data-i18n-aria="aria.dailyMenu" data-i18n="daily.menu" aria-label="Back to main menu">Main menu</button>
+<!-- [Task 8d D8] 결과 창 한 틀 — 데일리는 하루 한 판이라 다시하기가 없다: 한 가지 결정(메인 메뉴) = 주 · 공유 = 작은 soft 알약 -->
+<div class="mf-foot"><button id="btn-daily-menu" class="mf-btn kit-btn-v2" data-kind="primary" type="button" data-i18n-aria="aria.dailyMenu" data-i18n="daily.menu" aria-label="Back to main menu">Main menu</button></div>
+<div class="mf-side"><button id="btn-share" class="mf-soft kit-pill-v2" data-variant="soft" type="button" data-i18n-aria="aria.share" data-i18n="daily.share" aria-label="Share your daily result with a result card image">Share</button></div>
 </div></div>
 <!-- ===== Ranking board (v5 E-1) =====
 Layered ON TOP of the clear / over sheets (z-index 71 vs the 70 of .modal)
@@ -12299,7 +12277,7 @@ moment the sheet opens, and never between opens. -->
 RANK_MODES 루프 · buildRankList 가 id 로 찾고 aria-selected 를 찍는다). 옛 젤리 알약(.rank-tab) 두 줄 접기는 은퇴. -->
 <div id="modal-rank" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="rank-h"><div class="sheet jbox jbox--modal mf-tabhost">
 <h2 id="rank-h" data-i18n="rank.title">Records</h2>
-<button class="r10-x x-btn" type="button" data-w6x="rank-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
+<button id="rank-close" class="r10-x x-btn" type="button" data-w6x="rank-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
 <div class="cp-card kit-frame-v2 mframe" data-tabs="3" data-rows="2" data-part="modal-plate">
 <div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
 <div id="rank-tabs" class="cp-tabs kit-frame-v2__tabs" role="tablist" data-i18n-aria="aria.rankTab" aria-label="Pick which records to show">
@@ -12313,7 +12291,7 @@ RANK_MODES 루프 · buildRankList 가 id 로 찾고 aria-selected 를 찍는다
 <div class="cp-body">
 <p id="rank-hint"></p>
 <div id="rank-list"></div>
-<button id="rank-close" data-part="btn-modal" data-variant="primary" class="btn btn-primary" data-i18n-aria="aria.rankClose" data-i18n="rank.close" aria-label="Close records">Close</button>
+<!-- [Task 8d D2] 「닫기」 단추 은퇴 — ✕ 하나(id rank-close 를 ✕ 가 물려받음). -->
 </div>
 </div>
 </div></div>
@@ -12331,7 +12309,7 @@ aria-selected 로 낸다 — 새 상태 어휘를 만들지 않는다.
 짜임 = 장비 창과 같다: 바깥 .sheet(.mf-tabhost)는 그리지 않는 틀 — 제목 캡슐 + ✕ 가 판 위에 서고, 그 아래 탭 달린 젤리 판(.cp-card.mframe) = 탭 → 본문(.cp-body). -->
 <div id="modal-quest" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="quest-h"><div class="sheet jbox jbox--modal mf-tabhost">
 <h2 id="quest-h" data-i18n="quest.title">Missions</h2>
-<button class="r10-x x-btn" type="button" data-w6x="quest-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
+<button id="quest-close" class="r10-x x-btn" type="button" data-w6x="quest-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
 <!-- [Task 129 수정 1회차 M7] data-part="modal-plate"(판을 찾는 도구의 손잡이) = 보이는 판(안쪽 탭 판) — 바깥 틀은 그리지 않는다 -->
 <div class="cp-card kit-frame-v2 mframe" data-tabs="3" data-part="modal-plate">
 <div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
@@ -12344,10 +12322,12 @@ aria-selected 로 낸다 — 새 상태 어휘를 만들지 않는다.
 <!-- 출석 7일 — 새 저장 칸 0. store.streak · store.streakClaimed(§21④)만 읽는다. -->
 <div id="quest-att" class="qs-att" role="list" aria-label="Attendance"></div>
 <div id="quest-list" class="qs-list"></div>
-<div class="qs-foot">
-<button id="quest-all" class="rank-tab qs-all" type="button" aria-selected="false" data-i18n="quest.claimall">Claim all</button>
+<!-- [Task 8d D2 · D3 · D11] 「닫기」 단추 은퇴(✕ 하나 — id quest-close 를 ✕ 가 물려받음) · 「모두 받기」 = 이 창의 한 가지 결정(킷 주 단추) ·
+받을 수 있는 미션 알림 = 판 안 맨 아래 한 줄(옛 판 밖 검은 토스트 「받을 수 있어요: …」 — 창이 열린 동안은 이 줄이 맡는다). -->
+<div class="qs-foot mf-foot">
+<button id="quest-all" class="mf-btn kit-btn-v2" data-kind="primary" type="button" data-i18n="quest.claimall">Claim all</button>
 </div>
-<button id="quest-close" data-part="btn-modal" data-variant="primary" class="btn btn-primary" data-i18n-aria="aria.close" data-i18n="rank.close" aria-label="Close">Close</button>
+<p id="quest-note" class="mf-note" hidden><i class="mf-note-ic" aria-hidden="true"></i><span id="quest-note-t"></span></p>
 </div>
 </div>
 </div></div>
@@ -12357,7 +12337,7 @@ aria-selected 로 낸다 — 새 상태 어휘를 만들지 않는다.
 꾸미기 캡슐 갈래(oddsPaint 가 탭 줄을 hidden)에서는 판이 탭 없는 기본 실루엣으로 선다(실루엣 규칙이 :has(> .cp-tabs[hidden]) 를 뺀다). -->
 <div id="modal-odds" class="modal w6m" hidden role="dialog" aria-modal="true" aria-labelledby="odds-h"><div class="sheet jbox jbox--modal mf-tabhost">
 <h2 id="odds-h" data-i18n="odds.title">Odds</h2>
-<button class="r10-x x-btn" type="button" data-w6x="odds-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
+<button id="odds-close" class="r10-x x-btn" type="button" data-w6x="odds-close" data-i18n-aria="aria.close" aria-label="Close">&times;</button>
 <!-- [Task 129 수정 1회차 M7] data-part="modal-plate" = 보이는 판(안쪽 탭 판) -->
 <div class="cp-card kit-frame-v2 mframe" data-tabs="3" data-part="modal-plate">
 <div class="cp-fx" aria-hidden="true"><i class="cp-gnd"></i><i class="cp-jelly"></i></div>
@@ -12370,7 +12350,7 @@ aria-selected 로 낸다 — 새 상태 어휘를 만들지 않는다.
 </div>
 <div class="cp-body">
 <div id="odds-body" class="od-body"></div>
-<button id="odds-close" data-part="btn-modal" data-variant="primary" class="btn btn-primary" type="button" data-i18n="rank.close">Close</button>
+<!-- [Task 8d D2 · 지휘자 답 3] 「닫기」 단추 은퇴 — ✕ 하나(id odds-close 를 ✕ 가 물려받음). -->
 </div>
 </div>
 </div></div>
@@ -12473,7 +12453,7 @@ game.js **앞**이어야 한다 — 부팅 직후 나는 소리까지 클립으�
 이 파일을 빼고 빌드해도 게임은 돈다 — 그때는 모든 슬롯이 기존 신스다. -->
 <script defer src="catalog/js/tw-02-7ea6fa41.js"></script>
 <script defer src="catalog/js/tw-03-06721556.js"></script>
-<script defer src="catalog/js/tw-04-007965cc.js"></script>
+<script defer src="catalog/js/tw-04-7048f7f3.js"></script>
 <!-- ==FRUITDEF:BEGIN== generated by tools/fruit-tiles.js — do not edit by hand -->
 <!-- 열매 실루엣 클립 패스 9종 (DESIGN-V4 §5.8). clipPathUnits="objectBoundingBox"
 라 좌표가 0..1 이고, 타일 크기(--ts)가 어떤 값이든 같은 모양이 나온다.
@@ -12551,7 +12531,7 @@ width/height 0 + aria-hidden: 레이아웃·접근성 트리에 아무것도 더
 
 
 
-<link rel="stylesheet" href="tw-late-485257c8.css">
+<link rel="stylesheet" href="tw-late-d21b79a9.css">
 <style id="compat-p1">
 @supports not (width: 1cqw) {
 #app.classic #classic-hud { --cqw: min(1vw, calc(var(--app-max) / 100)); height: calc(38.5 * var(--cqw)); }
@@ -12590,91 +12570,84 @@ width: 100%;
 position: relative;
 display: flex;
 flex-direction: column;
-justify-content: flex-end;
-gap: 1px;
+align-items: stretch;
+gap: calc(var(--f2-w) * .006);
 width: 100%;
-aspect-ratio: 16 / 9;
-padding: 6px 8px 7px;
-border: 0;
-border-radius: 12px;
-overflow: hidden;
+min-width: 0;
+padding: calc(var(--f2-w) * .016) calc(var(--f2-w) * .016) calc(var(--f2-w) * .020);
+border: calc(var(--f2-w) * .004) solid var(--role-f2-pill-line);
+border-radius: calc(var(--f2-w) * .046);
+box-sizing: border-box;
+background: var(--role-f2-pill);
+color: var(--prim-art-ink);
 text-align: left;
-background-color: #6B4A2E;
+text-shadow: none;
+box-shadow: 0 calc(var(--f2-w) * .008) calc(var(--f2-w) * .020) var(--role-f2-cast);
+}
+.mm-thumb {
+position: relative;
+display: block;
+aspect-ratio: 2 / 1;
+border-radius: calc(var(--f2-w) * .032);
+background-color: var(--role-f2-pill-line);
 background-image: var(--mm-thumb);
 background-repeat: no-repeat;
 background-position: 50% 42%;
 background-size: cover;
-box-shadow:
-inset 0 0 0 2.5px #4E2809,
-inset 0 2.5px 0 rgba(255, 255, 255, .22),
-0 3px 0 #67380F,
-0 6px 14px rgba(83, 28, 40, .22);
-}
-.mm-veil {
-position: absolute;
-inset: 0;
-border-radius: inherit;
-background-image: linear-gradient(180deg, rgba(30, 12, 24, 0) 30%, rgba(30, 12, 24, .74) 100%);
-pointer-events: none;
 }
 .mm-k, .mm-n, .mm-p {
-position: relative;
-z-index: 1;
 min-width: 0;
+padding: 0 calc(var(--f2-w) * .006);
 white-space: nowrap;
 overflow: hidden;
 text-overflow: ellipsis;
-text-shadow: 0 1px 0 rgba(40, 14, 26, .85);
+line-height: 1.25;
 }
 .mm-k {
 font-family: var(--font-display);
-font-size: var(--text-min);   /* [Task 7a] 옛 9px — 하한이 늘 이긴다 */
-letter-spacing: .5px;
-font-weight: 700;
-color: #FFE9B8;
+font-size: var(--text-min);
+letter-spacing: .02em;
+color: var(--role-f2-ink);
 }
 .mm-n {
 font-style: normal;
-font-weight: 700;
-font-size: 11px;
-letter-spacing: -.01em;
-color: #FFFFFF;
+font-weight: 800;
+font-size: max(var(--text-min), calc(var(--f2-w) * .034));
+color: var(--prim-art-ink);
+white-space: normal;
+word-break: keep-all;
+display: -webkit-box;
+-webkit-box-orient: vertical;
+-webkit-line-clamp: 2;
 }
 .mm-p {
-font-size: var(--text-min);   /* [Task 7a] 옛 9.5px — 하한이 늘 이긴다 */
+display: flex;
+flex-wrap: wrap;
+column-gap: .55em;
+white-space: normal;
+overflow: visible;
+font-size: var(--text-min);
 font-weight: 700;
-letter-spacing: -.01em;
-color: #FFE0B0;
+color: var(--role-f2-ink);
 }
+.mm-p > i { font-style: normal; white-space: nowrap; }   /* 별 · 깬 판 두 토막 — 좁은 카드에서는 두 줄로 접힌다(말줄임 0) */
 .mm-cell.is-cur {
+border-color: var(--role-f2-hi);
 box-shadow:
-inset 0 0 0 3px #FFC94A,
-inset 0 0 0 5.5px #4E2809,
-inset 0 5.5px 0 rgba(255, 255, 255, .22),
-0 3px 0 #67380F,
-0 6px 14px rgba(83, 28, 40, .28);
+0 0 0 calc(var(--f2-w) * .006) var(--role-f2-hi),
+0 calc(var(--f2-w) * .008) calc(var(--f2-w) * .020) var(--role-f2-cast);
 }
-.mm-cell.is-lock {
-background-color: #8A8590;
-background-blend-mode: luminosity;
-}
-.mm-cell.is-lock .mm-veil {
-background-image: linear-gradient(180deg, rgba(30, 12, 24, .40) 0%, rgba(30, 12, 24, .82) 100%);
-}
-.mm-cell.is-lock .mm-n { color: rgba(255, 255, 255, .72); }
-.mm-cell.is-lock .mm-p { color: rgba(255, 224, 176, .58); }
 .mm-lock {
 position: absolute;
-right: 5px;
-top: 4px;
+right: calc(var(--f2-w) * .030);
+top: calc(var(--f2-w) * .028);
 z-index: 2;
-width: 19px;
-height: 19px;
+width: calc(var(--f2-w) * .060);
+height: calc(var(--f2-w) * .060);
 background-image: var(--lib-glyph-lock);
 background-repeat: no-repeat;
 background-position: 50% 50%;
 background-size: contain;
-filter: drop-shadow(0 1px 0 rgba(40, 14, 26, .6));
 }
 .mm-cell:active { transform: translateY(2px); }
 .mm-cell.is-lock:active { transform: none; }
@@ -12879,8 +12852,7 @@ cursor: pointer;
 #modal-quest .sheet > h2,
 #modal-quest #quest-tabs,
 #modal-quest #quest-att,
-#modal-quest .qs-foot,
-#modal-quest #quest-close{ flex:0 0 auto; }
+#modal-quest .qs-foot{ flex:0 0 auto; }   /* [Task 8d D2] #quest-close 「닫기」 단추 은퇴(✕ 가 id 를 물려받음) — 목록에서 뺐다 */
 #modal-quest #quest-list{
 flex:0 1 auto;
 min-height:0;
@@ -13969,7 +13941,7 @@ color: var(--prim-art-ink); text-shadow: var(--mf-halo); }
 [data-tier="epic"] > .gc-chip{ background: var(--role-rw-item-3); }
 #modal-odds, #modal-gres{ --mu: calc(var(--f2-w) / 110.8); }
 #modal-odds .sheet{ display: flex; flex-direction: column; }
-#modal-odds .sheet > h2, #modal-odds #odds-tabs, #modal-odds #odds-close{ flex: 0 0 auto; }
+#modal-odds .sheet > h2, #modal-odds #odds-tabs{ flex: 0 0 auto; }   /* [Task 8d] #odds-close 「닫기」 단추 은퇴(✕ 가 id 를 물려받음) — 목록에서 뺐다 */
 #modal-odds .od-body{ flex: 0 1 auto; min-height: 0; margin: calc(1.99 * var(--mu)) 0 0; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
 #modal-odds .od-body::-webkit-scrollbar{ width: 0; height: 0; }
 #modal-odds .od-sec{ margin: 0 0 calc(2.6 * var(--mu)); padding: calc(2.6 * var(--mu)) calc(3.1 * var(--mu)); border-radius: calc(4.6 * var(--mu)); background: var(--role-f2-pill); border: calc(.3 * var(--mu)) solid var(--role-f2-pill-line); }
@@ -14098,7 +14070,7 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="rare"] .gres-top
 html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top::before{ background: var(--role-rw-item-2); }
 #sh-tabs .sh-dot{ display: flex; align-items: center; justify-content: center; box-sizing: border-box; width: calc(4.42 * var(--cqw)); height: calc(4.42 * var(--cqw)); padding: 0;
 border-radius: 50%; background: var(--role-pink-face-b); color: var(--prim-white); box-shadow: none; font-size: max(var(--text-min), calc(2.69 * var(--cqw))); line-height: 1; letter-spacing: 0; }
-.coin-x2 .btn{ word-break: keep-all; }
+.coin-x2 :is(.mf-btn, .mf-soft){ word-break: keep-all; }   /* [Task 8d] 2배 줄 단추 = 킷 보조 · soft 알약(옛 .btn) */
 @media (min-aspect-ratio: 1/1) {
 #app #screen-shop{ --cqw: calc(var(--stage-u) * 5); }
 #app #screen-shop[data-art~="bg"]{ background: var(--prim-bg-light) url("catalog/t3-shop-interior-w.webp") center 62% / cover no-repeat; }
@@ -15745,8 +15717,10 @@ overflow-wrap: anywhere;
 #modal-gear-info .gi-cmp-d { font-weight: 900; }
 </style>
 <style id="modal-frame-129">
-#app .sheet.mframe > .cp-fx { z-index: -1; }
-.sheet.mframe > .cp-fx { --f2-bd: var(--jbox-bw); --f2-r: var(--jbox-radius); }
+#app .sheet.mframe > .cp-fx,
+#app #cut-bar.mframe > .cp-fx { z-index: -1; }   /* [Task 8d D7] 스토리 대화 판(#cut-bar)도 같은 판 틀(선택자 목록 — 창 판 줄의 특이성 무변) */
+.sheet.mframe > .cp-fx,
+#cut-bar.mframe > .cp-fx { --f2-bd: var(--jbox-bw); --f2-r: var(--jbox-radius); }
 .jbox--modal:is(.mframe, .mf-tabhost)::before,
 .jbox--modal:is(.mframe, .mf-tabhost)::after { content: none; }
 .w6m .sheet.mf-tabhost { padding-left: 0 !important; padding-right: 0 !important; padding-bottom: 0 !important; }
@@ -15783,7 +15757,7 @@ padding: 0 var(--w6m-pad-x) var(--w6m-pad-b);
 #app .cp-card.mframe[data-rows="2"] > .cp-tabs > .cp-tab:nth-child(n+4),
 #app .cp-card.mframe[data-rows="2"] > .cp-tabs:has(> .cp-tab:nth-child(n+4)[aria-selected="true"]) > .cp-tab:nth-child(-n+3) { top: 0; bottom: 50%; }
 #charpanel:has(~ :is(#modal-gear, #modal-gear-info):not([hidden])) :is(#cp-h, #cp-close) { opacity: var(--mode-a-under-head-a); }
-#app :is(.modal, #screen-shop) { --mf-halo: 0 0 .06em var(--prim-white-a97), 0 0 .16em var(--prim-white-a90), 0 0 .32em var(--prim-white-a62); }
+#app :is(.modal, #screen-shop, #screen-story) { --mf-halo: 0 0 .06em var(--prim-white-a97), 0 0 .16em var(--prim-white-a90), 0 0 .32em var(--prim-white-a62); }
 #app #modal-drops :is(.dr-name, .dr-p, .dr-cap, .dr-note, .dr-ud),
 #app #modal-arc :is(#arc-best, #arc-when, .sub-score),
 #app #modal-gear-info :is(.gi-meta, .gi-fl),
@@ -15795,6 +15769,128 @@ padding: 0 var(--w6m-pad-x) var(--w6m-pad-b);
 .05em .05em 0 var(--prim-white-a97), -.05em .05em 0 var(--prim-white-a97), .05em -.05em 0 var(--prim-white-a97), -.05em -.05em 0 var(--prim-white-a97),
 0 0 .25em var(--prim-white-a97), 0 0 .5em var(--prim-white-a97), 0 0 .9em var(--prim-white-a90); }
 #app #modal-arc #arc-best { text-shadow: var(--mf-halo-gold); }
+</style>
+<style id="windows-8d">
+#app .modal .mf-foot { flex: 0 0 auto; flex-direction: column; }
+#app .modal .mf-foot.mf-pair { flex-direction: row; }
+#app .modal .mf-pair > .mf-btn { flex: 1 1 0; }
+#app .modal .mf-btn { min-width: 0; }
+#app .modal :is(.mf-btn, .mf-soft, .mf-foot, .mf-side)[hidden] { display: none; }   /* 포털 전용 2배 줄(.coin-x2.mf-foot)도 숨으면 숨는다 */
+#app .modal :is(.mf-btn, .mf-soft) { word-break: keep-all; }
+#app #modal-invite .mf-foot { --f2-w: 95.7vw; }
+@media (min-aspect-ratio: 1/1) and (min-width: 700px) { #app #modal-invite .mf-foot { --f2-w: min(95.7vw, calc(var(--f2-phone-w) * .957)); } }
+#app .modal .mf-side {
+flex: 0 0 auto;
+display: flex;
+flex-wrap: wrap;
+justify-content: center;
+gap: calc(var(--f2-w) * .026);
+}
+#app .modal .mf-soft.kit-pill-v2[data-variant="soft"] {
+--f2-bh: calc(var(--f2-w) * .0950);
+padding: 0 calc(var(--f2-bh) * .55);
+font-size: max(var(--text-min), calc(var(--f2-bh) * .40));
+color: var(--prim-art-ink);
+text-shadow: none;
+white-space: nowrap;
+cursor: pointer;
+}
+#app #modal-quest .qs-get.kit-btn-v2 {
+--f2-bh: calc(var(--f2-w) * .0850);
+min-width: calc(var(--f2-w) * .1750);
+padding: 0 calc(var(--f2-w) * .0240);
+font-family: var(--font-display);
+font-size: max(var(--text-min), calc(var(--f2-bh) * .40));
+line-height: 1.15;
+text-shadow: none;
+}
+#app #modal-quest .qs-day { color: var(--prim-art-ink); }
+#app #modal-quest .mf-note {
+flex: 0 0 auto;
+display: flex;
+align-items: center;
+justify-content: center;
+gap: .4em;
+margin: 0;
+min-width: 0;
+font-size: max(var(--text-min), calc(var(--f2-w) * .0300));
+font-weight: 700;
+line-height: 1.3;
+color: var(--prim-art-ink);
+text-shadow: var(--mf-halo);
+}
+#app #modal-quest .mf-note[hidden] { display: none; }
+#app #modal-quest .mf-note > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#app #modal-quest .mf-note-ic {
+flex: 0 0 auto;
+width: 1.3em;
+height: 1.3em;
+background: center / contain no-repeat url("catalog/lib-glyph-giftbox.webp");
+}
+#app :is(#mm-grid, #th-grid) {
+flex: 0 1 auto;
+min-height: 0;
+overflow-y: auto;
+overflow-x: hidden;
+scrollbar-width: none;
+padding: calc(var(--f2-w) * .008);
+margin: calc(var(--f2-w) * -.008);
+}
+#app :is(#mm-grid, #th-grid)::-webkit-scrollbar { width: 0; height: 0; }
+#app #cut-bar {
+padding: calc(var(--f2-w) * .052) calc(var(--f2-w) * .058) calc(var(--f2-w) * .046);
+box-sizing: border-box;
+}
+#app #cut-bar .cut-line {
+position: relative;
+font-size: calc(var(--f2-w) * .0430);
+line-height: 1.4;
+color: var(--prim-art-ink);
+text-shadow: var(--mf-halo);
+}
+#app #cut-bar .cut-who.kit-pill-v2 {
+--f2-bh: calc(var(--f2-w) * .0760);
+position: absolute;
+left: calc(var(--f2-w) * .050);
+top: 0;
+z-index: 2;
+margin: 0;
+transform: translateY(-55%);
+font-family: var(--font-display);
+font-weight: 400;
+font-size: max(var(--text-min), calc(var(--f2-bh) * .50));
+color: var(--prim-art-ink);
+}
+#app #cut-bar .cut-who:empty { display: none; }
+#app #cut-bar .cut-more { color: var(--role-f2-ink); }
+#app #screen-story .cut-skip.kit-pill-v2 {
+--f2-bh: var(--touch-min);
+min-width: calc(var(--f2-bh) * 1.45);
+padding: 0 calc(var(--f2-bh) * .36);
+font-size: max(var(--text-min), calc(var(--f2-bh) * .32));
+color: var(--prim-art-ink);
+}
+#app #screen-story .cut-skip[hidden] { display: none; }
+@media (min-aspect-ratio: 1/1) {
+#app #cut-bar { padding: calc(var(--stage-u) * 22) calc(var(--stage-u) * 28) calc(var(--stage-u) * 18); }
+#app #cut-bar .cut-line { font-size: max(var(--text-min), calc(var(--stage-u) * 21)); }
+#app #cut-bar .cut-who.kit-pill-v2 { --f2-bh: calc(var(--stage-u) * 34); left: calc(var(--stage-u) * 24); }
+#app #screen-story .cut-skip.kit-pill-v2 { --f2-bh: max(var(--touch-min), calc(var(--stage-u) * 44)); }
+}
+#app .bb-center .mp-txt > i[data-two] { white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.05; }
+#app .bb-center .mp-txt > i[data-two] > .mp-chk { display: block; font-size: inherit; font-weight: 600; line-height: 1; }
+#app .bb-center .mp-txt > i[data-two] > .mp-chn { display: block; white-space: nowrap; line-height: 1.05; }
+@media (min-aspect-ratio: 1/1) {
+#app :is(#modal-minimap, #modal-theater) .sheet {
+--pw: min(calc(var(--stage-u) * 620), 100%);
+--jbox-w: calc(var(--stage-u) * 430);
+--jbox-radius: calc(var(--stage-u) * 40);
+--jbox-bw: calc(var(--stage-u) * 1.5);
+}
+}
+#app :is(#mm-grid, #th-grid)[data-cols="5"] { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+#app :is(#mm-grid, #th-grid)[data-cols="4"] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+#app :is(#mm-grid, #th-grid)[data-cols="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 </style>
 </body>
 </html>
