@@ -15876,7 +15876,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
       <!-- [판정판 126 · Task 126] 판 화면(클래식 · 아케이드 · 타임러시 · 데일리) 단추 판 = 킷 코드 단추 한 장(.act-plate.kit-btn-v2 — 단추 상자를 덮는 맨 밑 층 ·
            색 토큰만 단추마다). 옛 9조각 그림 판(lib-btn-*)은 은퇴. 전투에서는 메달 그림이 판이라 display:none(CSS 「액션바 스킨」 절). -->
       <button id="btn-add" data-part="btn-medal" data-variant="attack" class="act" data-i18n-aria="aria.add" aria-label="Add remaining numbers to the board"><i class="act-plate kit-btn-v2" data-kind="secondary" aria-hidden="true"></i><i class="act-hit" aria-hidden="true"></i><span class="act-ico"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-add"/></svg></span><span class="act-t" data-i18n="act.add">Add</span><span id="add-badge" class="act-badge">5</span></button>
-      <!-- [판정판 130 · Task 8e] 전투 스킬 단추 셋(각성 · 펫소환 · 스킬)의 후광(.act-halo — 시안 2 · 3 「스킬 단추 후광 연출」): 금 고리 + 은은한 빛 상시 ·
+      <!-- [판정판 130 · Task 8e] 전투 스킬 단추 셋(각성 · 펫소환 · 스킬)의 후광(.act-halo — 시안 2 · 3 「스킬 단추 후광 연출」): 금 고리 + 은은한 빛(세기 = 게이지 비율 — 판정판 131 · 펫소환은 0) ·
            .urge(쓸 수 있음)일 때만 도는 빛줄기(.ah-rays) + 별빛(.ah-spark) · 쓴 순간 커지며 사라짐(.halo-pop). 코드로만(CSS 「play-8e」 4절).
            전투가 아니면 display:none(다른 모드 단추 무변). 공격 단추(btn-add)는 전투에서 은퇴라 후광이 없다. -->
       <button id="btn-hint" data-part="btn-medal" data-variant="special" class="act" data-i18n-aria="aria.hint" aria-label="Show a hint"><i class="act-plate kit-btn-v2" data-kind="secondary" aria-hidden="true"></i><i class="act-hit" aria-hidden="true"></i><i class="act-halo" aria-hidden="true"><i class="ah-rays"></i><i class="ah-spark ah-spark--1"></i><i class="ah-spark ah-spark--2"></i></i><span class="act-ico"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-hint"/></svg></span><span class="act-t" data-i18n="act.hint">Hint</span><span id="hint-badge" class="act-badge">3</span></button>
@@ -45447,6 +45447,13 @@ window.TT_SFX = {
      매 syncHud 마다 되돌리면 endless/daily/rush 가 이 절의 비용을 늘 치른다. */
   var actBattleLabels = false;
 
+  /* [Task 131] 단추 후광 세기 --ah-k(0~1, 소수 둘째 자리) — setCls 처럼 바뀔 때만 쓴다(매 syncHud 마다 style 속성을 다시 쓰지 않는다). */
+  function setHaloK(btn, k) {
+    if (!btn || !btn.style) return;
+    var v = String(Math.round(clamp(k, 0, 1) * 100) / 100);
+    if (btn.__ahK !== v) { btn.__ahK = v; btn.style.setProperty('--ah-k', v); }
+  }
+
   /**
    * 네 버튼의 배지·활성·라벨을 duel 상태로 덮어쓴다. syncHud 의 기존 블록이
    * 먼저 다 돌고 **그 위에** 얹히므로, 비전투 경로는 한 글자도 달라지지 않는다.
@@ -45481,6 +45488,11 @@ window.TT_SFX = {
       setCls(bsh, 'urge', gFull);
       setCls(bsh, 'primed', gaugeFull() && !!S.skillKind);
     }
+    /* [판정판 131 · Task 131 — 사용자 반려 2026-10-21 「게이지가 쌓이면 후광이 빛나게」] 후광 세기 = 게이지 비율(0~1)을 단추의 --ah-k 로 넘긴다 —
+       .act-halo 의 opacity 가 읽는다(CSS 「play-8e」 4절). 각성 = duelSpPct · 스킬 = duelGaugePct · 펫소환 = 게이지가 없어 늘 0. */
+    setHaloK(bh, duelSpPct() / 100);
+    setHaloK(bu, 0);
+    setHaloK(bsh, duelGaugePct() / 100);
     /* 0910 판정판 14 — 전투에서의 「만땅 대기」. 버튼의 `urge` 와 **같은 사실**을
        HUD 초상 쪽에도 흘려 준다(gFull 을 다시 계산하지 않는다 = 두 신호가 갈릴
        수 없다). 지속 중(#app.skill)은 applySkill 이 든다. */
@@ -73417,7 +73429,10 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
 }
 
 /* ---- 4. 스킬 단추 후광(.act-halo — 시안 2 · 3) ------------------------------------------------------
-   금 고리(단추 뒤 원형 테) + 은은한 빛 = 상시 · 도는 빛줄기(.ah-rays — conic 을 radial 로 가린 판, transform rotate) + 별빛 = .urge 일 때만 ·
+   [판정판 131 · Task 131 — 사용자 반려 2026-10-21 「게이지가 쌓이면 후광이 빛나게 · 처음부터 후광이 그림으로 있는 건 잘못」]
+   금 고리(단추 뒤 원형 테) + 은은한 빛의 세기 = 게이지 비율(--ah-k 0~1 — syncBattleActs 가 단추에 넘긴다: 각성 = duelSpPct · 스킬 = duelGaugePct ·
+   펫소환 = 게이지가 없어 늘 0). 0% 는 안 보이고 100% 는 옛 상시 세기 그대로 · 사이는 비례 · 바뀔 때 opacity 전이 --dur-2 --ease(움직임 줄이기 = 전이 0).
+   도는 빛줄기(.ah-rays — conic 을 radial 로 가린 판, transform rotate) + 별빛 = .urge 일 때만 ·
    .primed(지속 중 다음 것이 참)은 지금 신호(단추 쪽)를 유지하고 빛줄기만 약하게 · 쓴 순간(.halo-pop) 후광이 커지며 사라진다(scale 1→1.4 · 1→0, --dur-2).
    자리 = 메달 그림의 돔 가운데(그림 360×455 에서 돔 가운데 y 44% · 돔 폭 = 그림 높이 .69) · 지름 = 그림 높이 .92(가로 두루마리 메달 .98) — 고리(지름의
    74~91%)가 돔 바로 바깥에 선다(시안 zoom-gauge-52v53). 메달 그림(::before)보다 아래(z -1 · 단추 쌓임 안). */
@@ -73438,6 +73453,8 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
   background-image:
     radial-gradient(closest-side, transparent 74%, var(--prim-art-gold) 78%, var(--prim-art-gold-e) 86%, transparent 91%),
     radial-gradient(closest-side, color-mix(in srgb, var(--role-rw-star-2) calc(var(--mo-mk-55) * 100%), transparent) 55%, transparent 100%);
+  opacity: var(--ah-k, var(--mo-mk-0));
+  transition: opacity var(--dur-2) var(--ease);
 }
 #app.battle #actionbar .act .act-halo .ah-rays {
   position: absolute;
@@ -74044,6 +74061,9 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
   #app.battle #actionbar .act .act-halo .ah-rays,
   #app.battle #actionbar .act .act-halo .ah-spark { animation: none !important; }
   #app.battle #actionbar .act.urge .act-halo .ah-spark { opacity: var(--mo-mk-100); }
+  /* [Task 131] 후광 세기(게이지 비율)는 전이 없이 값만 바뀐다(MOTION-SPEC §3 31행 — 9행 게이지 값 변화와 같은 대체).
+     !important = 전역 리셋(15절 transition-duration 80ms · I 절 속성 화이트리스트 — 둘 다 !important)보다 앞서려고. */
+  #app.battle #actionbar .act .act-halo { transition: none !important; }
 }
 </style>
 <style id="gear-121">
