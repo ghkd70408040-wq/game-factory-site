@@ -73068,10 +73068,13 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
        그림은 ::before contain · 아래 가운데라 크기 그대로이고, 상자만 명패가 이웃 상자에 안 걸릴 만큼 넓어진다(배지는 그림 기준 — 아래 right 식).
        명패 폭 = 명패 글자(--bt-np-fs) × --bt-np-em — 가장 긴 명패를 글자 단위로 잰 값(ko 「펫소환」 2.96 · en 「Awaken」 3.75 — 821 · 844 · 1280 실측)에
        여유를 둔 3.0 · 3.8. 결과: 상자 사이 ≤ 그림 폭의 .139(관문 가로 .15) · 명패끼리 · 명패↔이웃 상자 겹침 0.
-       ko 1280 이상은 그림 폭이 이겨 그대로 · 821×462 · 844×390 은 메달 그림이 서로 가까워진다 · en 1280 은 조금 벌어진다. */
+       ko 1280 이상은 그림 폭이 이기거나 조금 넓어진다 · 821×462 · 844×390 은 메달 그림이 서로 가까워진다 · en 1280 은 조금 벌어진다.
+       [수정 1회차 — 지휘자 눈 확인 「821 · 844 ko 각성 · 펫소환 명패가 붙어 보임」(844 ko 명패 사이 0.39px)] 명패 최소 틈 --bt-np-gap = 명패 글자 × .35
+       (11px 에서 3.85px · 폰 가로 DPR 3 에서 장치 화소 약 12) 를 더한다: 상자 폭 = max(그림 폭, 가장 긴 명패 − 틈 + 명패 최소 틈) → 명패 사이 ≥ 명패 최소 틈. */
     --bt-np-fs: max(var(--text-min), calc(var(--bu) * 18));
     --bt-np-em: 3.0;
-    --bt-medal-tw: max(var(--bt-medal-w), calc(var(--bt-np-fs) * var(--bt-np-em) - var(--bt-medal-g)));
+    --bt-np-gap: .35;
+    --bt-medal-tw: max(var(--bt-medal-w), calc(var(--bt-np-fs) * (var(--bt-np-em) + var(--bt-np-gap)) - var(--bt-medal-g)));
     position: absolute;
     left: calc(var(--bt-x0) + var(--bu) * 979);
     top: calc(var(--bt-y0) + var(--bu) * 531);
