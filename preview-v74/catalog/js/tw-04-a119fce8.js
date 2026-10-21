@@ -14859,9 +14859,27 @@ var MAP_GATES = [
 [94.00, 71.20, 8.00, 2.96, '--node-jelly-1'],   //  9 우측 기둥 옆 — 10챕터 방면
 [50.00, 40.20, 8.50, 3.15, '--node-jelly-1']    // 10 스테인드글라스 단상 — 최종 목적지
 ];
+var MAP_WIDE_GEO = { w: 2600, h: 1271, x0: 1006, cw: 587 };
+function mapWideArt(c) {
+var ch = MAP_CHAPTERS[(c || mapChap) - 1];
+if (!ch || !ch.wide || typeof window === 'undefined' || !window.matchMedia) return '';
+return window.matchMedia('(min-aspect-ratio: 1/1)').matches ? ch.wide : '';
+}
+function mapWideXY(a) {
+var g = MAP_WIDE_GEO;
+return [(g.x0 + a[0] / 100 * g.cw) / g.w * 100, a[1], a[2] * g.cw / g.w, a[3], a[4]];
+}
 function mapAnchors(c) {
 if (SIAN_MAP) return SIAN_SLOTS;   // 시안 판은 챕터와 무관하게 같은 6칸을 재사용한다
-return MAP_ANCHORS_CH[Math.min(Math.max(1, c || mapChap), MAP_ANCHORS_CH.length) - 1];
+var k = Math.min(Math.max(1, c || mapChap), MAP_ANCHORS_CH.length);
+return mapWideArt(k) ? MAP_ANCHORS_CH[k - 1].map(mapWideXY) : MAP_ANCHORS_CH[k - 1];
+}
+function mapWideSync() {
+var l = $('map-layer');
+if (!l || !l.getAttribute) return;
+if ((l.getAttribute('data-ar') === 'wide') === !!mapWideArt(mapChap)) return;
+buildMap();
+mapCenterCurrent();
 }
 function mapLowBottom(c) {
 var a = mapAnchors(c), m = 0;
@@ -14874,22 +14892,23 @@ var MAP_CHAPTERS = [
 { img: '',                 ar: '',           zoom: 1.00, x: '0%', tint: '#F5A97C', alpha: 0.08 },  //  3 캔디 케인 사막
 { img: '',                 ar: '',           zoom: 1.00, x: '0%', tint: '#8FE3C8', alpha: 0.08 },  //  4 박하 언덕
 { img: '',                 ar: '',           zoom: 1.00, x: '0%', tint: '#A9713F', alpha: 0.08 },  //  5 초코 관문
-{ img: '--art-map-ch06',   ar: '780/1688',   zoom: 1.00, x: '0%', tint: '',        alpha: 0    },  //  6 크림 회랑
+{ img: '--art-map-ch06',   ar: '780/1688',   zoom: 1.00, x: '0%', tint: '',        alpha: 0,    wide: '--art-map-ch06-w' },  //  6 크림 회랑
 { img: '',                 ar: '',           zoom: 1.00, x: '0%', tint: '#E0A64B', alpha: 0.08 },  //  7 시럽 미로
-{ img: '--art-map-ch08',   ar: '780/1688',   zoom: 1.00, x: '0%', tint: '#EFD9E6', alpha: 0.06 },  //  8 설탕 감옥
-{ img: '--art-map-ch09',   ar: '780/1688',   zoom: 1.00, x: '0%', tint: '',        alpha: 0    },  //  9 심장의 방
-{ img: '--art-map-ch10',   ar: '780/1688',   zoom: 1.00, x: '0%', tint: '',        alpha: 0    }   // 10 왕좌
+{ img: '--art-map-ch08',   ar: '780/1688',   zoom: 1.00, x: '0%', tint: '#EFD9E6', alpha: 0.06, wide: '--art-map-ch08-w' },  //  8 설탕 감옥
+{ img: '--art-map-ch09',   ar: '780/1688',   zoom: 1.00, x: '0%', tint: '',        alpha: 0,    wide: '--art-map-ch09-w' },  //  9 심장의 방
+{ img: '--art-map-ch10',   ar: '780/1688',   zoom: 1.00, x: '0%', tint: '',        alpha: 0,    wide: '--art-map-ch10-w' }   // 10 왕좌
 ];
 var mapPre = {};
 function mapPreloadChapterArt(c) {
 if (typeof Image === 'undefined') return;
 var ch = MAP_CHAPTERS[(c | 0) - 1];
-if (!ch || !ch.img || mapPre[ch.img]) return;
+var img = ch && (mapWideArt(c | 0) || ch.img);   /* [Task 7d] 가로 창이면 그 챕터가 실제로 깔 넓은 그림을 묻는다 */
+if (!img || mapPre[img]) return;
 var raw = (typeof getComputedStyle !== 'undefined' && document.documentElement)
-? getComputedStyle(document.documentElement).getPropertyValue(ch.img).trim() : '';
+? getComputedStyle(document.documentElement).getPropertyValue(img).trim() : '';
 var m = /^url\((['"]?)([^'")]+)\1\)$/.exec(raw);
-if (!m || m[2].indexOf('data:') === 0) { mapPre[ch.img] = 1; return; }
-mapPre[ch.img] = 1;
+if (!m || m[2].indexOf('data:') === 0) { mapPre[img] = 1; return; }
+mapPre[img] = 1;
 try { var im = new Image(); im.src = m[2]; } catch (e) { /* 화면과 무관 */ }
 }
 var mapChap = 1;          // 지금 보고 있는 챕터 (1-base)
@@ -14975,6 +14994,7 @@ root.appendChild(makeMapNode(first + i, i));
 }
 }
 var gate = MAP_GATES[mapChap - 1] || MAP_GATES[0];
+if (mapWideArt(mapChap)) gate = mapWideXY(gate);   /* [Task 7d] 넓은 그림이면 관문 표지도 같은 식으로 옮긴다(노드와 한 좌표계) */
 var g = document.createElement('span');
 g.className = 'map-node st-gate';
 g.setAttribute('aria-hidden', 'true');
@@ -14991,14 +15011,13 @@ if (layer && layer.style) {
 layer.style.setProperty('--bgz', String(ch.zoom));
 layer.style.setProperty('--bgx', ch.x);
 layer.style.setProperty('--map-n1b', (mapLowBottom(mapChap) / 100).toFixed(4));
-layer.style.aspectRatio = ch.ar || '2600 / 1272';
-if (ch.img) layer.style.backgroundImage = 'var(' + ch.img + ')';
+var wide = mapWideArt(mapChap);
+layer.style.aspectRatio = wide ? (MAP_WIDE_GEO.w + ' / ' + MAP_WIDE_GEO.h) : (ch.ar || '2600 / 1272');
+if (wide) layer.style.backgroundImage = 'var(' + wide + ')';
+else if (ch.img) layer.style.backgroundImage = 'var(' + ch.img + ')';
 else layer.style.backgroundImage = '';
-var arp = String(ch.ar || '2600/1272').split('/');
-if ((parseFloat(arp[0]) || 1) < (parseFloat(arp[1]) || 1)) layer.setAttribute('data-ar', 'tall');
+if (wide) layer.setAttribute('data-ar', 'wide');
 else layer.removeAttribute('data-ar');
-var view = $('map-view');
-if (view && view.style) view.style.setProperty('--map-art', ch.img ? 'var(' + ch.img + ')' : 'var(--art-map-bg)');
 }
 var tint = $('map-tint');
 if (tint && tint.style) {
@@ -17731,8 +17750,9 @@ if (resizeSettle) clearTimeout(resizeSettle);
 resizeSettle = setTimeout(function () { resizeSettle = 0; layout(); }, 420);
 var ms = $('screen-map');
 if (ms && ms.classList && ms.classList.contains('active')) {
+mapWideSync();
 mapFit();
-later(mapFit, 440);   // iOS 회전 직후의 낡은 뷰포트 값 대비 (layout() 과 같은 이유)
+later(function () { mapWideSync(); mapFit(); }, 440);   // iOS 회전 직후의 낡은 뷰포트 값 대비 (layout() 과 같은 이유)
 }
 }
 function wire() {
