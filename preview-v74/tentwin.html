@@ -556,8 +556,8 @@ animation-duration: 620ms;
 50%    { opacity:1;   transform:scale(1.045); }
 }
 @keyframes awk-av-glow{
-0%,100%{ filter: var(--dh-av-me-drop) drop-shadow(0 0 6px  var(--role-mint-face-a)) drop-shadow(0 0 14px var(--role-mint-face-b)); }
-50%    { filter: var(--dh-av-me-drop) drop-shadow(0 0 11px var(--role-mint-face-a)) drop-shadow(0 0 24px var(--role-mint-face-b)); }
+0%,100%{ opacity: var(--mo-mk-0); }
+50%    { opacity: var(--mo-mk-100); }
 }
 #app.skill #hero-slot::after,
 #app.skill-full #hero-slot::after{
@@ -574,8 +574,34 @@ animation: awk-av-ring 1.15s ease-in-out infinite;
 box-shadow: 0 0 6px 1px var(--role-mint-face-a), 0 0 13px 3px var(--role-mint-face-b);
 animation-duration: 2.3s;
 }
-#app.battle.skill #duel-hud .dh-av-me      { --dh-av-awk: awk-av-glow 1.15s ease-in-out infinite; }
-#app.battle.skill-full #duel-hud .dh-av-me { --dh-av-awk: awk-av-glow 2.3s  ease-in-out infinite; }
+#app.battle.skill #duel-hud .dh-av-me,
+#app.battle.skill-full #duel-hud .dh-av-me { filter: none; }
+#app.battle.skill #duel-hud .dh-av-me      { --awk-dur: 1.15s; }
+#app.battle.skill-full #duel-hud .dh-av-me { --awk-dur: 2.3s; }
+#app.battle.skill #duel-hud .dh-av-me::before,
+#app.battle.skill #duel-hud .dh-av-me::after,
+#app.battle.skill-full #duel-hud .dh-av-me::before,
+#app.battle.skill-full #duel-hud .dh-av-me::after {
+content: "";
+position: absolute;
+inset: 0;
+z-index: -1;
+pointer-events: none;
+background-image: inherit;
+background-size: inherit;
+background-position: inherit;
+background-repeat: inherit;
+animation: awk-av-glow var(--awk-dur) ease-in-out infinite;
+}
+#app.battle.skill #duel-hud .dh-av-me::before,
+#app.battle.skill-full #duel-hud .dh-av-me::before {
+filter: var(--dh-av-me-drop) drop-shadow(0 0 6px var(--role-mint-face-a)) drop-shadow(0 0 14px var(--role-mint-face-b));
+animation-delay: calc(var(--awk-dur) / -2);
+}
+#app.battle.skill #duel-hud .dh-av-me::after,
+#app.battle.skill-full #duel-hud .dh-av-me::after {
+filter: var(--dh-av-me-drop) drop-shadow(0 0 11px var(--role-mint-face-a)) drop-shadow(0 0 24px var(--role-mint-face-b));
+}
 #app.mg  #duel-hud .dh-av-me { filter: var(--dh-av-me-drop) drop-shadow(0 0 14px rgba(255, 150, 40, .55)); }
 #app.mg2 #duel-hud .dh-av-me { filter: var(--dh-av-me-drop) drop-shadow(0 0 20px rgba(255, 90, 30, .65)); }
 @media (prefers-reduced-motion: reduce){
@@ -583,6 +609,10 @@ animation-duration: 2.3s;
 #app.skill-full #hero-slot::after,
 #app.battle.skill #duel-hud .dh-av-me,
 #app.battle.skill-full #duel-hud .dh-av-me{ animation: none; }
+#app.battle.skill #duel-hud .dh-av-me::before,
+#app.battle.skill #duel-hud .dh-av-me::after,
+#app.battle.skill-full #duel-hud .dh-av-me::before,
+#app.battle.skill-full #duel-hud .dh-av-me::after{ display: none; }   /* [Task 126] 엇갈리는 두 겹은 끄고 아래 정적 빛(9/19) 한 줄이 맡는다 */
 #app.skill #hero-slot::after,
 #app.skill-full #hero-slot::after{ opacity: .9; }
 #app.battle.skill #duel-hud .dh-av-me,
@@ -8179,21 +8209,42 @@ background-color: transparent !important;
 }
 #actionbar > .act { position: relative; z-index: 1; }
 .act {
+--act-bw-t: 15px; --act-bw-r: 17px; --act-bw-b: 18px; --act-bw-l: 17px;
+--act-min-h: 52px;
 gap: 1px;
-min-height: 52px;
+min-height: var(--act-min-h);
 padding: 0 2px;
 border-style: solid;
-border-width: 15px 17px 18px 17px;
+border-color: transparent;
+border-width: var(--act-bw-t) var(--act-bw-r) var(--act-bw-b) var(--act-bw-l);
 border-radius: 0;
 background: none;
 box-shadow: none;
 color: #FFFFFF;
 text-shadow: 0 1.5px 0 rgba(110, 70, 58, .6);
 }
-#btn-add     { border-image: var(--lib-btn-mint) 32 39 38 39 fill stretch; }
-#btn-hint    { border-image: var(--lib-btn-yellow) 32 39 39 39 fill stretch; }
-#btn-undo    { border-image: var(--lib-btn-purple) 31 39 37 39 fill stretch; }
-#btn-shuffle { border-image: var(--lib-btn-pink) 29 41 35 41 fill stretch; }
+#actionbar .act > .act-plate {
+position: absolute;
+inset: calc(var(--act-bw-t) * -1) calc(var(--act-bw-r) * -1) calc(var(--act-bw-b) * -1) calc(var(--act-bw-l) * -1);
+z-index: -1;
+height: auto;
+min-width: 0;
+padding: 0;
+pointer-events: none;
+--f2-bh: var(--act-min-h);
+--f2-br: calc(var(--f2-bh) * .155);
+}
+@supports (top: round(down, 1.5px, 1px)) {
+#actionbar .act > .act-plate {
+inset: calc(round(down, var(--act-bw-t), 1px) * -1) calc(round(down, var(--act-bw-r), 1px) * -1)
+calc(round(down, var(--act-bw-b), 1px) * -1) calc(round(down, var(--act-bw-l), 1px) * -1);
+}
+}
+#btn-add > .act-plate     { --f2-c1: var(--role-sky-face-a);    --f2-c2: var(--role-sky-face-b);    --f2-cl: var(--role-sky-outline); }
+#btn-hint > .act-plate    { --f2-c1: var(--role-yellow-face-a); --f2-c2: var(--role-yellow-face-b); --f2-cl: var(--role-yellow-outline); }
+#btn-undo > .act-plate    { --f2-c1: var(--role-purple-face-a); --f2-c2: var(--role-purple-face-b); --f2-cl: var(--role-purple-outline); }
+#btn-shuffle > .act-plate { --f2-c1: var(--role-pink-face-a);   --f2-c2: var(--role-pink-face-b);   --f2-cl: var(--role-pink-outline); }
+#app.battle #actionbar .act > .act-plate { display: none; }
 .act:active { transform: scale(.94); background: none; }
 .act .act-t {
 padding: 1px 7px 2px;
@@ -8225,7 +8276,7 @@ box-shadow: 0 0 0 2px rgba(110, 70, 58, .55);
 #hint-badge, #undo-badge { background: var(--mL-face-a); }
 .act.off .act-badge { background: rgba(253, 243, 220, .5); color: rgba(92, 64, 51, .6); }
 @media (max-width: 400px) {
-.act { border-width: 13px 12px 15px 12px; }
+.act { --act-bw-t: 13px; --act-bw-r: 12px; --act-bw-b: 15px; --act-bw-l: 12px; }
 .act .act-t { font-size: 10px; padding: 1px 5px 2px; }
 }
 @media (max-height: 739px) {
@@ -9212,7 +9263,7 @@ filter: drop-shadow(0 0 10px rgba(102, 240, 159, .40));
 <link rel="preload" as="image" href="catalog/jelly-box-c.webp">
 <link rel="preload" as="image" href="catalog/duel-title-play.webp">
 <!-- ==RELEASE:BEGIN== 출시 메타 (scratchpad/release-0908/apply-head.py 가 생성·교체, 본문 무접촉) -->
-<meta name="build" content="108e7da-20261021-0921">
+<meta name="build" content="bd6ae75-20261021-1057">
 <meta name="application-name" content="텐트윈 젤리팡 월드">
 <meta name="description" lang="ko" content="숫자 젤리를 골라 10을 만들어 터뜨리는 퍼즐이에요. 모험·아케이드·데일리·타임 러시·클래식을 즐겨요. Ten Twin Jelly Pang World: pick number jellies that equal or sum to 10.">
 <link rel="manifest" href="tentwin.webmanifest">
@@ -9266,7 +9317,7 @@ navigator.serviceWorker.register('sw.js',{scope:'./'}).catch(function(e){console
 })}
 </script>
 <!-- ==RELEASE:END== -->
-<link rel="preload" as="style" href="tw-late-96ce1fa8.css">
+<link rel="preload" as="style" href="tw-late-bd1b811b.css">
 </head>
 <body>
 <!-- ============================================================
@@ -10366,15 +10417,17 @@ lib-hud-bar.webp 를 쓰고 있었다(정본 판을 입은 클래식·전투에�
 뒤집으면 「아랫변이 없는 판」이 되어 화면 밑에 붙는 형태가 그대로 나온다. -->
 <footer id="actionbar" data-part="hud" data-variant="actionbar">
 <i class="dh-plate dh-plate--top" data-part="hud-plate" data-variant="top" data-flip="y" aria-hidden="true"></i>
-<button id="btn-add" data-part="btn-medal" data-variant="attack" class="act" data-i18n-aria="aria.add" aria-label="Add remaining numbers to the board"><i class="act-hit" aria-hidden="true"></i><span class="act-ico"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-add"/></svg></span><span class="act-t" data-i18n="act.add">Add</span><span id="add-badge" class="act-badge">5</span></button>
+<!-- [판정판 126 · Task 126] 판 화면(클래식 · 아케이드 · 타임러시 · 데일리) 단추 판 = 킷 코드 단추 한 장(.act-plate.kit-btn-v2 — 단추 상자를 덮는 맨 밑 층 ·
+색 토큰만 단추마다). 옛 9조각 그림 판(lib-btn-*)은 은퇴. 전투에서는 메달 그림이 판이라 display:none(CSS 「액션바 스킨」 절). -->
+<button id="btn-add" data-part="btn-medal" data-variant="attack" class="act" data-i18n-aria="aria.add" aria-label="Add remaining numbers to the board"><i class="act-plate kit-btn-v2" data-kind="secondary" aria-hidden="true"></i><i class="act-hit" aria-hidden="true"></i><span class="act-ico"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-add"/></svg></span><span class="act-t" data-i18n="act.add">Add</span><span id="add-badge" class="act-badge">5</span></button>
 <!-- [판정판 130 · Task 8e] 전투 스킬 단추 셋(각성 · 펫소환 · 스킬)의 후광(.act-halo — 시안 2 · 3 「스킬 단추 후광 연출」): 금 고리 + 은은한 빛 상시 ·
 .urge(쓸 수 있음)일 때만 도는 빛줄기(.ah-rays) + 별빛(.ah-spark) · 쓴 순간 커지며 사라짐(.halo-pop). 코드로만(CSS 「play-8e」 4절).
 전투가 아니면 display:none(다른 모드 단추 무변). 공격 단추(btn-add)는 전투에서 은퇴라 후광이 없다. -->
-<button id="btn-hint" data-part="btn-medal" data-variant="special" class="act" data-i18n-aria="aria.hint" aria-label="Show a hint"><i class="act-hit" aria-hidden="true"></i><i class="act-halo" aria-hidden="true"><i class="ah-rays"></i><i class="ah-spark ah-spark--1"></i><i class="ah-spark ah-spark--2"></i></i><span class="act-ico"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-hint"/></svg></span><span class="act-t" data-i18n="act.hint">Hint</span><span id="hint-badge" class="act-badge">3</span></button>
-<button id="btn-undo" data-part="btn-medal" data-variant="pet" class="act" data-i18n-aria="aria.undo" aria-label="Undo last match"><i class="act-hit" aria-hidden="true"></i><i class="act-halo" aria-hidden="true"><i class="ah-rays"></i><i class="ah-spark ah-spark--1"></i><i class="ah-spark ah-spark--2"></i></i><span class="act-ico"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-undo"/></svg></span><span class="act-t" data-i18n="act.undo">Undo</span><span id="undo-badge" class="act-badge">1</span></button>
+<button id="btn-hint" data-part="btn-medal" data-variant="special" class="act" data-i18n-aria="aria.hint" aria-label="Show a hint"><i class="act-plate kit-btn-v2" data-kind="secondary" aria-hidden="true"></i><i class="act-hit" aria-hidden="true"></i><i class="act-halo" aria-hidden="true"><i class="ah-rays"></i><i class="ah-spark ah-spark--1"></i><i class="ah-spark ah-spark--2"></i></i><span class="act-ico"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-hint"/></svg></span><span class="act-t" data-i18n="act.hint">Hint</span><span id="hint-badge" class="act-badge">3</span></button>
+<button id="btn-undo" data-part="btn-medal" data-variant="pet" class="act" data-i18n-aria="aria.undo" aria-label="Undo last match"><i class="act-plate kit-btn-v2" data-kind="secondary" aria-hidden="true"></i><i class="act-hit" aria-hidden="true"></i><i class="act-halo" aria-hidden="true"><i class="ah-rays"></i><i class="ah-spark ah-spark--1"></i><i class="ah-spark ah-spark--2"></i></i><span class="act-ico"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-undo"/></svg></span><span class="act-t" data-i18n="act.undo">Undo</span><span id="undo-badge" class="act-badge">1</span></button>
 <!-- v4 A-2: re-deal the living tiles when the board is locked. The bar now
 holds FOUR .act buttons; .act is `flex:1 1 0`, so they simply share the row. -->
-<button id="btn-shuffle" data-part="btn-medal" data-variant="awaken" class="act" data-i18n-aria="aria.shuffle" aria-label="Shuffle the board"><i class="act-hit" aria-hidden="true"></i><i class="act-halo" aria-hidden="true"><i class="ah-rays"></i><i class="ah-spark ah-spark--1"></i><i class="ah-spark ah-spark--2"></i></i><span class="act-ico"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-shuffle"/></svg></span><span class="act-t" data-i18n="act.shuffle">Shuffle</span><span id="shuffle-badge" class="act-badge">1</span></button>
+<button id="btn-shuffle" data-part="btn-medal" data-variant="awaken" class="act" data-i18n-aria="aria.shuffle" aria-label="Shuffle the board"><i class="act-plate kit-btn-v2" data-kind="secondary" aria-hidden="true"></i><i class="act-hit" aria-hidden="true"></i><i class="act-halo" aria-hidden="true"><i class="ah-rays"></i><i class="ah-spark ah-spark--1"></i><i class="ah-spark ah-spark--2"></i></i><span class="act-ico"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-shuffle"/></svg></span><span class="act-t" data-i18n="act.shuffle">Shuffle</span><span id="shuffle-badge" class="act-badge">1</span></button>
 </footer>
 </section>
 <!-- W9 PC 와이드 배경판. 세 스크린보다 **뒤**에 놓아야 일반 형제
@@ -12488,7 +12541,7 @@ width/height 0 + aria-hidden: 레이아웃·접근성 트리에 아무것도 더
 
 
 
-<link rel="stylesheet" href="tw-late-96ce1fa8.css">
+<link rel="stylesheet" href="tw-late-bd1b811b.css">
 <style id="compat-p1">
 @supports not (width: 1cqw) {
 #app.classic #classic-hud { --cqw: min(1vw, calc(var(--app-max) / 100)); height: calc(38.5 * var(--cqw)); }
@@ -14373,7 +14426,9 @@ top: calc(var(--bt-my) + var(--bt-hu) * 22.995);
 --bt-medal-h: calc(var(--bu) * 135 / 2.11);
 --bt-medal-w: calc(var(--bt-medal-h) * 718 / 907);
 --bt-medal-g: calc(var(--bt-medal-h) * .11);
---bt-medal-tw: var(--bt-medal-w);
+--bt-np-fs: max(var(--text-min), calc(var(--bu) * 18));
+--bt-np-em: 3.0;
+--bt-medal-tw: max(var(--bt-medal-w), calc(var(--bt-np-fs) * var(--bt-np-em) - var(--bt-medal-g)));
 position: absolute;
 left: calc(var(--bt-x0) + var(--bu) * 979);
 top: calc(var(--bt-y0) + var(--bu) * 531);
@@ -14417,11 +14472,11 @@ font-size: max(var(--text-min), calc(var(--bu) * 17.5)) !important;
 }
 #app.battle #screen-game.active #actionbar .act .act-t {
 padding: 0 calc(var(--bu) * 4);
-font-size: max(var(--text-min), calc(var(--bu) * 18));
+font-size: var(--bt-np-fs);
 max-width: none;
 height: max(32%, calc(var(--text-min) * 1.3));
 }
-html[lang="en"] #app.battle #screen-game.active #actionbar .act .act-t { font-size: max(var(--text-min), calc(var(--bu) * 17.5)); }
+html[lang="en"] #app.battle #screen-game.active #actionbar { --bt-np-fs: max(var(--text-min), calc(var(--bu) * 17.5)); --bt-np-em: 3.8; }
 }
 </style>
 <style id="play-8e">
@@ -14537,7 +14592,7 @@ transform: scale(1.22);
 }
 #app.battle #duel-hud #duel-me-fx { z-index: 7; }
 #app.battle #duel-hud #duel-me-fx > i { position: absolute; display: block; pointer-events: none; }
-#app.battle #duel-hud #duel-me-av { animation: var(--dh-av-awk, none), b8e-breathe var(--dur-amb) ease-in-out infinite alternate; }
+#app.battle #duel-hud #duel-me-av { animation: b8e-breathe var(--dur-amb) ease-in-out infinite alternate; }
 @keyframes b8e-breathe { from { translate: 0 0; } to { translate: 0 -1%; } }
 #app.battle #duel-hud #duel-me-av[data-atk-tier="1"] ~ #duel-me-glow {
 --b8e-glo: var(--mo-mk-35); --b8e-ghi: var(--mo-mk-55);
@@ -14575,7 +14630,7 @@ animation: b8e-orbit calc(var(--dur-amb) * 2) linear infinite;
 }
 #app.battle #duel-hud #duel-me-fx .mfx-spark--2 { animation-delay: calc(var(--dur-amb) * -1) !important; }
 @keyframes b8e-orbit { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-#app.battle #duel-hud #duel-me-av.cast { animation: var(--dh-av-awk, none), b8e-step var(--mo-cast-life) var(--ease-out) 1; }
+#app.battle #duel-hud #duel-me-av.cast { animation: b8e-step var(--mo-cast-life) var(--ease-out) 1; }
 @keyframes b8e-step {
 0%     { translate: 0 0; scale: 1; }
 11.43% { translate: -6% 0; scale: 1.06; }
@@ -14625,7 +14680,7 @@ mask-image: radial-gradient(closest-side, var(--prim-white) 35%, transparent 100
 45%    { opacity: var(--mo-mk-80);  transform: scale(.9) rotate(45deg); }
 100%   { opacity: var(--mo-mk-0);   transform: scale(.6) rotate(70deg); }
 }
-#app.battle #duel-hud #duel-me-av.hit { animation: var(--dh-av-awk, none), b8e-flinch var(--dur-2) var(--ease-out) 1; }
+#app.battle #duel-hud #duel-me-av.hit { animation: b8e-flinch var(--dur-2) var(--ease-out) 1; }
 @keyframes b8e-flinch {
 0%   { rotate: 0deg;  translate: 0 0; }
 30%  { rotate: 5deg;  translate: 4% 0; }
@@ -14718,8 +14773,8 @@ to   { transform: scale(1.4); opacity: var(--mo-mk-0); }
 }
 @media (pointer: coarse) {
 #app.battle #duel-hud #duel-me-fx .mfx-trail--r { display: none !important; }   /* [수정 1 · I3] 시전 마법 띠도 폰은 하나(왼쪽 — 악당 쪽으로 휘감는 띠) */
-#app.battle #duel-hud #duel-me-av { animation: var(--dh-av-awk, none); }
-#app.battle #duel-hud #duel-me-av.cast { animation: var(--dh-av-awk, none), b8e-step-t var(--mo-cast-life) var(--ease-out) 1; }
+#app.battle #duel-hud #duel-me-av { animation: none; }
+#app.battle #duel-hud #duel-me-av.cast { animation: b8e-step-t var(--mo-cast-life) var(--ease-out) 1; }
 @keyframes b8e-step-t {
 0%     { translate: 0 0; }
 11.43% { translate: -6% 0; }
@@ -15010,7 +15065,7 @@ padding: 0;
 margin: 0;
 }
 #app.classic #screen-game.active #actionbar { grid-template-columns: var(--bt-medal-tw); }
-:is(#app.battle, #app:not(.battle)) #screen-game.active #actionbar {
+#app:not(.battle) #screen-game.active #actionbar {
 column-gap: max(var(--bt-medal-g), calc(var(--text-min) * 4.5 - var(--bt-medal-w))) !important;
 }
 @media (pointer: coarse) {
@@ -15037,9 +15092,13 @@ flex: none;
 width: var(--bt-medal-tw);
 height: var(--bt-medal-h);
 min-height: 0;
-border-width: calc(var(--bt-medal-h) * .234) calc(var(--bt-medal-h) * .266) calc(var(--bt-medal-h) * .281);
+--act-bw-t: calc(var(--bt-medal-h) * .234);
+--act-bw-r: calc(var(--bt-medal-h) * .266);
+--act-bw-b: calc(var(--bt-medal-h) * .281);
+--act-bw-l: var(--act-bw-r);
 justify-content: flex-start;
 }
+#app:not(.battle) #screen-game.active #actionbar .act > .act-plate { --f2-bh: var(--bt-medal-h); }
 #app:not(.battle) #screen-game.active #actionbar .act .act-ico .ic { width: calc(var(--bt-medal-h) * .33); height: calc(var(--bt-medal-h) * .33); }
 #app:not(.battle) #screen-game.active #actionbar .act .act-t {
 position: absolute;
