@@ -961,9 +961,11 @@ button {
   0%,100%{ opacity:.72; transform:scale(1);     }
   50%    { opacity:1;   transform:scale(1.045); }
 }
+/* [판정판 126 · Task 126] 초상 빛은 opacity 만 움직인다(움직임 규칙 — filter 애니메이트 금지). 옛 키프레임은 filter 반경(6→11 · 14→24px)을
+   움직였다. 지금은 빛 두 겹(정적 filter — 아래 「전투 HUD」 절)이 서로 엇갈려 나타났다 사라진다. */
 @keyframes awk-av-glow{
-  0%,100%{ filter: var(--dh-av-me-drop) drop-shadow(0 0 6px  var(--role-mint-face-a)) drop-shadow(0 0 14px var(--role-mint-face-b)); }
-  50%    { filter: var(--dh-av-me-drop) drop-shadow(0 0 11px var(--role-mint-face-a)) drop-shadow(0 0 24px var(--role-mint-face-b)); }
+  0%,100%{ opacity: var(--mo-mk-0); }
+  50%    { opacity: var(--mo-mk-100); }
 }
 /* 모험 HUD — 원형 캡슐. z-index 0 이라 링(2)·마스코트(1) **뒤**에 앉는다:
    빛은 캡슐을 덮는 것이 아니라 캡슐 뒤에서 새어 나와야 테두리 키색이 산다. */
@@ -985,10 +987,40 @@ button {
 /* 전투 HUD — 그림 실루엣을 따르는 빛. 각성이 폭주(mg/mg2)를 이기는 것은
    의도다: 폭주는 몇십 초를 가는 상태이고 각성은 7~10초짜리 사건이라, 겹치는
    순간에 말해야 하는 것은 방금 일어난 쪽이다.
-   [판정판 130 · Task 8e 수정 1 · I1] 이 빛은 값(변수 --dh-av-awk)으로만 둔다 — 같은 그림 상자의 숨쉬기 · 시전 · 맞음(<style id="play-8e"> 3절)이
-   자기 움직임 목록 맨 앞에 이 값을 같이 싣는다(animation 은 한 속성이라 한 규칙이 다 써야 둘 다 돈다). 값 · 특이도 싸움 0. */
-#app.battle.skill #duel-hud .dh-av-me      { --dh-av-awk: awk-av-glow 1.15s ease-in-out infinite; }
-#app.battle.skill-full #duel-hud .dh-av-me { --dh-av-awk: awk-av-glow 2.3s  ease-in-out infinite; }
+   [판정판 126 · Task 126] 빛 = 같은 그림을 든 정적 두 겹(::before 6/14px · ::after 11/24px — 옛 키프레임 0% · 50% 의 빛 그대로)이고
+   opacity 만 엇갈린다(::before 는 반 주기 앞당김 — 0% = 6/14 만 · 50% = 11/24 만 · 사이는 두 겹 불투명도의 합 1). 두 겹은 그림 상자의 자식이라
+   상자 자신의 움직임(숨쉬기 · 시전 · 맞음 — <style id="play-8e"> 3절)과 따로 돌면서 그 움직임을 그대로 따라간다(옛 --dh-av-awk 끼워 넣기 은퇴).
+   상자 자신의 filter 는 각성 동안 none — 바닥 그림자(--dh-av-me-drop)는 두 겹 사슬 맨 앞에 옛 키프레임과 같은 순서로 든다(상자 filter 로 두면
+   두 겹의 빛까지 묶어 그림자를 드리워 빛이 탁해진다 — 실측). 각성 동안 폭주(mg/mg2) 빛 filter 를 덮는 몫(옛 움직임 filter 가 하던 것)도 이 줄이 잇는다.
+   시간은 옛 값 그대로(지속 1.15s · 만땅 대기 2.3s — 모험 HUD awk-av-ring 과 같은 주기). */
+#app.battle.skill #duel-hud .dh-av-me,
+#app.battle.skill-full #duel-hud .dh-av-me { filter: none; }
+#app.battle.skill #duel-hud .dh-av-me      { --awk-dur: 1.15s; }
+#app.battle.skill-full #duel-hud .dh-av-me { --awk-dur: 2.3s; }
+#app.battle.skill #duel-hud .dh-av-me::before,
+#app.battle.skill #duel-hud .dh-av-me::after,
+#app.battle.skill-full #duel-hud .dh-av-me::before,
+#app.battle.skill-full #duel-hud .dh-av-me::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: inherit;
+  background-size: inherit;
+  background-position: inherit;
+  background-repeat: inherit;
+  animation: awk-av-glow var(--awk-dur) ease-in-out infinite;
+}
+#app.battle.skill #duel-hud .dh-av-me::before,
+#app.battle.skill-full #duel-hud .dh-av-me::before {
+  filter: var(--dh-av-me-drop) drop-shadow(0 0 6px var(--role-mint-face-a)) drop-shadow(0 0 14px var(--role-mint-face-b));
+  animation-delay: calc(var(--awk-dur) / -2);
+}
+#app.battle.skill #duel-hud .dh-av-me::after,
+#app.battle.skill-full #duel-hud .dh-av-me::after {
+  filter: var(--dh-av-me-drop) drop-shadow(0 0 11px var(--role-mint-face-a)) drop-shadow(0 0 24px var(--role-mint-face-b));
+}
 /* 폭주 — 값(반경·색·α)은 0901 원문 그대로 옮기고 기법만 box-shadow → drop-shadow. */
 #app.mg  #duel-hud .dh-av-me { filter: var(--dh-av-me-drop) drop-shadow(0 0 14px rgba(255, 150, 40, .55)); }
 #app.mg2 #duel-hud .dh-av-me { filter: var(--dh-av-me-drop) drop-shadow(0 0 20px rgba(255, 90, 30, .65)); }
@@ -999,6 +1031,10 @@ button {
   #app.skill-full #hero-slot::after,
   #app.battle.skill #duel-hud .dh-av-me,
   #app.battle.skill-full #duel-hud .dh-av-me{ animation: none; }
+  #app.battle.skill #duel-hud .dh-av-me::before,
+  #app.battle.skill #duel-hud .dh-av-me::after,
+  #app.battle.skill-full #duel-hud .dh-av-me::before,
+  #app.battle.skill-full #duel-hud .dh-av-me::after{ display: none; }   /* [Task 126] 엇갈리는 두 겹은 끄고 아래 정적 빛(9/19) 한 줄이 맡는다 */
   #app.skill #hero-slot::after,
   #app.skill-full #hero-slot::after{ opacity: .9; }
   #app.battle.skill #duel-hud .dh-av-me,
@@ -12780,22 +12816,55 @@ html[data-fruit="1"] .tile.blocker:not([data-sp]):not(.dead) {
   background-color: transparent !important;
 }
 #actionbar > .act { position: relative; z-index: 1; }
+/* [판정판 126 · Task 126] 테(border)는 이제 **칠이 없는 안 여백**이다(아이콘 · 명패 자리) — 판은 아래 .act-plate 가 단추 상자 전체에 그린다.
+   테 폭은 변수 넷이 한 곳에서 정하고(≤400 · 가로 PC 는 값만 바꾼다), 판이 같은 넷으로 테 바깥 끝까지 덮는다. 상자 · 안 여백 크기는 전과 같다. */
 .act {
+  --act-bw-t: 15px; --act-bw-r: 17px; --act-bw-b: 18px; --act-bw-l: 17px;
+  --act-min-h: 52px;
   gap: 1px;
-  min-height: 52px;
+  min-height: var(--act-min-h);
   padding: 0 2px;
   border-style: solid;
-  border-width: 15px 17px 18px 17px;
+  border-color: transparent;
+  border-width: var(--act-bw-t) var(--act-bw-r) var(--act-bw-b) var(--act-bw-l);
   border-radius: 0;
   background: none;
   box-shadow: none;
   color: #FFFFFF;
   text-shadow: 0 1.5px 0 rgba(110, 70, 58, .6);
 }
-#btn-add     { border-image: var(--lib-btn-mint) 32 39 38 39 fill stretch; }
-#btn-hint    { border-image: var(--lib-btn-yellow) 32 39 39 39 fill stretch; }
-#btn-undo    { border-image: var(--lib-btn-purple) 31 39 37 39 fill stretch; }
-#btn-shuffle { border-image: var(--lib-btn-pink) 29 41 35 41 fill stretch; }
+/* [판정판 126 · Task 126] 단추 판 = 킷 코드 단추(.kit-btn-v2[data-kind=secondary] — 8d 창 단추와 같은 부품 · 같은 층: 면 그라디언트 · 겉선 · 어깨 ·
+   드리운 그림자 · 질감층(접지 띠 · 옆 림 · 아래 발광 · 비네트) · 좌상 반짝이). 옛 9조각 그림 판 넷(lib-btn-cta-blue · yellow · purple · pink)은 은퇴 —
+   그림 바깥에 구워진 회색 그림자 · 밝은 테(2026-10-19 사용자 반려)와 모서리 조각 찌꺼기 · 이음 자국(plate-edge 후속 126)이 함께 사라진다.
+   ① 자리 = 단추 상자(테 바깥 끝) 그대로 — inset 음수 테 폭. 맨 밑(z -1 — 단추의 쌓임 맥락 안에서 아이콘 · 명패 · 배지 아래).
+   ② 자(尺) --f2-bh = 단추 자기 키. 폰 단추는 px 상자라 그 최소 키(--act-min-h), 가로 PC 는 --bt-medal-h(play-8e 7절).
+   ③ 모서리 = 키 × .155 — 옛 그림 넷이 화면에 그리던 모서리(폰 5~10px · 1280 가로 5~12px 실측)의 가운데 값. 킷 기본 .287 은 이 단추에서 알약이 된다.
+   ④ 색 = 단추마다 지금 면 색 계열의 역할 토큰 셋(위 · 아래 · 겉선) — 추가 = 하늘(옛 cta-blue) · 힌트 = 노랑 · 되돌리기 = 보라 · 섞기 = 분홍.
+   끈 상태(.act.off — 옅게 .34)와 눌림(.act:active scale)은 단추 자신에 걸려 판도 함께 따른다. 전투는 메달 그림이 판이라 판을 끈다. */
+#actionbar .act > .act-plate {
+  position: absolute;
+  inset: calc(var(--act-bw-t) * -1) calc(var(--act-bw-r) * -1) calc(var(--act-bw-b) * -1) calc(var(--act-bw-l) * -1);
+  z-index: -1;
+  height: auto;
+  min-width: 0;
+  padding: 0;
+  pointer-events: none;
+  --f2-bh: var(--act-min-h);
+  --f2-br: calc(var(--f2-bh) * .155);
+}
+/* 가로 PC 의 테는 키의 비율(소수 px)이라 브라우저가 테 폭을 장치 화소로 내림한다(1280×720 에서 14.97 → 14px). 판도 같은 값으로 내려야
+   상자 밖으로 1px 넘치지 않는다 — round() 를 아는 브라우저만(모르는 곳은 위 값 · 넘침 1px 이하). */
+@supports (top: round(down, 1.5px, 1px)) {
+  #actionbar .act > .act-plate {
+    inset: calc(round(down, var(--act-bw-t), 1px) * -1) calc(round(down, var(--act-bw-r), 1px) * -1)
+           calc(round(down, var(--act-bw-b), 1px) * -1) calc(round(down, var(--act-bw-l), 1px) * -1);
+  }
+}
+#btn-add > .act-plate     { --f2-c1: var(--role-sky-face-a);    --f2-c2: var(--role-sky-face-b);    --f2-cl: var(--role-sky-outline); }
+#btn-hint > .act-plate    { --f2-c1: var(--role-yellow-face-a); --f2-c2: var(--role-yellow-face-b); --f2-cl: var(--role-yellow-outline); }
+#btn-undo > .act-plate    { --f2-c1: var(--role-purple-face-a); --f2-c2: var(--role-purple-face-b); --f2-cl: var(--role-purple-outline); }
+#btn-shuffle > .act-plate { --f2-c1: var(--role-pink-face-a);   --f2-c2: var(--role-pink-face-b);   --f2-cl: var(--role-pink-outline); }
+#app.battle #actionbar .act > .act-plate { display: none; }
 .act:active { transform: scale(.94); background: none; }
 /* 라벨은 캡 면에 **직접 얹지 않는다**. 네 캡의 면색을 실측하면 흰 글자는
    2.74~4.83:1, 잉크(#5C4033)는 1.95~3.42:1 로 **어느 쪽도 4.5:1 을 못 넘고**,
@@ -12837,7 +12906,7 @@ html[data-fruit="1"] .tile.blocker:not([data-sp]):not(.dead) {
 
 /* 390px 기기: 네 캡이 한 줄에 들어가야 하므로 캡 두께를 한 단 줄인다. */
 @media (max-width: 400px) {
-  .act { border-width: 13px 12px 15px 12px; }
+  .act { --act-bw-t: 13px; --act-bw-r: 12px; --act-bw-b: 15px; --act-bw-l: 12px; }
   .act .act-t { font-size: 10px; padding: 1px 5px 2px; }
 }
 
@@ -15804,15 +15873,17 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
          뒤집으면 「아랫변이 없는 판」이 되어 화면 밑에 붙는 형태가 그대로 나온다. -->
     <footer id="actionbar" data-part="hud" data-variant="actionbar">
       <i class="dh-plate dh-plate--top" data-part="hud-plate" data-variant="top" data-flip="y" aria-hidden="true"></i>
-      <button id="btn-add" data-part="btn-medal" data-variant="attack" class="act" data-i18n-aria="aria.add" aria-label="Add remaining numbers to the board"><i class="act-hit" aria-hidden="true"></i><span class="act-ico"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-add"/></svg></span><span class="act-t" data-i18n="act.add">Add</span><span id="add-badge" class="act-badge">5</span></button>
+      <!-- [판정판 126 · Task 126] 판 화면(클래식 · 아케이드 · 타임러시 · 데일리) 단추 판 = 킷 코드 단추 한 장(.act-plate.kit-btn-v2 — 단추 상자를 덮는 맨 밑 층 ·
+           색 토큰만 단추마다). 옛 9조각 그림 판(lib-btn-*)은 은퇴. 전투에서는 메달 그림이 판이라 display:none(CSS 「액션바 스킨」 절). -->
+      <button id="btn-add" data-part="btn-medal" data-variant="attack" class="act" data-i18n-aria="aria.add" aria-label="Add remaining numbers to the board"><i class="act-plate kit-btn-v2" data-kind="secondary" aria-hidden="true"></i><i class="act-hit" aria-hidden="true"></i><span class="act-ico"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-add"/></svg></span><span class="act-t" data-i18n="act.add">Add</span><span id="add-badge" class="act-badge">5</span></button>
       <!-- [판정판 130 · Task 8e] 전투 스킬 단추 셋(각성 · 펫소환 · 스킬)의 후광(.act-halo — 시안 2 · 3 「스킬 단추 후광 연출」): 금 고리 + 은은한 빛 상시 ·
            .urge(쓸 수 있음)일 때만 도는 빛줄기(.ah-rays) + 별빛(.ah-spark) · 쓴 순간 커지며 사라짐(.halo-pop). 코드로만(CSS 「play-8e」 4절).
            전투가 아니면 display:none(다른 모드 단추 무변). 공격 단추(btn-add)는 전투에서 은퇴라 후광이 없다. -->
-      <button id="btn-hint" data-part="btn-medal" data-variant="special" class="act" data-i18n-aria="aria.hint" aria-label="Show a hint"><i class="act-hit" aria-hidden="true"></i><i class="act-halo" aria-hidden="true"><i class="ah-rays"></i><i class="ah-spark ah-spark--1"></i><i class="ah-spark ah-spark--2"></i></i><span class="act-ico"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-hint"/></svg></span><span class="act-t" data-i18n="act.hint">Hint</span><span id="hint-badge" class="act-badge">3</span></button>
-      <button id="btn-undo" data-part="btn-medal" data-variant="pet" class="act" data-i18n-aria="aria.undo" aria-label="Undo last match"><i class="act-hit" aria-hidden="true"></i><i class="act-halo" aria-hidden="true"><i class="ah-rays"></i><i class="ah-spark ah-spark--1"></i><i class="ah-spark ah-spark--2"></i></i><span class="act-ico"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-undo"/></svg></span><span class="act-t" data-i18n="act.undo">Undo</span><span id="undo-badge" class="act-badge">1</span></button>
+      <button id="btn-hint" data-part="btn-medal" data-variant="special" class="act" data-i18n-aria="aria.hint" aria-label="Show a hint"><i class="act-plate kit-btn-v2" data-kind="secondary" aria-hidden="true"></i><i class="act-hit" aria-hidden="true"></i><i class="act-halo" aria-hidden="true"><i class="ah-rays"></i><i class="ah-spark ah-spark--1"></i><i class="ah-spark ah-spark--2"></i></i><span class="act-ico"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-hint"/></svg></span><span class="act-t" data-i18n="act.hint">Hint</span><span id="hint-badge" class="act-badge">3</span></button>
+      <button id="btn-undo" data-part="btn-medal" data-variant="pet" class="act" data-i18n-aria="aria.undo" aria-label="Undo last match"><i class="act-plate kit-btn-v2" data-kind="secondary" aria-hidden="true"></i><i class="act-hit" aria-hidden="true"></i><i class="act-halo" aria-hidden="true"><i class="ah-rays"></i><i class="ah-spark ah-spark--1"></i><i class="ah-spark ah-spark--2"></i></i><span class="act-ico"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-undo"/></svg></span><span class="act-t" data-i18n="act.undo">Undo</span><span id="undo-badge" class="act-badge">1</span></button>
       <!-- v4 A-2: re-deal the living tiles when the board is locked. The bar now
            holds FOUR .act buttons; .act is `flex:1 1 0`, so they simply share the row. -->
-      <button id="btn-shuffle" data-part="btn-medal" data-variant="awaken" class="act" data-i18n-aria="aria.shuffle" aria-label="Shuffle the board"><i class="act-hit" aria-hidden="true"></i><i class="act-halo" aria-hidden="true"><i class="ah-rays"></i><i class="ah-spark ah-spark--1"></i><i class="ah-spark ah-spark--2"></i></i><span class="act-ico"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-shuffle"/></svg></span><span class="act-t" data-i18n="act.shuffle">Shuffle</span><span id="shuffle-badge" class="act-badge">1</span></button>
+      <button id="btn-shuffle" data-part="btn-medal" data-variant="awaken" class="act" data-i18n-aria="aria.shuffle" aria-label="Shuffle the board"><i class="act-plate kit-btn-v2" data-kind="secondary" aria-hidden="true"></i><i class="act-hit" aria-hidden="true"></i><i class="act-halo" aria-hidden="true"><i class="ah-rays"></i><i class="ah-spark ah-spark--1"></i><i class="ah-spark ah-spark--2"></i></i><span class="act-ico"><svg class="ic" aria-hidden="true" focusable="false"><use href="#ic-shuffle"/></svg></span><span class="act-t" data-i18n="act.shuffle">Shuffle</span><span id="shuffle-badge" class="act-badge">1</span></button>
     </footer>
   </section>
 
@@ -56989,10 +57060,9 @@ html[lang="en"] #app-intro .api-logo{
    어긋난다 — 한 줄에 나란히 선 버튼들에서는 상자의 통일이 조각의 정확한 비율보다
    앞선다. 조각은 25:33 을 15:17 로 앉는 만큼만 눌리고, 알약 모양이라 그 눌림이
    눈에 안 띈다(실렌더 확인 대상).
-   ⚠ 잠정 교체다. 최종 CTA 체계는 W6.5b 소관이다. */
-#btn-add{
-  border-image:var(--lib-btn-cta-blue) 25 33 28 33 fill stretch;
-}
+   ⚠ 잠정 교체다. 최종 CTA 체계는 W6.5b 소관이다.
+   [판정판 126 · Task 126] 이 #btn-add 그림 판(cta-blue 9조각) 줄은 은퇴 — 단추 판은 킷 코드 단추(.act-plate, 「액션바 스킨」 절)이고
+   색은 같은 파랑 계열 역할 토큰(--role-sky-*)이다. */
 
 /* ===========================================================================
    W6.5a ⑤ — 모달 헤더: 유리 캡슐 + 레터링 · X 무지개 젤리
@@ -72994,7 +73064,14 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
     --bt-medal-h: calc(var(--bu) * 135 / 2.11);
     --bt-medal-w: calc(var(--bt-medal-h) * 718 / 907);
     --bt-medal-g: calc(var(--bt-medal-h) * .11);
-    --bt-medal-tw: var(--bt-medal-w);
+    /* [판정판 126 · Task 126 — 지휘자 답 안 A] 보이지 않는 메달 상자 폭 = max(그림 폭, 가장 긴 명패 − 틈) · 틈은 .11H 그대로(가로 · 세로).
+       그림은 ::before contain · 아래 가운데라 크기 그대로이고, 상자만 명패가 이웃 상자에 안 걸릴 만큼 넓어진다(배지는 그림 기준 — 아래 right 식).
+       명패 폭 = 명패 글자(--bt-np-fs) × --bt-np-em — 가장 긴 명패를 글자 단위로 잰 값(ko 「펫소환」 2.96 · en 「Awaken」 3.75 — 821 · 844 · 1280 실측)에
+       여유를 둔 3.0 · 3.8. 결과: 상자 사이 ≤ 그림 폭의 .139(관문 가로 .15) · 명패끼리 · 명패↔이웃 상자 겹침 0.
+       ko 1280 이상은 그림 폭이 이겨 그대로 · 821×462 · 844×390 은 메달 그림이 서로 가까워진다 · en 1280 은 조금 벌어진다. */
+    --bt-np-fs: max(var(--text-min), calc(var(--bu) * 18));
+    --bt-np-em: 3.0;
+    --bt-medal-tw: max(var(--bt-medal-w), calc(var(--bt-np-fs) * var(--bt-np-em) - var(--bt-medal-g)));
     position: absolute;
     left: calc(var(--bt-x0) + var(--bu) * 979);
     top: calc(var(--bt-y0) + var(--bu) * 531);
@@ -73038,14 +73115,14 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
   }
   #app.battle #screen-game.active #actionbar .act .act-t {
     padding: 0 calc(var(--bu) * 4);
-    font-size: max(var(--text-min), calc(var(--bu) * 18));
+    font-size: var(--bt-np-fs);
     /* [판정판 130 · Task 8e 수정 2 · 우려 2] 명패 글자 잘림 0 — 명패 판을 글자에 맞춘다(메달보다 넓어도 된다 · 가운데 그대로 ·
        안전 상자 안). 옛 max-width 88%(그림 명패 폭)는 글자 하한(11px)이 걸리는 작은 창에서 글자를 잘랐다(844×390 「펫소환」 「Awaken」).
        키는 그림 명패 비(32%)와 글자 하한이 드는 키 중 큰 쪽. 큰 창은 그림 명패 그대로(글자가 판보다 작다). */
     max-width: none;
     height: max(32%, calc(var(--text-min) * 1.3));
   }
-  html[lang="en"] #app.battle #screen-game.active #actionbar .act .act-t { font-size: max(var(--text-min), calc(var(--bu) * 17.5)); }
+  html[lang="en"] #app.battle #screen-game.active #actionbar { --bt-np-fs: max(var(--text-min), calc(var(--bu) * 17.5)); --bt-np-em: 3.8; }
 }
 </style>
 <style id="play-8e">
@@ -73219,9 +73296,9 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
 #app.battle #duel-hud #duel-me-fx { z-index: 7; }
 #app.battle #duel-hud #duel-me-fx > i { position: absolute; display: block; pointer-events: none; }
 /* 단계 0~3 숨쉬기 — translate 는 transform 과 따로 합성된다(그림 상자의 --me-flip transform 무접촉).
-   [수정 1 · I1] 목록 맨 앞 = 옛 각성 · 만땅 대기 초상 빛(--dh-av-awk · @keyframes awk-av-glow 절 — 판정판 14 「만땅 대기」 신호 · 반려 안 된 부품). 상태가 아니면 none.
-   숨쉬기 · 시전 · 맞음 세 규칙이 같은 값을 맨 앞에 싣는다 — 셋 중 무엇이 서도 초상 빛은 끊기지 않는다. */
-#app.battle #duel-hud #duel-me-av { animation: var(--dh-av-awk, none), b8e-breathe var(--dur-amb) ease-in-out infinite alternate; }
+   [Task 126] 각성 · 만땅 대기 초상 빛(@keyframes awk-av-glow 절)은 그림 상자의 두 가상 요소가 따로 돌린다 — 상자 자신의 움직임 목록에 끼워 넣던
+   옛 값(--dh-av-awk · 수정 1 I1)은 은퇴. 숨쉬기 · 시전 · 맞음 무엇이 서도 초상 빛은 끊기지 않는다(자식 층이라 상자 animation 과 무관). */
+#app.battle #duel-hud #duel-me-av { animation: b8e-breathe var(--dur-amb) ease-in-out infinite alternate; }
 @keyframes b8e-breathe { from { translate: 0 0; } to { translate: 0 -1%; } }
 /* 단계 1 — 옅은 빛 원 맥동 · 단계 2 · 3 — 강한 빛 */
 #app.battle #duel-hud #duel-me-av[data-atk-tier="1"] ~ #duel-me-glow {
@@ -73262,7 +73339,7 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
 #app.battle #duel-hud #duel-me-fx .mfx-spark--2 { animation-delay: calc(var(--dur-amb) * -1) !important; }
 @keyframes b8e-orbit { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 /* 시전(.cast — JS meCastFx 가 --mo-cast-life 동안 켠다): 내딛기 · 마법 띠 · 지팡이 쪽 별빛 */
-#app.battle #duel-hud #duel-me-av.cast { animation: var(--dh-av-awk, none), b8e-step var(--mo-cast-life) var(--ease-out) 1; }
+#app.battle #duel-hud #duel-me-av.cast { animation: b8e-step var(--mo-cast-life) var(--ease-out) 1; }
 @keyframes b8e-step {
   0%     { translate: 0 0; scale: 1; }
   11.43% { translate: -6% 0; scale: 1.06; }
@@ -73314,7 +73391,7 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
 }
 /* [지휘자 답 Q4 · 채택표 「(말로)」 「맞으면 움찔 + 빨간 번쩍」] 맞은 순간(.hit — JS meHitFx, --dur-2): 그림이 악당 반대쪽으로 움찔(rotate · translate)
    + 그림 상자 위 빨간 번쩍(#duel-me-fx::before opacity). 숨쉬기 · 시전보다 뒤(같은 특이도 — 뒤 규칙이 이긴다). 색 = 악당 체력 채움 토큰(빨강). */
-#app.battle #duel-hud #duel-me-av.hit { animation: var(--dh-av-awk, none), b8e-flinch var(--dur-2) var(--ease-out) 1; }
+#app.battle #duel-hud #duel-me-av.hit { animation: b8e-flinch var(--dur-2) var(--ease-out) 1; }
 @keyframes b8e-flinch {
   0%   { rotate: 0deg;  translate: 0 0; }
   30%  { rotate: 5deg;  translate: 4% 0; }
@@ -73421,10 +73498,10 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
      (수정 2회차 판정 — 보고 task-8e-report.md 「수정 2회차」 · scratchpad/rc1017/t8e/fix1/perf-fix2-*.json). */
 @media (pointer: coarse) {
   #app.battle #duel-hud #duel-me-fx .mfx-trail--r { display: none !important; }   /* [수정 1 · I3] 시전 마법 띠도 폰은 하나(왼쪽 — 악당 쪽으로 휘감는 띠) */
-  #app.battle #duel-hud #duel-me-av { animation: var(--dh-av-awk, none); }
+  #app.battle #duel-hud #duel-me-av { animation: none; }
   /* 시전 내딛기 = 옆걸음만(scale 1.06 빼기) — 실측: 빛(filter)이 도는 그림 상자를 키웠다 줄이면 매 프레임 다시 그려 50ms 넘는 프레임이 는다
      (같은 조건 3회 44 · 37 · 48 → 옆걸음만 39 · 25 · 25 — fix1/perf-i3split2.json). 키프레임 % 는 b8e-step 과 같다(M3 — b17 대조). */
-  #app.battle #duel-hud #duel-me-av.cast { animation: var(--dh-av-awk, none), b8e-step-t var(--mo-cast-life) var(--ease-out) 1; }
+  #app.battle #duel-hud #duel-me-av.cast { animation: b8e-step-t var(--mo-cast-life) var(--ease-out) 1; }
   @keyframes b8e-step-t {
     0%     { translate: 0 0; }
     11.43% { translate: -6% 0; }
@@ -73768,8 +73845,10 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
         위 줄은 위로 · 아래 줄은 아래로 · 왼쪽 칸은 왼쪽으로 · 오른쪽 칸은 오른쪽으로(전투 아래 하나 · 클래식 하나는 가운데 기준).
         넓힌 자리는 서로 반대쪽으로 자라 이웃 · 다른 조작 요소와 겹치지 않는다(시험 smoke-t6 · elementFromPoint).
      ② 칸 사이(가로)는 명패 · 배지가 글자 하한(--text-min)에서도 이웃과 안 겹치게: max(.11H, 글자 하한 × 4.5 − 메달 폭).
-        4.5 = 두 명패(가장 긴 「되돌리기」 · 「Shuffle」 + 안 여백) 반폭 합을 글자 하한 단위로 잰 값(844×390 실측). 1280 이상은 .11H 그대로. */
-  :is(#app.battle, #app:not(.battle)) #screen-game.active #actionbar {
+        4.5 = 두 명패(가장 긴 「되돌리기」 · 「Shuffle」 + 안 여백) 반폭 합을 글자 하한 단위로 잰 값(844×390 실측). 1280 이상은 .11H 그대로.
+        [판정판 126 · Task 126 — 지휘자 답 안 A] 판 화면만. 전투는 틈 .11H 그대로 두고 보이지 않는 메달 상자 폭을 명패에 맞춰 넓힌다
+        (battle-landscape 7절 --bt-medal-tw) — 이 식은 821×462 · 844×390 전투에서 상자 사이를 메달 폭의 .52 · .81 로 벌려 관문(가로 .15)을 넘었다. */
+  #app:not(.battle) #screen-game.active #actionbar {
     column-gap: max(var(--bt-medal-g), calc(var(--text-min) * 4.5 - var(--bt-medal-w))) !important;
   }
   @media (pointer: coarse) {
@@ -73803,10 +73882,15 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
     min-height: 0;
     /* [수정 2 · 우려 2] 유리 단추의 테 · 아이콘 · 이름표를 단추 키에 맞춘다. 옛 px 테(위 15 · 옆 17 · 아래 18)와 아이콘 21px 는 작은 창(844×390 —
        키 34.7px)에서 단추를 칸보다 넓게(38px) 만들고 이름표를 단추 밖 아래로 밀어 아래 줄 단추와 겹쳤다(fix1/zoom-daily844-btn.png).
-       테 = 키 × .234 · .266 · .281(키 64 = 1280 에서 옛 15 · 17 · 18 그대로 — 9조각 그림은 테 폭을 따라 줄어든다). */
-    border-width: calc(var(--bt-medal-h) * .234) calc(var(--bt-medal-h) * .266) calc(var(--bt-medal-h) * .281);
+       테 = 키 × .234 · .266 · .281(키 64 = 1280 에서 옛 15 · 17 · 18 그대로).
+       [판정판 126 · Task 126] 테는 값만 바꾼다(변수 넷 — 판 .act-plate 가 같은 값으로 테 바깥 끝까지 덮는다) · 판의 자 = 단추 키. */
+    --act-bw-t: calc(var(--bt-medal-h) * .234);
+    --act-bw-r: calc(var(--bt-medal-h) * .266);
+    --act-bw-b: calc(var(--bt-medal-h) * .281);
+    --act-bw-l: var(--act-bw-r);
     justify-content: flex-start;
   }
+  #app:not(.battle) #screen-game.active #actionbar .act > .act-plate { --f2-bh: var(--bt-medal-h); }
   #app:not(.battle) #screen-game.active #actionbar .act .act-ico .ic { width: calc(var(--bt-medal-h) * .33); height: calc(var(--bt-medal-h) * .33); }
   /* 이름표 = 단추 아래쪽 위에 겹친 작은 판(가운데 · 글자 폭 · 글자 하한). 아래 끝에서 = 키 × .15 − 글자 하한 × .5(0 아래로는 안 감):
      1280(키 64)에서 4px — 옛 흐름 자리보다 5px 아래(유리 아래 테 위) · 844×390(키 34.7)에서 0 — 단추 아래 끝에 붙어 위 아이콘을 덜 가린다.
