@@ -5632,8 +5632,10 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   gap: calc(var(--iw-size, 28px) * .22);
 }
 .iw.iw-band .iw-main { font-size: var(--iw-size, 28px); }
-/* 부제는 본문에서 파생한다 — 두 값을 따로 두면 띠 높이가 둘 중 큰 쪽을 따라간다. */
-.iw.iw-band .iw-sub { font-size: calc(var(--iw-size, 28px) * .44); }
+/* 부제는 본문에서 파생한다 — 두 값을 따로 두면 띠 높이가 둘 중 큰 쪽을 따라간다.
+   [Task 7e 수정 1회차 — I1] 하한 --text-min(11px): 좁은 띠(본문 14~23px)에서 ×.44 가 6~10px 로 떨어졌다(전투 포함).
+   본문 하한이 14px 라 부제 11px 는 본문보다 작다. 띠 높이는 14px 본문에서만 0.8px 늘고(13.2 → 14.0) multBandHalf 의 숨통 2px 안이다. */
+.iw.iw-band .iw-sub { font-size: max(var(--text-min), calc(var(--iw-size, 28px) * .44)); }
 /* 128px 글자용 6px 스트로크는 30px 글자에서 글씨를 메운다. 띠는 글자에 비례한다. */
 .iw.iw-band.iw-plate .iw-main {
   -webkit-text-stroke: calc(var(--iw-size, 28px) * .105) rgba(18, 10, 26, .96);
@@ -34642,6 +34644,15 @@ window.TT_SFX = {
          ② 판과 세로로 겹치는 상자(무대 크기 #topbar 등)는 「판 위 HUD」 가 아니므로 뺀다.
          ③ 자기 상자 밖에 서는 가운데 노드를 셈에 더한다 — #rush-timer(fixed · #hud-row 상자에 안 잡힘), 그리고 아래 #ch-tc. */
     var side = !!(br && br.width > 0 && battleStage());
+    /* [Task 7e 수정 1회차 — I3 · 지휘자 판정] 비전투 가로 무대에서는 띠 아래 한계를 #board 와 보이는 판 #board-scroll 윗변 중
+       **위쪽**으로 한다(판 짜임이 바뀌어 둘이 벌어져도 띠가 판 상자를 안 밟게). 전투는 #board 그대로(무변). */
+    if (side && !battleOn()) {
+      el = $('board-scroll');
+      if (el && el.getBoundingClientRect) {
+        r = el.getBoundingClientRect();
+        if (r.height > 0 && r.top < bot) bot = r.top;
+      }
+    }
     var ids = ['duel-hud', 'classic-hud', 'topbar', 'tb-stats', 'hud-row', 'boss-bar'];
     if (side) ids.push('rush-timer');
     for (i = 0; i < ids.length; i++) {
