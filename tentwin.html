@@ -74882,8 +74882,9 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
 /* ⑪ 7b — 창 안 길이 = 무대 자 u(가로 창 · 1280×720 에서 1u = 1px 라 화면 무변 · 1920×1080 은 1.5배 · 821×462 는 .64배 — 글자 하한 --text-min).
    값은 지금 px 수 그대로(새 값 0 — scratchpad/rc1017/t8d/gen7b.py 가 1280 ↔ 1920 에서 안 큰 계산값만 뽑았다). 판 · 간판 · 단추 · 탭 · ✕ 는 위 무리 규칙 · 킷 자(--f2-w)가 맡는다. */
 @media (min-aspect-ratio: 1/1) {
-  /* 판 글자 바탕(상속 16px) — 글자를 따로 안 정한 줄 · em 길이가 판과 같이 큰다 */
-  #app .modal.w6m .sheet,
+  /* 판 글자 바탕(상속 16px) — 글자를 따로 안 정한 줄 · em 길이가 판과 같이 큰다. 8c 창(확률 · 뽑기 결과 — .w6m 이지만 7b 무리 밖 · 큰 창 배율은 8c 의 --mu)은 뺀다
+     (7b 수정 1회차 · 리뷰 Important 2 — :where 로 감싸 특이성은 그대로) */
+  #app .modal.w6m:not(:where(#modal-odds, #modal-gres)) .sheet,
   #app :is(#modal-mode, #modal-classic, #modal-minimap, #modal-theater) .sheet { font-size: calc(var(--stage-u) * 16); }
   /* r10m 넷(플레이 · 클래식 · 챕터 · 극장) — 안여백(r10-panel 17px) · 리본 간판(판 자 · 겉선 자는 위 「창 자 · 겉선 자」 묶음 줄) */
   #app :is(#modal-mode, #modal-classic, #modal-minimap, #modal-theater) .sheet.r10-panel {
@@ -74976,8 +74977,9 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
   #app #modal-arc .big-score { margin: calc(var(--stage-u) * 2) 0 calc(var(--stage-u) * 6); }
   #app #modal-arc .big-score > b { font-size: calc(var(--stage-u) * 86); }
   #app #modal-adv #adv-stars { font-size: calc(var(--stage-u) * 40); letter-spacing: calc(var(--stage-u) * 2); }
-  #app .modal :is(.sub-score, .rank-line, .adv-hearts) { font-size: max(var(--text-min), calc(var(--stage-u) * 13)); }
-  #app .modal .sub-score { margin-bottom: calc(var(--stage-u) * 4); }
+  /* 결과 창 작은 줄 — 8c 뽑기 결과 창(#modal-gres)의 .sub-score 는 8c 몫이라 뺀다(7b 수정 1회차 · 리뷰 Important 2 · 특이성 그대로) */
+  #app .modal:not(:where(#modal-odds, #modal-gres)) :is(.sub-score, .rank-line, .adv-hearts) { font-size: max(var(--text-min), calc(var(--stage-u) * 13)); }
+  #app .modal:not(:where(#modal-odds, #modal-gres)) .sub-score { margin-bottom: calc(var(--stage-u) * 4); }
   #app .modal .rank-line { margin: calc(var(--stage-u) * 2) 0; }
   #app #modal-arc #arc-dir { font-size: max(var(--text-min), calc(var(--stage-u) * 15)); }
   #app #modal-arc :is(#arc-kos, #arc-who) { font-size: max(var(--text-min), calc(var(--stage-u) * 13.5)); }
