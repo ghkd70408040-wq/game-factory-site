@@ -14,8 +14,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
 <script>
-/* 짧은 변 ≥600(데스크톱·태블릿, 세로·가로 무관, T6)은 껍데기 play.html(세로 기둥 iframe)로
-   — 판정판 64. 프레임 안(itch·play)·?noshell=1·앱은 제외. */
+/* 짧은 변 ≥600 의 세로 창(태블릿 세로 등)은 껍데기 play.html(세로 기둥 iframe)로
+   — 판정판 64(T6). 프레임 안(itch·play)·?noshell=1·앱은 제외.
+   [Task 7d · 2026-10-21] 가로 창(창 가로 ≥ 세로 — CSS 가로 절 (min-aspect-ratio: 1/1) 과 같은 조건)은 넘기지 않는다:
+   가로 관문(tools/measure/landscape-gate.py) 40 화면 × 7크기 전부 PASS 뒤 PC 기본 링크 = 본체 창 전체 가로.
+   play.html 은 지우지 않는다(옛 링크 · 세로 큰 창). */
 (function(){try{
   /* final-fix I-2 — zip 산출물의 index.html(build-packages.py 가 tentwin.html
      본문을 그대로 그 이름으로 넣는다, play.html 은 zip에서 빠진다)이 짧은 변
@@ -27,10 +30,11 @@
   var q=location.search;
   if(/[?&](noshell=1|platform=twa)(&|$)/.test(q))return;
   var w=window.innerWidth,h=window.innerHeight;
-  // 가로 폰(짧은 변<600)만 본체로 남는다 — 그 화면에서 왕국만 폭 캡되는 CSS는
+  // 폰(짧은 변<600 — 세로 · 가로)은 본체로 남는다([Task 7d] 가로 창은 아래 줄로 크기와 무관하게 남는다) — 그 화면에서 왕국만 폭 캡되는 CSS는
   // `#screen-kingdom` 절 끝의 `@media (min-aspect-ratio:1/1) and (max-height:599.98px)`
   // (감사 A F1.1/F1.2). [116 · 2026-10-15] 왕국은 그 캡에서 빠졌다(메인 v3 가로 배치) — 캡은 상점만.
   if(Math.min(w,h)<600)return;
+  if(w>=h)return;   // [Task 7d] 가로 창 = 본체가 창 전체 가로로 선다(데스크톱 · 태블릿 가로)
   location.replace('play.html'+q+location.hash);
 }catch(e){}})();
 </script>
