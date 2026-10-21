@@ -12933,6 +12933,11 @@ var ak = btn.getAttribute('data-i18n-aria');
 if (ak) btn.setAttribute('aria-label', t(ak));
 }
 var actBattleLabels = false;
+function setHaloK(btn, k) {
+if (!btn || !btn.style) return;
+var v = String(Math.round(clamp(k, 0, 1) * 100) / 100);
+if (btn.__ahK !== v) { btn.__ahK = v; btn.style.setProperty('--ah-k', v); }
+}
 function syncBattleActs(ba, bh, bu, bsh) {
 var d = S.duel;
 if (!d) return;
@@ -12951,6 +12956,9 @@ setCls(bsh, 'off', !gFull);
 setCls(bsh, 'urge', gFull);
 setCls(bsh, 'primed', gaugeFull() && !!S.skillKind);
 }
+setHaloK(bh, duelSpPct() / 100);
+setHaloK(bu, 0);
+setHaloK(bsh, duelGaugePct() / 100);
 setAppClass('skill-full', gFull);
 setActLabel(bh, 'act.special', 'aria.special');
 setActLabel(bu, 'act.pet', 'aria.pet');
