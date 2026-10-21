@@ -48231,10 +48231,35 @@ window.TT_SFX = {
        MAP_GATE = [58.50, 22.99, 2.90, 4.78, '--node-jelly-1'];
        MAP_CHAPTERS 배경값 = ch2 { zoom 1.18, x '18%' } · ch3 { zoom 1.34, x '34%' } */
 
-  /** 지금 챕터의 앵커표. 표가 세 장이 됐어도 읽는 쪽 코드는 한 줄도 안 바뀐다. */
+  /* [Task 7d · B4] 높은 장 넓은 그림(MAP_CHAPTERS 의 wide 칸 · 표 머리 주석 (d)).
+     넓은 그림 넷의 기하 = A4 geometry.json(넷 다 같다): 폭 2600 · 높이 1271 · 가운데 세로 원본 자리 x0 1006 · 폭 cw 587. */
+  var MAP_WIDE_GEO = { w: 2600, h: 1271, x0: 1006, cw: 587 };
+  /** 챕터 c 가 지금 넓은 그림으로 서나 — 그 그림의 변수 이름(아니면 ''). 가로 창 = hub-bars-121 6 절의 (min-aspect-ratio: 1/1). */
+  function mapWideArt(c) {
+    var ch = MAP_CHAPTERS[(c || mapChap) - 1];
+    if (!ch || !ch.wide || typeof window === 'undefined' || !window.matchMedia) return '';
+    return window.matchMedia('(min-aspect-ratio: 1/1)').matches ? ch.wide : '';
+  }
+  /** 세로 그림 기준 앵커 [x%, y%, w%, h%, 원반] → 넓은 그림 기준(세로 · 높이는 그대로 — 넓은 그림 높이 = 원본 높이). */
+  function mapWideXY(a) {
+    var g = MAP_WIDE_GEO;
+    return [(g.x0 + a[0] / 100 * g.cw) / g.w * 100, a[1], a[2] * g.cw / g.w, a[3], a[4]];
+  }
+
+  /** 지금 챕터의 앵커표. 표가 세 장이 됐어도 읽는 쪽 코드는 한 줄도 안 바뀐다.
+      [Task 7d] 넓은 그림으로 선 챕터는 같은 표를 넓은 그림 자리로 옮겨 돌려준다(노드 · 가운데 맞춤 · 최저 노드 · Game.MAP_ANCHORS 한 출처). */
   function mapAnchors(c) {
     if (SIAN_MAP) return SIAN_SLOTS;   // 시안 판은 챕터와 무관하게 같은 6칸을 재사용한다
-    return MAP_ANCHORS_CH[Math.min(Math.max(1, c || mapChap), MAP_ANCHORS_CH.length) - 1];
+    var k = Math.min(Math.max(1, c || mapChap), MAP_ANCHORS_CH.length);
+    return mapWideArt(k) ? MAP_ANCHORS_CH[k - 1].map(mapWideXY) : MAP_ANCHORS_CH[k - 1];
+  }
+  /** [Task 7d] 지은 지도(레이어 표지 data-ar="wide")가 지금 방향과 어긋나면 다시 짓는다 — 창을 돌리거나 늘려 가로 ↔ 세로가 바뀐 때(onResize). */
+  function mapWideSync() {
+    var l = $('map-layer');
+    if (!l || !l.getAttribute) return;
+    if ((l.getAttribute('data-ar') === 'wide') === !!mapWideArt(mapChap)) return;
+    buildMap();
+    mapCenterCurrent();
   }
   /** 이 챕터에서 가장 아래에 있는 노드의 아래끝(레이어 %). 레이어의 세로 오프셋을
       역산하는 값이라(§25-3) 챕터마다 다르고, 그래서 JS 가 써 준다. */
@@ -48287,6 +48312,12 @@ window.TT_SFX = {
        이 "이미 그 문법으로 돈다"고 적어 둔 원래 두 값으로 되돌린다 —
        ch2 #FFC489(푸딩빛 호박) · ch3 #F5A97C(모래빛 살구). α 는 .08 그대로.
        4~10 은 두 문서가 일치하므로 손대지 않았다.
+
+     ▣ (d) [Task 7d · B4] `wide` 칸 — 세로 그림 넷(6 · 8 · 9 · 10)의 **가로 창 넓은 그림**(A4)
+       가로 창(min-aspect-ratio 1/1 — hub-bars-121 6 절과 같은 조건)에서는 img 대신 wide 그림을 깔고 레이어 비를
+       MAP_WIDE_GEO(2600:1271)로 둔다. 넓은 그림 가운데(x 1006~1593)가 세로 그림 원본(587x1271 로 줄인 것)이라 노드 · 관문은
+       mapWideXY 식(x' = (1006 + x% × 5.87)/2600 · 폭 × 587/2600 · 세로 그대로 — A4 geometry.json)으로 같은 그림 자리에 앉는다.
+       세로 창은 img · ar · 앵커표 그대로. 옛 임시 D8(가로 창 가운데 기둥 + 어둡게 덮은 양옆)은 은퇴.
      ------------------------------------------------------------------------ */
   var MAP_CHAPTERS = [
     { img: '',                 ar: '',           zoom: 1.00, x: '0%', tint: '',        alpha: 0    },  //  1 젤리 숲
@@ -48294,11 +48325,11 @@ window.TT_SFX = {
     { img: '',                 ar: '',           zoom: 1.00, x: '0%', tint: '#F5A97C', alpha: 0.08 },  //  3 캔디 케인 사막
     { img: '',                 ar: '',           zoom: 1.00, x: '0%', tint: '#8FE3C8', alpha: 0.08 },  //  4 박하 언덕
     { img: '',                 ar: '',           zoom: 1.00, x: '0%', tint: '#A9713F', alpha: 0.08 },  //  5 초코 관문
-    { img: '--art-map-ch06',   ar: '780/1688',   zoom: 1.00, x: '0%', tint: '',        alpha: 0    },  //  6 크림 회랑
+    { img: '--art-map-ch06',   ar: '780/1688',   zoom: 1.00, x: '0%', tint: '',        alpha: 0,    wide: '--art-map-ch06-w' },  //  6 크림 회랑
     { img: '',                 ar: '',           zoom: 1.00, x: '0%', tint: '#E0A64B', alpha: 0.08 },  //  7 시럽 미로
-    { img: '--art-map-ch08',   ar: '780/1688',   zoom: 1.00, x: '0%', tint: '#EFD9E6', alpha: 0.06 },  //  8 설탕 감옥
-    { img: '--art-map-ch09',   ar: '780/1688',   zoom: 1.00, x: '0%', tint: '',        alpha: 0    },  //  9 심장의 방
-    { img: '--art-map-ch10',   ar: '780/1688',   zoom: 1.00, x: '0%', tint: '',        alpha: 0    }   // 10 왕좌
+    { img: '--art-map-ch08',   ar: '780/1688',   zoom: 1.00, x: '0%', tint: '#EFD9E6', alpha: 0.06, wide: '--art-map-ch08-w' },  //  8 설탕 감옥
+    { img: '--art-map-ch09',   ar: '780/1688',   zoom: 1.00, x: '0%', tint: '',        alpha: 0,    wide: '--art-map-ch09-w' },  //  9 심장의 방
+    { img: '--art-map-ch10',   ar: '780/1688',   zoom: 1.00, x: '0%', tint: '',        alpha: 0,    wide: '--art-map-ch10-w' }   // 10 왕좌
   ];
 
   /** 다음 챕터의 배경이 **외부 파일**이면 미리 물어 둔다(임베드는 이미 문서에
@@ -48308,12 +48339,13 @@ window.TT_SFX = {
   function mapPreloadChapterArt(c) {
     if (typeof Image === 'undefined') return;
     var ch = MAP_CHAPTERS[(c | 0) - 1];
-    if (!ch || !ch.img || mapPre[ch.img]) return;
+    var img = ch && (mapWideArt(c | 0) || ch.img);   /* [Task 7d] 가로 창이면 그 챕터가 실제로 깔 넓은 그림을 묻는다 */
+    if (!img || mapPre[img]) return;
     var raw = (typeof getComputedStyle !== 'undefined' && document.documentElement)
-      ? getComputedStyle(document.documentElement).getPropertyValue(ch.img).trim() : '';
+      ? getComputedStyle(document.documentElement).getPropertyValue(img).trim() : '';
     var m = /^url\((['"]?)([^'")]+)\1\)$/.exec(raw);
-    if (!m || m[2].indexOf('data:') === 0) { mapPre[ch.img] = 1; return; }
-    mapPre[ch.img] = 1;
+    if (!m || m[2].indexOf('data:') === 0) { mapPre[img] = 1; return; }
+    mapPre[img] = 1;
     try { var im = new Image(); im.src = m[2]; } catch (e) { /* 화면과 무관 */ }
   }
 
@@ -48424,6 +48456,7 @@ window.TT_SFX = {
     /* 관문 마커. 버튼이 아니라 표지라서 <span> 이고, 탭도 포커스도 받지
        않는다(§A "탭 불가"). 챕터마다 가리키는 곳이 다르다. */
     var gate = MAP_GATES[mapChap - 1] || MAP_GATES[0];
+    if (mapWideArt(mapChap)) gate = mapWideXY(gate);   /* [Task 7d] 넓은 그림이면 관문 표지도 같은 식으로 옮긴다(노드와 한 좌표계) */
     var g = document.createElement('span');
     g.className = 'map-node st-gate';
     g.setAttribute('aria-hidden', 'true');
@@ -48451,15 +48484,15 @@ window.TT_SFX = {
       /* 0901 (5-a) — 세로 배경 넷은 레이어의 종횡비를 자기 그림에 맞춘다.
          값은 MAP_CHAPTERS 의 ar 칸이고, 없으면 CSS 기본값(:10190)과 같은
          파노라마 비율로 돌아간다. 배경을 미는 값(zoom/x)은 안 건드린다. */
-      layer.style.aspectRatio = ch.ar || '2600 / 1272';
-      if (ch.img) layer.style.backgroundImage = 'var(' + ch.img + ')';
+      /* [Task 7d · B4] 가로 창의 세로 그림 챕터(6 · 8 · 9 · 10)는 넓은 그림(wide) — 레이어 비 = 그 그림(2600:1271) · 노드는 mapAnchors 가 옮긴 자리.
+         data-ar="wide" = hub-bars-121 6 절의 「들어 올릴 높이」 규칙 표지. 옛 data-ar="tall"(창 높이 기둥) · #map-view 의 --map-art(어둡게 덮은 양옆) = 임시 D8 은퇴. */
+      var wide = mapWideArt(mapChap);
+      layer.style.aspectRatio = wide ? (MAP_WIDE_GEO.w + ' / ' + MAP_WIDE_GEO.h) : (ch.ar || '2600 / 1272');
+      if (wide) layer.style.backgroundImage = 'var(' + wide + ')';
+      else if (ch.img) layer.style.backgroundImage = 'var(' + ch.img + ')';
       else layer.style.backgroundImage = '';
-      /* [판정판 121] 세로 그림 챕터 표지 — 가로 창에서 그 챕터는 창 높이에 맞춰 가운데에 서고(mapFit) 양옆을 같은 그림이 덮는다(hub-bars-121 §6). */
-      var arp = String(ch.ar || '2600/1272').split('/');
-      if ((parseFloat(arp[0]) || 1) < (parseFloat(arp[1]) || 1)) layer.setAttribute('data-ar', 'tall');
+      if (wide) layer.setAttribute('data-ar', 'wide');
       else layer.removeAttribute('data-ar');
-      var view = $('map-view');
-      if (view && view.style) view.style.setProperty('--map-art', ch.img ? 'var(' + ch.img + ')' : 'var(--art-map-bg)');
     }
     var tint = $('map-tint');
     if (tint && tint.style) {
@@ -52656,8 +52689,11 @@ window.TT_SFX = {
        되어 드래그가 저절로 성립하지 않게 된다. */
     var ms = $('screen-map');
     if (ms && ms.classList && ms.classList.contains('active')) {
+      /* [Task 7d · B4] 세로 그림 챕터는 방향이 바뀌면 그림 · 노드 자리가 바뀐다(가로 = 넓은 그림 · 세로 = 세로 그림) — 표지가 지금 방향과
+         어긋날 때만 다시 짓는다(지금 노드 가운데). 440ms 뒤에 한 번 더 보는 까닭은 아래 mapFit 과 같다. */
+      mapWideSync();
       mapFit();
-      later(mapFit, 440);   // iOS 회전 직후의 낡은 뷰포트 값 대비 (layout() 과 같은 이유)
+      later(function () { mapWideSync(); mapFit(); }, 440);   // iOS 회전 직후의 낡은 뷰포트 값 대비 (layout() 과 같은 이유)
     }
   }
 
@@ -56597,9 +56633,15 @@ html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catal
      넷을 임베드하면 base64 팽창으로 +600KB 가 붙는다. 프리로드는 이미 있다.
      ------------------------------------------------------------------------ */
   --art-map-ch06:url("catalog/art-map-ch06.webp");     /* ch6  크림 회랑 (780x1688) */
-  --art-map-ch08:url("catalog/art-map-ch08.webp");     /* ch8  설탕 감옥 (780x1688) */
-  --art-map-ch09:url("catalog/art-map-ch09.webp");     /* ch9  심장의 방 (780x1688) */
-  --art-map-ch10:url("catalog/art-map-ch10.webp");     /* ch10 왕좌     (780x1688) */
+  /* [Task 7d] 08 · 09 · 10 = 오른쪽 아래 제미나이 별을 지운 사본(A4 — 같은 이름 · 같은 크기). ?v=2 = 서비스워커 cache-first 가 옛 그림을 붙들지 않게. */
+  --art-map-ch08:url("catalog/art-map-ch08.webp?v=2"); /* ch8  설탕 감옥 (780x1688) */
+  --art-map-ch09:url("catalog/art-map-ch09.webp?v=2"); /* ch9  심장의 방 (780x1688) */
+  --art-map-ch10:url("catalog/art-map-ch10.webp?v=2"); /* ch10 왕좌     (780x1688) */
+  /* [Task 7d · B4] 가로 창의 넓은 그림 넷(A4 — 2600x1271 · 가운데 x 1006~1593 = 세로 그림 원본 587x1271 · 양옆 이어 그림). MAP_CHAPTERS 의 wide 칸이 부른다. */
+  --art-map-ch06-w:url("catalog/art-map-ch06-w.webp");
+  --art-map-ch08-w:url("catalog/art-map-ch08-w.webp");
+  --art-map-ch09-w:url("catalog/art-map-ch09-w.webp");
+  --art-map-ch10-w:url("catalog/art-map-ch10-w.webp");
   --ch-boss-face-mint:url("catalog/ch-boss-face-mint.webp");
   --ch-boss-face-cocoa:url("catalog/ch-boss-face-cocoa.webp");   /* [판정판 121 · Task 6] .bs-cocoa 의 얼굴(종전 포도 얼굴 빌림) */
   /* ---- W7 표준 4크롭 × 4캐릭터. CHAR_STD 의 낱말 넷과 짝이다 ---- */
@@ -71485,8 +71527,11 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
    노드 좌표는 레이어(#map-layer — 그림 비율 상자, 2600:1272)에 대한 % 라(MAP_ANCHORS_CH · makeMapNode) 그 상자를 키우면 노드가 그림 위
    같은 자리에 그대로 앉는다. 상자 높이 --map-lh = 창 높이와 「창 폭으로 덮는 높이」 중 큰 값 — 16:9 창은 높이로(폭이 남아 좌우 드래그),
    아주 넓은 창(2000×740)은 폭으로 덮고(드래그 0) 기본 규칙(25-3)의 들어 올림이 최저 노드를 아래 줄 위로 올린다(창을 덮는 데까지만).
-   세로 그림 챕터(6 · 8 · 9 · 10, data-ar="tall")는 덮으면 노드가 창 밖으로 흩어지므로 높이를 창에 맞추고 가운데(mapFit)에 세운다 —
-   양옆은 같은 챕터 그림을 또렷하게 덮고 정적 어둡게 한 겹(--map-dim-a, 애니메이트 없음)을 얹은 #map-view 바탕(흐림 0).
+   [Task 7d · B4] 세로 그림 챕터(6 · 8 · 9 · 10)도 가로 창에서는 넓은 그림(A4 · 2600:1271 · data-ar="wide")으로 같은 cover 를 쓴다 — 옛 임시 D8
+   (창 높이 기둥 data-ar="tall" + #map-view 의 같은 그림 · 어둡게 덮은 양옆 · color-mix 대체)은 은퇴. 이 넷은 최저 노드가 그림의 85% 근처라
+   (파노라마 장은 그보다 위) 창 높이 그대로 덮으면 들어 올릴 자리가 없어 51 · 71 · 81~85 · 91 번이 아래 줄 밑으로 들어간다 → 들어 올릴 수 있는
+   가장 낮은 높이 (띠 + 여유)/(1 − 최저 노드 몫)을 max 에 하나 더한다. 그 높이에서 위 top 식은 「레이어 아래끝 = 창 아래끝 · 최저 노드
+   아래끝 = 띠 + 여유 위」 가 되고 그림 위쪽이 그만큼 창 밖으로 나간다(16:9 에서 약 25% — 노드 · 길은 그림 아래 절반이라 창 안).
    띠 = 공용 아래 줄 높이(창 아래 끝 − --safe-b − 7u − 가운데 판 120u — 위 5 절 「세로 기준 = 창 가장자리」). 노드 번호 글자(그림 높이 비)도
    상자 높이를 따른다. */
 @media (min-aspect-ratio: 1/1) {
@@ -71494,46 +71539,21 @@ html[lang="en"] #app .bb > .bb-theater > .bb-lab { top: 71%; white-space: normal
     --map-lh: max(100dvh, calc(100vw * 1272 / 2600));
     --map-bar: calc(var(--safe-b) + var(--stage-u) * 127);
   }
-  /* 세로 그림 챕터 — 창 위 끝부터 아래 줄 위(띠 + 여유)까지의 높이 · 위 끝 0. 최저 노드(그림의 85%)가 아래 줄에 안 가린다(창 높이 그대로면
-     51 · 61 … 번이 가운데 판 밑으로 들어갔다 — 1280×720 실측). 아래 남는 띠는 #map-view 바탕(같은 그림 · 정적 어둡게)이 채운다. */
-  #screen-map #map-layer[data-ar="tall"] { --map-lh: calc(100dvh - var(--map-bar) - var(--map-safe-gap)); top: 0; }
+  #screen-map #map-layer[data-ar="wide"] {
+    --map-safe-gap: calc(var(--stage-u) * 10);   /* 띠와의 여유도 무대 자(1280 기준 10px 그대로 — 1920×1080 은 15px) */
+    --map-lh: max(100dvh, calc(100vw * 1272 / 2600), calc((var(--map-bar) + var(--map-safe-gap)) / (1 - var(--map-n1b))));
+  }
   #screen-map #map-path .mn-num {
     font-size: max(var(--text-min), calc(var(--h, 5) * .44 * var(--map-lh) / 100));
     -webkit-text-stroke-width: calc(var(--h, 5) * .0396 * var(--map-lh) / 100);
   }
-  #screen-map #map-view {
-    --map-dim-a: .35;
-    background-image:
-      linear-gradient(color-mix(in srgb, var(--prim-ink) calc(var(--map-dim-a) * 100%), transparent),
-                      color-mix(in srgb, var(--prim-ink) calc(var(--map-dim-a) * 100%), transparent)),
-      var(--map-art, var(--art-map-bg));
-    background-repeat: no-repeat, no-repeat;
-    background-position: center center, center center;
-    background-size: 100% 100%, cover;
-  }
 }
-/* 6 절의 대체(리뷰 Minor 1) — 위 선언보다 뒤라 이긴다.
-   ① dvh 를 모르는 기기: 레이어 높이 두 줄을 vh 로(0 절 대체와 같은 까닭 — 사용자 정의 속성이라 @supports 로 감싼다).
-   ② color-mix 를 모르는 기기(iOS 16.1 · Chrome 110 아래): 바탕 선언 전체가 버려져 세로 그림 챕터 양옆이 빈 바탕이 된다 → 같은 그림 위에
-      잉크 알파 토큰 --prim-line-light(= --prim-ink 와 같은 rgb 34 27 46 · 알파 .1) 네 겹 = 1 − .9⁴ = .344(≈ --map-dim-a .35)로 어둡게 한다
-      (새 색 0 — 바뀌지 않는 정적 바탕). */
+/* 6 절의 대체(리뷰 Minor 1) — 위 선언보다 뒤라 이긴다. dvh 를 모르는 기기: 레이어 높이 두 줄을 vh 로(0 절 대체와 같은 까닭 — 사용자 정의
+   속성이라 @supports 로 감싼다). [Task 7d] 옛 color-mix 대체(세로 그림 챕터 양옆 어둡게)는 D8 과 함께 은퇴. */
 @supports not (height: 100dvh) {
   @media (min-aspect-ratio: 1/1) {
     #screen-map #map-layer { --map-lh: max(100vh, calc(100vw * 1272 / 2600)); }
-    #screen-map #map-layer[data-ar="tall"] { --map-lh: calc(100vh - var(--map-bar) - var(--map-safe-gap)); }
-  }
-}
-@supports not (color: color-mix(in srgb, red, red)) {
-  @media (min-aspect-ratio: 1/1) {
-    #screen-map #map-view {
-      background-image:
-        linear-gradient(var(--prim-line-light), var(--prim-line-light)), linear-gradient(var(--prim-line-light), var(--prim-line-light)),
-        linear-gradient(var(--prim-line-light), var(--prim-line-light)), linear-gradient(var(--prim-line-light), var(--prim-line-light)),
-        var(--map-art, var(--art-map-bg));
-      background-repeat: no-repeat;
-      background-position: center center;
-      background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, cover;
-    }
+    #screen-map #map-layer[data-ar="wide"] { --map-lh: max(100vh, calc(100vw * 1272 / 2600), calc((var(--map-bar) + var(--map-safe-gap)) / (1 - var(--map-n1b)))); }
   }
 }
 </style>
@@ -74991,8 +75011,11 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
   color: var(--prim-art-ink);
 }
 #app #screen-story .cut-skip[hidden] { display: none; }
-/* 가로(창 가로 ≥ 세로 — 대사 판이 창 폭 전부로 눕는다): 자 = 무대 자 u(1280×720 에서 1u = 1px). 대사 글자 = 21u(옛 15px 의 1.4배) · 안여백 · 이름 알약도 u. */
+/* 가로(창 가로 ≥ 세로 — 대사 판이 창 폭 전부로 눕는다): 자 = 무대 자 u(1280×720 에서 1u = 1px). 대사 글자 = 21u(옛 15px 의 1.4배) · 안여백 · 이름 알약도 u.
+   [Task 7d] 화면 = 창 전체(메인 · 지도 · 상점과 같은 틀 — hub-bars-121 5 절의 fixed · inset 0). 900px 아래 가로 창(821×462 · 844×390)은 #app 이 620 폭 기둥이라
+   컷 그림이 가운데 기둥 · 양옆 빈 바탕이었다 — 컷 그림(cover)이 창을 덮는다. 900 이상은 #app 이 이미 창 폭이라 상자 무변. */
 @media (min-aspect-ratio: 1/1) {
+  #app #screen-story { position: fixed; inset: 0; width: auto; min-height: 0; max-width: none; margin: 0; }
   #app #cut-bar { padding: calc(var(--stage-u) * 22) calc(var(--stage-u) * 28) calc(var(--stage-u) * 18); }
   #app #cut-bar .cut-line { font-size: max(var(--text-min), calc(var(--stage-u) * 21)); }
   #app #cut-bar .cut-who.kit-pill-v2 { --f2-bh: calc(var(--stage-u) * 34); left: calc(var(--stage-u) * 24); }
