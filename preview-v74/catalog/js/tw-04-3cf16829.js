@@ -18972,6 +18972,7 @@ openShopScreen: openShopScreen, closeShopScreen: closeShopScreen, setShopTab: se
 dealBuy: dealBuy, dealGearOf: dealGearOf, dealLeft: dealLeft,   /* P3 T5 — 특가 */
 gachaTable: gachaTable, gachaPull: gachaPull, gachaBuy: gachaBuy, gachaPick: gachaPick, gachaDrawItem: gachaDrawItem, friendOwned: friendOwned, grantFriend: grantFriend, GACHA_PRICE: GACHA_PRICE, GACHA_TIER_P: GACHA_TIER_P, GACHA_TEN_UP: GACHA_TEN_UP,   /* P3 T6 — 뽑기 엔진(표 한 출처) */
 gachaKindSet: gachaKindSet, gachaRun: gachaRun, gachaPlay: gachaPlay, openOdds: openOdds, closeOdds: closeOdds, pctText: pctText,   /* P3 T7 — 뽑기 탭 · 확률 정보 창 */
+capRowName: capRowName, capRowArt: capRowArt,   /* [Task 7c 수정 2회차] rc1009 M-2 — 확률 창 후보 줄 이름 · 그림의 한 출처를 화면에서 대조하는 스모크 손잡이 */
 gresOpenAll: gresOpenAll, gresClose: gresClose, gresOpen: gresOpen,   /* P3 T8 — 뽑기 결과 창(캡슐 · 카드 뒤집기). gresOpen 은 수정 1회차(결제 없이 여는 손잡이 — 성능 귀속 측정 · 뒤 태스크) */
 adCapLeft: adCapLeft, adRowOk: adRowOk, watchAdFor: watchAdFor, paintCoinX2: paintCoinX2, twWatchAdForHeart: twWatchAdForHeart, P3_AD_COIN: P3_AD_COIN, P3_AD_STAR: P3_AD_STAR,   /* P3 T9 — 보상형 광고 */
 friendDupPay: friendDupPay, P3_DUP_STAR: P3_DUP_STAR,   /* P3 T10 — 중복 친구 별 +10 */
