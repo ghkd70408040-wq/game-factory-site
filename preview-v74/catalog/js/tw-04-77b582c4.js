@@ -2408,7 +2408,7 @@ en: {
 'rules.r2': 'Joined by a <b>straight path</b> across, down, or diagonally.',
 'rules.r3': 'Or the <b>end</b> of a row to the <b>start</b> of the next.',
 'rules.note': 'Either way, nothing may be left standing in between.',
-'skills.title': 'Three buttons in battle',
+'skills.title': 'Battle gauges & buttons',
 'skills.s1': '<b>Attack</b> fills on your hero\'s name plate and fires on its own when full.',
 'skills.s2': '<b>Awakening</b> fills only when you <b>alternate</b> sum-10 and same-number matches. Tap it to score <b>×{am}</b> for {awk}s.',
 'skills.s3': "<b>Skill</b> fills with every match, faster at higher combos. Tap it to fire your hero's own skill.",
@@ -3571,7 +3571,7 @@ ko: {
 'rules.r2': '가로·세로·대각선 <b>곧은 길</b>로 이어질 것',
 'rules.r3': '또는 줄 <b>끝</b>에서 다음 줄 <b>첫 칸</b>으로',
 'rules.note': '어느 쪽이든 사이에 타일이 남아 있으면 안 돼.',
-'skills.title': '전투의 세 단추',
+'skills.title': '전투 게이지와 단추',
 'skills.s1': '<b>공격</b> 게이지는 캐릭터 이름판에서 차고, 다 차면 저절로 공격해요.',
 'skills.s2': '<b>각성</b> 게이지는 합이 10인 짝과 같은 숫자 짝을 <b>번갈아</b> 맞출 때만 차요. 누르면 {awk}초 동안 점수가 <b>{am}배</b>예요.',
 'skills.s3': '<b>스킬</b> 게이지는 매치마다, 콤보가 높을수록 빨리 차요. 누르면 캐릭터 스킬을 써요.',
@@ -6721,27 +6721,41 @@ if (isFinite(v) && v > 0 && String(raw).indexOf('ms') < 0) v *= 1000;
 multLifeCache = (isFinite(v) && v > 0) ? v : 1000;   /* 토큰을 못 읽을 때의 안전값 */
 return multLifeCache;
 }
+function multBandHalf(size) { return size * 0.47 + size * 0.105 + 2; }
 function multBandGap() {
 var vh = (typeof window !== 'undefined' ? (window.innerHeight || 844) : 844);
 var top = 0, i, el, r;
-var bot = 0, br = null;
+var bot = 0, br = null, yieldTc = false;
 el = $('board') || $('board-scroll');
 if (el && el.getBoundingClientRect) {
 br = el.getBoundingClientRect();
 if (br.height > 0) bot = br.top;
 }
-var side = !!(br && br.width > 0 && battleOn() && battleStage());
+var side = !!(br && br.width > 0 && battleStage());
 var ids = ['duel-hud', 'classic-hud', 'topbar', 'tb-stats', 'hud-row', 'boss-bar'];
+if (side) ids.push('rush-timer');
 for (i = 0; i < ids.length; i++) {
 el = $(ids[i]);
 if (!el || el.hidden || !el.getBoundingClientRect) continue;
 r = el.getBoundingClientRect();
 if (r.width <= 0 || r.height <= 0) continue;
 if (side && (r.right <= br.left || r.left >= br.right)) continue;
+if (side && r.bottom > br.top && r.top < br.bottom) continue;
 if (r.bottom > top) top = r.bottom;
 }
-if (!(bot > 0) || !(bot > top)) { top = vh * 0.06; bot = vh * 0.18; }
-return { top: top, bot: bot };
+if (side) {
+el = $('ch-tc');
+if (el && !el.hidden && el.getBoundingClientRect) {
+r = el.getBoundingClientRect();
+if (r.width > 0 && r.height > 0 && r.right > br.left && r.left < br.right &&
+!(r.bottom > br.top && r.top < br.bottom) && r.bottom > top) {
+if (bot - r.bottom >= 2 * multBandHalf(MULT_BAND_MIN)) top = r.bottom;
+else yieldTc = true;
+}
+}
+}
+if (!(bot > 0) || !(bot > top)) { top = vh * 0.06; bot = vh * 0.18; yieldTc = false; }
+return { top: top, bot: bot, yieldTc: yieldTc };
 }
 function multBandWord(m, sub) {
 var g = multBandGap();
@@ -6750,14 +6764,34 @@ var size = multSize(m) * MULT_BAND_K;
 var byGap = gap * MULT_BAND_FILL;
 if (byGap < size) size = byGap;
 if (size < MULT_BAND_MIN) size = MULT_BAND_MIN;
-var half = size * 0.47 + size * 0.105 + 2;
+var half = multBandHalf(size);
 var y = (g.top + g.bot) / 2;
 if (y + half > g.bot) y = g.bot - half;      /* 판 위 끝을 넘지 않는다 */
 if (y - half < 0) y = half;                  /* 화면 위로도 안 나간다 */
 impactWord('×' + m, multColor(m), size,
 { topCss: Math.round(y * 10) / 10 + 'px', dur: multLifeMs(),
 sub: sub, plate: true, band: true, slot: 0 });
+if (g.yieldTc) multYieldTc();
 return { y: y, size: size, gap: gap };       /* smoke 가 읽는다 */
+}
+function multYieldTc() {
+var el = $('ch-tc');
+if (!el || !el.classList) return;
+if (el.mfT) { clearTimeout(el.mfT); el.mfT = 0; }
+el.classList.remove('mult-yield');
+el.classList.remove('mult-yield-still');
+void el.offsetWidth;
+if (fxReduced()) {
+el.classList.add('mult-yield-still');
+var hold = Math.round(multLifeMs());
+if (hold < 1400) hold = 1400;
+el.mfT = setTimeout(function () {
+el.mfT = 0;
+el.classList.remove('mult-yield-still');
+}, hold);
+return;
+}
+el.classList.add('mult-yield');
 }
 var multFxUntil = 0;
 function multFxOn() { return now() < multFxUntil; }
