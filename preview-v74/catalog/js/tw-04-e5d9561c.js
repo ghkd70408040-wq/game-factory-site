@@ -5030,6 +5030,8 @@ if (ss.hidden !== isRush()) ss.hidden = isRush();
 var sk = ss.querySelector ? ss.querySelector('.stat-k') : null;
 var skv = isDaily() ? t('hud.daily') : t('hud.stage');
 if (sk && sk.textContent !== skv) sk.textContent = skv;
+if (ss.getAttribute('aria-label') !== skv) ss.setAttribute('aria-label', skv);
+setCls(ss, 'is-daily', isDaily());
 }
 setText('score-val', S.score);
 var bestShown;

@@ -8277,7 +8277,7 @@ box-shadow: 0 0 0 2px rgba(110, 70, 58, .55);
 .act.off .act-badge { background: rgba(253, 243, 220, .5); color: rgba(92, 64, 51, .6); }
 @media (max-width: 400px) {
 .act { --act-bw-t: 13px; --act-bw-r: 12px; --act-bw-b: 15px; --act-bw-l: 12px; }
-.act .act-t { font-size: 10px; padding: 1px 5px 2px; }
+.act .act-t { font-size: var(--text-min); padding: 1px 5px 2px; }   /* [Task 7c] 옛 10px(400 이하 en — ko 는 11.5px 규칙이 이긴다) — 글자 하한(관문 play · win 줄 en 390 · 360 「Add」 10px) */
 }
 @media (max-height: 739px) {
 #char-pick .cc-art { height: auto; }
@@ -9263,7 +9263,7 @@ filter: drop-shadow(0 0 10px rgba(102, 240, 159, .40));
 <link rel="preload" as="image" href="catalog/jelly-box-c.webp">
 <link rel="preload" as="image" href="catalog/duel-title-play.webp">
 <!-- ==RELEASE:BEGIN== 출시 메타 (scratchpad/release-0908/apply-head.py 가 생성·교체, 본문 무접촉) -->
-<meta name="build" content="060b331-20261021-1149">
+<meta name="build" content="d176776-20261021-1517">
 <meta name="application-name" content="텐트윈 젤리팡 월드">
 <meta name="description" lang="ko" content="숫자 젤리를 골라 10을 만들어 터뜨리는 퍼즐이에요. 모험·아케이드·데일리·타임 러시·클래식을 즐겨요. Ten Twin Jelly Pang World: pick number jellies that equal or sum to 10.">
 <link rel="manifest" href="tentwin.webmanifest">
@@ -9317,7 +9317,7 @@ navigator.serviceWorker.register('sw.js',{scope:'./'}).catch(function(e){console
 })}
 </script>
 <!-- ==RELEASE:END== -->
-<link rel="preload" as="style" href="tw-late-bd1b811b.css">
+<link rel="preload" as="style" href="tw-late-71297c24.css">
 </head>
 <body>
 <!-- ============================================================
@@ -9758,15 +9758,17 @@ v3~5 는 [일시정지 | 다섯 개의 .stat] 한 줄이었고, style.css 의 �
 <!-- [hud-unify 0910] 칸 = capsule Component 의 code 변주 인스턴스.
 슬롯 수는 모드가 정한다(syncHud 의 [hidden] 그대로): 아케이드 4 ·
 타임러시 3(단계 내림, 시계는 #rush-timer) · 데일리 5(단계=데일리# + 시간).
-«캡슐 인스턴스 수만 다르고 칸의 부품은 하나»가 이 파도의 계약이다. -->
+«캡슐 인스턴스 수만 다르고 칸의 부품은 하나»가 이 파도의 계약이다.
+[Task 7c · 지휘자 판정 (b) 2026-10-21] 칸 = [글리프 .stat-i][값 .stat-v] — 클래식 위 바 .ch-g 와 같은 문법. 이름 .stat-k 는 화면에서 뺀다
+(글자 하한 11px 에서 이름 + 큰 수가 칸에 안 들었다 — 칸 자리 · 크기 무변). 읽기 프로그램 이름 = 칸의 aria-label(data-i18n-aria · 데일리는 syncHud). -->
 <div id="tb-stats" data-part="hud" data-variant="stats">
-<div class="stat" id="stat-stage" data-part="capsule" data-variant="code" data-slot="stage"><span class="stat-k" data-i18n="hud.stage">Stage</span><span id="stage-val" class="stat-v">1</span></div>
-<div class="stat" data-part="capsule" data-variant="code" data-slot="score"><span class="stat-k" data-i18n="hud.score">Score</span><span id="score-val" class="stat-v">0</span></div>
-<div class="stat" data-part="capsule" data-variant="code" data-slot="best"><span class="stat-k" data-i18n="hud.best">Best</span><span id="best-val" class="stat-v">0</span></div>
+<div class="stat" id="stat-stage" data-part="capsule" data-variant="code" data-slot="stage" role="group" data-i18n-aria="hud.stage" aria-label="Stage"><i class="stat-i" aria-hidden="true"></i><span class="stat-k" data-i18n="hud.stage">Stage</span><span id="stage-val" class="stat-v">1</span></div>
+<div class="stat" data-part="capsule" data-variant="code" data-slot="score" role="group" data-i18n-aria="hud.score" aria-label="Score"><i class="stat-i" aria-hidden="true"></i><span class="stat-k" data-i18n="hud.score">Score</span><span id="score-val" class="stat-v">0</span></div>
+<div class="stat" data-part="capsule" data-variant="code" data-slot="best" role="group" data-i18n-aria="hud.best" aria-label="Best"><i class="stat-i" aria-hidden="true"></i><span class="stat-k" data-i18n="hud.best">Best</span><span id="best-val" class="stat-v">0</span></div>
 <!-- v4 A-1: remaining valid matches (사천성-style). game.js recomputes it only
 when the board actually changed, never per frame. -->
-<div class="stat" id="stat-moves" data-part="capsule" data-variant="code" data-slot="moves"><span class="stat-k" data-i18n="hud.moves">Moves</span><span id="moves-val" class="stat-v">0</span></div>
-<div class="stat" id="stat-timer" data-part="capsule" data-variant="code" data-slot="time" hidden><span class="stat-k" data-i18n="hud.time">Time</span><span id="timer-val" class="stat-v">0:00</span></div>
+<div class="stat" id="stat-moves" data-part="capsule" data-variant="code" data-slot="moves" role="group" data-i18n-aria="hud.moves" aria-label="Moves"><i class="stat-i" aria-hidden="true"></i><span class="stat-k" data-i18n="hud.moves">Moves</span><span id="moves-val" class="stat-v">0</span></div>
+<div class="stat" id="stat-timer" data-part="capsule" data-variant="code" data-slot="time" role="group" data-i18n-aria="hud.time" aria-label="Time" hidden><i class="stat-i" aria-hidden="true"></i><span class="stat-k" data-i18n="hud.time">Time</span><span id="timer-val" class="stat-v">0:00</span></div>
 </div>
 </header>
 <!-- ============================================================
@@ -12463,7 +12465,7 @@ game.js **앞**이어야 한다 — 부팅 직후 나는 소리까지 클립으�
 이 파일을 빼고 빌드해도 게임은 돈다 — 그때는 모든 슬롯이 기존 신스다. -->
 <script defer src="catalog/js/tw-02-7ea6fa41.js"></script>
 <script defer src="catalog/js/tw-03-06721556.js"></script>
-<script defer src="catalog/js/tw-04-c1d6c7c8.js"></script>
+<script defer src="catalog/js/tw-04-e5d9561c.js"></script>
 <!-- ==FRUITDEF:BEGIN== generated by tools/fruit-tiles.js — do not edit by hand -->
 <!-- 열매 실루엣 클립 패스 9종 (DESIGN-V4 §5.8). clipPathUnits="objectBoundingBox"
 라 좌표가 0..1 이고, 타일 크기(--ts)가 어떤 값이든 같은 모양이 나온다.
@@ -12541,13 +12543,13 @@ width/height 0 + aria-hidden: 레이아웃·접근성 트리에 아무것도 더
 
 
 
-<link rel="stylesheet" href="tw-late-bd1b811b.css">
+<link rel="stylesheet" href="tw-late-71297c24.css">
 <style id="compat-p1">
 @supports not (width: 1cqw) {
 #app.classic #classic-hud { --cqw: min(1vw, calc(var(--app-max) / 100)); height: calc(38.5 * var(--cqw)); }
 #app.classic #ch-cap.wf-cap { --wcap-w: calc(42.3 * var(--cqw)); --wcap-h: calc(15.7 * var(--cqw)); left: calc(29.0 * var(--cqw)); top: calc(8.4 * var(--cqw)); }
 #app.classic #classic-hud .ch-g { --f2-ph: calc(6.9 * var(--cqw)); --jh: calc(8.09 * var(--cqw)); gap: calc(1.0 * var(--cqw)); padding: 0 calc(1.8 * var(--cqw)); border-image-width: 0 calc(5.37 * var(--cqw)); }
-#app.classic #classic-hud .ch-g::after { font-size: calc(2.85 * var(--cqw)); }
+#app.classic #classic-hud .ch-g::after { font-size: max(var(--text-min), calc(2.85 * var(--cqw))); }   /* [Task 7c] 글자 하한 */
 #app.classic #classic-hud .ch-g b { font-size: calc(4.2 * var(--cqw)); }
 #app.classic #classic-hud .ch-i { width: calc(4.4 * var(--cqw)); height: calc(4.4 * var(--cqw)); }
 #app.classic .ch-i-goal { box-shadow: inset 0 0 0 calc(.9 * var(--cqw)) #E86A9E, 0 1px 0 rgba(255,255,255,.75); }
@@ -13949,13 +13951,13 @@ color: var(--prim-art-ink); text-shadow: var(--mf-halo); }
 #modal-odds .od-box{ display: grid; grid-template-columns: 1fr 1fr; column-gap: calc(3 * var(--mu)); align-content: start; box-sizing: border-box; max-height: calc(28 * var(--mu)); padding-bottom: calc(.6 * var(--mu)); overflow-y: auto; overflow-x: hidden;
 -webkit-overflow-scrolling: touch; scrollbar-width: none; }
 #modal-odds .od-box::-webkit-scrollbar{ width: 0; height: 0; }
-#modal-odds .od-row{ display: flex; align-items: center; gap: calc(1.5 * var(--mu)); font-size: calc(3.3 * var(--mu)); color: var(--prim-art-ink); }
+#modal-odds .od-row{ display: flex; align-items: center; gap: calc(1.5 * var(--mu)); font-size: max(var(--text-min), calc(3.3 * var(--mu))); /* [Task 7c] 글자 하한(360 폭 10.26px) */ color: var(--prim-art-ink); }
 #modal-odds .od-row .od-p{ margin-left: auto; flex: none; }
 #modal-odds .od-row .od-n{ min-width: 0; text-align: left; word-break: keep-all; overflow-wrap: anywhere; }
-#modal-odds .sh-fine{ margin: calc(2.6 * var(--mu)) 0 0; font-size: calc(3 * var(--mu)); line-height: 1.5; text-align: center; color: var(--role-f2-ink); }
+#modal-odds .sh-fine{ margin: calc(2.6 * var(--mu)) 0 0; font-size: max(var(--text-min), calc(3 * var(--mu))); /* [Task 7c] 글자 하한(옛 10.1px — Task 8d 우려 3) */ line-height: 1.5; text-align: center; color: var(--role-f2-ink); }
 #modal-odds .sh-fine + .sh-fine{ margin-top: 0; }
 #modal-odds .od-ic{ width: calc(6.2 * var(--mu)); height: calc(6.2 * var(--mu)); flex: none; background: center / contain no-repeat; }
-#modal-odds .od-rules ul{ margin: 0; padding-left: calc(4 * var(--mu)); list-style: disc; text-align: left; font-size: calc(3.3 * var(--mu)); line-height: 1.55; color: var(--prim-art-ink); }
+#modal-odds .od-rules ul{ margin: 0; padding-left: calc(4 * var(--mu)); list-style: disc; text-align: left; font-size: max(var(--text-min), calc(3.3 * var(--mu))); /* [Task 7c] 글자 하한 */ line-height: 1.55; color: var(--prim-art-ink); }
 #modal-gres .sheet{ background: none; box-shadow: none; }                      /* 목업 R1 — 판 없음(이 창만 예외). 제목 캡슐은 남긴다 */
 #modal-gres .sheet > h2{ background-color: var(--prim-white); }               /* 수정 2회차 N-1 — 이 창만 밝은 캡슐: 면 바탕만 불투명 흰 토큰(새 값 0). 겉선 · 림 · 면 그림층 · 글자는 부품 그대로(대비 t8f2a · 확률 창 무변 t8f2b) */
 #modal-gres .sheet > h2, #modal-gres .sheet > p, #modal-gres #gres-all, #modal-gres .sheet-row{ flex: 0 0 auto; }
@@ -15229,6 +15231,24 @@ inset 0 0 0 calc(var(--bu) * 4) var(--mode-b-rim);
 #app.battle #actionbar .act.urge .act-halo .ah-spark { opacity: var(--mo-mk-100); }
 #app.battle #actionbar .act .act-halo { transition: none !important; }
 }
+.stat-i { display: none; }
+#app:not(.classic):not(.battle) #screen-game #tb-stats .stat {
+column-gap: calc(var(--wcap-h) * 1.0 / 6.9);
+}
+#app:not(.classic):not(.battle) #screen-game #tb-stats .stat-k { display: none; }
+#app:not(.classic):not(.battle) #screen-game #tb-stats .stat-i {
+display: block;
+flex: 0 0 auto;
+width: calc(var(--wcap-h) * 3.8 / 6.9);
+height: calc(var(--wcap-h) * 3.8 / 6.9);
+background: center / contain no-repeat;
+}
+#app:not(.classic):not(.battle) #screen-game #tb-stats .stat[data-slot="stage"] > .stat-i { background-image: var(--lib-glyph-flag); }
+#app:not(.classic):not(.battle) #screen-game #tb-stats .stat[data-slot="stage"].is-daily > .stat-i { background-image: var(--lib-glyph-cal); }
+#app:not(.classic):not(.battle) #screen-game #tb-stats .stat[data-slot="score"] > .stat-i { background-image: var(--lib-glyph-score); }
+#app:not(.classic):not(.battle) #screen-game #tb-stats .stat[data-slot="best"] > .stat-i { background-image: var(--lib-glyph-crown); }
+#app:not(.classic):not(.battle) #screen-game #tb-stats .stat[data-slot="moves"] > .stat-i { background-image: var(--lib-glyph-target); }
+#app:not(.classic):not(.battle) #screen-game #tb-stats .stat[data-slot="time"] > .stat-i { background-image: var(--lib-glyph-clock); }
 </style>
 <style id="gear-121">
 [data-under],
@@ -15806,6 +15826,7 @@ padding: 0 var(--w6m-pad-x) var(--w6m-pad-b);
 #app .modal .coin-x2.mf-pair[data-stack] { flex-direction: column; }
 #app .modal .coin-x2.mf-pair[data-stack] > .mf-btn { flex: 0 0 auto; }
 #app .modal .mf-btn { min-width: 0; }
+#app .modal .mf-btn { padding-bottom: calc(var(--f2-bh) * .04); }
 #app .modal :is(.mf-btn, .mf-soft, .mf-foot, .mf-side)[hidden] { display: none; }   /* 포털 전용 2배 줄(.coin-x2.mf-foot)도 숨으면 숨는다 */
 #app .modal :is(.mf-btn, .mf-soft) { word-break: keep-all; }
 @media (min-aspect-ratio: 1/1) {
@@ -15820,7 +15841,7 @@ gap: calc(var(--f2-w) * .026);
 }
 #app .modal .mf-soft.kit-pill-v2[data-variant="soft"] {
 --f2-bh: calc(var(--f2-w) * .0950);
-padding: 0 calc(var(--f2-bh) * .55);
+padding: 0 calc(var(--f2-bh) * .55) calc(var(--f2-bh) * .04);   /* [Task 7c] 아래 여백 .04bh — 위 .mf-btn 줄과 같은 글자 처짐 되돌리기 */
 font-size: max(var(--text-min), calc(var(--f2-bh) * .40));
 color: var(--prim-art-ink);
 text-shadow: none;
