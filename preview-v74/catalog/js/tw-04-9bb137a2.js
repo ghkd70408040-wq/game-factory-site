@@ -6732,6 +6732,13 @@ br = el.getBoundingClientRect();
 if (br.height > 0) bot = br.top;
 }
 var side = !!(br && br.width > 0 && battleStage());
+if (side && !battleOn()) {
+el = $('board-scroll');
+if (el && el.getBoundingClientRect) {
+r = el.getBoundingClientRect();
+if (r.height > 0 && r.top < bot) bot = r.top;
+}
+}
 var ids = ['duel-hud', 'classic-hud', 'topbar', 'tb-stats', 'hud-row', 'boss-bar'];
 if (side) ids.push('rush-timer');
 for (i = 0; i < ids.length; i++) {
