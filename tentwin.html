@@ -12907,7 +12907,7 @@ html[data-fruit="1"] .tile.blocker:not([data-sp]):not(.dead) {
 /* 390px 기기: 네 캡이 한 줄에 들어가야 하므로 캡 두께를 한 단 줄인다. */
 @media (max-width: 400px) {
   .act { --act-bw-t: 13px; --act-bw-r: 12px; --act-bw-b: 15px; --act-bw-l: 12px; }
-  .act .act-t { font-size: 10px; padding: 1px 5px 2px; }
+  .act .act-t { font-size: var(--text-min); padding: 1px 5px 2px; }   /* [Task 7c] 옛 10px(400 이하 en — ko 는 11.5px 규칙이 이긴다) — 글자 하한(관문 play · win 줄 en 390 · 360 「Add」 10px) */
 }
 
 /* ---- 26-5. 짧은 화면의 무대 높이 되돌리기 ----------------------------------
@@ -15181,15 +15181,17 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
       <!-- [hud-unify 0910] 칸 = capsule Component 의 code 변주 인스턴스.
            슬롯 수는 모드가 정한다(syncHud 의 [hidden] 그대로): 아케이드 4 ·
            타임러시 3(단계 내림, 시계는 #rush-timer) · 데일리 5(단계=데일리# + 시간).
-           «캡슐 인스턴스 수만 다르고 칸의 부품은 하나»가 이 파도의 계약이다. -->
+           «캡슐 인스턴스 수만 다르고 칸의 부품은 하나»가 이 파도의 계약이다.
+           [Task 7c · 지휘자 판정 (b) 2026-10-21] 칸 = [글리프 .stat-i][값 .stat-v] — 클래식 위 바 .ch-g 와 같은 문법. 이름 .stat-k 는 화면에서 뺀다
+           (글자 하한 11px 에서 이름 + 큰 수가 칸에 안 들었다 — 칸 자리 · 크기 무변). 읽기 프로그램 이름 = 칸의 aria-label(data-i18n-aria · 데일리는 syncHud). -->
       <div id="tb-stats" data-part="hud" data-variant="stats">
-      <div class="stat" id="stat-stage" data-part="capsule" data-variant="code" data-slot="stage"><span class="stat-k" data-i18n="hud.stage">Stage</span><span id="stage-val" class="stat-v">1</span></div>
-      <div class="stat" data-part="capsule" data-variant="code" data-slot="score"><span class="stat-k" data-i18n="hud.score">Score</span><span id="score-val" class="stat-v">0</span></div>
-      <div class="stat" data-part="capsule" data-variant="code" data-slot="best"><span class="stat-k" data-i18n="hud.best">Best</span><span id="best-val" class="stat-v">0</span></div>
+      <div class="stat" id="stat-stage" data-part="capsule" data-variant="code" data-slot="stage" role="group" data-i18n-aria="hud.stage" aria-label="Stage"><i class="stat-i" aria-hidden="true"></i><span class="stat-k" data-i18n="hud.stage">Stage</span><span id="stage-val" class="stat-v">1</span></div>
+      <div class="stat" data-part="capsule" data-variant="code" data-slot="score" role="group" data-i18n-aria="hud.score" aria-label="Score"><i class="stat-i" aria-hidden="true"></i><span class="stat-k" data-i18n="hud.score">Score</span><span id="score-val" class="stat-v">0</span></div>
+      <div class="stat" data-part="capsule" data-variant="code" data-slot="best" role="group" data-i18n-aria="hud.best" aria-label="Best"><i class="stat-i" aria-hidden="true"></i><span class="stat-k" data-i18n="hud.best">Best</span><span id="best-val" class="stat-v">0</span></div>
       <!-- v4 A-1: remaining valid matches (사천성-style). game.js recomputes it only
            when the board actually changed, never per frame. -->
-      <div class="stat" id="stat-moves" data-part="capsule" data-variant="code" data-slot="moves"><span class="stat-k" data-i18n="hud.moves">Moves</span><span id="moves-val" class="stat-v">0</span></div>
-      <div class="stat" id="stat-timer" data-part="capsule" data-variant="code" data-slot="time" hidden><span class="stat-k" data-i18n="hud.time">Time</span><span id="timer-val" class="stat-v">0:00</span></div>
+      <div class="stat" id="stat-moves" data-part="capsule" data-variant="code" data-slot="moves" role="group" data-i18n-aria="hud.moves" aria-label="Moves"><i class="stat-i" aria-hidden="true"></i><span class="stat-k" data-i18n="hud.moves">Moves</span><span id="moves-val" class="stat-v">0</span></div>
+      <div class="stat" id="stat-timer" data-part="capsule" data-variant="code" data-slot="time" role="group" data-i18n-aria="hud.time" aria-label="Time" hidden><i class="stat-i" aria-hidden="true"></i><span class="stat-k" data-i18n="hud.time">Time</span><span id="timer-val" class="stat-v">0:00</span></div>
       </div>
     </header>
     <!-- ============================================================
@@ -31632,6 +31634,10 @@ window.TT_SFX = {
       var sk = ss.querySelector ? ss.querySelector('.stat-k') : null;
       var skv = isDaily() ? t('hud.daily') : t('hud.stage');
       if (sk && sk.textContent !== skv) sk.textContent = skv;
+      /* [Task 7c] 이름 글자는 화면에서 빠졌다(칸 = [글리프][값]) — 읽기 프로그램 이름(aria-label)과 글리프(데일리 = 달력 · 그 밖 = 깃발)가 같은 갈래를 따른다.
+         applyI18n 이 언어를 바꿀 때 data-i18n-aria(hud.stage)로 되돌려도 setLang 이 곧바로 syncHud 를 불러 다시 맞춘다(위 이름 글자와 같은 규약). */
+      if (ss.getAttribute('aria-label') !== skv) ss.setAttribute('aria-label', skv);
+      setCls(ss, 'is-daily', isDaily());
     }
     setText('score-val', S.score);
     /* "Best" must mean the best of the mode being played. Daily used to show the
@@ -63618,7 +63624,7 @@ html.menu-v2 #screen-menu .tagline{
   order:1;
   flex:0 0 auto;
   font-family:var(--font-display);
-  font-size:2.85cqw;
+  font-size:max(var(--text-min), 2.85cqw);   /* [Task 7c] 글자 하한 11px — 360 폭 10.26px 였다(관문 minText 는 의사 요소를 못 재는 자리 · landscape-gate.json _doc 「알려진 자리」) */
   line-height:1;
   letter-spacing:-.02em;
   color:rgba(91,79,98,.74);
@@ -70280,7 +70286,7 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
 /* 글자 — 칸이 판을 따라 커지고 작아지므로 크기도 같은 자(cqw)로 잰다.
    최악 케이스 실측 근거: 칸 72.2px · 안폭 ≈ 59px, 「점수 + 5자리」 = 55px. */
 #app:not(.classic):not(.battle) #screen-game #tb-stats .stat-k{ font-size: 2.05cqw; }
-#app:not(.classic):not(.battle) #screen-game #tb-stats .stat-v{ font-size: 2.80cqw; }
+#app:not(.classic):not(.battle) #screen-game #tb-stats .stat-v{ font-size: max(var(--text-min), 2.80cqw); }   /* [Task 7c] 글자 하한(390 10.92 · 360 10.08px 였다) — 이름 .stat-k 는 play-8e 9절이 화면에서 뺀다 */
 /* 남은 짝 3개 이하 — 옛 처방은 붉은 우물 + 1px 링(background/box-shadow)이었는데
    그 두 자리는 이제 부품이 쓴다. 같은 «위험» 신호를 부품의 겉선·림으로 옮긴다
    (숫자 색과 두근거림 :1123 은 그대로 산다). */
@@ -70314,7 +70320,7 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
     padding: 0 calc(1.00 * var(--cqw));
   }
   #app:not(.classic):not(.battle) #screen-game #tb-stats .stat-k{ font-size: calc(2.05 * var(--cqw)); }
-  #app:not(.classic):not(.battle) #screen-game #tb-stats .stat-v{ font-size: calc(2.80 * var(--cqw)); }
+  #app:not(.classic):not(.battle) #screen-game #tb-stats .stat-v{ font-size: max(var(--text-min), calc(2.80 * var(--cqw))); }
 }
 
 }   /* @media 세로 끝 */
@@ -70338,7 +70344,7 @@ html[lang="en"] #app.battle .dh-foe .dh-name{
   #app.classic #classic-hud { --cqw: min(1vw, calc(var(--app-max) / 100)); height: calc(38.5 * var(--cqw)); }
   #app.classic #ch-cap.wf-cap { --wcap-w: calc(42.3 * var(--cqw)); --wcap-h: calc(15.7 * var(--cqw)); left: calc(29.0 * var(--cqw)); top: calc(8.4 * var(--cqw)); }
   #app.classic #classic-hud .ch-g { --f2-ph: calc(6.9 * var(--cqw)); --jh: calc(8.09 * var(--cqw)); gap: calc(1.0 * var(--cqw)); padding: 0 calc(1.8 * var(--cqw)); border-image-width: 0 calc(5.37 * var(--cqw)); }
-  #app.classic #classic-hud .ch-g::after { font-size: calc(2.85 * var(--cqw)); }
+  #app.classic #classic-hud .ch-g::after { font-size: max(var(--text-min), calc(2.85 * var(--cqw))); }   /* [Task 7c] 글자 하한 */
   #app.classic #classic-hud .ch-g b { font-size: calc(4.2 * var(--cqw)); }
   #app.classic #classic-hud .ch-i { width: calc(4.4 * var(--cqw)); height: calc(4.4 * var(--cqw)); }
   #app.classic .ch-i-goal { box-shadow: inset 0 0 0 calc(.9 * var(--cqw)) #E86A9E, 0 1px 0 rgba(255,255,255,.75); }
@@ -72344,13 +72350,13 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
 #modal-odds .od-box{ display: grid; grid-template-columns: 1fr 1fr; column-gap: calc(3 * var(--mu)); align-content: start; box-sizing: border-box; max-height: calc(28 * var(--mu)); padding-bottom: calc(.6 * var(--mu)); overflow-y: auto; overflow-x: hidden;
   -webkit-overflow-scrolling: touch; scrollbar-width: none; }
 #modal-odds .od-box::-webkit-scrollbar{ width: 0; height: 0; }
-#modal-odds .od-row{ display: flex; align-items: center; gap: calc(1.5 * var(--mu)); font-size: calc(3.3 * var(--mu)); color: var(--prim-art-ink); }
+#modal-odds .od-row{ display: flex; align-items: center; gap: calc(1.5 * var(--mu)); font-size: max(var(--text-min), calc(3.3 * var(--mu))); /* [Task 7c] 글자 하한(360 폭 10.26px) */ color: var(--prim-art-ink); }
 #modal-odds .od-row .od-p{ margin-left: auto; flex: none; }
 #modal-odds .od-row .od-n{ min-width: 0; text-align: left; word-break: keep-all; overflow-wrap: anywhere; }
-#modal-odds .sh-fine{ margin: calc(2.6 * var(--mu)) 0 0; font-size: calc(3 * var(--mu)); line-height: 1.5; text-align: center; color: var(--role-f2-ink); }
+#modal-odds .sh-fine{ margin: calc(2.6 * var(--mu)) 0 0; font-size: max(var(--text-min), calc(3 * var(--mu))); /* [Task 7c] 글자 하한(옛 10.1px — Task 8d 우려 3) */ line-height: 1.5; text-align: center; color: var(--role-f2-ink); }
 #modal-odds .sh-fine + .sh-fine{ margin-top: 0; }
 #modal-odds .od-ic{ width: calc(6.2 * var(--mu)); height: calc(6.2 * var(--mu)); flex: none; background: center / contain no-repeat; }
-#modal-odds .od-rules ul{ margin: 0; padding-left: calc(4 * var(--mu)); list-style: disc; text-align: left; font-size: calc(3.3 * var(--mu)); line-height: 1.55; color: var(--prim-art-ink); }
+#modal-odds .od-rules ul{ margin: 0; padding-left: calc(4 * var(--mu)); list-style: disc; text-align: left; font-size: max(var(--text-min), calc(3.3 * var(--mu))); /* [Task 7c] 글자 하한 */ line-height: 1.55; color: var(--prim-art-ink); }
 
 /* ---- [P3-T8] 뽑기 결과 창(목업 R1 — **판 없음**) — 카드 = 등급 액자(74 등급 토큰) · 영웅 뒤 금빛 = 정적 층 · 뒤집기 = transform 만 · 모션 = MOTION-SPEC §3 19~26행 ----
    길이는 전부 calc(N * var(--mu))(모달 단위 — 위 [P3-T7-F1] 공용 정의 한 줄을 그대로 쓴다). N 은 T7 확률 창과 같은 읽기(지휘자 판정 Q5 · 390 에서 1 mu = 3.37px).
@@ -74065,6 +74071,31 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
      !important = 전역 리셋(15절 transition-duration 80ms · I 절 속성 화이트리스트 — 둘 다 !important)보다 앞서려고. */
   #app.battle #actionbar .act .act-halo { transition: none !important; }
 }
+
+/* ---- 9. 판 화면 위 바 스탯 칸(아케이드 · 타임러시 · 데일리 · 폰 세로 · PC 가로 · 결과 창 뒤 같은 칸) = [글리프][값] ---------------------
+   [Task 7c · 지휘자 판정 (b) 2026-10-21] 글자 하한 11px 에서 이름(.stat-k) + 큰 수(98,765)가 칸 자리 · 크기 그대로는 안 들었다(390 en · 360 ko/en 잘림 —
+   scratchpad/rc1017/t7c/statfit-11.png). 클래식 위 바(.ch-g [아이콘][숫자])와 같은 문법으로 이름 글자를 화면에서 빼고 칸 앞에 기존 글리프 토큰을 둔다
+   (nchip 과 같은 짝 — 새 그림 0): 단계 = 깃발 · 데일리 판의 같은 칸 = 달력(#stat-stage.is-daily — syncHud) · 점수 = score · 최고 = 왕관 · 남은 짝 = 과녁 · 시간 = 시계.
+   글리프 · 틈 = 클래식 .ch-i 의 칸 높이 비율(아이콘 3.8 · 틈 1.0 / 알약 6.9cqw) × 이 칸 높이(--wcap-h — 세로 --tbs-caph · 가로 56 · 48bu).
+   칸 자리 · 크기 · 재질 · 색 · 안여백은 그대로. 읽기 프로그램 이름 = 칸의 aria-label(role=group · data-i18n-aria hud.* — 새 키 0). */
+.stat-i { display: none; }
+#app:not(.classic):not(.battle) #screen-game #tb-stats .stat {
+  column-gap: calc(var(--wcap-h) * 1.0 / 6.9);
+}
+#app:not(.classic):not(.battle) #screen-game #tb-stats .stat-k { display: none; }
+#app:not(.classic):not(.battle) #screen-game #tb-stats .stat-i {
+  display: block;
+  flex: 0 0 auto;
+  width: calc(var(--wcap-h) * 3.8 / 6.9);
+  height: calc(var(--wcap-h) * 3.8 / 6.9);
+  background: center / contain no-repeat;
+}
+#app:not(.classic):not(.battle) #screen-game #tb-stats .stat[data-slot="stage"] > .stat-i { background-image: var(--lib-glyph-flag); }
+#app:not(.classic):not(.battle) #screen-game #tb-stats .stat[data-slot="stage"].is-daily > .stat-i { background-image: var(--lib-glyph-cal); }
+#app:not(.classic):not(.battle) #screen-game #tb-stats .stat[data-slot="score"] > .stat-i { background-image: var(--lib-glyph-score); }
+#app:not(.classic):not(.battle) #screen-game #tb-stats .stat[data-slot="best"] > .stat-i { background-image: var(--lib-glyph-crown); }
+#app:not(.classic):not(.battle) #screen-game #tb-stats .stat[data-slot="moves"] > .stat-i { background-image: var(--lib-glyph-target); }
+#app:not(.classic):not(.battle) #screen-game #tb-stats .stat[data-slot="time"] > .stat-i { background-image: var(--lib-glyph-clock); }
 </style>
 <style id="gear-121">
 /* ===== [판정판 121 · 2026-10-17 Task 5] 겹친 창 규칙 + 장비 목록 · 설명 창 ==================================================
@@ -74824,6 +74855,12 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
 #app .modal .coin-x2.mf-pair[data-stack] > .mf-btn { flex: 0 0 auto; }
 /* 킷 주 단추의 최소 폭(5.68bh)은 방 바닥 줄 몫 — 창에서는 줄 폭을 따른다 */
 #app .modal .mf-btn { min-width: 0; }
+/* [Task 7c · Task 128 — font-audit 「잉크 중심」 FAIL 20 · 원인 9fe0551] 창 단추 글자 처짐 되돌리기. 옛 창 단추(.w6m .sheet .btn)는
+   64-fix2 ③(사용자 「글자가 아래로 처짐 — 정렬 비율 똑바로」)의 세로 여백으로 글자 묶음을 면 가운데에 두었는데, 킷 단추(.mf-btn.kit-btn-v2) ·
+   soft 알약(.mf-soft)으로 옮기며 그 몫이 빠져 글자가 상자 가운데(면보다 아래)에 섰다(480 폭 en 최대 +2.54px · 관문 1.5).
+   아래 여백 .04bh = 묶음을 .02bh 올림(창 단추 · 곁가지 알약 같은 값 — 390 · 480 × ko · en 실측 분포의 가운데). 높이 · 글자 · 폭 무변(border-box).
+   방 바닥 단추(#cp-go · #cp-skin)와 장비 창(.cp-go)은 이 선택자 밖 — 무변. */
+#app .modal .mf-btn { padding-bottom: calc(var(--f2-bh) * .04); }
 /* 킷 단추 · 알약은 display 를 스스로 세워 [hidden] 을 이긴다 — 창에서 숨긴 단추(#pz-restart · #btn-retry · #btn-continue 등)는 숨는다 */
 #app .modal :is(.mf-btn, .mf-soft, .mf-foot, .mf-side)[hidden] { display: none; }   /* 포털 전용 2배 줄(.coin-x2.mf-foot)도 숨으면 숨는다 */
 #app .modal :is(.mf-btn, .mf-soft) { word-break: keep-all; }
@@ -74843,7 +74880,7 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
 }
 #app .modal .mf-soft.kit-pill-v2[data-variant="soft"] {
   --f2-bh: calc(var(--f2-w) * .0950);
-  padding: 0 calc(var(--f2-bh) * .55);
+  padding: 0 calc(var(--f2-bh) * .55) calc(var(--f2-bh) * .04);   /* [Task 7c] 아래 여백 .04bh — 위 .mf-btn 줄과 같은 글자 처짐 되돌리기 */
   font-size: max(var(--text-min), calc(var(--f2-bh) * .40));
   color: var(--prim-art-ink);
   text-shadow: none;
