@@ -710,6 +710,8 @@ html[data-platform="web"] [data-app-only]{display:none !important}
   --spring: cubic-bezier(.34, 1.56, .64, 1);
   --drop: cubic-bezier(.22, 1.4, .36, 1);
   --ease: cubic-bezier(.4, 0, .2, 1);
+  --ease-linear: linear;          /* 반복 회전 · 게이지 채움 (MOTION-SPEC §1.2) */
+  --ease-breathe: ease-in-out;    /* 숨쉬기 반복 (MOTION-SPEC §1.2) */
 
   --safe-t: env(safe-area-inset-top, 0px);
   --safe-b: env(safe-area-inset-bottom, 0px);
@@ -5630,8 +5632,10 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   gap: calc(var(--iw-size, 28px) * .22);
 }
 .iw.iw-band .iw-main { font-size: var(--iw-size, 28px); }
-/* 부제는 본문에서 파생한다 — 두 값을 따로 두면 띠 높이가 둘 중 큰 쪽을 따라간다. */
-.iw.iw-band .iw-sub { font-size: calc(var(--iw-size, 28px) * .44); }
+/* 부제는 본문에서 파생한다 — 두 값을 따로 두면 띠 높이가 둘 중 큰 쪽을 따라간다.
+   [Task 7e 수정 1회차 — I1] 하한 --text-min(11px): 좁은 띠(본문 14~23px)에서 ×.44 가 6~10px 로 떨어졌다(전투 포함).
+   본문 하한이 14px 라 부제 11px 는 본문보다 작다. 띠 높이는 14px 본문에서만 0.8px 늘고(13.2 → 14.0) multBandHalf 의 숨통 2px 안이다. */
+.iw.iw-band .iw-sub { font-size: max(var(--text-min), calc(var(--iw-size, 28px) * .44)); }
 /* 128px 글자용 6px 스트로크는 30px 글자에서 글씨를 메운다. 띠는 글자에 비례한다. */
 .iw.iw-band.iw-plate .iw-main {
   -webkit-text-stroke: calc(var(--iw-size, 28px) * .105) rgba(18, 10, 26, .96);
@@ -5658,6 +5662,12 @@ html[lang="ko"] .rank-meta { font-size: 11.5px; }
   75%  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
   100% { opacity: 0; transform: translate(-50%, -50%) scale(1.04); }
 }
+/* [Task 7e — 최종 리뷰 I1] 띠가 서 있는 동안 가운데 홈 #ch-tc 가 비킨다(지우지 않는다 — 위 「나머지가 비킨다」 · multFxOn 과 같은 창).
+   PC 가로 무대에서 홈 아래 ~ 판 윗변 틈이 띠 하한 상자보다 좁을 때만 JS(multYieldTc)가 건다 — 세로 · 전투에는 안 걸린다.
+   opacity 만 · 시간 = --mo-mult-life(박자 = iw-band-pop 의 15% · 75%) · 이징 = --ease. 정지 표시는 .mult-yield-still(정적). */
+#ch-tc.mult-yield { animation: mult-yield var(--mo-mult-life) var(--ease) 1; }
+#ch-tc.mult-yield-still { opacity: var(--mo-mk-0); }
+@keyframes mult-yield { 15%, 75% { opacity: var(--mo-mk-0); } }
 
 /* ---- 라이트 테마: 글자 대비 재조정 (원색 그대로는 4.5:1 을 못 넘는다) ------- */
 :where(:root[data-theme="light"]) .char-card { border-color: rgba(34, 27, 46, .12); background: rgba(34, 27, 46, .04); }
@@ -16928,7 +16938,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){
            집 규약대로 EN 문안이고, 두 언어는 i18n 표에만 산다. -->
       <div class="howto-panel">
         <div class="howto-art rules-card">
-          <h3 class="rules-title" data-i18n="skills.title">Three buttons in battle</h3>
+          <h3 class="rules-title" data-i18n="skills.title">Battle gauges &amp; buttons</h3>
           <!-- ⑱-b 번호 원판 → 전투 메달(하단 4버튼과 같은 그림). [64-fix3d M-2] 글자 없는 원판
                medal-<역할>-v3 파생 아이콘(medal-<역할>-v3-90.webp · 레시피 tools/build/derive-rules-medals.py).
                각 설명 줄이 자기 메달을 이고 서서 그림↔글 1:1. -->
@@ -27833,7 +27843,7 @@ window.TT_SFX = {
          ([판정판 130] 공격 단추 · duel.atkstat 은퇴 — 첫 줄 「공격」 은 이름판 게이지 줄(act.attack 글자)과 낱말을 맞춘다. 단추는 셋)
          카드에서 "각성", 버튼에서 "awaken", 토스트에서 "게이지"라고 부르면 셋이
          같은 것인 줄 모른다. EN·KO 키 순서도 같게 유지한다. */
-      'skills.title': 'Three buttons in battle',
+      'skills.title': 'Battle gauges & buttons',
       'skills.s1': '<b>Attack</b> fills on your hero\'s name plate and fires on its own when full.',
       'skills.s2': '<b>Awakening</b> fills only when you <b>alternate</b> sum-10 and same-number matches. Tap it to score <b>×{am}</b> for {awk}s.',
       'skills.s3': "<b>Skill</b> fills with every match, faster at higher combos. Tap it to fire your hero's own skill.",
@@ -29335,7 +29345,7 @@ window.TT_SFX = {
          ([판정판 130] 공격 단추 · duel.atkstat 은퇴 — 첫 줄 「공격」 은 이름판 게이지 줄(act.attack 글자)과 낱말을 맞춘다. 단추는 셋)
          카드에서 "각성", 버튼에서 "awaken", 토스트에서 "게이지"라고 부르면 셋이
          같은 것인 줄 모른다. EN·KO 키 순서도 같게 유지한다. */
-      'skills.title': '전투의 세 단추',
+      'skills.title': '전투 게이지와 단추',
       'skills.s1': '<b>공격</b> 게이지는 캐릭터 이름판에서 차고, 다 차면 저절로 공격해요.',
       'skills.s2': '<b>각성</b> 게이지는 합이 10인 짝과 같은 숫자 짝을 <b>번갈아</b> 맞출 때만 차요. 누르면 {awk}초 동안 점수가 <b>{am}배</b>예요.',
       'skills.s3': '<b>스킬</b> 게이지는 매치마다, 콤보가 높을수록 빨리 차요. 누르면 캐릭터 스킬을 써요.',
@@ -34610,11 +34620,16 @@ window.TT_SFX = {
     return multLifeCache;
   }
 
-  /** HUD 아래 끝 ~ 판 위 끝. 배율 띠가 설 수 있는 **유일한 구간**이다. */
+  /** 띠 글자 상자의 반높이 — line-height .94 + 스트로크(글자 크기의 10.5%) + 숨통 2px.
+   *  multBandWord 의 「판을 안 밟는다」 산술과 multBandGap 의 「틈이 하한 상자보다 좁은가」 가 같은 식을 쓴다. */
+  function multBandHalf(size) { return size * 0.47 + size * 0.105 + 2; }
+
+  /** HUD 아래 끝 ~ 판 위 끝. 배율 띠가 설 수 있는 **유일한 구간**이다.
+   *  yieldTc = 띠가 서 있는 동안 가운데 홈 #ch-tc 가 비켜야 하는가(multBandWord 가 multYieldTc 로 건다). */
   function multBandGap() {
     var vh = (typeof window !== 'undefined' ? (window.innerHeight || 844) : 844);
     var top = 0, i, el, r;
-    var bot = 0, br = null;
+    var bot = 0, br = null, yieldTc = false;
     el = $('board') || $('board-scroll');
     if (el && el.getBoundingClientRect) {
       br = el.getBoundingClientRect();
@@ -34622,21 +34637,51 @@ window.TT_SFX = {
     }
     /* [판정판 121] 가로 전투에서는 HUD 조각이 판 **옆** 기둥에도 선다(#hud-row 칩 줄 = 악당 카드 아래 · 일시정지 = 왼쪽 위).
        띠가 서는 곳은 판 **위**이므로, 가로에서는 판과 가로로 겹치지 않는 노드를 「HUD 아래 끝」 셈에서 뺀다. 세로는
-       battleStage() 가 null 이라 종전과 글자 그대로다(모든 노드가 판 위 전폭 띠). 읽기만 한다. */
-    var side = !!(br && br.width > 0 && battleOn() && battleStage());
+       battleStage() 가 null 이라 종전과 글자 그대로다(모든 노드가 판 위 전폭 띠). 읽기만 한다.
+       [Task 7e — 최종 리뷰 I1] 이 거름은 「가로 무대인가」(battleStage()) 한 질문으로 가른다 — 모드와 무관하다. 8e · 127 이 클래식 ·
+       아케이드 · 타임러시 · 데일리 · 놀이터에도 같은 무대 짜임을 입혔는데 여기만 전투(battleOn())로 갈라 두어, 그 다섯 판에서는 옆 기둥
+       노드가 「HUD 아래 끝」 을 판 아래로 끌어내려 띠가 아래 대체 자리(창 6~18%)로 떨어져 캡슐 · 러시 시계를 덮었다. 가로 무대에서는 또
+         ② 판과 세로로 겹치는 상자(무대 크기 #topbar 등)는 「판 위 HUD」 가 아니므로 뺀다.
+         ③ 자기 상자 밖에 서는 가운데 노드를 셈에 더한다 — #rush-timer(fixed · #hud-row 상자에 안 잡힘), 그리고 아래 #ch-tc. */
+    var side = !!(br && br.width > 0 && battleStage());
+    /* [Task 7e 수정 1회차 — I3 · 지휘자 판정] 비전투 가로 무대에서는 띠 아래 한계를 #board 와 보이는 판 #board-scroll 윗변 중
+       **위쪽**으로 한다(판 짜임이 바뀌어 둘이 벌어져도 띠가 판 상자를 안 밟게). 전투는 #board 그대로(무변). */
+    if (side && !battleOn()) {
+      el = $('board-scroll');
+      if (el && el.getBoundingClientRect) {
+        r = el.getBoundingClientRect();
+        if (r.height > 0 && r.top < bot) bot = r.top;
+      }
+    }
     var ids = ['duel-hud', 'classic-hud', 'topbar', 'tb-stats', 'hud-row', 'boss-bar'];
+    if (side) ids.push('rush-timer');
     for (i = 0; i < ids.length; i++) {
       el = $(ids[i]);
       if (!el || el.hidden || !el.getBoundingClientRect) continue;
       r = el.getBoundingClientRect();
       if (r.width <= 0 || r.height <= 0) continue;
       if (side && (r.right <= br.left || r.left >= br.right)) continue;
+      if (side && r.bottom > br.top && r.top < br.bottom) continue;
       if (r.bottom > top) top = r.bottom;
+    }
+    /* [Task 7e] 가운데 홈 #ch-tc(클래식 · 놀이터 — #classic-hud 상자 바로 아래에 선다). 홈 아래 ~ 판 윗변 틈에 띠 하한 상자
+       (글자 MULT_BAND_MIN)가 들어가면 홈 아래 끝을 「HUD 아래 끝」 으로 삼고, 안 들어가면 띠가 서 있는 동안 홈이 비킨다
+       (yieldTc — 띠는 캡슐 무리 아래 끝 ~ 판 윗변 틈에 선다). 새 자리로 옮기지 않는다. */
+    if (side) {
+      el = $('ch-tc');
+      if (el && !el.hidden && el.getBoundingClientRect) {
+        r = el.getBoundingClientRect();
+        if (r.width > 0 && r.height > 0 && r.right > br.left && r.left < br.right &&
+            !(r.bottom > br.top && r.top < br.bottom) && r.bottom > top) {
+          if (bot - r.bottom >= 2 * multBandHalf(MULT_BAND_MIN)) top = r.bottom;
+          else yieldTc = true;
+        }
+      }
     }
     /* 판이 아직 없거나(첫 프레임) 상단을 못 읽었으면 화면 위 18% 를 띠로 본다 —
        그 자리는 어떤 국면에서도 판보다 위다. */
-    if (!(bot > 0) || !(bot > top)) { top = vh * 0.06; bot = vh * 0.18; }
-    return { top: top, bot: bot };
+    if (!(bot > 0) || !(bot > top)) { top = vh * 0.06; bot = vh * 0.18; yieldTc = false; }
+    return { top: top, bot: bot, yieldTc: yieldTc };
   }
 
   /**
@@ -34654,14 +34699,39 @@ window.TT_SFX = {
     if (size < MULT_BAND_MIN) size = MULT_BAND_MIN;
     /* 글자 상자의 반높이 — line-height .94 + 스트로크(글자 크기의 10.5%) + 숨통 2px.
        이 값이 「판을 안 밟는다」의 산술 근거다: 아래에서 중심 y 를 이만큼 띄운다. */
-    var half = size * 0.47 + size * 0.105 + 2;
+    var half = multBandHalf(size);
     var y = (g.top + g.bot) / 2;
     if (y + half > g.bot) y = g.bot - half;      /* 판 위 끝을 넘지 않는다 */
     if (y - half < 0) y = half;                  /* 화면 위로도 안 나간다 */
     impactWord('×' + m, multColor(m), size,
                { topCss: Math.round(y * 10) / 10 + 'px', dur: multLifeMs(),
                  sub: sub, plate: true, band: true, slot: 0 });
+    if (g.yieldTc) multYieldTc();
     return { y: y, size: size, gap: gap };       /* smoke 가 읽는다 */
+  }
+
+  /* [Task 7e — 최종 리뷰 I1] 띠가 서 있는 동안 가운데 홈 #ch-tc 가 **비킨다**(지우지 않는다) — 아래 multFxOn() 억제 문법과
+     같은 창(--mo-mult-life)이다. 홈은 늘 떠 있는 노드라 「뜰 때 묻기」 대신 띠와 같은 수명의 CSS 한 번(.mult-yield — opacity 만,
+     박자 = iw-band-pop 의 15% · 75%)으로 비켰다가 돌아온다. 되감기는 impactWord 와 같은 한 줄(void offsetWidth)이고, 정지 표시
+     (fxReduced)에서는 띠의 iw-still 과 같은 시간만큼 정적으로 숨는다(.mult-yield-still — 맨 setTimeout 인 까닭도 같다). */
+  function multYieldTc() {
+    var el = $('ch-tc');
+    if (!el || !el.classList) return;
+    if (el.mfT) { clearTimeout(el.mfT); el.mfT = 0; }
+    el.classList.remove('mult-yield');
+    el.classList.remove('mult-yield-still');
+    void el.offsetWidth;
+    if (fxReduced()) {
+      el.classList.add('mult-yield-still');
+      var hold = Math.round(multLifeMs());
+      if (hold < 1400) hold = 1400;
+      el.mfT = setTimeout(function () {
+        el.mfT = 0;
+        el.classList.remove('mult-yield-still');
+      }, hold);
+      return;
+    }
+    el.classList.add('mult-yield');
   }
 
   /* ---- 배율이 떠 있는 동안의 **억제** (삭제가 아니다) ----------------------
@@ -73277,7 +73347,7 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
   transform: scaleX(var(--atk, 0));
   /* [지휘자 답 Q6] 채택표(시안 3)대로 분홍 → 주황 — 있는 토큰 둘(--prim-art-pink · --role-me-atk-b), 새 원시값 0 */
   background-image: linear-gradient(90deg, var(--prim-art-pink), var(--role-me-atk-b));
-  transition: transform var(--dur-2) linear;
+  transition: transform var(--dur-2) var(--ease-linear);
 }
 #app.battle #duel-hud #duel-me-atkrow .dh-atk-pct {
   flex: 0 0 auto;
@@ -73344,17 +73414,17 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
 /* 단계 0~3 숨쉬기 — translate 는 transform 과 따로 합성된다(그림 상자의 --me-flip transform 무접촉).
    [Task 126] 각성 · 만땅 대기 초상 빛(@keyframes awk-av-glow 절)은 그림 상자의 두 가상 요소가 따로 돌린다 — 상자 자신의 움직임 목록에 끼워 넣던
    옛 값(--dh-av-awk · 수정 1 I1)은 은퇴. 숨쉬기 · 시전 · 맞음 무엇이 서도 초상 빛은 끊기지 않는다(자식 층이라 상자 animation 과 무관). */
-#app.battle #duel-hud #duel-me-av { animation: b8e-breathe var(--dur-amb) ease-in-out infinite alternate; }
+#app.battle #duel-hud #duel-me-av { animation: b8e-breathe var(--dur-amb) var(--ease-breathe) infinite alternate; }
 @keyframes b8e-breathe { from { translate: 0 0; } to { translate: 0 -1%; } }
 /* 단계 1 — 옅은 빛 원 맥동 · 단계 2 · 3 — 강한 빛 */
 #app.battle #duel-hud #duel-me-av[data-atk-tier="1"] ~ #duel-me-glow {
   --b8e-glo: var(--mo-mk-35); --b8e-ghi: var(--mo-mk-55);
-  animation: b8e-glow var(--dur-amb) ease-in-out infinite alternate;
+  animation: b8e-glow var(--dur-amb) var(--ease-breathe) infinite alternate;
 }
 #app.battle #duel-hud #duel-me-av[data-atk-tier="2"] ~ #duel-me-glow,
 #app.battle #duel-hud #duel-me-av[data-atk-tier="3"] ~ #duel-me-glow {
   --b8e-glo: var(--mo-mk-70); --b8e-ghi: var(--mo-mk-100);
-  animation: b8e-glow var(--dur-amb) ease-in-out infinite alternate;
+  animation: b8e-glow var(--dur-amb) var(--ease-breathe) infinite alternate;
 }
 @keyframes b8e-glow {
   from { opacity: var(--b8e-glo); transform: scale(1.22); }
@@ -73380,7 +73450,7 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
 #app.battle #duel-hud #duel-me-av[data-atk-tier="2"] ~ #duel-me-fx .mfx-spark,
 #app.battle #duel-hud #duel-me-av[data-atk-tier="3"] ~ #duel-me-fx .mfx-spark {
   opacity: var(--mo-mk-100);
-  animation: b8e-orbit calc(var(--dur-amb) * 2) linear infinite;
+  animation: b8e-orbit calc(var(--dur-amb) * 2) var(--ease-linear) infinite;
 }
 #app.battle #duel-hud #duel-me-fx .mfx-spark--2 { animation-delay: calc(var(--dur-amb) * -1) !important; }
 @keyframes b8e-orbit { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
@@ -73499,12 +73569,12 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
 #app.battle #actionbar .act.urge .act-halo .ah-rays {
   display: block;
   opacity: var(--mo-mk-100);
-  animation: b8e-spin calc(var(--dur-amb) * 4) linear infinite;
+  animation: b8e-spin calc(var(--dur-amb) * 4) var(--ease-linear) infinite;
 }
 #app.battle #actionbar .act.primed .act-halo .ah-rays {
   display: block;
   opacity: var(--mo-mk-35);
-  animation: b8e-spin calc(var(--dur-amb) * 4) linear infinite;
+  animation: b8e-spin calc(var(--dur-amb) * 4) var(--ease-linear) infinite;
 }
 @keyframes b8e-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 #app.battle #actionbar .act .act-halo .ah-spark {
@@ -73523,7 +73593,7 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
 #app.battle #actionbar .act .act-halo .ah-spark--2 { right: -4%; top: 58%; }
 #app.battle #actionbar .act.urge .act-halo .ah-spark {
   display: block;
-  animation: b8e-twinkle var(--dur-amb) ease-in-out infinite alternate;
+  animation: b8e-twinkle var(--dur-amb) var(--ease-breathe) infinite alternate;
 }
 #app.battle #actionbar .act.urge .act-halo .ah-spark--2 { animation-delay: calc(var(--dur-amb) / -2); }
 @keyframes b8e-twinkle {

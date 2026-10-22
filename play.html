@@ -1,6 +1,22 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<script>
+/* [Task 7e · 2026-10-21 — 최종 리뷰 M6] 가로 창으로 play.html 을 직접 연 사람(옛 링크 · 즐겨찾기 · 공유 링크)도 본체 창 전체 가로로.
+   첫 진입에서 맨 위 창이고 가로 창(창 가로 >= 세로)이면 tentwin.html 로 한 번 넘긴다. tentwin.html 머리 넘김과 같은 측정
+   (innerWidth · innerHeight) · 반대 조건이라 두 넘김이 방향으로 갈려 되풀이가 없다(tentwin.html 은 가로 창을 넘기지 않는다).
+   제외도 그 넘김과 같다: 파일명이 play.html 이 아님 · 프레임 안 · ?noshell=1 · ?platform=twa. 첫 진입만 — 판 도중 창을 돌려도
+   다시 읽지 않는다. 넘기는 동안은 아래 기둥 iframe 을 띄우지 않는다(__twLand). */
+(function(){try{
+  if(!/\/play\.html$/i.test(location.pathname))return;
+  if(window.self!==window.top)return;
+  var q=location.search;
+  if(/[?&](noshell=1|platform=twa)(&|$)/.test(q))return;
+  if(window.innerWidth<window.innerHeight)return;
+  window.__twLand=1;
+  location.replace('tentwin.html'+q+location.hash);
+}catch(e){}})();
+</script>
 <title>Ten Twin</title>
 <meta name="description" content="Ten Twin — match tiles that are equal or sum to 10.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='rgb(22,19,31)'/%3E%3Crect x='7' y='13' width='25' height='25' rx='6' fill='rgb(102,217,240)'/%3E%3Crect x='32' y='26' width='25' height='25' rx='6' fill='rgb(240,125,102)'/%3E%3C/svg%3E">
@@ -18,6 +34,7 @@ html,body{margin:0;height:100%;background:#191426;overflow:hidden}
    그저 안쪽 iframe 의 쿼리에 tw_shell=1 을 보태 "나는 세로 기둥 안에서
    돈다"는 사실만 알린다 — 기존 search·hash 전달은 그대로 유지한다. */
 (function(){
+  if(window.__twLand)return;   /* [Task 7e] 머리에서 tentwin.html 로 넘기는 중 — 기둥 iframe 을 띄우지 않는다 */
   var f=document.getElementById('game');
   var q = location.search ? (location.search+'&tw_shell=1') : '?tw_shell=1';
   f.src='tentwin.html'+q+location.hash;
