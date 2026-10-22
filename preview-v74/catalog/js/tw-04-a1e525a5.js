@@ -7929,7 +7929,7 @@ endFever(true);
 mascotReset();      // a new board clears a game-over slump as well as a fever dance
 passiveReset();     // v3: 새 판 = 패시브의 누적·장전·배너 기억 전부 초기화
 pvChip('');
-S.hudKept = false;  // [Task 7g] 새 판 = 두루마리 붙듦 풀림(러시의 같은 게임 다음 보드만 rushNextBoard 가 되살린다)
+S.hudKept = false;  // [Task 7g] 새 판 = 두루마리 붙듦 풀림(러시의 같은 게임 — 다음 보드 · 다시 하기 — 만 rushNextBoard · restartStage 가 되살린다)
 layoutRowsReset();  // D1: 타일 크기의 행 기준도 판마다 새로 잡는다
 S.gainPet = 0;
 S.gainStar = 0;
@@ -10918,10 +10918,10 @@ if (S.mode === 'adv') { advStart(S.stage); J.sfx.ui(); return; }
 hurryReset();          // 같은 이유 — 다시 시작하면 화면 상태도 처음으로
 S.combo = 1;
 S.comboUntil = 0;
-var keepEnd = S.rushEndAt;
+var keepEnd = S.rushEndAt, keepHud = S.hudKept;
 startStage(S.stage, isDaily() ? dailySeed() : S.seed);
 if (isDaily()) { S.score = 0; S.matches = 0; S.maxCombo = 1; S.startedAt = Date.now(); syncHud(); startTimer(); }
-if (isRush()) { S.rushEndAt = keepEnd; startRushLoop(); }
+if (isRush()) { S.rushEndAt = keepEnd; S.hudKept = keepHud; startRushLoop(); syncHud(); }
 J.sfx.ui();
 }
 function openHowto(fromPause) {
