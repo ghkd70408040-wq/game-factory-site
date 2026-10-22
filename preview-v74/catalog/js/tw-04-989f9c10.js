@@ -4415,6 +4415,7 @@ howtoFromPause: false,   // (a) fix: How-to opened from the pause modal
 sprintTimes: [],         // match timestamps inside the `sprint` mission window
 overInfo: null,          // frozen game-over figures; see paintOverModal()
 rushStartedAt: 0,
+hudKept: false,
 // --- v4 ---
 pairsLeft: 0,
 shuffles: 0,             // shuffles left this stage
@@ -5072,6 +5073,15 @@ var st = $('stat-timer');
 if (st && st.hidden !== !isDaily()) st.hidden = !isDaily();
 syncMission();
 syncRushHud();
+syncHudKeep();
+}
+function syncHudKeep() {
+if (!S.hudKept) {
+var row = $('hud-row');
+S.hudKept = !!(row && row.querySelector &&
+row.querySelector('#mission-badge:not([hidden]), #adv-goal:not([hidden]), #pv-chip:not([hidden]), #tw-chip:not([hidden])'));
+}
+setAppClass('hud-kept', S.hudKept);
 }
 function syncDynamicI18n() {
 try { syncPetInfo(); syncSidePanes(); fitAllDesc(); } catch (e) { /* 부팅 전 */ }
@@ -7919,6 +7929,7 @@ endFever(true);
 mascotReset();      // a new board clears a game-over slump as well as a fever dance
 passiveReset();     // v3: 새 판 = 패시브의 누적·장전·배너 기억 전부 초기화
 pvChip('');
+S.hudKept = false;  // [Task 7g] 새 판 = 두루마리 붙듦 풀림(러시의 같은 게임 다음 보드만 rushNextBoard 가 되살린다)
 layoutRowsReset();  // D1: 타일 크기의 행 기준도 판마다 새로 잡는다
 S.gainPet = 0;
 S.gainStar = 0;
@@ -8340,9 +8351,10 @@ J.sfx.win();
 if (typeof window !== 'undefined') {
 J.confetti(window.innerWidth / 2, window.innerHeight * 0.4);
 }
-var keepEnd = S.rushEndAt;
+var keepEnd = S.rushEndAt, keepHud = S.hudKept;
 startStage(S.stage, (S.seed + 0x9E3779B1) >>> 0);
 S.rushEndAt = keepEnd;         // startStage must not reset the session clock
+S.hudKept = keepHud;
 toast(t('toast.rushnext'));    // after startStage: its clearTimers() would
 // otherwise cancel the toast's hide timer
 syncHud();
@@ -8354,6 +8366,7 @@ stopComboLoop();
 endFever(true);
 passiveReset();
 pvChip('');
+S.hudKept = false;  // [Task 7g] 이어하기도 새로 선 게임 — 두루마리 붙듦 풀림(startStage 와 같은 자리)
 layoutRowsReset();  // D1: startStage() 를 안 거치는 유일한 진입로라 여기도 필요하다
 hurryReset();
 applyCharSkin();

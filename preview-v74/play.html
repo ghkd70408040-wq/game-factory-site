@@ -26,6 +26,11 @@ html,body{margin:0;height:100%;background:#191426;overflow:hidden}
 #bg{position:fixed;inset:-40px;background:url("catalog/art-menu-day-w.webp") center/cover no-repeat;filter:blur(18px) brightness(.72);z-index:0}
 #col{position:fixed;top:0;bottom:0;left:0;right:0;margin:0 auto;width:clamp(360px,56.25vh,480px);max-width:100vw;z-index:1;background:#000;box-shadow:0 0 0 1px rgba(255,255,255,.08),0 30px 80px rgba(0,0,0,.55)}
 #game{display:block;width:100%;height:100%;border:0}
+/* [Task 7g · 2026-10-22 사용자 답 「PC 는 가로 화면」] 가로 창(창 가로 >= 세로 — 게임 가로 절 (min-aspect-ratio: 1/1) 과 같은 조건)이면
+   기둥 폭 제한 · 흐린 배경을 끈다 → 게임 iframe 이 창 전체 → 게임이 PC 가로 화면을 그린다. 포털(itch · CrazyGames zip 의 index.html =
+   이 껍데기) iframe 안에서도 같다 — 맨 위 창 넘김(머리 스크립트)과 아래 iframe 띄우기 · 검색어 전달은 그대로. 세로 창은 한 줄도 안 바뀐다.
+   CSS 라 창 크기를 바꾸면 세로 ↔ 가로가 바로 따라간다. */
+@media (min-aspect-ratio:1/1){#col{width:auto}#bg{display:none}}
 </style></head>
 <body><div id="bg"></div><div id="col"><iframe id="game" title="Ten Twin" allow="autoplay; fullscreen; clipboard-write; web-share"></iframe></div>
 <script>
