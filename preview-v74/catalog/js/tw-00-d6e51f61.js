@@ -760,6 +760,7 @@ return true;
 function at() { return actx.currentTime; }
 function envelope(t0, dur, peak, attack) {
 var g = actx.createGain();
+g.gain.value = 0.0001;
 var a = attack === undefined ? 0.006 : attack;
 g.gain.setValueAtTime(0.0001, t0);
 g.gain.linearRampToValueAtTime(Math.max(0.0002, peak), t0 + a);
@@ -1382,20 +1383,20 @@ skillCharged: function () {
 if (!gate('skillCharged')) return;
 var t0 = at();
 // ① 차오름 — 바람 + 부드러운 상승(크레셴도).
-noise(t0, 0.56, 0.060, 'bandpass', 380, 7200, 1.4, 0.44);
-tone('triangle', 293.66, 1174.66, t0, 0.52, 0.080, 0.36);
+noise(t0, 0.56, 0.120, 'bandpass', 380, 7200, 1.4, 0.44);
+tone('triangle', 293.66, 1174.66, t0, 0.52, 0.160, 0.36);
 // ② 흐름 — 받침 화음(D6 · A6) + 초당 14번 반짝이는 짧은 음(점점 작아짐).
-tone('triangle', 1174.66, 1174.66, t0 + 0.40, 0.80, 0.034, 0.06);
-tone('sine', 1760.00, 1760.00, t0 + 0.40, 0.80, 0.020, 0.06);
+tone('triangle', 1174.66, 1174.66, t0 + 0.40, 0.80, 0.068, 0.06);
+tone('sine', 1760.00, 1760.00, t0 + 0.40, 0.80, 0.040, 0.06);
 var arp = [1479.98, 1760.00, 2349.32, 1760.00];
 for (var i = 0; i < 10; i++) {
-var st = t0 + 0.42 + i / 14, f = arp[i % 4], pk = 0.090 - i * 0.0065;
+var st = t0 + 0.42 + i / 14, f = arp[i % 4], pk = 0.180 - i * 0.013;
 tone('sine', f, f, st, 0.055, pk, 0.004);
 tone('sine', f * 2.01, f * 2.01, st, 0.030, pk * 0.22, 0.003);
 }
 // ③ 끝 반짝 한 알.
-tone('sine', 3520.00, 3520.00, t0 + 1.10, 0.20, 0.060, 0.003);
-tone('sine', 3520.00 * 2.76, 3520.00 * 2.76, t0 + 1.10, 0.08, 0.010, 0.003);
+tone('sine', 3520.00, 3520.00, t0 + 1.10, 0.20, 0.120, 0.003);
+tone('sine', 3520.00 * 2.76, 3520.00 * 2.76, t0 + 1.10, 0.08, 0.020, 0.003);
 },
 petBell: function () {
 if (!gate('petBell')) return;

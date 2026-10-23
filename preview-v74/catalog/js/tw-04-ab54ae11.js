@@ -111,6 +111,7 @@ var MISSION_SPRINT_MS = 30000;  // rolling window for the `sprint` mission
 // Cumulative-match milestones (DESIGN 9-FUN E)
 var MILESTONES = [100, 500, 1000, 5000];
 var MILESTONE_REWARD = { 100: 5, 500: 5, 1000: 5, 5000: 5 };
+var CLASSIC_HIDE = true;
 var DAILY_QUESTS = [
 { id: 'm10',    goal: [15, 25, 40],       ico: '--lib-glyph-target' },
 { id: 'combo',  goal: [5, 8, 12],         ico: '--lib-glyph-flag' },
@@ -8258,7 +8259,9 @@ var res = submit ? arcSubmitBest(mode, value)
 : { best: store.arcadeBest[mode] || null, fresh: false };
 runCoinPay(coinForArc(!!res.fresh, why === 'clear'));
 bumpStreak();
-claimStreakRewards();
+var streakGot = claimStreakRewards();
+achvCheck();
+if (streakGot.days.length) toast(t('streak.reward', { d: streakGot.days[streakGot.days.length - 1] }));
 dropProgress();
 persist();
 var board = $('board');
@@ -14566,7 +14569,8 @@ var freed = false;                            // 이 판이 젤리공주를 풀�
 var dupIds = [];                              // P3 T10 — 이 판 끝에서 별 +10 으로 바뀐 친구들(알림은 skin.gem 토스트 뒤에 차례로)
 if ((S.score | 0) > (store.advBest[key] | 0)) store.advBest[key] = S.score | 0;
 bumpStreak();
-claimStreakRewards();
+var streakGot = claimStreakRewards();
+achvCheck();
 if (win) {
 var ease = (p.sec > 0 && advLeftMs() >= p.sec * 250) ||
 (S.adds >= Math.ceil(addsForStage(p.n) / 2));
@@ -14624,6 +14628,12 @@ if (board) board.classList.add('grayed');
 J.sfx.lose();
 J.vibrate(60);
 mascotSad();
+}
+if (streakGot.days.length) {
+var stMsg = t('streak.reward', { d: streakGot.days[streakGot.days.length - 1] });
+var stAt = win ? (dupAt | 0) : 0;
+if (stAt > 0) later(function () { toast(stMsg); }, stAt);
+else toast(stMsg);
 }
 S.gainGem = gemGain | 0;
 var advTail = function () {
@@ -15994,7 +16004,6 @@ J.sfx.ui();
 if (store.save) { startEndless(false); return; }
 openAdventure();
 }
-var CLASSIC_HIDE = true;
 function classicSkillsOn() { return !!store.classicSkills; }
 function syncClassicSheet() {
 var on = classicSkillsOn();
