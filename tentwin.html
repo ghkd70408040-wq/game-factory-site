@@ -14666,7 +14666,7 @@ html[lang="ko"] #modal-arc .sheet-row .btn { word-break: keep-all; min-width: 0;
 <!-- ==RELEASE:BEGIN== 출시 메타 (scratchpad/release-0908/apply-head.py 가 생성·교체, 본문 무접촉) -->
 <meta name="build" content="8decb36-20260908-1716">
 <meta name="application-name" content="텐트윈 젤리팡 월드">
-<meta name="description" lang="ko" content="숫자 젤리를 골라 10을 만들어 터뜨리는 퍼즐이에요. 모험·아케이드·데일리·타임 러시·클래식을 즐겨요. Ten Twin Jelly Pang World: pick number jellies that equal or sum to 10.">
+<meta name="description" lang="ko" content="숫자 젤리를 골라 10을 만들어 터뜨리는 퍼즐이에요. 모험과 아케이드 대전을 즐겨요. Ten Twin Jelly Pang World: pick number jellies that equal or sum to 10.">
 <link rel="manifest" href="tentwin.webmanifest">
 <link rel="canonical" href="https://ghkd70408040-wq.github.io/game-factory-site/tentwin.html">
 <meta name="robots" content="index,follow">
@@ -23534,10 +23534,12 @@ window.TT_SFX = {
     { id: 'pet',    goal: [1, 2, 3],          ico: '--lib-glyph-heart' },
     { id: 'awaken', goal: [1, 2, 3],          ico: '--lib-glyph-inf' },
     { id: 'clear',  goal: [1, 2, 3],          ico: '--lib-glyph-crown' },
-    { id: 'daily',  goal: [1, 1, 1],  fix: 1, ico: '--lib-glyph-cal' },
+    /* [Task 7h] classic: 1 = 클래식 계열 판(데일리 · 타임 러시)에서만 오르는 퀘스트 — CLASSIC_HIDE 면 dqRoll 뽑기 풀에서 빠지고
+       questsEnsure 가 저장된 오늘 목록의 그 칸을 바꾼다(되살리면 이 표식만 보고 다시 뽑힌다). */
+    { id: 'daily',  goal: [1, 1, 1],  fix: 1, ico: '--lib-glyph-cal', classic: 1 },
     { id: 'duel',   goal: [1, 1, 1],  fix: 2, ico: '--lib-badge-a' },
     { id: 'star2',  goal: [1, 1, 1],  fix: 2, ico: '--lib-star-gold' },
-    { id: 'rush',   goal: [1000, 2000, 3500], ico: '--lib-glyph-clock' },
+    { id: 'rush',   goal: [1000, 2000, 3500], ico: '--lib-glyph-clock', classic: 1 },
     { id: 'item',   goal: [1, 1, 1],  fix: 1, ico: '--lib-slot-ic-item' }, /* P3 — 코인이 화폐가 되어 원반은 코인 전용 */
     { id: 'match',  goal: [30, 60, 100],      ico: '--lib-glyph-target' },
     { id: 'chain',  goal: [3, 5, 8],          ico: '--lib-glyph-flag' }
@@ -27220,7 +27222,7 @@ window.TT_SFX = {
       'load.tip4': 'Tap the ⓘ next to a stat to read it.',
       'load.tip5': 'Skill fires once the gauge is full.',
       'load.tip6': 'Pet skills can turn a battle around.',
-      'load.tip7': 'The daily puzzle builds your streak.',
+      'load.tip7': 'Play a round every day to build your streak.',   /* [Task 7h] 옛 'The daily puzzle builds your streak.' — 데일리 숨김 · 출석 = 하루 한 판 */
       'load.tip8': 'Stuck? Shuffle makes new pairs.',
 
       'aria.logo': 'Ten Twin Jelly Pang World',
@@ -28774,7 +28776,7 @@ window.TT_SFX = {
       'load.tip4': '능력치 옆 ⓘ 를 누르면 설명이 나와요.',
       'load.tip5': '스킬은 게이지가 가득 찼을 때 터져요.',
       'load.tip6': '펫 스킬 한 방이 전투를 뒤집어요.',
-      'load.tip7': '데일리를 매일 풀면 연속 기록이 쌓여요.',
+      'load.tip7': '매일 한 판씩 하면 출석이 쌓여요.',   /* [Task 7h] 옛 '데일리를 매일 풀면 연속 기록이 쌓여요.' — 데일리 숨김 · 출석 = 하루 한 판 */
       'load.tip8': '막히면 섞기로 새 짝을 만들어요.',
 
       'aria.logo': 'Ten Twin 젤리 팡 월드',
@@ -36410,6 +36412,8 @@ window.TT_SFX = {
   function dqRoll(dateK) {
     var r = qRng(parseInt(dateK, 10) | 0);
     var pool = DAILY_QUESTS.slice(), list = [], i, d, lv;
+    /* [Task 7h] CLASSIC_HIDE — 클래식 계열 표식(classic) 줄은 뽑기 풀에서 뺀다. 뽑기 순서 · 난이도 규칙(아래)은 무변. */
+    if (CLASSIC_HIDE) pool = pool.filter(function (q) { return !q.classic; });
     for (i = 0; i < 3 && pool.length; i++) {
       d = pool.splice(Math.floor(r() * pool.length) % pool.length, 1)[0];
       lv = d.fix ? d.fix : (1 + (Math.floor(r() * 3) % 3));
@@ -36440,6 +36444,31 @@ window.TT_SFX = {
   }
 
   /**
+   * [Task 7h] CLASSIC_HIDE — 이미 저장된 오늘 목록(업데이트 당일)에 클래식 계열 칸(표식 classic)이 있으면 그 칸만 바꾼다.
+   * 새 칸 = DAILY_QUESTS 표 순서에서 표식이 없고 목록에 없는 첫 퀘스트 · 난이도 = 그 퀘스트의 fix 가 있으면 fix, 없으면 1 · 진행 · 완료 · 수령 0.
+   * 「쉬운 것 하나는 반드시」(dqRoll)는 깨지지 않는다 — 표 앞쪽의 표식 없는 퀘스트(m10 · combo · pet · awaken · clear)는 fix 가 없어 난이도 1 로 들어온다.
+   * @return 바꾼 칸 수
+   */
+  function dqSwapClassic(list) {
+    var n = 0, i, j, k, d, c, used;
+    for (i = 0; i < list.length; i++) {
+      d = list[i] && dqDefOf(list[i].id);
+      if (!d || !d.classic) continue;
+      c = null;
+      for (j = 0; j < DAILY_QUESTS.length && !c; j++) {
+        if (DAILY_QUESTS[j].classic) continue;
+        used = false;
+        for (k = 0; k < list.length; k++) { if (list[k] && list[k].id === DAILY_QUESTS[j].id) used = true; }
+        if (!used) c = DAILY_QUESTS[j];
+      }
+      if (!c) continue;
+      list[i] = { id: c.id, lv: c.fix ? c.fix : 1, goal: c.goal[(c.fix ? c.fix : 1) - 1], prog: 0, done: 0, claimed: 0 };
+      n++;
+    }
+    return n;
+  }
+
+  /**
    * 읽는 순간 굴린다. 날짜(주)가 바뀌었으면 목록을 새로 뽑고 진행은 0 —
    * **별도 타이머 0**. dailyDoneToday() 가 쓰는 그 관례 그대로다.
    */
@@ -36449,6 +36478,7 @@ window.TT_SFX = {
     if (!q.daily || q.daily.date !== dk || !q.daily.list || q.daily.list.length !== 3) {
       q.daily = dqRoll(dk); dirty = true;
     }
+    if (CLASSIC_HIDE && dqSwapClassic(q.daily.list) > 0) dirty = true;   /* [Task 7h] 업데이트 당일 저장 목록의 클래식 칸 바꿈 */
     if (!q.weekly || q.weekly.week !== wk || !q.weekly.list || !q.weekly.list.length) {
       q.weekly = wqRoll(wk); dirty = true;
     }
@@ -36695,6 +36725,8 @@ window.TT_SFX = {
    *  true 로 준다. 남의 판을 열면서 내 저장(store.save)을 이어받으면 링크가
    *  가리킨 판이 아니라 내가 쓰던 판이 뜬다. */
   function dailyLinkEnter() {
+    /* [Task 7h] CLASSIC_HIDE — 데일리는 숨긴 클래식 계열이다. 공유 링크(?daily=)로 들어와도 판 · 결과를 열지 않는다(오류 · 토스트 없이 보통 부팅 = 메인). */
+    if (CLASSIC_HIDE) return;
     if (!dailyIsReplay() && store.dailyBest && store.dailyBest.date === todayKey()) {
       showDailyResult(0, false);
       return;
@@ -37301,6 +37333,9 @@ window.TT_SFX = {
     var res = submit ? arcSubmitBest(mode, value)
                      : { best: store.arcadeBest[mode] || null, fresh: false };
     runCoinPay(coinForArc(!!res.fresh, why === 'clear'));
+    /* [Task 7h] 출석 = 아케이드 대전 한 판 끝도 하루(advFinish 와 같은 두 줄 — 하루 한 번은 bumpStreak 규칙 · 보상은 같은 자리). */
+    bumpStreak();
+    claimStreakRewards();
     dropProgress();
     persist();
 
@@ -41339,6 +41374,12 @@ window.TT_SFX = {
   function buildRankList() {
     if (typeof document === 'undefined') return;
     var i, b;
+    /* [Task 7h] CLASSIC_HIDE — 탭 여섯 · 안내 줄 · TOP5 다섯 줄은 전부 클래식 계열이라 그리지 않고 「아케이드 대전」 구획만 선다.
+       탭 줄을 hidden 으로 두면 판이 탭 없는 기본 실루엣으로 선다 — 확률 창 꾸미기 갈래(oddsPaint 가 #odds-tabs 를 hidden)와 같은 규칙
+       (실루엣 규칙이 :not(:has(> .cp-tabs[hidden])) 로 탭 자리를 뺀다). 새 그림 · 새 색 0. 기록 데이터 · 저장 경로는 무변. */
+    var tabs = $('rank-tabs'), hint = $('rank-hint');
+    if (tabs) tabs.hidden = CLASSIC_HIDE;
+    if (hint) hint.hidden = CLASSIC_HIDE;
     for (i = 0; i < RANK_MODES.length; i++) {
       b = $('rank-tab-' + RANK_MODES[i]);
       if (!b) continue;
@@ -41353,7 +41394,7 @@ window.TT_SFX = {
     if (!list) return;
     var arr = (store.ranks && Array.isArray(store.ranks[rankMode])) ? store.ranks[rankMode] : [];
     list.textContent = '';                     // cheapest full clear, no parser
-    for (i = 0; i < RANK_CAP; i++) list.appendChild(buildRankRow(i, arr[i]));
+    if (!CLASSIC_HIDE) for (i = 0; i < RANK_CAP; i++) list.appendChild(buildRankRow(i, arr[i]));
     buildArcRankSection(list);
   }
 
@@ -47629,6 +47670,12 @@ window.TT_SFX = {
        재도전의 근거이기도 하다. 저장은 아래 두 갈래가 각각 persist() 한다. */
     if ((S.score | 0) > (store.advBest[key] | 0)) store.advBest[key] = S.score | 0;
 
+    /* [Task 7h] 출석 7일 = 「그날 아무 판(모험 · 아케이드)이나 한 판 끝내면 하루」(데일리 완료만 세던 것을 넓힘 — 클래식 · 데일리 숨김).
+       깼든 졌든 여기서 센다 — 포기(advAbandon)는 이 함수를 지나지 않는다. 하루 한 번만 오르는 것은 bumpStreak 의 lastDailyDate 규칙 그대로.
+       보상(3 · 7 · 14일)은 데일리 결과에서만 받던 길밖에 없어(퀘스트 창 출석 칸은 보기만) 같은 자리에서 받는다 — 아래 두 갈래가 persist() 한다. */
+    bumpStreak();
+    claimStreakRewards();
+
     if (win) {
       /* 0826 ★★ 여유 — 두 축 중 **하나만** 채우면 된다. 시간탄은 속도를,
          일반탄은 手 절약을 보는데, 어느 쪽이 이 판의 축인지는 판마다 다르므로
@@ -49898,8 +49945,14 @@ window.TT_SFX = {
   /* [KD61-0922] 놀이터 선택 창(spec 5절) — 「클래식 / 아케이드」 두 줄.
      새 시스템 0: 클래식 줄은 openClassicHub(), 아케이드 줄은 플레이 시트를
      **모험 줄만 감춘 상태**로 연다(대전 3종은 그 시트에 이미 산다 — 판정판 49).
-     상태는 시트의 data-arcade-only 한 칸이고, 닫을 때 반드시 원상 복구한다. */
-  function openPlayground() { openModal('modal-playground'); J.sfx.ui(); }
+     상태는 시트의 data-arcade-only 한 칸이고, 닫을 때 반드시 원상 복구한다.
+     [Task 7h] CLASSIC_HIDE 면 선택 창을 건너뛰고 「아케이드 대전」 창을 바로 연다(사용자 「놀이터누르면 아케이드 대전 모달창 뜨게」) —
+     #pg-arcade 가 하던 그 한 줄(openModeSheet arcadeOnly)이다. 놀이터 단추(메인 #kd-bot-play · 지도 #map-play — data-kd="playground")는
+     전부 kdBldgTap → KD_BUILDINGS playground.go → 이 함수 하나를 지난다. #modal-playground 마크업 · #pg-* 배선은 되살림용으로 남긴다. */
+  function openPlayground() {
+    if (CLASSIC_HIDE) { openModeSheet({ arcadeOnly: true }); return; }
+    openModal('modal-playground'); J.sfx.ui();
+  }
   function closePlayground() { closeModal('modal-playground'); }
   function modeSheetArcadeOnly(on) {
     var m = $('modal-mode'), adv = $('mode-adv'), h = $('mode-h');
@@ -49940,6 +49993,14 @@ window.TT_SFX = {
     if (store.save) { startEndless(false); return; }
     openAdventure();
   }
+
+  /* [Task 7h · 2026-10-23] 클래식 숨기기 스위치 하나. 사용자: 「클레식 모드가 너무 수준이떨어져서 저건 출시하면 안되겟어 클래식모드는 없에고
+     다음에 업데이트할때 제대로 만들어서 업데이트하자 지금은 놀이터누르면 아케이드 대전 모달창 뜨게하는걸로 수정해주고」.
+     입구만 숨긴다 — 클래식 코드 · 기록(store.ranks · RANK_MODES) · 저장(store.save · saveClassic) · 저장 소독은 그대로다(왕국 건물 hide 와 같은 방식).
+     이 값을 읽는 자리: openPlayground(놀이터 = 아케이드 대전 창 바로) · dailyLinkEnter(?daily= 는 메인으로) · buildRankList(기록 창 = 아케이드 대전 3줄만) ·
+     dqRoll · questsEnsure(일일 퀘스트 「데일리 1판」 · 「타임러시 n점」 뺌).
+     false 로 바꾸면 클래식 입구 · 기록 탭 · 퀘스트가 되살아난다. */
+  var CLASSIC_HIDE = true;
 
   /* ---- W7.5 §클래식 허브 ---------------------------------------------------
    * 모드 시트와 같은 규약이다: 허브는 **상태를 만들지 않는다**. 각 줄은 진입
