@@ -117,10 +117,10 @@ var DAILY_QUESTS = [
 { id: 'pet',    goal: [1, 2, 3],          ico: '--lib-glyph-heart' },
 { id: 'awaken', goal: [1, 2, 3],          ico: '--lib-glyph-inf' },
 { id: 'clear',  goal: [1, 2, 3],          ico: '--lib-glyph-crown' },
-{ id: 'daily',  goal: [1, 1, 1],  fix: 1, ico: '--lib-glyph-cal' },
+{ id: 'daily',  goal: [1, 1, 1],  fix: 1, ico: '--lib-glyph-cal', classic: 1 },
 { id: 'duel',   goal: [1, 1, 1],  fix: 2, ico: '--lib-badge-a' },
 { id: 'star2',  goal: [1, 1, 1],  fix: 2, ico: '--lib-star-gold' },
-{ id: 'rush',   goal: [1000, 2000, 3500], ico: '--lib-glyph-clock' },
+{ id: 'rush',   goal: [1000, 2000, 3500], ico: '--lib-glyph-clock', classic: 1 },
 { id: 'item',   goal: [1, 1, 1],  fix: 1, ico: '--lib-slot-ic-item' }, /* P3 — 코인이 화폐가 되어 원반은 코인 전용 */
 { id: 'match',  goal: [30, 60, 100],      ico: '--lib-glyph-target' },
 { id: 'chain',  goal: [3, 5, 8],          ico: '--lib-glyph-flag' }
@@ -1945,7 +1945,7 @@ en: {
 'load.tip4': 'Tap the ⓘ next to a stat to read it.',
 'load.tip5': 'Skill fires once the gauge is full.',
 'load.tip6': 'Pet skills can turn a battle around.',
-'load.tip7': 'The daily puzzle builds your streak.',
+'load.tip7': 'Play a round every day to build your streak.',   /* [Task 7h] 옛 'The daily puzzle builds your streak.' — 데일리 숨김 · 출석 = 하루 한 판 */
 'load.tip8': 'Stuck? Shuffle makes new pairs.',
 'aria.logo': 'Ten Twin Jelly Pang World',
 'aria.play': 'Play Endless mode',
@@ -3114,7 +3114,7 @@ ko: {
 'load.tip4': '능력치 옆 ⓘ 를 누르면 설명이 나와요.',
 'load.tip5': '스킬은 게이지가 가득 찼을 때 터져요.',
 'load.tip6': '펫 스킬 한 방이 전투를 뒤집어요.',
-'load.tip7': '데일리를 매일 풀면 연속 기록이 쌓여요.',
+'load.tip7': '매일 한 판씩 하면 출석이 쌓여요.',   /* [Task 7h] 옛 '데일리를 매일 풀면 연속 기록이 쌓여요.' — 데일리 숨김 · 출석 = 하루 한 판 */
 'load.tip8': '막히면 섞기로 새 짝을 만들어요.',
 'aria.logo': 'Ten Twin 젤리 팡 월드',
 'aria.play': '무한 모드 시작',
@@ -7696,6 +7696,7 @@ function achvGoal(a) { return a.id === 'petall' ? MATE_IDS.length : a.goal; }
 function dqRoll(dateK) {
 var r = qRng(parseInt(dateK, 10) | 0);
 var pool = DAILY_QUESTS.slice(), list = [], i, d, lv;
+if (CLASSIC_HIDE) pool = pool.filter(function (q) { return !q.classic; });
 for (i = 0; i < 3 && pool.length; i++) {
 d = pool.splice(Math.floor(r() * pool.length) % pool.length, 1)[0];
 lv = d.fix ? d.fix : (1 + (Math.floor(r() * 3) % 3));
@@ -7720,12 +7721,31 @@ list.push({ id: d.id, goal: d.goal, prog: 0, done: 0, claimed: 0 });
 }
 return { week: weekK, list: list };
 }
+function dqSwapClassic(list) {
+var n = 0, i, j, k, d, c, used;
+for (i = 0; i < list.length; i++) {
+d = list[i] && dqDefOf(list[i].id);
+if (!d || !d.classic) continue;
+c = null;
+for (j = 0; j < DAILY_QUESTS.length && !c; j++) {
+if (DAILY_QUESTS[j].classic) continue;
+used = false;
+for (k = 0; k < list.length; k++) { if (list[k] && list[k].id === DAILY_QUESTS[j].id) used = true; }
+if (!used) c = DAILY_QUESTS[j];
+}
+if (!c) continue;
+list[i] = { id: c.id, lv: c.fix ? c.fix : 1, goal: c.goal[(c.fix ? c.fix : 1) - 1], prog: 0, done: 0, claimed: 0 };
+n++;
+}
+return n;
+}
 function questsEnsure() {
 var dk = todayKey(), wk = weekKey(), q = store.quests, dirty = false;
 if (!q || typeof q !== 'object') { q = {}; dirty = true; }
 if (!q.daily || q.daily.date !== dk || !q.daily.list || q.daily.list.length !== 3) {
 q.daily = dqRoll(dk); dirty = true;
 }
+if (CLASSIC_HIDE && dqSwapClassic(q.daily.list) > 0) dirty = true;   /* [Task 7h] 업데이트 당일 저장 목록의 클래식 칸 바꿈 */
 if (!q.weekly || q.weekly.week !== wk || !q.weekly.list || !q.weekly.list.length) {
 q.weekly = wqRoll(wk); dirty = true;
 }
@@ -7902,6 +7922,7 @@ var cur = Date.UTC(t.getFullYear(), t.getMonth(), t.getDate());
 return Math.max(1, Math.floor((cur - base) / 86400000) + 1);
 }
 function dailyLinkEnter() {
+if (CLASSIC_HIDE) return;
 if (!dailyIsReplay() && store.dailyBest && store.dailyBest.date === todayKey()) {
 showDailyResult(0, false);
 return;
@@ -8235,6 +8256,8 @@ S.arcLastValue = value | 0;
 var res = submit ? arcSubmitBest(mode, value)
 : { best: store.arcadeBest[mode] || null, fresh: false };
 runCoinPay(coinForArc(!!res.fresh, why === 'clear'));
+bumpStreak();
+claimStreakRewards();
 dropProgress();
 persist();
 var board = $('board');
@@ -10531,6 +10554,9 @@ return row;
 function buildRankList() {
 if (typeof document === 'undefined') return;
 var i, b;
+var tabs = $('rank-tabs'), hint = $('rank-hint');
+if (tabs) tabs.hidden = CLASSIC_HIDE;
+if (hint) hint.hidden = CLASSIC_HIDE;
 for (i = 0; i < RANK_MODES.length; i++) {
 b = $('rank-tab-' + RANK_MODES[i]);
 if (!b) continue;
@@ -10544,7 +10570,7 @@ var list = $('rank-list');
 if (!list) return;
 var arr = (store.ranks && Array.isArray(store.ranks[rankMode])) ? store.ranks[rankMode] : [];
 list.textContent = '';                     // cheapest full clear, no parser
-for (i = 0; i < RANK_CAP; i++) list.appendChild(buildRankRow(i, arr[i]));
+if (!CLASSIC_HIDE) for (i = 0; i < RANK_CAP; i++) list.appendChild(buildRankRow(i, arr[i]));
 buildArcRankSection(list);
 }
 function buildArcRankSection(list) {
@@ -14535,6 +14561,8 @@ var gemGain = 0;                              // 이 판이 적립한 젤리별
 var freed = false;                            // 이 판이 젤리공주를 풀어 줬는가
 var dupIds = [];                              // P3 T10 — 이 판 끝에서 별 +10 으로 바뀐 친구들(알림은 skin.gem 토스트 뒤에 차례로)
 if ((S.score | 0) > (store.advBest[key] | 0)) store.advBest[key] = S.score | 0;
+bumpStreak();
+claimStreakRewards();
 if (win) {
 var ease = (p.sec > 0 && advLeftMs() >= p.sec * 250) ||
 (S.adds >= Math.ceil(addsForStage(p.n) / 2));
@@ -15935,7 +15963,10 @@ function syncModeSheet() {
 setStageBadge('mode-adv-b', Math.max(1, store.advMax | 0));
 syncArcadeSheet();
 }
-function openPlayground() { openModal('modal-playground'); J.sfx.ui(); }
+function openPlayground() {
+if (CLASSIC_HIDE) { openModeSheet({ arcadeOnly: true }); return; }
+openModal('modal-playground'); J.sfx.ui();
+}
 function closePlayground() { closeModal('modal-playground'); }
 function modeSheetArcadeOnly(on) {
 var m = $('modal-mode'), adv = $('mode-adv'), h = $('mode-h');
@@ -15959,6 +15990,7 @@ J.sfx.ui();
 if (store.save) { startEndless(false); return; }
 openAdventure();
 }
+var CLASSIC_HIDE = true;
 function classicSkillsOn() { return !!store.classicSkills; }
 function syncClassicSheet() {
 var on = classicSkillsOn();
