@@ -1022,6 +1022,7 @@ var JUICE_SFX = ['select', 'match', 'fail', 'rowClear', 'combo', 'deal', 'win', 
 'hurry', 'cry',
 'spBlast', 'petBell', 'foeStab',
 'awakenMax',
+'skillCharged',
 'reward',
 'starGet'];
 var UI_SFX_MERGE_MS = 60;
@@ -6988,7 +6989,7 @@ var was = gaugeFull();
 store.gauge = clamp(store.gauge + gaugeGain(combo) * (battleOn() ? AWAKEN_GAIN_K : 1),
 0, SKILL_MAX);
 if (!was && gaugeFull()) {
-if (battleOn() && J.sfx.awakenMax) J.sfx.awakenMax(); else J.sfx.mission();
+if (!battleOn()) J.sfx.mission();
 J.vibrate(battleOn() ? 40 : 24);
 if (battleOn()) {
 fullCue('btn-shuffle');
@@ -8798,10 +8799,11 @@ J.sfx.mission();
 J.vibrate(20);
 }
 if (mkStar) {
+var starWas = gaugeFull();
 store.gauge = SKILL_MAX;
 syncSkill();
 floatOnBoard(mkC.x, mkC.y - 72, t('mk.star'), '#FFD34D');
-J.sfx.mission();
+if (starWas || S.skillKind) J.sfx.mission();
 J.vibrate(28);
 if (typeof window !== 'undefined') {
 J.shockwave(mkC.x, mkC.y, '#FFD34D');
@@ -13041,6 +13043,8 @@ setCls(bsh, 'primed', gaugeFull() && !!S.skillKind);
 setHaloK(bh, duelSpPct() / 100);
 setHaloK(bu, 0);
 setHaloK(bsh, duelGaugePct() / 100);
+if (d.gFullWas === false && gFull) J.sfx.skillCharged();
+d.gFullWas = gFull;
 setAppClass('skill-full', gFull);
 setActLabel(bh, 'act.special', 'aria.special');
 setActLabel(bu, 'act.pet', 'aria.pet');

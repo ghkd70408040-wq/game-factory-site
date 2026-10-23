@@ -11,7 +11,7 @@ var SFX_DEBOUNCE   = 12;       // ms — 동일 sfx 12ms 내 재호출 무시 (�
 // v3 voice: 캐릭터 대사다. cheer 보다도 길게 — 한 마디가 끝나기 전에 다음이 시작하면
 // 말이 아니라 잡음이 된다. 실제 겹침 방지는 voiceBusyUntil 이 한 겹 더 맡는다.
 var SFX_DEBOUNCE_MAP = { match: 70, combo: 70, cheer: 340, voice: 300, tierUp: 300, jackpot: 240,
-spBlast: 300, petBell: 300, foeStab: 300, awakenMax: 900 };
+spBlast: 300, petBell: 300, foeStab: 300, awakenMax: 900, skillCharged: 1300 };
 var MATCH_PEAK = 0.20;
 var VOICE_GAIN = 1.26;
 var JELLY_ROOT  = 620;
@@ -1377,6 +1377,25 @@ tone('sine', 2093.00, 2093.00, t0 + 0.50, 0.30, 0.036, 0.004);
 noise(t0 + 0.44, 0.26, 0.026, 'highpass', 4200, 9000, 0.7, 0.040);
 // 꼬리 — C4 받침이 0.42s 남아 "큰 것"의 크기를 만든다(spBlast ③ 와 같은 문법).
 tone('sine', 261.63, 261.63, t0 + 0.48, 0.42, 0.038, 0.012);
+},
+skillCharged: function () {
+if (!gate('skillCharged')) return;
+var t0 = at();
+// ① 차오름 — 바람 + 부드러운 상승(크레셴도).
+noise(t0, 0.56, 0.060, 'bandpass', 380, 7200, 1.4, 0.44);
+tone('triangle', 293.66, 1174.66, t0, 0.52, 0.080, 0.36);
+// ② 흐름 — 받침 화음(D6 · A6) + 초당 14번 반짝이는 짧은 음(점점 작아짐).
+tone('triangle', 1174.66, 1174.66, t0 + 0.40, 0.80, 0.034, 0.06);
+tone('sine', 1760.00, 1760.00, t0 + 0.40, 0.80, 0.020, 0.06);
+var arp = [1479.98, 1760.00, 2349.32, 1760.00];
+for (var i = 0; i < 10; i++) {
+var st = t0 + 0.42 + i / 14, f = arp[i % 4], pk = 0.090 - i * 0.0065;
+tone('sine', f, f, st, 0.055, pk, 0.004);
+tone('sine', f * 2.01, f * 2.01, st, 0.030, pk * 0.22, 0.003);
+}
+// ③ 끝 반짝 한 알.
+tone('sine', 3520.00, 3520.00, t0 + 1.10, 0.20, 0.060, 0.003);
+tone('sine', 3520.00 * 2.76, 3520.00 * 2.76, t0 + 1.10, 0.08, 0.010, 0.003);
 },
 petBell: function () {
 if (!gate('petBell')) return;
