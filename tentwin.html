@@ -73248,12 +73248,13 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
   #app.battle #screen-game.active #duel-hud #duel-foe-n { left: calc(var(--bt-fx) + var(--bt-hu) * 60.5 + var(--bu) * 16.8); top: calc(var(--bt-fy) + var(--bt-hu) * 30.3); }
   #app.battle #screen-game.active #duel-hud #duel-me-n  { left: calc(var(--bt-mx) + var(--bt-hu) * 60.5 + var(--bu) * 16.8); top: calc(var(--bt-my) + var(--bt-hu) * 30.3); }
 
-  /* ---- 7. 스킬 메달 = 오른 기둥 아래 두루마리 안([Task 7f] 전투 셋 = 한 줄 — 옛 2×2) ----------------------------------------
-     메달 그림(718:907)은 .act::before 가 contain · 아래 맞춤으로 그리므로 상자를 그림 비 그대로 두면 늘어나는 곳이 0 이다.
-     간격 .11H — 세로 이웃 .11 · 가로 이웃은 폭 기준 .11/.7916 = .139(둘 다 ≤ .15, landscape-gate 가로 maxGapRatio 와 같은 셈).
+  /* ---- 7. 스킬 메달 = 오른 기둥 아래 두루마리 안([Task 7f] 전투 셋 = 한 줄 — 옛 2×2 · [Task 7i] 종이 안 약 1.2배) ----------------------
+     메달 그림(718:907)은 .act::before 가 contain · 아래 맞춤으로 그린다. [Task 7i] 단추 상자(누르는 자리) = 그림의 **잉크 폭** — 그림(::before)은
+     단추 상자보다 넓어 좌우 투명 여백이 이웃 위로 넘친다(세로 액션바 ②절 「캔버스의 죽은 여백」 지렛대). 잉크 사이 .06H(가로 이웃 폭 기준 ≈ .086 ≤ .15).
      세로용 유리 띠(::before 서리 · ::after 트레이)와 뒤집은 판(.dh-plate)은 끈다 — 바탕은 영웅 카드.
      [Task 7f] 배지 = 메달 높이 비례(폰 390×844 비) · 하한 --text-min — 하한으로 커진 만큼은 위로만 자란다(돔을 안 덮음).
-     명패 = 알약 키(메달 높이 × .32) · 글자 = 알약 키 × .48(수정 1회차 판정 「알약 키의 절반쯤」) · 하한 --text-min. 옛: 명패 18bu · 배지 17.5bu(무대 자). */
+     명패 = 알약 키(메달 높이 × .32) · 글자 = 알약 키 × .48(수정 1회차 판정 「알약 키의 절반쯤」) · 하한 --text-min. 옛: 명패 18bu · 배지 17.5bu(무대 자).
+     [Task 7i] 배지 · 명패 규칙은 그대로라 메달과 함께 커진다. 옛(7f): 단추 상자 = 그림 폭 · 사이 .11H · 상자 = 글자 안전 상자 211bu. */
   #app.battle #screen-game.active #actionbar {
     /* [Task 6b] 상자 = 영웅 카드 아래 상자(x 936~1236 · y 497~700 · 300×203) — 악당 아래 판 #duel-foe-box 와 같은 크기 · 같은 위 끝.
        메달 2×2 는 그 안 가운데: 2H + .11H = 203 → H = 96.21(간격 비 .11H 그대로). 메달 그림 폭 W = H × 718/907.
@@ -73265,10 +73266,33 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
        옛 값(Task 6b · 8e): 상자 = 두루마리 겉 상자 300×203 · H = 203/2.11 = 96.21 · 하한 늘 max(--touch-min, W).
        [Task 7f — 사용자 반려 2026-10-22 「스킬 버튼들 … 보이지도 않아 모양이」 · 설계 승인 「한 줄로 크게」] 셋(전투) = 안전 상자 안 **한 줄**(왼쪽부터 각성 · 펫소환 · 스킬).
        H = 안전 상자 폭 211 에 셋이 드는 가장 큰 높이: 3W + 2 × .11H = 211 → H = 211 / (3 × 718/907 + .22) = 81.31bu(옛 2줄 63.98 의 1.27배) ·
-       세로는 안전 상자(135) 가운데(align-content center). 옛 값(8e 수정 1 I4): 두 줄 2H + .11H = 135 → H = 63.98 · 2열. */
-    --bt-medal-h: calc(var(--bu) * 211 / (3 * 718 / 907 + 2 * .11));
+       세로는 안전 상자(135) 가운데(align-content center). 옛 값(8e 수정 1 I4): 두 줄 2H + .11H = 135 → H = 63.98 · 2열.
+       [Task 7i — 사용자 2026-10-23 「저거 각성 펫소환 아이콘을 조금더 못키우나 작어서 잘안보이네」 · 설계 승인 「좋아」] 셋 같은 크기 · 한 줄 그대로
+       **약 1.2배**: 목표 H = 81.31 × 1.2 = 97.58bu. 들어갈 자리 = 두루마리 **종이 안쪽**(그림 x 108~864 = 9조각 가운데 띠 — 무대 x 974.7~1196.2 ·
+       폭 P = 300 − (108 + 111) × 203/566 = 221.45bu · 글자 안전 상자 211 보다 조금 넓다). 셋이 드는 지렛대:
+         ① 단추 상자 = 그림의 **잉크 폭**(그림 360×455 alpha > 0 실측 — 각성 medal-special x 21~337 · 펫소환 medal-pet 21~339 · 스킬 medal-awaken
+           15~344 · ko · en 같음 → 폭의 317 · 319 · 330 / 360). 그림(::before)은 상자보다 넓어 좌우 투명 여백이 이웃 위로 넘친다(아래 .act::before).
+         ② 잉크 사이 = .06H(굵은 포인터는 가운데 누르는 자리 44px 가 이웃 상자에 안 닿을 만큼 — max(.06H, (터치 하한 − 펫소환 잉크)/2)).
+         ③ 명패(알약 폭 2.28 × .32H — 잉크보다 조금 넓다 · en 작은 창 「Awaken」 은 글자 폭)가 종이 안: 상자를 종이 안쪽에서 양 끝 명패가 잉크 밖으로
+           나온 만큼(--bt-ovl · --bt-ovr) 줄이고 셋을 그 가운데 — 잉크 · 명패 묶음이 종이 가운데.
+       H = min(1.2배, 위 조건이 드는 가장 큰 값): 잉크 합 966/360 · W + 틈 2 + 양 끝 명패 넘침 ≤ P 를 틈 · 왼 명패의 두 경우씩 풀어 넷 중 가장 작은 값
+       (넘침 · 틈이 둘 중 큰 쪽이라 「넷 다 ≤ P」 와 같다 — 해당 없는 경우는 --bt-touch · --bt-np-wen 0 이라 저절로 안 걸린다).
+       실측: ko · 가는 포인터 = 1.2배 그대로(넷 중 가장 작은 넘침 조건 97.88bu > 97.58) · en 844×390 · 굵은 포인터 844×390 은 조금 작다(보고 task-7i-report.md). */
+    --bt-ik: calc(718 / 907 / 360);                                   /* 그림 1px(360 폭) = 메달 높이 × 이 값 */
+    --bt-npk: calc(2.28 * .32);                                       /* 명패 알약 폭 / 메달 높이(알약 키 .32H × 가로세로 2.28 — 아래 .act-t) */
+    --bt-paper: calc(var(--bu) * (300 - (108 + 111) * 203 / 566));    /* 종이 안쪽 폭 P */
+    --bt-touch: 0px;                                                  /* 굵은 포인터만 --touch-min(아래 @media (pointer: coarse)) */
+    --bt-np-wen: 0px;                                                 /* en 만 「Awaken」 글자 명패 폭(아래 html[lang="en"]) */
+    --bt-medal-h: min(
+      calc(var(--bu) * 211 / (3 * 718 / 907 + 2 * .11) * 1.2),
+      calc(var(--bt-paper) / (642.5 * var(--bt-ik) + .12 + var(--bt-npk))),
+      calc((var(--bt-paper) - var(--bt-touch)) / (323.5 * var(--bt-ik) + var(--bt-npk))),
+      calc((var(--bt-paper) - var(--bt-np-wen) / 2) / (642.5 * var(--bt-ik) + .12 + var(--bt-npk) / 2)),
+      calc((var(--bt-paper) - var(--bt-touch) - var(--bt-np-wen) / 2) / (323.5 * var(--bt-ik) + var(--bt-npk) / 2)));
     --bt-medal-w: calc(var(--bt-medal-h) * 718 / 907);
-    --bt-medal-g: calc(var(--bt-medal-h) * .11);
+    --bt-medal-g: max(calc(var(--bt-medal-h) * .06), calc((var(--bt-touch) - var(--bt-medal-h) * 319 * var(--bt-ik)) / 2));
+    --bt-ovl: max(calc(var(--bt-medal-h) * (var(--bt-npk) - 317 * var(--bt-ik)) / 2), calc((var(--bt-np-wen) - var(--bt-medal-h) * 317 * var(--bt-ik)) / 2));
+    --bt-ovr: calc(var(--bt-medal-h) * (var(--bt-npk) - 330 * var(--bt-ik)) / 2);
     /* [판정판 126 · Task 126 — 지휘자 답 안 A] 보이지 않는 메달 상자 폭 = max(그림 폭, 가장 긴 명패 − 틈) · 틈은 .11H 그대로(가로 · 세로).
        그림은 ::before contain · 아래 가운데라 크기 그대로이고, 상자만 명패가 이웃 상자에 안 걸릴 만큼 넓어진다(배지는 그림 기준 — 아래 right 식).
        명패 폭 = 명패 글자(--bt-np-fs) × --bt-np-em — 가장 긴 명패를 글자 단위로 잰 값(ko 「펫소환」 2.96 · en 「Awaken」 3.75 — 821 · 844 · 1280 실측)에
@@ -73282,20 +73306,19 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
        (폰 390×844 실측 비: 배지 키 · 최소 폭 24/129 · 글자 12/129 · 좌우 안여백 6/129) · 하한은 그대로(글자 --text-min · 배지 키 글자 하한 × 1.5).
        [Task 7f 수정 1회차 — 지휘자 판정 I2] 명패 글자는 폰 비(13/129 — PC 에서 11px 까지 작아짐)가 아니라 **명패 알약 키의 절반쯤**: 알약 키
        --bt-np-h = max(메달 × .32, 글자 하한 × 1.3)(그림 명패 비 · 무변) · 글자 = 알약 키 × .48 · 하한 --text-min(ko · en 같음).
-       .48 = 「절반」 과 판정의 예(1280 ≈ 12~13 · 1668 ≈ 15~16 · 1920 ≈ 18)를 함께 맞추는 값(12.5 · 15.8 · 18.7 — .5 면 1920 이 19.5). */
+       .48 = 「절반」 과 판정의 예(1280 ≈ 12~13 · 1668 ≈ 15~16 · 1920 ≈ 18)를 함께 맞추는 값(12.5 · 15.8 · 18.7 — .5 면 1920 이 19.5).
+       [Task 7i] 위 126 상자 폭 식(--bt-medal-tw = max(그림 폭, 명패 − 틈 + 명패 최소 틈) · --bt-np-em 3.0 · --bt-np-gap .35)은 전투에서 은퇴 —
+       단추 상자 = 잉크 폭(아래 단추별 --bt-ink-l · --bt-ink-r). 판 화면 단추(#app:not(.battle))는 자기 --bt-medal-tw 그대로. */
     --bt-np-h: max(calc(var(--bt-medal-h) * .32), calc(var(--text-min) * 1.3));
     --bt-np-fs: max(var(--text-min), calc(var(--bt-np-h) * .48));
-    --bt-np-em: 3.0;
-    --bt-np-gap: .35;
-    --bt-medal-tw: max(var(--bt-medal-w), calc(var(--bt-np-fs) * (var(--bt-np-em) + var(--bt-np-gap)) - var(--bt-medal-g)));
     position: absolute;
-    left: calc(var(--bt-x0) + var(--bu) * 979);
+    left: calc(var(--bt-x0) + var(--bu) * (936 + 108 * 203 / 566) + var(--bt-ovl));   /* [Task 7i] 종이 안쪽 왼끝 + 왼 명패 넘침(옛: 안전 상자 979) */
     top: calc(var(--bt-y0) + var(--bu) * 531);
-    width: calc(var(--bu) * 211);
+    width: calc(var(--bt-paper) - var(--bt-ovl) - var(--bt-ovr));                      /* [Task 7i] 옛: 안전 상자 211 */
     height: calc(var(--bu) * 135);
     z-index: 1;
     display: grid;
-    grid-template-columns: repeat(3, var(--bt-medal-tw));   /* [Task 7f] 한 줄 셋(옛 2열) */
+    grid-template-columns: repeat(3, auto);   /* [Task 7f] 한 줄 셋(옛 2열) · [Task 7i] 칸 = 단추 상자(잉크 폭 — 단추마다 다름) */
     grid-auto-rows: var(--bt-medal-h);
     justify-content: center;
     align-content: center;
@@ -73315,20 +73338,28 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
   #app.battle #screen-game.active #actionbar::after,
   #app.battle #screen-game.active #actionbar > .dh-plate { display: none; }
   #app.battle #screen-game.active #actionbar .act {
-    width: var(--bt-medal-tw);
+    width: calc(var(--bt-medal-w) * (var(--bt-ink-r) - var(--bt-ink-l)) / 360);   /* [Task 7i] 단추 상자 = 잉크 폭(옛: --bt-medal-tw) */
     height: var(--bt-medal-h) !important;
     min-height: 0 !important;
     flex: none;
   }
-  #app.battle #screen-game.active #actionbar .act::before { inset: 0 !important; }
+  /* [Task 7i] 단추별 잉크 열(그림 360 폭 · alpha > 0 · 끝은 「다음 열」 — 잉크 = r − l) */
+  #app.battle #screen-game.active #actionbar #btn-hint    { --bt-ink-l: 21; --bt-ink-r: 338; }   /* 각성 medal-special-ko · en x 21~337 */
+  #app.battle #screen-game.active #actionbar #btn-undo    { --bt-ink-l: 21; --bt-ink-r: 340; }   /* 펫소환 medal-pet x 21~339 */
+  #app.battle #screen-game.active #actionbar #btn-shuffle { --bt-ink-l: 15; --bt-ink-r: 345; }   /* 스킬 medal-awaken x 15~344 */
+  /* [Task 7i] 그림 상자 = 그림 폭 W — 잉크 왼끝 · 오른끝이 단추 상자 양 끝에 오게 좌우로 넘친다(옛: inset 0 = 단추 상자 = 그림 폭). */
+  #app.battle #screen-game.active #actionbar .act::before {
+    inset: 0 calc(var(--bt-medal-w) * (var(--bt-ink-r) - 360) / 360) 0 calc(var(--bt-medal-w) * var(--bt-ink-l) / -360) !important;
+  }
   #app.battle #screen-game.active #actionbar .act .act-badge {
     /* [Task 7f] 폰 배지(390×844: 키 · 최소 폭 24 · 글자 12 · 좌우 안여백 6 / 그림 높이 129)를 메달 높이에 비례 · 하한 그대로(키 글자 하한 × 1.5 · 글자 --text-min).
        오른쪽 끝 = 돔 오른 어깨(그림 오른끝 안 .067W — 그대로). 옛: 키 · 폭 29bu · 글자 17.5bu · 안여백 7bu(메달 64bu 의 45% — 돔을 덮음).
        [수정 1회차 I1] 아래 끝 = 비례 배지의 아래 끝(메달 위에서 (.047 + 24/129)H = .233H — 돔 위)에 고정: 하한으로 커진 만큼은 **위로만** 자란다
-       (작은 가로 창 821 · 844 에서 메달 위로 약 7 · 8px — 한 줄이라 메달 위 안전 상자 여유 (135 − 81.3)/2 = 26.8bu 안). 옛: 위 끝 .047H 고정(아래로 자라 돔을 덮음). */
+       (작은 가로 창 821 · 844 에서 메달 위로 약 7 · 8px — 한 줄이라 메달 위 안전 상자 여유 (135 − 81.3)/2 = 26.8bu 안). 옛: 위 끝 .047H 고정(아래로 자라 돔을 덮음).
+       [Task 7i] 메달 97.6bu 에서 위 여유 (135 − 97.6)/2 = 18.7bu · 오른끝 = 그림 오른끝 안 .067W 그대로 — 그림 오른끝 = 단추 상자 오른끝 + (360 − 잉크 오른끝)/360 · W. */
     --bt-bd-h: max(calc(var(--text-min) * 1.5), calc(var(--bt-medal-h) * 24 / 129));
     top: calc(var(--bt-medal-h) * (.047 + 24 / 129) - var(--bt-bd-h)) !important;
-    right: calc((var(--bt-medal-tw) - var(--bt-medal-w)) / 2 + var(--bt-medal-w) * .067) !important;   /* 그림 기준(터치 상자가 넓을 때도) */
+    right: calc(var(--bt-medal-w) * (.067 - (360 - var(--bt-ink-r)) / 360)) !important;   /* 그림 기준(옛: (단추 폭 − W)/2 + .067W) */
     min-width: var(--bt-bd-h) !important;
     height: var(--bt-bd-h) !important;
     padding: 0 calc(var(--bt-medal-h) * 6 / 129) !important;
@@ -73345,8 +73376,17 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
   }
   /* [Task 7f 수정 1회차 — 지휘자 판정 M1] en = 보이지 않는 상자 폭도 그림 폭(한 줄 셋이 안전 상자 211 에 든다) — 「Awaken」 명패가 그림보다 넓은
      작은 가로 창(844×390 · 11px)에서만 명패가 자기 상자를 넘는다(명패끼리 겹침 0 · 두루마리 종이(기둥 안쪽) 안 — smoke-battle-acts en 칸).
-     큰 창은 명패가 그림보다 좁아 옛 식(max(그림 폭, 명패 − 틈 + 최소 틈))과 같은 값. 옛: en --bt-np-em 3.8 로 상자를 넓혀 844 에서 안전 상자를 양쪽 8.9px 넘었다. */
-  html[lang="en"] #app.battle #screen-game.active #actionbar { --bt-medal-tw: var(--bt-medal-w); }
+     큰 창은 명패가 그림보다 좁아 옛 식(max(그림 폭, 명패 − 틈 + 최소 틈))과 같은 값. 옛: en --bt-np-em 3.8 로 상자를 넓혀 844 에서 안전 상자를 양쪽 8.9px 넘었다.
+     [Task 7i] en 도 단추 상자 = 잉크 폭(ko 와 같다 — 옛 줄 `--bt-medal-tw: var(--bt-medal-w)` 은퇴). 대신 가장 넓은 명패 「Awaken」(각성 · 맨 왼쪽)이
+     글자 하한(11px)에서 알약 비보다 넓어지는 작은 창(844×390)에서는 그 글자 폭이 종이 안에 들게 H 와 왼쪽 넘침(--bt-ovl)이 따른다:
+     --bt-np-wen = 글자 하한 × 3.3(「Awaken」 11px 글자 36.2px — 821 · 844 실측 3.29em) + 좌우 안여백 4bu × 2. 큰 창은 알약 비가 이겨 이 값이 안 걸린다. */
+  html[lang="en"] #app.battle #screen-game.active #actionbar { --bt-np-wen: calc(var(--text-min) * 3.3 + var(--bu) * 8); }
+  /* [Task 7i] 굵은 포인터(터치) — 누르는 자리(.act-hit, 판 화면 절 @media (pointer: coarse))는 터치 하한 44px. 가운데(펫소환) 자리가 양옆 단추 상자에
+     안 닿게 틈 = max(.06H, (터치 하한 − 펫소환 잉크)/2) — 위 --bt-medal-g 식 · H 는 그 틈으로도 종이에 드는 값(위 min 셋째 · 다섯째 항).
+     + .5bu = 양쪽 .25bu 여유(상자 자리가 레이아웃 단위 1/64px 로 반올림돼 딱 맞춘 틈이 0.01~0.02px 겹쳤다 — 844×390@1 실측). */
+  @media (pointer: coarse) {
+    #app.battle #screen-game.active #actionbar { --bt-touch: calc(var(--touch-min) + var(--bu) * .5); }
+  }
 }
 </style>
 <style id="play-8e">
@@ -73822,7 +73862,9 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
   /* 영웅 단추 = 두루마리 판의 글자 안전 상자 안(지휘자 답 Q3 · Q5 「안전 상자가 허락하는 최대」 · 수정 1 I4 판정). 상자 = x 979~1190 · y 531~666(211×135),
      메달 = battle-landscape 7절 값 그대로(높이 = 211 / (3 × 718/907 + .22) = 81.3bu · 폭 ×718/907 · 사이 .11H · 3열 · 터치 폭 하한은 굵은 포인터만).
      [Task 7f — 사용자 설계 승인 「한 줄로 크게」] 셋(전투) = 한 줄(왼쪽부터 각성 · 펫소환 · 스킬 = DOM 차례 그대로). 옛: 위 둘 + 아래 하나 가운데
-     (#btn-shuffle 이 두 칸에 걸침 — 은퇴). */
+     (#btn-shuffle 이 두 칸에 걸침 — 은퇴).
+     [Task 7i] 메달 약 1.2배(97.6bu) · 단추 상자 = 잉크 폭 · 사이 .06H · 자리 = 두루마리 종이 안쪽(그림 x 108~864) — 값은 battle-landscape 7절. 후광은 아래
+     식(--ah-h = 메달 높이) 그대로 따라 커진다. */
   #app.battle #screen-game.active #actionbar .act .act-halo {
     --ah-h: var(--bt-medal-h);
     --ah-top: 0px;
@@ -74061,7 +74103,7 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
   }
   /* 단추 = 오른쪽 두루마리 판의 글자 안전 상자 안 — 옛 전투 메달과 같은 칸(battle-landscape 7절 · 수정 1 I4: 상자 211×135 · 높이 135/2.11 = 64bu ·
      폭 ×718/907 · 사이 .11H · 2열 · 터치 폭 하한은 굵은 포인터만 — 지휘자 답 Q3 · Q5). [Task 7f] 전투만 한 줄 셋 81.3bu 로 바뀌었고(사용자 반려 ·
-     지시서 「전투가 아닌 모드 무변」) 판 화면 단추는 옛 64bu 2열을 유지한다 — 이제 갈래끼리 크기가 다르다. 단추 넷(아케이드 · 타임러시 · 데일리) = 2×2 ·
+     지시서 「전투가 아닌 모드 무변」) 판 화면 단추는 옛 64bu 2열을 유지한다 — 이제 갈래끼리 크기가 다르다([Task 7i] 전투 97.6bu · 이 갈래 무변). 단추 넷(아케이드 · 타임러시 · 데일리) = 2×2 ·
      하나(클래식 「추가」) = 가운데 한 칸. 단추 그림은 각 갈래 자기 것(유리 네모) 그대로. */
   #app:not(.battle) #screen-game.active #actionbar {
     --bt-medal-h: calc(var(--bu) * 135 / 2.11);
