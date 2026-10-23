@@ -73258,7 +73258,8 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
 
   /* ---- 7. 스킬 메달 = 오른 기둥 아래 두루마리 안([Task 7f] 전투 셋 = 한 줄 — 옛 2×2 · [Task 7i] 종이 안 약 1.2배) ----------------------
      메달 그림(718:907)은 .act::before 가 contain · 아래 맞춤으로 그린다. [Task 7i] 단추 상자(누르는 자리) = 그림의 **잉크 폭** — 그림(::before)은
-     단추 상자보다 넓어 좌우 투명 여백이 이웃 위로 넘친다(세로 액션바 ②절 「캔버스의 죽은 여백」 지렛대). 잉크 사이 .06H(가로 이웃 폭 기준 ≈ .086 ≤ .15).
+     단추 상자보다 넓어 좌우 투명 여백이 이웃 위로 넘친다(세로 액션바 ②절 「캔버스의 죽은 여백」 지렛대). [수정 1회차] 잉크 사이 = 명패 최소 틈이
+     드는 만큼(아래 --bt-g1 · --bt-g2 — 가로 이웃 폭 기준 큰 창 .121 · 821 .133 · 844 ko .151(관문 maxGapRatio .15 를 .001 넘음 — 보고)).
      세로용 유리 띠(::before 서리 · ::after 트레이)와 뒤집은 판(.dh-plate)은 끈다 — 바탕은 영웅 카드.
      [Task 7f] 배지 = 메달 높이 비례(폰 390×844 비) · 하한 --text-min — 하한으로 커진 만큼은 위로만 자란다(돔을 안 덮음).
      명패 = 알약 키(메달 높이 × .32) · 글자 = 알약 키 × .48(수정 1회차 판정 「알약 키의 절반쯤」) · 하한 --text-min. 옛: 명패 18bu · 배지 17.5bu(무대 자).
@@ -73280,27 +73281,46 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
        폭 P = 300 − (108 + 111) × 203/566 = 221.45bu · 글자 안전 상자 211 보다 조금 넓다). 셋이 드는 지렛대:
          ① 단추 상자 = 그림의 **잉크 폭**(그림 360×455 alpha > 0 실측 — 각성 medal-special x 21~337 · 펫소환 medal-pet 21~339 · 스킬 medal-awaken
            15~344 · ko · en 같음 → 폭의 317 · 319 · 330 / 360). 그림(::before)은 상자보다 넓어 좌우 투명 여백이 이웃 위로 넘친다(아래 .act::before).
-         ② 잉크 사이 = .06H(굵은 포인터는 가운데 누르는 자리 44px 가 이웃 상자에 안 닿을 만큼 — max(.06H, (터치 하한 − 펫소환 잉크)/2)).
+         ② 이웃한 명패 알약 사이 ≥ 명패 최소 틈 .35 × 명패 글자(126 수정 1회차 판정 「붙어 보임」 — 11px 에서 3.85px) — [수정 1회차 지휘자 판정 I1]
+           로 되살림. 잉크 사이 = 두 알약이 잉크 밖으로 나온 만큼 + 그 틈(각성↔펫소환 --bt-g1 · 펫소환↔스킬 --bt-g2 — 알약이 잉크보다 나온 양이
+           단추마다 달라 둘이 다르다) · 굵은 포인터는 가운데 누르는 자리 44px 가 양옆 단추 상자에 안 닿을 만큼 이상(max). 잉크 사이 ≥ .06H 는
+           저절로 지켜진다(명패 틈만으로도 ≥ .0698H).
          ③ 명패(알약 폭 2.28 × .32H — 잉크보다 조금 넓다 · en 작은 창 「Awaken」 은 글자 폭)가 종이 안: 상자를 종이 안쪽에서 양 끝 명패가 잉크 밖으로
            나온 만큼(--bt-ovl · --bt-ovr) 줄이고 셋을 그 가운데 — 잉크 · 명패 묶음이 종이 가운데.
-       H = min(1.2배, 위 조건이 드는 가장 큰 값): 잉크 합 966/360 · W + 틈 2 + 양 끝 명패 넘침 ≤ P 를 틈 · 왼 명패의 두 경우씩 풀어 넷 중 가장 작은 값
-       (넘침 · 틈이 둘 중 큰 쪽이라 「넷 다 ≤ P」 와 같다 — 해당 없는 경우는 --bt-touch · --bt-np-wen 0 이라 저절로 안 걸린다).
-       실측: ko · 가는 포인터 = 1.2배 그대로(넷 중 가장 작은 넘침 조건 97.88bu > 97.58) · en 844×390 · 굵은 포인터 844×390 은 조금 작다(보고 task-7i-report.md). */
+       H = min(1.2배, 위 조건이 드는 가장 큰 값). 조건 = 잉크 합 + 틈 둘 + 양 끝 넘침 ≤ P 이고 틈 · 넘침 · 명패 틈이 저마다 두 경우 중 큰 쪽(max)이라
+       「모든 경우의 조합이 ≤ P」 와 같다 → 조합마다 H 상한을 풀어 가장 작은 값(아래 min 의 열 항). 겹치는 조합을 걸러 남은 열 가지 — (가) 세 알약
+       + 명패 틈 둘(틈 = 글자 비례 · 글자 하한) · (나) 왼 알약이 en 글자 폭 · (다) 오른 틈이 터치 자리 · (라) 두 틈이 터치 자리. 해당 없는 경우는
+       --bt-touch · --bt-np-wen 이 0 이라 그 항이 저절로 안 걸린다.
+       실측(수정 1회차): 큰 창 1.186배 · 821×462 1.177 · 844×390 ko 1.165 · en 844 1.106(「Awaken」 글자 알약 — 판정대로 1.15 아래 그대로) ·
+       굵은 포인터 844 ko 1.165 · en 1.097 · 667×375@1 1.158(보고 task-7i-report.md 「수정 1회차」 표). */
     --bt-ik: calc(718 / 907 / 360);                                   /* 그림 1px(360 폭) = 메달 높이 × 이 값 */
     --bt-npk: calc(2.28 * .32);                                       /* 명패 알약 폭 / 메달 높이(알약 키 .32H × 가로세로 2.28 — 아래 .act-t) */
+    --bt-gk: calc(.35 * .48 * .32);                                   /* 명패 최소 틈 / 메달 높이(글자 = 알약 키 × .48 일 때) */
+    --bt-gf: calc(var(--text-min) * .35);                             /* 명패 최소 틈 — 글자 하한일 때(11px 에서 3.85px) */
     --bt-paper: calc(var(--bu) * (300 - (108 + 111) * 203 / 566));    /* 종이 안쪽 폭 P */
     --bt-touch: 0px;                                                  /* 굵은 포인터만 --touch-min(아래 @media (pointer: coarse)) */
     --bt-np-wen: 0px;                                                 /* en 만 「Awaken」 글자 명패 폭(아래 html[lang="en"]) */
     --bt-medal-h: min(
-      calc(var(--bu) * 211 / (3 * 718 / 907 + 2 * .11) * 1.2),
-      calc(var(--bt-paper) / (642.5 * var(--bt-ik) + .12 + var(--bt-npk))),
-      calc((var(--bt-paper) - var(--bt-touch)) / (323.5 * var(--bt-ik) + var(--bt-npk))),
-      calc((var(--bt-paper) - var(--bt-np-wen) / 2) / (642.5 * var(--bt-ik) + .12 + var(--bt-npk) / 2)),
-      calc((var(--bt-paper) - var(--bt-touch) - var(--bt-np-wen) / 2) / (323.5 * var(--bt-ik) + var(--bt-npk) / 2)));
+      calc(var(--bu) * 211 / (3 * 718 / 907 + 2 * .11) * 1.2),                                                     /* 목표 1.2배 */
+      calc(var(--bt-paper) / (3 * var(--bt-npk) + 2 * var(--bt-gk))),                                                /* (가) 틈 = 글자 비례 */
+      calc((var(--bt-paper) - 2 * var(--bt-gf)) / (3 * var(--bt-npk))),                                               /* (가) 틈 = 글자 하한 */
+      calc((var(--bt-paper) - var(--bt-np-wen)) / (2 * var(--bt-npk) + 2 * var(--bt-gk))),                            /* (나) */
+      calc((var(--bt-paper) - var(--bt-np-wen) - 2 * var(--bt-gf)) / (2 * var(--bt-npk))),                            /* (나) */
+      calc((var(--bt-paper) - var(--bt-touch) / 2) / (165 * var(--bt-ik) + 2 * var(--bt-npk) + var(--bt-gk))),       /* (다) */
+      calc((var(--bt-paper) - var(--bt-gf) - var(--bt-touch) / 2) / (165 * var(--bt-ik) + 2 * var(--bt-npk))),       /* (다) */
+      calc((var(--bt-paper) - var(--bt-np-wen) - var(--bt-touch) / 2) / (165 * var(--bt-ik) + var(--bt-npk) + var(--bt-gk))),     /* (나)(다) */
+      calc((var(--bt-paper) - var(--bt-np-wen) - var(--bt-gf) - var(--bt-touch) / 2) / (165 * var(--bt-ik) + var(--bt-npk))),     /* (나)(다) */
+      calc((var(--bt-paper) - var(--bt-touch)) / (323.5 * var(--bt-ik) + var(--bt-npk))),                            /* (라) */
+      calc((var(--bt-paper) - var(--bt-np-wen) / 2 - var(--bt-touch)) / (323.5 * var(--bt-ik) + var(--bt-npk) / 2))); /* (나)(라) */
     --bt-medal-w: calc(var(--bt-medal-h) * 718 / 907);
-    --bt-medal-g: max(calc(var(--bt-medal-h) * .06), calc((var(--bt-touch) - var(--bt-medal-h) * 319 * var(--bt-ik)) / 2));
-    --bt-ovl: max(calc(var(--bt-medal-h) * (var(--bt-npk) - 317 * var(--bt-ik)) / 2), calc((var(--bt-np-wen) - var(--bt-medal-h) * 317 * var(--bt-ik)) / 2));
-    --bt-ovr: calc(var(--bt-medal-h) * (var(--bt-npk) - 330 * var(--bt-ik)) / 2);
+    /* 알약 폭(키 하한 포함 실제 값) · 잉크 밖으로 나온 양(한쪽) · 틈 */
+    --bt-np-w: calc(var(--bt-np-h) * 2.28);
+    --bt-ovl: calc((max(var(--bt-np-w), var(--bt-np-wen)) - var(--bt-medal-h) * 317 * var(--bt-ik)) / 2);   /* 각성(맨 왼쪽) — en 작은 창은 글자 폭 */
+    --bt-ov2: calc((var(--bt-np-w) - var(--bt-medal-h) * 319 * var(--bt-ik)) / 2);                           /* 펫소환(가운데) */
+    --bt-ovr: calc((var(--bt-np-w) - var(--bt-medal-h) * 330 * var(--bt-ik)) / 2);                           /* 스킬(맨 오른쪽) */
+    --bt-tgap: calc((var(--bt-touch) - var(--bt-medal-h) * 319 * var(--bt-ik)) / 2);                         /* 터치 자리 — 가는 포인터는 음수 */
+    --bt-g1: max(calc(var(--bt-ovl) + var(--bt-ov2) + var(--bt-np-fs) * .35), var(--bt-tgap));               /* 잉크 사이 각성↔펫소환 */
+    --bt-g2: max(calc(var(--bt-ov2) + var(--bt-ovr) + var(--bt-np-fs) * .35), var(--bt-tgap));               /* 잉크 사이 펫소환↔스킬 */
     /* [판정판 126 · Task 126 — 지휘자 답 안 A] 보이지 않는 메달 상자 폭 = max(그림 폭, 가장 긴 명패 − 틈) · 틈은 .11H 그대로(가로 · 세로).
        그림은 ::before contain · 아래 가운데라 크기 그대로이고, 상자만 명패가 이웃 상자에 안 걸릴 만큼 넓어진다(배지는 그림 기준 — 아래 right 식).
        명패 폭 = 명패 글자(--bt-np-fs) × --bt-np-em — 가장 긴 명패를 글자 단위로 잰 값(ko 「펫소환」 2.96 · en 「Awaken」 3.75 — 821 · 844 · 1280 실측)에
@@ -73330,7 +73350,7 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
     grid-auto-rows: var(--bt-medal-h);
     justify-content: center;
     align-content: center;
-    gap: var(--bt-medal-g) !important;
+    gap: 0 !important;   /* [Task 7i 수정 1회차] 잉크 사이 둘이 달라 칸 틈 대신 가운데 단추(펫소환)의 좌우 바깥 여백 --bt-g1 · --bt-g2(아래) */
     padding: 0 !important;
     margin: 0;
     border-style: none !important;
@@ -73355,6 +73375,9 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
   #app.battle #screen-game.active #actionbar #btn-hint    { --bt-ink-l: 21; --bt-ink-r: 338; }   /* 각성 medal-special-ko · en x 21~337 */
   #app.battle #screen-game.active #actionbar #btn-undo    { --bt-ink-l: 21; --bt-ink-r: 340; }   /* 펫소환 medal-pet x 21~339 */
   #app.battle #screen-game.active #actionbar #btn-shuffle { --bt-ink-l: 15; --bt-ink-r: 345; }   /* 스킬 medal-awaken x 15~344 */
+  /* [Task 7i 수정 1회차] 잉크 사이 = 가운데 단추의 바깥 여백(왼 각성↔펫소환 --bt-g1 · 오른 펫소환↔스킬 --bt-g2). 그리드 auto 칸이 여백까지 품는다.
+     !important = 메달 기본 줄(#app.battle #actionbar .act 의 margin 0 !important)을 더 좁은 선택자로 이긴다. */
+  #app.battle #screen-game.active #actionbar #btn-undo { margin: 0 var(--bt-g2) 0 var(--bt-g1) !important; }
   /* [Task 7i] 그림 상자 = 그림 폭 W — 잉크 왼끝 · 오른끝이 단추 상자 양 끝에 오게 좌우로 넘친다(옛: inset 0 = 단추 상자 = 그림 폭). */
   #app.battle #screen-game.active #actionbar .act::before {
     inset: 0 calc(var(--bt-medal-w) * (var(--bt-ink-r) - 360) / 360) 0 calc(var(--bt-medal-w) * var(--bt-ink-l) / -360) !important;
@@ -73387,10 +73410,12 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
      큰 창은 명패가 그림보다 좁아 옛 식(max(그림 폭, 명패 − 틈 + 최소 틈))과 같은 값. 옛: en --bt-np-em 3.8 로 상자를 넓혀 844 에서 안전 상자를 양쪽 8.9px 넘었다.
      [Task 7i] en 도 단추 상자 = 잉크 폭(ko 와 같다 — 옛 줄 `--bt-medal-tw: var(--bt-medal-w)` 은퇴). 대신 가장 넓은 명패 「Awaken」(각성 · 맨 왼쪽)이
      글자 하한(11px)에서 알약 비보다 넓어지는 작은 창(844×390)에서는 그 글자 폭이 종이 안에 들게 H 와 왼쪽 넘침(--bt-ovl)이 따른다:
-     --bt-np-wen = 글자 하한 × 3.3(「Awaken」 11px 글자 36.2px — 821 · 844 실측 3.29em) + 좌우 안여백 4bu × 2. 큰 창은 알약 비가 이겨 이 값이 안 걸린다. */
-  html[lang="en"] #app.battle #screen-game.active #actionbar { --bt-np-wen: calc(var(--text-min) * 3.3 + var(--bu) * 8); }
+     --bt-np-wen = 글자 하한 × 3.3(「Awaken」 11px 글자 36.2px — 821 · 844 실측 3.29em) + 좌우 안여백 4bu × 2. 큰 창은 알약 비가 이겨 이 값이 안 걸린다.
+     [수정 1회차 판정 Minor 2] + 1bu = 양쪽 .5bu 여유(대체 글꼴이 실려 「Awaken」 이 조금 넓어져도 종이 왼끝을 넘지 않게 — 터치 반올림 여유와 같은 값).
+     오른쪽 .5bu 도 함께 잡혀 각성↔펫소환 명패 틈도 그만큼 넉넉하다. 이 칸에서 1.15배가 안 들면 드는 값 그대로(지휘자 판정 — 틈을 줄여 배율을 지키지 않음). */
+  html[lang="en"] #app.battle #screen-game.active #actionbar { --bt-np-wen: calc(var(--text-min) * 3.3 + var(--bu) * 9); }
   /* [Task 7i] 굵은 포인터(터치) — 누르는 자리(.act-hit, 판 화면 절 @media (pointer: coarse))는 터치 하한 44px. 가운데(펫소환) 자리가 양옆 단추 상자에
-     안 닿게 틈 = max(.06H, (터치 하한 − 펫소환 잉크)/2) — 위 --bt-medal-g 식 · H 는 그 틈으로도 종이에 드는 값(위 min 셋째 · 다섯째 항).
+     안 닿게 틈 ≥ (터치 하한 − 펫소환 잉크)/2 — 위 --bt-tgap · --bt-g1 · --bt-g2 식 · H 는 그 틈으로도 종이에 드는 값(위 min 의 (다) · (라) 항).
      + .5bu = 양쪽 .25bu 여유(상자 자리가 레이아웃 단위 1/64px 로 반올림돼 딱 맞춘 틈이 0.01~0.02px 겹쳤다 — 844×390@1 실측). */
   @media (pointer: coarse) {
     #app.battle #screen-game.active #actionbar { --bt-touch: calc(var(--touch-min) + var(--bu) * .5); }
