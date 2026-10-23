@@ -57593,14 +57593,25 @@ html[lang="en"] #app-intro .api-logo{
      ui-x-jelly 는 staging "반려" 그대로이고 catalog 에는 남는다.
      글자 `&times;` 는 지우지 않고 투명하게 둔다(스크린리더·aria 는 그 글자를 읽고,
      그림이 못 오면 44pt 빈 버튼이 남을 뿐 자리는 안 무너진다).
-   =========================================================================== */
+
+   ▣ [Task 7j · 사용자 2026-10-23] 진한 테 — 「X 표시가 눈에 안들어와 이것도수정해」(PC 가로 상점 캡처 · 밝은 배경 위 ✕).
+     그림 · 크기 · 자리는 그대로 두고, 그림 모양을 따라 도는 바깥 겉선을 정적 filter 로 두른다:
+     블러 0 인 drop-shadow 네 방향(사슬이라 앞 그림자까지 다시 밀려 사방이 메워진 고리) + 그 아래 아주 옅은 그림자 하나.
+     색 = --prim-art-ink(그림에 구운 겉선 ≈ #46322A 와 같은 갈색 계열 · 129 ⑤ 의 가장 진한 잉크 — 지휘자 판정 A) ·
+     옅은 그림자 = 같은 잉크 × 접지 알파 리프 --mode-b-contact · 두께 = ✕ 크기 × .045(44 → 2px 안팎 · 가로는 무대 자 — 아래 ⑨ 7b 가 --x-sz 를 준다).
+     새 원시값 0 · 움직임 0(filter 는 움직이지 않는다 — 눌림은 transform 그대로). 모든 창의 ✕ 가 같이 바뀐다(이 규칙 하나).
+     테가 부모 overflow · clip-path 로 잘리는 창 0(22창 · 4 크기 — scratchpad/rc1017/t7j/probe-xclip.py).
+     되돌리기: filter 줄을 filter:none !important 로. */
 .x-btn,
 #charpanel #cp-close.x-btn{
+  --x-sz: 44px;                                   /* ✕ 한 변(세로) — 가로는 ⑨ 7b 미디어가 무대 자로 바꾼다 */
+  --x-ring: calc(var(--x-sz) * .045);             /* 진한 테 두께 */
+  --x-ring-c: var(--prim-art-ink);
   box-sizing:border-box !important;
-  width:44px !important;
-  height:44px !important;
-  min-width:44px !important;
-  min-height:44px !important;
+  width:var(--x-sz) !important;
+  height:var(--x-sz) !important;
+  min-width:var(--x-sz) !important;
+  min-height:var(--x-sz) !important;
   padding:0 !important;
   border:0 !important;
   border-radius:0 !important;
@@ -57610,7 +57621,12 @@ html[lang="en"] #app-intro .api-logo{
   background-position:center center !important;
   background-size:contain !important;
   box-shadow:none !important;
-  filter:none !important;
+  filter:
+    drop-shadow(var(--x-ring) 0 0 var(--x-ring-c))
+    drop-shadow(calc(var(--x-ring) * -1) 0 0 var(--x-ring-c))
+    drop-shadow(0 var(--x-ring) 0 var(--x-ring-c))
+    drop-shadow(0 calc(var(--x-ring) * -1) 0 var(--x-ring-c))
+    drop-shadow(0 var(--x-ring) calc(var(--x-ring) * 1.5) color-mix(in srgb, var(--x-ring-c) calc(var(--mode-b-contact) * 100%), transparent)) !important;
   font:800 26px/1 var(--font-latin) !important;
   color:transparent !important;
   -webkit-text-fill-color:transparent !important;
@@ -75261,14 +75277,12 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
 #app :is(#mm-grid, #th-grid)[data-cols="4"] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 #app :is(#mm-grid, #th-grid)[data-cols="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 /* ⑨ 7b · 큰 창 배율 — ✕ (공용 부품 .x-btn · 44px)도 가로 창에서 무대 자를 따른다(1920×1080 에서 다른 부품은 1.5배인데 ✕ 만 44px 그대로였다 — 지휘자 눈).
-   하한 = 터치 하한(--touch-min) — 작은 가로 창(821×462)에서도 누를 자리는 줄지 않는다. 공용 부품이라 방 · 상점 ✕ 도 같이 따라온다. */
+   하한 = 터치 하한(--touch-min) — 작은 가로 창(821×462)에서도 누를 자리는 줄지 않는다. 공용 부품이라 방 · 상점 ✕ 도 같이 따라온다.
+   [Task 7j] 식은 그대로 ✕ 한 변 변수(--x-sz — W6.5b 규칙의 폭 · 높이 · 최소 폭 · 최소 높이와 진한 테 두께 --x-ring 이 읽는다)에 준다(계산 크기 무변). */
 @media (min-aspect-ratio: 1/1) {
   .x-btn,
   #charpanel #cp-close.x-btn {
-    width: max(var(--touch-min), calc(var(--stage-u) * 44)) !important;
-    height: max(var(--touch-min), calc(var(--stage-u) * 44)) !important;
-    min-width: max(var(--touch-min), calc(var(--stage-u) * 44)) !important;
-    min-height: max(var(--touch-min), calc(var(--stage-u) * 44)) !important;
+    --x-sz: max(var(--touch-min), calc(var(--stage-u) * 44));
   }
 }
 /* ⑩ 덧붙임 A(지휘자 눈) — 가로 창(PC)의 결과 창(모험 · 게임오버 · 아케이드) 주 · 보조 = [보조 | 주] 한 줄(마크업은 주 먼저 — 줄을 거꾸로 세운다 · 폰 세로는 주 먼저 쌓기 그대로).
