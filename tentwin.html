@@ -3183,7 +3183,7 @@ button {
      (Task 5 「✕ 둘」 반려와 같은 꼴). 4px 는 뒤 색 · 모양은 맑게 살리고 글자 · 세부만 흐린다(8px 는 옛 서리 막 느낌). α .12 · 색은 그대로.
      정적 값이다 — 막이 뜰 때 움직이는 것은 아래 fadein(opacity)뿐이다. 옛 값: blur(1px). */
   background-color: rgba(88, 64, 112, .12);
-  -webkit-backdrop-filter: var(--mode-a-veil-blur);   /* [Task 8c] 값 = 리프 --mode-a-veil-blur(blur(4px) saturate(1.04) — 무변) · 상점 판 면 뒤 흐림이 함께 읽는다 */
+  -webkit-backdrop-filter: var(--mode-a-veil-blur);   /* [Task 8c] 값 = 리프 --mode-a-veil-blur(blur(4px) saturate(1.04) — 무변) · [Task 7j] 상점 판 면 뒤 흐림은 은퇴(이 막만 읽는다) */
   backdrop-filter: var(--mode-a-veil-blur);
   animation: fadein 200ms var(--ease);
 }
@@ -14100,7 +14100,8 @@ html[lang="ko"] #modal-arc .sheet-row .btn { word-break: keep-all; min-width: 0;
   /* [Task 129 수정 1회차 M9] 창 아래 방 머리(✕ · 제목 캡슐) α — 장비 창 · 장비 정보 카드가 방 위에 떠 있는 동안(✕ 둘 · 제목 둘 혼동 막기 · 정적 값) */
   --mode-a-under-head-a: 0;
   /* [Task 8c · 지휘자 답 checkpoint 1] 막 B 의 뒤 흐림(모든 창 .modal 의 backdrop-filter — Task 129 값) = 리프 하나. 상점 판(방 — 막 없음)은 판 면 뒤만
-     같은 값으로 흐린다(판 밖 배경은 또렷 · 정적 — 움직임 0). 두 소비처가 이 리프를 함께 읽는다(값 사본 0). */
+     같은 값으로 흐린다(판 밖 배경은 또렷 · 정적 — 움직임 0). 두 소비처가 이 리프를 함께 읽는다(값 사본 0).
+     [Task 7j] 상점 판 소비처는 은퇴(판 면 뒤 흐림 = 젤리 겉선 밖 번짐의 원인 · 서리 막 반려와 같은 결) — 소비처는 막 B 하나. */
   --mode-a-veil-blur: blur(4px) saturate(1.04);
   /* [판정판 129 · Task 129] Task 8a D5 의 창 판 면 α 리프 --mode-a-alpha-win(.90)은 은퇴 — 사용자 10-19 「너무 어둡고 … 투명도나 질감이 누락」 ·
      모든 창 판 = 캐릭터 방 정보 카드 재질(면 α = --mode-a-alpha). 판 위 글자 읽힘은 방이 하는 방식(이름 상자 · 안 상자 · 막 B)이 맡는다. */
@@ -57660,14 +57661,26 @@ html[lang="en"] #app-intro .api-logo{
      ui-x-jelly 는 staging "반려" 그대로이고 catalog 에는 남는다.
      글자 `&times;` 는 지우지 않고 투명하게 둔다(스크린리더·aria 는 그 글자를 읽고,
      그림이 못 오면 44pt 빈 버튼이 남을 뿐 자리는 안 무너진다).
-   =========================================================================== */
+
+   ▣ [Task 7j · 사용자 2026-10-23] 진한 테 — 「X 표시가 눈에 안들어와 이것도수정해」(PC 가로 상점 캡처 · 밝은 배경 위 ✕).
+     그림 · 크기 · 자리는 그대로 두고, 그림 모양을 따라 도는 바깥 겉선을 정적 filter 로 두른다:
+     블러 0 인 drop-shadow 네 방향(사슬이라 앞 그림자까지 다시 밀려 사방이 메워진 고리) + 그 아래 아주 옅은 그림자 하나.
+     색 = --prim-art-ink(그림에 구운 겉선 ≈ #46322A 와 같은 갈색 계열 · 129 ⑤ 의 가장 진한 잉크 — 지휘자 판정 A) ·
+     옅은 그림자 = 같은 잉크 × 접지 알파 리프 --mode-b-contact · 두께 = ✕ 크기 × .045(44 → 2px 안팎 · 가로는 무대 자 — 아래 ⑨ 7b 가 --x-sz 를 준다).
+     실측 두께(계산 filter): 세로 · 821×462 1.98px · 1280×720 1.98px · 1366×768 ≈ 2px(2.11) · 1920×1080 ≈ 3px(2.97).
+     새 원시값 0 · 움직임 0(filter 는 움직이지 않는다 — 눌림은 transform 그대로). 모든 창의 ✕ 가 같이 바뀐다(이 규칙 하나).
+     테가 부모 overflow · clip-path 로 잘리는 창 0(22창 · 4 크기 — scratchpad/rc1017/t7j/probe-xclip.py).
+     되돌리기: filter 줄을 filter:none !important 로. */
 .x-btn,
 #charpanel #cp-close.x-btn{
+  --x-sz: 44px;                                   /* ✕ 한 변(세로) — 가로는 ⑨ 7b 미디어가 무대 자로 바꾼다 */
+  --x-ring: calc(var(--x-sz) * .045);             /* 진한 테 두께 */
+  --x-ring-c: var(--prim-art-ink);
   box-sizing:border-box !important;
-  width:44px !important;
-  height:44px !important;
-  min-width:44px !important;
-  min-height:44px !important;
+  width:var(--x-sz) !important;
+  height:var(--x-sz) !important;
+  min-width:var(--x-sz) !important;
+  min-height:var(--x-sz) !important;
   padding:0 !important;
   border:0 !important;
   border-radius:0 !important;
@@ -57677,7 +57690,12 @@ html[lang="en"] #app-intro .api-logo{
   background-position:center center !important;
   background-size:contain !important;
   box-shadow:none !important;
-  filter:none !important;
+  filter:
+    drop-shadow(var(--x-ring) 0 0 var(--x-ring-c))
+    drop-shadow(calc(var(--x-ring) * -1) 0 0 var(--x-ring-c))
+    drop-shadow(0 var(--x-ring) 0 var(--x-ring-c))
+    drop-shadow(0 calc(var(--x-ring) * -1) 0 var(--x-ring-c))
+    drop-shadow(0 var(--x-ring) calc(var(--x-ring) * 1.5) color-mix(in srgb, var(--x-ring-c) calc(var(--mode-b-contact) * 100%), transparent)) !important;
   font:800 26px/1 var(--font-latin) !important;
   color:transparent !important;
   -webkit-text-fill-color:transparent !important;
@@ -72446,9 +72464,13 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
 }
 /* 판 재질 = 모달 틀(Task 129) — 젤리 층이 읽는 판 상자 자 둘(창 판 .sheet.mframe 과 같은 뜻 · 같은 값 출처) · 젤리 층은 판 내용 뒤(판이 .jbox--modal 이라 isolation). */
 #sh-plate.mframe > .cp-fx{ z-index: -1; --f2-bd: var(--jbox-bw); --f2-r: var(--jbox-radius); }
-/* [지휘자 답 checkpoint 1] 방에는 막이 없어 넓은 판 너머로 선반 · 병이 또렷이 비쳐 판이 흐릿하게 사라져 보였다 — 판 면 뒤만 모달 막과 같은 흐림(리프 --mode-a-veil-blur ·
-   판 등급의 뒤 흐림 손잡이 --jbox-blur)으로 서리 유리처럼. 판 밖 배경은 또렷 · 재질 · 색 토큰 무변 · 정적(움직임 0). */
-#sh-plate{ --jbox-blur: var(--mode-a-veil-blur); }
+/* [Task 7j · 사용자 2026-10-23] 판 면 뒤 흐림(서리 유리 — 옛 「[지휘자 답 checkpoint 1] #sh-plate{ --jbox-blur: var(--mode-a-veil-blur); }」)은 은퇴.
+   사용자(원문, PC 가로 상점 1369×761): 「지금 상점 젤리모달창 번짐 이있어 양측 우측상단에 심지어 젤리판이 투명한느낌도 안들어」.
+   · 번짐 원인(잼 — scratchpad/rc1017/t7j/probe-bleed.py): 그 흐림은 판 상자(반지름 --jbox-radius 40u · 초타원 코너)에 걸리는데 젤리 덮개의 실루엣
+     (.cp-jelly clip-path — 모서리 반지름 ≈ 판 폭 × .119 = 1366×768 에서 114px)이 훨씬 둥글어, 네 모서리에서 젤리 겉선 밖으로 흐린 사각 귀퉁이가 비쳤다
+     (겉선 + 1px 밖 달라진 화소 3,466 → 흐림만 끄면 0 · 젤리 층 · 접지 · 판 그림자 · 의사요소는 하나씩 꺼도 무변).
+   · 재질: 흐림이 상점 판에만 걸린 단 하나의 차이였다(방 정보 카드 · 모든 창 판 = 뒤 흐림 없음). 서리 막 반려(2026-10-19 「뒤를 하얗게 씻는 서리 막」)와 같은 결 —
+     판 재질은 판 등급 기본값(--jbox-blur: none)으로 캐릭터 방 정보 카드와 같다(표 = scratchpad/rc1017/t7j/mat-*.json). 글자 읽힘은 판이 아니라 안 상자 · 잉크(129 ⑤ · ⑨)가 맡는다. */
 
 /* ---- 간판 — 시안의 「상점」 간판(무지개 호 + 작은 성 + 별 = 그림 한 장) + 사탕 글씨(.mvh-title — 획득표 리본 제목과 같은 글꼴 · 채움 · 흰 테 규칙) ----
    글자 자리 = 그림 메타 safe_box(640×393 그림에서 23.2% · 44.6% ~ 75.95% · 94.5%). 글자 크기 = 글자 자리 높이 × --mvh-fs(긴 이름은 fitHead 가 폭에 맞춰 줄인다).
@@ -75393,14 +75415,12 @@ html[data-shop-art~="capsule"] #modal-gres #gres-cap[data-tier="epic"] .gres-top
 #app :is(#mm-grid, #th-grid)[data-cols="4"] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 #app :is(#mm-grid, #th-grid)[data-cols="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 /* ⑨ 7b · 큰 창 배율 — ✕ (공용 부품 .x-btn · 44px)도 가로 창에서 무대 자를 따른다(1920×1080 에서 다른 부품은 1.5배인데 ✕ 만 44px 그대로였다 — 지휘자 눈).
-   하한 = 터치 하한(--touch-min) — 작은 가로 창(821×462)에서도 누를 자리는 줄지 않는다. 공용 부품이라 방 · 상점 ✕ 도 같이 따라온다. */
+   하한 = 터치 하한(--touch-min) — 작은 가로 창(821×462)에서도 누를 자리는 줄지 않는다. 공용 부품이라 방 · 상점 ✕ 도 같이 따라온다.
+   [Task 7j] 식은 그대로 ✕ 한 변 변수(--x-sz — W6.5b 규칙의 폭 · 높이 · 최소 폭 · 최소 높이와 진한 테 두께 --x-ring 이 읽는다)에 준다(계산 크기 무변). */
 @media (min-aspect-ratio: 1/1) {
   .x-btn,
   #charpanel #cp-close.x-btn {
-    width: max(var(--touch-min), calc(var(--stage-u) * 44)) !important;
-    height: max(var(--touch-min), calc(var(--stage-u) * 44)) !important;
-    min-width: max(var(--touch-min), calc(var(--stage-u) * 44)) !important;
-    min-height: max(var(--touch-min), calc(var(--stage-u) * 44)) !important;
+    --x-sz: max(var(--touch-min), calc(var(--stage-u) * 44));
   }
 }
 /* ⑩ 덧붙임 A(지휘자 눈) — 가로 창(PC)의 결과 창(모험 · 게임오버 · 아케이드) 주 · 보조 = [보조 | 주] 한 줄(마크업은 주 먼저 — 줄을 거꾸로 세운다 · 폰 세로는 주 먼저 쌓기 그대로).
