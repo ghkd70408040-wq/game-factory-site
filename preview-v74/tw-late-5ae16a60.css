@@ -873,11 +873,14 @@ padding:0 16px !important;
 }
 .x-btn,
 #charpanel #cp-close.x-btn{
+--x-sz: 44px;                                   /* ✕ 한 변(세로) — 가로는 ⑨ 7b 미디어가 무대 자로 바꾼다 */
+--x-ring: calc(var(--x-sz) * .045);             /* 진한 테 두께 */
+--x-ring-c: var(--prim-art-ink);
 box-sizing:border-box !important;
-width:44px !important;
-height:44px !important;
-min-width:44px !important;
-min-height:44px !important;
+width:var(--x-sz) !important;
+height:var(--x-sz) !important;
+min-width:var(--x-sz) !important;
+min-height:var(--x-sz) !important;
 padding:0 !important;
 border:0 !important;
 border-radius:0 !important;
@@ -887,7 +890,12 @@ background-repeat:no-repeat !important;
 background-position:center center !important;
 background-size:contain !important;
 box-shadow:none !important;
-filter:none !important;
+filter:
+drop-shadow(var(--x-ring) 0 0 var(--x-ring-c))
+drop-shadow(calc(var(--x-ring) * -1) 0 0 var(--x-ring-c))
+drop-shadow(0 var(--x-ring) 0 var(--x-ring-c))
+drop-shadow(0 calc(var(--x-ring) * -1) 0 var(--x-ring-c))
+drop-shadow(0 var(--x-ring) calc(var(--x-ring) * 1.5) color-mix(in srgb, var(--x-ring-c) calc(var(--mode-b-contact) * 100%), transparent)) !important;
 font:800 26px/1 var(--font-latin) !important;
 color:transparent !important;
 -webkit-text-fill-color:transparent !important;
