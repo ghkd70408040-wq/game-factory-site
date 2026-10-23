@@ -3183,7 +3183,7 @@ button {
      (Task 5 「✕ 둘」 반려와 같은 꼴). 4px 는 뒤 색 · 모양은 맑게 살리고 글자 · 세부만 흐린다(8px 는 옛 서리 막 느낌). α .12 · 색은 그대로.
      정적 값이다 — 막이 뜰 때 움직이는 것은 아래 fadein(opacity)뿐이다. 옛 값: blur(1px). */
   background-color: rgba(88, 64, 112, .12);
-  -webkit-backdrop-filter: var(--mode-a-veil-blur);   /* [Task 8c] 값 = 리프 --mode-a-veil-blur(blur(4px) saturate(1.04) — 무변) · 상점 판 면 뒤 흐림이 함께 읽는다 */
+  -webkit-backdrop-filter: var(--mode-a-veil-blur);   /* [Task 8c] 값 = 리프 --mode-a-veil-blur(blur(4px) saturate(1.04) — 무변) · [Task 7j] 상점 판 면 뒤 흐림은 은퇴(이 막만 읽는다) */
   backdrop-filter: var(--mode-a-veil-blur);
   animation: fadein 200ms var(--ease);
 }
@@ -14100,7 +14100,8 @@ html[lang="ko"] #modal-arc .sheet-row .btn { word-break: keep-all; min-width: 0;
   /* [Task 129 수정 1회차 M9] 창 아래 방 머리(✕ · 제목 캡슐) α — 장비 창 · 장비 정보 카드가 방 위에 떠 있는 동안(✕ 둘 · 제목 둘 혼동 막기 · 정적 값) */
   --mode-a-under-head-a: 0;
   /* [Task 8c · 지휘자 답 checkpoint 1] 막 B 의 뒤 흐림(모든 창 .modal 의 backdrop-filter — Task 129 값) = 리프 하나. 상점 판(방 — 막 없음)은 판 면 뒤만
-     같은 값으로 흐린다(판 밖 배경은 또렷 · 정적 — 움직임 0). 두 소비처가 이 리프를 함께 읽는다(값 사본 0). */
+     같은 값으로 흐린다(판 밖 배경은 또렷 · 정적 — 움직임 0). 두 소비처가 이 리프를 함께 읽는다(값 사본 0).
+     [Task 7j] 상점 판 소비처는 은퇴(판 면 뒤 흐림 = 젤리 겉선 밖 번짐의 원인 · 서리 막 반려와 같은 결) — 소비처는 막 B 하나. */
   --mode-a-veil-blur: blur(4px) saturate(1.04);
   /* [판정판 129 · Task 129] Task 8a D5 의 창 판 면 α 리프 --mode-a-alpha-win(.90)은 은퇴 — 사용자 10-19 「너무 어둡고 … 투명도나 질감이 누락」 ·
      모든 창 판 = 캐릭터 방 정보 카드 재질(면 α = --mode-a-alpha). 판 위 글자 읽힘은 방이 하는 방식(이름 상자 · 안 상자 · 막 B)이 맡는다. */
@@ -72378,9 +72379,13 @@ html:not([data-portal="cg"]) [data-portal-only]{ display: none !important; }
 }
 /* 판 재질 = 모달 틀(Task 129) — 젤리 층이 읽는 판 상자 자 둘(창 판 .sheet.mframe 과 같은 뜻 · 같은 값 출처) · 젤리 층은 판 내용 뒤(판이 .jbox--modal 이라 isolation). */
 #sh-plate.mframe > .cp-fx{ z-index: -1; --f2-bd: var(--jbox-bw); --f2-r: var(--jbox-radius); }
-/* [지휘자 답 checkpoint 1] 방에는 막이 없어 넓은 판 너머로 선반 · 병이 또렷이 비쳐 판이 흐릿하게 사라져 보였다 — 판 면 뒤만 모달 막과 같은 흐림(리프 --mode-a-veil-blur ·
-   판 등급의 뒤 흐림 손잡이 --jbox-blur)으로 서리 유리처럼. 판 밖 배경은 또렷 · 재질 · 색 토큰 무변 · 정적(움직임 0). */
-#sh-plate{ --jbox-blur: var(--mode-a-veil-blur); }
+/* [Task 7j · 사용자 2026-10-23] 판 면 뒤 흐림(서리 유리 — 옛 「[지휘자 답 checkpoint 1] #sh-plate{ --jbox-blur: var(--mode-a-veil-blur); }」)은 은퇴.
+   사용자(원문, PC 가로 상점 1369×761): 「지금 상점 젤리모달창 번짐 이있어 양측 우측상단에 심지어 젤리판이 투명한느낌도 안들어」.
+   · 번짐 원인(잼 — scratchpad/rc1017/t7j/probe-bleed.py): 그 흐림은 판 상자(반지름 --jbox-radius 40u · 초타원 코너)에 걸리는데 젤리 덮개의 실루엣
+     (.cp-jelly clip-path — 모서리 반지름 ≈ 판 폭 × .119 = 1366×768 에서 114px)이 훨씬 둥글어, 네 모서리에서 젤리 겉선 밖으로 흐린 사각 귀퉁이가 비쳤다
+     (겉선 + 1px 밖 달라진 화소 3,466 → 흐림만 끄면 0 · 젤리 층 · 접지 · 판 그림자 · 의사요소는 하나씩 꺼도 무변).
+   · 재질: 흐림이 상점 판에만 걸린 단 하나의 차이였다(방 정보 카드 · 모든 창 판 = 뒤 흐림 없음). 서리 막 반려(2026-10-19 「뒤를 하얗게 씻는 서리 막」)와 같은 결 —
+     판 재질은 판 등급 기본값(--jbox-blur: none)으로 캐릭터 방 정보 카드와 같다(표 = scratchpad/rc1017/t7j/mat-*.json). 글자 읽힘은 판이 아니라 안 상자 · 잉크(129 ⑤ · ⑨)가 맡는다. */
 
 /* ---- 간판 — 시안의 「상점」 간판(무지개 호 + 작은 성 + 별 = 그림 한 장) + 사탕 글씨(.mvh-title — 획득표 리본 제목과 같은 글꼴 · 채움 · 흰 테 규칙) ----
    글자 자리 = 그림 메타 safe_box(640×393 그림에서 23.2% · 44.6% ~ 75.95% · 94.5%). 글자 크기 = 글자 자리 높이 × --mvh-fs(긴 이름은 fitHead 가 폭에 맞춰 줄인다).
