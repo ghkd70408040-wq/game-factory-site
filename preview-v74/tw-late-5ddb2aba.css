@@ -16,7 +16,7 @@ content:"";position:absolute;inset:0;
 background-repeat:no-repeat;
 background-position:center bottom;
 background-size:contain;
-transition:opacity 160ms var(--ease),filter 160ms var(--ease);
+transition:opacity var(--dur-1) var(--ease),filter var(--dur-1) var(--ease);
 pointer-events:none;
 }
 #app.battle #btn-hint.act::before   {background-image:url("catalog/medal-special-ko@3x.webp");}
@@ -26,7 +26,8 @@ html[lang="en"] #app.battle #btn-hint.act::before   {background-image:url("catal
 html[lang="en"] #app.battle #btn-undo.act::before   {background-image:url("catalog/medal-pet-en@3x.webp");}
 html[lang="en"] #app.battle #btn-shuffle.act::before{background-image:url("catalog/medal-awaken-en@3x.webp");}
 #app.battle #actionbar .act .act-ico{display:none !important;}
-#app.battle #actionbar .act:active{transform:scale(.94);background:none !important;}
+#app.battle #actionbar .act:active{background:none !important;}
+#app.battle #actionbar .act:not(.off):active{transform:scale(.94);}
 #app.battle #actionbar .act.off{opacity:1 !important;}
 #app.battle #actionbar .act.off::before{opacity:.92;filter:saturate(.62) brightness(.94) contrast(1.06);}
 #app.battle #actionbar .act.urge{
@@ -246,9 +247,9 @@ text-shadow:0 1px 0 rgba(255,255,255,.62), 0 0 3px rgba(255,255,255,.45);
 .w6m .sheet .btn-ghost,
 .w6m .sheet .btn-secondary{
 border-radius:16px;
-background-color:rgba(255,255,255,.38);
+background-color:var(--prim-white-a38);
 background-image:none;
-box-shadow:inset 0 0 0 2px rgba(255,255,255,.62), 0 1px 0 rgba(110,70,58,.10);
+box-shadow:inset 0 0 0 2px var(--prim-white-a62), 0 1px 0 rgba(110,70,58,.10);
 color:var(--prim-art-ink);
 }
 .w6m .sheet .btn-ghost,
@@ -261,7 +262,7 @@ text-shadow:none;
 }
 .w6m .sheet .btn-ghost:active,
 .w6m .sheet .btn-secondary:active{ transform:translateY(2px); background-color:rgba(255,255,255,.52); }
-.w6m .rank-row.rank-empty{ background-color:rgba(255,255,255,.20); }
+.w6m .rank-row.rank-empty{ background-color:var(--prim-white-a20); }
 .w6m .rank-row .rank-main{ color:var(--prim-art-ink); }
 .w6m .rank-row .rank-pos,
 .w6m .rank-row .rank-meta,
@@ -376,7 +377,7 @@ inset 0 0 46px rgba(90, 196, 255, .60),
 0 0 22px rgba(122, 224, 255, .45);
 pointer-events: none;
 z-index: 6;
-animation: chillpulse 1.6s ease-in-out infinite;
+animation: chillpulse var(--dur-amb) var(--ease-breathe) infinite;
 }
 @keyframes chillpulse { 0%, 100% { opacity: .88; } 50% { opacity: 1; } }
 #app.chill.battle #duel-timer,
@@ -702,12 +703,12 @@ background-position:center bottom;
 background-size:contain;
 filter:drop-shadow(0 6px 10px rgba(40,26,58,.42));
 transform:translateX(-26vw) translateY(8px);
-transition:transform .42s cubic-bezier(.22,.9,.28,1.02);
+transition:transform var(--dur-3) cubic-bezier(.22,.9,.28,1.02);
 }
 #ts-over.go #ts-cast{ transform:translateX(0) translateY(0); }
 #ts-over.grab #ts-cast{
 transform:translateX(16vw) translateY(-9vh) scale(.82);
-animation:ts-hang 1.05s ease-in-out infinite;
+animation:ts-hang 1.05s var(--ease-breathe) infinite;
 }
 @keyframes ts-hang{
 0%,100%{ rotate:-5deg; }
@@ -1226,7 +1227,7 @@ transition:none;
 animation:w65-awk-bounce var(--mo-full-pulse) var(--ease) infinite;
 }
 #app.battle #btn-shuffle.act.urge::before{
-animation:w65-awk-glow var(--mo-full-pulse) linear infinite;
+animation:w65-awk-glow var(--mo-full-pulse) var(--ease-linear) infinite;
 }
 #app.battle #btn-shuffle.act.urge::after{
 content:"";
@@ -1246,7 +1247,7 @@ animation:w65-awk-spark var(--mo-full-pulse) ease-out infinite;
 z-index:1;
 }
 #app.battle #btn-shuffle.act.primed::before{
-animation:w65-awk-glow calc(var(--mo-full-pulse) * 2) linear infinite;
+animation:w65-awk-glow calc(var(--mo-full-pulse) * 2) var(--ease-linear) infinite;
 opacity:.92;
 }
 #app.battle #btn-shuffle.act.primed::after{
@@ -1511,7 +1512,7 @@ mask:linear-gradient(90deg,#000 0 calc(100% - var(--gauge-tick-w)),transparent 0
 width:100% !important;
 transform-origin:left center;
 transform:scaleX(var(--p,0));
-transition:transform 260ms linear !important;
+transition:transform var(--dur-2) var(--ease-linear) !important;
 }
 #app.battle #actionbar::after{
 border-image:none !important;
@@ -1566,13 +1567,13 @@ html[lang="en"] #app.battle #actionbar .act .act-t{ font-size:11px; }
 width:100% !important;
 transform-origin:left center;
 transform:scaleX(var(--p,1));
-transition:transform 100ms linear !important;
+transition:transform 100ms var(--ease-linear) !important;
 }
 #combo-fill{
 width:100% !important;
 transform-origin:left center;
 transform:scaleX(var(--p,0));
-transition:transform 120ms linear !important;
+transition:transform 120ms var(--ease-linear) !important;
 }
 @media (prefers-reduced-motion: reduce){
 *, *::before, *::after{
@@ -2623,7 +2624,7 @@ inset 0 0 0 calc(var(--f2-w) * .0040) var(--f2-chip-line),
 #charpanel .pick-mate #mate-pick .char-card.cp-center {
 transform: scale(1.28);
 z-index: 2;
-transition: transform .16s var(--ease);
+transition: transform var(--dur-1) var(--ease);
 }
 #charpanel #cp-track .cp-th[aria-current="true"],
 #charpanel .pick-mate #mate-pick .char-card[aria-current="true"] {
@@ -3894,7 +3895,7 @@ cursor:default;
 #duel-hud.fhit .kit-hud-v2__side--foe{ animation: h2-shake .18s ease-out 1; }
 #duel-hud.fhit.big .kit-hud-v2__side--foe{ animation: h2-shake .30s ease-out 2; }
 #duel-hud.down .kit-hud-v2__side--foe{ animation: bossdown .6s var(--ease) forwards; }
-#app.skill #duel-hud::before{ animation: h2-awaken 1.4s ease-in-out infinite; }
+#app.skill #duel-hud::before{ animation: h2-awaken 1.4s var(--ease-breathe) infinite; }
 #app.skill #duel-hud .kit-hud-v2__timer{ transform: scale(1.06); }
 }
 }
@@ -4031,7 +4032,7 @@ transform: translateY(-50%);
 border: 0 !important;
 border-image: none !important;
 border-radius: 50%;
-background: rgba(255,255,255,.26);
+background: var(--prim-white-a26);
 box-shadow:
 inset 0 calc(var(--f2-bh) * .03) calc(var(--f2-bh) * .05) rgba(40,26,56,.22),
 inset 0 0 0 1.6px rgba(255,255,255,.55),
@@ -4176,14 +4177,14 @@ pointer-events: none;
 --hudj-haze: 0;
 --hudj-haze-y: 14.0%;
 --hudj-milk-a: 0.000;
---hudj-rim-in: calc(var(--f2-ref-w) * 0.00315);
---hudj-rim-w: calc(var(--f2-ref-w) * 0.00350);
+--hudj-rim-in: calc(var(--f2-ref-w) * var(--mode-a-rim-in-k));
+--hudj-rim-w: calc(var(--f2-ref-w) * var(--mode-a-rim-w-k));
 --hudj-rim-a: 0.4000;
 --hudj-rim-blur: calc(var(--f2-ref-w) * 0.00160);
---hudj-rim-w2: calc(var(--f2-ref-w) * 0.01094);
---hudj-rim-w3: calc(var(--f2-ref-w) * 0.01290);
---hudj-rim-k2: 0.424;
---hudj-rim-k3: 0.093;
+--hudj-rim-w2: calc(var(--f2-ref-w) * var(--mode-a-rim-w2-k));
+--hudj-rim-w3: calc(var(--f2-ref-w) * var(--mode-a-rim-w3-k));
+--hudj-rim-k2: var(--mode-a-rim-k2);
+--hudj-rim-k3: var(--mode-a-rim-k3);
 --hudj-rim-tc: calc(var(--hudj-rim-in) + var(--hudj-rim-w) + var(--hudj-rim-w2));
 --hudj-rim-td: calc(var(--hudj-rim-tc) + var(--hudj-rim-w3));
 --hudj-rim-p3: calc(var(--hudj-rim-a) * var(--hudj-rim-k3));
@@ -6764,7 +6765,7 @@ display: block;
 height: 100%;
 transform-origin: 0 50%;
 transform: scaleX(var(--atk, 0));
-transition: transform 200ms linear;
+transition: transform 200ms var(--ease-linear);
 }
 .dh-foe .dh-subfill { background-image: var(--duel-foe-atk); }
 .dh-mid { flex: 0 0 auto; width: 92px; display: flex; flex-direction: column; align-items: center; }
@@ -6818,7 +6819,7 @@ container-type: inline-size;
 #duel-hud.fhit .dh-foe,
 #duel-hud.mhit .dh-me { animation: dhknock 300ms var(--ease); }
 #duel-hud.fhit.big .dh-foe { animation: dhknock 460ms var(--spring) 2; }
-#duel-hud.tell .dh-foe { animation: dhtell .6s ease-in-out infinite; }
+#duel-hud.tell .dh-foe { animation: dhtell .6s var(--ease-breathe) infinite; }
 #duel-hud.down .dh-foe { animation: bossdown .6s var(--ease) forwards; }
 #duel-hud.down .dh-foe .dh-fill { transform: scaleX(0); }
 @media (prefers-reduced-motion: reduce) {
@@ -7256,7 +7257,7 @@ inset 0 0 46px rgba(90, 196, 255, .60),
 0 0 22px rgba(122, 224, 255, .45);
 pointer-events: none;
 z-index: 6;
-animation: chillpulse 1.6s ease-in-out infinite;
+animation: chillpulse var(--dur-amb) var(--ease-breathe) infinite;
 }
 #app.chill.battle #duel-timer,
 #app.chill #duel-timer.chill {

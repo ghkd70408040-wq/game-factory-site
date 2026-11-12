@@ -754,7 +754,12 @@ var t = nowMs();
 var deb = SFX_DEBOUNCE_MAP[name] !== undefined ? SFX_DEBOUNCE_MAP[name] : SFX_DEBOUNCE;
 if (lastSfxAt[name] !== undefined && (t - lastSfxAt[name]) < deb) return false;
 lastSfxAt[name] = t;
-if (actx.state === 'suspended') { try { actx.resume(); } catch (e) {} }
+if (actx.state === 'suspended' || actx.state === 'interrupted') {
+try {
+var pr = actx.resume();
+if (pr && typeof pr.catch === 'function') pr.catch(function () {});
+} catch (e) {}
+}
 return true;
 }
 function at() { return actx.currentTime; }
@@ -1928,7 +1933,7 @@ if (!actx || !master) return;
 if (T.state !== 'ready') { trkLoad(T); return; }
 if (!trkBuild(T)) return;
 try {
-if (actx.state === 'suspended') {
+if (actx.state === 'suspended' || actx.state === 'interrupted') {
 var pr = actx.resume();
 if (pr && typeof pr.catch === 'function') pr.catch(function () {});
 }
@@ -2666,7 +2671,7 @@ if (!actx) createAudio();
 if (!actx || !master) return;
 if (!bgmBuild()) return;
 try {
-if (actx.state === 'suspended') {
+if (actx.state === 'suspended' || actx.state === 'interrupted') {
 var pr = actx.resume();
 if (pr && typeof pr.catch === 'function') pr.catch(function () {});
 }
@@ -3282,7 +3287,7 @@ if (actx && actx.state === 'running') { try { actx.suspend(); } catch (e) {} }
 } else {
 // 음소거로 시작 → 나중에 켠 경우. 토글 자체가 사용자 제스처이므로 여기서 생성 허용.
 if (!actx) createAudio();
-if (actx && actx.state === 'suspended') {
+if (actx && (actx.state === 'suspended' || actx.state === 'interrupted')) {
 var pr = actx.resume();
 if (pr && typeof pr.catch === 'function') pr.catch(function () {});
 }

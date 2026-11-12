@@ -1471,7 +1471,7 @@ if (typeof o.hearts === 'number' && isFinite(o.hearts)) {
 store.hearts = Math.max(0, o.hearts | 0);
 }
 if (typeof o.heartAt === 'number' && isFinite(o.heartAt)) {
-store.heartAt = Math.max(0, o.heartAt | 0);
+store.heartAt = Math.max(0, Math.floor(Number(o.heartAt) || 0));
 }
 if (typeof o.gauge === 'number' && isFinite(o.gauge)) {
 store.gauge = clamp(o.gauge, 0, SKILL_MAX);
@@ -2193,7 +2193,7 @@ en: {
 'odds.rule.pity': 'After {n} pulls without an epic, the next pull is a sure epic. Now {c}/{n}.',
 'odds.rule.dup': 'A repeat raises the level by one. At the top level {max}, you get coins back. Common gives {c}, rare {r}, and epic {e}.',
 'odds.rule.friend': "Only friends you don't have yet. Rarity weights common {c}, rare {r}, epic {e} are shared by the friends left.",
-'odds.skin.dup': 'Skins you have never come out.',
+'odds.skin.dup': 'Skins you already own never come out.',
 'odds.foot1': 'Pulls use only coins, stars and ad rewards. They are never sold for money.',
 'odds.foot2': 'The odds shown come from the same table the draw uses. Decimals are rounded. ({date})',
 'gres.title1': 'Result',
@@ -2231,7 +2231,7 @@ en: {
 'gacha.ad': 'Watch an ad to pull',
 'gacha.ad.week': 'Free pull, once a week',
 'coin.x2': 'Double coins',
-'coin.x2.no': 'Just take',
+'coin.x2.no': 'Collect',
 'coin.x2.got': 'You got {n} more coins!',
 'gacha.dup.star': '{name} is already with you, so you got {n} stars.',
 'toast.noadds': 'No adds left',
@@ -2300,7 +2300,7 @@ en: {
 'char.churup.pass': 'Picks a row with two or more tiles left and reshuffles it. It also blocks the next board quake.',
 'char.mukmul.name': 'Inky',
 'char.mukmul.pass': 'Repaints {pn} tiles into the most common number on the board.',
-'char.tiktok.name': 'TikTok',
+'char.tiktok.name': 'Ticktock',
 'char.tiktok.pass': 'Stops time for {psec} seconds. You can keep matching while the clock and the villain gauge are stopped.',
 'char.kkultteok.name': 'Honeybee',
 'char.kkultteok.pass': 'Turns {pn} fruits into golden fruits. A match with a golden fruit scores {mult} times the points.',
@@ -2641,10 +2641,10 @@ en: {
 'rec.why.pudding': 'Base Score is high, so every match pays and long boards stay on track.',
 'rec.why.sodawitch': 'Soda Spell makes every match score {x}× for {sec}s and cuts boss HP fast.',
 'rec.why.atk.blk': "This boss keeps dropping blockers. Bubbly's Bubble Wave washes away 2 of them at a time.",
-'rec.why.atk.freeze': 'This boss freezes a column. While TikTok holds time, the freeze does not work.',
+'rec.why.atk.freeze': 'This boss freezes a column. While Ticktock holds time, the freeze does not work.',
 'rec.why.atk.mask': "This boss hides numbers. Bubbly's Bubble Wave brings every hidden number back at once.",
 'rec.why.atk.quake': "This boss shakes the board. Churup's Big Bite blocks the next quake.",
-'rec.why.atk.cycle': 'This boss rotates four attacks. When TikTok stops time, you get a window whatever comes next.',
+'rec.why.atk.cycle': 'This boss rotates four attacks. When Ticktock stops time, you get a window whatever comes next.',
 'adv.go': 'Start',
 'adv.missionwin': 'Mission clear! Every match ×{mult} from now on',
 'adv.missionfail': 'Mission time is up. The stage goes on.',
@@ -2748,7 +2748,7 @@ en: {
 'skill.churup.name': "CHURUP'S BIG BITE!",
 'duel.petmongle': 'Time Puddle! Clock and villain gauge frozen for {n}s',
 'duel.petchurup': 'Big Bite! {n} row reshuffled',
-'skill.tiktok.name': "TIKTOK'S TIME STOP!",
+'skill.tiktok.name': "TICKTOCK'S TIME STOP!",
 'skill.mukmul.name': "INKY'S INK SPLASH!",
 'skill.kkultteok.name': "HONEYBEE'S GOLDEN CALL!",
 'skill.bangul.name': "BUBBLY'S BUBBLE WAVE!",
@@ -2767,7 +2767,7 @@ en: {
 'pet.lock.mongle': 'Match 10 times in a row with no delay and Mongle joins you.',
 'pet.lock.churup': 'Churup turns up in the rare slot of an Adventure gift box.',
 'pet.lock.mukmul': 'Beat the stage-20 boss and Inky joins you.',
-'pet.lock.tiktok': 'Chain 3 skills in a row and TikTok joins you.',
+'pet.lock.tiktok': 'Chain 3 skills in a row and Ticktock joins you.',
 'pet.lock.kkultteok': 'Collect 30 gear fruits and Honeybee joins you.',
 'pet.lock.bangul': 'Beat the stage-40 boss and Bubbly joins you.',
 'pet.lock.sseokssak': 'Make 500 sum-10 matches in total and Sweepy joins you.',
@@ -3361,7 +3361,7 @@ ko: {
 'odds.rule.ten': '{n}회 뽑기에서 앞 칸이 모두 일반이면 마지막 칸은 희귀 이상이에요. 희귀 {r}, 영웅 {e}예요.',
 'odds.rule.pity': '영웅 없이 {n}회를 뽑으면 다음 한 번은 영웅이 확정이에요. 지금 {c}/{n}이에요.',
 'odds.rule.dup': '같은 장비가 또 나오면 레벨이 하나 올라요. 최고 레벨 {max}이면 코인으로 돌려받아요. 일반 {c}, 희귀 {r}, 영웅 {e}개예요.',
-'odds.rule.friend': '아직 없는 친구만 나와요. 등급 무게 일반 {c}, 희귀 {r}, 영웅 {e}를 남은 친구끼리 나눠요.',
+'odds.rule.friend': '아직 없는 친구만 나와요. 남은 친구끼리 등급 비율(일반 {c}, 희귀 {r}, 영웅 {e})로 확률을 나눠요.',
 'odds.skin.dup': '가진 스킨은 나오지 않아요.',
 'odds.foot1': '코인, 별, 광고 보상으로만 뽑아요. 현금으로 팔지 않아요.',
 'odds.foot2': '보이는 확률은 실제 추첨에 쓰는 표와 같은 값이에요. 소수점 아래는 반올림했어요. ({date} 기준)',
@@ -3805,7 +3805,7 @@ ko: {
 'rec.why.pudding': '기본 점수가 높아서 어떤 매치든 점수가 붙어요. 긴 판을 끝까지 끌고 가요.',
 'rec.why.sodawitch': '탄산 주문이 {sec}초 동안 모든 매치 점수를 {x}배로 올려 보스를 빠르게 깎아요.',
 'rec.why.atk.blk': '이 보스는 블로커를 자주 떨어뜨려요. 방울이의 거품 파도가 블로커를 2개씩 씻어 내요.',
-'rec.why.atk.freeze': '이 보스는 한 줄을 얼려요. 째깍이가 시간을 멈춘 동안에는 얼리기가 통하지 않아요.',
+'rec.why.atk.freeze': '이 보스는 한 열을 얼려요. 째깍이가 시간을 멈춘 동안에는 얼리기가 통하지 않아요.',
 'rec.why.atk.mask': '이 보스는 숫자를 가려요. 방울이의 거품 파도가 가려진 숫자를 한 번에 되돌려요.',
 'rec.why.atk.quake': '이 보스는 판을 흔들어요. 츄릅의 크게 한 입이 다음 흔들기를 한 번 막아 줘요.',
 'rec.why.atk.cycle': '이 보스는 네 가지 공격을 번갈아 써요. 째깍이가 시간을 멈추면 어떤 공격이 와도 대응할 틈이 생겨요.',
@@ -13046,8 +13046,10 @@ setCls(bsh, 'primed', gaugeFull() && !!S.skillKind);
 setHaloK(bh, duelSpPct() / 100);
 setHaloK(bu, 0);
 setHaloK(bsh, duelGaugePct() / 100);
+if (S.running && !d.down) {
 if (d.gFullWas === false && gFull) J.sfx.skillCharged();
 d.gFullWas = gFull;
+}
 setAppClass('skill-full', gFull);
 setActLabel(bh, 'act.special', 'aria.special');
 setActLabel(bu, 'act.pet', 'aria.pet');
@@ -18056,10 +18058,13 @@ if (b) b.classList.remove('grayed');
 openMap();
 });
 on($('adv-again'), 'click', function () {
+var n = parseInt(this.getAttribute('data-n'), 10) | 0;
+heartsTick();
+if (store.hearts <= 0) { openNodeCard(n < 1 ? 1 : n); return; }
 closeModal('modal-adv');
 var b = $('board');
 if (b) b.classList.remove('grayed');
-advStart(parseInt(this.getAttribute('data-n'), 10) | 0);
+advStart(n);
 });
 function pickTarget(ev, root) {
 var el = ev && ev.target;
