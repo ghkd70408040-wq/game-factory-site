@@ -1,6 +1,22 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<script>
+/* [Task 7e · 2026-10-21 — 최종 리뷰 M6] 가로 창으로 play.html 을 직접 연 사람(옛 링크 · 즐겨찾기 · 공유 링크)도 본체 창 전체 가로로.
+   첫 진입에서 맨 위 창이고 가로 창(창 가로 >= 세로)이면 tentwin.html 로 한 번 넘긴다. tentwin.html 머리 넘김과 같은 측정
+   (innerWidth · innerHeight) · 반대 조건이라 두 넘김이 방향으로 갈려 되풀이가 없다(tentwin.html 은 가로 창을 넘기지 않는다).
+   제외도 그 넘김과 같다: 파일명이 play.html 이 아님 · 프레임 안 · ?noshell=1 · ?platform=twa. 첫 진입만 — 판 도중 창을 돌려도
+   다시 읽지 않는다. 넘기는 동안은 아래 기둥 iframe 을 띄우지 않는다(__twLand). */
+(function(){try{
+  if(!/\/play\.html$/i.test(location.pathname))return;
+  if(window.self!==window.top)return;
+  var q=location.search;
+  if(/[?&](noshell=1|platform=twa)(&|$)/.test(q))return;
+  if(window.innerWidth<window.innerHeight)return;
+  window.__twLand=1;
+  location.replace('tentwin.html'+q+location.hash);
+}catch(e){}})();
+</script>
 <title>Ten Twin</title>
 <meta name="description" content="Ten Twin — match tiles that are equal or sum to 10.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='rgb(22,19,31)'/%3E%3Crect x='7' y='13' width='25' height='25' rx='6' fill='rgb(102,217,240)'/%3E%3Crect x='32' y='26' width='25' height='25' rx='6' fill='rgb(240,125,102)'/%3E%3C/svg%3E">
@@ -10,6 +26,11 @@ html,body{margin:0;height:100%;background:#191426;overflow:hidden}
 #bg{position:fixed;inset:-40px;background:url("catalog/art-menu-day-w.webp") center/cover no-repeat;filter:blur(18px) brightness(.72);z-index:0}
 #col{position:fixed;top:0;bottom:0;left:0;right:0;margin:0 auto;width:clamp(360px,56.25vh,480px);max-width:100vw;z-index:1;background:#000;box-shadow:0 0 0 1px rgba(255,255,255,.08),0 30px 80px rgba(0,0,0,.55)}
 #game{display:block;width:100%;height:100%;border:0}
+/* [Task 7g · 2026-10-22 사용자 답 「PC 는 가로 화면」] 가로 창(창 가로 >= 세로 — 게임 가로 절 (min-aspect-ratio: 1/1) 과 같은 조건)이면
+   기둥 폭 제한 · 흐린 배경을 끈다 → 게임 iframe 이 창 전체 → 게임이 PC 가로 화면을 그린다. 포털(itch · CrazyGames zip 의 index.html =
+   이 껍데기) iframe 안에서도 같다 — 맨 위 창 넘김(머리 스크립트)과 아래 iframe 띄우기 · 검색어 전달은 그대로. 세로 창은 한 줄도 안 바뀐다.
+   CSS 라 창 크기를 바꾸면 세로 ↔ 가로가 바로 따라간다. */
+@media (min-aspect-ratio:1/1){#col{width:auto}#bg{display:none}}
 </style></head>
 <body><div id="bg"></div><div id="col"><iframe id="game" title="Ten Twin" allow="autoplay; fullscreen; clipboard-write; web-share"></iframe></div>
 <script>
@@ -18,6 +39,7 @@ html,body{margin:0;height:100%;background:#191426;overflow:hidden}
    그저 안쪽 iframe 의 쿼리에 tw_shell=1 을 보태 "나는 세로 기둥 안에서
    돈다"는 사실만 알린다 — 기존 search·hash 전달은 그대로 유지한다. */
 (function(){
+  if(window.__twLand)return;   /* [Task 7e] 머리에서 tentwin.html 로 넘기는 중 — 기둥 iframe 을 띄우지 않는다 */
   var f=document.getElementById('game');
   var q = location.search ? (location.search+'&tw_shell=1') : '?tw_shell=1';
   f.src='tentwin.html'+q+location.hash;
